@@ -39,16 +39,16 @@ double PolynomialSolver::quadraticFunction(double a, double b, double c, double 
 std::vector<double> PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const
 {
-  if (std::abs(a) < tolerance) {
+  if (std::abs(a) <= tolerance) {
     THROW_SIMULATION_ERROR(
       "Not computable because any value of min_value~max_value will be the solution.");
   }
   double ret = -b / a;
   if (min_value <= ret && ret <= max_value) {
     return {ret};
-  } else if (std::abs(ret - max_value) < tolerance) {
+  } else if (std::abs(ret - max_value) <= tolerance) {
     return {max_value};
-  } else if (std::abs(ret - min_value) < tolerance) {
+  } else if (std::abs(ret - min_value) <= tolerance) {
     return {min_value};
   }
   return {};
@@ -58,11 +58,11 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const
 {
   std::vector<double> candidates, ret;
-  if (std::abs(a) < tolerance) {
+  if (std::abs(a) <= tolerance) {
     return solveLinearEquation(b, c);
   }
   double root = b * b - 4 * a * c;
-  if (std::abs(root) < tolerance) {
+  if (std::abs(root) <= tolerance) {
     candidates = {-b / (2 * a)};
   } else if (root < 0) {
     candidates = {};
@@ -72,9 +72,9 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
       ret.push_back(candidate);
-    } else if (std::abs(candidate - max_value) < tolerance) {
+    } else if (std::abs(candidate - max_value) <= tolerance) {
       ret.push_back(max_value);
-    } else if (std::abs(candidate - min_value) < tolerance) {
+    } else if (std::abs(candidate - min_value) <= tolerance) {
       ret.push_back(min_value);
     }
   }
@@ -84,7 +84,7 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
 std::vector<double> PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
 {
-  if (std::abs(a) < tolerance) {
+  if (std::abs(a) <= tolerance) {
     return solveQuadraticEquation(b, c, d);
   }
   std::vector<double> solutions, candidates, ret;
@@ -99,9 +99,9 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
       ret.push_back(candidate);
-    } else if (std::abs(candidate - max_value) < tolerance) {
+    } else if (std::abs(candidate - max_value) <= tolerance) {
       ret.push_back(max_value);
-    } else if (std::abs(candidate - min_value) < tolerance) {
+    } else if (std::abs(candidate - min_value) <= tolerance) {
       ret.push_back(min_value);
     }
   }
@@ -134,8 +134,7 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
     x[2] = q * cos((t - M_PI * 2) / 3) - a;
     return 3;
   } else {
-    // A =-pow(fabs(r)+sqrt(r2-q3),1./3);
-    A = -root3(fabs(r) + sqrt(r2 - q3));
+    A = -root3(std::abs(r) + sqrt(r2 - q3));
     if (r < 0) {
       A = -A;
     }
@@ -148,7 +147,7 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
     x[0] = (A + B) - a;
     x[1] = -0.5 * (A + B) - a;
     x[2] = 0.5 * sqrt(3.) * (A - B);
-    if (fabs(x[2]) < tolerance) {
+    if (std::abs(x[2]) <= tolerance) {
       x[2] = x[1];
       return 2;
     }

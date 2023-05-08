@@ -18,6 +18,8 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
+constexpr double epsilon = std::numeric_limits<double>::epsilon();
+
 bool checkValueWithTolerance(double value, double expected, double tolerance)
 {
   if (tolerance < 0) {
@@ -55,44 +57,46 @@ TEST(PolynomialSolverTest, QuadraticFunction)
   math::geometry::PolynomialSolver solver;
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 0, 2), 6);
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(0, 0, 0, 2), 0);
+  EXPECT_THROW(solver.quadraticFunction(0, 0, 0, 2), common::SimulationError);
 }
 
+// Testcase for ax^2+bx+c = 0
 TEST(PolynomialSolverTest, SolveQuadraticEquation)
 {
   math::geometry::PolynomialSolver solver;
-  for (int a = -20; a < 20; a = a + 1) {
-    for (int b = -20; b < 20; b = b + 1) {
-      for (int c = -20; c < 20; c = c + 1) {
-        auto ret = solver.solveQuadraticEquation(
-          static_cast<double>(a), static_cast<double>(b), static_cast<double>(c), 0, 1);
-        for (const auto & solution : ret) {
-          EXPECT_TRUE(checkValueWithTolerance(
-            solver.quadraticFunction(
-              static_cast<double>(a), static_cast<double>(b), static_cast<double>(c), solution),
-            0.0, 1e-10));
+  for (double a = -20; a < 20; a = a + 1) {
+    for (double b = -20; b < 20; b = b + 1) {
+      for (double c = -20; c < 20; c = c + 1) {
+        if (std::abs(a) <= epsilon && std::abs(b) <= epsilon) {
+          EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
+        } else {
+          auto ret = solver.solveQuadraticEquation(a, b, c, 0, 1);
+          for (const auto & solution : ret) {
+            EXPECT_TRUE(
+              checkValueWithTolerance(solver.quadraticFunction(a, b, c, solution), 0.0, 1e-10));
+          }
         }
       }
     }
   }
 }
 
+// Testcase for ax^3+bx^2+cx+d = 0
 TEST(PolynomialSolverTest, SolveCubicEquation)
 {
   math::geometry::PolynomialSolver solver;
-  for (int a = -10; a < 10; a = a + 1) {
-    for (int b = -10; b < 10; b = b + 1) {
-      for (int c = -10; c < 10; c = c + 1) {
-        for (int d = -10; d < 10; d = d + 1) {
-          auto ret = solver.solveCubicEquation(
-            static_cast<double>(a), static_cast<double>(b), static_cast<double>(c),
-            static_cast<double>(d), 0, 1);
-          for (const auto & solution : ret) {
-            EXPECT_TRUE(checkValueWithTolerance(
-              solver.cubicFunction(
-                static_cast<double>(a), static_cast<double>(b), static_cast<double>(c),
-                static_cast<double>(d), solution),
-              0.0, 1e-10));
+  for (double a = -10; a < 10; a = a + 1) {
+    for (double b = -10; b < 10; b = b + 1) {
+      for (double c = -10; c < 10; c = c + 1) {
+        for (double d = -10; d < 10; d = d + 1) {
+          if (std::abs(a) <= epsilon && std::abs(b) <= epsilon && std::abs(c) <= epsilon) {
+            EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
+          } else {
+            auto ret = solver.solveCubicEquation(a, b, c, d, 0, 1);
+            for (const auto & solution : ret) {
+              EXPECT_TRUE(
+                checkValueWithTolerance(solver.cubicFunction(a, b, c, d, solution), 0.0, 1e-10));
+            }
           }
         }
       }
