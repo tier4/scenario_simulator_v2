@@ -1,10 +1,10 @@
 # Build Instructions
 
-This setup instruction is based on ROS2-galactic.
+This setup instruction is based on ROS 2 galactic.
 
 ## Setup ROS 2 environment
 
-This framework only supports ROS 2 Galactic Geochelone now. (We are planning to support ROS2 Humble Hawksbill)  
+This framework only supports ROS 2 Galactic Geochelone now. (We are planning to support ROS 2 Humble Hawksbill)  
 You can install Galactic by executing the command below in your terminal.
 
 ```bash

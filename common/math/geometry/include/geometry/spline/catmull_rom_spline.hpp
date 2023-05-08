@@ -42,7 +42,7 @@ public:
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution, double offset = 0.0) const;
   std::optional<double> getSValue(
-    const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0);
+    const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0) const;
   double getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, double s) const;
   geometry_msgs::msg::Vector3 getSquaredDistanceVector(
     const geometry_msgs::msg::Point & point, double s) const;

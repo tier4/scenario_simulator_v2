@@ -5,7 +5,7 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
 ## Prerequisites 
 
 1. Ubuntu 20.04 machine
-3. ROS2 Galactic Geochelone desktop version [installed](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
+3. ROS 2 Galactic Geochelone desktop version [installed](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
 
 ## How to build
 
