@@ -86,7 +86,7 @@ public:
 
   /**
    * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver
-   * This value was determined by @hakuturu583.
+   * This value was determined by Masaya Kataoka (@hakuturu583).
    * The reason this value is not std::numeric_limits<double>::epsilon is that when using 
    * this set of functions to find the intersection of a Catmull-Rom Spline curve and a line segment, 
    * the solution is not a Catmull-Rom Spline, it was confirmed that in cases where the solution is 
