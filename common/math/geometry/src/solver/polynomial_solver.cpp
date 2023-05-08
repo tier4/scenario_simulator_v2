@@ -41,7 +41,7 @@ std::vector<double> PolynomialSolver::solveLinearEquation(
 {
   if (std::abs(a) <= tolerance) {
     THROW_SIMULATION_ERROR(
-      "Not computable because a=0 in the linear equation ax+b=0 "
+      "Not computable because a=0 in the linear equation ax+b=0, "
       "so any value of x = ",
       min_value, "~", max_value, " will be the solution.",
       "There are no expected cases where this exception is thrown.",
