@@ -17,6 +17,7 @@
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <vector>
 
 namespace math
@@ -39,12 +40,8 @@ std::vector<double> PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const
 {
   if (std::abs(a) < tolerance) {
-    if (std::abs(b) < tolerance) {
-      if (min_value <= 0 && 0 <= max_value) {
-        return {0};
-      }
-    }
-    return {};
+    THROW_SIMULATION_ERROR(
+      "Not computable because any value of min_value~max_value will be the solution.");
   }
   double ret = -b / a;
   if (min_value <= ret && ret <= max_value) {
@@ -54,7 +51,6 @@ std::vector<double> PolynomialSolver::solveLinearEquation(
   } else if (std::abs(ret - min_value) < tolerance) {
     return {min_value};
   }
-
   return {};
 }
 
