@@ -69,7 +69,8 @@ auto FollowTrajectoryAction::start() -> void
       };
 
       applyFollowTrajectoryAction(
-        actor, traffic_simulator::follow_trajectory::Parameter(
+        actor, std::make_shared<traffic_simulator::follow_trajectory::Parameter<
+                 traffic_simulator::follow_trajectory::Polyline>>(
                  initial_distance_offset,
                  trajectory_following_mode.following_mode == FollowingMode::position,
                  trajectory_ref.trajectory.as<Trajectory>().closed, polyline()));

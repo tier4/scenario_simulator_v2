@@ -27,7 +27,7 @@ namespace follow_trajectory
 struct Vertex
 {
   /*
-     absolute SimulationTime. The OpenSCENARIO interpreter is responsible for
+     Absolute SimulationTime. The OpenSCENARIO interpreter is responsible for
      setting the proper time.
   */
   std::optional<double> time;

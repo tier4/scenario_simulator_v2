@@ -635,7 +635,7 @@ void EntityBase::requestSpeedChange(
 }
 
 auto EntityBase::requestFollowTrajectory(
-  const follow_trajectory::Parameter<follow_trajectory::Polyline> &) -> void
+  const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &) -> void
 {
 }
 

@@ -31,7 +31,7 @@ auto FollowPolylineTrajectoryAction::calculateWaypoints()
 
   auto && waypoints = traffic_simulator_msgs::msg::WaypointsArray();
 
-  for (auto && vertex : parameter.shape.vertices) {
+  for (auto && vertex : parameter->shape.vertices) {
     auto && point = geometry_msgs::msg::Point();
     point.x = vertex.position.position.x;
     point.y = vertex.position.position.y;
@@ -182,32 +182,28 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       if (
         getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) and
         getInput<decltype(target_speed)>("target_speed", target_speed) and
-        not parameter.shape.vertices.empty()) {
-        // PRINT(parameter.initial_distance_offset);
-        // PRINT(parameter.dynamic_constraints_ignorable);
-        // PRINT(parameter.closed);
+        not parameter->shape.vertices.empty()) {
+        // PRINT(parameter->initial_distance_offset);
+        // PRINT(parameter->dynamic_constraints_ignorable);
+        // PRINT(parameter->closed);
 
-        auto waypoints_exhausted = [&]() {
-          return parameter.shape.vertices.size() <= current_waypoint_index;
-        };
+        auto waypoints_exhausted = [&]() { return parameter->shape.vertices.empty(); };
 
         auto pop_current_waypoint = [&]() {
-          ++current_waypoint_index;
-          if (waypoints_exhausted() and parameter.closed) {
-            current_waypoint_index = 0;
+          if (std::rotate(
+                std::begin(parameter->shape.vertices), std::begin(parameter->shape.vertices) + 1,
+                std::end(parameter->shape.vertices));
+              not parameter->closed) {
+            parameter->shape.vertices.pop_back();
           }
         };
 
-        auto discard_current_waypoint = pop_current_waypoint;
-
-        auto current_waypoint = [&]() {
-          return parameter.shape.vertices.at(current_waypoint_index);
-        };
+        auto current_waypoint = [&]() { return parameter->shape.vertices.front(); };
 
         auto remain_time = [&]() {
           // TODO std::find_first_of => iter != std::end => return *iter, else infinity
-          if (parameter.shape.vertices.at(current_waypoint_index).time) {
-            return *parameter.shape.vertices.at(current_waypoint_index).time - entity_status.time;
+          if (parameter->shape.vertices.front().time) {
+            return *parameter->shape.vertices.front().time - entity_status.time;
           } else {
             return std::numeric_limits<double>::infinity();
           }
@@ -236,8 +232,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         auto adjust = [&](auto suggested_speed) {
           std::cout << std::string(80, '-') << std::endl;
 
-          std::cout << "waypoint " << current_waypoint_index + 1 << "/"
-                    << parameter.shape.vertices.size() << std::endl;
+          std::cout << "waypoint 1/" << parameter->shape.vertices.size() << std::endl;
 
           if (current_waypoint().time) {
             const auto distance_to_next_waypoint =
@@ -294,11 +289,11 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
         if (remain_time() <= step_time) {
           std::cout << "TIME OVER!!!" << std::endl;
-          if (parameter.dynamic_constraints_ignorable) {
+          if (parameter->dynamic_constraints_ignorable) {
             std::cout << "TELEPORT!" << std::endl;
             throw std::runtime_error("TELEPORT!");
           } else {
-            discard_current_waypoint();
+            pop_current_waypoint();
           }
         }
 

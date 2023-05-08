@@ -23,8 +23,8 @@ namespace vehicle
 {
 struct FollowPolylineTrajectoryAction : public VehicleActionNode
 {
-  using Parameter =
-    traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Polyline>;
+  using Parameter = std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<
+    traffic_simulator::follow_trajectory::Polyline>>;
 
   Parameter parameter;
 
@@ -33,8 +33,6 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
   geometry_msgs::msg::Vector3 velocity;  // world coordinate
 
   geometry_msgs::msg::Vector3 direction;  // world coordinate
-
-  std::size_t current_waypoint_index = 0;
 
   using VehicleActionNode::VehicleActionNode;
 
