@@ -122,7 +122,7 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
   double r2 = r * r;
   double q3 = q * q * q;
   double A, B;
-  if (r2 <= (q3 + tolerance)) {  //<<-- FIXED!
+  if (r2 <= (q3 + tolerance)) {
     double t = r / sqrt(q3);
     if (t < -1) {
       t = -1;
