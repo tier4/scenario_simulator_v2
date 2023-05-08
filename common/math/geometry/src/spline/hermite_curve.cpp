@@ -141,7 +141,7 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
       return solver_.solveCubicEquation(a, b, c, d);
     }
     /**
-    * @note PolynomialSolver::solveCubicEquation throws comon::SimulationError when any x value can satisfy the equation, 
+    * @note PolynomialSolver::solveCubicEquation throws common::SimulationError when any x value can satisfy the equation, 
     * so the beginning and end point of this curve can collide with the line segment.
     */
     catch (const common::SimulationError &) {
