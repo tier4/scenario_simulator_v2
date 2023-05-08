@@ -85,7 +85,7 @@ public:
   double linearFunction(double a, double b, double t) const;
 
   /**
-   * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver
+   * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver.
    * This value was determined by Masaya Kataoka (@hakuturu583).
    * The reason this value is not std::numeric_limits<double>::epsilon is that when using 
    * this set of functions to find the intersection of a Catmull-Rom spline curve and a line segment, 
