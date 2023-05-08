@@ -134,7 +134,20 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
   double b = by_ * ex - bx_ * ey;
   double c = cy_ * ex - cx_ * ey;
   double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
-  auto solutions = solver_.solveCubicEquation(a, b, c, d);
+
+  const auto get_solutions = [search_backward]() {
+    try {
+      auto solutions = solver_.solveCubicEquation(a, b, c, d);
+    }
+    /**
+    * @note PolynomialSolver::solveCubicEquation throws comon::SimulationError when any x value can satisfy the equation, 
+    * so the beginning and end point of this curve can collide with the line segment.
+    */
+    catch (common::SimulationError) {
+      return search_backward : 1.0 ? 0.0;
+    }
+  };
+
   for (const auto solution : solutions) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
     double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);

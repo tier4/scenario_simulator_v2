@@ -40,14 +40,21 @@ std::vector<double> PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const
 {
   if (std::abs(a) <= tolerance) {
-    THROW_SIMULATION_ERROR(
-      "Not computable because a=0 in the linear equation ", a, " x + ", b,
-      "=0, "
-      "so any value of x = ",
-      min_value, "~", max_value, " will be the solution.",
-      "There are no expected cases where this exception is thrown.",
-      "Please contact the scenario_simulator_v2 developers, ",
-      "especially Masaya Kataoka (@hakuturu583).");
+    if (std::abs(b) <= tolerance) {
+      THROW_SIMULATION_ERROR(
+        "Not computable because a=0 in the linear equation ", a, " x + ", b,
+        "=0, "
+        "so any value of x = ",
+        min_value, "~", max_value, " will be the solution.",
+        "There are no expected cases where this exception is thrown.",
+        "Please contact the scenario_simulator_v2 developers, ",
+        "especially Masaya Kataoka (@hakuturu583).");
+    } else {
+      /**
+       * @note In this case, ax*b = 0 (a=0, b≠0) so any x cannot satisfy this equation.
+       */
+      return {};
+    }
   }
   double ret = -b / a;
   if (min_value <= ret && ret <= max_value) {
