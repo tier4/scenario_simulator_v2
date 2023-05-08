@@ -75,11 +75,11 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   }
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
-      ret.emplace_back(candidate);
+      ret.push_back(candidate);
     } else if (std::abs(candidate - max_value) < tolerance) {
-      ret.emplace_back(max_value);
+      ret.push_back(max_value);
     } else if (std::abs(candidate - min_value) < tolerance) {
-      ret.emplace_back(min_value);
+      ret.push_back(min_value);
     }
   }
   return ret;
@@ -102,11 +102,11 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
   }
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
-      ret.emplace_back(candidate);
+      ret.push_back(candidate);
     } else if (std::abs(candidate - max_value) < tolerance) {
-      ret.emplace_back(max_value);
+      ret.push_back(max_value);
     } else if (std::abs(candidate - min_value) < tolerance) {
-      ret.emplace_back(min_value);
+      ret.push_back(min_value);
     }
   }
   return ret;
