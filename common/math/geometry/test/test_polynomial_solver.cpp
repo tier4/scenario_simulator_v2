@@ -48,7 +48,9 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
   math::geometry::PolynomialSolver solver;
   for (double a = -20; a < 20; a = a + 0.1) {
     for (double b = -20; b < 20; b = b + 0.1) {
-      if (std::abs(a) <= math::geometry::PolynomialSolver::tolerance) {
+      if (
+        std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
+        std::abs(b) <= math::geometry::PolynomialSolver::tolerance) {
         EXPECT_THROW(solver.solveLinearEquation(a, b, 0, 1), common::SimulationError);
       } else {
         auto ret = solver.solveLinearEquation(a, b, 0, 1);
@@ -82,7 +84,8 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
       for (double c = -20; c < 20; c = c + 1) {
         if (
           std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
-          std::abs(b) <= math::geometry::PolynomialSolver::tolerance) {
+          std::abs(b) <= math::geometry::PolynomialSolver::tolerance &&
+          std::abs(c) <= math::geometry::PolynomialSolver::tolerance) {
           EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
         } else {
           auto ret = solver.solveQuadraticEquation(a, b, c, 0, 1);
@@ -109,7 +112,8 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
           if (
             std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
             std::abs(b) <= math::geometry::PolynomialSolver::tolerance &&
-            std::abs(c) <= math::geometry::PolynomialSolver::tolerance) {
+            std::abs(c) <= math::geometry::PolynomialSolver::tolerance &&
+            std::abs(d) <= math::geometry::PolynomialSolver::tolerance) {
             EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
           } else {
             auto ret = solver.solveCubicEquation(a, b, c, d, 0, 1);

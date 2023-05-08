@@ -20,6 +20,7 @@
 #include <limits>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <vector>
 
 namespace math
@@ -135,20 +136,20 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
   double c = cy_ * ex - cx_ * ey;
   double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
 
-  const auto get_solutions = [search_backward]() {
+  const auto get_solutions = [search_backward, a, b, c, d, this]() -> std::vector<double> {
     try {
-      auto solutions = solver_.solveCubicEquation(a, b, c, d);
+      return solver_.solveCubicEquation(a, b, c, d);
     }
     /**
     * @note PolynomialSolver::solveCubicEquation throws comon::SimulationError when any x value can satisfy the equation, 
     * so the beginning and end point of this curve can collide with the line segment.
     */
-    catch (common::SimulationError) {
-      return search_backward : 1.0 ? 0.0;
+    catch (const common::SimulationError &) {
+      return {search_backward ? 1.0 : 0.0};
     }
   };
 
-  for (const auto solution : solutions) {
+  for (const auto solution : get_solutions()) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
     double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
     double tx = (x - point0.x) / (point1.x - point0.x);
