@@ -50,9 +50,13 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
   math::geometry::PolynomialSolver solver;
   for (double a = -20; a < 20; a = a + 0.1) {
     for (double b = -20; b < 20; b = b + 0.1) {
-      auto ret = solver.solveLinearEquation(a, b, 0, 1);
-      for (const auto & solution : ret) {
-        EXPECT_TRUE(checkValueWithTolerance(solver.linearFunction(a, b, solution), 0.0, 1e-10));
+      if (std::abs(a) <= epsilon) {
+        EXPECT_THROW(solver.solveLinearEquation(a, b, 0, 1), common::SimulationError);
+      } else {
+        auto ret = solver.solveLinearEquation(a, b, 0, 1);
+        for (const auto & solution : ret) {
+          EXPECT_TRUE(checkValueWithTolerance(solver.linearFunction(a, b, solution), 0.0, 1e-10));
+        }
       }
     }
   }
@@ -66,7 +70,7 @@ TEST(PolynomialSolverTest, QuadraticFunction)
   math::geometry::PolynomialSolver solver;
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 0, 2), 6);
-  EXPECT_THROW(solver.quadraticFunction(0, 0, 0, 2), common::SimulationError);
+  EXPECT_DOUBLE_EQ(solver.quadraticFunction(0, 0, 0, 2), 0);
 }
 
 /**
