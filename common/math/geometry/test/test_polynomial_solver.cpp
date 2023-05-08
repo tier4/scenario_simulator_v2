@@ -31,6 +31,9 @@ bool checkValueWithTolerance(double value, double expected, double tolerance)
   return false;
 }
 
+/**
+ * @note Testcase for ax+b = 0
+ */
 TEST(PolynomialSolverTest, LinearFunction)
 {
   math::geometry::PolynomialSolver solver;
@@ -39,6 +42,9 @@ TEST(PolynomialSolverTest, LinearFunction)
   EXPECT_DOUBLE_EQ(solver.linearFunction(0, 0, 2), 0);
 }
 
+/**
+ * @note Testcase for ax+b = 0
+ */
 TEST(PolynomialSolverTest, SolveLinearEquation)
 {
   math::geometry::PolynomialSolver solver;
@@ -52,6 +58,9 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
   }
 }
 
+/**
+ * @note Testcase for ax^2+bx+c = 0
+ */
 TEST(PolynomialSolverTest, QuadraticFunction)
 {
   math::geometry::PolynomialSolver solver;
@@ -60,7 +69,9 @@ TEST(PolynomialSolverTest, QuadraticFunction)
   EXPECT_THROW(solver.quadraticFunction(0, 0, 0, 2), common::SimulationError);
 }
 
-// Testcase for ax^2+bx+c = 0
+/**
+ * @note Testcase for ax^3+bx^2+cx+d = 0
+ */
 TEST(PolynomialSolverTest, SolveQuadraticEquation)
 {
   math::geometry::PolynomialSolver solver;
@@ -81,7 +92,9 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
   }
 }
 
-// Testcase for ax^3+bx^2+cx+d = 0
+/**
+ * @note Testcase for ax^3+bx^2+cx+d = 0
+ */
 TEST(PolynomialSolverTest, SolveCubicEquation)
 {
   math::geometry::PolynomialSolver solver;
