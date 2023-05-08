@@ -88,9 +88,9 @@ public:
    * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver
    * This value was determined by Masaya Kataoka (@hakuturu583).
    * The reason this value is not std::numeric_limits<double>::epsilon is that when using 
-   * this set of functions to find the intersection of a Catmull-Rom Spline curve and a line segment, 
-   * the solution is not a Catmull-Rom Spline, it was confirmed that in cases where the solution is 
-   * very close to the endpoints of the Hermite curves that make up the Catmull-Rom Spline, 
+   * this set of functions to find the intersection of a Catmull-Rom spline curve and a line segment, 
+   * the solution is not a Catmull-Rom spline, it was confirmed that in cases where the solution is 
+   * very close to the endpoints of the Hermite curves that make up the Catmull-Rom spline, 
    * the solution will no longer be obtained.
    */
   constexpr static double tolerance = 1e-7;
