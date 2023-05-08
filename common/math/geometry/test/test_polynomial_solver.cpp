@@ -18,8 +18,6 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-constexpr double epsilon = std::numeric_limits<double>::epsilon();
-
 bool checkValueWithTolerance(double value, double expected, double tolerance)
 {
   if (tolerance < 0) {
@@ -50,7 +48,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
   math::geometry::PolynomialSolver solver;
   for (double a = -20; a < 20; a = a + 0.1) {
     for (double b = -20; b < 20; b = b + 0.1) {
-      if (std::abs(a) <= epsilon) {
+      if (std::abs(a) <= math::geometry::PolynomialSolver::tolerance) {
         EXPECT_THROW(solver.solveLinearEquation(a, b, 0, 1), common::SimulationError);
       } else {
         auto ret = solver.solveLinearEquation(a, b, 0, 1);
@@ -82,7 +80,9 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
   for (double a = -20; a < 20; a = a + 1) {
     for (double b = -20; b < 20; b = b + 1) {
       for (double c = -20; c < 20; c = c + 1) {
-        if (std::abs(a) <= epsilon && std::abs(b) <= epsilon) {
+        if (
+          std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
+          std::abs(b) <= math::geometry::PolynomialSolver::tolerance) {
           EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
         } else {
           auto ret = solver.solveQuadraticEquation(a, b, c, 0, 1);
@@ -106,7 +106,10 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
     for (double b = -10; b < 10; b = b + 1) {
       for (double c = -10; c < 10; c = c + 1) {
         for (double d = -10; d < 10; d = d + 1) {
-          if (std::abs(a) <= epsilon && std::abs(b) <= epsilon && std::abs(c) <= epsilon) {
+          if (
+            std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
+            std::abs(b) <= math::geometry::PolynomialSolver::tolerance &&
+            std::abs(c) <= math::geometry::PolynomialSolver::tolerance) {
             EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
           } else {
             auto ret = solver.solveCubicEquation(a, b, c, d, 0, 1);
