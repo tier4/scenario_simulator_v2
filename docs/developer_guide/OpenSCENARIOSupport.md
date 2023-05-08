@@ -121,11 +121,12 @@ Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh` co
 
 #### Built-in commands
 
-| Name               | Effect                                                   |
-|:-------------------|:---------------------------------------------------------|
-| exitSuccess        | Immediately terminates the simulation as successful.     |
-| exitFailure        | Immediately terminates the simulation as a failure.      |
-| WalkStraightAction | Make a **pedestrian** NPC walk straight without a target |
+| Name                        | Effect                                                   |
+|:----------------------------|:---------------------------------------------------------|
+| exitSuccess                 | Immediately terminates the simulation as successful.     |
+| exitFailure                 | Immediately terminates the simulation as a failure.      |
+| WalkStraightAction          | Make a **pedestrian** NPC walk straight without a target |
+| V2ITrafficSignalStateAction | `TrafficSignalStateAction` for V2I traffic signals       |
 
 These built-in commands force the simulation to terminate.
 This termination ignores the StoryboardElement's lifecycle transition (that is, it means that `StoryboardElementStateCondition` cannot be used to prevent or detect the execution of this command).
