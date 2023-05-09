@@ -87,24 +87,24 @@ public:
 
   auto getTrafficLights() -> auto & { return traffic_lights_; }
 
-  auto getTrafficRelationReferees(const LaneletID lanelet_id)
+  auto getTrafficLights(const LaneletID lanelet_id)
     -> std::vector<std::reference_wrapper<TrafficLight>>
   {
-    std::vector<std::reference_wrapper<TrafficLight>> refers;
+    std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
 
     if (hdmap_->isTrafficRelation(lanelet_id)) {
       for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
-        refers.emplace_back(getTrafficLight(traffic_light.id()));
+        traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
       }
     } else if (hdmap_->isTrafficLight(lanelet_id)) {
-      refers.emplace_back(getTrafficLight(lanelet_id));
+      traffic_lights.emplace_back(getTrafficLight(lanelet_id));
     } else {
       throw common::scenario_simulator_exception::Error(
         "Given lanelet ID ", lanelet_id,
         " is neither a traffic light ID not a traffic relation ID.");
     }
 
-    return refers;
+    return traffic_lights;
   }
 
   auto hasAnyLightChanged() -> bool;
