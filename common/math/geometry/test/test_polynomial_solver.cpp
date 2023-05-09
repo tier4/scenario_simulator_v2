@@ -134,7 +134,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
             std::abs(b) <= math::geometry::PolynomialSolver::tolerance &&
             std::abs(c) <= math::geometry::PolynomialSolver::tolerance &&
             std::abs(d) <= math::geometry::PolynomialSolver::tolerance) {
-            EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
+            EXPECT_THROW(solver.solveCubicEquation(a, b, c, d, 0, 1), common::SimulationError);
           }
           /**
            * @note Other cases, solver must be able to obtain an exact solution.
