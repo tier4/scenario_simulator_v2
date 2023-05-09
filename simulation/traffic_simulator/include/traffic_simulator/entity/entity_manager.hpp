@@ -43,7 +43,8 @@
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/traffic_lights/conventional_traffic_light_manager.hpp>
+#include <traffic_simulator/traffic_lights/v2i_traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -100,7 +101,9 @@ class EntityManager
 
   MarkerArray markers_raw_;
 
-  const std::shared_ptr<TrafficLightManagerBase> traffic_light_manager_ptr_;
+  const std::shared_ptr<TrafficLightManagerBase> conventional_traffic_light_manager_ptr_;
+
+  const std::shared_ptr<TrafficLightManagerBase> v2i_traffic_light_manager_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -124,17 +127,34 @@ public:
   }
 
   template <typename... Ts>
-  auto makeTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
+  auto makeConventionalTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
   {
     const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
 
     if (architecture_type == "awf/universe") {
       return std::make_shared<
-        TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
+        ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
-        "Unexpected architecture_type ", std::quoted(architecture_type), " given.");
+        "Unexpected architecture_type ", std::quoted(architecture_type),
+        " given for normal traffic lights simulation.");
+    }
+  }
+
+  template <typename... Ts>
+  auto makeV2ITrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
+  {
+    const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
+
+    if (architecture_type == "awf/universe") {
+      return std::make_shared<
+        V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
+        std::forward<decltype(xs)>(xs)...);
+    } else {
+      throw common::SemanticError(
+        "Unexpected architecture_type ", std::quoted(architecture_type),
+        " given for V2I traffic lights simulation.");
     }
   }
 
@@ -156,30 +176,55 @@ public:
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    traffic_light_manager_ptr_(makeTrafficLightManager(hdmap_utils_ptr_, node))
+    conventional_traffic_light_manager_ptr_(
+      makeConventionalTrafficLightManager(hdmap_utils_ptr_, node)),
+    v2i_traffic_light_manager_ptr_(makeV2ITrafficLightManager(hdmap_utils_ptr_, node))
   {
     updateHdmapMarker();
   }
 
   ~EntityManager() = default;
 
+private:
+  struct TrafficLightManager
+  {
+    std::shared_ptr<TrafficLightManagerBase> conventional_traffic_light_manager_ptr_;
+    std::shared_ptr<TrafficLightManagerBase> v2i_traffic_light_manager_ptr_;
+  } traffic_light_manager;
+
 public:
-  template <typename... Ts>
-  auto getTrafficLight(Ts &&... xs) const -> decltype(auto)
-  {
-    return traffic_light_manager_ptr_->getTrafficLight(std::forward<decltype(xs)>(xs)...);
+#define FORWARD_TO_TRAFFIC_LIGHT_MANAGER(NAME, ...)                                       \
+  switch (type) {                                                                         \
+    case TrafficLightType::conventional:                                                  \
+      return conventional_traffic_light_manager_ptr_->NAME(__VA_ARGS__);                  \
+    case TrafficLightType::v2i:                                                           \
+      return v2i_traffic_light_manager_ptr_->NAME(__VA_ARGS__);                           \
+    default:                                                                              \
+      throw std::runtime_error(                                                           \
+        "Unexpected type of TrafficLight was going to be used. Wrong signal type may be " \
+        "specified in the scenario.");                                                    \
   }
 
-  auto getTrafficLights() const -> decltype(auto)
+  template <typename... Ts>
+  auto getTrafficLight(
+    const std::int64_t lanelet_id,
+    const TrafficLightType type = TrafficLightType::conventional) const -> decltype(auto)
   {
-    return traffic_light_manager_ptr_->getTrafficLights();
+    FORWARD_TO_TRAFFIC_LIGHT_MANAGER(getTrafficLight, lanelet_id);
+  }
+
+  auto getTrafficLights(const TrafficLightType type = TrafficLightType::conventional) const
+    -> decltype(auto)
+  {
+    FORWARD_TO_TRAFFIC_LIGHT_MANAGER(getTrafficLights);
   }
 
   template <typename... Ts>
-  auto getTrafficRelationReferees(Ts &&... xs) const -> decltype(auto)
+  auto getTrafficRelationReferees(
+    const std::int64_t lanelet_id,
+    const TrafficLightType type = TrafficLightType::conventional) const -> decltype(auto)
   {
-    return traffic_light_manager_ptr_->getTrafficRelationReferees(
-      std::forward<decltype(xs)>(xs)...);
+    FORWARD_TO_TRAFFIC_LIGHT_MANAGER(getTrafficRelationReferees, lanelet_id);
   }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
@@ -439,7 +484,8 @@ public:
                   name, makeEntityStatus(), parameters, std::forward<decltype(xs)>(xs)...));
         success) {
       iter->second->setHdMapUtils(hdmap_utils_ptr_);
-      iter->second->setTrafficLightManager(traffic_light_manager_ptr_);
+      // FIXME: this ignores V2I traffic lights
+      iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
       if (npc_logic_started_ && not isEgo(name)) {
         iter->second->startNpcLogic();
       }
