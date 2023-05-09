@@ -13,7 +13,10 @@
     "DBUILD",
     "DWITH_INTEGRATION_TEST",
     "engageable",
+    "hakuturu",
+    "Kataoka",
     "libunwind",
+    "Masaya",
     "npcs",
     "okta",
     "oktas",
@@ -27,6 +30,7 @@
     "randomizers",
     "subspline",
     "TESTRANDOMIZER",
-    "travelling"
+    "travelling",
+    "Tschirnhaus"
   ]
 }

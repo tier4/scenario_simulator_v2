@@ -17,6 +17,7 @@
 #include <iostream>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <vector>
 
 namespace math
@@ -38,23 +39,34 @@ double PolynomialSolver::quadraticFunction(double a, double b, double c, double 
 std::vector<double> PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const
 {
-  if (std::abs(a) < tolerance) {
-    if (std::abs(b) < tolerance) {
-      if (min_value <= 0 && 0 <= max_value) {
-        return {0};
-      }
+  /**
+   * @note In this case, ax*b = 0 (a=0) can cause division by zero.
+   * So give special treatment to this case.
+   */
+  if (std::abs(a) <= tolerance) {
+    if (std::abs(b) <= tolerance) {
+      THROW_SIMULATION_ERROR(
+        "Not computable because a=0 in the linear equation ", a, " x + ", b,
+        "=0, "
+        "so any value of x = ",
+        min_value, "~", max_value, " will be the solution.",
+        "There are no expected cases where this exception is thrown.",
+        "Please contact the scenario_simulator_v2 developers, ",
+        "especially Masaya Kataoka (@hakuturu583).");
     }
+    /**
+     * @note In this case, ax*b = 0 (a=0, b≠0) so any x cannot satisfy this equation.
+     */
     return {};
   }
   double ret = -b / a;
   if (min_value <= ret && ret <= max_value) {
     return {ret};
-  } else if (std::abs(ret - max_value) < tolerance) {
+  } else if (std::abs(ret - max_value) <= tolerance) {
     return {max_value};
-  } else if (std::abs(ret - min_value) < tolerance) {
+  } else if (std::abs(ret - min_value) <= tolerance) {
     return {min_value};
   }
-
   return {};
 }
 
@@ -62,11 +74,11 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const
 {
   std::vector<double> candidates, ret;
-  if (std::abs(a) < tolerance) {
+  if (std::abs(a) <= tolerance) {
     return solveLinearEquation(b, c);
   }
   double root = b * b - 4 * a * c;
-  if (std::abs(root) < tolerance) {
+  if (std::abs(root) <= tolerance) {
     candidates = {-b / (2 * a)};
   } else if (root < 0) {
     candidates = {};
@@ -75,11 +87,11 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   }
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
-      ret.emplace_back(candidate);
-    } else if (std::abs(candidate - max_value) < tolerance) {
-      ret.emplace_back(max_value);
-    } else if (std::abs(candidate - min_value) < tolerance) {
-      ret.emplace_back(min_value);
+      ret.push_back(candidate);
+    } else if (std::abs(candidate - max_value) <= tolerance) {
+      ret.push_back(max_value);
+    } else if (std::abs(candidate - min_value) <= tolerance) {
+      ret.push_back(min_value);
     }
   }
   return ret;
@@ -88,7 +100,7 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
 std::vector<double> PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
 {
-  if (std::abs(a) < tolerance) {
+  if (std::abs(a) <= tolerance) {
     return solveQuadraticEquation(b, c, d);
   }
   std::vector<double> solutions, candidates, ret;
@@ -102,11 +114,11 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
   }
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
-      ret.emplace_back(candidate);
-    } else if (std::abs(candidate - max_value) < tolerance) {
-      ret.emplace_back(max_value);
-    } else if (std::abs(candidate - min_value) < tolerance) {
-      ret.emplace_back(min_value);
+      ret.push_back(candidate);
+    } else if (std::abs(candidate - max_value) <= tolerance) {
+      ret.push_back(max_value);
+    } else if (std::abs(candidate - min_value) <= tolerance) {
+      ret.push_back(min_value);
     }
   }
   return ret;
@@ -116,30 +128,39 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
 {
   x = std::vector<double>(3);
   double a2 = a * a;
+  /**
+   * @note Tschirnhaus transformation, transform into x^3 + q*x + r = 0
+   * @sa https://science-log.com/%E6%95%B0%E5%AD%A6/3%E6%AC%A1%E6%96%B9%E7%A8%8B%E5%BC%8F%E3%81%AE%E8%A7%A3%E3%81%AE%E5%85%AC%E5%BC%8F/
+   */
   double q = (a2 - 3 * b) / 9;
   double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
-  // equation x^3 + q*x + r = 0
   double r2 = r * r;
   double q3 = q * q * q;
   double A, B;
-  if (r2 <= (q3 + tolerance)) {  //<<-- FIXED!
-    double t = r / sqrt(q3);
+  if (r2 <= (q3 + tolerance)) {
+    /**
+     * @note If 3 real roots are found.
+     * @sa https://onihusube.hatenablog.com/entry/2018/10/08/140426
+     */
+    double t = r / std::sqrt(q3);
     if (t < -1) {
       t = -1;
     }
     if (t > 1) {
       t = 1;
     }
-    t = acos(t);
+    t = std::acos(t);
     a /= 3;
-    q = -2 * sqrt(q);
-    x[0] = q * cos(t / 3) - a;
-    x[1] = q * cos((t + M_PI * 2) / 3) - a;
-    x[2] = q * cos((t - M_PI * 2) / 3) - a;
+    q = -2 * std::sqrt(q);
+    x[0] = q * std::cos(t / 3) - a;
+    x[1] = q * std::cos((t + M_PI * 2) / 3) - a;
+    x[2] = q * std::cos((t - M_PI * 2) / 3) - a;
     return 3;
   } else {
-    // A =-pow(fabs(r)+sqrt(r2-q3),1./3);
-    A = -root3(fabs(r) + sqrt(r2 - q3));
+    /**
+     * @note If imaginary solutions exist.
+     */
+    A = -std::cbrt(std::abs(r) + std::sqrt(r2 - q3));
     if (r < 0) {
       A = -A;
     }
@@ -151,46 +172,20 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
     a /= 3;
     x[0] = (A + B) - a;
     x[1] = -0.5 * (A + B) - a;
-    x[2] = 0.5 * sqrt(3.) * (A - B);
-    if (fabs(x[2]) < tolerance) {
+    x[2] = 0.5 * std::sqrt(3.) * (A - B);
+    /**
+     * @note If the imaginary part of the complex almost zero, this equation has a multiple root.
+     */
+    if (std::abs(x[2]) <= tolerance) {
       x[2] = x[1];
       return 2;
     }
     return 1;
   }
+  /**
+   * @note No roots are found.
+   */
   return 0;
-}
-
-double PolynomialSolver::_root3(double x) const
-{
-  double s = 1.;
-  while (x < 1.) {
-    x *= 8.;
-    s *= 0.5;
-  }
-  while (x > 8.) {
-    x *= 0.125;
-    s *= 2.;
-  }
-  double r = 1.5;
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  return r * s;
-}
-
-double PolynomialSolver::root3(double x) const
-{
-  if (x > 0) {
-    return _root3(x);
-  } else if (x < 0) {
-    return -_root3(-x);
-  } else {
-    return 0.;
-  }
 }
 }  // namespace geometry
 }  // namespace math

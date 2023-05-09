@@ -85,7 +85,15 @@ public:
   double linearFunction(double a, double b, double t) const;
 
   /**
-   * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver
+   * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver.
+   * This value was determined by Masaya Kataoka (@hakuturu583).
+   * The reason this value is not std::numeric_limits<double>::epsilon is that when using 
+   * this set of functions to find the intersection of a Catmull-Rom spline curve and a line segment, 
+   * it was confirmed that when the solution is very close to the endpoints of the Hermite curves 
+   * that make up the Catmull-Rom spline, the solution could not calculated.
+   * When considering a 1 km long Catmull-Rom spline (assuming a very long lanelet) with a tolerance of 1e-7, 
+   * the error in calculating the intersection position in a tangentially distorted coordinate system was ±0.0001 m.
+   * This value is small enough, so it is determined as 1e-7.
    */
   constexpr static double tolerance = 1e-7;
 
@@ -103,8 +111,6 @@ private:
            if return value is 1, 1 real root : x[0], x[1] ± i*x[2],
  */
   int solveP3(std::vector<double> & x, double a, double b, double c) const;
-  double _root3(double x) const;
-  double root3(double x) const;
 };
 }  // namespace geometry
 }  // namespace math
