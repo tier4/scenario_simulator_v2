@@ -76,6 +76,32 @@ struct ApplyFaultInjection : public CustomCommand
   }
 };
 
+struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
+                                          public SimulatorCore::CoordinateSystemConversion
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope &) -> void override
+  {
+    lanelet_id = std::stoi(parameters.at(0));
+    state = parameters.at(1);
+    if (parameters.size() == 3) {
+      publish_frequency = boost::lexical_cast<double>(parameters.at(2));
+    }
+
+    for (auto & traffic_light : toWayIDs(lanelet_id)) {
+      //      traffic_light.clear();
+      //      traffic_light.set(state);
+    }
+  }
+
+  hdmap_utils::HdMapUtils::LaneletId lanelet_id;
+
+  String state;
+
+  Double publish_frequency = 10.0;
+};
+
 struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::ActionApplication
 {
   using CustomCommand::CustomCommand;
@@ -216,6 +242,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("exitSuccess", ExitSuccess),
       ELEMENT("printParameter", PrintParameter),
       ELEMENT("test", TestCommand),
+      ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction)
     };
 #undef ELEMENT
 
