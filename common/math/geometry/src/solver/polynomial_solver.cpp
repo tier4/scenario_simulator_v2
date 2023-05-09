@@ -126,12 +126,11 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
   x = std::vector<double>(3);
   double a2 = a * a;
   /**
-   * @note Tschirnhaus transformation
+   * @note Tschirnhaus transformation, transform into x^3 + q*x + r = 0
    * @sa https://science-log.com/%E6%95%B0%E5%AD%A6/3%E6%AC%A1%E6%96%B9%E7%A8%8B%E5%BC%8F%E3%81%AE%E8%A7%A3%E3%81%AE%E5%85%AC%E5%BC%8F/
    */
   double q = (a2 - 3 * b) / 9;
   double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
-  // equation x^3 + q*x + r = 0
   double r2 = r * r;
   double q3 = q * q * q;
   double A, B;
@@ -157,7 +156,6 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
   } else {
     /**
      * @note If imaginary solutions exist.
-     * A = B = ∛(-q/2 ± √(r2 - q3))
      */
     A = -std::cbrt(std::abs(r) + std::sqrt(r2 - q3));
     if (r < 0) {
