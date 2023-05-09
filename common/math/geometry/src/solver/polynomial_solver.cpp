@@ -125,6 +125,10 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
 {
   x = std::vector<double>(3);
   double a2 = a * a;
+  /**
+   * @note Tschirnhaus transformation
+   * @sa https://science-log.com/%E6%95%B0%E5%AD%A6/3%E6%AC%A1%E6%96%B9%E7%A8%8B%E5%BC%8F%E3%81%AE%E8%A7%A3%E3%81%AE%E5%85%AC%E5%BC%8F/
+   */
   double q = (a2 - 3 * b) / 9;
   double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
   // equation x^3 + q*x + r = 0
@@ -132,22 +136,30 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
   double q3 = q * q * q;
   double A, B;
   if (r2 <= (q3 + tolerance)) {
-    double t = r / sqrt(q3);
+    /**
+     * @note If 3 real roots are found.
+     * @sa https://onihusube.hatenablog.com/entry/2018/10/08/140426
+     */
+    double t = r / std::sqrt(q3);
     if (t < -1) {
       t = -1;
     }
     if (t > 1) {
       t = 1;
     }
-    t = acos(t);
+    t = std::acos(t);
     a /= 3;
-    q = -2 * sqrt(q);
-    x[0] = q * cos(t / 3) - a;
-    x[1] = q * cos((t + M_PI * 2) / 3) - a;
-    x[2] = q * cos((t - M_PI * 2) / 3) - a;
+    q = -2 * std::sqrt(q);
+    x[0] = q * std::cos(t / 3) - a;
+    x[1] = q * std::cos((t + M_PI * 2) / 3) - a;
+    x[2] = q * std::cos((t - M_PI * 2) / 3) - a;
     return 3;
   } else {
-    A = -root3(std::abs(r) + sqrt(r2 - q3));
+    /**
+     * @note If imaginary solutions exist.
+     * A = B = ∛(-q/2 ± √(r2 - q3))
+     */
+    A = -std::cbrt(std::abs(r) + std::sqrt(r2 - q3));
     if (r < 0) {
       A = -A;
     }
@@ -159,46 +171,20 @@ int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doubl
     a /= 3;
     x[0] = (A + B) - a;
     x[1] = -0.5 * (A + B) - a;
-    x[2] = 0.5 * sqrt(3.) * (A - B);
+    x[2] = 0.5 * std::sqrt(3.) * (A - B);
+    /**
+     * @note If the imaginary part of the complex almost zero, this equation has a multiple root.
+     */
     if (std::abs(x[2]) <= tolerance) {
       x[2] = x[1];
       return 2;
     }
     return 1;
   }
+  /**
+   * @note No roots are found.
+   */
   return 0;
-}
-
-double PolynomialSolver::_root3(double x) const
-{
-  double s = 1.;
-  while (x < 1.) {
-    x *= 8.;
-    s *= 0.5;
-  }
-  while (x > 8.) {
-    x *= 0.125;
-    s *= 2.;
-  }
-  double r = 1.5;
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  r -= 1. / 3. * (r - x / (r * r));
-  return r * s;
-}
-
-double PolynomialSolver::root3(double x) const
-{
-  if (x > 0) {
-    return _root3(x);
-  } else if (x < 0) {
-    return -_root3(-x);
-  } else {
-    return 0.;
-  }
 }
 }  // namespace geometry
 }  // namespace math
