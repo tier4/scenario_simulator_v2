@@ -39,6 +39,10 @@ double PolynomialSolver::quadraticFunction(double a, double b, double c, double 
 std::vector<double> PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const
 {
+  /**
+   * @note In this case, ax*b = 0 (a=0) can cause division by zero.
+   * So give special treatment to this case.
+   */
   if (std::abs(a) <= tolerance) {
     if (std::abs(b) <= tolerance) {
       THROW_SIMULATION_ERROR(
