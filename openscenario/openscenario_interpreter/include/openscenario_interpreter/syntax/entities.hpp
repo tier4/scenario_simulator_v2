@@ -45,8 +45,6 @@ public:
 
   auto ref(const EntityRef &) const -> Object;
 
-  auto flatten(const EntityRef &) const -> std::list<EntityRef>;
-
   auto begin() const { return entities.begin(); }
 
   auto end() const { return entities.end(); }
