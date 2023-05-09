@@ -2,6 +2,87 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.8 (2023-05-09)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/model3d-field
+* Merge branch 'master' into feature/interpreter/environment
+* Merge branch 'master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge branch 'master' into fix/cleanup_code
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/AJD-697_improve_port_management_zmq
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/delay_in_condition
+* Merge pull request `#978 <https://github.com/tier4/scenario_simulator_v2/issues/978>`_ from tier4/feature/interpreter/relative-heading-condition
+* Merge remote-tracking branch 'origin/master' into clean-dicts
+* Merge branch 'master' into feature/interpreter/model3d-field
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge branch 'master' into feature/noise_delay_object
+* Rename `service_with_validation.h` to `service_with_validation.hpp`
+* Fix missing header include
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/relative-heading-condition
+* Merge pull request `#975 <https://github.com/tier4/scenario_simulator_v2/issues/975>`_ from tier4/emergency-state/backwardcompatibility-1
+* refactor(concealer)
+* refactor(concealer): delete mrm merger
+* fix build errors & linter errors
+* refactor(concealer): divide callback function
+* Use adapi as default
+* Use adapi as default
+* Merge remote-tracking branch 'origin/master' into emergency-state/backwardcompatibility-1
+* Merge remote-tracking branch 'origin/emergency-state/latest' into emergency-state/backwardcompatibility-1
+* Fix msg name
+* use __has_include
+* modify CMakeLists.txt
+* Merge pull request `#965 <https://github.com/tier4/scenario_simulator_v2/issues/965>`_ from tier4/emergency-state/latest-behavior
+* feat(concealer): implement MRM behavior interface
+* chore: delete commented line in package.xml
+* chore: add debug messages
+* feat(concealer): change mrm state behavior when no source exists
+* feat(concealer): add MinimumRiskManeuverMerger
+* feat(concealer): add MinimumRiskManeuverMerger
+* refactor(concealer): delete unused operator overload
+* Merge branch 'master' into import/universe-2437
+* chore(concealer): apply linter
+* feat(concealer): implement EmergencyState interface for Autoware.Universe
+* refactor(concealer): update EmergencyState interface for Autoware
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge branch 'master' into feature/get_lateral_distance
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge pull request `#927 <https://github.com/tier4/scenario_simulator_v2/issues/927>`_ from tier4/chore/remove_had_map_rouute
+* chore: apply ament_clang_format
+* feat(concealer): branch MrmState type depending on whether there is　autoware_adapi_v1_msgs
+* feat(concealer): branch MrmState type depending on whether there is　autoware_adapi_v1_msgs
+* chore: add autoware_adapi_v1_msgs as an option
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#930 <https://github.com/tier4/scenario_simulator_v2/issues/930>`_ from tier4/emergency-state/import-pr929
+* fix(concealer): remove unnecessary wait for autoware states
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge pull request `#929 <https://github.com/tier4/scenario_simulator_v2/issues/929>`_ from mitsudome-r/fix/remove-unnecessary-waits
+* Merge branch 'master' into feature/simple_noise_simulator
+* fix(concealer): remove unnecessary wait for autoware states
+* chore(concealer): remove unused had_map_route msg
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* chore: apply clang-format
+* fix!(UserDefinedValueCondition): convert mrm state to emergency state
+* fix!(concealer): use MrmState instead of EmergencyState
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into fix_wrong_merge
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/use_job_in_standstill_duration
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Shota Minami, Tatsuya Yamasaki, f0reachARR, hrjp, kosuke55, kyoichi-sugahara, mitsudome-r, yamacir-kit
+
 0.6.7 (2022-11-17)
 ------------------
 * refactor(preprocessor): modify struct name
