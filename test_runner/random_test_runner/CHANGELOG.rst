@@ -2,6 +2,36 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge pull request `#894 <https://github.com/tier4/scenario_simulator_v2/issues/894>`_ from tier4/fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge branch 'master' into feature/simple_noise_simulator
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/simple_noise_simulator
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Add missing headers
+* Format
+* Replace boost::optional with std::optional
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into fix_wrong_merge
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/use_job_in_standstill_duration
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Shota Minami, hrjp, kyoichi-sugahara, yamacir-kit
+
 0.6.7 (2022-11-17)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feat/heat_beat

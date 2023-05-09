@@ -2,6 +2,123 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge pull request `#980 <https://github.com/tier4/scenario_simulator_v2/issues/980>`_ from tier4/feature/interpreter/environment
+* Merge branch 'master' into feature/interpreter/model3d-field
+* Fix example scenario
+* Fix scenario typo
+* Add sample scenario of Environment
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/model3d-field
+* Merge branch 'master' into feature/interpreter/environment
+* Merge branch 'master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge branch 'master' into fix/cleanup_code
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/AJD-697_improve_port_management_zmq
+* Merge pull request `#971 <https://github.com/tier4/scenario_simulator_v2/issues/971>`_ from tier4/feature/interpreter/delay_in_condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/delay_in_condition
+* Merge pull request `#978 <https://github.com/tier4/scenario_simulator_v2/issues/978>`_ from tier4/feature/interpreter/relative-heading-condition
+* Merge remote-tracking branch 'origin/master' into clean-dicts
+* Merge branch 'master' into feature/interpreter/model3d-field
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge branch 'master' into feature/noise_delay_object
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/relative-heading-condition
+* Merge pull request `#975 <https://github.com/tier4/scenario_simulator_v2/issues/975>`_ from tier4/emergency-state/backwardcompatibility-1
+* Merge branch 'master' into feature/noise_delay_object
+* Update sample scenario to use one-argument version of `RelativeHeadingCondition`
+* Merge remote-tracking branch 'origin/master' into emergency-state/backwardcompatibility-1
+* Add time-based testing scenaio for condtion edge
+* Merge pull request `#972 <https://github.com/tier4/scenario_simulator_v2/issues/972>`_ from tier4/fix/openscenario_utility/conversion
+* Revert "Revert some changes for `scenario_test_runner.py`"
+* Revert some changes for `scenario_test_runner.py`
+* Remove unreachable statements of `MacroExpander.__call_\_`
+* Cleanup import statements of `scenario_test_runner.py`
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge branch 'master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/license_and_properties
+* Merge remote-tracking branch 'origin/master' into fix/get-unique-route-lanelets
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#967 <https://github.com/tier4/scenario_simulator_v2/issues/967>`_ from RobotecAI/fix/AJD-655-terminates-sigint
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* refactor: apply ament_clang_format
+* fix(test_runner):  ensure 0 exit code after sigint
+* fix(test_runner):  ensure 0 exit code after sigint
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin' into fix/getting_next_lanelet
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/license_and_properties
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#962 <https://github.com/tier4/scenario_simulator_v2/issues/962>`_ from tier4/feature/interpreter/relative-distance-condition
+* Merge pull request `#954 <https://github.com/tier4/scenario_simulator_v2/issues/954>`_ from tier4/fix/python-installation
+* Add some test scenario to `workflow_example`
+* Update `DistanceCondition` to support lateral lane-coordinate distance
+* Update `RelativeDistanceCondition` to support lateral lane-coordinate distance
+* chore: add debug messages
+* Add new test scenario `...RelativeDistanceCondition.yaml`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/license_and_properties
+* Merge branch 'master' into feature/noise_lost_object
+* Cleanup
+* Update package `scenario_test_runner` to use CMake to install scripts instead of setuptools
+* Granted execute permission to some Python scripts
+* Merge pull request `#952 <https://github.com/tier4/scenario_simulator_v2/issues/952>`_ from tier4/feature/interpreter/catalog
+* Update scenario `sample.yaml` to use catalog `openscenario_experimental_catalog`
+* Fix scenario `sample.yaml` to specify `value` of `Property` as string instead of number
+* Merge pull request `#951 <https://github.com/tier4/scenario_simulator_v2/issues/951>`_ from tier4/fix/warnings
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* suppress warning from setuptools
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into emergency-state/backward-compatibility
+* Merge remote-tracking branch 'origin/master' into import/universe-2437
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge pull request `#937 <https://github.com/tier4/scenario_simulator_v2/issues/937>`_ from tier4/feature/interpreter/noise
+* Update `AssignControllerAction` to consider some object detection properties
+* Merge branch 'master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#928 <https://github.com/tier4/scenario_simulator_v2/issues/928>`_ from tier4/feature/interpreter/speed-profile-action
+* Merge branch 'master' into feature/simple_noise_simulator
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/speed-profile-action
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge pull request `#909 <https://github.com/tier4/scenario_simulator_v2/issues/909>`_ from tier4/feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge pull request `#915 <https://github.com/tier4/scenario_simulator_v2/issues/915>`_ from tier4/fix/add_on_exit_to_simulator
+* Update `SpeedProfileAction` debug informations
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Update `SpeedProfileAction` to select `Transition` by attribute `followingMode`
+* chore(test_runner): fix linter error
+* feat(test_runner): use ShutdownOnce instead of Shutdown
+* Update example scenario `SpeedProfileAction.yaml`
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* chore(launch): add on_exit flag to interpreter
+* add on_exit flag to the simulator
+* fix speed action scenrio
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into fix_wrong_merge
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/use_job_in_standstill_duration
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Michał Kiełczykowski, Minami Shota, Shota Minami, Tatsuya Yamasaki, f0reachARR, hrjp, kyoichi-sugahara, yamacir-kit
+
 0.6.7 (2022-11-17)
 ------------------
 * Merge pull request `#903 <https://github.com/tier4/scenario_simulator_v2/issues/903>`_ from tier4/feature/empty/parameter_value_distribution

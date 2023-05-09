@@ -2,6 +2,175 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge pull request `#894 <https://github.com/tier4/scenario_simulator_v2/issues/894>`_ from tier4/fix/cleanup_code
+* Merge branch 'master' into feature/interpreter/model3d-field
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/publishing-delay
+* Merge branch 'master' into fix/cleanup_code
+* Merge branch 'master' into feature/interpreter/environment
+* Merge pull request `#981 <https://github.com/tier4/scenario_simulator_v2/issues/981>`_ from RobotecAI/ref/AJD-697_improve_port_management_zmq
+* Merge branch 'master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/delay_in_condition
+* Merge remote-tracking branch 'origin/master' into clean-dicts
+* ref(sim_interface): apply ament clang reformat
+* ref(zmq): add socket_port as rosparam
+* Merge branch 'master' into feature/interpreter/model3d-field
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge pull request `#964 <https://github.com/tier4/scenario_simulator_v2/issues/964>`_ from tier4/feature/noise_delay_object
+* change variable name
+* fix error
+* use queue
+* ament_clang_format
+* fix code style
+* fix variable
+* replace vector with deque
+* get param from interpreter
+* fix conflict
+* Merge branch 'master' into feature/noise_delay_object
+* Merge remote-tracking branch 'origin/master' into emergency-state/backwardcompatibility-1
+* Merge pull request `#973 <https://github.com/tier4/scenario_simulator_v2/issues/973>`_ from tier4/feature/interpreter/probability-of-lost
+* Update the probability range to be [0, 1) from [0, 100)
+* Move member function `recognizeWithProbability` into `DetectionSensor::update`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/license_and_properties
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin' into fix/getting_next_lanelet
+* Merge pull request `#958 <https://github.com/tier4/scenario_simulator_v2/issues/958>`_ from tier4/feature/noise_lost_object
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* tempolary implemantation of delay recognition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/license_and_properties
+* delete comment
+* add function of recognizing object with probability
+* change function name from applyNoise to applyPositionNoise
+* added param probability of lost recognition
+* Merge branch 'master' into feature/noise_lost_object
+* temp
+* Merge pull request `#951 <https://github.com/tier4/scenario_simulator_v2/issues/951>`_ from tier4/fix/warnings
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* remove C++ warnings
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into emergency-state/backward-compatibility
+* Merge remote-tracking branch 'origin/master' into import/universe-2437
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge pull request `#937 <https://github.com/tier4/scenario_simulator_v2/issues/937>`_ from tier4/feature/interpreter/noise
+* Move data member `random_engine\_` to `DetectionSensor` from `DetectionSensorBase`
+* Update `DetectionSensor<>::applyNoise` to not to receive non-const reference
+* Cleanup member function `DetectionSensor<...>::update`
+* Move member function `applyNoise` into `DetectionSensor` from `DetectionSensorBase`
+* Update `rand_engine\_` to allocate on the stack instead of the heap
+* Update `position_noise_distribution` to allocate on the stack instead of the heap
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge pull request `#914 <https://github.com/tier4/scenario_simulator_v2/issues/914>`_ from tier4/feature/simple_noise_simulator
+* Merge branch 'master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge pull request `#922 <https://github.com/tier4/scenario_simulator_v2/issues/922>`_ from RobotecAI/ajd-618/get-rotation-matrix-optimization
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* apply format
+* add member variable
+* Merge pull request `#884 <https://github.com/tier4/scenario_simulator_v2/issues/884>`_ from tier4/feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge branch 'master' into feature/simple_noise_simulator
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Format
+* Fix typo
+* Add implentation commnes
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Apply clang_format
+* Precompute rotation matrix
+* Check if polygon is empty
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* remove omit
+* update proto
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/simple_noise_simulator
+* define member function as template
+* change include order
+* apply clang-format
+* add simple noise generator
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Fix typo
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Rename variable
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Add missing headers
+* Fix wrong variable name
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Format
+* Replace boost::optional with std::optional
+* Clip occupied area by grid square
+* Fix filling range
+* Fix infinite loop
+* Use std::pair instead of original type
+* Simplify for loop
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Revert "Fix bounding box shifting"
+* Fix bounding box shifting
+* Add missing comment
+* Remove redundant utility
+* Change variable name
+* Fix typo
+* Add overlap check
+* Add internal utility
+* Refactor
+* Rename
+* Remove debug code
+* Add target file
+* Change class name
+* Add pixel traversal as iterator
+* Update URL
+* Format
+* Add validation
+* Rename type names
+* Refactor
+* Refactor
+* Update Doxygen comment
+* Refactor
+* Format
+* Complete new algorithm implementation
+* Use optimized method
+* Optimize filling algorithm
+* Change data structure
+* Implement invisible polygon calculation
+* Fix division by zero bug
+* Optimize line traverse
+* Convert coordinate in advance
+* [WIP] Impletation complete, but not works
+* [WIP] Implement sweep line algorithm
+* Fix wrong comment
+* Improve corner calculation
+* [WIP] implement sweep line
+* Add missing coordinate conversion
+* [WIP] implement improved algorithm
+* Merge branch 'master' into feature/improve_occupancy_grid_algorithm
+* Refactor to keep consistency
+* Refactor
+* Refactor
+* Refactor
+* Merge branch 'master' into fix_wrong_merge
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/use_job_in_standstill_duration
+* Contributors: Adam Krawczyk, Dawid Moszyński, Kotaro Yoshimoto, Kyoichi Sugahara, Masaya Kataoka, MasayaKataoka, Minami Shota, Shota Minami, f0reachARR, hrjp, kyoichi sugahara, kyoichi-sugahara, yamacir-kit
+
 0.6.7 (2022-11-17)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feat/heat_beat

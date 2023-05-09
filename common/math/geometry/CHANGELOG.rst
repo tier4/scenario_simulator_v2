@@ -2,6 +2,43 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge pull request `#993 <https://github.com/tier4/scenario_simulator_v2/issues/993>`_ from tier4/fix/add_const
+* add const
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge pull request `#894 <https://github.com/tier4/scenario_simulator_v2/issues/894>`_ from tier4/fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into emergency-state/backwardcompatibility-1
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/license_and_properties
+* Merge branch 'master' into feature/noise_lost_object
+* Merge pull request `#951 <https://github.com/tier4/scenario_simulator_v2/issues/951>`_ from tier4/fix/warnings
+* remove C++ warnings
+* Merge remote-tracking branch 'origin/master' into emergency-state/backward-compatibility
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge branch 'master' into feature/simple_noise_simulator
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge pull request `#909 <https://github.com/tier4/scenario_simulator_v2/issues/909>`_ from tier4/feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* split functions
+* Add missing headers
+* Format
+* Replace boost::optional with std::optional
+* Merge branch 'master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into fix_wrong_merge
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, Shota Minami, Tatsuya Yamasaki, hrjp, kyoichi-sugahara, yamacir-kit
+
 0.6.7 (2022-11-17)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/service-request-until-success
