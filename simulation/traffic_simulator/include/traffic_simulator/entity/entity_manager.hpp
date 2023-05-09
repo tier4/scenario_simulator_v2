@@ -193,39 +193,48 @@ private:
   } traffic_light_manager;
 
 public:
-#define FORWARD_TO_TRAFFIC_LIGHT_MANAGER(NAME, ...)                                       \
-  switch (type) {                                                                         \
-    case TrafficLightType::conventional:                                                  \
-      return conventional_traffic_light_manager_ptr_->NAME(__VA_ARGS__);                  \
-    case TrafficLightType::v2i:                                                           \
-      return v2i_traffic_light_manager_ptr_->NAME(__VA_ARGS__);                           \
-    default:                                                                              \
-      throw std::runtime_error(                                                           \
-        "Unexpected type of TrafficLight was going to be used. Wrong signal type may be " \
-        "specified in the scenario.");                                                    \
-  }
 
-  template <typename... Ts>
-  auto getTrafficLight(
-    const std::int64_t lanelet_id,
-    const TrafficLightType type = TrafficLightType::conventional) const -> decltype(auto)
-  {
-    FORWARD_TO_TRAFFIC_LIGHT_MANAGER(getTrafficLight, lanelet_id);
-  }
+#define FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(NAME)                 \
+  template <typename... Ts>                                           \
+  decltype(auto) getConventional##NAME(Ts &&... xs) const             \
+  {                                                                   \
+    return conventional_traffic_light_manager_ptr_->get##NAME(xs...); \
+  }                                                                   \
+  static_assert(true, "");                                            \
+  template <typename... Ts>                                           \
+  decltype(auto) getV2I##NAME(Ts &&... xs) const                      \
+  {                                                                   \
+    return v2i_traffic_light_manager_ptr_->get##NAME(xs...);          \
+  }                                                                   \
+  static_assert(true, "")
 
-  auto getTrafficLights(const TrafficLightType type = TrafficLightType::conventional) const
-    -> decltype(auto)
-  {
-    FORWARD_TO_TRAFFIC_LIGHT_MANAGER(getTrafficLights);
-  }
 
-  template <typename... Ts>
-  auto getTrafficRelationReferees(
-    const std::int64_t lanelet_id,
-    const TrafficLightType type = TrafficLightType::conventional) const -> decltype(auto)
-  {
-    FORWARD_TO_TRAFFIC_LIGHT_MANAGER(getTrafficRelationReferees, lanelet_id);
-  }
+//  auto getConventionalTrafficLights(std::int64_t lanelet_id) const {
+//    return conventional_traffic_light_manager_ptr_->getTrafficLights(lanelet_id);
+//  }
+//
+//  auto getV2ITrafficLights(std::int64_t lanelet_id) const {
+//    return v2i_traffic_light_manager_ptr_->getTrafficLights(lanelet_id);
+//  }
+//
+//  auto getConventionalTrafficLights() const {
+//    return conventional_traffic_light_manager_ptr_->getTrafficLights();
+//  }
+//
+//  auto getV2ITrafficLights() const {
+//    return v2i_traffic_light_manager_ptr_->getTrafficLights();
+//  }
+//
+//  auto getConventionalTrafficLight(std::int64_t lanelet_id) const {
+//    return conventional_traffic_light_manager_ptr_->getTrafficLight(lanelet_id);
+//  }
+//
+//  auto getV2ITrafficLight(std::int64_t lanelet_id) const {
+//    return v2i_traffic_light_manager_ptr_->getTrafficLight(lanelet_id);
+//  }
+
+  FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLights);
+  FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLight);
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   template <typename... Ts>                                           \
