@@ -156,15 +156,19 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
     double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
     double ty = (y - point0.y) / (point1.y - point0.y);
     if (std::abs(tx - ty) > epsilon || std::isnan(tx) || std::isnan(ty)) {
+      /**
+       * @note If the curve and the line segment to be intersected are parallel to either of the x/y axes, one of the two parameters, 
+       * tx, ty, will be in the range 0~1 while the other will be out of that range by division by zero.
+       */
       if ((0 <= tx && tx <= 1) || (0 <= ty && ty <= 1)) {
         if (0 <= solution && solution <= 1) {
-          s_values.emplace_back(solution);
+          s_values.push_back(solution);
         }
       }
     } else {
       if ((0 <= tx && tx <= 1) && (0 <= ty && ty <= 1)) {
         if (0 <= solution && solution <= 1) {
-          s_values.emplace_back(solution);
+          s_values.push_back(solution);
         }
       }
     }
