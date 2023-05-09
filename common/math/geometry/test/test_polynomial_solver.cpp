@@ -82,7 +82,7 @@ TEST(PolynomialSolverTest, QuadraticFunction)
 }
 
 /**
- * @note Testcase for ax^3+bx^2+cx+d = 0
+ * @note Testcase for ax^2+bx+c = 0
  */
 TEST(PolynomialSolverTest, SolveQuadraticEquation)
 {
