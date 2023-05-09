@@ -102,7 +102,7 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
     const auto p1 = polygon[i + 1];
     auto s = getCollisionPointIn2D(p0, p1, search_backward);
     if (s) {
-      s_values.emplace_back(s.value());
+      s_values.push_back(s.value());
     }
   }
   if (close_start_end) {
@@ -110,7 +110,7 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
     const auto p1 = polygon[0];
     auto s = getCollisionPointIn2D(p0, p1, search_backward);
     if (s) {
-      s_values.emplace_back(s.value());
+      s_values.push_back(s.value());
     }
   }
   if (s_values.empty()) {
