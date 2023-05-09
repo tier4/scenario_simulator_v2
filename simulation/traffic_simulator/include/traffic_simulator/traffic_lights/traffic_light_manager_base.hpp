@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
-#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
+#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MODULE_BASE_HPP_
+#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MODULE_BASE_HPP_
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
@@ -31,6 +31,12 @@
 
 namespace traffic_simulator
 {
+
+enum class TrafficLightType {
+  conventional,
+  v2i,
+};
+
 class TrafficLightManagerBase
 {
 protected:
@@ -105,37 +111,5 @@ public:
 
   auto update(const double) -> void;
 };
-
-template <typename Message>
-class TrafficLightManager : public TrafficLightManagerBase
-{
-  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
-
-public:
-  template <typename Node>
-  explicit TrafficLightManager(
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
-    const std::string & map_frame = "map")
-  : TrafficLightManagerBase(node, hdmap, map_frame),
-    traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
-  {
-  }
-
-private:
-  static auto name() -> const char *;
-
-  auto publishTrafficLightStateArray() const -> void override;
-};
-
-template <>
-auto TrafficLightManager<
-  autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
-  -> void;
-
-template <>
-auto TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name() -> const
-  char *;
 }  // namespace traffic_simulator
-
-#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MODULE_BASE_HPP_
