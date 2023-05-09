@@ -89,9 +89,9 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
       publish_frequency = boost::lexical_cast<double>(parameters.at(2));
     }
 
-    for (auto & traffic_light : toWayIDs(lanelet_id)) {
-      //      traffic_light.clear();
-      //      traffic_light.set(state);
+    for (auto & traffic_light : toWayIDs(lanelet_id, traffic_simulator::TrafficLightType::v2i)) {
+      traffic_light.get().clear();
+      traffic_light.get().set(state);
     }
   }
 
@@ -242,8 +242,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("exitSuccess", ExitSuccess),
       ELEMENT("printParameter", PrintParameter),
       ELEMENT("test", TestCommand),
-      ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction)
-    };
+      ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction)};
 #undef ELEMENT
 
   if (type == ":") {
