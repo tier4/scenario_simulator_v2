@@ -2,8 +2,8 @@
 Changelog for package kashiwanoha_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.8 (2023-05-09)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
 * Merge branch 'master' into feature/simple_noise_simulator
 * Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed

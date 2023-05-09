@@ -2,8 +2,8 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.8 (2023-05-09)
+------------------
 * Merge pull request `#979 <https://github.com/tier4/scenario_simulator_v2/issues/979>`_ from RobotecAI/ref/AJD-696_clean_up_metics_traffic_sim
 * Merge pull request `#988 <https://github.com/tier4/scenario_simulator_v2/issues/988>`_ from tier4/fix/ignore_errors_in_draw
 * Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim

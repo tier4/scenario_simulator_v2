@@ -2,8 +2,8 @@
 Changelog for package openscenario_experimental_catalog
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.8 (2023-05-09)
+------------------
 * Merge remote-tracking branch 'origin/master' into emergency-state/backwardcompatibility-1
 * Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
 * Merge remote-tracking branch 'origin/master' into fix/cleanup_code

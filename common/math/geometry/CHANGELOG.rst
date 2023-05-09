@@ -2,8 +2,8 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.8 (2023-05-09)
+------------------
 * Merge pull request `#993 <https://github.com/tier4/scenario_simulator_v2/issues/993>`_ from tier4/fix/add_const
 * add const
 * Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim

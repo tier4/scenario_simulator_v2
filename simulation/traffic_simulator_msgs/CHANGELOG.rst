@@ -2,8 +2,8 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.8 (2023-05-09)
+------------------
 * fix(traffic_sim): fix interface update
 * feat(traffic_sim): ensure max_jerk as variable in entity_base
 * fix(traffic_sim): fix dynamic constraints in actioons

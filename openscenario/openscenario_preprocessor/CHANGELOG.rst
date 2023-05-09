@@ -2,8 +2,8 @@
 Changelog for package openscenario_preprocessor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.8 (2023-05-09)
+------------------
 * Merge remote-tracking branch 'origin/master' into clean-dicts
 * Merge branch 'master' into feature/noise_delay_object
 * Merge remote-tracking branch 'origin/master' into emergency-state/backwardcompatibility-1

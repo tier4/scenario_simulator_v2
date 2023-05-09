@@ -2,8 +2,8 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.8 (2023-05-09)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/model3d-field
 * Merge branch 'master' into feature/interpreter/environment
 * Merge branch 'master' into ref/AJD-696_clean_up_metics_traffic_sim

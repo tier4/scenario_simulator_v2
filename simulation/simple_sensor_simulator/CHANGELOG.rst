@@ -2,8 +2,8 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.8 (2023-05-09)
+------------------
 * Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
 * Merge pull request `#894 <https://github.com/tier4/scenario_simulator_v2/issues/894>`_ from tier4/fix/cleanup_code
 * Merge branch 'master' into feature/interpreter/model3d-field

@@ -2,8 +2,8 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.6.8 (2023-05-09)
+------------------
 * Merge branch 'master' into fix/cleanup_code
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/delay_in_condition
 * Revert "feat(traffic_sim): add max_jerk, maxJerk, setJerkLimit"
