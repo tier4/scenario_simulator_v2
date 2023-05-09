@@ -31,8 +31,8 @@ public:
  * @param b
  * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
  */
-  std::vector<double> solveLinearEquation(
-    double a, double b, double min_value = 0, double max_value = 1) const;
+  auto solveLinearEquation(double a, double b, double min_value = 0, double max_value = 1) const
+    -> std::vector<double>;
   /**
  * @brief solve quadratic equation a*x^2 + b*x + c = 0
  *
@@ -40,8 +40,9 @@ public:
  * @param b
  * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
  */
-  std::vector<double> solveQuadraticEquation(
-    double a, double b, double c, double min_value = 0, double max_value = 1) const;
+  auto solveQuadraticEquation(
+    double a, double b, double c, double min_value = 0, double max_value = 1) const
+    -> std::vector<double>;
   /**
  * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
  *
@@ -51,8 +52,9 @@ public:
  * @param d
  * @return std::vector<double> real root of the cubic functions (from 0 to 1)
  */
-  std::vector<double> solveCubicEquation(
-    double a, double b, double c, double d, double min_value = 0, double max_value = 1) const;
+  auto solveCubicEquation(
+    double a, double b, double c, double d, double min_value = 0, double max_value = 1) const
+    -> std::vector<double>;
   /**
  * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
  *
@@ -63,7 +65,7 @@ public:
  * @param t
  * @return double result of cubic function
  */
-  double cubicFunction(double a, double b, double c, double d, double t) const;
+  auto cubicFunction(double a, double b, double c, double d, double t) const -> double;
   /**
  * @brief calculate result of quadratic function a*t^2 + b*t + c
  *
@@ -73,7 +75,7 @@ public:
  * @param t
  * @return double result of quadratic function
  */
-  double quadraticFunction(double a, double b, double c, double t) const;
+  auto quadraticFunction(double a, double b, double c, double t) const -> double;
   /**
  * @brief calculate result of quadratic function a*t + b
  *
@@ -82,7 +84,7 @@ public:
  * @param t
  * @return double result of quadratic function
  */
-  double linearFunction(double a, double b, double t) const;
+  auto linearFunction(double a, double b, double t) const -> double;
 
   /**
    * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver.
@@ -110,7 +112,7 @@ private:
            if return value is 2, 2 real roots: x[0], x[1],
            if return value is 1, 1 real root : x[0], x[1] ± i*x[2],
  */
-  int solveP3(std::vector<double> & x, double a, double b, double c) const;
+  auto solveP3(std::vector<double> & x, double a, double b, double c) const -> int;
 };
 }  // namespace geometry
 }  // namespace math

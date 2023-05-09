@@ -24,20 +24,24 @@ namespace math
 {
 namespace geometry
 {
-double PolynomialSolver::linearFunction(double a, double b, double t) const { return a * t + b; }
+auto PolynomialSolver::linearFunction(double a, double b, double t) const -> double
+{
+  return a * t + b;
+}
 
-double PolynomialSolver::cubicFunction(double a, double b, double c, double d, double t) const
+auto PolynomialSolver::cubicFunction(double a, double b, double c, double d, double t) const
+  -> double
 {
   return a * t * t * t + b * t * t + c * t + d;
 }
 
-double PolynomialSolver::quadraticFunction(double a, double b, double c, double t) const
+auto PolynomialSolver::quadraticFunction(double a, double b, double c, double t) const -> double
 {
   return a * t * t + b * t + c;
 }
 
-std::vector<double> PolynomialSolver::solveLinearEquation(
-  double a, double b, double min_value, double max_value) const
+auto PolynomialSolver::solveLinearEquation(
+  double a, double b, double min_value, double max_value) const -> std::vector<double>
 {
   /**
    * @note In this case, ax*b = 0 (a=0) can cause division by zero.
@@ -70,8 +74,8 @@ std::vector<double> PolynomialSolver::solveLinearEquation(
   return {};
 }
 
-std::vector<double> PolynomialSolver::solveQuadraticEquation(
-  double a, double b, double c, double min_value, double max_value) const
+auto PolynomialSolver::solveQuadraticEquation(
+  double a, double b, double c, double min_value, double max_value) const -> std::vector<double>
 {
   std::vector<double> candidates, ret;
   if (std::abs(a) <= tolerance) {
@@ -97,8 +101,9 @@ std::vector<double> PolynomialSolver::solveQuadraticEquation(
   return ret;
 }
 
-std::vector<double> PolynomialSolver::solveCubicEquation(
+auto PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
+  -> std::vector<double>
 {
   if (std::abs(a) <= tolerance) {
     return solveQuadraticEquation(b, c, d);
@@ -124,7 +129,7 @@ std::vector<double> PolynomialSolver::solveCubicEquation(
   return ret;
 }
 
-int PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, double c) const
+auto PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, double c) const -> int
 {
   x = std::vector<double>(3);
   double a2 = a * a;
