@@ -50,7 +50,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
     for (double b = -20; b < 20; b = b + 0.1) {
       /**
        * @note If the ax+b=0 (a=0,b=0), any x value are solution, 
-       * so throwing common::SimulationError errors are expected.
+       * so throwing a common::SimulationError error is expected.
        */
       if (
         std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
@@ -93,7 +93,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
       for (double c = -20; c < 20; c = c + 1) {
         /**
          * @note If the ax^2+bx+c=0 (a=0,b=0,c=0), any x value are solution, 
-         * so throwing common::SimulationError errors are expected.
+         * so throwing a common::SimulationError error is expected.
          */
         if (
           std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
@@ -128,7 +128,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
         for (double d = -10; d < 10; d = d + 1) {
           /**
            * @note If the ax^3+bx^2+cx+d=0 (a=0,b=0,c=0,d=0), any x value are solution, 
-           * so throwing common::SimulationError errors are expected.
+           * so throwing a common::SimulationError error is expected.
            */
           if (
             std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
