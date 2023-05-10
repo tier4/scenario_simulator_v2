@@ -49,7 +49,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
   for (double a = -20; a < 20; a = a + 0.1) {
     for (double b = -20; b < 20; b = b + 0.1) {
       /**
-       * @note If the ax+b=0 (a=0,b=0), any x value are solution, 
+       * @note If the ax+b=0 (a=0,b=0), any x value is a solution, 
        * so throwing a common::SimulationError error is expected.
        */
       if (
@@ -92,7 +92,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
     for (double b = -20; b < 20; b = b + 1) {
       for (double c = -20; c < 20; c = c + 1) {
         /**
-         * @note If the ax^2+bx+c=0 (a=0,b=0,c=0), any x value are solution, 
+         * @note If the ax^2+bx+c=0 (a=0,b=0,c=0), any x value is a solution, 
          * so throwing a common::SimulationError error is expected.
          */
         if (
@@ -127,7 +127,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
       for (double c = -10; c < 10; c = c + 1) {
         for (double d = -10; d < 10; d = d + 1) {
           /**
-           * @note If the ax^3+bx^2+cx+d=0 (a=0,b=0,c=0,d=0), any x value are solution, 
+           * @note If the ax^3+bx^2+cx+d=0 (a=0,b=0,c=0,d=0), any x value is a solution, 
            * so throwing a common::SimulationError error is expected.
            */
           if (
