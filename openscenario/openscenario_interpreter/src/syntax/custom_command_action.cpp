@@ -27,7 +27,8 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct ApplyFaultInjection : public CustomCommand
+template <auto Version>
+struct ApplyFaultInjectionAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
@@ -46,22 +47,59 @@ struct ApplyFaultInjection : public CustomCommand
 
   auto start(const Scope &) -> void override
   {
-    auto makeFaultInjectionEvents = [](const std::vector<std::string> & events) {
-      auto makeFaultInjectionEvent = [](const auto & name) {
-        tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
-        fault_injection_event.level = tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
-        fault_injection_event.name = name;
-        return fault_injection_event;
-      };
-      tier4_simulation_msgs::msg::SimulationEvents simulation_events;
-      simulation_events.stamp = node().now();
-      for (const auto & event : events) {
-        simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
-      }
-      return simulation_events;
-    };
+    static_assert(0 < Version and Version <= 2);
 
-    publisher().publish(makeFaultInjectionEvents(parameters));
+    if constexpr (Version == 1)
+    {
+      auto makeFaultInjectionEvents = [](const std::vector<std::string> & events) {
+        auto makeFaultInjectionEvent = [](const auto & name) {
+          tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
+          fault_injection_event.level = tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+          fault_injection_event.name = name;
+          return fault_injection_event;
+        };
+        tier4_simulation_msgs::msg::SimulationEvents simulation_events;
+        simulation_events.stamp = node().now();
+        for (const auto & event : events) {
+          simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
+        }
+        return simulation_events;
+      };
+
+      publisher().publish(makeFaultInjectionEvents(parameters));
+    }
+    else
+    {
+      auto makeFaultInjectionEvents = [](const std::vector<std::string> & parameters) {
+
+        auto makeFaultInjectionEvent = [](const auto & level, const auto & name) {
+
+          auto convert = [](const auto & level) {
+            if (level == "OK") {
+              return tier4_simulation_msgs::msg::FaultInjectionEvent::OK;
+            } else if (level == "WARN") {
+              return tier4_simulation_msgs::msg::FaultInjectionEvent::WARN;
+            } else if (level == "ERROR") {
+              return tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+            } else {
+              return tier4_simulation_msgs::msg::FaultInjectionEvent::STALE;
+            }
+          };
+
+          tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
+          fault_injection_event.level = convert(level);
+          fault_injection_event.name = name;
+          return fault_injection_event;
+        };
+
+        tier4_simulation_msgs::msg::SimulationEvents simulation_events;
+        simulation_events.stamp = node().now();
+        simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(parameters[0], parameters[1]));
+        return simulation_events;
+      };
+
+      publisher().publish(makeFaultInjectionEvents(parameters));
+    }
   }
 };
 
@@ -196,7 +234,8 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
   static const std::unordered_map<
     std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
     commands{
-      ELEMENT("FaultInjectionAction", ApplyFaultInjection),
+      ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
+      ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
       ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED
