@@ -26,7 +26,19 @@ jobs:
         with:
           python-version: "3.10"
       - name: Install
-        run: pip3 install mkdocs mkdocs-material pymdown-extensions fontawesome_markdown markdown python-markdown-math plantuml-markdown mkdocs-codeinclude-plugin mkdocs-git-revision-date-localized-plugin plantuml
+        run: >
+          pip3 install
+            fontawesome_markdown
+            markdown
+            mkdocs
+            mkdocs-codeinclude-plugin
+            mkdocs-git-revision-date-localized-plugin
+            mkdocs-material 
+            mkdocs-mermaid2-plugin
+            plantuml
+            plantuml-markdown
+            pymdown-extensions
+            python-markdown-math
       - name: Install doxygen/depends of doxybook
         run: sudo apt install -y doxygen wget
       - name: Wget package

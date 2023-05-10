@@ -20,8 +20,9 @@ extra:
     - icon: fontawesome/solid/code-pull-request
       link: https://github.com/tier4/scenario_simulator_v2/pulls
 plugins:
-  - search
   - git-revision-date-localized
+  - mermaid2
+  - search
 
 copyright: "Copyright &copy; 2022 TIER IV, Inc."
 
@@ -46,10 +47,10 @@ extra_css:
   - "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
   - stylesheet/tierivcolor.css
   - stylesheet/extra.css
-  - https://unpkg.com/mermaid@8.0.0/dist/mermaid.css
+  - https://unpkg.com/mermaid@8.7.0/dist/mermaid.css
 extra_javascript:
   - http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
-  - https://unpkg.com/mermaid/dist/mermaid.min.js
+  - https://unpkg.com/mermaid@8.7.0/dist/mermaid.min.js
 
 nav:
   - Home: README.md
@@ -73,7 +74,7 @@ nav:
   - Developer Guide:
       - About: developer_guide/About.md
       - developer_guide/AutowareAPI.md
-      - developer_guide/NPCBehavior.md
+      - developer_guide/EntityBehavior.md
       - developer_guide/BehaviorPlugin.md
       #      - developer_guide/ErrorCategories.md
       - developer_guide/OpenSCENARIOSupport.md

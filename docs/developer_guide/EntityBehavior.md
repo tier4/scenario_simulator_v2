@@ -127,3 +127,6 @@ When this plug-in is used, Entity can only be moved by specifying its pose, velo
 When using this plug-in, any consistency in physical behavior is ignored.
 Changes in posture, velocity, acceleration, and jerk over time will not occur.
 The EntityStatus value will continue to be the value specified and updated via the setEntityStatus function, etc.
+This plug-in was developed primarily to drive the simulator from Autoware rosbag data.  
+
+
