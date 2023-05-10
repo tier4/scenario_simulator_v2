@@ -78,7 +78,7 @@ TEST(PolynomialSolverTest, QuadraticFunction)
   math::geometry::PolynomialSolver solver;
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);   //  x^2 + x + 1 =  7 (x=2)
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 0, 2), 6);   //  x^2 + x + 0 =  6 (x=2)
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(2, 0, 3, 1), 11);  // 2x^2     + 3 = 11 (x=2)
+  EXPECT_DOUBLE_EQ(solver.quadraticFunction(2, 0, 3, 2), 11);  // 2x^2     + 3 = 11 (x=2)
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(0, 0, 0, 2), 0);   //            0 =  0 (x=2)
 }
 
