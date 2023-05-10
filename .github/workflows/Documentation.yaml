@@ -30,7 +30,7 @@ jobs:
       - name: Install
         run: >
           pip3 install \
-            fontawesome_markdown
+            fontawesome_markdown \
             markdown \
             mkdocs \
             mkdocs-codeinclude-plugin \
