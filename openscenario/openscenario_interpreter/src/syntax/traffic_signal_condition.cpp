@@ -38,7 +38,7 @@ auto TrafficSignalCondition::description() const -> String
 
 auto TrafficSignalCondition::evaluate() -> Object
 {
-  if (auto && traffic_relation = toWayIDs(boost::lexical_cast<std::int64_t>(name));
+  if (auto && traffic_relation = getConventionalTrafficLights(boost::lexical_cast<std::int64_t>(name));
       state == "none") {
     current_state = "none";
     return asBoolean(std::all_of(

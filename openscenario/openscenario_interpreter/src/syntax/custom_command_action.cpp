@@ -89,7 +89,7 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
       publish_frequency = boost::lexical_cast<double>(parameters.at(2));
     }
 
-    for (auto & traffic_light : toWayIDs(lanelet_id, traffic_simulator::TrafficLightType::v2i)) {
+    for (auto & traffic_light : getV2ITrafficLights(lanelet_id)) {
       traffic_light.get().clear();
       traffic_light.get().set(state);
     }

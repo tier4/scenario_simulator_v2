@@ -180,9 +180,15 @@ public:
     }
 
     template <typename... Ts>
-    static auto toWayIDs(Ts &&... xs) -> decltype(auto)
+    static auto getConventionalTrafficLights(Ts &&... xs) -> decltype(auto)
     {
-      return core->getTrafficRelationReferees(std::forward<decltype(xs)>(xs)...);
+      return core->getConventionalTrafficLights(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto getV2ITrafficLights(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights(std::forward<decltype(xs)>(xs)...);
     }
   };
 
