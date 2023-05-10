@@ -58,7 +58,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
         EXPECT_THROW(solver.solveLinearEquation(a, b, 0, 1), common::SimulationError);
       }
       /**
-       * @note Other cases, solver must be able to obtain an exact solution.
+       * @note Other cases, solver must be able to obtain solutions.
        */
       else {
         auto ret = solver.solveLinearEquation(a, b, 0, 1);
@@ -102,7 +102,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
           EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
         }
         /**
-         * @note Other cases, solver must be able to obtain an exact solution.
+         * @note Other cases, solver must be able to obtain solutions.
          */
         else {
           auto ret = solver.solveQuadraticEquation(a, b, c, 0, 1);
@@ -138,7 +138,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
             EXPECT_THROW(solver.solveCubicEquation(a, b, c, d, 0, 1), common::SimulationError);
           }
           /**
-           * @note Other cases, solver must be able to obtain an exact solution.
+           * @note Other cases, solver must be able to obtain solutions.
            */
           else {
             auto ret = solver.solveCubicEquation(a, b, c, d, 0, 1);
