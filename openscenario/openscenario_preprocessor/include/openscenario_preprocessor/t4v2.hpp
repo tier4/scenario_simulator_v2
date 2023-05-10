@@ -24,7 +24,9 @@ namespace openscenario_preprocessor
 class T4V2
 {
 public:
-  auto deriveToXoscStringScenarios(boost::filesystem::path path) -> std::vector<std::string>;
+  auto deriveToXoscStringScenarios(
+    boost::filesystem::path modifiers_path, boost::filesystem::path scenario_path = {})
+    -> std::vector<std::string>;
 
   auto loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document;
 
@@ -36,7 +38,8 @@ public:
     const openscenario_interpreter::ParameterDistribution & scenario_modifier_distribution)
     -> std::vector<pugi::xml_document>;
 
-  std::pair<std::string, std::string> splitScenarioModifiers(std::string scenario);
+  std::pair<boost::filesystem::path, boost::filesystem::path> splitScenarioModifiers(
+    boost::filesystem::path scenario_path);
 };
 }  // namespace openscenario_preprocessor
 #endif  //OPENSCENARIO_PREPROCESSOR_T4V2_HPP

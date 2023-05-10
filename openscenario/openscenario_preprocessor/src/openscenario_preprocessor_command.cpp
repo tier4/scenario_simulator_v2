@@ -75,7 +75,8 @@ int main(const int argc, char const * const * const argv)
     "format,f", value<openscenario_preprocessor::ScenarioFormat>()->multitoken(),
     "output scenario format (t4v2 / xosc)")(
     "parameters,p", value<std::string>()->default_value("null"), "parameters in json format")(
-    "scenario,s", value<std::string>(), "path of scenario file")("help,H", "help");
+    "scenario,s", value<std::string>(), "path of scenario file")("skip-full-derivation", "")(
+    "help,H", "help");
 
   variables_map vm;
   store(parse_command_line(argc, argv, description), vm);
@@ -85,6 +86,7 @@ int main(const int argc, char const * const * const argv)
   auto format_option = vm["format"].as<openscenario_preprocessor::ScenarioFormat>();
   auto parameters_option = boost::filesystem::path(vm["parameters"].as<std::string>());
   auto scenario_option = boost::filesystem::path(vm["scenario"].as<std::string>());
+  bool skip_full_derivation_option = (vm.count("skip-full-derivation") > 0);
 
   auto scenario_path = boost::filesystem::path(scenario_option);
 
@@ -95,10 +97,22 @@ int main(const int argc, char const * const * const argv)
 
   std::vector<boost::filesystem::path> xosc_scenario_paths;
 
+  boost::filesystem::path scenario_modifiers_path{};
+
   // preprocess t4v2 format and convert to xosc scenarios
   if (scenario_path.extension() == ".yaml" or scenario_path.extension() == ".yml") {
     openscenario_preprocessor::T4V2 t4v2;
-    auto xosc_string_scenarios = t4v2.deriveToXoscStringScenarios(scenario_path);
+
+    auto [modifiers_path, base_scenario_path] = t4v2.splitScenarioModifiers(scenario_path);
+    scenario_modifiers_path = modifiers_path;
+
+    auto xosc_string_scenarios = [&]() {
+      if (skip_full_derivation_option) {
+        return t4v2.deriveToXoscStringScenarios(base_scenario_path);
+      } else {
+        return t4v2.deriveToXoscStringScenarios(base_scenario_path, modifiers_path);
+      }
+    }();
 
     boost::filesystem::path t4v2_output_directory = "/tmp/openscenario_preprocessor/t4v2_derived";
     if (not boost::filesystem::exists(t4v2_output_directory)) {
@@ -129,6 +143,29 @@ int main(const int argc, char const * const * const argv)
 
       preprocessor.preprocessScenario(
         "/tmp/openscenario_preprocessor/parameter_value_distribution.xosc", format_option);
+
+      // merge senario modifiers if skip_full_derivation_option is ON
+      if (
+        format_option == openscenario_preprocessor::ScenarioFormat::t4v2 &&
+        skip_full_derivation_option) {
+        auto derived_scenario_paths = preprocessor.getPreprocessedScenarios();
+        while (not derived_scenario_paths.empty()) {
+          std::ifstream input_scenario_file{derived_scenario_paths.front().string()};
+          std::stringstream scenario_ss;
+          scenario_ss << input_scenario_file.rdbuf();
+          input_scenario_file.close();
+
+          std::ofstream scenario_file{derived_scenario_paths.front().string()};
+          std::ifstream modifiers_file{scenario_modifiers_path.string()};
+          scenario_file << modifiers_file.rdbuf();
+          modifiers_file.close();
+
+          scenario_file << scenario_ss.str();
+          scenario_file.close();
+
+          derived_scenario_paths.pop();
+        }
+      }
     }
   } else {
     // TODO

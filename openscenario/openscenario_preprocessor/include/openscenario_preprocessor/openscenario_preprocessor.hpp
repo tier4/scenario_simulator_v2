@@ -69,6 +69,11 @@ public:
 
   void convertXMLtoYAML(const pugi::xml_node & xml, YAML::Emitter & emitter);
 
+  const std::queue<boost::filesystem::path> & getPreprocessedScenarios() const
+  {
+    return preprocessed_scenarios;
+  }
+
 protected:
   std::queue<boost::filesystem::path> preprocessed_scenarios;
 

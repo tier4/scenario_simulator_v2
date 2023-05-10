@@ -34,25 +34,20 @@ const std::string_view scenario_modifiers_distribution_base = R"###(
     </ParameterValueDistribution>
 </OpenSCENARIO>)###";
 
-auto T4V2::deriveToXoscStringScenarios(boost::filesystem::path path) -> std::vector<std::string>
+auto T4V2::deriveToXoscStringScenarios(
+  boost::filesystem::path scenario_path, boost::filesystem::path modifiers_path)
+  -> std::vector<std::string>
 {
-  std::fstream file{path};
-  std::stringstream scenario;
-  scenario << file.rdbuf();
-  file.close();
-
-  auto split = splitScenarioModifiers(scenario.str());
-
-  std::ofstream base_scenario_ofs("/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
-  base_scenario_ofs << split.second;
-  base_scenario_ofs.close();
-
-  auto openscenario_doc = loadScenarioFile("/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
+  auto openscenario_doc = loadScenarioFile(scenario_path.string());
 
   std::vector<std::string> derived_scenarios;
-  if (not split.first.empty()) {
+  if (not modifiers_path.empty()) {
+    std::fstream file{modifiers_path.string()};
+    std::stringstream modifiers_ss;
+    modifiers_ss << file.rdbuf();
+    file.close();
     auto parameter_value_distribution =
-      generateParameterValueDistributionFromScenarioModifiers(split.first);
+      generateParameterValueDistributionFromScenarioModifiers(modifiers_ss.str());
     boost::filesystem::path parameter_value_distribution_path =
       "/tmp/openscenario_preprocessor/scenario_modifiers_distribution.xosc";
     parameter_value_distribution.save_file(parameter_value_distribution_path.string().c_str());
@@ -83,14 +78,31 @@ auto T4V2::deriveToXoscStringScenarios(boost::filesystem::path path) -> std::vec
   return derived_scenarios;
 }
 
-std::pair<std::string, std::string> T4V2::splitScenarioModifiers(std::string scenario)
+std::pair<boost::filesystem::path, boost::filesystem::path> T4V2::splitScenarioModifiers(
+  boost::filesystem::path scenario_path)
 {
+  std::fstream file{scenario_path.string()};
+  std::stringstream scenario_ss;
+  scenario_ss << file.rdbuf();
+  file.close();
+
+  auto scenario_string = scenario_ss.str();
+
   std::regex re("(.*\n|^)(OpenSCENARIO.*)");
   std::smatch match;
 
-  if (std::regex_search(scenario, match, re)) {
-    return std::make_pair(
-      scenario.substr(0, match.position(2)), scenario.substr(match.position(2)));
+  if (std::regex_search(scenario_string, match, re)) {
+    std::ofstream modifiers_ofs("/tmp/openscenario_preprocessor/t4v2_modifiers.yaml");
+    modifiers_ofs << scenario_string.substr(0, match.position(2));
+    modifiers_ofs.close();
+
+    std::ofstream base_scenario_ofs("/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
+    base_scenario_ofs << scenario_string.substr(match.position(2));
+    base_scenario_ofs.close();
+
+    return std::make_pair<boost::filesystem::path, boost::filesystem::path>(
+      "/tmp/openscenario_preprocessor/t4v2_modifiers.yaml",
+      "/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
   } else {
     throw std::runtime_error(
       "No OpenSCENARIO element found in TIER IV 2.0 Format Scenario. Please check your "
