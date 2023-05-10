@@ -51,9 +51,7 @@ auto PolynomialSolver::solveLinearEquation(
     if (std::abs(b) <= tolerance) {
       THROW_SIMULATION_ERROR(
         "Not computable because a=0 in the linear equation ", a, " x + ", b,
-        "=0, "
-        "so any value of x = ",
-        min_value, "~", max_value, " will be the solution.",
+        "=0, so any value of x = ", min_value, "~", max_value, " will be the solution.",
         "There are no expected cases where this exception is thrown.",
         "Please contact the scenario_simulator_v2 developers, ",
         "especially Masaya Kataoka (@hakuturu583).");
@@ -81,13 +79,14 @@ auto PolynomialSolver::solveQuadraticEquation(
   if (std::abs(a) <= tolerance) {
     return solveLinearEquation(b, c);
   }
-  double root = b * b - 4 * a * c;
-  if (std::abs(root) <= tolerance) {
+  double discriminant = b * b - 4 * a * c;
+  if (std::abs(discriminant) <= tolerance) {
     candidates = {-b / (2 * a)};
-  } else if (root < 0) {
+  } else if (discriminant < 0) {
     candidates = {};
   } else {
-    candidates = {(-b - std::sqrt(root)) / (2 * a), (-b + std::sqrt(root)) / (2 * a)};
+    candidates = {
+      (-b - std::sqrt(discriminant)) / (2 * a), (-b + std::sqrt(discriminant)) / (2 * a)};
   }
   for (const auto candidate : candidates) {
     if (min_value <= candidate && candidate <= max_value) {
@@ -134,7 +133,8 @@ auto PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doub
   x = std::vector<double>(3);
   double a2 = a * a;
   /**
-   * @note Tschirnhaus transformation, transform into x^3 + q*x + r = 0
+   * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
+   * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
    */
   double q = (a2 - 3 * b) / 9;
   double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
@@ -143,7 +143,7 @@ auto PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doub
   double A, B;
   if (r2 <= (q3 + tolerance)) {
     /**
-     * @note If 3 real roots are found.
+     * @note If 3 real solutions are found.
      * @sa https://onihusube.hatenablog.com/entry/2018/10/08/140426
      */
     double t = r / std::sqrt(q3);
@@ -178,7 +178,7 @@ auto PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doub
     x[1] = -0.5 * (A + B) - a;
     x[2] = 0.5 * std::sqrt(3.) * (A - B);
     /**
-     * @note If the imaginary part of the complex almost zero, this equation has a multiple root.
+     * @note If the imaginary part of the complex almost zero, this equation has a multiple solution.
      */
     if (std::abs(x[2]) <= tolerance) {
       x[2] = x[1];
@@ -187,7 +187,7 @@ auto PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doub
     return 1;
   }
   /**
-   * @note No roots are found.
+   * @note No solutions are found.
    */
   return 0;
 }

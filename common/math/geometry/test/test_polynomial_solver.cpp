@@ -35,9 +35,9 @@ bool checkValueWithTolerance(double value, double expected, double tolerance)
 TEST(PolynomialSolverTest, LinearFunction)
 {
   math::geometry::PolynomialSolver solver;
-  EXPECT_DOUBLE_EQ(solver.linearFunction(1, 1, 2), 3);  // x + 1 (x=2)
-  EXPECT_DOUBLE_EQ(solver.linearFunction(1, 0, 2), 2);  // x + 0 (x=2)
-  EXPECT_DOUBLE_EQ(solver.linearFunction(0, 0, 2), 0);  // 0 (x=2)
+  EXPECT_DOUBLE_EQ(solver.linearFunction(1, 1, 2), 3);  // x + 1 = 3 (x=2)
+  EXPECT_DOUBLE_EQ(solver.linearFunction(1, 0, 2), 2);  // x + 0 = 2 (x=2)
+  EXPECT_DOUBLE_EQ(solver.linearFunction(0, 0, 2), 0);  //     0 = 0 (x=2)
 }
 
 /**
@@ -49,8 +49,8 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
   for (double a = -20; a < 20; a = a + 0.1) {
     for (double b = -20; b < 20; b = b + 0.1) {
       /**
-       * @note If the ax+b=0 (a=0,b=0), any x value are solution, 
-       * so throwing common::SimulationError errors are expected.
+       * @note If the ax+b=0 (a=0,b=0), any x value is a solution, 
+       * so throwing a common::SimulationError error is expected.
        */
       if (
         std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
@@ -58,7 +58,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
         EXPECT_THROW(solver.solveLinearEquation(a, b, 0, 1), common::SimulationError);
       }
       /**
-       * @note Other cases, solver must be able to obtain an exact solution.
+       * @note Other cases, solver must be able to obtain solutions.
        */
       else {
         auto ret = solver.solveLinearEquation(a, b, 0, 1);
@@ -76,9 +76,10 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
 TEST(PolynomialSolverTest, QuadraticFunction)
 {
   math::geometry::PolynomialSolver solver;
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);  // x^2 + x + 1 (x=2)
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 0, 2), 6);  // x^2 + x + 0 (x=2)
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(0, 0, 0, 2), 0);  // 0 (x=2)
+  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);   //  x^2 + x + 1 =  7 (x=2)
+  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 0, 2), 6);   //  x^2 + x + 0 =  6 (x=2)
+  EXPECT_DOUBLE_EQ(solver.quadraticFunction(2, 0, 3, 2), 11);  // 2x^2     + 3 = 11 (x=2)
+  EXPECT_DOUBLE_EQ(solver.quadraticFunction(0, 0, 0, 2), 0);   //            0 =  0 (x=2)
 }
 
 /**
@@ -91,8 +92,8 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
     for (double b = -20; b < 20; b = b + 1) {
       for (double c = -20; c < 20; c = c + 1) {
         /**
-         * @note If the ax^2+bx+c=0 (a=0,b=0,c=0), any x value are solution, 
-         * so throwing common::SimulationError errors are expected.
+         * @note If the ax^2+bx+c=0 (a=0,b=0,c=0), any x value is a solution, 
+         * so throwing a common::SimulationError error is expected.
          */
         if (
           std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
@@ -101,7 +102,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
           EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
         }
         /**
-         * @note Other cases, solver must be able to obtain an exact solution.
+         * @note Other cases, solver must be able to obtain solutions.
          */
         else {
           auto ret = solver.solveQuadraticEquation(a, b, c, 0, 1);
@@ -126,8 +127,8 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
       for (double c = -10; c < 10; c = c + 1) {
         for (double d = -10; d < 10; d = d + 1) {
           /**
-           * @note If the ax^3+bx^2+cx+d=0 (a=0,b=0,c=0,d=0), any x value are solution, 
-           * so throwing common::SimulationError errors are expected.
+           * @note If the ax^3+bx^2+cx+d=0 (a=0,b=0,c=0,d=0), any x value is a solution, 
+           * so throwing a common::SimulationError error is expected.
            */
           if (
             std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
@@ -137,7 +138,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
             EXPECT_THROW(solver.solveCubicEquation(a, b, c, d, 0, 1), common::SimulationError);
           }
           /**
-           * @note Other cases, solver must be able to obtain an exact solution.
+           * @note Other cases, solver must be able to obtain solutions.
            */
           else {
             auto ret = solver.solveCubicEquation(a, b, c, d, 0, 1);
