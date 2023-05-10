@@ -134,7 +134,8 @@ auto PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doub
   x = std::vector<double>(3);
   double a2 = a * a;
   /**
-   * @note Tschirnhaus transformation, transform into x^3 + q*x + r = 0
+   * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
+   * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
    */
   double q = (a2 - 3 * b) / 9;
   double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
