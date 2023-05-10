@@ -51,9 +51,7 @@ auto PolynomialSolver::solveLinearEquation(
     if (std::abs(b) <= tolerance) {
       THROW_SIMULATION_ERROR(
         "Not computable because a=0 in the linear equation ", a, " x + ", b,
-        "=0, "
-        "so any value of x = ",
-        min_value, "~", max_value, " will be the solution.",
+        "=0, so any value of x = ", min_value, "~", max_value, " will be the solution.",
         "There are no expected cases where this exception is thrown.",
         "Please contact the scenario_simulator_v2 developers, ",
         "especially Masaya Kataoka (@hakuturu583).");
