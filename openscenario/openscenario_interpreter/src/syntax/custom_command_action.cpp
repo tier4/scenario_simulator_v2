@@ -49,8 +49,7 @@ struct ApplyFaultInjectionAction : public CustomCommand
   {
     static_assert(0 < Version and Version <= 2);
 
-    if constexpr (Version == 1)
-    {
+    if constexpr (Version == 1) {
       auto makeFaultInjectionEvents = [](const std::vector<std::string> & events) {
         auto makeFaultInjectionEvent = [](const auto & name) {
           tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
@@ -67,13 +66,9 @@ struct ApplyFaultInjectionAction : public CustomCommand
       };
 
       publisher().publish(makeFaultInjectionEvents(parameters));
-    }
-    else
-    {
+    } else {
       auto makeFaultInjectionEvents = [](const std::vector<std::string> & parameters) {
-
         auto makeFaultInjectionEvent = [](const auto & level, const auto & name) {
-
           auto convert = [](const auto & level) {
             if (level == "OK") {
               return tier4_simulation_msgs::msg::FaultInjectionEvent::OK;
@@ -94,7 +89,8 @@ struct ApplyFaultInjectionAction : public CustomCommand
 
         tier4_simulation_msgs::msg::SimulationEvents simulation_events;
         simulation_events.stamp = node().now();
-        simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(parameters[0], parameters[1]));
+        simulation_events.fault_injection_events.push_back(
+          makeFaultInjectionEvent(parameters[0], parameters[1]));
         return simulation_events;
       };
 
