@@ -36,6 +36,6 @@ If you want to know TIER IV Scenario format Version 2.0 , which is a default sce
 
 If you want to know about vehicle dynamics model in simulation, please check [this documentation](VehicleDynamics.md).
 
-## NPC Behavior
+## Entity Behavior
 
-If you want to know about NPC behavior, please check [this documentation](NPCBehavior.md)
+If you want to know about Entity behavior, please check [this documentation](EntityBehavior.md)

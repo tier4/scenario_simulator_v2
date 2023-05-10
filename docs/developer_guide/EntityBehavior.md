@@ -1,13 +1,14 @@
-# NPC Behavior
+# Entity Behavior
 
-Behavior logic of the NPC(non-player-character) is pluggable.
+Behavior logic of the entity is pluggable.
 If you want to use your own behavior, please see [this document](BehaviorPlugin.md).
 
-In this document, we describe how default behavior tree NPC works in traffic environment.
-Default behavior tree NPC logics are in [this package](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/behavior_tree_plugin).
+In this document, we describe how default behavior tree entity works in traffic environment.
+Default behavior tree entity behavior logics are in [this package](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/behavior_tree_plugin).
 
-## Vehicle NPC
-Behavior tree of vehicle NPC is here.
+## Vehicle entity (with Behavior-Tree Plugin)
+
+Behavior tree of vehicle entity is here.
 
 ```mermaid
 graph TD
@@ -34,22 +35,21 @@ graph TD
     click L "https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/behavior_tree_plugin/src/vehicle/follow_lane_sequence/move_backward_action.cpp"
 ```
 
-| Action               | Behavior                                            | Success                                            | Failure                                                                                 |
-|----------------------|-----------------------------------------------------|----------------------------------------------------|-----------------------------------------------------------------------------------------|
-| LaneChange           | Changing to target lane.                            | Moved to target lane.                              | Failed to calculate lane change trajectory.                                             |
-| FollowLane           | Following lane and moving to goal.                  |                                                    | Lane change was requested, traffic light, stop sing, conflicting entities are detected. |
-| FollowFrontEntity    | Following target entity in front of the NPC.        | Target entity was disappeared in front of the NPC. |                                                                                         |
-| StopAtTrafficLight   | Stopping at a traffic light until it becomes green. | The traffic light become green.                    |                                                                                         |
-| StopAtStopLine       | Stopping at a stop line.                            | The NPC was stopped at stop line.                  | Overrun stop line.                                                                      |
-| StopAtCrossingEntity | Stopping at crossing entity.                        | Target entity was crossed.                         |                                                                                         |
-| Yield                | Yield to right-of-way entity.                       | Right of way entity is moved.                      |                                                                                         |
-| MoveBackward         | Move backward on lane.                              | Another request and new goal point was suggested.  |                                                                                         |
-
+| Action               | Behavior                                            | Success                                               | Failure                                                                                 |
+|----------------------|-----------------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------------------------------------|
+| LaneChange           | Changing to target lane.                            | Moved to target lane.                                 | Failed to calculate lane change trajectory.                                             |
+| FollowLane           | Following lane and moving to goal.                  |                                                       | Lane change was requested, traffic light, stop sing, conflicting entities are detected. |
+| FollowFrontEntity    | Following target entity in front of the entity.     | Target entity was disappeared in front of the entity. |                                                                                         |
+| StopAtTrafficLight   | Stopping at a traffic light until it becomes green. | The traffic light become green.                       |                                                                                         |
+| StopAtStopLine       | Stopping at a stop line.                            | The entity was stopped at stop line.                  | Overrun stop line.                                                                      |
+| StopAtCrossingEntity | Stopping at crossing entity.                        | Target entity was crossed.                            |                                                                                         |
+| Yield                | Yield to right-of-way entity.                       | Right of way entity is moved.                         |                                                                                         |
+| MoveBackward         | Move backward on lane.                              | Another request and new goal point was suggested.     |                                                                                         |
 
 ### Behavior
 #### LaneChange
 
-By using `API::requestLaneChange` function, you send lane change request to target NPC.
+By using `API::requestLaneChange` function, you send lane change request to target entity.
 You can send request with these parameters.
 
 ##### Target
@@ -120,3 +120,10 @@ You can send request with these parameters.
 |-------------|-----------------------------------------------------------------------------|--------------------|
 | FORCE       | Changing lanes and fulfilling constraints ignoring dynamics.                | :heavy_check_mark: |
 | BEST_EFFORT | Changing lanes and trying to fulfill constraints without ignoring dynamics. |                    |
+
+## Vehicle NPC (Do-Nothing Plugin)
+
+When this plug-in is used, Entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the setEntityStatus function, etc.
+When using this plug-in, any consistency in physical behavior is ignored.
+Changes in posture, velocity, acceleration, and jerk over time will not occur.
+The EntityStatus value will continue to be the value specified and updated via the setEntityStatus function, etc.
