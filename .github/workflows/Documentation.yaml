@@ -31,15 +31,15 @@ jobs:
         run: >
           pip3 install \
             fontawesome_markdown
-            markdown
-            mkdocs
-            mkdocs-codeinclude-plugin
-            mkdocs-git-revision-date-localized-plugin
-            mkdocs-material 
-            mkdocs-mermaid2-plugin
-            plantuml
-            plantuml-markdown
-            pymdown-extensions
+            markdown \
+            mkdocs \
+            mkdocs-codeinclude-plugin \
+            mkdocs-git-revision-date-localized-plugin \
+            mkdocs-material \
+            mkdocs-mermaid2-plugin \
+            plantuml \
+            plantuml-markdown \
+            pymdown-extensions \
             python-markdown-math
       - name: Install doxygen/depends of doxybook
         run: sudo apt install -y doxygen wget
