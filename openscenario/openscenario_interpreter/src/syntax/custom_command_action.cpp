@@ -46,33 +46,22 @@ struct ApplyFaultInjection : public CustomCommand
 
   auto start(const Scope &) -> void override
   {
-    auto & events = parameters;
-    const auto now = node().now();
-
-    auto makeFaultInjectionEvent = [](const auto & name) {
-      tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
-      {
+    auto makeFaultInjectionEvents = [](const std::vector<std::string> & events) {
+      auto makeFaultInjectionEvent = [](const auto & name) {
+        tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
         fault_injection_event.level = tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
         fault_injection_event.name = name;
-      }
-
-      return fault_injection_event;
-    };
-
-    auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
+        return fault_injection_event;
+      };
       tier4_simulation_msgs::msg::SimulationEvents simulation_events;
-      {
-        simulation_events.stamp = now;
-
-        for (const auto & event : events) {
-          simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
-        }
+      simulation_events.stamp = node().now();
+      for (const auto & event : events) {
+        simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
       }
-
       return simulation_events;
     };
 
-    publisher().publish(makeFaultInjectionEvents(events));
+    publisher().publish(makeFaultInjectionEvents(parameters));
   }
 };
 
