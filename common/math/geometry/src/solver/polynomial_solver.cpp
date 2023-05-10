@@ -135,7 +135,6 @@ auto PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doub
   double a2 = a * a;
   /**
    * @note Tschirnhaus transformation, transform into x^3 + q*x + r = 0
-   * @sa https://science-log.com/%E6%95%B0%E5%AD%A6/3%E6%AC%A1%E6%96%B9%E7%A8%8B%E5%BC%8F%E3%81%AE%E8%A7%A3%E3%81%AE%E5%85%AC%E5%BC%8F/
    */
   double q = (a2 - 3 * b) / 9;
   double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
