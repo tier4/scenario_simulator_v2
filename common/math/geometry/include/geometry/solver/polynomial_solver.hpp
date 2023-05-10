@@ -29,7 +29,7 @@ public:
  *
  * @param a
  * @param b
- * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
+ * @return std::vector<double> real solution of the quadratic functions (from 0 to 1)
  */
   auto solveLinearEquation(double a, double b, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
@@ -38,7 +38,7 @@ public:
  *
  * @param a
  * @param b
- * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
+ * @return std::vector<double> real solution of the quadratic functions (from 0 to 1)
  */
   auto solveQuadraticEquation(
     double a, double b, double c, double min_value = 0, double max_value = 1) const
@@ -50,7 +50,7 @@ public:
  * @param b
  * @param c
  * @param d
- * @return std::vector<double> real root of the cubic functions (from 0 to 1)
+ * @return std::vector<double> real solution of the cubic functions (from 0 to 1)
  */
   auto solveCubicEquation(
     double a, double b, double c, double d, double min_value = 0, double max_value = 1) const
@@ -108,9 +108,9 @@ private:
  * @param b
  * @param c
  * @return int
-           if return value is 3, 3 real roots: x[0], x[1], x[2],
-           if return value is 2, 2 real roots: x[0], x[1],
-           if return value is 1, 1 real root : x[0], x[1] ± i*x[2],
+           if return value is 3, 3 real solutions: x[0], x[1], x[2],
+           if return value is 2, 2 real solutions: x[0], x[1],
+           if return value is 1, 1 real solution : x[0], x[1] ± i*x[2],
  */
   auto solveP3(std::vector<double> & x, double a, double b, double c) const -> int;
 };
