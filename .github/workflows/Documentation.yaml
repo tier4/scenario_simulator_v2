@@ -29,7 +29,7 @@ jobs:
         run: pip3 install --upgrade pip
       - name: Install
         run: >
-          pip3 install
+          pip3 install \
             fontawesome_markdown
             markdown
             mkdocs
