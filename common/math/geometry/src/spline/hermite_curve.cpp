@@ -143,8 +143,8 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
     /**
     * @note PolynomialSolver::solveCubicEquation throws common::SimulationError when any x value can satisfy the equation, 
     * so the beginning and end point of this curve can collide with the line segment.
-    * If search_backward = true, line segment collisions at the end of the curve. So return 1.
-    * If search_backward = false, line segment collisions at the start of the curve. So return 0.
+    * If search_backward = true, the line segment collisions at the end of the curve. So return 1.
+    * If search_backward = false, the line segment collisions at the start of the curve. So return 0.
     */
     catch (const common::SimulationError &) {
       return {search_backward ? 1.0 : 0.0};
