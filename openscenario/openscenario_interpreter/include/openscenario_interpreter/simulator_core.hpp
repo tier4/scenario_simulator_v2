@@ -190,6 +190,18 @@ public:
     {
       return core->getV2ITrafficLights(std::forward<decltype(xs)>(xs)...);
     }
+
+    template <typename... Ts>
+    static auto updateConventionalTrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->updateConventionalTrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto updateV2ITrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->updateV2ITrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
+    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5

@@ -93,6 +93,8 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
       traffic_light.get().clear();
       traffic_light.get().set(state);
     }
+
+    updateV2ITrafficLightsPublishRate(publish_frequency);
   }
 
   hdmap_utils::HdMapUtils::LaneletId lanelet_id;

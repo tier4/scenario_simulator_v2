@@ -591,8 +591,12 @@ void EntityManager::update(const double current_time, const double step_time)
   current_time_ = current_time;
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
-    conventional_traffic_light_manager_ptr_->update(step_time_);
-    v2i_traffic_light_manager_ptr_->update(step_time_);
+    static bool first = true;
+    if (first) {
+      first = false;
+      conventional_traffic_light_manager_ptr_->updatePublishRate(30.0);
+      v2i_traffic_light_manager_ptr_->updatePublishRate(10.0);
+    }
   }
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;

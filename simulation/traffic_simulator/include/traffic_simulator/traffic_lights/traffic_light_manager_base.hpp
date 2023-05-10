@@ -52,6 +52,16 @@ protected:
 
   const std::string map_frame_;
 
+  rclcpp::TimerBase::SharedPtr timer_ = nullptr;
+
+  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
+
+  rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
+
+  rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
+
+  double update_rate_ = 0.0;
+
   template <typename NodePointer>
   explicit TrafficLightManagerBase(
     const NodePointer & node, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap,
@@ -60,7 +70,9 @@ protected:
       node, "traffic_light/marker", rclcpp::QoS(1).transient_local())),
     clock_ptr_(node->get_clock()),
     hdmap_(hdmap),
-    map_frame_(map_frame)
+    map_frame_(map_frame),
+    node_base_interface_(node->get_node_base_interface()),
+    node_timers_interface_(node->get_node_timers_interface())
   {
   }
 
@@ -108,6 +120,21 @@ public:
   }
 
   auto hasAnyLightChanged() -> bool;
+
+  auto updatePublishRate(double update_rate) -> void
+  {
+    if (update_rate_ != update_rate) {
+      update_rate_ = update_rate;
+      if (timer_) {
+        timer_->reset();
+      }
+
+      timer_ = rclcpp::create_timer(
+        node_base_interface_, node_timers_interface_, clock_ptr_,
+        rclcpp::Duration::from_seconds(1.0 / update_rate_),
+        [this]() -> void { update(1.0 / update_rate_); });
+    }
+  }
 
   auto update(const double) -> void;
 };
