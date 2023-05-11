@@ -116,9 +116,6 @@ private:
   void attachOccupancyGridSensor(
     const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
     simulation_api_schema::AttachOccupancyGridSensorResponse & res);
-  void updateSensorFrame(
-    const simulation_api_schema::UpdateSensorFrameRequest & req,
-    simulation_api_schema::UpdateSensorFrameResponse & res);
   void updateTrafficLights(
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);

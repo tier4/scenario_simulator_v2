@@ -67,10 +67,10 @@ message UpdatedEntityStatus {
  * Requests initializing simulation.
  **/
 message InitializeRequest {
-    double realtime_factor = 1;                      // Realtime factor of the simulation.
-    double step_time = 2;                            // Step time of the simulation.
-    double initialize_time = 3;                      // Simulation time at initialization
-    builtin_interfaces.Time initialize_ros_time = 4; // ROS time at initialization
+  double realtime_factor = 1;                      // Realtime factor of the simulation.
+  double step_time = 2;                            // Step time of the simulation.
+  double initialize_time = 3;                      // Simulation time at initialization
+  builtin_interfaces.Time initialize_ros_time = 4; // ROS time at initialization
 }
 
 /**
@@ -212,22 +212,6 @@ message AttachOccupancyGridSensorResponse {
   Result result = 1; // Result of [AttachOccupancyGridSensorRequest](#AttachOccupancyGridRequest)
 }
 
-/**
- * Requests updating a frame of sensor simulation.
- **/
-message UpdateSensorFrameRequest {
-  double current_time = 1;                      // Current simulation timestamp.
-  builtin_interfaces.Time current_ros_time = 2; // Current ROS time
-}
-
-/**
- * Response of updating a frame of sensor simulation.
- **/
-message UpdateSensorFrameResponse {
-  Result result = 1; // Result of [UpdateSensorFrameRequest](#UpdateSensorFrameRequest)
-}
-
-
 message TrafficLightState {
   message LampState {
     enum State {
@@ -289,7 +273,6 @@ message SimulationResponse {
   oneof response {
     InitializeResponse initialize = 1;
     UpdateFrameResponse update_frame = 2;
-    UpdateSensorFrameResponse update_sensor_frame = 3;
     SpawnVehicleEntityResponse spawn_vehicle_entity = 4;
     SpawnPedestrianEntityResponse spawn_pedestrian_entity = 5;
     SpawnMiscObjectEntityResponse  spawn_misc_object_entity = 6;
