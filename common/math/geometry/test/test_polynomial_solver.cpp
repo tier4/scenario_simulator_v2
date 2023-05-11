@@ -163,7 +163,7 @@ TEST(PolynomialSolverTest, SolveSpecificCubicEquationWithMinMax)
   constexpr double max_value = 1;
   /**
    * @note solve x^3 - 2x^2 - 11x + 12 = 0 (solutions should be -3, 1, 4)
-   * range of the solution should be min_value ~ max_value.
+   * range of the solution should be [min_value, max_value].
    */
   math::geometry::PolynomialSolver solver;
   auto solutions = solver.solveCubicEquation(1, -2, -11, 12, min_value, max_value);
@@ -186,7 +186,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
   constexpr double min_value = 0;
   constexpr double max_value = 1;
   /**
-   * @note Coverage verification of each coefficient for the cubic equation ax^3 + bx^2 + cx + d = 0 in the range [-10~10] in increments of 1
+   * @note Coverage verification of each coefficient for the cubic equation ax^3 + bx^2 + cx + d = 0 in the range [-10, 10] in increments of 1
    */
   math::geometry::PolynomialSolver solver;
   for (double a = -10; a < 10; a = a + 1) {
