@@ -128,9 +128,9 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
 TEST(PolynomialSolverTest, QuadraticFunction)
 {
   math::geometry::PolynomialSolver solver;
-  EXPECT_DOUBLE_EQ(solver.cubicFunction(1, 1, 1, 1, 2), 15);  //  x^3 +  x^2 + x + 1 =  7 (x=2)
-  EXPECT_DOUBLE_EQ(solver.cubicFunction(4, 1, 1, 0, 2), 38);  // 4x^3 +  x^2 + x + 0 =  6 (x=2)
-  EXPECT_DOUBLE_EQ(solver.cubicFunction(3, 2, 0, 3, 2), 35);  // 3x^3 + 2x^2     + 3 = 11 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubicFunction(1, 1, 1, 1, 2), 15);  //  x^3 +  x^2 + x + 1 = 15 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubicFunction(4, 1, 1, 0, 2), 38);  // 4x^3 +  x^2 + x + 0 = 38 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubicFunction(3, 2, 0, 3, 2), 35);  // 3x^3 + 2x^2     + 3 = 35 (x=2)
   EXPECT_DOUBLE_EQ(solver.cubicFunction(0, 0, 0, 0, 2), 0);   //                   0 =  0 (x=2)
 }
 
