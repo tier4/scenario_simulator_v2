@@ -178,30 +178,6 @@ public:
       position.rpy.z = std::numeric_limits<double>::quiet_NaN();
       return position;
     }
-
-    template <typename... Ts>
-    static auto getConventionalTrafficLights(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getConventionalTrafficLights(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto getV2ITrafficLights(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getV2ITrafficLights(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto updateConventionalTrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
-    {
-      return core->updateConventionalTrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
-    static auto updateV2ITrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
-    {
-      return core->updateV2ITrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
-    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
@@ -456,6 +432,30 @@ public:
       } else {
         return Double::nan();
       }
+    }
+
+    template <typename... Ts>
+    static auto getConventionalTrafficLights(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto getV2ITrafficLights(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto updateConventionalTrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->updateConventionalTrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto updateV2ITrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->updateV2ITrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
     }
   };
 };

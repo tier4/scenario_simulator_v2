@@ -77,7 +77,7 @@ struct ApplyFaultInjection : public CustomCommand
 };
 
 struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
-                                          public SimulatorCore::CoordinateSystemConversion
+                                          public SimulatorCore::NonStandardOperation
 {
   using CustomCommand::CustomCommand;
 
