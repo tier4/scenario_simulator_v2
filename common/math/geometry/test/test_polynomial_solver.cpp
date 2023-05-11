@@ -78,7 +78,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
 /**
  * @note Testcase for ax^2+bx+c
  */
-TEST(PolynomialSolverTest, CubicFunction)
+TEST(PolynomialSolverTest, QuadraticFunction)
 {
   math::geometry::PolynomialSolver solver;
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);   //  x^2 + x + 1 =  7 (x=2)
@@ -127,7 +127,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
 /**
  * @note Testcase for ax^3+bx^2+cx+d
  */
-TEST(PolynomialSolverTest, QuadraticFunction)
+TEST(PolynomialSolverTest, CubicFunction)
 {
   math::geometry::PolynomialSolver solver;
   EXPECT_DOUBLE_EQ(solver.cubicFunction(1, 1, 1, 1, 2), 15);  //  x^3 +  x^2 + x + 1 = 15 (x=2)
