@@ -164,7 +164,7 @@ TEST(PolynomialSolverTest, SolveSpecificCubicEquationWithMinMax)
   constexpr double min_value = 0;
   constexpr double max_value = 1;
   /**
-   * @note solve x^3 - 2x^2 - 11x + 12 = 0 (solutions should be -3, 1, 4)
+   * @note solve x^3 - 2x^2 - 11x + 12 = 0 (solutions should be 1)
    * range of the solution should be [min_value, max_value].
    */
   math::geometry::PolynomialSolver solver;
