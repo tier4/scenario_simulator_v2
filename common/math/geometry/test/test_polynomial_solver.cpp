@@ -18,7 +18,9 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-bool checkValueWithTolerance(double value, double expected, double tolerance)
+using solver_tolerance = math::geometry::PolynomialSolver::tolerance;
+
+bool checkValueWithTolerance(double value, double expected, double tolerance = solver_tolerance)
 {
   if (tolerance < 0) {
     throw std::logic_error("tolerance should be over 0");
@@ -54,9 +56,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
        * @note If the ax+b=0 (a=0,b=0), any x value is a solution, 
        * so throwing a common::SimulationError error is expected.
        */
-      if (
-        std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
-        std::abs(b) <= math::geometry::PolynomialSolver::tolerance) {
+      if (std::abs(a) <= solver_tolerance && std::abs(b) <= solver_tolerance) {
         EXPECT_THROW(
           solver.solveLinearEquation(a, b, min_value, max_value), common::SimulationError);
       }
@@ -66,7 +66,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
       else {
         auto ret = solver.solveLinearEquation(a, b, min_value, max_value);
         for (const auto & solution : ret) {
-          EXPECT_TRUE(checkValueWithTolerance(solver.linearFunction(a, b, solution), 0.0, 1e-10));
+          EXPECT_TRUE(checkValueWithTolerance(solver.linearFunction(a, b, solution), 0.0));
           EXPECT_TRUE(min_value <= solution && solution <= max_value);
         }
       }
@@ -102,9 +102,8 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
          * so throwing a common::SimulationError error is expected.
          */
         if (
-          std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
-          std::abs(b) <= math::geometry::PolynomialSolver::tolerance &&
-          std::abs(c) <= math::geometry::PolynomialSolver::tolerance) {
+          std::abs(a) <= solver_tolerance && std::abs(b) <= solver_tolerance &&
+          std::abs(c) <= solver_tolerance) {
           EXPECT_THROW(
             solver.solveQuadraticEquation(a, b, c, min_value, max_value), common::SimulationError);
         }
@@ -114,8 +113,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
         else {
           auto ret = solver.solveQuadraticEquation(a, b, c, 0, 1);
           for (const auto & solution : ret) {
-            EXPECT_TRUE(
-              checkValueWithTolerance(solver.quadraticFunction(a, b, c, solution), 0.0, 1e-10));
+            EXPECT_TRUE(checkValueWithTolerance(solver.quadraticFunction(a, b, c, solution), 0.0));
             EXPECT_TRUE(min_value <= solution && solution <= max_value);
           }
         }
@@ -139,10 +137,35 @@ TEST(PolynomialSolverTest, QuadraticFunction)
 /**
  * @note Testcase for ax^3+bx^2+cx+d = 0
  */
+TEST(PolynomialSolverTest, SolveSpecificCubicEquation)
+{
+  constexpr double min_value = 0;
+  constexpr double max_value = 1;
+  constexpr double infinity = std::numeric_limits<double>::infinity();
+  /**
+   * @note solve x^3 - 2x^2 - 11x + 12 = 0 (solutions should be -3, 1, 4)
+   */
+  math::geometry::PolynomialSolver solver;
+  auto solutions = solver.solveCubicEquation(1, -2, -11, 12, -infinity, infinity);
+  std::sort(solutions.begin(), solutions.end());
+  EXPECT_EQ(static_cast<int>(solutions.size()), 3);
+  if (solutions.size() == 3) {
+    EXPECT_TRUE(checkValueWithTolerance(solutions[0], -3));
+    EXPECT_TRUE(checkValueWithTolerance(solutions[1], 1));
+    EXPECT_TRUE(checkValueWithTolerance(solutions[2], 4));
+  }
+}
+
+/**
+ * @note Testcase for ax^3+bx^2+cx+d = 0
+ */
 TEST(PolynomialSolverTest, SolveCubicEquation)
 {
   constexpr double min_value = 0;
   constexpr double max_value = 1;
+  /**
+   * @note Coverage verification of each coefficient for the cubic equation ax^3 + bx^2 + cx + d = 0 in the range [-10~10] in increments of 1
+   */
   math::geometry::PolynomialSolver solver;
   for (double a = -10; a < 10; a = a + 1) {
     for (double b = -10; b < 10; b = b + 1) {
@@ -153,10 +176,8 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
            * so throwing a common::SimulationError error is expected.
            */
           if (
-            std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
-            std::abs(b) <= math::geometry::PolynomialSolver::tolerance &&
-            std::abs(c) <= math::geometry::PolynomialSolver::tolerance &&
-            std::abs(d) <= math::geometry::PolynomialSolver::tolerance) {
+            std::abs(a) <= solver_tolerance && std::abs(b) <= solver_tolerance &&
+            std::abs(c) <= solver_tolerance && std::abs(d) <= solver_tolerance) {
             EXPECT_THROW(
               solver.solveCubicEquation(a, b, c, d, min_value, max_value), common::SimulationError);
           }
@@ -166,8 +187,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
           else {
             auto ret = solver.solveCubicEquation(a, b, c, d, min_value, max_value);
             for (const auto & solution : ret) {
-              EXPECT_TRUE(
-                checkValueWithTolerance(solver.cubicFunction(a, b, c, d, solution), 0.0, 1e-10));
+              EXPECT_TRUE(checkValueWithTolerance(solver.cubicFunction(a, b, c, d, solution), 0.0));
               EXPECT_TRUE(min_value <= solution && solution <= max_value);
             }
           }
