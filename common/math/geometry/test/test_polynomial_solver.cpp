@@ -77,7 +77,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
 /**
  * @note Testcase for ax^2+bx+c
  */
-TEST(PolynomialSolverTest, QuadraticFunction)
+TEST(PolynomialSolverTest, CubicFunction)
 {
   math::geometry::PolynomialSolver solver;
   EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);   //  x^2 + x + 1 =  7 (x=2)
