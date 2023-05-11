@@ -45,6 +45,8 @@ TEST(PolynomialSolverTest, LinearFunction)
  */
 TEST(PolynomialSolverTest, SolveLinearEquation)
 {
+  constexpr double min_value = 0;
+  constexpr double max_value = 1;
   math::geometry::PolynomialSolver solver;
   for (double a = -20; a < 20; a = a + 0.1) {
     for (double b = -20; b < 20; b = b + 0.1) {
@@ -55,15 +57,17 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
       if (
         std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
         std::abs(b) <= math::geometry::PolynomialSolver::tolerance) {
-        EXPECT_THROW(solver.solveLinearEquation(a, b, 0, 1), common::SimulationError);
+        EXPECT_THROW(
+          solver.solveLinearEquation(a, b, min_value, max_value), common::SimulationError);
       }
       /**
        * @note Other cases, solver must be able to obtain solutions.
        */
       else {
-        auto ret = solver.solveLinearEquation(a, b, 0, 1);
+        auto ret = solver.solveLinearEquation(a, b, min_value, max_value);
         for (const auto & solution : ret) {
           EXPECT_TRUE(checkValueWithTolerance(solver.linearFunction(a, b, solution), 0.0, 1e-10));
+          EXPECT_TRUE(min_value <= solution && solution <= max_value);
         }
       }
     }
@@ -87,6 +91,8 @@ TEST(PolynomialSolverTest, QuadraticFunction)
  */
 TEST(PolynomialSolverTest, SolveQuadraticEquation)
 {
+  constexpr double min_value = 0;
+  constexpr double max_value = 1;
   math::geometry::PolynomialSolver solver;
   for (double a = -20; a < 20; a = a + 1) {
     for (double b = -20; b < 20; b = b + 1) {
@@ -99,7 +105,8 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
           std::abs(a) <= math::geometry::PolynomialSolver::tolerance &&
           std::abs(b) <= math::geometry::PolynomialSolver::tolerance &&
           std::abs(c) <= math::geometry::PolynomialSolver::tolerance) {
-          EXPECT_THROW(solver.solveQuadraticEquation(a, b, c, 0, 1), common::SimulationError);
+          EXPECT_THROW(
+            solver.solveQuadraticEquation(a, b, c, min_value, max_value), common::SimulationError);
         }
         /**
          * @note Other cases, solver must be able to obtain solutions.
@@ -109,6 +116,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
           for (const auto & solution : ret) {
             EXPECT_TRUE(
               checkValueWithTolerance(solver.quadraticFunction(a, b, c, solution), 0.0, 1e-10));
+            EXPECT_TRUE(min_value <= solution && solution <= max_value);
           }
         }
       }
@@ -117,10 +125,24 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
 }
 
 /**
+ * @note Testcase for ax^3+bx^2+cx+d
+ */
+TEST(PolynomialSolverTest, QuadraticFunction)
+{
+  math::geometry::PolynomialSolver solver;
+  EXPECT_DOUBLE_EQ(solver.cubicFunction(1, 1, 1, 1, 2), 15);  //  x^3 +  x^2 + x + 1 =  7 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubicFunction(4, 1, 1, 0, 2), 38);  // 4x^3 +  x^2 + x + 0 =  6 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubicFunction(3, 2, 0, 3, 2), 35);  // 3x^3 + 2x^2     + 3 = 11 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubicFunction(0, 0, 0, 0, 2), 0);   //            0 =  0 (x=2)
+}
+
+/**
  * @note Testcase for ax^3+bx^2+cx+d = 0
  */
 TEST(PolynomialSolverTest, SolveCubicEquation)
 {
+  constexpr double min_value = 0;
+  constexpr double max_value = 1;
   math::geometry::PolynomialSolver solver;
   for (double a = -10; a < 10; a = a + 1) {
     for (double b = -10; b < 10; b = b + 1) {
@@ -135,16 +157,18 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
             std::abs(b) <= math::geometry::PolynomialSolver::tolerance &&
             std::abs(c) <= math::geometry::PolynomialSolver::tolerance &&
             std::abs(d) <= math::geometry::PolynomialSolver::tolerance) {
-            EXPECT_THROW(solver.solveCubicEquation(a, b, c, d, 0, 1), common::SimulationError);
+            EXPECT_THROW(
+              solver.solveCubicEquation(a, b, c, d, min_value, max_value), common::SimulationError);
           }
           /**
            * @note Other cases, solver must be able to obtain solutions.
            */
           else {
-            auto ret = solver.solveCubicEquation(a, b, c, d, 0, 1);
+            auto ret = solver.solveCubicEquation(a, b, c, d, min_value, max_value);
             for (const auto & solution : ret) {
               EXPECT_TRUE(
                 checkValueWithTolerance(solver.cubicFunction(a, b, c, d, solution), 0.0, 1e-10));
+              EXPECT_TRUE(min_value <= solution && solution <= max_value);
             }
           }
         }
