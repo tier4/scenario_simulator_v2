@@ -38,24 +38,24 @@ auto TrafficSignalCondition::description() const -> String
 
 auto TrafficSignalCondition::evaluate() -> Object
 {
-  if (auto && traffic_relation =
+  if (auto && traffic_lights =
         getConventionalTrafficLights(boost::lexical_cast<std::int64_t>(name));
       state == "none") {
     current_state = "none";
     return asBoolean(std::all_of(
-      std::begin(traffic_relation), std::end(traffic_relation),
+      std::begin(traffic_lights), std::end(traffic_lights),
       [](const traffic_simulator::TrafficLight & traffic_light) { return traffic_light.empty(); }));
   } else {
     std::stringstream ss;
     std::string separator = "";
-    for (traffic_simulator::TrafficLight & traffic_light : traffic_relation) {
+    for (traffic_simulator::TrafficLight & traffic_light : traffic_lights) {
       ss << separator << traffic_light;
       separator = "; ";
     }
     current_state = ss.str();
 
     return asBoolean(std::all_of(
-      std::begin(traffic_relation), std::end(traffic_relation),
+      std::begin(traffic_lights), std::end(traffic_lights),
       [this](const traffic_simulator::TrafficLight & traffic_light) {
         return traffic_light.contains(state);
       }));
