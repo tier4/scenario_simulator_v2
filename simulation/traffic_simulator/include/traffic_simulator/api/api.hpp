@@ -331,7 +331,6 @@ public:
     const bool continuous);
 
 private:
-  bool updateSensorFrame();
   bool updateEntityStatusInSim();
   bool updateTrafficLightsInSim();
 

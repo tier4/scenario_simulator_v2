@@ -36,8 +36,6 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(&ScenarioSimulator::updateFrame, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
-      &ScenarioSimulator::updateSensorFrame, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
       &ScenarioSimulator::spawnVehicleEntity, this, std::placeholders::_1, std::placeholders::_2),
     std::bind(
       &ScenarioSimulator::spawnPedestrianEntity, this, std::placeholders::_1,
@@ -99,6 +97,7 @@ void ScenarioSimulator::updateFrame(
   builtin_interfaces::msg::Time t;
   simulation_interface::toMsg(req.current_ros_time(), t);
   current_ros_time_ = t;
+  sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status_);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
 }
@@ -217,23 +216,6 @@ void ScenarioSimulator::attachOccupancyGridSensor(
 {
   res = simulation_api_schema::AttachOccupancyGridSensorResponse();
   sensor_sim_.attachOccupancyGridSensor(current_time_, req.configuration(), *this);
-  res.mutable_result()->set_success(true);
-}
-
-void ScenarioSimulator::updateSensorFrame(
-  const simulation_api_schema::UpdateSensorFrameRequest & req,
-  simulation_api_schema::UpdateSensorFrameResponse & res)
-{
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if (std::abs(req.current_time() - current_time_) > e) {
-    res.mutable_result()->set_success(false);
-    res.mutable_result()->set_description("timestamp does not match");
-  }
-  builtin_interfaces::msg::Time t;
-  simulation_interface::toMsg(req.current_ros_time(), t);
-  current_ros_time_ = t;
-  sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status_);
-  res = simulation_api_schema::UpdateSensorFrameResponse();
   res.mutable_result()->set_success(true);
 }
 

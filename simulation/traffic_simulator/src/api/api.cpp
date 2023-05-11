@@ -255,21 +255,6 @@ bool API::attachLidarSensor(const std::string & entity_name, const helper::Lidar
     lidar_type, entity_name, getParameter<std::string>("architecture_type", "awf/universe")));
 }
 
-bool API::updateSensorFrame()
-{
-  if (configuration.standalone_mode) {
-    return true;
-  } else {
-    simulation_api_schema::UpdateSensorFrameRequest req;
-    req.set_current_time(clock_.getCurrentSimulationTime());
-    simulation_interface::toProto(
-      clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
-    simulation_api_schema::UpdateSensorFrameResponse res;
-    zeromq_client_.call(req, res);
-    return res.result().success();
-  }
-}
-
 bool API::updateTrafficLightsInSim()
 {
   simulation_api_schema::UpdateTrafficLightsRequest req;
@@ -368,8 +353,7 @@ bool API::updateFrame()
     if (!updateEntityStatusInSim()) {
       return false;
     }
-    updateTrafficLightsInSim();
-    return updateSensorFrame();
+    return updateTrafficLightsInSim();
   } else {
     entity_manager_ptr_->broadcastEntityTransform();
     clock_.update();
