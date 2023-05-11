@@ -18,7 +18,7 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-using solver_tolerance = math::geometry::PolynomialSolver::tolerance;
+constexpr double solver_tolerance = math::geometry::PolynomialSolver::tolerance;
 
 bool checkValueWithTolerance(double value, double expected, double tolerance = solver_tolerance)
 {
@@ -139,8 +139,6 @@ TEST(PolynomialSolverTest, QuadraticFunction)
  */
 TEST(PolynomialSolverTest, SolveSpecificCubicEquation)
 {
-  constexpr double min_value = 0;
-  constexpr double max_value = 1;
   constexpr double infinity = std::numeric_limits<double>::infinity();
   /**
    * @note solve x^3 - 2x^2 - 11x + 12 = 0 (solutions should be -3, 1, 4)
@@ -153,6 +151,30 @@ TEST(PolynomialSolverTest, SolveSpecificCubicEquation)
     EXPECT_TRUE(checkValueWithTolerance(solutions[0], -3));
     EXPECT_TRUE(checkValueWithTolerance(solutions[1], 1));
     EXPECT_TRUE(checkValueWithTolerance(solutions[2], 4));
+  }
+}
+
+/**
+ * @note Testcase for ax^3+bx^2+cx+d = 0
+ */
+TEST(PolynomialSolverTest, SolveSpecificCubicEquationWithMinMax)
+{
+  constexpr double min_value = 0;
+  constexpr double max_value = 1;
+  /**
+   * @note solve x^3 - 2x^2 - 11x + 12 = 0 (solutions should be -3, 1, 4)
+   * range of the solution should be min_value ~ max_value.
+   */
+  math::geometry::PolynomialSolver solver;
+  auto solutions = solver.solveCubicEquation(1, -2, -11, 12, min_value, max_value);
+  EXPECT_EQ(static_cast<int>(solutions.size()), 1);
+  if (solutions.size() == 1) {
+    /**
+     * @note I used EXPECT_TRUE(checkValueWithTolerance(solutions[1], 1)) in 1 = max_value, SolveSpecificCubicEquation testcase,
+     * but in this test case, The solution x obtained satisfies std::abs(x-max_value) <= solver_tolerance, 
+     * so the value of max_value (in this case, double 1.0 value) must be assigned.
+     */
+    EXPECT_DOUBLE_EQ(solutions[0], 1);
   }
 }
 
