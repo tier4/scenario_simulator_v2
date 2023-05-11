@@ -2,9 +2,9 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>do_nothing_plugin</name>
-  <version>0.0.0</version>
+  <version>0.6.8</version>
   <description>Behavior plugin for do nothing</description>
-  <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
+  <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
   <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

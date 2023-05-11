@@ -22,7 +22,16 @@ namespace entity_behavior
 class DoNothingBehavior : public BehaviorPluginBase
 {
 public:
+  /**
+   * @brief just update timestamp of entity_status_ member variable.
+   * @param current_time current time scenario time
+   * @param step_time step time of the simulation, arguments exist for other BehaviorPlugin classes but are not used by this plugin.
+   */
   void update(double current_time, double step_time) override;
+  /**
+   * @brief setup rclcpp::logger for debug output, 
+   * @param logger 
+   */
   void configure(const rclcpp::Logger & logger) override;
   const std::string & getCurrentAction() const override;
 
