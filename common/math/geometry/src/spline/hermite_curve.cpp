@@ -138,7 +138,10 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
 
   const auto get_solutions = [search_backward, a, b, c, d, this]() -> std::vector<double> {
     try {
-      return solver_.solveCubicEquation(a, b, c, d);
+      /**
+       * @note Obtain a solution to the cubic equation ax^3 + bx^2 + cx + d = 0 that falls within the range (0~1).
+       */
+      return solver_.solveCubicEquation(a, b, c, d, 0, 1);
     }
     /**
     * @note PolynomialSolver::solveCubicEquation throws common::SimulationError when any x value can satisfy the equation, 
@@ -163,15 +166,11 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
        * tx, ty, will be in the range 0~1 while the other will be out of that range because of division by zero.
        */
       if ((0 <= tx && tx <= 1) || (0 <= ty && ty <= 1)) {
-        if (0 <= solution && solution <= 1) {
-          s_values.push_back(solution);
-        }
+        s_values.push_back(solution);
       }
     } else {
       if ((0 <= tx && tx <= 1) && (0 <= ty && ty <= 1)) {
-        if (0 <= solution && solution <= 1) {
-          s_values.push_back(solution);
-        }
+        s_values.push_back(solution);
       }
     }
   }
