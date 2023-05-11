@@ -281,7 +281,9 @@ bool API::updateEntityStatusInSim()
   simulation_api_schema::UpdateEntityStatusRequest req;
   if (entity_manager_ptr_->isEgoSpawned()) {
     simulation_interface::toProto(
-      asAutoware(entity_manager_ptr_->getEgoName()).getVehicleCommand(),
+      {autoware_auto_control_msgs::msg::
+         AckermannControlCommand(),                      // Vehicle command is not utilized by
+       autoware_auto_vehicle_msgs::msg::GearCommand()},  // simple_sensor_simulator
       *req.mutable_vehicle_command());
     req.set_ego_entity_status_before_update_is_empty(false);
     simulation_interface::toProto(

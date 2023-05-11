@@ -16,6 +16,7 @@
 #include <concealer/task_queue.hpp>
 #include <rclcpp/rclcpp.hpp>
 
+// TODO: pzyskowski : use conditional variables to wait for new messages instead of sleep_for
 namespace concealer
 {
 TaskQueue::TaskQueue()
@@ -42,13 +43,15 @@ TaskQueue::TaskQueue()
 {
 }
 
-TaskQueue::~TaskQueue()
+void TaskQueue::stopAndJoin()
 {
   if (dispatcher.joinable()) {
     is_stop_requested.store(true, std::memory_order_release);
     dispatcher.join();
   }
 }
+
+TaskQueue::~TaskQueue() { stopAndJoin(); }
 
 bool TaskQueue::exhausted() const noexcept { return thunks.empty(); }
 
