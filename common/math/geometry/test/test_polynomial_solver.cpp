@@ -44,6 +44,7 @@ TEST(PolynomialSolverTest, LinearFunction)
 
 /**
  * @note Testcase for ax+b = 0
+ * Coverage verification of each coefficient for the cubic equation ax^2 + bx + c = 0 in the range [-20, 20] in increments of 0.1
  */
 TEST(PolynomialSolverTest, SolveLinearEquation)
 {
@@ -88,6 +89,7 @@ TEST(PolynomialSolverTest, CubicFunction)
 
 /**
  * @note Testcase for ax^2+bx+c = 0
+ * Coverage verification of each coefficient for the cubic equation ax^2 + bx + c = 0 in the range [-20, 20] in increments of 1
  */
 TEST(PolynomialSolverTest, SolveQuadraticEquation)
 {
@@ -180,14 +182,12 @@ TEST(PolynomialSolverTest, SolveSpecificCubicEquationWithMinMax)
 
 /**
  * @note Testcase for ax^3+bx^2+cx+d = 0
+ * Coverage verification of each coefficient for the cubic equation ax^3 + bx^2 + cx + d = 0 in the range [-10, 10] in increments of 1
  */
 TEST(PolynomialSolverTest, SolveCubicEquation)
 {
   constexpr double min_value = 0;
   constexpr double max_value = 1;
-  /**
-   * @note Coverage verification of each coefficient for the cubic equation ax^3 + bx^2 + cx + d = 0 in the range [-10, 10] in increments of 1
-   */
   math::geometry::PolynomialSolver solver;
   for (double a = -10; a < 10; a = a + 1) {
     for (double b = -10; b < 10; b = b + 1) {
