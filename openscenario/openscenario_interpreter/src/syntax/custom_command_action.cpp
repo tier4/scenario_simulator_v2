@@ -88,14 +88,14 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
 
     lanelet_id = boost::lexical_cast<std::int64_t>(parameters.at(0));
 
-    auto trim_quates = [](const auto & str) {
+    auto trim_quotes = [](const auto & str) {
       if (str.front() == '"' && str.back() == '"') {
         return std::string{std::next(std::begin(str)), std::prev(std::end(str))};
       } else {
         return str;
       }
     };
-    state = trim_quates(parameters.at(1));
+    state = trim_quotes(parameters.at(1));
 
     if (parameters.size() == 3) {
       publish_frequency = boost::lexical_cast<double>(parameters.at(2));
