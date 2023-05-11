@@ -29,15 +29,15 @@ auto PolynomialSolver::linearFunction(double a, double b, double t) const -> dou
   return a * t + b;
 }
 
+auto PolynomialSolver::quadraticFunction(double a, double b, double c, double t) const -> double
+{
+  return a * t * t + b * t + c;
+}
+
 auto PolynomialSolver::cubicFunction(double a, double b, double c, double d, double t) const
   -> double
 {
   return a * t * t * t + b * t * t + c * t + d;
-}
-
-auto PolynomialSolver::quadraticFunction(double a, double b, double c, double t) const -> double
-{
-  return a * t * t + b * t + c;
 }
 
 auto PolynomialSolver::solveLinearEquation(
