@@ -52,7 +52,7 @@ auto PolynomialSolver::solveLinearEquation(
       THROW_SIMULATION_ERROR(
         "Not computable x because of the linear equation ", a, " x + ", b, "=0, and a = ", a,
         ", b = ", b, " is very close to zero ,so any value of x = [", min_value, ",", max_value,
-        "] will be the solution.", "There are no expected cases where this exception is thrown.",
+        "] will be the solution. There are no expected cases where this exception is thrown.",
         "Please contact the scenario_simulator_v2 developers, ",
         "especially Masaya Kataoka (@hakuturu583).");
     }
