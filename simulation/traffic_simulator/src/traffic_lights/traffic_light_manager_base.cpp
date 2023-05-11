@@ -70,7 +70,7 @@ auto TrafficLightManagerBase::update(const double) -> void
 
 auto TrafficLightManagerBase::start(double update_rate) -> void
 {
-  if (timer_ == nullptr) {
+  if (!timer_) {
     update_rate_ = update_rate;
     using namespace std::chrono_literals;
     timer_ = rclcpp::create_timer(
@@ -83,7 +83,7 @@ auto TrafficLightManagerBase::updatePublishRate(double update_rate) -> void
 {
   if (update_rate_ != update_rate) {
     update_rate_ = update_rate;
-    if (timer_) {
+    if (timer_ && not timer_->is_canceled()) {
       timer_->cancel();
     }
 
