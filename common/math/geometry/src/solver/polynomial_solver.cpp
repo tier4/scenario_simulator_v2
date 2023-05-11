@@ -29,15 +29,15 @@ auto PolynomialSolver::linearFunction(double a, double b, double t) const -> dou
   return a * t + b;
 }
 
+auto PolynomialSolver::quadraticFunction(double a, double b, double c, double t) const -> double
+{
+  return a * t * t + b * t + c;
+}
+
 auto PolynomialSolver::cubicFunction(double a, double b, double c, double d, double t) const
   -> double
 {
   return a * t * t * t + b * t * t + c * t + d;
-}
-
-auto PolynomialSolver::quadraticFunction(double a, double b, double c, double t) const -> double
-{
-  return a * t * t + b * t + c;
 }
 
 auto PolynomialSolver::solveLinearEquation(
@@ -50,14 +50,14 @@ auto PolynomialSolver::solveLinearEquation(
   if (std::abs(a) <= tolerance) {
     if (std::abs(b) <= tolerance) {
       THROW_SIMULATION_ERROR(
-        "Not computable because a=0 in the linear equation ", a, " x + ", b,
-        "=0, so any value of x = ", min_value, "~", max_value, " will be the solution.",
-        "There are no expected cases where this exception is thrown.",
+        "Not computable x because of the linear equation ", a, " x + ", b, "=0, and a = ", a,
+        ", b = ", b, " is very close to zero ,so any value of x = [", min_value, ",", max_value,
+        "] will be the solution. There are no expected cases where this exception is thrown.",
         "Please contact the scenario_simulator_v2 developers, ",
         "especially Masaya Kataoka (@hakuturu583).");
     }
     /**
-     * @note In this case, ax*b = 0 (a=0, b≠0) so any x cannot satisfy this equation.
+     * @note In this case, ax*b = 0 (a=0,b!=0) so any x cannot satisfy this equation.
      */
     return {};
   }

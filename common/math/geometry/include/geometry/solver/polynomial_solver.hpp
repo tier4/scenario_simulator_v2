@@ -29,7 +29,7 @@ public:
  *
  * @param a
  * @param b
- * @return std::vector<double> real solution of the quadratic functions (from 0 to 1)
+ * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
  */
   auto solveLinearEquation(double a, double b, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
@@ -38,7 +38,7 @@ public:
  *
  * @param a
  * @param b
- * @return std::vector<double> real solution of the quadratic functions (from 0 to 1)
+ * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
  */
   auto solveQuadraticEquation(
     double a, double b, double c, double min_value = 0, double max_value = 1) const
@@ -50,22 +50,20 @@ public:
  * @param b
  * @param c
  * @param d
- * @return std::vector<double> real solution of the cubic functions (from 0 to 1)
+ * @return std::vector<double> real solution of the cubic functions (from min_value to max_value)
  */
   auto solveCubicEquation(
     double a, double b, double c, double d, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
   /**
- * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
+ * @brief calculate result of quadratic function a*t + b
  *
  * @param a
  * @param b
- * @param c
- * @param d
  * @param t
- * @return double result of cubic function
+ * @return double result of quadratic function
  */
-  auto cubicFunction(double a, double b, double c, double d, double t) const -> double;
+  auto linearFunction(double a, double b, double t) const -> double;
   /**
  * @brief calculate result of quadratic function a*t^2 + b*t + c
  *
@@ -77,15 +75,16 @@ public:
  */
   auto quadraticFunction(double a, double b, double c, double t) const -> double;
   /**
- * @brief calculate result of quadratic function a*t + b
+ * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
  *
  * @param a
  * @param b
+ * @param c
+ * @param d
  * @param t
- * @return double result of quadratic function
+ * @return double result of cubic function
  */
-  auto linearFunction(double a, double b, double t) const -> double;
-
+  auto cubicFunction(double a, double b, double c, double d, double t) const -> double;
   /**
    * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver.
    * This value was determined by Masaya Kataoka (@hakuturu583).
