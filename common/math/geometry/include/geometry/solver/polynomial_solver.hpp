@@ -29,7 +29,7 @@ public:
  *
  * @param a
  * @param b
- * @return std::vector<double> real solution of the quadratic functions (from 0 to 1)
+ * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
  */
   auto solveLinearEquation(double a, double b, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
@@ -38,7 +38,7 @@ public:
  *
  * @param a
  * @param b
- * @return std::vector<double> real solution of the quadratic functions (from 0 to 1)
+ * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
  */
   auto solveQuadraticEquation(
     double a, double b, double c, double min_value = 0, double max_value = 1) const
@@ -50,7 +50,7 @@ public:
  * @param b
  * @param c
  * @param d
- * @return std::vector<double> real solution of the cubic functions (from 0 to 1)
+ * @return std::vector<double> real solution of the cubic functions (from min_value to max_value)
  */
   auto solveCubicEquation(
     double a, double b, double c, double d, double min_value = 0, double max_value = 1) const
