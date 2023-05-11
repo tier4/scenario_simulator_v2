@@ -31,12 +31,6 @@
 
 namespace traffic_simulator
 {
-
-enum class TrafficLightType {
-  conventional,
-  v2i,
-};
-
 class TrafficLightManagerBase
 {
 protected:
@@ -57,8 +51,6 @@ protected:
   rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
 
   rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
-
-  rclcpp::CallbackGroup::SharedPtr timer_callback_group_;
 
   double update_rate_ = 0.0;
 
