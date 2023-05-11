@@ -83,25 +83,36 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
 
   auto start(const Scope &) -> void override
   {
-    lanelet_id = std::stoi(parameters.at(0));
-    state = parameters.at(1);
+    // V2ITrafficSignalStateAction(traffic_light_id, state, publish_frequency(optional))
+    assert(parameters.size() == 2 || parameters.size() == 3);
+
+    lanelet_id = boost::lexical_cast<std::int64_t>(parameters.at(0));
+
+    auto trim_quates = [](const auto & str) {
+      if (str.front() == '"' && str.back() == '"') {
+        return std::string{std::next(std::begin(str)), std::prev(std::end(str))};
+      } else {
+        return str;
+      }
+    };
+    state = trim_quates(parameters.at(1));
+
     if (parameters.size() == 3) {
       publish_frequency = boost::lexical_cast<double>(parameters.at(2));
+      updateV2ITrafficLightsPublishRate(publish_frequency);
     }
 
     for (auto & traffic_light : getV2ITrafficLights(lanelet_id)) {
       traffic_light.get().clear();
       traffic_light.get().set(state);
     }
-
-    updateV2ITrafficLightsPublishRate(publish_frequency);
   }
 
-  hdmap_utils::HdMapUtils::LaneletId lanelet_id;
+  std::int64_t lanelet_id;
 
   String state;
 
-  Double publish_frequency = 10.0;
+  Double publish_frequency;
 };
 
 struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::ActionApplication

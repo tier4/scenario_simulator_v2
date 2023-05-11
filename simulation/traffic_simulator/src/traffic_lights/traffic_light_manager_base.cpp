@@ -67,4 +67,30 @@ auto TrafficLightManagerBase::update(const double) -> void
 
   drawMarkers();
 }
+
+auto TrafficLightManagerBase::start(double update_rate) -> void
+{
+  if (timer_ == nullptr) {
+    update_rate_ = update_rate;
+    using namespace std::chrono_literals;
+    timer_ = rclcpp::create_timer(
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / update_rate_,
+      [this]() -> void { update(1.0 / update_rate_); });
+  }
+}
+
+auto TrafficLightManagerBase::updatePublishRate(double update_rate) -> void
+{
+  if (update_rate_ != update_rate) {
+    update_rate_ = update_rate;
+    if (timer_) {
+      timer_->cancel();
+    }
+
+    using namespace std::chrono_literals;
+    timer_ = rclcpp::create_timer(
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / update_rate_,
+      [this]() -> void { update(1.0 / update_rate_); });
+  }
+}
 }  // namespace traffic_simulator
