@@ -25,14 +25,18 @@ public:
   /**
    * @brief just update timestamp of entity_status_ member variable.
    * @param current_time current time scenario time
-   * @param step_time step time of the simulation, arguments exist for other BehaviorPlugin classes but are not used by this plugin.
+   * @param step_time step time of the simulation, this argument exists for other BehaviorPlugin classes but are not used by this plugin.
    */
   void update(double current_time, double step_time) override;
   /**
-   * @brief setup rclcpp::logger for debug output, 
-   * @param logger 
+   * @brief setup rclcpp::logger for debug output, but there is no debug output in this plugin.
+   * @param logger logger for debug output, this argument exists for other BehaviorPlugin classes but are not used by this plugin.
    */
   void configure(const rclcpp::Logger & logger) override;
+  /**
+   * @brief Get the Current Action object
+   * @return const std::string& always return "do_nothing"
+   */
   const std::string & getCurrentAction() const override;
 
 #define DEFINE_GETTER_SETTER(NAME, TYPE)        \
