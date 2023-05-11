@@ -49,53 +49,46 @@ struct ApplyFaultInjectionAction : public CustomCommand
   {
     static_assert(0 < Version and Version <= 2);
 
+    auto makeFaultInjectionEvent = [](const auto & level, const auto & name) {
+      tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
+      fault_injection_event.level = level;
+      fault_injection_event.name = name;
+      return fault_injection_event;
+    };
+
+    tier4_simulation_msgs::msg::SimulationEvents simulation_events;
+
+    simulation_events.stamp = node().now();
+
     if constexpr (Version == 1) {
-      auto makeFaultInjectionEvents = [](const std::vector<std::string> & events) {
-        auto makeFaultInjectionEvent = [](const auto & name) {
-          tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
-          fault_injection_event.level = tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
-          fault_injection_event.name = name;
-          return fault_injection_event;
-        };
-        tier4_simulation_msgs::msg::SimulationEvents simulation_events;
-        simulation_events.stamp = node().now();
-        for (const auto & event : events) {
-          simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
-        }
-        return simulation_events;
-      };
-
-      publisher().publish(makeFaultInjectionEvents(parameters));
-    } else {
-      auto makeFaultInjectionEvents = [](const std::vector<std::string> & parameters) {
-        auto makeFaultInjectionEvent = [](const auto & level, const auto & name) {
-          auto convert = [](const auto & level) {
-            if (level == "OK") {
-              return tier4_simulation_msgs::msg::FaultInjectionEvent::OK;
-            } else if (level == "WARN") {
-              return tier4_simulation_msgs::msg::FaultInjectionEvent::WARN;
-            } else if (level == "ERROR") {
-              return tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
-            } else {
-              return tier4_simulation_msgs::msg::FaultInjectionEvent::STALE;
-            }
-          };
-
-          tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
-          fault_injection_event.level = convert(level);
-          fault_injection_event.name = name;
-          return fault_injection_event;
-        };
-
-        tier4_simulation_msgs::msg::SimulationEvents simulation_events;
-        simulation_events.stamp = node().now();
+      for (const auto & event : parameters) {
         simulation_events.fault_injection_events.push_back(
-          makeFaultInjectionEvent(parameters[0], parameters[1]));
-        return simulation_events;
+          makeFaultInjectionEvent(tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR, event));
+      }
+    } else {
+      auto makeFaultInjectionEventLevel = [](const auto & level) {
+        if (level == "OK") {
+          return tier4_simulation_msgs::msg::FaultInjectionEvent::OK;
+        } else if (level == "WARN" or level == "WARNING") {
+          return tier4_simulation_msgs::msg::FaultInjectionEvent::WARN;
+        } else if (level == "ERROR") {
+          return tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+        } else if (level == "STALE") {
+          return tier4_simulation_msgs::msg::FaultInjectionEvent::STALE;
+        } else {
+          throw Error(
+            "FaultInjectionAction@v2 expects error level to be given as first argument, but ",
+            level,
+            " was given. This is not a valid error level specification. Valid error levels are OK, "
+            "WARN, ERROR, and STALE.");
+        }
       };
 
-      publisher().publish(makeFaultInjectionEvents(parameters));
+      simulation_events.fault_injection_events.push_back(
+        makeFaultInjectionEvent(makeFaultInjectionEventLevel(parameters[0]), parameters[1]));
     }
+
+    publisher().publish(simulation_events);
   }
 };
 
@@ -231,6 +224,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
     std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
     commands{
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
+      ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
