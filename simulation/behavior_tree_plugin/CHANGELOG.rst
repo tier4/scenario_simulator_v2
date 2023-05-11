@@ -2,6 +2,105 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.8 (2023-05-09)
+------------------
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge pull request `#894 <https://github.com/tier4/scenario_simulator_v2/issues/894>`_ from tier4/fix/cleanup_code
+* Revert "feat(traffic_sim): add max_jerk, maxJerk, setJerkLimit"
+* Merge remote-tracking branch 'origin/master' into clean-dicts
+* Merge branch 'master' into feature/noise_delay_object
+* feat(traffic_sim): add max_jerk, maxJerk, setJerkLimit
+* Merge remote-tracking branch 'origin/master' into emergency-state/backwardcompatibility-1
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* format: append ament_clang_format
+* Merge branch 'master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/license_and_properties
+* Merge remote-tracking branch 'origin/master' into fix/get-unique-route-lanelets
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#968 <https://github.com/tier4/scenario_simulator_v2/issues/968>`_ from RobotecAI/fix/AJD-658-abnormal-longitudinal-speed
+* refactor: apply cr suggestion
+* fix(beh_tree_plug): fix target_speed init in MoveBackwardAction
+* Merge branch 'master' into import/universe-2437
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge branch 'master' into feature/get_lateral_distance
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge pull request `#946 <https://github.com/tier4/scenario_simulator_v2/issues/946>`_ from tier4/fix/stop_behavior
+* update stopping behavior
+* Merge remote-tracking branch 'origin/master' into emergency-state/backward-compatibility
+* Fix wrong merge
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge branch 'master' into feature/simple_noise_simulator
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge pull request `#909 <https://github.com/tier4/scenario_simulator_v2/issues/909>`_ from tier4/feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* use std::clamp
+* use std::clamp
+* remove unused exception
+* add comment
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/simple_noise_simulator
+* fix lane matching timing
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* rename functions
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* fix runtime error
+* fix vehicle action node class
+* add const
+* add const
+* fix stop line mergin
+* fix calculate stop distance function
+* add getRunningDistance function
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* enable consider jerk in world frame npc dynamics model
+* add error check
+* format
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* fix getDynamicStates function
+* add check
+* add speed planner class
+* use timeDerivative
+* remove debug line
+* split functions
+* enable check constrint
+* split into some functions
+* add planJerk function
+* remove unused argument
+* enable calculate jerk
+* fix jerk planning logic
+* update jerk planning logic
+* modify default value
+* add setter for acceleration/deceleration rate
+* use functions in base class
+* add calculateEntityStatusUpdated function to the base class
+* add calculateEntityStatusUpdatedInWorldFrame function in base class
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* add calculateStopDistance function
+* fix compile errors in behavior plugin
+* Add missing headers
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Format
+* Replace boost::optional with std::optional
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into fix_wrong_merge
+* remove debug lines
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/use_job_in_standstill_duration
+* add measurement job
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Michał Kiełczykowski, Shota Minami, Tatsuya Yamasaki, hrjp, kyoichi-sugahara, yamacir-kit
+
 0.6.7 (2022-11-17)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feat/heat_beat
