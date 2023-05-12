@@ -56,12 +56,12 @@ public:
     double a, double b, double c, double d, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
   /**
- * @brief calculate result of quadratic function a*t + b
+ * @brief calculate result of linear function a*t + b
  *
  * @param a
  * @param b
  * @param t
- * @return double result of quadratic function
+ * @return double result of linear function
  */
   auto linearFunction(double a, double b, double t) const -> double;
   /**
