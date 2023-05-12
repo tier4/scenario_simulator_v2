@@ -175,6 +175,8 @@ auto truncate(T & v, const U & max)
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
+  std::cout << std::string(80, '-') << std::endl;
+
   if (getBlackBoardValues();
       request == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY and
       getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) and
@@ -195,10 +197,12 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
     auto current_waypoint = [&]() { return parameter->shape.vertices.front(); };
 
-    auto remain_time = [&]() {
-      // TODO std::find_first_of => iter != std::end => return *iter, else infinity
-      if (parameter->shape.vertices.front().time) {
-        return *parameter->shape.vertices.front().time - entity_status.time;
+    auto remain_time = [this]() {
+      if (auto iter = std::find_if(
+            std::begin(parameter->shape.vertices), std::end(parameter->shape.vertices),
+            [this](auto && vertex) { return vertex.time and entity_status.time < *vertex.time; });
+          iter != std::end(parameter->shape.vertices)) {
+        return *iter->time - entity_status.time;
       } else {
         return std::numeric_limits<double>::infinity();
       }
@@ -225,52 +229,52 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     };
 
     auto adjust = [&](auto suggested_speed) {
-      std::cout << std::string(80, '-') << std::endl;
-
       std::cout << "waypoint 1/" << parameter->shape.vertices.size() << std::endl;
 
-      if (current_waypoint().time) {
-        const auto distance_to_next_waypoint =
-          distance(entity_status.pose.position, current_waypoint().position.position);
+      PRINT(suggested_speed);
 
-        const auto estimated_time_of_arrival = distance_to_next_waypoint / suggested_speed;
+      const auto remain = remain_time();
+      PRINT(remain);
 
-        const auto desired_speed = distance_to_next_waypoint / remain_time();
+      const auto distance_to_next_waypoint =
+        distance(entity_status.pose.position, current_waypoint().position.position);
+      PRINT(distance_to_next_waypoint);
 
-        PRINT(remain_time());
-        // PRINT(suggested_speed);
-        PRINT(estimated_time_of_arrival);
-        // PRINT(desired_speed);
+      const auto estimated_time_of_arrival = distance_to_next_waypoint / suggested_speed;
+      PRINT(estimated_time_of_arrival);
 
-        if (remain_time() < estimated_time_of_arrival) {
-          std::cout << "TIME SHORTAGE => ACCELERATE" << std::endl;
-          auto accelerated_speed = std::min(
-            suggested_speed + maximum_acceleration_currently_available() * step_time,
-            desired_speed);
-          // PRINT(suggested_speed);
-          // PRINT(maximum_acceleration_currently_available());
-          // PRINT(maximum_acceleration_currently_available() * step_time);
-          // PRINT(suggested_speed + maximum_acceleration_currently_available() * step_time);
-          // PRINT(accelerated_speed);
-          return accelerated_speed;
-        } else if (estimated_time_of_arrival < remain_time()) {
-          std::cout << "TOO FAST => DECELERATE" << std::endl;
-          auto decelerated_speed = std::max(
-            suggested_speed + minimum_acceleration_currently_available() * step_time,
-            desired_speed);
-          // PRINT(suggested_speed);
-          // PRINT(minimum_acceleration_currently_available());
-          // PRINT(minimum_acceleration_currently_available() * step_time);
-          // PRINT(suggested_speed + minimum_acceleration_currently_available() * step_time);
-          // PRINT(desired_speed);
-          // PRINT(decelerated_speed);
-          return decelerated_speed;
-        } else {
-          std::cout << "OK" << std::endl;
-          return suggested_speed;
-        }
+      const auto desired_speed = distance_to_next_waypoint / remain;
+      PRINT(desired_speed);
+
+      if (remain < estimated_time_of_arrival) {
+        PRINT(remain < estimated_time_of_arrival);
+        std::cout << "SLOW => ACCELERATE" << std::endl;
+
+        PRINT(maximum_acceleration_currently_available());
+        PRINT(maximum_acceleration_currently_available() * step_time);
+        PRINT(suggested_speed + maximum_acceleration_currently_available() * step_time);
+
+        const auto accelerated_speed = std::min(
+          suggested_speed + maximum_acceleration_currently_available() * step_time, desired_speed);
+        PRINT(accelerated_speed);
+
+        return accelerated_speed;
+      } else if (estimated_time_of_arrival < remain_time()) {
+        PRINT(estimated_time_of_arrival < remain_time());
+        std::cout << "FAST => DECELERATE" << std::endl;
+
+        PRINT(minimum_acceleration_currently_available());
+        PRINT(minimum_acceleration_currently_available() * step_time);
+        PRINT(suggested_speed + minimum_acceleration_currently_available() * step_time);
+
+        const auto decelerated_speed = std::max(
+          suggested_speed + minimum_acceleration_currently_available() * step_time, desired_speed);
+        PRINT(decelerated_speed);
+
+        return decelerated_speed;
       } else {
-        return suggested_speed;
+        std::cout << "OK" << std::endl;
+        return desired_speed;
       }
     };
 
@@ -289,6 +293,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         std::cout << "TELEPORT!" << std::endl;
         throw std::runtime_error("TELEPORT!");
       } else {
+        std::cout << "DISCARD CURRENT WAYPOINT!" << std::endl;
         pop_current_waypoint();
       }
     }
@@ -298,11 +303,15 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
     truncate(velocity, adjust(entity_status.action_status.twist.linear.x));
 
-    auto previous_direction = direction;
+    auto make_direction = [this]() {
+      geometry_msgs::msg::Vector3 direction;
+      direction.x = 0;
+      direction.y = 0;
+      direction.z = std::atan2(velocity.y, velocity.x);
+      return direction;
+    };
 
-    direction.x = 0;
-    direction.y = 0;
-    direction.z = std::atan2(velocity.y, velocity.x);
+    auto previous_direction = std::exchange(direction, make_direction());
 
     auto updated_status = entity_status;
 
