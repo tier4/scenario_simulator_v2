@@ -27,7 +27,8 @@ TEST(TrafficLightManager, getIds)
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
+  traffic_simulator::ConventionalTrafficLightManager<
+    autoware_auto_perception_msgs::msg::TrafficSignalArray>
     manager(hdmap_utils_ptr, node, "map");
   manager.getTrafficLight(34836);
   EXPECT_FALSE(manager.getTrafficLights().find(34836) == std::end(manager.getTrafficLights()));
@@ -45,7 +46,8 @@ TEST(TrafficLightManager, setColor)
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
+  traffic_simulator::ConventionalTrafficLightManager<
+    autoware_auto_perception_msgs::msg::TrafficSignalArray>
     manager(hdmap_utils_ptr, node, "map");
   for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
     using Color = traffic_simulator::TrafficLight::Color;
@@ -74,7 +76,8 @@ TEST(TrafficLightManager, setArrow)
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
   const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-  traffic_simulator::ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>
+  traffic_simulator::ConventionalTrafficLightManager<
+    autoware_auto_perception_msgs::msg::TrafficSignalArray>
     manager(hdmap_utils_ptr, node, "map");
   for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
     using Color = traffic_simulator::TrafficLight::Color;
