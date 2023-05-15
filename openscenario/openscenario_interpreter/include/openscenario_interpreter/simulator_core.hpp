@@ -284,10 +284,10 @@ public:
           return configuration;
         }());
 
-        core->asAutoware(entity_ref)
+        core->asFieldOperatorApplication(entity_ref)
           .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
 
-        core->asAutoware(entity_ref)
+        core->asFieldOperatorApplication(entity_ref)
           .declare_parameter<bool>(
             "allow_goal_modification",
             controller.properties.template get<Boolean>("allowGoalModification"));
@@ -408,9 +408,9 @@ public:
     }
 
     template <typename... Ts>
-    static auto asAutoware(Ts &&... xs) -> decltype(auto)
+    static auto asFieldOperatorApplication(Ts &&... xs) -> decltype(auto)
     {
-      return core->asAutoware(std::forward<decltype(xs)>(xs)...);
+      return core->asFieldOperatorApplication(std::forward<decltype(xs)>(xs)...);
     }
 
     static auto activateNonUserDefinedControllers() -> decltype(auto)
