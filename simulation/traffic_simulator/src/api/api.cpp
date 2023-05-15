@@ -283,32 +283,9 @@ bool API::updateEntityStatusInSim()
     simulation_interface::toProto(status, *req.mutable_status());
     simulation_api_schema::UpdateEntityStatusResponse res;
     zeromq_client_.call(req, res);
-
-    // TODO: This section of code was not utilized at all before (simple sensor simulator did not sent updated entity status back)
-    //       It might be reasonable to reconsider how update from the simple_sensor_simulator should be utilized
-    // TODO: Optimization to check before updating whether the values changed might be implemented
-    traffic_simulator_msgs::msg::EntityStatus status_msg;
-    status_msg = entity_manager_ptr_->getEntityStatus(name);
-    geometry_msgs::msg::Pose pose;
-    simulation_interface::toMsg(res.status().pose(), pose);
-    status_msg.pose = pose;
-    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
-        pose, entity_manager_ptr_->getEntityStatus(res.status().name()).bounding_box, false);
-    if (lanelet_pose) {
-      status_msg.lanelet_pose_valid = true;
-      status_msg.lanelet_pose = lanelet_pose.value();
-    } else {
-      status_msg.lanelet_pose_valid = false;
-      status_msg.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-    }
-    simulation_interface::toMsg(res.status().action_status(), status_msg.action_status);
-    if (entity_manager_ptr_->isEgo(res.status().name()) and not isNpcLogicStarted()) {
-      ego_entity_simulation_->setInitialStatus(status_msg);
-    }
-    if (not entity_manager_ptr_->isEgo(res.status().name())) {
-      entity_manager_ptr_->setEntityStatus(res.status().name(), status_msg);
-    }
     success &= res.result().success();
+
+    // TODO: Temporarily removed utilization of updated status - it was not utilized before anyway. Bring it back though
   }
   return success;
 }
