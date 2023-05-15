@@ -129,7 +129,7 @@ private:
   double current_time_;
   rclcpp::Time current_ros_time_;
   bool initialized_;
-  std::vector<traffic_simulator_msgs::EntityStatus> entity_status_;
+  std::map<std::string, traffic_simulator_msgs::EntityStatus> entity_status_;
   zeromq::MultiServer server_;
 };
 }  // namespace simple_sensor_simulator

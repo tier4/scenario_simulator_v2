@@ -97,7 +97,9 @@ void ScenarioSimulator::updateFrame(
   builtin_interfaces::msg::Time t;
   simulation_interface::toMsg(req.current_ros_time(), t);
   current_ros_time_ = t;
-  sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status_);
+  std::vector<traffic_simulator_msgs::EntityStatus> entity_status;
+  std::transform(entity_status_.begin(), entity_status_.end(), std::back_inserter(entity_status), [](auto &kv){ return kv.second;} );
+  sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
 }
@@ -106,11 +108,9 @@ void ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
-  entity_status_ = {};
-  for (const auto & proto : req.status()) {
-    entity_status_.emplace_back(proto);
-  }
+  entity_status_[req.status().name()] = req.status();
   res = simulation_api_schema::UpdateEntityStatusResponse();
+  // no data was sent from simple_sensor_simulator anyway - will be fixed next
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
 }
@@ -186,6 +186,7 @@ void ScenarioSimulator::despawnEntity(
   }
   misc_objects_ = misc_objects;
   if (found) {
+    entity_status_.erase(req.name());
     res.mutable_result()->set_success(true);
   } else {
     res.mutable_result()->set_success(false);
