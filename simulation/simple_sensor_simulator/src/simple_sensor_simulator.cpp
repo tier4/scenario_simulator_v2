@@ -108,9 +108,11 @@ void ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
-  entity_status_[req.status().name()] = req.status();
+  const traffic_simulator_msgs::EntityStatus& updated_entity_status = entity_status_[req.status().name()] = req.status();
   res = simulation_api_schema::UpdateEntityStatusResponse();
-  // no data was sent from simple_sensor_simulator anyway - will be fixed next
+  res.mutable_status()->set_name(updated_entity_status.name());
+  res.mutable_status()->mutable_action_status()->CopyFrom(updated_entity_status.action_status());
+  res.mutable_status()->mutable_pose()->CopyFrom(updated_entity_status.pose());
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
 }
