@@ -85,27 +85,28 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
       std::make_pair(
         "currentMinimumRiskManeuverState.behavior",
         [result]() {
-          return make<String>(asAutoware(result.str(1)).getMinimumRiskManeuverBehaviorName());
+          return make<String>(
+            asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverBehaviorName());
         }),
       std::make_pair(
         "currentMinimumRiskManeuverState.state",
         [result]() {
-          auto s = asAutoware(result.str(1)).getMinimumRiskManeuverStateName();
+          auto s = asFieldOperatorApplication(result.str(1)).getMinimumRiskManeuverStateName();
           std::cout << "currentMinimumRiskManeuverState.state is called : " << s << std::endl;
           return make<String>(s);
         }),
       std::make_pair(
         "currentEmergencyState",
         [result]() {
-          auto s = asAutoware(result.str(1)).getEmergencyStateName();
+          auto s = asFieldOperatorApplication(result.str(1)).getEmergencyStateName();
           std::cout << "currentEmergencyState is called : " << s << std::endl;
           return make<String>(s);
         }),
       std::make_pair(
         "currentTurnIndicatorsState",
         [result]() {
-          return make<String>(
-            boost::lexical_cast<String>(asAutoware(result.str(1)).getTurnIndicatorsCommand()));
+          return make<String>(boost::lexical_cast<String>(
+            asFieldOperatorApplication(result.str(1)).getTurnIndicatorsCommand()));
         }),
     };
     evaluate_value = dispatch.at(result.str(2));  // XXX catch
@@ -160,7 +161,7 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     };
 #else
     throw SyntaxError(
-      "The ability to have ROS2 topics as values for `UserDefinedValueCondition` is enabled only "
+      "The ability to have ROS 2 topics as values for `UserDefinedValueCondition` is enabled only "
       "when the `UserDefinedValue` type is present in the `tier4_simulation_msgs` package.");
 #endif
   } else {

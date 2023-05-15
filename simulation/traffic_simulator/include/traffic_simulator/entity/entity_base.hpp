@@ -17,7 +17,7 @@
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <concealer/autoware.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <memory>
 #include <optional>
 #include <queue>
@@ -52,7 +52,7 @@ public:
 
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray &);
 
-  virtual auto asAutoware() const -> concealer::Autoware &;
+  virtual auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &;
 
   virtual void cancelRequest();
 
@@ -190,6 +190,10 @@ public:
 
   virtual void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
+
+  virtual auto activateOutOfRangeJob(
+    double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
+    double min_jerk, double max_jerk) -> void;
 
   virtual auto setVelocityLimit(double) -> void;
 

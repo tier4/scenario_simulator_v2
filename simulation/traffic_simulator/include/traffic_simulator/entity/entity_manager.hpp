@@ -205,7 +205,7 @@ public:
   }                                                                            \
   static_assert(true, "")
 
-  FORWARD_TO_ENTITY(asAutoware, const);
+  FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
@@ -229,6 +229,7 @@ public:
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
+  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
   FORWARD_TO_ENTITY(setBehaviorParameter, );

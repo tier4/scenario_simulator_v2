@@ -25,18 +25,7 @@
 
 namespace traffic_simulator
 {
-metrics::MetricLifecycle API::getMetricLifecycle(const std::string & name)
-{
-  return metrics_manager_.getLifecycle(name);
-}
-
-bool API::metricExists(const std::string & name) { return metrics_manager_.exists(name); }
-
-void API::setVerbose(const bool verbose)
-{
-  metrics_manager_.setVerbose(verbose);
-  entity_manager_ptr_->setVerbose(verbose);
-}
+void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbose); }
 
 bool API::despawn(const std::string & name)
 {
@@ -292,7 +281,9 @@ bool API::updateEntityStatusInSim()
   simulation_api_schema::UpdateEntityStatusRequest req;
   if (entity_manager_ptr_->isEgoSpawned()) {
     simulation_interface::toProto(
-      asAutoware(entity_manager_ptr_->getEgoName()).getVehicleCommand(),
+      {autoware_auto_control_msgs::msg::
+         AckermannControlCommand(),                      // Vehicle command is not utilized by
+       autoware_auto_vehicle_msgs::msg::GearCommand()},  // simple_sensor_simulator
       *req.mutable_vehicle_command());
     req.set_ego_entity_status_before_update_is_empty(false);
     simulation_interface::toProto(
@@ -350,7 +341,6 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    metrics_manager_.calculate();
     if (!updateEntityStatusInSim()) {
       return false;
     }
@@ -361,7 +351,6 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    metrics_manager_.calculate();
     return true;
   }
 }
