@@ -48,9 +48,9 @@ protected:
 
   rclcpp::TimerBase::SharedPtr timer_ = nullptr;
 
-  rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
+  const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
 
-  rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
+  const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
 
   double update_rate_ = 0.0;
 
