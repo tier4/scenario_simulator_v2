@@ -100,7 +100,10 @@ message UpdateFrameResponse {
  **/
 message SpawnVehicleEntityRequest {
   traffic_simulator_msgs.VehicleParameters parameters = 1; // Parameters of vehicle entity.
-  bool is_ego = 2;                                    // If true, the entity is Ego vehicle. (Autoware vehicle.)
+  bool is_ego = 2;                                         // If true, the entity is Ego vehicle. (Autoware vehicle.)
+  string asset_key = 3;                                    // Asset key of the entity simulator entity
+  geometry_msgs.Pose pose = 4;                             // Entity initial pose
+  double initial_speed = 5;                                // Entity initial speed
 }
 
 /**

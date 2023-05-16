@@ -117,6 +117,7 @@ class EntityManager
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
 public:
+
   template <typename Node>
   auto getOrigin(Node & node) const
   {

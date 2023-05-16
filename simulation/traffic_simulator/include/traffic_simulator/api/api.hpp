@@ -33,6 +33,7 @@
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
+#include <traffic_simulator/hdmap_utils//hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
@@ -126,13 +127,24 @@ public:
         simulation_api_schema::SpawnVehicleEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
+        req.set_asset_key("dummy"); // TODO: Should be filled from function API
+        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
+        req.set_initial_speed(0.0); // TODO: Should be filled from function API
         zeromq_client_.call(req, res);
         return res.result().success();
       }
     };
 
     return register_to_entity_manager() and register_to_environment_simulator();
+  }
+
+  geometry_msgs::msg::Pose toMapPose(const geometry_msgs::msg::Pose& pose) {
+    return pose;
+  }
+
+  geometry_msgs::msg::Pose toMapPose(const traffic_simulator_msgs::msg::LaneletPose& pose) {
+    return entity_manager_ptr_->getHdmapUtils()->toMapPose(pose).pose;
   }
 
   template <typename Pose>
