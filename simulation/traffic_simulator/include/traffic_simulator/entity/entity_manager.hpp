@@ -138,7 +138,7 @@ public:
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),
-        " given for normal traffic lights simulation.");
+        " given for conventional traffic lights simulation.");
     }
   }
 
@@ -205,12 +205,12 @@ public:
 
 #undef FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
 
-  auto resetConventionalTrafficLightsPublishRate(double rate) -> void
+  auto resetConventionalTrafficLightPublishRate(double rate) -> void
   {
     return conventional_traffic_light_manager_ptr_->resetPublishRate(rate);
   }
 
-  auto resetV2ITrafficLightsPublishRate(double rate) -> void
+  auto resetV2ITrafficLightPublishRate(double rate) -> void
   {
     return v2i_traffic_light_manager_ptr_->resetPublishRate(rate);
   }

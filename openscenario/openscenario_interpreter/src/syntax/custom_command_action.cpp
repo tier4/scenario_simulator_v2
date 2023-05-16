@@ -106,7 +106,7 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
 
     switch (parameters.size()) {
       case 3:
-        resetV2ITrafficLightsPublishRate(boost::lexical_cast<double>(parameters[2]));
+        resetV2ITrafficLightPublishRate(boost::lexical_cast<double>(parameters[2]));
         [[fallthrough]];
 
       case 2:

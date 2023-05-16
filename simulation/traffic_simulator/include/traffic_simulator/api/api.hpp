@@ -301,8 +301,8 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
-  FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightsPublishRate);
-  FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightsPublishRate);
+  FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
+  FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
