@@ -34,12 +34,12 @@ public:
   auto solveLinearEquation(double a, double b, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
   /**
- * @brief solve quadratic equation a*x^2 + b*x + c = 0
- *
- * @param a
- * @param b
- * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
- */
+  * @brief solve quadratic equation a*x^2 + b*x + c = 0
+  *
+  * @param a
+  * @param b
+  * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
+  */
   auto solveQuadraticEquation(
     double a, double b, double c, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
@@ -65,25 +65,25 @@ public:
  */
   auto linearFunction(double a, double b, double t) const -> double;
   /**
- * @brief calculate result of quadratic function a*t^2 + b*t + c
- *
- * @param a
- * @param b
- * @param c
- * @param t
- * @return double result of quadratic function
- */
+   * @brief calculate result of quadratic function a*t^2 + b*t + c
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param t
+   * @return double result of quadratic function
+   */
   auto quadraticFunction(double a, double b, double c, double t) const -> double;
   /**
- * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
- *
- * @param a
- * @param b
- * @param c
- * @param d
- * @param t
- * @return double result of cubic function
- */
+   * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @param t
+   * @return double result of cubic function
+   */
   auto cubicFunction(double a, double b, double c, double d, double t) const -> double;
   /**
    * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver.
@@ -100,18 +100,18 @@ public:
 
 private:
   /**
- * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0, this code is public domain
- * @sa http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html
- * @param x
- * @param a
- * @param b
- * @param c
- * @return int
-           if return value is 3, 3 real solutions: x[0], x[1], x[2],
-           if return value is 2, 2 real solutions: x[0], x[1],
-           if return value is 1, 1 real solution : x[0], x[1] ± i*x[2],
- */
-  auto solveP3(std::vector<double> & x, double a, double b, double c) const -> int;
+   * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0
+   * @param x
+   * @param a
+   * @param b
+   * @param c
+   * @return int
+             if return value is 3, 3 real solutions: x[0], x[1], x[2],
+             if return value is 2, 2 real solutions: x[0], x[1],
+             if return value is 1, 1 real solution : x[0], x[1] ± i*x[2],
+   */
+  auto solveP3(std::vector<double> & x, const double a, const double b, const double c) const
+    -> int;
 };
 }  // namespace geometry
 }  // namespace math

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <boost/math/constants/constants.hpp>
 #include <cmath>
 #include <geometry/solver/polynomial_solver.hpp>
 #include <iostream>
@@ -128,22 +129,25 @@ auto PolynomialSolver::solveCubicEquation(
   return ret;
 }
 
-auto PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, double c) const -> int
+/// @note this code is public domain (http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html)
+auto PolynomialSolver::solveP3(
+  std::vector<double> & x, const double a, const double b, const double c) const -> int
 {
   x = std::vector<double>(3);
-  double a2 = a * a;
+  const double a2 = a * a;
   /**
    * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
    * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
    */
-  double q = (a2 - 3 * b) / 9;
-  double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
-  double r2 = r * r;
-  double q3 = q * q * q;
-  double A, B;
+  const double q = (a2 - 3 * b) / 9;
+  const double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
+  const double r2 = r * r;
+  const double q3 = q * q * q;
   if (r2 <= (q3 + tolerance)) {
     /**
      * @note If 3 real solutions are found.
+     * The URL specified in @sa is a reference material for developers who wish to follow the formulas,
+     * and the code that exists in the material is not included in this library.
      * @sa https://onihusube.hatenablog.com/entry/2018/10/08/140426
      */
     double t = r / std::sqrt(q3);
@@ -154,29 +158,24 @@ auto PolynomialSolver::solveP3(std::vector<double> & x, double a, double b, doub
       t = 1;
     }
     t = std::acos(t);
-    a /= 3;
-    q = -2 * std::sqrt(q);
-    x[0] = q * std::cos(t / 3) - a;
-    x[1] = q * std::cos((t + M_PI * 2) / 3) - a;
-    x[2] = q * std::cos((t - M_PI * 2) / 3) - a;
+    x[0] = -2 * std::sqrt(q) * std::cos(t / 3) - a / 3;
+    x[1] = -2 * std::sqrt(q) * std::cos((t + boost::math::constants::two_pi<double>()) / 3) - a / 3;
+    x[2] = -2 * std::sqrt(q) * std::cos((t - boost::math::constants::two_pi<double>()) / 3) - a / 3;
     return 3;
   } else {
     /**
      * @note If imaginary solutions exist.
      */
-    A = -std::cbrt(std::abs(r) + std::sqrt(r2 - q3));
-    if (r < 0) {
-      A = -A;
-    }
-    if (A == 0) {
-      B = 0;
-    } else {
-      B = q / A;
-    }
-    a /= 3;
-    x[0] = (A + B) - a;
-    x[1] = -0.5 * (A + B) - a;
-    x[2] = 0.5 * std::sqrt(3.) * (A - B);
+    const double A = [&]() {
+      const auto calculate_real_solution = [&]() {
+        return -std::cbrt(std::abs(r) + std::sqrt(r2 - q3));
+      };
+      return r < 0 ? -1 * calculate_real_solution() : calculate_real_solution();
+    }();
+    double B = (A == 0) ? 0 : q / A;
+    x[0] = (A + B) - a / 3;
+    x[1] = -0.5 * (A + B) - a / 3;
+    x[2] = 0.5 * std::sqrt(3.0) * (A - B);
     /**
      * @note If the imaginary part of the complex almost zero, this equation has a multiple solution.
      */
