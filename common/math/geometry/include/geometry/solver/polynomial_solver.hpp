@@ -117,6 +117,14 @@ private:
   auto filterByRange(
     const std::vector<double> & values, const double min_value, const double max_value) const
     -> std::vector<double>;
+  /**
+   * @brief check the value0 and value1 is equal or not with considering tolerance.
+   * @param value0 the value you want to compare
+   * @param value1 the value you want to compared
+   * @return true value0 and value1 are equal
+   * @return false value0 and value1 are not equal
+   */
+  auto isEqual(double value0, double value1) const -> bool;
 };
 }  // namespace geometry
 }  // namespace math

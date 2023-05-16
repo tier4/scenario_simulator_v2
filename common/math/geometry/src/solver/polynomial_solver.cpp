@@ -46,8 +46,8 @@ auto PolynomialSolver::solveLinearEquation(
    * @note In this case, ax*b = 0 (a=0) can cause division by zero.
    * So give special treatment to this case.
    */
-  if (std::abs(a) <= tolerance) {
-    if (std::abs(b) <= tolerance) {
+  if (isEqual(a, 0)) {
+    if (isEqual(b, 0)) {
       THROW_SIMULATION_ERROR(
         "Not computable x because of the linear equation ", a, " x + ", b, "=0, and a = ", a,
         ", b = ", b, " is very close to zero ,so any value of x = [", min_value, ",", max_value,
@@ -67,11 +67,11 @@ auto PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const -> std::vector<double>
 {
   std::vector<double> candidates, ret;
-  if (std::abs(a) <= tolerance) {
+  if (isEqual(a, 0)) {
     return solveLinearEquation(b, c);
   }
   double discriminant = b * b - 4 * a * c;
-  if (std::abs(discriminant) <= tolerance) {
+  if (isEqual(discriminant, 0)) {
     candidates = {-b / (2 * a)};
   } else if (discriminant < 0) {
     candidates = {};
@@ -86,7 +86,7 @@ auto PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
   -> std::vector<double>
 {
-  if (std::abs(a) <= tolerance) {
+  if (isEqual(a, 0)) {
     return solveQuadraticEquation(b, c, d);
   }
   /// @note Function that takes a std::vector of complex numbers and selects only real numbers from it and returns them
@@ -183,7 +183,7 @@ auto PolynomialSolver::solveCubicEquationWithComplex(
      * @note If the imaginary part of the complex almost zero, this equation has a multiple solution.
      */
     const double imaginary_part = 0.5 * std::sqrt(3.0) * (A - B);
-    if (std::abs(imaginary_part) <= tolerance) {
+    if (isEqual(imaginary_part, 0)) {
       return {
         // clang-format off
         std::complex<double>((A + B) - a / 3, 0),
@@ -203,6 +203,11 @@ auto PolynomialSolver::solveCubicEquationWithComplex(
    * @note No solutions are found.
    */
   return {};
+}
+
+auto PolynomialSolver::isEqual(double value0, double value1) const -> bool
+{
+  return std::abs(value0 - value1) <= tolerance;
 }
 }  // namespace geometry
 }  // namespace math
