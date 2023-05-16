@@ -66,28 +66,34 @@ auto PolynomialSolver::solveLinearEquation(
 auto PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const -> std::vector<double>
 {
-  std::vector<double> candidates, ret;
-  if (isEqual(a, 0)) {
-    return solveLinearEquation(b, c);
-  }
-  double discriminant = b * b - 4 * a * c;
-  if (isEqual(discriminant, 0)) {
-    candidates = {-b / (2 * a)};
-  } else if (discriminant < 0) {
-    candidates = {};
-  } else {
-    candidates = {
-      (-b - std::sqrt(discriminant)) / (2 * a), (-b + std::sqrt(discriminant)) / (2 * a)};
-  }
-  return filterByRange(candidates, min_value, max_value);
+  const auto solve_without_limit =
+    [this](double a, double b, double c, double min_value, double max_value) {
+      std::vector<double> candidates;
+      if (isEqual(a, 0)) {
+        return solveLinearEquation(b, c, min_value, max_value);
+      }
+      double discriminant = b * b - 4 * a * c;
+      if (isEqual(discriminant, 0)) {
+        candidates = {-b / (2 * a)};
+      } else if (discriminant < 0) {
+        candidates = {};
+      } else {
+        candidates = {
+          (-b - std::sqrt(discriminant)) / (2 * a), (-b + std::sqrt(discriminant)) / (2 * a)};
+      }
+      return candidates;
+    };
+
+  return filterByRange(solve_without_limit(a, b, c, min_value, max_value), min_value, max_value);
 }
 
 auto PolynomialSolver::solveCubicEquation(
   double a, double b, double c, double d, double min_value, double max_value) const
   -> std::vector<double>
 {
+  // Fallback to quadratic equation solver since a = 0
   if (isEqual(a, 0)) {
-    return solveQuadraticEquation(b, c, d);
+    return solveQuadraticEquation(b, c, d, min_value, max_value);
   }
   /// @note Function that takes a std::vector of complex numbers and selects only real numbers from it and returns them
   const auto get_real_values =
@@ -112,6 +118,7 @@ auto PolynomialSolver::solveCubicEquation(
       });
     return real_values;
   };
+
   return filterByRange(
     get_real_values(solveCubicEquationWithComplex(b / a, c / a, d / a)), min_value, max_value);
 }
@@ -120,7 +127,12 @@ auto PolynomialSolver::filterByRange(
   const std::vector<double> & values, const double min_value, const double max_value) const
   -> std::vector<double>
 {
-  const auto is_in_range = [&](double value) -> std::optional<double> {
+  /**
+   * @note Function to check if value exists between [min_value,max_value] considering the tolerance,
+   * returning std::nullopt if not present. If not, return std::nullopt, otherwise return value.
+   */
+  const auto is_in_range =
+    [](double value, double min_value, double max_value) -> std::optional<double> {
     if (min_value <= value && value <= max_value) {
       return value;
     } else if (std::abs(value - max_value) <= tolerance) {
@@ -132,8 +144,9 @@ auto PolynomialSolver::filterByRange(
   };
   std::vector<double> filtered_values = {};
   std::for_each(
-    values.begin(), values.end(), [&filtered_values, is_in_range](const double value) mutable {
-      if (const auto filtered_value = is_in_range(value)) {
+    values.begin(), values.end(),
+    [&filtered_values, is_in_range, min_value, max_value](const double value) mutable {
+      if (const auto filtered_value = is_in_range(value, min_value, max_value)) {
         filtered_values.push_back(filtered_value.value());
       }
     });
@@ -151,9 +164,8 @@ auto PolynomialSolver::solveCubicEquationWithComplex(
    */
   const double q = (a2 - 3 * b) / 9;
   const double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
-  const double r2 = r * r;
   const double q3 = q * q * q;
-  if (r2 <= (q3 + tolerance)) {
+  if (r * r <= (q3 + tolerance)) {
     /**
      * @note If 3 real solutions are found.
      * The URL specified in @sa is a reference material for developers who wish to follow the formulas,
@@ -172,13 +184,13 @@ auto PolynomialSolver::solveCubicEquationWithComplex(
     /**
      * @note If imaginary solutions exist.
      */
-    const double A = [&]() {
-      const auto calculate_real_solution = [&]() {
-        return -std::cbrt(std::abs(r) + std::sqrt(r2 - q3));
+    const double A = [r, q3]() {
+      const auto calculate_real_solution = [r, q3]() {
+        return -std::cbrt(std::abs(r) + std::sqrt(r * r - q3));
       };
       return r < 0 ? -1 * calculate_real_solution() : calculate_real_solution();
     }();
-    const double B = (A == 0) ? 0 : q / A;
+    const double B = isEqual(A, 0) ? 0 : q / A;
     /**
      * @note If the imaginary part of the complex almost zero, this equation has a multiple solution.
      */
@@ -195,7 +207,7 @@ auto PolynomialSolver::solveCubicEquationWithComplex(
       // clang-format off
       std::complex<double>((A + B) - a / 3, 0),
       std::complex<double>(-0.5 * (A + B) - a / 3, -imaginary_part),
-      std::complex<double>(-0.5 * (A + B) - a / 3,  imaginary_part),
+      std::complex<double>(-0.5 * (A + B) - a / 3,  imaginary_part)
       // clang-format on
     };
   }
