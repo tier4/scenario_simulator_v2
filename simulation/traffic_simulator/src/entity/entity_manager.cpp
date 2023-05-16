@@ -254,10 +254,10 @@ auto EntityManager::getLongitudinalDistance(
 {
   if (!include_adjacent_lanelet) {
     auto forward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
-      static_cast<LaneletPose>(from), static_cast<LaneletPose>(to));
+      from.getNonCanonicalizedLaneletPose(), to.getNonCanonicalizedLaneletPose());
 
     auto backward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
-      static_cast<LaneletPose>(to), static_cast<LaneletPose>(from));
+      to.getNonCanonicalizedLaneletPose(), from.getNonCanonicalizedLaneletPose());
 
     if (forward_distance && backward_distance) {
       if (forward_distance.value() > backward_distance.value()) {

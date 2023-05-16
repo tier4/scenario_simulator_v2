@@ -35,6 +35,7 @@ public:
     const std::vector<std::int64_t> & route_lanelets);
   explicit operator LaneletPose() const noexcept { return lanelet_pose_; }
   explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
+  LaneletPose getNonCanonicalizedLaneletPose() const { return non_canonicalized_lanelet_pose; }
 
 /**
 Note: The comparison operator for the CanonicalizedLaneletPose type compares the s values after making sure that the lanelet_id is the same.
@@ -66,6 +67,7 @@ private:
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
     const std::vector<std::int64_t> & route_lanelets) -> LaneletPose;
   const LaneletPose lanelet_pose_;
+  LaneletPose non_canonicalized_lanelet_pose;
   const geometry_msgs::msg::Pose map_pose_;
 };
 }  // namespace lanelet_pose
