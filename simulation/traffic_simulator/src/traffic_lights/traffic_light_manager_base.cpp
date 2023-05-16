@@ -68,29 +68,29 @@ auto TrafficLightManagerBase::update(const double) -> void
   drawMarkers();
 }
 
-auto TrafficLightManagerBase::createTimer(double update_rate) -> void
+auto TrafficLightManagerBase::createTimer(double publish_rate) -> void
 {
   if (!timer_) {
-    update_rate_ = update_rate;
+    publish_rate_ = publish_rate;
     using namespace std::chrono_literals;
     timer_ = rclcpp::create_timer(
-      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / update_rate_,
-      [this]() -> void { update(1.0 / update_rate_); });
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
+      [this]() -> void { update(1.0 / publish_rate_); });
   }
 }
 
-auto TrafficLightManagerBase::updatePublishRate(double update_rate) -> void
+auto TrafficLightManagerBase::applyPublishRate(double publish_rate) -> void
 {
-  if (update_rate_ != update_rate) {
-    update_rate_ = update_rate;
+  if (publish_rate_ != publish_rate) {
+    publish_rate_ = publish_rate;
     if (timer_ && not timer_->is_canceled()) {
       timer_->cancel();
     }
 
     using namespace std::chrono_literals;
     timer_ = rclcpp::create_timer(
-      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / update_rate_,
-      [this]() -> void { update(1.0 / update_rate_); });
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
+      [this]() -> void { update(1.0 / publish_rate_); });
   }
 }
 }  // namespace traffic_simulator

@@ -52,7 +52,7 @@ protected:
 
   const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
 
-  double update_rate_ = 0.0;
+  double publish_rate_ = 0.0;
 
   template <typename NodePointer>
   explicit TrafficLightManagerBase(
@@ -115,7 +115,7 @@ public:
 
   auto createTimer(double update_rate) -> void;
 
-  auto updatePublishRate(double update_rate) -> void;
+  auto applyPublishRate(double update_rate) -> void;
 
   auto update(const double) -> void;
 };

@@ -201,14 +201,14 @@ public:
 
 #undef FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
 
-  auto updateConventionalTrafficLightsPublishRate(double rate) -> void
+  auto applyConventionalTrafficLightsPublishRate(double rate) -> void
   {
-    return conventional_traffic_light_manager_ptr_->updatePublishRate(rate);
+    return conventional_traffic_light_manager_ptr_->applyPublishRate(rate);
   }
 
-  auto updateV2ITrafficLightsPublishRate(double rate) -> void
+  auto applyV2ITrafficLightsPublishRate(double rate) -> void
   {
-    return v2i_traffic_light_manager_ptr_->updatePublishRate(rate);
+    return v2i_traffic_light_manager_ptr_->applyPublishRate(rate);
   }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
