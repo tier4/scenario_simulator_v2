@@ -260,6 +260,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
+      ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
       ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED
@@ -268,7 +269,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("exitSuccess", ExitSuccess),
       ELEMENT("printParameter", PrintParameter),
       ELEMENT("test", TestCommand),
-      ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction)};
+    };
 #undef ELEMENT
 
   if (type == ":") {
