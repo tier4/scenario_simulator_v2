@@ -447,15 +447,15 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyConventionalTrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
+    static auto resetConventionalTrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
     {
-      return core->applyConventionalTrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
+      return core->resetConventionalTrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
-    static auto applyV2ITrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
+    static auto resetV2ITrafficLightsPublishRate(Ts &&... xs) -> decltype(auto)
     {
-      return core->applyV2ITrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
+      return core->resetV2ITrafficLightsPublishRate(std::forward<decltype(xs)>(xs)...);
     }
   };
 };

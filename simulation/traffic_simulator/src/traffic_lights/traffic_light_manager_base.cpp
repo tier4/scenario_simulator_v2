@@ -79,7 +79,7 @@ auto TrafficLightManagerBase::createTimer(double publish_rate) -> void
   }
 }
 
-auto TrafficLightManagerBase::applyPublishRate(double publish_rate) -> void
+auto TrafficLightManagerBase::resetPublishRate(double publish_rate) -> void
 {
   if (publish_rate_ != publish_rate) {
     publish_rate_ = publish_rate;

@@ -129,7 +129,9 @@ public:
   template <typename... Ts>
   auto makeConventionalTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
   {
-    if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe"); architecture_type == "awf/universe") {
+    if (const auto architecture_type =
+          getParameter<std::string>("architecture_type", "awf/universe");
+        architecture_type == "awf/universe") {
       return std::make_shared<
         ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
@@ -143,7 +145,9 @@ public:
   template <typename... Ts>
   auto makeV2ITrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
   {
-    if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe"); architecture_type == "awf/universe") {
+    if (const auto architecture_type =
+          getParameter<std::string>("architecture_type", "awf/universe");
+        architecture_type == "awf/universe") {
       return std::make_shared<
         V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
@@ -201,14 +205,14 @@ public:
 
 #undef FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
 
-  auto applyConventionalTrafficLightsPublishRate(double rate) -> void
+  auto resetConventionalTrafficLightsPublishRate(double rate) -> void
   {
-    return conventional_traffic_light_manager_ptr_->applyPublishRate(rate);
+    return conventional_traffic_light_manager_ptr_->resetPublishRate(rate);
   }
 
-  auto applyV2ITrafficLightsPublishRate(double rate) -> void
+  auto resetV2ITrafficLightsPublishRate(double rate) -> void
   {
-    return v2i_traffic_light_manager_ptr_->applyPublishRate(rate);
+    return v2i_traffic_light_manager_ptr_->resetPublishRate(rate);
   }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \

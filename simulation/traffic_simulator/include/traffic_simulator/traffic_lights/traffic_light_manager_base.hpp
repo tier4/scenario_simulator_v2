@@ -115,7 +115,7 @@ public:
 
   auto createTimer(double update_rate) -> void;
 
-  auto applyPublishRate(double update_rate) -> void;
+  auto resetPublishRate(double update_rate) -> void;
 
   auto update(const double) -> void;
 };
