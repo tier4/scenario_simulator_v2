@@ -15,6 +15,7 @@
 #ifndef GEOMETRY__SOLVER__POLYNOMIAL_SOLVER_HPP_
 #define GEOMETRY__SOLVER__POLYNOMIAL_SOLVER_HPP_
 
+#include <complex>
 #include <vector>
 
 namespace math
@@ -112,6 +113,16 @@ private:
    */
   auto solveP3(std::vector<double> & x, const double a, const double b, const double c) const
     -> int;
+  auto solveCubicEquationWithComplex(const double a, const double b, const double c) const
+    -> std::vector<std::complex<double>>;
+  /**
+   * @brief filter values by range.
+   * @param values the values you want to check.
+   * @return std::vector<double> filterd values.
+   */
+  auto filterByRange(
+    const std::vector<double> & values, const double min_value, const double max_value) const
+    -> std::vector<double>;
 };
 }  // namespace geometry
 }  // namespace math

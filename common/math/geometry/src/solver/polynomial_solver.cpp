@@ -18,6 +18,7 @@
 #include <geometry/solver/polynomial_solver.hpp>
 #include <iostream>
 #include <limits>
+#include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <vector>
@@ -59,15 +60,7 @@ auto PolynomialSolver::solveLinearEquation(
      */
     return {};
   }
-  double ret = -b / a;
-  if (min_value <= ret && ret <= max_value) {
-    return {ret};
-  } else if (std::abs(ret - max_value) <= tolerance) {
-    return {max_value};
-  } else if (std::abs(ret - min_value) <= tolerance) {
-    return {min_value};
-  }
-  return {};
+  return filterByRange({-b / a}, min_value, max_value);
 }
 
 auto PolynomialSolver::solveQuadraticEquation(
@@ -86,16 +79,7 @@ auto PolynomialSolver::solveQuadraticEquation(
     candidates = {
       (-b - std::sqrt(discriminant)) / (2 * a), (-b + std::sqrt(discriminant)) / (2 * a)};
   }
-  for (const auto candidate : candidates) {
-    if (min_value <= candidate && candidate <= max_value) {
-      ret.push_back(candidate);
-    } else if (std::abs(candidate - max_value) <= tolerance) {
-      ret.push_back(max_value);
-    } else if (std::abs(candidate - min_value) <= tolerance) {
-      ret.push_back(min_value);
-    }
-  }
-  return ret;
+  return filterByRange(candidates, min_value, max_value);
 }
 
 auto PolynomialSolver::solveCubicEquation(
@@ -114,16 +98,31 @@ auto PolynomialSolver::solveCubicEquation(
   } else if (result == 1) {
     candidates = {solutions[0]};
   }
-  for (const auto candidate : candidates) {
-    if (min_value <= candidate && candidate <= max_value) {
-      ret.push_back(candidate);
-    } else if (std::abs(candidate - max_value) <= tolerance) {
-      ret.push_back(max_value);
-    } else if (std::abs(candidate - min_value) <= tolerance) {
-      ret.push_back(min_value);
+  return filterByRange(candidates, min_value, max_value);
+}
+
+auto PolynomialSolver::filterByRange(
+  const std::vector<double> & values, const double min_value, const double max_value) const
+  -> std::vector<double>
+{
+  const auto is_in_range = [&](double value) -> std::optional<double> {
+    if (min_value <= value && value <= max_value) {
+      return value;
+    } else if (std::abs(value - max_value) <= tolerance) {
+      return max_value;
+    } else if (std::abs(value - min_value) <= tolerance) {
+      return min_value;
     }
-  }
-  return ret;
+    return std::nullopt;
+  };
+  std::vector<double> filtered_values = {};
+  std::for_each(
+    values.begin(), values.end(), [filtered_values, is_in_range](const double value) mutable {
+      if (const auto filtered_value = is_in_range(value)) {
+        filtered_values.push_back(filtered_value.value());
+      }
+    });
+  return filtered_values;
 }
 
 /// @note this code is public domain (http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html)
@@ -179,6 +178,70 @@ auto PolynomialSolver::solveP3(
    * @note No solutions are found.
    */
   return 0;
+}
+
+auto PolynomialSolver::solveCubicEquationWithComplex(
+  const double a, const double b, const double c) const -> std::vector<std::complex<double>>
+{
+  const double a2 = a * a;
+  /**
+   * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
+   * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
+   */
+  const double q = (a2 - 3 * b) / 9;
+  const double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
+  const double r2 = r * r;
+  const double q3 = q * q * q;
+  if (r2 <= (q3 + tolerance)) {
+    /**
+     * @note If 3 real solutions are found.
+     * The URL specified in @sa is a reference material for developers who wish to follow the formulas,
+     * and the code that exists in the material is not included in this library.
+     * @sa https://onihusube.hatenablog.com/entry/2018/10/08/140426
+     */
+    const double t = std::acos(std::clamp(r / std::sqrt(q3), -1.0, 1.0));
+    return {
+      // clang-format off
+      std::complex<double>(-2 * std::sqrt(q) * std::cos(t / 3) - a / 3, 0),
+      std::complex<double>(-2 * std::sqrt(q) * std::cos((t + boost::math::constants::two_pi<double>()) / 3) - a / 3, 0),
+      std::complex<double>(-2 * std::sqrt(q) * std::cos((t - boost::math::constants::two_pi<double>()) / 3) - a / 3, 0)
+      // clang-format on
+    };
+  } else {
+    /**
+     * @note If imaginary solutions exist.
+     */
+    const double A = [&]() {
+      const auto calculate_real_solution = [&]() {
+        return -std::cbrt(std::abs(r) + std::sqrt(r2 - q3));
+      };
+      return r < 0 ? -1 * calculate_real_solution() : calculate_real_solution();
+    }();
+    const double B = (A == 0) ? 0 : q / A;
+    /**
+     * @note If the imaginary part of the complex almost zero, this equation has a multiple solution.
+     */
+    const double imaginary_part = 0.5 * std::sqrt(3.0) * (A - B);
+    if (std::abs(imaginary_part) <= tolerance) {
+      return {
+        // clang-format off
+        std::complex<double>((A + B) - a / 3, 0),
+        std::complex<double>(-0.5 * (A + B) - a / 3)
+        // clang-format on
+      };
+    }
+    return {
+      // clang-format off
+      std::complex<double>((A + B) - a / 3, 0),
+      std::complex<double>(-0.5 * (A + B) - a / 3, -imaginary_part),
+      std::complex<double>(-0.5 * (A + B) - a / 3,  imaginary_part),
+      // clang-format on
+    };
+  }
+  /**
+   * @note No solutions are found.
+   */
+  return {};
 }
 }  // namespace geometry
 }  // namespace math
