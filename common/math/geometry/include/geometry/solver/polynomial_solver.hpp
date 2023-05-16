@@ -102,23 +102,17 @@ public:
 private:
   /**
    * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0
-   * @param x
-   * @param a
-   * @param b
-   * @param c
-   * @return int
-             if return value is 3, 3 real solutions: x[0], x[1], x[2],
-             if return value is 2, 2 real solutions: x[0], x[1],
-             if return value is 1, 1 real solution : x[0], x[1] ± i*x[2],
+   * @param a 
+   * @param b 
+   * @param c 
+   * @return std::vector<std::complex<double>> Up to 3 complex solutions
    */
-  auto solveP3(std::vector<double> & x, const double a, const double b, const double c) const
-    -> int;
   auto solveCubicEquationWithComplex(const double a, const double b, const double c) const
     -> std::vector<std::complex<double>>;
   /**
    * @brief filter values by range.
    * @param values the values you want to check.
-   * @return std::vector<double> filterd values.
+   * @return std::vector<double> filtered values.
    */
   auto filterByRange(
     const std::vector<double> & values, const double min_value, const double max_value) const

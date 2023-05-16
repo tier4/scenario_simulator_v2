@@ -89,16 +89,26 @@ auto PolynomialSolver::solveCubicEquation(
   if (std::abs(a) <= tolerance) {
     return solveQuadraticEquation(b, c, d);
   }
-  std::vector<double> solutions, candidates, ret;
-  auto result = solveP3(solutions, b / a, c / a, d / a);
-  if (result == 3) {
-    candidates = solutions;
-  } else if (result == 2) {
-    candidates = {solutions[0], solutions[1]};
-  } else if (result == 1) {
-    candidates = {solutions[0]};
-  }
-  return filterByRange(candidates, min_value, max_value);
+  const auto get_real_values =
+    [](const std::vector<std::complex<double>> & complex_values) -> std::vector<double> {
+    const auto is_real_value = [](const std::complex<double> & complex_value) {
+      constexpr double epsilon = std::numeric_limits<double>::epsilon();
+      return (std::abs(complex_value.imag()) <= epsilon)
+               ? std::optional<double>(complex_value.real())
+               : std::nullopt;
+    };
+    std::vector<double> real_values = {};
+    std::for_each(
+      complex_values.begin(), complex_values.end(),
+      [&real_values, is_real_value](const auto complex_value) mutable {
+        if (const auto real_value = is_real_value(complex_value)) {
+          real_values.push_back(real_value.value());
+        }
+      });
+    return real_values;
+  };
+  return filterByRange(
+    get_real_values(solveCubicEquationWithComplex(b / a, c / a, d / a)), min_value, max_value);
 }
 
 auto PolynomialSolver::filterByRange(
@@ -117,7 +127,7 @@ auto PolynomialSolver::filterByRange(
   };
   std::vector<double> filtered_values = {};
   std::for_each(
-    values.begin(), values.end(), [filtered_values, is_in_range](const double value) mutable {
+    values.begin(), values.end(), [&filtered_values, is_in_range](const double value) mutable {
       if (const auto filtered_value = is_in_range(value)) {
         filtered_values.push_back(filtered_value.value());
       }
@@ -126,60 +136,6 @@ auto PolynomialSolver::filterByRange(
 }
 
 /// @note this code is public domain (http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html)
-auto PolynomialSolver::solveP3(
-  std::vector<double> & x, const double a, const double b, const double c) const -> int
-{
-  x = std::vector<double>(3);
-  const double a2 = a * a;
-  /**
-   * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
-   * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
-   */
-  const double q = (a2 - 3 * b) / 9;
-  const double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
-  const double r2 = r * r;
-  const double q3 = q * q * q;
-  if (r2 <= (q3 + tolerance)) {
-    /**
-     * @note If 3 real solutions are found.
-     * The URL specified in @sa is a reference material for developers who wish to follow the formulas,
-     * and the code that exists in the material is not included in this library.
-     * @sa https://onihusube.hatenablog.com/entry/2018/10/08/140426
-     */
-    const double t = std::acos(std::clamp(r / std::sqrt(q3), -1.0, 1.0));
-    x[0] = -2 * std::sqrt(q) * std::cos(t / 3) - a / 3;
-    x[1] = -2 * std::sqrt(q) * std::cos((t + boost::math::constants::two_pi<double>()) / 3) - a / 3;
-    x[2] = -2 * std::sqrt(q) * std::cos((t - boost::math::constants::two_pi<double>()) / 3) - a / 3;
-    return 3;
-  } else {
-    /**
-     * @note If imaginary solutions exist.
-     */
-    const double A = [&]() {
-      const auto calculate_real_solution = [&]() {
-        return -std::cbrt(std::abs(r) + std::sqrt(r2 - q3));
-      };
-      return r < 0 ? -1 * calculate_real_solution() : calculate_real_solution();
-    }();
-    const double B = (A == 0) ? 0 : q / A;
-    x[0] = (A + B) - a / 3;
-    x[1] = -0.5 * (A + B) - a / 3;
-    x[2] = 0.5 * std::sqrt(3.0) * (A - B);
-    /**
-     * @note If the imaginary part of the complex almost zero, this equation has a multiple solution.
-     */
-    if (std::abs(x[2]) <= tolerance) {
-      x[2] = x[1];
-      return 2;
-    }
-    return 1;
-  }
-  /**
-   * @note No solutions are found.
-   */
-  return 0;
-}
-
 auto PolynomialSolver::solveCubicEquationWithComplex(
   const double a, const double b, const double c) const -> std::vector<std::complex<double>>
 {
