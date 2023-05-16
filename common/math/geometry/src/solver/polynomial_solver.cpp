@@ -103,6 +103,7 @@ auto PolynomialSolver::solveCubicEquation(
                  ? std::optional<double>(complex_value.real())
                  : std::nullopt;
       };
+      /// @note Iterate all complex values and check the value is real value or not.
       std::vector<double> real_values = {};
       std::for_each(
         complex_values.begin(), complex_values.end(),
@@ -140,6 +141,7 @@ auto PolynomialSolver::filterByRange(
     }
     return std::nullopt;
   };
+  /// @note Iterate values and check the value is in range or not.
   std::vector<double> filtered_values = {};
   std::for_each(
     values.begin(), values.end(),
