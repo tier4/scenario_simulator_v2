@@ -83,36 +83,31 @@ struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
 
   auto start(const Scope &) -> void override
   {
-    // V2ITrafficSignalStateAction(traffic_light_id, state, publish_frequency(optional))
-    assert(parameters.size() == 2 || parameters.size() == 3);
-
-    lanelet_id = boost::lexical_cast<std::int64_t>(parameters.at(0));
-
-    auto trim_quotes = [](const auto & str) {
-      if (str.front() == '"' && str.back() == '"') {
-        return std::string{std::next(std::begin(str)), std::prev(std::end(str))};
-      } else {
-        return str;
-      }
+    auto unquote = [](auto s) {
+      std::stringstream(s) >> std::quoted(s);
+      return s;
     };
-    state = trim_quotes(parameters.at(1));
 
-    if (parameters.size() == 3) {
-      publish_frequency = boost::lexical_cast<double>(parameters.at(2));
-      updateV2ITrafficLightsPublishRate(publish_frequency);
-    }
+    switch (parameters.size()) {
+      case 3:
+        updateV2ITrafficLightsPublishRate(boost::lexical_cast<double>(parameters[2]));
+        [[fallthrough]];
 
-    for (auto & traffic_light : getV2ITrafficLights(lanelet_id)) {
-      traffic_light.get().clear();
-      traffic_light.get().set(state);
+      case 2:
+        for (auto & traffic_light :
+             getV2ITrafficLights(boost::lexical_cast<std::int64_t>(parameters[0]))) {
+          traffic_light.get().clear();
+          traffic_light.get().set(unquote(parameters.at(1)));
+        }
+        break;
+
+      default:
+        throw Error(
+          "An unexpected number of arguments were passed to V2ITrafficSignalStateAction. Expected "
+          "2 or 3 arguments, but actually passed ",
+          parameters.size(), ".");
     }
   }
-
-  std::int64_t lanelet_id;
-
-  String state;
-
-  Double publish_frequency;
 };
 
 struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::ActionApplication
