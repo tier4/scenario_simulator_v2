@@ -321,7 +321,7 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
 }
 
 std::optional<double> CatmullRomSpline::getSValue(
-  const geometry_msgs::msg::Pose & pose, double threshold_distance)
+  const geometry_msgs::msg::Pose & pose, double threshold_distance) const
 {
   double s = 0;
   for (size_t i = 0; i < curves_.size(); i++) {

@@ -29,18 +29,5 @@ auto DeterministicMultiParameterDistribution::derive() -> ParameterDistribution
 {
   return DeterministicMultiParameterDistributionType::derive();
 }
-
-auto DeterministicMultiParameterDistribution::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index,
-  std::size_t global_size) -> ParameterList
-{
-  return DeterministicMultiParameterDistributionType::derive(
-    local_index, local_size, global_index, global_size);
-}
-
-auto DeterministicMultiParameterDistribution::getNumberOfDeriveScenarios() const -> std::size_t
-{
-  return DeterministicMultiParameterDistributionType::getNumberOfDeriveScenarios();
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

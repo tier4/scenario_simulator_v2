@@ -43,6 +43,8 @@ class TaskQueue
 public:
   explicit TaskQueue();
 
+  void stopAndJoin();
+
   ~TaskQueue();
 
   template <typename F>

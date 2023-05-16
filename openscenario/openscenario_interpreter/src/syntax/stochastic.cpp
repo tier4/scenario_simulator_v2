@@ -50,21 +50,5 @@ auto Stochastic::derive() -> ParameterDistribution
   }
   return distribution;
 }
-
-auto Stochastic::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index,
-  std::size_t global_size) -> ParameterList
-{
-  // update random_engine
-  random_engine.seed(random_seed);
-  random_engine.discard(global_index);
-
-  // N test_runs : i (0 <= i < N)
-  // M distributions : j (0 <= j < M)
-  // index : i * M + j
-  return std::next(stochastic_distributions.begin(), local_index % stochastic_distributions.size())
-    ->derive(local_index, local_size, global_index, global_size);
-}
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -30,20 +30,5 @@ auto StochasticDistribution::derive() -> Object
   return apply<Object>(
     [](auto & unnamed_distribution) { return unnamed_distribution.derive(); }, *this);
 }
-
-auto StochasticDistribution::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index,
-  std::size_t global_size) -> ParameterList
-{
-  return {
-    {parameter_name, make(apply<ParameterList>(
-                            [&](auto & unnamed_distribution) {
-                              return unnamed_distribution.derive(
-                                local_index, local_size, global_index, global_size);
-                            },
-                            (StochasticDistributionType &)*this)
-                            .begin()
-                            ->second)}};
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

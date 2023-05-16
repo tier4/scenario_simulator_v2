@@ -36,32 +36,5 @@ auto Deterministic::derive() -> ParameterDistribution
   }
   return distribution;
 }
-
-auto Deterministic::derive(
-  std::size_t local_index, std::size_t local_size, std::size_t global_index,
-  std::size_t global_size) -> ParameterList
-{
-  auto child =
-    std::next(deterministic_parameter_distributions.begin(), std::floor(local_index / local_size));
-  return apply<ParameterList>(
-    [&](auto & child_distribution) {
-      return child_distribution.derive(
-        local_index % local_size, local_size / deterministic_parameter_distributions.size(),
-        global_index, global_size);
-    },
-    (DeterministicParameterDistribution &)*child);
-}
-
-auto Deterministic::getNumberOfDeriveScenarios() const -> std::size_t
-{
-  return std::accumulate(
-    deterministic_parameter_distributions.begin(), deterministic_parameter_distributions.end(), 1,
-    [](std::size_t pre_result, auto distribution) {
-      return pre_result *
-             apply<std::size_t>(
-               [](auto & distribution) { return distribution.getNumberOfDeriveScenarios(); },
-               distribution);
-    });
-}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

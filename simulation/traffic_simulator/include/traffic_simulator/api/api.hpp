@@ -261,7 +261,7 @@ public:
   }                                                                        \
   static_assert(true, "")
 
-  FORWARD_TO_ENTITY_MANAGER(asAutoware);
+  FORWARD_TO_ENTITY_MANAGER(asFieldOperatorApplication);
   FORWARD_TO_ENTITY_MANAGER(cancelRequest);
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
