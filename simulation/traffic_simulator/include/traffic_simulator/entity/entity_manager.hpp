@@ -143,9 +143,7 @@ public:
   template <typename... Ts>
   auto makeV2ITrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
   {
-    const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-
-    if (architecture_type == "awf/universe") {
+    if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe"); architecture_type == "awf/universe") {
       return std::make_shared<
         V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
