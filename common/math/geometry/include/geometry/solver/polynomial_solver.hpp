@@ -63,7 +63,7 @@ public:
  * @param t
  * @return double result of linear function
  */
-  auto linearFunction(double a, double b, double t) const -> double;
+  auto linear(double a, double b, double t) const -> double;
   /**
    * @brief calculate result of quadratic function a*t^2 + b*t + c
    *
@@ -73,7 +73,7 @@ public:
    * @param t
    * @return double result of quadratic function
    */
-  auto quadraticFunction(double a, double b, double c, double t) const -> double;
+  auto quadratic(double a, double b, double c, double t) const -> double;
   /**
    * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
    *
@@ -84,7 +84,7 @@ public:
    * @param t
    * @return double result of cubic function
    */
-  auto cubicFunction(double a, double b, double c, double d, double t) const -> double;
+  auto cubic(double a, double b, double c, double d, double t) const -> double;
   /**
    * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver.
    * This value was determined by Masaya Kataoka (@hakuturu583).

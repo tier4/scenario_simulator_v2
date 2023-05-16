@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <boost/math/constants/constants.hpp>
 #include <cmath>
 #include <geometry/solver/polynomial_solver.hpp>
@@ -25,18 +26,14 @@ namespace math
 {
 namespace geometry
 {
-auto PolynomialSolver::linearFunction(double a, double b, double t) const -> double
-{
-  return a * t + b;
-}
+auto PolynomialSolver::linear(double a, double b, double t) const -> double { return a * t + b; }
 
-auto PolynomialSolver::quadraticFunction(double a, double b, double c, double t) const -> double
+auto PolynomialSolver::quadratic(double a, double b, double c, double t) const -> double
 {
   return a * t * t + b * t + c;
 }
 
-auto PolynomialSolver::cubicFunction(double a, double b, double c, double d, double t) const
-  -> double
+auto PolynomialSolver::cubic(double a, double b, double c, double d, double t) const -> double
 {
   return a * t * t * t + b * t * t + c * t + d;
 }
@@ -150,14 +147,7 @@ auto PolynomialSolver::solveP3(
      * and the code that exists in the material is not included in this library.
      * @sa https://onihusube.hatenablog.com/entry/2018/10/08/140426
      */
-    double t = r / std::sqrt(q3);
-    if (t < -1) {
-      t = -1;
-    }
-    if (t > 1) {
-      t = 1;
-    }
-    t = std::acos(t);
+    const double t = std::acos(std::clamp(r / std::sqrt(q3), -1.0, 1.0));
     x[0] = -2 * std::sqrt(q) * std::cos(t / 3) - a / 3;
     x[1] = -2 * std::sqrt(q) * std::cos((t + boost::math::constants::two_pi<double>()) / 3) - a / 3;
     x[2] = -2 * std::sqrt(q) * std::cos((t - boost::math::constants::two_pi<double>()) / 3) - a / 3;
@@ -172,7 +162,7 @@ auto PolynomialSolver::solveP3(
       };
       return r < 0 ? -1 * calculate_real_solution() : calculate_real_solution();
     }();
-    double B = (A == 0) ? 0 : q / A;
+    const double B = (A == 0) ? 0 : q / A;
     x[0] = (A + B) - a / 3;
     x[1] = -0.5 * (A + B) - a / 3;
     x[2] = 0.5 * std::sqrt(3.0) * (A - B);

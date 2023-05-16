@@ -37,9 +37,9 @@ bool checkValueWithTolerance(double value, double expected, double tolerance = s
 TEST(PolynomialSolverTest, LinearFunction)
 {
   math::geometry::PolynomialSolver solver;
-  EXPECT_DOUBLE_EQ(solver.linearFunction(1, 1, 2), 3);  // x + 1 = 3 (x=2)
-  EXPECT_DOUBLE_EQ(solver.linearFunction(1, 0, 2), 2);  // x + 0 = 2 (x=2)
-  EXPECT_DOUBLE_EQ(solver.linearFunction(0, 0, 2), 0);  //     0 = 0 (x=2)
+  EXPECT_DOUBLE_EQ(solver.linear(1, 1, 2), 3);  // x + 1 = 3 (x=2)
+  EXPECT_DOUBLE_EQ(solver.linear(1, 0, 2), 2);  // x + 0 = 2 (x=2)
+  EXPECT_DOUBLE_EQ(solver.linear(0, 0, 2), 0);  //     0 = 0 (x=2)
 }
 
 /**
@@ -67,7 +67,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
       else {
         auto ret = solver.solveLinearEquation(a, b, min_value, max_value);
         for (const auto & solution : ret) {
-          EXPECT_TRUE(checkValueWithTolerance(solver.linearFunction(a, b, solution), 0.0));
+          EXPECT_TRUE(checkValueWithTolerance(solver.linear(a, b, solution), 0.0));
           EXPECT_TRUE(min_value <= solution && solution <= max_value);
         }
       }
@@ -81,10 +81,10 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
 TEST(PolynomialSolverTest, QuadraticFunction)
 {
   math::geometry::PolynomialSolver solver;
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 1, 2), 7);   //  x^2 + x + 1 =  7 (x=2)
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(1, 1, 0, 2), 6);   //  x^2 + x + 0 =  6 (x=2)
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(2, 0, 3, 2), 11);  // 2x^2     + 3 = 11 (x=2)
-  EXPECT_DOUBLE_EQ(solver.quadraticFunction(0, 0, 0, 2), 0);   //            0 =  0 (x=2)
+  EXPECT_DOUBLE_EQ(solver.quadratic(1, 1, 1, 2), 7);   //  x^2 + x + 1 =  7 (x=2)
+  EXPECT_DOUBLE_EQ(solver.quadratic(1, 1, 0, 2), 6);   //  x^2 + x + 0 =  6 (x=2)
+  EXPECT_DOUBLE_EQ(solver.quadratic(2, 0, 3, 2), 11);  // 2x^2     + 3 = 11 (x=2)
+  EXPECT_DOUBLE_EQ(solver.quadratic(0, 0, 0, 2), 0);   //            0 =  0 (x=2)
 }
 
 /**
@@ -115,7 +115,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
         else {
           auto ret = solver.solveQuadraticEquation(a, b, c, 0, 1);
           for (const auto & solution : ret) {
-            EXPECT_TRUE(checkValueWithTolerance(solver.quadraticFunction(a, b, c, solution), 0.0));
+            EXPECT_TRUE(checkValueWithTolerance(solver.quadratic(a, b, c, solution), 0.0));
             EXPECT_TRUE(min_value <= solution && solution <= max_value);
           }
         }
@@ -130,10 +130,10 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
 TEST(PolynomialSolverTest, CubicFunction)
 {
   math::geometry::PolynomialSolver solver;
-  EXPECT_DOUBLE_EQ(solver.cubicFunction(1, 1, 1, 1, 2), 15);  //  x^3 +  x^2 + x + 1 = 15 (x=2)
-  EXPECT_DOUBLE_EQ(solver.cubicFunction(4, 1, 1, 0, 2), 38);  // 4x^3 +  x^2 + x + 0 = 38 (x=2)
-  EXPECT_DOUBLE_EQ(solver.cubicFunction(3, 2, 0, 3, 2), 35);  // 3x^3 + 2x^2     + 3 = 35 (x=2)
-  EXPECT_DOUBLE_EQ(solver.cubicFunction(0, 0, 0, 0, 2), 0);   //                   0 =  0 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubic(1, 1, 1, 1, 2), 15);  //  x^3 +  x^2 + x + 1 = 15 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubic(4, 1, 1, 0, 2), 38);  // 4x^3 +  x^2 + x + 0 = 38 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubic(3, 2, 0, 3, 2), 35);  // 3x^3 + 2x^2     + 3 = 35 (x=2)
+  EXPECT_DOUBLE_EQ(solver.cubic(0, 0, 0, 0, 2), 0);   //                   0 =  0 (x=2)
 }
 
 /**
@@ -209,7 +209,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
           else {
             auto ret = solver.solveCubicEquation(a, b, c, d, min_value, max_value);
             for (const auto & solution : ret) {
-              EXPECT_TRUE(checkValueWithTolerance(solver.cubicFunction(a, b, c, d, solution), 0.0));
+              EXPECT_TRUE(checkValueWithTolerance(solver.cubic(a, b, c, d, solution), 0.0));
               EXPECT_TRUE(min_value <= solution && solution <= max_value);
             }
           }
