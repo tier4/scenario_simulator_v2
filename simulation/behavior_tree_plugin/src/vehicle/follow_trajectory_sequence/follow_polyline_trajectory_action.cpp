@@ -146,7 +146,7 @@ DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(*=);
 DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(/=);
 
 template <typename T, typename U>
-auto distance(const T & from, const U & to)
+auto hypot(const T & from, const U & to)
 {
   return std::hypot(to.x - from.x, to.y - from.y, to.z - from.z);
 }
@@ -182,10 +182,6 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) and
       getInput<decltype(target_speed)>("target_speed", target_speed) and parameter and
       not parameter->shape.vertices.empty()) {
-    // PRINT(parameter->initial_distance_offset);
-    // PRINT(parameter->dynamic_constraints_ignorable);
-    // PRINT(parameter->closed);
-
     auto pop_current_waypoint = [&]() {
       if (std::rotate(
             std::begin(parameter->shape.vertices), std::begin(parameter->shape.vertices) + 1,
@@ -208,85 +204,6 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       }
     };
 
-    auto maximum_acceleration_currently_available = [&]() {
-      return std::clamp(
-        entity_status.action_status.accel.linear.x +
-          behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time,
-        -behavior_parameter.dynamic_constraints.max_deceleration,
-        +behavior_parameter.dynamic_constraints.max_acceleration);
-    };
-
-    auto minimum_acceleration_currently_available = [&]() {
-      return std::clamp(
-        entity_status.action_status.accel.linear.x -
-          behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time,
-        -behavior_parameter.dynamic_constraints.max_deceleration,
-        +behavior_parameter.dynamic_constraints.max_acceleration);
-    };
-
-    auto max_speed = [&]() {
-      return target_speed ? *target_speed : behavior_parameter.dynamic_constraints.max_speed;
-    };
-
-    auto adjust = [&](auto suggested_speed) {
-      std::cout << "waypoint 1/" << parameter->shape.vertices.size() << std::endl;
-
-      PRINT(suggested_speed);
-
-      const auto remain = remain_time();
-      PRINT(remain);
-
-      const auto distance_to_next_waypoint =
-        distance(entity_status.pose.position, current_waypoint().position.position);
-      PRINT(distance_to_next_waypoint);
-
-      const auto estimated_time_of_arrival = distance_to_next_waypoint / suggested_speed;
-      PRINT(estimated_time_of_arrival);
-
-      const auto desired_speed = distance_to_next_waypoint / remain;
-      PRINT(desired_speed);
-
-      if (remain < estimated_time_of_arrival) {
-        PRINT(remain < estimated_time_of_arrival);
-        std::cout << "SLOW => ACCELERATE" << std::endl;
-
-        PRINT(maximum_acceleration_currently_available());
-        PRINT(maximum_acceleration_currently_available() * step_time);
-        PRINT(suggested_speed + maximum_acceleration_currently_available() * step_time);
-
-        const auto accelerated_speed = std::min(
-          suggested_speed + maximum_acceleration_currently_available() * step_time, desired_speed);
-        PRINT(accelerated_speed);
-
-        return accelerated_speed;
-      } else if (estimated_time_of_arrival < remain_time()) {
-        PRINT(estimated_time_of_arrival < remain_time());
-        std::cout << "FAST => DECELERATE" << std::endl;
-
-        PRINT(minimum_acceleration_currently_available());
-        PRINT(minimum_acceleration_currently_available() * step_time);
-        PRINT(suggested_speed + minimum_acceleration_currently_available() * step_time);
-
-        const auto decelerated_speed = std::max(
-          suggested_speed + minimum_acceleration_currently_available() * step_time, desired_speed);
-        PRINT(decelerated_speed);
-
-        return decelerated_speed;
-      } else {
-        std::cout << "OK" << std::endl;
-        return desired_speed;
-      }
-    };
-
-    auto steering = [&](
-                      auto && current_position, auto && current_target, auto && current_velocity) {
-      // TODO: truncate by maximum_acceleration_currently_available() *
-      // step_time
-      return normalize(current_target - current_position) *
-               behavior_parameter.dynamic_constraints.max_speed -
-             current_velocity;
-    };  // vector [m/s]
-
     if (remain_time() <= step_time) {
       std::cout << "TIME OVER!!!" << std::endl;
       if (parameter->dynamic_constraints_ignorable) {
@@ -298,10 +215,54 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       }
     }
 
-    velocity +=
-      steering(entity_status.pose.position, current_waypoint().position.position, velocity);
+    PRINT(remain_time());
 
-    truncate(velocity, adjust(entity_status.action_status.twist.linear.x));
+    const auto position = entity_status.pose.position;
+
+    const auto target_position = current_waypoint().position.position;
+
+    const auto distance = hypot(position, target_position);  // [m]
+
+    const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
+
+    const auto max_acceleration = std::clamp(
+      acceleration /* [m/s^2] */ +
+        behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
+          step_time /* [s] */,
+      -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */,
+      +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
+
+    const auto max_deceleration = std::clamp(
+      acceleration /* [m/s^2] */ -
+        behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
+          step_time /* [s] */,
+      -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */,
+      +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
+
+    const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
+
+    /*
+       The desired speed is the speed at which the destination can be reached
+       exactly at the specified time (= time remaining at zero).
+
+       If no arrival time is specified for subsequent waypoints, there is no
+       need to accelerate or decelerate, so the current speed remains the
+       desired speed.
+    */
+    const auto desired_speed = std::isinf(remain_time()) ? speed : distance / remain_time();
+
+    const auto max_speed = std::clamp(
+      desired_speed,  // [m/s]
+      speed /* [m/s] */ - max_deceleration /* [m/s^2] */ * step_time,
+      speed /* [m/s] */ + max_acceleration /* [m/s^2] */ * step_time);
+
+    PRINT(speed / desired_speed);
+
+    const auto desired_velocity = normalize(target_position - position) * max_speed;  // [m/s]
+
+    const auto steering = desired_velocity - velocity;
+
+    velocity = truncate(velocity + steering, max_speed);
 
     auto make_direction = [this]() {
       geometry_msgs::msg::Vector3 direction;
@@ -334,12 +295,12 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
 
-    if (auto d = distance(updated_status.pose.position, current_waypoint().position.position);
-        std::abs(d) <= std::numeric_limits<double>::epsilon()) {
+    if (const auto distance = hypot(updated_status.pose.position, target_position);
+        std::abs(distance) <= std::numeric_limits<double>::epsilon()) {
       std::cout << "REACHED!!!" << std::endl;
       pop_current_waypoint();
     } else {
-      PRINT(d);
+      PRINT(distance);
     }
 
     return parameter->shape.vertices.empty() ? BT::NodeStatus::SUCCESS : BT::NodeStatus::RUNNING;
