@@ -185,13 +185,6 @@ public:
 
   ~EntityManager() = default;
 
-private:
-  struct TrafficLightManager
-  {
-    std::shared_ptr<TrafficLightManagerBase> conventional_traffic_light_manager_ptr_;
-    std::shared_ptr<TrafficLightManagerBase> v2i_traffic_light_manager_ptr_;
-  } traffic_light_manager;
-
 public:
 #define FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(NAME)                 \
   template <typename... Ts>                                           \
@@ -207,32 +200,10 @@ public:
   }                                                                   \
   static_assert(true, "")
 
-  //  auto getConventionalTrafficLights(std::int64_t lanelet_id) const {
-  //    return conventional_traffic_light_manager_ptr_->getTrafficLights(lanelet_id);
-  //  }
-  //
-  //  auto getV2ITrafficLights(std::int64_t lanelet_id) const {
-  //    return v2i_traffic_light_manager_ptr_->getTrafficLights(lanelet_id);
-  //  }
-  //
-  //  auto getConventionalTrafficLights() const {
-  //    return conventional_traffic_light_manager_ptr_->getTrafficLights();
-  //  }
-  //
-  //  auto getV2ITrafficLights() const {
-  //    return v2i_traffic_light_manager_ptr_->getTrafficLights();
-  //  }
-  //
-  //  auto getConventionalTrafficLight(std::int64_t lanelet_id) const {
-  //    return conventional_traffic_light_manager_ptr_->getTrafficLight(lanelet_id);
-  //  }
-  //
-  //  auto getV2ITrafficLight(std::int64_t lanelet_id) const {
-  //    return v2i_traffic_light_manager_ptr_->getTrafficLight(lanelet_id);
-  //  }
-
   FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLights);
   FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLight);
+
+#undef FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
 
   auto updateConventionalTrafficLightsPublishRate(double rate) -> void
   {
