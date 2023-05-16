@@ -12,14 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <color_names/color_names.hpp>
-#include <iterator>
-#include <memory>
-#include <string>
 #include <traffic_simulator/traffic_lights/v2i_traffic_light_manager.hpp>
-#include <type_traits>
-#include <utility>
-#include <vector>
 
 namespace traffic_simulator
 {
