@@ -25,44 +25,44 @@ class PolynomialSolver
 {
 public:
   /**
- * @brief solve linear equation a*x + b = 0
- *
- * @param a
- * @param b
- * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
- */
+   * @brief solve linear equation a*x + b = 0
+   *
+   * @param a
+   * @param b
+   * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
+   */
   auto solveLinearEquation(double a, double b, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
   /**
-  * @brief solve quadratic equation a*x^2 + b*x + c = 0
-  *
-  * @param a
-  * @param b
-  * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
-  */
+   * @brief solve quadratic equation a*x^2 + b*x + c = 0
+   *
+   * @param a
+   * @param b
+   * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
+   */
   auto solveQuadraticEquation(
     double a, double b, double c, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
   /**
- * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
- *
- * @param a
- * @param b
- * @param c
- * @param d
- * @return std::vector<double> real solution of the cubic functions (from min_value to max_value)
- */
+   * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @return std::vector<double> real solution of the cubic functions (from min_value to max_value)
+   */
   auto solveCubicEquation(
     double a, double b, double c, double d, double min_value = 0, double max_value = 1) const
     -> std::vector<double>;
   /**
- * @brief calculate result of linear function a*t + b
- *
- * @param a
- * @param b
- * @param t
- * @return double result of linear function
- */
+   * @brief calculate result of linear function a*t + b
+   *
+   * @param a
+   * @param b
+   * @param t
+   * @return double result of linear function
+   */
   auto linear(double a, double b, double t) const -> double;
   /**
    * @brief calculate result of quadratic function a*t^2 + b*t + c
