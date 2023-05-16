@@ -113,7 +113,7 @@ public:
 
   auto hasAnyLightChanged() -> bool;
 
-  auto start(double update_rate) -> void;
+  auto createTimer(double update_rate) -> void;
 
   auto updatePublishRate(double update_rate) -> void;
 

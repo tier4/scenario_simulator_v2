@@ -68,7 +68,7 @@ auto TrafficLightManagerBase::update(const double) -> void
   drawMarkers();
 }
 
-auto TrafficLightManagerBase::start(double update_rate) -> void
+auto TrafficLightManagerBase::createTimer(double update_rate) -> void
 {
   if (!timer_) {
     update_rate_ = update_rate;
