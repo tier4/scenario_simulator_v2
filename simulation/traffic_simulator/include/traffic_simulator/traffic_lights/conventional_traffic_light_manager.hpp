@@ -16,19 +16,11 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__CONVENTIONAL_TRAFFIC_LIGHT_MANAGER_HPP_
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <stdexcept>  // std::out_of_range
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
-#include <tuple>
-#include <unordered_map>
-#include <utility>
-#include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {
