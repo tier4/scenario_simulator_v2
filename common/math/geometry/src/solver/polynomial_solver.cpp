@@ -67,18 +67,14 @@ auto PolynomialSolver::solveLinearEquation(
 auto PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const -> std::vector<double>
 {
-  const auto solve_without_limit = [this](double a, double b, double c) {
-    std::vector<double> candidates;
-    double discriminant = b * b - 4 * a * c;
-    if (isEqual(discriminant, 0)) {
-      candidates = {-b / (2 * a)};
+  const auto solve_without_limit = [this](double a, double b, double c) -> std::vector<double> {
+    if (double discriminant = b * b - 4 * a * c; isEqual(discriminant, 0)) {
+      return {-b / (2 * a)};
     } else if (discriminant < 0) {
-      candidates = {};
+      return {};
     } else {
-      candidates = {
-        (-b - std::sqrt(discriminant)) / (2 * a), (-b + std::sqrt(discriminant)) / (2 * a)};
+      return {(-b - std::sqrt(discriminant)) / (2 * a), (-b + std::sqrt(discriminant)) / (2 * a)};
     }
-    return candidates;
   };
 
   /// @note Fallback to linear equation solver if a = 0
