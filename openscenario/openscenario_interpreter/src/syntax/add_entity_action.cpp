@@ -89,16 +89,16 @@ try {
       if (position.is<WorldPosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeWorldPosition>(position.as<WorldPosition>()),
-          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian), pedestrian.model3d);
       } else if (position.is<RelativeWorldPosition>()) {
         applyAddEntityAction(
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeWorldPosition>()),
-          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian), pedestrian.model3d);
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
-          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian), pedestrian.model3d);
       } else {
         throw common::Error(__FILE__);
       }
@@ -109,16 +109,16 @@ try {
       if (position.is<WorldPosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeWorldPosition>(position.as<WorldPosition>()),
-          static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
+          static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object), misc_object.model3d);
       } else if (position.is<RelativeWorldPosition>()) {
         applyAddEntityAction(
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeWorldPosition>()),
-          static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
+          static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object), misc_object.model3d);
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
-          static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
+          static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object), misc_object.model3d);
       } else {
         throw common::Error(__FILE__);
       }

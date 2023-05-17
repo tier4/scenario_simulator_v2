@@ -150,7 +150,7 @@ public:
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
-    const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
+    const traffic_simulator_msgs::msg::PedestrianParameters & parameters, std::string model3d = "",
     const std::string & behavior = PedestrianBehavior::defaultBehavior())
   {
     auto register_to_entity_manager = [&]() {
@@ -166,6 +166,8 @@ public:
         simulation_api_schema::SpawnPedestrianEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
+        req.set_asset_key(model3d);
+        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         zeromq_client_.call(req, res);
         return res.result().success();
       }
@@ -177,7 +179,7 @@ public:
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
-    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
+    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters, std::string model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       using traffic_simulator::entity::MiscObjectEntity;
@@ -192,6 +194,8 @@ public:
         simulation_api_schema::SpawnMiscObjectEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
+        req.set_asset_key(model3d);
+        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         zeromq_client_.call(req, res);
         return res.result().success();
       }

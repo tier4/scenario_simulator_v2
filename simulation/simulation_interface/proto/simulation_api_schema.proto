@@ -118,6 +118,8 @@ message SpawnVehicleEntityResponse {
  **/
 message SpawnPedestrianEntityRequest {
   traffic_simulator_msgs.PedestrianParameters parameters = 1; // Parameters of pedestrian entity.
+  string asset_key = 2;                                       // Asset key of the entity simulator entity
+  geometry_msgs.Pose pose = 3;                                // Entity initial pose
 }
 
 /**
@@ -132,6 +134,8 @@ message SpawnPedestrianEntityResponse {
  **/
 message SpawnMiscObjectEntityRequest {
   traffic_simulator_msgs.MiscObjectParameters parameters = 1; // Parameters of misc object entity.
+  string asset_key = 2;                                       // Asset key of the entity simulator entity
+  geometry_msgs.Pose pose = 3;                                // Entity initial pose
 }
 
 /**

@@ -279,7 +279,7 @@ bool API::updateEntityStatusInSim()
     zeromq_client_.call(req, res);
     success &= res.result().success();
 
-    // TODO: Temporarily removed utilization of updated status - it was not utilized before anyway. Bring it back though
+    // TODO: Temporarily removed utilization of updated status - it was not filled and utilized before anyway. Bring it back though
   }
   return success;
 }
