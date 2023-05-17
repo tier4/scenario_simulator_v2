@@ -168,8 +168,7 @@ auto PolynomialSolver::solveMonicCubicEquationWithComplex(
     // clang-format off
     [this, a](const auto q, const auto r) -> std::vector<std::complex<double>> {
     // clang-format on
-    const double q3 = q * q * q;
-    if (r * r <= (q3 + tolerance)) {
+    if (const double q3 = q * q * q; r * r <= (q3 + tolerance)) {
       /**
        * @note If 3 real solutions are found.
        * The URL specified in @sa is a reference material for developers who wish to follow the formulas,
