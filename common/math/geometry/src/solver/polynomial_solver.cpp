@@ -178,9 +178,9 @@ auto PolynomialSolver::solveMonicCubicEquationWithComplex(
       const double t = std::acos(std::clamp(r / std::sqrt(q3), -1.0, 1.0));
       return {
         // clang-format off
-      std::complex<double>(-2 * std::sqrt(q) * std::cos( t                                             / 3) - a / 3, 0),
-      std::complex<double>(-2 * std::sqrt(q) * std::cos((t + boost::math::constants::two_pi<double>()) / 3) - a / 3, 0),
-      std::complex<double>(-2 * std::sqrt(q) * std::cos((t - boost::math::constants::two_pi<double>()) / 3) - a / 3, 0)
+        std::complex<double>(-2 * std::sqrt(q) * std::cos( t                                             / 3) - a / 3, 0),
+        std::complex<double>(-2 * std::sqrt(q) * std::cos((t + boost::math::constants::two_pi<double>()) / 3) - a / 3, 0),
+        std::complex<double>(-2 * std::sqrt(q) * std::cos((t - boost::math::constants::two_pi<double>()) / 3) - a / 3, 0)
         // clang-format on
       };
     } else {
