@@ -156,9 +156,9 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
 
   for (const auto solution : get_solutions()) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
-    double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
+    double x = solver_.cubic(ax_, bx_, cx_, dx_, solution);
     double tx = (x - point0.x) / (point1.x - point0.x);
-    double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
+    double y = solver_.cubic(ay_, by_, cy_, dy_, solution);
     double ty = (y - point0.y) / (point1.y - point0.y);
     if (std::abs(tx - ty) > epsilon || std::isnan(tx) || std::isnan(ty)) {
       /**
