@@ -98,7 +98,15 @@ void ScenarioSimulator::updateFrame(
   simulation_interface::toMsg(req.current_ros_time(), t);
   current_ros_time_ = t;
   std::vector<traffic_simulator_msgs::EntityStatus> entity_status;
-  std::transform(entity_status_.begin(), entity_status_.end(), std::back_inserter(entity_status), [](auto &kv){ return kv.second;} );
+  std::transform(entity_status_.begin(), entity_status_.end(), std::back_inserter(entity_status), [this](auto &kv){
+    traffic_simulator_msgs::EntityStatus status;
+    *status.mutable_pose() = kv.second.pose();
+    *status.mutable_action_status() = kv.second.action_status();
+    *status.mutable_name() = kv.second.name();
+    *status.mutable_type() = kv.second.type();
+    *status.mutable_subtype() = kv.second.subtype();
+    *status.mutable_bounding_box() = getBoundingBox(status.name());
+    return status;} );
   sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
@@ -108,7 +116,7 @@ void ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
-  const traffic_simulator_msgs::EntityStatus& updated_entity_status = entity_status_[req.status().name()] = req.status();
+  const simulation_api_schema::EntityStatus& updated_entity_status = entity_status_[req.status().name()] = req.status();
   res = simulation_api_schema::UpdateEntityStatusResponse();
   res.mutable_status()->set_name(updated_entity_status.name());
   res.mutable_status()->mutable_action_status()->CopyFrom(updated_entity_status.action_status());
@@ -230,6 +238,30 @@ void ScenarioSimulator::updateTrafficLights(
   (void)req;
   res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
+}
+
+traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std::string& name) {
+  for (const auto & ego : ego_vehicles_) {
+    if (ego.name() == name) {
+      return ego.bounding_box();
+    }
+  }
+  for (const auto & vehicle : vehicles_) {
+    if (vehicle.name() == name) {
+      return vehicle.bounding_box();
+    }
+  }
+  for (const auto & pedestrian : pedestrians_) {
+    if (pedestrian.name() == name) {
+      return pedestrian.bounding_box();
+    }
+  }
+  for (const auto & misc_object : misc_objects_) {
+    if (misc_object.name() == name) {
+      return misc_object.bounding_box();
+    }
+  }
+  return traffic_simulator_msgs::BoundingBox();
 }
 }  // namespace simple_sensor_simulator
 

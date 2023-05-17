@@ -146,10 +146,16 @@ void toMsg(
   const traffic_simulator_msgs::EntitySubtype & proto,
   traffic_simulator_msgs::msg::EntitySubtype & subtype);
 void toProto(
+    const traffic_simulator_msgs::msg::EntityStatus & status,
+    simulation_api_schema::EntityStatus & proto);
+void toProto(
   const traffic_simulator_msgs::msg::EntityStatus & status,
   traffic_simulator_msgs::EntityStatus & proto);
 void toMsg(
   const traffic_simulator_msgs::EntityStatus & proto,
+  traffic_simulator_msgs::msg::EntityStatus & status);
+void toMsg(
+  const simulation_api_schema::EntityStatus & proto,
   traffic_simulator_msgs::msg::EntityStatus & status);
 void toProto(
   const builtin_interfaces::msg::Duration & duration, builtin_interfaces::Duration & proto);

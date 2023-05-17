@@ -166,22 +166,6 @@ void toMsg(const traffic_simulator_msgs::Axles & proto, traffic_simulator_msgs::
   toMsg(proto.rear_axle(), axles.rear_axle);
 }
 
-/*
-void toProto(
-  const traffic_simulator_msgs::msg::Property & p,
-  traffic_simulator_msgs::Property & proto)
-{
-  // proto.set_is_ego(p.is_ego);
-}
-
-void toMsg(
-  const traffic_simulator_msgs::Property & proto,
-  traffic_simulator_msgs::msg::Property & p)
-{
-  // p.is_ego = proto.is_ego();
-}
-*/
-
 void toProto(
   const traffic_simulator_msgs::msg::VehicleParameters & p,
   traffic_simulator_msgs::VehicleParameters & proto)
@@ -189,7 +173,6 @@ void toProto(
   toProto(p.bounding_box, *proto.mutable_bounding_box());
   toProto(p.axles, *proto.mutable_axles());
   toProto(p.performance, *proto.mutable_performance());
-  // toProto(p.property, *proto.mutable_property());
   proto.set_name(p.name);
 }
 
@@ -200,7 +183,6 @@ void toMsg(
   toMsg(proto.axles(), p.axles);
   toMsg(proto.bounding_box(), p.bounding_box);
   toMsg(proto.performance(), p.performance);
-  // toMsg(proto.property(), p.property);
   p.name = proto.name();
 }
 
@@ -403,19 +385,15 @@ void toMsg(
 }
 
 void toProto(
-  const traffic_simulator_msgs::msg::EntityStatus & status,
-  traffic_simulator_msgs::EntityStatus & proto)
+    const traffic_simulator_msgs::msg::EntityStatus & status,
+    traffic_simulator_msgs::EntityStatus & proto)
 {
   toProto(status.type, *proto.mutable_type());
   toProto(status.subtype, *proto.mutable_subtype());
   proto.set_time(status.time);
   proto.set_name(status.name);
-  toProto(status.bounding_box, *proto.mutable_bounding_box());
   toProto(status.action_status, *proto.mutable_action_status());
   toProto(status.pose, *proto.mutable_pose());
-  toProto(status.lanelet_pose, *proto.mutable_lanelet_pose());
-  proto.set_lanelet_pose_valid(status.lanelet_pose_valid);
-  // proto.PrintDebugString();
 }
 
 void toMsg(
@@ -431,6 +409,33 @@ void toMsg(
   toMsg(proto.pose(), status.pose);
   toMsg(proto.lanelet_pose(), status.lanelet_pose);
   status.lanelet_pose_valid = proto.lanelet_pose_valid();
+}
+
+void toProto(
+    const traffic_simulator_msgs::msg::EntityStatus & status,
+    simulation_api_schema::EntityStatus & proto)
+{
+  toProto(status.type, *proto.mutable_type());
+  toProto(status.subtype, *proto.mutable_subtype());
+  proto.set_time(status.time);
+  proto.set_name(status.name);
+  toProto(status.action_status, *proto.mutable_action_status());
+  toProto(status.pose, *proto.mutable_pose());
+}
+
+void toMsg(
+    const simulation_api_schema::EntityStatus & proto,
+    traffic_simulator_msgs::msg::EntityStatus & status)
+{
+  toMsg(proto.type(), status.type);
+  toMsg(proto.subtype(), status.subtype);
+  status.time = proto.time();
+  status.name = proto.name();
+  toMsg(proto.action_status(), status.action_status);
+  toMsg(proto.pose(), status.pose);
+  status.bounding_box = traffic_simulator_msgs::msg::BoundingBox();
+  status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+  status.lanelet_pose_valid = false;
 }
 
 void toProto(

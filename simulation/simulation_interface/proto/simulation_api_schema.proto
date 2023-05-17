@@ -7,6 +7,18 @@ import "traffic_simulator_msgs.proto";
 package simulation_api_schema;
 
 /**
+ * Entity status passed over the protobuf interface
+ **/
+message EntityStatus {
+  traffic_simulator_msgs.EntityType type = 1;            // Type of the entity.
+  traffic_simulator_msgs.EntitySubtype subtype = 2;      // subtype of the entity.
+  double time = 3;                                       // Current simulation time.
+  string name = 4;                                       // Name of the entity.
+  traffic_simulator_msgs.ActionStatus action_status = 5; // Action status of the entity.
+  geometry_msgs.Pose pose = 6;                           // Pose in map coordinate of the entity.
+}
+
+/**
  * Result of the request
  **/
 message Result {
@@ -163,7 +175,7 @@ message DespawnEntityResponse {
  * Requests updating entity status.
  **/
 message UpdateEntityStatusRequest {
-  traffic_simulator_msgs.EntityStatus status = 1;                 // Updated entity status in traffic simulator.
+  EntityStatus status = 1;                 // Updated entity status in traffic simulator.
 }
 
 /**
