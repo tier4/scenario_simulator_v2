@@ -159,9 +159,8 @@ auto PolynomialSolver::solveMonicCubicEquationWithComplex(
    * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
    */
   const auto tschirnhaus_transformation = [](const auto a, const auto b, const auto c) {
-    const double q = (a * a - 3 * b) / 9;
-    const double r = (a * (2 * a * a - 9 * b) + 27 * c) / 54;
-    return std::tuple<double, double>(q, r);
+    /// @note The first element of the return value is q, the second element is r
+    return std::tuple<double, double>((a * a - 3 * b) / 9, (a * (2 * a * a - 9 * b) + 27 * c) / 54);
   };
 
   const auto solve_without_limit =
