@@ -42,25 +42,26 @@ auto PolynomialSolver::cubic(double a, double b, double c, double d, double t) c
 auto PolynomialSolver::solveLinearEquation(
   double a, double b, double min_value, double max_value) const -> std::vector<double>
 {
-  /**
-   * @note In this case, ax*b = 0 (a=0) can cause division by zero.
-   * So give special treatment to this case.
-   */
-  if (isEqual(a, 0)) {
-    if (isEqual(b, 0)) {
-      THROW_SIMULATION_ERROR(
-        "Not computable x because of the linear equation ", a, " x + ", b, "=0, and a = ", a,
-        ", b = ", b, " is very close to zero ,so any value of x = [", min_value, ",", max_value,
-        "] will be the solution. There are no expected cases where this exception is thrown.",
-        "Please contact the scenario_simulator_v2 developers, ",
-        "especially Masaya Kataoka (@hakuturu583).");
+  const auto solve_without_limit = [this](double a, double b) -> std::vector<double> {
+    /// @note In this case, ax*b = 0 (a=0) can cause division by zero. So give special treatment to this case.
+    if (isEqual(a, 0)) {
+      if (isEqual(b, 0)) {
+        THROW_SIMULATION_ERROR(
+          "Not computable x because of the linear equation ", a, " x + ", b, "=0, and a = ", a,
+          ", b = ", b, " is very close to zero ,so any value of x will be the solution.",
+          "There are no expected cases where this exception is thrown.",
+          "Please contact the scenario_simulator_v2 developers, ",
+          "especially Masaya Kataoka (@hakuturu583).");
+      }
+      /// @note In this case, ax*b = 0 (a=0,b!=0) so any x cannot satisfy this equation.
+      return {};
     }
-    /**
-     * @note In this case, ax*b = 0 (a=0,b!=0) so any x cannot satisfy this equation.
-     */
-    return {};
-  }
-  return filterByRange({-b / a}, min_value, max_value);
+    /// @note In this case, ax*b = 0 (a!=0, b!=0) so x = -b/a is a only solution.
+    return {-b / a};
+  };
+
+  /// @note No fallback because of the order cannot be lowered any further.
+  return filterByRange(solve_without_limit(a, b), min_value, max_value);
 }
 
 auto PolynomialSolver::solveQuadraticEquation(
@@ -94,9 +95,9 @@ auto PolynomialSolver::solveCubicEquation(
     const auto get_real_values =
       [](const std::vector<std::complex<double>> & complex_values) -> std::vector<double> {
       /**
-         * @note Function that takes a complex number as input and returns the real part if it is a real number (imaginary part is 0) 
-         * or std::nullopt if it is an imaginary or complex number.
-         */
+       * @note Function that takes a complex number as input and returns the real part if it is a real number (imaginary part is 0) 
+       * or std::nullopt if it is an imaginary or complex number.
+       */
       const auto is_real_value = [](const std::complex<double> & complex_value) {
         constexpr double epsilon = std::numeric_limits<double>::epsilon();
         return (std::abs(complex_value.imag()) <= epsilon)
