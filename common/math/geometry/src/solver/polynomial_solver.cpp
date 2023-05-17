@@ -154,14 +154,13 @@ auto PolynomialSolver::filterByRange(
 auto PolynomialSolver::solveMonicCubicEquationWithComplex(
   const double a, const double b, const double c) const -> std::vector<std::complex<double>>
 {
+  /**
+   * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
+   * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
+   */
   const auto tschirnhaus_transformation = [](const auto a, const auto b, const auto c) {
-    const double a2 = a * a;
-    /**
-    * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
-    * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
-    */
-    const double q = (a2 - 3 * b) / 9;
-    const double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
+    const double q = (a * a - 3 * b) / 9;
+    const double r = (a * (2 * a * a - 9 * b) + 27 * c) / 54;
     return std::tuple<double, double>(q, r);
   };
 
