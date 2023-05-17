@@ -154,64 +154,67 @@ auto PolynomialSolver::filterByRange(
 auto PolynomialSolver::solveMonicCubicEquationWithComplex(
   const double a, const double b, const double c) const -> std::vector<std::complex<double>>
 {
-  const double a2 = a * a;
-  /**
-   * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
-   * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
-   */
-  const double q = (a2 - 3 * b) / 9;
-  const double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
-  const double q3 = q * q * q;
-  if (r * r <= (q3 + tolerance)) {
+  const auto tschirnhaus_transformation = [](const auto a, const auto b, const auto c) {
+    const double a2 = a * a;
     /**
-     * @note If 3 real solutions are found.
-     * The URL specified in @sa is a reference material for developers who wish to follow the formulas,
-     * and the code that exists in the material is not included in this library.
-     * @sa https://onihusube.hatenablog.com/entry/2018/10/08/140426
-     */
-    const double t = std::acos(std::clamp(r / std::sqrt(q3), -1.0, 1.0));
-    return {
-      // clang-format off
-      std::complex<double>(-2 * std::sqrt(q) * std::cos(t / 3) - a / 3, 0),
-      std::complex<double>(-2 * std::sqrt(q) * std::cos((t + boost::math::constants::two_pi<double>()) / 3) - a / 3, 0),
-      std::complex<double>(-2 * std::sqrt(q) * std::cos((t - boost::math::constants::two_pi<double>()) / 3) - a / 3, 0)
-      // clang-format on
-    };
-  } else {
-    /**
-     * @note If imaginary solutions exist.
-     */
-    const double A = [r, q3]() {
-      const auto calculate_real_solution = [r, q3]() {
-        return -std::cbrt(std::abs(r) + std::sqrt(r * r - q3));
-      };
-      return r < 0 ? -1 * calculate_real_solution() : calculate_real_solution();
-    }();
-    const double B = isEqual(A, 0) ? 0 : q / A;
-    /**
-     * @note If the imaginary part of the complex almost zero, this equation has a multiple solution.
-     */
-    const double imaginary_part = 0.5 * std::sqrt(3.0) * (A - B);
-    if (isEqual(imaginary_part, 0)) {
+    * @note Tschirnhaus transformation, transform into x^3 + 3q*x + 2r = 0
+    * @sa https://oshima-gakushujuku.com/blog/math/formula-qubic-equation/
+    */
+    const double q = (a2 - 3 * b) / 9;
+    const double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
+    return std::tuple<double, double>(q, r);
+  };
+
+  const auto solve_without_limit =
+    // clang-format off
+    [this, a](const auto q, const auto r) -> std::vector<std::complex<double>> {
+    // clang-format on
+    const double q3 = q * q * q;
+    if (r * r <= (q3 + tolerance)) {
+      /**
+       * @note If 3 real solutions are found.
+       * The URL specified in @sa is a reference material for developers who wish to follow the formulas,
+       * and the code that exists in the material is not included in this library.
+       * @sa https://onihusube.hatenablog.com/entry/2018/10/08/140426
+       */
+      const double t = std::acos(std::clamp(r / std::sqrt(q3), -1.0, 1.0));
       return {
         // clang-format off
-        std::complex<double>((A + B) - a / 3, 0),
-        std::complex<double>(-0.5 * (A + B) - a / 3)
+      std::complex<double>(-2 * std::sqrt(q) * std::cos( t                                             / 3) - a / 3, 0),
+      std::complex<double>(-2 * std::sqrt(q) * std::cos((t + boost::math::constants::two_pi<double>()) / 3) - a / 3, 0),
+      std::complex<double>(-2 * std::sqrt(q) * std::cos((t - boost::math::constants::two_pi<double>()) / 3) - a / 3, 0)
         // clang-format on
       };
+    } else {
+      /// @note If imaginary solutions exist.
+      const double A = [r, q3]() {
+        const auto calculate_real_solution = [r, q3]() {
+          return -std::cbrt(std::abs(r) + std::sqrt(r * r - q3));
+        };
+        return r < 0 ? -1 * calculate_real_solution() : calculate_real_solution();
+      }();
+      const double B = isEqual(A, 0) ? 0 : q / A;
+      /// @note If the imaginary part of the complex almost zero, this equation has a multiple solution.
+      const double imaginary_part = 0.5 * std::sqrt(3.0) * (A - B);
+      return isEqual(imaginary_part, 0)
+               ? std::vector<std::complex<double>>({
+                   // clang-format off
+                    std::complex<double>(       (A + B) - a / 3, 0),
+                    std::complex<double>(-0.5 * (A + B) - a / 3, 0)
+                   // clang-format on
+                 })
+               : std::vector<std::complex<double>>({
+                   // clang-format off
+                    std::complex<double>(       (A + B) - a / 3,               0),
+                    std::complex<double>(-0.5 * (A + B) - a / 3, -imaginary_part),
+                    std::complex<double>(-0.5 * (A + B) - a / 3,  imaginary_part)
+                   // clang-format on
+                 });
     }
-    return {
-      // clang-format off
-      std::complex<double>((A + B) - a / 3, 0),
-      std::complex<double>(-0.5 * (A + B) - a / 3, -imaginary_part),
-      std::complex<double>(-0.5 * (A + B) - a / 3,  imaginary_part)
-      // clang-format on
-    };
-  }
-  /**
-   * @note No solutions are found.
-   */
-  return {};
+    /// @note No solutions are found.
+    return {};
+  };
+  return std::apply(solve_without_limit, tschirnhaus_transformation(a, b, c));
 }
 
 auto PolynomialSolver::isEqual(double value0, double value1) const -> bool
