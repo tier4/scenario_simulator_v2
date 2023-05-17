@@ -61,9 +61,6 @@ auto API::setEntityStatus(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   entity_manager_ptr_->setEntityStatus(name, status);
-  if (entity_manager_ptr_->isEgo(name) && getCurrentTime() <= 0) {
-    ego_entity_simulation_->setInitialStatus(status);
-  }
 }
 
 auto API::setEntityStatus(
@@ -97,9 +94,6 @@ auto API::setEntityStatus(
     status.lanelet_pose_valid = false;
   }
   entity_manager_ptr_->setEntityStatus(name, status);
-  if (entity_manager_ptr_->isEgo(name) && getCurrentTime() <= 0) {
-    ego_entity_simulation_->setInitialStatus(status);
-  }
 }
 
 std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
