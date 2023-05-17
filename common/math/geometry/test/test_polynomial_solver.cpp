@@ -31,9 +31,7 @@ bool checkValueWithTolerance(double value, double expected, double tolerance = s
   return false;
 }
 
-/**
- * @note Testcase for ax+b
- */
+/// @note Testcase for ax+b
 TEST(PolynomialSolverTest, LinearFunction)
 {
   math::geometry::PolynomialSolver solver;
@@ -61,9 +59,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
         EXPECT_THROW(
           solver.solveLinearEquation(a, b, min_value, max_value), common::SimulationError);
       }
-      /**
-       * @note Other cases, solver must be able to obtain solutions.
-       */
+      /// @note Other cases, solver must be able to obtain solutions.
       else {
         auto ret = solver.solveLinearEquation(a, b, min_value, max_value);
         for (const auto & solution : ret) {
@@ -75,9 +71,7 @@ TEST(PolynomialSolverTest, SolveLinearEquation)
   }
 }
 
-/**
- * @note Testcase for ax^2+bx+c
- */
+/// @note Testcase for ax^2+bx+c
 TEST(PolynomialSolverTest, QuadraticFunction)
 {
   math::geometry::PolynomialSolver solver;
@@ -109,9 +103,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
           EXPECT_THROW(
             solver.solveQuadraticEquation(a, b, c, min_value, max_value), common::SimulationError);
         }
-        /**
-         * @note Other cases, solver must be able to obtain solutions.
-         */
+        /// @note Other cases, solver must be able to obtain solutions.
         else {
           auto ret = solver.solveQuadraticEquation(a, b, c, 0, 1);
           for (const auto & solution : ret) {
@@ -124,9 +116,7 @@ TEST(PolynomialSolverTest, SolveQuadraticEquation)
   }
 }
 
-/**
- * @note Testcase for ax^3+bx^2+cx+d
- */
+/// @note Testcase for ax^3+bx^2+cx+d
 TEST(PolynomialSolverTest, CubicFunction)
 {
   math::geometry::PolynomialSolver solver;
@@ -136,16 +126,12 @@ TEST(PolynomialSolverTest, CubicFunction)
   EXPECT_DOUBLE_EQ(solver.cubic(0, 0, 0, 0, 2), 0);   //                   0 =  0 (x=2)
 }
 
-/**
- * @note Testcase for ax^3+bx^2+cx+d = 0
- */
+/// @note Testcase for ax^3+bx^2+cx+d = 0
 TEST(PolynomialSolverTest, SolveSpecificCubicEquation)
 {
   constexpr double infinity = std::numeric_limits<double>::infinity();
-  /**
-   * @note solve x^3 - 2x^2 - 11x + 12 = 0 (solutions should be -3, 1, 4)
-   */
   math::geometry::PolynomialSolver solver;
+  /// @note solve x^3 - 2x^2 - 11x + 12 = 0 (solutions should be -3, 1, 4)
   auto solutions = solver.solveCubicEquation(1, -2, -11, 12, -infinity, infinity);
   std::sort(solutions.begin(), solutions.end());
   EXPECT_EQ(static_cast<int>(solutions.size()), 3);
@@ -156,9 +142,7 @@ TEST(PolynomialSolverTest, SolveSpecificCubicEquation)
   }
 }
 
-/**
- * @note Testcase for ax^3+bx^2+cx+d = 0
- */
+/// @note Testcase for ax^3+bx^2+cx+d = 0
 TEST(PolynomialSolverTest, SolveSpecificCubicEquationWithMinMax)
 {
   constexpr double min_value = 0;
@@ -203,9 +187,7 @@ TEST(PolynomialSolverTest, SolveCubicEquation)
             EXPECT_THROW(
               solver.solveCubicEquation(a, b, c, d, min_value, max_value), common::SimulationError);
           }
-          /**
-           * @note Other cases, solver must be able to obtain solutions.
-           */
+          /// @note Other cases, solver must be able to obtain solutions.
           else {
             auto ret = solver.solveCubicEquation(a, b, c, d, min_value, max_value);
             for (const auto & solution : ret) {
