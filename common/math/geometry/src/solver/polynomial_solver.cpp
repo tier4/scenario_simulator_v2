@@ -111,7 +111,7 @@ auto PolynomialSolver::solveCubicEquation(
         });
       return real_values;
     };
-    return get_real_values(solveCubicEquationWithComplex(b / a, c / a, d / a));
+    return get_real_values(solveMonicCubicEquationWithComplex(b / a, c / a, d / a));
   };
 
   /// @note Fallback to quadratic equation solver if a = 0
@@ -151,7 +151,7 @@ auto PolynomialSolver::filterByRange(
 }
 
 /// @note this code is public domain (http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html)
-auto PolynomialSolver::solveCubicEquationWithComplex(
+auto PolynomialSolver::solveMonicCubicEquationWithComplex(
   const double a, const double b, const double c) const -> std::vector<std::complex<double>>
 {
   const double a2 = a * a;

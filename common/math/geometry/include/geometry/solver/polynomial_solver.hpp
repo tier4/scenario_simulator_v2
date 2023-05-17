@@ -107,7 +107,7 @@ private:
    * @param c 
    * @return std::vector<std::complex<double>> Up to 3 complex solutions
    */
-  auto solveCubicEquationWithComplex(const double a, const double b, const double c) const
+  auto solveMonicCubicEquationWithComplex(const double a, const double b, const double c) const
     -> std::vector<std::complex<double>>;
   /**
    * @brief filter values by range.
