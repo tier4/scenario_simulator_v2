@@ -97,7 +97,7 @@ public:
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
-    const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters, std::string model3d = "",
     const std::string & behavior = VehicleBehavior::defaultBehavior())
   {
     auto register_to_entity_manager = [&]() {
@@ -127,7 +127,7 @@ public:
         simulation_api_schema::SpawnVehicleEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
-        req.set_asset_key("dummy"); // TODO: Should be filled from function API
+        req.set_asset_key(model3d);
         simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
         req.set_initial_speed(0.0); // TODO: Should be filled from function API

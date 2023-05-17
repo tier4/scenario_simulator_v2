@@ -54,7 +54,7 @@ try {
       if (position.is<WorldPosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeWorldPosition>(position.as<WorldPosition>()),
-          static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
+          static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle), vehicle.model3d,
           entity.as<ScenarioObject>().object_controller.isUserDefinedController()
             ? traffic_simulator::VehicleBehavior::autoware()
             : traffic_simulator::VehicleBehavior::defaultBehavior());
@@ -62,14 +62,14 @@ try {
         applyAddEntityAction(
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeWorldPosition>()),
-          static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
+          static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),vehicle.model3d,
           entity.as<ScenarioObject>().object_controller.isUserDefinedController()
             ? traffic_simulator::VehicleBehavior::autoware()
             : traffic_simulator::VehicleBehavior::defaultBehavior());
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
-          static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
+          static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle), vehicle.model3d,
           entity.as<ScenarioObject>().object_controller.isUserDefinedController()
             ? traffic_simulator::VehicleBehavior::autoware()
             : traffic_simulator::VehicleBehavior::defaultBehavior());
