@@ -111,6 +111,7 @@ auto PolynomialSolver::solveCubicEquation(
         });
       return real_values;
     };
+    /// @note Finds the complex solution of the monic cubic equation and returns only those that are real numbers.
     return get_real_values(solveMonicCubicEquationWithComplex(b / a, c / a, d / a));
   };
 
