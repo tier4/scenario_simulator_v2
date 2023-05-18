@@ -64,15 +64,6 @@ jobs:
           target-ros2-distro: ${{ matrix.rosdistro }}
           vcs-repo-file-url: dependency_${{ matrix.rosdistro }}.repos
           extra-cmake-args: -DBUILD_CPP_MOCK_SCENARIOS=ON
-          colcon-defaults: |
-            {
-              "build": {
-                "mixin": ["coverage-gcc", "coverage-pytest"]
-              },
-              "test": {
-                "mixin": ["coverage-pytest"]
-              }
-            }
           # If possible, pin the repository in the workflow to a specific commit to avoid
           # changes in colcon-mixin-repository from breaking your tests.
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/1ddb69bedfd1f04c2f000e95452f7c24a4d6176b/index.yaml
@@ -81,14 +72,6 @@ jobs:
         run: |
           cd /__w/scenario_simulator_v2/scenario_simulator_v2/ros_ws
           colcon test-result --verbose
-      - name: publish codecov result
-        uses: codecov/codecov-action@v1.2.1
-        if: always()
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }} # only needed for private repos
-          files: ros_ws/lcov/total_coverage.info,ros_ws/coveragepy/.coverage
-          flags: colcon_test
-          env_vars: ROS_DISTRO
       - name: collect test result
         if: always()
         run: |
