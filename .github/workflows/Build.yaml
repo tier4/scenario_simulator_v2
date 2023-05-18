@@ -45,6 +45,11 @@ jobs:
           apt remove libunwind-14-dev -y
           apt install python3-nose -y
           pip uninstall nose -y
+      # See also https://300man.biz/archives/23970
+      - name: workbound for galactic
+        if: ${{ matrix.rosdistro == 'galactic' }}
+        run: |
+          pip3 install pyOpenSSL --upgrade
       - name: Search packages in this repository
         id: list_packages
         run: |
