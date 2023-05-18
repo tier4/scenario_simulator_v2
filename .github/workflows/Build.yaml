@@ -58,7 +58,7 @@ jobs:
         run: |
           echo "Target packages: ${{ steps.list_packages.outputs.package_list }}"
       - name: Run build test
-        uses: ros-tooling/action-ros-ci@v0.2
+        uses: ros-tooling/action-ros-ci@v0.3
         with:
           package-name: ${{ steps.list_packages.outputs.package_list }}
           target-ros2-distro: ${{ matrix.rosdistro }}

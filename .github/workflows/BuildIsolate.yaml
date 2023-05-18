@@ -68,7 +68,7 @@ jobs:
         run: |
           pip3 install pyOpenSSL --upgrade
       - name: Run build test for ${{ matrix.package }} package
-        uses: ros-tooling/action-ros-ci@v0.2
+        uses: ros-tooling/action-ros-ci@v0.3
         with:
           package-name: ${{ matrix.package }}
           target-ros2-distro: ${{ matrix.rosdistro }}
