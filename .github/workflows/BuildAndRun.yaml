@@ -80,6 +80,14 @@ jobs:
           colcon test --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
+      - name: Show test result
+        if: always()
+        run: |
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
+          cd ~/ros2_ws
+          colcon test-result --verbose
+        shell: bash
+
       - name: Scenario test
         run: |
           source ~/ros2_ws/install/setup.bash
