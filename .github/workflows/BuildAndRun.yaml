@@ -81,6 +81,7 @@ jobs:
         shell: bash
 
       - name: Show test result
+        if: always()
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           cd ~/ros2_ws
