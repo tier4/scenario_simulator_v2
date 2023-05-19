@@ -27,7 +27,8 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct ApplyFaultInjection : public CustomCommand
+template <auto Version>
+struct ApplyFaultInjectionAction : public CustomCommand
 {
   using CustomCommand::CustomCommand;
 
@@ -46,33 +47,82 @@ struct ApplyFaultInjection : public CustomCommand
 
   auto start(const Scope &) -> void override
   {
-    auto & events = parameters;
-    const auto now = node().now();
+    static_assert(0 < Version and Version <= 2);
 
-    auto makeFaultInjectionEvent = [](const auto & name) {
+    auto makeFaultInjectionEvent = [](const auto & level, const auto & name) {
       tier4_simulation_msgs::msg::FaultInjectionEvent fault_injection_event;
-      {
-        fault_injection_event.level = tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
-        fault_injection_event.name = name;
-      }
-
+      fault_injection_event.level = level;
+      fault_injection_event.name = name;
       return fault_injection_event;
     };
 
-    auto makeFaultInjectionEvents = [&](const std::vector<std::string> & events) {
-      tier4_simulation_msgs::msg::SimulationEvents simulation_events;
-      {
-        simulation_events.stamp = now;
+    tier4_simulation_msgs::msg::SimulationEvents simulation_events;
 
-        for (const auto & event : events) {
-          simulation_events.fault_injection_events.push_back(makeFaultInjectionEvent(event));
-        }
+    simulation_events.stamp = node().now();
+
+    if constexpr (Version == 1) {
+      for (const auto & event : parameters) {
+        simulation_events.fault_injection_events.push_back(
+          makeFaultInjectionEvent(tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR, event));
       }
+    } else {
+      auto makeFaultInjectionEventLevel = [](const auto & level) {
+        if (level == "OK") {
+          return tier4_simulation_msgs::msg::FaultInjectionEvent::OK;
+        } else if (level == "WARN" or level == "WARNING") {
+          return tier4_simulation_msgs::msg::FaultInjectionEvent::WARN;
+        } else if (level == "ERROR") {
+          return tier4_simulation_msgs::msg::FaultInjectionEvent::ERROR;
+        } else if (level == "STALE") {
+          return tier4_simulation_msgs::msg::FaultInjectionEvent::STALE;
+        } else {
+          throw Error(
+            "FaultInjectionAction@v2 expects error level to be given as first argument, but ",
+            level,
+            " was given. This is not a valid error level specification. Valid error levels are OK, "
+            "WARN, ERROR, and STALE.");
+        }
+      };
 
-      return simulation_events;
+      simulation_events.fault_injection_events.push_back(
+        makeFaultInjectionEvent(makeFaultInjectionEventLevel(parameters[0]), parameters[1]));
+    }
+
+    publisher().publish(simulation_events);
+  }
+};
+
+struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
+                                          public SimulatorCore::NonStandardOperation
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope &) -> void override
+  {
+    auto unquote = [](auto s) {
+      std::stringstream(s) >> std::quoted(s);
+      return s;
     };
 
-    publisher().publish(makeFaultInjectionEvents(events));
+    switch (parameters.size()) {
+      case 3:
+        resetV2ITrafficLightPublishRate(boost::lexical_cast<double>(parameters[2]));
+        [[fallthrough]];
+
+      case 2:
+        for (auto & traffic_light :
+             getV2ITrafficLights(boost::lexical_cast<std::int64_t>(parameters[0]))) {
+          traffic_light.get().clear();
+          traffic_light.get().set(unquote(parameters.at(1)));
+        }
+        break;
+
+      default:
+        throw Error(
+          "An unexpected number of arguments were passed to V2ITrafficSignalStateAction. Expected "
+          "2 or 3 arguments, but actually passed ",
+          parameters.size(), ".");
+    }
   }
 };
 
@@ -207,7 +257,10 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
   static const std::unordered_map<
     std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
     commands{
-      ELEMENT("FaultInjectionAction", ApplyFaultInjection),
+      ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
+      ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
+      ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
+      ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
       ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED

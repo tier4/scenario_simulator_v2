@@ -75,15 +75,6 @@ OpenSCENARIO:
                           h: 0
                           p: 0
                           r: 0
-              - LongitudinalAction:
-                  SpeedAction:
-                    SpeedActionDynamics:
-                      dynamicsDimension: time
-                      value: 0
-                      dynamicsShape: step
-                    SpeedActionTarget:
-                      AbsoluteTargetSpeed:
-                        value: 2.778
     Story:
       - name: ''
         Act:
