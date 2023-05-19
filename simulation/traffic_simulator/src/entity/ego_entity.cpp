@@ -106,41 +106,6 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
   return parameter;
 }
 
-auto EgoEntity::addLaneletPoseToEntityStatus() -> void
-{
-  traffic_simulator_msgs::msg::EntityStatus status = status_;
-
-  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-
-  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-
-  if (unique_route_lanelets.empty()) {
-    lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
-  } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
-    if (!lanelet_pose) {
-      lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
-    }
-  }
-
-  if (lanelet_pose) {
-    math::geometry::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
-    if (const auto s_value = spline.getSValue(status.pose)) {
-      status.pose.position.z = spline.getPoint(s_value.value()).z;
-    }
-  }
-
-  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-  if (status.lanelet_pose_valid) {
-    status.lanelet_pose = lanelet_pose.value();
-  }
-
-  setStatus(status);
-}
-
 auto EgoEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "EgoEntity";
@@ -182,15 +147,14 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  field_operator_application->rethrow();
-  field_operator_application->spinSome();
-
   EntityBase::onUpdate(current_time, step_time);
   setStatus(externally_updated_status_);
 
-  addLaneletPoseToEntityStatus();
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
+
+  field_operator_application->rethrow();
+  field_operator_application->spinSome();
 
   EntityBase::onPostUpdate(current_time, step_time);
 }
