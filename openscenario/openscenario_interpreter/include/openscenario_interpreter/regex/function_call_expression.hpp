@@ -36,7 +36,7 @@ struct FunctionCallExpression
   static auto pattern() -> const auto &
   {
     static const auto pattern =
-      std::regex(R"(^(\w+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)");
+      std::regex(R"(^([\w@]+)(\(((?:(?:[^\("\s,\)]+|\"[^"]*\"),?\s*)*)\))?$)");
     return pattern;
   }
 
