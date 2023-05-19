@@ -13,12 +13,12 @@
 // limitations under the License.
 
 #include <behavior_tree_plugin/vehicle/follow_trajectory_sequence/follow_polyline_trajectory_action.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 #define LINE() \
-  std::cout << "; \x1b[33m" __FILE__ "\x1b[31m:\x1b[36m" << __LINE__ << "\x1b[0m" << std::endl
+  std::cout << "\x1b[33m" __FILE__ "\x1b[31m:\x1b[36m" << __LINE__ << "\x1b[0m" << std::endl
 
-#define PRINT(...) \
-  std::cout << "; " #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
+#define PRINT(...) std::cout << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
 
 namespace entity_behavior
 {
@@ -28,18 +28,6 @@ auto FollowPolylineTrajectoryAction::calculateWaypoints()
   -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   return traffic_simulator_msgs::msg::WaypointsArray();
-
-  auto && waypoints = traffic_simulator_msgs::msg::WaypointsArray();
-
-  for (auto && vertex : parameter->shape.vertices) {
-    auto && point = geometry_msgs::msg::Point();
-    point.x = vertex.position.position.x;
-    point.y = vertex.position.position.y;
-    point.z = vertex.position.position.z;
-    waypoints.waypoints.push_back(std::forward<decltype(point)>(point));
-  }
-
-  return std::forward<decltype(waypoints)>(waypoints);
 }
 
 auto FollowPolylineTrajectoryAction::calculateObstacle(
@@ -165,36 +153,61 @@ auto truncate(const T & v, const U & max)
   }
 }
 
-template <typename T, typename U>
-auto truncate(T & v, const U & max)
+template <typename T>
+auto definitelyLessThan(T a, T b)
 {
-  if (auto x = norm(v); max < x) {
-    v *= (max / x);
-  }
+  return (b - a) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
+}
+
+template <typename T>
+auto approximatelyEqualTo(T a, T b)
+{
+  return std::abs(a - b) <=
+         (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
+}
+
+template <typename T>
+auto definitelyGreaterThan(T a, T b)
+{
+  return (a - b) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
+}
+
+template <typename T>
+auto essentiallyEqualTo(T a, T b)
+{
+  return std::abs(a - b) <=
+         (std::numeric_limits<T>::epsilon() * std::min(std::abs(a), std::abs(b)));
 }
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
-  std::cout << std::string(80, '-') << std::endl;
+  auto pop_front = [this]() {
+    if (std::rotate(
+          std::begin(parameter->shape.vertices), std::begin(parameter->shape.vertices) + 1,
+          std::end(parameter->shape.vertices));
+        not parameter->closed) {
+      parameter->shape.vertices.pop_back();
+    }
+  };
 
   if (getBlackBoardValues();
       request == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY and
       getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) and
       getInput<decltype(target_speed)>("target_speed", target_speed) and parameter and
       not parameter->shape.vertices.empty()) {
-    auto pop_current_waypoint = [&]() {
-      if (std::rotate(
-            std::begin(parameter->shape.vertices), std::begin(parameter->shape.vertices) + 1,
-            std::end(parameter->shape.vertices));
-          not parameter->closed) {
-        parameter->shape.vertices.pop_back();
-      }
-    };
+    const auto position = entity_status.pose.position;
 
-    auto current_waypoint = [&]() { return parameter->shape.vertices.front(); };
+    /*
+       We've made sure that parameter->shape.vertices is not empty, so a
+       reference to vertices.front() always succeeds. vertices.front() is
+       referenced only this once in this member function.
+    */
+    const auto target_position = parameter->shape.vertices.front().position.position;
 
-    auto remain_time = [this]() {
-      if (auto iter = std::find_if(
+    const auto distance = hypot(position, target_position);  // [m]
+
+    const auto remaining_time = [this]() {
+      if (const auto iter = std::find_if(
             std::begin(parameter->shape.vertices), std::end(parameter->shape.vertices),
             [this](auto && vertex) { return vertex.time and entity_status.time < *vertex.time; });
           iter != std::end(parameter->shape.vertices)) {
@@ -202,26 +215,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       } else {
         return std::numeric_limits<double>::infinity();
       }
-    };
-
-    if (remain_time() <= step_time) {
-      std::cout << "TIME OVER!!!" << std::endl;
-      if (parameter->dynamic_constraints_ignorable) {
-        std::cout << "TELEPORT!" << std::endl;
-        throw std::runtime_error("TELEPORT!");
-      } else {
-        std::cout << "DISCARD CURRENT WAYPOINT!" << std::endl;
-        pop_current_waypoint();
-      }
-    }
-
-    PRINT(remain_time());
-
-    const auto position = entity_status.pose.position;
-
-    const auto target_position = current_waypoint().position.position;
-
-    const auto distance = hypot(position, target_position);  // [m]
+    }();
 
     const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
 
@@ -249,14 +243,61 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        need to accelerate or decelerate, so the current speed remains the
        desired speed.
     */
-    const auto desired_speed = std::isinf(remain_time()) ? speed : distance / remain_time();
+    const auto desired_speed = std::isinf(remaining_time) ? speed : distance / remaining_time;
 
+    /*
+       However, the desired speed is unrealistically large in terms of vehicle
+       performance and dynamic constraints, so it is clamped to a realistic
+       value.
+    */
     const auto max_speed = std::clamp(
       desired_speed,  // [m/s]
       speed /* [m/s] */ - max_deceleration /* [m/s^2] */ * step_time,
       speed /* [m/s] */ + max_acceleration /* [m/s^2] */ * step_time);
 
-    PRINT(speed / desired_speed);
+    const auto remaining_time_to_arrival = distance / max_speed;  // [s]
+
+    std::cout << "remaining_time_to_arrival = " << remaining_time_to_arrival << " / "
+              << remaining_time << std::endl;
+
+    /*
+       If the target point is reached during this step, it is considered
+       reached.
+    */
+    if (definitelyLessThan(remaining_time_to_arrival, step_time)) {
+      /*
+         If remaining time to arrival is less than remaining time, the vehicle
+         reached the waypoint on time. Otherwise, the vehicle has reached the
+         waypoint earlier than the specified time.
+
+         This means that the vehicle did not slow down enough to reach the
+         current waypoint after passing the previous waypoint. In order to cope
+         with such situations, it is necessary to perform speed planning
+         considering not only the front of the waypoint queue but also the
+         waypoints after it. However, even with such speed planning, there is a
+         possibility that on-time arrival may not be possible depending on the
+         relationship between waypoint intervals, specified arrival times,
+         vehicle parameters, and dynamic restraints. For example, there is a
+         situation in which a large speed change is required over a short
+         distance while the permissible jerk is small.
+
+         This implementation does simple velocity planning that considers only
+         the nearest waypoints in favor of simplicity of implementation.
+      */
+      std::cout << "REACHED!" << std::endl;
+      if (definitelyLessThan(remaining_time_to_arrival, remaining_time)) {
+        pop_front();
+        return tick();  // tail recursion
+      } else {
+        throw common::SimulationError(
+          "Vehicle ", std::quoted(entity_status.name), " reached the target waypoint ",
+          remaining_time,
+          " seconds earlier than the specified time. This is not due to a bug in the simulator, "
+          "but due to waypoint settings. Since FollowTrajectoryAction respects vehicle parameters "
+          "and dynamic constraints to accelerate and decelerate, the distance between waypoints "
+          "and the arrival time of waypoints should be specified within a realistic range.");
+      }
+    }
 
     const auto desired_velocity = normalize(target_position - position) * max_speed;  // [m/s]
 
@@ -264,15 +305,13 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
     velocity = truncate(velocity + steering, max_speed);
 
-    auto make_direction = [this]() {
+    const auto previous_direction = std::exchange(direction, [this]() {
       geometry_msgs::msg::Vector3 direction;
       direction.x = 0;
       direction.y = 0;
       direction.z = std::atan2(velocity.y, velocity.x);
       return direction;
-    };
-
-    auto previous_direction = std::exchange(direction, make_direction());
+    }());
 
     auto updated_status = entity_status;
 
@@ -294,14 +333,6 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     setOutput("updated_status", updated_status);
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
-
-    if (const auto distance = hypot(updated_status.pose.position, target_position);
-        std::abs(distance) <= std::numeric_limits<double>::epsilon()) {
-      std::cout << "REACHED!!!" << std::endl;
-      pop_current_waypoint();
-    } else {
-      PRINT(distance);
-    }
 
     return parameter->shape.vertices.empty() ? BT::NodeStatus::SUCCESS : BT::NodeStatus::RUNNING;
   } else {
