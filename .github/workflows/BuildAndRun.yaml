@@ -32,6 +32,11 @@ jobs:
         run: |
           git config --global --add safe.directory '*'
 
+      - uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Search packages in this repository
         id: list_packages
         run: |
@@ -40,11 +45,6 @@ jobs:
       - name: Show target packages
         run: |
           echo "Target packages: ${{ steps.list_packages.outputs.package_list }}"
-
-      - uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Copy repository
         run: |
