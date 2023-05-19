@@ -78,6 +78,8 @@ public:
 
   auto setInitialStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
+  auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+
   auto updateStatus(double time, double step_time) -> void;
 };
 }  // namespace vehicle_simulation
