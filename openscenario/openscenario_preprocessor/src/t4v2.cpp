@@ -17,6 +17,7 @@
 #include <boost/range/adaptor/indexed.hpp>
 #include <iostream>
 #include <openscenario_preprocessor/deriver.hpp>
+#include <openscenario_validator/schema.hpp>
 #include <openscenario_preprocessor/t4v2.hpp>
 #include <openscenario_preprocessor/template_distributions.hpp>
 #include <pugixml.hpp>
@@ -100,7 +101,7 @@ if __name__ == "__main__":
   input_yaml_path = sys.argv[1]
   output_xosc_path = sys.argv[2]
 
-  xsd = open("/tmp/OpenSCENARIO-1.2.xsd")
+  xsd = open("/tmp/openscenario_preprocessor/schema.xsd")
   schema = xmlschema.XMLSchema(xsd)
 
   if os.path.exists(input_yaml_path):
@@ -338,7 +339,6 @@ void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
 
 auto T4V2::loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document
 {
-  std::cout << "loading scenario file: " << path << std::endl;
   std::string script_path = "/tmp/openscenario_preprocessor/load_yaml_to_xosc_with_encode.py";
   std::ofstream ofs(script_path);
   ofs << load_yaml_to_xosc_with_encode_python_script;
@@ -347,7 +347,6 @@ auto T4V2::loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document
   std::stringstream command_ss;
   command_ss << "python3 " << script_path << " " << path.string()
              << " /tmp/openscenario_preprocessor/normalized.xosc";
-  std::cout << command_ss.str() << std::endl;
 
   if (system(command_ss.str().c_str()) != 0) {
     throw std::runtime_error("failed to execute python script : " + command_ss.str());

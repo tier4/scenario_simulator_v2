@@ -17,6 +17,7 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
 #include <openscenario_preprocessor/t4v2.hpp>
+#include <openscenario_validator/schema.hpp>
 
 const std::string_view template_scenario = R"###(
 <OpenSCENARIO>
@@ -62,7 +63,7 @@ auto create_parameter_value_distribution_from_json(
   return script;
 }
 
-int main(const int argc, char const * const * const argv)
+int main(const int argc, char const * const * const argv) try
 {
   using namespace boost::program_options;
 
@@ -98,6 +99,11 @@ int main(const int argc, char const * const * const argv)
   std::vector<boost::filesystem::path> xosc_scenario_paths;
 
   boost::filesystem::path scenario_modifiers_path{};
+
+  // setup xsd file
+  auto file = std::ofstream("/tmp/openscenario_preprocessor/schema.xsd", std::ios::trunc);
+  file << openscenario_validator::schema;
+  file.close();
 
   // preprocess t4v2 format and convert to xosc scenarios
   if (scenario_path.extension() == ".yaml" or scenario_path.extension() == ".yml") {
@@ -168,7 +174,10 @@ int main(const int argc, char const * const * const argv)
       }
     }
   } else {
-    // TODO
+    throw std::runtime_error("parameters option is required");
   }
   return 0;
+} catch (std::exception & e) {
+  std::cerr << "Caught an exception : " << e.what() << std::endl;
+  return 1;
 }
