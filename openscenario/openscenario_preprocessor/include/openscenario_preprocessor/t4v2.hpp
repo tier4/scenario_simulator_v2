@@ -24,19 +24,19 @@ namespace openscenario_preprocessor
 class T4V2
 {
 public:
-  auto deriveToXoscStringScenarios(
-    boost::filesystem::path modifiers_path, boost::filesystem::path scenario_path = {})
-    -> std::vector<std::string>;
-
-  auto loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document;
-
-  auto generateParameterValueDistributionFromScenarioModifiers(std::string scenario_modifiers_str)
-    -> pugi::xml_document;
-
   auto deriveScenarioWithScenarioModifiers(
     const pugi::xml_document & base_scenario_doc,
     const openscenario_interpreter::ParameterDistribution & scenario_modifier_distribution)
     -> std::vector<pugi::xml_document>;
+
+  auto deriveToXoscStringScenarios(
+    boost::filesystem::path modifiers_path, boost::filesystem::path scenario_path = {})
+    -> std::vector<std::string>;
+
+  auto generateParameterValueDistributionFromScenarioModifiers(std::string scenario_modifiers_str)
+    -> pugi::xml_document;
+
+  auto loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document;
 
   std::pair<boost::filesystem::path, boost::filesystem::path> splitScenarioModifiers(
     boost::filesystem::path scenario_path);

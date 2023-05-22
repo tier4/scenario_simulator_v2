@@ -34,6 +34,92 @@ const std::string_view scenario_modifiers_distribution_base = R"###(
     </ParameterValueDistribution>
 </OpenSCENARIO>)###";
 
+const std::string_view load_yaml_to_xosc_with_encode_python_script = R"###(
+import xmlschema
+import yaml
+import os
+import sys
+import xml.etree.ElementTree as ET
+
+
+def from_yaml(keyword, node):
+
+  if isinstance(node, dict):
+    #
+    # ???: { ... }
+    #
+    result = {}
+
+    for tag, value in node.items():
+
+      if isinstance(value, list) and len(value) == 0:
+        #
+        # Tag: []
+        #
+        # => REMOVE
+        #
+        continue
+
+      if str.islower(tag[0]):
+        #
+        # tag: { ... }
+        #
+        # => @tag: { ... }
+        #
+        result["@" + tag] = str(value)
+      else:
+        #
+        # Tag: { ... }
+        #
+        # => NO CHANGES
+        #
+        result[tag] = from_yaml(tag, value)
+
+    return result
+
+  elif isinstance(node, list):
+    #
+    # ???: [ ... ]
+    #
+    result = []
+
+    for index, item in enumerate(node):
+      result.append(from_yaml(keyword, item))
+
+    return result
+
+  elif isinstance(node, str):
+    return node
+
+  else:
+    return None
+
+
+if __name__ == "__main__":
+  # parse arguments here (input yaml path, output xosc path)
+  input_yaml_path = sys.argv[1]
+  output_xosc_path = sys.argv[2]
+
+  xsd = open("/tmp/OpenSCENARIO-1.2.xsd")
+  schema = xmlschema.XMLSchema(xsd)
+
+  if os.path.exists(input_yaml_path):
+    with open(input_yaml_path, "r") as file:
+      openscenario_yaml = from_yaml("OpenSCENARIO", yaml.safe_load(file))
+      openscenario_yaml.pop("ScenarioModifiers", None)
+      xosc, errors = schema.encode(
+        openscenario_yaml,
+        indent=2,
+        preserve_root=True,
+        unordered=True,  # Reorder elements
+        # The "strict" mode is too strict than we would like.
+        validation="lax",
+      )
+      xosc = xmlschema.XMLResource(xosc).tostring().replace("True", "true").replace("False", "false")
+      with open(output_xosc_path, "w") as file:
+        file.write(xosc)
+)###";
+
 auto T4V2::deriveToXoscStringScenarios(
   boost::filesystem::path scenario_path, boost::filesystem::path modifiers_path)
   -> std::vector<std::string>
@@ -253,10 +339,20 @@ void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
 auto T4V2::loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document
 {
   std::cout << "loading scenario file: " << path << std::endl;
-  YAML::Node scenario_yaml = YAML::LoadFile(path.string());
+  std::string script_path = "/tmp/openscenario_preprocessor/load_yaml_to_xosc_with_encode.py";
+  std::ofstream ofs(script_path);
+  ofs << load_yaml_to_xosc_with_encode_python_script;
+  ofs.close();
+
+  std::stringstream command_ss;
+  command_ss << "python3 " << script_path << " " << path.string() << " /tmp/openscenario_preprocessor/normalized.xosc";
+  std::cout << command_ss.str() << std::endl;
+
+  if(system(command_ss.str().c_str()) != 0){
+    throw std::runtime_error("failed to execute python script : %s", command_ss.str());
+  }
   pugi::xml_document doc;
-  std::cout << "convert yaml to xml" << std::endl;
-  convertYAMLtoXML(scenario_yaml, doc);
+  doc.load_file("/tmp/openscenario_preprocessor/normalized.xosc");
   return doc;
 }
 }  // namespace openscenario_preprocessor
