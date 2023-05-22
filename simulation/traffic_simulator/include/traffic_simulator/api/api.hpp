@@ -281,9 +281,10 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
+  FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
+  FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLights);
+  FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
+  FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
@@ -301,6 +302,8 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
+  FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
+  FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
