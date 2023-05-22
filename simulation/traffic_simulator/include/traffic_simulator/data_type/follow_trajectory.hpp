@@ -26,15 +26,11 @@ namespace follow_trajectory
 {
 struct Vertex
 {
-  /*
-     Absolute SimulationTime. The OpenSCENARIO interpreter is responsible for
-     setting the proper time.
-  */
-  std::optional<double> time;
+  double time;
 
   geometry_msgs::msg::Pose position;
 
-  explicit Vertex(const std::optional<double> & time, const geometry_msgs::msg::Pose & position)
+  explicit Vertex(const double time, const geometry_msgs::msg::Pose & position)
   : time(time), position(position)
   {
   }
@@ -60,7 +56,15 @@ struct Parameter
 {
   double initial_distance_offset;
 
+  /*
+     true if trajectoryFollowingMode == FollowingMode.follow
+  */
   bool dynamic_constraints_ignorable;
+
+  /*
+     If Parameter::closed is true, this variable is always assigned false.
+  */
+  bool timing_is_absolute;
 
   bool closed;
 
@@ -70,9 +74,10 @@ struct Parameter
 
   explicit Parameter(
     const double initial_distance_offset, const bool dynamic_constraints_ignorable,
-    const bool closed, const Shape & shape)
+    const bool timing_is_absolute, const bool closed, const Shape & shape)
   : initial_distance_offset(initial_distance_offset),
     dynamic_constraints_ignorable(dynamic_constraints_ignorable),
+    timing_is_absolute(timing_is_absolute and not closed),
     closed(closed),
     shape(shape)
   {

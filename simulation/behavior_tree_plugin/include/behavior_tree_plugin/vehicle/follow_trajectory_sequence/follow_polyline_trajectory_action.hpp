@@ -28,6 +28,8 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
 
   Parameter parameter;
 
+  double relative_timing_offset = std::numeric_limits<double>::quiet_NaN();
+
   std::optional<double> target_speed;
 
   geometry_msgs::msg::Vector3 velocity;  // world coordinate

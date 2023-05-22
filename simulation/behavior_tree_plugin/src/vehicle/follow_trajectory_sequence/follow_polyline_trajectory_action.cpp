@@ -187,6 +187,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
           std::end(parameter->shape.vertices));
         not parameter->closed) {
       parameter->shape.vertices.pop_back();
+    } else {
+      relative_timing_offset = entity_status.time;
     }
   };
 
@@ -209,9 +211,28 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     const auto remaining_time = [this]() {
       if (const auto iter = std::find_if(
             std::begin(parameter->shape.vertices), std::end(parameter->shape.vertices),
-            [this](auto && vertex) { return vertex.time and entity_status.time < *vertex.time; });
+            [](auto && vertex) { return not std::isnan(vertex.time); });
           iter != std::end(parameter->shape.vertices)) {
-        return *iter->time - entity_status.time;
+        /*
+           If the trajectory is a closed loop, timing_is_absolute must always
+           be false, which is guaranteed by the constructor of type Parameter.
+        */
+        auto offset = [this]() {
+          if (parameter->timing_is_absolute) {
+            return 0.0;
+          } else if (std::isnan(relative_timing_offset)) {  // When uninitialized.
+            return relative_timing_offset = entity_status.time;
+          } else {
+            return relative_timing_offset;
+          }
+        };
+
+        if (const auto remaining_time = (offset() + iter->time) - entity_status.time;
+            remaining_time < 0) {
+          throw common::Error("TIME OVER!");
+        } else {
+          return remaining_time;
+        }
       } else {
         return std::numeric_limits<double>::infinity();
       }
