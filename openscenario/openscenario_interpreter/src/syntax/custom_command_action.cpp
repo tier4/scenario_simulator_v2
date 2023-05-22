@@ -92,6 +92,40 @@ struct ApplyFaultInjectionAction : public CustomCommand
   }
 };
 
+struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
+                                          public SimulatorCore::NonStandardOperation
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope &) -> void override
+  {
+    auto unquote = [](auto s) {
+      std::stringstream(s) >> std::quoted(s);
+      return s;
+    };
+
+    switch (parameters.size()) {
+      case 3:
+        resetV2ITrafficLightPublishRate(boost::lexical_cast<double>(parameters[2]));
+        [[fallthrough]];
+
+      case 2:
+        for (auto & traffic_light :
+             getV2ITrafficLights(boost::lexical_cast<std::int64_t>(parameters[0]))) {
+          traffic_light.get().clear();
+          traffic_light.get().set(unquote(parameters.at(1)));
+        }
+        break;
+
+      default:
+        throw Error(
+          "An unexpected number of arguments were passed to V2ITrafficSignalStateAction. Expected "
+          "2 or 3 arguments, but actually passed ",
+          parameters.size(), ".");
+    }
+  }
+};
+
 struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::ActionApplication
 {
   using CustomCommand::CustomCommand;
@@ -226,6 +260,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
+      ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
       ELEMENT("debugSegmentationFault", DebugSegmentationFault),  // DEPRECATED

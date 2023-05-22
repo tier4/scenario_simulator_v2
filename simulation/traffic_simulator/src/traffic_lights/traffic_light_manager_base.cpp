@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <color_names/color_names.hpp>
 #include <iterator>
 #include <memory>
 #include <string>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -69,27 +68,29 @@ auto TrafficLightManagerBase::update(const double) -> void
   drawMarkers();
 }
 
-template <>
-auto TrafficLightManager<
-  autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
-  -> void
+auto TrafficLightManagerBase::createTimer(double publish_rate) -> void
 {
-  autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;
-  {
-    traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
-    traffic_light_state_array.header.stamp = clock_ptr_->now();
-    for (const auto & [id, traffic_light] : getTrafficLights()) {
-      traffic_light_state_array.signals.push_back(
-        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light));
-    }
+  if (!timer_) {
+    publish_rate_ = publish_rate;
+    using namespace std::chrono_literals;
+    timer_ = rclcpp::create_timer(
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
+      [this]() -> void { update(1.0 / publish_rate_); });
   }
-  traffic_light_state_array_publisher_->publish(traffic_light_state_array);
 }
 
-template <>
-auto TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name() -> const
-  char *
+auto TrafficLightManagerBase::resetPublishRate(double publish_rate) -> void
 {
-  return "/perception/traffic_light_recognition/traffic_signals";
+  if (publish_rate_ != publish_rate) {
+    publish_rate_ = publish_rate;
+    if (timer_ && not timer_->is_canceled()) {
+      timer_->cancel();
+    }
+
+    using namespace std::chrono_literals;
+    timer_ = rclcpp::create_timer(
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
+      [this]() -> void { update(1.0 / publish_rate_); });
+  }
 }
 }  // namespace traffic_simulator

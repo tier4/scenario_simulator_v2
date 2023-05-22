@@ -33,7 +33,7 @@ auto TrafficSignalStateAction::run() noexcept -> void {}
 
 auto TrafficSignalStateAction::start() const -> void
 {
-  for (traffic_simulator::TrafficLight & traffic_light : toWayIDs(id())) {
+  for (traffic_simulator::TrafficLight & traffic_light : getConventionalTrafficLights(id())) {
     traffic_light.clear();
     traffic_light.set(state);
   };
