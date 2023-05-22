@@ -345,10 +345,11 @@ auto T4V2::loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document
   ofs.close();
 
   std::stringstream command_ss;
-  command_ss << "python3 " << script_path << " " << path.string() << " /tmp/openscenario_preprocessor/normalized.xosc";
+  command_ss << "python3 " << script_path << " " << path.string()
+             << " /tmp/openscenario_preprocessor/normalized.xosc";
   std::cout << command_ss.str() << std::endl;
 
-  if(system(command_ss.str().c_str()) != 0){
+  if (system(command_ss.str().c_str()) != 0) {
     throw std::runtime_error("failed to execute python script : %s", command_ss.str());
   }
   pugi::xml_document doc;
