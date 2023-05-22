@@ -502,7 +502,8 @@ void EntityManager::requestLaneChange(
 
 bool EntityManager::trafficLightsChanged()
 {
-  return traffic_light_manager_ptr_->hasAnyLightChanged();
+  return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
+         v2i_traffic_light_manager_ptr_->hasAnyLightChanged();
 }
 
 void EntityManager::requestSpeedChange(
@@ -590,7 +591,9 @@ void EntityManager::update(const double current_time, const double step_time)
   current_time_ = current_time;
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
-    traffic_light_manager_ptr_->update(step_time_);
+    conventional_traffic_light_manager_ptr_->createTimer(
+      configuration.conventional_traffic_light_publish_rate);
+    v2i_traffic_light_manager_ptr_->createTimer(configuration.v2i_traffic_light_publish_rate);
   }
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> all_status;
