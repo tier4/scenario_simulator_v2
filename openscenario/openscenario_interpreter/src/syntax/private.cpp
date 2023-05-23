@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/reader/nameref.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 
@@ -22,7 +23,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Private::Private(const pugi::xml_node & node, Scope & scope)
-: Scope(scope), entity_ref(readAttribute<String>("entityRef", node, local()))
+: Scope(scope), entity_ref(readNameRef("entityRef", node, local(), scope.entities(true)))
 {
   actors.emplace_back(entity_ref);
 

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/nameref.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/relative_target_speed.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
@@ -22,7 +23,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 RelativeTargetSpeed::RelativeTargetSpeed(const pugi::xml_node & node, Scope & scope)
-: entity_ref(readAttribute<String>("entityRef", node, scope)),
+: entity_ref(readNameRef("entityRef", node, scope, scope.entities())),
   value(readAttribute<Double>("value", node, scope)),
   speed_target_value_type(readAttribute<SpeedTargetValueType>(
     "speedTargetValueType", node, scope, SpeedTargetValueType())),

@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 SelectedEntityRefs::SelectedEntityRefs(const pugi::xml_node & tree, Scope & scope)
-: entityRefs(readElements<EntityRef, 0>("EntityRef", tree, scope))
+: entityRefs(readElements<EntityRef, 0>("EntityRef", tree, scope, scope.entities(true)))
 {
 }
 

@@ -95,7 +95,7 @@ auto DistanceCondition::description() const -> std::string
 
 #define APPLY(F, ...) F(__VA_ARGS__)
 
-auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> double
+auto DistanceCondition::distance(const String & triggering_entity) const -> double
 {
   APPLY(SWITCH_COORDINATE_SYSTEM, SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_FREESPACE, DISTANCE);
   return std::numeric_limits<double>::quiet_NaN();
@@ -104,7 +104,7 @@ auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> d
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(
-  const EntityRef & triggering_entity) const -> double
+  const String & triggering_entity) const -> double
 {
   return apply<double>(
     overload(
@@ -129,7 +129,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<  //
   CoordinateSystem::entity, RelativeDistanceType::lateral, false>(
-  const EntityRef & triggering_entity) const -> double
+  const String & triggering_entity) const -> double
 {
   return apply<double>(
     overload(
@@ -154,7 +154,7 @@ auto DistanceCondition::distance<  //
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, false>(
-  const EntityRef & triggering_entity) const -> double
+  const String & triggering_entity) const -> double
 {
   return apply<double>(
     overload(
@@ -179,7 +179,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<  //
   CoordinateSystem::lane, RelativeDistanceType::lateral, false>(
-  const EntityRef & triggering_entity) const -> double
+  const String & triggering_entity) const -> double
 {
   return apply<double>(
     overload(
@@ -216,7 +216,7 @@ auto DistanceCondition::distance<  //
 template <>
 auto DistanceCondition::distance<  //
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, false>(
-  const EntityRef & triggering_entity) const -> double
+  const String & triggering_entity) const -> double
 {
   return apply<double>(
     overload(

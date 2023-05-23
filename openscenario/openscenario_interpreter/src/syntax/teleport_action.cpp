@@ -52,7 +52,7 @@ auto TeleportAction::start() const -> void
   }
 }
 
-auto TeleportAction::teleport(const EntityRef & entity_ref, const Position & position) -> void
+auto TeleportAction::teleport(const String & entity_ref, const Position & position) -> void
 {
   auto teleport = overload(
     [&](const WorldPosition & position) {

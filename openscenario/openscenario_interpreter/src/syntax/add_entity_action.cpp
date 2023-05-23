@@ -45,7 +45,7 @@ auto AddEntityAction::endsImmediately() noexcept -> bool  //
   return true;
 }
 
-auto AddEntityAction::operator()(const EntityRef & entity_ref) const -> void
+auto AddEntityAction::operator()(const String & entity_ref) const -> void
 try {
   const auto entity = global().entities->ref(entity_ref);
 

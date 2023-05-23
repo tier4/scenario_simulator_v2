@@ -36,12 +36,12 @@ Entities::Entities(const pugi::xml_node & node, Scope & scope)
   scope.global().entities = this;
 }
 
-auto Entities::isAdded(const EntityRef & entity_ref) const -> bool
+auto Entities::isAdded(const String & entity_ref) const -> bool
 {
   return ref(entity_ref).template as<ScenarioObject>().is_added;
 }
 
-auto Entities::ref(const EntityRef & entity_ref) const -> Object
+auto Entities::ref(const String & entity_ref) const -> Object
 {
   if (auto entry = entities.find(entity_ref); entry == std::end(entities)) {
     throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");

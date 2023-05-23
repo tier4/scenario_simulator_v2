@@ -48,7 +48,7 @@ struct AddEntityAction : private Scope,
 
   static auto endsImmediately() noexcept -> bool;
 
-  /*  */ auto operator()(const EntityRef &) const -> void;
+  /*  */ auto operator()(const String &) const -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

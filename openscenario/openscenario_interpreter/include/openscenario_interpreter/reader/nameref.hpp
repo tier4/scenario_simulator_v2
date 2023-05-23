@@ -15,19 +15,21 @@
 #ifndef OPENSCENARIO_INTERPRETER__READER__NAMEREF_HPP_
 #define OPENSCENARIO_INTERPRETER__READER__NAMEREF_HPP_
 
+#include <boost/range/adaptors.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace reader
 {
-template <typename Node, typename Scope, typename Candidates>
+template <typename T = String, typename Node, typename Scope, typename Candidates>
 auto readNameRef(
   const std::string & name, const Node & node, const Scope & scope, const Candidates & candidates)
-  -> String
+  -> T
 {
-  auto nameRef = readAttribute<String>(name, node, scope);
+  auto nameRef = readAttribute<T>(name, node, scope);
   if (auto referenced = std::find(std::begin(candidates), std::end(candidates), nameRef);
       referenced != std::end(candidates)) {
     return nameRef;
@@ -35,6 +37,18 @@ auto readNameRef(
     throw common::SyntaxError(
       "Reference to ", std::quoted(nameRef),
       " is invalid in this context; maybe it is undefined or forbidden");
+  }
+}
+
+template <typename T = String, typename Node, typename Scope, typename Candidates>
+auto readNameRef(
+  const std::string & name, const Node & node, const Scope & scope, const Candidates & candidates,
+  T && value) -> T
+{
+  if (node.attribute(name.c_str())) {
+    return readNameRef<T>(name, node, scope, candidates);
+  } else {
+    return value;
   }
 }
 }  // namespace reader
