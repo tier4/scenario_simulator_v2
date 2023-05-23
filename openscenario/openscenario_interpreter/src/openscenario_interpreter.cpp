@@ -134,7 +134,7 @@ auto Interpreter::engage() const -> void
       scenario_object.template is<ScenarioObject>() and
       scenario_object.template as<ScenarioObject>().is_added and
       scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
-      asAutoware(name).engage();
+      asFieldOperatorApplication(name).engage();
     }
   }
 }
@@ -149,7 +149,7 @@ auto Interpreter::engageable() const -> bool
              not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>()
                    .object_controller.isUserDefinedController() or
-             asAutoware(name).engageable();
+             asFieldOperatorApplication(name).engageable();
     });
 }
 
@@ -163,7 +163,7 @@ auto Interpreter::engaged() const -> bool
              not scenario_object.template as<ScenarioObject>().is_added or
              not scenario_object.template as<ScenarioObject>()
                    .object_controller.isUserDefinedController() or
-             asAutoware(name).engaged();
+             asFieldOperatorApplication(name).engaged();
     });
 }
 

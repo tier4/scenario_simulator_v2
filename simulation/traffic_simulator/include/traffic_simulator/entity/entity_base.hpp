@@ -17,7 +17,7 @@
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <concealer/autoware.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <memory>
 #include <optional>
 #include <queue>
@@ -27,7 +27,7 @@
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/job/job_list.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -52,7 +52,7 @@ public:
 
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray &);
 
-  virtual auto asAutoware() const -> concealer::Autoware &;
+  virtual auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &;
 
   virtual void cancelRequest();
 

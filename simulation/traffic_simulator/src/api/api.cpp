@@ -264,7 +264,7 @@ bool API::updateTrafficLightsInSim()
   simulation_api_schema::UpdateTrafficLightsRequest req;
   simulation_api_schema::UpdateTrafficLightsResponse res;
   if (entity_manager_ptr_->trafficLightsChanged()) {
-    for (const auto & [id, traffic_light] : entity_manager_ptr_->getTrafficLights()) {
+    for (const auto & [id, traffic_light] : entity_manager_ptr_->getConventionalTrafficLights()) {
       simulation_api_schema::TrafficLightState state;
       simulation_interface::toProto(
         static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
@@ -281,7 +281,9 @@ bool API::updateEntityStatusInSim()
   simulation_api_schema::UpdateEntityStatusRequest req;
   if (entity_manager_ptr_->isEgoSpawned()) {
     simulation_interface::toProto(
-      asAutoware(entity_manager_ptr_->getEgoName()).getVehicleCommand(),
+      {autoware_auto_control_msgs::msg::
+         AckermannControlCommand(),                      // Vehicle command is not utilized by
+       autoware_auto_vehicle_msgs::msg::GearCommand()},  // simple_sensor_simulator
       *req.mutable_vehicle_command());
     req.set_ego_entity_status_before_update_is_empty(false);
     simulation_interface::toProto(
