@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/nameref.hpp>
 #include <openscenario_interpreter/syntax/relative_target_lane.hpp>
 
 namespace openscenario_interpreter
@@ -20,7 +21,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 RelativeTargetLane::RelativeTargetLane(const pugi::xml_node & node, Scope & scope)
-: entity_ref(readAttribute<String>("entityRef", node, scope)),
+: entity_ref(readNameRef("entityRef", node, scope, scope.entities())),
   value(readAttribute<Integer>("value", node, scope))
 {
 }

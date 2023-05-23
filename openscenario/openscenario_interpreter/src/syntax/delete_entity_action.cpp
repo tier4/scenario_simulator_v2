@@ -19,7 +19,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto DeleteEntityAction::operator()(const EntityRef & entity_ref) const -> void
+auto DeleteEntityAction::operator()(const String & entity_ref) const -> void
 {
   applyDeleteEntityAction(entity_ref);
 }

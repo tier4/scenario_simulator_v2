@@ -15,7 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_REF_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_REF_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/nameref.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
+#include <pugixml.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -31,14 +34,11 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntityRef : public String
 {
-  template <typename... Ts>
-  EntityRef(Ts &&... xs) : String(std::forward<decltype(xs)>(xs)...)
-  {
-  }
+  EntityRef() = default;
 
-  template <typename Node, typename Scope>
-  explicit EntityRef(const Node & node, Scope & scope)
-  : String(readAttribute<String>("entityRef", node, scope))
+  template <typename Candidates>
+  EntityRef(const pugi::xml_node & node, Scope & scope, const Candidates & candidates)
+  : String(readNameRef("entityRef", node, scope, candidates))
   {
   }
 };

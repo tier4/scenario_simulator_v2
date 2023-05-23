@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/reader/nameref.hpp>
 #include <openscenario_interpreter/syntax/speed_profile_action.hpp>
 
 namespace openscenario_interpreter
@@ -23,7 +24,11 @@ inline namespace syntax
 {
 SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
-  entity_ref(readAttribute<EntityRef>("entityRef", node, scope, "")),
+  // NOTE: OpenSCENARIO User Guide does not state whether `EntitySelection` is allowed
+  // for `SpeedProfileAciton.entityRef`. It seems `EntitySelection` can be used only when
+  // it is the subject of any actions or conditions, so I left default allowance of entities
+  // and `EntitySelection` is not allowed here.
+  entity_ref(readNameRef("entityRef", node, scope, scope.entities(), String())),
   following_mode(readAttribute<FollowingMode>("followingMode", node, scope)),
   dynamic_constraints(
     readElement<DynamicConstraints>("DynamicConstraints", node, scope, DynamicConstraints())),
@@ -31,8 +36,8 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
 {
 }
 
-auto SpeedProfileAction::apply(
-  const EntityRef & actor, const SpeedProfileEntry & speed_profile_entry) -> void
+auto SpeedProfileAction::apply(const String & actor, const SpeedProfileEntry & speed_profile_entry)
+  -> void
 {
   auto absolute_target_speed = [&]() { return speed_profile_entry.speed; };
 

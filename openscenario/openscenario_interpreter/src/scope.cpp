@@ -17,6 +17,9 @@
 #include <cassert>
 #include <iterator>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity_selection.hpp>
+#include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -129,5 +132,19 @@ auto Scope::local() noexcept -> Scope & { return *this; }
 auto Scope::insert(const Name & identifier, const Object & object) -> void
 {
   return frame->define(identifier, object);
+}
+
+auto Scope::entities(bool allow_entity_selecition, bool allow_misc_external)
+  -> std::list<std::string>
+{
+  auto entity_list = std::list<std::string>();
+  for (const auto & [entity, object] : *scenario_definition->entities) {
+    if (
+      (allow_entity_selecition or not object.is<EntitySelection>()) and
+      (allow_misc_external or not object.is<MiscObject>())) {
+      entity_list.push_back(entity);
+    }
+  }
+  return entity_list;
 }
 }  // namespace openscenario_interpreter

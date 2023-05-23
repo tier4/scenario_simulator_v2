@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/reader/nameref.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
@@ -22,7 +23,7 @@ inline namespace syntax
 {
 TimeHeadwayCondition::TimeHeadwayCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: entity_ref(readAttribute<String>("entityRef", node, scope)),
+: entity_ref(readNameRef("entityRef", node, scope, scope.entities())),
   value(readAttribute<Double>("value", node, scope)),
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   along_route(readAttribute<Boolean>("alongRoute", node, scope)),

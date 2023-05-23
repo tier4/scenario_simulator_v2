@@ -88,12 +88,12 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   auto description() const -> String;
 
   template <CoordinateSystem::value_type, RelativeDistanceType::value_type, Boolean::value_type>
-  auto distance(const EntityRef &) -> double
+  auto distance(const String &) -> double
   {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
 
-  auto distance(const EntityRef &) -> double;
+  auto distance(const String &) -> double;
 
   auto evaluate() -> Object;
 };
@@ -102,12 +102,12 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
 // cspell: ignore euclidian
 
 // clang-format off
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           false>(const EntityRef &) -> double;
-template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const String &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const String &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const String &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const String &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           false>(const String &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const String &) -> double;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
+#include <openscenario_interpreter/reader/nameref.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
@@ -30,7 +31,7 @@ RelativeDistanceCondition::RelativeDistanceCondition(
 : Scope(scope),
   coordinate_system(
     readAttribute<CoordinateSystem>("coordinateSystem", node, scope, CoordinateSystem::entity)),
-  entity_ref(readAttribute<String>("entityRef", node, scope)),
+  entity_ref(readNameRef("entityRef", node, scope, scope.entities())),
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope)),
   rule(readAttribute<Rule>("rule", node, scope)),
@@ -57,7 +58,7 @@ auto RelativeDistanceCondition::description() const -> String
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, false>(
-  const EntityRef & triggering_entity) -> double
+  const String & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -70,8 +71,8 @@ auto RelativeDistanceCondition::distance<
 
 template <>
 auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::lateral, false>(
-  const EntityRef & triggering_entity) -> double
+  CoordinateSystem::entity, RelativeDistanceType::lateral, false>(const String & triggering_entity)
+  -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -85,7 +86,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true>(
-  const EntityRef & triggering_entity) -> double
+  const String & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -99,7 +100,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(
-  const EntityRef & triggering_entity) -> double
+  const String & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -114,7 +115,7 @@ auto RelativeDistanceCondition::distance<
 
 template <>
 auto RelativeDistanceCondition::distance<
-  CoordinateSystem::lane, RelativeDistanceType::lateral, false>(const EntityRef & triggering_entity)
+  CoordinateSystem::lane, RelativeDistanceType::lateral, false>(const String & triggering_entity)
   -> double
 {
   if (
@@ -129,7 +130,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, false>(
-  const EntityRef & triggering_entity) -> double
+  const String & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -176,7 +177,7 @@ auto RelativeDistanceCondition::distance<
 
 #define APPLY(F, ...) F(__VA_ARGS__)
 
-auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) -> double
+auto RelativeDistanceCondition::distance(const String & triggering_entity) -> double
 {
   APPLY(SWITCH_COORDINATE_SYSTEM, SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_FREESPACE, DISTANCE);
   return Double::nan();
