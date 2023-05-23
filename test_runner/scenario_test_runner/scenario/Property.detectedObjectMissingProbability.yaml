@@ -57,7 +57,7 @@ OpenSCENARIO:
               Property:
                 - name: "isEgo"
                   value: "true"
-                - name: "detectedObjectMissingProbalibity"
+                - name: "detectedObjectMissingProbability"
                   value: "0.7"
       - name: Npc1
         Vehicle:
