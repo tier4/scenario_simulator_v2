@@ -100,9 +100,9 @@ auto PolynomialSolver::solveCubicEquation(
       const auto get_real_values =
         [](const std::vector<std::complex<double>> & complex_values) -> std::vector<double> {
         /**
-       * @note Function that takes a complex number as input and returns the real part if it is a real number (imaginary part is 0) 
-       * or std::nullopt if it is an imaginary or complex number.
-       */
+         * @note Function that takes a complex number as input and returns the real part if it is a real number (imaginary part is 0) 
+         * or std::nullopt if it is an imaginary or complex number.
+         */
         const auto is_real_value = [](const std::complex<double> & complex_value) {
           constexpr double epsilon = std::numeric_limits<double>::epsilon();
           return (std::abs(complex_value.imag()) <= epsilon)
