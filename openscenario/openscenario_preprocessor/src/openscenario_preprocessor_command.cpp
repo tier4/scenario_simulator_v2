@@ -63,8 +63,8 @@ auto create_parameter_value_distribution_from_json(
   return script;
 }
 
-int main(const int argc, char const * const * const argv) try
-{
+int main(const int argc, char const * const * const argv)
+try {
   using namespace boost::program_options;
 
   options_description description("openscenario_preprocessor_command");

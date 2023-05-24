@@ -17,9 +17,9 @@
 #include <boost/range/adaptor/indexed.hpp>
 #include <iostream>
 #include <openscenario_preprocessor/deriver.hpp>
-#include <openscenario_validator/schema.hpp>
 #include <openscenario_preprocessor/t4v2.hpp>
 #include <openscenario_preprocessor/template_distributions.hpp>
+#include <openscenario_validator/schema.hpp>
 #include <pugixml.hpp>
 #include <regex>
 
