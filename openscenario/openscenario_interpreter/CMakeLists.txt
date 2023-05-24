@@ -107,7 +107,7 @@ add_library(parameter_value_distribution_without_ros STATIC
   src/scope.cpp)
 
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
-# cspell: ignore DWITHOUT
+# cspell: ignore DPARAMETER
 target_compile_definitions(parameter_value_distribution_without_ros PUBLIC -DPARAMETER_VALUE_DISTRIBUTION_ONLY)
 target_include_directories(parameter_value_distribution_without_ros PUBLIC include)
 target_include_directories(parameter_value_distribution_without_ros PUBLIC ${scenario_simulator_exception_INCLUDE_DIRS})

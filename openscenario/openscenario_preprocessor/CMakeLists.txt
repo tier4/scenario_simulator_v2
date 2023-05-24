@@ -24,13 +24,14 @@ ament_auto_add_executable(${PROJECT_NAME}_node
 target_link_libraries(${PROJECT_NAME}_node XercesC::XercesC)
 target_link_libraries(${PROJECT_NAME}_node yaml-cpp)
 
-find_library(parameter_value_distribution_LIBRARYIES parameter_value_distribution_without_ros)
+find_library(parameter_value_distribution_LIBRARIES parameter_value_distribution_without_ros)
 
 add_executable(${PROJECT_NAME}_command
   src/t4v2.cpp
   src/${PROJECT_NAME}.cpp
   src/${PROJECT_NAME}_command.cpp)
 
+# cspell: ignore DPARAMETER
 target_compile_definitions(${PROJECT_NAME}_command PUBLIC -DPARAMETER_VALUE_DISTRIBUTION_ONLY)
 
 target_include_directories(${PROJECT_NAME}_command PUBLIC include)
@@ -45,7 +46,7 @@ target_link_libraries(${PROJECT_NAME}_command XercesC::XercesC)
 target_link_libraries(${PROJECT_NAME}_command pugixml)
 target_link_libraries(${PROJECT_NAME}_command yaml-cpp)
 
-target_link_libraries(${PROJECT_NAME}_command ${parameter_value_distribution_LIBRARYIES})
+target_link_libraries(${PROJECT_NAME}_command ${parameter_value_distribution_LIBRARIES})
 target_link_libraries(${PROJECT_NAME}_command ${openscenario_validator_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}_node ${PROJECT_NAME}_command
