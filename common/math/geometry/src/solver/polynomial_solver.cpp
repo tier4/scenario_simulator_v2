@@ -27,22 +27,28 @@ namespace math
 {
 namespace geometry
 {
-auto PolynomialSolver::linear(double a, double b, double t) const -> double { return a * t + b; }
+auto PolynomialSolver::linear(const double a, const double b, const double t) const -> double
+{
+  return a * t + b;
+}
 
-auto PolynomialSolver::quadratic(double a, double b, double c, double t) const -> double
+auto PolynomialSolver::quadratic(
+  const double a, const double b, const double c, const double t) const -> double
 {
   return a * t * t + b * t + c;
 }
 
-auto PolynomialSolver::cubic(double a, double b, double c, double d, double t) const -> double
+auto PolynomialSolver::cubic(
+  const double a, const double b, const double c, const double d, const double t) const -> double
 {
   return a * t * t * t + b * t * t + c * t + d;
 }
 
 auto PolynomialSolver::solveLinearEquation(
-  double a, double b, double min_value, double max_value) const -> std::vector<double>
+  const double a, const double b, const double min_value, const double max_value) const
+  -> std::vector<double>
 {
-  const auto solve_without_limit = [this](double a, double b) -> std::vector<double> {
+  const auto solve_without_limit = [this](const double a, const double b) -> std::vector<double> {
     /// @note In this case, ax*b = 0 (a=0) can cause division by zero. So give special treatment to this case.
     if (isApproximatelyEqualTo(a, 0)) {
       if (isApproximatelyEqualTo(b, 0)) {
@@ -65,7 +71,8 @@ auto PolynomialSolver::solveLinearEquation(
 }
 
 auto PolynomialSolver::solveQuadraticEquation(
-  double a, double b, double c, double min_value, double max_value) const -> std::vector<double>
+  const double a, const double b, const double c, const double min_value,
+  const double max_value) const -> std::vector<double>
 {
   const auto solve_without_limit = [this](double a, double b, double c) -> std::vector<double> {
     if (double discriminant = b * b - 4 * a * c; isApproximatelyEqualTo(discriminant, 0)) {
@@ -84,37 +91,38 @@ auto PolynomialSolver::solveQuadraticEquation(
 }
 
 auto PolynomialSolver::solveCubicEquation(
-  double a, double b, double c, double d, double min_value, double max_value) const
-  -> std::vector<double>
+  const double a, const double b, const double c, const double d, const double min_value,
+  const double max_value) const -> std::vector<double>
 {
-  const auto solve_without_limit = [this](double a, double b, double c, double d) {
-    /// @note Function that takes a std::vector of complex numbers and selects only real numbers from it and returns them
-    const auto get_real_values =
-      [](const std::vector<std::complex<double>> & complex_values) -> std::vector<double> {
-      /**
+  const auto solve_without_limit =
+    [this](const double a, const double b, const double c, const double d) {
+      /// @note Function that takes a std::vector of complex numbers and selects only real numbers from it and returns them
+      const auto get_real_values =
+        [](const std::vector<std::complex<double>> & complex_values) -> std::vector<double> {
+        /**
        * @note Function that takes a complex number as input and returns the real part if it is a real number (imaginary part is 0) 
        * or std::nullopt if it is an imaginary or complex number.
        */
-      const auto is_real_value = [](const std::complex<double> & complex_value) {
-        constexpr double epsilon = std::numeric_limits<double>::epsilon();
-        return (std::abs(complex_value.imag()) <= epsilon)
-                 ? std::optional<double>(complex_value.real())
-                 : std::nullopt;
+        const auto is_real_value = [](const std::complex<double> & complex_value) {
+          constexpr double epsilon = std::numeric_limits<double>::epsilon();
+          return (std::abs(complex_value.imag()) <= epsilon)
+                   ? std::optional<double>(complex_value.real())
+                   : std::nullopt;
+        };
+        /// @note Iterate all complex values and check the value is real value or not.
+        std::vector<double> real_values = {};
+        std::for_each(
+          complex_values.begin(), complex_values.end(),
+          [&real_values, is_real_value](const auto complex_value) mutable {
+            if (const auto real_value = is_real_value(complex_value)) {
+              real_values.push_back(real_value.value());
+            }
+          });
+        return real_values;
       };
-      /// @note Iterate all complex values and check the value is real value or not.
-      std::vector<double> real_values = {};
-      std::for_each(
-        complex_values.begin(), complex_values.end(),
-        [&real_values, is_real_value](const auto complex_value) mutable {
-          if (const auto real_value = is_real_value(complex_value)) {
-            real_values.push_back(real_value.value());
-          }
-        });
-      return real_values;
+      /// @note Finds the complex solution of the monic cubic equation and returns only those that are real numbers.
+      return get_real_values(solveMonicCubicEquationWithComplex(b / a, c / a, d / a));
     };
-    /// @note Finds the complex solution of the monic cubic equation and returns only those that are real numbers.
-    return get_real_values(solveMonicCubicEquationWithComplex(b / a, c / a, d / a));
-  };
 
   /// @note Fallback to quadratic equation solver if a = 0
   return isApproximatelyEqualTo(a, 0)
@@ -130,7 +138,7 @@ auto PolynomialSolver::filterByRange(
    * @note Function to check if value exists between [min_value,max_value] considering the tolerance,
    * returning std::nullopt if not present. If not, return std::nullopt, otherwise return value.
    */
-  const auto is_in_range = [](double value, double min_value, double max_value) {
+  const auto is_in_range = [](const double value, const double min_value, const double max_value) {
     if (min_value <= value && value <= max_value) {
       return std::optional(value);
     } else if (std::abs(value - max_value) <= tolerance) {
@@ -216,7 +224,8 @@ auto PolynomialSolver::solveMonicCubicEquationWithComplex(
   return std::apply(solve_without_limit, tschirnhaus_transformation(a, b, c));
 }
 
-auto PolynomialSolver::isApproximatelyEqualTo(double value0, double value1) const -> bool
+auto PolynomialSolver::isApproximatelyEqualTo(const double value0, const double value1) const
+  -> bool
 {
   return std::abs(value0 - value1) <= tolerance;
 }
