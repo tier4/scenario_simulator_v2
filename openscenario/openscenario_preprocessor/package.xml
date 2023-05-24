@@ -16,7 +16,6 @@
   <depend>xerces</depend>
   <depend>pugixml-dev</depend>
   <depend>yaml-cpp</depend>
-  <depend>librapidxml-dev</depend>
   <depend>nlohmann-json-dev</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
