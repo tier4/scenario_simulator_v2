@@ -170,7 +170,7 @@ is not guaranteed.
 
 **Note** - This feature only adjusts the interval between ssv2 generating a
 perception result and publishing it. Note that there is another kind of delay
-between when `scenario_simulatorv_2` publishes the perception result and when
+between when `scenario_simulator_v2` publishes the perception result and when
 it reaches the planning module.
 
 **Default behavior** - If the property is not specified, the default value is
