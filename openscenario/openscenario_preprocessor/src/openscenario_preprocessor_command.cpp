@@ -69,6 +69,7 @@ try {
 
   options_description description("openscenario_preprocessor_command");
 
+//  cspell: ignore multitoken
   description.add_options()(
     "output-directory,o",
     value<std::string>()->default_value("/tmp/openscenario_preprocessor/derived"),
@@ -150,7 +151,7 @@ try {
       preprocessor.preprocessScenario(
         "/tmp/openscenario_preprocessor/parameter_value_distribution.xosc", format_option);
 
-      // merge senario modifiers if skip_full_derivation_option is ON
+      // merge scenario modifiers if skip_full_derivation_option is ON
       if (
         format_option == openscenario_preprocessor::ScenarioFormat::t4v2 &&
         skip_full_derivation_option) {

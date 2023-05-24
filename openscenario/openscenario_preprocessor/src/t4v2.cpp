@@ -24,6 +24,9 @@
 
 namespace openscenario_preprocessor
 {
+
+// cspell: ignore isinstance etree
+
 const std::string_view scenario_modifiers_distribution_base = R"###(
 <OpenSCENARIO>
     <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
