@@ -124,7 +124,7 @@ private:
    * @return true value0 and value1 are equal
    * @return false value0 and value1 are not equal
    */
-  auto isEqual(double value0, double value1) const -> bool;
+  auto isApproximatelyEqualTo(double value0, double value1) const -> bool;
 };
 }  // namespace geometry
 }  // namespace math

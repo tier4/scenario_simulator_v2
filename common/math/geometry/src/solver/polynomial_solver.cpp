@@ -44,8 +44,8 @@ auto PolynomialSolver::solveLinearEquation(
 {
   const auto solve_without_limit = [this](double a, double b) -> std::vector<double> {
     /// @note In this case, ax*b = 0 (a=0) can cause division by zero. So give special treatment to this case.
-    if (isEqual(a, 0)) {
-      if (isEqual(b, 0)) {
+    if (isApproximatelyEqualTo(a, 0)) {
+      if (isApproximatelyEqualTo(b, 0)) {
         THROW_SIMULATION_ERROR(
           "Not computable x because of the linear equation ", a, " x + ", b, "=0, and a = ", a,
           ", b = ", b, " is very close to zero ,so any value of x will be the solution.",
@@ -68,7 +68,7 @@ auto PolynomialSolver::solveQuadraticEquation(
   double a, double b, double c, double min_value, double max_value) const -> std::vector<double>
 {
   const auto solve_without_limit = [this](double a, double b, double c) -> std::vector<double> {
-    if (double discriminant = b * b - 4 * a * c; isEqual(discriminant, 0)) {
+    if (double discriminant = b * b - 4 * a * c; isApproximatelyEqualTo(discriminant, 0)) {
       return {-b / (2 * a)};
     } else if (discriminant < 0) {
       return {};
@@ -78,8 +78,9 @@ auto PolynomialSolver::solveQuadraticEquation(
   };
 
   /// @note Fallback to linear equation solver if a = 0
-  return isEqual(a, 0) ? solveLinearEquation(b, c, min_value, max_value)
-                       : filterByRange(solve_without_limit(a, b, c), min_value, max_value);
+  return isApproximatelyEqualTo(a, 0)
+           ? solveLinearEquation(b, c, min_value, max_value)
+           : filterByRange(solve_without_limit(a, b, c), min_value, max_value);
 }
 
 auto PolynomialSolver::solveCubicEquation(
@@ -116,8 +117,9 @@ auto PolynomialSolver::solveCubicEquation(
   };
 
   /// @note Fallback to quadratic equation solver if a = 0
-  return isEqual(a, 0) ? solveQuadraticEquation(b, c, d, min_value, max_value)
-                       : filterByRange(solve_without_limit(a, b, c, d), min_value, max_value);
+  return isApproximatelyEqualTo(a, 0)
+           ? solveQuadraticEquation(b, c, d, min_value, max_value)
+           : filterByRange(solve_without_limit(a, b, c, d), min_value, max_value);
 }
 
 auto PolynomialSolver::filterByRange(
@@ -191,10 +193,10 @@ auto PolynomialSolver::solveMonicCubicEquationWithComplex(
         };
         return r < 0 ? -1 * calculate_real_solution() : calculate_real_solution();
       }();
-      const double B = isEqual(A, 0) ? 0 : q / A;
+      const double B = isApproximatelyEqualTo(A, 0) ? 0 : q / A;
       /// @note If the imaginary part of the complex almost zero, this equation has a multiple solution.
       const double imaginary_part = 0.5 * std::sqrt(3.0) * (A - B);
-      return isEqual(imaginary_part, 0)
+      return isApproximatelyEqualTo(imaginary_part, 0)
                ? std::vector<std::complex<double>>({
                    // clang-format off
                     std::complex<double>(       (A + B) - a / 3, 0),
@@ -215,7 +217,7 @@ auto PolynomialSolver::solveMonicCubicEquationWithComplex(
   return std::apply(solve_without_limit, tschirnhaus_transformation(a, b, c));
 }
 
-auto PolynomialSolver::isEqual(double value0, double value1) const -> bool
+auto PolynomialSolver::isApproximatelyEqualTo(double value0, double value1) const -> bool
 {
   return std::abs(value0 - value1) <= tolerance;
 }
