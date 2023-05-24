@@ -32,7 +32,8 @@ public:
    * @param b
    * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
    */
-  auto solveLinearEquation(double a, double b, double min_value = 0, double max_value = 1) const
+  auto solveLinearEquation(
+    const double a, const double b, const double min_value = 0, const double max_value = 1) const
     -> std::vector<double>;
   /**
    * @brief solve quadratic equation a*x^2 + b*x + c = 0
@@ -42,8 +43,8 @@ public:
    * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
    */
   auto solveQuadraticEquation(
-    double a, double b, double c, double min_value = 0, double max_value = 1) const
-    -> std::vector<double>;
+    const double a, const double b, const double c, const double min_value = 0,
+    const double max_value = 1) const -> std::vector<double>;
   /**
    * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
    *
@@ -54,8 +55,8 @@ public:
    * @return std::vector<double> real solution of the cubic functions (from min_value to max_value)
    */
   auto solveCubicEquation(
-    double a, double b, double c, double d, double min_value = 0, double max_value = 1) const
-    -> std::vector<double>;
+    const double a, const double b, const double c, const double d, const double min_value = 0,
+    const double max_value = 1) const -> std::vector<double>;
   /**
    * @brief calculate result of linear function a*t + b
    *
@@ -64,7 +65,7 @@ public:
    * @param t
    * @return double result of linear function
    */
-  auto linear(double a, double b, double t) const -> double;
+  auto linear(const double a, const double b, const double t) const -> double;
   /**
    * @brief calculate result of quadratic function a*t^2 + b*t + c
    *
@@ -74,7 +75,7 @@ public:
    * @param t
    * @return double result of quadratic function
    */
-  auto quadratic(double a, double b, double c, double t) const -> double;
+  auto quadratic(const double a, const double b, const double c, const double t) const -> double;
   /**
    * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
    *
@@ -85,7 +86,8 @@ public:
    * @param t
    * @return double result of cubic function
    */
-  auto cubic(double a, double b, double c, double d, double t) const -> double;
+  auto cubic(const double a, const double b, const double c, const double d, const double t) const
+    -> double;
   /**
    * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver.
    * This value was determined by Masaya Kataoka (@hakuturu583).
@@ -124,7 +126,7 @@ private:
    * @return true value0 and value1 are equal
    * @return false value0 and value1 are not equal
    */
-  auto isEqual(double value0, double value1) const -> bool;
+  auto isApproximatelyEqualTo(const double value0, const double value1) const -> bool;
 };
 }  // namespace geometry
 }  // namespace math

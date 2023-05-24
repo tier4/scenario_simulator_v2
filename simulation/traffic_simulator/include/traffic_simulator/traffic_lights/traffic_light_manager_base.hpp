@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
-#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
+#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
+#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
@@ -46,6 +46,14 @@ protected:
 
   const std::string map_frame_;
 
+  rclcpp::TimerBase::SharedPtr timer_ = nullptr;
+
+  const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
+
+  const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
+
+  double publish_rate_ = 0.0;
+
   template <typename NodePointer>
   explicit TrafficLightManagerBase(
     const NodePointer & node, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap,
@@ -54,7 +62,9 @@ protected:
       node, "traffic_light/marker", rclcpp::QoS(1).transient_local())),
     clock_ptr_(node->get_clock()),
     hdmap_(hdmap),
-    map_frame_(map_frame)
+    map_frame_(map_frame),
+    node_base_interface_(node->get_node_base_interface()),
+    node_timers_interface_(node->get_node_timers_interface())
   {
   }
 
@@ -81,61 +91,33 @@ public:
 
   auto getTrafficLights() -> auto & { return traffic_lights_; }
 
-  auto getTrafficRelationReferees(const LaneletID lanelet_id)
+  auto getTrafficLights(const LaneletID lanelet_id)
     -> std::vector<std::reference_wrapper<TrafficLight>>
   {
-    std::vector<std::reference_wrapper<TrafficLight>> refers;
+    std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
 
     if (hdmap_->isTrafficRelation(lanelet_id)) {
       for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
-        refers.emplace_back(getTrafficLight(traffic_light.id()));
+        traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
       }
     } else if (hdmap_->isTrafficLight(lanelet_id)) {
-      refers.emplace_back(getTrafficLight(lanelet_id));
+      traffic_lights.emplace_back(getTrafficLight(lanelet_id));
     } else {
       throw common::scenario_simulator_exception::Error(
         "Given lanelet ID ", lanelet_id,
         " is neither a traffic light ID not a traffic relation ID.");
     }
 
-    return refers;
+    return traffic_lights;
   }
 
   auto hasAnyLightChanged() -> bool;
 
+  auto createTimer(double update_rate) -> void;
+
+  auto resetPublishRate(double update_rate) -> void;
+
   auto update(const double) -> void;
 };
-
-template <typename Message>
-class TrafficLightManager : public TrafficLightManagerBase
-{
-  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
-
-public:
-  template <typename Node>
-  explicit TrafficLightManager(
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
-    const std::string & map_frame = "map")
-  : TrafficLightManagerBase(node, hdmap, map_frame),
-    traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
-  {
-  }
-
-private:
-  static auto name() -> const char *;
-
-  auto publishTrafficLightStateArray() const -> void override;
-};
-
-template <>
-auto TrafficLightManager<
-  autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
-  -> void;
-
-template <>
-auto TrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name() -> const
-  char *;
 }  // namespace traffic_simulator
-
-#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_HPP_
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
