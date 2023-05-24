@@ -61,9 +61,10 @@ generator, its behavior is deterministic. Therefore, as long as
 of other vehicles is reproducible. However, since Autoware's behavior is
 nondeterministic, if the scenario is such that vehicles interact with each
 other, or if the scenario defines triggers for events that depend on Autoware's
-behavior, the progress of the scenario itself will be nondeterministic. ` makes
-every effort to reproducible results, but the reproducibility of test results
-involving Autoware is not guaranteed.
+behavior, the progress of the scenario itself will be nondeterministic. In
+other words, `scenario_simulator_v2` makes every effort to reproducible
+results, but the reproducibility of test results involving Autoware is not
+guaranteed.
 
 **Note** - This property shares the random number generator with the property
 `detectedObjectPositionStandardDeviation`.
