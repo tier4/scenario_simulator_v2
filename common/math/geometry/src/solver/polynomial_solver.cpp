@@ -130,16 +130,15 @@ auto PolynomialSolver::filterByRange(
    * @note Function to check if value exists between [min_value,max_value] considering the tolerance,
    * returning std::nullopt if not present. If not, return std::nullopt, otherwise return value.
    */
-  const auto is_in_range =
-    [](double value, double min_value, double max_value) -> std::optional<double> {
+  const auto is_in_range = [](double value, double min_value, double max_value) {
     if (min_value <= value && value <= max_value) {
-      return value;
+      return std::optional(value);
     } else if (std::abs(value - max_value) <= tolerance) {
-      return max_value;
+      return std::optional(max_value);
     } else if (std::abs(value - min_value) <= tolerance) {
-      return min_value;
+      return std::optional(min_value);
     }
-    return std::nullopt;
+    return std::optional<double>();
   };
   /// @note Iterate values and check the value is in range or not.
   std::vector<double> filtered_values = {};
