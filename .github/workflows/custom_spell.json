@@ -1,17 +1,15 @@
 {
-  "ignorePaths": [
-    "*.drawio",
-    "*/**/CHANGELOG.rst",
-    "external/lanelet2_matching/**",
-    "*.xsd"
-  ],
+  "ignorePaths": ["*.drawio", "*/**/CHANGELOG.rst", "external/lanelet2_matching/**", "*.xsd"],
   "words": [
     "ARGN",
     "AUTORCC",
-    "classname",
     "DBOOST",
     "DBUILD",
     "DWITH_INTEGRATION_TEST",
+    "Mersenne",
+    "Petrich",
+    "TESTRANDOMIZER",
+    "classname",
     "engageable",
     "libunwind",
     "npcs",
@@ -19,7 +17,6 @@
     "oktas",
     "oneof",
     "parametersetaction",
-    "Petrich",
     "piotr",
     "pluggable",
     "protos",
