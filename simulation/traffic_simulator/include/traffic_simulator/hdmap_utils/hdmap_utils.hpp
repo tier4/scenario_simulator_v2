@@ -199,7 +199,8 @@ public:
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along) const;
   std::vector<geometry_msgs::msg::Point> getLeftBound(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getRightBound(std::int64_t lanelet_id) const;
-
+  std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(
+    const std::vector<std::int64_t> & lanelet_ids) const;
   using LaneletId = std::int64_t;
 
   auto isTrafficLight(const LaneletId) const -> bool;
@@ -232,8 +233,7 @@ private:
   getTrafficLightRegElementsOnPath(const std::vector<std::int64_t> & lanelet_ids) const;
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
     const std::vector<std::int64_t> & lanelet_ids) const;
-  std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(
-    const std::vector<std::int64_t> & lanelet_ids) const;
+
   geometry_msgs::msg::Vector3 getVectorFromPose(
     const geometry_msgs::msg::Pose & pose, double magnitude) const;
   void mapCallback(const autoware_auto_mapping_msgs::msg::HADMapBin & msg) const;
