@@ -233,7 +233,6 @@ private:
   getTrafficLightRegElementsOnPath(const std::vector<std::int64_t> & lanelet_ids) const;
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
     const std::vector<std::int64_t> & lanelet_ids) const;
-
   geometry_msgs::msg::Vector3 getVectorFromPose(
     const geometry_msgs::msg::Pose & pose, double magnitude) const;
   void mapCallback(const autoware_auto_mapping_msgs::msg::HADMapBin & msg) const;
