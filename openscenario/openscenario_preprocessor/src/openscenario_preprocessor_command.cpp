@@ -69,7 +69,7 @@ try {
 
   options_description description("openscenario_preprocessor_command");
 
-//  cspell: ignore multitoken
+  //  cspell: ignore multitoken
   description.add_options()(
     "output-directory,o",
     value<std::string>()->default_value("/tmp/openscenario_preprocessor/derived"),
