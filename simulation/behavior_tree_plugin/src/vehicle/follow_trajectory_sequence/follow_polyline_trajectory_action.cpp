@@ -39,10 +39,10 @@ auto FollowPolylineTrajectoryAction::calculateObstacle(
 
 auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 {
-  auto && ports = VehicleActionNode::providedPorts();
+  auto ports = VehicleActionNode::providedPorts();
   ports.emplace(BT::InputPort<Parameter>("polyline_trajectory_parameter"));
   ports.emplace(BT::InputPort<decltype(target_speed)>("target_speed"));
-  return std::forward<decltype(ports)>(ports);
+  return ports;
 }
 
 template <typename T, typename = void>
@@ -153,27 +153,35 @@ auto truncate(const T & v, const U & max)
   }
 }
 
-template <typename T>
-auto definitelyLessThan(T a, T b)
+template <typename T, typename... Ts>
+auto isDefinitelyLessThan(T a, T b, Ts... xs)
 {
-  return (b - a) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
+  auto compare = [](T a, T b) {
+    return (b - a) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
+  };
+
+  if constexpr (0 < sizeof...(Ts)) {
+    return compare(a, b) and compare(b, xs...);
+  } else {
+    return compare(a, b);
+  }
 }
 
 template <typename T>
-auto approximatelyEqualTo(T a, T b)
+auto isApproximatelyEqualTo(T a, T b)
 {
   return std::abs(a - b) <=
          (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
 }
 
 template <typename T>
-auto definitelyGreaterThan(T a, T b)
+auto isDefinitelyGreaterThan(T a, T b)
 {
   return (a - b) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
 }
 
 template <typename T>
-auto essentiallyEqualTo(T a, T b)
+auto isEssentiallyEqualTo(T a, T b)
 {
   return std::abs(a - b) <=
          (std::numeric_limits<T>::epsilon() * std::min(std::abs(a), std::abs(b)));
@@ -181,17 +189,6 @@ auto essentiallyEqualTo(T a, T b)
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
-  auto pop_front = [this]() {
-    if (std::rotate(
-          std::begin(parameter->shape.vertices), std::begin(parameter->shape.vertices) + 1,
-          std::end(parameter->shape.vertices));
-        not parameter->closed) {
-      parameter->shape.vertices.pop_back();
-    } else {
-      relative_timing_offset = entity_status.time;
-    }
-  };
-
   if (getBlackBoardValues();
       request == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY and
       getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) and
@@ -285,7 +282,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        If the target point is reached during this step, it is considered
        reached.
     */
-    if (definitelyLessThan(remaining_time_to_arrival, step_time)) {
+    if (isDefinitelyLessThan(remaining_time_to_arrival, step_time)) {
       /*
          If remaining time to arrival is less than remaining time, the vehicle
          reached the waypoint on time. Otherwise, the vehicle has reached the
@@ -305,9 +302,17 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
          This implementation does simple velocity planning that considers only
          the nearest waypoints in favor of simplicity of implementation.
       */
-      std::cout << "REACHED!" << std::endl;
-      if (definitelyLessThan(remaining_time_to_arrival, remaining_time)) {
-        pop_front();
+      if (isDefinitelyLessThan(
+            remaining_time_to_arrival, remaining_time, remaining_time_to_arrival + step_time)) {
+        if (std::rotate(
+              std::begin(parameter->shape.vertices), std::begin(parameter->shape.vertices) + 1,
+              std::end(parameter->shape.vertices));
+            not parameter->closed) {
+          parameter->shape.vertices.pop_back();
+        }
+        if (not parameter->timing_is_absolute) {
+          relative_timing_offset = entity_status.time;
+        }
         return tick();  // tail recursion
       } else {
         throw common::SimulationError(
