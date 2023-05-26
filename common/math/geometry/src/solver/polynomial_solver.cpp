@@ -74,7 +74,8 @@ auto PolynomialSolver::solveQuadraticEquation(
   const double a, const double b, const double c, const double min_value,
   const double max_value) const -> std::vector<double>
 {
-  const auto solve_without_limit = [this](double a, double b, double c) -> std::vector<double> {
+  const auto solve_without_limit =
+    [this](const double a, const double b, const double c) -> std::vector<double> {
     if (const double discriminant = b * b - 4 * a * c; isApproximatelyEqualTo(discriminant, 0)) {
       return {-b / (2 * a)};
     } else if (discriminant < 0) {
