@@ -114,7 +114,7 @@ auto PolynomialSolver::solveCubicEquation(
         std::vector<double> real_values = {};
         std::for_each(
           complex_values.begin(), complex_values.end(),
-          [&real_values, is_real_value](const auto complex_value) mutable {
+          [&real_values, is_real_value](const auto & complex_value) mutable {
             if (const auto real_value = is_real_value(complex_value)) {
               real_values.push_back(real_value.value());
             }
