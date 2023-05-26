@@ -293,8 +293,12 @@ bool API::updateFrame()
     if (not entity_manager_ptr_->isEgoSpawned()) {
       THROW_SEMANTIC_ERROR("Malformed state: ego simulated but not registered in entity manager.");
     }
-    entity_manager_ptr_->setEntityStatusExternally(
-      entity_manager_ptr_->getEgoName(), ego_entity_simulation_->getStatus());
+    auto ego_name = entity_manager_ptr_->getEgoName();
+    auto ego_status = ego_entity_simulation_->getStatus();
+    // apply additional status data (from ll2) to ego_entity_simulation_ for this update
+    entity_manager_ptr_->refillEntityStatusWithLaneletData(ego_name, ego_status);
+    ego_entity_simulation_->setStatus(ego_status);
+    entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
   }
 
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());

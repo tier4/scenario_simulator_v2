@@ -266,6 +266,7 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
+  FORWARD_TO_ENTITY(refillEntityStatusWithLaneletData, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );

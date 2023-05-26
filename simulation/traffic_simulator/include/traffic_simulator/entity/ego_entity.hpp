@@ -25,7 +25,6 @@
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
@@ -40,8 +39,6 @@ class EgoEntity : public VehicleEntity
 
   static auto makeFieldOperatorApplication(const Configuration &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
-
-  auto addLaneletPoseToEntityStatus() -> void;
 
   traffic_simulator_msgs::msg::EntityStatus externally_updated_status_;
 

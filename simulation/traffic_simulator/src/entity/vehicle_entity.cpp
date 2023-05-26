@@ -89,7 +89,7 @@ auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::
   return behavior_plugin_ptr_->getObstacle();
 }
 
-auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t>
+auto VehicleEntity::getRouteLanelets(double horizon) const -> std::vector<std::int64_t>
 {
   if (status_.lanelet_pose_valid) {
     return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);

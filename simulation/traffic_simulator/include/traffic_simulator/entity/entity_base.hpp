@@ -26,6 +26,7 @@
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
@@ -112,7 +113,10 @@ public:
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
-  virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
+  virtual auto getRouteLanelets(const double horizon = 100) const -> std::vector<std::int64_t> = 0;
+
+  /*   */ auto refillEntityStatusWithLaneletData(
+    traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
 
   /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
 

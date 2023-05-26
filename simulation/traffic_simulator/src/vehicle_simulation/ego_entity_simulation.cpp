@@ -132,15 +132,13 @@ auto EgoEntitySimulation::makeSimulationModel(
 
 auto EgoEntitySimulation::setAutowareStatus() -> void
 {
-  const auto current_pose = status_.pose;
-
   autoware->set([this]() {
     geometry_msgs::msg::Accel message;
     message.linear.x = vehicle_model_ptr_->getAx();
     return message;
   }());
 
-  autoware->set(current_pose);
+  autoware->set(status_.pose);
 
   autoware->set(getCurrentTwist());
 }
@@ -213,7 +211,6 @@ void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_s
 
   updateStatus(time, step_time);
   updatePreviousValues();
-  setAutowareStatus();
 }
 
 auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
@@ -280,10 +277,17 @@ auto EgoEntitySimulation::getStatus() const -> const traffic_simulator_msgs::msg
   return status_;
 }
 
-auto EgoEntitySimulation::setInitialStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
+auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
   -> void
 {
   status_ = status;
+  setAutowareStatus();
+}
+
+auto EgoEntitySimulation::setInitialStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
+  -> void
+{
+  setStatus(status);
   initial_pose_ = status_.pose;
 }
 
@@ -298,6 +302,6 @@ auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
   status.action_status.accel = getCurrentAccel(step_time);
   status.action_status.linear_jerk = getLinearJerk(step_time);
 
-  status_ = status;
+  setStatus(status);
 }
 }  // namespace vehicle_simulation
