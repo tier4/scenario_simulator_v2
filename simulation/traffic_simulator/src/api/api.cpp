@@ -254,7 +254,7 @@ bool API::updateTrafficLightsInSim()
   simulation_api_schema::UpdateTrafficLightsRequest req;
   simulation_api_schema::UpdateTrafficLightsResponse res;
   if (entity_manager_ptr_->trafficLightsChanged()) {
-    for (const auto & [id, traffic_light] : entity_manager_ptr_->getTrafficLights()) {
+    for (const auto & [id, traffic_light] : entity_manager_ptr_->getConventionalTrafficLights()) {
       simulation_api_schema::TrafficLightState state;
       simulation_interface::toProto(
         static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
