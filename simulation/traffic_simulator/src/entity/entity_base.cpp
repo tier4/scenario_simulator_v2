@@ -226,12 +226,12 @@ auto EntityBase::refillEntityStatusWithLaneletData(
 
   if (unique_route_lanelets.empty()) {
     lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
+      hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
   } else {
     lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
     if (!lanelet_pose) {
       lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
+        hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
     }
   }
   if (lanelet_pose) {
