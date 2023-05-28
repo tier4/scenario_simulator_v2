@@ -256,7 +256,6 @@ public:
   bool initialize(double realtime_factor, double step_time);
 
   bool updateFrame();
-  auto refillEntityStatusWithLaneletData(const std::string& name, traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
 
   double getCurrentTime() const noexcept { return clock_.getCurrentScenarioTime(); }
 
