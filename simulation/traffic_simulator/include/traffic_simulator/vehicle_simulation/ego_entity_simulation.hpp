@@ -57,8 +57,10 @@ private:
 
   traffic_simulator_msgs::msg::EntityStatus status_;
 
+public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
+private:
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;

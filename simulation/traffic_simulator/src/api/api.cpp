@@ -340,17 +340,17 @@ bool API::updateFrame()
 
     if (unique_route_lanelets.empty()) {
       lanelet_pose =
-          entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+          ego_entity_simulation_->hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
     } else {
-      lanelet_pose = entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+      lanelet_pose = ego_entity_simulation_->hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
       if (!lanelet_pose) {
         lanelet_pose =
-            entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+            ego_entity_simulation_->hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
       }
     }
     if (lanelet_pose) {
       math::geometry::CatmullRomSpline spline(
-          entity_manager_ptr_->getHdmapUtils()->getCenterPoints(lanelet_pose->lanelet_id));
+          ego_entity_simulation_->hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
       if (const auto s_value = spline.getSValue(status.pose)) {
         status.pose.position.z = spline.getPoint(s_value.value()).z;
       }
