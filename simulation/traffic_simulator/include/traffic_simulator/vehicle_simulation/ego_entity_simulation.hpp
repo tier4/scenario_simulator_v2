@@ -55,6 +55,8 @@ class EgoEntitySimulation
 
   traffic_simulator_msgs::msg::EntityStatus status_;
 
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
@@ -68,7 +70,7 @@ class EgoEntitySimulation
 public:
   auto setAutowareStatus() -> void;
 
-  explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double);
+  explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double, std::shared_ptr<hdmap_utils::HdMapUtils>);
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 

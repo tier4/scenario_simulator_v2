@@ -33,7 +33,7 @@
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
-#include <traffic_simulator/hdmap_utils//hdmap_utils.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
@@ -108,7 +108,7 @@ public:
         if (entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
               name, pose, parameters, configuration, clock_.getStepTime())) {
           ego_entity_simulation_ = std::make_unique<vehicle_simulation::EgoEntitySimulation>(
-            parameters, clock_.getStepTime());
+            parameters, clock_.getStepTime(), entity_manager_ptr_->getHdmapUtils());
           ego_entity_simulation_->setInitialStatus(entity_manager_ptr_->getEntityStatus(name));
           return true;
         }
