@@ -296,7 +296,7 @@ bool API::updateFrame()
     auto ego_name = entity_manager_ptr_->getEgoName();
     auto ego_status = ego_entity_simulation_->getStatus();
     // apply additional status data (from ll2) to ego_entity_simulation_ for this update
-    entity_manager_ptr_->refillEntityStatusWithLaneletData(ego_name, ego_status);
+    refillEntityStatusWithLaneletData(ego_name, ego_status);
     ego_entity_simulation_->setStatus(ego_status);
     entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
   }
@@ -330,6 +330,37 @@ bool API::updateFrame()
     return true;
   }
 }
+
+  auto API::refillEntityStatusWithLaneletData(const std::string& name,
+      traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+  {
+    const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(entity_manager_ptr_->getRouteLanelets(name));
+
+    std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+
+    if (unique_route_lanelets.empty()) {
+      lanelet_pose =
+          entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+    } else {
+      lanelet_pose = entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+      if (!lanelet_pose) {
+        lanelet_pose =
+            entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+      }
+    }
+    if (lanelet_pose) {
+      math::geometry::CatmullRomSpline spline(
+          entity_manager_ptr_->getHdmapUtils()->getCenterPoints(lanelet_pose->lanelet_id));
+      if (const auto s_value = spline.getSValue(status.pose)) {
+        status.pose.position.z = spline.getPoint(s_value.value()).z;
+      }
+    }
+
+    status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
+    if (status.lanelet_pose_valid) {
+      status.lanelet_pose = lanelet_pose.value();
+    }
+  }
 
 void API::startNpcLogic()
 {
