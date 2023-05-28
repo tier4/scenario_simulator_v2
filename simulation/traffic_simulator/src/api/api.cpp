@@ -331,10 +331,10 @@ bool API::updateFrame()
   }
 }
 
-  auto API::refillEntityStatusWithLaneletData(const std::string& name,
+  auto API::refillEntityStatusWithLaneletData(const std::string&,
       traffic_simulator_msgs::msg::EntityStatus & status) const -> void
   {
-    const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(entity_manager_ptr_->getRouteLanelets(name));
+    const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(ego_entity_simulation_->autoware->getRouteLanelets());
 
     std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 

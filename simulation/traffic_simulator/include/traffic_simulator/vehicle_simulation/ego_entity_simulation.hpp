@@ -36,8 +36,10 @@ enum class VehicleModelType {
 
 class EgoEntitySimulation
 {
+public:
   const std::unique_ptr<concealer::Autoware> autoware;
 
+private:
   const VehicleModelType vehicle_model_type_;
 
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
