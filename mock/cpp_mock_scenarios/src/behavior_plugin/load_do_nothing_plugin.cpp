@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 
+/// @note Test case to verify if the do_nothing plugin can be loaded.
 class LoadDoNothingPlugin : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -40,6 +41,7 @@ public:
 private:
   void onUpdate() override
   {
+    /// @note When using the do_nothing plugin, the return value of the getCurrentAction function is always do_nothing.
     if (
       api_.getCurrentAction("ego") != "do_nothing" ||
       api_.getCurrentAction("pedestrian") != "do_nothing") {
