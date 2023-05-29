@@ -10,18 +10,18 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
-  <depend>rclcpp</depend>
-  <depend>pluginlib</depend>
-  <depend>traffic_simulator</depend>
   <depend>behaviortree_cpp_v3</depend>
+  <depend>pluginlib</depend>
   <depend>quaternion_operation</depend>
+  <depend>rclcpp</depend>
+  <depend>traffic_simulator</depend>
 
-  <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>
   <test_depend>ament_cmake_lint_cmake</test_depend>
   <test_depend>ament_cmake_pep257</test_depend>
   <test_depend>ament_cmake_xmllint</test_depend>
+  <test_depend>ament_lint_auto</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
