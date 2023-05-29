@@ -75,6 +75,7 @@ nav:
       - developer_guide/AutowareAPI.md
       - developer_guide/NPCBehavior.md
       - developer_guide/BehaviorPlugin.md
+      - developer_guide/ConfiguringPerceptionTopics.md
       #      - developer_guide/ErrorCategories.md
       - developer_guide/OpenSCENARIOSupport.md
       - developer_guide/SimpleSensorSimulator.md
