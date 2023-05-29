@@ -26,7 +26,7 @@ void DoNothingBehavior::update(double current_time, double)
 
 const std::string & DoNothingBehavior::getCurrentAction() const
 {
-  static std::string behavior = "do_nothing";
+  static const std::string behavior = "do_nothing";
   return behavior;
 }
 }  // namespace entity_behavior
