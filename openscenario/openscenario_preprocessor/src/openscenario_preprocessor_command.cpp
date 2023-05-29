@@ -140,8 +140,23 @@ try {
   // derive for given parameters
   if (parameters_option != "null") {
     for (auto scenario_path : xosc_scenario_paths) {
-      auto parameter_value_distribution = create_parameter_value_distribution_from_json(
-        scenario_path, nlohmann::json::parse(parameters_option.c_str()));
+      auto parameters_json = nlohmann::json::parse(parameters_option.c_str());
+      // convert value to string, because current implementation is not support other types
+      for (auto & json_item : parameters_json.items()) {
+        if (not json_item.value().is_string()) {
+          try {
+            json_item.value() = boost::lexical_cast<std::string>(json_item.value());
+          } catch (std::exception & e) {
+            std::stringstream what;
+            what << "Cannot convert parameter value, type  " << json_item.value().type_name()
+                 << " to string  : " << e.what();
+            throw std::runtime_error(what.str());
+          }
+        }
+      }
+
+      auto parameter_value_distribution =
+        create_parameter_value_distribution_from_json(scenario_path, parameters_json);
 
       parameter_value_distribution.save_file(
         "/tmp/openscenario_preprocessor/parameter_value_distribution.xosc");
