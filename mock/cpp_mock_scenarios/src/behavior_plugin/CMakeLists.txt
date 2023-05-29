@@ -5,7 +5,7 @@ target_link_libraries(load_do_nothing_plugin cpp_scenario_node)
 
 install(TARGETS
   load_do_nothing_plugin
-  DESTINATION lib/cpp_mock_scenarios  
+  DESTINATION lib/cpp_mock_scenarios
 )
 
 if(BUILD_TESTING)
