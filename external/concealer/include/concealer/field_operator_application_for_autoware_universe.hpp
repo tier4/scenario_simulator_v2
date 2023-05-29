@@ -69,6 +69,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   auto cooperate(const tier4_rtc_msgs::msg::CooperateStatusArray &) -> void;
 
+  bool sendCooperateCommands(const tier4_rtc_msgs::msg::CooperateStatusArray &, const std::string &, const bool) -> void;
+
   std::string minimum_risk_maneuver_state;
 
   std::string minimum_risk_maneuver_behavior;

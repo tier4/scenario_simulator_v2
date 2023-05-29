@@ -67,6 +67,33 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   }
 }
 
+bool FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommands(
+  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array,
+  const std::string & module_name, const bool activate)
+  ->void
+{
+  auto cooperate_status = std::find_if(
+    cooperate_status_array.statuses.begin(), cooperate_status_array.statuses.end(),
+    [&](auto && cooperate_status) { return cooperate_status.module == module_name; });
+  if (cooperate_status == cooperate_status_array.statuses.end()) {
+    return false;
+  } else {
+    auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
+    request->stamp = cooperate_status_array.stamp;
+
+    tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
+    cooperate_command.module = cooperate_status->module;
+    cooperate_command.uuid = cooperate_status->uuid;
+    cooperate_command.command.type =
+      activate ? tier4_rtc_msgs::msg::Command::ACTIVATE : tier4_rtc_msgs::msg::Command::DEACTIVATE;
+    request->commands.push_back(cooperate_command);
+
+    task_queue.delay([this, request]() { requestCooperateCommands(request); });
+
+    return true;
+  }
+}
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   const geometry_msgs::msg::Pose & initial_pose) -> void
 {
