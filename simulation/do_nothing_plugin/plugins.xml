@@ -4,7 +4,7 @@
          type="entity_behavior::DoNothingBehavior"
          base_class_type="entity_behavior::BehaviorPluginBase">
     <description>
-      A do nothing planner plugin for pedestrian entity.
+      A do nothing planner plugin for pedestrian/vehicle entity.
     </description>
   </class>
 </library>
