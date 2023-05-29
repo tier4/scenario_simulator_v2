@@ -25,7 +25,7 @@
 #include "traffic_simulator_msgs/msg/entity_status.hpp"
 #include "traffic_simulator_msgs/msg/lanelet_pose.hpp"
 
-struct NPCDescription
+struct NonAutowareEntity
 {
   traffic_simulator_msgs::msg::LaneletPose start_position;
   double speed;
@@ -38,7 +38,7 @@ struct TestDescription
   geometry_msgs::msg::Pose ego_goal_pose;
   traffic_simulator_msgs::msg::LaneletPose ego_start_position;
 
-  std::vector<NPCDescription> npcs_descriptions;
+  std::vector<NonAutowareEntity> npcs_descriptions;
 };
 
 enum RandomTestType { RANDOM_RUN, REPLAY };
@@ -146,7 +146,7 @@ DEFINE_FMT_FORMATTER(
 DEFINE_FMT_FORMATTER(TestCaseParameters, "seed: {}", v.seed)
 
 DEFINE_FMT_FORMATTER(
-  NPCDescription, "name: {}, start_position: {}, speed: {}", v.name, v.start_position, v.speed)
+  NonAutowareEntity, "name: {}, start_position: {}, speed: {}", v.name, v.start_position, v.speed)
 
 template <>
 struct fmt::formatter<TestDescription>

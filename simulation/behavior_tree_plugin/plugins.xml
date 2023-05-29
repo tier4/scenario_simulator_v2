@@ -4,14 +4,14 @@
          type="entity_behavior::PedestrianBehaviorTree"
          base_class_type="entity_behavior::BehaviorPluginBase">
     <description>
-      A behavior tree planner plugin for pedestrian NPC.
+      A behavior tree planner plugin for pedestrian entity.
     </description>
   </class>
   <class name="behavior_tree_plugin/VehicleBehaviorTree"
          type="entity_behavior::VehicleBehaviorTree"
          base_class_type="entity_behavior::BehaviorPluginBase">
     <description>
-      A behavior tree planner plugin for vehicle NPC.
+      A behavior tree planner plugin for vehicle entity.
     </description>
   </class>
 </library>

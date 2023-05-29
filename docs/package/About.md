@@ -4,7 +4,7 @@
 
 ### Traffic Simulator Package
 Traffic simulator for scenario testing.  
-This package includes NPC logic, API etc...
+This package includes entity logics such as getting distance, checking collision and API.
 
 ![traffic simulator](../image/simple_demo.png "traffic simulator")
 

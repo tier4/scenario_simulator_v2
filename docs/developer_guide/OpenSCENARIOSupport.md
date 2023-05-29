@@ -282,7 +282,7 @@ OpenSCENARIO standards.
 ### CustomCommandAction
 #### WalkStraightAction
 - This action is a temporary feature until `FollowTrajectoryAction` is implemented.
-- This action cannot be used in combination with `AcquirePositionAction` because `WalkStraightAction` just makes a pedestrian NPC go straight without a destination.
+- This action cannot be used in combination with `AcquirePositionAction` because `WalkStraightAction` just makes a pedestrian entity go straight without a destination.
 
 
 ### SpeedAction

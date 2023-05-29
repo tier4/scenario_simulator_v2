@@ -10,7 +10,7 @@
                         <mxPoint x="560" y="160" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="18" value="Define parameters&lt;br style=&quot;font-size: 14px;&quot;&gt;Define NPC behavior" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=middle;labelBackgroundColor=none;fontColor=#E4FDE1;fontSize=14;" parent="17" connectable="0" vertex="1">
+                <mxCell id="18" value="Define parameters&lt;br style=&quot;font-size: 14px;&quot;&gt;Define Entity behavior" style="edgeLabel;resizable=0;html=1;align=center;verticalAlign=middle;labelBackgroundColor=none;fontColor=#E4FDE1;fontSize=14;" parent="17" connectable="0" vertex="1">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint y="-30" as="offset"/>
                     </mxGeometry>

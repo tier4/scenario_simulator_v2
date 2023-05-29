@@ -104,10 +104,10 @@ auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::Waypoin
   } catch (const std::runtime_error & e) {
     if (not status_.lanelet_pose_valid) {
       THROW_SIMULATION_ERROR(
-        "Failed to calculate waypoints in NPC logics, please check Entity : ", name,
+        "Failed to calculate waypoints in entity logics, please check entity : ", name,
         " is in a lane coordinate.");
     } else {
-      THROW_SIMULATION_ERROR("Failed to calculate waypoint in NPC logics.");
+      THROW_SIMULATION_ERROR("Failed to calculate waypoint in entity logics.");
     }
   }
 }

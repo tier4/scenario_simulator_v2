@@ -41,8 +41,8 @@ message LaneletPose {
 message EntityType {
   enum Enum {
     EGO = 0;         // Ego Vehicle (Autoware Vehicle)
-    VEHICLE = 1;     // Vehicle Entity (NPC Vehicle)
-    PEDESTRIAN = 2;  // Pedestrian Entity (NPC Pedestrian)
+    VEHICLE = 1;     // Vehicle Entity (Non Autoware Vehicle)
+    PEDESTRIAN = 2;  // Pedestrian Entity (Non Autoware Pedestrian)
     MISC_OBJECT = 3; // Misc Object Entity (Static Objects in environment like cones)
   }
   Enum type = 1;

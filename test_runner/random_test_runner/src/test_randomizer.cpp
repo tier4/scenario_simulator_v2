@@ -169,7 +169,7 @@ traffic_simulator_msgs::msg::LaneletPose TestRandomizer::generatePoseFromLanelet
     lanelet_part.lanelet_id, getRandomS(lanelet_part));
 }
 
-NPCDescription TestRandomizer::generateNpcFromLaneletsWithMinDistanceFromPoses(
+NonAutowareEntity TestRandomizer::generateNpcFromLaneletsWithMinDistanceFromPoses(
   int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
   double min_distance, const std::vector<LaneletPart> & lanelets)
 {

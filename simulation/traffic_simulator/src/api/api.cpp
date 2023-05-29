@@ -358,7 +358,7 @@ bool API::updateFrame()
 void API::startNpcLogic()
 {
   if (isNpcLogicStarted()) {
-    THROW_SIMULATION_ERROR("NPC logics are already started.");
+    THROW_SIMULATION_ERROR("Entity logics are already started.");
   }
   entity_manager_ptr_->startNpcLogic();
   clock_.onNpcLogicStart();
