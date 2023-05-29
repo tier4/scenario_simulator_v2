@@ -77,7 +77,7 @@ jobs:
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           cd ~/ros2_ws
-          colcon test --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+          colcon test --packages-select ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Show test result
