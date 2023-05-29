@@ -12,4 +12,3 @@ if(BUILD_TESTING)
   include(../../cmake/add_cpp_mock_scenario_test.cmake)
   add_cpp_mock_scenario_test(${PROJECT_NAME} "load_do_nothing_plugin" "5.0")
 endif()
-
