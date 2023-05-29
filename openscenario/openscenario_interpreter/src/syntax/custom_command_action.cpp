@@ -260,10 +260,9 @@ struct ForkExecCommand : public CustomCommand
 auto makeCustomCommand(const std::string & type, const std::string & content)
   -> std::shared_ptr<CustomCommand>
 {
-#define ELEMENT(NAME, TYPE)                                                             \
-  std::make_pair(NAME, [](auto &&... xs) {                                              \
-    return std::shared_ptr<CustomCommand>(new TYPE(std::forward<decltype(xs)>(xs)...)); \
-  })
+#define ELEMENT(NAME, TYPE) \
+  std::make_pair(           \
+    NAME, [](auto &&... xs) { return std::make_shared<TYPE>(std::forward<decltype(xs)>(xs)...); })
 
   static const std::unordered_map<
     std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
