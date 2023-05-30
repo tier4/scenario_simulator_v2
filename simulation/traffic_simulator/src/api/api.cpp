@@ -306,7 +306,10 @@ bool API::updateFrame()
     auto ego_name = entity_manager_ptr_->getEgoName();
     auto ego_status = ego_entity_simulation_->getStatus();
     if (not configuration.standalone_mode) {
-      updateEntityStatusInSim(entity_manager_ptr_->getEgoName(), ego_status);
+      auto ego_status_opt = updateEntityStatusInSim(entity_manager_ptr_->getEgoName(), ego_status);
+      if (ego_status_opt) {
+        ego_status = *ego_status_opt;
+      }
     } else {
       THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
     }
