@@ -113,7 +113,7 @@ public:
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
-  virtual auto getRouteLanelets(const double horizon = 100) const -> std::vector<std::int64_t> = 0;
+  virtual auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> = 0;
 
   /*   */ auto refillEntityStatusWithLaneletData(
     traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
