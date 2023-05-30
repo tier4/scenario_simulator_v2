@@ -35,16 +35,7 @@ auto SelectedEntityRefs::enumerate(const Entities & entities) -> std::list<Strin
 {
   auto selected_entities = std::list<String>();
   for (const auto & entityRef : entityRefs) {
-    auto object = entities.ref(entityRef);
-    if (object.is<ScenarioObject>()) {
-      selected_entities.emplace_back(entityRef);
-    } else if (object.is<EntitySelection>()) {
-      selected_entities.merge(object.as<EntitySelection>().enumerate(entities));
-    } else {
-      THROW_SYNTAX_ERROR(
-        "Unexpected entity ", std::quoted(entityRef), " of type ",
-        std::quoted(object->type().name()), " is detected; this is a bug");
-    }
+    selected_entities.merge(entities.enumerate(entityRef));
   }
   return selected_entities;
 }

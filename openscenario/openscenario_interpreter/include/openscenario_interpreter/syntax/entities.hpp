@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
+#include <list>
 
 namespace openscenario_interpreter
 {
@@ -46,6 +47,8 @@ public:
   auto isAdded(const String &) const -> bool;
 
   auto ref(const String &) const -> Object;
+
+  auto enumerate(const String &) const -> std::list<String>;
 
   auto begin() const { return entities.begin(); }
 

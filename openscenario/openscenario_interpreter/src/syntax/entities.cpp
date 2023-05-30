@@ -49,5 +49,15 @@ auto Entities::ref(const String & entity_ref) const -> Object
     return entry->second;
   }
 }
+
+auto Entities::enumerate(const String & entity_ref) const -> std::list<String> {
+  if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
+    return { entity_ref };
+  } else if (object.is<EntitySelection>()) {
+    return object.as<EntitySelection>().enumerate(*this);
+  } else {
+    THROW_SYNTAX_ERROR("Unsupported entity type is specified");
+  }
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
