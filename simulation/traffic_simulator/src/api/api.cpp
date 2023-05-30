@@ -278,6 +278,9 @@ std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatus
   if (res.result().success()) {
     simulation_interface::toMsg(res.status().pose(), status.pose);
     simulation_interface::toMsg(res.status().action_status(), status.action_status);
+    // Temporarly deinitialize lanelet pose as it should be correctly filled from here
+    status.lanelet_pose_valid = false;
+    status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
     return status;
   }
   return std::nullopt;
@@ -297,22 +300,23 @@ bool API::updateEntityStatusInSim()
 bool API::updateFrame()
 {
   if (ego_entity_simulation_) {
-    ego_entity_simulation_->update(
-      clock_.getCurrentSimulationTime(), clock_.getStepTime(),
-      entity_manager_ptr_->isNpcLogicStarted());
+    if (configuration.standalone_mode) {
+      THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
+    }
     if (not entity_manager_ptr_->isEgoSpawned()) {
       THROW_SEMANTIC_ERROR("Malformed state: ego simulated but not registered in entity manager.");
     }
+
+    ego_entity_simulation_->update(
+      clock_.getCurrentSimulationTime(), clock_.getStepTime(),
+      entity_manager_ptr_->isNpcLogicStarted());
     auto ego_name = entity_manager_ptr_->getEgoName();
     auto ego_status = ego_entity_simulation_->getStatus();
-    if (not configuration.standalone_mode) {
-      auto ego_status_opt = updateEntityStatusInSim(entity_manager_ptr_->getEgoName(), ego_status);
-      if (ego_status_opt) {
-        ego_status = *ego_status_opt;
-      }
-    } else {
-      THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
+    auto ego_status_opt = updateEntityStatusInSim(entity_manager_ptr_->getEgoName(), ego_status);
+    if (ego_status_opt) {
+      ego_status = *ego_status_opt;
     }
+    refillEntityStatusWithLaneletData(ego_name, ego_status);
     // apply additional status data (from ll2) to ego_entity_simulation_ for this update
     entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
   }
@@ -349,6 +353,38 @@ bool API::updateFrame()
     return true;
   }
 }
+
+auto API::refillEntityStatusWithLaneletData(const std::string& name,
+      traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+  {
+    const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(entity_manager_ptr_->getRouteLanelets(name));
+
+    std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+
+    if (unique_route_lanelets.empty()) {
+      lanelet_pose =
+          entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+    } else {
+    lanelet_pose = entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+    if (!lanelet_pose) {
+      lanelet_pose =
+          entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+    }
+  }
+  if (lanelet_pose) {
+    math::geometry::CatmullRomSpline spline(
+           entity_manager_ptr_->getHdmapUtils()->getCenterPoints(lanelet_pose->lanelet_id));
+    if (const auto s_value = spline.getSValue(status.pose)) {
+      status.pose.position.z = spline.getPoint(s_value.value()).z;
+    }
+  }
+
+  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
+  if (status.lanelet_pose_valid) {
+    status.lanelet_pose = lanelet_pose.value();
+  }
+}
+
 
 void API::startNpcLogic()
 {

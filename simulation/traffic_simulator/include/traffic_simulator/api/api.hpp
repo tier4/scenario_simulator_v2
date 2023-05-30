@@ -353,6 +353,8 @@ private:
   bool updateEntityStatusInSim();
   std::optional<traffic_simulator_msgs::msg::EntityStatus>  updateEntityStatusInSim(const std::string& entity_name, traffic_simulator_msgs::msg::EntityStatus status);
   bool updateTrafficLightsInSim();
+  auto refillEntityStatusWithLaneletData(const std::string& name,
+                                                traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
 
   const Configuration configuration;
 
