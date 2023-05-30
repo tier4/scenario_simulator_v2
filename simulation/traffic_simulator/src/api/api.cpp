@@ -284,7 +284,9 @@ bool API::updateEntityStatusInSim()
 {
   bool success = true;
   for (const auto & name : entity_manager_ptr_->getEntityNames()) {
-    success &= static_cast<bool>(updateEntityStatusInSim(name));
+    if (!entity_manager_ptr_->isEgo(name)) {
+      success &= static_cast<bool>(updateEntityStatusInSim(name));
+    }
   }
   return success;
 }
@@ -308,6 +310,9 @@ bool API::updateFrame()
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
+    if (entity_manager_ptr_->isEgoSpawned()) {
+      updateEntityStatusInSim(entity_manager_ptr_->getEgoName());
+    }
     if (!updateEntityStatusInSim()) {
       return false;
     }
