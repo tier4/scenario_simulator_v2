@@ -267,16 +267,20 @@ bool API::updateTrafficLightsInSim()
   return res.result().success();
 }
 
-bool API::updateEntityStatusInSim(const std::string& entity_name, traffic_simulator_msgs::msg::EntityStatus status) {
+std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatusInSim(const std::string& entity_name, traffic_simulator_msgs::msg::EntityStatus status) {
   simulation_api_schema::UpdateEntityStatusRequest req;
   simulation_api_schema::EntityStatus proto;
   status.name = entity_name;
   simulation_interface::toProto(status, *req.mutable_status());
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
-  // TODO: Temporarily removed utilization of updated status - it was not filled and utilized before anyway. Bring it back though
 
-  return res.result().success();
+  if (res.result().success()) {
+    simulation_interface::toMsg(res.status().pose(), status.pose);
+    simulation_interface::toMsg(res.status().action_status(), status.action_status);
+    return status;
+  }
+  return std::nullopt;
 }
 
 bool API::updateEntityStatusInSim()
