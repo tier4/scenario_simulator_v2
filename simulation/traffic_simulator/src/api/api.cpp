@@ -301,6 +301,11 @@ bool API::updateFrame()
     }
     auto ego_name = entity_manager_ptr_->getEgoName();
     auto ego_status = ego_entity_simulation_->getStatus();
+    if (not configuration.standalone_mode) {
+      updateEntityStatusInSim(entity_manager_ptr_->getEgoName(), ego_status);
+    } else {
+      THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
+    }
     // apply additional status data (from ll2) to ego_entity_simulation_ for this update
     entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
   }
@@ -309,9 +314,6 @@ bool API::updateFrame()
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
-    if (entity_manager_ptr_->isEgoSpawned()) {
-      updateEntityStatusInSim(entity_manager_ptr_->getEgoName(), entity_manager_ptr_->getEntityStatus(entity_manager_ptr_->getEgoName()));
-    }
     if (!updateEntityStatusInSim()) {
       return false;
     }
