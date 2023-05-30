@@ -37,7 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TriggeringEntities
+struct TriggeringEntities : private Scope
 {
   const TriggeringEntitiesRule triggering_entities_rule;
 
@@ -46,7 +46,8 @@ struct TriggeringEntities
   template <typename Candidates>
   explicit TriggeringEntities(
     const pugi::xml_node & node, Scope & scope, const Candidates & candidates)
-  : triggering_entities_rule(
+  : Scope(scope),
+    triggering_entities_rule(
       readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)),
     entity_refs(readElements<EntityRef, 1>("EntityRef", node, scope, candidates))
   {
@@ -55,8 +56,12 @@ struct TriggeringEntities
   template <typename Predicate>
   auto apply(Predicate && predicate) const -> decltype(auto)
   {
+    auto entities = std::list<String>();
+    for (auto & entity_ref : entity_refs) {
+      entities.merge(global().entities->enumerate(entity_ref));
+    }
     return triggering_entities_rule.apply(
-      std::begin(entity_refs), std::end(entity_refs), std::forward<decltype(predicate)>(predicate));
+      std::begin(entities), std::end(entities), std::forward<decltype(predicate)>(predicate));
   }
 
   auto description() const -> String;
