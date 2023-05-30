@@ -27,10 +27,12 @@
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
+#include <geographic_msgs/msg/geo_point.hpp>
 #include <string>
 #include <thread>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
 #if __cplusplus
 extern "C" {
@@ -132,6 +134,8 @@ private:
   std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
   traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string& name);
   zeromq::MultiServer server_;
+  geographic_msgs::msg::GeoPoint getOrigin();
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
 };
 }  // namespace simple_sensor_simulator
 

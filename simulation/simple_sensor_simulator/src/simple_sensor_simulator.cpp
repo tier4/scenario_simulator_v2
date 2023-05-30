@@ -60,6 +60,23 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 {
 }
 
+geographic_msgs::msg::GeoPoint ScenarioSimulator::getOrigin()
+{
+  geographic_msgs::msg::GeoPoint origin;
+  {
+    if (!has_parameter("origin_latitude")) {
+      declare_parameter("origin_latitude", 0.0);
+    }
+    if (!has_parameter("origin_longitude")) {
+      declare_parameter("origin_longitude", 0.0);
+    }
+    get_parameter("origin_latitude", origin.latitude);
+    get_parameter("origin_longitude", origin.longitude);
+  }
+
+  return origin;
+}
+
 ScenarioSimulator::~ScenarioSimulator() {}
 
 int ScenarioSimulator::getSocketPort()
@@ -75,10 +92,10 @@ void ScenarioSimulator::initialize(
   initialized_ = true;
   realtime_factor_ = req.realtime_factor();
   step_time_ = req.step_time();
+  hdmap_utils_ = std::make_shared<hdmap_utils::HdMapUtils>(req.lanelet2_map_path(), getOrigin());
   res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
-  std::cout << "Lanelet map filepath " << req.lanelet2_map_path() << std::endl;
   ego_vehicles_ = {};
   vehicles_ = {};
   pedestrians_ = {};
