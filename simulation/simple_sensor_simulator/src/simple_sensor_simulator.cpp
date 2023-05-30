@@ -134,7 +134,19 @@ void ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
-  const simulation_api_schema::EntityStatus& updated_entity_status = entity_status_[req.status().name()] = req.status();
+  if (isEgo(req.status().name())) {
+    if (ego_entity_simulation_) {
+      ego_entity_simulation_->update(
+          current_time_ + step_time_, step_time_,
+          req.npc_logic_started());
+    }
+    simulation_api_schema::EntityStatus status;
+    simulation_interface::toProto(ego_entity_simulation_->getStatus(), status);
+    entity_status_[req.status().name()] = status;
+  } else {
+    entity_status_[req.status().name()] = req.status();
+  }
+  const simulation_api_schema::EntityStatus& updated_entity_status = entity_status_[req.status().name()];
   res = simulation_api_schema::UpdateEntityStatusResponse();
   res.mutable_status()->set_name(updated_entity_status.name());
   res.mutable_status()->mutable_action_status()->CopyFrom(updated_entity_status.action_status());
@@ -163,7 +175,6 @@ void ScenarioSimulator::spawnVehicleEntity(
 
     ego_entity_simulation_->refillEntityStatusWithLaneletData(initial_status);
     ego_entity_simulation_->setInitialStatus(initial_status);
-    std::cout << "Status in SSS: " << traffic_simulator_msgs::msg::to_yaml(ego_entity_simulation_->getStatus()) << std::endl;
   } else {
     vehicles_.emplace_back(req.parameters());
   }
@@ -227,6 +238,9 @@ void ScenarioSimulator::despawnEntity(
   misc_objects_ = misc_objects;
   if (found) {
     entity_status_.erase(req.name());
+    if (isEgo(req.name())) {
+      ego_entity_simulation_.reset();
+    }
     res.mutable_result()->set_success(true);
   } else {
     res.mutable_result()->set_success(false);
@@ -292,6 +306,15 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
     }
   }
   return traffic_simulator_msgs::BoundingBox();
+}
+
+bool ScenarioSimulator::isEgo(const std::string& name) {
+  for (const auto &ego: ego_vehicles_) {
+    if (ego.name() == name) {
+      return true;
+    }
+  }
+  return false;
 }
 }  // namespace simple_sensor_simulator
 

@@ -295,6 +295,7 @@ auto EgoEntitySimulation::setInitialStatus(const traffic_simulator_msgs::msg::En
 auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
 {
   traffic_simulator_msgs::msg::EntityStatus status;
+  status.name = status_.name;
   status.time = time;
   status.type = status_.type;
   status.bounding_box = status_.bounding_box;

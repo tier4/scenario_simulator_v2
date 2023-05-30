@@ -177,6 +177,7 @@ message DespawnEntityResponse {
  **/
 message UpdateEntityStatusRequest {
   EntityStatus status = 1;                 // Updated entity status in traffic simulator.
+  bool npc_logic_started = 2;              // Npc logic started flag
 }
 
 /**

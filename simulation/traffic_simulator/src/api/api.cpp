@@ -29,9 +29,6 @@ void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbo
 
 bool API::despawn(const std::string & name)
 {
-  if (entity_manager_ptr_->isEgo(name)) {
-    ego_entity_simulation_.reset();
-  }
   const auto result = entity_manager_ptr_->despawnEntity(name);
   if (!result) {
     return false;
@@ -272,6 +269,7 @@ std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatus
   simulation_api_schema::EntityStatus proto;
   status.name = entity_name;
   simulation_interface::toProto(status, *req.mutable_status());
+  req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
 
@@ -299,7 +297,7 @@ bool API::updateEntityStatusInSim()
 
 bool API::updateFrame()
 {
-  if (ego_entity_simulation_) {
+  if (entity_manager_ptr_->isEgoSpawned()) {
     if (configuration.standalone_mode) {
       THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
     }
@@ -307,17 +305,13 @@ bool API::updateFrame()
       THROW_SEMANTIC_ERROR("Malformed state: ego simulated but not registered in entity manager.");
     }
 
-    ego_entity_simulation_->update(
-      clock_.getCurrentSimulationTime(), clock_.getStepTime(),
-      entity_manager_ptr_->isNpcLogicStarted());
     auto ego_name = entity_manager_ptr_->getEgoName();
-    auto ego_status = ego_entity_simulation_->getStatus();
+    auto ego_status = entity_manager_ptr_->getEntityStatus(ego_name);
     auto ego_status_opt = updateEntityStatusInSim(entity_manager_ptr_->getEgoName(), ego_status);
     if (ego_status_opt) {
       ego_status = *ego_status_opt;
     }
     refillEntityStatusWithLaneletData(ego_name, ego_status);
-    // apply additional status data (from ll2) to ego_entity_simulation_ for this update
     entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
   }
 
@@ -432,9 +426,6 @@ void API::requestSpeedChange(const std::string & name, double target_speed, bool
 {
   assert(entity_manager_ptr_);
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
-  if (entity_manager_ptr_->isEgo(name) and not isNpcLogicStarted()) {
-    ego_entity_simulation_->requestSpeedChange(target_speed);
-  }
 }
 
 void API::requestSpeedChange(
@@ -443,9 +434,6 @@ void API::requestSpeedChange(
 {
   assert(entity_manager_ptr_);
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
-  if (entity_manager_ptr_->isEgo(name) and not isNpcLogicStarted()) {
-    ego_entity_simulation_->requestSpeedChange(target_speed);
-  }
 }
 
 void API::requestSpeedChange(

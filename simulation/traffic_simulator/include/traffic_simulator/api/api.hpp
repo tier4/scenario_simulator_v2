@@ -60,9 +60,6 @@ class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
 
-  // will be moved to simple_sensor_simulator
-  std::unique_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
-
 public:
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit API(NodeT && node, const Configuration & configuration = Configuration())
@@ -107,10 +104,6 @@ public:
         }
         if (entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
               name, pose, parameters, configuration, clock_.getStepTime())) {
-          ego_entity_simulation_ = std::make_unique<vehicle_simulation::EgoEntitySimulation>(
-            parameters, clock_.getStepTime(), entity_manager_ptr_->getHdmapUtils());
-          ego_entity_simulation_->setInitialStatus(entity_manager_ptr_->getEntityStatus(name));
-          std::cout << "Status in OSI: " << traffic_simulator_msgs::msg::to_yaml(ego_entity_simulation_->getStatus()) << std::endl;
           return true;
         }
         return false;

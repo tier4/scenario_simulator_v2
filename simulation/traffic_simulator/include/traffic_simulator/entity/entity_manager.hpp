@@ -45,7 +45,6 @@
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/conventional_traffic_light_manager.hpp>
 #include <traffic_simulator/traffic_lights/v2i_traffic_light_manager.hpp>
-#include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
