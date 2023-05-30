@@ -63,7 +63,7 @@ public:                                         \
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 
-/// @note Getters defined by this macro return stored values and setters are store values.
+/// @note Getters defined by this macro return stored values and setters store values.
 #define DEFINE_GETTER_SETTER(NAME, TYPE, FIELD_NAME)                   \
 public:                                                                \
   TYPE get##NAME() override { return FIELD_NAME; };                    \
