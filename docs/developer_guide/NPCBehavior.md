@@ -6,6 +6,16 @@ If you want to use your own behavior, please see [this document](BehaviorPlugin.
 In this document, we describe how default behavior tree NPC works in traffic environment.
 Default behavior tree NPC logics are in [this package](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/behavior_tree_plugin).
 
+## List of behaviors
+
+If you want to check detail, please check documents below.
+
+| Entity \ Behavior Type | Behavior-Tree                                         | Do-Nothing                                         |
+|------------------------|-------------------------------------------------------|----------------------------------------------------|
+| Vehicle                | [document](#vehicle-npc-with-behavior-tree-plugin)    | [document](#vehicle-npc-with-do-nothing-plugin)    |
+| Pedestrian             | [document](#pedestrian-npc-with-behavior-tree-plugin) | [document](#pedestrian-npc-with-do-nothing-plugin) |
+| MiscObject             | Does not exist.                                       | Does not exist.                                    |
+
 ## Vehicle NPC (with Behavior-Tree Plugin)
 Behavior tree of vehicle NPC is here.
 
