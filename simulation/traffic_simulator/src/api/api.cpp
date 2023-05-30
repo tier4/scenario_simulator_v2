@@ -267,9 +267,8 @@ bool API::updateTrafficLightsInSim()
   return res.result().success();
 }
 
-bool API::updateEntityStatusInSim(const std::string& entity_name) {
+bool API::updateEntityStatusInSim(const std::string& entity_name, traffic_simulator_msgs::msg::EntityStatus status) {
   simulation_api_schema::UpdateEntityStatusRequest req;
-  auto status = entity_manager_ptr_->getEntityStatus(entity_name);
   simulation_api_schema::EntityStatus proto;
   status.name = entity_name;
   simulation_interface::toProto(status, *req.mutable_status());
@@ -285,7 +284,7 @@ bool API::updateEntityStatusInSim()
   bool success = true;
   for (const auto & name : entity_manager_ptr_->getEntityNames()) {
     if (!entity_manager_ptr_->isEgo(name)) {
-      success &= static_cast<bool>(updateEntityStatusInSim(name));
+      success &= static_cast<bool>(updateEntityStatusInSim(name, entity_manager_ptr_->getEntityStatus(name)));
     }
   }
   return success;
@@ -311,7 +310,7 @@ bool API::updateFrame()
 
   if (not configuration.standalone_mode) {
     if (entity_manager_ptr_->isEgoSpawned()) {
-      updateEntityStatusInSim(entity_manager_ptr_->getEgoName());
+      updateEntityStatusInSim(entity_manager_ptr_->getEgoName(), entity_manager_ptr_->getEntityStatus(entity_manager_ptr_->getEgoName()));
     }
     if (!updateEntityStatusInSim()) {
       return false;
