@@ -15,6 +15,7 @@
 #ifndef GEOMETRY__SOLVER__POLYNOMIAL_SOLVER_HPP_
 #define GEOMETRY__SOLVER__POLYNOMIAL_SOLVER_HPP_
 
+#include <complex>
 #include <vector>
 
 namespace math
@@ -25,81 +26,107 @@ class PolynomialSolver
 {
 public:
   /**
- * @brief solve linear equation a*x + b = 0
- *
- * @param a
- * @param b
- * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
- */
-  std::vector<double> solveLinearEquation(
-    double a, double b, double min_value = 0, double max_value = 1) const;
+   * @brief solve linear equation a*x + b = 0
+   *
+   * @param a
+   * @param b
+   * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
+   */
+  auto solveLinearEquation(
+    const double a, const double b, const double min_value = 0, const double max_value = 1) const
+    -> std::vector<double>;
   /**
- * @brief solve quadratic equation a*x^2 + b*x + c = 0
- *
- * @param a
- * @param b
- * @return std::vector<double> real root of the quadratic functions (from 0 to 1)
- */
-  std::vector<double> solveQuadraticEquation(
-    double a, double b, double c, double min_value = 0, double max_value = 1) const;
+   * @brief solve quadratic equation a*x^2 + b*x + c = 0
+   *
+   * @param a
+   * @param b
+   * @return std::vector<double> real solution of the quadratic functions (from min_value to max_value)
+   */
+  auto solveQuadraticEquation(
+    const double a, const double b, const double c, const double min_value = 0,
+    const double max_value = 1) const -> std::vector<double>;
   /**
- * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
- *
- * @param a
- * @param b
- * @param c
- * @param d
- * @return std::vector<double> real root of the cubic functions (from 0 to 1)
- */
-  std::vector<double> solveCubicEquation(
-    double a, double b, double c, double d, double min_value = 0, double max_value = 1) const;
+   * @brief solve cubic function a*t^3 + b*t^2 + c*t + d = 0
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @return std::vector<double> real solution of the cubic functions (from min_value to max_value)
+   */
+  auto solveCubicEquation(
+    const double a, const double b, const double c, const double d, const double min_value = 0,
+    const double max_value = 1) const -> std::vector<double>;
   /**
- * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
- *
- * @param a
- * @param b
- * @param c
- * @param d
- * @param t
- * @return double result of cubic function
- */
-  double cubicFunction(double a, double b, double c, double d, double t) const;
+   * @brief calculate result of linear function a*t + b
+   *
+   * @param a
+   * @param b
+   * @param t
+   * @return double result of linear function
+   */
+  auto linear(const double a, const double b, const double t) const -> double;
   /**
- * @brief calculate result of quadratic function a*t^2 + b*t + c
- *
- * @param a
- * @param b
- * @param c
- * @param t
- * @return double result of quadratic function
- */
-  double quadraticFunction(double a, double b, double c, double t) const;
+   * @brief calculate result of quadratic function a*t^2 + b*t + c
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param t
+   * @return double result of quadratic function
+   */
+  auto quadratic(const double a, const double b, const double c, const double t) const -> double;
   /**
- * @brief calculate result of quadratic function a*t + b
- *
- * @param a
- * @param b
- * @param t
- * @return double result of quadratic function
- */
-  double linearFunction(double a, double b, double t) const;
+   * @brief calculate result of cubic function a*t^3 + b*t^2 + c*t + d
+   *
+   * @param a
+   * @param b
+   * @param c
+   * @param d
+   * @param t
+   * @return double result of cubic function
+   */
+  auto cubic(const double a, const double b, const double c, const double d, const double t) const
+    -> double;
+  /**
+   * @brief Hard coded parameter, tolerance of calculation results of the PolynomialSolver.
+   * This value was determined by Masaya Kataoka (@hakuturu583).
+   * The reason this value is not std::numeric_limits<double>::epsilon is that when using 
+   * this set of functions to find the intersection of a Catmull-Rom spline curve and a line segment, 
+   * it was confirmed that when the solution is very close to the endpoints of the Hermite curves 
+   * that make up the Catmull-Rom spline, the solution could not calculated.
+   * When considering a 1 km long Catmull-Rom spline (assuming a very long lanelet) with a tolerance of 1e-7, 
+   * the error in calculating the intersection position in a tangentially distorted coordinate system was ±0.0001 m.
+   * This value is sufficiently small that it was tentatively determined to be 1e-7.
+   */
+  constexpr static double tolerance = 1e-7;
 
 private:
   /**
- * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0, this code is public domain
- * @sa http://math.ivanovo.ac.ru/dalgebra/Khashin/poly/index.html
- * @param x
- * @param a
- * @param b
- * @param c
- * @return int
-           if return value is 3, 3 real roots: x[0], x[1], x[2],
-           if return value is 2, 2 real roots: x[0], x[1],
-           if return value is 1, 1 real root : x[0], x[1] ± i*x[2],
- */
-  int solveP3(std::vector<double> & x, double a, double b, double c) const;
-  double _root3(double x) const;
-  double root3(double x) const;
+   * @brief solve cubic equation x^3 + a*x^2 + b*x + c = 0
+   * @param a 
+   * @param b 
+   * @param c 
+   * @return std::vector<std::complex<double>> Up to 3 complex solutions
+   */
+  auto solveMonicCubicEquationWithComplex(const double a, const double b, const double c) const
+    -> std::vector<std::complex<double>>;
+  /**
+   * @brief filter values by range.
+   * @param values the values you want to check.
+   * @return std::vector<double> filtered values.
+   */
+  auto filterByRange(
+    const std::vector<double> & values, const double min_value, const double max_value) const
+    -> std::vector<double>;
+  /**
+   * @brief check the value0 and value1 is equal or not with considering tolerance.
+   * @param value0 the value you want to compare
+   * @param value1 the value you want to compared
+   * @return true value0 and value1 are equal
+   * @return false value0 and value1 are not equal
+   */
+  auto isApproximatelyEqualTo(const double value0, const double value1) const -> bool;
 };
 }  // namespace geometry
 }  // namespace math
