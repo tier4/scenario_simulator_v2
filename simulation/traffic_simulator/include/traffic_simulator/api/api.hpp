@@ -351,6 +351,7 @@ public:
 
 private:
   bool updateEntityStatusInSim();
+  bool updateEntityStatusInSim(const std::string& entity_name);
   bool updateTrafficLightsInSim();
 
   const Configuration configuration;
