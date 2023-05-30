@@ -83,6 +83,7 @@ message InitializeRequest {
   double step_time = 2;                            // Step time of the simulation.
   double initialize_time = 3;                      // Simulation time at initialization
   builtin_interfaces.Time initialize_ros_time = 4; // ROS time at initialization
+  string lanelet2_map_path = 5;                    // Path to lanelet2 map file
 }
 
 /**

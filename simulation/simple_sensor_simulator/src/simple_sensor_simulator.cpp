@@ -78,6 +78,7 @@ void ScenarioSimulator::initialize(
   res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
+  std::cout << "Lanelet map filepath " << req.lanelet2_map_path() << std::endl;
   ego_vehicles_ = {};
   vehicles_ = {};
   pedestrians_ = {};
