@@ -39,6 +39,7 @@ public:
    */
   const std::string & getCurrentAction() const override;
 
+/// @note Getters defined by this macro return default values and setters are behaved as no-operation functions.
 #define DEFINE_GETTER_SETTER(NAME, TYPE)        \
 public:                                         \
   TYPE get##NAME() override { return TYPE(); }; \
@@ -62,6 +63,7 @@ public:                                         \
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 
+/// @note Getters defined by this macro return stored values and setters are store values.
 #define DEFINE_GETTER_SETTER(NAME, TYPE, FIELD_NAME)                   \
 public:                                                                \
   TYPE get##NAME() override { return FIELD_NAME; };                    \
