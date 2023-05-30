@@ -27,6 +27,7 @@ EntityAction::EntityAction(const pugi::xml_node & node, Scope & scope)
     choice(node,
       std::make_pair(   "AddEntityAction", [&](auto && node) { return make<   AddEntityAction>(node, scope); }),
       std::make_pair("DeleteEntityAction", [&](auto && node) { return make<DeleteEntityAction>(node, scope); }))),
+  Scope(scope),
   entity_ref(readNameRef("entityRef", node, scope, scope.entities(true)))
 // clang-format on
 {
@@ -40,7 +41,11 @@ auto EntityAction::run() noexcept -> void {}
 
 auto EntityAction::start() const -> void
 {
-  return apply<void>([this](auto && action) { return action(entity_ref); }, *this);
+  return apply<void>([this](auto && action) {
+    for (const auto & entity : global().entities->enumerate(entity_ref)) {
+      action(entity);
+    }
+  }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
