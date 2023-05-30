@@ -29,6 +29,8 @@ struct SelectedEntityRefs : public Object
   const std::list<EntityRef> entityRefs;
 
   SelectedEntityRefs(const pugi::xml_node &, Scope &);
+
+  auto enumerate(const Entities & entities) -> std::list<String>;
 };
 
 struct SelectedByTypes : public Object
@@ -36,6 +38,8 @@ struct SelectedByTypes : public Object
   const std::list<ByType> byTypes;
 
   SelectedByTypes(const pugi::xml_node &, Scope &);
+
+  auto enumerate(const Entities & entities) -> std::list<String>;
 };
 
 /* ---- SelectedEntities -------------------------------------------------------
@@ -48,9 +52,11 @@ struct SelectedByTypes : public Object
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SelectedEntities : ComplexType
+struct SelectedEntities : public ComplexType
 {
   SelectedEntities(const pugi::xml_node &, Scope &);
+
+  auto enumerate(const Entities & entities) -> std::list<String>;
 };
 
 DEFINE_LAZY_VISITOR(SelectedEntities, CASE(SelectedEntityRefs), CASE(SelectedByTypes));
