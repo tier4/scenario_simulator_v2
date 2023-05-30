@@ -304,6 +304,12 @@ bool API::updateFrame()
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
+    if (!updateEntityStatusInSim()) {
+      return false;
+    }
+    if (!updateTrafficLightsInSim()) {
+      return false;
+    }
     simulation_api_schema::UpdateFrameRequest req;
     req.set_current_time(clock_.getCurrentSimulationTime());
     simulation_interface::toProto(
@@ -317,10 +323,7 @@ bool API::updateFrame()
     clock_.update();
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    if (!updateEntityStatusInSim()) {
-      return false;
-    }
-    return updateTrafficLightsInSim();
+    return true;
   } else {
     entity_manager_ptr_->broadcastEntityTransform();
     clock_.update();
