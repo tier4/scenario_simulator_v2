@@ -152,6 +152,18 @@ void ScenarioSimulator::spawnVehicleEntity(
   }
   if (req.is_ego()) {
     ego_vehicles_.emplace_back(req.parameters());
+    traffic_simulator_msgs::msg::VehicleParameters parameters;
+    simulation_interface::toMsg(req.parameters(), parameters);
+    ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(parameters, step_time_,
+                                                                                       hdmap_utils_);
+    traffic_simulator_msgs::msg::EntityStatus initial_status;
+    initial_status.name = parameters.name;
+    simulation_interface::toMsg(req.pose(), initial_status.pose);
+    initial_status.bounding_box = parameters.bounding_box;
+
+    ego_entity_simulation_->refillEntityStatusWithLaneletData(initial_status);
+    ego_entity_simulation_->setInitialStatus(initial_status);
+    std::cout << "Status in SSS: " << traffic_simulator_msgs::msg::to_yaml(ego_entity_simulation_->getStatus()) << std::endl;
   } else {
     vehicles_.emplace_back(req.parameters());
   }

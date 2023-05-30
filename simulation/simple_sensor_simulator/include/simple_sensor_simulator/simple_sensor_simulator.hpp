@@ -33,6 +33,7 @@
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 
 #if __cplusplus
 extern "C" {
@@ -136,6 +137,7 @@ private:
   zeromq::MultiServer server_;
   geographic_msgs::msg::GeoPoint getOrigin();
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+  std::shared_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
 };
 }  // namespace simple_sensor_simulator
 
