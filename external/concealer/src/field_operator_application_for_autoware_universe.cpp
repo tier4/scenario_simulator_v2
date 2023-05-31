@@ -67,10 +67,9 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   }
 }
 
-bool FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommands(
+auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommands(
   const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array,
-  const std::string & module_name, const bool activate)
-  ->void
+  const std::string & module_name, const bool activate) -> bool
 {
   auto cooperate_status = std::find_if(
     cooperate_status_array.statuses.begin(), cooperate_status_array.statuses.end(),
