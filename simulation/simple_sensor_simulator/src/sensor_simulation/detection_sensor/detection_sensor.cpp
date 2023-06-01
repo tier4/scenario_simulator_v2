@@ -24,6 +24,7 @@
 #include <simulation_interface/conversions.hpp>
 #include <string>
 #include <vector>
+#include "perception_utils/conversion.hpp"
 
 namespace simple_sensor_simulator
 {
@@ -87,6 +88,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     const std::vector<std::string> detected_objects{
       configuration_.filter_by_range() ? getDetectedObjects(statuses) : lidar_detected_entity};
     autoware_auto_perception_msgs::msg::DetectedObjects msg;
+    autoware_auto_perception_msgs::msg::TrackedObjects gt_msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = "map";
     last_update_stamp_ = current_time;
@@ -96,6 +98,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
           detected_objects.end() and
         status.type().type() != traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
         autoware_auto_perception_msgs::msg::DetectedObject object;
+        // autoware_auto_perception_msgs::msg::TrackedObject gt_object;
         switch (status.subtype().value()) {
           case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
             object.classification.push_back(makeObjectClassification(
@@ -156,6 +159,13 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         simulation_interface::toMsg(
           status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
         object.shape.type = object.shape.BOUNDING_BOX;
+        const auto gt_object = perception_utils::toTrackedObject(object);
+        // gt_object.kinematics = object.kinematics;
+        // gt_object.shape = object.shape;
+        // gt_object.classification = object.classification;
+        // gt_object.existence_probability = 1.0;
+        
+        gt_msg.objects.push_back(gt_object);
 
         if (auto probability_of_lost = std::uniform_real_distribution();
             probability_of_lost(random_engine_) > configuration_.probability_of_lost()) {

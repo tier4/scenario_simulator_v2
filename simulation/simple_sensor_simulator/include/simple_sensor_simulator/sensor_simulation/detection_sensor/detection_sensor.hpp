@@ -16,8 +16,9 @@
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
 
 #include <simulation_api_schema.pb.h>
-
+#include "unique_identifier_msgs/msg/uuid.hpp"
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
 #include <memory>
 #include <queue>
 #include <random>
@@ -60,6 +61,9 @@ template <typename T>
 class DetectionSensor : public DetectionSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
+  const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
+    ground_truth_publisher_ptr_;
+  const std::vector<unique_identifier_msgs::msg::UUID> uuids_;
 
   std::mt19937 random_engine_;
 
@@ -72,9 +76,12 @@ public:
   explicit DetectionSensor(
     const double current_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
-    const typename rclcpp::Publisher<T>::SharedPtr & publisher)
+    const typename rclcpp::Publisher<T>::SharedPtr & publisher,
+    const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr &
+      ground_truth_publisher)
   : DetectionSensorBase(current_time, configuration),
     publisher_ptr_(publisher),
+    ground_truth_publisher_ptr_(ground_truth_publisher),
     random_engine_(configuration.random_seed())
   {
   }
