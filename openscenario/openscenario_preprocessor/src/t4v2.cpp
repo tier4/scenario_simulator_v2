@@ -177,25 +177,44 @@ std::pair<boost::filesystem::path, boost::filesystem::path> T4V2::splitScenarioM
 
   auto scenario_string = scenario_ss.str();
 
-  std::regex re("(.*\n|^)(OpenSCENARIO.*)");
-  std::smatch match;
+  ;
+  if (auto modifiers_pos = scenario_string.find("ScenarioModifiers");
+      modifiers_pos != std::string::npos) {
+    auto openscenario_pos = scenario_string.find("OpenSCENARIO");
 
-  if (std::regex_search(scenario_string, match, re)) {
+    if (openscenario_pos == std::string::npos) {
+      throw std::runtime_error(
+        "No OpenSCENARIO element found in TIER IV 2.0 Format Scenario. Please check your "
+        "scenario.");
+    }
+
     std::ofstream modifiers_ofs("/tmp/openscenario_preprocessor/t4v2_modifiers.yaml");
-    modifiers_ofs << scenario_string.substr(0, match.position(2));
-    modifiers_ofs.close();
-
     std::ofstream base_scenario_ofs("/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
-    base_scenario_ofs << scenario_string.substr(match.position(2));
-    base_scenario_ofs.close();
 
+    if (openscenario_pos > modifiers_pos) {
+      std::regex re("(.*\n|^)(OpenSCENARIO.*)");
+      std::smatch match;
+      std::regex_search(scenario_string, match, re);
+      modifiers_ofs << scenario_string.substr(0, match.position(2));
+      base_scenario_ofs << scenario_string.substr(match.position(2));
+    } else {
+      std::regex re("(.*\n|^)(ScenarioModifiers.*)");
+      std::smatch match;
+      std::regex_search(scenario_string, match, re);
+      base_scenario_ofs << scenario_string.substr(0, match.position(2));
+      modifiers_ofs << scenario_string.substr(match.position(2));
+    }
+    modifiers_ofs.close();
+    base_scenario_ofs.close();
     return std::make_pair<boost::filesystem::path, boost::filesystem::path>(
       "/tmp/openscenario_preprocessor/t4v2_modifiers.yaml",
       "/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
   } else {
-    throw std::runtime_error(
-      "No OpenSCENARIO element found in TIER IV 2.0 Format Scenario. Please check your "
-      "scenario.");
+    std::ofstream base_scenario_ofs("/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
+    base_scenario_ofs << scenario_string;
+    base_scenario_ofs.close();
+    return std::make_pair<boost::filesystem::path, boost::filesystem::path>(
+      "", "/tmp/openscenario_preprocessor/t4v2_openscenario.yaml");
   }
 }
 

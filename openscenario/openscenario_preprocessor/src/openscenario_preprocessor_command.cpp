@@ -172,17 +172,17 @@ try {
         skip_full_derivation_option) {
         auto derived_scenario_paths = preprocessor.getPreprocessedScenarios();
         while (not derived_scenario_paths.empty()) {
-
           // 1. copy scenario content to stringstream
           std::cout << "1. copy scenario content to stringstream" << std::endl;
           std::stringstream scenario_ss;
           std::ifstream input_scenario_file{derived_scenario_paths.front().string()};
-          if(not input_scenario_file){
+          if (not input_scenario_file) {
             std::stringstream what;
             what << "Cannot open scenario file : " << derived_scenario_paths.front().string();
             throw std::runtime_error(what.str());
-          }else{
-              std::cout << "opened scenario file : " << derived_scenario_paths.front().string() << std::endl;
+          } else {
+            std::cout << "opened scenario file : " << derived_scenario_paths.front().string()
+                      << std::endl;
           }
           scenario_ss << input_scenario_file.rdbuf();
           std::string scenario_str = scenario_ss.str();
@@ -199,7 +199,7 @@ try {
           std::stringstream merged_scenario_ss;
 
           std::ifstream modifiers_file{scenario_modifiers_path.string()};
-          if(not modifiers_file){
+          if (not modifiers_file) {
             std::stringstream what;
             what << "Cannot open scenario modifiers file : " << scenario_modifiers_path.string();
             throw std::runtime_error(what.str());
@@ -225,16 +225,15 @@ try {
           std::cout << "written scenario content : " << merged_scenario_ss.str() << std::endl;
           std::cout << "-------------------------------------" << std::endl;
 
-//          std::ofstream scenario_file(derived_scenario_paths.front().string(), std::ios::trunc);
-//          if(not scenario_file){
-//            std::stringstream what;
-//            what << "Cannot open scenario file : " << derived_scenario_paths.front().string();
-//            throw std::runtime_error(what.str());
-//          }
-//          scenario_file << merged_scenario_ss.str();
-//          scenario_file.close();
+          //          std::ofstream scenario_file(derived_scenario_paths.front().string(), std::ios::trunc);
+          //          if(not scenario_file){
+          //            std::stringstream what;
+          //            what << "Cannot open scenario file : " << derived_scenario_paths.front().string();
+          //            throw std::runtime_error(what.str());
+          //          }
+          //          scenario_file << merged_scenario_ss.str();
+          //          scenario_file.close();
           std::cout << "scenario file closed" << std::endl;
-
 
           modifiers_file.close();
           derived_scenario_paths.pop();
