@@ -172,19 +172,71 @@ try {
         skip_full_derivation_option) {
         auto derived_scenario_paths = preprocessor.getPreprocessedScenarios();
         while (not derived_scenario_paths.empty()) {
-          std::ifstream input_scenario_file{derived_scenario_paths.front().string()};
+
+          // 1. copy scenario content to stringstream
+          std::cout << "1. copy scenario content to stringstream" << std::endl;
           std::stringstream scenario_ss;
+          std::ifstream input_scenario_file{derived_scenario_paths.front().string()};
+          if(not input_scenario_file){
+            std::stringstream what;
+            what << "Cannot open scenario file : " << derived_scenario_paths.front().string();
+            throw std::runtime_error(what.str());
+          }else{
+              std::cout << "opened scenario file : " << derived_scenario_paths.front().string() << std::endl;
+          }
           scenario_ss << input_scenario_file.rdbuf();
+          std::string scenario_str = scenario_ss.str();
           input_scenario_file.close();
 
-          std::ofstream scenario_file{derived_scenario_paths.front().string()};
+          std::cout << "file closed" << std::endl;
+          std::cout << "-------------------------------------" << std::endl;
+          std::cout << "copied scenario content : " << scenario_str << std::endl;
+          std::cout << "-------------------------------------" << std::endl;
+
+          // 2. write scenario modifiers to scenario file
+          std::cout << "2. write scenario modifiers to scenario file" << std::endl;
+
+          std::stringstream merged_scenario_ss;
+
           std::ifstream modifiers_file{scenario_modifiers_path.string()};
-          scenario_file << modifiers_file.rdbuf();
+          if(not modifiers_file){
+            std::stringstream what;
+            what << "Cannot open scenario modifiers file : " << scenario_modifiers_path.string();
+            throw std::runtime_error(what.str());
+          }
+
+          std::cout << "append scenario modifiers to scenario file" << std::endl;
+          std::cout << "-------------------------------------" << std::endl;
+          std::cout << "scenario modifiers content : " << modifiers_file.rdbuf() << std::endl;
+          std::cout << "-------------------------------------" << std::endl;
+          merged_scenario_ss << modifiers_file.rdbuf() << std::endl;
+
+          std::cout << "scenario modifiers file closed" << std::endl;
+
+          std::cout << "-------------------------------------" << std::endl;
+          std::cout << "merged_scenario_ss : " << merged_scenario_ss.str() << std::endl;
+          std::cout << "-------------------------------------" << std::endl;
+          std::cout << std::endl;
+          std::cout << std::endl;
+
+          merged_scenario_ss << scenario_str << std::endl;
+          std::cout << "scenario content to be written" << std::endl;
+          std::cout << "-------------------------------------" << std::endl;
+          std::cout << "written scenario content : " << merged_scenario_ss.str() << std::endl;
+          std::cout << "-------------------------------------" << std::endl;
+
+//          std::ofstream scenario_file(derived_scenario_paths.front().string(), std::ios::trunc);
+//          if(not scenario_file){
+//            std::stringstream what;
+//            what << "Cannot open scenario file : " << derived_scenario_paths.front().string();
+//            throw std::runtime_error(what.str());
+//          }
+//          scenario_file << merged_scenario_ss.str();
+//          scenario_file.close();
+          std::cout << "scenario file closed" << std::endl;
+
+
           modifiers_file.close();
-
-          scenario_file << scenario_ss.str();
-          scenario_file.close();
-
           derived_scenario_paths.pop();
         }
       }
