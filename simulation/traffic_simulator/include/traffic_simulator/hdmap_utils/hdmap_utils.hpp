@@ -200,7 +200,7 @@ public:
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along) const;
   std::vector<geometry_msgs::msg::Point> getLeftBound(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getRightBound(std::int64_t lanelet_id) const;
-  
+
   using LaneletId = std::int64_t;
 
   auto isTrafficLight(const LaneletId) const -> bool;
