@@ -189,6 +189,11 @@ auto isEssentiallyEqualTo(T a, T b)
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
+  /*
+     The following code implements the steering behavior known as "seek". See
+     "Steering Behaviors For Autonomous Characters" by Craig Reynolds for more
+     information.
+  */
   if (getBlackBoardValues();
       request == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY and
       getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) and
@@ -203,6 +208,10 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     */
     const auto target_position = parameter->shape.vertices.front().position.position;
 
+    /*
+       Note: If not dynamic_constraints_ignorable, the linear distance should
+       cause problems.
+    */
     const auto distance = hypot(position, target_position);  // [m]
 
     const auto remaining_time = [this]() {
@@ -258,7 +267,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        exactly at the specified time (= time remaining at zero).
 
        If no arrival time is specified for subsequent waypoints, there is no
-       need to accelerate or decelerate, so the current speed remains the
+       need to accelerate or decelerate, so the current speed will be the
        desired speed.
     */
     const auto desired_speed = std::isinf(remaining_time) ? speed : distance / remaining_time;
@@ -325,8 +334,31 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       }
     }
 
-    const auto desired_velocity = normalize(target_position - position) * max_speed;  // [m/s]
+    const auto desired_velocity = [&]() {
+      /*
+         Note: The followingMode in OpenSCENARIO is passed as variable
+         dynamic_constraints_ignoreable. the value of the variable is
+         `followingMode == position`.
+      */
+      if (parameter->dynamic_constraints_ignorable) {
+        return normalize(target_position - position) * max_speed;  // [m/s]
+      } else {
+        /*
+           Note: The vector returned if dynamic_constraints_ignoreable == true
+           ignores parameters such as the maximum rudder angle of the vehicle
+           entry. In this clause, such parameters must be respected and the
+           rotation angle difference of the z-axis center of the vector must be
+           kept below a certain value.
+        */
+        throw common::SimulationError("The followingMode is only supported for position.");
+      }
+    }();
 
+    /*
+       Note: If obstacle avoidance is to be implemented, the steering behavior
+       known by the name "collision avoidance" should be synthesized here into
+       steering.
+    */
     const auto steering = desired_velocity - velocity;
 
     velocity = truncate(velocity + steering, max_speed);

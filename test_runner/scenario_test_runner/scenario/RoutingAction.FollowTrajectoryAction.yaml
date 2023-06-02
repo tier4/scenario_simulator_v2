@@ -78,7 +78,7 @@ OpenSCENARIO:
                         offset: 0
                         scale: 1
                     TrajectoryFollowingMode:
-                      followingMode: follow
+                      followingMode: position
                     TrajectoryRef:
                       Trajectory:
                         closed: false
