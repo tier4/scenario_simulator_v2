@@ -253,11 +253,17 @@ auto EntityManager::getLongitudinalDistance(
   bool include_adjacent_lanelet, bool include_opposite_direction) -> std::optional<double>
 {
   if (!include_adjacent_lanelet) {
+
+    auto to_canonicalized = static_cast<LaneletPose>(to);
+    if (to.hasAlternativeLaneletPose()) {
+      to_canonicalized = to.getAlternativeLaneletPoseBaseOnShortestRouteFrom(static_cast<LaneletPose>(from), hdmap_utils_ptr_);
+    }
+
     auto forward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
-      from.getNonCanonicalizedLaneletPose(), to.getNonCanonicalizedLaneletPose());
+      static_cast<LaneletPose>(from), to_canonicalized);
 
     auto backward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
-      to.getNonCanonicalizedLaneletPose(), from.getNonCanonicalizedLaneletPose());
+      to_canonicalized, static_cast<LaneletPose>(from));
 
     if (forward_distance && backward_distance) {
       if (forward_distance.value() > backward_distance.value()) {

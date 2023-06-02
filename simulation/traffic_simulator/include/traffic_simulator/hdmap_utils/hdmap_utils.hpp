@@ -67,6 +67,9 @@ class HdMapUtils
 public:
   explicit HdMapUtils(const boost::filesystem::path &, const geographic_msgs::msg::GeoPoint &);
 
+  auto canonicalizeAllLaneletPose(
+    const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+    -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
   auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
     -> std::tuple<
       std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<std::int64_t>>;

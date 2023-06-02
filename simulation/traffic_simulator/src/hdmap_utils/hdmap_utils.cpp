@@ -85,6 +85,37 @@ HdMapUtils::HdMapUtils(
     lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
+auto HdMapUtils::canonicalizeAllLaneletPose(
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+  -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
+{
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> canonicalized_all;
+  auto canonicalized = lanelet_pose;
+  while (canonicalized.s < 0) {
+    if (const auto ids = getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+      return canonicalized_all;
+    } else {
+      for (const auto id : ids) {
+        canonicalized.s = lanelet_pose.s + getLaneletLength(id);
+        canonicalized.lanelet_id = id;
+        canonicalized_all.push_back(canonicalized);
+      }
+    }
+  }
+  while (canonicalized.s > (getLaneletLength(canonicalized.lanelet_id) + 0.2)) {
+    if (const auto ids = getNextLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+      return canonicalized_all;
+    } else {
+      for (const auto id : ids) {
+        canonicalized.s = lanelet_pose.s - getLaneletLength(id);
+        canonicalized.lanelet_id = id;
+        canonicalized_all.push_back(canonicalized);
+      }
+    }
+  }
+  return canonicalized_all;
+}
+
 // If route is not specified, the lanelet_id with the lowest array index is used as a candidate for canonicalize destination.
 auto HdMapUtils::canonicalizeLaneletPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const

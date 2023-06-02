@@ -23,7 +23,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPose & maybe_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
-  non_canonicalized_lanelet_pose(maybe_non_canonicalized_lanelet_pose),
+  lanelet_poses_(hdmap_utils->canonicalizeAllLaneletPose(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
 {
 }
@@ -33,7 +33,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
   const std::vector<std::int64_t> & route_lanelets)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils, route_lanelets)),
-  non_canonicalized_lanelet_pose(maybe_non_canonicalized_lanelet_pose),
+  lanelet_poses_(hdmap_utils->canonicalizeAllLaneletPose(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
 {
 }
@@ -77,6 +77,22 @@ auto CanonicalizedLaneletPose::canonicalize(
       ",rpy.z=", may_non_canonicalized_lanelet_pose.rpy.z,
       ") is invalid, please check lanelet length, connection and entity route.");
   }
+}
+
+auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
+  LaneletPose from,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) const -> LaneletPose
+{
+    std::vector<std::int64_t> shortest_route = hdmap_utils->getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
+    LaneletPose alternative_lanelet_pose = lanelet_poses_[0];
+    for (const auto laneletPose : lanelet_poses_) {
+      auto route = hdmap_utils->getRoute(from.lanelet_id, laneletPose.lanelet_id);
+      if (shortest_route.size() > route.size()) {
+          shortest_route = route;
+          alternative_lanelet_pose = laneletPose;
+      }
+    }
+    return alternative_lanelet_pose;
 }
 }  // namespace lanelet_pose
 
