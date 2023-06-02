@@ -175,6 +175,7 @@ public:
     const std::vector<std::int64_t> & lanelet_ids, const char subtype[]) const;
   std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id) const;
+  std::vector<int64_t> getStopLineIdsOnPath(const std::vector<std::int64_t> & route_lanelets) const;
   std::vector<std::int64_t> getTrafficLightIds() const;
   std::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, const std::string &) const;
@@ -199,8 +200,6 @@ public:
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along) const;
   std::vector<geometry_msgs::msg::Point> getLeftBound(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getRightBound(std::int64_t lanelet_id) const;
-  std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(
-    const std::vector<std::int64_t> & lanelet_ids) const;
   using LaneletId = std::int64_t;
 
   auto isTrafficLight(const LaneletId) const -> bool;
@@ -232,6 +231,8 @@ private:
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
   getTrafficLightRegElementsOnPath(const std::vector<std::int64_t> & lanelet_ids) const;
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
+    const std::vector<std::int64_t> & lanelet_ids) const;
+  std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(
     const std::vector<std::int64_t> & lanelet_ids) const;
   geometry_msgs::msg::Vector3 getVectorFromPose(
     const geometry_msgs::msg::Pose & pose, double magnitude) const;
