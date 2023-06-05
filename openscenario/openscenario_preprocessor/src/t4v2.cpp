@@ -327,36 +327,36 @@ auto T4V2::deriveScenarioWithScenarioModifiers(
   return derived_scripts;
 }
 
-template <class XMLClass>
-void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
-{
-  switch (yaml.Type()) {
-    case YAML::NodeType::Scalar:
-      break;
-    case YAML::NodeType::Sequence:
-      break;
-    case YAML::NodeType::Map:
-      for (const auto & element : yaml) {
-        auto key = element.first.as<std::string>();
-        if (element.second.IsScalar()) {
-          xml.append_attribute(key.c_str()).set_value(element.second.as<std::string>().c_str());
-        } else if (element.second.IsSequence()) {
-          for (const auto & sequence_element : element.second) {
-            auto child = xml.append_child(key.c_str());
-            convertYAMLtoXML(sequence_element, child);
-          }
-        } else {
-          auto child = xml.append_child(key.c_str());
-          convertYAMLtoXML(element.second, child);
-        }
-      }
-      break;
-    case YAML::NodeType::Null:
-      break;
-    default:
-      throw std::runtime_error("Unknown YAML node type");
-  }
-}
+//template <class XMLClass>
+//void convertYAMLtoXML(const YAML::Node & yaml, XMLClass & xml)
+//{
+//  switch (yaml.Type()) {
+//    case YAML::NodeType::Scalar:
+//      break;
+//    case YAML::NodeType::Sequence:
+//      break;
+//    case YAML::NodeType::Map:
+//      for (const auto & element : yaml) {
+//        auto key = element.first.as<std::string>();
+//        if (element.second.IsScalar()) {
+//          xml.append_attribute(key.c_str()).set_value(element.second.as<std::string>().c_str());
+//        } else if (element.second.IsSequence()) {
+//          for (const auto & sequence_element : element.second) {
+//            auto child = xml.append_child(key.c_str());
+//            convertYAMLtoXML(sequence_element, child);
+//          }
+//        } else {
+//          auto child = xml.append_child(key.c_str());
+//          convertYAMLtoXML(element.second, child);
+//        }
+//      }
+//      break;
+//    case YAML::NodeType::Null:
+//      break;
+//    default:
+//      throw std::runtime_error("Unknown YAML node type");
+//  }
+//}
 
 auto T4V2::loadScenarioFile(boost::filesystem::path path) -> pugi::xml_document
 {
