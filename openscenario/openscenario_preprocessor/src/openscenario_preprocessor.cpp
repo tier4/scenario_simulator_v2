@@ -83,7 +83,8 @@ void Preprocessor::generateDerivedScenarioFromDistribution(
         derived_scenario_yaml << yaml_emitter.c_str();
         derived_scenario_yaml.close();
 
-        // NOTE: for debug, write out yaml to "/tmp/openscenario_preprocessor/preprocessed_scenario.yaml"
+        // NOTE: for debug, write out yaml to
+        // "/tmp/openscenario_preprocessor/preprocessed_scenario.yaml"
         std::ofstream debug_yaml{"/tmp/openscenario_preprocessor/preprocessed_scenario.yaml"};
         debug_yaml << yaml_emitter.c_str();
         debug_yaml.close();
@@ -108,7 +109,7 @@ void Preprocessor::convertXMLtoYAML(const pugi::xml_node & xml, YAML::Emitter & 
   // the map of node name and {total count, used count}
   std::map<std::string, std::pair<int, int>> count;
   for (const auto & child : xml.children()) {
-    if (count.find(child.name()) != count.end()) {
+    if (count.find(child.name()) == count.end()) {
       count[child.name()] = std::make_pair(1, 0);
     } else {
       count[child.name()].first++;
@@ -123,7 +124,9 @@ void Preprocessor::convertXMLtoYAML(const pugi::xml_node & xml, YAML::Emitter & 
       emitter << YAML::Key << attr.name();
       emitter << YAML::Value << YAML::SingleQuoted << attr.as_string();
     }
-    // end map in child element part
+    if (xml.children().empty()) {
+      emitter << YAML::EndMap;
+    }
   }
 
   // iterate child elements
@@ -131,21 +134,21 @@ void Preprocessor::convertXMLtoYAML(const pugi::xml_node & xml, YAML::Emitter & 
     if (xml.attributes().empty()) {
       emitter << YAML::BeginMap;
     }
-
     for (const auto & child : xml.children()) {
-      // count == 1, make single map in yaml
+      // total count == 1, make single map in yaml
       if (count[child.name()].first == 1) {
         emitter << YAML::Key << child.name();
         emitter << YAML::Value;
         convertXMLtoYAML(child, emitter);
       } else {
-        // count > 1, make sequence in yaml
+        // total count > 1, make sequence in yaml
         if (count[child.name()].second == 0) {
           // first node
-          emitter << YAML::BeginSeq;
           emitter << YAML::Key << child.name();
           emitter << YAML::Value;
+          emitter << YAML::BeginSeq;
           convertXMLtoYAML(child, emitter);
+          // count up used count
           count[child.name()].second++;
         } else if (count[child.name()].second == count[child.name()].first - 1) {
           // last node
@@ -158,9 +161,6 @@ void Preprocessor::convertXMLtoYAML(const pugi::xml_node & xml, YAML::Emitter & 
         }
       }
     }
-  }
-
-  if (not xml.attributes().empty() or not xml.children().empty()) {
     emitter << YAML::EndMap;
   }
 }
