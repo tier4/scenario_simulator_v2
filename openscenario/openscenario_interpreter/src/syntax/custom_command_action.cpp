@@ -38,7 +38,7 @@ struct ApplyFaultInjectionAction : public CustomCommand
     return node;
   }
 
-  static auto client() -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &
+  static auto publisher() -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &
   {
     static auto publisher = node().create_publisher<tier4_simulation_msgs::msg::SimulationEvents>(
       "/simulation/events", rclcpp::QoS(1).reliable());
@@ -93,7 +93,8 @@ struct ApplyFaultInjectionAction : public CustomCommand
 };
 
 template <auto Version>
-struct ApplyRequestToCorporateAction : public CustomCommand
+struct ApplyRequestToCorporateCommandAction : public CustomCommand,
+                                              public SimulatorCore::NonStandardOperation
 {
   using CustomCommand::CustomCommand;
 
@@ -271,7 +272,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
-      ELEMENT("RequestToCorporateAction", ApplyRequestToCorporateAction),
+      ELEMENT("RequestToCorporateCommandAction@v1", ApplyRequestToCorporateCommandAction<1>),
       ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),

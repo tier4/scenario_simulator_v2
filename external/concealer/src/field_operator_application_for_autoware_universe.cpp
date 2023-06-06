@@ -71,9 +71,49 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommands(
   const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array,
   const std::string & module_name, const bool activate) -> bool
 {
+  const auto module_type_code = [](std::string module_name) -> uint8_t {
+
+#define ELEMENT(IDENTIFIER)                              \
+  {                                                      \
+    #IDENTIFIER, tier4_rtc_msgs::msg::Module::IDENTIFIER \
+  }
+    static std::unordered_map<std::string, uint8_t> module_type_map = {
+      ELEMENT(NONE),
+      ELEMENT(LANE_CHANGE_LEFT),
+      ELEMENT(LANE_CHANGE_RIGHT),
+      ELEMENT(AVOIDANCE_LEFT),
+      ELEMENT(AVOIDANCE_RIGHT),
+      ELEMENT(GOAL_PLANNER),
+      ELEMENT(PULL_OUT),
+      ELEMENT(TRAFFIC_LIGHT),
+      ELEMENT(INTERSECTION),
+      ELEMENT(INTERSECTION_OCCLUSION),
+      ELEMENT(CROSSWALK),
+      ELEMENT(BLIND_SPOT),
+      ELEMENT(DETECTION_AREA),
+      ELEMENT(NO_STOPPING_AREA),
+      ELEMENT(OCCLUSION_SPOT),
+      ELEMENT(EXT_REQUEST_LANE_CHANGE_LEFT),
+      ELEMENT(EXT_REQUEST_LANE_CHANGE_RIGHT),
+      ELEMENT(AVOIDANCE_BY_LC_LEFT),
+      ELEMENT(AVOIDANCE_BY_LC_RIGHT),
+    };
+#undef ELEMENT
+
+    auto module_type = module_type_map.find(module_name);
+    if (module_type == module_type_map.end()) {
+      throw std::runtime_error(
+        "Unknown module name for tier4_rtc_msgs::msg::Module : " + module_name);
+    } else {
+      return module_type->second;
+    }
+  }(module_name);
+
   auto cooperate_status = std::find_if(
     cooperate_status_array.statuses.begin(), cooperate_status_array.statuses.end(),
-    [&](auto && cooperate_status) { return cooperate_status.module == module_name; });
+    [module_type_code](const auto & cooperate_status) {
+      return cooperate_status.module.type == module_type_code;
+    });
   if (cooperate_status == cooperate_status_array.statuses.end()) {
     return false;
   } else {
