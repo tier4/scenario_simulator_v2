@@ -334,7 +334,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     const auto remaining_time_to_arrival_to_front_waypoint =
       distance_to_front_waypoint / max_speed;  // [s]
 
-    if constexpr (false) {
+    // clang-format off
+    if constexpr (true) {
       std::cout << std::string(80, '-') << std::endl;
 
       std::cout << std::fixed << "acceleration = " << acceleration << std::endl;
@@ -385,7 +386,6 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       PRINT(distance);
       PRINT(remaining_time);
 
-      // clang-format off
       std::cout << std::fixed
                 << "remaining_time_to_arrival_to_front_waypoint "
                 << "("
@@ -409,8 +409,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                 << "== " << std::isnan(remaining_time_to_front_waypoint) << " or " << isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time) << " "
                 << "== " << (std::isnan(remaining_time_to_front_waypoint) or isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time))
                 << std::endl;
-      // clang-format on
     }
+    // clang-format on
 
     /*
        If the target point is reached during this step, it is considered
@@ -472,7 +472,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
            Relative time starts from the start of FollowTrajectoryAction or
            from the time of reaching the previous "waypoint with arrival time".
         */
-        if (not parameter->timing_is_absolute and not std::isnan(remaining_time_to_front_waypoint)) {
+        if (
+          not parameter->timing_is_absolute and not std::isnan(remaining_time_to_front_waypoint)) {
           relative_timing_offset = entity_status.time;
         }
         return tick();  // tail recursion
