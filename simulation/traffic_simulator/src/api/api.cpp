@@ -334,15 +334,15 @@ bool API::updateFrame()
     if (!res.result().success()) {
       return false;
     }
-    entity_manager_ptr_->broadcastEntityTransform();
+//    entity_manager_ptr_->broadcastEntityTransform();
     clock_.update();
-    clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
+//    clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
     return true;
   } else {
-    entity_manager_ptr_->broadcastEntityTransform();
+//    entity_manager_ptr_->broadcastEntityTransform();
     clock_.update();
-    clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
+//    clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
     return true;
   }

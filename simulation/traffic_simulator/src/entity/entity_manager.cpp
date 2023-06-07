@@ -61,9 +61,9 @@ void EntityManager::broadcastTransform(
   }
 
   if (static_transform) {
-    broadcaster_.sendTransform(transform_stamped);
+//    broadcaster_.sendTransform(transform_stamped);
   } else {
-    base_link_broadcaster_.sendTransform(transform_stamped);
+//    base_link_broadcaster_.sendTransform(transform_stamped);
   }
 }
 

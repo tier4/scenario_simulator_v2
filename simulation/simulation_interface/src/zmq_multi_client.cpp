@@ -143,8 +143,6 @@ void MultiClient::call(
     //std::cout << "[ZMQ_DEBUG]Sending update status" << std::endl;
     traffic_simulator_msgs::msg::EntityStatus sent_status;
     simulation_interface::toMsg(req.status(), sent_status);
-    //std::cout << "[ZMQ_DEBUG] Sent status: " << traffic_simulator_msgs::msg::to_yaml(sent_status) << std::endl;
-
     simulation_api_schema::SimulationRequest sim_request;
     simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_update_entity_status() = req;
@@ -155,7 +153,7 @@ void MultiClient::call(
     status.name = sim_response.update_entity_status().status().name();
     simulation_interface::toMsg(sim_response.update_entity_status().status().action_status(), status.action_status);
     simulation_interface::toMsg(sim_response.update_entity_status().status().pose(), status.pose);
-    //std::cout << "[ZMQ_DEBUG] Received status: " << traffic_simulator_msgs::msg::to_yaml(status) << std::endl;;
+//    //std::cout << "[ZMQ_DEBUG] Received status: " << traffic_simulator_msgs::msg::to_yaml(status) << std::endl;;
   }
 }
 void MultiClient::call(
@@ -163,11 +161,13 @@ void MultiClient::call(
   simulation_api_schema::AttachLidarSensorResponse & res)
 {
   if (is_running) {
+    //std::cout << "[ZMQ_DEBUG]lidar" << std::endl;
     simulation_api_schema::SimulationRequest sim_request;
     simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_attach_lidar_sensor() = req;
     call(sim_request, sim_response);
     res = sim_response.attach_lidar_sensor();
+    //std::cout << "[ZMQ_DEBUG] lidar rec " << res.result().success() << std::endl;
   }
 }
 void MultiClient::call(
@@ -175,11 +175,13 @@ void MultiClient::call(
   simulation_api_schema::AttachDetectionSensorResponse & res)
 {
   if (is_running) {
+    //std::cout << "[ZMQ_DEBUG]det" << std::endl;
     simulation_api_schema::SimulationRequest sim_request;
     simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_attach_detection_sensor() = req;
     call(sim_request, sim_response);
     res = sim_response.attach_detection_sensor();
+    //std::cout << "[ZMQ_DEBUG] det rec " << res.result().success() << std::endl;
   }
 }
 
@@ -188,11 +190,13 @@ void MultiClient::call(
   simulation_api_schema::AttachOccupancyGridSensorResponse & res)
 {
   if (is_running) {
+    //std::cout << "[ZMQ_DEBUG]occu" << std::endl;
     simulation_api_schema::SimulationRequest sim_request;
     simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_attach_occupancy_grid_sensor() = req;
     call(sim_request, sim_response);
     res = sim_response.attach_occupancy_grid_sensor();
+    //std::cout << "[ZMQ_DEBUG] occu rec " << res.result().success() << std::endl;
   }
 }
 
@@ -201,11 +205,13 @@ void MultiClient::call(
   simulation_api_schema::UpdateTrafficLightsResponse & res)
 {
   if (is_running) {
+    //std::cout << "[ZMQ_DEBUG]treafic" << std::endl;
     simulation_api_schema::SimulationRequest sim_request;
     simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_update_traffic_lights() = req;
     call(sim_request, sim_response);
     res = sim_response.update_traffic_lights();
+    //std::cout << "[ZMQ_DEBUG] traffic rec " << res.result().success() << std::endl;
   }
 }
 

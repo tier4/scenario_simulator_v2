@@ -30,7 +30,7 @@ auto V2ITrafficLightManager<
         static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light));
     }
   }
-  traffic_light_state_array_publisher_->publish(traffic_light_state_array);
+//  traffic_light_state_array_publisher_->publish(traffic_light_state_array);
 }
 
 template <>
