@@ -105,7 +105,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
   task_queue.delay([this, route] {
     std::cout << "[ZMQ_DEBUG] Planning" << std::endl;
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
-//    setGoalPose(route.back());
+    setGoalPose(route.back());
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
 //      setCheckpoint(each);
     }
@@ -121,7 +121,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
     waitForAutowareStateToBeDriving([this]() {
       auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
-//      requestEngage(request);
+      requestEngage(request);
     });
     std::cout << "[ZMQ_DEBUG] Waited for drivieng" << std::endl;
   });

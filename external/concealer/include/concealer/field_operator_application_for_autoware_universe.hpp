@@ -48,8 +48,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   // clang-format off
 //  PublisherWrapper<geometry_msgs::msg::PoseStamped>               setCheckpoint;
-//  PublisherWrapper<geometry_msgs::msg::PoseStamped>               setGoalPose;
-//  PublisherWrapper<geometry_msgs::msg::PoseWithCovarianceStamped> setInitialPose;
+  PublisherWrapper<geometry_msgs::msg::PoseStamped>               setGoalPose;
+  PublisherWrapper<geometry_msgs::msg::PoseWithCovarianceStamped> setInitialPose;
 
   SubscriberWrapper<autoware_auto_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>          getAckermannControlCommand;
@@ -60,7 +60,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
 
 //  ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>         requestCooperateCommands;
-//  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>           requestEngage;
+  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>           requestEngage;
 //  ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit> requestSetVelocityLimit;
 
   Cooperator current_cooperator = Cooperator::simulator;
@@ -107,8 +107,8 @@ public:
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
 //    setCheckpoint("/planning/mission_planning/checkpoint", *this),
-//    setGoalPose("/planning/mission_planning/goal", *this),
-//    setInitialPose("/initialpose", *this),
+    setGoalPose("/planning/mission_planning/goal", *this),
+    setInitialPose("/initialpose", *this),
     getAutowareState("/autoware/state", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { cooperate(v); }),
@@ -117,7 +117,7 @@ public:
     getTrajectory("/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
 //    requestCooperateCommands("/api/external/set/rtc_commands", *this),
-//    requestEngage("/api/external/set/engage", *this),
+    requestEngage("/api/external/set/engage", *this),
 //    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
   // clang-format on
