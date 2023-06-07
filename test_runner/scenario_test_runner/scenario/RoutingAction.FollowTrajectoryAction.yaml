@@ -1,51 +1,25 @@
 OpenSCENARIO:
   FileHeader:
-    revMajor: 1
-    revMinor: 1
-    date: '2022-10-03T01:22:50.205Z'
+    revMajor: 0
+    revMinor: 0
+    date: '1970-01-01T09:00:00+09:00'
     description: ''
     author: 'Tatsuya Yamasaki'
   ParameterDeclarations:
     ParameterDeclaration: []
   CatalogLocations:
-    CatalogLocation: []
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
   RoadNetwork:
     LogicFile:
       filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
   Entities:
     ScenarioObject:
       - name: ego
-        Vehicle:
-          name: ''
-          vehicleCategory: car
-          BoundingBox:
-            Center:
-              x: 0
-              y: 0
-              z: 1.25
-            Dimensions:
-              width: 1.8
-              length: 4
-              height: 2.5
-          Performance:
-            maxSpeed: 50
-            maxAcceleration: INF
-            maxDeceleration: INF
-          Axles:
-            FrontAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.6
-              trackWidth: 1.8
-              positionX: 2
-              positionZ: 0.3
-            RearAxle:
-              maxSteering: 0.5236
-              wheelDiameter: 0.6
-              trackWidth: 1.8
-              positionX: 0
-              positionZ: 0.3
-          Properties:
-            Property: []
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
         ObjectController:
           Controller:
             name: ''
@@ -61,10 +35,10 @@ OpenSCENARIO:
                   Position:
                     LanePosition:
                       roadId: ''
-                      laneId: '34462'
+                      laneId: '34513'
                       s: 1
                       offset: 0
-                      Orientation:
+                      Orientation: &ORIENTATION
                         type: relative
                         h: 0
                         p: 0
@@ -86,66 +60,21 @@ OpenSCENARIO:
                         Shape:
                           Polyline:
                             Vertex:
-                              - time: 3
-                                Position:
+                              - Position:
                                   LanePosition:
                                     roadId: ''
                                     laneId: '34513'
                                     s: 10
                                     offset: 0
-                                    Orientation:
-                                      type: relative
-                                      h: 0
-                                      p: 0
-                                      r: 0
-                              - time: 4
-                                Position:
-                                  LanePosition:
-                                    roadId: ''
-                                    laneId: '34462'
-                                    s: 20
-                                    offset: 0
-                                    Orientation:
-                                      type: relative
-                                      h: 0
-                                      p: 0
-                                      r: 0
-                              - time: 10
-                                Position:
-                                  LanePosition:
-                                    roadId: ''
-                                    laneId: '34513'
-                                    s: 30
-                                    offset: 0
-                                    Orientation:
-                                      type: relative
-                                      h: 0
-                                      p: 0
-                                      r: 0
-                              - time: 12
-                                Position:
-                                  LanePosition:
-                                    roadId: ''
-                                    laneId: '34462'
-                                    s: 40
-                                    offset: 0
-                                    Orientation:
-                                      type: relative
-                                      h: 0
-                                      p: 0
-                                      r: 0
-                              - time: 15
+                                    Orientation: *ORIENTATION
+                              - time: 9
                                 Position: &ego_destination
                                   LanePosition:
                                     roadId: ''
-                                    laneId: '34513'
+                                    laneId: '34507'
                                     s: 50
                                     offset: 0
-                                    Orientation:
-                                      type: relative
-                                      h: 0
-                                      p: 0
-                                      r: 0
+                                    Orientation: *ORIENTATION
     Story:
       - name: ''
         Act:
@@ -177,13 +106,6 @@ OpenSCENARIO:
                                       ReachPositionCondition:
                                         Position: *ego_destination
                                         tolerance: 1
-                                - name: ''
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    SimulationTimeCondition:
-                                      value: 10
-                                      rule: greaterThan
                         Action:
                           - name: ''
                             UserDefinedAction:

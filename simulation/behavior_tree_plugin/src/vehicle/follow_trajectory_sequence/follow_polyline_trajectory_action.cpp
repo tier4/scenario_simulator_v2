@@ -212,90 +212,219 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        Note: If not dynamic_constraints_ignorable, the linear distance should
        cause problems.
     */
-    const auto distance = hypot(position, target_position);  // [m]
+    const auto distance_to_front_waypoint = hypot(position, target_position);  // [m]
 
-    const auto remaining_time = [this]() {
-      if (const auto iter = std::find_if(
+    auto absolute = [this](const auto & vertex) {
+      /*
+         If the trajectory is a closed loop, timing_is_absolute must always be
+         false, which is guaranteed by the constructor of type Parameter.
+      */
+      auto offset = [this]() {
+        if (parameter->timing_is_absolute) {
+          return 0.0;
+        } else if (std::isnan(relative_timing_offset)) {  // When uninitialized.
+          return relative_timing_offset = entity_status.time;
+        } else {
+          return relative_timing_offset;
+        }
+      };
+
+      return offset() + vertex.time;
+    };
+
+    const auto remaining_time_to_front_waypoint =
+      absolute(parameter->shape.vertices.front()) - entity_status.time;
+
+    const auto [distance, remaining_time] = [&]() {
+      if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
             std::begin(parameter->shape.vertices), std::end(parameter->shape.vertices),
             [](auto && vertex) { return not std::isnan(vertex.time); });
-          iter != std::end(parameter->shape.vertices)) {
+          first_waypoint_with_arrival_time_specified != std::end(parameter->shape.vertices)) {
         /*
-           If the trajectory is a closed loop, timing_is_absolute must always
-           be false, which is guaranteed by the constructor of type Parameter.
+           Note for anyone working on adding support for followingMode follow
+           to this function (FollowPolylineTrajectoryAction::tick) in the
+           future: if followingMode is follow, this distance calculation may be
+           inappropriate.
         */
-        auto offset = [this]() {
-          if (parameter->timing_is_absolute) {
-            return 0.0;
-          } else if (std::isnan(relative_timing_offset)) {  // When uninitialized.
-            return relative_timing_offset = entity_status.time;
-          } else {
-            return relative_timing_offset;
+        auto total_distance_to = [this](auto last) {
+          auto total_distance = 0.0;
+          for (auto iter = std::begin(parameter->shape.vertices); 0 < std::distance(iter, last);
+               ++iter) {
+            total_distance += hypot(iter->position.position, std::next(iter)->position.position);
           }
+          return total_distance;
         };
 
-        if (const auto remaining_time = (offset() + iter->time) - entity_status.time;
+        if (const auto remaining_time =
+              absolute(*first_waypoint_with_arrival_time_specified) - entity_status.time;
             remaining_time < 0) {
           throw common::Error("TIME OVER!");
         } else {
-          return remaining_time;
+          return std::make_tuple(
+            distance_to_front_waypoint +
+              total_distance_to(first_waypoint_with_arrival_time_specified),
+            remaining_time);
         }
       } else {
-        return std::numeric_limits<double>::infinity();
+        return std::make_tuple(distance_to_front_waypoint, std::numeric_limits<double>::infinity());
       }
     }();
 
     const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
 
-    const auto max_acceleration = std::clamp(
+    const auto max_acceleration = std::min(
       acceleration /* [m/s^2] */ +
         behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
           step_time /* [s] */,
-      -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */,
       +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
 
-    const auto max_deceleration = std::clamp(
+    const auto min_acceleration = std::max(
       acceleration /* [m/s^2] */ -
         behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
           step_time /* [s] */,
-      -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */,
-      +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
+      -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */);
 
     const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
 
     /*
-       The desired speed is the speed at which the destination can be reached
-       exactly at the specified time (= time remaining at zero).
+       The desired acceleration is the acceleration at which the destination
+       can be reached exactly at the specified time (= time remaining at zero).
 
        If no arrival time is specified for subsequent waypoints, there is no
-       need to accelerate or decelerate, so the current speed will be the
-       desired speed.
+       need to accelerate or decelerate, so the current acceleration will be
+       the desired speed.
     */
-    const auto desired_speed = std::isinf(remaining_time) ? speed : distance / remaining_time;
+    const auto desired_acceleration = [&]() {
+      if (std::isinf(remaining_time)) {
+        return acceleration;
+      } else {
+        /*
+                        v [m/s]
+                         ^
+                         |
+           desired_speed +      🭈🭆🭂|
+                         |   🭈🭆🭂▉▉▉|
+                         |🭈🭆🭂▉▉▉▉▉▉|
+                   speed +🮋▉▉▉▉▉▉▉▉|
+                         |🮋▉▉▉▉▉▉▉▉|
+                         |🮋▉▉▉▉▉▉▉▉|
+                         +---------+---------------> t [s]
+                       0          remaining_time
+
+           desired_speed = speed + desired_acceleration * remaining_time
+
+           distance = (speed + desired_speed) * remaining_time * 1/2
+
+                    = (speed + speed + desired_acceleration * remaining_time) * remaining_time * 1/2
+
+                    = speed * remaining_time + desired_acceleration * remaining_time^2 * 1/2
+        */
+        return 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time;
+      }
+    }();
 
     /*
-       However, the desired speed is unrealistically large in terms of vehicle
-       performance and dynamic constraints, so it is clamped to a realistic
-       value.
+       However, the desired acceleration is unrealistically large in terms of
+       vehicle performance and dynamic constraints, so it is clamped to a
+       realistic value.
     */
-    const auto max_speed = std::clamp(
-      desired_speed,  // [m/s]
-      speed /* [m/s] */ - max_deceleration /* [m/s^2] */ * step_time,
-      speed /* [m/s] */ + max_acceleration /* [m/s^2] */ * step_time);
+    const auto max_speed =
+      speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time;
 
-    const auto remaining_time_to_arrival = distance / max_speed;  // [s]
+    const auto remaining_time_to_arrival_to_front_waypoint =
+      distance_to_front_waypoint / max_speed;  // [s]
 
-    std::cout << "remaining_time_to_arrival = " << remaining_time_to_arrival << " / "
-              << remaining_time << std::endl;
+    if constexpr (false) {
+      std::cout << std::string(80, '-') << std::endl;
+
+      std::cout << std::fixed << "acceleration = " << acceleration << std::endl;
+
+      std::cout << std::fixed
+                << "min_acceleration "
+                << "== std::max(acceleration - max_deceleration_rate * step_time, -max_deceleration) "
+                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate << " * " << step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
+                << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
+                << "== std::max(" << (acceleration - behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time) << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
+                << "== " << min_acceleration
+                << std::endl;
+
+      std::cout << std::fixed
+                << "max_acceleration "
+                << "== std::min(acceleration + max_acceleration_rate * step_time, +max_acceleration) "
+                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate << " * " << step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
+                << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
+                << "== std::min(" << (acceleration + behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time) << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
+                << "== " << max_acceleration
+                << std::endl;
+
+      std::cout << std::fixed
+                << "min_acceleration < acceleration < max_acceleration "
+                << "== " << min_acceleration << " < " << acceleration << " < " << max_acceleration << std::endl;
+
+      std::cout << std::fixed << std::boolalpha
+                << "desired_acceleration "
+                << "== 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time "
+                << "== 2 * " << distance << " / " << std::pow(remaining_time, 2) << " - 2 * " << speed << " / " << remaining_time << " "
+                << "== " << (2 * distance / std::pow(remaining_time, 2)) << " - " << (2 * speed / remaining_time) << " "
+                << "== " << desired_acceleration << " "
+                << "(acceleration < desired_acceleration == " << (acceleration < desired_acceleration) << " == need to " <<(acceleration < desired_acceleration ? "accelerate" : "decelerate") << ")"
+                << std::endl;
+
+      std::cout << std::fixed
+                << "max_speed "
+                << "== speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time "
+                << "== " << speed << " + std::clamp(" << desired_acceleration << ", " << min_acceleration << ", " << max_acceleration << ") * " << step_time << " "
+                << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) << " * " << step_time << " "
+                << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time << " "
+                << "== " << max_speed
+                << std::endl;
+
+      PRINT(distance_to_front_waypoint);
+      PRINT(remaining_time_to_front_waypoint);
+
+      PRINT(distance);
+      PRINT(remaining_time);
+
+      // clang-format off
+      std::cout << std::fixed
+                << "remaining_time_to_arrival_to_front_waypoint "
+                << "("
+                << "== distance_to_front_waypoint / max_speed "
+                << "== " << distance_to_front_waypoint << " / " << max_speed << " "
+                << "== " << remaining_time_to_arrival_to_front_waypoint
+                << ")"
+                << std::endl;
+
+      std::cout << std::fixed
+                << "arrive during this frame? "
+                << "== remaining_time_to_arrival_to_front_waypoint < step_time "
+                << "== " << remaining_time_to_arrival_to_front_waypoint << " < " << step_time << " "
+                << "== " << std::boolalpha << isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)
+                << std::endl;
+
+      std::cout << std::fixed << std::boolalpha
+                << "not too early? "
+                << "== std::isnan(remaining_time_to_front_waypoint) or remaining_time_to_front_waypoint < remaining_time_to_arrival_to_front_waypoint + step_time "
+                << "== std::isnan(" << remaining_time_to_front_waypoint << ") or " << remaining_time_to_front_waypoint << " < " << remaining_time_to_arrival_to_front_waypoint << " + " << step_time << " "
+                << "== " << std::isnan(remaining_time_to_front_waypoint) << " or " << isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time) << " "
+                << "== " << (std::isnan(remaining_time_to_front_waypoint) or isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time))
+                << std::endl;
+      // clang-format on
+    }
 
     /*
        If the target point is reached during this step, it is considered
        reached.
     */
-    if (isDefinitelyLessThan(remaining_time_to_arrival, step_time)) {
+    if (isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)) {
       /*
-         If remaining time to arrival is less than remaining time, the vehicle
-         reached the waypoint on time. Otherwise, the vehicle has reached the
-         waypoint earlier than the specified time.
+         The condition "Is remaining time to front waypoint less than remaining
+         time to arrival to front waypoint + step time?" means "If arrival is
+         next frame, is it too late?". This clause is executed only if the
+         front waypoint is expected to arrive during this frame. That is, the
+         conjunction of these conditions means "Did the vehicle arrive at the
+         front waypoint exactly on time?" Otherwise the vehicle will have
+         reached the front waypoint too early.
 
          This means that the vehicle did not slow down enough to reach the
          current waypoint after passing the previous waypoint. In order to cope
@@ -310,16 +439,40 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
          This implementation does simple velocity planning that considers only
          the nearest waypoints in favor of simplicity of implementation.
+
+         Note: There is no need to consider the case of arrival too late.
+         Because that case has already been verified when calculating the
+         remaining time.
+
+         Note: If remaining time to front waypoint is nan, there is no need to
+         verify whether the arrival is too early. This arrival determination is
+         only interesting for the front waypoint. Verifying whether or not the
+         arrival time is specified in the front waypoint is exactly the
+         condition of "Is remaining time to front waypoint nan?"
       */
-      if (isDefinitelyLessThan(
-            remaining_time_to_arrival, remaining_time, remaining_time_to_arrival + step_time)) {
+      if (
+        std::isnan(remaining_time_to_front_waypoint) or
+        isDefinitelyLessThan(
+          remaining_time_to_front_waypoint,
+          remaining_time_to_arrival_to_front_waypoint + step_time)) {
         if (std::rotate(
               std::begin(parameter->shape.vertices), std::begin(parameter->shape.vertices) + 1,
               std::end(parameter->shape.vertices));
             not parameter->closed) {
           parameter->shape.vertices.pop_back();
         }
-        if (not parameter->timing_is_absolute) {
+        /*
+           The OpenSCENARIO standard does not define the behavior when the
+           value of Timing.domainAbsoluteRelative is "relative". The standard
+           only states "Definition of time value context as either absolute or
+           relative", and it is completely unclear when the relative time
+           starts.
+
+           This implementation has interpreted the specification as follows:
+           Relative time starts from the start of FollowTrajectoryAction or
+           from the time of reaching the previous "waypoint with arrival time".
+        */
+        if (not parameter->timing_is_absolute and not std::isnan(remaining_time_to_front_waypoint)) {
           relative_timing_offset = entity_status.time;
         }
         return tick();  // tail recursion
@@ -337,14 +490,14 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     const auto desired_velocity = [&]() {
       /*
          Note: The followingMode in OpenSCENARIO is passed as variable
-         dynamic_constraints_ignoreable. the value of the variable is
+         dynamic_constraints_ignorable. the value of the variable is
          `followingMode == position`.
       */
       if (parameter->dynamic_constraints_ignorable) {
         return normalize(target_position - position) * max_speed;  // [m/s]
       } else {
         /*
-           Note: The vector returned if dynamic_constraints_ignoreable == true
+           Note: The vector returned if dynamic_constraints_ignorable == true
            ignores parameters such as the maximum rudder angle of the vehicle
            entry. In this clause, such parameters must be respected and the
            rotation angle difference of the z-axis center of the vector must be
