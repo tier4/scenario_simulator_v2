@@ -24,7 +24,9 @@
   <test_depend>ament_cmake_pep257</test_depend>
   <test_depend>ament_cmake_xmllint</test_depend>
   <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_cmake_gtest</test_depend>
+  <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>openscenario_utility</test_depend>
+  <test_depend>ament_index_python</test_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

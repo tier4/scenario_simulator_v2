@@ -56,7 +56,7 @@ install(TARGETS ${PROJECT_NAME}_node ${PROJECT_NAME}_command
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-#  ament_auto_add_gtest(${PROJECT_NAME}_test DIRECTORY "test/")
+  ament_add_pytest_test(test_${PROJECT_NAME} "test/test_main.py")
 endif()
 
 ament_auto_package()
