@@ -195,10 +195,14 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
      information.
   */
   if (getBlackBoardValues();
-      request == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY and
-      getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) and
-      getInput<decltype(target_speed)>("target_speed", target_speed) and parameter and
-      not parameter->shape.vertices.empty()) {
+      request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
+      not getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) or
+      not getInput<decltype(target_speed)>("target_speed", target_speed) or not parameter) {
+    return BT::NodeStatus::FAILURE;
+  } else if (parameter->shape.vertices.empty()) {
+    LINE();
+    return BT::NodeStatus::SUCCESS;
+  } else {
     const auto position = entity_status.pose.position;
 
     /*
@@ -257,8 +261,35 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
         if (const auto remaining_time =
               absolute(*first_waypoint_with_arrival_time_specified) - entity_status.time;
-            remaining_time < 0) {
-          throw common::Error("TIME OVER!");
+            /*
+               The conditional expression below should ideally be
+               remaining_time < 0.
+
+               The simulator runs at a constant frame rate, so the step time is
+               1/FPS. If the simulation time is an accumulation of step times
+               expressed as rational numbers, times that are integer multiples
+               of the frame rate will always be exact integer seconds.
+               Therefore, the timing of remaining_time == 0 always exists, and
+               the velocity planning of this member function (tick) aims to
+               reach the waypoint exactly at that timing. So the ideal timeout
+               condition is remaining_time < 0.
+
+               But actually the step time is expressed as a float and the
+               simulation time is its accumulation. As a result, it is not
+               guaranteed that there will be times when the simulation time is
+               exactly zero. For example, remaining_time == -0.00006 and it was
+               judged to be out of time.
+
+               For the above reasons, the condition is remaining_time <
+               -step_time. In other words, the conditions are such that a delay
+               of 1 step time is allowed.
+            */
+            remaining_time < -step_time) {
+          throw common::Error(
+            "Vehicle ", std::quoted(entity_status.name),
+            " failed to reach the trajectory waypoint at the specified time. This may be due to "
+            "unrealistic conditions of arrival time specification compared to vehicle parameters "
+            "and dynamic constraints.");
         } else {
           return std::make_tuple(
             distance_to_front_waypoint +
@@ -334,8 +365,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     const auto remaining_time_to_arrival_to_front_waypoint =
       distance_to_front_waypoint / max_speed;  // [s]
 
-    // clang-format off
     if constexpr (true) {
+      // clang-format off
       std::cout << std::string(80, '-') << std::endl;
 
       std::cout << std::fixed << "acceleration = " << acceleration << std::endl;
@@ -409,8 +440,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                 << "== " << std::isnan(remaining_time_to_front_waypoint) << " or " << isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time) << " "
                 << "== " << (std::isnan(remaining_time_to_front_waypoint) or isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time))
                 << std::endl;
+      // clang-format on
     }
-    // clang-format on
 
     /*
        If the target point is reached during this step, it is considered
@@ -479,12 +510,10 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         return tick();  // tail recursion
       } else {
         throw common::SimulationError(
-          "Vehicle ", std::quoted(entity_status.name), " reached the target waypoint ",
-          remaining_time,
-          " seconds earlier than the specified time. This is not due to a bug in the simulator, "
-          "but due to waypoint settings. Since FollowTrajectoryAction respects vehicle parameters "
-          "and dynamic constraints to accelerate and decelerate, the distance between waypoints "
-          "and the arrival time of waypoints should be specified within a realistic range.");
+          "Vehicle ", std::quoted(entity_status.name),
+          " arrived at the waypoint in trajectory N seconds earlier than the specified time. This "
+          "may be due to unrealistic conditions of arrival time specification compared to vehicle "
+          "parameters and dynamic constraints.");
       }
     }
 
@@ -546,9 +575,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
 
-    return parameter->shape.vertices.empty() ? BT::NodeStatus::SUCCESS : BT::NodeStatus::RUNNING;
-  } else {
-    return BT::NodeStatus::FAILURE;
+    return BT::NodeStatus::RUNNING;
   }
 }
 }  // namespace vehicle

@@ -56,7 +56,7 @@ OpenSCENARIO:
                     TrajectoryRef:
                       Trajectory:
                         closed: false
-                        name: zigzag
+                        name: straight
                         Shape:
                           Polyline:
                             Vertex:
@@ -67,7 +67,7 @@ OpenSCENARIO:
                                     s: 10
                                     offset: 0
                                     Orientation: *ORIENTATION
-                              - time: 9
+                              - time: 10
                                 Position: &ego_destination
                                   LanePosition:
                                     roadId: ''
