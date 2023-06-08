@@ -147,6 +147,8 @@ public:
 
   virtual auto rethrow() const noexcept(false) -> void;
 
+  virtual auto sendCooperateCommand(const std::string &, const std::string &) -> bool = 0;
+
   virtual auto setCooperator(const std::string &) -> void = 0;
 
   virtual auto setVelocityLimit(double) -> void = 0;

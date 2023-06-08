@@ -67,9 +67,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommands(
-  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array,
-  const std::string & module_name, const bool activate) -> bool
+auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
+  const std::string & module_name, const std::string & command) -> bool
 {
   const auto module_type_code = [](std::string module_name) -> uint8_t {
 
@@ -102,29 +101,58 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommands(
 
     auto module_type = module_type_map.find(module_name);
     if (module_type == module_type_map.end()) {
-      throw std::runtime_error(
-        "Unknown module name for tier4_rtc_msgs::msg::Module : " + module_name);
+      std::stringstream what;
+      what << "Unexpected module name for tier4_rtc_msgs::msg::Module : " << module_name;
+      what << ". One of the following module names is expected : { ";
+      for (auto element : module_type_map) {
+        what << element.first << ", ";
+      }
+      what << "}";
+      throw common::Error(what.str());
     } else {
       return module_type->second;
     }
   }(module_name);
 
   auto cooperate_status = std::find_if(
-    cooperate_status_array.statuses.begin(), cooperate_status_array.statuses.end(),
+    latest_cooperate_status_array.statuses.begin(), latest_cooperate_status_array.statuses.end(),
     [module_type_code](const auto & cooperate_status) {
       return cooperate_status.module.type == module_type_code;
     });
-  if (cooperate_status == cooperate_status_array.statuses.end()) {
+  if (cooperate_status == latest_cooperate_status_array.statuses.end()) {
     return false;
   } else {
     auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
-    request->stamp = cooperate_status_array.stamp;
+    request->stamp = latest_cooperate_status_array.stamp;
 
     tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
     cooperate_command.module = cooperate_status->module;
     cooperate_command.uuid = cooperate_status->uuid;
-    cooperate_command.command.type =
-      activate ? tier4_rtc_msgs::msg::Command::ACTIVATE : tier4_rtc_msgs::msg::Command::DEACTIVATE;
+    cooperate_command.command.type = [command]() {
+#define ELEMENT(IDENTIFIER)                               \
+  {                                                       \
+    #IDENTIFIER, tier4_rtc_msgs::msg::Command::IDENTIFIER \
+  }
+      static std::unordered_map<std::string, uint8_t> command_type_map = {
+        ELEMENT(ACTIVATE),
+        ELEMENT(DEACTIVATE),
+      };
+#undef ELEMENT
+
+      auto command_type = command_type_map.find(command);
+      if (command_type == command_type_map.end()) {
+        std::stringstream what;
+        what << "Unexpected command for tier4_rtc_msgs::msg::Command : " << command;
+        what << ", One of the following commands is expected : {";
+        for (auto element : command_type_map) {
+          what << element.first << ", ";
+        }
+        what << "}";
+        throw std::runtime_error(what.str());
+      } else {
+        return command_type->second;
+      }
+    }();
     request->commands.push_back(cooperate_command);
 
     task_queue.delay([this, request]() { requestCooperateCommands(request); });

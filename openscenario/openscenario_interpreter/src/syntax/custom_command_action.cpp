@@ -100,7 +100,7 @@ struct ApplyRequestToCorporateCommandAction : public CustomCommand,
 
   auto start(const Scope &) -> void override
   {
-    // build content and send request via concealer
+    asFieldOperatorApplication("ego").sendCooperateCommand(parameters.at(0), parameters.at(1));
   }
 };
 
@@ -272,7 +272,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
-      ELEMENT("RequestToCorporateCommandAction@v1", ApplyRequestToCorporateCommandAction<1>),
+      ELEMENT("RequestToCooperateCommandAction@v1", ApplyRequestToCorporateCommandAction<1>),
       ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
