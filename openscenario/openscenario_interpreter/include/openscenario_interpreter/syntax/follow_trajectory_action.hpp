@@ -55,7 +55,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct FollowTrajectoryAction : private Scope,
                                 private SimulatorCore::ActionApplication,
-                                private SimulatorCore::ConditionEvaluation
+                                private SimulatorCore::NonStandardOperation
 {
   const Double initial_distance_offset;
 
@@ -65,9 +65,11 @@ struct FollowTrajectoryAction : private Scope,
 
   const TrajectoryRef trajectory_ref;
 
+  std::unordered_map<String, Boolean> accomplishments;
+
   explicit FollowTrajectoryAction(const pugi::xml_node &, Scope &);
 
-  static auto accomplished() noexcept -> bool;
+  /*  */ auto accomplished() -> bool;
 
   static auto endsImmediately() noexcept -> bool;
 

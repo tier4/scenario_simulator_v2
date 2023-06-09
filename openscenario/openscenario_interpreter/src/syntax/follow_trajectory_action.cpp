@@ -32,7 +32,22 @@ FollowTrajectoryAction::FollowTrajectoryAction(const pugi::xml_node & node, Scop
 {
 }
 
-auto FollowTrajectoryAction::accomplished() noexcept -> bool { return false; }
+auto FollowTrajectoryAction::accomplished() -> bool
+{
+  return std::all_of(
+    std::begin(accomplishments), std::end(accomplishments), [this](auto && accomplishment) {
+      auto is_running = [this](auto &&... xs) {
+        if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>()) {
+          return evaluateCurrentState(std::forward<decltype(xs)>(xs)...) ==
+                 "follow_polyline_trajectory";
+        } else {
+          return false;
+        }
+      };
+      return accomplishment.second or
+             (accomplishment.second = not is_running(accomplishment.first));
+    });
+}
 
 auto FollowTrajectoryAction::endsImmediately() noexcept -> bool { return false; }
 
@@ -40,7 +55,13 @@ auto FollowTrajectoryAction::run() -> void {}
 
 auto FollowTrajectoryAction::start() -> void
 {
-  for (auto && actor : actors) {
+  accomplishments.clear();
+
+  for (const auto & actor : actors) {
+    accomplishments.emplace(actor, false);
+  }
+
+  for (const auto & actor : actors) {
     auto repack_trajectory = [this]() {
       if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>()) {
         auto polyline = traffic_simulator::follow_trajectory::Polyline();

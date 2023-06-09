@@ -359,11 +359,11 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        vehicle performance and dynamic constraints, so it is clamped to a
        realistic value.
     */
-    const auto max_speed =
+    const auto desired_speed =
       speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time;
 
     const auto remaining_time_to_arrival_to_front_waypoint =
-      distance_to_front_waypoint / max_speed;  // [s]
+      distance_to_front_waypoint / desired_speed;  // [s]
 
     if constexpr (true) {
       // clang-format off
@@ -403,12 +403,12 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                 << std::endl;
 
       std::cout << std::fixed
-                << "max_speed "
+                << "desired_speed "
                 << "== speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time "
                 << "== " << speed << " + std::clamp(" << desired_acceleration << ", " << min_acceleration << ", " << max_acceleration << ") * " << step_time << " "
                 << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) << " * " << step_time << " "
                 << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time << " "
-                << "== " << max_speed
+                << "== " << desired_speed
                 << std::endl;
 
       PRINT(distance_to_front_waypoint);
@@ -420,8 +420,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       std::cout << std::fixed
                 << "remaining_time_to_arrival_to_front_waypoint "
                 << "("
-                << "== distance_to_front_waypoint / max_speed "
-                << "== " << distance_to_front_waypoint << " / " << max_speed << " "
+                << "== distance_to_front_waypoint / desired_speed "
+                << "== " << distance_to_front_waypoint << " / " << desired_speed << " "
                 << "== " << remaining_time_to_arrival_to_front_waypoint
                 << ")"
                 << std::endl;
@@ -447,7 +447,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        If the target point is reached during this step, it is considered
        reached.
     */
-    if (isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)) {
+    if (std::isnan(remaining_time_to_arrival_to_front_waypoint) or
+        isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)) {
       /*
          The condition "Is remaining time to front waypoint less than remaining
          time to arrival to front waypoint + step time?" means "If arrival is
@@ -524,7 +525,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
          `followingMode == position`.
       */
       if (parameter->dynamic_constraints_ignorable) {
-        return normalize(target_position - position) * max_speed;  // [m/s]
+        return normalize(target_position - position) * desired_speed;  // [m/s]
       } else {
         /*
            Note: The vector returned if dynamic_constraints_ignorable == true
@@ -544,7 +545,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     */
     const auto steering = desired_velocity - velocity;
 
-    velocity = truncate(velocity + steering, max_speed);
+    velocity = truncate(velocity + steering, desired_speed);
 
     const auto previous_direction = std::exchange(direction, [this]() {
       geometry_msgs::msg::Vector3 direction;
