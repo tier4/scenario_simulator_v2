@@ -70,7 +70,7 @@ OpenSCENARIO:
                                       value: 0
                                       rule: greaterThan
                         Action:
-                          - name: 'hoge'
+                          - name: 'follow_trajectory'
                             PrivateAction:
                               - RoutingAction:
                                   FollowTrajectoryAction:
@@ -135,7 +135,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     StoryboardElementStateCondition:
-                                      storyboardElementRef: hoge
+                                      storyboardElementRef: follow_trajectory
                                       storyboardElementType: action
                                       state: completeState
                                 - name: ''
