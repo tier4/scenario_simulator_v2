@@ -447,8 +447,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        If the target point is reached during this step, it is considered
        reached.
     */
-    if (std::isnan(remaining_time_to_arrival_to_front_waypoint) or
-        isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)) {
+    if (
+      std::isnan(remaining_time_to_arrival_to_front_waypoint) or
+      isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)) {
       /*
          The condition "Is remaining time to front waypoint less than remaining
          time to arrival to front waypoint + step time?" means "If arrival is
