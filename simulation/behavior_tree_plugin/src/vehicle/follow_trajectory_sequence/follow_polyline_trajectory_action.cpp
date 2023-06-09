@@ -333,14 +333,14 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                         v [m/s]
                          ^
                          |
-           desired_speed +      🭈🭆🭂|
-                         |   🭈🭆🭂🮋🮋🮋|
-                         |🭈🭆🭂🮋🮋🮋🮋🮋🮋|
-                   speed +🮋🮋🮋🮋🮋🮋🮋🮋🮋|
-                         |🮋🮋🮋🮋🮋🮋🮋🮋🮋|
-                         |🮋🮋🮋🮋🮋🮋🮋🮋🮋|
-                         +---------+---------------> t [s]
-                       0          remaining_time
+           desired_speed +   /|
+                         |  / |
+                         | /  |
+                   speed +/   |
+                         |    |
+                         |    |
+                         +----+-------------> t [s]
+                       0     remaining_time
 
            desired_speed = speed + desired_acceleration * remaining_time
 
