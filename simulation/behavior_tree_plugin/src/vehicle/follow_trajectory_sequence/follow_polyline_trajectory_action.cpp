@@ -334,11 +334,11 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                          ^
                          |
            desired_speed +      🭈🭆🭂|
-                         |   🭈🭆🭂▉▉▉|
-                         |🭈🭆🭂▉▉▉▉▉▉|
-                   speed +🮋▉▉▉▉▉▉▉▉|
-                         |🮋▉▉▉▉▉▉▉▉|
-                         |🮋▉▉▉▉▉▉▉▉|
+                         |   🭈🭆🭂🮋🮋🮋|
+                         |🭈🭆🭂🮋🮋🮋🮋🮋🮋|
+                   speed +🮋🮋🮋🮋🮋🮋🮋🮋🮋|
+                         |🮋🮋🮋🮋🮋🮋🮋🮋🮋|
+                         |🮋🮋🮋🮋🮋🮋🮋🮋🮋|
                          +---------+---------------> t [s]
                        0          remaining_time
 
@@ -512,10 +512,10 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         return tick();  // tail recursion
       } else {
         throw common::SimulationError(
-          "Vehicle ", std::quoted(entity_status.name),
-          " arrived at the waypoint in trajectory N seconds earlier than the specified time. This "
-          "may be due to unrealistic conditions of arrival time specification compared to vehicle "
-          "parameters and dynamic constraints.");
+          "Vehicle ", std::quoted(entity_status.name), " arrived at the waypoint in trajectory ",
+          remaining_time_to_front_waypoint,
+          " seconds earlier than the specified time. This may be due to unrealistic conditions of "
+          "arrival time specification compared to vehicle parameters and dynamic constraints.");
       }
     }
 
