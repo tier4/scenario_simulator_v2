@@ -67,36 +67,84 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   }
 }
 
+#define DEFINE_GETTER(MEMBER_NAME)                                                   \
+  template <typename T, typename = void>                                             \
+  struct Has##MEMBER_NAME : std::false_type                                          \
+  {                                                                                  \
+  };                                                                                 \
+  template <typename T>                                                              \
+  struct Has##MEMBER_NAME<T, std::void_t<decltype(T::MEMBER_NAME)>> : std::true_type \
+  {                                                                                  \
+  };                                                                                 \
+  template <typename T>                                                              \
+  static constexpr int get##MEMBER_NAME()                                            \
+  {                                                                                  \
+    if constexpr (Has##MEMBER_NAME<T>::value)                                        \
+      return static_cast<int>(T::MEMBER_NAME);                                       \
+    else                                                                             \
+      return -1;                                                                     \
+  }
+
+namespace getter
+{
+DEFINE_GETTER(NONE)
+DEFINE_GETTER(LANE_CHANGE_LEFT)
+DEFINE_GETTER(LANE_CHANGE_RIGHT)
+DEFINE_GETTER(AVOIDANCE_LEFT)
+DEFINE_GETTER(AVOIDANCE_RIGHT)
+DEFINE_GETTER(GOAL_PLANNER)
+DEFINE_GETTER(PULL_OUT)
+DEFINE_GETTER(TRAFFIC_LIGHT)
+DEFINE_GETTER(INTERSECTION)
+DEFINE_GETTER(INTERSECTION_OCCLUSION)
+DEFINE_GETTER(CROSSWALK)
+DEFINE_GETTER(BLIND_SPOT)
+DEFINE_GETTER(DETECTION_AREA)
+DEFINE_GETTER(NO_STOPPING_AREA)
+DEFINE_GETTER(OCCLUSION_SPOT)
+DEFINE_GETTER(EXT_REQUEST_LANE_CHANGE_LEFT)
+DEFINE_GETTER(EXT_REQUEST_LANE_CHANGE_RIGHT)
+DEFINE_GETTER(AVOIDANCE_BY_LC_LEFT)
+DEFINE_GETTER(AVOIDANCE_BY_LC_RIGHT)
+DEFINE_GETTER(NO_DRIVABLE_LANE)
+}  // namespace getter
+#undef DEFINE_GETTER
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
   const std::string & module_name, const std::string & command) -> void
 {
   const auto module_type_code = [](const std::string & module_name) -> uint8_t {
 
-#define ELEMENT(IDENTIFIER)                              \
-  {                                                      \
-    #IDENTIFIER, tier4_rtc_msgs::msg::Module::IDENTIFIER \
+#define ADD_ELEMENT(MAP, IDENTIFIER)                                                     \
+  if (int value = getter::get##IDENTIFIER<tier4_rtc_msgs::msg::Module>(); value != -1) { \
+    MAP[#IDENTIFIER] = static_cast<uint8_t>(value);                                      \
   }
-    static std::unordered_map<std::string, uint8_t> module_type_map = {
-      ELEMENT(NONE),
-      ELEMENT(LANE_CHANGE_LEFT),
-      ELEMENT(LANE_CHANGE_RIGHT),
-      ELEMENT(AVOIDANCE_LEFT),
-      ELEMENT(AVOIDANCE_RIGHT),
-      ELEMENT(GOAL_PLANNER),
-      ELEMENT(TRAFFIC_LIGHT),
-      ELEMENT(INTERSECTION),
-      ELEMENT(INTERSECTION_OCCLUSION),
-      ELEMENT(CROSSWALK),
-      ELEMENT(BLIND_SPOT),
-      ELEMENT(DETECTION_AREA),
-      ELEMENT(NO_STOPPING_AREA),
-      ELEMENT(OCCLUSION_SPOT),
-      ELEMENT(EXT_REQUEST_LANE_CHANGE_LEFT),
-      ELEMENT(EXT_REQUEST_LANE_CHANGE_RIGHT),
-      ELEMENT(AVOIDANCE_BY_LC_LEFT),
-      ELEMENT(AVOIDANCE_BY_LC_RIGHT),
-    };
-#undef ELEMENT
+    static std::unordered_map<std::string, uint8_t> module_type_map = [&]() {
+      std::unordered_map<std::string, uint8_t> map;
+      ADD_ELEMENT(map, NONE)
+      ADD_ELEMENT(map, LANE_CHANGE_LEFT)
+      ADD_ELEMENT(map, LANE_CHANGE_RIGHT)
+      ADD_ELEMENT(map, AVOIDANCE_LEFT)
+      ADD_ELEMENT(map, AVOIDANCE_RIGHT)
+      ADD_ELEMENT(map, GOAL_PLANNER)
+      ADD_ELEMENT(map, PULL_OUT)
+      ADD_ELEMENT(map, TRAFFIC_LIGHT)
+      ADD_ELEMENT(map, INTERSECTION)
+      ADD_ELEMENT(map, INTERSECTION_OCCLUSION)
+      ADD_ELEMENT(map, CROSSWALK)
+      ADD_ELEMENT(map, BLIND_SPOT)
+      ADD_ELEMENT(map, DETECTION_AREA)
+      ADD_ELEMENT(map, NO_STOPPING_AREA)
+      ADD_ELEMENT(map, OCCLUSION_SPOT)
+      ADD_ELEMENT(map, EXT_REQUEST_LANE_CHANGE_LEFT)
+      ADD_ELEMENT(map, EXT_REQUEST_LANE_CHANGE_RIGHT)
+      ADD_ELEMENT(map, AVOIDANCE_BY_LC_LEFT)
+      ADD_ELEMENT(map, AVOIDANCE_BY_LC_RIGHT)
+      ADD_ELEMENT(map, NO_DRIVABLE_LANE)
+      return map;
+    }();
+
+#undef ADD_ELEMENT
 
     const auto module_type = module_type_map.find(module_name);
     if (module_type == module_type_map.end()) {
