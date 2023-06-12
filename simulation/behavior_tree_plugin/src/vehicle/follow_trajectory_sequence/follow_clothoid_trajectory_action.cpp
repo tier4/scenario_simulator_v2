@@ -28,6 +28,7 @@ auto FollowClothoidTrajectoryAction::calculateObstacle(
   const traffic_simulator_msgs::msg::WaypointsArray &)
   -> const std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
+  /// @note When implementing a function to stop for obstacles on the trajectory, implement a process to detect obstacles here.
   return std::nullopt;
 }
 
