@@ -85,31 +85,44 @@ HdMapUtils::HdMapUtils(
     lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
-auto HdMapUtils::canonicalizeAllLaneletPose(
+auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
   std::vector<traffic_simulator_msgs::msg::LaneletPose> canonicalized_all;
-  auto canonicalized = lanelet_pose;
-  while (canonicalized.s < 0) {
-    if (const auto ids = getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+  if (lanelet_pose.s < 0) {
+    if (const auto ids = getPreviousLaneletIds(lanelet_pose.lanelet_id); ids.empty()) {
       return canonicalized_all;
     } else {
       for (const auto id : ids) {
-        canonicalized.s = lanelet_pose.s + getLaneletLength(id);
-        canonicalized.lanelet_id = id;
-        canonicalized_all.push_back(canonicalized);
+        const auto lanelet_pose_tmp = traffic_simulator::helper::constructLaneletPose(
+          id, lanelet_pose.s + getLaneletLength(lanelet_pose.lanelet_id), 0);
+        if (auto canonicalized_lanelet_poses = gelAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
+            canonicalized_lanelet_poses.empty()) {
+          canonicalized_all.push_back(lanelet_pose_tmp);
+        } else {
+          std::copy(
+            canonicalized_lanelet_poses.begin(), canonicalized_lanelet_poses.end(),
+            std::back_inserter(canonicalized_all));
+        }
       }
     }
   }
-  while (canonicalized.s > (getLaneletLength(canonicalized.lanelet_id) + 0.2)) {
-    if (const auto ids = getNextLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+  if (lanelet_pose.s > (getLaneletLength(lanelet_pose.lanelet_id))) {
+    if (const auto ids = getNextLaneletIds(lanelet_pose.lanelet_id); ids.empty()) {
       return canonicalized_all;
     } else {
       for (const auto id : ids) {
-        canonicalized.s = lanelet_pose.s - getLaneletLength(id);
-        canonicalized.lanelet_id = id;
-        canonicalized_all.push_back(canonicalized);
+        const auto lanelet_pose_tmp = traffic_simulator::helper::constructLaneletPose(
+          id, lanelet_pose.s - getLaneletLength(lanelet_pose.lanelet_id), 0);
+        if (auto canonicalized_lanelet_poses = gelAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
+            canonicalized_lanelet_poses.empty()) {
+          canonicalized_all.push_back(lanelet_pose_tmp);
+        } else {
+          std::copy(
+            canonicalized_lanelet_poses.begin(), canonicalized_lanelet_poses.end(),
+            std::back_inserter(canonicalized_all));
+        }
       }
     }
   }
