@@ -65,13 +65,11 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   Cooperator current_cooperator = Cooperator::simulator;
 
+  tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
+
   auto approve(const tier4_rtc_msgs::msg::CooperateStatusArray &) -> void;
 
   auto cooperate(const tier4_rtc_msgs::msg::CooperateStatusArray &) -> void;
-
-  auto sendCooperateCommands(const tier4_rtc_msgs::msg::CooperateStatusArray &, const std::string &, std::string &) -> void;
-
-  tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
   std::string minimum_risk_maneuver_state;
 
