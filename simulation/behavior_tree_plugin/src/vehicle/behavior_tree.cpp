@@ -22,8 +22,6 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
-#include <behavior_tree_plugin/vehicle/follow_trajectory_sequence/follow_clothoid_trajectory_action.hpp>
-#include <behavior_tree_plugin/vehicle/follow_trajectory_sequence/follow_nurbs_trajectory_action.hpp>
 #include <behavior_tree_plugin/vehicle/follow_trajectory_sequence/follow_polyline_trajectory_action.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <iostream>
@@ -47,8 +45,6 @@ void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
     "StopAtTrafficLight");
   factory_.registerNodeType<vehicle::follow_lane_sequence::YieldAction>("Yield");
   factory_.registerNodeType<vehicle::follow_lane_sequence::MoveBackwardAction>("MoveBackward");
-  factory_.registerNodeType<vehicle::FollowClothoidTrajectoryAction>("FollowClothoidTrajectory");
-  factory_.registerNodeType<vehicle::FollowNurbsTrajectoryAction>("FollowNurbsTrajectory");
   factory_.registerNodeType<vehicle::FollowPolylineTrajectoryAction>("FollowPolylineTrajectory");
   factory_.registerNodeType<vehicle::LaneChangeAction>("LaneChange");
 

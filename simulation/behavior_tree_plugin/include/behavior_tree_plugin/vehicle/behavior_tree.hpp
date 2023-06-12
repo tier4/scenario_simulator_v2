@@ -59,8 +59,6 @@ public:
   DEFINE_GETTER_SETTER(DebugMarker, std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
-  DEFINE_GETTER_SETTER(FollowClothoidTrajectoryParameter, std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Clothoid>>)
-  DEFINE_GETTER_SETTER(FollowNurbsTrajectoryParameter, std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Nurbs>>)
   DEFINE_GETTER_SETTER(FollowPolylineTrajectoryParameter, std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Polyline>>)
   DEFINE_GETTER_SETTER(GoalPoses, std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)

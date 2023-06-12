@@ -4,8 +4,6 @@
         <LaneChange name="lane_change" />
         <Fallback name="follow_trajectory_sequence">
           <FollowPolylineTrajectory name="follow_polyline_trajectory" />
-          <FollowClothoidTrajectory name="follow_clothoid_trajectory" />
-          <FollowNurbsTrajectory name="follow_nurbs_trajectory" />
         </Fallback>
         <Fallback name="follow_lane_sequence">
             <FollowLane name="follow_lane" />

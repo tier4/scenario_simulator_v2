@@ -41,16 +41,6 @@ struct Polyline
   std::vector<Vertex> vertices;
 };
 
-struct Clothoid
-{
-  // TODO
-};
-
-struct Nurbs
-{
-  // TODO
-};
-
 template <typename Shape>
 struct Parameter
 {
