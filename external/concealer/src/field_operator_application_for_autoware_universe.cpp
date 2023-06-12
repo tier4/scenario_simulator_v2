@@ -181,10 +181,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     cooperate_command.module = cooperate_status->module;
     cooperate_command.uuid = cooperate_status->uuid;
     cooperate_command.command.type = [command]() {
+    // clang-format off
 #define ELEMENT(IDENTIFIER)                               \
   {                                                       \
     #IDENTIFIER, tier4_rtc_msgs::msg::Command::IDENTIFIER \
   }
+      // clang-format on
       static std::unordered_map<std::string, uint8_t> command_type_map = {
         ELEMENT(ACTIVATE),
         ELEMENT(DEACTIVATE),
