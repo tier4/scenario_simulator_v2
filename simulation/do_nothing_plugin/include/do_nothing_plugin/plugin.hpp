@@ -24,7 +24,7 @@ class DoNothingBehavior : public BehaviorPluginBase
 public:
   /**
    * @brief just update timestamp of entity_status_ member variable.
-   * @param current_time current time scenario time
+   * @param current_time current time in scenario time
    * @param step_time step time of the simulation, this argument exists for other BehaviorPlugin classes but are not used by this plugin.
    */
   void update(double current_time, double step_time) override;
