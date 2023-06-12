@@ -83,7 +83,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
       ELEMENT(AVOIDANCE_LEFT),
       ELEMENT(AVOIDANCE_RIGHT),
       ELEMENT(GOAL_PLANNER),
-      ELEMENT(PULL_OUT),
       ELEMENT(TRAFFIC_LIGHT),
       ELEMENT(INTERSECTION),
       ELEMENT(INTERSECTION_OCCLUSION),
