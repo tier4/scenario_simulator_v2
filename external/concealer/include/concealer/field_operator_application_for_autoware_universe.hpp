@@ -69,7 +69,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   auto cooperate(const tier4_rtc_msgs::msg::CooperateStatusArray &) -> void;
 
-  auto sendCooperateCommands(const tier4_rtc_msgs::msg::CooperateStatusArray &, const std::string &, std::string &) -> bool;
+  auto sendCooperateCommands(const tier4_rtc_msgs::msg::CooperateStatusArray &, const std::string &, std::string &) -> void;
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
@@ -156,7 +156,7 @@ public:
 
   auto restrictTargetSpeed(double) const -> double override;
 
-  auto sendCooperateCommand(const std::string &, const std::string &) -> bool override;
+  auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
 
   auto setCooperator(const std::string & cooperator) -> void override;
 

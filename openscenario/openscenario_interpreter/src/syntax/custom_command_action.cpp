@@ -100,7 +100,8 @@ struct ApplyRequestToCorporateCommandAction : public CustomCommand,
 
   auto start(const Scope &) -> void override
   {
-    asFieldOperatorApplication("ego").sendCooperateCommand(parameters.at(0), parameters.at(1));
+    static_assert(0 < Version and Version <= 1);
+    sendCooperateCommand(parameters.at(0), parameters.at(1));
   }
 };
 

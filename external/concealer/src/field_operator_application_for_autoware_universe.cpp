@@ -68,7 +68,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
-  const std::string & module_name, const std::string & command) -> bool
+  const std::string & module_name, const std::string & command) -> void
 {
   const auto module_type_code = [](std::string module_name) -> uint8_t {
 
@@ -119,7 +119,11 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
       return cooperate_status.module.type == module_type_code;
     });
   if (cooperate_status == latest_cooperate_status_array.statuses.end()) {
-    return false;
+    std::stringstream what;
+    what << "Failed to send cooperate command : Cannot find a request to cooperate for module \""
+         << module_name;
+    what << ". Please check if the situation is such that the request occurs when sending.";
+    throw common::Error(what.str());
   } else {
     auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
     request->stamp = latest_cooperate_status_array.stamp;
@@ -155,8 +159,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     request->commands.push_back(cooperate_command);
 
     task_queue.delay([this, request]() { requestCooperateCommands(request); });
-
-    return true;
   }
 }
 
