@@ -220,7 +220,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     */
     const auto distance_to_front_waypoint = hypot(position, target_position);  // [m]
 
-    auto absolute = [this](const auto & vertex) {
+    auto to_simulation_time = [this](const auto & vertex) {
       /*
          If the trajectory is a closed loop, timing_is_absolute must always be
          false, which is guaranteed by the constructor of type Parameter.
@@ -239,7 +239,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     };
 
     const auto remaining_time_to_front_waypoint =
-      absolute(parameter->shape.vertices.front()) - entity_status.time;
+      to_simulation_time(parameter->shape.vertices.front()) - entity_status.time;
 
     const auto [distance, remaining_time] = [&]() {
       if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
@@ -262,7 +262,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         };
 
         if (const auto remaining_time =
-              absolute(*first_waypoint_with_arrival_time_specified) - entity_status.time;
+              to_simulation_time(*first_waypoint_with_arrival_time_specified) - entity_status.time;
             /*
                The conditional expression below should ideally be
                remaining_time < 0.
