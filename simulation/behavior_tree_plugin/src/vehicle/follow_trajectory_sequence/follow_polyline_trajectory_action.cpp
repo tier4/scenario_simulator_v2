@@ -193,6 +193,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
      The following code implements the steering behavior known as "seek". See
      "Steering Behaviors For Autonomous Characters" by Craig Reynolds for more
      information.
+
+     See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
@@ -287,9 +289,12 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
             remaining_time < -step_time) {
           throw common::Error(
             "Vehicle ", std::quoted(entity_status.name),
-            " failed to reach the trajectory waypoint at the specified time. This may be due to "
-            "unrealistic conditions of arrival time specification compared to vehicle parameters "
-            "and dynamic constraints.");
+            " failed to reach the trajectory waypoint at the specified time. The specified time "
+            "is ",
+            first_waypoint_with_arrival_time_specified->time, " seconds (",
+            (parameter->timing_is_absolute ? "absolute" : "relative"),
+            " timing). This may be due to unrealistic conditions of arrival time specification "
+            "compared to vehicle parameters and dynamic constraints.");
         } else {
           return std::make_tuple(
             distance_to_front_waypoint +
