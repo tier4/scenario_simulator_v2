@@ -3,7 +3,7 @@ OpenSCENARIO:
     revMajor: 1
     revMinor: 1
     date: "2023-06-12T11:11:00+09:00"
-    description: "Ego avoids a parked car with approval to the AVOIDANCE_RIGHT request. But ego does not return to the left lane, as this scenario will not approve any other requests to cooperate."
+    description: "Ego avoids a parked car with an approval for the AVOIDANCE_RIGHT request. But ego does not return to the left lane, as this scenario will not approve any other requests to cooperate."
     author: "Kotaro YOSHIMOTO"
   ParameterDeclarations:
     ParameterDeclaration: []
@@ -100,7 +100,7 @@ OpenSCENARIO:
     Story:
       - name: ""
         Act:
-          - name: "Act( Deactivate the request to cooperate for intersection )"
+          - name: ""
             ManeuverGroup:
               - maximumExecutionCount: 1
                 name: ""

@@ -70,7 +70,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
 auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
   const std::string & module_name, const std::string & command) -> void
 {
-  const auto module_type_code = [](std::string module_name) -> uint8_t {
+  const auto module_type_code = [](const std::string & module_name) -> uint8_t {
 
 #define ELEMENT(IDENTIFIER)                              \
   {                                                      \
@@ -98,12 +98,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     };
 #undef ELEMENT
 
-    auto module_type = module_type_map.find(module_name);
+    const auto module_type = module_type_map.find(module_name);
     if (module_type == module_type_map.end()) {
       std::stringstream what;
       what << "Unexpected module name for tier4_rtc_msgs::msg::Module : " << module_name;
       what << ". One of the following module names is expected : { ";
-      for (auto element : module_type_map) {
+      for (const auto & element : module_type_map) {
         what << element.first << ", ";
       }
       what << "}";
@@ -113,14 +113,15 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     }
   }(module_name);
 
-  auto cooperate_status = std::find_if(
+  const auto cooperate_status = std::find_if(
     latest_cooperate_status_array.statuses.begin(), latest_cooperate_status_array.statuses.end(),
     [module_type_code](const auto & cooperate_status) {
       return cooperate_status.module.type == module_type_code;
     });
+
   if (cooperate_status == latest_cooperate_status_array.statuses.end()) {
     std::stringstream what;
-    what << "Failed to send cooperate command : Cannot find a request to cooperate for module \""
+    what << "Failed to send a cooperate command : Cannot find a request to cooperate for module \""
          << module_name;
     what << ". Please check if the situation is such that the request occurs when sending.";
     throw common::Error(what.str());
@@ -142,16 +143,16 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
       };
 #undef ELEMENT
 
-      auto command_type = command_type_map.find(command);
+      const auto command_type = command_type_map.find(command);
       if (command_type == command_type_map.end()) {
         std::stringstream what;
         what << "Unexpected command for tier4_rtc_msgs::msg::Command : " << command;
         what << ", One of the following commands is expected : {";
-        for (auto element : command_type_map) {
+        for (const auto & element : command_type_map) {
           what << element.first << ", ";
         }
         what << "}";
-        throw std::runtime_error(what.str());
+        throw common::Error(what.str());
       } else {
         return command_type->second;
       }
