@@ -96,7 +96,7 @@ auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
     } else {
       for (const auto id : ids) {
         const auto lanelet_pose_tmp = traffic_simulator::helper::constructLaneletPose(
-          id, lanelet_pose.s + getLaneletLength(lanelet_pose.lanelet_id), 0);
+          id, lanelet_pose.s + getLaneletLength(id), 0);
         if (auto canonicalized_lanelet_poses = gelAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
             canonicalized_lanelet_poses.empty()) {
           canonicalized_all.push_back(lanelet_pose_tmp);

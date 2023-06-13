@@ -131,15 +131,17 @@ TEST(HdMapUtils, CanonicalizeNegative)
   origin.longitude = 139.78066608243;
   hdmap_utils::HdMapUtils hdmap_utils(path, origin);
 
-  const auto lanelet_len = hdmap_utils.getLaneletLength(34696);
-  double canonicalized_lanelet_offset = -5;
+  double canonicalized_lanelet_offset = -22;
   const auto non_canonicalized_lanelet_pose =
-    traffic_simulator::helper::constructLaneletPose(34768, canonicalized_lanelet_offset, 0);
+    traffic_simulator::helper::constructLaneletPose(34564, canonicalized_lanelet_offset, 0);
   const auto canonicalized_lanelet_pose = std::get<std::optional<traffic_simulator::LaneletPose>>(
     hdmap_utils.canonicalizeLaneletPose(non_canonicalized_lanelet_pose));
 
-  EXPECT_EQ(canonicalized_lanelet_pose.value().lanelet_id, 34696);
-  EXPECT_EQ(canonicalized_lanelet_pose.value().s, lanelet_len + canonicalized_lanelet_offset);
+  EXPECT_EQ(canonicalized_lanelet_pose.value().lanelet_id, 34576);
+  EXPECT_EQ(
+    canonicalized_lanelet_pose.value().s, canonicalized_lanelet_offset +
+                                            hdmap_utils.getLaneletLength(34570) +
+                                            hdmap_utils.getLaneletLength(34576));
 }
 
 TEST(HdMapUtils, CanonicalizePositive)
@@ -151,15 +153,17 @@ TEST(HdMapUtils, CanonicalizePositive)
   origin.longitude = 139.78066608243;
   hdmap_utils::HdMapUtils hdmap_utils(path, origin);
 
-  const auto lanelet_len = hdmap_utils.getLaneletLength(34981);
-  double canonicalized_lanelet_offset = 5;
-  const auto non_canonicalized_lanelet_pose = traffic_simulator::helper::constructLaneletPose(
-    34981, lanelet_len + canonicalized_lanelet_offset, 0);
+  double non_canonicalized_lanelet_s = 30;
+  const auto non_canonicalized_lanelet_pose =
+    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s, 0);
   const auto canonicalized_lanelet_pose = std::get<std::optional<traffic_simulator::LaneletPose>>(
     hdmap_utils.canonicalizeLaneletPose(non_canonicalized_lanelet_pose));
 
-  EXPECT_EQ(canonicalized_lanelet_pose.value().lanelet_id, 34585);
-  EXPECT_EQ(canonicalized_lanelet_pose.value().s, canonicalized_lanelet_offset);
+  EXPECT_EQ(canonicalized_lanelet_pose.value().lanelet_id, 34579);
+  EXPECT_EQ(
+    canonicalized_lanelet_pose.value().s, non_canonicalized_lanelet_s -
+                                            hdmap_utils.getLaneletLength(34981) -
+                                            hdmap_utils.getLaneletLength(34585));
 }
 
 TEST(HdMapUtils, CanonicalizeAllNegative)
@@ -171,7 +175,7 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
   origin.longitude = 139.78066608243;
   hdmap_utils::HdMapUtils hdmap_utils(path, origin);
 
-  double canonicalized_lanelet_offset = -31;
+  double canonicalized_lanelet_offset = -22;
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34564, canonicalized_lanelet_offset, 0);
   const auto canonicalized_lanelet_poses =
@@ -181,18 +185,18 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34576);
   EXPECT_EQ(
     canonicalized_lanelet_poses[0].s, canonicalized_lanelet_offset +
-                                        hdmap_utils.getLaneletLength(34564) +
-                                        hdmap_utils.getLaneletLength(34570));
+                                        hdmap_utils.getLaneletLength(34570) +
+                                        hdmap_utils.getLaneletLength(34576));
   EXPECT_EQ(canonicalized_lanelet_poses[1].lanelet_id, 34981);
   EXPECT_EQ(
     canonicalized_lanelet_poses[1].s, canonicalized_lanelet_offset +
-                                        hdmap_utils.getLaneletLength(34564) +
-                                        hdmap_utils.getLaneletLength(34636));
+                                        hdmap_utils.getLaneletLength(34636) +
+                                        hdmap_utils.getLaneletLength(34981));
   EXPECT_EQ(canonicalized_lanelet_poses[2].lanelet_id, 34600);
   EXPECT_EQ(
     canonicalized_lanelet_poses[2].s, canonicalized_lanelet_offset +
-                                        hdmap_utils.getLaneletLength(34564) +
-                                        hdmap_utils.getLaneletLength(34648));
+                                        hdmap_utils.getLaneletLength(34648) +
+                                        hdmap_utils.getLaneletLength(34600));
 }
 
 TEST(HdMapUtils, CanonicalizeAllPositive)
@@ -204,26 +208,28 @@ TEST(HdMapUtils, CanonicalizeAllPositive)
   origin.longitude = 139.78066608243;
   hdmap_utils::HdMapUtils hdmap_utils(path, origin);
 
-  const auto lanelet_len = hdmap_utils.getLaneletLength(34981);
-  double canonicalized_lanelet_offset = 25;
-  const auto non_canonicalized_lanelet_pose = traffic_simulator::helper::constructLaneletPose(
-    34981, lanelet_len + canonicalized_lanelet_offset, 0);
+  double non_canonicalized_lanelet_s = 30;
+  const auto non_canonicalized_lanelet_pose =
+    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s, 0);
   const auto canonicalized_lanelet_poses =
     hdmap_utils.gelAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
   EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(3));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34579);
   EXPECT_EQ(
-    canonicalized_lanelet_poses[0].s,
-    canonicalized_lanelet_offset - hdmap_utils.getLaneletLength(34585));
+    canonicalized_lanelet_poses[0].s, non_canonicalized_lanelet_s -
+                                        hdmap_utils.getLaneletLength(34585) -
+                                        hdmap_utils.getLaneletLength(34981));
   EXPECT_EQ(canonicalized_lanelet_poses[1].lanelet_id, 34564);
   EXPECT_EQ(
-    canonicalized_lanelet_poses[1].s,
-    canonicalized_lanelet_offset - hdmap_utils.getLaneletLength(34636));
+    canonicalized_lanelet_poses[1].s, non_canonicalized_lanelet_s -
+                                        hdmap_utils.getLaneletLength(34636) -
+                                        hdmap_utils.getLaneletLength(34981));
   EXPECT_EQ(canonicalized_lanelet_poses[2].lanelet_id, 34630);
   EXPECT_EQ(
-    canonicalized_lanelet_poses[2].s,
-    canonicalized_lanelet_offset - hdmap_utils.getLaneletLength(34651));
+    canonicalized_lanelet_poses[2].s, non_canonicalized_lanelet_s -
+                                        hdmap_utils.getLaneletLength(34651) -
+                                        hdmap_utils.getLaneletLength(34981));
 }
 
 int main(int argc, char ** argv)
