@@ -42,8 +42,8 @@ auto ControllerAction::run() noexcept -> void {}
 
 auto ControllerAction::start() const -> void
 {
-  for (const auto & actor : actors) {
-    assign_controller_action(actor);
+  for (const auto & object : global().entities->objects(actors)) {
+    assign_controller_action(object);
   }
 }
 }  // namespace syntax
