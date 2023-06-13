@@ -72,81 +72,64 @@ struct is_vector3<
 {
 };
 
-#define DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(OPERATOR)                                       \
-  template <                                                                                      \
-    typename T, typename U,                                                                       \
-    std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, std::nullptr_t> = nullptr> \
-  auto operator OPERATOR(const T & a, const U & b)                                                \
-  {                                                                                               \
-    geometry_msgs::msg::Vector3 v;                                                                \
-    v.x = a.x OPERATOR b.x;                                                                       \
-    v.y = a.y OPERATOR b.y;                                                                       \
-    v.z = a.z OPERATOR b.z;                                                                       \
-    return v;                                                                                     \
-  }                                                                                               \
-  static_assert(true)
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, std::nullptr_t> = nullptr>
+auto operator+(const T & a, const U & b)
+{
+  geometry_msgs::msg::Vector3 v;
+  v.x = a.x + b.x;
+  v.y = a.y + b.y;
+  v.z = a.z + b.z;
+  return v;
+}
 
-DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(+);
-DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(-);
-DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(*);
-DEFINE_VECTOR3_VS_VECTOR3_BINARY_OPERATOR(/);
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, std::nullptr_t> = nullptr>
+auto operator-(const T & a, const U & b)
+{
+  geometry_msgs::msg::Vector3 v;
+  v.x = a.x - b.x;
+  v.y = a.y - b.y;
+  v.z = a.z - b.z;
+  return v;
+}
 
-#define DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(OPERATOR)                          \
-  template <                                                                                      \
-    typename T, typename U,                                                                       \
-    std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, std::nullptr_t> = nullptr> \
-  auto operator OPERATOR(T & a, const U & b)->decltype(auto)                                      \
-  {                                                                                               \
-    a.x OPERATOR b.x;                                                                             \
-    a.y OPERATOR b.y;                                                                             \
-    a.z OPERATOR b.z;                                                                             \
-    return a;                                                                                     \
-  }                                                                                               \
-  static_assert(true)
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, std::nullptr_t> = nullptr>
+auto operator+=(T & a, const U & b) -> decltype(auto)
+{
+  a.x += b.x;
+  a.y += b.y;
+  a.z += b.z;
+  return a;
+}
 
-DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(+=);
-DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(-=);
-DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(*=);
-DEFINE_VECTOR3_VS_VECTOR3_COMPOUND_ASSIGNMENT_OPERATOR(/=);
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<is_vector3<T>, std::is_scalar<U>>, std::nullptr_t> = nullptr>
+auto operator*(const T & a, const U & b)
+{
+  geometry_msgs::msg::Vector3 v;
+  v.x = a.x * b;
+  v.y = a.y * b;
+  v.z = a.z * b;
+  return v;
+}
 
-#define DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(OPERATOR)                                   \
-  template <                                                                                 \
-    typename T, typename U,                                                                  \
-    std::enable_if_t<std::conjunction_v<is_vector3<T>, std::is_scalar<U>>, std::nullptr_t> = \
-      nullptr>                                                                               \
-  auto operator OPERATOR(const T & a, const U & b)                                           \
-  {                                                                                          \
-    geometry_msgs::msg::Vector3 v;                                                           \
-    v.x = a.x OPERATOR b;                                                                    \
-    v.y = a.y OPERATOR b;                                                                    \
-    v.z = a.z OPERATOR b;                                                                    \
-    return v;                                                                                \
-  }                                                                                          \
-  static_assert(true)
-
-DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(+);
-DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(-);
-DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(*);
-DEFINE_VECTOR3_VS_SCALAR_BINARY_OPERATOR(/);
-
-#define DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(OPERATOR)                      \
-  template <                                                                                 \
-    typename T, typename U,                                                                  \
-    std::enable_if_t<std::conjunction_v<is_vector3<T>, std::is_scalar<U>>, std::nullptr_t> = \
-      nullptr>                                                                               \
-  auto operator OPERATOR(T & a, const U & b)                                                 \
-  {                                                                                          \
-    a.x OPERATOR b;                                                                          \
-    a.y OPERATOR b;                                                                          \
-    a.z OPERATOR b;                                                                          \
-    return a;                                                                                \
-  }                                                                                          \
-  static_assert(true)
-
-DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(+=);
-DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(-=);
-DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(*=);
-DEFINE_VECTOR3_VS_SCALAR_COMPOUND_ASSIGNMENT_OPERATOR(/=);
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<is_vector3<T>, std::is_scalar<U>>, std::nullptr_t> = nullptr>
+auto operator/(const T & a, const U & b)
+{
+  geometry_msgs::msg::Vector3 v;
+  v.x = a.x / b;
+  v.y = a.y / b;
+  v.z = a.z / b;
+  return v;
+}
 
 template <typename T, typename U>
 auto hypot(const T & from, const U & to)
