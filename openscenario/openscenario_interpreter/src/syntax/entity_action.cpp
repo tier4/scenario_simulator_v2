@@ -41,11 +41,13 @@ auto EntityAction::run() noexcept -> void {}
 
 auto EntityAction::start() const -> void
 {
-  return apply<void>([this](auto && action) {
-    for (const auto & entity : global().entities->enumerate(entity_ref)) {
-      action(entity);
-    }
-  }, *this);
+  return apply<void>(
+    [this](auto && action) {
+      for (const auto & entity : global().entities->objects({entity_ref})) {
+        action(entity);
+      }
+    },
+    *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
