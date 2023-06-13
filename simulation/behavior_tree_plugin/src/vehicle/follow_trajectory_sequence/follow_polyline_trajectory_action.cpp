@@ -28,6 +28,7 @@ auto FollowPolylineTrajectoryAction::calculateWaypoints()
   -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   auto waypoints = traffic_simulator_msgs::msg::WaypointsArray();
+  waypoints.waypoints.push_back(entity_status.pose.position);
   for (const auto & vertex : parameter->shape.vertices) {
     waypoints.waypoints.push_back(vertex.position.position);
   }
@@ -571,30 +572,40 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
     velocity = truncate(velocity + steering, desired_speed);
 
-    const auto previous_direction = std::exchange(direction, [this]() {
+    auto updated_status = entity_status;
+
+    updated_status.pose.position += velocity * step_time;
+
+    updated_status.pose.orientation = [this]() {
       geometry_msgs::msg::Vector3 direction;
       direction.x = 0;
       direction.y = 0;
       direction.z = std::atan2(velocity.y, velocity.x);
-      return direction;
-    }());
+      return quaternion_operation::convertEulerAngleToQuaternion(direction);
+    }();
 
-    auto updated_status = entity_status;
-
-    // clang-format off
     updated_status.action_status.twist.linear.x = norm(velocity);
+
     updated_status.action_status.twist.linear.y = 0;
+
     updated_status.action_status.twist.linear.z = 0;
-    updated_status.action_status.twist.angular.x = 0;
-    updated_status.action_status.twist.angular.y = 0;
-    updated_status.action_status.twist.angular.z = (direction.z - previous_direction.z) / step_time;
-    updated_status.action_status.accel.linear = (updated_status.action_status.twist.linear - entity_status.action_status.twist.linear) / step_time;
-    updated_status.action_status.accel.angular = (updated_status.action_status.twist.angular - entity_status.action_status.twist.angular) / step_time;
-    updated_status.pose.position += velocity * step_time;
-    updated_status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(direction);
+
+    updated_status.action_status.twist.angular =
+      quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
+        entity_status.pose.orientation, updated_status.pose.orientation)) /
+      step_time;
+
+    updated_status.action_status.accel.linear =
+      (updated_status.action_status.twist.linear - entity_status.action_status.twist.linear) /
+      step_time;
+
+    updated_status.action_status.accel.angular =
+      (updated_status.action_status.twist.angular - entity_status.action_status.twist.angular) /
+      step_time;
+
     updated_status.time = entity_status.time + step_time;
+
     updated_status.lanelet_pose_valid = false;
-    // clang-format on
 
     setOutput("updated_status", updated_status);
     setOutput("waypoints", calculateWaypoints());

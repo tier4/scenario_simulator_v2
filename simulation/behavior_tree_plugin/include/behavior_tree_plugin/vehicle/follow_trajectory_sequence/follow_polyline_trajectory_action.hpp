@@ -34,8 +34,6 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
 
   geometry_msgs::msg::Vector3 velocity;  // world coordinate
 
-  geometry_msgs::msg::Vector3 direction;  // world coordinate
-
   using VehicleActionNode::VehicleActionNode;
 
   auto calculateWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
