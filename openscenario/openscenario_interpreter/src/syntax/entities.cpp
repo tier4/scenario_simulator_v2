@@ -50,14 +50,19 @@ auto Entities::ref(const String & entity_ref) const -> Object
   }
 }
 
-auto Entities::enumerate(const String & entity_ref) const -> std::list<String> {
-  if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
-    return { entity_ref };
-  } else if (object.is<EntitySelection>()) {
-    return object.as<EntitySelection>().enumerate(*this);
-  } else {
-    THROW_SYNTAX_ERROR("Unsupported entity type is specified");
+auto Entities::objects(const std::list<String> & entity_refs) const -> std::list<String>
+{
+  auto object_list = std::list<String>();
+  for (auto & entity_ref : entity_refs) {
+    if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
+      object_list.emplace_back(entity_ref);
+    } else if (object.is<EntitySelection>()) {
+      object_list.merge(object.as<EntitySelection>().objects(*this));
+    } else {
+      THROW_SYNTAX_ERROR("Unsupported entity type is specified");
+    }
   }
+  return object_list;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

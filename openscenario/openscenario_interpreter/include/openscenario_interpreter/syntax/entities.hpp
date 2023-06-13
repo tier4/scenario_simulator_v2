@@ -15,9 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITIES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITIES_HPP_
 
+#include <list>
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
-#include <list>
 
 namespace openscenario_interpreter
 {
@@ -48,7 +48,7 @@ public:
 
   auto ref(const String &) const -> Object;
 
-  auto enumerate(const String &) const -> std::list<String>;
+  auto objects(const std::list<String> &) const -> std::list<String>;
 
   auto begin() const { return entities.begin(); }
 
