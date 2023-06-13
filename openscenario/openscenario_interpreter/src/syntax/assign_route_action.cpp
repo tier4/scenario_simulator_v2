@@ -42,9 +42,9 @@ auto AssignRouteAction::run() -> void {}
 
 auto AssignRouteAction::start() -> void
 {
-  for (const auto & actor : actors) {
+  for (const auto & object : global().entities->objects(actors)) {
     applyAssignRouteAction(
-      actor,
+      object,
       static_cast<std::vector<traffic_simulator_msgs::msg::LaneletPose>>(route.as<const Route>()));
   }
 }
