@@ -79,10 +79,11 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   template <typename T>                                                              \
   static constexpr int get##MEMBER_NAME()                                            \
   {                                                                                  \
-    if constexpr (Has##MEMBER_NAME<T>::value)                                        \
+    if constexpr (Has##MEMBER_NAME<T>::value) {                                      \
       return static_cast<int>(T::MEMBER_NAME);                                       \
-    else                                                                             \
+    } else {                                                                         \
       return -1;                                                                     \
+    }                                                                                \
   }
 
 namespace getter
