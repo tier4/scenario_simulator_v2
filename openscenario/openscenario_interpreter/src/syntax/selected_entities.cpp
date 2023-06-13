@@ -46,17 +46,30 @@ auto SelectedByTypes::objects(const Entities & entities) -> std::list<String>
   auto selected_entities = std::list<String>();
   for (const auto & [name, object] : entities) {
     for (const auto & byType : byTypes) {
-      if (
-        (object.is<Vehicle>() and byType.objectType == ObjectType::vehicle) or
-        (object.is<Pedestrian>() and byType.objectType == ObjectType::pedestrian) or
-        (object.is<MiscObject>() and byType.objectType == ObjectType::miscellaneous)) {
-        selected_entities.emplace_back(name);
-      } else if (byType.objectType == ObjectType::external) {
+      switch (byType.objectType) {
+      case ObjectType::vehicle:
+        if (object.is<Vehicle>()) {
+          selected_entities.emplace_back(name);
+        }
+        break;
+      case ObjectType::pedestrian:
+        if (object.is<Pedestrian>()) {
+          selected_entities.emplace_back(name);
+        }
+        break;
+      case ObjectType::miscellaneous:
+        if (object.is<MiscObject>()) {
+          selected_entities.emplace_back(name);
+        }
+        break;
+      case ObjectType::external:
         THROW_SYNTAX_ERROR("Selecting external object is not supported yet");
-      } else {
+        break;
+      default:
         THROW_SYNTAX_ERROR(
           "Unexpected entity ", std::quoted(name), " of type ",
           std::quoted(makeTypename(object->type().name())), " is detected; this is a bug");
+        break;
       }
     }
   }
