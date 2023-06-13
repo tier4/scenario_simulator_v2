@@ -43,11 +43,11 @@ auto TeleportAction::run() noexcept -> void {}
 
 auto TeleportAction::start() const -> void
 {
-  for (const auto & actor : actors) {
-    if (not global().entities->ref(actor).as<ScenarioObject>().is_added) {
-      AddEntityAction(local(), position)(actor);  // NOTE: TIER IV extension
+  for (const auto & object : global().entities->objects(actors)) {
+    if (not global().entities->ref(object).as<ScenarioObject>().is_added) {
+      AddEntityAction(local(), position)(object);  // NOTE: TIER IV extension
     } else {
-      return teleport(actor, position);
+      teleport(object, position);
     }
   }
 }
