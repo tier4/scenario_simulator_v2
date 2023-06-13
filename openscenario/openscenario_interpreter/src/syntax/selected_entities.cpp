@@ -31,13 +31,9 @@ SelectedEntityRefs::SelectedEntityRefs(const pugi::xml_node & tree, Scope & scop
 {
 }
 
-auto SelectedEntityRefs::enumerate(const Entities & entities) -> std::list<String>
+auto SelectedEntityRefs::objects(const Entities & entities) -> std::list<String>
 {
-  auto selected_entities = std::list<String>();
-  for (const auto & entityRef : entityRefs) {
-    selected_entities.merge(entities.enumerate(entityRef));
-  }
-  return selected_entities;
+  return entities.objects(std::list<String>(std::begin(entityRefs), std::end(entityRefs)));
 }
 
 SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
@@ -45,7 +41,7 @@ SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
 {
 }
 
-auto SelectedByTypes::enumerate(const Entities & entities) -> std::list<String>
+auto SelectedByTypes::objects(const Entities & entities) -> std::list<String>
 {
   auto selected_entities = std::list<String>();
   for (const auto & [name, object] : entities) {
@@ -60,7 +56,7 @@ auto SelectedByTypes::enumerate(const Entities & entities) -> std::list<String>
       } else {
         THROW_SYNTAX_ERROR(
           "Unexpected entity ", std::quoted(name), " of type ",
-          std::quoted(object->type().name()), " is detected; this is a bug");
+          std::quoted(makeTypename(object->type().name())), " is detected; this is a bug");
       }
     }
   }
@@ -77,9 +73,9 @@ SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
 {
 }
 
-auto SelectedEntities::enumerate(const Entities & entities) -> std::list<String>
+auto SelectedEntities::objects(const Entities & entities) -> std::list<String>
 {
-  return apply<std::list<String>>([&](auto & e) { return e.enumerate(entities); }, *this);
+  return apply<std::list<String>>([&](auto & e) { return e.objects(entities); }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
