@@ -27,13 +27,27 @@ namespace vehicle
 auto FollowPolylineTrajectoryAction::calculateWaypoints()
   -> const traffic_simulator_msgs::msg::WaypointsArray
 {
-  return traffic_simulator_msgs::msg::WaypointsArray();
+  auto waypoints = traffic_simulator_msgs::msg::WaypointsArray();
+  for (const auto & vertex : parameter->shape.vertices) {
+    waypoints.waypoints.push_back(vertex.position.position);
+  }
+  return waypoints;
 }
 
 auto FollowPolylineTrajectoryAction::calculateObstacle(
   const traffic_simulator_msgs::msg::WaypointsArray &)
   -> const std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
+  /*
+     Obstacle avoidance is not implemented for this action.
+
+     If you implement obstacle avoidance for this action, implement this
+     virtual function to return the location of any obstacles blocking the path
+     of this action's actor. However, this virtual function is currently used
+     only for the visualization of obstacle information, so the obstacle
+     avoidance algorithm does not necessarily need to use this virtual
+     function.
+  */
   return std::nullopt;
 }
 
