@@ -43,25 +43,29 @@ auto SpeedAction::accomplished() -> bool
   };
 
   auto check = [this](auto && actor) {
-    if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      return equal_to<double>()(
-        speed_action_target.as<AbsoluteTargetSpeed>().value, evaluateSpeed(actor));
-    } else {
-      switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
-        case SpeedTargetValueType::delta:
+    auto objects = global().entities->objects({actor});
+    return std::transform_reduce(
+      std::begin(objects), std::end(objects), true, std::logical_and(), [&](const auto & object) {
+        if (speed_action_target.is<AbsoluteTargetSpeed>()) {
           return equal_to<double>()(
-            evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
-              speed_action_target.as<RelativeTargetSpeed>().value,
-            evaluateSpeed(actor));
-        case SpeedTargetValueType::factor:
-          return equal_to<double>()(
-            evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
-              speed_action_target.as<RelativeTargetSpeed>().value,
-            evaluateSpeed(actor));
-        default:
-          return false;
-      }
-    }
+            speed_action_target.as<AbsoluteTargetSpeed>().value, evaluateSpeed(object));
+        } else {
+          switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
+            case SpeedTargetValueType::delta:
+              return equal_to<double>()(
+                evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
+                  speed_action_target.as<RelativeTargetSpeed>().value,
+                evaluateSpeed(object));
+            case SpeedTargetValueType::factor:
+              return equal_to<double>()(
+                evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
+                  speed_action_target.as<RelativeTargetSpeed>().value,
+                evaluateSpeed(object));
+            default:
+              return false;
+          }
+        }
+      });
   };
 
   if (endsImmediately()) {
@@ -93,22 +97,24 @@ auto SpeedAction::start() -> void
     accomplishments.emplace(actor, false);
   }
 
-  for (auto && each : accomplishments) {
-    if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      applySpeedAction(
-        std::get<0>(each), speed_action_target.as<AbsoluteTargetSpeed>().value,
-        static_cast<traffic_simulator::speed_change::Transition>(
-          speed_action_dynamics.dynamics_shape),
-        static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics), true);
-    } else {
-      applySpeedAction(
-        std::get<0>(each),
-        static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
-          speed_action_target.as<RelativeTargetSpeed>()),
-        static_cast<traffic_simulator::speed_change::Transition>(
-          speed_action_dynamics.dynamics_shape),
-        static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics),
-        speed_action_target.as<RelativeTargetSpeed>().continuous);
+  for (const auto & accomplishment : accomplishments) {
+    for (const auto & object : global().entities->objects({accomplishment.first})) {
+      if (speed_action_target.is<AbsoluteTargetSpeed>()) {
+        applySpeedAction(
+          object, speed_action_target.as<AbsoluteTargetSpeed>().value,
+          static_cast<traffic_simulator::speed_change::Transition>(
+            speed_action_dynamics.dynamics_shape),
+          static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics), true);
+      } else {
+        applySpeedAction(
+          object,
+          static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
+            speed_action_target.as<RelativeTargetSpeed>()),
+          static_cast<traffic_simulator::speed_change::Transition>(
+            speed_action_dynamics.dynamics_shape),
+          static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics),
+          speed_action_target.as<RelativeTargetSpeed>().continuous);
+      }
     }
   }
 }
