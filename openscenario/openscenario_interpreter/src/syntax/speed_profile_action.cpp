@@ -76,16 +76,18 @@ auto SpeedProfileAction::apply(const String & actor, const SpeedProfileEntry & s
     }
   };
 
-  applyProfileAction(actor, dynamic_constraints);
+  for (const auto & object : global().entities->objects({actor})) {
+    applyProfileAction(object, dynamic_constraints);
 
-  if (entity_ref.empty()) {
-    applySpeedAction(
-      actor, absolute_target_speed(), transition(), constraint(),
-      std::isnan(speed_profile_entry.time));
-  } else {
-    applySpeedAction(
-      actor, relative_target_speed(), transition(), constraint(),
-      std::isnan(speed_profile_entry.time));
+    if (entity_ref.empty()) {
+      applySpeedAction(
+        object, absolute_target_speed(), transition(), constraint(),
+        std::isnan(speed_profile_entry.time));
+    } else {
+      applySpeedAction(
+        object, relative_target_speed(), transition(), constraint(),
+        std::isnan(speed_profile_entry.time));
+    }
   }
 }
 
@@ -104,12 +106,16 @@ auto SpeedProfileAction::run() -> void
 {
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-      if (entity_ref.empty()) {
-        return equal_to<double>()(evaluateSpeed(actor), speed_profile_entry.speed);
-      } else {
-        return equal_to<double>()(
-          evaluateSpeed(actor), speed_profile_entry.speed + evaluateSpeed(entity_ref));
-      }
+      auto objects = global().entities->objects({actor});
+      return std::transform_reduce(
+        std::begin(objects), std::end(objects), true, std::logical_and(), [&](const auto & object) {
+          if (entity_ref.empty()) {
+            return equal_to<double>()(evaluateSpeed(object), speed_profile_entry.speed);
+          } else {
+            return equal_to<double>()(
+              evaluateSpeed(object), speed_profile_entry.speed + evaluateSpeed(entity_ref));
+          }
+        });
     };
 
     if (
@@ -128,7 +134,9 @@ auto SpeedProfileAction::start() -> void
 
   for (const auto & actor : actors) {
     accomplishments.emplace(actor, std::begin(speed_profile_entry));
-    apply(actor, *accomplishments[actor]);
+    for (const auto & object : global().entities->objects({actor})) {
+      apply(object, *accomplishments[actor]);
+    }
   }
 }
 }  // namespace syntax
