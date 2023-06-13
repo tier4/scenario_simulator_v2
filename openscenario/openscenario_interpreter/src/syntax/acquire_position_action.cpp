@@ -29,20 +29,20 @@ AcquirePositionAction::AcquirePositionAction(const pugi::xml_node & node, Scope 
 auto AcquirePositionAction::start() -> void
 {
   const auto acquire_position = overload(
-    [](const WorldPosition & position, auto && actor) {
-      return applyAcquirePositionAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
+    [](const WorldPosition & position, auto && object) {
+      return applyAcquirePositionAction(object, static_cast<geometry_msgs::msg::Pose>(position));
     },
-    [](const RelativeWorldPosition & position, auto && actor) {
+    [](const RelativeWorldPosition & position, auto && object) {
       return applyAcquirePositionAction(
-        actor, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
+        object, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
     },
-    [](const LanePosition & position, auto && actor) {
+    [](const LanePosition & position, auto && object) {
       return applyAcquirePositionAction(
-        actor, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
+        object, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
     });
 
-  for (const auto & actor : actors) {
-    apply<void>(acquire_position, position, actor);
+  for (const auto & object : global().entities->objects(actors)) {
+    apply<void>(acquire_position, position, object);
   }
 }
 }  // namespace syntax
