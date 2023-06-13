@@ -42,7 +42,7 @@ struct Polyline
 };
 
 template <typename Shape>
-struct Parameter
+struct Parameter  // OpenSCENARIO 1.2 FollowTrajectoryAction
 {
   double initial_distance_offset;
 
@@ -52,9 +52,21 @@ struct Parameter
   bool dynamic_constraints_ignorable;
 
   /*
-     If Parameter::closed is true, this variable is always assigned false.
+     This data member corresponds to the attribute
+     TimeReference.Timing.domainAbsoluteRelative of ASAM OpenSCENARIO 1.2. the
+     OpenSCENARIO standard does not define the behavior when the value of
+     domainAbsoluteRelative is "relative". The standard only states "Definition
+     of time value context as either absolute or relative", and it is
+     completely unclear when the relative time starts.
+
+     This implementation has interpreted the specification as follows: Relative
+     time starts from the start of FollowTrajectoryAction or from the time of
+     reaching the previous "waypoint with arrival time".
+
+     Note: If Parameter::closed is true, this variable is always assigned
+     false.
   */
-  bool timing_is_absolute;
+  bool time_specification_of_trajectory_is_absolute_simulation_time;
 
   bool closed;
 
@@ -64,10 +76,12 @@ struct Parameter
 
   explicit Parameter(
     const double initial_distance_offset, const bool dynamic_constraints_ignorable,
-    const bool timing_is_absolute, const bool closed, const Shape & shape)
+    const bool time_specification_of_trajectory_is_absolute_simulation_time, const bool closed,
+    const Shape & shape)
   : initial_distance_offset(initial_distance_offset),
     dynamic_constraints_ignorable(dynamic_constraints_ignorable),
-    timing_is_absolute(timing_is_absolute and not closed),
+    time_specification_of_trajectory_is_absolute_simulation_time(
+      time_specification_of_trajectory_is_absolute_simulation_time and not closed),
     closed(closed),
     shape(shape)
   {

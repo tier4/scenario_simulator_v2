@@ -222,11 +222,13 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
     auto to_simulation_time = [this](const auto & vertex) {
       /*
-         If the trajectory is a closed loop, timing_is_absolute must always be
-         false, which is guaranteed by the constructor of type Parameter.
+         If the trajectory is a closed loop,
+         time_specification_of_trajectory_is_absolute_simulation_time must
+         always be false, which is guaranteed by the constructor of type
+         Parameter.
       */
       auto offset = [this]() {
-        if (parameter->timing_is_absolute) {
+        if (parameter->time_specification_of_trajectory_is_absolute_simulation_time) {
           return 0.0;
         } else if (std::isnan(relative_timing_offset)) {  // When uninitialized.
           return relative_timing_offset = entity_status.time;
@@ -292,7 +294,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
             " failed to reach the trajectory waypoint at the specified time. The specified time "
             "is ",
             first_waypoint_with_arrival_time_specified->time, " seconds (",
-            (parameter->timing_is_absolute ? "absolute" : "relative"),
+            (parameter->time_specification_of_trajectory_is_absolute_simulation_time ? "absolute"
+                                                                                     : "relative"),
             " timing). This may be due to unrealistic conditions of arrival time specification "
             "compared to vehicle parameters and dynamic constraints.");
         } else {
@@ -511,7 +514,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
            from the time of reaching the previous "waypoint with arrival time".
         */
         if (
-          not parameter->timing_is_absolute and not std::isnan(remaining_time_to_front_waypoint)) {
+          not parameter->time_specification_of_trajectory_is_absolute_simulation_time and
+          not std::isnan(remaining_time_to_front_waypoint)) {
           relative_timing_offset = entity_status.time;
         }
         return tick();  // tail recursion

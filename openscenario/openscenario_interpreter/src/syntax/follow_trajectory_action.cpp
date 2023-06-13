@@ -81,7 +81,7 @@ auto FollowTrajectoryAction::start() -> void
         }
         return polyline;
       } else {
-        throw std::logic_error("Non-Polyline trajectory is not yet implemented.");
+        throw common::SyntaxError("Non-Polyline trajectory is not yet implemented.");
       }
     };
 
