@@ -10,13 +10,13 @@ Default behavior tree NPC logics are in [this package](https://github.com/tier4/
 
 If you want to check detail, please check documents below.
 
-| Entity \ Behavior Type | Behavior-Tree                                         | Do-Nothing                                         |
-|------------------------|-------------------------------------------------------|----------------------------------------------------|
-| Vehicle                | [document](#vehicle-npc-with-behavior-tree-plugin)    | [document](#vehicle-npc-with-do-nothing-plugin)    |
-| Pedestrian             | [document](#pedestrian-npc-with-behavior-tree-plugin) | [document](#pedestrian-npc-with-do-nothing-plugin) |
-| MiscObject             | Does not exist.                                       | Does not exist.                                    |
+| Entity \ Behavior | Behavior-Tree                                  | Do-Nothing                                  |
+|-------------------|------------------------------------------------|---------------------------------------------|
+| Vehicle           | [document](#vehicle-npc-with-behavior-tree)    | [document](#vehicle-npc-with-do-nothing)    |
+| Pedestrian        | [document](#pedestrian-npc-with-behavior-tree) | [document](#pedestrian-npc-with-do-nothing) |
+| MiscObject        | Does not exist.                                | Does not exist.                             |
 
-## Vehicle NPC (with Behavior-Tree Plugin)
+## Vehicle NPC (with Behavior-Tree)
 Behavior tree of vehicle NPC is here.
 
 ```mermaid
@@ -132,14 +132,14 @@ You can send request with these parameters.
 | BEST_EFFORT | Changing lanes and trying to fulfill constraints without ignoring dynamics. |                    |
 
 
-## Vehicle NPC (with Do-Nothing Plugin)
+## Vehicle NPC (with Do-Nothing)
 
-When this plug-in is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the setEntityStatus function, etc.  
-When using this plug-in, any consistency in physical behavior is ignored. Changes in posture, velocity, acceleration, and jerk over time will not occur.  
+When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the setEntityStatus function, etc.  
+When using this behavior, any consistency in physical behavior is ignored. Changes in posture, velocity, acceleration, and jerk over time will not occur.  
 The EntityStatus value will continue to be the value specified and updated via the setEntityStatus function, etc.  
-This plug-in was developed primarily to drive the simulator from Autoware rosbag data.  
+This behavior was developed primarily to drive the simulator from Autoware rosbag data.  
 
-## Pedestrian NPC (with Behavior-Tree Plugin)
+## Pedestrian NPC (with Behavior-Tree)
 
 Behavior tree of pedestrian entity is here.
 
@@ -159,9 +159,9 @@ graph TD
 | FollowLane   | Entity following the lane which it is exist.      |         |         |
 | WalkStraight | Entity walk forward and without considering lane. |         |         |
 
-## Pedestrian NPC (with Do-Nothing Plugin)
+## Pedestrian NPC (with Do-Nothing)
 
-When this plug-in is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the setEntityStatus function, etc.  
-When using this plug-in, any consistency in physical behavior is ignored. Changes in posture, velocity, acceleration, and jerk over time will not occur.  
+When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the setEntityStatus function, etc.  
+When using this behavior, any consistency in physical behavior is ignored. Changes in posture, velocity, acceleration, and jerk over time will not occur.  
 The EntityStatus value will continue to be the value specified and updated via the setEntityStatus function, etc.  
-This plug-in was developed primarily to drive the simulator from Autoware rosbag data.  
+This behavior was developed primarily to drive the simulator from Autoware rosbag data.  
