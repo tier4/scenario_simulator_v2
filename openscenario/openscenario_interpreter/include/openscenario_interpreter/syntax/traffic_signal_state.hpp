@@ -32,7 +32,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TrafficSignalState : private SimulatorCore::CoordinateSystemConversion
+struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 {
   using LaneletId = std::int64_t;
 

@@ -184,12 +184,6 @@ public:
       position.rpy.z = std::numeric_limits<double>::quiet_NaN();
       return position;
     }
-
-    template <typename... Ts>
-    static auto toWayIDs(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getTrafficRelationReferees(std::forward<decltype(xs)>(xs)...);
-    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
@@ -444,6 +438,30 @@ public:
       } else {
         return Double::nan();
       }
+    }
+
+    template <typename... Ts>
+    static auto getConventionalTrafficLights(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto getV2ITrafficLights(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto resetConventionalTrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->resetConventionalTrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->resetV2ITrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
     }
   };
 };
