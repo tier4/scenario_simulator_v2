@@ -1650,6 +1650,16 @@ std::vector<lanelet::ConstLineString3d> HdMapUtils::getStopLinesOnPath(
   return ret;
 }
 
+std::vector<std::int64_t> HdMapUtils::getStopLineIdsOnPath(
+  const std::vector<std::int64_t> & route_lanelets) const
+{
+  std::vector<std::int64_t> stop_line_ids;
+  for (const auto & ret : getStopLinesOnPath(route_lanelets)) {
+    stop_line_ids.emplace_back(ret.id());
+  }
+  return stop_line_ids;
+}
+
 std::vector<lanelet::AutowareTrafficLightConstPtr> HdMapUtils::getTrafficLights(
   const std::int64_t traffic_light_id) const
 {
