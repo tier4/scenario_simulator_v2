@@ -6,7 +6,17 @@ If you want to use your own behavior, please see [this document](BehaviorPlugin.
 In this document, we describe how default behavior tree NPC works in traffic environment.
 Default behavior tree NPC logics are in [this package](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/behavior_tree_plugin).
 
-## Vehicle NPC
+## List of behaviors
+
+If you want to check detail, please check documents below.
+
+| Entity \ Behavior | Behavior-Tree                                  | Do-Nothing                                  |
+|-------------------|------------------------------------------------|---------------------------------------------|
+| Vehicle           | [document](#vehicle-npc-with-behavior-tree)    | [document](#vehicle-npc-with-do-nothing)    |
+| Pedestrian        | [document](#pedestrian-npc-with-behavior-tree) | [document](#pedestrian-npc-with-do-nothing) |
+| MiscObject        | Does not exist.                                | Does not exist.                             |
+
+## Vehicle NPC (with Behavior-Tree)
 Behavior tree of vehicle NPC is here.
 
 ```mermaid
@@ -120,3 +130,38 @@ You can send request with these parameters.
 |-------------|-----------------------------------------------------------------------------|--------------------|
 | FORCE       | Changing lanes and fulfilling constraints ignoring dynamics.                | :heavy_check_mark: |
 | BEST_EFFORT | Changing lanes and trying to fulfill constraints without ignoring dynamics. |                    |
+
+
+## Vehicle NPC (with Do-Nothing)
+
+When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the `API::setEntityStatus` function, etc.  
+When using this behavior, any consistency in physical behavior is ignored. Changes in posture, velocity, acceleration, and jerk over time will not occur.  
+The EntityStatus value will continue to be the value specified and updated via the `API::setEntityStatus` function, etc.  
+This behavior was developed primarily to drive the simulator from Autoware rosbag data.  
+
+## Pedestrian NPC (with Behavior-Tree)
+
+Behavior tree of pedestrian entity is here.
+
+```mermaid
+graph TD
+    A[Root]:::behavior --> B(Fallback):::flow
+    B --> C[FollowLane]:::behavior
+    B --> D[WalkStraight]:::behavior
+    classDef behavior fill:#F5AD1A;
+    classDef flow fill:#CFE7E8
+    click C "https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/behavior_tree_plugin/src/pedestrian/follow_lane_action.cpp"
+    click D "https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/behavior_tree_plugin/src/pedestrian/walk_straight_action.cpp"
+```
+
+| Action       | Behavior                                          | Success | Failure |
+|--------------|---------------------------------------------------|---------|---------|
+| FollowLane   | Entity following the lane which it is exist.      |         |         |
+| WalkStraight | Entity walk forward and without considering lane. |         |         |
+
+## Pedestrian NPC (with Do-Nothing)
+
+When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the `API::setEntityStatus` function, etc.  
+When using this behavior, any consistency in physical behavior is ignored. Changes in posture, velocity, acceleration, and jerk over time will not occur.  
+The EntityStatus value will continue to be the value specified and updated via the `API::setEntityStatus` function, etc.  
+This behavior was developed primarily to drive the simulator from Autoware rosbag data.  
