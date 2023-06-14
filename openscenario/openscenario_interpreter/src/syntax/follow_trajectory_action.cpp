@@ -90,7 +90,9 @@ auto FollowTrajectoryAction::start() -> void
                traffic_simulator::follow_trajectory::Polyline>>(
                initial_distance_offset,
                trajectory_following_mode.following_mode == FollowingMode::position,
-               time_reference.as<Timing>().domain_absolute_relative == ReferenceContext::absolute,
+               time_reference.as<Timing>().domain_absolute_relative == ReferenceContext::absolute
+                 ? 0.0
+                 : evaluateSimulationTime(),
                trajectory_ref.trajectory.as<Trajectory>().closed,  //
                repack_trajectory()));
   }

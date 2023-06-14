@@ -218,28 +218,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     */
     const auto distance_to_front_waypoint = hypot(position, target_position);  // [m]
 
-    auto to_simulation_time = [this](const auto & vertex) {
-      /*
-         If the trajectory is a closed loop,
-         time_specification_of_trajectory_is_absolute_simulation_time must
-         always be false, which is guaranteed by the constructor of type
-         Parameter.
-      */
-      auto offset = [this]() {
-        if (parameter->time_specification_of_trajectory_is_absolute_simulation_time) {
-          return 0.0;
-        } else if (std::isnan(relative_timing_offset)) {  // When uninitialized.
-          return relative_timing_offset = entity_status.time;
-        } else {
-          return relative_timing_offset;
-        }
-      };
-
-      return offset() + vertex.time;
-    };
-
     const auto remaining_time_to_front_waypoint =
-      to_simulation_time(parameter->shape.vertices.front()) - entity_status.time;
+      (parameter->base_time ? *parameter->base_time : 0.0) +
+      parameter->shape.vertices.front().time - entity_status.time;
 
     const auto [distance, remaining_time] = [&]() {
       if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
@@ -261,8 +242,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
           return total_distance;
         };
 
-        if (const auto remaining_time =
-              to_simulation_time(*first_waypoint_with_arrival_time_specified) - entity_status.time;
+        if (const auto remaining_time = (parameter->base_time ? *parameter->base_time : 0.0) +
+                                        first_waypoint_with_arrival_time_specified->time -
+                                        entity_status.time;
             /*
                The conditional expression below should ideally be
                remaining_time < 0.
@@ -292,10 +274,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
             " failed to reach the trajectory waypoint at the specified time. The specified time "
             "is ",
             first_waypoint_with_arrival_time_specified->time, " seconds (",
-            (parameter->time_specification_of_trajectory_is_absolute_simulation_time ? "absolute"
-                                                                                     : "relative"),
-            " timing). This may be due to unrealistic conditions of arrival time specification "
-            "compared to vehicle parameters and dynamic constraints.");
+            (parameter->base_time ? "absolute" : "relative"),
+            " simulation time). This may be due to unrealistic conditions of arrival time "
+            "specification compared to vehicle parameters and dynamic constraints.");
         } else {
           return std::make_tuple(
             distance_to_front_waypoint +
@@ -511,10 +492,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
            Relative time starts from the start of FollowTrajectoryAction or
            from the time of reaching the previous "waypoint with arrival time".
         */
-        if (
-          not parameter->time_specification_of_trajectory_is_absolute_simulation_time and
-          not std::isnan(remaining_time_to_front_waypoint)) {
-          relative_timing_offset = entity_status.time;
+        if (parameter->base_time and not std::isnan(remaining_time_to_front_waypoint)) {
+          parameter->base_time = entity_status.time;
         }
         return tick();  // tail recursion
       } else {
