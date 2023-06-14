@@ -67,147 +67,165 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   }
 }
 
-#define DEFINE_GETTER(MEMBER_NAME)                                                   \
-  template <typename T, typename = void>                                             \
-  struct Has##MEMBER_NAME : std::false_type                                          \
-  {                                                                                  \
-  };                                                                                 \
-  template <typename T>                                                              \
-  struct Has##MEMBER_NAME<T, std::void_t<decltype(T::MEMBER_NAME)>> : std::true_type \
-  {                                                                                  \
-  };                                                                                 \
-  template <typename T>                                                              \
-  static constexpr int get##MEMBER_NAME()                                            \
-  {                                                                                  \
-    if constexpr (Has##MEMBER_NAME<T>::value) {                                      \
-      return static_cast<int>(T::MEMBER_NAME);                                       \
-    } else {                                                                         \
-      return -1;                                                                     \
-    }                                                                                \
+template <auto N, typename Tuples>
+struct lister
+{
+  std::reference_wrapper<const Tuples> tuples;
+
+  explicit lister(const Tuples & tuples) : tuples(std::cref(tuples)) {}
+};
+
+template <auto N, typename Tuples>
+auto operator<<(std::ostream & ostream, const lister<N, Tuples> & lister) -> std::ostream &
+{
+  for (auto iterator = std::begin(lister.tuples.get()); iterator != std::end(lister.tuples.get());
+       ++iterator) {
+    switch (std::distance(iterator, std::end(lister.tuples.get()))) {
+      case 1:
+        return ostream << std::get<N>(*iterator);
+
+      case 2:
+        ostream << std::get<N>(*iterator) << " and ";
+        break;
+
+      default:
+        ostream << std::get<N>(*iterator) << ", ";
+        break;
+    }
   }
 
-namespace getter
+  return ostream;
+}
+
+template <auto N, typename Tuples>
+auto listup(const Tuples & tuples) -> lister<N, Tuples>
 {
-DEFINE_GETTER(NONE)
-DEFINE_GETTER(LANE_CHANGE_LEFT)
-DEFINE_GETTER(LANE_CHANGE_RIGHT)
-DEFINE_GETTER(AVOIDANCE_LEFT)
-DEFINE_GETTER(AVOIDANCE_RIGHT)
-DEFINE_GETTER(GOAL_PLANNER)
-DEFINE_GETTER(PULL_OUT)
-DEFINE_GETTER(TRAFFIC_LIGHT)
-DEFINE_GETTER(INTERSECTION)
-DEFINE_GETTER(INTERSECTION_OCCLUSION)
-DEFINE_GETTER(CROSSWALK)
-DEFINE_GETTER(BLIND_SPOT)
-DEFINE_GETTER(DETECTION_AREA)
-DEFINE_GETTER(NO_STOPPING_AREA)
-DEFINE_GETTER(OCCLUSION_SPOT)
-DEFINE_GETTER(EXT_REQUEST_LANE_CHANGE_LEFT)
-DEFINE_GETTER(EXT_REQUEST_LANE_CHANGE_RIGHT)
-DEFINE_GETTER(AVOIDANCE_BY_LC_LEFT)
-DEFINE_GETTER(AVOIDANCE_BY_LC_RIGHT)
-DEFINE_GETTER(NO_DRIVABLE_LANE)
-}  // namespace getter
-#undef DEFINE_GETTER
+  return lister<N, Tuples>(tuples);
+}
+
+#define DEFINE_DATA_MEMBER_DETECTOR(NAME)                                     \
+  template <typename T, typename = void>                                      \
+  struct Has##NAME : public std::false_type                                   \
+  {                                                                           \
+  };                                                                          \
+                                                                              \
+  template <typename T>                                                       \
+  struct Has##NAME<T, std::void_t<decltype(T::NAME)>> : public std::true_type \
+  {                                                                           \
+  }
+
+DEFINE_DATA_MEMBER_DETECTOR(NONE);
+DEFINE_DATA_MEMBER_DETECTOR(LANE_CHANGE_LEFT);
+DEFINE_DATA_MEMBER_DETECTOR(LANE_CHANGE_RIGHT);
+DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_LEFT);
+DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_RIGHT);
+DEFINE_DATA_MEMBER_DETECTOR(GOAL_PLANNER);
+DEFINE_DATA_MEMBER_DETECTOR(PULL_OUT);
+DEFINE_DATA_MEMBER_DETECTOR(TRAFFIC_LIGHT);
+DEFINE_DATA_MEMBER_DETECTOR(INTERSECTION);
+DEFINE_DATA_MEMBER_DETECTOR(INTERSECTION_OCCLUSION);
+DEFINE_DATA_MEMBER_DETECTOR(CROSSWALK);
+DEFINE_DATA_MEMBER_DETECTOR(BLIND_SPOT);
+DEFINE_DATA_MEMBER_DETECTOR(DETECTION_AREA);
+DEFINE_DATA_MEMBER_DETECTOR(NO_STOPPING_AREA);
+DEFINE_DATA_MEMBER_DETECTOR(OCCLUSION_SPOT);
+DEFINE_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_LEFT);
+DEFINE_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_RIGHT);
+DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_LEFT);
+DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_RIGHT);
+DEFINE_DATA_MEMBER_DETECTOR(NO_DRIVABLE_LANE);
+
+#undef DEFINE_DATA_MEMBER_DETECTOR
+
+template <typename T>
+auto toModuleType(const std::string & module_name)
+{
+  static const std::unordered_map<std::string, std::uint8_t> module_type_map = [&]() {
+    std::unordered_map<std::string, std::uint8_t> module_type_map;
+
+#define EMPLACE(IDENTIFIER)                              \
+  if constexpr (Has##IDENTIFIER<T>::value) {             \
+    module_type_map.emplace(#IDENTIFIER, T::IDENTIFIER); \
+  }                                                      \
+  static_assert(true)
+
+    /*
+       The following elements are in order of definition in the
+       tier4_rtc_msgs/msg/Module.msg file. Of course, unordered_map doesn't
+       preserve the insertion order, so the order itself doesn't matter.
+    */
+    EMPLACE(NONE);
+    EMPLACE(LANE_CHANGE_LEFT);
+    EMPLACE(LANE_CHANGE_RIGHT);
+    EMPLACE(AVOIDANCE_LEFT);
+    EMPLACE(AVOIDANCE_RIGHT);
+    EMPLACE(GOAL_PLANNER);
+    EMPLACE(PULL_OUT);
+    EMPLACE(TRAFFIC_LIGHT);
+    EMPLACE(INTERSECTION);
+    EMPLACE(INTERSECTION_OCCLUSION);
+    EMPLACE(CROSSWALK);
+    EMPLACE(BLIND_SPOT);
+    EMPLACE(DETECTION_AREA);
+    EMPLACE(NO_STOPPING_AREA);
+    EMPLACE(OCCLUSION_SPOT);
+    EMPLACE(EXT_REQUEST_LANE_CHANGE_LEFT);
+    EMPLACE(EXT_REQUEST_LANE_CHANGE_RIGHT);
+    EMPLACE(AVOIDANCE_BY_LC_LEFT);
+    EMPLACE(AVOIDANCE_BY_LC_RIGHT);
+    EMPLACE(NO_DRIVABLE_LANE);
+
+#undef EMPLACE
+
+    return module_type_map;
+  }();
+
+  if (const auto module_type = module_type_map.find(module_name);
+      module_type == module_type_map.end()) {
+    throw common::Error(
+      "Unexpected module name for tier4_rtc_msgs::msg::Module: ", module_name,
+      ". One of the following module names is expected: ", listup<0>(module_type_map), ".");
+  } else {
+    return module_type->second;
+  }
+}
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
   const std::string & module_name, const std::string & command) -> void
 {
-  const auto module_type_code = [](const std::string & module_name) -> uint8_t {
-
-#define ADD_ELEMENT(MAP, IDENTIFIER)                                                     \
-  if (int value = getter::get##IDENTIFIER<tier4_rtc_msgs::msg::Module>(); value != -1) { \
-    MAP[#IDENTIFIER] = static_cast<uint8_t>(value);                                      \
-  }
-    static std::unordered_map<std::string, uint8_t> module_type_map = [&]() {
-      std::unordered_map<std::string, uint8_t> map;
-      ADD_ELEMENT(map, NONE)
-      ADD_ELEMENT(map, LANE_CHANGE_LEFT)
-      ADD_ELEMENT(map, LANE_CHANGE_RIGHT)
-      ADD_ELEMENT(map, AVOIDANCE_LEFT)
-      ADD_ELEMENT(map, AVOIDANCE_RIGHT)
-      ADD_ELEMENT(map, GOAL_PLANNER)
-      ADD_ELEMENT(map, PULL_OUT)
-      ADD_ELEMENT(map, TRAFFIC_LIGHT)
-      ADD_ELEMENT(map, INTERSECTION)
-      ADD_ELEMENT(map, INTERSECTION_OCCLUSION)
-      ADD_ELEMENT(map, CROSSWALK)
-      ADD_ELEMENT(map, BLIND_SPOT)
-      ADD_ELEMENT(map, DETECTION_AREA)
-      ADD_ELEMENT(map, NO_STOPPING_AREA)
-      ADD_ELEMENT(map, OCCLUSION_SPOT)
-      ADD_ELEMENT(map, EXT_REQUEST_LANE_CHANGE_LEFT)
-      ADD_ELEMENT(map, EXT_REQUEST_LANE_CHANGE_RIGHT)
-      ADD_ELEMENT(map, AVOIDANCE_BY_LC_LEFT)
-      ADD_ELEMENT(map, AVOIDANCE_BY_LC_RIGHT)
-      ADD_ELEMENT(map, NO_DRIVABLE_LANE)
-      return map;
-    }();
-
-#undef ADD_ELEMENT
-
-    const auto module_type = module_type_map.find(module_name);
-    if (module_type == module_type_map.end()) {
-      std::stringstream what;
-      what << "Unexpected module name for tier4_rtc_msgs::msg::Module : " << module_name;
-      what << ". One of the following module names is expected : { ";
-      for (const auto & element : module_type_map) {
-        what << element.first << ", ";
-      }
-      what << "}";
-      throw common::Error(what.str());
+  auto to_command_type = [](const auto & command) {
+    static const std::unordered_map<std::string, std::uint8_t> command_type_map = {
+      {"ACTIVATE", tier4_rtc_msgs::msg::Command::ACTIVATE},
+      {"DEACTIVATE", tier4_rtc_msgs::msg::Command::DEACTIVATE},
+    };
+    if (const auto command_type = command_type_map.find(command);
+        command_type == command_type_map.end()) {
+      throw common::Error(
+        "Unexpected command for tier4_rtc_msgs::msg::Command: ", command,
+        ", One of the following commands is expected: ", listup<0>(command_type_map), ".");
     } else {
-      return module_type->second;
+      return command_type->second;
     }
-  }(module_name);
+  };
 
-  const auto cooperate_status = std::find_if(
-    latest_cooperate_status_array.statuses.begin(), latest_cooperate_status_array.statuses.end(),
-    [module_type_code](const auto & cooperate_status) {
-      return cooperate_status.module.type == module_type_code;
-    });
-
-  if (cooperate_status == latest_cooperate_status_array.statuses.end()) {
-    std::stringstream what;
-    what << "Failed to send a cooperate command : Cannot find a request to cooperate for module \""
-         << module_name;
-    what << ". Please check if the situation is such that the request occurs when sending.";
-    throw common::Error(what.str());
+  if (const auto cooperate_status = std::find_if(
+        latest_cooperate_status_array.statuses.begin(),
+        latest_cooperate_status_array.statuses.end(),
+        [type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name)](
+          const auto & cooperate_status) { return cooperate_status.module.type == type; });
+      cooperate_status == latest_cooperate_status_array.statuses.end()) {
+    throw common::Error(
+      "Failed to send a cooperate command: Cannot find a request to cooperate for module ",
+      std::quoted(module_name),
+      ". Please check if the situation is such that the request occurs when sending.");
   } else {
-    auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
-    request->stamp = latest_cooperate_status_array.stamp;
-
     tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
     cooperate_command.module = cooperate_status->module;
     cooperate_command.uuid = cooperate_status->uuid;
-    cooperate_command.command.type = [command]() {
-    // clang-format off
-#define ELEMENT(IDENTIFIER)                               \
-  {                                                       \
-    #IDENTIFIER, tier4_rtc_msgs::msg::Command::IDENTIFIER \
-  }
-      // clang-format on
-      static std::unordered_map<std::string, uint8_t> command_type_map = {
-        ELEMENT(ACTIVATE),
-        ELEMENT(DEACTIVATE),
-      };
-#undef ELEMENT
+    cooperate_command.command.type = to_command_type(command);
 
-      const auto command_type = command_type_map.find(command);
-      if (command_type == command_type_map.end()) {
-        std::stringstream what;
-        what << "Unexpected command for tier4_rtc_msgs::msg::Command : " << command;
-        what << ", One of the following commands is expected : {";
-        for (const auto & element : command_type_map) {
-          what << element.first << ", ";
-        }
-        what << "}";
-        throw common::Error(what.str());
-      } else {
-        return command_type->second;
-      }
-    }();
+    auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
+    request->stamp = latest_cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
     task_queue.delay([this, request]() { requestCooperateCommands(request); });
