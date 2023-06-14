@@ -18,7 +18,12 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/autoware_universe.cpp
   src/cooperator.cpp
   src/execute.cpp
+  src/field_operator_application.cpp
+  src/field_operator_application_for_autoware_universe.cpp
   src/task_queue.cpp)
+
+target_link_libraries(${PROJECT_NAME}
+  atomic)
 
 # workaround to allow deprecated header to build on both galactic and humble
 if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)

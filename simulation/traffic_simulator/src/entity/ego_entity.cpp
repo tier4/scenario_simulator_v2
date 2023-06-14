@@ -15,6 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <boost/lexical_cast.hpp>
+#include <concealer/autoware_universe.hpp>
+#include <concealer/field_operator_application_for_autoware_universe.hpp>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -127,14 +129,15 @@ auto EgoEntity::makeSimulationModel(
   }
 }
 
-auto EgoEntity::makeAutoware(const Configuration & configuration)
-  -> std::unique_ptr<concealer::Autoware>
+auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration)
+  -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
   if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
       architecture_type == "awf/universe") {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
-             ? std::make_unique<concealer::AutowareUniverse>(
+             ? std::make_unique<
+                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
                  getParameter<std::string>("autoware_launch_package"),
                  getParameter<std::string>("autoware_launch_file"),
                  "map_path:=" + configuration.map_path.string(),
@@ -146,7 +149,8 @@ auto EgoEntity::makeAutoware(const Configuration & configuration)
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
                  "scenario_simulation:=true", "perception/enable_traffic_light:=false")
-             : std::make_unique<concealer::AutowareUniverse>();
+             : std::make_unique<
+                 concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
   } else {
     throw common::SemanticError(
       "Unexpected architecture_type ", std::quoted(architecture_type), " was given.");
@@ -159,21 +163,22 @@ EgoEntity::EgoEntity(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration, const double step_time)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
-  autoware(makeAutoware(configuration)),
+  field_operator_application(makeFieldOperatorApplication(configuration)),
+  autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
 {
 }
 
-auto EgoEntity::asAutoware() const -> concealer::Autoware &
+auto EgoEntity::asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &
 {
-  assert(autoware);
-  return *autoware;
+  assert(field_operator_application);
+  return *field_operator_application;
 }
 
 auto EgoEntity::getCurrentAction() const -> std::string
 {
-  const auto state = autoware->getAutowareStateName();
+  const auto state = field_operator_application->getAutowareStateName();
   return state.empty() ? "Launching" : state;
 }
 
@@ -277,7 +282,10 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ids{};
 
-  if (const auto universe = dynamic_cast<concealer::AutowareUniverse *>(autoware.get()); universe) {
+  if (const auto universe =
+        dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
+          field_operator_application.get());
+      universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
       ids += point.lane_ids;
     }
@@ -321,12 +329,15 @@ auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
-  return autoware->getWaypoints();
+  return field_operator_application->getWaypoints();
 }
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
+  field_operator_application->rethrow();
   autoware->rethrow();
+
+  field_operator_application->spinSome();
 
   EntityBase::onUpdate(current_time, step_time);
 
@@ -375,6 +386,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   previous_linear_velocity_ = vehicle_model_ptr_->getVx();
   previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 
+  field_operator_application->spinSome();
+
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
@@ -413,13 +426,13 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
     route.push_back(pose_stamped);
   }
 
-  if (not autoware->initialized()) {
-    autoware->initialize(getMapPose());
-    autoware->plan(route);
+  if (not field_operator_application->initialized()) {
+    field_operator_application->initialize(getMapPose());
+    field_operator_application->plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
-    autoware->plan(route);
-    autoware->engage();
+    field_operator_application->plan(route);
+    field_operator_application->engage();
   }
 }
 
@@ -471,7 +484,7 @@ auto EgoEntity::setStatus(const CanonicalizedEntityStatus & status) -> void
 
   const auto current_pose = getMapPose();
 
-  if (autoware->initialized()) {
+  if (field_operator_application->initialized()) {
     autoware->set([this]() {
       geometry_msgs::msg::Accel message;
       message.linear.x = vehicle_model_ptr_->getAx();
@@ -495,12 +508,12 @@ void EgoEntity::requestSpeedChange(double value, bool)
   switch (vehicle_model_type_) {
     case VehicleModelType::DELAY_STEER_ACC:
     case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0, 0;
+      v << 0, 0, 0, field_operator_application->restrictTargetSpeed(value), 0, 0;
       break;
 
     case VehicleModelType::IDEAL_STEER_ACC:
     case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-      v << 0, 0, 0, autoware->restrictTargetSpeed(value);
+      v << 0, 0, 0, field_operator_application->restrictTargetSpeed(value);
       break;
 
     case VehicleModelType::IDEAL_STEER_VEL:
@@ -508,7 +521,7 @@ void EgoEntity::requestSpeedChange(double value, bool)
       break;
 
     case VehicleModelType::DELAY_STEER_VEL:
-      v << 0, 0, 0, autoware->restrictTargetSpeed(value), 0;
+      v << 0, 0, 0, field_operator_application->restrictTargetSpeed(value), 0;
       break;
 
     default:
@@ -526,7 +539,7 @@ void EgoEntity::requestSpeedChange(
 
 auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
-  autoware->setVelocityLimit(value);
+  field_operator_application->setVelocityLimit(value);
 }
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -2,6 +2,275 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.6.8 (2023-05-09)
+------------------
+* Merge pull request `#990 <https://github.com/tier4/scenario_simulator_v2/issues/990>`_ from tier4/fix/cspell_errors
+* apply linter
+* docs: use ROS 2 instead of ROS2
+* Merge pull request `#979 <https://github.com/tier4/scenario_simulator_v2/issues/979>`_ from RobotecAI/ref/AJD-696_clean_up_metics_traffic_sim
+* ref(simulator_core): apply ament_clang_reformat
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge pull request `#980 <https://github.com/tier4/scenario_simulator_v2/issues/980>`_ from tier4/feature/interpreter/environment
+* Merge pull request `#894 <https://github.com/tier4/scenario_simulator_v2/issues/894>`_ from tier4/fix/cleanup_code
+* Merge branch 'master' into feature/interpreter/environment
+* Merge pull request `#986 <https://github.com/tier4/scenario_simulator_v2/issues/986>`_ from tier4/feature/interpreter/publishing-delay
+* Merge pull request `#977 <https://github.com/tier4/scenario_simulator_v2/issues/977>`_ from tier4/feature/interpreter/model3d-field
+* Merge branch 'master' into feature/interpreter/model3d-field
+* Update AssignControllerAction to read property `detectedObjectPublishingDelay`
+* Lipsticks
+* Revert "feat(traffic_sim): add setJerkLimit"
+* Fix optional types default
+* Fix code styles
+* Revert unexpected formatting change
+* Use default constructor instead of optional with warnings
+* Revert "Add optional support for  readElement"
+* Revert "Add optional support for readAttribute"
+* Use if initialization on validate
+* Remove done todo
+* Fix code styles
+* Show tag name on attribute error message
+* Fix code styles
+* Use default constructor on Percipitation
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/model3d-field
+* Fix misuse constant
+* Merge branch 'master' into feature/interpreter/environment
+* Fix code style
+* Add range checker on Environment related element
+* Use optional on Weather
+* Add optional support for readAttribute
+* Use optional by readElement on Environment
+* Add optional support for  readElement
+* Use boost::optional for indicate element is empty
+* Add missing member to Environment
+* Add RoadCondition tag syntax
+* Add Wetness attribute syntax
+* Fix code styles
+* feat(traffic_sim): add out_of_range as job actvated in AddEntityAction functor
+* Merge branch 'master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge branch 'master' into fix/cleanup_code
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/AJD-697_improve_port_management_zmq
+* Merge pull request `#971 <https://github.com/tier4/scenario_simulator_v2/issues/971>`_ from tier4/feature/interpreter/delay_in_condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/delay_in_condition
+* feat(traffic_sim): ensure max_jerk as variable in entity_base
+* Revert "feat(traffic_sim): add max_jerk, maxJerk, setJerkLimit"
+* Merge pull request `#978 <https://github.com/tier4/scenario_simulator_v2/issues/978>`_ from tier4/feature/interpreter/relative-heading-condition
+* Merge remote-tracking branch 'origin/master' into clean-dicts
+* Fix code style
+* Add DomeImage tag syntax
+* Add copyright notice to time_of_day.cpp
+* Add Wind tag syntax
+* Add Precipitation tag to Weather
+* Add Precipitation tag syntax
+* Add PrecipitationType attribute syntax
+* Fix XSD comment
+* Add first Weather tag syntax
+* Merge branch 'master' into feature/interpreter/model3d-field
+* Add OpenSCENARIO version
+* Add range information for Fog
+* Fix class member naming
+* Add Fog tag syntax
+* Add Sun tag syntax
+* Add FractionalCloudCover attribute type
+* Add TimeOfDay tag syntax
+* Add ParameterDeclarations child to Environment
+* Add Environment to Catalog
+* Add EnvironmentAction syntax to GlobalAction
+* Add EnvironmentAction syntax
+* Add Environment base syntax
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Use `typename` instead of `class`
+* Format
+* Use static_cast instead of dynamic initialization
+* Use more precise function signature
+* Remove trailing return type from lambda function
+* Update signature of lambda functions
+* Merge branch 'master' into feature/noise_delay_object
+* Change not to use `std::reverse_iterator`
+* Fix wrong evaluation order
+* Refactor `update_condition`
+* Update `Condition::evaluate`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/relative-heading-condition
+* Merge pull request `#975 <https://github.com/tier4/scenario_simulator_v2/issues/975>`_ from tier4/emergency-state/backwardcompatibility-1
+* refactor(concealer)
+* Merge branch 'master' into feature/noise_delay_object
+* feat(traffic_sim): add max_jerk, maxJerk, setJerkLimit
+* Update sample scenario to use one-argument version of `RelativeHeadingCondition`
+* Update `RelativeHeadingCondition` to work even if only one argument is given
+* Add `model3d` attribute to entity object
+* ref(traffic_sim):  out_of_range  only for npc vehicles, add tolerance
+* ref(traffic_simulator): remove out_of_range metric
+* Merge remote-tracking branch 'origin/master' into emergency-state/backwardcompatibility-1
+* Merge remote-tracking branch 'origin/emergency-state/latest' into emergency-state/backwardcompatibility-1
+* Merge pull request `#973 <https://github.com/tier4/scenario_simulator_v2/issues/973>`_ from tier4/feature/interpreter/probability-of-lost
+* Update to accept all condition edges
+* Lipsticks
+* Update `applyAssignControllerAction` to set `probability_of_lost` to detection sensor
+* Merge remote-tracking branch 'origin' into feature/add_setgoalposes_api
+* Use `test()` instead of subscript operator
+* Fix wrong comparison
+* Merge remote-tracking branch 'origin/master' into fix/openscenario_utility/conversion
+* Merge pull request `#874 <https://github.com/tier4/scenario_simulator_v2/issues/874>`_ from tier4/feature/interpreter/user-defined-value-condition
+* Update wording
+* Fix typo
+* Refactor `evaluate` implementation
+* Merge remote-tracking branch 'origin/master' into fix/get-unique-route-lanelets
+* Merge pull request `#957 <https://github.com/tier4/scenario_simulator_v2/issues/957>`_ from tier4/feature/interpreter/license_and_properties
+* Fix wrong comparison
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge branch 'master' into fix/cleanup_code
+* Format
+* Add condition edge implementation
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/license_and_properties
+* Add `delay` functionality for `condition`
+* Format
+* Update `License` definition
+* Merge remote-tracking branch 'origin/master' into fix/get-unique-route-lanelets
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#967 <https://github.com/tier4/scenario_simulator_v2/issues/967>`_ from RobotecAI/fix/AJD-655-terminates-sigint
+* Merge pull request `#932 <https://github.com/tier4/scenario_simulator_v2/issues/932>`_ from tier4/feature/interpreter/alive-monitoring
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Move a message type `UserDefinedValue` to an external package `tier4_simulation_msgs`
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge pull request `#966 <https://github.com/tier4/scenario_simulator_v2/issues/966>`_ from RobotecAI/fix/AJD-653-map-path-files
+* Update ReleaseNotes
+* reformat: apply ament_clang_format
+* refactor: apply ament_clang_format
+* use __has_include
+* modify CMakeLists.txt
+* fix(os_interp): fix abort caused by ~Interpreter
+* fix(sim_core): fix getting the eval sim time
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin' into fix/getting_next_lanelet
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/license_and_properties
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#965 <https://github.com/tier4/scenario_simulator_v2/issues/965>`_ from tier4/emergency-state/latest-behavior
+* Merge pull request `#962 <https://github.com/tier4/scenario_simulator_v2/issues/962>`_ from tier4/feature/interpreter/relative-distance-condition
+* Merge pull request `#954 <https://github.com/tier4/scenario_simulator_v2/issues/954>`_ from tier4/fix/python-installation
+* feat(interpreter): implement MRM behavior interface
+* chore: delete commented line in package.xml
+* Cleanup
+* Update `DistanceCondition` to support lateral lane-coordinate distance
+* Update `RelativeDistanceCondition` to support lateral lane-coordinate distance
+* chore: add debug messages
+* Lipsticks
+* Format
+* Make `resource` and `spdxId` optional
+* Add License and Properties fields
+* Remove unused parameter
+* feat(interpreter): implement EmergencyState interface for interpreter
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Add new command `features`
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* chore: revert condition name
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into emergency-state/backward-compatibility
+* feat(UserDefinedCondition): add `currentMrmState` and `currentMrmBehavior` when there is　autoware_adapi_v1_msgs
+* chore: add autoware_adapi_v1_msgs as an option
+* Update `MultiServer` to be monitored by `status_monitor`
+* Remove `status_monitor` from `openscenario_interpreter_node`
+* Update struct `Status` to hold first caller name
+* Merge remote-tracking branch 'origin/master' into import/universe-2437
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge pull request `#937 <https://github.com/tier4/scenario_simulator_v2/issues/937>`_ from tier4/feature/interpreter/noise
+* Update `StatusMonitor` to check elapsed time since last access
+* Update `AssignControllerAction` to consider some object detection properties
+* Update `rand_engine\_` to allocate on the stack instead of the heap
+* Lipsticks
+* Merge branch 'master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge pull request `#926 <https://github.com/tier4/scenario_simulator_v2/issues/926>`_ from tier4/feature/empty/parameter_value_distribution-fixed
+* Update `CMakeLists.txt` to not build `libopenscenario_interpreter.so` as component
+* Add new struct `openscenario_interpreter::LifecycleNode`
+* refactor(interpreter): use static_cast to clarify what the code is meant
+* refactor(interpreter): initialize Scope::seed with loaded value from scenario
+* refactor(interpreter): use Scope::seed
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#928 <https://github.com/tier4/scenario_simulator_v2/issues/928>`_ from tier4/feature/interpreter/speed-profile-action
+* refactor(interpreter): initialize randomSeed with 0
+* Merge branch 'master' into feature/simple_noise_simulator
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* chore(interpreter): apply clang-format
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* refactor(interpreter): avoid copy and use perfect forwarding
+* refactor(interpreter): rename template name
+* Remove deprecated static member function `ActionApplication::getBehaviorParameter`
+* Cleanup member function `SpeedProfileAction::run`
+* Remove debug printings from `SpeedProfileAction`
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge pull request `#909 <https://github.com/tier4/scenario_simulator_v2/issues/909>`_ from tier4/feature/jerk_planning
+* Revert "Revert "refactor(interpreter): delete unnecessary this keyword""
+* chore(interpreter): fix compile error
+* refactor(interpreter): rename variable
+* Revert "refactor(interpreter): delete unnecessary this keyword"
+* refactor(interpreter): make a name of member variable that is used as a function, like a function
+* refactor(interpreter): delete unnecessary this keyword
+* refactor(interpreter): make name for instance of StochasticDistributionSampler like a function
+* refactor(interpreter): use explicit keyword for struct constructor
+* chore(interpreter): fix implementation of  ProbabilityDistributionSet::evaluate()
+* feat(interpreter): implement ProbabilityDistributionSet::evaluate()
+* refactor(interpreter): delete unused member in UserDefinedDistribution
+* chore(interpreter): fix compile error
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* feat(interpreter): implement evaluate functions for stochastic distribution classes
+* refactor(interpreter): rename StochasticDistributionClass into StochasticDistributionSampler
+* Update `SpeedProfileAction` debug informations
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* refactor(interpreter): delete unused inheritance
+* fix(interpreter): add missing attribute to DeterministicSingleParameterDistribution
+* feat(interpreter): add ParameterValueDistributionDefinition
+* Update `SpeedProfileAction` to select `Transition` by attribute `followingMode`
+* Added debug prints to `SpeedProfileAction`
+* Update SpeedProfileAction to call `requestSpeedChange` with `Transition::AUTO`
+* Add new function `getBehaviorParameter` for debug
+* Rename local function `compare` to `accomplished`
+* fix!(UserDefinedValueCondition): convert mrm state to emergency state
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* chore(interpreter): update error messages
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/simple_noise_simulator
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* refactor(interpreter): move distribution.hpp into `random` directory
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* fix compile errors
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Fix wrong function call
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Format
+* Replace boost::optional with std::optional
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Update some nodes to treat `scenario_simulator_v2_msgs` to be required dependency
+* Update `UserDefinedValueCondition` to be compilable even if there is no package named `scenario_simulator_v2_msgs`
+* Update `UserDefinedValueCondition` to use message of package `scenario_simulator_v2_msgs`
+* Update `UserDefinedValueCondition` to not to depend `ParameterDeclaration`
+* Remove data member `name` from `openscenario_msgs::msg::ParameterDeclaration`
+* Remove `openscenario_msgs::msg::ValueConstraint` and `ValueConstraintGroup`
+* Rename data member `evaluateValue` to `evaluate_value`
+* Merge branch 'master' into feature/improve_occupancy_grid_algorithm
+* Lipsticks
+* Merge branch 'master' into fix_wrong_merge
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/use_job_in_standstill_duration
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Michał Kiełczykowski, Minami Shota, Shota Minami, Tatsuya Yamasaki, f0reachARR, hrjp, kyoichi-sugahara, yamacir-kit, ぐるぐる
+
 0.6.7 (2022-11-17)
 ------------------
 * chore(interpreter): fix commit-leaked lines
