@@ -134,9 +134,9 @@ You can send request with these parameters.
 
 ## Vehicle NPC (with Do-Nothing)
 
-When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the setEntityStatus function, etc.  
+When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the `API::setEntityStatus` function, etc.  
 When using this behavior, any consistency in physical behavior is ignored. Changes in posture, velocity, acceleration, and jerk over time will not occur.  
-The EntityStatus value will continue to be the value specified and updated via the setEntityStatus function, etc.  
+The EntityStatus value will continue to be the value specified and updated via the `API::setEntityStatus` function, etc.  
 This behavior was developed primarily to drive the simulator from Autoware rosbag data.  
 
 ## Pedestrian NPC (with Behavior-Tree)
@@ -161,7 +161,7 @@ graph TD
 
 ## Pedestrian NPC (with Do-Nothing)
 
-When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the setEntityStatus function, etc.  
+When this behavior is used, entity can only be moved by specifying its pose, velocity, acceleration, jerk, etc. via the `API::setEntityStatus` function, etc.  
 When using this behavior, any consistency in physical behavior is ignored. Changes in posture, velocity, acceleration, and jerk over time will not occur.  
-The EntityStatus value will continue to be the value specified and updated via the setEntityStatus function, etc.  
+The EntityStatus value will continue to be the value specified and updated via the `API::setEntityStatus` function, etc.  
 This behavior was developed primarily to drive the simulator from Autoware rosbag data.  
