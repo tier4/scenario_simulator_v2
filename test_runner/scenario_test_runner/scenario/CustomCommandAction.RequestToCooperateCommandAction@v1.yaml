@@ -3,7 +3,7 @@ OpenSCENARIO:
     revMajor: 1
     revMinor: 1
     date: "2023-06-12T11:11:00+09:00"
-    description: "Ego avoids a parked car with an approval for the AVOIDANCE_RIGHT request. But ego does not return to the left lane, as this scenario will not approve any other requests to cooperate."
+    description: ""
     author: "Kotaro YOSHIMOTO"
   ParameterDeclarations:
     ParameterDeclaration: []
@@ -14,6 +14,14 @@ OpenSCENARIO:
   RoadNetwork:
     LogicFile:
       filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController:
+        - name: controller-1
+          Phase:
+            - name: phase-1
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34802', state: 'red' }
   Entities:
     ScenarioObject:
       - name: ego
@@ -45,8 +53,8 @@ OpenSCENARIO:
                   Position:
                     LanePosition:
                       roadId: ""
-                      laneId: "34513"
-                      s: 0
+                      laneId: "34408"
+                      s: 10
                       offset: 0
                       Orientation:
                         type: relative
@@ -58,8 +66,8 @@ OpenSCENARIO:
                     Position:
                       LanePosition:
                         roadId: ""
-                        laneId: "34507"
-                        s: 40
+                        laneId: "34630"
+                        s: 10
                         offset: 0
                         Orientation:
                           type: relative
@@ -74,33 +82,10 @@ OpenSCENARIO:
                         Property:
                           - name: maxSpeed
                             value: "8.3333"
-          - entityRef: Npc1
-            PrivateAction:
-              - TeleportAction:
-                  Position:
-                    LanePosition:
-                      roadId: ""
-                      laneId: "34513"
-                      s: 40
-                      offset: 0
-                      Orientation:
-                        type: relative
-                        h: 0
-                        p: 0
-                        r: 0
-              - LongitudinalAction:
-                  SpeedAction:
-                    SpeedActionDynamics:
-                      dynamicsDimension: time
-                      value: 0
-                      dynamicsShape: step
-                    SpeedActionTarget:
-                      AbsoluteTargetSpeed:
-                        value: 0
     Story:
       - name: ""
         Act:
-          - name: ""
+          - name: "ignore the red traffic light by approving RTC"
             ManeuverGroup:
               - maximumExecutionCount: 1
                 name: ""
@@ -113,10 +98,10 @@ OpenSCENARIO:
                       - name: ""
                         priority: parallel
                         Action:
-                          - name: "approve AVOIDANCE_RIGHT request"
+                          - name: "approve TRAFFIC_LIGHT request"
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: RequestToCooperateCommandAction@v1(AVOIDANCE_RIGHT, ACTIVATE)
+                                type: RequestToCooperateCommandAction@v1(TRAFFIC_LIGHT, ACTIVATE)
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -165,7 +150,7 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: "check stop position(staying in the right lane)"
+                                - name: "check reaching the destination"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -178,8 +163,8 @@ OpenSCENARIO:
                                         Position:
                                           LanePosition:
                                             roadId: ""
-                                            laneId: "34468"
-                                            s: 40
+                                            laneId: "34630"
+                                            s: 10
                                             offset: 0
                                             Orientation:
                                               type: relative
@@ -204,19 +189,6 @@ OpenSCENARIO:
                                     SimulationTimeCondition:
                                       value: 60
                                       rule: greaterThan
-                            - Condition:
-                                - name: "detect collision with NPC"
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByEntityCondition:
-                                    TriggeringEntities:
-                                      triggeringEntitiesRule: any
-                                      EntityRef:
-                                        - entityRef: ego
-                                    EntityCondition:
-                                      CollisionCondition:
-                                        EntityRef:
-                                          entityRef: Npc1
                         Action:
                           - name: ""
                             UserDefinedAction:
