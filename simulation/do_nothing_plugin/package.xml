@@ -1,26 +1,23 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>geometry</name>
+  <name>do_nothing_plugin</name>
   <version>0.6.8</version>
-  <description>geometry math library for scenario_simulator_v2 application</description>
+  <description>Behavior plugin for do nothing</description>
   <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
-  <license>Apache License 2.0</license>
+  <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
-  <depend>boost</depend>
-  <depend>geometry_msgs</depend>
+  <depend>behaviortree_cpp_v3</depend>
+  <depend>pluginlib</depend>
   <depend>quaternion_operation</depend>
   <depend>rclcpp</depend>
-  <depend>scenario_simulator_exception</depend>
-  <depend>tf2_geometry_msgs</depend>
-  <depend>traffic_simulator_msgs</depend>
+  <depend>traffic_simulator</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>
-  <test_depend>ament_cmake_gtest</test_depend>
   <test_depend>ament_cmake_lint_cmake</test_depend>
   <test_depend>ament_cmake_pep257</test_depend>
   <test_depend>ament_cmake_xmllint</test_depend>
