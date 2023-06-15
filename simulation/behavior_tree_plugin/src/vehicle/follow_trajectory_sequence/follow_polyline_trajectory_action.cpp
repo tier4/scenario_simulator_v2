@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <arithmetic/floating_point/comparison.hpp>
 #include <behavior_tree_plugin/vehicle/follow_trajectory_sequence/follow_polyline_trajectory_action.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -146,40 +147,6 @@ auto truncate(const T & v, const U & max)
   }
 }
 
-template <typename T, typename... Ts>
-auto isDefinitelyLessThan(T a, T b, Ts... xs)
-{
-  auto compare = [](T a, T b) {
-    return (b - a) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
-  };
-
-  if constexpr (0 < sizeof...(Ts)) {
-    return compare(a, b) and compare(b, xs...);
-  } else {
-    return compare(a, b);
-  }
-}
-
-template <typename T>
-auto isApproximatelyEqualTo(T a, T b)
-{
-  return std::abs(a - b) <=
-         (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
-}
-
-template <typename T>
-auto isDefinitelyGreaterThan(T a, T b)
-{
-  return (a - b) > (std::numeric_limits<T>::epsilon() * std::max(std::abs(a), std::abs(b)));
-}
-
-template <typename T>
-auto isEssentiallyEqualTo(T a, T b)
-{
-  return std::abs(a - b) <=
-         (std::numeric_limits<T>::epsilon() * std::min(std::abs(a), std::abs(b)));
-}
-
 template <typename F, typename... Ts>
 auto any(F f, Ts &&... xs)
 {
@@ -204,6 +171,9 @@ auto isinf = [](auto... xs) constexpr { return (std::isinf(xs) and ...); };
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
+  using math::arithmetic::isApproximatelyEqualTo;
+  using math::arithmetic::isDefinitelyLessThan;
+
   auto pop = [this]() {
     /*
        The OpenSCENARIO standard does not define the behavior when the value of
