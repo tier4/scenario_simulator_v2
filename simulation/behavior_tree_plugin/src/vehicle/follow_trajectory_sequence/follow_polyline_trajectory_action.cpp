@@ -185,8 +185,54 @@ auto isEssentiallyEqualTo(T a, T b)
          (std::numeric_limits<T>::epsilon() * std::min(std::abs(a), std::abs(b)));
 }
 
+template <typename F, typename... Ts>
+auto any(F f, Ts &&... xs)
+{
+  return (f(xs) and ...);
+}
+
+template <typename F, typename T, std::enable_if_t<is_vector3<T>::value, std::nullptr_t> = nullptr>
+auto any(F f, const T & v)
+{
+  return any(f, v.x, v.y, v.z);
+}
+
+auto isnan = [](auto... xs) constexpr { return (std::isnan(xs) and ...); };
+
+auto isinf = [](auto... xs) constexpr { return (std::isinf(xs) and ...); };
+
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
+  auto pop = [this]() {
+    /*
+       The OpenSCENARIO standard does not define the behavior when the value of
+       Timing.domainAbsoluteRelative is "relative". The standard only states
+       "Definition of time value context as either absolute or relative", and
+       it is completely unclear when the relative time starts.
+
+       This implementation has interpreted the specification as follows:
+       Relative time starts from the start of FollowTrajectoryAction or from
+       the time of reaching the previous "waypoint with arrival time".
+
+        Note: static_cast<bool>(parameter->base_time) means
+        "Timing.domainAbsoluteRelative is relative".
+
+        Note: not std::isnan(parameter->shape.vertices.front().time) means "The
+        waypoint about to be popped is the waypoint with the specified arrival
+        time".
+    */
+    if (parameter->base_time and not std::isnan(parameter->shape.vertices.front().time)) {
+      parameter->base_time = entity_status.time;
+    }
+
+    if (std::rotate(
+          std::begin(parameter->shape.vertices), std::begin(parameter->shape.vertices) + 1,
+          std::end(parameter->shape.vertices));
+        not parameter->closed) {
+      parameter->shape.vertices.pop_back();
+    }
+  };
+
   /*
      The following code implements the steering behavior known as "seek". See
      "Steering Behaviors For Autonomous Characters" by Craig Reynolds for more
@@ -202,26 +248,45 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   } else if (parameter->shape.vertices.empty()) {
     LINE();
     return BT::NodeStatus::SUCCESS;
-  } else {
-    const auto position = entity_status.pose.position;
-
+  } else if (const auto position = entity_status.pose.position;
+             any(isnan, position) or any(isinf, position)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Entity ",
+      std::quoted(entity_status.name),
+      " coordinate value contains NaN or infinity. The values are [", position.x, ", ", position.y,
+      ", ", position.z, "].");
+  } else if (
     /*
        We've made sure that parameter->shape.vertices is not empty, so a
        reference to vertices.front() always succeeds. vertices.front() is
        referenced only this once in this member function.
     */
     const auto target_position = parameter->shape.vertices.front().position.position;
-
+    any(isnan, target_position) or any(isinf, target_position)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Target position coordinate value contains NaN or "
+      "infinity. The values are [",
+      target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
+  } else if (
     /*
        Note: If not dynamic_constraints_ignorable, the linear distance should
        cause problems.
     */
-    const auto distance_to_front_waypoint = hypot(position, target_position);  // [m]
-
-    const auto remaining_time_to_front_waypoint =
-      (parameter->base_time ? *parameter->base_time : 0.0) +
-      parameter->shape.vertices.front().time - entity_status.time;
-
+    const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
+      hypot(position, target_position), (parameter->base_time ? *parameter->base_time : 0.0) +
+                                          parameter->shape.vertices.front().time -
+                                          entity_status.time);
+    /*
+       This clause is to avoid division-by-zero errors in later clauses with
+       distance_to_front_waypoint as the denominator if the distance
+       miraculously becomes zero.
+    */
+    isApproximatelyEqualTo(distance_to_front_waypoint, 0.0)) {
+    pop();
+    return tick();
+  } else {
     const auto [distance, remaining_time] = [&]() {
       if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
             std::begin(parameter->shape.vertices), std::end(parameter->shape.vertices),
@@ -475,26 +540,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         isDefinitelyLessThan(
           remaining_time_to_front_waypoint,
           remaining_time_to_arrival_to_front_waypoint + step_time)) {
-        if (std::rotate(
-              std::begin(parameter->shape.vertices), std::begin(parameter->shape.vertices) + 1,
-              std::end(parameter->shape.vertices));
-            not parameter->closed) {
-          parameter->shape.vertices.pop_back();
-        }
-        /*
-           The OpenSCENARIO standard does not define the behavior when the
-           value of Timing.domainAbsoluteRelative is "relative". The standard
-           only states "Definition of time value context as either absolute or
-           relative", and it is completely unclear when the relative time
-           starts.
-
-           This implementation has interpreted the specification as follows:
-           Relative time starts from the start of FollowTrajectoryAction or
-           from the time of reaching the previous "waypoint with arrival time".
-        */
-        if (parameter->base_time and not std::isnan(remaining_time_to_front_waypoint)) {
-          parameter->base_time = entity_status.time;
-        }
+        pop();
         return tick();  // tail recursion
       } else {
         throw common::SimulationError(
