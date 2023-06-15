@@ -39,10 +39,10 @@ auto FollowPolylineTrajectoryAction::calculateObstacle(
   const traffic_simulator_msgs::msg::WaypointsArray &)
   -> const std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  /*
+  /**
      Obstacle avoidance is not implemented for this action.
 
-     If you implement obstacle avoidance for this action, implement this
+     @todo If you implement obstacle avoidance for this action, implement this
      virtual function to return the location of any obstacles blocking the path
      of this action's actor. However, this virtual function is currently used
      only for the visualization of obstacle information, so the obstacle
@@ -271,8 +271,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
   } else if (
     /*
-       Note: If not dynamic_constraints_ignorable, the linear distance should
-       cause problems.
+       If not dynamic_constraints_ignorable, the linear distance should cause
+       problems.
     */
     const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
       hypot(position, target_position), (parameter->base_time ? *parameter->base_time : 0.0) +
@@ -286,89 +286,114 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     isApproximatelyEqualTo(distance_to_front_waypoint, 0.0)) {
     pop();
     return tick();
-  } else {
-    const auto [distance, remaining_time] = [&]() {
-      if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
-            std::begin(parameter->shape.vertices), std::end(parameter->shape.vertices),
-            [](auto && vertex) { return not std::isnan(vertex.time); });
-          first_waypoint_with_arrival_time_specified != std::end(parameter->shape.vertices)) {
-        /*
-           Note for anyone working on adding support for followingMode follow
-           to this function (FollowPolylineTrajectoryAction::tick) in the
-           future: if followingMode is follow, this distance calculation may be
-           inappropriate.
-        */
-        auto total_distance_to = [this](auto last) {
-          auto total_distance = 0.0;
-          for (auto iter = std::begin(parameter->shape.vertices); 0 < std::distance(iter, last);
-               ++iter) {
-            total_distance += hypot(iter->position.position, std::next(iter)->position.position);
+  } else if (
+    const auto [distance, remaining_time] =
+      [&]() {
+        if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
+              std::begin(parameter->shape.vertices), std::end(parameter->shape.vertices),
+              [](auto && vertex) { return not std::isnan(vertex.time); });
+            first_waypoint_with_arrival_time_specified != std::end(parameter->shape.vertices)) {
+          /*
+             Note for anyone working on adding support for followingMode follow
+             to this function (FollowPolylineTrajectoryAction::tick) in the
+             future: if followingMode is follow, this distance calculation may be
+             inappropriate.
+          */
+          auto total_distance_to = [this](auto last) {
+            auto total_distance = 0.0;
+            for (auto iter = std::begin(parameter->shape.vertices); 0 < std::distance(iter, last);
+                 ++iter) {
+              total_distance += hypot(iter->position.position, std::next(iter)->position.position);
+            }
+            return total_distance;
+          };
+
+          if (const auto remaining_time = (parameter->base_time ? *parameter->base_time : 0.0) +
+                                          first_waypoint_with_arrival_time_specified->time -
+                                          entity_status.time;
+              /*
+                 The conditional expression below should ideally be
+                 remaining_time < 0.
+
+                 The simulator runs at a constant frame rate, so the step time is
+                 1/FPS. If the simulation time is an accumulation of step times
+                 expressed as rational numbers, times that are integer multiples
+                 of the frame rate will always be exact integer seconds.
+                 Therefore, the timing of remaining_time == 0 always exists, and
+                 the velocity planning of this member function (tick) aims to
+                 reach the waypoint exactly at that timing. So the ideal timeout
+                 condition is remaining_time < 0.
+
+                 But actually the step time is expressed as a float and the
+                 simulation time is its accumulation. As a result, it is not
+                 guaranteed that there will be times when the simulation time is
+                 exactly zero. For example, remaining_time == -0.00006 and it was
+                 judged to be out of time.
+
+                 For the above reasons, the condition is remaining_time <
+                 -step_time. In other words, the conditions are such that a delay
+                 of 1 step time is allowed.
+              */
+              remaining_time < -step_time) {
+            throw common::Error(
+              "Vehicle ", std::quoted(entity_status.name),
+              " failed to reach the trajectory waypoint at the specified time. The specified time "
+              "is ",
+              first_waypoint_with_arrival_time_specified->time, " seconds (",
+              (parameter->base_time ? "absolute" : "relative"),
+              " simulation time). This may be due to unrealistic conditions of arrival time "
+              "specification compared to vehicle parameters and dynamic constraints.");
+          } else {
+            return std::make_tuple(
+              distance_to_front_waypoint +
+                total_distance_to(first_waypoint_with_arrival_time_specified),
+              remaining_time);
           }
-          return total_distance;
-        };
-
-        if (const auto remaining_time = (parameter->base_time ? *parameter->base_time : 0.0) +
-                                        first_waypoint_with_arrival_time_specified->time -
-                                        entity_status.time;
-            /*
-               The conditional expression below should ideally be
-               remaining_time < 0.
-
-               The simulator runs at a constant frame rate, so the step time is
-               1/FPS. If the simulation time is an accumulation of step times
-               expressed as rational numbers, times that are integer multiples
-               of the frame rate will always be exact integer seconds.
-               Therefore, the timing of remaining_time == 0 always exists, and
-               the velocity planning of this member function (tick) aims to
-               reach the waypoint exactly at that timing. So the ideal timeout
-               condition is remaining_time < 0.
-
-               But actually the step time is expressed as a float and the
-               simulation time is its accumulation. As a result, it is not
-               guaranteed that there will be times when the simulation time is
-               exactly zero. For example, remaining_time == -0.00006 and it was
-               judged to be out of time.
-
-               For the above reasons, the condition is remaining_time <
-               -step_time. In other words, the conditions are such that a delay
-               of 1 step time is allowed.
-            */
-            remaining_time < -step_time) {
-          throw common::Error(
-            "Vehicle ", std::quoted(entity_status.name),
-            " failed to reach the trajectory waypoint at the specified time. The specified time "
-            "is ",
-            first_waypoint_with_arrival_time_specified->time, " seconds (",
-            (parameter->base_time ? "absolute" : "relative"),
-            " simulation time). This may be due to unrealistic conditions of arrival time "
-            "specification compared to vehicle parameters and dynamic constraints.");
         } else {
           return std::make_tuple(
-            distance_to_front_waypoint +
-              total_distance_to(first_waypoint_with_arrival_time_specified),
-            remaining_time);
+            distance_to_front_waypoint, std::numeric_limits<double>::infinity());
         }
-      } else {
-        return std::make_tuple(distance_to_front_waypoint, std::numeric_limits<double>::infinity());
-      }
-    }();
-
-    const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
-
-    const auto max_acceleration = std::min(
-      acceleration /* [m/s^2] */ +
-        behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
-          step_time /* [s] */,
-      +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
-
-    const auto min_acceleration = std::max(
-      acceleration /* [m/s^2] */ -
-        behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
-          step_time /* [s] */,
-      -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */);
-
-    const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
-
+      }();
+    isApproximatelyEqualTo(distance, 0.0)) {
+    pop();
+    return tick();
+  } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
+             isinf(acceleration) or isnan(acceleration)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Entity ",
+      std::quoted(entity_status.name), "'s acceleration value is NaN or infinity. The value is ",
+      acceleration, ".");
+  } else if (const auto max_acceleration = std::min(
+               acceleration /* [m/s^2] */ +
+                 behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
+                   step_time /* [s] */,
+               +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
+             isinf(max_acceleration) or isnan(max_acceleration)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Entity ",
+      std::quoted(entity_status.name),
+      "'s maximum acceleration value is NaN or infinity. The value is ", max_acceleration, ".");
+  } else if (const auto min_acceleration = std::max(
+               acceleration /* [m/s^2] */ -
+                 behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
+                   step_time /* [s] */,
+               -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */);
+             isinf(min_acceleration) or isnan(min_acceleration)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Entity ",
+      std::quoted(entity_status.name),
+      "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ".");
+  } else if (const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
+             isinf(speed) or isnan(speed)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Entity ",
+      std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ", speed,
+      ".");
+  } else if (
     /*
        The desired acceleration is the acceleration at which the destination
        can be reached exactly at the specified time (= time remaining at zero).
@@ -377,35 +402,43 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        need to accelerate or decelerate, so the current acceleration will be
        the desired speed.
     */
-    const auto desired_acceleration = [&]() {
-      if (std::isinf(remaining_time)) {
-        return acceleration;
-      } else {
-        /*
-                        v [m/s]
-                         ^
-                         |
-           desired_speed +   /|
-                         |  / |
-                         | /  |
-                   speed +/   |
-                         |    |
-                         |    |
-                         +----+-------------> t [s]
-                       0     remaining_time
+    const auto desired_acceleration =
+      [&]() {
+        if (std::isinf(remaining_time)) {
+          return acceleration;  /// @todo Accelerate to match speed with `target_speed`.
+        } else {
+          /*
+                          v [m/s]
+                           ^
+                           |
+             desired_speed +   /|
+                           |  / |
+                           | /  |
+                     speed +/   |
+                           |    |
+                           |    |
+                           +----+-------------> t [s]
+                         0     remaining_time
 
-           desired_speed = speed + desired_acceleration * remaining_time
+             desired_speed = speed + desired_acceleration * remaining_time
 
-           distance = (speed + desired_speed) * remaining_time * 1/2
+             distance = (speed + desired_speed) * remaining_time * 1/2
 
-                    = (speed + speed + desired_acceleration * remaining_time) * remaining_time * 1/2
+                      = (speed + speed + desired_acceleration * remaining_time) * remaining_time * 1/2
 
-                    = speed * remaining_time + desired_acceleration * remaining_time^2 * 1/2
-        */
-        return 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time;
-      }
-    }();
-
+                      = speed * remaining_time + desired_acceleration * remaining_time^2 * 1/2
+          */
+          return 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time;
+        }
+      }();
+    std::isinf(desired_acceleration) or std::isnan(desired_acceleration)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Entity ",
+      std::quoted(entity_status.name),
+      "'s desired acceleration value contains NaN or infinity. The value is ", desired_acceleration,
+      ".");
+  } else if (
     /*
        However, the desired acceleration is unrealistically large in terms of
        vehicle performance and dynamic constraints, so it is clamped to a
@@ -413,10 +446,26 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     */
     const auto desired_speed =
       speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time;
-
+    std::isinf(desired_speed) or std::isnan(desired_speed)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Entity ",
+      std::quoted(entity_status.name), "'s desired speed value is NaN or infinity. The value is ",
+      desired_speed, ".");
+  } else if (
+    /*
+       It's okay for this value to be infinite.
+    */
     const auto remaining_time_to_arrival_to_front_waypoint =
       distance_to_front_waypoint / desired_speed;  // [s]
-
+    std::isnan(remaining_time_to_arrival_to_front_waypoint)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Entity ",
+      std::quoted(entity_status.name),
+      "'s remaining time to arrival to front waypoint is NaN or infinity. The value is ",
+      remaining_time_to_arrival_to_front_waypoint, ".");
+  } else {
     if constexpr (true) {
       // clang-format off
       std::cout << std::string(80, '-') << std::endl;
