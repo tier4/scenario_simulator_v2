@@ -15,11 +15,6 @@
 #include <behavior_tree_plugin/vehicle/follow_trajectory_sequence/follow_polyline_trajectory_action.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-#define LINE() \
-  std::cout << "\x1b[33m" __FILE__ "\x1b[31m:\x1b[36m" << __LINE__ << "\x1b[0m" << std::endl
-
-#define PRINT(...) std::cout << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
-
 namespace entity_behavior
 {
 namespace vehicle
@@ -252,7 +247,6 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       not getInput<decltype(target_speed)>("target_speed", target_speed) or not parameter) {
     return BT::NodeStatus::FAILURE;
   } else if (parameter->shape.vertices.empty()) {
-    LINE();
     return BT::NodeStatus::SUCCESS;
   } else if (const auto position = entity_status.pose.position;
              any(isnan, position) or any(isinf, position)) {
@@ -493,14 +487,15 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     const auto remaining_time_to_arrival_to_front_waypoint =
       distance_to_front_waypoint / desired_speed;  // [s]
 
-    if constexpr (true) {
+    if constexpr (false) {
       // clang-format off
-      std::cout << std::string(80, '-') << std::endl;
+      std::cout << std::fixed << std::boolalpha << std::string(80, '-') << std::endl;
 
-      std::cout << std::fixed << "acceleration = " << acceleration << std::endl;
+      std::cout << "acceleration "
+                << "== " << acceleration
+                << std::endl;
 
-      std::cout << std::fixed
-                << "min_acceleration "
+      std::cout << "min_acceleration "
                 << "== std::max(acceleration - max_deceleration_rate * step_time, -max_deceleration) "
                 << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate << " * " << step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
                 << "== std::max(" << acceleration << " - " << behavior_parameter.dynamic_constraints.max_deceleration_rate * step_time << ", " << -behavior_parameter.dynamic_constraints.max_deceleration << ") "
@@ -508,8 +503,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                 << "== " << min_acceleration
                 << std::endl;
 
-      std::cout << std::fixed
-                << "max_acceleration "
+      std::cout << "max_acceleration "
                 << "== std::min(acceleration + max_acceleration_rate * step_time, +max_acceleration) "
                 << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate << " * " << step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
                 << "== std::min(" << acceleration << " + " << behavior_parameter.dynamic_constraints.max_acceleration_rate * step_time << ", " << behavior_parameter.dynamic_constraints.max_acceleration << ") "
@@ -517,12 +511,10 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                 << "== " << max_acceleration
                 << std::endl;
 
-      std::cout << std::fixed
-                << "min_acceleration < acceleration < max_acceleration "
+      std::cout << "min_acceleration < acceleration < max_acceleration "
                 << "== " << min_acceleration << " < " << acceleration << " < " << max_acceleration << std::endl;
 
-      std::cout << std::fixed << std::boolalpha
-                << "desired_acceleration "
+      std::cout << "desired_acceleration "
                 << "== 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time "
                 << "== 2 * " << distance << " / " << std::pow(remaining_time, 2) << " - 2 * " << speed << " / " << remaining_time << " "
                 << "== " << (2 * distance / std::pow(remaining_time, 2)) << " - " << (2 * speed / remaining_time) << " "
@@ -530,8 +522,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                 << "(acceleration < desired_acceleration == " << (acceleration < desired_acceleration) << " == need to " <<(acceleration < desired_acceleration ? "accelerate" : "decelerate") << ")"
                 << std::endl;
 
-      std::cout << std::fixed
-                << "desired_speed "
+      std::cout << "desired_speed "
                 << "== speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time "
                 << "== " << speed << " + std::clamp(" << desired_acceleration << ", " << min_acceleration << ", " << max_acceleration << ") * " << step_time << " "
                 << "== " << speed << " + " << std::clamp(desired_acceleration, min_acceleration, max_acceleration) << " * " << step_time << " "
@@ -539,14 +530,23 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                 << "== " << desired_speed
                 << std::endl;
 
-      PRINT(distance_to_front_waypoint);
-      PRINT(remaining_time_to_front_waypoint);
+      std::cout << "distance_to_front_waypoint "
+                << "== " << distance_to_front_waypoint
+                << std::endl;
 
-      PRINT(distance);
-      PRINT(remaining_time);
+      std::cout << "remaining_time_to_arrival_to_front_waypoint "
+                << "== " << remaining_time_to_arrival_to_front_waypoint
+                << std::endl;
 
-      std::cout << std::fixed
-                << "remaining_time_to_arrival_to_front_waypoint "
+      std::cout << "distance "
+                << "== " << distance
+                << std::endl;
+
+      std::cout << "remaining_time "
+                << "== " << remaining_time
+                << std::endl;
+
+      std::cout << "remaining_time_to_arrival_to_front_waypoint "
                 << "("
                 << "== distance_to_front_waypoint / desired_speed "
                 << "== " << distance_to_front_waypoint << " / " << desired_speed << " "
@@ -554,15 +554,13 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                 << ")"
                 << std::endl;
 
-      std::cout << std::fixed
-                << "arrive during this frame? "
+      std::cout << "arrive during this frame? "
                 << "== remaining_time_to_arrival_to_front_waypoint < step_time "
                 << "== " << remaining_time_to_arrival_to_front_waypoint << " < " << step_time << " "
-                << "== " << std::boolalpha << isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)
+                << "== " << isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)
                 << std::endl;
 
-      std::cout << std::fixed << std::boolalpha
-                << "not too early? "
+      std::cout << "not too early? "
                 << "== std::isnan(remaining_time_to_front_waypoint) or remaining_time_to_front_waypoint < remaining_time_to_arrival_to_front_waypoint + step_time "
                 << "== std::isnan(" << remaining_time_to_front_waypoint << ") or " << remaining_time_to_front_waypoint << " < " << remaining_time_to_arrival_to_front_waypoint << " + " << step_time << " "
                 << "== " << std::isnan(remaining_time_to_front_waypoint) << " or " << isDefinitelyLessThan(remaining_time_to_front_waypoint, remaining_time_to_arrival_to_front_waypoint + step_time) << " "
