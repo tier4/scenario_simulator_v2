@@ -50,6 +50,12 @@ public:
       return name;
     }
 
+    static auto doNothing() noexcept -> const std::string &
+    {
+      static const std::string name = "do_nothing_plugin/DoNothingPlugin";
+      return name;
+    }
+
     static auto defaultBehavior() -> const std::string & { return behaviorTree(); }
   };
 
