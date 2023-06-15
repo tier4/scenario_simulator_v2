@@ -96,8 +96,7 @@ OpenSCENARIO:
                                                     s: 1
                                                     offset: 0
                                                     Orientation: *ORIENTATION
-                                              - time: 10
-                                                Position: &ego_destination
+                                              - Position: &ego_destination
                                                   LanePosition:
                                                     roadId: ''
                                                     laneId: '34513'
@@ -149,7 +148,7 @@ OpenSCENARIO:
                                     EntityCondition:
                                       ReachPositionCondition:
                                         Position: *ego_destination
-                                        tolerance: 1
+                                        tolerance: 0.01
                         Action:
                           - name: ''
                             UserDefinedAction:

@@ -34,19 +34,37 @@ FollowTrajectoryAction::FollowTrajectoryAction(const pugi::xml_node & node, Scop
 
 auto FollowTrajectoryAction::accomplished() -> bool
 {
-  return std::all_of(
-    std::begin(accomplishments), std::end(accomplishments), [this](auto && accomplishment) {
-      auto is_running = [this](auto &&... xs) {
-        if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>()) {
-          return evaluateCurrentState(std::forward<decltype(xs)>(xs)...) ==
-                 "follow_polyline_trajectory";
-        } else {
-          return false;
-        }
-      };
-      return accomplishment.second or
-             (accomplishment.second = not is_running(accomplishment.first));
-    });
+  if (trajectory_ref.trajectory.as<Trajectory>().closed) {
+    return false;
+  } else if (accomplishments.empty()) {
+    /*
+       In order to reflect the execution request of FollowTrajectoryAction to
+       traffic_simulator, it is necessary to call updateFrame once after
+       calling applyFollowTrajectoryAction. This means that evaluating
+       accomplished immediately after start will have unexpected results (often
+       evaluateCurrentState == "follow_polyline_trajectory" will be false). So
+       the first accomplished after calling start will always evaluate to
+       false.
+    */
+    for (const auto & actor : actors) {
+      accomplishments.emplace(actor, false);
+    }
+    return false;
+  } else {
+    return std::all_of(
+      std::begin(accomplishments), std::end(accomplishments), [this](auto && accomplishment) {
+        auto is_running = [this](auto &&... xs) {
+          if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>()) {
+            return evaluateCurrentState(std::forward<decltype(xs)>(xs)...) ==
+                   "follow_polyline_trajectory";
+          } else {
+            return false;
+          }
+        };
+        return accomplishment.second or
+               (accomplishment.second = not is_running(accomplishment.first));
+      });
+  }
 }
 
 auto FollowTrajectoryAction::endsImmediately() noexcept -> bool { return false; }
@@ -56,10 +74,6 @@ auto FollowTrajectoryAction::run() -> void {}
 auto FollowTrajectoryAction::start() -> void
 {
   accomplishments.clear();
-
-  for (const auto & actor : actors) {
-    accomplishments.emplace(actor, false);
-  }
 
   for (const auto & actor : actors) {
     auto repack_trajectory = [this]() {
