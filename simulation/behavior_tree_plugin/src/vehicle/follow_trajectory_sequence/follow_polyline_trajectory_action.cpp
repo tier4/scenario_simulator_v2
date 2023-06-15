@@ -188,6 +188,12 @@ auto isEssentiallyEqualTo(T a, T b)
 template <typename F, typename... Ts>
 auto any(F f, Ts &&... xs)
 {
+  return (f(xs) or ...);
+}
+
+template <typename F, typename... Ts>
+auto every(F f, Ts &&... xs)
+{
   return (f(xs) and ...);
 }
 
@@ -252,10 +258,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
              any(isnan, position) or any(isinf, position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Entity ",
-      std::quoted(entity_status.name),
-      " coordinate value contains NaN or infinity. The values are [", position.x, ", ", position.y,
-      ", ", position.z, "].");
+      "following information to the developer: Vehicle ",
+      std::quoted(entity_status.name), " coordinate value contains NaN or infinity. The value is [",
+      position.x, ", ", position.y, ", ", position.z, "].");
   } else if (
     /*
        We've made sure that parameter->shape.vertices is not empty, so a
@@ -266,8 +271,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     any(isnan, target_position) or any(isinf, target_position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Target position coordinate value contains NaN or "
-      "infinity. The values are [",
+      "following information to the developer: Vehicle ",
+      std::quoted(entity_status.name),
+      "'s target position coordinate value contains NaN or infinity. The value is [",
       target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
   } else if (
     /*
@@ -312,8 +318,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                                           first_waypoint_with_arrival_time_specified->time -
                                           entity_status.time;
               /*
-                 The conditional expression below should ideally be
-                 remaining_time < 0.
+                 The condition below should ideally be remaining_time < 0.
 
                  The simulator runs at a constant frame rate, so the step time is
                  1/FPS. If the simulation time is an accumulation of step times
@@ -339,7 +344,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
               "Vehicle ", std::quoted(entity_status.name),
               " failed to reach the trajectory waypoint at the specified time. The specified time "
               "is ",
-              first_waypoint_with_arrival_time_specified->time, " seconds (",
+              first_waypoint_with_arrival_time_specified->time, " (in ",
               (parameter->base_time ? "absolute" : "relative"),
               " simulation time). This may be due to unrealistic conditions of arrival time "
               "specification compared to vehicle parameters and dynamic constraints.");
@@ -361,7 +366,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
              isinf(acceleration) or isnan(acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Entity ",
+      "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s acceleration value is NaN or infinity. The value is ",
       acceleration, ".");
   } else if (const auto max_acceleration = std::min(
@@ -372,7 +377,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
              isinf(max_acceleration) or isnan(max_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Entity ",
+      "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
       "'s maximum acceleration value is NaN or infinity. The value is ", max_acceleration, ".");
   } else if (const auto min_acceleration = std::max(
@@ -383,14 +388,14 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
              isinf(min_acceleration) or isnan(min_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Entity ",
+      "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
       "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ".");
   } else if (const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
              isinf(speed) or isnan(speed)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Entity ",
+      "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ", speed,
       ".");
   } else if (
@@ -434,7 +439,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     std::isinf(desired_acceleration) or std::isnan(desired_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Entity ",
+      "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
       "'s desired acceleration value contains NaN or infinity. The value is ", desired_acceleration,
       ".");
@@ -449,23 +454,45 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     std::isinf(desired_speed) or std::isnan(desired_speed)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Entity ",
+      "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s desired speed value is NaN or infinity. The value is ",
       desired_speed, ".");
-  } else if (
+  } else if (const auto desired_velocity =
+               [&]() {
+                 /*
+                    Note: The followingMode in OpenSCENARIO is passed as
+                    variable dynamic_constraints_ignorable. the value of the
+                    variable is `followingMode == position`.
+                 */
+                 if (parameter->dynamic_constraints_ignorable) {
+                   return normalize(target_position - position) * desired_speed;  // [m/s]
+                 } else {
+                   /*
+                      Note: The vector returned if
+                      dynamic_constraints_ignorable == true ignores parameters
+                      such as the maximum rudder angle of the vehicle entry. In
+                      this clause, such parameters must be respected and the
+                      rotation angle difference of the z-axis center of the
+                      vector must be kept below a certain value.
+                   */
+                   throw common::SimulationError(
+                     "The followingMode is only supported for position.");
+                 }
+               }();
+             any(isinf, desired_velocity) or any(isnan, desired_velocity)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(entity_status.name),
+      "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
+      desired_velocity.y, ", ", desired_velocity.z, "].");
+  } else {
     /*
        It's okay for this value to be infinite.
     */
     const auto remaining_time_to_arrival_to_front_waypoint =
       distance_to_front_waypoint / desired_speed;  // [s]
-    std::isnan(remaining_time_to_arrival_to_front_waypoint)) {
-    throw common::Error(
-      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Entity ",
-      std::quoted(entity_status.name),
-      "'s remaining time to arrival to front waypoint is NaN or infinity. The value is ",
-      remaining_time_to_arrival_to_front_waypoint, ".");
-  } else {
+
     if constexpr (true) {
       // clang-format off
       std::cout << std::string(80, '-') << std::endl;
@@ -548,9 +575,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        If the target point is reached during this step, it is considered
        reached.
     */
-    if (
-      std::isnan(remaining_time_to_arrival_to_front_waypoint) or
-      isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)) {
+    if (isDefinitelyLessThan(remaining_time_to_arrival_to_front_waypoint, step_time)) {
       /*
          The condition "Is remaining time to front waypoint less than remaining
          time to arrival to front waypoint + step time?" means "If arrival is
@@ -599,26 +624,6 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
           "arrival time specification compared to vehicle parameters and dynamic constraints.");
       }
     }
-
-    const auto desired_velocity = [&]() {
-      /*
-         Note: The followingMode in OpenSCENARIO is passed as variable
-         dynamic_constraints_ignorable. the value of the variable is
-         `followingMode == position`.
-      */
-      if (parameter->dynamic_constraints_ignorable) {
-        return normalize(target_position - position) * desired_speed;  // [m/s]
-      } else {
-        /*
-           Note: The vector returned if dynamic_constraints_ignorable == true
-           ignores parameters such as the maximum rudder angle of the vehicle
-           entry. In this clause, such parameters must be respected and the
-           rotation angle difference of the z-axis center of the vector must be
-           kept below a certain value.
-        */
-        throw common::SimulationError("The followingMode is only supported for position.");
-      }
-    }();
 
     /*
        Note: If obstacle avoidance is to be implemented, the steering behavior
