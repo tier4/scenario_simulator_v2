@@ -14,6 +14,11 @@
 
 #include <arithmetic/floating_point/comparison.hpp>
 #include <behavior_tree_plugin/vehicle/follow_trajectory_sequence/follow_polyline_trajectory_action.hpp>
+#include <geometry/vector3/hypot.hpp>
+#include <geometry/vector3/norm.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
+#include <geometry/vector3/truncate.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
 namespace entity_behavior
@@ -56,118 +61,37 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
   return ports;
 }
 
-template <typename T, typename = void>
-struct is_vector3 : public std::false_type
+using math::geometry::operator +;
+using math::geometry::operator -;
+using math::geometry::operator *;
+using math::geometry::operator /;
+using math::geometry::operator +=;
+
+using math::geometry::hypot;
+using math::geometry::norm;
+using math::geometry::normalize;
+using math::geometry::truncate;
+
+template <typename F, typename T, typename... Ts>
+auto any(F f, T && x, Ts &&... xs)
 {
-};
-
-template <typename T>
-struct is_vector3<
-  T, std::void_t<decltype(std::declval<T>().x, std::declval<T>().y, std::declval<T>().z)>>
-: public std::true_type
-{
-};
-
-template <
-  typename T, typename U,
-  std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, std::nullptr_t> = nullptr>
-auto operator+(const T & a, const U & b)
-{
-  geometry_msgs::msg::Vector3 v;
-  v.x = a.x + b.x;
-  v.y = a.y + b.y;
-  v.z = a.z + b.z;
-  return v;
-}
-
-template <
-  typename T, typename U,
-  std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, std::nullptr_t> = nullptr>
-auto operator-(const T & a, const U & b)
-{
-  geometry_msgs::msg::Vector3 v;
-  v.x = a.x - b.x;
-  v.y = a.y - b.y;
-  v.z = a.z - b.z;
-  return v;
-}
-
-template <
-  typename T, typename U,
-  std::enable_if_t<std::conjunction_v<is_vector3<T>, is_vector3<U>>, std::nullptr_t> = nullptr>
-auto operator+=(T & a, const U & b) -> decltype(auto)
-{
-  a.x += b.x;
-  a.y += b.y;
-  a.z += b.z;
-  return a;
-}
-
-template <
-  typename T, typename U,
-  std::enable_if_t<std::conjunction_v<is_vector3<T>, std::is_scalar<U>>, std::nullptr_t> = nullptr>
-auto operator*(const T & a, const U & b)
-{
-  geometry_msgs::msg::Vector3 v;
-  v.x = a.x * b;
-  v.y = a.y * b;
-  v.z = a.z * b;
-  return v;
-}
-
-template <
-  typename T, typename U,
-  std::enable_if_t<std::conjunction_v<is_vector3<T>, std::is_scalar<U>>, std::nullptr_t> = nullptr>
-auto operator/(const T & a, const U & b)
-{
-  geometry_msgs::msg::Vector3 v;
-  v.x = a.x / b;
-  v.y = a.y / b;
-  v.z = a.z / b;
-  return v;
-}
-
-template <typename T, typename U>
-auto hypot(const T & from, const U & to)
-{
-  return std::hypot(to.x - from.x, to.y - from.y, to.z - from.z);
-}
-
-auto norm(const geometry_msgs::msg::Vector3 & v) { return std::hypot(v.x, v.y, v.z); }
-
-auto normalize(const geometry_msgs::msg::Vector3 & v) { return v / norm(v); }
-
-template <typename T, typename U>
-auto truncate(const T & v, const U & max)
-{
-  if (auto x = norm(v); max < x) {
-    return v * (max / x);
-  } else {
-    return v;
+  if constexpr (math::geometry::IsLikeVector3<std::decay_t<decltype(x)>>::value)
+  {
+    return any(f, x.x, x.y, x.z);
+  }
+  else if constexpr (0 < sizeof...(xs))
+  {
+    return f(x) or any(f, std::forward<decltype(xs)>(xs)...);
+  }
+  else
+  {
+    return f(x);
   }
 }
 
-template <typename F, typename... Ts>
-auto any(F f, Ts &&... xs)
-{
-  return (f(xs) or ...);
-}
+auto isnan = [](auto x) constexpr { return std::isnan(x); };
 
-template <typename F, typename... Ts>
-auto every(F f, Ts &&... xs)
-{
-  return (f(xs) and ...);
-}
-
-template <typename F, typename T, std::enable_if_t<is_vector3<T>::value, std::nullptr_t> = nullptr>
-auto any(F f, const T & v)
-{
-  return any(f, v.x, v.y, v.z);
-}
-
-auto isnan = [](auto... xs) constexpr { return (std::isnan(xs) and ...); };
-
-auto isinf = [](auto... xs) constexpr { return (std::isinf(xs) and ...); };
+auto isinf = [](auto x) constexpr { return std::isinf(x); };
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
