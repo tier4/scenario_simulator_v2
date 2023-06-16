@@ -15,6 +15,7 @@
 #define GEOMETRY__SPLINE__CATMULL_ROM_SPLINE_HPP_
 
 #include <exception>
+#include <geometry/polygon/line_segment.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/point.hpp>
@@ -52,12 +53,8 @@ public:
   std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true) const override;
-  const geometry_msgs::msg::Point getRightBoundsPoint(
-    double width, double s, double z_offset = 0) const;
-  const geometry_msgs::msg::Point getLeftBoundsPoint(
-    double width, double s, double z_offset = 0) const;
   const std::vector<geometry_msgs::msg::Point> getPolygon(
-    double width, size_t num_points = 30, double z_offset = 0);
+    const double width, const size_t num_points = 30, const double z_offset = 0);
   const std::vector<geometry_msgs::msg::Point> control_points;
 
 private:
@@ -69,7 +66,7 @@ private:
   std::pair<size_t, double> getCurveIndexAndS(double s) const;
   bool checkConnection() const;
   bool equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const;
-
+  std::vector<LineSegment> line_segments_;
   std::vector<HermiteCurve> curves_;
   std::vector<double> length_list_;
   std::vector<double> maximum_2d_curvatures_;

@@ -28,13 +28,12 @@ namespace math
 namespace geometry
 {
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
-  double width, size_t num_points, double z_offset)
+  const double width, const size_t num_points, const double z_offset)
 {
   std::vector<geometry_msgs::msg::Point> points;
   std::vector<geometry_msgs::msg::Point> left_bounds = getLeftBounds(width, num_points, z_offset);
   std::vector<geometry_msgs::msg::Point> right_bounds = getRightBounds(width, num_points, z_offset);
-  size_t num_sections = static_cast<size_t>(left_bounds.size() - 1);
-  for (size_t i = 0; i < num_sections; i++) {
+  for (size_t i = 0; i < static_cast<size_t>(left_bounds.size() - 1); i++) {
     geometry_msgs::msg::Point pr_0 = right_bounds[i];
     geometry_msgs::msg::Point pl_0 = left_bounds[i];
     geometry_msgs::msg::Point pr_1 = right_bounds[i + 1];
@@ -49,32 +48,6 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
   return points;
 }
 
-const geometry_msgs::msg::Point CatmullRomSpline::getRightBoundsPoint(
-  double width, double s, double z_offset) const
-{
-  geometry_msgs::msg::Vector3 vec = getNormalVector(s);
-  double theta = std::atan2(vec.y, vec.x);
-  geometry_msgs::msg::Point p = getPoint(s);
-  geometry_msgs::msg::Point point;
-  point.x = p.x + 0.5 * width * std::cos(theta);
-  point.y = p.y + 0.5 * width * std::sin(theta);
-  point.z = p.z + z_offset;
-  return point;
-}
-
-const geometry_msgs::msg::Point CatmullRomSpline::getLeftBoundsPoint(
-  double width, double s, double z_offset) const
-{
-  geometry_msgs::msg::Vector3 vec = getNormalVector(s);
-  double theta = std::atan2(vec.y, vec.x);
-  geometry_msgs::msg::Point p = getPoint(s);
-  geometry_msgs::msg::Point point;
-  point.x = p.x - 0.5 * width * std::cos(theta);
-  point.y = p.y - 0.5 * width * std::sin(theta);
-  point.z = p.z + z_offset;
-  return point;
-}
-
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
   double width, size_t num_points, double z_offset) const
 {
@@ -82,7 +55,18 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
   double step_size = getLength() / static_cast<double>(num_points);
   for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
     double s = step_size * static_cast<double>(i);
-    points.emplace_back(getRightBoundsPoint(width, s, z_offset));
+    points.emplace_back(
+      [this](
+        const double width, const double s, const double z_offset) -> geometry_msgs::msg::Point {
+        geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+        double theta = std::atan2(vec.y, vec.x);
+        geometry_msgs::msg::Point p = getPoint(s);
+        geometry_msgs::msg::Point point;
+        point.x = p.x + 0.5 * width * std::cos(theta);
+        point.y = p.y + 0.5 * width * std::sin(theta);
+        point.z = p.z + z_offset;
+        return point;
+      }(width, s, z_offset));
   }
   return points;
 }
@@ -94,7 +78,18 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
   double step_size = getLength() / static_cast<double>(num_points);
   for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
     double s = step_size * static_cast<double>(i);
-    points.emplace_back(getLeftBoundsPoint(width, s, z_offset));
+    points.emplace_back(
+      [this](
+        const double width, const double s, const double z_offset) -> geometry_msgs::msg::Point {
+        geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+        double theta = std::atan2(vec.y, vec.x);
+        geometry_msgs::msg::Point p = getPoint(s);
+        geometry_msgs::msg::Point point;
+        point.x = p.x - 0.5 * width * std::cos(theta);
+        point.y = p.y - 0.5 * width * std::sin(theta);
+        point.z = p.z + z_offset;
+        return point;
+      }(width, s, z_offset));
   }
   return points;
 }
@@ -130,110 +125,121 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
 }
 
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
-: control_points(control_points)
+: control_points(control_points), line_segments_(getLineSegments(control_points))
 {
-  size_t n = control_points.size() - 1;
-  if (control_points.size() <= 2) {
-    THROW_SEMANTIC_ERROR(
-      control_points.size(),
-      " control points are only exists. At minimum, 3 control points are required");
+  switch (control_points.size()) {
+    case 0:
+      THROW_SEMANTIC_ERROR("Control points are empty. We cannot determine the shape of the curve.");
+      break;
+    /// @note In this case, spline is interpreted as point.
+    case 1:
+      break;
+    /// @note In this case, spline is interpreted as line segment.
+    case 2:
+      break;
+    /// @note In this case, spline is interpreted as curve.
+    default:
+      [this](const auto & control_points) -> void {
+        size_t n = control_points.size() - 1;
+        for (size_t i = 0; i < n; i++) {
+          if (i == 0) {
+            double ax = 0;
+            double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;
+            double cx = -3 * control_points[0].x + 4 * control_points[1].x - control_points[2].x;
+            double dx = 2 * control_points[0].x;
+            double ay = 0;
+            double by = control_points[0].y - 2 * control_points[1].y + control_points[2].y;
+            double cy = -3 * control_points[0].y + 4 * control_points[1].y - control_points[2].y;
+            double dy = 2 * control_points[0].y;
+            double az = 0;
+            double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
+            double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
+            double dz = 2 * control_points[0].z;
+            ax = ax * 0.5;
+            bx = bx * 0.5;
+            cx = cx * 0.5;
+            dx = dx * 0.5;
+            ay = ay * 0.5;
+            by = by * 0.5;
+            cy = cy * 0.5;
+            dy = dy * 0.5;
+            az = az * 0.5;
+            bz = bz * 0.5;
+            cz = cz * 0.5;
+            dz = dz * 0.5;
+            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+          } else if (i == (n - 1)) {
+            double ax = 0;
+            double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
+            double cx = -1 * control_points[i - 1].x + control_points[i + 1].x;
+            double dx = 2 * control_points[i].x;
+            double ay = 0;
+            double by = control_points[i - 1].y - 2 * control_points[i].y + control_points[i + 1].y;
+            double cy = -1 * control_points[i - 1].y + control_points[i + 1].y;
+            double dy = 2 * control_points[i].y;
+            double az = 0;
+            double bz = control_points[i - 1].z - 2 * control_points[i].z + control_points[i + 1].z;
+            double cz = -1 * control_points[i - 1].z + control_points[i + 1].z;
+            double dz = 2 * control_points[i].z;
+            ax = ax * 0.5;
+            bx = bx * 0.5;
+            cx = cx * 0.5;
+            dx = dx * 0.5;
+            ay = ay * 0.5;
+            by = by * 0.5;
+            cy = cy * 0.5;
+            dy = dy * 0.5;
+            az = az * 0.5;
+            bz = bz * 0.5;
+            cz = cz * 0.5;
+            dz = dz * 0.5;
+            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+          } else {
+            double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
+                        3 * control_points[i + 1].x + control_points[i + 2].x;
+            double bx = 2 * control_points[i - 1].x - 5 * control_points[i].x +
+                        4 * control_points[i + 1].x - control_points[i + 2].x;
+            double cx = -control_points[i - 1].x + control_points[i + 1].x;
+            double dx = 2 * control_points[i].x;
+            double ay = -1 * control_points[i - 1].y + 3 * control_points[i].y -
+                        3 * control_points[i + 1].y + control_points[i + 2].y;
+            double by = 2 * control_points[i - 1].y - 5 * control_points[i].y +
+                        4 * control_points[i + 1].y - control_points[i + 2].y;
+            double cy = -control_points[i - 1].y + control_points[i + 1].y;
+            double dy = 2 * control_points[i].y;
+            double az = -1 * control_points[i - 1].z + 3 * control_points[i].z -
+                        3 * control_points[i + 1].z + control_points[i + 2].z;
+            double bz = 2 * control_points[i - 1].z - 5 * control_points[i].z +
+                        4 * control_points[i + 1].z - control_points[i + 2].z;
+            double cz = -control_points[i - 1].z + control_points[i + 1].z;
+            double dz = 2 * control_points[i].z;
+            ax = ax * 0.5;
+            bx = bx * 0.5;
+            cx = cx * 0.5;
+            dx = dx * 0.5;
+            ay = ay * 0.5;
+            by = by * 0.5;
+            cy = cy * 0.5;
+            dy = dy * 0.5;
+            az = az * 0.5;
+            bz = bz * 0.5;
+            cz = cz * 0.5;
+            dz = dz * 0.5;
+            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+          }
+        }
+        for (const auto & curve : curves_) {
+          length_list_.emplace_back(curve.getLength());
+          maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
+        }
+        total_length_ = 0;
+        for (const auto & length : length_list_) {
+          total_length_ = total_length_ + length;
+        }
+        checkConnection();
+      }(control_points);
+      break;
   }
-  for (size_t i = 0; i < n; i++) {
-    if (i == 0) {
-      double ax = 0;
-      double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;
-      double cx = -3 * control_points[0].x + 4 * control_points[1].x - control_points[2].x;
-      double dx = 2 * control_points[0].x;
-      double ay = 0;
-      double by = control_points[0].y - 2 * control_points[1].y + control_points[2].y;
-      double cy = -3 * control_points[0].y + 4 * control_points[1].y - control_points[2].y;
-      double dy = 2 * control_points[0].y;
-      double az = 0;
-      double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
-      double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
-      double dz = 2 * control_points[0].z;
-      ax = ax * 0.5;
-      bx = bx * 0.5;
-      cx = cx * 0.5;
-      dx = dx * 0.5;
-      ay = ay * 0.5;
-      by = by * 0.5;
-      cy = cy * 0.5;
-      dy = dy * 0.5;
-      az = az * 0.5;
-      bz = bz * 0.5;
-      cz = cz * 0.5;
-      dz = dz * 0.5;
-      curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
-    } else if (i == (n - 1)) {
-      double ax = 0;
-      double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
-      double cx = -1 * control_points[i - 1].x + control_points[i + 1].x;
-      double dx = 2 * control_points[i].x;
-      double ay = 0;
-      double by = control_points[i - 1].y - 2 * control_points[i].y + control_points[i + 1].y;
-      double cy = -1 * control_points[i - 1].y + control_points[i + 1].y;
-      double dy = 2 * control_points[i].y;
-      double az = 0;
-      double bz = control_points[i - 1].z - 2 * control_points[i].z + control_points[i + 1].z;
-      double cz = -1 * control_points[i - 1].z + control_points[i + 1].z;
-      double dz = 2 * control_points[i].z;
-      ax = ax * 0.5;
-      bx = bx * 0.5;
-      cx = cx * 0.5;
-      dx = dx * 0.5;
-      ay = ay * 0.5;
-      by = by * 0.5;
-      cy = cy * 0.5;
-      dy = dy * 0.5;
-      az = az * 0.5;
-      bz = bz * 0.5;
-      cz = cz * 0.5;
-      dz = dz * 0.5;
-      curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
-    } else {
-      double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
-                  3 * control_points[i + 1].x + control_points[i + 2].x;
-      double bx = 2 * control_points[i - 1].x - 5 * control_points[i].x +
-                  4 * control_points[i + 1].x - control_points[i + 2].x;
-      double cx = -control_points[i - 1].x + control_points[i + 1].x;
-      double dx = 2 * control_points[i].x;
-      double ay = -1 * control_points[i - 1].y + 3 * control_points[i].y -
-                  3 * control_points[i + 1].y + control_points[i + 2].y;
-      double by = 2 * control_points[i - 1].y - 5 * control_points[i].y +
-                  4 * control_points[i + 1].y - control_points[i + 2].y;
-      double cy = -control_points[i - 1].y + control_points[i + 1].y;
-      double dy = 2 * control_points[i].y;
-      double az = -1 * control_points[i - 1].z + 3 * control_points[i].z -
-                  3 * control_points[i + 1].z + control_points[i + 2].z;
-      double bz = 2 * control_points[i - 1].z - 5 * control_points[i].z +
-                  4 * control_points[i + 1].z - control_points[i + 2].z;
-      double cz = -control_points[i - 1].z + control_points[i + 1].z;
-      double dz = 2 * control_points[i].z;
-      ax = ax * 0.5;
-      bx = bx * 0.5;
-      cx = cx * 0.5;
-      dx = dx * 0.5;
-      ay = ay * 0.5;
-      by = by * 0.5;
-      cy = cy * 0.5;
-      dy = dy * 0.5;
-      az = az * 0.5;
-      bz = bz * 0.5;
-      cz = cz * 0.5;
-      dz = dz * 0.5;
-      curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
-    }
-  }
-  for (const auto & curve : curves_) {
-    length_list_.emplace_back(curve.getLength());
-    maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
-  }
-  total_length_ = 0;
-  for (const auto & length : length_list_) {
-    total_length_ = total_length_ + length;
-  }
-  checkConnection();
 }
 
 std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
