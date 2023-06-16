@@ -41,7 +41,8 @@ public:
   const geometry_msgs::msg::Vector3 getNormalVector(double s) const;
   const geometry_msgs::msg::Pose getPose(double s) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
-    double start_s, double end_s, double resolution, double offset = 0.0) const;
+    const double start_s, const double end_s, const double resolution,
+    const double offset = 0.0) const;
   std::optional<double> getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0) const;
   double getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, double s) const;
@@ -59,9 +60,9 @@ public:
 
 private:
   const std::vector<geometry_msgs::msg::Point> getRightBounds(
-    double width, size_t num_points = 30, double z_offset = 0) const;
+    const double width, const size_t num_points = 30, const double z_offset = 0) const;
   const std::vector<geometry_msgs::msg::Point> getLeftBounds(
-    double width, size_t num_points = 30, double z_offset = 0) const;
+    const double width, const size_t num_points = 30, const double z_offset = 0) const;
   double getSInSplineCurve(size_t curve_index, double s) const;
   std::pair<size_t, double> getCurveIndexAndS(double s) const;
   bool checkConnection() const;

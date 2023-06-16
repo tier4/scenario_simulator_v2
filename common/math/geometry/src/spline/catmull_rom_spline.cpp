@@ -49,7 +49,7 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
 }
 
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
-  double width, size_t num_points, double z_offset) const
+  const double width, const size_t num_points, const double z_offset) const
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
@@ -72,7 +72,7 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
 }
 
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
-  double width, size_t num_points, double z_offset) const
+  const double width, const size_t num_points, const double z_offset) const
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
@@ -95,28 +95,26 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
 }
 
 const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
-  double start_s, double end_s, double resolution, double offset) const
+  const double start_s, const double end_s, const double resolution, const double offset) const
 {
   if (start_s > end_s) {
     std::vector<geometry_msgs::msg::Point> ret;
-    resolution = std::fabs(resolution);
     double s = start_s;
     while (s > end_s) {
       auto p = getPoint(s, offset);
       ret.emplace_back(p);
-      s = s - resolution;
+      s = s - std::fabs(resolution);
     }
     auto p = getPoint(end_s, offset);
     ret.emplace_back(p);
     return ret;
   } else {
     std::vector<geometry_msgs::msg::Point> ret;
-    resolution = std::fabs(resolution);
     double s = start_s;
     while (s < end_s) {
       auto p = getPoint(s, offset);
       ret.emplace_back(p);
-      s = s + resolution;
+      s = s + std::fabs(resolution);
     }
     auto p = getPoint(end_s, offset);
     ret.emplace_back(p);
