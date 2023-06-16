@@ -61,42 +61,33 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
   return ports;
 }
 
-using math::geometry::operator +;
-using math::geometry::operator -;
-using math::geometry::operator *;
-using math::geometry::operator /;
-using math::geometry::operator +=;
-
-using math::geometry::hypot;
-using math::geometry::norm;
-using math::geometry::normalize;
-using math::geometry::truncate;
-
 template <typename F, typename T, typename... Ts>
 auto any(F f, T && x, Ts &&... xs)
 {
-  if constexpr (math::geometry::IsLikeVector3<std::decay_t<decltype(x)>>::value)
-  {
+  if constexpr (math::geometry::IsLikeVector3<std::decay_t<decltype(x)>>::value) {
     return any(f, x.x, x.y, x.z);
-  }
-  else if constexpr (0 < sizeof...(xs))
-  {
+  } else if constexpr (0 < sizeof...(xs)) {
     return f(x) or any(f, std::forward<decltype(xs)>(xs)...);
-  }
-  else
-  {
+  } else {
     return f(x);
   }
 }
-
-auto isnan = [](auto x) constexpr { return std::isnan(x); };
-
-auto isinf = [](auto x) constexpr { return std::isinf(x); };
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
+
+  using math::geometry::operator+;
+  using math::geometry::operator-;
+  using math::geometry::operator*;
+  using math::geometry::operator/;
+  using math::geometry::operator+=;
+
+  using math::geometry::hypot;
+  using math::geometry::norm;
+  using math::geometry::normalize;
+  using math::geometry::truncate;
 
   auto pop = [this]() {
     /*
@@ -128,6 +119,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     }
   };
 
+  auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
+
   /*
      The following code implements the steering behavior known as "seek". See
      "Steering Behaviors For Autonomous Characters" by Craig Reynolds for more
@@ -142,8 +135,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     return BT::NodeStatus::FAILURE;
   } else if (parameter->shape.vertices.empty()) {
     return BT::NodeStatus::SUCCESS;
-  } else if (const auto position = entity_status.pose.position;
-             any(isnan, position) or any(isinf, position)) {
+  } else if (const auto position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -156,7 +148,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
        referenced only this once in this member function.
     */
     const auto target_position = parameter->shape.vertices.front().position.position;
-    any(isnan, target_position) or any(isinf, target_position)) {
+    any(is_infinity_or_nan, target_position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -367,7 +359,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
                      "The followingMode is only supported for position.");
                  }
                }();
-             any(isinf, desired_velocity) or any(isnan, desired_velocity)) {
+             any(is_infinity_or_nan, desired_velocity)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
