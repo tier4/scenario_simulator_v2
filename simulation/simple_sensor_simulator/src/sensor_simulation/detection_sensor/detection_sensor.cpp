@@ -28,6 +28,24 @@
 
 namespace simple_sensor_simulator
 {
+
+// utils
+unique_identifier_msgs::msg::UUID generateUUID(const std::string& input_str)
+{
+    std::hash<std::string> hasher;
+    size_t hashValue = hasher(input_str);
+
+    // copy after creating temp std::array 
+    std::array<unsigned char, 16> tempArray;
+    std::memcpy(tempArray.data(), &hashValue, sizeof(hashValue));
+
+    unique_identifier_msgs::msg::UUID uuid;
+    std::memcpy(uuid.uuid.data(), tempArray.data(), tempArray.size());
+
+    return uuid;
+}
+// utils end
+
 auto DetectionSensorBase::getDetectedObjects(
   const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
   -> std::vector<std::string>
@@ -159,12 +177,11 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         simulation_interface::toMsg(
           status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
         object.shape.type = object.shape.BOUNDING_BOX;
-        const auto gt_object = perception_utils::toTrackedObject(object);
-        // gt_object.kinematics = object.kinematics;
-        // gt_object.shape = object.shape;
-        // gt_object.classification = object.classification;
-        // gt_object.existence_probability = 1.0;
-        
+        auto gt_object = perception_utils::toTrackedObject(object); // there are no id for this object
+        // get uuid from string
+        gt_object.object_id = generateUUID(status.name());
+
+
         gt_msg.objects.push_back(gt_object);
 
         if (auto probability_of_lost = std::uniform_real_distribution();
@@ -173,6 +190,9 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         }
       }
     }
+    // publish ground truth
+    ground_truth_publisher_ptr_->publish(gt_msg);
+    
 
     queue_objects_.push(std::make_pair(msg, current_time));
     autoware_auto_perception_msgs::msg::DetectedObjects delayed_objects;
