@@ -36,7 +36,10 @@ public:
   LineSegment & operator=(const LineSegment &);
   const geometry_msgs::msg::Point start_point;
   const geometry_msgs::msg::Point end_point;
+  bool isIntersect2D(const geometry_msgs::msg::Point & point) const;
   bool isIntersect2D(const LineSegment & l0) const;
+  std::optional<double> getIntersection2DSValue(const geometry_msgs::msg::Point & point) const;
+  std::optional<double> getIntersection2DSValue(const LineSegment & line) const;
   std::optional<geometry_msgs::msg::Point> getIntersection2D(const LineSegment & line) const;
   std::optional<geometry_msgs::msg::Point> getIntersection2DWithXAxis(double x) const;
 
@@ -45,7 +48,6 @@ public:
   double getLength() const;
   double get2DLength() const;
   double getSlope() const;
-  double getIntercept() const;
 };
 
 std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points);

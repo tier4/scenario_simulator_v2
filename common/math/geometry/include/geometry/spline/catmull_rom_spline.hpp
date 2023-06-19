@@ -50,10 +50,10 @@ public:
     const geometry_msgs::msg::Point & point, double s) const;
   std::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
-    bool search_backward = false) const;
+    const bool search_backward = false) const;
   std::optional<double> getCollisionPointIn2D(
-    const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
-    bool close_start_end = true) const override;
+    const std::vector<geometry_msgs::msg::Point> & polygon,
+    const bool search_backward = false) const override;
   const std::vector<geometry_msgs::msg::Point> getPolygon(
     const double width, const size_t num_points = 30, const double z_offset = 0);
   const std::vector<geometry_msgs::msg::Point> control_points;
@@ -63,8 +63,8 @@ private:
     const double width, const size_t num_points = 30, const double z_offset = 0) const;
   const std::vector<geometry_msgs::msg::Point> getLeftBounds(
     const double width, const size_t num_points = 30, const double z_offset = 0) const;
-  double getSInSplineCurve(size_t curve_index, double s) const;
-  std::pair<size_t, double> getCurveIndexAndS(double s) const;
+  double getSInSplineCurve(const size_t curve_index, const double s) const;
+  std::pair<size_t, double> getCurveIndexAndS(const double s) const;
   bool checkConnection() const;
   bool equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const;
   std::vector<LineSegment> line_segments_;

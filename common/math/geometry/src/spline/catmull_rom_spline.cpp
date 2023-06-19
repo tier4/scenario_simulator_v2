@@ -236,7 +236,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   }
 }
 
-std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
+std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(const double s) const
 {
   if (s < 0) {
     return std::make_pair(0, s);
@@ -256,7 +256,7 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
   THROW_SIMULATION_ERROR("failed to calculate curve index");  // LCOV_EXCL_LINE
 }
 
-double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
+double CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double s) const
 {
   size_t n = curves_.size();
   double ret = 0;
@@ -271,33 +271,67 @@ double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
 }
 
 std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
-  bool close_start_end) const
+  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
 {
-  size_t n = curves_.size();
-  if (search_backward) {
-    for (size_t i = 0; i < n; i++) {
-      auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward, close_start_end);
-      if (s) {
-        return getSInSplineCurve(n - 1 - i, s.value());
+  const auto get_collision_point_2d_with_curve =
+    [this](const auto & polygon, const auto search_backward) -> std::optional<double> {
+    size_t n = curves_.size();
+    if (search_backward) {
+      for (size_t i = 0; i < n; i++) {
+        auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward);
+        if (s) {
+          return getSInSplineCurve(n - 1 - i, s.value());
+        }
+      }
+      return std::optional<double>();
+    } else {
+      for (size_t i = 0; i < n; i++) {
+        auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward);
+        if (s) {
+          return std::optional<double>(getSInSplineCurve(i, s.value()));
+        }
+      }
+      return std::optional<double>();
+    }
+    return std::optional<double>();
+  };
+  const auto get_collision_point_2d_with_line =
+    [this](const auto & polygon, const auto search_backward) -> std::optional<double> {
+    const auto polygon_lines = getLineSegments(polygon);
+    std::vector<double> s_value_candidates = {};
+    for (const auto & line : getLineSegments(polygon)) {
+      if (const auto s_value = line_segments_[0].getIntersection2DSValue(line)) {
+        s_value_candidates.emplace_back(s_value.value());
       }
     }
-    return std::nullopt;
-  } else {
-    for (size_t i = 0; i < n; i++) {
-      auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward, close_start_end);
-      if (s) {
-        return getSInSplineCurve(i, s.value());
-      }
+    if (s_value_candidates.empty()) {
+      return std::optional<double>();
     }
-    return std::nullopt;
+    return search_backward
+             ? *std::max_element(s_value_candidates.begin(), s_value_candidates.end())
+             : *std::min_element(s_value_candidates.begin(), s_value_candidates.end());
+  };
+  const auto get_collision_point_2d_with_point =
+    [this](const auto & polygon, const auto search_backward) { return std::optional<double>(); };
+  switch (control_points.size()) {
+    case 0:
+      THROW_SEMANTIC_ERROR("Control points are empty. We cannot determine the shape of the curve.");
+      break;
+    /// @note In this case, spline is interpreted as point.
+    case 1:
+      return get_collision_point_2d_with_point(polygon, search_backward);
+    /// @note In this case, spline is interpreted as line segment.
+    case 2:
+      return get_collision_point_2d_with_line(polygon, search_backward);
+    /// @note In this case, spline is interpreted as curve.
+    default:
+      return get_collision_point_2d_with_curve(polygon, search_backward);
   }
-  return std::nullopt;
 }
 
 std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
-  bool search_backward) const
+  const bool search_backward) const
 {
   size_t n = curves_.size();
   if (search_backward) {

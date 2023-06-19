@@ -42,6 +42,11 @@ LineSegment::LineSegment(
 
 LineSegment::~LineSegment() {}
 
+bool LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const
+{
+  return getIntersection2DSValue(point) ? true : false;
+}
+
 bool LineSegment::isIntersect2D(const LineSegment & l0) const
 {
   double s, t;
@@ -62,22 +67,52 @@ bool LineSegment::isIntersect2D(const LineSegment & l0) const
   return true;
 }
 
-std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
-  const LineSegment & line) const
+std::optional<double> LineSegment::getIntersection2DSValue(
+  const geometry_msgs::msg::Point & point) const
+{
+  const auto get_s = [this](const auto & point) {
+    const auto s = (point.y - start_point.y) / (end_point.y - start_point.y);
+    return 0 <= s && s <= 1 ? s : std::optional<double>();
+  };
+  constexpr double epsilon = std::numeric_limits<double>::epsilon();
+  if (std::abs(end_point.x - start_point.x) <= epsilon) {
+    if (std::abs(end_point.y - start_point.y) <= epsilon) {
+      return (std::abs(end_point.x - point.x) <= epsilon &&
+              std::abs(end_point.y - point.y) <= epsilon)
+               ? std::optional<double>(0)
+               : std::optional<double>();
+    }
+    return (std::abs(point.x - start_point.x) <= epsilon &&
+            std::abs(point.y - start_point.y) <= epsilon)
+             ? std::optional<double>(get_s(point))
+             : std::optional<double>();
+  }
+  return std::abs((point.y - start_point.y) / (point.x - start_point.x) - getSlope()) <= epsilon
+           ? std::optional<double>(get_s(point))
+           : std::optional<double>();
+}
+
+std::optional<double> LineSegment::getIntersection2DSValue(const LineSegment & line) const
 {
   if (!isIntersect2D(line)) {
-    return std::nullopt;
+    return std::optional<double>();
   }
   const auto det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
                    (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
-  const auto t = ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
-                  (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
-                 det;
-  geometry_msgs::msg::Point point;
-  point.x = t * start_point.x + (1.0 - t) * end_point.x;
-  point.y = t * start_point.y + (1.0 - t) * end_point.y;
-  point.z = t * start_point.z + (1.0 - t) * end_point.z;
-  return point;
+  return ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
+          (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
+         det;
+}
+
+std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
+  const LineSegment & line) const
+{
+  const auto s = getIntersection2DSValue(line);
+  return s ? geometry_msgs::build<geometry_msgs::msg::Point>()
+               .x(s.value() * start_point.x + (1.0 - s.value()) * end_point.x)
+               .y(s.value() * start_point.y + (1.0 - s.value()) * end_point.y)
+               .z(s.value() * start_point.z + (1.0 - s.value()) * end_point.z)
+           : std::optional<geometry_msgs::msg::Point>();
 }
 
 geometry_msgs::msg::Vector3 LineSegment::getVector() const
@@ -113,8 +148,6 @@ double LineSegment::getSlope() const
 {
   return (end_point.y - start_point.y) / (end_point.x - start_point.x);
 }
-
-double LineSegment::getIntercept() const { return end_point.y - getSlope() * end_point.x; }
 
 LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
 
