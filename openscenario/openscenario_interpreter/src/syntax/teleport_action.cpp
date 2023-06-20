@@ -27,6 +27,15 @@ inline namespace syntax
 TeleportAction::TeleportAction(const pugi::xml_node & node, Scope & scope)
 : Scope(scope), position(readElement<Position>("Position", node, local()))
 {
+  // OpenSCENARIO 1.2 Table 11
+  for (const auto & actor : actors) {
+    if (auto object_types = global().entities->objectTypes({actor});
+        not object_types.count(ObjectType::external)) {
+      THROW_SEMANTIC_ERROR(
+        "Actors cannot be ExternalObjectReference;"
+        "See OpenSCENARIO 1.2 Table 11 for more details");
+    }
+  }
 }
 
 auto TeleportAction::accomplished() noexcept -> bool { return true; }

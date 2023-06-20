@@ -31,6 +31,16 @@ LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
     readElement<TransitionDynamics>("LaneChangeActionDynamics", node, local())),
   lane_change_target(readElement<LaneChangeTarget>("LaneChangeTarget", node, local()))
 {
+  // OpenSCENARIO 1.2 Table 11
+  for (const auto & actor : actors) {
+    if (auto object_types = global().entities->objectTypes({actor});
+        object_types != std::set{ObjectType::vehicle} and
+        object_types != std::set{ObjectType::pedestrian}) {
+      THROW_SEMANTIC_ERROR(
+        "Actors may be either of vehicle type or a pedestrian type;"
+        "See OpenSCENARIO 1.2 Table 11 for more details");
+    }
+  }
 }
 
 auto LaneChangeAction::accomplished() -> bool

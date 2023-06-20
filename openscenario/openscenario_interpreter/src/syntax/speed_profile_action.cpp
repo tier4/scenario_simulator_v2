@@ -36,20 +36,11 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
     readElement<DynamicConstraints>("DynamicConstraints", node, scope, DynamicConstraints())),
   speed_profile_entry(readElements<SpeedProfileEntry, 1>("SpeedProfileEntry", node, scope))
 {
-  {
-    // OpenSCENARIO 1.2 Table 11
-    auto constraint = [&](auto actor) {
-      auto objects = scope.global().entities->objects({actor});
-      auto is_vehicle = [&](auto object) {
-        return scope.global().entities->ref(object).template is_also<Vehicle>();
-      };
-      auto is_pedestrian = [&](auto object) {
-        return scope.global().entities->ref(object).template is_also<Pedestrian>();
-      };
-      return std::all_of(std::begin(objects), std::end(objects), is_vehicle) ||
-             std::all_of(std::begin(objects), std::end(objects), is_pedestrian);
-    };
-    if (not std::all_of(std::begin(scope.actors), std::end(scope.actors), constraint)) {
+  // OpenSCENARIO 1.2 Table 11
+  for (const auto & actor : actors) {
+    if (auto object_types = global().entities->objectTypes({actor});
+        object_types != std::set{ObjectType::vehicle} and
+        object_types != std::set{ObjectType::pedestrian}) {
       THROW_SEMANTIC_ERROR(
         "Actors may be either of vehicle type or a pedestrian type;"
         "See OpenSCENARIO 1.2 Table 11 for more details");

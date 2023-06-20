@@ -30,25 +30,6 @@ LongitudinalAction::LongitudinalAction(const pugi::xml_node & node, Scope & scop
       std::make_pair(        "SpeedProfileAction", [&](const auto & node) { return make<SpeedProfileAction>(node, scope); })))
 // clang-format on
 {
-  {
-    // OpenSCENARIO 1.2 Table 11
-    auto constraint = [&](auto actor) {
-      auto objects = scope.global().entities->objects({actor});
-      auto is_vehicle = [&](auto object) {
-        return scope.global().entities->ref(object).template is_also<Vehicle>();
-      };
-      auto is_pedestrian = [&](auto object) {
-        return scope.global().entities->ref(object).template is_also<Pedestrian>();
-      };
-      return std::all_of(std::begin(objects), std::end(objects), is_vehicle) ||
-             std::all_of(std::begin(objects), std::end(objects), is_pedestrian);
-    };
-    if (not std::all_of(std::begin(scope.actors), std::end(scope.actors), constraint)) {
-      THROW_SEMANTIC_ERROR(
-        "Actors may be either of vehicle type or a pedestrian type;"
-        "See OpenSCENARIO 1.2 Table 11 for more details");
-    }
-  }
 }
 
 auto LongitudinalAction::endsImmediately() const -> bool
