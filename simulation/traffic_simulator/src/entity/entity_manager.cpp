@@ -255,22 +255,22 @@ auto EntityManager::getLongitudinalDistance(
   if (!include_adjacent_lanelet) {
     auto to_canonicalized = static_cast<LaneletPose>(to);
     if (to.hasAlternativeLaneletPose()) {
-      to_canonicalized = to.getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-        static_cast<LaneletPose>(from), hdmap_utils_ptr_);
+      if (
+        const auto to_canonicalized_optional = to.getAlternativeLaneletPoseBaseOnShortestRouteFrom(
+          static_cast<LaneletPose>(from), hdmap_utils_ptr_)) {
+        to_canonicalized = to_canonicalized_optional.value();
+      }
     }
 
-    auto forward_distance =
+    const auto forward_distance =
       hdmap_utils_ptr_->getLongitudinalDistance(static_cast<LaneletPose>(from), to_canonicalized);
 
-    auto backward_distance =
+    const auto backward_distance =
       hdmap_utils_ptr_->getLongitudinalDistance(to_canonicalized, static_cast<LaneletPose>(from));
 
     if (forward_distance && backward_distance) {
-      if (forward_distance.value() > backward_distance.value()) {
-        return -backward_distance.value();
-      } else {
-        return forward_distance.value();
-      }
+      return forward_distance.value() > backward_distance.value() ? -backward_distance.value()
+                                                                  : forward_distance.value();
     } else if (forward_distance) {
       return forward_distance.value();
     } else if (backward_distance) {
