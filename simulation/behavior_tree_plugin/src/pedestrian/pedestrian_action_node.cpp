@@ -91,7 +91,40 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
     lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);
   }
   if (lanelet_pose) {
-    return traffic_simulator::CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils);
+    const auto canonicalized = hdmap_utils->canonicalizeLaneletPose(lanelet_pose.value());
+    if (
+      const auto canonicalized_lanelet_pose =
+        std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
+      // If canonicalize succeed, set canonicalized pose and set other values.
+      return traffic_simulator::CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils);
+    } else {
+      // If canonicalize failed, set end of road lanelet pose.
+      if (
+        const auto end_of_road_lanelet_id = std::get<std::optional<std::int64_t>>(canonicalized)) {
+        if (lanelet_pose.value().s < 0) {
+          traffic_simulator::LaneletPose end_of_road_lanelet_pose;
+          {
+            end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
+            end_of_road_lanelet_pose.s = 0;
+            end_of_road_lanelet_pose.offset = lanelet_pose.value().offset;
+            end_of_road_lanelet_pose.rpy = lanelet_pose.value().rpy;
+          }
+          return traffic_simulator::CanonicalizedLaneletPose(end_of_road_lanelet_pose, hdmap_utils);
+        } else {
+          traffic_simulator::LaneletPose end_of_road_lanelet_pose;
+          {
+            end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
+            end_of_road_lanelet_pose.s =
+              hdmap_utils->getLaneletLength(end_of_road_lanelet_id.value());
+            end_of_road_lanelet_pose.offset = lanelet_pose.value().offset;
+            end_of_road_lanelet_pose.rpy = lanelet_pose.value().rpy;
+          }
+          return traffic_simulator::CanonicalizedLaneletPose(end_of_road_lanelet_pose, hdmap_utils);
+        }
+      } else {
+        THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
+      }
+    }
   } else {
     return std::nullopt;
   }
