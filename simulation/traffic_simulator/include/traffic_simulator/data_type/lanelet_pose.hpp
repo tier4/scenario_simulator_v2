@@ -38,7 +38,7 @@ public:
   bool hasAlternativeLaneletPose() const { return lanelet_poses_.size() > 1; }
   auto getAlternativeLaneletPoseBaseOnShortestRouteFrom(
     LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) const
-    -> LaneletPose;
+    -> std::optional<LaneletPose>;
 
 /**
 Note: The comparison operator for the CanonicalizedLaneletPose type compares the s values after making sure that the lanelet_id is the same.
