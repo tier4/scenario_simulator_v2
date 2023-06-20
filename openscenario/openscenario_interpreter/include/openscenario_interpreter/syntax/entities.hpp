@@ -17,7 +17,9 @@
 
 #include <list>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <pugixml.hpp>
+#include <set>
 
 namespace openscenario_interpreter
 {
@@ -44,6 +46,8 @@ struct Entities
   auto ref(const String &) const -> Object;
 
   auto objects(const std::list<String> &) const -> std::list<String>;
+
+  auto objectTypes(const std::list<String> &) const -> std::set<ObjectType::value_type>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

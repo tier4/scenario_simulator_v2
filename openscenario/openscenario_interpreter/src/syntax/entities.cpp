@@ -64,5 +64,21 @@ auto Entities::objects(const std::list<String> & entity_refs) const -> std::list
   }
   return object_list;
 }
+
+auto Entities::objectTypes(const std::list<String> & entity_refs) const
+  -> std::set<ObjectType::value_type>
+{
+  auto type_set = std::set<ObjectType::value_type>();
+  for (const auto & entity_ref : entity_refs) {
+    if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
+      type_set.emplace(object.as<ScenarioObject>().objectType());
+    } else if (object.is<EntitySelection>()) {
+      type_set.merge(object.as<EntitySelection>().objectTypes(*this));
+    } else {
+      THROW_SYNTAX_ERROR("Unsupported entity type is specified");
+    }
+  }
+  return type_set;
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

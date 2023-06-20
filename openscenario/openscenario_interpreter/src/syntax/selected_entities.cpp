@@ -36,6 +36,11 @@ auto SelectedEntityRefs::objects(const Entities & entities) -> std::list<String>
   return entities.objects(std::list<String>(std::begin(entityRefs), std::end(entityRefs)));
 }
 
+auto SelectedEntityRefs::objectTypes(const Entities & entities) -> std::set<ObjectType::value_type>
+{
+  return entities.objectTypes(std::list<String>(std::begin(entityRefs), std::end(entityRefs)));
+}
+
 SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
 : byTypes(readElements<ByType, 0>("ByType", tree, scope))
 {
@@ -44,36 +49,24 @@ SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
 auto SelectedByTypes::objects(const Entities & entities) -> std::list<String>
 {
   auto selected_entities = std::list<String>();
+  auto object_types = objectTypes(entities);
   for (const auto & [name, object] : entities.entities) {
-    for (const auto & byType : byTypes) {
-      switch (byType.objectType) {
-        case ObjectType::vehicle:
-          if (object.is_also<Vehicle>()) {
-            selected_entities.emplace_back(name);
-          }
-          break;
-        case ObjectType::pedestrian:
-          if (object.is_also<Pedestrian>()) {
-            selected_entities.emplace_back(name);
-          }
-          break;
-        case ObjectType::miscellaneous:
-          if (object.is_also<MiscObject>()) {
-            selected_entities.emplace_back(name);
-          }
-          break;
-        case ObjectType::external:
-          THROW_SYNTAX_ERROR("Selecting external object is not supported yet");
-          break;
-        default:
-          THROW_SYNTAX_ERROR(
-            "Unexpected entity ", std::quoted(name), " of type ",
-            std::quoted(makeTypename(object->type().name())), " is detected; this is a bug");
-          break;
+    if (object.is<ScenarioObject>()) {
+      if (object_types.count(object.as<ScenarioObject>().objectType())) {
+        selected_entities.emplace_back(name);
+      } else {
+        // do nothing if not found
       }
+    } else {
+      // do nothing for EntitySelection
     }
   }
   return selected_entities;
+}
+
+auto SelectedByTypes::objectTypes(const Entities &) -> std::set<ObjectType::value_type>
+{
+  return std::set<ObjectType::value_type>(std::begin(byTypes), std::end(byTypes));
 }
 
 SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
@@ -89,6 +82,12 @@ SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
 auto SelectedEntities::objects(const Entities & entities) -> std::list<String>
 {
   return apply<std::list<String>>([&](auto & e) { return e.objects(entities); }, *this);
+}
+
+auto SelectedEntities::objectTypes(const Entities & entities) -> std::set<ObjectType::value_type>
+{
+  return apply<std::set<ObjectType::value_type>>(
+    [&](auto & e) { return e.objectTypes(entities); }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

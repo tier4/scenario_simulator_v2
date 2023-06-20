@@ -15,6 +15,10 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
+#include <openscenario_interpreter/syntax/external_object_reference.hpp>
+#include <openscenario_interpreter/syntax/misc_object.hpp>
+#include <openscenario_interpreter/syntax/pedestrian.hpp>
+#include <openscenario_interpreter/syntax/vehicle.hpp>
 
 namespace openscenario_interpreter
 {
@@ -30,6 +34,21 @@ EntityObject::EntityObject(const pugi::xml_node & node, Scope & scope)
       std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>(node, scope);        })))
 // clang-format on
 {
+}
+
+auto EntityObject::objectType() -> ObjectType
+{
+  if (is_also<Vehicle>()) {
+    return {ObjectType::vehicle};
+  } else if (is_also<Pedestrian>()) {
+    return {ObjectType::pedestrian};
+  } else if (is_also<MiscObject>()) {
+    return {ObjectType::miscellaneous};
+  } else if (is_also<ExternalObjectReference>()) {
+    return {ObjectType::external};
+  } else {
+    THROW_SEMANTIC_ERROR("Unexpected entity object is detected");
+  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -30,7 +30,9 @@ struct SelectedEntityRefs : public Object
 
   explicit SelectedEntityRefs(const pugi::xml_node &, Scope &);
 
-  auto objects(const Entities & entities) -> std::list<String>;
+  auto objects(const Entities &) -> std::list<String>;
+
+  auto objectTypes(const Entities &) -> std::set<ObjectType::value_type>;
 };
 
 struct SelectedByTypes : public Object
@@ -39,7 +41,9 @@ struct SelectedByTypes : public Object
 
   explicit SelectedByTypes(const pugi::xml_node &, Scope &);
 
-  auto objects(const Entities & entities) -> std::list<String>;
+  auto objects(const Entities &) -> std::list<String>;
+
+  auto objectTypes(const Entities &) -> std::set<ObjectType::value_type>;
 };
 
 /* ---- SelectedEntities -------------------------------------------------------
@@ -57,6 +61,8 @@ struct SelectedEntities : public ComplexType
   explicit SelectedEntities(const pugi::xml_node &, Scope &);
 
   auto objects(const Entities & entities) -> std::list<String>;
+
+  auto objectTypes(const Entities & entities) -> std::set<ObjectType::value_type>;
 };
 
 DEFINE_LAZY_VISITOR(SelectedEntities, CASE(SelectedEntityRefs), CASE(SelectedByTypes));
