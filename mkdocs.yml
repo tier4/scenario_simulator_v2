@@ -22,6 +22,8 @@ extra:
 plugins:
   - search
   - git-revision-date-localized
+  - redirects:
+      redirect_maps:
 
 copyright: "Copyright &copy; 2022 TIER IV, Inc."
 
