@@ -20,7 +20,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 ByType::ByType(const pugi::xml_node & tree, Scope & scope)
-: objectType(readAttribute<ObjectType>("objectType", tree, scope))
+: ObjectType(readAttribute<ObjectType>("objectType", tree, scope))
 {
 }
 }  // namespace syntax

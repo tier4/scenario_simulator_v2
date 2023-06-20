@@ -30,10 +30,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ByType
+struct ByType : public ObjectType
 {
-  const ObjectType objectType;
-
   explicit ByType(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
