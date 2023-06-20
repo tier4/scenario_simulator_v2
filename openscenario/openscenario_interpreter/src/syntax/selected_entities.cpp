@@ -44,7 +44,7 @@ SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
 auto SelectedByTypes::objects(const Entities & entities) -> std::list<String>
 {
   auto selected_entities = std::list<String>();
-  for (const auto & [name, object] : entities) {
+  for (const auto & [name, object] : entities.entities) {
     for (const auto & byType : byTypes) {
       switch (byType.objectType) {
         case ObjectType::vehicle:

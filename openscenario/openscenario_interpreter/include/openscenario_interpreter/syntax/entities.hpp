@@ -35,12 +35,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Entities
 {
-private:
   std::unordered_map<std::string, Object> entities;
-
-public:
-  using iterator = decltype(entities)::iterator;
-  using const_iterator = decltype(entities)::const_iterator;
 
   explicit Entities(const pugi::xml_node &, Scope &);
 
@@ -49,10 +44,6 @@ public:
   auto ref(const String &) const -> Object;
 
   auto objects(const std::list<String> &) const -> std::list<String>;
-
-  auto begin() const { return entities.begin(); }
-
-  auto end() const { return entities.end(); }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

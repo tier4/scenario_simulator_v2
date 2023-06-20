@@ -138,7 +138,7 @@ auto Scope::entities(bool allow_entity_selecition, bool allow_misc_external)
   -> std::list<std::string>
 {
   auto entity_list = std::list<std::string>();
-  for (const auto & [entity, object] : *scenario_definition->entities) {
+  for (const auto & [entity, object] : scenario_definition->entities->entities) {
     if (
       (allow_entity_selecition or not object.is<EntitySelection>()) and
       (allow_misc_external or not object.is<MiscObject>())) {
