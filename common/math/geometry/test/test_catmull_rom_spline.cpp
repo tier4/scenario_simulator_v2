@@ -19,13 +19,26 @@
 
 #include "expect_eq_macros.hpp"
 
-TEST(CatmullRomSpline, GetCollisionWith2ControlPointsPointIn2)
+TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
 {
   geometry_msgs::msg::Point p0;
   geometry_msgs::msg::Point p1;
   p1.x = 1;
   auto points = {p0, p1};
   auto spline = math::geometry::CatmullRomSpline(points);
+  const auto s = spline.getCollisionPointIn2D(
+    {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
+     geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0)});
+  EXPECT_TRUE(s);
+  if (s) {
+    EXPECT_DOUBLE_EQ(s.value(), 0.0);
+  }
+}
+
+TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
+{
+  auto spline = math::geometry::CatmullRomSpline(
+    {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0)});
   const auto s = spline.getCollisionPointIn2D(
     {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0)});

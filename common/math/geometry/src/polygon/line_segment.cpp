@@ -95,8 +95,6 @@ std::optional<double> LineSegment::getIntersection2DSValue(
 
 std::optional<double> LineSegment::getIntersection2DSValue(const LineSegment & line) const
 {
-  std::cout << "start : " << geometry_msgs::msg::to_yaml(start_point) << std::endl;
-  std::cout << "end : " << geometry_msgs::msg::to_yaml(end_point) << std::endl;
   if (!isIntersect2D(line)) {
     return std::optional<double>();
   }
