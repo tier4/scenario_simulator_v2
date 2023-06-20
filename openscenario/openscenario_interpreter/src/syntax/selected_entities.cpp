@@ -48,17 +48,17 @@ auto SelectedByTypes::objects(const Entities & entities) -> std::list<String>
     for (const auto & byType : byTypes) {
       switch (byType.objectType) {
       case ObjectType::vehicle:
-        if (object.is<Vehicle>()) {
+        if (object.is_also<Vehicle>()) {
           selected_entities.emplace_back(name);
         }
         break;
       case ObjectType::pedestrian:
-        if (object.is<Pedestrian>()) {
+        if (object.is_also<Pedestrian>()) {
           selected_entities.emplace_back(name);
         }
         break;
       case ObjectType::miscellaneous:
-        if (object.is<MiscObject>()) {
+        if (object.is_also<MiscObject>()) {
           selected_entities.emplace_back(name);
         }
         break;
