@@ -28,7 +28,7 @@ struct SelectedEntityRefs : public Object
 {
   const std::list<EntityRef> entityRefs;
 
-  SelectedEntityRefs(const pugi::xml_node &, Scope &);
+  explicit SelectedEntityRefs(const pugi::xml_node &, Scope &);
 
   auto objects(const Entities & entities) -> std::list<String>;
 };
@@ -37,7 +37,7 @@ struct SelectedByTypes : public Object
 {
   const std::list<ByType> byTypes;
 
-  SelectedByTypes(const pugi::xml_node &, Scope &);
+  explicit SelectedByTypes(const pugi::xml_node &, Scope &);
 
   auto objects(const Entities & entities) -> std::list<String>;
 };
@@ -54,7 +54,7 @@ struct SelectedByTypes : public Object
  * -------------------------------------------------------------------------- */
 struct SelectedEntities : public ComplexType
 {
-  SelectedEntities(const pugi::xml_node &, Scope &);
+  explicit SelectedEntities(const pugi::xml_node &, Scope &);
 
   auto objects(const Entities & entities) -> std::list<String>;
 };

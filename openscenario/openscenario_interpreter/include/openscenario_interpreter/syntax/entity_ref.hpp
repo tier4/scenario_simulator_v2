@@ -37,7 +37,7 @@ struct EntityRef : public String
   EntityRef() = default;
 
   template <typename Candidates>
-  EntityRef(const pugi::xml_node & node, Scope & scope, const Candidates & candidates)
+  explicit EntityRef(const pugi::xml_node & node, Scope & scope, const Candidates & candidates)
   : String(readNameRef("entityRef", node, scope, candidates))
   {
   }

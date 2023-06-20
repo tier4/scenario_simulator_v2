@@ -34,7 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntitySelection : public Scope, public SelectedEntities
 {
-  EntitySelection(const pugi::xml_node & node, Scope & scope);
+  explicit EntitySelection(const pugi::xml_node & node, Scope & scope);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

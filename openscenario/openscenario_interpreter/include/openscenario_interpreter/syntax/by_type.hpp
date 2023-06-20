@@ -34,7 +34,7 @@ struct ByType
 {
   const ObjectType objectType;
 
-  ByType(const pugi::xml_node &, Scope &);
+  explicit ByType(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
