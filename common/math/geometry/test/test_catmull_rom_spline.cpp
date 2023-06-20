@@ -26,12 +26,41 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
   p1.x = 1;
   auto points = {p0, p1};
   auto spline = math::geometry::CatmullRomSpline(points);
-  const auto s = spline.getCollisionPointIn2D(
-    {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
-     geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0)});
-  EXPECT_TRUE(s);
-  if (s) {
-    EXPECT_DOUBLE_EQ(s.value(), 0.0);
+  {
+    const auto s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0)});
+    EXPECT_TRUE(s);
+    if (s) {
+      EXPECT_DOUBLE_EQ(s.value(), 0.0);
+    }
+  }
+  {
+    const auto s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(-1).z(0)});
+    EXPECT_TRUE(s);
+    if (s) {
+      EXPECT_DOUBLE_EQ(s.value(), 0.0);
+    }
+  }
+  {
+    const auto s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(0.5).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(0.5).y(-1).z(0)});
+    EXPECT_TRUE(s);
+    if (s) {
+      EXPECT_DOUBLE_EQ(s.value(), 0.5);
+    }
+  }
+  {
+    const auto s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(1.0).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(0.5).y(-1).z(0)});
+    EXPECT_TRUE(s);
+    if (s) {
+      EXPECT_DOUBLE_EQ(s.value(), 0.75);
+    }
   }
 }
 
