@@ -153,12 +153,16 @@ LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
 
 std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points)
 {
-  std::vector<LineSegment> seg;
-  for (size_t i = 0; i < points.size() - 1; i++) {
-    seg.emplace_back(LineSegment(points[i], points[i + 1]));
+  if (points.size() <= 1) {
+    return {};
+  } else {
+    std::vector<LineSegment> seg;
+    for (size_t i = 0; i < points.size() - 1; i++) {
+      seg.emplace_back(LineSegment(points[i], points[i + 1]));
+    }
+    seg.emplace_back(LineSegment(points[points.size() - 1], points[0]));
+    return seg;
   }
-  seg.emplace_back(LineSegment(points[points.size() - 1], points[0]));
-  return seg;
 }
 }  // namespace geometry
 }  // namespace math

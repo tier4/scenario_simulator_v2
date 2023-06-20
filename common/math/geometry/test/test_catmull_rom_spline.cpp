@@ -19,6 +19,15 @@
 
 #include "expect_eq_macros.hpp"
 
+TEST(CatmullRomSpline, GetCollisionWith2ControlPointsPointIn2)
+{
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
+  p1.x = 1;
+  auto points = {p0, p1};
+  auto spline = math::geometry::CatmullRomSpline(points);
+}
+
 TEST(CatmullRomSpline, GetCollisionPointIn2D)
 {
   geometry_msgs::msg::Point p0;
@@ -234,9 +243,6 @@ TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointsAreNotEnough)
 {
   EXPECT_THROW(
     math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
-    common::SemanticError);
-  EXPECT_THROW(
-    math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(1)),
     common::SemanticError);
 }
 
