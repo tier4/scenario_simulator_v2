@@ -112,7 +112,7 @@ public:
     setGoalPose("/planning/mission_planning/goal", *this),
     setInitialPose("/initialpose", *this),
     getAutowareState("/autoware/state", *this),
-    getAckermannControlCommand("/control/command/control_cmd", *this),
+    getAckermannControlCommand("/control/command/control_cmd_auto", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v;
                                                                                             cooperate(v); }),
     getEmergencyState("/system/emergency/emergency_state", *this, [this](const auto & v) { receiveEmergencyState(v); }),

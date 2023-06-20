@@ -17,7 +17,7 @@
 namespace concealer
 {
 AutowareUniverse::AutowareUniverse()
-: getAckermannControlCommand("/control/command/control_cmd", *this),
+: getAckermannControlCommand("/control/command/control_cmd_auto", *this),
   getGearCommandImpl("/control/command/gear_cmd", *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", *this),
   setAcceleration("/localization/acceleration", *this),
