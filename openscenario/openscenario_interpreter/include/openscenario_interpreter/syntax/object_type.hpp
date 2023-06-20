@@ -44,8 +44,8 @@ struct ObjectType
   enum value_type {
     vehicle,
 
-    miscellaneous,
     pedestrian,
+    miscellaneous,
     external,
   } value;
 
