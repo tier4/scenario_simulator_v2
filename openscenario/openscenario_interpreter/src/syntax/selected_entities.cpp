@@ -47,29 +47,29 @@ auto SelectedByTypes::objects(const Entities & entities) -> std::list<String>
   for (const auto & [name, object] : entities) {
     for (const auto & byType : byTypes) {
       switch (byType.objectType) {
-      case ObjectType::vehicle:
-        if (object.is_also<Vehicle>()) {
-          selected_entities.emplace_back(name);
-        }
-        break;
-      case ObjectType::pedestrian:
-        if (object.is_also<Pedestrian>()) {
-          selected_entities.emplace_back(name);
-        }
-        break;
-      case ObjectType::miscellaneous:
-        if (object.is_also<MiscObject>()) {
-          selected_entities.emplace_back(name);
-        }
-        break;
-      case ObjectType::external:
-        THROW_SYNTAX_ERROR("Selecting external object is not supported yet");
-        break;
-      default:
-        THROW_SYNTAX_ERROR(
-          "Unexpected entity ", std::quoted(name), " of type ",
-          std::quoted(makeTypename(object->type().name())), " is detected; this is a bug");
-        break;
+        case ObjectType::vehicle:
+          if (object.is_also<Vehicle>()) {
+            selected_entities.emplace_back(name);
+          }
+          break;
+        case ObjectType::pedestrian:
+          if (object.is_also<Pedestrian>()) {
+            selected_entities.emplace_back(name);
+          }
+          break;
+        case ObjectType::miscellaneous:
+          if (object.is_also<MiscObject>()) {
+            selected_entities.emplace_back(name);
+          }
+          break;
+        case ObjectType::external:
+          THROW_SYNTAX_ERROR("Selecting external object is not supported yet");
+          break;
+        default:
+          THROW_SYNTAX_ERROR(
+            "Unexpected entity ", std::quoted(name), " of type ",
+            std::quoted(makeTypename(object->type().name())), " is detected; this is a bug");
+          break;
       }
     }
   }
