@@ -49,7 +49,7 @@ struct ObjectType
     external,
   } value;
 
-  explicit ObjectType() = default;
+  ObjectType() = default;
 
   operator value_type() const noexcept { return value; }
 };
