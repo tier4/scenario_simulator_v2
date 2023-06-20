@@ -39,12 +39,19 @@ TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
 {
   auto spline = math::geometry::CatmullRomSpline(
     {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0)});
-  const auto s = spline.getCollisionPointIn2D(
-    {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
-     geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0)});
-  EXPECT_TRUE(s);
-  if (s) {
-    EXPECT_DOUBLE_EQ(s.value(), 0.0);
+  {
+    const auto s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0)});
+    EXPECT_TRUE(s);
+    if (s) {
+      EXPECT_DOUBLE_EQ(s.value(), 0.0);
+    }
+  }
+  {
+    EXPECT_FALSE(spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(-1).z(0)}));
   }
 }
 
