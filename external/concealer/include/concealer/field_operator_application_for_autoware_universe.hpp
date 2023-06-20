@@ -65,6 +65,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   Cooperator current_cooperator = Cooperator::simulator;
 
+  tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
+
   auto approve(const tier4_rtc_msgs::msg::CooperateStatusArray &) -> void;
 
   auto cooperate(const tier4_rtc_msgs::msg::CooperateStatusArray &) -> void;
@@ -109,7 +111,8 @@ public:
     setInitialPose("/initialpose", *this),
     getAutowareState("/autoware/state", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
-    getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { cooperate(v); }),
+    getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v;
+                                                                                            cooperate(v); }),
     getEmergencyState("/system/emergency/emergency_state", *this, [this](const auto & v) { receiveEmergencyState(v); }),
     getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
     getTrajectory("/planning/scenario_planning/trajectory", *this),
@@ -149,6 +152,8 @@ public:
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
 
   auto restrictTargetSpeed(double) const -> double override;
+
+  auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
 
   auto setCooperator(const std::string & cooperator) -> void override;
 

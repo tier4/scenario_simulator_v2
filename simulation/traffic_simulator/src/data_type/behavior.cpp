@@ -23,13 +23,15 @@ std::ostream & operator<<(std::ostream & stream, const Request & value)
   switch (value) {
     default:
     case Request::NONE:
-      return stream << "request : NONE" << std::endl;
+      return stream << "NONE";
     case Request::LANE_CHANGE:
-      return stream << "request : LANE_CHANGE" << std::endl;
+      return stream << "LANE_CHANGE";
     case Request::FOLLOW_LANE:
-      return stream << "request : FOLLOW_LANE" << std::endl;
+      return stream << "FOLLOW_LANE";
+    case Request::FOLLOW_POLYLINE_TRAJECTORY:
+      return stream << "FOLLOW_POLYLINE_TRAJECTORY";
     case Request::WALK_STRAIGHT:
-      return stream << "request : WALK_STRAIGHT" << std::endl;
+      return stream << "WALK_STRAIGHT";
   }
 }
 
@@ -42,6 +44,8 @@ std::string getRequestString(const Request & request)
       return "lane_change";
     case Request::FOLLOW_LANE:
       return "follow_lane";
+    case Request::FOLLOW_POLYLINE_TRAJECTORY:
+      return "follow_polyline_trajectory";
     case Request::WALK_STRAIGHT:
       return "walk_straight";
     default:

@@ -301,6 +301,12 @@ public:
     }
 
     template <typename... Ts>
+    static auto applyFollowTrajectoryAction(Ts &&... xs)
+    {
+      return core->requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
     static auto applyLaneChangeAction(Ts &&... xs)
     {
       return core->requestLaneChange(std::forward<decltype(xs)>(xs)...);
@@ -461,6 +467,13 @@ public:
     static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
     {
       return core->resetV2ITrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto sendCooperateCommand(Ts &&... xs) -> decltype(auto)
+    {
+      return asFieldOperatorApplication(core->getEgoName())
+        .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
     }
   };
 };
