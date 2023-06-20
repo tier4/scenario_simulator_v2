@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <iostream>
 #include <optional>
 
 namespace math
@@ -94,14 +95,16 @@ std::optional<double> LineSegment::getIntersection2DSValue(
 
 std::optional<double> LineSegment::getIntersection2DSValue(const LineSegment & line) const
 {
+  std::cout << "start : " << geometry_msgs::msg::to_yaml(start_point) << std::endl;
+  std::cout << "end : " << geometry_msgs::msg::to_yaml(end_point) << std::endl;
   if (!isIntersect2D(line)) {
     return std::optional<double>();
   }
   const auto det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
                    (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
-  return ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
-          (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
-         det;
+  return 1 - ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
+              (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
+               det;
 }
 
 std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
