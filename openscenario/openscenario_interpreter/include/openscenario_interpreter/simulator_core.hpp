@@ -463,6 +463,13 @@ public:
     {
       return core->resetV2ITrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
     }
+
+    template <typename... Ts>
+    static auto sendCooperateCommand(Ts &&... xs) -> decltype(auto)
+    {
+      return asFieldOperatorApplication(core->getEgoName())
+        .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
+    }
   };
 };
 }  // namespace openscenario_interpreter
