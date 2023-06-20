@@ -311,15 +311,22 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
              ? *std::max_element(s_value_candidates.begin(), s_value_candidates.end())
              : *std::min_element(s_value_candidates.begin(), s_value_candidates.end());
   };
-  const auto get_collision_point_2d_with_point =
-    [this](const auto & polygon, const auto search_backward) { return std::optional<double>(); };
+  const auto get_collision_point_2d_with_point = [this](const auto & polygon) {
+    const auto polygon_lines = getLineSegments(polygon);
+    for (const auto & line : polygon_lines) {
+      if (line.isIntersect2D(control_points[0])) {
+        return std::optional<double>(0);
+      }
+    }
+    return std::optional<double>();
+  };
   switch (control_points.size()) {
     case 0:
       THROW_SEMANTIC_ERROR("Control points are empty. We cannot determine the shape of the curve.");
       break;
     /// @note In this case, spline is interpreted as point.
     case 1:
-      return get_collision_point_2d_with_point(polygon, search_backward);
+      return get_collision_point_2d_with_point(polygon);
     /// @note In this case, spline is interpreted as line segment.
     case 2:
       return get_collision_point_2d_with_line(polygon, search_backward);

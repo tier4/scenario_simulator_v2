@@ -42,7 +42,6 @@ public:
   std::optional<double> getIntersection2DSValue(const LineSegment & line) const;
   std::optional<geometry_msgs::msg::Point> getIntersection2D(const LineSegment & line) const;
   std::optional<geometry_msgs::msg::Point> getIntersection2DWithXAxis(double x) const;
-
   geometry_msgs::msg::Vector3 getVector() const;
   geometry_msgs::msg::Vector3 get2DVector() const;
   double getLength() const;
