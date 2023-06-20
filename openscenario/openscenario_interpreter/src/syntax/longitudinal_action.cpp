@@ -45,7 +45,7 @@ LongitudinalAction::LongitudinalAction(const pugi::xml_node & node, Scope & scop
     };
     if (not std::all_of(std::begin(scope.actors), std::end(scope.actors), constraint)) {
       THROW_SEMANTIC_ERROR(
-        "Actors of may be either of vehicle type or a pedestrian type;"
+        "Actors may be either of vehicle type or a pedestrian type;"
         "See OpenSCENARIO 1.2 Table 11 for more details");
     }
   }
