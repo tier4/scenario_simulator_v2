@@ -79,6 +79,16 @@ If you want to force-push the commit during the review, please contact the maint
 If more than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
 Your contribution will be recorded in the [release note](https://tier4.github.io/scenario_simulator_v2-docs/ReleaseNotes/).
 
+## Update Documentation
+
+If your pull request changes the behavior of the software, please update the documentation in the `docs/` directory.
+The documentation is built by [mkdocs](https://www.mkdocs.org/).
+
+You may rename existing files or add new files to the `docs/` directory.
+* If you add new files, you should add the file name to the `nav` section in the `mkdocs.yml` file.
+
+* If you rename existing files, you should set up a redirect from the old file to the new file.
+Redirects are defined in the `mkdocs.yml` file using `mkdocs-redirects` plugin, so you will edit `plugins.redirects.redirect_maps` in the `mkdocs.yml` file.
 
 ## License
 

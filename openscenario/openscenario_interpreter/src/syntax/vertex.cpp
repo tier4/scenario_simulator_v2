@@ -20,7 +20,11 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Vertex::Vertex(const pugi::xml_node & node, Scope & scope)
-: time(readAttribute<Double>("time", node, scope)),
+: time(readAttribute<Double>(
+    "time", node, scope,
+    Double::
+      nan()  // Do not change this default value, since the traffic_simulator relies on the fact that this variable is set to nan when Vertex.time is unspecified.
+    )),
   position(readElement<Position>("Position", node, scope))
 {
 }

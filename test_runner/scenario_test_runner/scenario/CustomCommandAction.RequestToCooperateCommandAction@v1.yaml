@@ -1,0 +1,208 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 1
+    date: "2023-06-12T11:11:00+09:00"
+    description: ""
+    author: "Kotaro YOSHIMOTO"
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController:
+        - name: controller-1
+          Phase:
+            - name: phase-1
+              duration: 10
+              TrafficSignalState:
+                - { trafficSignalId: '34802', state: 'red' }
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: ""
+            Properties:
+              Property:
+                - name: isEgo
+                  value: "true"
+                - name: isClairvoyant
+                  value: "true"
+                - name: cooperator
+                  value: scenario
+      - name: Npc1
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: "34408"
+                      s: 10
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ""
+                        laneId: "34630"
+                        s: 10
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ""
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: "8.3333"
+    Story:
+      - name: ""
+        Act:
+          - name: "ignore the red traffic light by approving RTC"
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        Action:
+                          - name: "approve TRAFFIC_LIGHT request"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: RequestToCooperateCommandAction@v1(TRAFFIC_LIGHT, ACTIVATE)
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: "detect ego is stopped"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      SpeedCondition:
+                                        rule: lessThan
+                                        value: 0.0001
+                                - name: "avoid triggering immediately after start"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 5
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: "start on simulation start"
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: "check reaching the destination"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ""
+                                            laneId: "34630"
+                                            s: 10
+                                            offset: 0
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: 0
+                                              r: 0
+                                        tolerance: 1
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: "timeout scenario"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 60
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
