@@ -12,21 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/vertex.hpp>
+#ifndef GEOMETRY__VECTOR3__HYPOT_HPP_
+#define GEOMETRY__VECTOR3__HYPOT_HPP_
 
-namespace openscenario_interpreter
+#include <geometry/vector3/is_like_vector3.hpp>
+
+namespace math
 {
-inline namespace syntax
+namespace geometry
 {
-Vertex::Vertex(const pugi::xml_node & node, Scope & scope)
-: time(readAttribute<Double>(
-    "time", node, scope,
-    Double::
-      nan()  // Do not change this default value, since the traffic_simulator relies on the fact that this variable is set to nan when Vertex.time is unspecified.
-    )),
-  position(readElement<Position>("Position", node, scope))
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, IsLikeVector3<U>>, std::nullptr_t> =
+    nullptr>
+auto hypot(const T & from, const U & to)
 {
+  return std::hypot(to.x - from.x, to.y - from.y, to.z - from.z);
 }
-}  // namespace syntax
-}  // namespace openscenario_interpreter
+}  // namespace geometry
+}  // namespace math
+
+#endif  // GEOMETRY__VECTOR3__HYPOT_HPP_

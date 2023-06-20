@@ -20,9 +20,9 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /**
- * Note: Stochastic.randomSeed is initialized with 0, if it is not specified in scenario.
- *       The behavior related to this implementation is not specified in the OpenSCENARIO standard,
- *       so it may change in the future.
+   Note: Stochastic.randomSeed is initialized with 0, if it is not specified in
+   scenario. The behavior related to this implementation is not specified in
+   the OpenSCENARIO standard, so it may change in the future.
  */
 Stochastic::Stochastic(const pugi::xml_node & node, Scope & scope)
 : number_of_test_runs(readAttribute<UnsignedInt>("numberOfTestRuns", node, scope)),

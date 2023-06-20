@@ -23,6 +23,7 @@
 #include <queue>
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
+#include <traffic_simulator/data_type/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -159,6 +160,9 @@ public:
   virtual void requestSpeedChange(double, bool);
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
+
+  virtual auto requestFollowTrajectory(
+    const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &) -> void;
 
   virtual void requestWalkStraight();
 
