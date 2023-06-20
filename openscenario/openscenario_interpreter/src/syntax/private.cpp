@@ -14,7 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/reader/nameref.hpp>
+#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 

@@ -15,7 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_REF_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_REF_HPP_
 
-#include <openscenario_interpreter/reader/nameref.hpp>
+#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <pugixml.hpp>

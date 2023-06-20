@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/nameref.hpp>
+#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>

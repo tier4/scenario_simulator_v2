@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/nameref.hpp>
+#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>

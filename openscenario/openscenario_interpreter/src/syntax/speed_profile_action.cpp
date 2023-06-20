@@ -15,7 +15,7 @@
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/reader/nameref.hpp>
+#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/speed_profile_action.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>

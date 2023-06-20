@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/nameref.hpp>
+#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/relative_target_speed.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
