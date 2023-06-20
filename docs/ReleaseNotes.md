@@ -4,10 +4,12 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature                                                  | Brief summary                                                                                                          | Category                                        | Pull request                                                      | Contributor                                   |
-|----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------------|
-| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Added `FaultInjectionAction@v2`, a CustomCommandAction for raising a fault injection event with specified error level. | `openscenario_interpreter`                      | [#1002](https://github.com/tier4/scenario_simulator_v2/pull/1002) | [yamacir-kit](https://github.com/yamacir-kit) |
-| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Added `V2ITrafficSignalStateAction`, an implementation of `TrafficSignalState` for V2I traffic signals.                | `openscenario_interpreter`, `traffic_simulator` | [#1004](https://github.com/tier4/scenario_simulator_v2/pull/1004) | [HansRobo](https://github.com/HansRobo)       |
+| Feature                                                  | Brief summary                                                                                                                                             | Category                                        | Pull request                                                      | Contributor                                   |
+|----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------------|
+| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Added `FaultInjectionAction@v2`, a CustomCommandAction for raising a fault injection event with specified error level.                                    | `openscenario_interpreter`                      | [#1002](https://github.com/tier4/scenario_simulator_v2/pull/1002) | [yamacir-kit](https://github.com/yamacir-kit) |
+| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Added `V2ITrafficSignalStateAction`, an implementation of `TrafficSignalState` for V2I traffic signals.                                                   | `openscenario_interpreter`, `traffic_simulator` | [#1004](https://github.com/tier4/scenario_simulator_v2/pull/1004) | [HansRobo](https://github.com/HansRobo)       |
+| Add do noting behavior plugin                            | Add do nothing behavior for driving the simulator from Autoware rosbag data.                                                                              | `do_nothing_plugin`,`traffic_simulator`         | [#1001](https://github.com/tier4/scenario_simulator_v2/pull/1011) | [hakuturu583](https://github.com/hakuturu583) |
+| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Added `RequestToCooperateCommandAction@v1`, a CustomCommandAction to simulate an operation by humans or external applications for a request to cooperate. | `openscenario_interpreter`, `concealer`         | [#1013](https://github.com/tier4/scenario_simulator_v2/pull/1013) | [HansRobo](https://github.com/HansRobo)       |
 
 Bug Fixes:bug:
 
@@ -56,6 +58,7 @@ Minor Tweaks :oncoming_police_car:
 | OpenSCENARIO `UserDefinedValueCondition` | Support ADAPI interface for minimum-risk-maneuver state with backward compatibility for legacy emergency state              | `openscenario_interpreter`, `concealer` | [#975](https://github.com/tier4/scenario_simulator_v2/pull/975) | [HansRobo](https://github.com/HansRobo)       |
 | Port management                          | Change communication between `traffic_simulator` and `simple_sensor_simulator` from multi-port to single-port.              | `simulation_interface`                  | [#981](https://github.com/tier4/scenario_simulator_v2/pull/981) | [dmoszynski](https://github.com/dmoszynski)   |
 | OpenSCENARIO `model3d` in entity object  | Add `model3d` attribute parsing in entity objects.                                                                          | `openscenario_interpreter`              | [#977](https://github.com/tier4/scenario_simulator_v2/pull/977) | [f0reachARR](https://github.com/f0reachARR)   |
+
 ## Version 0.6.7
 
 Major Changes :race_car: :red_car: :blue_car:
