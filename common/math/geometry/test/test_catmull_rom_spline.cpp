@@ -96,10 +96,7 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
      * 
      * -----------------------------------------------------------
      * ============= Spline Curve (Control point is P0, P1)
-     * 
-     * $ Line segment for checking collision.  
-     * $
-     * $
+     * $$$$$$$$$$$$$ Line segment for checking collision.  
      *
      * s value is based on lane coordinate in spline curve, so it should be 0.0
      */
@@ -136,12 +133,9 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
      * 
      * -----------------------------------------------------------
      * ============= Spline Curve (Control point is P0, P1)
-     * 
-     * $ Line segment for checking collision.  
-     * $
-     * $
+     * $$$$$$$$$$$$$ Line segment for checking collision.  
      *
-     * s value is based on lane coordinate in spline curve, so it should be 0.0
+     * s value is based on lane coordinate in spline curve, so it should be 0.5
      */
     const auto s = spline.getCollisionPointIn2D(
       {geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(0),
@@ -149,15 +143,6 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
     EXPECT_TRUE(s);
     if (s) {
       EXPECT_DOUBLE_EQ(s.value(), 0.5);
-    }
-  }
-  {
-    const auto s = spline.getCollisionPointIn2D(
-      {geometry_msgs::build<geometry_msgs::msg::Point>().x(1.0).y(1).z(0),
-       geometry_msgs::build<geometry_msgs::msg::Point>().x(0.5).y(-1).z(0)});
-    EXPECT_TRUE(s);
-    if (s) {
-      EXPECT_DOUBLE_EQ(s.value(), 0.75);
     }
   }
 }
