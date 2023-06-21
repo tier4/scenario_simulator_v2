@@ -68,9 +68,15 @@ bool LineSegment::isIntersect2D(const LineSegment & l0) const
   return true;
 }
 
+/**
+ * @brief Find intersection point of 1 line segment and 1 point.
+ * @param point point of you want to find intersection.
+ * @return std::optional<double> 
+ */
 std::optional<double> LineSegment::getIntersection2DSValue(
   const geometry_msgs::msg::Point & point) const
 {
+  /// @note calculating s value from y axis value.
   const auto get_s = [this](const auto & point) {
     const auto s = (point.y - start_point.y) / (end_point.y - start_point.y);
     return 0 <= s && s <= 1 ? s : std::optional<double>();
@@ -110,7 +116,7 @@ std::optional<double> LineSegment::getIntersection2DSValue(const LineSegment & l
 
 /**
  * @brief Find intersection point of two line segments.
- * @param line 
+ * @param line Line segment of you want to find intersection.
  * @return std::optional<geometry_msgs::msg::Point> Intersection point, if the value is std::nullopt, lines have no intersection point. 
  */
 std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
