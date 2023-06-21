@@ -122,6 +122,10 @@ TEST(HdMapUtils, RoadShoulder)
   }
 }
 
+// Check if lanelet pose canonicalization works correctly for s < 0
+// Following lanelets: 34576 -> 34570 -> 34564
+// Canonicalized lanelet pose of (id=34564, s=-22) is suppose to be
+//                               (id=34576, s=-22 + length of 34570 + length of 34576)
 TEST(HdMapUtils, CanonicalizeNegative)
 {
   std::string path =
@@ -131,19 +135,23 @@ TEST(HdMapUtils, CanonicalizeNegative)
   origin.longitude = 139.78066608243;
   hdmap_utils::HdMapUtils hdmap_utils(path, origin);
 
-  double canonicalized_lanelet_offset = -22;
+  double non_canonicalized_lanelet_s = -22;
   const auto non_canonicalized_lanelet_pose =
-    traffic_simulator::helper::constructLaneletPose(34564, canonicalized_lanelet_offset, 0);
+    traffic_simulator::helper::constructLaneletPose(34564, non_canonicalized_lanelet_s, 0);
   const auto canonicalized_lanelet_pose = std::get<std::optional<traffic_simulator::LaneletPose>>(
     hdmap_utils.canonicalizeLaneletPose(non_canonicalized_lanelet_pose));
 
   EXPECT_EQ(canonicalized_lanelet_pose.value().lanelet_id, 34576);
   EXPECT_EQ(
-    canonicalized_lanelet_pose.value().s, canonicalized_lanelet_offset +
+    canonicalized_lanelet_pose.value().s, non_canonicalized_lanelet_s +
                                             hdmap_utils.getLaneletLength(34570) +
                                             hdmap_utils.getLaneletLength(34576));
 }
 
+// Check if lanelet pose canonicalization works correctly for s > length of lanelet pose
+// Following lanelets: 34981 -> 34585 -> 34579
+// Canonicalized lanelet pose of (id=34981, s=30) is suppose to be
+//                               (id=34579, s=30 - length of 34585 - length of 34981)
 TEST(HdMapUtils, CanonicalizePositive)
 {
   std::string path =
@@ -162,10 +170,19 @@ TEST(HdMapUtils, CanonicalizePositive)
   EXPECT_EQ(canonicalized_lanelet_pose.value().lanelet_id, 34579);
   EXPECT_EQ(
     canonicalized_lanelet_pose.value().s, non_canonicalized_lanelet_s -
-                                            hdmap_utils.getLaneletLength(34981) -
-                                            hdmap_utils.getLaneletLength(34585));
+                                            hdmap_utils.getLaneletLength(34585) -
+                                            hdmap_utils.getLaneletLength(34981));
 }
 
+// Check if gelAllCanonicalizedLaneletPoses() returns all possible canonicalized lanelet poses
+// for s < 0
+// Following lanelets: 34576 -> 34570 -> 34564
+//                     34981 -> 34636 -> 34564
+//                     34600 -> 34648 -> 34564
+// Canonicalized lanelet pose of (id=34564, s=-22) is suppose to be
+//                               (id=34575, s=-22 + length of 34570 + length of 34576)
+//                               (id=34981, s=-22 + length of 34636 + length of 34981)
+//                               (id=34600, s=-22 + length of 34648 + length of 34600)
 TEST(HdMapUtils, CanonicalizeAllNegative)
 {
   std::string path =
@@ -175,30 +192,39 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
   origin.longitude = 139.78066608243;
   hdmap_utils::HdMapUtils hdmap_utils(path, origin);
 
-  double canonicalized_lanelet_offset = -22;
+  double non_canonicalized_lanelet_s = -22;
   const auto non_canonicalized_lanelet_pose =
-    traffic_simulator::helper::constructLaneletPose(34564, canonicalized_lanelet_offset, 0);
+    traffic_simulator::helper::constructLaneletPose(34564, non_canonicalized_lanelet_s, 0);
   const auto canonicalized_lanelet_poses =
     hdmap_utils.gelAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
   EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(3));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34576);
   EXPECT_EQ(
-    canonicalized_lanelet_poses[0].s, canonicalized_lanelet_offset +
+    canonicalized_lanelet_poses[0].s, non_canonicalized_lanelet_s +
                                         hdmap_utils.getLaneletLength(34570) +
                                         hdmap_utils.getLaneletLength(34576));
   EXPECT_EQ(canonicalized_lanelet_poses[1].lanelet_id, 34981);
   EXPECT_EQ(
-    canonicalized_lanelet_poses[1].s, canonicalized_lanelet_offset +
+    canonicalized_lanelet_poses[1].s, non_canonicalized_lanelet_s +
                                         hdmap_utils.getLaneletLength(34636) +
                                         hdmap_utils.getLaneletLength(34981));
   EXPECT_EQ(canonicalized_lanelet_poses[2].lanelet_id, 34600);
   EXPECT_EQ(
-    canonicalized_lanelet_poses[2].s, canonicalized_lanelet_offset +
+    canonicalized_lanelet_poses[2].s, non_canonicalized_lanelet_s +
                                         hdmap_utils.getLaneletLength(34648) +
                                         hdmap_utils.getLaneletLength(34600));
 }
 
+// Check if gelAllCanonicalizedLaneletPoses() returns all possible canonicalized lanelet poses
+// for s > length of lanelet pose
+// Following lanelets: 34981 -> 34585 -> 34579
+//                     34981 -> 34636 -> 34564
+//                     34981 -> 34651 -> 34630
+// Canonicalized lanelet pose of (id=34981, s=30) is suppose to be
+//                               (id=34579, s=30 - length of 34585 - length of 34981)
+//                               (id=34564, s=30 - length of 34636 - length of 34981)
+//                               (id=34630, s=30 - length of 34651 - length of 34981)
 TEST(HdMapUtils, CanonicalizeAllPositive)
 {
   std::string path =
