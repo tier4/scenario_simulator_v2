@@ -246,7 +246,7 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
 {
   if (status.lanelet_pose_valid) {
     auto polygon = hdmap_utils->getLaneletPolygon(status.lanelet_pose.lanelet_id);
-    return spline.getCollisionPointIn2D(polygon, false, true);
+    return spline.getCollisionPointIn2D(polygon, false);
   }
   return std::nullopt;
 }
@@ -285,7 +285,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
       status.pose, math::geometry::getPointsFromBbox(
                      status.bounding_box, width_extension_right, width_extension_left,
                      length_extension_front, length_extension_rear));
-    return spline.getCollisionPointIn2D(polygon, false, true);
+    return spline.getCollisionPointIn2D(polygon, false);
   }
   return std::nullopt;
 }
