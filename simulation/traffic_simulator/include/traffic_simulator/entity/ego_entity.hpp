@@ -77,7 +77,7 @@ public:
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+  auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 

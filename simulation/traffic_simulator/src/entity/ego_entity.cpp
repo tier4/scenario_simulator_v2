@@ -117,7 +117,7 @@ auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obst
   return std::nullopt;
 }
 
-auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
+auto EgoEntity::getRouteLanelets(double /*unused horizon*/) const -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ids{};
 
