@@ -182,6 +182,7 @@ std::vector<LineSegment> getLineSegments(
     for (size_t i = 0; i < points.size() - 1; i++) {
       seg.emplace_back(LineSegment(points[i], points[i + 1]));
     }
+    /// @note If true, the end point(points[points.size() - 1]) and start point(points[0]) was connected.
     if (close_start_end) {
       seg.emplace_back(LineSegment(points[points.size() - 1], points[0]));
     }

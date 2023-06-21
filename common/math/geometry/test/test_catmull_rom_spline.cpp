@@ -176,7 +176,7 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
 /// @note Test case for checking collision with spline with 1 control points. (Same as point.)
 TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
 {
-    /**
+  /**
      * @note
      * y
      * ^
