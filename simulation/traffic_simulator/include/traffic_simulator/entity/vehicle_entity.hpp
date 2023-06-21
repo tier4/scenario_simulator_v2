@@ -50,6 +50,12 @@ public:
       return name;
     }
 
+    static auto doNothing() noexcept -> const std::string &
+    {
+      static const std::string name = "do_nothing_plugin/DoNothingPlugin";
+      return name;
+    }
+
     static auto defaultBehavior() -> const std::string & { return behaviorTree(); }
   };
 
@@ -90,6 +96,10 @@ public:
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
   void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override;
+
+  auto requestFollowTrajectory(
+    const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &)
+    -> void override;
 
   void requestLaneChange(const std::int64_t to_lanelet_id) override;
 
