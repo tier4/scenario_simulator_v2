@@ -15,6 +15,7 @@
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
 #include <optional>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace math
 {
@@ -41,6 +42,21 @@ LineSegment::LineSegment(
 }
 
 LineSegment::~LineSegment() {}
+
+geometry_msgs::msg::Point LineSegment::getPoint(const double s) const
+{
+  if (0 <= s && s <= 1) {
+    return geometry_msgs::build<geometry_msgs::msg::Point>()
+      .x(start_point.x + (end_point.x - start_point.x) * s)
+      .y(start_point.y + (end_point.y - start_point.y) * s)
+      .z(start_point.z + (end_point.z - start_point.z) * s);
+  }
+  THROW_SIMULATION_ERROR(
+    "Invalid S value is specified, while getting point on a line segment.",
+    "The range of s value should be in range [0,1]."
+    "This message is not originally intended to be displayed, if you see it, please "
+    "contact the developer of traffic_simulator.");
+}
 
 bool LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const
 {

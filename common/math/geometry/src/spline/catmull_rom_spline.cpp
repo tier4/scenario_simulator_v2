@@ -399,6 +399,7 @@ std::optional<double> CatmullRomSpline::getSValue(
 double CatmullRomSpline::getSquaredDistanceIn2D(
   const geometry_msgs::msg::Point & point, double s) const
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto index_and_s = getCurveIndexAndS(s);
   return curves_[index_and_s.first].getSquaredDistanceIn2D(point, index_and_s.second, true);
 }
@@ -406,14 +407,34 @@ double CatmullRomSpline::getSquaredDistanceIn2D(
 geometry_msgs::msg::Vector3 CatmullRomSpline::getSquaredDistanceVector(
   const geometry_msgs::msg::Point & point, double s) const
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto index_and_s = getCurveIndexAndS(s);
   return curves_[index_and_s.first].getSquaredDistanceVector(point, index_and_s.second, true);
 }
 
 const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
 {
-  const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getPoint(index_and_s.second, true);
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      if (std::fabs(s) <= std::numeric_limits<double>::epsilon()) {
+        return control_points[0];
+      }
+      THROW_SIMULATION_ERROR(
+        "Only 1 control point exists for the spline.",
+        "So only when the s=0 can calculate point."
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 2:
+      return line_segments_[0].getPoint(s);
+    default:
+      const auto index_and_s = getCurveIndexAndS(s);
+      return curves_[index_and_s.first].getPoint(index_and_s.second, true);
+  }
 }
 
 const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s, double offset) const
@@ -438,18 +459,42 @@ double CatmullRomSpline::getMaximum2DCurvature() const
 
 const geometry_msgs::msg::Vector3 CatmullRomSpline::getNormalVector(double s) const
 {
-  const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getNormalVector(index_and_s.second, true);
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      THROW_SIMULATION_ERROR(
+        "Only 1 control point exists for the spline.",
+        "So, the normal vector cannot be calculated.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 2:
+      if (0 <= s && s <= 1) {
+        return line_segments_[0].getVector();
+      }
+      THROW_SIMULATION_ERROR(
+        "Invalid S value is specified, while getting noramal vector.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    default:
+      const auto index_and_s = getCurveIndexAndS(s);
+      return curves_[index_and_s.first].getNormalVector(index_and_s.second, true);
+  }
 }
 
 const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(double s) const
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto index_and_s = getCurveIndexAndS(s);
   return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
 }
 
 const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
 {
+  std::cout << __FILE__ << "," << __LINE__ << std::endl;
   const auto index_and_s = getCurveIndexAndS(s);
   return curves_[index_and_s.first].getPose(index_and_s.second, true);
 }
