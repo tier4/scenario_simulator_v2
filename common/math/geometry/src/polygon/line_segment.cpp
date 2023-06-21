@@ -166,6 +166,12 @@ double LineSegment::getSlope() const
 
 LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
 
+/**
+ * @brief Get the line segments from points. 
+ * @param points Points you want to build line segments.
+ * @param close_start_end If true, returned line segments are connected their start and end. 
+ * @return std::vector<LineSegment> 
+ */
 std::vector<LineSegment> getLineSegments(
   const std::vector<geometry_msgs::msg::Point> & points, const bool close_start_end)
 {
