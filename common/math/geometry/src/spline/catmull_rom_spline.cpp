@@ -270,9 +270,18 @@ double CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const doubl
   THROW_SEMANTIC_ERROR("curve index does not match");  // LCOV_EXCL_LINE
 }
 
+/**
+ * @brief Get collision point in 2D (x and y)
+ * @param polygon points of polygons.
+ * @param search_backward 
+ * @return std::optional<double> 
+ */
 std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
 {
+  /// @note Define a set of lambda functions to be used depending on the number of control points.
+  // ================================ Start definition ================================
+  /// @note If the spline has three or more control points.
   const auto get_collision_point_2d_with_curve =
     [this](const auto & polygon, const auto search_backward) -> std::optional<double> {
     size_t n = curves_.size();
@@ -295,6 +304,7 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
     }
     return std::optional<double>();
   };
+  /// @note If the spline has two control points. (Same as single line segment.)
   const auto get_collision_point_2d_with_line =
     [this](const auto & polygon, const auto search_backward) -> std::optional<double> {
     const auto polygon_lines = getLineSegments(polygon);
@@ -311,6 +321,7 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
              ? *std::max_element(s_value_candidates.begin(), s_value_candidates.end())
              : *std::min_element(s_value_candidates.begin(), s_value_candidates.end());
   };
+  /// @note If the spline has one control point. (Same as point.)
   const auto get_collision_point_2d_with_point = [this](const auto & polygon) {
     const auto polygon_lines = getLineSegments(polygon);
     for (const auto & line : polygon_lines) {
@@ -320,6 +331,7 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
     }
     return std::optional<double>();
   };
+  // ================================ End definition ================================
   switch (control_points.size()) {
     case 0:
       THROW_SEMANTIC_ERROR("Control points are empty. We cannot determine the shape of the curve.");
