@@ -145,6 +145,32 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
       EXPECT_DOUBLE_EQ(s.value(), 0.5);
     }
   }
+  {
+    /**
+     * @note
+     * y
+     * ^
+     * |
+     * + (x,y,z) = (0,1,0)
+     * $
+     * $
+     * $
+     * + (x,y,z) = (0,0.2,0)
+     * |
+     * +================+--> x
+     * P0 = (0,0,0)     P1 = (1,0,0)
+     * 
+     * -----------------------------------------------------------
+     * ============= Spline Curve (Control point is P0, P1)
+     * $$$$$$$$$$$$$ Line segment for checking collision.  
+     *
+     * Line segment does not on the spline curve, so return value should be str::nullopt
+     */
+    const auto s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0.2).z(0)});
+    EXPECT_FALSE(s);
+  }
 }
 
 TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)

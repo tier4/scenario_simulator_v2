@@ -105,6 +105,11 @@ std::optional<double> LineSegment::getIntersection2DSValue(const LineSegment & l
                det;
 }
 
+/**
+ * @brief Find intersection point of two line segments.
+ * @param line 
+ * @return std::optional<geometry_msgs::msg::Point> Intersection point, if the value is std::nullopt, lines have no intersection point. 
+ */
 std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
   const LineSegment & line) const
 {
