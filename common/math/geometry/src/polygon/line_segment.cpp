@@ -166,7 +166,8 @@ double LineSegment::getSlope() const
 
 LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
 
-std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points)
+std::vector<LineSegment> getLineSegments(
+  const std::vector<geometry_msgs::msg::Point> & points, const bool close_start_end)
 {
   if (points.size() <= 1) {
     return {};
@@ -175,7 +176,9 @@ std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::P
     for (size_t i = 0; i < points.size() - 1; i++) {
       seg.emplace_back(LineSegment(points[i], points[i + 1]));
     }
-    seg.emplace_back(LineSegment(points[points.size() - 1], points[0]));
+    if (close_start_end) {
+      seg.emplace_back(LineSegment(points[points.size() - 1], points[0]));
+    }
     return seg;
   }
 }

@@ -49,7 +49,8 @@ public:
   double getSlope() const;
 };
 
-std::vector<LineSegment> getLineSegments(const std::vector<geometry_msgs::msg::Point> & points);
+std::vector<LineSegment> getLineSegments(
+  const std::vector<geometry_msgs::msg::Point> & points, const bool close_start_end = false);
 }  // namespace geometry
 }  // namespace math
 

@@ -173,8 +173,29 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
   }
 }
 
+/// @note Test case for checking collision with spline with 1 control points. (Same as point.)
 TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
 {
+    /**
+     * @note
+     * y
+     * ^
+     * |
+     * + (x,y,z) = (0,1,0) => control point for spline, start point of line segment.
+     * $
+     * $
+     * $
+     * +----------------------> x
+     * $
+     * $
+     * $
+     * +
+     * 
+     * -----------------------------------------------------------
+     * $$$$$$$$$$$$$ Line segment for checking collision.  
+     *
+     * s value is based on lane coordinate in spline curve, so it should be 0.0
+     */
   auto spline = math::geometry::CatmullRomSpline(
     {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0)});
   {
@@ -187,6 +208,27 @@ TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
     }
   }
   {
+    /**
+     * @note
+     * y
+     * ^
+     * |
+     * (x,y,z) = (0,1,0) => control point for spline
+     * +      +
+     * |      $
+     * |      $
+     * |      $
+     * +------+--------> x
+     * |      $
+     * |      $
+     * |      $
+     * |      +
+     * 
+     * -----------------------------------------------------------
+     * $$$$$$$$$$$$$ Line segment for checking collision.  
+     *
+     * Line segment does not on the spline curve, so return value should be str::nullopt
+     */
     EXPECT_FALSE(spline.getCollisionPointIn2D(
       {geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(0),
        geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(-1).z(0)}));
