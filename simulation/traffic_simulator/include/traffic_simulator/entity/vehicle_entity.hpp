@@ -97,6 +97,10 @@ public:
 
   void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override;
 
+  auto requestFollowTrajectory(
+    const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &)
+    -> void override;
+
   void requestLaneChange(const std::int64_t to_lanelet_id) override;
 
   void requestLaneChange(const traffic_simulator::lane_change::Parameter &) override;
