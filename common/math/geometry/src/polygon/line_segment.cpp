@@ -78,16 +78,19 @@ std::optional<double> LineSegment::getIntersection2DSValue(
   constexpr double epsilon = std::numeric_limits<double>::epsilon();
   if (std::abs(end_point.x - start_point.x) <= epsilon) {
     if (std::abs(end_point.y - start_point.y) <= epsilon) {
+      /// @note If start_point and end_point is a same point, checking the point is same as end_point or not.
       return (std::abs(end_point.x - point.x) <= epsilon &&
               std::abs(end_point.y - point.y) <= epsilon)
                ? std::optional<double>(0)
                : std::optional<double>();
     }
+    /// @note If the line segment is parallel to y axis, calculate s value from y axis value.
     return (std::abs(point.x - start_point.x) <= epsilon &&
             std::abs(point.y - start_point.y) <= epsilon)
              ? std::optional<double>(get_s(point))
              : std::optional<double>();
   }
+  /// @note If the line segment is not parallel to x and y axis, calculate s value from y axis value.
   return std::abs((point.y - start_point.y) / (point.x - start_point.x) - getSlope()) <= epsilon
            ? std::optional<double>(get_s(point))
            : std::optional<double>();
