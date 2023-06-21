@@ -279,6 +279,13 @@ double CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const doubl
 std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
 {
+  if (polygon.size() <= 1) {
+    THROW_SIMULATION_ERROR(
+      "Number of points in polygon are invalid, it requires more than 2 points but only ",
+      static_cast<int>(polygon.size()), " exists.",
+      " This message is not originally intended to be displayed, if you see it, please contact the "
+      "developer of traffic_simulator.");
+  }
   /// @note Define a set of lambda functions to be used depending on the number of control points.
   // ================================ Start definition ================================
   /// @note If the spline has three or more control points.
