@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
 #include <optional>
@@ -43,19 +45,42 @@ LineSegment::LineSegment(
 
 LineSegment::~LineSegment() {}
 
-geometry_msgs::msg::Point LineSegment::getPoint(const double s) const
+geometry_msgs::msg::Point LineSegment::getPoint(const double s, const bool autoscale) const
 {
-  if (0 <= s && s <= 1) {
+  const auto s_normalized = autoscale ? s / getLength() : s;
+  if (0 <= s_normalized && s_normalized <= 1) {
     return geometry_msgs::build<geometry_msgs::msg::Point>()
       .x(start_point.x + (end_point.x - start_point.x) * s)
       .y(start_point.y + (end_point.y - start_point.y) * s)
       .z(start_point.z + (end_point.z - start_point.z) * s);
   }
-  THROW_SIMULATION_ERROR(
-    "Invalid S value is specified, while getting point on a line segment.",
-    "The range of s value should be in range [0,1]."
-    "This message is not originally intended to be displayed, if you see it, please "
-    "contact the developer of traffic_simulator.");
+  if (autoscale) {
+    THROW_SIMULATION_ERROR(
+      "Invalid S value is specified, while getting point on a line segment.",
+      "The range of s_normalized value should be in range [0,", getLength(), "].",
+      "But, your values are = ", s, " and length = ", getLength(),
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Invalid S value is specified, while getting point on a line segment.",
+      "The range of s_normalized value should be in range [0,1].", "But, your values are = ", s,
+      " and length = ", getLength(),
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
+  }
+}
+
+geometry_msgs::msg::Pose LineSegment::getPose(const double s, const bool autoscale) const
+{
+  return geometry_msgs::build<geometry_msgs::msg::Pose>()
+    .position(getPoint(s, autoscale))
+    .orientation([this]() -> geometry_msgs::msg::Quaternion {
+      const auto tangent_vec = getVector();
+      return quaternion_operation::convertEulerAngleToQuaternion(
+        geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(
+          std::atan2(tangent_vec.y, tangent_vec.x)));
+    }());
 }
 
 bool LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const
@@ -154,6 +179,16 @@ geometry_msgs::msg::Vector3 LineSegment::getVector() const
   return vec;
 }
 
+geometry_msgs::msg::Vector3 LineSegment::getNormalVector() const
+{
+  geometry_msgs::msg::Vector3 tangent_vec = getVector();
+  double theta = M_PI / 2.0;
+  geometry_msgs::msg::Vector3 vec;
+  vec.x = tangent_vec.x * std::cos(theta) - tangent_vec.y * std::sin(theta);
+  vec.y = tangent_vec.x * std::sin(theta) + tangent_vec.y * std::cos(theta);
+  return vec;
+}
+
 geometry_msgs::msg::Vector3 LineSegment::get2DVector() const
 {
   geometry_msgs::msg::Vector3 vec;
@@ -177,6 +212,23 @@ double LineSegment::getLength() const
 double LineSegment::getSlope() const
 {
   return (end_point.y - start_point.y) / (end_point.x - start_point.x);
+}
+
+double LineSegment::getSquaredDistanceIn2D(
+  const geometry_msgs::msg::Point & point, const double s, const bool autoscale) const
+{
+  const auto point_on_line = getPoint(s, autoscale);
+  return std::pow(point.x - point_on_line.x, 2) + std::pow(point.y - point_on_line.y, 2);
+}
+
+geometry_msgs::msg::Vector3 LineSegment::getSquaredDistanceVector(
+  const geometry_msgs::msg::Point & point, const double s, const bool autoscale) const
+{
+  const auto point_on_line = getPoint(s, autoscale);
+  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+    .x(point.x - point_on_line.x)
+    .y(point.y - point_on_line.y)
+    .z(point.z - point_on_line.z);
 }
 
 LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
