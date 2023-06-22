@@ -109,6 +109,8 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     autoware_auto_perception_msgs::msg::TrackedObjects gt_msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = "map";
+    gt_msg.header.stamp = stamp;
+    gt_msg.header.frame_id = "map";
     last_update_stamp_ = current_time;
     for (const auto & status : statuses) {
       if (
