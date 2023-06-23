@@ -225,10 +225,13 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
                  cooperate_status.finish_distance >= -20.0;
         });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
-    throw common::Error(
-      "Failed to send a cooperate command: Cannot find a valid request to cooperate for module ",
-      std::quoted(module_name), " and command ", std::quoted(command),
-      ". Please check if the situation is such that the request occurs when sending.");
+    std::stringstream what;
+    what << "Failed to send a cooperate command: Cannot find a valid request to cooperate for module "
+         << std::quoted(module_name) << " and command " << std::quoted(command) << "."
+         << "Please check if the situation is such that the request occurs when sending."
+         << "Following is the latest cooperate status array: "
+         << tier4_rtc_msgs::msg::to_yaml(latest_cooperate_status_array);
+    throw common::Error(what.str());
   } else {
     tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
     cooperate_command.module = cooperate_status->module;
