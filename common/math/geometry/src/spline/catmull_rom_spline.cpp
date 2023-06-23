@@ -403,7 +403,7 @@ double CatmullRomSpline::getSquaredDistanceIn2D(
     case 0:
       THROW_SIMULATION_ERROR(
         "Only 0 control point exists for the spline.",
-        "If this message was displaied, something completely unexpected happens.",
+        "If this message was displayed, something completely unexpected happens.",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 1:
@@ -431,7 +431,7 @@ geometry_msgs::msg::Vector3 CatmullRomSpline::getSquaredDistanceVector(
     case 0:
       THROW_SIMULATION_ERROR(
         "Only 0 control point exists for the spline.",
-        "If this message was displaied, something completely unexpected happens.",
+        "If this message was displayed, something completely unexpected happens.",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 1:
@@ -460,7 +460,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
     case 0:
       THROW_SIMULATION_ERROR(
         "Only 0 control point exists for the spline.",
-        "If this message was displaied, something completely unexpected happens.",
+        "If this message was displayed, something completely unexpected happens.",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 1:
@@ -506,7 +506,7 @@ const geometry_msgs::msg::Vector3 CatmullRomSpline::getNormalVector(double s) co
     case 0:
       THROW_SIMULATION_ERROR(
         "Only 0 control point exists for the spline.",
-        "If this message was displaied, something completely unexpected happens.",
+        "If this message was displayed, something completely unexpected happens.",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 1:
@@ -520,7 +520,7 @@ const geometry_msgs::msg::Vector3 CatmullRomSpline::getNormalVector(double s) co
         return line_segments_[0].getNormalVector();
       }
       THROW_SIMULATION_ERROR(
-        "Invalid S value is specified, while getting noramal vector.",
+        "Invalid S value is specified, while getting normal vector.",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     default:
@@ -535,7 +535,7 @@ const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(double s) c
     case 0:
       THROW_SIMULATION_ERROR(
         "Only 0 control point exists for the spline.",
-        "If this message was displaied, something completely unexpected happens.",
+        "If this message was displayed, something completely unexpected happens.",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 1:
@@ -564,7 +564,7 @@ const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
     case 0:
       THROW_SIMULATION_ERROR(
         "Only 0 control point exists for the spline.",
-        "If this message was displaied, something completely unexpected happens.",
+        "If this message was displayed, something completely unexpected happens.",
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 1:
