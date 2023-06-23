@@ -213,12 +213,16 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
   if (const auto cooperate_status = std::find_if(
         latest_cooperate_status_array.statuses.begin(),
         latest_cooperate_status_array.statuses.end(),
-        [type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name)](
-          const auto & cooperate_status) { return cooperate_status.module.type == type; });
+        [type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name), command,
+         to_command_type](const auto & cooperate_status) {
+          return cooperate_status.module.type == type &&
+                 to_command_type(command) == cooperate_status.command_status.type &&
+                 cooperate_status.finish_distance >= 0.0;
+        });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
     throw common::Error(
-      "Failed to send a cooperate command: Cannot find a request to cooperate for module ",
-      std::quoted(module_name),
+      "Failed to send a cooperate command: Cannot find a valid request to cooperate for module ",
+      std::quoted(module_name), " and command ", std::quoted(command),
       ". Please check if the situation is such that the request occurs when sending.");
   } else {
     tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
