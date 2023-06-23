@@ -215,9 +215,14 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
         latest_cooperate_status_array.statuses.end(),
         [type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name), command,
          to_command_type](const auto & cooperate_status) {
+          /**
+           *  NOTE : the finish_distance filter is set to over -20.0,
+           *  because some valid rtc statuses has negative finish_distance due to the errors of localization or numerical calculation.
+           *  This threshold is advised by a member of TIER IV planning and control team.
+           */
           return cooperate_status.module.type == type &&
                  to_command_type(command) == cooperate_status.command_status.type &&
-                 cooperate_status.finish_distance >= 0.0;
+                 cooperate_status.finish_distance >= -20.0;
         });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
     throw common::Error(
