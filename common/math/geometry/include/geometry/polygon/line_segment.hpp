@@ -59,7 +59,8 @@ public:
     const geometry_msgs::msg::Point & point, const double s, const bool autoscale = false) const;
 
 private:
-  std::optional<double> denormalize(const std::optional<double> s) const;
+  std::optional<double> denormalize(
+    const std::optional<double> s, const bool throw_error_on_out_of_range = true) const;
   double denormalize(const double s) const;
 };
 

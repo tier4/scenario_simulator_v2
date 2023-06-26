@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <iostream>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -85,7 +86,7 @@ geometry_msgs::msg::Pose LineSegment::getPose(const double s, const bool autosca
 
 bool LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const
 {
-  return getIntersection2DSValue(point) ? true : false;
+  return getIntersection2DSValue(point, true) ? true : false;
 }
 
 bool LineSegment::isIntersect2D(const LineSegment & l0) const
@@ -117,8 +118,11 @@ std::optional<double> LineSegment::getIntersection2DSValue(
   const geometry_msgs::msg::Point & point, const bool autoscale) const
 {
   const auto get_s_normalized = [this](const auto & point) -> std::optional<double> {
-    /// @note calculating s value from y axis value.
-    const auto get_s = [this](const auto & point) {
+    const auto get_s_from_x = [this](const auto & point) {
+      const auto s = (point.x - start_point.x) / (end_point.x - start_point.x);
+      return 0 <= s && s <= 1 ? s : std::optional<double>();
+    };
+    const auto get_s_from_y = [this](const auto & point) {
       const auto s = (point.y - start_point.y) / (end_point.y - start_point.y);
       return 0 <= s && s <= 1 ? s : std::optional<double>();
     };
@@ -132,15 +136,11 @@ std::optional<double> LineSegment::getIntersection2DSValue(
                  : std::optional<double>();
       }
       /// @note If the line segment is parallel to y axis, calculate s value from y axis value.
-      return (std::abs(point.x - start_point.x) <= epsilon &&
-              std::abs(point.y - start_point.y) <= epsilon)
-               ? std::optional<double>(get_s(point))
-               : std::optional<double>();
+      return std::abs(point.x - start_point.x) <= epsilon ? get_s_from_y(point)
+                                                          : std::optional<double>();
     }
-    /// @note If the line segment is not parallel to x and y axis, calculate s value from y axis value.
-    return std::abs((point.y - start_point.y) / (point.x - start_point.x) - getSlope()) <= epsilon
-             ? std::optional<double>(get_s(point))
-             : std::optional<double>();
+    /// @note If the line segment is not parallel to x and y axis, calculate s value from x axis value.
+    return get_s_from_x(point);
   };
   return autoscale ? denormalize(get_s_normalized(point)) : get_s_normalized(point);
 }
@@ -169,7 +169,7 @@ std::optional<double> LineSegment::getIntersection2DSValue(
 std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
   const LineSegment & line) const
 {
-  const auto s = getIntersection2DSValue(line);
+  const auto s = getIntersection2DSValue(line, true);
   return s ? geometry_msgs::build<geometry_msgs::msg::Point>()
                .x(s.value() * start_point.x + (1.0 - s.value()) * end_point.x)
                .y(s.value() * start_point.y + (1.0 - s.value()) * end_point.y)
@@ -186,6 +186,10 @@ geometry_msgs::msg::Vector3 LineSegment::getVector() const
   return vec;
 }
 
+/**
+ * @brief Get normal vector of the line segment.
+ * @return geometry_msgs::msg::Vector3 
+ */
 geometry_msgs::msg::Vector3 LineSegment::getNormalVector() const
 {
   geometry_msgs::msg::Vector3 tangent_vec = getVector();
@@ -252,12 +256,30 @@ geometry_msgs::msg::Vector3 LineSegment::getSquaredDistanceVector(
     .z(point.z - point_on_line.z);
 }
 
-std::optional<double> LineSegment::denormalize(const std::optional<double> s) const
+std::optional<double> LineSegment::denormalize(
+  const std::optional<double> s, const bool throw_error_on_out_of_range) const
 {
+  if (!throw_error_on_out_of_range && 0 <= s && s <= 1) {
+    return std::optional<double>();
+  }
   return s ? denormalize(s.value()) : std::optional<double>();
 }
 
-double LineSegment::denormalize(const double s) const { return s * getLength(); }
+/**
+ * @brief Denormalize s value in coordinate along line segment.
+ * @param s s value in coordinate along line segment.
+ * @return double Denormalized s value.
+ */
+double LineSegment::denormalize(const double s) const
+{
+  if (0 <= s && s <= 1) {
+    return s * getLength();
+  }
+  THROW_SIMULATION_ERROR(
+    "Invalid normalized s value, s = ", s, ", S value should be in range [0,1].",
+    "This message is not originally intended to be displayed, if you see it, please "
+    "contact the developer of traffic_simulator.");
+}
 
 LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
 

@@ -89,6 +89,43 @@ TEST(LineSegment, GetPose)
   }
 }
 
+TEST(LineSegment, isIntersect2D)
+{
+  {
+    /**
+     * @note
+     * y
+     * ^
+     * |
+     * + (x,y,z) = (0,1,0) => control point for spline, start point of line segment.
+     * $
+     * $
+     * $
+     * +----------------------> x
+     * $
+     * $
+     * $
+     * +
+     * 
+     * -----------------------------------------------------------
+     * $$$$$$$$$$$$$ Line segment
+     */
+    math::geometry::LineSegment line(
+      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
+      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0));
+    EXPECT_TRUE(
+      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
+    // EXPECT_TRUE(
+    //   line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
+    // EXPECT_TRUE(
+    //   line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
+    // EXPECT_TRUE(
+    //   line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
+    // EXPECT_TRUE(
+    //   line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1.0).z(0)));
+  }
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
