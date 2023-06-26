@@ -61,6 +61,8 @@ class DetectionSensor : public DetectionSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
+  typename rclcpp::PublisherBase::SharedPtr ground_truth_publisher_base_ptr_;
+
   std::mt19937 random_engine_;
 
   std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>> queue_objects_;
@@ -72,9 +74,11 @@ public:
   explicit DetectionSensor(
     const double current_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
-    const typename rclcpp::Publisher<T>::SharedPtr & publisher)
+    const typename rclcpp::Publisher<T>::SharedPtr & publisher,
+    const typename rclcpp::PublisherBase::SharedPtr & ground_truth_publisher = nullptr)
   : DetectionSensorBase(current_time, configuration),
     publisher_ptr_(publisher),
+    ground_truth_publisher_base_ptr_(ground_truth_publisher),
     random_engine_(configuration.random_seed())
   {
   }
