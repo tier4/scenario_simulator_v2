@@ -131,6 +131,54 @@ TEST(LineSegment, isIntersect2D)
   }
 }
 
+TEST(LineSegment, getIntersection2DSValue)
+{
+  {
+    /**
+     * @note
+     * y
+     * ^
+     * |
+     * + (x,y,z) = (0,1,0)
+     * $
+     * $
+     * $
+     * +----------------------> x
+     * $
+     * $
+     * $
+     * + (x,y,z) = (0,-1,0)
+     * 
+     * -----------------------------------------------------------
+     * $$$$$$$$$$$$$ Line segment
+     */
+    math::geometry::LineSegment line(
+      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
+      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0));
+    {
+      const auto s = line.getIntersection2DSValue(
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0), false);
+      EXPECT_TRUE(s);
+      if (s) {
+        EXPECT_DOUBLE_EQ(s.value(), 0.5);
+      }
+    }
+    {
+      const auto s = line.getIntersection2DSValue(
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0), true);
+      EXPECT_TRUE(s);
+      if (s) {
+        EXPECT_DOUBLE_EQ(s.value(), 1.0);
+      }
+    }
+    {
+      const auto s = line.getIntersection2DSValue(
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0), false);
+      EXPECT_FALSE(s);
+    }
+  }
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
