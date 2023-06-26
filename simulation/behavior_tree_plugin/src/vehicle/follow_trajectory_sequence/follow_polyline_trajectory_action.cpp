@@ -509,20 +509,24 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       }
     }
 
+    const auto current_velocity =
+      quaternion_operation::convertQuaternionToEulerAngle(entity_status.pose.orientation) *
+      entity_status.action_status.twist.linear.x;
+
     /*
        Note: If obstacle avoidance is to be implemented, the steering behavior
        known by the name "collision avoidance" should be synthesized here into
        steering.
     */
-    const auto steering = desired_velocity - velocity;
+    const auto steering = desired_velocity - current_velocity;
 
-    velocity = truncate(velocity + steering, desired_speed);
+    const auto velocity = truncate(current_velocity + steering, desired_speed);
 
     auto updated_status = entity_status;
 
     updated_status.pose.position += velocity * step_time;
 
-    updated_status.pose.orientation = [this]() {
+    updated_status.pose.orientation = [&]() {
       geometry_msgs::msg::Vector3 direction;
       direction.x = 0;
       direction.y = 0;
