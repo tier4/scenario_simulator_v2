@@ -20,21 +20,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
-#include <autoware_adapi_v1_msgs/msg/response_status.hpp>
-#include <type_traits>
-
-template <typename T, typename = void>
-struct has_data_member_status : public std::false_type
-{
-};
-
-template <typename T>
-struct has_data_member_status<T, std::void_t<decltype(std::declval<T>().status)>> : public std::true_type
-{
-};
-
-template <typename T>
-constexpr auto has_data_member_status_v = has_data_member_status<T>::value;
 
 namespace concealer
 {
@@ -63,41 +48,20 @@ public:
     validateAvailability();
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
       if (const auto & service_call_result = callWithTimeoutValidation(request)) {
-        if constexpr (has_data_member_status_v<typename T::Response>) {
-          if constexpr (std::is_same<
-                          autoware_adapi_v1_msgs::msg::ResponseStatus,
-                          decltype(T::Response::status)>::value) {
-            if (const auto & service_call_status = service_call_result->get()->status->success)
-            {
-              RCLCPP_INFO_STREAM(
-                logger, service_name << " service request has been accepted "
-                                    << (service_call_status.message.empty()
-                                          ? "."
-                                          : " (" + service_call_status.message + ")."));
-              return;
-            } else {
-              RCLCPP_ERROR_STREAM(
-                logger, service_name << " service request was accepted, but ResponseStatus is FAILURE "
-                                    << (service_call_status.message.empty()
-                                          ? ""
-                                          : " (" + service_call_status.message + ")"));
-            }
-          }
-        }
         if (const auto & service_call_status = service_call_result->get()->status;
-          service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
-        RCLCPP_INFO_STREAM(
-          logger, service_name << " service request has been accepted "
-                                << (service_call_status.message.empty()
-                                      ? "."
-                                      : " (" + service_call_status.message + ")."));
-        return;
+            service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
+          RCLCPP_INFO_STREAM(
+            logger, service_name << " service request has been accepted "
+                                 << (service_call_status.message.empty()
+                                       ? "."
+                                       : " (" + service_call_status.message + ")."));
+          return;
         } else {
-        RCLCPP_ERROR_STREAM(
-          logger, service_name << " service request was accepted, but ResponseStatus is FAILURE "
-                                << (service_call_status.message.empty()
-                                      ? ""
-                                      : " (" + service_call_status.message + ")"));
+          RCLCPP_ERROR_STREAM(
+            logger, service_name << " service request was accepted, but ResponseStatus is FAILURE "
+                                 << (service_call_status.message.empty()
+                                       ? ""
+                                       : " (" + service_call_status.message + ")"));
         }
       }
     }
