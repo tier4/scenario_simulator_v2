@@ -325,7 +325,7 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
         THROW_SIMULATION_ERROR(
           "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
           "Number of the line segments should be one when the spline have 2 control points.",
-          "Something completely unexpected heppens.",
+          "Something completely unexpected happened.",
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
@@ -435,7 +435,7 @@ double CatmullRomSpline::getSquaredDistanceIn2D(
         THROW_SIMULATION_ERROR(
           "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
           "Number of the line segments should be one when the spline have 2 control points.",
-          "Something completely unexpected heppens.",
+          "Something completely unexpected happened.",
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
@@ -473,7 +473,7 @@ geometry_msgs::msg::Vector3 CatmullRomSpline::getSquaredDistanceVector(
         THROW_SIMULATION_ERROR(
           "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
           "Number of the line segments should be one when the spline have 2 control points.",
-          "Something completely unexpected heppens.",
+          "Something completely unexpected happened.",
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
@@ -507,7 +507,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
         THROW_SIMULATION_ERROR(
           "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
           "Number of the line segments should be one when the spline have 2 control points.",
-          "Something completely unexpected heppens.",
+          "Something completely unexpected happened.",
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
@@ -587,7 +587,7 @@ const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(double s) c
         THROW_SIMULATION_ERROR(
           "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
           "Number of the line segments should be one when the spline have 2 control points.",
-          "Something completely unexpected heppens.",
+          "Something completely unexpected happened.",
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
@@ -623,7 +623,7 @@ const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
         THROW_SIMULATION_ERROR(
           "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
           "Number of the line segments should be one when the spline have 2 control points.",
-          "Something completely unexpected heppens.",
+          "Something completely unexpected happened.",
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
