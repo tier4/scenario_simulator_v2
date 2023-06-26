@@ -38,6 +38,7 @@ message DetectionSensorConfiguration {
   int32 random_seed = 7;                // random_seed for noise generation.
   double probability_of_lost = 8;       // probability of lost recognition. (0.0 ~ 1.0)
   double object_recognition_delay = 9;  // object recognition delay. (unit : second) It delays only the position recognition.
+  bool enable_ground_truth_delay = 10;  // If true, simulator publish ground truth with delay.
 }
 
 /**

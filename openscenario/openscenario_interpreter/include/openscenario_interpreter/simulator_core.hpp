@@ -257,6 +257,7 @@ public:
           configuration.set_pos_noise_stddev(controller.properties.template get<Double>("detectedObjectPositionStandardDeviation"));
           configuration.set_probability_of_lost(controller.properties.template get<Double>("detectedObjectMissingProbability"));
           configuration.set_random_seed(controller.properties.template get<UnsignedInteger>("randomSeed"));
+          configuration.set_enable_ground_truth_delay(controller.properties.template get<Boolean>("isEnableDetectedObjectGroundTruthDelay"))
           configuration.set_range(300);
           configuration.set_update_duration(0.1);
           // clang-format on
