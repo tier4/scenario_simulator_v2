@@ -321,6 +321,14 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
     const auto polygon_lines = getLineSegments(polygon);
     std::vector<double> s_value_candidates = {};
     for (const auto & line : getLineSegments(polygon)) {
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be one when the spline have 2 control points.",
+          "Something completely unexpected heppens.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
       if (const auto s_value = line_segments_[0].getIntersection2DSValue(line)) {
         s_value_candidates.emplace_back(s_value.value());
       }
@@ -423,6 +431,14 @@ double CatmullRomSpline::getSquaredDistanceIn2D(
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be one when the spline have 2 control points.",
+          "Something completely unexpected heppens.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
       return line_segments_[0].getSquaredDistanceIn2D(point, s, true);
     default:
       const auto index_and_s = getCurveIndexAndS(s);
@@ -453,6 +469,14 @@ geometry_msgs::msg::Vector3 CatmullRomSpline::getSquaredDistanceVector(
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be one when the spline have 2 control points.",
+          "Something completely unexpected heppens.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
       return line_segments_[0].getSquaredDistanceVector(point, s, true);
     default:
       const auto index_and_s = getCurveIndexAndS(s);
@@ -479,6 +503,14 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be one when the spline have 2 control points.",
+          "Something completely unexpected heppens.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
       return line_segments_[0].getPoint(s);
     default:
       const auto index_and_s = getCurveIndexAndS(s);
@@ -551,6 +583,14 @@ const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(double s) c
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be one when the spline have 2 control points.",
+          "Something completely unexpected heppens.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
       if (0 <= s && s <= getLength()) {
         return line_segments_[0].getVector();
       }
@@ -579,6 +619,14 @@ const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be one when the spline have 2 control points.",
+          "Something completely unexpected heppens.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
       return line_segments_[0].getPose(s, true);
     default:
       const auto index_and_s = getCurveIndexAndS(s);
