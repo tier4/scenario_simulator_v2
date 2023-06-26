@@ -436,27 +436,14 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::str
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
-  const autoware_auto_system_msgs::msg::EmergencyState & message) -> void
+  const tier4_external_api_msgs::msg::Emergency & message) -> void
 {
-#define CASE(IDENTIFIER)                                           \
-  case autoware_auto_system_msgs::msg::EmergencyState::IDENTIFIER: \
-    minimum_risk_maneuver_state = #IDENTIFIER;                     \
-    break
-
-  switch (message.state) {
-    CASE(MRM_FAILED);
-    CASE(MRM_OPERATING);
-    CASE(MRM_SUCCEEDED);
-    CASE(NORMAL);
-    CASE(OVERRIDE_REQUESTING);
-
-    default:
-      throw common::Error("Unsupported MrmState::state, number: ", static_cast<int>(message.state));
+  if (message.emergency) {
+    throw common::Error("Emergency state received");
   }
-
   minimum_risk_maneuver_behavior = "";
-#undef CASE
 }
+
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
   const autoware_adapi_v1_msgs::msg::MrmState & message) -> void

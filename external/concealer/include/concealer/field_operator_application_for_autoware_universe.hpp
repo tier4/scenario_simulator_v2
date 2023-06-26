@@ -35,6 +35,7 @@
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
+#include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
@@ -54,7 +55,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<autoware_auto_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>          getAckermannControlCommand;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                         getCooperateStatusArray;
-  SubscriberWrapper<autoware_auto_system_msgs::msg::EmergencyState>                    getEmergencyState;
+  SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                           getEmergencyState;
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                             getMrmState;
   SubscriberWrapper<autoware_auto_planning_msgs::msg::Trajectory>                      getTrajectory;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
@@ -78,7 +79,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   auto receiveMrmState(const autoware_adapi_v1_msgs::msg::MrmState & msg) -> void;
 
-  auto receiveEmergencyState(const autoware_auto_system_msgs::msg::EmergencyState & msg) -> void;
+  auto receiveEmergencyState(const tier4_external_api_msgs::msg::Emergency & msg) -> void;
 
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
   auto is##NAME() const noexcept                             \
@@ -115,7 +116,7 @@ public:
     getAckermannControlCommand("/control/command/control_cmd", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v;
                                                                                             cooperate(v); }),
-    getEmergencyState("/system/emergency/emergency_state", *this, [this](const auto & v) { receiveEmergencyState(v); }),
+    getEmergencyState("/api/external/get/emergency", *this, [this](const auto & v) { receiveEmergencyState(v); }),
     getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
     getTrajectory("/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
