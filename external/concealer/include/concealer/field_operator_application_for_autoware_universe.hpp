@@ -32,6 +32,7 @@
 #include <concealer/utility/subscriber_wrapper.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
+#include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
@@ -59,9 +60,9 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<autoware_auto_planning_msgs::msg::Trajectory>                      getTrajectory;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
 
-  ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>         requestCooperateCommands;
-  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>           requestEngage;
-  ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit> requestSetVelocityLimit;
+  ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>             requestCooperateCommands;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>   requestEngage;
+  ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>     requestSetVelocityLimit;
 
   Cooperator current_cooperator = Cooperator::simulator;
 
@@ -120,7 +121,7 @@ public:
     getTrajectory("/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
-    requestEngage("/api/external/set/engage", *this),
+    requestEngage("/api/operation_mode/change_to_autonomous", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
   // clang-format on

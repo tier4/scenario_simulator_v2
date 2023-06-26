@@ -325,8 +325,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
   task_queue.delay([this]() {
     waitForAutowareStateToBeDriving([this]() {
-      auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
-      request->engage = true;
+      auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ChangeOperationMode::Request>();
       requestEngage(request);
     });
   });
