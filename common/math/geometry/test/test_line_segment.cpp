@@ -115,14 +115,18 @@ TEST(LineSegment, isIntersect2D)
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0));
     EXPECT_TRUE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
-    // EXPECT_TRUE(
-    //   line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
-    // EXPECT_TRUE(
-    //   line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
-    // EXPECT_TRUE(
-    //   line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
-    // EXPECT_TRUE(
-    //   line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1.0).z(0)));
+    EXPECT_TRUE(
+      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
+    EXPECT_TRUE(
+      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
+    EXPECT_TRUE(
+      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
+    EXPECT_TRUE(
+      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0)));
+    EXPECT_FALSE(
+      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(2).z(0)));
+    EXPECT_FALSE(
+      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-2).z(0)));
   }
 }
 
