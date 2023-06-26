@@ -46,6 +46,12 @@ LineSegment::LineSegment(
 
 LineSegment::~LineSegment() {}
 
+/**
+ * @brief Get point on the line segment from s value.
+ * @param s s value in coordinate along line segment.
+ * @param autoscale If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
+ * @return geometry_msgs::msg::Point 
+ */
 geometry_msgs::msg::Point LineSegment::getPoint(const double s, const bool autoscale) const
 {
   const double s_normalized = autoscale ? s / getLength() : s;
@@ -72,6 +78,12 @@ geometry_msgs::msg::Point LineSegment::getPoint(const double s, const bool autos
   }
 }
 
+/**
+ * @brief Get pose on the line segment from s value. Orientation of thee return value was calculated from the vector of the line segment.
+ * @param s s value in coordinate along line segment.
+ * @param autoscale If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
+ * @return geometry_msgs::msg::Pose 
+ */
 geometry_msgs::msg::Pose LineSegment::getPose(const double s, const bool autoscale) const
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -157,6 +169,12 @@ std::optional<double> LineSegment::getIntersection2DSValue(
   return autoscale ? denormalize(get_s_normalized(point)) : get_s_normalized(point);
 }
 
+/**
+ * @brief Get S value of the intersection point of two line segment.
+ * @param line The line segment you want to check intersection.
+ * @param autoscale If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
+ * @return std::optional<double> 
+ */
 std::optional<double> LineSegment::getIntersection2DSValue(
   const LineSegment & line, const bool autoscale) const
 {
