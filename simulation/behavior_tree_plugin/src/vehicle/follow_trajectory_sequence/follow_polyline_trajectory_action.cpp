@@ -73,7 +73,12 @@ auto any(F f, T && x, Ts &&... xs)
   }
 }
 
-auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
+auto makeUpdatedStatus(
+  const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<
+    traffic_simulator::follow_trajectory::Polyline>> & parameter,
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time)
+  -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
@@ -89,7 +94,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  auto pop = [this]() {
+  auto pop = [&]() {
     /*
        The OpenSCENARIO standard does not define the behavior when the value of
        Timing.domainAbsoluteRelative is "relative". The standard only states
@@ -128,13 +133,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
      See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
-  if (getBlackBoardValues();
-      request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
-      not getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) or
-      not getInput<decltype(target_speed)>("target_speed", target_speed) or not parameter) {
-    return BT::NodeStatus::FAILURE;
-  } else if (parameter->shape.vertices.empty()) {
-    return BT::NodeStatus::SUCCESS;
+  if (parameter->shape.vertices.empty()) {
+    return std::nullopt;
   } else if (const auto position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -171,7 +171,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     */
     isApproximatelyEqualTo(distance_to_front_waypoint, 0.0)) {
     pop();
-    return tick();
+    return makeUpdatedStatus(entity_status, parameter, behavior_parameter, step_time);
   } else if (
     const auto [distance, remaining_time] =
       [&]() {
@@ -185,7 +185,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
              future: if followingMode is follow, this distance calculation may be
              inappropriate.
           */
-          auto total_distance_to = [this](auto last) {
+          auto total_distance_to = [&](auto last) {
             auto total_distance = 0.0;
             for (auto iter = std::begin(parameter->shape.vertices); 0 < std::distance(iter, last);
                  ++iter) {
@@ -241,7 +241,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       }();
     isApproximatelyEqualTo(distance, 0.0)) {
     pop();
-    return tick();
+    return makeUpdatedStatus(entity_status, parameter, behavior_parameter, step_time);
   } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
              isinf(acceleration) or isnan(acceleration)) {
     throw common::Error(
@@ -499,7 +499,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
           remaining_time_to_front_waypoint,
           remaining_time_to_arrival_to_front_waypoint + step_time)) {
         pop();
-        return tick();  // tail recursion
+        return makeUpdatedStatus(entity_status, parameter, behavior_parameter, step_time);
       } else {
         throw common::SimulationError(
           "Vehicle ", std::quoted(entity_status.name), " arrived at the waypoint in trajectory ",
@@ -557,11 +557,26 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
     updated_status.lanelet_pose_valid = false;
 
-    setOutput("updated_status", updated_status);
+    return updated_status;
+  }
+}
+
+auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
+{
+  if (getBlackBoardValues();
+      request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
+      not getInput<decltype(parameter)>("polyline_trajectory_parameter", parameter) or
+      not getInput<decltype(target_speed)>("target_speed", target_speed) or not parameter) {
+    return BT::NodeStatus::FAILURE;
+  } else if (
+    const auto updated_status =
+      makeUpdatedStatus(entity_status, parameter, behavior_parameter, step_time)) {
+    setOutput("updated_status", *updated_status);
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
-
     return BT::NodeStatus::RUNNING;
+  } else {
+    return BT::NodeStatus::SUCCESS;
   }
 }
 }  // namespace vehicle
