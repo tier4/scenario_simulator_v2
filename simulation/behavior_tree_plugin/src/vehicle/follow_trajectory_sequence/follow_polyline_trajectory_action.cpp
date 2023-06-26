@@ -94,7 +94,7 @@ auto makeUpdatedStatus(
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  auto pop = [&]() {
+  auto discard_the_front_waypoint_and_recurse = [&]() {
     /*
        The OpenSCENARIO standard does not define the behavior when the value of
        Timing.domainAbsoluteRelative is "relative". The standard only states
@@ -122,6 +122,8 @@ auto makeUpdatedStatus(
         not parameter->closed) {
       parameter->shape.vertices.pop_back();
     }
+
+    return makeUpdatedStatus(entity_status, parameter, behavior_parameter, step_time);
   };
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
@@ -170,8 +172,7 @@ auto makeUpdatedStatus(
        miraculously becomes zero.
     */
     isApproximatelyEqualTo(distance_to_front_waypoint, 0.0)) {
-    pop();
-    return makeUpdatedStatus(entity_status, parameter, behavior_parameter, step_time);
+    return discard_the_front_waypoint_and_recurse();
   } else if (
     const auto [distance, remaining_time] =
       [&]() {
@@ -240,8 +241,7 @@ auto makeUpdatedStatus(
         }
       }();
     isApproximatelyEqualTo(distance, 0.0)) {
-    pop();
-    return makeUpdatedStatus(entity_status, parameter, behavior_parameter, step_time);
+    return discard_the_front_waypoint_and_recurse();
   } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
              isinf(acceleration) or isnan(acceleration)) {
     throw common::Error(
@@ -498,8 +498,7 @@ auto makeUpdatedStatus(
         isDefinitelyLessThan(
           remaining_time_to_front_waypoint,
           remaining_time_to_arrival_to_front_waypoint + step_time)) {
-        pop();
-        return makeUpdatedStatus(entity_status, parameter, behavior_parameter, step_time);
+        return discard_the_front_waypoint_and_recurse();
       } else {
         throw common::SimulationError(
           "Vehicle ", std::quoted(entity_status.name), " arrived at the waypoint in trajectory ",
