@@ -114,44 +114,51 @@ bool LineSegment::isIntersect2D(const LineSegment & l0) const
  * @return std::optional<double> 
  */
 std::optional<double> LineSegment::getIntersection2DSValue(
-  const geometry_msgs::msg::Point & point) const
+  const geometry_msgs::msg::Point & point, const bool autoscale) const
 {
-  /// @note calculating s value from y axis value.
-  const auto get_s = [this](const auto & point) {
-    const auto s = (point.y - start_point.y) / (end_point.y - start_point.y);
-    return 0 <= s && s <= 1 ? s : std::optional<double>();
-  };
-  constexpr double epsilon = std::numeric_limits<double>::epsilon();
-  if (std::abs(end_point.x - start_point.x) <= epsilon) {
-    if (std::abs(end_point.y - start_point.y) <= epsilon) {
-      /// @note If start_point and end_point is a same point, checking the point is same as end_point or not.
-      return (std::abs(end_point.x - point.x) <= epsilon &&
-              std::abs(end_point.y - point.y) <= epsilon)
-               ? std::optional<double>(0)
+  const auto get_s_normalized = [this](const auto & point) -> std::optional<double> {
+    /// @note calculating s value from y axis value.
+    const auto get_s = [this](const auto & point) {
+      const auto s = (point.y - start_point.y) / (end_point.y - start_point.y);
+      return 0 <= s && s <= 1 ? s : std::optional<double>();
+    };
+    constexpr double epsilon = std::numeric_limits<double>::epsilon();
+    if (std::abs(end_point.x - start_point.x) <= epsilon) {
+      if (std::abs(end_point.y - start_point.y) <= epsilon) {
+        /// @note If start_point and end_point is a same point, checking the point is same as end_point or not.
+        return (std::abs(end_point.x - point.x) <= epsilon &&
+                std::abs(end_point.y - point.y) <= epsilon)
+                 ? std::optional<double>(0)
+                 : std::optional<double>();
+      }
+      /// @note If the line segment is parallel to y axis, calculate s value from y axis value.
+      return (std::abs(point.x - start_point.x) <= epsilon &&
+              std::abs(point.y - start_point.y) <= epsilon)
+               ? std::optional<double>(get_s(point))
                : std::optional<double>();
     }
-    /// @note If the line segment is parallel to y axis, calculate s value from y axis value.
-    return (std::abs(point.x - start_point.x) <= epsilon &&
-            std::abs(point.y - start_point.y) <= epsilon)
+    /// @note If the line segment is not parallel to x and y axis, calculate s value from y axis value.
+    return std::abs((point.y - start_point.y) / (point.x - start_point.x) - getSlope()) <= epsilon
              ? std::optional<double>(get_s(point))
              : std::optional<double>();
-  }
-  /// @note If the line segment is not parallel to x and y axis, calculate s value from y axis value.
-  return std::abs((point.y - start_point.y) / (point.x - start_point.x) - getSlope()) <= epsilon
-           ? std::optional<double>(get_s(point))
-           : std::optional<double>();
+  };
+  return autoscale ? denormalize(get_s_normalized(point)) : get_s_normalized(point);
 }
 
-std::optional<double> LineSegment::getIntersection2DSValue(const LineSegment & line) const
+std::optional<double> LineSegment::getIntersection2DSValue(
+  const LineSegment & line, const bool autoscale) const
 {
-  if (!isIntersect2D(line)) {
-    return std::optional<double>();
-  }
-  const auto det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
-                   (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
-  return 1 - ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
-              (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
-               det;
+  const auto get_s_normalized = [this](const auto & line) -> std::optional<double> {
+    if (!isIntersect2D(line)) {
+      return std::optional<double>();
+    }
+    const auto det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
+                     (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
+    return 1 - ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
+                (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
+                 det;
+  };
+  return autoscale ? denormalize(get_s_normalized(line)) : get_s_normalized(line);
 }
 
 /**
@@ -245,6 +252,13 @@ geometry_msgs::msg::Vector3 LineSegment::getSquaredDistanceVector(
     .z(point.z - point_on_line.z);
 }
 
+std::optional<double> LineSegment::denormalize(const std::optional<double> s) const
+{
+  return s ? denormalize(s.value()) : std::optional<double>();
+}
+
+double LineSegment::denormalize(const double s) const { return s * getLength(); }
+
 LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
 
 /**
@@ -270,5 +284,6 @@ std::vector<LineSegment> getLineSegments(
     return seg;
   }
 }
+
 }  // namespace geometry
 }  // namespace math

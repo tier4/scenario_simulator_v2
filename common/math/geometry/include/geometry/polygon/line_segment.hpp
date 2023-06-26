@@ -42,8 +42,10 @@ public:
   geometry_msgs::msg::Pose getPose(const double s, const bool autoscale = false) const;
   bool isIntersect2D(const geometry_msgs::msg::Point & point) const;
   bool isIntersect2D(const LineSegment & l0) const;
-  std::optional<double> getIntersection2DSValue(const geometry_msgs::msg::Point & point) const;
-  std::optional<double> getIntersection2DSValue(const LineSegment & line) const;
+  std::optional<double> getIntersection2DSValue(
+    const geometry_msgs::msg::Point & point, const bool autoscale = false) const;
+  std::optional<double> getIntersection2DSValue(
+    const LineSegment & line, const bool autoscale = false) const;
   std::optional<geometry_msgs::msg::Point> getIntersection2D(const LineSegment & line) const;
   std::optional<geometry_msgs::msg::Point> getIntersection2DWithXAxis(double x) const;
   geometry_msgs::msg::Vector3 getVector() const;
@@ -56,6 +58,10 @@ public:
     const geometry_msgs::msg::Point & point, const double s, const bool autoscale = false) const;
   geometry_msgs::msg::Vector3 getSquaredDistanceVector(
     const geometry_msgs::msg::Point & point, const double s, const bool autoscale = false) const;
+
+private:
+  std::optional<double> denormalize(const std::optional<double> s) const;
+  double denormalize(const double s) const;
 };
 
 std::vector<LineSegment> getLineSegments(
