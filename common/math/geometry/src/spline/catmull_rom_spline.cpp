@@ -123,7 +123,10 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
 {
   switch (control_points.size()) {
     case 0:
-      THROW_SEMANTIC_ERROR("Control points are empty. We cannot determine the shape of the curve.");
+      THROW_SEMANTIC_ERROR(
+        "Control points are empty. We cannot determine the shape of the curve.",
+        "This message is not originally intended to be displayed, if you see it, please contact "
+        "the developer of traffic_simulator.");
       break;
     /// @note In this case, spline is interpreted as point.
     case 1:
@@ -342,7 +345,10 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
 
   switch (control_points.size()) {
     case 0:
-      THROW_SEMANTIC_ERROR("Control points are empty. We cannot determine the shape of the curve.");
+      THROW_SEMANTIC_ERROR(
+        "Control points are empty. We cannot determine the shape of the curve.",
+        "This message is not originally intended to be displayed, if you see it, please contact "
+        "the developer of traffic_simulator.");
       break;
     /// @note In this case, spline is interpreted as point.
     case 1:
