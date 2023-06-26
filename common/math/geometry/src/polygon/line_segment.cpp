@@ -84,11 +84,23 @@ geometry_msgs::msg::Pose LineSegment::getPose(const double s, const bool autosca
     }());
 }
 
+/**
+ * @brief Checking the intersection with 1 line segment and 1 point in 2D (x,y) coordinate. Ignore z axis.
+ * @param point point you want to check intersection.
+ * @return true Intersection detected.
+ * @return false Intersection does not detected.
+ */
 bool LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const
 {
   return getIntersection2DSValue(point, true) ? true : false;
 }
 
+/**
+ * @brief Checking the intersection with 2 line segments in 2D (x,y) coordinate. Ignore z axis.
+ * @param l0 line segments you want to check intersection.
+ * @return true Intersection detected.
+ * @return false Intersection does not detected.
+ */
 bool LineSegment::isIntersect2D(const LineSegment & l0) const
 {
   double s, t;

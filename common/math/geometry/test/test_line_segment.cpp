@@ -97,7 +97,7 @@ TEST(LineSegment, isIntersect2D)
      * y
      * ^
      * |
-     * + (x,y,z) = (0,1,0) => control point for spline, start point of line segment.
+     * + (x,y,z) = (0,1,0)
      * $
      * $
      * $
@@ -105,7 +105,7 @@ TEST(LineSegment, isIntersect2D)
      * $
      * $
      * $
-     * +
+     * + (x,y,z) = (0,-1,0)
      * 
      * -----------------------------------------------------------
      * $$$$$$$$$$$$$ Line segment
@@ -113,18 +113,19 @@ TEST(LineSegment, isIntersect2D)
     math::geometry::LineSegment line(
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0));
+    /// @note check intersection with point (0,0,0)
     EXPECT_TRUE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
+    /// @note check intersection with point (0,0,1)
     EXPECT_TRUE(
-      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
-    EXPECT_TRUE(
-      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
-    EXPECT_TRUE(
-      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
+      line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(-1)));
+    /// @note check intersection with point (0,1,0)
     EXPECT_TRUE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0)));
+    /// @note check intersection with point (0,2,0)
     EXPECT_FALSE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(2).z(0)));
+    /// @note check intersection with point (0,-2,0)
     EXPECT_FALSE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-2).z(0)));
   }
