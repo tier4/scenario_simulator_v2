@@ -47,12 +47,12 @@ LineSegment::~LineSegment() {}
 
 geometry_msgs::msg::Point LineSegment::getPoint(const double s, const bool autoscale) const
 {
-  const auto s_normalized = autoscale ? s / getLength() : s;
+  const double s_normalized = autoscale ? s / getLength() : s;
   if (0 <= s_normalized && s_normalized <= 1) {
     return geometry_msgs::build<geometry_msgs::msg::Point>()
-      .x(start_point.x + (end_point.x - start_point.x) * s)
-      .y(start_point.y + (end_point.y - start_point.y) * s)
-      .z(start_point.z + (end_point.z - start_point.z) * s);
+      .x(start_point.x + (end_point.x - start_point.x) * s_normalized)
+      .y(start_point.y + (end_point.y - start_point.y) * s_normalized)
+      .z(start_point.z + (end_point.z - start_point.z) * s_normalized);
   }
   if (autoscale) {
     THROW_SIMULATION_ERROR(
