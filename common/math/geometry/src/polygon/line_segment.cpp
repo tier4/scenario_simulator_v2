@@ -214,6 +214,13 @@ double LineSegment::getSlope() const
   return (end_point.y - start_point.y) / (end_point.x - start_point.x);
 }
 
+/**
+ * @brief Get squared distance (euclidean distance) between specified 3D point and specified 3D point on line segment in 2D. (x,y)
+ * @param point Specified 3D point
+ * @param S value of specified 3D point in coordinate along line segment.
+ * @param autoscale If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
+ * @return double 
+ */
 double LineSegment::getSquaredDistanceIn2D(
   const geometry_msgs::msg::Point & point, const double s, const bool autoscale) const
 {
@@ -221,6 +228,13 @@ double LineSegment::getSquaredDistanceIn2D(
   return std::pow(point.x - point_on_line.x, 2) + std::pow(point.y - point_on_line.y, 2);
 }
 
+/**
+ * @brief Get 3D vector from specified 3D point to specified 3D point on line segment.
+ * @param point Specified 3D point
+ * @param s S value of specified 3D point in coordinate along line segment.
+ * @param autoscale If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
+ * @return geometry_msgs::msg::Vector3 
+ */
 geometry_msgs::msg::Vector3 LineSegment::getSquaredDistanceVector(
   const geometry_msgs::msg::Point & point, const double s, const bool autoscale) const
 {
