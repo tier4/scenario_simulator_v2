@@ -16,12 +16,28 @@
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
 
 TEST(LineSegmentTest, GetPoint)
 {
   {
+    /**
+     * @note
+     * y
+     * ^
+     * |    + P1 = (1,1,1)
+     * |   $
+     * |  $
+     * | $
+     * |$
+     * +-------> x
+     * P0 = (0,0,0)
+     * 
+     * -----------------------------------------------------------
+     * $$$$$$$$$ Line segment (start point is P0, end point is P1)
+     */
     math::geometry::LineSegment line(
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
@@ -31,10 +47,45 @@ TEST(LineSegmentTest, GetPoint)
     /// @note if s = 1, and autoscale = false, the value should be end point.
     EXPECT_POINT_EQ(
       line.getPoint(1, false), geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
-    /// @note if s = std::sart(3), and autoscale = true, the value should be end point.
+    /// @note if s is not in range s = [0,1], getPoint function should be throw error.
+    EXPECT_THROW(line.getPoint(2, false), common::SimulationError);
+    EXPECT_THROW(line.getPoint(2, true), common::SimulationError);
+    EXPECT_THROW(line.getPoint(-1, false), common::SimulationError);
+    EXPECT_THROW(line.getPoint(-1, true), common::SimulationError);
+    /// @note if s = std::hypot((0,0,0), (1,1,1)), and autoscale = true, the value should be end point.
     EXPECT_POINT_EQ(
       line.getPoint(std::sqrt(3), true),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
+  }
+}
+
+TEST(LineSegment, GetPose)
+{
+  {
+    /**
+     * @note
+     * z
+     * ^
+     * + (0,0,1)
+     * $
+     * $
+     * $
+     * $
+     * +-------> x
+     * P0 = (0,0,0)
+     * 
+     * -----------------------------------------------------------
+     * $$$$$$$$$ Line segment (start point is P0, end point is P1)
+     */
+    math::geometry::LineSegment line(
+      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0),
+      geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1));
+    /// @note if s = 0, the value should be start point.
+    EXPECT_POSE_EQ(
+      line.getPose(0, false),
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
+        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
   }
 }
 
