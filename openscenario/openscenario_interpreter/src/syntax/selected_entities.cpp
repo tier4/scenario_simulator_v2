@@ -51,14 +51,10 @@ auto SelectedByTypes::objects(const Entities & entities) -> std::list<String>
   auto selected_entities = std::list<String>();
   auto object_types = objectTypes(entities);
   for (const auto & [name, object] : entities.entities) {
-    if (object.is<ScenarioObject>()) {
-      if (object_types.count(object.as<ScenarioObject>().objectType())) {
-        selected_entities.emplace_back(name);
-      } else {
-        // do nothing if not found
-      }
-    } else {
-      // do nothing for EntitySelection
+    if (
+      object.is<ScenarioObject>() and
+      object_types.count(object.as<ScenarioObject>().objectType())) {
+      selected_entities.emplace_back(name);
     }
   }
   return selected_entities;
