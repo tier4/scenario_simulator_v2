@@ -289,9 +289,6 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
       " This message is not originally intended to be displayed, if you see it, please contact the "
       "developer of traffic_simulator.");
   }
-
-  /// @note Define a set of lambda functions to be used depending on the number of control points.
-
   /// @note If the spline has three or more control points.
   const auto get_collision_point_2d_with_curve =
     [this](const auto & polygon, const auto search_backward) -> std::optional<double> {
