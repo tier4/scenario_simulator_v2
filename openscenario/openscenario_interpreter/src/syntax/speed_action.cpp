@@ -56,28 +56,27 @@ auto SpeedAction::accomplished() -> bool
 
   auto check = [this](auto && actor) {
     auto objects = global().entities->objects({actor});
-    return std::transform_reduce(
-      std::begin(objects), std::end(objects), true, std::logical_and(), [&](const auto & object) {
-        if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-          return equal_to<double>()(
-            speed_action_target.as<AbsoluteTargetSpeed>().value, evaluateSpeed(object));
-        } else {
-          switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
-            case SpeedTargetValueType::delta:
-              return equal_to<double>()(
-                evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
-                  speed_action_target.as<RelativeTargetSpeed>().value,
-                evaluateSpeed(object));
-            case SpeedTargetValueType::factor:
-              return equal_to<double>()(
-                evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
-                  speed_action_target.as<RelativeTargetSpeed>().value,
-                evaluateSpeed(object));
-            default:
-              return false;
-          }
+    return std::all_of(std::begin(objects), std::end(objects), [&](const auto & object) {
+      if (speed_action_target.is<AbsoluteTargetSpeed>()) {
+        return equal_to<double>()(
+          speed_action_target.as<AbsoluteTargetSpeed>().value, evaluateSpeed(object));
+      } else {
+        switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
+          case SpeedTargetValueType::delta:
+            return equal_to<double>()(
+              evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
+                speed_action_target.as<RelativeTargetSpeed>().value,
+              evaluateSpeed(object));
+          case SpeedTargetValueType::factor:
+            return equal_to<double>()(
+              evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
+                speed_action_target.as<RelativeTargetSpeed>().value,
+              evaluateSpeed(object));
+          default:
+            return false;
         }
-      });
+      }
+    });
   };
 
   if (endsImmediately()) {

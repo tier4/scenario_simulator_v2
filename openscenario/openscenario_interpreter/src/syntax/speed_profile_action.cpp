@@ -119,15 +119,14 @@ auto SpeedProfileAction::run() -> void
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
       auto objects = global().entities->objects({actor});
-      return std::transform_reduce(
-        std::begin(objects), std::end(objects), true, std::logical_and(), [&](const auto & object) {
-          if (entity_ref.empty()) {
-            return equal_to<double>()(evaluateSpeed(object), speed_profile_entry.speed);
-          } else {
-            return equal_to<double>()(
-              evaluateSpeed(object), speed_profile_entry.speed + evaluateSpeed(entity_ref));
-          }
-        });
+      return std::all_of(std::begin(objects), std::end(objects), [&](const auto & object) {
+        if (entity_ref.empty()) {
+          return equal_to<double>()(evaluateSpeed(object), speed_profile_entry.speed);
+        } else {
+          return equal_to<double>()(
+            evaluateSpeed(object), speed_profile_entry.speed + evaluateSpeed(entity_ref));
+        }
+      });
     };
 
     if (

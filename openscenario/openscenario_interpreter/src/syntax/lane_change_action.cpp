@@ -49,9 +49,9 @@ auto LaneChangeAction::accomplished() -> bool
     std::begin(accomplishments), std::end(accomplishments), [&](auto & accomplishment) {
       const auto is_lane_changing = [&](const auto & actor) {
         auto objects = global().entities->objects({actor});
-        return std::transform_reduce(
-          std::begin(objects), std::end(objects), true, std::logical_and(),
-          [](const auto & object) { return evaluateCurrentState(object) == "lane_change"; });
+        return std::all_of(std::begin(objects), std::end(objects), [](const auto & object) {
+          return evaluateCurrentState(object) == "lane_change";
+        });
       };
       return accomplishment.second or
              (accomplishment.second = not is_lane_changing(accomplishment.first));
