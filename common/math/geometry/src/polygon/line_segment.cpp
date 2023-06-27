@@ -18,6 +18,7 @@
 #include <geometry/polygon/line_segment.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <iostream>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -185,9 +186,18 @@ std::optional<double> LineSegment::getIntersection2DSValue(
     }
     const auto det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
                      (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
-    return 1 - ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
-                (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
-                 det;
+    const auto s =
+      1 - ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
+           (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
+            det;
+    if (std::isnan(s)) {
+      THROW_SIMULATION_ERROR(
+        "One line segment is on top of the other. So determinant is zero.",
+        "If this message was displayed, something completely unexpected happens.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    }
+    return s;
   };
   return autoscale ? denormalize(get_s_normalized(line)) : get_s_normalized(line);
 }
@@ -200,7 +210,7 @@ std::optional<double> LineSegment::getIntersection2DSValue(
 std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
   const LineSegment & line) const
 {
-  const auto s = getIntersection2DSValue(line, true);
+  const auto s = getIntersection2DSValue(line, false);
   return s ? geometry_msgs::build<geometry_msgs::msg::Point>()
                .x(s.value() * start_point.x + (1.0 - s.value()) * end_point.x)
                .y(s.value() * start_point.y + (1.0 - s.value()) * end_point.y)

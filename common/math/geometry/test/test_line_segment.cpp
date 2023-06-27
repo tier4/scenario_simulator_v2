@@ -180,6 +180,18 @@ TEST(LineSegment, getIntersection2DSValue)
         geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0), false);
       EXPECT_FALSE(s);
     }
+    {
+      EXPECT_THROW(
+        line.getIntersection2D(math::geometry::LineSegment(
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0))),
+        common::SimulationError);
+    }
+    {
+      EXPECT_TRUE(line.getIntersection2D(math::geometry::LineSegment(
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0),
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(0).z(0))));
+    }
   }
 }
 
