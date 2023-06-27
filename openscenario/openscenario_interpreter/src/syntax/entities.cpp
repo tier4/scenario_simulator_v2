@@ -44,8 +44,8 @@ auto Entities::isAdded(const String & entity_ref) const -> bool
       return entity.as<ScenarioObject>().is_added;
     } else {
       THROW_ERROR(
-        common::Error, "Unsupported entity type ",
-        std::quoted(makeTypename(entity->type().name())), " is detected");
+        common::Error, "Unsupported entity type ", std::quoted(makeTypename(entity->type().name())),
+        " is detected");
     }
   });
 }
