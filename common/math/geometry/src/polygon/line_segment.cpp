@@ -255,7 +255,7 @@ double LineSegment::getSlope() const
 }
 
 /**
- * @brief Get squared distance (euclidean distance) between specified 3D point and specified 3D point on line segment in 2D. (x,y)
+ * @brief Get squared distance (Square of euclidean distance) between specified 3D point and specified 3D point on line segment in 2D. (x,y)
  * @param point Specified 3D point
  * @param S value of specified 3D point in coordinate along line segment.
  * @param autoscale If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
