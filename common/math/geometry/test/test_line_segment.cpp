@@ -181,12 +181,39 @@ TEST(LineSegment, getIntersection2DSValue)
       EXPECT_FALSE(s);
     }
     {
+      /// @note Checking intersection for 2 same line segment.
       EXPECT_THROW(
         line.getIntersection2D(math::geometry::LineSegment(
           geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
           geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0))),
         common::SimulationError);
     }
+    {
+      /// @note Checking intersection for 1 line segment and part of it.
+      EXPECT_THROW(
+        line.getIntersection2D(math::geometry::LineSegment(
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))),
+        common::SimulationError);
+    }
+    /**
+     * @note
+     *           y
+     *           ^
+     *           |
+     *           + (x,y,z) = (0,1,0)
+     *           $
+     *           $
+     *           $       (x,y,z) = (1,0,0)
+     * --+=======+=======+------------> x
+     *   (x,y,z) = (-1,0,0)
+     *           $
+     *           $
+     *           + (x,y,z) = (0,-1,0)
+     * 
+     * -----------------------------------------------------------
+     * $$$$$$$$$$$$$ Line segment
+     */
     {
       EXPECT_TRUE(line.getIntersection2D(math::geometry::LineSegment(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0),
