@@ -32,6 +32,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/behavior/longitudinal_speed_planning.cpp
   src/color_utils/color_utils.cpp
   src/data_type/behavior.cpp
+  src/data_type/follow_trajectory.cpp
   src/data_type/lane_change.cpp
   src/data_type/speed_change.cpp
   src/entity/ego_entity.cpp
