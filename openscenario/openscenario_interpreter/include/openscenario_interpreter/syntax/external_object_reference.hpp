@@ -34,7 +34,7 @@ struct ExternalObjectReference
 {
   const String name;
 
-  ExternalObjectReference(const pugi::xml_node & node, Scope & scope);
+  explicit ExternalObjectReference(const pugi::xml_node & node, Scope & scope);
 };
 
 }  // namespace syntax
