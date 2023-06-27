@@ -61,10 +61,7 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
      * 
      * -----------------------------------------------------------
      * ============= Spline Curve (Control point is P0, P1)
-     * 
-     * $ Line segment for checking collision.  
-     * $
-     * $
+     * $$$$$$$$$$$$$ Line segment for checking collision.  
      *
      * s value is based on lane coordinate in spline curve, so it should be 0.0
      */
