@@ -17,22 +17,69 @@
 
 #include <iomanip>
 #include <iostream>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
 inline namespace utility
 {
-template <typename SequenceContainer>
-auto & print_to(std::ostream & os, const SequenceContainer & sequence_container)
+namespace detail
 {
-  const auto * separator = "[";
+template <typename T, typename Enabler = void>
+struct has_ostream_operator : std::false_type
+{
+};
+template <typename T>
+struct has_ostream_operator<
+  T, std::void_t<decltype(std::declval<std::ostream &>() << std::declval<T &>())>> : std::true_type
+{
+};
 
-  for (const auto & each : sequence_container) {
-    os << separator << each;
-    separator = ", ";
+template <typename T, typename Enabler = void>
+struct is_iterable : std::false_type
+{
+};
+template <typename T>
+struct is_iterable<
+  T, std::void_t<decltype(std::begin(std::declval<T>())), decltype(std::end(std::declval<T>()))>>
+: std::true_type
+{
+};
+
+template <typename T, typename Enabler = void>
+struct printer
+{
+  static auto print_to(std::ostream & os, const T & value) -> std::ostream & = delete;
+};
+
+template <typename T>
+struct printer<T, std::enable_if_t<has_ostream_operator<T>::value>>
+{
+  static auto print_to(std::ostream & os, const T & value) -> std::ostream &
+  {
+    return os << value;
+  };
+};
+
+template <typename T>
+struct printer<T, std::enable_if_t<not has_ostream_operator<T>::value and is_iterable<T>::value>>
+{
+  static auto print_to(std::ostream & os, const T & iterable) -> std::ostream &
+  {
+    const auto * separator = "[";
+    for (const auto & value : iterable) {
+      os << std::exchange(separator, ",");
+      printer<decltype(value)>::print_to(os, value);
+    }
+    return os << "]";
   }
+};
+}  // namespace detail
 
-  return os << "]";
+template <typename T>
+auto print_to(std::ostream & os, const T & value) -> std::ostream &
+{
+  return detail::printer<T>::print_to(os, value);
 }
 
 inline auto print_keys_to = [](auto & os, const auto & xs) -> decltype(auto) {
