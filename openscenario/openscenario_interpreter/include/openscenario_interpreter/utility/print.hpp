@@ -66,7 +66,8 @@ struct printer<T, std::enable_if_t<not has_ostream_operator<T>::value and is_ite
 {
   static auto print_to(std::ostream & os, const T & iterable) -> std::ostream &
   {
-    const auto * separator = "[";
+    os << "[";
+    const auto * separator = "";
     for (const auto & value : iterable) {
       os << std::exchange(separator, ",");
       printer<decltype(value)>::print_to(os, value);
