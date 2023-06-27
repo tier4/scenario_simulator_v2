@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/entity_selection.hpp>
+#include <openscenario_interpreter/syntax/external_object_reference.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
@@ -141,7 +142,8 @@ auto Scope::entities(bool allow_entity_selecition, bool allow_misc_external)
   for (const auto & [entity, object] : scenario_definition->entities->entities) {
     if (
       (allow_entity_selecition or not object.is<EntitySelection>()) and
-      (allow_misc_external or not object.is<MiscObject>())) {
+      (allow_misc_external or
+       not(object.is<MiscObject>() or object.is<ExternalObjectReference>()))) {
       entity_list.push_back(entity);
     }
   }
