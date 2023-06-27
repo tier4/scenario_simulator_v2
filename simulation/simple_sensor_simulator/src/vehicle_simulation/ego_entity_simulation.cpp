@@ -207,7 +207,7 @@ void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_s
           "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
 
-    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+    vehicle_model_ptr_->setGear(autoware->getGearCommand().gear_shift.data);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
   }

@@ -18,13 +18,13 @@
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/utility/publisher_wrapper.hpp>
 #include <concealer/utility/subscriber_wrapper.hpp>
+#include <tier4_external_api_msgs/msg/turn_signal_stamped.hpp>
+#include <tier4_external_api_msgs/msg/control_command_stamped.hpp>
+#include <tier4_external_api_msgs/msg/gear_shift_stamped.hpp>
+#include <tier4_external_api_msgs/msg/vehicle_status_stamped.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 
@@ -38,17 +38,15 @@ class AutowareUniverse : public Autoware
 {
   // clang-format off
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand, ThreadSafety::safe> getAckermannControlCommand;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
+  // SubscriberWrapper<tier4_external_api_msgs::msg::ControlCommandStamped, ThreadSafety::safe> getControlCommand;
+  SubscriberWrapper<tier4_external_api_msgs::msg::GearShiftStamped,             ThreadSafety::safe> getGearCommandImpl;
+  SubscriberWrapper<tier4_external_api_msgs::msg::TurnSignalStamped,   ThreadSafety::safe> getTurnIndicatorsCommand;
   SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
 
   PublisherWrapper<geometry_msgs::msg::AccelWithCovarianceStamped>        setAcceleration;
   PublisherWrapper<nav_msgs::msg::Odometry>                               setOdometry;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::SteeringReport>       setSteeringReport;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::GearReport>           setGearReport;
+  PublisherWrapper<tier4_external_api_msgs::msg::VehicleStatusStamped>    setVehicleStatus;
   PublisherWrapper<autoware_auto_vehicle_msgs::msg::ControlModeReport>    setControlModeReport;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::VelocityReport>       setVelocityReport;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport> setTurnIndicatorsReport;
   // clang-format on
 
   const rclcpp::TimerBase::SharedPtr localization_update_timer;
@@ -82,13 +80,14 @@ public:
 
   auto updateVehicleState() -> void;
 
-  auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand override;
+  auto getGearCommand() const -> tier4_external_api_msgs::msg::GearShiftStamped override;
 
   auto getGearSign() const -> double override;
 
   auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> override;
+    tier4_external_api_msgs::msg::GearShiftStamped> override;
+
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 };

@@ -141,12 +141,12 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
 }
 
 auto FieldOperatorApplication::getTurnIndicatorsCommand() const
-  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
+  -> tier4_external_api_msgs::msg::TurnSignalStamped
 {
   static auto turn_indicators_command = []() {
-    autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
-    turn_indicators_command.command =
-      autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
+    tier4_external_api_msgs::msg::TurnSignalStamped turn_indicators_command;
+    turn_indicators_command.turn_signal.data =
+      tier4_external_api_msgs::msg::TurnSignal::NONE;
     return turn_indicators_command;
   }();
   turn_indicators_command.stamp = now();
@@ -156,26 +156,26 @@ auto FieldOperatorApplication::getTurnIndicatorsCommand() const
 auto FieldOperatorApplication::rethrow() const -> void { task_queue.rethrow(); }
 }  // namespace concealer
 
-namespace autoware_auto_vehicle_msgs::msg
+namespace tier4_external_api_msgs::msg
 {
 auto operator<<(
-  std::ostream & out, const autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+  std::ostream & out, const TurnSignalStamped & message)
   -> std::ostream &
 {
 #define CASE(IDENTIFIER)                                                   \
-  case autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER: \
+  case TurnSignal::IDENTIFIER: \
     out << #IDENTIFIER;                                                    \
     break
 
-  switch (message.command) {
-    CASE(DISABLE);
-    CASE(ENABLE_LEFT);
-    CASE(ENABLE_RIGHT);
-    CASE(NO_COMMAND);
+  switch (message.turn_signal.data) {
+    CASE(NONE);
+    CASE(LEFT);
+    CASE(RIGHT);
+    CASE(HAZARD);
 
     default:
       throw common::Error(
-        "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.command));
+        "Unsupported TurnIndicatorsCommand, state number : ", static_cast<int>(message.turn_signal.data));
   }
 
 #undef CASE
@@ -183,30 +183,30 @@ auto operator<<(
   return out;
 }
 
-auto operator>>(std::istream & is, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand & message)
+auto operator>>(std::istream & is, TurnSignalStamped & message)
   -> std::istream &
 {
 #define STATE(IDENTIFIER) \
-  {#IDENTIFIER, autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER}
+  {#IDENTIFIER, TurnSignal::IDENTIFIER}
 
   std::unordered_map<std::string, std::uint8_t> state_dictionary{
-    STATE(DISABLE),
-    STATE(ENABLE_LEFT),
-    STATE(ENABLE_RIGHT),
-    STATE(NO_COMMAND),
+    STATE(NONE),
+    STATE(LEFT),
+    STATE(RIGHT),
+    STATE(HAZARD),
   };
 
 #undef STATE
 
-  std::string command_string;
-  is >> command_string;
+  std::string data_string;
+  is >> data_string;
 
-  if (auto iter = state_dictionary.find(command_string); iter != state_dictionary.end()) {
-    message.set__command(iter->second);
+  if (auto iter = state_dictionary.find(data_string); iter != state_dictionary.end()) {
+    message.turn_signal.set__data(iter->second);
   } else {
-    throw common::Error("Unsupported TurnIndicatorsCommand::command : ", command_string.c_str());
+    throw common::Error("Unsupported TurnSignal::data : ", data_string.c_str());
   }
 
   return is;
 }
-}  // namespace autoware_auto_vehicle_msgs::msg
+}  // namespace tier4_external_api_msgs::msg
