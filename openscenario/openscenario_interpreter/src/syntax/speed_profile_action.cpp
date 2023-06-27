@@ -145,9 +145,7 @@ auto SpeedProfileAction::start() -> void
 
   for (const auto & actor : actors) {
     accomplishments.emplace(actor, std::begin(speed_profile_entry));
-    for (const auto & object : global().entities->objects({actor})) {
-      apply(object, *accomplishments[actor]);
-    }
+    apply(actor, *accomplishments[actor]);
   }
 }
 }  // namespace syntax
