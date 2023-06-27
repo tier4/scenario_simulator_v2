@@ -46,7 +46,7 @@ struct ApplyFaultInjectionAction : public CustomCommand
   {
     static auto publisher =
       node().template create_publisher<tier4_simulation_msgs::msg::SimulationEvents>(
-        "events", rclcpp::QoS(1).reliable());
+        "events", rclcpp::QoS(rclcpp::KeepLast(10)).reliable());
     return *publisher;
   }
 
