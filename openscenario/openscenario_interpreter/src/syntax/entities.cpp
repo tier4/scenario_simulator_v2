@@ -38,7 +38,16 @@ Entities::Entities(const pugi::xml_node & node, Scope & scope)
 
 auto Entities::isAdded(const String & entity_ref) const -> bool
 {
-  return ref(entity_ref).template as<ScenarioObject>().is_added;
+  auto object_list = objects({entity_ref});
+  return std::all_of(std::begin(object_list), std::end(object_list), [&](const String & object) {
+    if (auto entity = ref(object); entity.is<ScenarioObject>()) {
+      return entity.as<ScenarioObject>().is_added;
+    } else {
+      THROW_ERROR(
+        common::Error, "Unsupported entity type ",
+        std::quoted(makeTypename(entity->type().name())), " is detected");
+    }
+  });
 }
 
 auto Entities::ref(const String & entity_ref) const -> Object
