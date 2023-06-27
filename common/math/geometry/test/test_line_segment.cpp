@@ -56,6 +56,7 @@ TEST(LineSegmentTest, GetPoint)
     EXPECT_POINT_EQ(
       line.getPoint(std::sqrt(3), true),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
+    EXPECT_DOUBLE_EQ(line.getLength(), std::sqrt(3));
   }
 }
 

@@ -16,6 +16,8 @@
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <geometry/vector3/hypot.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -206,14 +208,7 @@ std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
            : std::optional<geometry_msgs::msg::Point>();
 }
 
-geometry_msgs::msg::Vector3 LineSegment::getVector() const
-{
-  geometry_msgs::msg::Vector3 vec;
-  vec.x = end_point.x - start_point.x;
-  vec.y = end_point.y - start_point.y;
-  vec.z = end_point.z - start_point.z;
-  return vec;
-}
+geometry_msgs::msg::Vector3 LineSegment::getVector() const { return end_point - start_point; }
 
 /**
  * @brief Get normal vector of the line segment.
@@ -223,19 +218,18 @@ geometry_msgs::msg::Vector3 LineSegment::getNormalVector() const
 {
   geometry_msgs::msg::Vector3 tangent_vec = getVector();
   double theta = M_PI / 2.0;
-  geometry_msgs::msg::Vector3 vec;
-  vec.x = tangent_vec.x * std::cos(theta) - tangent_vec.y * std::sin(theta);
-  vec.y = tangent_vec.x * std::sin(theta) + tangent_vec.y * std::cos(theta);
-  return vec;
+  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+    .x(tangent_vec.x * std::cos(theta) - tangent_vec.y * std::sin(theta))
+    .y(tangent_vec.x * std::sin(theta) + tangent_vec.y * std::cos(theta))
+    .z(0);
 }
 
 geometry_msgs::msg::Vector3 LineSegment::get2DVector() const
 {
-  geometry_msgs::msg::Vector3 vec;
-  vec.x = end_point.x - start_point.x;
-  vec.y = end_point.y - start_point.y;
-  vec.z = 0;
-  return vec;
+  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+    .x(end_point.x - start_point.x)
+    .y(end_point.y - start_point.y)
+    .z(0);
 }
 
 double LineSegment::get2DLength() const
@@ -243,11 +237,7 @@ double LineSegment::get2DLength() const
   return std::hypot(end_point.x - start_point.x, end_point.y - start_point.y);
 }
 
-double LineSegment::getLength() const
-{
-  return std::hypot(
-    end_point.x - start_point.x, end_point.y - start_point.y, end_point.z - start_point.z);
-}
+double LineSegment::getLength() const { return hypot(end_point, start_point); }
 
 double LineSegment::getSlope() const
 {
