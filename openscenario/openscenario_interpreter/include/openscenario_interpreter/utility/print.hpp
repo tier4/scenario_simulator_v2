@@ -23,7 +23,7 @@ namespace openscenario_interpreter
 {
 inline namespace utility
 {
-namespace detail
+namespace internal
 {
 template <typename T, typename Enabler = void>
 struct has_ostream_operator : std::false_type
@@ -45,42 +45,26 @@ struct is_iterable<
 : std::true_type
 {
 };
-
-template <typename T, typename Enabler = void>
-struct printer
-{
-  static auto print_to(std::ostream & os, const T & value) -> std::ostream & = delete;
-};
+}  // namespace internal
 
 template <typename T>
-struct printer<T, std::enable_if_t<has_ostream_operator<T>::value>>
+auto print_to(std::ostream & os, const T & value)
+  -> std::enable_if_t<internal::has_ostream_operator<T>::value, std::ostream &>
 {
-  static auto print_to(std::ostream & os, const T & value) -> std::ostream &
-  {
-    return os << value;
-  };
-};
+  return os << value;
+}
 
 template <typename T>
-struct printer<T, std::enable_if_t<not has_ostream_operator<T>::value and is_iterable<T>::value>>
+auto print_to(std::ostream & os, const T & iterable) -> std::enable_if_t<
+  not internal::has_ostream_operator<T>::value and internal::is_iterable<T>::value, std::ostream &>
 {
-  static auto print_to(std::ostream & os, const T & iterable) -> std::ostream &
-  {
-    os << "[";
-    const auto * separator = "";
-    for (const auto & value : iterable) {
-      os << std::exchange(separator, ",");
-      printer<decltype(value)>::print_to(os, value);
-    }
-    return os << "]";
+  os << "[";
+  const auto * separator = "";
+  for (const auto & value : iterable) {
+    os << std::exchange(separator, ", ");
+    print_to(os, value);
   }
-};
-}  // namespace detail
-
-template <typename T>
-auto print_to(std::ostream & os, const T & value) -> std::ostream &
-{
-  return detail::printer<T>::print_to(os, value);
+  return os << "]";
 }
 
 inline auto print_keys_to = [](auto & os, const auto & xs) -> decltype(auto) {
