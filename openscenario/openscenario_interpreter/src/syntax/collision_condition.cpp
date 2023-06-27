@@ -54,7 +54,10 @@ auto CollisionCondition::evaluate() const -> Object
     another_given_entity.is<EntityRef>() and
     global().entities->isAdded(another_given_entity.as<EntityRef>())) {
     return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-      return evaluateCollisionCondition(triggering_entity, another_given_entity.as<EntityRef>());
+      auto objects = global().entities->objects({triggering_entity});
+      return std::any_of(std::begin(objects), std::end(objects), [&](const auto & object) {
+        return evaluateCollisionCondition(object, another_given_entity.as<EntityRef>());
+      });
     }));
   } else {
     // TODO ByType

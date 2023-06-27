@@ -23,10 +23,11 @@ inline namespace syntax
 {
 SpeedCondition::SpeedCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: value(readAttribute<Double>("value", node, scope)),
+: Scope(scope),
+  value(readAttribute<Double>("value", node, scope)),
   compare(readAttribute<Rule>("rule", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size())
 {
 }
 
@@ -48,8 +49,15 @@ auto SpeedCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(evaluateSpeed(triggering_entity));
-    return compare(results.back(), value);
+    auto objects = global().entities->objects({triggering_entity});
+    auto & speeds = results.emplace_back(objects.size());
+    std::transform(
+      std::begin(objects), std::end(objects), std::begin(speeds),
+      [&](const auto & object) { return evaluateSpeed(object); });
+
+    return not objects.empty() and std::all_of(
+                                     std::begin(speeds), std::end(speeds),
+                                     [&](auto speed) { return compare(speed, value); });
   }));
 }
 }  // namespace syntax

@@ -33,7 +33,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct StandStillCondition : private SimulatorCore::ConditionEvaluation
+struct StandStillCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   const Double duration;
 
@@ -41,7 +41,7 @@ struct StandStillCondition : private SimulatorCore::ConditionEvaluation
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> results;  // for description
+  std::vector<std::vector<Double>> results;  // for description
 
   explicit StandStillCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 

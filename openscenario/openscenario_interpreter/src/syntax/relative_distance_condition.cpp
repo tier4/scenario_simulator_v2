@@ -37,7 +37,7 @@ RelativeDistanceCondition::RelativeDistanceCondition(
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size())
 {
 }
 
@@ -188,8 +188,15 @@ auto RelativeDistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    results.push_back(distance(triggering_entity));
-    return rule(results.back(), value);
+    auto objects = global().entities->objects({triggering_entity});
+    auto & distances = results.emplace_back(objects.size());
+    std::transform(
+      std::begin(objects), std::end(objects), std::begin(distances),
+      [&](const auto & object) { return distance(object); });
+
+    return not objects.empty() and std::all_of(
+                                     std::begin(distances), std::end(distances),
+                                     [&](auto distance) { return rule(distance, value); });
   }));
 }
 }  // namespace syntax

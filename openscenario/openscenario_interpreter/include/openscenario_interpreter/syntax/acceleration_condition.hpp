@@ -34,7 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct AccelerationCondition : private SimulatorCore::ConditionEvaluation
+struct AccelerationCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   const Double value;
 
@@ -42,7 +42,7 @@ struct AccelerationCondition : private SimulatorCore::ConditionEvaluation
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<double> results;  // for description
+  std::vector<std::vector<Double>> results;  // for description
 
   explicit AccelerationCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 

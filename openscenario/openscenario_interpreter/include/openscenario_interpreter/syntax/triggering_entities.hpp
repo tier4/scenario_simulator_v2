@@ -56,10 +56,8 @@ struct TriggeringEntities : private Scope
   template <typename Predicate>
   auto apply(Predicate && predicate) const -> decltype(auto)
   {
-    auto objects =
-      global().entities->objects(std::list<String>(std::begin(entity_refs), std::end(entity_refs)));
     return triggering_entities_rule.apply(
-      std::begin(objects), std::end(objects), std::forward<decltype(predicate)>(predicate));
+      std::begin(entity_refs), std::end(entity_refs), std::forward<decltype(predicate)>(predicate));
   }
 
   auto description() const -> String;

@@ -81,7 +81,7 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> results;  // for description
+  std::vector<std::vector<Double>> results;  // for description
 
   explicit RelativeDistanceCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 

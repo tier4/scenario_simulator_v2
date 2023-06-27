@@ -42,7 +42,7 @@ DistanceCondition::DistanceCondition(
   value(readAttribute<Double>("value", node, scope)),
   position(readElement<Position>("Position", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size())
 {
 }
 
@@ -255,8 +255,15 @@ auto DistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(distance(triggering_entity));
-    return rule(results.back(), value);
+    auto objects = global().entities->objects({triggering_entity});
+    auto & distances = results.emplace_back(objects.size());
+    std::transform(
+      std::begin(objects), std::end(objects), std::begin(distances),
+      [&](const auto & object) { return this->distance(object); });
+
+    return not objects.empty() and std::all_of(
+                                     std::begin(distances), std::end(distances),
+                                     [&](auto distance) { return rule(distance, value); });
   }));
 }
 }  // namespace syntax

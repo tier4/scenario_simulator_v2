@@ -43,7 +43,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TimeHeadwayCondition : private SimulatorCore::ConditionEvaluation
+struct TimeHeadwayCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   const String entity_ref;
 
@@ -57,7 +57,7 @@ struct TimeHeadwayCondition : private SimulatorCore::ConditionEvaluation
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> results;  // for description
+  std::vector<std::vector<Double>> results;  // for description
 
   explicit TimeHeadwayCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 

@@ -23,13 +23,14 @@ inline namespace syntax
 {
 TimeHeadwayCondition::TimeHeadwayCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: entity_ref(readNameRef("entityRef", node, scope, scope.entities())),
+: Scope(scope),
+  entity_ref(readNameRef("entityRef", node, scope, scope.entities())),
   value(readAttribute<Double>("value", node, scope)),
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   along_route(readAttribute<Boolean>("alongRoute", node, scope)),
   compare(readAttribute<Rule>("rule", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size())
 {
 }
 
@@ -52,8 +53,15 @@ auto TimeHeadwayCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(evaluateTimeHeadway(triggering_entity, entity_ref));
-    return compare(results.back(), value);
+    auto objects = global().entities->objects({triggering_entity});
+    auto & headways = results.emplace_back(objects.size());
+    std::transform(
+      std::begin(objects), std::end(objects), std::begin(headways),
+      [&](const auto & object) { return evaluateTimeHeadway(object, entity_ref); });
+
+    return std::all_of(std::begin(headways), std::end(headways), [&](auto headway) {
+      return compare(headway, value);
+    });
   }));
 }
 }  // namespace syntax

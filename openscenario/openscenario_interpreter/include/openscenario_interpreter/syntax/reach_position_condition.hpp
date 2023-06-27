@@ -37,7 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ReachPositionCondition : private SimulatorCore::CoordinateSystemConversion
+struct ReachPositionCondition : private Scope, private SimulatorCore::CoordinateSystemConversion
 {
   const Double tolerance;
 
@@ -47,7 +47,7 @@ struct ReachPositionCondition : private SimulatorCore::CoordinateSystemConversio
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> results;  // for description
+  std::vector<std::vector<Double>> results;  // for description
 
   explicit ReachPositionCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
