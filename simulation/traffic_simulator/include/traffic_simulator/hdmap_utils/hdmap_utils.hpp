@@ -175,6 +175,7 @@ public:
     const std::vector<std::int64_t> & lanelet_ids, const char subtype[]) const;
   std::vector<geometry_msgs::msg::Point> getLaneletPolygon(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getStopLinePolygon(std::int64_t lanelet_id) const;
+  std::vector<int64_t> getStopLineIdsOnPath(const std::vector<std::int64_t> & route_lanelets) const;
   std::vector<std::int64_t> getTrafficLightIds() const;
   std::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     std::int64_t traffic_light_id, const std::string &) const;
