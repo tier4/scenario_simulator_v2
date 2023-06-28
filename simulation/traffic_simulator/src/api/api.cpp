@@ -427,7 +427,10 @@ void API::requestLaneChange(
 
 void API::requestSpeedChange(const std::string & name, double target_speed, bool continuous)
 {
-  assert(entity_manager_ptr_);
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(__FILE__, __LINE__, "Entity manager is not initialized");
+  }
+
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
   if (entity_manager_ptr_->isEgo(name) and not isNpcLogicStarted()) {
     ego_entity_simulation_->requestSpeedChange(target_speed);
@@ -438,7 +441,10 @@ void API::requestSpeedChange(
   const std::string & name, const double target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
 {
-  assert(entity_manager_ptr_);
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(__FILE__, __LINE__, "Entity manager is not initialized");
+  }
+
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
   if (entity_manager_ptr_->isEgo(name) and not isNpcLogicStarted()) {
     ego_entity_simulation_->requestSpeedChange(target_speed);
@@ -448,7 +454,10 @@ void API::requestSpeedChange(
 void API::requestSpeedChange(
   const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
-  assert(entity_manager_ptr_);
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(__FILE__, __LINE__, "Entity manager is not initialized");
+  }
+
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
 }
 
@@ -457,7 +466,10 @@ void API::requestSpeedChange(
   const speed_change::Transition transition, const speed_change::Constraint constraint,
   const bool continuous)
 {
-  assert(entity_manager_ptr_);
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(__FILE__, __LINE__, "Entity manager is not initialized");
+  }
+
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
 }
 
