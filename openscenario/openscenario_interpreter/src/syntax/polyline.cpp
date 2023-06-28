@@ -20,7 +20,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Polyline::Polyline(const pugi::xml_node & node, Scope & scope)
-: vertex(readElements<Vertex, 2>("Vertex", node, scope))
+: vertices(readElements<Vertex, 2>("Vertex", node, scope))
 {
 }
 }  // namespace syntax

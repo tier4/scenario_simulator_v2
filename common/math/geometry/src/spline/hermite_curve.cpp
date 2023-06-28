@@ -20,6 +20,7 @@
 #include <limits>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <vector>
 
 namespace math
@@ -101,7 +102,7 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
     const auto p1 = polygon[i + 1];
     auto s = getCollisionPointIn2D(p0, p1, search_backward);
     if (s) {
-      s_values.emplace_back(s.value());
+      s_values.push_back(s.value());
     }
   }
   if (close_start_end) {
@@ -109,7 +110,7 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
     const auto p1 = polygon[0];
     auto s = getCollisionPointIn2D(p0, p1, search_backward);
     if (s) {
-      s_values.emplace_back(s.value());
+      s_values.push_back(s.value());
     }
   }
   if (s_values.empty()) {
@@ -134,24 +135,42 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
   double b = by_ * ex - bx_ * ey;
   double c = cy_ * ex - cx_ * ey;
   double d = dy_ * ex - dx_ * ey - ex * fy + ey * fx;
-  auto solutions = solver_.solveCubicEquation(a, b, c, d);
-  for (const auto solution : solutions) {
+
+  const auto get_solutions = [search_backward, a, b, c, d, this]() -> std::vector<double> {
+    try {
+      /**
+       * @note Obtain a solution to the cubic equation ax^3 + bx^2 + cx + d = 0 that falls within the range [0, 1].
+       */
+      return solver_.solveCubicEquation(a, b, c, d, 0, 1);
+    }
+    /**
+     * @note PolynomialSolver::solveCubicEquation throws common::SimulationError when any x value can satisfy the equation, 
+     * so the beginning and end point of this curve can collide with the line segment.
+     * If search_backward = true, the line segment collisions at the end of the curve. So return 1.
+     * If search_backward = false, the line segment collisions at the start of the curve. So return 0.
+     */
+    catch (const common::SimulationError &) {
+      return {search_backward ? 1.0 : 0.0};
+    }
+  };
+
+  for (const auto solution : get_solutions()) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
-    double x = solver_.cubicFunction(ax_, bx_, cx_, dx_, solution);
+    double x = solver_.cubic(ax_, bx_, cx_, dx_, solution);
     double tx = (x - point0.x) / (point1.x - point0.x);
-    double y = solver_.cubicFunction(ay_, by_, cy_, dy_, solution);
+    double y = solver_.cubic(ay_, by_, cy_, dy_, solution);
     double ty = (y - point0.y) / (point1.y - point0.y);
     if (std::abs(tx - ty) > epsilon || std::isnan(tx) || std::isnan(ty)) {
+      /**
+       * @note If the curve and the line segment to be intersected are parallel to either of the x/y axes, one of the two parameters, 
+       * tx, ty, will be in the range [0, 1] while the other will be out of that range because of division by zero.
+       */
       if ((0 <= tx && tx <= 1) || (0 <= ty && ty <= 1)) {
-        if (0 <= solution && solution <= 1) {
-          s_values.emplace_back(solution);
-        }
+        s_values.push_back(solution);
       }
     } else {
       if ((0 <= tx && tx <= 1) && (0 <= ty && ty <= 1)) {
-        if (0 <= solution && solution <= 1) {
-          s_values.emplace_back(solution);
-        }
+        s_values.push_back(solution);
       }
     }
   }

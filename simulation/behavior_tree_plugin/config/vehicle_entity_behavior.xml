@@ -2,6 +2,9 @@
     <BehaviorTree>
     <Fallback name="root">
         <LaneChange name="lane_change" />
+        <Fallback name="follow_trajectory_sequence">
+          <FollowPolylineTrajectory name="follow_polyline_trajectory" />
+        </Fallback>
         <Fallback name="follow_lane_sequence">
             <FollowLane name="follow_lane" />
             <Fallback name="follow_lane_behavior_selector">
