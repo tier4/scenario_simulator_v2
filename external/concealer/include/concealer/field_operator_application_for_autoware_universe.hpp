@@ -19,7 +19,6 @@
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
-#include <autoware_auto_planning_msgs/msg/trajectory.hpp>
 #include <autoware_auto_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
@@ -34,6 +33,7 @@
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
+#include <tier4_planning_msgs/msg/trajectory.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
@@ -57,7 +57,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                         getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                           getEmergencyState;
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                             getMrmState;
-  SubscriberWrapper<autoware_auto_planning_msgs::msg::Trajectory>                      getTrajectory;
+  SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                              getTrajectory;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
 
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>               requestCooperateCommands;
@@ -118,7 +118,7 @@ public:
                                                                                             cooperate(v); }),
     getEmergencyState("/api/external/get/emergency", *this, [this](const auto & v) { receiveEmergencyState(v); }),
     getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
-    getTrajectory("/planning/scenario_planning/trajectory", *this),
+    getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/operation_mode/change_to_autonomous", *this),
