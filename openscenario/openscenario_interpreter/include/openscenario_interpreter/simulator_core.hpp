@@ -257,7 +257,7 @@ public:
           configuration.set_pos_noise_stddev(controller.properties.template get<Double>("detectedObjectPositionStandardDeviation"));
           configuration.set_probability_of_lost(controller.properties.template get<Double>("detectedObjectMissingProbability"));
           configuration.set_random_seed(controller.properties.template get<UnsignedInteger>("randomSeed"));
-          configuration.set_range(300);
+          configuration.set_range(controller.properties.template get<Double>("detectionSensorRange",300.0));
           configuration.set_update_duration(0.1);
           // clang-format on
           return configuration;
