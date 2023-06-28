@@ -66,8 +66,6 @@ class DetectionSensor : public DetectionSensorBase
 
   std::mt19937 random_engine_;
 
-  std::queue<std::pair<T, double>> queue_objects_;
-
   auto applyPositionNoise(typename T::_objects_type::value_type) ->
     typename T::_objects_type::value_type;
 

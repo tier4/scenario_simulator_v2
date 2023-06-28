@@ -76,13 +76,11 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::apply
 
 unique_identifier_msgs::msg::UUID generateUUIDMsg(const std::string & input)
 {
-  boost::uuids::string_generator generate_uuid;
-
+  static boost::uuids::string_generator generate_uuid;
   const auto uuid = generate_uuid(input);
 
   unique_identifier_msgs::msg::UUID uuid_msg;
   std::copy(uuid.begin(), uuid.end(), uuid_msg.uuid.begin());
-
   return uuid_msg;
 }
 
@@ -202,17 +200,35 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
       }
     }
 
-    queue_objects_.push(std::make_pair(msg, current_time));
-    autoware_auto_perception_msgs::msg::DetectedObjects delayed_objects;
-    if (current_time - queue_objects_.front().second >= configuration_.object_recognition_delay()) {
-      delayed_objects = queue_objects_.front().first;
-      queue_objects_.pop();
+    static std::queue<std::pair<
+      std::pair<
+        autoware_auto_perception_msgs::msg::DetectedObjects,
+        autoware_auto_perception_msgs::msg::TrackedObjects>,
+      double>>
+      queue_objects;
+
+    queue_objects.push(std::make_pair(std::make_pair(msg, ground_truth_msg), current_time));
+
+    static rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
+      ground_truth_publisher = std::dynamic_pointer_cast<
+        rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>>(
+        ground_truth_publisher_base_ptr_);
+    if (not configuration_.enable_ground_truth_delay()) {
+      ground_truth_publisher->publish(ground_truth_msg);
+    }
+
+    autoware_auto_perception_msgs::msg::DetectedObjects delayed_msg;
+    autoware_auto_perception_msgs::msg::TrackedObjects delayed_ground_truth_msg;
+    if (current_time - queue_objects.front().second >= configuration_.object_recognition_delay()) {
+      delayed_msg = queue_objects.front().first.first;
+      delayed_ground_truth_msg = queue_objects.front().first.second;
+      queue_objects.pop();
     }
 
     autoware_auto_perception_msgs::msg::DetectedObjects noised_msg;
-    noised_msg.header = delayed_objects.header;
-    noised_msg.objects.reserve(delayed_objects.objects.size());
-    for (const auto & object : delayed_objects.objects) {
+    noised_msg.header = delayed_msg.header;
+    noised_msg.objects.reserve(delayed_msg.objects.size());
+    for (const auto & object : delayed_msg.objects) {
       if (auto probability_of_lost = std::uniform_real_distribution();
           probability_of_lost(random_engine_) > configuration_.probability_of_lost()) {
         noised_msg.objects.push_back(applyPositionNoise(object));
@@ -222,11 +238,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     publisher_ptr_->publish(noised_msg);
 
     if (configuration_.enable_ground_truth_delay()) {
-      static rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
-        publisher = std::dynamic_pointer_cast<
-          rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>>(
-          ground_truth_publisher_base_ptr_);
-      publisher->publish(ground_truth_msg);
+      ground_truth_publisher->publish(delayed_ground_truth_msg);
     }
   }
 }
