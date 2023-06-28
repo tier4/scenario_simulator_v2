@@ -217,8 +217,7 @@ auto EntityBase::getLaneletPose(double matching_distance) const
   }
 }
 
-auto EntityBase::refillEntityStatusWithLaneletData(
-  traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+auto EntityBase::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void
 {
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
 

@@ -116,8 +116,7 @@ public:
 
   virtual auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> = 0;
 
-  /*   */ auto refillEntityStatusWithLaneletData(
-    traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
+  /*   */ auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
 
   /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
 
