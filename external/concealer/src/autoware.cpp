@@ -24,11 +24,11 @@ Autoware::Autoware()
 {
 }
 
-auto Autoware::getGearCommand() const -> tier4_external_api_msgs::msg::GearShiftStamped
+auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
 {
   static auto gear_command = []() {
-    tier4_external_api_msgs::msg::GearShiftStamped gear_command;
-    gear_command.gear_shift.data = tier4_external_api_msgs::msg::GearShift::DRIVE;
+    autoware_auto_vehicle_msgs::msg::GearCommand gear_command;
+    gear_command.command = autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE;
     return gear_command;
   }();
   gear_command.stamp = now();
@@ -45,12 +45,12 @@ auto Autoware::set(const geometry_msgs::msg::Twist & twist) -> void { current_tw
 auto Autoware::set(const geometry_msgs::msg::Pose & pose) -> void { current_pose.store(pose); }
 
 auto Autoware::getTurnIndicatorsCommand() const
-  -> tier4_external_api_msgs::msg::TurnSignalStamped
+  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   static auto turn_indicators_command = []() {
-    tier4_external_api_msgs::msg::TurnSignalStamped turn_indicators_command;
-    turn_indicators_command.turn_signal.data =
-      tier4_external_api_msgs::msg::TurnSignal::NONE;
+    autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
+    turn_indicators_command.command =
+      autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
     return turn_indicators_command;
   }();
   turn_indicators_command.stamp = now();

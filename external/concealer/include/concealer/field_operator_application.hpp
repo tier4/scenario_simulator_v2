@@ -30,7 +30,6 @@
 #include <concealer/transition_assertion.hpp>
 #include <concealer/utility/autoware_stream.hpp>
 #include <concealer/utility/visibility.hpp>
-#include <tier4_external_api_msgs/msg/turn_signal_stamped.hpp>
 #include <exception>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -144,7 +143,7 @@ public:
   virtual auto restrictTargetSpeed(double) const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-    -> tier4_external_api_msgs::msg::TurnSignalStamped;
+    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto rethrow() const noexcept(false) -> void;
 
@@ -156,11 +155,11 @@ public:
 };
 }  // namespace concealer
 
-namespace tier4_external_api_msgs::msg
+namespace autoware_auto_vehicle_msgs::msg
 {
-auto operator<<(std::ostream &, const TurnSignalStamped &) -> std::ostream &;
+auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
 
-auto operator>>(std::istream &, TurnSignalStamped &) -> std::istream &;
-}  // tier4_external_api_msgs::msg
+auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
+}  // namespace autoware_auto_vehicle_msgs::msg
 
 #endif  // CONCEALER__AUTOWARE_USER_HPP_

@@ -360,7 +360,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getTurnIndicatorsCommand() const
-  -> tier4_external_api_msgs::msg::TurnSignalStamped
+  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   return getTurnIndicatorsCommandImpl();
 }

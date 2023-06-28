@@ -19,14 +19,17 @@ namespace concealer
 AutowareUniverse::AutowareUniverse()
 : getAckermannControlCommand("/control/command/control_cmd", *this),
   // getControlCommand("/api/external/set/command/local/control", *this),
-  getGearCommandImpl("/api/external/set/command/local/shift", *this),
-  getTurnIndicatorsCommand("/api/external/set/command/local/turn_signal", *this),
+  getGearCommandImpl("/control/command/gear_cmd", *this),
+  getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", *this),
   getPathWithLaneId(
     "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this),
   setAcceleration("/localization/acceleration", *this),
   setOdometry("/localization/kinematic_state", *this),
-  setVehicleStatus("/api/external/get/vehicle/status", *this),
+  setSteeringReport("/vehicle/status/steering_status", *this),
+  setGearReport("/vehicle/status/gear_status", *this),
   setControlModeReport("/vehicle/status/control_mode", *this),
+  setVelocityReport("/vehicle/status/velocity_status", *this),
+  setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
   // Autoware.Universe requires localization topics to send data at 50Hz
   localization_update_timer(rclcpp::create_timer(
     this, get_clock(), std::chrono::milliseconds(20), [this]() { updateLocalization(); })),
@@ -113,35 +116,56 @@ auto AutowareUniverse::updateVehicleState() -> void
     return message;
   }());
 
-  setVehicleStatus([this]() {
-    tier4_external_api_msgs::msg::VehicleStatusStamped message;
+  setGearReport([this]() {
+    autoware_auto_vehicle_msgs::msg::GearReport message;
     message.stamp = get_clock()->now();
+    message.report = getGearCommand().command;
+    return message;
+  }());
+
+  setSteeringReport([this]() {
+    autoware_auto_vehicle_msgs::msg::SteeringReport message;
+    message.stamp = get_clock()->now();
+    message.steering_tire_angle = getSteeringAngle();
+    return message;
+  }());
+
+  setVelocityReport([this]() {
     const auto twist = current_twist.load();
-    message.status.twist = twist;
-    message.status.steering.data = getSteeringAngle();
-    message.status.turn_signal.data = getTurnIndicatorsCommand().turn_signal.data;
-    message.status.gear_shift.data = getTurnIndicatorsCommand().turn_signal.data;
-    message.status.gear_shift.data = getGearCommand().gear_shift.data;
+    autoware_auto_vehicle_msgs::msg::VelocityReport message;
+    message.header.stamp = get_clock()->now();
+    message.header.frame_id = "base_link";
+    message.longitudinal_velocity = twist.linear.x;
+    message.lateral_velocity = twist.linear.y;
+    message.heading_rate = twist.angular.z;
+    return message;
+  }());
+
+  setTurnIndicatorsReport([this]() {
+    autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport message;
+    message.stamp = get_clock()->now();
+    message.report = getTurnIndicatorsCommand().command;
     return message;
   }());
 }
 
-auto AutowareUniverse::getGearCommand() const -> tier4_external_api_msgs::msg::GearShiftStamped
+auto AutowareUniverse::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
 {
   return getGearCommandImpl();
 }
 
 auto AutowareUniverse::getGearSign() const -> double
 {
-  using tier4_external_api_msgs::msg::GearShift;
-  return getGearCommand().gear_shift.data == GearShift::REVERSE
+  using autoware_auto_vehicle_msgs::msg::GearCommand;
+  return getGearCommand().command == GearCommand::REVERSE or
+             getGearCommand().command == GearCommand::REVERSE_2
            ? -1.0
            : 1.0;
 }
 
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
   autoware_auto_control_msgs::msg::AckermannControlCommand,
-  tier4_external_api_msgs::msg::GearShiftStamped>
+  autoware_auto_vehicle_msgs::msg::GearCommand>
 {
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }

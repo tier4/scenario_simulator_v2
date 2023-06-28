@@ -17,10 +17,10 @@
 
 #include <atomic>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/utility/visibility.hpp>
-#include <tier4_external_api_msgs/msg/turn_signal_stamped.hpp>
-#include <tier4_external_api_msgs/msg/gear_shift_stamped.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
@@ -48,7 +48,7 @@ public:
 
   virtual auto getAcceleration() const -> double = 0;
 
-  virtual auto getGearCommand() const -> tier4_external_api_msgs::msg::GearShiftStamped;
+  virtual auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand;
 
   virtual auto getSteeringAngle() const -> double = 0;
 
@@ -58,11 +58,11 @@ public:
   virtual auto getGearSign() const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-    -> tier4_external_api_msgs::msg::TurnSignalStamped;
+    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
-    tier4_external_api_msgs::msg::GearShiftStamped> = 0;
+    autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
   virtual auto getRouteLanelets() const -> std::vector<std::int64_t> = 0;
 
