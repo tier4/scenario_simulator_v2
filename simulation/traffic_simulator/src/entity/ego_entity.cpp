@@ -135,11 +135,6 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) const -> std::vector
 
 auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose { return status_.pose; }
 
-auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
-{
-  return status_.action_status.twist;
-}
-
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   return field_operator_application->getWaypoints();

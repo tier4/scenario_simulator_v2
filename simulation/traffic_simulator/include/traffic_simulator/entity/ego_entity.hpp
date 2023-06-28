@@ -66,8 +66,6 @@ public:
 
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 
-  auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
-
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
