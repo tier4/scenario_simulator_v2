@@ -340,7 +340,9 @@ bool API::updateFrame()
       clock_.getCurrentSimulationTime(), clock_.getStepTime(),
       entity_manager_ptr_->isNpcLogicStarted());
     if (not entity_manager_ptr_->isEgoSpawned()) {
-      THROW_SEMANTIC_ERROR("Malformed state: ego simulated but not registered in entity manager.");
+      THROW_SIMULATION_ERROR(
+        "This exception is basically not supposed to be sent. Contact the developer as there is "
+        "some kind of bug.");
     }
     auto ego_name = entity_manager_ptr_->getEgoName();
     auto ego_status = ego_entity_simulation_->getStatus();
