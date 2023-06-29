@@ -20,7 +20,7 @@
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
-#include <autoware_auto_system_msgs/msg/autoware_state.hpp>
+#include <tier4_system_msgs/msg/autoware_state.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
@@ -49,7 +49,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
-  SubscriberWrapper<autoware_auto_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
+  SubscriberWrapper<tier4_system_msgs::msg::AutowareState, ThreadSafety::safe>         getAutowareState;
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>          getAckermannControlCommand;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                         getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                           getEmergencyState;
@@ -82,18 +82,19 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
   auto is##NAME() const noexcept                             \
   {                                                          \
-    using autoware_auto_system_msgs::msg::AutowareState;     \
+    using tier4_system_msgs::msg::AutowareState;     \
     return getAutowareState().state == AutowareState::VALUE; \
   }                                                          \
   static_assert(true, "")
 
-  DEFINE_STATE_PREDICATE(Initializing, INITIALIZING);            // 1
-  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);    // 2
-  DEFINE_STATE_PREDICATE(Planning, PLANNING);                    // 3
-  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);  // 4
-  DEFINE_STATE_PREDICATE(Driving, DRIVING);                      // 5
-  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVED_GOAL);             // 6
-  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);                // 7
+  DEFINE_STATE_PREDICATE(Initializing, INITIALIZING_VEHICLE);
+  DEFINE_STATE_PREDICATE(WaitingForRoute, WAITING_FOR_ROUTE);
+  DEFINE_STATE_PREDICATE(Planning, PLANNING);
+  DEFINE_STATE_PREDICATE(WaitingForEngage, WAITING_FOR_ENGAGE);
+  DEFINE_STATE_PREDICATE(Driving, DRIVING);
+  DEFINE_STATE_PREDICATE(ArrivedGoal, ARRIVAL_GOAL);
+  DEFINE_STATE_PREDICATE(Emergency, EMERGENCY);
+  DEFINE_STATE_PREDICATE(Finalizing, FINALIZING);
 
 #undef DEFINE_STATE_PREDICATE
 
@@ -108,7 +109,7 @@ public:
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    getAutowareState("/autoware/state", *this),
+    getAutowareState("/api/iv_msgs/autoware/state", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v;
                                                                                             cooperate(v); }),

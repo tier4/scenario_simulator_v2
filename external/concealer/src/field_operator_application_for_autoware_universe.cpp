@@ -383,26 +383,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double v
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
 {
-  using autoware_auto_system_msgs::msg::AutowareState;
-
-#define CASE(IDENTIFIER)          \
-  case AutowareState::IDENTIFIER: \
-    return #IDENTIFIER
-
-  switch (getAutowareState().state) {
-    CASE(INITIALIZING);
-    CASE(WAITING_FOR_ROUTE);
-    CASE(PLANNING);
-    CASE(WAITING_FOR_ENGAGE);
-    CASE(DRIVING);
-    CASE(ARRIVED_GOAL);
-    CASE(FINALIZING);
-
-    default:
-      return "";
-  }
-
-#undef CASE
+  return getAutowareState().state;
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const -> std::string
