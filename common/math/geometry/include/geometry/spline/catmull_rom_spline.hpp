@@ -35,19 +35,19 @@ public:
   explicit CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points);
   double getLength() const override { return total_length_; }
   double getMaximum2DCurvature() const;
-  const geometry_msgs::msg::Point getPoint(double s) const;
-  const geometry_msgs::msg::Point getPoint(double s, double offset) const;
-  const geometry_msgs::msg::Vector3 getTangentVector(double s) const;
-  const geometry_msgs::msg::Vector3 getNormalVector(double s) const;
-  const geometry_msgs::msg::Pose getPose(double s) const;
+  const geometry_msgs::msg::Point getPoint(const double s) const;
+  const geometry_msgs::msg::Point getPoint(const double s, const double offset) const;
+  const geometry_msgs::msg::Vector3 getTangentVector(const double s) const;
+  const geometry_msgs::msg::Vector3 getNormalVector(const double s) const;
+  const geometry_msgs::msg::Pose getPose(const double s) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     const double start_s, const double end_s, const double resolution,
     const double offset = 0.0) const;
   std::optional<double> getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0) const;
-  double getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, double s) const;
+  double getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, const double s) const;
   geometry_msgs::msg::Vector3 getSquaredDistanceVector(
-    const geometry_msgs::msg::Point & point, double s) const;
+    const geometry_msgs::msg::Point & point, const double s) const;
   std::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     const bool search_backward = false) const;
@@ -66,7 +66,7 @@ private:
   double getSInSplineCurve(const size_t curve_index, const double s) const;
   std::pair<size_t, double> getCurveIndexAndS(const double s) const;
   bool checkConnection() const;
-  bool equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const;
+  bool equals(const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1) const;
   std::vector<LineSegment> line_segments_;
   std::vector<HermiteCurve> curves_;
   std::vector<double> length_list_;
