@@ -89,15 +89,16 @@ auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> canonicalized_all;
-  if (lanelet_pose.s < 0) {
-    if (const auto ids = getPreviousLaneletIds(lanelet_pose.lanelet_id); ids.empty()) {
-      return canonicalized_all;
-    } else {
+  /// @note Define lambda functions for canonicalizing previous/next lanelet.
+  const auto canonicalize_to_previous_lanelet =
+    [this](const auto & lanelet_pose) -> std::vector<traffic_simulator_msgs::msg::LaneletPose> {
+    if (const auto ids = getPreviousLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
+      std::vector<traffic_simulator_msgs::msg::LaneletPose> canonicalized_all;
       for (const auto id : ids) {
         const auto lanelet_pose_tmp = traffic_simulator::helper::constructLaneletPose(
           id, lanelet_pose.s + getLaneletLength(id), lanelet_pose.offset);
-        if (auto canonicalized_lanelet_poses = gelAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
+        if (const auto canonicalized_lanelet_poses =
+              gelAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
             canonicalized_lanelet_poses.empty()) {
           canonicalized_all.emplace_back(lanelet_pose_tmp);
         } else {
@@ -106,16 +107,20 @@ auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
             std::back_inserter(canonicalized_all));
         }
       }
-    }
-  }
-  if (lanelet_pose.s > (getLaneletLength(lanelet_pose.lanelet_id))) {
-    if (const auto ids = getNextLaneletIds(lanelet_pose.lanelet_id); ids.empty()) {
       return canonicalized_all;
     } else {
+      return {};
+    }
+  };
+  const auto canonicalize_to_next_lanelet =
+    [this](const auto & lanelet_pose) -> std::vector<traffic_simulator_msgs::msg::LaneletPose> {
+    if (const auto ids = getNextLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
+      std::vector<traffic_simulator_msgs::msg::LaneletPose> canonicalized_all;
       for (const auto id : ids) {
         const auto lanelet_pose_tmp = traffic_simulator::helper::constructLaneletPose(
           id, lanelet_pose.s - getLaneletLength(lanelet_pose.lanelet_id), lanelet_pose.offset);
-        if (auto canonicalized_lanelet_poses = gelAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
+        if (const auto canonicalized_lanelet_poses =
+              gelAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
             canonicalized_lanelet_poses.empty()) {
           canonicalized_all.emplace_back(lanelet_pose_tmp);
         } else {
@@ -124,9 +129,24 @@ auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
             std::back_inserter(canonicalized_all));
         }
       }
+      return canonicalized_all;
+    } else {
+      return {};
     }
+  };
+
+  /// @note If s value unders 0, it means this pose is on the previous lanelet.
+  if (lanelet_pose.s < 0) {
+    return canonicalize_to_previous_lanelet(lanelet_pose);
   }
-  return canonicalized_all;
+  /// @note If s value overs it's lanelet length, it means this pose is on the next lanelet.
+  else if (lanelet_pose.s > (getLaneletLength(lanelet_pose.lanelet_id))) {
+    return canonicalize_to_next_lanelet(lanelet_pose);
+  }
+  /// @note If s value is in range [0,length_of_the_lanelet], return lanelet_pose.
+  else {
+    return {lanelet_pose};
+  }
 }
 
 // If route is not specified, the lanelet_id with the lowest array index is used as a candidate for canonicalize destination.
