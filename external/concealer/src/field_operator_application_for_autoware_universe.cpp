@@ -51,9 +51,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
   }
 
   if (not request->commands.empty()) {
-    task_queue.delay([this, request]() {
-//      requestCooperateCommands(request);
-    });
+    task_queue.delay([this, request]() { requestCooperateCommands(request); });
   }
 }
 
@@ -74,14 +72,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
 {
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
-      std::cout << "[ZMQ_DEBUG]Initializing pose" << std::endl;
       waitForAutowareStateToBeWaitingForRoute([&]() {
         geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
         initial_pose_msg.header.stamp = get_clock()->now();
         initial_pose_msg.header.frame_id = "map";
         initial_pose_msg.pose.pose = initial_pose;
-//        return setInitialPose(initial_pose_msg);
-        return;
+        return setInitialPose(initial_pose_msg);
       });
 
       // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
@@ -92,7 +88,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
       //   request->pose.pose.pose = initial_pose;
       //   requestInitializePose(request);
       // });
-      std::cout << "[ZMQ_DEBUG]initialzied pose" << std::endl;
     });
   }
 }
@@ -103,27 +98,23 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
   assert(not route.empty());
 
   task_queue.delay([this, route] {
-    std::cout << "[ZMQ_DEBUG] Planning" << std::endl;
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
     setGoalPose(route.back());
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-//      setCheckpoint(each);
+      setCheckpoint(each);
     }
     waitForAutowareStateToBeWaitingForEngage();
-    std::cout << "[ZMQ_DEBUG] Planned" << std::endl;
   });
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
   task_queue.delay([this]() {
-    std::cout << "[ZMQ_DEBUG] Waiting for drivieng" << std::endl;
     waitForAutowareStateToBeDriving([this]() {
       auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
       requestEngage(request);
     });
-    std::cout << "[ZMQ_DEBUG] Waited for drivieng" << std::endl;
   });
 }
 
@@ -217,7 +208,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
     request->velocity = velocity_limit;
     // We attempt to resend the service up to 30 times, but this number of times was determined by
     // heuristics, not for any technical reason
-//    requestSetVelocityLimit(request, 30);
+    requestSetVelocityLimit(request, 30);
   });
 }
 

@@ -27,16 +27,16 @@ namespace traffic_simulator
 template <typename Message>
 class ConventionalTrafficLightManager : public TrafficLightManagerBase
 {
-//  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
+  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
 
 public:
   template <typename Node>
   explicit ConventionalTrafficLightManager(
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
     const std::string & map_frame = "map")
-  : TrafficLightManagerBase(node, hdmap, map_frame)
-//    traffic_light_state_array_publisher_(
-//      rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
+  : TrafficLightManagerBase(node, hdmap, map_frame),
+    traffic_light_state_array_publisher_(
+      rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
   {
   }
 
