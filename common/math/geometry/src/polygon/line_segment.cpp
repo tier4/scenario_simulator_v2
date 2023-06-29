@@ -18,7 +18,6 @@
 #include <geometry/polygon/line_segment.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
-#include <iostream>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 
