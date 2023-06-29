@@ -59,7 +59,7 @@ class API
 {
   using EntityManager = traffic_simulator::entity::EntityManager;
 
-  // @todo will be moved to simple_sensor_simulator
+  /// @todo will be moved to simple_sensor_simulator
   std::unique_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
 
 public:

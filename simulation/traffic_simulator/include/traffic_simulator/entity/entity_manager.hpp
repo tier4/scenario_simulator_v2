@@ -56,7 +56,7 @@
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
 
-// @todo find some shared space for this function
+/// @todo find some shared space for this function
 template <typename T>
 static auto getParameter(const std::string & name, T value = {})
 {
