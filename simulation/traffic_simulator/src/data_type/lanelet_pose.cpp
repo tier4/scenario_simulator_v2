@@ -91,8 +91,8 @@ auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
   std::vector<std::int64_t> shortest_route =
     hdmap_utils->getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
   LaneletPose alternative_lanelet_pose = lanelet_poses_[0];
-  for (const auto laneletPose : lanelet_poses_) {
-    auto route = hdmap_utils->getRoute(from.lanelet_id, laneletPose.lanelet_id);
+  for (const auto & laneletPose : lanelet_poses_) {
+    const auto route = hdmap_utils->getRoute(from.lanelet_id, laneletPose.lanelet_id);
     if (shortest_route.size() > route.size()) {
       shortest_route = route;
       alternative_lanelet_pose = laneletPose;
