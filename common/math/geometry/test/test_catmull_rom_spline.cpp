@@ -211,7 +211,7 @@ TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
      * ^
      * |
      * (x,y,z) = (0,1,0) => control point for spline
-     * +      +
+     * +      + (x,y,z) = (1,1,0)
      * |      $
      * |      $
      * |      $
@@ -219,7 +219,7 @@ TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
      * |      $
      * |      $
      * |      $
-     * |      +
+     * |      + (x,y,z) = (1,-1,0)
      * 
      * -----------------------------------------------------------
      * $$$$$$$$$$$$$ Line segment for checking collision.  
