@@ -27,8 +27,9 @@ namespace math
 {
 namespace geometry
 {
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
+auto CatmullRomSpline::getPolygon(
   const double width, const size_t num_points, const double z_offset)
+  -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
   std::vector<geometry_msgs::msg::Point> left_bounds = getLeftBounds(width, num_points, z_offset);
@@ -48,8 +49,9 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
   return points;
 }
 
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
+auto CatmullRomSpline::getRightBounds(
   const double width, const size_t num_points, const double z_offset) const
+  -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
@@ -71,8 +73,9 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
   return points;
 }
 
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
+auto CatmullRomSpline::getLeftBounds(
   const double width, const size_t num_points, const double z_offset) const
+  -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
@@ -94,8 +97,9 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
   return points;
 }
 
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
+auto CatmullRomSpline::getTrajectory(
   const double start_s, const double end_s, const double resolution, const double offset) const
+  -> std::vector<geometry_msgs::msg::Point>
 {
   if (start_s > end_s) {
     std::vector<geometry_msgs::msg::Point> ret;
@@ -239,7 +243,7 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
   }
 }
 
-std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(const double s) const
+auto CatmullRomSpline::getCurveIndexAndS(const double s) const -> std::pair<size_t, double>
 {
   if (s < 0) {
     return std::make_pair(0, s);
@@ -259,7 +263,7 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(const double s) co
   THROW_SIMULATION_ERROR("failed to calculate curve index");  // LCOV_EXCL_LINE
 }
 
-double CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double s) const
+auto CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double s) const -> double
 {
   size_t n = curves_.size();
   double ret = 0;
@@ -279,8 +283,9 @@ double CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const doubl
  * @param search_backward 
  * @return std::optional<double> 
  */
-std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
+auto CatmullRomSpline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
+  -> std::optional<double>
 {
   if (polygon.size() <= 1) {
     THROW_SIMULATION_ERROR(
@@ -367,9 +372,9 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   }
 }
 
-std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
+auto CatmullRomSpline::getCollisionPointIn2D(
   const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
-  const bool search_backward) const
+  const bool search_backward) const -> std::optional<double>
 {
   size_t n = curves_.size();
   if (search_backward) {
@@ -392,8 +397,9 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   return std::nullopt;
 }
 
-std::optional<double> CatmullRomSpline::getSValue(
+auto CatmullRomSpline::getSValue(
   const geometry_msgs::msg::Pose & pose, const double threshold_distance) const
+  -> std::optional<double>
 {
   double s = 0;
   for (size_t i = 0; i < curves_.size(); i++) {
@@ -407,8 +413,8 @@ std::optional<double> CatmullRomSpline::getSValue(
   return std::nullopt;
 }
 
-double CatmullRomSpline::getSquaredDistanceIn2D(
-  const geometry_msgs::msg::Point & point, const double s) const
+auto CatmullRomSpline::getSquaredDistanceIn2D(
+  const geometry_msgs::msg::Point & point, const double s) const -> double
 {
   switch (control_points.size()) {
     case 0:
@@ -443,8 +449,8 @@ double CatmullRomSpline::getSquaredDistanceIn2D(
   }
 }
 
-geometry_msgs::msg::Vector3 CatmullRomSpline::getSquaredDistanceVector(
-  const geometry_msgs::msg::Point & point, const double s) const
+auto CatmullRomSpline::getSquaredDistanceVector(
+  const geometry_msgs::msg::Point & point, const double s) const -> geometry_msgs::msg::Vector3
 {
   switch (control_points.size()) {
     case 0:
@@ -481,7 +487,7 @@ geometry_msgs::msg::Vector3 CatmullRomSpline::getSquaredDistanceVector(
   }
 }
 
-const geometry_msgs::msg::Point CatmullRomSpline::getPoint(const double s) const
+auto CatmullRomSpline::getPoint(const double s) const -> geometry_msgs::msg::Point
 {
   switch (control_points.size()) {
     case 0:
@@ -515,8 +521,8 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(const double s) const
   }
 }
 
-const geometry_msgs::msg::Point CatmullRomSpline::getPoint(
-  const double s, const double offset) const
+auto CatmullRomSpline::getPoint(const double s, const double offset) const
+  -> geometry_msgs::msg::Point
 {
   geometry_msgs::msg::Vector3 vec = getNormalVector(s);
   double theta = std::atan2(vec.y, vec.x);
@@ -528,7 +534,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(
   return point;
 }
 
-double CatmullRomSpline::getMaximum2DCurvature() const
+auto CatmullRomSpline::getMaximum2DCurvature() const -> double
 {
   if (maximum_2d_curvatures_.empty()) {
     THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");  // LCOV_EXCL_LINE
@@ -536,7 +542,7 @@ double CatmullRomSpline::getMaximum2DCurvature() const
   return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
 }
 
-const geometry_msgs::msg::Vector3 CatmullRomSpline::getNormalVector(const double s) const
+auto CatmullRomSpline::getNormalVector(const double s) const -> geometry_msgs::msg::Vector3
 {
   switch (control_points.size()) {
     case 0:
@@ -565,7 +571,7 @@ const geometry_msgs::msg::Vector3 CatmullRomSpline::getNormalVector(const double
   }
 }
 
-const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(const double s) const
+auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::msg::Vector3
 {
   switch (control_points.size()) {
     case 0:
@@ -602,7 +608,7 @@ const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(const doubl
   }
 }
 
-const geometry_msgs::msg::Pose CatmullRomSpline::getPose(const double s) const
+auto CatmullRomSpline::getPose(const double s) const -> geometry_msgs::msg::Pose
 {
   switch (control_points.size()) {
     case 0:
@@ -632,7 +638,7 @@ const geometry_msgs::msg::Pose CatmullRomSpline::getPose(const double s) const
   }
 }
 
-bool CatmullRomSpline::checkConnection() const
+auto CatmullRomSpline::checkConnection() const -> bool
 {
   if (control_points.size() != (curves_.size() + 1)) {
     THROW_SIMULATION_ERROR(                                    // LCOV_EXCL_LINE
@@ -659,8 +665,8 @@ bool CatmullRomSpline::checkConnection() const
   return true;
 }
 
-bool CatmullRomSpline::equals(
-  const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1) const
+auto CatmullRomSpline::equals(
+  const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1) const -> bool
 {
   constexpr double e = std::numeric_limits<float>::epsilon();
   if (std::abs(p0.x - p1.x) > e) {
