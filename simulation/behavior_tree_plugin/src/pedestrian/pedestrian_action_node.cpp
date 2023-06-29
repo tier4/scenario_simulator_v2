@@ -102,24 +102,21 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
       if (
         const auto end_of_road_lanelet_id = std::get<std::optional<std::int64_t>>(canonicalized)) {
         if (lanelet_pose.value().s < 0) {
-          traffic_simulator::LaneletPose end_of_road_lanelet_pose;
-          {
-            end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
-            end_of_road_lanelet_pose.s = 0;
-            end_of_road_lanelet_pose.offset = lanelet_pose.value().offset;
-            end_of_road_lanelet_pose.rpy = lanelet_pose.value().rpy;
-          }
-          return traffic_simulator::CanonicalizedLaneletPose(end_of_road_lanelet_pose, hdmap_utils);
+          return traffic_simulator::CanonicalizedLaneletPose(
+            traffic_simulator_msgs::build<traffic_simulator::LaneletPose>()
+              .lanelet_id(end_of_road_lanelet_id.value())
+              .s(0.0)
+              .offset(lanelet_pose.value().offset)
+              .rpy(lanelet_pose.value().rpy),
+            hdmap_utils);
         } else {
-          traffic_simulator::LaneletPose end_of_road_lanelet_pose;
-          {
-            end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
-            end_of_road_lanelet_pose.s =
-              hdmap_utils->getLaneletLength(end_of_road_lanelet_id.value());
-            end_of_road_lanelet_pose.offset = lanelet_pose.value().offset;
-            end_of_road_lanelet_pose.rpy = lanelet_pose.value().rpy;
-          }
-          return traffic_simulator::CanonicalizedLaneletPose(end_of_road_lanelet_pose, hdmap_utils);
+          return traffic_simulator::CanonicalizedLaneletPose(
+            traffic_simulator_msgs::build<traffic_simulator::LaneletPose>()
+              .lanelet_id(end_of_road_lanelet_id.value())
+              .s(hdmap_utils->getLaneletLength(end_of_road_lanelet_id.value()))
+              .offset(lanelet_pose.value().offset)
+              .rpy(lanelet_pose.value().rpy),
+            hdmap_utils);
         }
       } else {
         THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
