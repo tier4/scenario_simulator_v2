@@ -27,6 +27,7 @@ where `<NAME>` and `<VALUE>` can be set to:
 | `detectedObjectMissingProbability`        | A `double` type value between `0.0` and `1.0` |  `0.0`  | Do not publish the perception topic with the given probability.                                                       |
 | `detectedObjectPositionStandardDeviation` | A positive `double` type value                |  `0.0`  | Randomize the positions of other vehicles included in the perception topic according to the given standard deviation. |
 | `detectedObjectPublishingDelay`           | A positive `double` type value                |  `0.0`  | Delays the publication of the perception topic by the specified number of seconds.                                    |
+| `pointcloudPublishingDelay`               | A positive `double` type value                |  `0.0`  | Delays the publication of the object pointcloud by the specified number of seconds.                                   |
 | `randomSeed`                              | A positive `integer` type value               |   `0`   | Specifies the seed value for the random number generator.                                                             |
 
 These properties are not exclusive. In other words, multiple properties can be
@@ -187,6 +188,51 @@ it reaches the planning module.
                 - name: "isEgo"
                   value: "true"
                 - name: "detectedObjectPublishingDelay"
+                  value: "3"
+```
+
+## Property `pointcloudPublishingDelay`
+
+**Summary** - Delays the publication of the object pointcloud by the specified
+number of seconds.
+
+**Purpose** - Just like in `detectedObjectPublishingDelay`, the object pointcloud
+is output by the results of the sensing and perception modules. but
+`scenario_simulator_v2` skips these processes, leading to fast output generation.
+This property works around this problem by setting an interval of the specified
+number of seconds between `scenario_simulator_v2` generating a object pointcloud
+and publishing it.
+
+**Specification** - The property's value must be a positive real number. The
+unit is seconds. It is an error if the value is negative. Since the delay is
+set to the same value for each topic, it is not possible to delay only a
+specific topic.
+
+**Guarantee** - This delay setting ensures that `scenario_simulator_v2`
+publishes the perception results in a consistent order. They are published
+according to their original order. However, while `scenario_simulator_v2`
+guarantees to publish in order, it does not guarantee that it reaches the
+planning module in order. This is because the arrival order of topics in ROS 2
+is not guaranteed.
+
+**Note** - This feature only adjusts the interval between ssv2 generating a
+object pointcloud and publishing it. Note that there is another kind of delay
+between when `scenario_simulator_v2` publishes the perception result and when
+it reaches the planning module.
+
+**Default behavior** - If the property is not specified, the default value is
+`"0.0"`, meaning no delay.
+
+**[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.pointcloudObjectPublishingDelay.yaml)** -
+```
+        ObjectController:
+          Controller:
+            name: '...'
+            Properties:
+              Property:
+                - name: "isEgo"
+                  value: "true"
+                - name: "pointcloudPublishingDelay"
                   value: "3"
 ```
 
