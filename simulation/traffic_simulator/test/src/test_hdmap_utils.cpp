@@ -181,6 +181,7 @@ TEST(HdMapUtils, CanonicalizePositive)
 /**
  * @note Testcase for lanelet pose canonicalization when s in
  * range [0,length_of_the_lanelet]
+ * Canonicalized lanelet pose of (id=34981, s=2) is suppose to be the same
  */
 TEST(HdMapUtils, Canonicalize)
 {
@@ -290,6 +291,7 @@ TEST(HdMapUtils, CanonicalizeAllPositive)
 /**
  * @note Testcase for gelAllCanonicalizedLaneletPoses() function when s in
  * range [0,length_of_the_lanelet]
+ * Canonicalized lanelet pose of (id=34981, s=2) is suppose to be the same
  */
 TEST(HdMapUtils, CanonicalizeAll)
 {
