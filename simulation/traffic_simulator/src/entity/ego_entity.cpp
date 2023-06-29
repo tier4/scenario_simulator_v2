@@ -34,6 +34,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
+// @todo find some shared space for this function
 template <typename T>
 static auto getParameter(const std::string & name, T value = {})
 {
