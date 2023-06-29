@@ -95,10 +95,10 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
     if (
       const auto canonicalized_lanelet_pose =
         std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
-      // If canonicalize succeed, set canonicalized pose and set other values.
+      /// @note If canonicalize succeed, set canonicalized pose and set other values.
       return traffic_simulator::CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils);
     } else {
-      // If canonicalize failed, set end of road lanelet pose.
+      /// @note If canonicalize failed, set end of road lanelet pose.
       if (
         const auto end_of_road_lanelet_id = std::get<std::optional<std::int64_t>>(canonicalized)) {
         if (lanelet_pose.value().s < 0) {
