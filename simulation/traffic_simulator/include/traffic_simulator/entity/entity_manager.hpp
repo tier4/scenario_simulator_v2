@@ -265,7 +265,6 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
-  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, );
@@ -406,6 +405,8 @@ public:
   bool isEgoSpawned() const;
 
   const std::string getEgoName() const;
+
+  auto fillEgoLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
 
   bool isInLanelet(const std::string & name, const std::int64_t lanelet_id, const double tolerance);
 
