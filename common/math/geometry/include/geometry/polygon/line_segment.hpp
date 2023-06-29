@@ -63,9 +63,9 @@ public:
     -> geometry_msgs::msg::Vector3;
 
 private:
-  std::optional<double> denormalize(
-    const std::optional<double> & s, const bool throw_error_on_out_of_range = true) const;
-  double denormalize(const double s) const;
+  auto denormalize(const std::optional<double> & s, const bool throw_error_on_out_of_range = true)
+    const -> std::optional<double>;
+  auto denormalize(const double s) const -> double;
 };
 
 auto getLineSegments(
