@@ -78,7 +78,8 @@ geometry_msgs::msg::Pose constructPose(
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
   const std::string & entity, const std::string & architecture_type, const double update_duration,
   const double range, bool filter_by_range, const double pos_noise_stddev, const int random_seed,
-  const double probability_of_lost, const double object_recognition_delay, const bool enable_ground_truth_delay)
+  const double probability_of_lost, const double object_recognition_delay,
+  const bool enable_ground_truth_delay)
 {
   simulation_api_schema::DetectionSensorConfiguration configuration;
   configuration.set_entity(entity);
