@@ -53,7 +53,7 @@ LineSegment::~LineSegment() {}
  * @param autoscale If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return geometry_msgs::msg::Point 
  */
-geometry_msgs::msg::Point LineSegment::getPoint(const double s, const bool autoscale) const
+auto LineSegment::getPoint(const double s, const bool autoscale) const -> geometry_msgs::msg::Point
 {
   const double s_normalized = autoscale ? s / getLength() : s;
   if (0 <= s_normalized && s_normalized <= 1) {
@@ -85,7 +85,7 @@ geometry_msgs::msg::Point LineSegment::getPoint(const double s, const bool autos
  * @param autoscale If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return geometry_msgs::msg::Pose 
  */
-geometry_msgs::msg::Pose LineSegment::getPose(const double s, const bool autoscale) const
+auto LineSegment::getPose(const double s, const bool autoscale) const -> geometry_msgs::msg::Pose
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(getPoint(s, autoscale))
@@ -103,7 +103,7 @@ geometry_msgs::msg::Pose LineSegment::getPose(const double s, const bool autosca
  * @return true Intersection detected.
  * @return false Intersection does not detected.
  */
-bool LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const
+auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool
 {
   return getIntersection2DSValue(point, true) ? true : false;
 }
@@ -114,7 +114,7 @@ bool LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const
  * @return true Intersection detected.
  * @return false Intersection does not detected.
  */
-bool LineSegment::isIntersect2D(const LineSegment & l0) const
+auto LineSegment::isIntersect2D(const LineSegment & l0) const -> bool
 {
   double s, t;
   s = (l0.start_point.x - l0.end_point.x) * (start_point.y - l0.start_point.y) -
@@ -139,8 +139,8 @@ bool LineSegment::isIntersect2D(const LineSegment & l0) const
  * @param point point of you want to find intersection.
  * @return std::optional<double> 
  */
-std::optional<double> LineSegment::getIntersection2DSValue(
-  const geometry_msgs::msg::Point & point, const bool autoscale) const
+auto LineSegment::getIntersection2DSValue(
+  const geometry_msgs::msg::Point & point, const bool autoscale) const -> std::optional<double>
 {
   const auto get_s_normalized = [this](const auto & point) -> std::optional<double> {
     const auto get_s_from_x = [this](const auto & point) {
@@ -176,8 +176,8 @@ std::optional<double> LineSegment::getIntersection2DSValue(
  * @param autoscale If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return std::optional<double> 
  */
-std::optional<double> LineSegment::getIntersection2DSValue(
-  const LineSegment & line, const bool autoscale) const
+auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool autoscale) const
+  -> std::optional<double>
 {
   const auto get_s_normalized = [this](const auto & line) -> std::optional<double> {
     if (!isIntersect2D(line)) {
@@ -206,8 +206,8 @@ std::optional<double> LineSegment::getIntersection2DSValue(
  * @param line Line segment of you want to find intersection.
  * @return std::optional<geometry_msgs::msg::Point> Intersection point, if the value is std::nullopt, lines have no intersection point. 
  */
-std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
-  const LineSegment & line) const
+auto LineSegment::getIntersection2D(const LineSegment & line) const
+  -> std::optional<geometry_msgs::msg::Point>
 {
   const auto s = getIntersection2DSValue(line, false);
   return s ? geometry_msgs::build<geometry_msgs::msg::Point>()
@@ -217,13 +217,16 @@ std::optional<geometry_msgs::msg::Point> LineSegment::getIntersection2D(
            : std::optional<geometry_msgs::msg::Point>();
 }
 
-geometry_msgs::msg::Vector3 LineSegment::getVector() const { return end_point - start_point; }
+auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3
+{
+  return end_point - start_point;
+}
 
 /**
  * @brief Get normal vector of the line segment.
  * @return geometry_msgs::msg::Vector3 
  */
-geometry_msgs::msg::Vector3 LineSegment::getNormalVector() const
+auto LineSegment::getNormalVector() const -> geometry_msgs::msg::Vector3
 {
   geometry_msgs::msg::Vector3 tangent_vec = getVector();
   double theta = M_PI / 2.0;
@@ -233,7 +236,7 @@ geometry_msgs::msg::Vector3 LineSegment::getNormalVector() const
     .z(0);
 }
 
-geometry_msgs::msg::Vector3 LineSegment::get2DVector() const
+auto LineSegment::get2DVector() const -> geometry_msgs::msg::Vector3
 {
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
     .x(end_point.x - start_point.x)
@@ -241,14 +244,14 @@ geometry_msgs::msg::Vector3 LineSegment::get2DVector() const
     .z(0);
 }
 
-double LineSegment::get2DLength() const
+auto LineSegment::get2DLength() const -> double
 {
   return std::hypot(end_point.x - start_point.x, end_point.y - start_point.y);
 }
 
-double LineSegment::getLength() const { return hypot(end_point, start_point); }
+auto LineSegment::getLength() const -> double { return hypot(end_point, start_point); }
 
-double LineSegment::getSlope() const
+auto LineSegment::getSlope() const -> double
 {
   return (end_point.y - start_point.y) / (end_point.x - start_point.x);
 }
@@ -260,8 +263,8 @@ double LineSegment::getSlope() const
  * @param autoscale If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
  * @return double 
  */
-double LineSegment::getSquaredDistanceIn2D(
-  const geometry_msgs::msg::Point & point, const double s, const bool autoscale) const
+auto LineSegment::getSquaredDistanceIn2D(
+  const geometry_msgs::msg::Point & point, const double s, const bool autoscale) const -> double
 {
   const auto point_on_line = getPoint(s, autoscale);
   return std::pow(point.x - point_on_line.x, 2) + std::pow(point.y - point_on_line.y, 2);
@@ -274,8 +277,9 @@ double LineSegment::getSquaredDistanceIn2D(
  * @param autoscale If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
  * @return geometry_msgs::msg::Vector3 
  */
-geometry_msgs::msg::Vector3 LineSegment::getSquaredDistanceVector(
+auto LineSegment::getSquaredDistanceVector(
   const geometry_msgs::msg::Point & point, const double s, const bool autoscale) const
+  -> geometry_msgs::msg::Vector3
 {
   const auto point_on_line = getPoint(s, autoscale);
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
@@ -284,8 +288,8 @@ geometry_msgs::msg::Vector3 LineSegment::getSquaredDistanceVector(
     .z(point.z - point_on_line.z);
 }
 
-std::optional<double> LineSegment::denormalize(
-  const std::optional<double> s, const bool throw_error_on_out_of_range) const
+auto LineSegment::denormalize(const std::optional<double> s, const bool throw_error_on_out_of_range)
+  const -> std::optional<double>
 {
   if (!throw_error_on_out_of_range && 0 <= s && s <= 1) {
     return std::optional<double>();
@@ -298,7 +302,7 @@ std::optional<double> LineSegment::denormalize(
  * @param s s value in coordinate along line segment.
  * @return double Denormalized s value.
  */
-double LineSegment::denormalize(const double s) const
+auto LineSegment::denormalize(const double s) const -> double
 {
   if (0 <= s && s <= 1) {
     return s * getLength();
@@ -317,8 +321,9 @@ LineSegment & LineSegment::operator=(const LineSegment &) { return *this; }
  * @param close_start_end If true, returned line segments are connected their start and end. 
  * @return std::vector<LineSegment> 
  */
-std::vector<LineSegment> getLineSegments(
+auto getLineSegments(
   const std::vector<geometry_msgs::msg::Point> & points, const bool close_start_end)
+  -> std::vector<LineSegment>
 {
   if (points.size() <= 1) {
     return {};
