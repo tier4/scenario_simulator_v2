@@ -223,7 +223,7 @@ it reaches the planning module.
 **Default behavior** - If the property is not specified, the default value is
 `"0.0"`, meaning no delay.
 
-**[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.pointcloudObjectPublishingDelay.yaml)** -
+**[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.pointcloudPublishingDelay.yaml)** -
 ```
         ObjectController:
           Controller:
