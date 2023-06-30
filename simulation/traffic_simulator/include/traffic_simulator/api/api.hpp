@@ -312,6 +312,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
+  FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);

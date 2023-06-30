@@ -34,7 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Polyline
 {
-  const std::list<Vertex> vertex;
+  const std::list<Vertex> vertices;
 
   explicit Polyline(const pugi::xml_node &, Scope &);
 };

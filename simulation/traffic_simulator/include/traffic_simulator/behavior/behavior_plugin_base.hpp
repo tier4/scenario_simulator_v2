@@ -18,6 +18,7 @@
 #include <optional>
 #include <string>
 #include <traffic_simulator/data_type/behavior.hpp>
+#include <traffic_simulator/data_type/follow_trajectory.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
@@ -59,6 +60,7 @@ public:
   DEFINE_GETTER_SETTER(BehaviorParameter, "behavior_parameter", traffic_simulator_msgs::msg::BehaviorParameter)
   DEFINE_GETTER_SETTER(EntityStatus, "entity_status", traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, "entity_type_list", EntityTypeDict)
+  DEFINE_GETTER_SETTER(FollowPolylineTrajectoryParameter, "polyline_trajectory_parameter", std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Polyline>>)
   DEFINE_GETTER_SETTER(GoalPoses, "goal_poses", std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils, "hdmap_utils", std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(Obstacle, "obstacle", std::optional<traffic_simulator_msgs::msg::Obstacle>)
