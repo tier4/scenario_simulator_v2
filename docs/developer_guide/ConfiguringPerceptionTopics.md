@@ -154,7 +154,7 @@ Since the delay is set to the same value for each object, it is not possible to
 delay only a specific object.
 
 **Note** - This feature sets the delay from when the perception results are
-obtained in `scenario_simulator_v2` to when they are published. Not that there
+obtained in `scenario_simulator_v2` to when they are published. Note that there
 are other potential sources of delay, such as frame rates becoming unstable,
 and delays in pub/sub.
 
