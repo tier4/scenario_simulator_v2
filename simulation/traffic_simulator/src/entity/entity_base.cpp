@@ -217,6 +217,11 @@ auto EntityBase::getLaneletPose(double matching_distance) const
   }
 }
 
+auto EntityBase::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+{
+  THROW_SIMULATION_ERROR(status.name, " entity does not support fillLaneletPose.");
+}
+
 auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
 
 auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
