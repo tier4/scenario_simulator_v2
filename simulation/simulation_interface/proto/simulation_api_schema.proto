@@ -230,30 +230,52 @@ message AttachOccupancyGridSensorResponse {
   Result result = 1; // Result of [AttachOccupancyGridSensorRequest](#AttachOccupancyGridRequest)
 }
 
-message TrafficLightState {
-  message LampState {
-    enum State {
-      UNKNOWN = 0;
-      RED = 1;
-      GREEN = 2;
-      YELLOW = 3;
-      LEFT = 4;
-      RIGHT = 5;
-      UP = 6;
-      DOWN = 7;
-    }
-    State type = 1;
-    float confidence = 2;
+message TrafficLight {
+  enum Color {
+    RED = 0;
+    AMBER = 1;
+    GREEN = 2;
+    WHITE = 3;
+    UNKNOWN_COLOR = 4;
   }
+
+  enum Shape {
+    CIRCLE = 0;
+    LEFT_ARROW = 1;
+    RIGHT_ARROW = 2;
+    UP_ARROW = 3;
+    UP_LEFT_ARROW = 4;
+    UP_RIGHT_ARROW = 5;
+    DOWN_ARROW = 6;
+    DOWN_LEFT_ARROW = 7;
+    DOWN_RIGHT_ARROW = 8;
+    CROSS = 9;
+    UNKNOWN_SHAPE = 10;
+  }
+
+  enum Status {
+    SOLID_OFF = 0;
+    SOLID_ON = 1;
+    FLASHING = 2;
+    UNKNOWN_STATUS = 3;
+  }
+
+  Color color = 1;
+  Shape shape = 2;
+  Status status = 3;
+  float confidence = 4;
+}
+
+message TrafficSignal {
   int32 id = 1;
-  repeated LampState lamp_states = 2;
+  repeated TrafficLight traffic_light_status = 2;
 }
 
 /**
  * Requests updating traffic lights in simulation.
  **/
 message UpdateTrafficLightsRequest {
-  repeated TrafficLightState states = 1;
+  repeated TrafficSignal states = 1;
 }
 
 /**

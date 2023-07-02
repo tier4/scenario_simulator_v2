@@ -341,6 +341,8 @@ TEST(Conversion, EntityStatus)
   EXPECT_ENTITY_STATUS_EQ(status, proto);
 }
 
+/// @todo Add test for EntityStatus from UpdatedEntityStatus
+
 TEST(Conversion, Time)
 {
   builtin_interfaces::Time proto;
@@ -490,61 +492,64 @@ TEST(Conversion, LaneletPose)
 
 TEST(Conversion, TrafficSignal)
 {
-  auto color = [](auto value) {
-    autoware_auto_perception_msgs::msg::TrafficLight traffic_light;
-    traffic_light.color = value;
-    EXPECT_EQ(traffic_light.color, value);
-    EXPECT_EQ(traffic_light.shape, 0);
-    EXPECT_EQ(traffic_light.status, 0);
-    return traffic_light;
+  using TrafficLightMsg = autoware_auto_perception_msgs::msg::TrafficLight;
+  std::vector<std::pair<std::uint8_t, simulation_api_schema::TrafficLight::Status>> statuses = {
+      {TrafficLightMsg::SOLID_OFF, simulation_api_schema::TrafficLight_Status_SOLID_OFF},
+      {TrafficLightMsg::SOLID_ON,  simulation_api_schema::TrafficLight_Status_SOLID_ON},
+      {TrafficLightMsg::FLASHING,  simulation_api_schema::TrafficLight_Status_FLASHING},
+      {TrafficLightMsg::UNKNOWN,   simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS}
   };
 
-  auto shape = [](auto value) {
-    autoware_auto_perception_msgs::msg::TrafficLight traffic_light;
-    traffic_light.shape = value;
-    EXPECT_EQ(traffic_light.color, 0);
-    EXPECT_EQ(traffic_light.shape, value);
-    EXPECT_EQ(traffic_light.status, 0);
-    return traffic_light;
+  std::vector<std::pair<std::uint8_t, simulation_api_schema::TrafficLight::Shape>> shapes = {
+      {TrafficLightMsg::CIRCLE,           simulation_api_schema::TrafficLight_Shape_CIRCLE},
+      {TrafficLightMsg::LEFT_ARROW,       simulation_api_schema::TrafficLight_Shape_LEFT_ARROW},
+      {TrafficLightMsg::RIGHT_ARROW,      simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW},
+      {TrafficLightMsg::UP_ARROW,         simulation_api_schema::TrafficLight_Shape_UP_ARROW},
+      {TrafficLightMsg::UP_LEFT_ARROW,    simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW},
+      {TrafficLightMsg::UP_RIGHT_ARROW,   simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW},
+      {TrafficLightMsg::DOWN_ARROW,       simulation_api_schema::TrafficLight_Shape_DOWN_ARROW},
+      {TrafficLightMsg::DOWN_LEFT_ARROW,  simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW},
+      {TrafficLightMsg::DOWN_RIGHT_ARROW, simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW},
+      {TrafficLightMsg::CROSS,            simulation_api_schema::TrafficLight_Shape_CROSS},
+      {TrafficLightMsg::UNKNOWN,          simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE}
   };
 
-  auto status = [](auto value) {
-    autoware_auto_perception_msgs::msg::TrafficLight traffic_light;
-    traffic_light.status = value;
-    EXPECT_EQ(traffic_light.color, 0);
-    EXPECT_EQ(traffic_light.shape, 0);
-    EXPECT_EQ(traffic_light.status, value);
-    return traffic_light;
+  std::vector<std::pair<std::uint8_t, simulation_api_schema::TrafficLight::Color>> colors = {
+      {TrafficLightMsg::RED,     simulation_api_schema::TrafficLight_Color_RED},
+      {TrafficLightMsg::AMBER,   simulation_api_schema::TrafficLight_Color_AMBER},
+      {TrafficLightMsg::GREEN,   simulation_api_schema::TrafficLight_Color_GREEN},
+      {TrafficLightMsg::WHITE,   simulation_api_schema::TrafficLight_Color_WHITE},
+      {TrafficLightMsg::UNKNOWN, simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR},
   };
 
-  autoware_auto_perception_msgs::msg::TrafficSignal message;
-  message.map_primitive_id = 123;
-  message.lights = {
-    status(autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN),
-    color(autoware_auto_perception_msgs::msg::TrafficLight::RED),
-    color(autoware_auto_perception_msgs::msg::TrafficLight::GREEN),
-    color(autoware_auto_perception_msgs::msg::TrafficLight::AMBER),
-    shape(autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW),
-    shape(autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW),
-    shape(autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW),
-    shape(autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW),
-  };
+  float max_confidence = 3.0f * TrafficLightMsg::UNKNOWN;
 
-  simulation_api_schema::TrafficLightState proto;
+  for (const auto& status : statuses) {
+    for (const auto& shape : shapes) {
+      for (const auto& color : colors) {
+        float confidence = static_cast<float>(status.first + shape.first + color.first)/max_confidence;
 
-  using LampState = simulation_api_schema::TrafficLightState::LampState;
+        TrafficLightMsg traffic_light_msg;
+        traffic_light_msg.status = status.first;
+        traffic_light_msg.shape = shape.first;
+        traffic_light_msg.color = color.first;
+        traffic_light_msg.confidence = confidence;
 
-  EXPECT_NO_THROW(simulation_interface::toProto(message, proto));
-  EXPECT_EQ(proto.id(), 123);
-  EXPECT_NE(proto.lamp_states()[0].confidence(), 1.0);
-  EXPECT_EQ(proto.lamp_states()[0].type(), LampState::UNKNOWN);
-  EXPECT_EQ(proto.lamp_states()[1].type(), LampState::RED);
-  EXPECT_EQ(proto.lamp_states()[2].type(), LampState::GREEN);
-  EXPECT_EQ(proto.lamp_states()[3].type(), LampState::YELLOW);
-  EXPECT_EQ(proto.lamp_states()[4].type(), LampState::LEFT);
-  EXPECT_EQ(proto.lamp_states()[5].type(), LampState::RIGHT);
-  EXPECT_EQ(proto.lamp_states()[6].type(), LampState::UP);
-  EXPECT_EQ(proto.lamp_states()[7].type(), LampState::DOWN);
+        autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal_msg;
+        traffic_signal_msg.lights.emplace_back(traffic_light_msg);
+        traffic_signal_msg.map_primitive_id = 101;
+
+        simulation_api_schema::TrafficSignal proto;
+        EXPECT_NO_THROW(simulation_interface::toProto(traffic_signal_msg, proto));
+        EXPECT_EQ(traffic_signal_msg.lights.size(), static_cast<std::size_t>(proto.traffic_light_status().size()));
+        EXPECT_EQ(proto.id(), proto.id());
+        EXPECT_EQ(proto.traffic_light_status().Get(0).shape(), shape.second);
+        EXPECT_EQ(proto.traffic_light_status().Get(0).color(), color.second);
+        EXPECT_EQ(proto.traffic_light_status().Get(0).status(), status.second);
+        EXPECT_FLOAT_EQ(proto.traffic_light_status().Get(0).confidence(), confidence);
+      }
+    }
+  }
 }
 
 int main(int argc, char ** argv)
