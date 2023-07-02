@@ -542,11 +542,20 @@ TEST(Conversion, TrafficSignal)
         simulation_api_schema::TrafficSignal proto;
         EXPECT_NO_THROW(simulation_interface::toProto(traffic_signal_msg, proto));
         EXPECT_EQ(traffic_signal_msg.lights.size(), static_cast<std::size_t>(proto.traffic_light_status().size()));
-        EXPECT_EQ(proto.id(), proto.id());
+        EXPECT_EQ(traffic_signal_msg.map_primitive_id, proto.id());
         EXPECT_EQ(proto.traffic_light_status().Get(0).shape(), shape.second);
         EXPECT_EQ(proto.traffic_light_status().Get(0).color(), color.second);
         EXPECT_EQ(proto.traffic_light_status().Get(0).status(), status.second);
         EXPECT_FLOAT_EQ(proto.traffic_light_status().Get(0).confidence(), confidence);
+
+        autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal_msg_back;
+        EXPECT_NO_THROW(simulation_interface::toMsg(proto, traffic_signal_msg_back));
+        EXPECT_EQ(static_cast<std::size_t>(proto.traffic_light_status().size()), traffic_signal_msg.lights.size());
+        EXPECT_EQ(proto.id(), traffic_signal_msg.map_primitive_id);
+        EXPECT_EQ(traffic_signal_msg_back.lights[0].shape, shape.first);
+        EXPECT_EQ(traffic_signal_msg_back.lights[0].color, color.first);
+        EXPECT_EQ(traffic_signal_msg_back.lights[0].status, status.first);
+        EXPECT_FLOAT_EQ(traffic_signal_msg_back.lights[0].confidence, proto.traffic_light_status().Get(0).confidence());
       }
     }
   }

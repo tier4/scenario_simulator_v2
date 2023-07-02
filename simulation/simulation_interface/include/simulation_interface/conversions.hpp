@@ -188,6 +188,10 @@ auto toProto(
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
   simulation_api_schema::TrafficSignal & proto);
+
+void toMsg(
+  const simulation_api_schema::TrafficSignal & proto,
+  autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state);
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_

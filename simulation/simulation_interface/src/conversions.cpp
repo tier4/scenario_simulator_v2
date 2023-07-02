@@ -676,4 +676,79 @@ void toProto(
       *proto.add_traffic_light_status() = convert_traffic_light(traffic_light);
   }
 }
+
+void toMsg(
+  const simulation_api_schema::TrafficSignal & proto,
+  autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state) {
+
+  auto convert_color = [](auto color) {
+    switch (color) {
+      case simulation_api_schema::TrafficLight_Color_RED:
+        return autoware_auto_perception_msgs::msg::TrafficLight::RED;
+      case simulation_api_schema::TrafficLight_Color_AMBER:
+        return autoware_auto_perception_msgs::msg::TrafficLight::AMBER;
+      case simulation_api_schema::TrafficLight_Color_GREEN:
+        return autoware_auto_perception_msgs::msg::TrafficLight::GREEN;
+      case simulation_api_schema::TrafficLight_Color_WHITE:
+        return autoware_auto_perception_msgs::msg::TrafficLight::WHITE;
+      default:
+        return autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN;
+    }
+  };
+
+  auto convert_shape = [](auto shape) {
+    switch (shape) {
+      case simulation_api_schema::TrafficLight_Shape_CIRCLE:
+        return autoware_auto_perception_msgs::msg::TrafficLight::CIRCLE;
+      case simulation_api_schema::TrafficLight_Shape_LEFT_ARROW:
+        return autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW;
+      case simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW:
+        return autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW;
+      case simulation_api_schema::TrafficLight_Shape_UP_ARROW:
+        return autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW;
+      case simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW:
+        return autoware_auto_perception_msgs::msg::TrafficLight::UP_LEFT_ARROW;
+      case simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW:
+        return autoware_auto_perception_msgs::msg::TrafficLight::UP_RIGHT_ARROW;
+      case simulation_api_schema::TrafficLight_Shape_DOWN_ARROW:
+        return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW;
+      case simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW:
+        return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_LEFT_ARROW;
+      case simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW:
+        return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_RIGHT_ARROW;
+      case simulation_api_schema::TrafficLight_Shape_CROSS:
+        return autoware_auto_perception_msgs::msg::TrafficLight::CROSS;
+      default:
+        return autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN;
+    }
+  };
+
+  auto convert_status = [](auto status) {
+    switch (status) {
+      case simulation_api_schema::TrafficLight_Status_SOLID_OFF:
+        return autoware_auto_perception_msgs::msg::TrafficLight::SOLID_OFF;
+      case simulation_api_schema::TrafficLight_Status_SOLID_ON:
+        return autoware_auto_perception_msgs::msg::TrafficLight::SOLID_ON;
+      case simulation_api_schema::TrafficLight_Status_FLASHING:
+        return autoware_auto_perception_msgs::msg::TrafficLight::FLASHING;
+      default:
+        return autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN;
+    }
+  };
+
+  auto convert_traffic_light = [convert_status, convert_shape, convert_color](const simulation_api_schema::TrafficLight& traffic_light) {
+    autoware_auto_perception_msgs::msg::TrafficLight message;
+    message.status = convert_status(traffic_light.status());
+    message.shape = convert_shape(traffic_light.shape());
+    message.color = convert_color(traffic_light.color());
+    message.confidence = traffic_light.confidence();
+    return message;
+  };
+
+  traffic_light_state.map_primitive_id = proto.id();
+  for (const auto & traffic_light : proto.traffic_light_status()) {
+    traffic_light_state.lights.emplace_back(convert_traffic_light(traffic_light));
+  }
+}
+
 }  // namespace simulation_interface
