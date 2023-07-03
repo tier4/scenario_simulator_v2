@@ -91,7 +91,37 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
     lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);
   }
   if (lanelet_pose) {
-    return traffic_simulator::CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils);
+    const auto canonicalized = hdmap_utils->canonicalizeLaneletPose(lanelet_pose.value());
+    if (
+      const auto canonicalized_lanelet_pose =
+        std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
+      /// @note If canonicalize succeed, set canonicalized pose and set other values.
+      return traffic_simulator::CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils);
+    } else {
+      /// @note If canonicalize failed, set end of road lanelet pose.
+      if (
+        const auto end_of_road_lanelet_id = std::get<std::optional<std::int64_t>>(canonicalized)) {
+        if (lanelet_pose.value().s < 0) {
+          return traffic_simulator::CanonicalizedLaneletPose(
+            traffic_simulator_msgs::build<traffic_simulator::LaneletPose>()
+              .lanelet_id(end_of_road_lanelet_id.value())
+              .s(0.0)
+              .offset(lanelet_pose.value().offset)
+              .rpy(lanelet_pose.value().rpy),
+            hdmap_utils);
+        } else {
+          return traffic_simulator::CanonicalizedLaneletPose(
+            traffic_simulator_msgs::build<traffic_simulator::LaneletPose>()
+              .lanelet_id(end_of_road_lanelet_id.value())
+              .s(hdmap_utils->getLaneletLength(end_of_road_lanelet_id.value()))
+              .offset(lanelet_pose.value().offset)
+              .rpy(lanelet_pose.value().rpy),
+            hdmap_utils);
+        }
+      } else {
+        THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
+      }
+    }
   } else {
     return std::nullopt;
   }
