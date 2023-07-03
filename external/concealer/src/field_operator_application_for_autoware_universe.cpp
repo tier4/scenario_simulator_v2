@@ -229,9 +229,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     what
       << "Failed to send a cooperate command: Cannot find a valid request to cooperate for module "
       << std::quoted(module_name) << " and command " << std::quoted(command) << "."
-      << "Please check if the situation is such that the request occurs when sending."
-      << "Following is the latest cooperate status array: "
-      << tier4_rtc_msgs::msg::to_yaml(latest_cooperate_status_array);
+      << "Please check if the situation is such that the request occurs when sending.";
     throw common::Error(what.str());
   } else {
     tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
