@@ -291,7 +291,7 @@ bool API::updateEntityStatusInSim()
   if (entity_manager_ptr_->isEgoSpawned()) {
     simulation_interface::toProto(
       {autoware_auto_control_msgs::msg::
-         AckermannControlCommand(),  // Vehicle command is not utilized by simple_sensor_simulator
+         AckermannControlCommand(),  /// @note Vehicle command is not utilized by simple_sensor_simulator
        autoware_auto_vehicle_msgs::msg::GearCommand()},
       *req.mutable_vehicle_command());
     req.set_ego_entity_status_before_update_is_empty(false);
@@ -346,7 +346,7 @@ bool API::updateFrame()
     }
     auto ego_name = entity_manager_ptr_->getEgoName();
     auto ego_status = ego_entity_simulation_->getStatus();
-    // apply additional status data (from ll2) to ego_entity_simulation_ for this update
+    /// @note apply additional status data (from ll2) to ego_entity_simulation_ for this update
     entity_manager_ptr_->fillLaneletPose(ego_name, ego_status);
     ego_entity_simulation_->setStatus(ego_status);
     entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
