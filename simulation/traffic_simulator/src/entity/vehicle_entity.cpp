@@ -307,5 +307,12 @@ void VehicleEntity::setTrafficLightManager(
   EntityBase::setTrafficLightManager(ptr);
   behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
 }
+
+auto VehicleEntity::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const
+  -> void
+{
+  EntityBase::fillLaneletPose(status, false);
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator

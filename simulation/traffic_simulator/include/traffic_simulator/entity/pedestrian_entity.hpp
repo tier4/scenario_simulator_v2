@@ -113,6 +113,8 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
+  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void override;
+
   const std::string plugin_name;
 
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
