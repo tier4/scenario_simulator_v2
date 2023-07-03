@@ -77,7 +77,7 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
 EgoEntity::EgoEntity(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-  const Configuration & configuration, const double)
+  const Configuration & configuration)
 : VehicleEntity(name, entity_status, parameters),
   field_operator_application(makeFieldOperatorApplication(configuration))
 {

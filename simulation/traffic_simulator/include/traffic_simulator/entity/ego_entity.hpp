@@ -47,8 +47,7 @@ public:
 
   explicit EgoEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
-    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
-    const double step_time);
+    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 

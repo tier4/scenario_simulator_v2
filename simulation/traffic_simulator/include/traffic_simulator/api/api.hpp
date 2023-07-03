@@ -105,7 +105,7 @@ public:
           return true;
         }
         if (entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-              name, pose, parameters, configuration, clock_.getStepTime())) {
+              name, pose, parameters, configuration)) {
           ego_entity_simulation_ = std::make_unique<vehicle_simulation::EgoEntitySimulation>(
             parameters, clock_.getStepTime());
           ego_entity_simulation_->setInitialStatus(entity_manager_ptr_->getEntityStatus(name));
