@@ -428,7 +428,8 @@ void API::requestLaneChange(
 void API::requestSpeedChange(const std::string & name, double target_speed, bool continuous)
 {
   if (entity_manager_ptr_ == nullptr) {
-    THROW_SIMULATION_ERROR(__FILE__, __LINE__, "Entity manager is not initialized");
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
   }
 
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
@@ -442,7 +443,8 @@ void API::requestSpeedChange(
   const speed_change::Constraint constraint, const bool continuous)
 {
   if (entity_manager_ptr_ == nullptr) {
-    THROW_SIMULATION_ERROR(__FILE__, __LINE__, "Entity manager is not initialized");
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
   }
 
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
@@ -455,7 +457,8 @@ void API::requestSpeedChange(
   const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
   if (entity_manager_ptr_ == nullptr) {
-    THROW_SIMULATION_ERROR(__FILE__, __LINE__, "Entity manager is not initialized");
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
   }
 
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
@@ -467,7 +470,8 @@ void API::requestSpeedChange(
   const bool continuous)
 {
   if (entity_manager_ptr_ == nullptr) {
-    THROW_SIMULATION_ERROR(__FILE__, __LINE__, "Entity manager is not initialized");
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
   }
 
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
