@@ -187,7 +187,7 @@ TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
    * $
    * $
    * $
-   * +
+   * + (x,y,z) = (0,-1,0) => control point for spline, start point of line segment.
    * 
    * -----------------------------------------------------------
    * $$$$$$$$$$$$$ Line segment for checking collision.  
