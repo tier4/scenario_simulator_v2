@@ -213,6 +213,7 @@ TEST(LineSegment, getIntersection2DSValue)
      * 
      * -----------------------------------------------------------
      * $$$$$$$$$$$$$ Line segment
+     * ============= Line segment
      */
     {
       EXPECT_TRUE(line.getIntersection2D(math::geometry::LineSegment(
