@@ -165,6 +165,24 @@ TEST(LineSegment, getIntersection2DSValue)
         EXPECT_DOUBLE_EQ(s.value(), 0.5);
       }
     }
+    /// @note Get intersection s value along with line segment. Point (x,y,z) = (0,1,0) is on the line segment.
+    {
+      const auto s = line.getIntersection2DSValue(
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0), false);
+      EXPECT_TRUE(s);
+      if (s) {
+        EXPECT_DOUBLE_EQ(s.value(), 1.0);
+      }
+    }
+    /// @note If autoscale = true, consider length of the line string.
+    {
+      const auto s = line.getIntersection2DSValue(
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0), true);
+      EXPECT_TRUE(s);
+      if (s) {
+        EXPECT_DOUBLE_EQ(s.value(), 2.0);
+      }
+    }
     /// @note If autoscale = true, consider length of the line string.
     {
       const auto s = line.getIntersection2DSValue(
