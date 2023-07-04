@@ -514,7 +514,7 @@ auto CatmullRomSpline::getPoint(const double s) const -> geometry_msgs::msg::Poi
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
-      return line_segments_[0].getPoint(s);
+      return line_segments_[0].getPoint(s, true);
     default:
       const auto index_and_s = getCurveIndexAndS(s);
       return curves_[index_and_s.first].getPoint(index_and_s.second, true);
