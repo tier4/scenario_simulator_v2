@@ -38,6 +38,7 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
    * +================+--> x
    * P0 = (0,0,0)     P1 = (1,0,0)
    *
+   * -----------------------------------------------------------
    * ============= Spline Curve (Control point is P0, P1)
    */
   auto spline = math::geometry::CatmullRomSpline(points);
