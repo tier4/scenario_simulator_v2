@@ -26,7 +26,7 @@ Position::Position(const pugi::xml_node & node, Scope & scope)
     choice(node,
       std::make_pair(         "WorldPosition", [&](auto && node) { return make<        WorldPosition>(node, scope); }),
       std::make_pair( "RelativeWorldPosition", [&](auto && node) { return make<RelativeWorldPosition>(node, scope); }),
-      std::make_pair("RelativeObjectPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair("RelativeObjectPosition", [&](auto && node) { return make<RelativeObjectPosition>(node, scope); }),
       std::make_pair(          "RoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
       std::make_pair(  "RelativeRoadPosition", [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
       std::make_pair(          "LanePosition", [&](auto && node) { return make<         LanePosition>(node, scope); }),
@@ -43,6 +43,7 @@ Position::operator geometry_msgs::msg::Pose() const
       // clang-format off
       [&](const         WorldPosition & position) { return static_cast<geometry_msgs::msg::Pose>(position); },
       [&](const RelativeWorldPosition & position) { return static_cast<geometry_msgs::msg::Pose>(position); },
+      [&](const RelativeObjectPosition & position) { return static_cast<geometry_msgs::msg::Pose>(position); },
       [&](const          LanePosition & position) { return static_cast<geometry_msgs::msg::Pose>(position); }
       // clang-format on
       ),

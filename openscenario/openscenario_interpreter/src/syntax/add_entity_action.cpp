@@ -66,6 +66,14 @@ try {
           entity.as<ScenarioObject>().object_controller.isUserDefinedController()
             ? traffic_simulator::VehicleBehavior::autoware()
             : traffic_simulator::VehicleBehavior::defaultBehavior());
+      } else if (position.is<RelativeObjectPosition>()) {
+        applyAddEntityAction(
+          entity_ref,
+          static_cast<NativeRelativeWorldPosition>(position.as<RelativeObjectPosition>()),
+          static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
+          entity.as<ScenarioObject>().object_controller.isUserDefinedController()
+            ? traffic_simulator::VehicleBehavior::autoware()
+            : traffic_simulator::VehicleBehavior::defaultBehavior());
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
@@ -95,6 +103,11 @@ try {
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeWorldPosition>()),
           static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
+      } else if (position.is<RelativeObjectPosition>()) {
+        applyAddEntityAction(
+          entity_ref,
+          static_cast<NativeRelativeWorldPosition>(position.as<RelativeObjectPosition>()),
+          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian));
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
@@ -114,6 +127,11 @@ try {
         applyAddEntityAction(
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeWorldPosition>()),
+          static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
+      } else if (position.is<RelativeObjectPosition>()) {
+        applyAddEntityAction(
+          entity_ref,
+          static_cast<NativeRelativeWorldPosition>(position.as<RelativeObjectPosition>()),
           static_cast<traffic_simulator_msgs::msg::MiscObjectParameters>(misc_object));
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(

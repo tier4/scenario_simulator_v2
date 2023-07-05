@@ -36,6 +36,10 @@ auto AcquirePositionAction::start() -> void
       return applyAcquirePositionAction(
         actor, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
     },
+    [](const RelativeObjectPosition & position, auto && actor) {
+      return applyAcquirePositionAction(
+        actor, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
+    },
     [](const LanePosition & position, auto && actor) {
       return applyAcquirePositionAction(
         actor, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
