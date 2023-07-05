@@ -29,7 +29,6 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
   p1.x = 1;
   auto points = {p0, p1};
   /**
-   * @note
    * y
    * ^
    * |
@@ -44,7 +43,6 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
   auto spline = math::geometry::CatmullRomSpline(points);
   {
     /**
-     * @note
      * y
      * ^
      * |
@@ -76,8 +74,7 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
   }
   {
     /**
-     * @note
-     * y
+     *               y
      *               ^
      *               |         + (x,y,z) = (1,1,0)
      *               |       $
@@ -108,7 +105,6 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
   }
   {
     /**
-     * @note
      *          y
      *          ^               (x,y,z) = (1,1,0)
      *          |               +
@@ -145,7 +141,6 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
   }
   {
     /**
-     * @note
      * y
      * ^
      * |
@@ -175,7 +170,6 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
 TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
 {
   /**
-   * @note
    * y
    * ^
    * |
@@ -207,7 +201,6 @@ TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
   }
   {
     /**
-     * @note
      * y
      * ^
      * |

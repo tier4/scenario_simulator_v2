@@ -24,7 +24,6 @@ TEST(LineSegmentTest, GetPoint)
 {
   {
     /**
-     * @note
      * y
      * ^
      * |    + P1 = (1,1,1)
@@ -64,7 +63,6 @@ TEST(LineSegment, GetPose)
 {
   {
     /**
-     * @note
      * z      y
      * ^     /
      * + (0,0,1)
@@ -94,7 +92,6 @@ TEST(LineSegment, isIntersect2D)
 {
   {
     /**
-     * @note
      * y
      * ^
      * |
@@ -136,7 +133,6 @@ TEST(LineSegment, getIntersection2DSValue)
 {
   {
     /**
-     * @note
      * y
      * ^
      * |
@@ -215,7 +211,6 @@ TEST(LineSegment, getIntersection2DSValue)
         common::SimulationError);
     }
     /**
-     * @note
      *           y
      *           ^
      *           |
