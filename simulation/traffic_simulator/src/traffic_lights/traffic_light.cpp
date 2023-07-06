@@ -166,35 +166,51 @@ auto operator<<(std::ostream & os, const TrafficLight::Bulb & bulb) -> std::ostr
             << std::get<TrafficLight::Shape>(bulb.value);
 }
 
-TrafficLight::Bulb::operator autoware_auto_perception_msgs::msg::TrafficLight() const
+auto demangle(const char * name) -> std::string
+{
+#ifdef __GNUC__
+  int failed = 0;
+
+  std::unique_ptr<char, decltype(&std::free)> demangled{
+    abi::__cxa_demangle(name, nullptr, nullptr, &failed),
+    [](void * x) noexcept -> void { std::free(x); }};
+
+  return std::string(failed ? name : demangled.get());
+#else
+  return std::string(name);
+#endif
+}
+
+template <typename TrafficLightBulbMessageType>
+TrafficLight::Bulb::operator TrafficLightBulbMessageType() const
 {
   auto color = [this]() {
     switch (std::get<Color>(value).value) {
       case Color::green:
-        return autoware_auto_perception_msgs::msg::TrafficLight::GREEN;
+        return TrafficLightBulbMessageType::GREEN;
       case Color::yellow:
-        return autoware_auto_perception_msgs::msg::TrafficLight::AMBER;
+        return TrafficLightBulbMessageType::AMBER;
       case Color::red:
-        return autoware_auto_perception_msgs::msg::TrafficLight::RED;
+        return TrafficLightBulbMessageType::RED;
       case Color::white:
-        return autoware_auto_perception_msgs::msg::TrafficLight::WHITE;
+        return TrafficLightBulbMessageType::WHITE;
       default:
         throw common::SyntaxError(
           std::get<Color>(value),
-          " is not supported as a color for autoware_auto_perception_msgs::msg::TrafficLight.");
+          " is not supported as a color for ", demangle(typeid(TrafficLightBulbMessageType))),".");
     }
   };
 
   auto status = [this]() {
     switch (std::get<Status>(value).value) {
       case Status::solid_on:
-        return autoware_auto_perception_msgs::msg::TrafficLight::SOLID_ON;
+        return TrafficLightBulbMessageType::SOLID_ON;
       case Status::solid_off:
-        return autoware_auto_perception_msgs::msg::TrafficLight::SOLID_OFF;
+        return TrafficLightBulbMessageType::SOLID_OFF;
       case Status::flashing:
-        return autoware_auto_perception_msgs::msg::TrafficLight::FLASHING;
+        return TrafficLightBulbMessageType::FLASHING;
       case Status::unknown:
-        return autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN;
+        return TrafficLightBulbMessageType::UNKNOWN;
       default:
         throw common::SyntaxError(
           std::get<Status>(value),
@@ -206,21 +222,21 @@ TrafficLight::Bulb::operator autoware_auto_perception_msgs::msg::TrafficLight() 
   auto shape = [this]() {
     switch (std::get<Shape>(value).value) {
       case Shape::circle:
-        return autoware_auto_perception_msgs::msg::TrafficLight::CIRCLE;
+        return TrafficLightBulbMessageType::CIRCLE;
       case Shape::cross:
-        return autoware_auto_perception_msgs::msg::TrafficLight::CROSS;
+        return TrafficLightBulbMessageType::CROSS;
       case Shape::left:
-        return autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW;
+        return TrafficLightBulbMessageType::LEFT_ARROW;
       case Shape::down:
-        return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW;
+        return TrafficLightBulbMessageType::DOWN_ARROW;
       case Shape::up:
-        return autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW;
+        return TrafficLightBulbMessageType::UP_ARROW;
       case Shape::right:
-        return autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW;
+        return TrafficLightBulbMessageType::RIGHT_ARROW;
       case Shape::lower_left:
-        return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_LEFT_ARROW;
+        return TrafficLightBulbMessageType::DOWN_LEFT_ARROW;
       case Shape::lower_right:
-        return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_RIGHT_ARROW;
+        return TrafficLightBulbMessageType::DOWN_RIGHT_ARROW;
       default:
         throw common::SyntaxError(
           std::get<Shape>(value),
@@ -228,12 +244,12 @@ TrafficLight::Bulb::operator autoware_auto_perception_msgs::msg::TrafficLight() 
     }
   };
 
-  autoware_auto_perception_msgs::msg::TrafficLight traffic_light;
-  traffic_light.color = color();
-  traffic_light.status = status();
-  traffic_light.shape = shape();
-  traffic_light.confidence = 1.0;
-  return traffic_light;
+  TrafficLightBulbMessageType traffic_light_bulb;
+  traffic_light_bulb.color = color();
+  traffic_light_bulb.status = status();
+  traffic_light_bulb.shape = shape();
+  traffic_light_bulb.confidence = 1.0;
+  return traffic_light_bulb;
 }
 
 TrafficLight::TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
@@ -272,17 +288,6 @@ auto TrafficLight::set(const std::string & states) -> void
     emplace(head);
     set(tail);
   }
-}
-
-TrafficLight::operator autoware_auto_perception_msgs::msg::TrafficSignal() const
-{
-  autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
-  traffic_signal.map_primitive_id = id;
-  for (auto && bulb : bulbs) {
-    traffic_signal.lights.push_back(
-      static_cast<autoware_auto_perception_msgs::msg::TrafficLight>(bulb));
-  }
-  return traffic_signal;
 }
 
 auto operator<<(std::ostream & os, const TrafficLight & traffic_light) -> std::ostream &
