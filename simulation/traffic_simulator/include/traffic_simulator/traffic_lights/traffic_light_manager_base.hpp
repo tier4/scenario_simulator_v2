@@ -15,7 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -96,8 +95,8 @@ public:
   {
     std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
 
-    if (hdmap_->isTrafficRelation(lanelet_id)) {
-      for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
+    if (hdmap_->isTrafficLightRelation(lanelet_id)) {
+      for (auto && traffic_light : hdmap_->getTrafficLightRelation(lanelet_id)->trafficLights()) {
         traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
       }
     } else if (hdmap_->isTrafficLight(lanelet_id)) {
