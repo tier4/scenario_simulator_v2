@@ -5,37 +5,15 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# find dependencies
 find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_library(behavior_tree_plugin SHARED
-  src/action_node.cpp
-  src/pedestrian/behavior_tree.cpp
-  src/pedestrian/follow_lane_action.cpp
-  src/pedestrian/pedestrian_action_node.cpp
-  src/pedestrian/walk_straight_action.cpp
-  src/transition_events/logging_event.cpp
-  src/transition_events/reset_request_event.cpp
-  src/transition_events/transition_event.cpp
-  src/vehicle/behavior_tree.cpp
-  src/vehicle/follow_lane_sequence/follow_front_entity_action.cpp
-  src/vehicle/follow_lane_sequence/follow_lane_action.cpp
-  src/vehicle/follow_lane_sequence/move_backward_action.cpp
-  src/vehicle/follow_lane_sequence/stop_at_crossing_entity_action.cpp
-  src/vehicle/follow_lane_sequence/stop_at_stop_line_action.cpp
-  src/vehicle/follow_lane_sequence/stop_at_traffic_light_action.cpp
-  src/vehicle/follow_lane_sequence/yield_action.cpp
-  src/vehicle/lane_change_action.cpp
-  src/vehicle/vehicle_action_node.cpp
-)
+ament_auto_add_library(${PROJECT_NAME} SHARED DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-# workaround to allow deprecated header to build on both galactic and humble
+# Workaround to allow deprecated header to build on both galactic and humble
 if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
-  target_compile_definitions(behavior_tree_plugin PUBLIC
-    USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
-  )
+  target_compile_definitions(behavior_tree_plugin PUBLIC USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER)
 endif()
 
 pluginlib_export_plugin_description_file(traffic_simulator plugins.xml)
@@ -44,11 +22,6 @@ if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
 endif()
-
-install(
-  TARGETS behavior_tree_plugin
-  DESTINATION lib
-)
 
 install(
   DIRECTORY config

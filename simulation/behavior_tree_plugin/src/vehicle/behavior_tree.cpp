@@ -22,6 +22,7 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_traffic_light_action.hpp>
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/yield_action.hpp>
+#include <behavior_tree_plugin/vehicle/follow_trajectory_sequence/follow_polyline_trajectory_action.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <iostream>
 #include <pugixml.hpp>
@@ -44,6 +45,7 @@ void VehicleBehaviorTree::configure(const rclcpp::Logger & logger)
     "StopAtTrafficLight");
   factory_.registerNodeType<vehicle::follow_lane_sequence::YieldAction>("Yield");
   factory_.registerNodeType<vehicle::follow_lane_sequence::MoveBackwardAction>("MoveBackward");
+  factory_.registerNodeType<vehicle::FollowPolylineTrajectoryAction>("FollowPolylineTrajectory");
   factory_.registerNodeType<vehicle::LaneChangeAction>("LaneChange");
 
   tree_ = createBehaviorTree(
