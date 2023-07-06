@@ -47,6 +47,7 @@ target_link_libraries(traffic_simulation_demo cpp_scenario_node)
 
 option(BUILD_CPP_MOCK_SCENARIOS "Building the C++ scenarios" OFF)
 if(BUILD_CPP_MOCK_SCENARIOS)
+  add_subdirectory(src/behavior_plugin)
   add_subdirectory(src/collision)
   add_subdirectory(src/crosswalk)
   add_subdirectory(src/follow_front_entity)

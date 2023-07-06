@@ -92,6 +92,19 @@ struct ApplyFaultInjectionAction : public CustomCommand
   }
 };
 
+template <auto Version>
+struct ApplyRequestToCorporateCommandAction : public CustomCommand,
+                                              public SimulatorCore::NonStandardOperation
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope &) -> void override
+  {
+    static_assert(0 < Version and Version <= 1);
+    sendCooperateCommand(parameters.at(0), parameters.at(1));
+  }
+};
+
 struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
                                           public SimulatorCore::NonStandardOperation
 {
@@ -260,6 +273,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
+      ELEMENT("RequestToCooperateCommandAction@v1", ApplyRequestToCorporateCommandAction<1>),
       ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
