@@ -26,6 +26,7 @@
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
+#include <simple_sensor_simulator/sensor_simulation/traffic_lights/traffic_lights_detector.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <string>
@@ -133,11 +134,13 @@ private:
   rclcpp::Time current_ros_time_;
   bool initialized_;
   std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
+  std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> traffic_signals_states_;
   traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string& name);
   zeromq::MultiServer server_;
   geographic_msgs::msg::GeoPoint getOrigin();
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   std::shared_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
+
   bool isEgo(const std::string& name);
 };
 }  // namespace simple_sensor_simulator

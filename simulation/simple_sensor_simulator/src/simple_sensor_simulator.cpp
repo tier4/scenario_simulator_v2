@@ -30,7 +30,7 @@ namespace simple_sensor_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("simple_sensor_simulator", options),
-  sensor_sim_(),
+  sensor_sim_(*this),
   server_(
     simulation_interface::protocol, simulation_interface::HostName::ANY, getSocketPort(),
     std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
@@ -125,7 +125,7 @@ void ScenarioSimulator::updateFrame(
     *status.mutable_subtype() = kv.second.subtype();
     *status.mutable_bounding_box() = getBoundingBox(status.name());
     return status;} );
-  sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status);
+  sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status, traffic_signals_states_);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
 }
@@ -278,8 +278,12 @@ void ScenarioSimulator::updateTrafficLights(
   const simulation_api_schema::UpdateTrafficLightsRequest & req,
   simulation_api_schema::UpdateTrafficLightsResponse & res)
 {
-  // TODO: handle traffic lights in simple simulator
-  (void)req;
+  traffic_signals_states_.clear();
+  for (const auto& traffic_signal_proto : req.states()) {
+    autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
+    simulation_interface::toMsg(traffic_signal_proto, traffic_signal);
+    traffic_signals_states_.emplace_back(traffic_signal);
+  }
   res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
 }
