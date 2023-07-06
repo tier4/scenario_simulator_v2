@@ -1797,16 +1797,17 @@ auto HdMapUtils::isTrafficLight(const LaneletId lanelet_id) const -> bool
   return false;
 }
 
-auto HdMapUtils::isTrafficRelation(const LaneletId lanelet_id) const -> bool
+auto HdMapUtils::isTrafficLightRelation(const LaneletId lanelet_id) const -> bool
 {
   return lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
            lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 
-auto HdMapUtils::getTrafficRelation(const LaneletId lanelet_id) const -> lanelet::TrafficLight::Ptr
+auto HdMapUtils::getTrafficLightRelation(const LaneletId lanelet_id) const
+  -> lanelet::TrafficLight::Ptr
 {
-  assert(isTrafficRelation(lanelet_id));
+  assert(isTrafficLightRelation(lanelet_id));
   return std::dynamic_pointer_cast<lanelet::TrafficLight>(
     lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
