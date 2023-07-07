@@ -53,6 +53,7 @@ public:
   auto getAccel() const noexcept -> geometry_msgs::msg::Accel;
   auto setLinearJerk(double) -> void;
   auto getLinearJerk() const noexcept -> double;
+  auto setTime(double) -> void;
   auto getTime() const noexcept -> double;
 
 private:
