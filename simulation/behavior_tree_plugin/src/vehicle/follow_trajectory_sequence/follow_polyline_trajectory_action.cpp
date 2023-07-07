@@ -552,8 +552,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
     entity_status_updated.lanelet_pose_valid = false;
 
-    setOutput("updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                                  entity_status_updated, hdmap_utils));
+    setOutput(
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+                          entity_status_updated, hdmap_utils));
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
 
