@@ -20,19 +20,19 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 
 namespace traffic_simulator
 {
 template <typename Message>
-class ConventionalTrafficLightManager : public TrafficLightManagerBase
+class ConventionalTrafficLightManager : public ConfigurableRateUpdater
 {
 public:
   template <typename Node>
   explicit ConventionalTrafficLightManager(
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
     const std::string & map_frame = "map")
-  : TrafficLightManagerBase(node, hdmap, map_frame)
+  : ConfigurableRateUpdater(node, hdmap, map_frame)
   {
   }
 
