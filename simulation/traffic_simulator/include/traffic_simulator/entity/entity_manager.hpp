@@ -474,6 +474,7 @@ public:
                   name, makeEntityStatus(), hdmap_utils_ptr_, parameters,
                   std::forward<decltype(xs)>(xs)...));
         success) {
+      // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
       if (npc_logic_started_ && not isEgo(name)) {
         iter->second->startNpcLogic();
