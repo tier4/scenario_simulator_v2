@@ -118,7 +118,7 @@ public:
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &) override;
 
   void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> &) override;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;

@@ -20,12 +20,12 @@
 
 namespace traffic_simulator
 {
-  class ConfigurableRateUpdater : public TrafficLightManagerBase  {
+  class ConfigurableRateUpdater : public TrafficLightManager  {
   public:
     template <typename NodePointer>
     ConfigurableRateUpdater(const NodePointer & node, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap,
     const std::string & map_frame = "map")
-    : TrafficLightManagerBase(node, hdmap, map_frame) {
+    : TrafficLightManager(node, hdmap, map_frame) {
 
     }
 

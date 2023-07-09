@@ -31,7 +31,7 @@
 
 namespace traffic_simulator
 {
-class TrafficLightManagerBase
+class TrafficLightManager
 {
 protected:
   using LaneletID = std::int64_t;
@@ -55,7 +55,7 @@ protected:
   double publish_rate_ = 0.0;
 
   template <typename NodePointer>
-  explicit TrafficLightManagerBase(
+  explicit TrafficLightManager(
     const NodePointer & node, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap,
     const std::string & map_frame = "map")
   : marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(

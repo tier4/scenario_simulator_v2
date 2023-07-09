@@ -112,9 +112,9 @@ class EntityManager
 
   MarkerArray markers_raw_;
 
-  const std::shared_ptr<TrafficLightManagerBase> conventional_traffic_light_manager_ptr_;
+  const std::shared_ptr<TrafficLightManager> conventional_traffic_light_manager_ptr_;
 
-  const std::shared_ptr<TrafficLightManagerBase> v2i_traffic_light_manager_ptr_;
+  const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -139,7 +139,7 @@ public:
   }
 
   template <typename... Ts>
-  auto makeConventionalTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
+  auto makeConventionalTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManager>
   {
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");
@@ -155,7 +155,7 @@ public:
   }
 
   template <typename... Ts>
-  auto makeV2ITrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
+  auto makeV2ITrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManager>
   {
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");

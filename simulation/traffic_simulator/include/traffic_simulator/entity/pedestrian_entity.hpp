@@ -81,7 +81,7 @@ public:
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override;
 
   void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr) override;
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
 

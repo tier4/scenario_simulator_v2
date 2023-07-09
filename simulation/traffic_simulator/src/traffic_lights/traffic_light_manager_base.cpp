@@ -22,7 +22,7 @@
 
 namespace traffic_simulator
 {
-auto TrafficLightManagerBase::deleteAllMarkers() const -> void
+auto TrafficLightManager::deleteAllMarkers() const -> void
 {
   visualization_msgs::msg::MarkerArray message;
   {
@@ -34,7 +34,7 @@ auto TrafficLightManagerBase::deleteAllMarkers() const -> void
   marker_pub_->publish(message);
 }
 
-auto TrafficLightManagerBase::drawMarkers() const -> void
+auto TrafficLightManager::drawMarkers() const -> void
 {
   visualization_msgs::msg::MarkerArray marker_array;
 
@@ -47,7 +47,7 @@ auto TrafficLightManagerBase::drawMarkers() const -> void
   marker_pub_->publish(marker_array);
 }
 
-auto TrafficLightManagerBase::hasAnyLightChanged() -> bool
+auto TrafficLightManager::hasAnyLightChanged() -> bool
 {
   return true;
   // return std::any_of(
@@ -57,7 +57,7 @@ auto TrafficLightManagerBase::hasAnyLightChanged() -> bool
   //   });
 }
 
-auto TrafficLightManagerBase::update(const double) -> void
+auto TrafficLightManager::update(const double) -> void
 {
   publishTrafficLightStateArray();
 
@@ -68,7 +68,7 @@ auto TrafficLightManagerBase::update(const double) -> void
   drawMarkers();
 }
 
-auto TrafficLightManagerBase::createTimer(double publish_rate) -> void
+auto TrafficLightManager::createTimer(double publish_rate) -> void
 {
   if (!timer_) {
     publish_rate_ = publish_rate;
@@ -79,7 +79,7 @@ auto TrafficLightManagerBase::createTimer(double publish_rate) -> void
   }
 }
 
-auto TrafficLightManagerBase::resetPublishRate(double publish_rate) -> void
+auto TrafficLightManager::resetPublishRate(double publish_rate) -> void
 {
   if (publish_rate_ != publish_rate) {
     publish_rate_ = publish_rate;

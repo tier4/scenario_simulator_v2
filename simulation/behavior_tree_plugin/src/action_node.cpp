@@ -51,7 +51,7 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils", hdmap_utils)) {
     THROW_SIMULATION_ERROR("failed to get input hdmap_utils in ActionNode");
   }
-  if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightManagerBase>>(
+  if (!getInput<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
         "traffic_light_manager", traffic_light_manager)) {
     THROW_SIMULATION_ERROR("failed to get input traffic_light_manager in ActionNode");
   }
