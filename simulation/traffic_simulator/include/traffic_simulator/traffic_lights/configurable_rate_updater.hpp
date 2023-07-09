@@ -16,7 +16,7 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__CONFIGURABLE_RATE_UPDATER_HPP
 
 #include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 
 namespace traffic_simulator
 {

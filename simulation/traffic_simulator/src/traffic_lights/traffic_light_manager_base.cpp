@@ -15,7 +15,7 @@
 #include <iterator>
 #include <memory>
 #include <string>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <type_traits>
 #include <utility>
 #include <vector>
