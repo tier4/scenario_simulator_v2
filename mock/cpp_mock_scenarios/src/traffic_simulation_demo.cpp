@@ -86,7 +86,7 @@ private:
     lanechange_executed_ = false;
 
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(120545, 0), getVehicleParameters());
+      "ego", traffic_simulator::helper::constructLaneletPose(34408, 0), getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 8, true);
     api_.requestAssignRoute(
@@ -132,7 +132,7 @@ private:
       "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
 
-    api_.getConventionalTrafficLight(34802).emplace(traffic_simulator::TrafficLight::Color::green);
+    api_.getConventionalTrafficLight(34802).emplace(traffic_simulator::TrafficLight::Color::yellow);
   }
 
 private:
