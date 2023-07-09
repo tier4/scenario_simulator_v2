@@ -38,41 +38,12 @@ protected:
 
   std::unordered_map<LaneletID, TrafficLight> traffic_lights_;
 
-  const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
-
-  const rclcpp::Clock::SharedPtr clock_ptr_;
-
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
 
-  const std::string map_frame_;
-
-  rclcpp::TimerBase::SharedPtr timer_ = nullptr;
-
-  const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
-
-  const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
-
-  double publish_rate_ = 0.0;
-
-  template <typename NodePointer>
-  explicit TrafficLightManager(
-    const NodePointer & node, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap,
-    const std::string & map_frame = "map")
-  : marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
-      node, "traffic_light/marker", rclcpp::QoS(1).transient_local())),
-    clock_ptr_(node->get_clock()),
-    hdmap_(hdmap),
-    map_frame_(map_frame),
-    node_base_interface_(node->get_node_base_interface()),
-    node_timers_interface_(node->get_node_timers_interface())
+  explicit TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap)
+    : hdmap_(hdmap)
   {
   }
-
-  auto deleteAllMarkers() const -> void;
-
-  auto drawMarkers() const -> void;
-
-  virtual auto publishTrafficLightStateArray() const -> void = 0;
 
 public:
   auto getTrafficLight(const LaneletID traffic_light_id) -> auto &
@@ -113,11 +84,9 @@ public:
 
   auto hasAnyLightChanged() -> bool;
 
-  auto createTimer(double update_rate) -> void;
+  virtual auto createTimer(double update_rate) -> void = 0;
 
-  auto resetPublishRate(double update_rate) -> void;
-
-  auto update(const double) -> void;
+  virtual auto resetPublishRate(double update_rate) -> void = 0;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_

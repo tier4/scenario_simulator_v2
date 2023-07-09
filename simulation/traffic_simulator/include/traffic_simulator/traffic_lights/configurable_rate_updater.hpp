@@ -20,17 +20,50 @@
 
 namespace traffic_simulator
 {
-  class ConfigurableRateUpdater : public TrafficLightManager  {
-  public:
-    template <typename NodePointer>
-    ConfigurableRateUpdater(const NodePointer & node, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap,
-    const std::string & map_frame = "map")
-    : TrafficLightManager(node, hdmap, map_frame) {
+class ConfigurableRateUpdater : public TrafficLightManager  {
+  rclcpp::TimerBase::SharedPtr timer_ = nullptr;
 
-    }
+  const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
 
-//    virtual auto update() -> void = 0;
-  };
+  const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
+
+  double publish_rate_ = 0.0;
+
+  const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+
+
+  const std::string map_frame_;
+
+  auto deleteAllMarkers() const -> void;
+
+  auto drawMarkers() const -> void;
+
+  virtual auto publishTrafficLightStateArray() const -> void = 0;
+
+protected:
+  const rclcpp::Clock::SharedPtr clock_ptr_;
+
+public:
+  template <typename NodePointer>
+  ConfigurableRateUpdater(const NodePointer & node, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap,
+  const std::string & map_frame = "map")
+  : TrafficLightManager(hdmap)
+  , node_base_interface_(node->get_node_base_interface())
+  , node_timers_interface_(node->get_node_timers_interface())
+  , marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
+      node, "traffic_light/marker", rclcpp::QoS(1).transient_local()))
+  , map_frame_(map_frame)
+  , clock_ptr_(node->get_clock())
+  {
+
+  }
+
+  auto createTimer(double update_rate) -> void;
+
+  auto resetPublishRate(double update_rate) -> void;
+
+  auto update(const double) -> void;
+};
 }
 
 #endif // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__CONFIGURABLE_RATE_UPDATER_HPP
