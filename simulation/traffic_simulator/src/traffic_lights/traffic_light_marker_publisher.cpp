@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator {
   auto TrafficLightMarkerPublisher::deleteAllMarkers() const -> void

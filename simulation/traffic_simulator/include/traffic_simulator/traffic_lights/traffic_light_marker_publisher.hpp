@@ -21,15 +21,13 @@
 namespace traffic_simulator {
 
 class TrafficLightMarkerPublisher : public ConfigurableRateUpdater {
+
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
+  const std::string map_frame_;
+  const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
 
   auto deleteAllMarkers() const -> void;
-
   auto drawMarkers() const -> void;
-
-  const std::string map_frame_;
-protected:
-  const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
 
 public:
   template <typename NodePointer>

@@ -15,7 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -27,7 +26,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {
@@ -35,51 +33,21 @@ class TrafficLightManager
 {
 protected:
   using LaneletID = std::int64_t;
+  using TrafficLigthMap = std::unordered_map<LaneletID, TrafficLight>;
 
-  std::unordered_map<LaneletID, TrafficLight> traffic_lights_;
-
+  TrafficLigthMap traffic_lights_;
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
+
 public:
-  explicit TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap)
-      : hdmap_(hdmap)
-  {
-  }
+  explicit TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap);
 
-  auto getTrafficLight(const LaneletID traffic_light_id) -> auto &
-  {
-    if (auto iter = traffic_lights_.find(traffic_light_id); iter != std::end(traffic_lights_)) {
-      return iter->second;
-    } else {
-      traffic_lights_.emplace(
-        std::piecewise_construct, std::forward_as_tuple(traffic_light_id),
-        std::forward_as_tuple(traffic_light_id, *hdmap_));
-      return traffic_lights_.at(traffic_light_id);
-    }
-  }
+  auto getTrafficLight(const LaneletID traffic_light_id) -> TrafficLight &;
 
-  auto getTrafficLights() const -> const auto & { return traffic_lights_; }
+  auto getTrafficLights() const -> const TrafficLigthMap &;
 
-  auto getTrafficLights() -> auto & { return traffic_lights_; }
+  auto getTrafficLights() -> TrafficLigthMap &;
 
-  auto getTrafficLights(const LaneletID lanelet_id)
-    -> std::vector<std::reference_wrapper<TrafficLight>>
-  {
-    std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
-
-    if (hdmap_->isTrafficRelation(lanelet_id)) {
-      for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
-        traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
-      }
-    } else if (hdmap_->isTrafficLight(lanelet_id)) {
-      traffic_lights.emplace_back(getTrafficLight(lanelet_id));
-    } else {
-      throw common::scenario_simulator_exception::Error(
-        "Given lanelet ID ", lanelet_id,
-        " is neither a traffic light ID not a traffic relation ID.");
-    }
-
-    return traffic_lights;
-  }
+  auto getTrafficLights(const LaneletID lanelet_id) -> std::vector<std::reference_wrapper<TrafficLight>>;
 
   auto hasAnyLightChanged() -> bool;
 };
