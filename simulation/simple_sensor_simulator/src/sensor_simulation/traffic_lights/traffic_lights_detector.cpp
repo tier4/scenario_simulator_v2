@@ -12,26 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include <simple_sensor_simulator/sensor_simulation/traffic_lights/traffic_lights_detector.hpp>
 
 namespace simple_sensor_simulator
 {
-namespace traffic_lights {
+namespace traffic_lights
+{
 
-TrafficLightsDetector::TrafficLightsDetector(std::string topic_name, rclcpp::Node& node)
-  :traffic_light_state_array_publisher_( rclcpp::create_publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>
-      (node, topic_name, rclcpp::QoS(10).transient_local()))
+TrafficLightsDetector::TrafficLightsDetector(std::string topic_name, rclcpp::Node & node)
+: traffic_light_state_array_publisher_(
+    rclcpp::create_publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>(
+      node, topic_name, rclcpp::QoS(10).transient_local()))
 {
 }
 
-auto TrafficLightsDetector::updateFrame(const rclcpp::Time& current_ros_time,
-                   std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> traffic_light_state) -> void {
+auto TrafficLightsDetector::updateFrame(
+  const rclcpp::Time & current_ros_time,
+  std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> traffic_light_state) -> void
+{
   autoware_auto_perception_msgs::msg::TrafficSignalArray msg;
   msg.header.frame_id = "camera_link";  // DIRTY HACK!!!
   msg.header.stamp = current_ros_time;
   msg.signals = std::move(traffic_light_state);
   traffic_light_state_array_publisher_->publish(msg);
 }
-}
-}
+}  // namespace traffic_lights
+}  // namespace simple_sensor_simulator

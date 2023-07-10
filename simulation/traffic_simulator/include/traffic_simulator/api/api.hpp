@@ -124,7 +124,7 @@ public:
         req.set_asset_key(model3d);
         simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
-        req.set_initial_speed(0.0); // TODO: Should be filled from function API
+        req.set_initial_speed(0.0);  // TODO: Should be filled from function API
         zeromq_client_.call(req, res);
         return res.result().success();
       }
@@ -133,11 +133,10 @@ public:
     return register_to_entity_manager() and register_to_environment_simulator();
   }
 
-  geometry_msgs::msg::Pose toMapPose(const geometry_msgs::msg::Pose& pose) {
-    return pose;
-  }
+  geometry_msgs::msg::Pose toMapPose(const geometry_msgs::msg::Pose & pose) { return pose; }
 
-  geometry_msgs::msg::Pose toMapPose(const traffic_simulator_msgs::msg::LaneletPose& pose) {
+  geometry_msgs::msg::Pose toMapPose(const traffic_simulator_msgs::msg::LaneletPose & pose)
+  {
     return entity_manager_ptr_->getHdmapUtils()->toMapPose(pose).pose;
   }
 
@@ -346,10 +345,11 @@ public:
 
 private:
   bool updateEntityStatusInSim();
-  std::optional<traffic_simulator_msgs::msg::EntityStatus>  updateEntityStatusInSim(const std::string& entity_name, traffic_simulator_msgs::msg::EntityStatus status);
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> updateEntityStatusInSim(
+    const std::string & entity_name, traffic_simulator_msgs::msg::EntityStatus status);
   bool updateTrafficLightsInSim();
-  auto refillEntityStatusWithLaneletData(const std::string& name,
-                                                traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
+  auto refillEntityStatusWithLaneletData(
+    const std::string & name, traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
 
   const Configuration configuration;
 

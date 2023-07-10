@@ -36,13 +36,14 @@ class V2ITrafficLightManager : public ConfigurableRateUpdater
 public:
   template <typename NodePointer>
   explicit V2ITrafficLightManager(
-    const std::shared_ptr<TrafficLightManager> & traffic_light_manager, const std::string & topic_name, const NodePointer & node,
+    const std::shared_ptr<TrafficLightManager> & traffic_light_manager,
+    const std::string & topic_name, const NodePointer & node,
     const std::string & sensor_frame = "camera_link")
-   : ConfigurableRateUpdater(node)
-   , traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local()))
-   , traffic_light_manager_(traffic_light_manager)
-   , sensor_frame_(sensor_frame)
+  : ConfigurableRateUpdater(node),
+    traffic_light_state_array_publisher_(
+      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
+    traffic_light_manager_(traffic_light_manager),
+    sensor_frame_(sensor_frame)
   {
   }
 
@@ -51,6 +52,7 @@ private:
 };
 
 template <>
-auto V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::update() -> void;
+auto V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::update()
+  -> void;
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_

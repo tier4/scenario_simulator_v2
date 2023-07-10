@@ -20,8 +20,8 @@
 
 namespace traffic_simulator
 {
-class ConfigurableRateUpdater {
-
+class ConfigurableRateUpdater
+{
   rclcpp::TimerBase::SharedPtr timer_ = nullptr;
   const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
   const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
@@ -33,9 +33,9 @@ protected:
 public:
   template <typename NodePointer>
   ConfigurableRateUpdater(const NodePointer & node)
-  : node_base_interface_(node->get_node_base_interface())
-  , node_timers_interface_(node->get_node_timers_interface())
-  , clock_ptr_(node->get_clock())
+  : node_base_interface_(node->get_node_base_interface()),
+    node_timers_interface_(node->get_node_timers_interface()),
+    clock_ptr_(node->get_clock())
   {
   }
 
@@ -45,6 +45,6 @@ public:
 
   virtual auto update() -> void = 0;
 };
-}
+}  // namespace traffic_simulator
 
-#endif // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__CONFIGURABLE_RATE_UPDATER_HPP
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__CONFIGURABLE_RATE_UPDATER_HPP

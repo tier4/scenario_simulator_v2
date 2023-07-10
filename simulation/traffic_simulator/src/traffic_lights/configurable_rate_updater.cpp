@@ -16,29 +16,29 @@
 
 namespace traffic_simulator
 {
-  auto ConfigurableRateUpdater::createTimer(double publish_rate) -> void
-  {
-    if (!timer_) {
-      publish_rate_ = publish_rate;
-      using namespace std::chrono_literals;
-      timer_ = rclcpp::create_timer(
-          node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
-          [this]() -> void { update(); });
-    }
-  }
-
-  auto ConfigurableRateUpdater::resetPublishRate(double publish_rate) -> void
-  {
-    if (publish_rate_ != publish_rate) {
-      publish_rate_ = publish_rate;
-      if (timer_ && not timer_->is_canceled()) {
-        timer_->cancel();
-      }
-
-      using namespace std::chrono_literals;
-      timer_ = rclcpp::create_timer(
-          node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
-          [this]() -> void { update(); });
-    }
+auto ConfigurableRateUpdater::createTimer(double publish_rate) -> void
+{
+  if (!timer_) {
+    publish_rate_ = publish_rate;
+    using namespace std::chrono_literals;
+    timer_ = rclcpp::create_timer(
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
+      [this]() -> void { update(); });
   }
 }
+
+auto ConfigurableRateUpdater::resetPublishRate(double publish_rate) -> void
+{
+  if (publish_rate_ != publish_rate) {
+    publish_rate_ = publish_rate;
+    if (timer_ && not timer_->is_canceled()) {
+      timer_->cancel();
+    }
+
+    using namespace std::chrono_literals;
+    timer_ = rclcpp::create_timer(
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
+      [this]() -> void { update(); });
+  }
+}
+}  // namespace traffic_simulator

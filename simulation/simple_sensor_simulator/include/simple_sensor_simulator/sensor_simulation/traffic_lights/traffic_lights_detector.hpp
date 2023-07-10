@@ -15,30 +15,34 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_PUBLISHER_HPP
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_PUBLISHER_HPP
 
+#include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
 
 namespace simple_sensor_simulator
 {
-namespace traffic_lights {
+namespace traffic_lights
+{
 /** @brief Implements traffic lights detector mechanism simulation
  * Currently it only allows to set traffic lights state and publish them on predefined topic
  * Future implementations might, for example, publish only traffic lights that are in a specific FoV of a camera sensor
  * Further refactoring would be required, however, to achieve this.
  */
-class TrafficLightsDetector {
+class TrafficLightsDetector
+{
 public:
-  TrafficLightsDetector(std::string topic_name, rclcpp::Node& node);
+  TrafficLightsDetector(std::string topic_name, rclcpp::Node & node);
 
-  auto updateFrame(const rclcpp::Time& current_ros_time,
-                   std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> new_traffic_light_state) -> void;
+  auto updateFrame(
+    const rclcpp::Time & current_ros_time,
+    std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> new_traffic_light_state) -> void;
 
 private:
-  const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::SharedPtr traffic_light_state_array_publisher_;
+  const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::SharedPtr
+    traffic_light_state_array_publisher_;
 };
-}
-}
+}  // namespace traffic_lights
+}  // namespace simple_sensor_simulator
 
-#endif // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_PUBLISHER_HPP
+#endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_PUBLISHER_HPP

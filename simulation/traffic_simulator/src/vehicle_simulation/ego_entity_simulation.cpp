@@ -30,7 +30,8 @@ static auto getParameter(const std::string & name, T value = {})
 }
 
 EgoEntitySimulation::EgoEntitySimulation(
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils)
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
@@ -308,23 +309,24 @@ auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
   setStatus(status);
 }
 
-auto EgoEntitySimulation::refillEntityStatusWithLaneletData(traffic_simulator_msgs::msg::EntityStatus& status) -> void {
-  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+auto EgoEntitySimulation::refillEntityStatusWithLaneletData(
+  traffic_simulator_msgs::msg::EntityStatus & status) -> void
+{
+  const auto unique_route_lanelets =
+    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
   if (unique_route_lanelets.empty()) {
-    lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
   } else {
     lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
     if (!lanelet_pose) {
-      lanelet_pose =
-          hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
     }
   }
   if (lanelet_pose) {
     math::geometry::CatmullRomSpline spline(
-        hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
     if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.value()).z;
     }

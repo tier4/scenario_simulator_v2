@@ -217,7 +217,6 @@ auto EntityBase::getLaneletPose(double matching_distance) const
   }
 }
 
-
 auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
 
 auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)

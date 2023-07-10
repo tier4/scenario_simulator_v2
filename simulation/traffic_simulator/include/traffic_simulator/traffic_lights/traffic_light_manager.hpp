@@ -47,7 +47,8 @@ public:
 
   auto getTrafficLights() -> TrafficLigthMap &;
 
-  auto getTrafficLights(const LaneletID lanelet_id) -> std::vector<std::reference_wrapper<TrafficLight>>;
+  auto getTrafficLights(const LaneletID lanelet_id)
+    -> std::vector<std::reference_wrapper<TrafficLight>>;
 
   auto hasAnyLightChanged() -> bool;
 };

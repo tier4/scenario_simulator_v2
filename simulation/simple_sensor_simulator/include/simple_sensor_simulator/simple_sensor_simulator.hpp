@@ -18,6 +18,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 
+#include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <map>
@@ -28,13 +29,12 @@
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <simple_sensor_simulator/sensor_simulation/traffic_lights/traffic_lights_detector.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
-#include <geographic_msgs/msg/geo_point.hpp>
 #include <string>
 #include <thread>
-#include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
+#include <vector>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 #if __cplusplus
 extern "C" {
@@ -135,13 +135,13 @@ private:
   bool initialized_;
   std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
   std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> traffic_signals_states_;
-  traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string& name);
+  traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string & name);
   zeromq::MultiServer server_;
   geographic_msgs::msg::GeoPoint getOrigin();
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   std::shared_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
 
-  bool isEgo(const std::string& name);
+  bool isEgo(const std::string & name);
 };
 }  // namespace simple_sensor_simulator
 

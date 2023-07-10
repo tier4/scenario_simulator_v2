@@ -264,7 +264,9 @@ bool API::updateTrafficLightsInSim()
   return res.result().success();
 }
 
-std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatusInSim(const std::string& entity_name, traffic_simulator_msgs::msg::EntityStatus status) {
+std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatusInSim(
+  const std::string & entity_name, traffic_simulator_msgs::msg::EntityStatus status)
+{
   simulation_api_schema::UpdateEntityStatusRequest req;
   simulation_api_schema::EntityStatus proto;
   status.name = entity_name;
@@ -289,7 +291,8 @@ bool API::updateEntityStatusInSim()
   bool success = true;
   for (const auto & name : entity_manager_ptr_->getEntityNames()) {
     if (!entity_manager_ptr_->isEgo(name)) {
-      success &= static_cast<bool>(updateEntityStatusInSim(name, entity_manager_ptr_->getEntityStatus(name)));
+      success &= static_cast<bool>(
+        updateEntityStatusInSim(name, entity_manager_ptr_->getEntityStatus(name)));
     }
   }
   return success;
@@ -348,26 +351,28 @@ bool API::updateFrame()
   }
 }
 
-auto API::refillEntityStatusWithLaneletData(const std::string& name,
-      traffic_simulator_msgs::msg::EntityStatus & status) const -> void
-  {
-    const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(entity_manager_ptr_->getRouteLanelets(name));
+auto API::refillEntityStatusWithLaneletData(
+  const std::string & name, traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+{
+  const auto unique_route_lanelets =
+    traffic_simulator::helper::getUniqueValues(entity_manager_ptr_->getRouteLanelets(name));
 
-    std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
-    if (unique_route_lanelets.empty()) {
-      lanelet_pose =
-          entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
-    } else {
-    lanelet_pose = entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+  if (unique_route_lanelets.empty()) {
+    lanelet_pose = entity_manager_ptr_->getHdmapUtils()->toLaneletPose(
+      status.pose, status.bounding_box, false, 1.0);
+  } else {
+    lanelet_pose =
+      entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
     if (!lanelet_pose) {
-      lanelet_pose =
-          entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+      lanelet_pose = entity_manager_ptr_->getHdmapUtils()->toLaneletPose(
+        status.pose, status.bounding_box, false, 1.0);
     }
   }
   if (lanelet_pose) {
     math::geometry::CatmullRomSpline spline(
-           entity_manager_ptr_->getHdmapUtils()->getCenterPoints(lanelet_pose->lanelet_id));
+      entity_manager_ptr_->getHdmapUtils()->getCenterPoints(lanelet_pose->lanelet_id));
     if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.value()).z;
     }
@@ -378,7 +383,6 @@ auto API::refillEntityStatusWithLaneletData(const std::string& name,
     status.lanelet_pose = lanelet_pose.value();
   }
 }
-
 
 void API::startNpcLogic()
 {

@@ -74,7 +74,9 @@ private:
 public:
   auto setAutowareStatus() -> void;
 
-  explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double, std::shared_ptr<hdmap_utils::HdMapUtils>);
+  explicit EgoEntitySimulation(
+    const traffic_simulator_msgs::msg::VehicleParameters &, double,
+    std::shared_ptr<hdmap_utils::HdMapUtils>);
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 
@@ -88,7 +90,8 @@ public:
 
   auto updateStatus(double time, double step_time) -> void;
 
-  auto refillEntityStatusWithLaneletData(traffic_simulator_msgs::msg::EntityStatus& status) -> void;
+  auto refillEntityStatusWithLaneletData(traffic_simulator_msgs::msg::EntityStatus & status)
+    -> void;
 };
 }  // namespace vehicle_simulation
 

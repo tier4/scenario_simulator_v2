@@ -18,10 +18,11 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 
-namespace traffic_simulator {
+namespace traffic_simulator
+{
 
-class TrafficLightMarkerPublisher : public ConfigurableRateUpdater {
-
+class TrafficLightMarkerPublisher : public ConfigurableRateUpdater
+{
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   const std::string map_frame_;
   const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
@@ -31,19 +32,19 @@ class TrafficLightMarkerPublisher : public ConfigurableRateUpdater {
 
 public:
   template <typename NodePointer>
-  explicit TrafficLightMarkerPublisher (
-      const std::shared_ptr<TrafficLightManager> & traffic_light_manager, const NodePointer & node,
-      const std::string & map_frame = "map")
-      : ConfigurableRateUpdater(node)
-      , marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
-          node, "traffic_light/marker", rclcpp::QoS(1).transient_local()))
-      , map_frame_(map_frame)
-      , traffic_light_manager_(traffic_light_manager)
+  explicit TrafficLightMarkerPublisher(
+    const std::shared_ptr<TrafficLightManager> & traffic_light_manager, const NodePointer & node,
+    const std::string & map_frame = "map")
+  : ConfigurableRateUpdater(node),
+    marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
+      node, "traffic_light/marker", rclcpp::QoS(1).transient_local())),
+    map_frame_(map_frame),
+    traffic_light_manager_(traffic_light_manager)
   {
   }
 
   virtual auto update() -> void override;
 };
 
-}
-#endif // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
+}  // namespace traffic_simulator
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP

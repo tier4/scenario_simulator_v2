@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp>
 
 namespace traffic_simulator
 {
 template <>
-auto V2ITrafficLightManager<
-  autoware_auto_perception_msgs::msg::TrafficSignalArray>::update()
+auto V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::update()
   -> void
 {
   autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;

@@ -31,8 +31,10 @@ namespace simple_sensor_simulator
 class SensorSimulation
 {
 public:
-  SensorSimulation(rclcpp::Node & node) {
-    traffic_lights_detectors_.emplace_back(std::make_unique<traffic_lights::TrafficLightsDetector>("/perception/traffic_light_recognition/traffic_signals", node));
+  SensorSimulation(rclcpp::Node & node)
+  {
+    traffic_lights_detectors_.emplace_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
+      "/perception/traffic_light_recognition/traffic_signals", node));
   }
 
   auto attachLidarSensor(

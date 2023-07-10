@@ -116,16 +116,20 @@ void ScenarioSimulator::updateFrame(
   simulation_interface::toMsg(req.current_ros_time(), t);
   current_ros_time_ = t;
   std::vector<traffic_simulator_msgs::EntityStatus> entity_status;
-  std::transform(entity_status_.begin(), entity_status_.end(), std::back_inserter(entity_status), [this](auto &kv){
-    traffic_simulator_msgs::EntityStatus status;
-    *status.mutable_pose() = kv.second.pose();
-    *status.mutable_action_status() = kv.second.action_status();
-    *status.mutable_name() = kv.second.name();
-    *status.mutable_type() = kv.second.type();
-    *status.mutable_subtype() = kv.second.subtype();
-    *status.mutable_bounding_box() = getBoundingBox(status.name());
-    return status;} );
-  sensor_sim_.updateSensorFrame(current_time_, current_ros_time_, entity_status, traffic_signals_states_);
+  std::transform(
+    entity_status_.begin(), entity_status_.end(), std::back_inserter(entity_status),
+    [this](auto & kv) {
+      traffic_simulator_msgs::EntityStatus status;
+      *status.mutable_pose() = kv.second.pose();
+      *status.mutable_action_status() = kv.second.action_status();
+      *status.mutable_name() = kv.second.name();
+      *status.mutable_type() = kv.second.type();
+      *status.mutable_subtype() = kv.second.subtype();
+      *status.mutable_bounding_box() = getBoundingBox(status.name());
+      return status;
+    });
+  sensor_sim_.updateSensorFrame(
+    current_time_, current_ros_time_, entity_status, traffic_signals_states_);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
 }
@@ -137,8 +141,7 @@ void ScenarioSimulator::updateEntityStatus(
   if (isEgo(req.status().name())) {
     if (ego_entity_simulation_) {
       ego_entity_simulation_->update(
-          current_time_ + step_time_, step_time_,
-          req.npc_logic_started());
+        current_time_ + step_time_, step_time_, req.npc_logic_started());
     }
     simulation_api_schema::EntityStatus status;
     simulation_interface::toProto(ego_entity_simulation_->getStatus(), status);
@@ -146,7 +149,8 @@ void ScenarioSimulator::updateEntityStatus(
   } else {
     entity_status_[req.status().name()] = req.status();
   }
-  const simulation_api_schema::EntityStatus& updated_entity_status = entity_status_[req.status().name()];
+  const simulation_api_schema::EntityStatus & updated_entity_status =
+    entity_status_[req.status().name()];
   res = simulation_api_schema::UpdateEntityStatusResponse();
   res.mutable_status()->set_name(updated_entity_status.name());
   res.mutable_status()->mutable_action_status()->CopyFrom(updated_entity_status.action_status());
@@ -166,8 +170,8 @@ void ScenarioSimulator::spawnVehicleEntity(
     ego_vehicles_.emplace_back(req.parameters());
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
-    ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(parameters, step_time_,
-                                                                                       hdmap_utils_);
+    ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
+      parameters, step_time_, hdmap_utils_);
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
     simulation_interface::toMsg(req.pose(), initial_status.pose);
@@ -279,7 +283,7 @@ void ScenarioSimulator::updateTrafficLights(
   simulation_api_schema::UpdateTrafficLightsResponse & res)
 {
   traffic_signals_states_.clear();
-  for (const auto& traffic_signal_proto : req.states()) {
+  for (const auto & traffic_signal_proto : req.states()) {
     autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
     simulation_interface::toMsg(traffic_signal_proto, traffic_signal);
     traffic_signals_states_.emplace_back(traffic_signal);
@@ -288,7 +292,8 @@ void ScenarioSimulator::updateTrafficLights(
   res.mutable_result()->set_success(true);
 }
 
-traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std::string& name) {
+traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std::string & name)
+{
   for (const auto & ego : ego_vehicles_) {
     if (ego.name() == name) {
       return ego.bounding_box();
@@ -312,8 +317,9 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
   return traffic_simulator_msgs::BoundingBox();
 }
 
-bool ScenarioSimulator::isEgo(const std::string& name) {
-  for (const auto &ego: ego_vehicles_) {
+bool ScenarioSimulator::isEgo(const std::string & name)
+{
+  for (const auto & ego : ego_vehicles_) {
     if (ego.name() == name) {
       return true;
     }
