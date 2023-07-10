@@ -104,7 +104,7 @@ auto PedestrianEntity::getDefaultDynamicConstraints() const
   return default_dynamic_constraints;
 }
 
-std::vector<std::int64_t> PedestrianEntity::getRouteLanelets(double horizon)
+auto PedestrianEntity::getRouteLanelets(double horizon) const -> std::vector<std::int64_t>
 {
   if (status_.lanelet_pose_valid) {
     return route_planner_ptr_->getRouteLanelets(status_.lanelet_pose, horizon);
@@ -232,6 +232,12 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
   auto behavior_parameter = getBehaviorParameter();
   behavior_parameter.dynamic_constraints.max_deceleration_rate = deceleration_rate;
   setBehaviorParameter(behavior_parameter);
+}
+
+auto PedestrianEntity::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const
+  -> void
+{
+  EntityBase::fillLaneletPose(status, true);
 }
 
 void PedestrianEntity::onUpdate(double current_time, double step_time)

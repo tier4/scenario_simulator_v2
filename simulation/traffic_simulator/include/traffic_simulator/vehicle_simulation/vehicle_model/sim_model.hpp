@@ -15,12 +15,12 @@
 #ifndef SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_HPP_
 #define SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_HPP_
 
-#include <traffic_simulator/vehicle_model/sim_model_delay_steer_acc.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_delay_steer_acc_geared.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_delay_steer_vel.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_ideal_steer_acc.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_ideal_steer_acc_geared.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_ideal_steer_vel.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_interface.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_vel.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc_geared.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_vel.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
 
 #endif  // SIMPLE_PLANNING_SIMULATOR__VEHICLE_MODEL__SIM_MODEL_HPP_

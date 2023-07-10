@@ -83,13 +83,13 @@ public:
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
+  auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &);
+  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
@@ -119,6 +119,8 @@ public:
 
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
+
+  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void override;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
