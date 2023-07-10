@@ -191,7 +191,7 @@ public:
     conventional_traffic_light_marker_publisher_ptr_(std::make_shared<TrafficLightMarkerPublisher>(conventional_traffic_light_manager_ptr_, node)),
     v2i_traffic_light_manager_ptr_(makeV2ITrafficLightManager(hdmap_utils_ptr_)),
     v2i_traffic_light_marker_publisher_ptr_(std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
-    v2i_traffic_light_publisher_ptr_(std::make_shared<V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(v2i_traffic_light_manager_ptr_, node))
+    v2i_traffic_light_publisher_ptr_(std::make_shared<V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(v2i_traffic_light_manager_ptr_, "/v2x/traffic_signals", node))
   {
     updateHdmapMarker();
   }

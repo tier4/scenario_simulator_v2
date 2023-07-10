@@ -33,11 +33,4 @@ auto V2ITrafficLightManager<
   }
   traffic_light_state_array_publisher_->publish(traffic_light_state_array);
 }
-
-template <>
-auto V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name() -> const
-  char *
-{
-  return "/v2x/traffic_signals";
-}
 }  // namespace traffic_simulator
