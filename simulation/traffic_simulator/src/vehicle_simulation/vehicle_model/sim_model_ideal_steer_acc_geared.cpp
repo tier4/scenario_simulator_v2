@@ -14,7 +14,7 @@
 
 #include <algorithm>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_ideal_steer_acc_geared.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc_geared.hpp>
 
 SimModelIdealSteerAccGeared::SimModelIdealSteerAccGeared(double wheelbase)
 : SimModelInterface(4 /* dim x */, 2 /* dim u */), wheelbase_(wheelbase), current_acc_(0.0)
