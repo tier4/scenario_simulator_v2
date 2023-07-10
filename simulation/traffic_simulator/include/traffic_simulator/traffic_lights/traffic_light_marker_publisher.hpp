@@ -31,7 +31,6 @@ class TrafficLightMarkerPublisher : public ConfigurableRateUpdater {
 protected:
   const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
 
-
 public:
   template <typename NodePointer>
   explicit TrafficLightMarkerPublisher (

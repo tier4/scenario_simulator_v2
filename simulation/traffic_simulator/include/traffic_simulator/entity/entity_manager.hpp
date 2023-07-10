@@ -44,6 +44,7 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -115,6 +116,7 @@ class EntityManager
   const std::shared_ptr<TrafficLightMarkerPublisher> conventional_traffic_light_marker_publisher_ptr_;
 
   const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
+  const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
   const std::shared_ptr<V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>> v2i_traffic_light_publisher_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
@@ -185,10 +187,10 @@ public:
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    conventional_traffic_light_manager_ptr_(
-      makeConventionalTrafficLightManager(hdmap_utils_ptr_)),
+    conventional_traffic_light_manager_ptr_(makeConventionalTrafficLightManager(hdmap_utils_ptr_)),
     conventional_traffic_light_marker_publisher_ptr_(std::make_shared<TrafficLightMarkerPublisher>(conventional_traffic_light_manager_ptr_, node)),
     v2i_traffic_light_manager_ptr_(makeV2ITrafficLightManager(hdmap_utils_ptr_)),
+    v2i_traffic_light_marker_publisher_ptr_(std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
     v2i_traffic_light_publisher_ptr_(std::make_shared<V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(v2i_traffic_light_manager_ptr_, node))
   {
     updateHdmapMarker();

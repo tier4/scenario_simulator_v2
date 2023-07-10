@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 
 namespace traffic_simulator
 {
@@ -21,10 +22,9 @@ auto V2ITrafficLightManager<
   autoware_auto_perception_msgs::msg::TrafficSignalArray>::update()
   -> void
 {
-  TrafficLightMarkerPublisher::update();
   autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;
   {
-    traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
+    traffic_light_state_array.header.frame_id = sensor_frame_;
     traffic_light_state_array.header.stamp = clock_ptr_->now();
     for (const auto & [id, traffic_light] : traffic_light_manager_->getTrafficLights()) {
       traffic_light_state_array.signals.push_back(
