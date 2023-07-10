@@ -51,7 +51,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic_lights/traffic_light_manager.cpp
   src/traffic_lights/configurable_rate_updater.cpp
   src/traffic_lights/traffic_light_marker_publisher.cpp
-  src/traffic_lights/conventional_traffic_light_manager.cpp
   src/traffic_lights/v2i_traffic_light_manager.cpp
   src/vehicle_simulation/ego_entity_simulation.cpp
   src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.cpp
