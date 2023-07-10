@@ -20,7 +20,7 @@
 #include <eigen3/Eigen/LU>
 #include <iostream>
 #include <queue>
-#include <traffic_simulator/vehicle_model/sim_model_interface.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
 /**
  * @class SimModelDelaySteerVel
  * @brief calculate delay steering dynamics

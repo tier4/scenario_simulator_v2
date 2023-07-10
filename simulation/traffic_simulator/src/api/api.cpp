@@ -29,6 +29,9 @@ void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbo
 
 bool API::despawn(const std::string & name)
 {
+  if (entity_manager_ptr_->isEgo(name)) {
+    ego_entity_simulation_.reset();
+  }
   const auto result = entity_manager_ptr_->despawnEntity(name);
   if (!result) {
     return false;
@@ -58,6 +61,9 @@ auto API::setEntityStatus(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   entity_manager_ptr_->setEntityStatus(name, status);
+  if (entity_manager_ptr_->isEgo(name) && getCurrentTime() <= 0) {
+    ego_entity_simulation_->setInitialStatus(status);
+  }
 }
 
 auto API::setEntityStatus(
@@ -91,6 +97,9 @@ auto API::setEntityStatus(
     status.lanelet_pose_valid = false;
   }
   entity_manager_ptr_->setEntityStatus(name, status);
+  if (entity_manager_ptr_->isEgo(name) && getCurrentTime() <= 0) {
+    ego_entity_simulation_->setInitialStatus(status);
+  }
 }
 
 std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
@@ -282,8 +291,8 @@ bool API::updateEntityStatusInSim()
   if (entity_manager_ptr_->isEgoSpawned()) {
     simulation_interface::toProto(
       {autoware_auto_control_msgs::msg::
-         AckermannControlCommand(),                      // Vehicle command is not utilized by
-       autoware_auto_vehicle_msgs::msg::GearCommand()},  // simple_sensor_simulator
+         AckermannControlCommand(),  /// @note Vehicle command is not utilized by simple_sensor_simulator
+       autoware_auto_vehicle_msgs::msg::GearCommand()},
       *req.mutable_vehicle_command());
     req.set_ego_entity_status_before_update_is_empty(false);
     simulation_interface::toProto(
@@ -317,13 +326,32 @@ bool API::updateEntityStatusInSim()
     simulation_interface::toMsg(status.action_status().twist(), status_msg.action_status.twist);
     simulation_interface::toMsg(status.action_status().accel(), status_msg.action_status.accel);
     entity_manager_ptr_->setEntityStatus(status.name(), status_msg);
+    if (entity_manager_ptr_->isEgo(status.name()) && getCurrentTime() <= 0) {
+      ego_entity_simulation_->setInitialStatus(status_msg);
+    }
   }
   return res.result().success();
 }
 
 bool API::updateFrame()
 {
-  std::optional<traffic_simulator_msgs::msg::EntityStatus> ego_status_before_update = std::nullopt;
+  if (ego_entity_simulation_) {
+    ego_entity_simulation_->update(
+      clock_.getCurrentSimulationTime(), clock_.getStepTime(),
+      entity_manager_ptr_->isNpcLogicStarted());
+    if (not entity_manager_ptr_->isEgoSpawned()) {
+      THROW_SIMULATION_ERROR(
+        "This exception is basically not supposed to be sent. Contact the developer as there is "
+        "some kind of bug.");
+    }
+    auto ego_name = entity_manager_ptr_->getEgoName();
+    auto ego_status = ego_entity_simulation_->getStatus();
+    /// @note apply additional status data (from ll2) to ego_entity_simulation_ for this update
+    entity_manager_ptr_->fillLaneletPose(ego_name, ego_status);
+    ego_entity_simulation_->setStatus(ego_status);
+    entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
+  }
+
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
@@ -395,6 +423,58 @@ void API::requestLaneChange(
   const lane_change::Constraint & constraint)
 {
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
+}
+
+void API::requestSpeedChange(const std::string & name, double target_speed, bool continuous)
+{
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
+  }
+
+  entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
+  if (entity_manager_ptr_->isEgo(name) and not isNpcLogicStarted()) {
+    ego_entity_simulation_->requestSpeedChange(target_speed);
+  }
+}
+
+void API::requestSpeedChange(
+  const std::string & name, const double target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
+{
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
+  }
+
+  entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
+  if (entity_manager_ptr_->isEgo(name) and not isNpcLogicStarted()) {
+    ego_entity_simulation_->requestSpeedChange(target_speed);
+  }
+}
+
+void API::requestSpeedChange(
+  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
+{
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
+  }
+
+  entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
+}
+
+void API::requestSpeedChange(
+  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+  const speed_change::Transition transition, const speed_change::Constraint constraint,
+  const bool continuous)
+{
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
+  }
+
+  entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
 }
 
 }  // namespace traffic_simulator

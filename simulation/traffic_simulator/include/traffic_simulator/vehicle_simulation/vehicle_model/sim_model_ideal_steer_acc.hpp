@@ -18,7 +18,7 @@
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/LU>
 #include <iostream>
-#include <traffic_simulator/vehicle_model/sim_model_interface.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_interface.hpp>
 
 /**
  * @class SimModelIdealSteerAcc

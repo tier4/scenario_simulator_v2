@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/vehicle_model/sim_model_ideal_steer_acc.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.hpp>
 
 SimModelIdealSteerAcc::SimModelIdealSteerAcc(double wheelbase)
 : SimModelInterface(4 /* dim x */, 2 /* dim u */), wheelbase_(wheelbase)
