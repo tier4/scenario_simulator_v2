@@ -34,7 +34,7 @@ namespace traffic_simulator
 
     const auto now = clock_ptr_->now();
 
-    for (const auto & [id, traffic_light] : getTrafficLights()) {
+    for (const auto & [id, traffic_light] : traffic_light_manager_->getTrafficLights()) {
       traffic_light.draw(marker_array.markers, now, map_frame_);
     }
 
@@ -45,7 +45,7 @@ namespace traffic_simulator
   {
     publishTrafficLightStateArray();
 
-    if (hasAnyLightChanged()) {
+    if (traffic_light_manager_->hasAnyLightChanged()) {
       deleteAllMarkers();
     }
 

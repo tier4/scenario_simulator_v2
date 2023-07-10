@@ -30,11 +30,11 @@ class V2ITrafficLightManager : public ConfigurableRateUpdater
   const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
 
 public:
-  template <typename Node>
+  template <typename NodePointer>
   explicit V2ITrafficLightManager(
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
+    const std::shared_ptr<TrafficLightManager> & traffic_lights_manager, const NodePointer & node,
     const std::string & map_frame = "map")
-  : ConfigurableRateUpdater(node, hdmap, map_frame),
+   : ConfigurableRateUpdater(traffic_lights_manager, node, map_frame),
     traffic_light_state_array_publisher_(
       rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
   {

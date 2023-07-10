@@ -39,13 +39,12 @@ protected:
   std::unordered_map<LaneletID, TrafficLight> traffic_lights_;
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
-
+public:
   explicit TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap)
-    : hdmap_(hdmap)
+      : hdmap_(hdmap)
   {
   }
 
-public:
   auto getTrafficLight(const LaneletID traffic_light_id) -> auto &
   {
     if (auto iter = traffic_lights_.find(traffic_light_id); iter != std::end(traffic_lights_)) {
@@ -83,10 +82,6 @@ public:
   }
 
   auto hasAnyLightChanged() -> bool;
-
-  virtual auto createTimer(double update_rate) -> void = 0;
-
-  virtual auto resetPublishRate(double update_rate) -> void = 0;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_

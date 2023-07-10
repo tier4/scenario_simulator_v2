@@ -113,8 +113,10 @@ class EntityManager
   MarkerArray markers_raw_;
 
   const std::shared_ptr<TrafficLightManager> conventional_traffic_light_manager_ptr_;
+  const std::shared_ptr<ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>> conventional_traffic_light_publisher_ptr_;
 
   const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
+  const std::shared_ptr<V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>> v2i_traffic_light_publisher_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -144,9 +146,7 @@ public:
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");
         architecture_type == "awf/universe") {
-      return std::make_shared<
-        ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
-        std::forward<decltype(xs)>(xs)...);
+      return std::make_shared<TrafficLightManager>(std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),
@@ -160,9 +160,7 @@ public:
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");
         architecture_type == "awf/universe") {
-      return std::make_shared<
-        V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
-        std::forward<decltype(xs)>(xs)...);
+      return std::make_shared<TrafficLightManager>(std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),
@@ -189,8 +187,10 @@ public:
       configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
     conventional_traffic_light_manager_ptr_(
-      makeConventionalTrafficLightManager(hdmap_utils_ptr_, node)),
-    v2i_traffic_light_manager_ptr_(makeV2ITrafficLightManager(hdmap_utils_ptr_, node))
+      makeConventionalTrafficLightManager(hdmap_utils_ptr_)),
+    conventional_traffic_light_publisher_ptr_(std::make_shared<ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(conventional_traffic_light_manager_ptr_, node)),
+    v2i_traffic_light_manager_ptr_(makeV2ITrafficLightManager(hdmap_utils_ptr_)),
+    v2i_traffic_light_publisher_ptr_(std::make_shared<V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(v2i_traffic_light_manager_ptr_, node))
   {
     updateHdmapMarker();
   }
@@ -219,12 +219,12 @@ public:
 
   auto resetConventionalTrafficLightPublishRate(double rate) -> void
   {
-    return conventional_traffic_light_manager_ptr_->resetPublishRate(rate);
+    return conventional_traffic_light_publisher_ptr_->resetPublishRate(rate);
   }
 
   auto resetV2ITrafficLightPublishRate(double rate) -> void
   {
-    return v2i_traffic_light_manager_ptr_->resetPublishRate(rate);
+    return v2i_traffic_light_publisher_ptr_->resetPublishRate(rate);
   }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \

@@ -28,11 +28,11 @@ template <typename Message>
 class ConventionalTrafficLightManager : public ConfigurableRateUpdater
 {
 public:
-  template <typename Node>
+  template <typename NodePointer>
   explicit ConventionalTrafficLightManager(
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
+    const std::shared_ptr<TrafficLightManager> & traffic_lights_manager, const NodePointer & node,
     const std::string & map_frame = "map")
-  : ConfigurableRateUpdater(node, hdmap, map_frame)
+  : ConfigurableRateUpdater(traffic_lights_manager, node, map_frame)
   {
   }
 

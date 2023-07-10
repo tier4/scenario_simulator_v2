@@ -25,7 +25,7 @@ auto V2ITrafficLightManager<
   {
     traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
     traffic_light_state_array.header.stamp = clock_ptr_->now();
-    for (const auto & [id, traffic_light] : getTrafficLights()) {
+    for (const auto & [id, traffic_light] : traffic_light_manager_->getTrafficLights()) {
       traffic_light_state_array.signals.push_back(
         static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light));
     }
