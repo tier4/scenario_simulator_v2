@@ -14,7 +14,7 @@
 
 #include <algorithm>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <traffic_simulator/vehicle_model/sim_model_delay_steer_acc_geared.hpp>
+#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared.hpp>
 
 SimModelDelaySteerAccGeared::SimModelDelaySteerAccGeared(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
