@@ -20,12 +20,12 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 
 namespace traffic_simulator
 {
 template <typename Message>
-class V2ITrafficLightManager : public ConfigurableRateUpdater
+class V2ITrafficLightManager : public TrafficLightMarkerPublisher
 {
   const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
 
@@ -34,7 +34,7 @@ public:
   explicit V2ITrafficLightManager(
     const std::shared_ptr<TrafficLightManager> & traffic_lights_manager, const NodePointer & node,
     const std::string & map_frame = "map")
-   : ConfigurableRateUpdater(traffic_lights_manager, node, map_frame),
+   : TrafficLightMarkerPublisher(traffic_lights_manager, node, map_frame),
     traffic_light_state_array_publisher_(
       rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
   {
