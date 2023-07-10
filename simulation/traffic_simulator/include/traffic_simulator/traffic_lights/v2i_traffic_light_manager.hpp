@@ -43,7 +43,9 @@ public:
 private:
   static auto name() -> const char *;
 
-  auto publishTrafficLightStateArray() const -> void override;
+  auto publishTrafficLightStateArray() const -> void;
+
+  virtual auto update() -> void override;
 };
 
 template <>
@@ -54,5 +56,8 @@ auto V2ITrafficLightManager<
 template <>
 auto V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name() -> const
   char *;
+
+template <>
+auto V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::update() -> void;
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_

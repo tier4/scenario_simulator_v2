@@ -39,4 +39,11 @@ auto V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArr
 {
   return "/v2x/traffic_signals";
 }
+
+template <>
+auto V2ITrafficLightManager<
+  autoware_auto_perception_msgs::msg::TrafficSignalArray>::update() -> void {
+  publishTrafficLightStateArray();
+  TrafficLightMarkerPublisher::update();
+}
 }  // namespace traffic_simulator

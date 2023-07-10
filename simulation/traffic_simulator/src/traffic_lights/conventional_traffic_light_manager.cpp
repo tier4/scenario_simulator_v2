@@ -17,13 +17,6 @@
 namespace traffic_simulator
 {
 template <>
-auto ConventionalTrafficLightManager<
-  autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
-  -> void
-{
-}
-
-template <>
 auto ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name()
   -> const char *
 {

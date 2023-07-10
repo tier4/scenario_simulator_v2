@@ -38,14 +38,7 @@ public:
 
 private:
   static auto name() -> const char *;
-
-  auto publishTrafficLightStateArray() const -> void override;
 };
-
-template <>
-auto ConventionalTrafficLightManager<
-  autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
-  -> void;
 
 template <>
 auto ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name()
