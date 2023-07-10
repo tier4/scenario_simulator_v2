@@ -120,6 +120,8 @@ public:
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManager> &) override;
 
+  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void override;
+
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
 

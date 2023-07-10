@@ -55,6 +55,7 @@
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
 
+/// @todo find some shared space for this function
 template <typename T>
 static auto getParameter(const std::string & name, T value = {})
 {
@@ -272,6 +273,7 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
+  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);

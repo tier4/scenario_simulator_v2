@@ -666,5 +666,6 @@ void EntityManager::startNpcLogic()
     it->second->startNpcLogic();
   }
 }
+
 }  // namespace entity
 }  // namespace traffic_simulator

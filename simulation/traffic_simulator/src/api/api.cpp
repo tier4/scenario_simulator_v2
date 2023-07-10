@@ -305,7 +305,9 @@ bool API::updateFrame()
       THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
     }
     if (not entity_manager_ptr_->isEgoSpawned()) {
-      THROW_SEMANTIC_ERROR("Malformed state: ego simulated but not registered in entity manager.");
+      THROW_SIMULATION_ERROR(
+        "This exception is basically not supposed to be sent. Contact the developer as there is "
+        "some kind of bug.");
     }
 
     auto ego_name = entity_manager_ptr_->getEgoName();
@@ -314,6 +316,7 @@ bool API::updateFrame()
     if (ego_status_opt) {
       ego_status = *ego_status_opt;
     }
+    /// @note apply additional status data (from ll2) to ego_entity_simulation_ for this update
     refillEntityStatusWithLaneletData(ego_name, ego_status);
     entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
   }
@@ -428,7 +431,11 @@ void API::requestLaneChange(
 
 void API::requestSpeedChange(const std::string & name, double target_speed, bool continuous)
 {
-  assert(entity_manager_ptr_);
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
+  }
+
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
 }
 
@@ -436,14 +443,22 @@ void API::requestSpeedChange(
   const std::string & name, const double target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
 {
-  assert(entity_manager_ptr_);
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
+  }
+
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
 }
 
 void API::requestSpeedChange(
   const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
-  assert(entity_manager_ptr_);
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
+  }
+
   entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
 }
 
@@ -452,7 +467,11 @@ void API::requestSpeedChange(
   const speed_change::Transition transition, const speed_change::Constraint constraint,
   const bool continuous)
 {
-  assert(entity_manager_ptr_);
+  if (entity_manager_ptr_ == nullptr) {
+    THROW_SIMULATION_ERROR(
+      "If you see this error, something completely unexpected happens. Please contact developer.");
+  }
+
   entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
 }
 

@@ -34,6 +34,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
+/// @todo find some shared space for this function
 template <typename T>
 static auto getParameter(const std::string & name, T value = {})
 {
@@ -76,7 +77,7 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
 EgoEntity::EgoEntity(
   const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-  const Configuration & configuration, const double)
+  const Configuration & configuration)
 : VehicleEntity(name, entity_status, parameters),
   field_operator_application(makeFieldOperatorApplication(configuration))
 {
@@ -117,7 +118,7 @@ auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obst
   return std::nullopt;
 }
 
-auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
+auto EgoEntity::getRouteLanelets(double /*unused horizon*/) const -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ids{};
 
@@ -134,11 +135,6 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
 }
 
 auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose { return status_.pose; }
-
-auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
-{
-  return status_.action_status.twist;
-}
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
@@ -267,6 +263,11 @@ void EgoEntity::requestSpeedChange(
 auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
   field_operator_application->setVelocityLimit(value);
+}
+
+auto EgoEntity::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+{
+  EntityBase::fillLaneletPose(status, false);
 }
 
 }  // namespace entity

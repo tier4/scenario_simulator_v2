@@ -47,8 +47,7 @@ public:
 
   explicit EgoEntity(
     const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
-    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
-    const double step_time);
+    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 
@@ -66,8 +65,6 @@ public:
 
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 
-  auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
-
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
@@ -77,7 +74,7 @@ public:
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+  auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
@@ -114,6 +111,8 @@ public:
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   auto setVelocityLimit(double) -> void override;
+
+  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

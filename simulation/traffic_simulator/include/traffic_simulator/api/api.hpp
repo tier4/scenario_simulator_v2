@@ -103,7 +103,7 @@ public:
           return true;
         }
         if (entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-              name, pose, parameters, configuration, clock_.getStepTime())) {
+              name, pose, parameters, configuration)) {
           return true;
         }
         return false;
