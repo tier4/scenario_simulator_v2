@@ -26,7 +26,7 @@ StandStillCondition::StandStillCondition(
   duration(readAttribute<Double>("duration", node, scope)),
   compare(Rule::greaterThan),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size())
+  results(triggering_entities.entity_refs.size(), { Double::nan() })
 {
 }
 

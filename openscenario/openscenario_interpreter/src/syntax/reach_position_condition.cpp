@@ -31,7 +31,7 @@ ReachPositionCondition::ReachPositionCondition(
   position(readElement<Position>("Position", node, scope)),
   compare(Rule::lessThan),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size())
+  results(triggering_entities.entity_refs.size(), { Double::nan() })
 {
 }
 
