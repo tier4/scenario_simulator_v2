@@ -22,12 +22,14 @@ Perception topics are configurable with the following syntax:
 
 where `<NAME>` and `<VALUE>` can be set to:
 
-| Name                                      | Value                                         | Default | Description                                                                                                           |
-|-------------------------------------------|-----------------------------------------------|:-------:|-----------------------------------------------------------------------------------------------------------------------|
-| `detectedObjectMissingProbability`        | A `double` type value between `0.0` and `1.0` |  `0.0`  | Do not publish the perception topic with the given probability.                                                       |
-| `detectedObjectPositionStandardDeviation` | A positive `double` type value                |  `0.0`  | Randomize the positions of other vehicles included in the perception topic according to the given standard deviation. |
-| `detectedObjectPublishingDelay`           | A positive `double` type value                |  `0.0`  | Delays the publication of the perception topic by the specified number of seconds.                                    |
-| `randomSeed`                              | A positive `integer` type value               |   `0`   | Specifies the seed value for the random number generator.                                                             |
+| Name                                      | Value                                         | Default | Description                                                                                                                                                                                                          |
+| ----------------------------------------- | --------------------------------------------- | :-----: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `detectedObjectMissingProbability`        | A `double` type value between `0.0` and `1.0` |  `0.0`  | Do not publish the perception topic with the given probability.                                                                                                                                                      |
+| `detectedObjectPositionStandardDeviation` | A positive `double` type value                |  `0.0`  | Randomize the positions of other vehicles included in the perception topic according to the given standard deviation.                                                                                                |
+| `detectedObjectPublishingDelay`           | A positive `double` type value                |  `0.0`  | Delays the publication of the perception topic by the specified number of seconds.                                                                                                                                   |
+| `randomSeed`                              | A positive `integer` type value               |   `0`   | Specifies the seed value for the random number generator.                                                                                                                                                            |
+| `detectionSensorRange`                    | A positive `double` type value                | `300.0` | Specifies the sensor detection range for detected object.                                                                                                                                                            |
+| `isClairvoyant`                           | A `boolean` type value                        | `false` | Specifies whether the detected object is a Clairvoyant. If this parameter is not defined explicitly, the property of `detectionSensorRange` is not reflected and only detected object detected by lidar is published |
 
 These properties are not exclusive. In other words, multiple properties can be
 specified at the same time. However, these properties only take effect for
@@ -220,4 +222,31 @@ deterministic.
               Property:
                 - name: "randomSeed"
                   value: "0"
+```
+
+## Property `detectionSensorRange`
+
+**Summary** - Specifies the range within which a sensor can detect objects.
+
+**Purpose** - The purpose of the detectionSensorRange property is to replicate the limits of recognition distance that exist in actual sensors on the simulator. By running simulations with varying values of this property, it can be used to determine requirements such as the minimum recognition distance needed in specific use cases.
+
+**Specification** - The detectionSensorRange property sets the detectable range for objects using the ego vehicle as the center, forming a circle with a radius equal to the detectionSensorRange value in meters. Ideally, the range should consider only objects that are both within this circle and detected by Lidar, in order to avoid detecting occluded objects. **However, the current specification detects all objects within the set range, without considering factors such as occlusion.Please note that there is room for discussion and modification regarding this part of the specification.**
+
+**Default behavior** - If the property is not specified, the default value is `"300.0"`, indicating a sensor detection range of 300 meters.
+
+**Note** - To ensure that objects within the recognition distance are detected by this property, it's necessary to explicitly set another property, isClairvoyant, to true. If this is not done, the value of detectionSensorRange will not be reflected in the simulator's behavior and only objects detected by the lidar will be outputted.
+
+**[Example of detectionSensorRange]([https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectionSensorRange.yaml])** -
+```
+        ObjectController:
+          Controller:
+            name: '...'
+            Properties:
+              Property:
+                - name: "isEgo"
+                  value: "true"
+                - name: "detectionSensorRange"
+                  value: "50"
+                - name: "isClairvoyant"
+                  value: "true"
 ```
