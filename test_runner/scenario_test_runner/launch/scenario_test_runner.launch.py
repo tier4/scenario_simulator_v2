@@ -58,24 +58,25 @@ def default_autoware_launch_file_of(architecture_type):
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
-    architecture_type       = LaunchConfiguration("architecture_type",       default="awf/universe")
-    autoware_launch_file    = LaunchConfiguration("autoware_launch_file",    default=default_autoware_launch_file_of(architecture_type.perform(context)))
-    autoware_launch_package = LaunchConfiguration("autoware_launch_package", default=default_autoware_launch_package_of(architecture_type.perform(context)))
-    global_frame_rate       = LaunchConfiguration("global_frame_rate",       default=30.0)
-    global_real_time_factor = LaunchConfiguration("global_real_time_factor", default=1.0)
-    global_timeout          = LaunchConfiguration("global_timeout",          default=180)
-    initialize_duration     = LaunchConfiguration("initialize_duration",     default=30)
-    launch_autoware         = LaunchConfiguration("launch_autoware",         default=True)
-    launch_rviz             = LaunchConfiguration("launch_rviz",             default=False)
-    output_directory        = LaunchConfiguration("output_directory",        default=Path("/tmp"))
-    port                    = LaunchConfiguration("port",                    default=8080)
-    record                  = LaunchConfiguration("record",                  default=True)
-    rviz_config             = LaunchConfiguration("rviz_config",             default="")
-    scenario                = LaunchConfiguration("scenario",                default=Path("/dev/null"))
-    sensor_model            = LaunchConfiguration("sensor_model",            default="")
-    sigterm_timeout         = LaunchConfiguration("sigterm_timeout",         default=8)
-    vehicle_model           = LaunchConfiguration("vehicle_model",           default="")
-    workflow                = LaunchConfiguration("workflow",                default=Path("/dev/null"))
+    architecture_type               = LaunchConfiguration("architecture_type",              default="awf/universe")
+    autoware_launch_file            = LaunchConfiguration("autoware_launch_file",           default=default_autoware_launch_file_of(architecture_type.perform(context)))
+    autoware_launch_package         = LaunchConfiguration("autoware_launch_package",        default=default_autoware_launch_package_of(architecture_type.perform(context)))
+    global_frame_rate               = LaunchConfiguration("global_frame_rate",              default=30.0)
+    global_real_time_factor         = LaunchConfiguration("global_real_time_factor",        default=1.0)
+    global_timeout                  = LaunchConfiguration("global_timeout",                 default=180)
+    initialize_duration             = LaunchConfiguration("initialize_duration",            default=30)
+    launch_autoware                 = LaunchConfiguration("launch_autoware",                default=True)
+    launch_rviz                     = LaunchConfiguration("launch_rviz",                    default=False)
+    launch_simple_sensor_simulator  = LaunchConfiguration("launch_simple_sensor_simulator", default=True)
+    output_directory                = LaunchConfiguration("output_directory",               default=Path("/tmp"))
+    port                            = LaunchConfiguration("port",                           default=8080)
+    record                          = LaunchConfiguration("record",                         default=True)
+    rviz_config                     = LaunchConfiguration("rviz_config",                    default="")
+    scenario                        = LaunchConfiguration("scenario",                       default=Path("/dev/null"))
+    sensor_model                    = LaunchConfiguration("sensor_model",                   default="")
+    sigterm_timeout                 = LaunchConfiguration("sigterm_timeout",                default=8)
+    vehicle_model                   = LaunchConfiguration("vehicle_model",                  default="")
+    workflow                        = LaunchConfiguration("workflow",                       default=Path("/dev/null"))
     # fmt: on
 
     print(f"architecture_type       := {architecture_type.perform(context)}")
@@ -166,6 +167,7 @@ def launch_setup(context, *args, **kwargs):
             output="screen",
             on_exit=ShutdownOnce(),
             parameters=[{"port": port}],
+            condition=IfCondition(launch_simple_sensor_simulator),
         ),
         LifecycleNode(
             package="openscenario_interpreter",
