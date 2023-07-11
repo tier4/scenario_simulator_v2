@@ -336,12 +336,84 @@ TEST(Conversion, EntityStatus)
   simulation_interface::toProto(status, proto);
   EXPECT_ENTITY_STATUS_EQ(status, proto);
   status = traffic_simulator_msgs::msg::EntityStatus();
-  EXPECT_TRUE(status.lanelet_pose_valid);
+  EXPECT_FALSE(proto.lanelet_pose_valid());
   simulation_interface::toMsg(proto, status);
   EXPECT_ENTITY_STATUS_EQ(status, proto);
+  EXPECT_FALSE(status.lanelet_pose_valid);
 }
 
-/// @todo Add test for EntityStatus from UpdatedEntityStatus
+TEST(Conversion, SentEntityStatus)
+{
+  simulation_api_schema::EntityStatus proto;
+  traffic_simulator_msgs::msg::EntityStatus status;
+  status.name = "test";
+  status.time = 3.0;
+  traffic_simulator_msgs::msg::ActionStatus action;
+  action.current_action = "test";
+  action.twist.linear.x = 1.0;
+  action.twist.linear.y = 2.0;
+  action.twist.linear.z = 3.0;
+  action.twist.angular.x = -20;
+  action.twist.angular.y = -4.2;
+  action.twist.angular.z = 9;
+  action.accel.linear.x = 3.0;
+  action.accel.linear.y = 908;
+  action.accel.linear.z = 987.0;
+  action.accel.angular.x = 0.3;
+  action.accel.angular.y = 0.5;
+  action.accel.angular.z = 98;
+  status.action_status = action;
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 4.0;
+  pose.position.y = 1.2;
+  pose.position.z = 5.1;
+  pose.orientation.x = 0.3;
+  pose.orientation.y = 8.3;
+  pose.orientation.z = 9.3;
+  pose.orientation.w = 10.2;
+  status.pose = pose;
+  simulation_interface::toProto(status, proto);
+  EXPECT_SENT_ENTITY_STATUS_EQ(status, proto);
+  status = traffic_simulator_msgs::msg::EntityStatus();
+  simulation_interface::toMsg(proto, status);
+  EXPECT_SENT_ENTITY_STATUS_EQ(status, proto);
+}
+
+TEST(Conversion, UpdatedEntityStatus)
+{
+  simulation_api_schema::EntityStatus proto;
+  traffic_simulator_msgs::msg::EntityStatus status;
+  status.name = "test";
+  traffic_simulator_msgs::msg::ActionStatus action;
+  action.current_action = "test";
+  action.twist.linear.x = 1.0;
+  action.twist.linear.y = 2.0;
+  action.twist.linear.z = 3.0;
+  action.twist.angular.x = -20;
+  action.twist.angular.y = -4.2;
+  action.twist.angular.z = 9;
+  action.accel.linear.x = 3.0;
+  action.accel.linear.y = 908;
+  action.accel.linear.z = 987.0;
+  action.accel.angular.x = 0.3;
+  action.accel.angular.y = 0.5;
+  action.accel.angular.z = 98;
+  status.action_status = action;
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 4.0;
+  pose.position.y = 1.2;
+  pose.position.z = 5.1;
+  pose.orientation.x = 0.3;
+  pose.orientation.y = 8.3;
+  pose.orientation.z = 9.3;
+  pose.orientation.w = 10.2;
+  status.pose = pose;
+  simulation_interface::toProto(status, proto);
+  EXPECT_UPDATED_ENTITY_STATUS_EQ(status, proto);
+  status = traffic_simulator_msgs::msg::EntityStatus();
+  simulation_interface::toMsg(proto, status);
+  EXPECT_UPDATED_ENTITY_STATUS_EQ(status, proto);
+}
 
 TEST(Conversion, Time)
 {
