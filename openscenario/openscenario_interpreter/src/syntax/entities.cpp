@@ -59,19 +59,19 @@ auto Entities::ref(const String & entity_ref) const -> Object
   }
 }
 
-auto Entities::objects(const std::list<String> & entity_refs) const -> std::list<String>
+auto Entities::objects(const std::list<String> & entity_refs) const -> std::set<String>
 {
-  auto object_list = std::list<String>();
+  auto object_set = std::set<String>();
   for (auto & entity_ref : entity_refs) {
     if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
-      object_list.emplace_back(entity_ref);
+      object_set.emplace(entity_ref);
     } else if (object.is<EntitySelection>()) {
-      object_list.merge(object.as<EntitySelection>().objects(*this));
+      object_set.merge(object.as<EntitySelection>().objects(*this));
     } else {
       THROW_SYNTAX_ERROR("Unsupported entity type is specified");
     }
   }
-  return object_list;
+  return object_set;
 }
 
 auto Entities::objectTypes(const std::list<String> & entity_refs) const

@@ -45,7 +45,7 @@ struct Entities
 
   auto ref(const String &) const -> Object;
 
-  auto objects(const std::list<String> &) const -> std::list<String>;
+  auto objects(const std::list<String> &) const -> std::set<String>;
 
   auto objectTypes(const std::list<String> &) const -> std::set<ObjectType::value_type>;
 };
