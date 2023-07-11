@@ -152,11 +152,6 @@
   EXPECT_ACTION_STATUS_EQ(MSG.action_status, PROTO.action_status()); \
   EXPECT_POSE_EQ(MSG.pose, PROTO.pose());
 
-#define EXPECT_UPDATED_ENTITY_STATUS_EQ(MSG, PROTO)                  \
-  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());              \
-  EXPECT_ACTION_STATUS_EQ(MSG.action_status, PROTO.action_status()); \
-  EXPECT_POSE_EQ(MSG.pose, PROTO.pose());
-
 /**
  * @brief Expect equal macros for autoware related messages.
  */

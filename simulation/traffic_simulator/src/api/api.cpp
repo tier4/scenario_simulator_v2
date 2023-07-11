@@ -278,7 +278,7 @@ std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatus
   if (res.result().success()) {
     simulation_interface::toMsg(res.status().pose(), status.pose);
     simulation_interface::toMsg(res.status().action_status(), status.action_status);
-    // Temporarly deinitialize lanelet pose as it should be correctly filled from here
+    // Temporarily deinitialize lanelet pose as it should be correctly filled from here
     status.lanelet_pose_valid = false;
     status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
     return status;
