@@ -22,7 +22,6 @@
 
 namespace traffic_simulator
 {
-
 TrafficLightManager::TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap)
 : hdmap_(hdmap)
 {
