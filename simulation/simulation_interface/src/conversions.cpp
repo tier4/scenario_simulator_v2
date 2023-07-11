@@ -632,10 +632,11 @@ void toProto(
         return simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
       case autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW:
         return simulation_api_schema::TrafficLight_Shape_UP_ARROW;
-      case autoware_auto_perception_msgs::msg::TrafficLight::UP_LEFT_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
-      case autoware_auto_perception_msgs::msg::TrafficLight::UP_RIGHT_ARROW:
-        return simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
+        /// @note Enums below are not supported yet in some platforms. I temporarily disabled them
+        //  case autoware_auto_perception_msgs::msg::TrafficLight::UP_LEFT_ARROW:
+        //    return simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
+        //  case autoware_auto_perception_msgs::msg::TrafficLight::UP_RIGHT_ARROW:
+        //    return simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
       case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW:
         return simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
       case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_LEFT_ARROW:
@@ -708,10 +709,11 @@ void toMsg(
         return autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW;
       case simulation_api_schema::TrafficLight_Shape_UP_ARROW:
         return autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW:
-        return autoware_auto_perception_msgs::msg::TrafficLight::UP_LEFT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW:
-        return autoware_auto_perception_msgs::msg::TrafficLight::UP_RIGHT_ARROW;
+        /// @note Enums below are not supported yet in some platforms. I temporarily disabled them
+        //  case simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW:
+        //    return autoware_auto_perception_msgs::msg::TrafficLight::UP_LEFT_ARROW;
+        //  case simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW:
+        //    return autoware_auto_perception_msgs::msg::TrafficLight::UP_RIGHT_ARROW;
       case simulation_api_schema::TrafficLight_Shape_DOWN_ARROW:
         return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW;
       case simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW:
