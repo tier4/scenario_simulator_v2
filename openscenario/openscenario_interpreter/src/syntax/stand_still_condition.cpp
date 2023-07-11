@@ -49,13 +49,12 @@ auto StandStillCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     auto objects = global().entities->objects({triggering_entity});
-    auto & speeds = results.emplace_back(objects.size());
     std::transform(
-      std::begin(objects), std::end(objects), std::begin(speeds),
+      std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [](const auto & object) { return evaluateStandStill(object); });
 
     return not objects.empty() and std::all_of(
-                                     std::begin(speeds), std::end(speeds),
+                                     std::begin(results.back()), std::end(results.back()),
                                      [&](auto speed) { return compare(speed, duration); });
   }));
 }

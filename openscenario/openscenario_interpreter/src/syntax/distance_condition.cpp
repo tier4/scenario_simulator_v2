@@ -256,13 +256,12 @@ auto DistanceCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     auto objects = global().entities->objects({triggering_entity});
-    auto & distances = results.emplace_back(objects.size());
     std::transform(
-      std::begin(objects), std::end(objects), std::begin(distances),
+      std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [&](const auto & object) { return this->distance(object); });
 
     return not objects.empty() and std::all_of(
-                                     std::begin(distances), std::end(distances),
+                                     std::begin(results.back()), std::end(results.back()),
                                      [&](auto distance) { return rule(distance, value); });
   }));
 }

@@ -49,15 +49,14 @@ auto AccelerationCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     auto objects = global().entities->objects({triggering_entity});
-    auto & accelerations = results.emplace_back(objects.size());
     std::transform(
-      std::begin(objects), std::end(objects), std::begin(accelerations),
+      std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [&](const auto & object) { return evaluateAcceleration(object); });
 
     return not objects.empty() and
-           std::all_of(std::begin(accelerations), std::end(accelerations), [&](auto acceleration) {
-             return compare(acceleration, value);
-           });
+           std::all_of(
+             std::begin(results.back()), std::end(results.back()),
+             [&](auto acceleration) { return compare(acceleration, value); });
   }));
 }
 }  // namespace syntax

@@ -54,12 +54,11 @@ auto TimeHeadwayCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     auto objects = global().entities->objects({triggering_entity});
-    auto & headways = results.emplace_back(objects.size());
     std::transform(
-      std::begin(objects), std::end(objects), std::begin(headways),
+      std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [&](const auto & object) { return evaluateTimeHeadway(object, entity_ref); });
 
-    return std::all_of(std::begin(headways), std::end(headways), [&](auto headway) {
+    return std::all_of(std::begin(results.back()), std::end(results.back()), [&](auto headway) {
       return compare(headway, value);
     });
   }));
