@@ -177,7 +177,7 @@ void ScenarioSimulator::spawnVehicleEntity(
     simulation_interface::toMsg(req.pose(), initial_status.pose);
     initial_status.bounding_box = parameters.bounding_box;
 
-    ego_entity_simulation_->refillEntityStatusWithLaneletData(initial_status);
+    ego_entity_simulation_->fillLaneletDataAndSnapZToLanelet(initial_status);
     ego_entity_simulation_->setInitialStatus(initial_status);
   } else {
     vehicles_.emplace_back(req.parameters());

@@ -18,7 +18,6 @@ namespace simple_sensor_simulator
 {
 namespace traffic_lights
 {
-
 TrafficLightsDetector::TrafficLightsDetector(std::string topic_name, rclcpp::Node & node)
 : traffic_light_state_array_publisher_(
     rclcpp::create_publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>(

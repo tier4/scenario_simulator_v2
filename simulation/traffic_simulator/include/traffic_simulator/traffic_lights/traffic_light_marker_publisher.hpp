@@ -20,7 +20,6 @@
 
 namespace traffic_simulator
 {
-
 class TrafficLightMarkerPublisher : public ConfigurableRateUpdater
 {
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;

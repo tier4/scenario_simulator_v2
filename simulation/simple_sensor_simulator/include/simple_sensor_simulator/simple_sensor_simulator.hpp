@@ -27,7 +27,6 @@
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
-#include <simple_sensor_simulator/sensor_simulation/traffic_lights/traffic_lights_detector.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
 #include <string>

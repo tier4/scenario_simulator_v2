@@ -317,7 +317,7 @@ bool API::updateFrame()
       ego_status = *ego_status_opt;
     }
     /// @note apply additional status data (from ll2) to ego_entity_simulation_ for this update
-    refillEntityStatusWithLaneletData(ego_name, ego_status);
+    entity_manager_ptr_->fillLaneletPose(ego_name, ego_status);
     entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
   }
 
@@ -351,39 +351,6 @@ bool API::updateFrame()
     clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
     debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
     return true;
-  }
-}
-
-auto API::refillEntityStatusWithLaneletData(
-  const std::string & name, traffic_simulator_msgs::msg::EntityStatus & status) const -> void
-{
-  const auto unique_route_lanelets =
-    traffic_simulator::helper::getUniqueValues(entity_manager_ptr_->getRouteLanelets(name));
-
-  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-
-  if (unique_route_lanelets.empty()) {
-    lanelet_pose = entity_manager_ptr_->getHdmapUtils()->toLaneletPose(
-      status.pose, status.bounding_box, false, 1.0);
-  } else {
-    lanelet_pose =
-      entity_manager_ptr_->getHdmapUtils()->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
-    if (!lanelet_pose) {
-      lanelet_pose = entity_manager_ptr_->getHdmapUtils()->toLaneletPose(
-        status.pose, status.bounding_box, false, 1.0);
-    }
-  }
-  if (lanelet_pose) {
-    math::geometry::CatmullRomSpline spline(
-      entity_manager_ptr_->getHdmapUtils()->getCenterPoints(lanelet_pose->lanelet_id));
-    if (const auto s_value = spline.getSValue(status.pose)) {
-      status.pose.position.z = spline.getPoint(s_value.value()).z;
-    }
-  }
-
-  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-  if (status.lanelet_pose_valid) {
-    status.lanelet_pose = lanelet_pose.value();
   }
 }
 
@@ -428,51 +395,4 @@ void API::requestLaneChange(
 {
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
-
-void API::requestSpeedChange(const std::string & name, double target_speed, bool continuous)
-{
-  if (entity_manager_ptr_ == nullptr) {
-    THROW_SIMULATION_ERROR(
-      "If you see this error, something completely unexpected happens. Please contact developer.");
-  }
-
-  entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
-}
-
-void API::requestSpeedChange(
-  const std::string & name, const double target_speed, const speed_change::Transition transition,
-  const speed_change::Constraint constraint, const bool continuous)
-{
-  if (entity_manager_ptr_ == nullptr) {
-    THROW_SIMULATION_ERROR(
-      "If you see this error, something completely unexpected happens. Please contact developer.");
-  }
-
-  entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
-}
-
-void API::requestSpeedChange(
-  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
-{
-  if (entity_manager_ptr_ == nullptr) {
-    THROW_SIMULATION_ERROR(
-      "If you see this error, something completely unexpected happens. Please contact developer.");
-  }
-
-  entity_manager_ptr_->requestSpeedChange(name, target_speed, continuous);
-}
-
-void API::requestSpeedChange(
-  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-  const speed_change::Transition transition, const speed_change::Constraint constraint,
-  const bool continuous)
-{
-  if (entity_manager_ptr_ == nullptr) {
-    THROW_SIMULATION_ERROR(
-      "If you see this error, something completely unexpected happens. Please contact developer.");
-  }
-
-  entity_manager_ptr_->requestSpeedChange(name, target_speed, transition, constraint, continuous);
-}
-
 }  // namespace traffic_simulator

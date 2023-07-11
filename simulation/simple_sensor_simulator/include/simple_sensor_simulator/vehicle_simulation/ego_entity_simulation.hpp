@@ -89,8 +89,7 @@ public:
 
   auto updateStatus(double time, double step_time) -> void;
 
-  auto refillEntityStatusWithLaneletData(traffic_simulator_msgs::msg::EntityStatus & status)
-    -> void;
+  auto fillLaneletDataAndSnapZToLanelet(traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 };
 }  // namespace vehicle_simulation
 

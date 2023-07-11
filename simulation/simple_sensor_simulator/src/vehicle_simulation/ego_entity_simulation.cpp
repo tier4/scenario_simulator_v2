@@ -306,11 +306,11 @@ auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
   status.action_status.accel = getCurrentAccel(step_time);
   status.action_status.linear_jerk = getLinearJerk(step_time);
 
-  refillEntityStatusWithLaneletData(status);
+  fillLaneletDataAndSnapZToLanelet(status);
   setStatus(status);
 }
 
-auto EgoEntitySimulation::refillEntityStatusWithLaneletData(
+auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
   traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
   const auto unique_route_lanelets =

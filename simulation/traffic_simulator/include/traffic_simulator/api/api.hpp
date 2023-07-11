@@ -99,14 +99,9 @@ public:
   {
     auto register_to_entity_manager = [&]() {
       if (behavior == VehicleBehavior::autoware()) {
-        if (entity_manager_ptr_->entityExists(name)) {
-          return true;
-        }
-        if (entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-              name, pose, parameters, configuration)) {
-          return true;
-        }
-        return false;
+        return entity_manager_ptr_->entityExists(name) or
+               entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
+                 name, pose, parameters, configuration);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, behavior);
@@ -311,6 +306,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
+  FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
@@ -328,28 +324,11 @@ public:
 
 #undef FORWARD_TO_ENTITY_MANAGER
 
-  void requestSpeedChange(const std::string & name, double target_speed, bool continuous);
-
-  void requestSpeedChange(
-    const std::string & name, const double target_speed, const speed_change::Transition transition,
-    const speed_change::Constraint constraint, const bool continuous);
-
-  void requestSpeedChange(
-    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-    bool continuous);
-
-  void requestSpeedChange(
-    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, const speed_change::Constraint constraint,
-    const bool continuous);
-
 private:
   bool updateEntityStatusInSim();
   std::optional<traffic_simulator_msgs::msg::EntityStatus> updateEntityStatusInSim(
     const std::string & entity_name, traffic_simulator_msgs::msg::EntityStatus status);
   bool updateTrafficLightsInSim();
-  auto refillEntityStatusWithLaneletData(
-    const std::string & name, traffic_simulator_msgs::msg::EntityStatus & status) const -> void;
 
   const Configuration configuration;
 
