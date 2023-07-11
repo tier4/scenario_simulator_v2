@@ -228,12 +228,13 @@ public:
 
   auto resetConventionalTrafficLightPublishRate(double rate) -> void
   {
-    return conventional_traffic_light_marker_publisher_ptr_->resetPublishRate(rate);
+    conventional_traffic_light_marker_publisher_ptr_->resetPublishRate(rate);
   }
 
   auto resetV2ITrafficLightPublishRate(double rate) -> void
   {
-    return v2i_traffic_light_publisher_ptr_->resetPublishRate(rate);
+    v2i_traffic_light_marker_publisher_ptr_->resetPublishRate(rate);
+    v2i_traffic_light_publisher_ptr_->resetPublishRate(rate);
   }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
