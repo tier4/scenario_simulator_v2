@@ -28,11 +28,11 @@
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <simple_sensor_simulator/sensor_simulation/traffic_lights/traffic_lights_detector.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
 #include <string>
 #include <thread>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
 

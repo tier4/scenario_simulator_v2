@@ -52,14 +52,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic_lights/configurable_rate_updater.cpp
   src/traffic_lights/traffic_light_marker_publisher.cpp
   src/traffic_lights/v2i_traffic_light_publisher.cpp
-  src/vehicle_simulation/ego_entity_simulation.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_vel.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_vel.cpp
-  src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
 )
 
 target_link_libraries(traffic_simulator

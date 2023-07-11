@@ -44,6 +44,14 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/sensor_simulation/sensor_simulation.cpp
   src/sensor_simulation/traffic_lights/traffic_lights_detector.cpp
   src/simple_sensor_simulator.cpp
+  src/vehicle_simulation/ego_entity_simulation.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_delay_steer_vel.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_acc_geared.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_ideal_steer_vel.cpp
+  src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
   embree3
