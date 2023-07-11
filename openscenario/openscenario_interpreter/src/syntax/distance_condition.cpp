@@ -42,7 +42,7 @@ DistanceCondition::DistanceCondition(
   value(readAttribute<Double>("value", node, scope)),
   position(readElement<Position>("Position", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), { Double::nan() })
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
 }
 

@@ -37,7 +37,7 @@ RelativeDistanceCondition::RelativeDistanceCondition(
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), { Double::nan() })
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
 }
 

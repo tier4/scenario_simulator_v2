@@ -30,7 +30,7 @@ TimeHeadwayCondition::TimeHeadwayCondition(
   along_route(readAttribute<Boolean>("alongRoute", node, scope)),
   compare(readAttribute<Rule>("rule", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), { Double::nan() })
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
 }
 
