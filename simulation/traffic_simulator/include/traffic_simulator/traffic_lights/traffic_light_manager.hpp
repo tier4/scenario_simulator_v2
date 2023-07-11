@@ -33,9 +33,9 @@ class TrafficLightManager
 {
 protected:
   using LaneletID = std::int64_t;
-  using TrafficLigthMap = std::unordered_map<LaneletID, TrafficLight>;
+  using TrafficLightMap = std::unordered_map<LaneletID, TrafficLight>;
 
-  TrafficLigthMap traffic_lights_;
+  TrafficLightMap traffic_lights_;
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
 
 public:
@@ -43,9 +43,9 @@ public:
 
   auto getTrafficLight(const LaneletID traffic_light_id) -> TrafficLight &;
 
-  auto getTrafficLights() const -> const TrafficLigthMap &;
+  auto getTrafficLights() const -> const TrafficLightMap &;
 
-  auto getTrafficLights() -> TrafficLigthMap &;
+  auto getTrafficLights() -> TrafficLightMap &;
 
   auto getTrafficLights(const LaneletID lanelet_id)
     -> std::vector<std::reference_wrapper<TrafficLight>>;

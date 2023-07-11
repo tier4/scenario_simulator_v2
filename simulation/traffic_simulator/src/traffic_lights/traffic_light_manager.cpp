@@ -49,12 +49,12 @@ auto TrafficLightManager::getTrafficLight(const LaneletID traffic_light_id) -> T
   }
 }
 
-auto TrafficLightManager::getTrafficLights() const -> const TrafficLigthMap &
+auto TrafficLightManager::getTrafficLights() const -> const TrafficLightMap &
 {
   return traffic_lights_;
 }
 
-auto TrafficLightManager::getTrafficLights() -> TrafficLigthMap & { return traffic_lights_; }
+auto TrafficLightManager::getTrafficLights() -> TrafficLightMap & { return traffic_lights_; }
 
 auto TrafficLightManager::getTrafficLights(const LaneletID lanelet_id)
   -> std::vector<std::reference_wrapper<TrafficLight>>
