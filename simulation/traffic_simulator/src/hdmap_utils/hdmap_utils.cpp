@@ -1812,6 +1812,25 @@ auto HdMapUtils::getTrafficLightRelation(const LaneletId lanelet_id) const
     lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 
+auto HdMapUtils::getTrafficLightRelationIDFromWayID(const LaneletId traffic_light_way_id) const
+  -> LaneletId
+{
+  assert(isTrafficLight(traffic_light_way_id));
+  for (const auto & regulatory_element : lanelet_map_ptr_->regulatoryElementLayer) {
+    if (
+      regulatory_element.second->attribute(lanelet::AttributeName::Subtype).value() ==
+      "traffic_light") {
+      for (const auto & ref_member : regulatory_element.second->refMembers()) {
+        if (ref_member.id() == traffic_light_way_id) {
+          return regulatory_element.second->id();
+        }
+      }
+    }
+  }
+  throw std::runtime_error(
+    "No traffic light relation found for way id " + std::to_string(traffic_light_way_id));
+}
+
 std::vector<geometry_msgs::msg::Point> HdMapUtils::toPolygon(
   const lanelet::ConstLineString3d & line_string) const
 {
