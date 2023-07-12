@@ -73,7 +73,6 @@ class LifecycleController(Node):
 
     def send_request_to_change_parameters(
         self,  # Arguments are alphabetically sorted
-        expect,
         frame_rate: float,
         output_directory: Path,
         real_time_factor: float,
@@ -116,7 +115,6 @@ class LifecycleController(Node):
 
     def configure_node(
         self,  # Arguments are alphabetically sorted
-        expect,
         frame_rate: float,
         output_directory: Path,
         real_time_factor: float,
@@ -126,7 +124,6 @@ class LifecycleController(Node):
         self.current_scenario = scenario
 
         while not self.send_request_to_change_parameters(
-            expect=expect,
             frame_rate=frame_rate,
             output_directory=output_directory,
             real_time_factor=real_time_factor,
