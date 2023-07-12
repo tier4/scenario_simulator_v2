@@ -12,8 +12,15 @@ Our simple sensor simulators do not include noise simulation, because scenario_s
 
 <font color="#065479E">_Note! Simple Sensor Simulator is just a reference implementation, so we can adapt any kinds of autonomous driving simulators if we can develop ZeroMQ interface to your simulator._</font>
 
+## How to simulate sensors.
 
-Architecture of the sensor simulation is below.
+Currentry, simple_sensor_simulator only supports
+
+* [LiDAR](#lidar-simulation)
+* [Occupancy Grid sensor](#occupancy-grid-sensor-simulation)
+* [Detection Sensor](#object-detection-results-simulation)
+
+Sequence diagram of the sensor simulation is below.
 
 ```mermaid
 sequenceDiagram
