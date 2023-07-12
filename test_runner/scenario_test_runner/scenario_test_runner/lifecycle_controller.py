@@ -84,12 +84,6 @@ class LifecycleController(Node):
 
         request.parameters = [
             Parameter(
-                name="intended_result",
-                value=ParameterValue(
-                    type=ParameterType.PARAMETER_STRING, string_value=str(expect.name)
-                ),
-            ),
-            Parameter(
                 name="osc_path",
                 value=ParameterValue(
                     type=ParameterType.PARAMETER_STRING, string_value=str(scenario)

@@ -34,13 +34,11 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
-  intended_result("success"),
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
   output_directory("/tmp")
 {
-  DECLARE_PARAMETER(intended_result);
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
@@ -58,12 +56,6 @@ auto Interpreter::currentScenarioDefinition() const -> const std::shared_ptr<Sce
 {
   return scenarios.front();
 }
-
-auto Interpreter::isAnErrorIntended() const -> bool { return intended_result == "error"; }
-
-auto Interpreter::isFailureIntended() const -> bool { return intended_result == "failure"; }
-
-auto Interpreter::isSuccessIntended() const -> bool { return intended_result == "success"; }
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
@@ -104,7 +96,6 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
 
-      GET_PARAMETER(intended_result);
       GET_PARAMETER(local_frame_rate);
       GET_PARAMETER(local_real_time_factor);
       GET_PARAMETER(osc_path);
@@ -304,7 +295,8 @@ auto Interpreter::reset() -> void
 
   scenarios.pop_front();
 
-  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
+  // INFO_STREAM.
   boost::apply_visitor(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
