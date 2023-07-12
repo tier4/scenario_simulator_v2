@@ -132,27 +132,11 @@ TEST(LineSegment, isIntersect2D)
 TEST(LineSegment, getIntersection2DSValue)
 {
   {
-    /**
-     * y
-     * ^
-     * |
-     * + (x,y,z) = (0,1,0)
-     * $
-     * $
-     * $
-     * +----------------------> x
-     * $
-     * $
-     * $
-     * + (x,y,z) = (0,-1,0)
-     * 
-     * -----------------------------------------------------------
-     * $$$$$$$$$$$$$ Line segment
-     */
     math::geometry::LineSegment line(
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0));
-    /// @note Get intersection s value along with line segment. Point (x,y,z) = (0,0,0) is on the line segment.
+    /// @image html "test/plot/getIntersection2DSValue_collision_point_0_0_0/getIntersection2DSValue_collision_point_0_0_0.png"
+    /// @brief Get intersection s value along with line segment. Point (x,y,z) = (0,0,0) is on the line segment.
     {
       const auto s = line.getIntersection2DSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0), false);
