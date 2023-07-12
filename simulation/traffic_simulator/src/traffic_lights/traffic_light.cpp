@@ -252,8 +252,9 @@ TrafficLight::Bulb::operator TrafficLightBulbMessageType() const
   return traffic_light_bulb;
 }
 
-TrafficLight::TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
-: id(id),
+TrafficLight::TrafficLight(const std::int64_t way_id, hdmap_utils::HdMapUtils & map_manager)
+: way_id(way_id),
+  relation_id(map_manager.getTrafficLightRelationIDFromWayID(way_id)),
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),

@@ -36,7 +36,7 @@
 
 namespace traffic_simulator
 {
-struct TrafficLightBase
+struct TrafficLight
 {
   struct Color
   {
@@ -254,13 +254,15 @@ struct TrafficLightBase
     explicit operator TrafficLightBulbMessageType() const;
   };
 
-  const std::int64_t id;
+  const std::int64_t way_id;
+
+  const std::int64_t relation_id;
 
   std::set<Bulb> bulbs;
 
   const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
 
-  explicit TrafficLightBase(const std::int64_t, hdmap_utils::HdMapUtils &);
+  explicit TrafficLight(const std::int64_t, hdmap_utils::HdMapUtils &);
 
   auto clear() { bulbs.clear(); }
 
@@ -291,7 +293,7 @@ struct TrafficLightBase
         marker.header.frame_id = frame_id;
         marker.action = marker.ADD;
         marker.ns = "bulb";
-        marker.id = id;
+        marker.id = way_id;
         marker.type = marker.SPHERE;
         marker.pose.position = optional_position(bulb).value();
         marker.pose.orientation = geometry_msgs::msg::Quaternion();
@@ -316,37 +318,15 @@ struct TrafficLightBase
   auto set(const std::string & states) -> void;
 
   friend auto operator<<(std::ostream & os, const TrafficLight & traffic_light) -> std::ostream &;
-};
 
-template <typename TrafficSignalMessageType>
-struct TrafficLight : public TrafficLightBase
-{
-  explicit TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & hdmap_utils)
-  : TrafficLightBase(id, hdmap_utils)
-  {
-    if constexpr (std::is_same_v<
-                    TrafficSignalMessageType, autoware_auto_perception_msgs::msg::TrafficSignal>) {
-      if (not map_manager.isTrafficLight(id)) {
-        throw common::scenario_simulator_exception::Error(
-          "Given lanelet ID ", id, " is not a traffic light ID.");
-      }
-    } else if constexpr (std::is_same_v<
-                           TrafficSignalMessageType,
-                           autoware_perception_msgs::msg::TrafficSignal>) {
-      if (not map_manager.isTrafficLightRelation(id)) {
-        throw common::scenario_simulator_exception::Error(
-          "Given lanelet ID ", id, " is not a traffic light relation ID.");
-      }
-    }
-  }
-
+  template <typename TrafficSignalMessageType>
   explicit operator TrafficSignalMessageType() const
   {
     TrafficSignalMessageType traffic_signal;
 
     if constexpr (std::is_same_v<
                     TrafficSignalMessageType, autoware_auto_perception_msgs::msg::TrafficSignal>) {
-      traffic_signal.map_primitive_id = id;
+      traffic_signal.map_primitive_id = way_id;
       for (auto && bulb : bulbs) {
         traffic_signal.lights.push_back(
           static_cast<autoware_auto_perception_msgs::msg::TrafficLight>(bulb));
@@ -354,7 +334,7 @@ struct TrafficLight : public TrafficLightBase
     } else if constexpr (std::is_same_v<
                            TrafficSignalMessageType,
                            autoware_perception_msgs::msg::TrafficSignal>) {
-      traffic_signal.traffic_signal_id = id;
+      //      traffic_signal.traffic_signal_id = id;
       for (auto && bulb : bulbs) {
         traffic_signal.elements.push_back(
           static_cast<autoware_perception_msgs::msg::TrafficLightElement>(bulb));
@@ -366,9 +346,62 @@ struct TrafficLight : public TrafficLightBase
     }
     return traffic_signal;
   }
-
-  auto set(const std::string & states) -> void;
 };
+
+//template <typename TrafficSignalMessageType>
+//struct TrafficLight : public TrafficLightBase
+//{
+//  explicit TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & hdmap_utils)
+//  : TrafficLightBase(id, hdmap_utils)
+//  {
+//    if (not map_manager.isTrafficLight(id)) {
+//      throw common::scenario_simulator_exception::Error(
+//        "Given lanelet ID ", id, " is not a traffic light ID.");
+//    }
+//    if constexpr (std::is_same_v<
+//                    TrafficSignalMessageType, autoware_auto_perception_msgs::msg::TrafficSignal>) {
+//      if (not map_manager.isTrafficLight(id)) {
+//        throw common::scenario_simulator_exception::Error(
+//          "Given lanelet ID ", id, " is not a traffic light ID.");
+//      }
+//    } else if constexpr (std::is_same_v<
+//                           TrafficSignalMessageType,
+//                           autoware_perception_msgs::msg::TrafficSignal>) {
+//      if (not map_manager.isTrafficLightRelation(id)) {
+//        throw common::scenario_simulator_exception::Error(
+//          "Given lanelet ID ", id, " is not a traffic light relation ID.");
+//      }
+//    }
+//  }
+//  explicit operator TrafficSignalMessageType() const
+//  {
+//    TrafficSignalMessageType traffic_signal;
+//
+//    if constexpr (std::is_same_v<
+//                    TrafficSignalMessageType, autoware_auto_perception_msgs::msg::TrafficSignal>) {
+//      traffic_signal.map_primitive_id = id;
+//      for (auto && bulb : bulbs) {
+//        traffic_signal.lights.push_back(
+//          static_cast<autoware_auto_perception_msgs::msg::TrafficLight>(bulb));
+//      }
+//    } else if constexpr (std::is_same_v<
+//                           TrafficSignalMessageType,
+//                           autoware_perception_msgs::msg::TrafficSignal>) {
+//      traffic_signal.traffic_signal_id = id;
+//      for (auto && bulb : bulbs) {
+//        traffic_signal.elements.push_back(
+//          static_cast<autoware_perception_msgs::msg::TrafficLightElement>(bulb));
+//      }
+//    } else {
+//      throw common::Error(
+//        "Unsupported message type for traffic signal  ", demangle(typeid(TrafficSignalMessageType)),
+//        ".");
+//    }
+//    return traffic_signal;
+//  }
+//
+//  auto set(const std::string & states) -> void;
+//};
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_

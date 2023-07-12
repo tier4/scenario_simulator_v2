@@ -207,13 +207,14 @@ public:
   auto isTrafficLightRelation(const LaneletId) const -> bool;
   auto getTrafficLightRelation(const LaneletId) const -> lanelet::TrafficLight::Ptr;
 
-  auto getTrafficLightRelationIDFromWayID(const LaneletId) const -> LaneletId
+  auto getTrafficLightRelationIDFromWayID(const LaneletId) const -> LaneletId;
 
-    private : math::geometry::HermiteCurve getLaneChangeTrajectory(
-                const geometry_msgs::msg::Pose & from_pose,
-                const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-                const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-                double tangent_vector_size = 100) const;
+private:
+  math::geometry::HermiteCurve getLaneChangeTrajectory(
+    const geometry_msgs::msg::Pose & from_pose,
+    const traffic_simulator_msgs::msg::LaneletPose & to_pose,
+    const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+    double tangent_vector_size = 100) const;
 
   /** @defgroup cache
    *  Declared mutable for caching
