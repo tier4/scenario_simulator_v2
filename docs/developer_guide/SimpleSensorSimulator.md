@@ -14,7 +14,7 @@ Our simple sensor simulators do not include noise simulation, because scenario_s
 
 ## How to simulate sensors.
 
-Currentry, simple_sensor_simulator only supports
+Currently, simple_sensor_simulator only supports
 
 * [LiDAR](#lidar-simulation)
 * [Occupancy Grid sensor](#occupancy-grid-sensor-simulation)
