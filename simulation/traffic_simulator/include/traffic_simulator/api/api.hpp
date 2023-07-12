@@ -94,8 +94,8 @@ public:
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
-    const traffic_simulator_msgs::msg::VehicleParameters & parameters, std::string model3d = "",
-    const std::string & behavior = VehicleBehavior::defaultBehavior())
+    const traffic_simulator_msgs::msg::VehicleParameters & parameters,
+    const std::string & behavior = VehicleBehavior::defaultBehavior(), std::string model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       if (behavior == VehicleBehavior::autoware()) {
@@ -138,8 +138,8 @@ public:
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
-    const traffic_simulator_msgs::msg::PedestrianParameters & parameters, std::string model3d = "",
-    const std::string & behavior = PedestrianBehavior::defaultBehavior())
+    const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
+    const std::string & behavior = PedestrianBehavior::defaultBehavior(), std::string model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       using traffic_simulator::entity::PedestrianEntity;
