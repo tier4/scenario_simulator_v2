@@ -158,7 +158,7 @@ obtained in `scenario_simulator_v2` to when they are published. Note that there
 are other potential sources of delay, such as frame rates becoming unstable,
 and delays in pub/sub.
 
-**Default behavior** - If the property is not specified, the default value is
+**Default behavior** - If the property is not defined, the default value is
 `"0.0"`, indicating no delay.
 
 **[Example of detectedObjectPublishingDelay](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPositionStandardDeviation.yaml)** -
