@@ -38,7 +38,8 @@ public:
   LineSegment & operator=(const LineSegment &);
   const geometry_msgs::msg::Point start_point;
   const geometry_msgs::msg::Point end_point;
-  auto getPoint(const double s, const bool denormalize_s = false) const -> geometry_msgs::msg::Point;
+  auto getPoint(const double s, const bool denormalize_s = false) const
+    -> geometry_msgs::msg::Point;
   auto getPose(const double s, const bool denormalize_s = false) const -> geometry_msgs::msg::Pose;
   auto isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool;
   auto isIntersect2D(const LineSegment & l0) const -> bool;

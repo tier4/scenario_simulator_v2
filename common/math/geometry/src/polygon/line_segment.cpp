@@ -53,7 +53,8 @@ LineSegment::~LineSegment() {}
  * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return geometry_msgs::msg::Point 
  */
-auto LineSegment::getPoint(const double s, const bool denormalize_s) const -> geometry_msgs::msg::Point
+auto LineSegment::getPoint(const double s, const bool denormalize_s) const
+  -> geometry_msgs::msg::Point
 {
   const double s_normalized = denormalize_s ? s / getLength() : s;
   if (0 <= s_normalized && s_normalized <= 1) {
@@ -85,7 +86,8 @@ auto LineSegment::getPoint(const double s, const bool denormalize_s) const -> ge
  * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return geometry_msgs::msg::Pose 
  */
-auto LineSegment::getPose(const double s, const bool denormalize_s) const -> geometry_msgs::msg::Pose
+auto LineSegment::getPose(const double s, const bool denormalize_s) const
+  -> geometry_msgs::msg::Pose
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(getPoint(s, denormalize_s))
