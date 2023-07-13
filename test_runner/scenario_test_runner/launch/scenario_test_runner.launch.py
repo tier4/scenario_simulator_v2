@@ -111,6 +111,11 @@ def launch_setup(context, *args, **kwargs):
             {"sensor_model": sensor_model},
             {"vehicle_model": vehicle_model},
         ]
+        parameters += make_vehicle_parameters()
+        return parameters
+    
+    def make_vehicle_parameters():
+        parameters = []
 
         def description():
             return get_package_share_directory(
@@ -120,7 +125,6 @@ def launch_setup(context, *args, **kwargs):
         if vehicle_model.perform(context):
             parameters.append(description() + "/config/vehicle_info.param.yaml")
             parameters.append(description() + "/config/simulator_model.param.yaml")
-
         return parameters
 
     return [
@@ -166,7 +170,7 @@ def launch_setup(context, *args, **kwargs):
             name="simple_sensor_simulator",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=[{"port": port}],
+            parameters=[{"port": port}]+make_vehicle_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         LifecycleNode(
