@@ -1817,12 +1817,11 @@ auto HdMapUtils::getTrafficLightRelationIDFromWayID(const LaneletId traffic_ligh
 {
   assert(isTrafficLight(traffic_light_way_id));
   for (const auto & regulatory_element : lanelet_map_ptr_->regulatoryElementLayer) {
-    if (
-      regulatory_element.second->attribute(lanelet::AttributeName::Subtype).value() ==
-      "traffic_light") {
-      for (const auto & ref_member : regulatory_element.second->refMembers()) {
+    if (regulatory_element->attribute(lanelet::AttributeName::Subtype).value() == "traffic_light") {
+      for (const auto & ref_member :
+           regulatory_element->getParameters<lanelet::ConstLineString3d>("refers")) {
         if (ref_member.id() == traffic_light_way_id) {
-          return regulatory_element.second->id();
+          return regulatory_element->id();
         }
       }
     }
