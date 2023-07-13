@@ -27,7 +27,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeObjectPosition --------------------------------------------------
+/* ---- RelativeObjectPosition 1.2 ---------------------------------------------
  *
  *  <xsd:complexType name="RelativeObjectPosition">
  *    <xsd:all>
