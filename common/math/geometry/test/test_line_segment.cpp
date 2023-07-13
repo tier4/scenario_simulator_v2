@@ -43,7 +43,7 @@ TEST(LineSegmentTest, GetPoint)
     /// @note if s = 0, the value should be start point.
     EXPECT_POINT_EQ(
       line.getPoint(0, false), geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0));
-    /// @note if s = 1, and autoscale = false, the value should be end point.
+    /// @note if s = 1, and denormalize_s = false, the value should be end point.
     EXPECT_POINT_EQ(
       line.getPoint(1, false), geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
     /// @note if s is not in range s = [0,1], getPoint function should be throw error.
@@ -51,7 +51,7 @@ TEST(LineSegmentTest, GetPoint)
     EXPECT_THROW(line.getPoint(2, true), common::SimulationError);
     EXPECT_THROW(line.getPoint(-1, false), common::SimulationError);
     EXPECT_THROW(line.getPoint(-1, true), common::SimulationError);
-    /// @note if s = std::hypot((0,0,0), (1,1,1)), and autoscale = true, the value should be end point.
+    /// @note if s = std::hypot((0,0,0), (1,1,1)), and denormalize_s = true, the value should be end point.
     EXPECT_POINT_EQ(
       line.getPoint(std::sqrt(3), true),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
@@ -135,7 +135,6 @@ TEST(LineSegment, getIntersection2DSValue)
     math::geometry::LineSegment line(
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0));
-    /// @image html "test/plot/getIntersection2DSValue_collision_point_0_0_0/getIntersection2DSValue_collision_point_0_0_0.png"
     /// @brief Get intersection s value along with line segment. Point (x,y,z) = (0,0,0) is on the line segment.
     {
       const auto s = line.getIntersection2DSValue(
@@ -154,7 +153,7 @@ TEST(LineSegment, getIntersection2DSValue)
         EXPECT_DOUBLE_EQ(s.value(), 1.0);
       }
     }
-    /// @note If autoscale = true, consider length of the line string.
+    /// @note If denormalize_s = true, consider length of the line string.
     {
       const auto s = line.getIntersection2DSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0), true);
@@ -163,7 +162,7 @@ TEST(LineSegment, getIntersection2DSValue)
         EXPECT_DOUBLE_EQ(s.value(), 2.0);
       }
     }
-    /// @note If autoscale = true, consider length of the line string.
+    /// @note If denormalize_s = true, consider length of the line string.
     {
       const auto s = line.getIntersection2DSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0), true);

@@ -50,19 +50,19 @@ LineSegment::~LineSegment() {}
 /**
  * @brief Get point on the line segment from s value.
  * @param s s value in coordinate along line segment.
- * @param autoscale If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
+ * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return geometry_msgs::msg::Point 
  */
-auto LineSegment::getPoint(const double s, const bool autoscale) const -> geometry_msgs::msg::Point
+auto LineSegment::getPoint(const double s, const bool denormalize_s) const -> geometry_msgs::msg::Point
 {
-  const double s_normalized = autoscale ? s / getLength() : s;
+  const double s_normalized = denormalize_s ? s / getLength() : s;
   if (0 <= s_normalized && s_normalized <= 1) {
     return geometry_msgs::build<geometry_msgs::msg::Point>()
       .x(start_point.x + (end_point.x - start_point.x) * s_normalized)
       .y(start_point.y + (end_point.y - start_point.y) * s_normalized)
       .z(start_point.z + (end_point.z - start_point.z) * s_normalized);
   }
-  if (autoscale) {
+  if (denormalize_s) {
     THROW_SIMULATION_ERROR(
       "Invalid S value is specified, while getting point on a line segment.",
       "The range of s_normalized value should be in range [0,", getLength(), "].",
@@ -82,13 +82,13 @@ auto LineSegment::getPoint(const double s, const bool autoscale) const -> geomet
 /**
  * @brief Get pose on the line segment from s value. Orientation of thee return value was calculated from the vector of the line segment.
  * @param s s value in coordinate along line segment.
- * @param autoscale If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
+ * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return geometry_msgs::msg::Pose 
  */
-auto LineSegment::getPose(const double s, const bool autoscale) const -> geometry_msgs::msg::Pose
+auto LineSegment::getPose(const double s, const bool denormalize_s) const -> geometry_msgs::msg::Pose
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
-    .position(getPoint(s, autoscale))
+    .position(getPoint(s, denormalize_s))
     .orientation([this]() -> geometry_msgs::msg::Quaternion {
       const auto tangent_vec = getVector();
       return quaternion_operation::convertEulerAngleToQuaternion(
@@ -140,7 +140,7 @@ auto LineSegment::isIntersect2D(const LineSegment & l0) const -> bool
  * @return std::optional<double> 
  */
 auto LineSegment::getIntersection2DSValue(
-  const geometry_msgs::msg::Point & point, const bool autoscale) const -> std::optional<double>
+  const geometry_msgs::msg::Point & point, const bool denormalize_s) const -> std::optional<double>
 {
   const auto get_s_normalized = [this](const auto & point) -> std::optional<double> {
     const auto get_s_from_x = [this](const auto & point) {
@@ -167,16 +167,16 @@ auto LineSegment::getIntersection2DSValue(
     /// @note If the line segment is not parallel to x and y axis, calculate s value from x axis value.
     return get_s_from_x(point);
   };
-  return autoscale ? denormalize(get_s_normalized(point)) : get_s_normalized(point);
+  return denormalize_s ? denormalize(get_s_normalized(point)) : get_s_normalized(point);
 }
 
 /**
  * @brief Get S value of the intersection point of two line segment.
  * @param line The line segment you want to check intersection.
- * @param autoscale If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
+ * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return std::optional<double> 
  */
-auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool autoscale) const
+auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool denormalize_s) const
   -> std::optional<double>
 {
   const auto get_s_normalized = [this](const auto & line) -> std::optional<double> {
@@ -198,7 +198,7 @@ auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool a
     }
     return s;
   };
-  return autoscale ? denormalize(get_s_normalized(line)) : get_s_normalized(line);
+  return denormalize_s ? denormalize(get_s_normalized(line)) : get_s_normalized(line);
 }
 
 /**
@@ -260,13 +260,13 @@ auto LineSegment::getSlope() const -> double
  * @brief Get squared distance (Square of euclidean distance) between specified 3D point and specified 3D point on line segment in 2D. (x,y)
  * @param point Specified 3D point
  * @param S value of specified 3D point in coordinate along line segment.
- * @param autoscale If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
+ * @param denormalize_s If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
  * @return double 
  */
 auto LineSegment::getSquaredDistanceIn2D(
-  const geometry_msgs::msg::Point & point, const double s, const bool autoscale) const -> double
+  const geometry_msgs::msg::Point & point, const double s, const bool denormalize_s) const -> double
 {
-  const auto point_on_line = getPoint(s, autoscale);
+  const auto point_on_line = getPoint(s, denormalize_s);
   return std::pow(point.x - point_on_line.x, 2) + std::pow(point.y - point_on_line.y, 2);
 }
 
@@ -274,14 +274,14 @@ auto LineSegment::getSquaredDistanceIn2D(
  * @brief Get 3D vector from specified 3D point to specified 3D point on line segment.
  * @param point Specified 3D point
  * @param s S value of specified 3D point in coordinate along line segment.
- * @param autoscale If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
+ * @param denormalize_s If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
  * @return geometry_msgs::msg::Vector3 
  */
 auto LineSegment::getSquaredDistanceVector(
-  const geometry_msgs::msg::Point & point, const double s, const bool autoscale) const
+  const geometry_msgs::msg::Point & point, const double s, const bool denormalize_s) const
   -> geometry_msgs::msg::Vector3
 {
-  const auto point_on_line = getPoint(s, autoscale);
+  const auto point_on_line = getPoint(s, denormalize_s);
   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
     .x(point.x - point_on_line.x)
     .y(point.y - point_on_line.y)
