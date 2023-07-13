@@ -88,44 +88,47 @@ TEST(LineSegment, GetPose)
   }
 }
 
+/// @brief In this test case, we check collision with the point and the line segment with start point (x,y,z) = (0,-1,0) and end point (x,y,z) = (0,1,0) in the cartesian coordinate system. (variable name "line").
 TEST(LineSegment, isIntersect2D)
 {
   {
-    /**
-     * y
-     * ^
-     * |
-     * + (x,y,z) = (0,1,0)
-     * $
-     * $
-     * $
-     * +----------------------> x
-     * $
-     * $
-     * $
-     * + (x,y,z) = (0,-1,0)
-     * 
-     * -----------------------------------------------------------
-     * $$$$$$$$$$$$$ Line segment
-     */
     math::geometry::LineSegment line(
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0));
-    /// @note check intersection with point (0,0,0)
+    /// @note Testing the `isIntersect2D` function can find intersection with point (0,0,0) and `line`.
+    // [Snippet_isIntersect2D_with_point_0_0_0]
     EXPECT_TRUE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0)));
-    /// @note check intersection with point (0,0,-1)
+    // [Snippet_isIntersect2D_with_point_0_0_0]
+    /// @snippet test/test_line_segment.cpp Snippet_isIntersect2D_with_point_0_0_0
+
+    /// @note Testing the `isIntersect2D` function can find intersection with point (0,0,-1)
+    // [Snippet_isIntersect2D_with_point_0_0_-1]
     EXPECT_TRUE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(-1)));
-    /// @note check intersection with point (0,1,0)
+    // [Snippet_isIntersect2D_with_point_0_0_-1]
+    /// @snippet test/test_line_segment.cpp Snippet_isIntersect2D_with_point_0_0_-1
+
+    /// @note Testing the `isIntersect2D` function can find intersection with point (0,1,0) and `line`.
+    // [Snippet_isIntersect2D_with_point_0_1_0]
     EXPECT_TRUE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0)));
-    /// @note check intersection with point (0,2,0)
+    // [Snippet_isIntersect2D_with_point_0_1_0]
+    /// @snippet test/test_line_segment.cpp Snippet_isIntersect2D_with_point_0_1_0
+
+    /// @note Testing the `isIntersect2D` function can find that there is no intersection with point (0,2,0) and `line`.
+    // [Snippet_isIntersect2D_with_point_0_2_0]
     EXPECT_FALSE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(2).z(0)));
-    /// @note check intersection with point (0,-2,0)
+    // [Snippet_isIntersect2D_with_point_0_2_0]
+    /// @snippet test/test_line_segment.cpp Snippet_isIntersect2D_with_point_0_2_0
+
+    /// @note Testing the `isIntersect2D` function can find that there is no intersection with point (0,-2,0) and `line`.
+    // [Snippet_isIntersect2D_with_point_0_-2_0]
     EXPECT_FALSE(
       line.isIntersect2D(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-2).z(0)));
+    // [Snippet_isIntersect2D_with_point_0_-2_0]
+    /// @snippet test/test_line_segment.cpp Snippet_isIntersect2D_with_point_0_-2_0
   }
 }
 
@@ -229,7 +232,6 @@ TEST(LineSegment, getIntersection2DSValue)
     }
     // [Snippet_getIntersection2D_with_line]
     /// @snippet test/test_line_segment.cpp Snippet_getIntersection2D_with_line
-
 
     /**
      * @note Testing the `getIntersection2D` function can detect erorrs getting intersection with part of the line segment `line`.
