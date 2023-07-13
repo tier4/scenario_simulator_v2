@@ -120,7 +120,7 @@ class EntityManager
   const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
   const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
   const std::shared_ptr<
-    V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>
+    V2ITrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>>
     v2i_traffic_light_publisher_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
@@ -198,7 +198,7 @@ public:
       std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
     v2i_traffic_light_publisher_ptr_(
       std::make_shared<
-        V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
+        V2ITrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
         v2i_traffic_light_manager_ptr_, "/v2x/traffic_signals", node))
   {
     updateHdmapMarker();

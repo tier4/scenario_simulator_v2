@@ -18,7 +18,7 @@
 namespace traffic_simulator
 {
 template <>
-auto V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::update()
+auto V2ITrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::update()
   -> void
 {
   autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;
