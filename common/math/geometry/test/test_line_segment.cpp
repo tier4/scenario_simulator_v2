@@ -129,63 +129,113 @@ TEST(LineSegment, isIntersect2D)
   }
 }
 
+/// @brief In this test case, we check collision with the line segment with start point (x,y,z) = (0,-1,0) and end point (x,y,z) = (0,1,0) in the cartesian coordinate system. (variable name "line").
 TEST(LineSegment, getIntersection2DSValue)
 {
   {
     math::geometry::LineSegment line(
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0));
-    /// @brief Get intersection s value along with line segment. Point (x,y,z) = (0,0,0) is on the line segment.
+    /**
+     * @note Testing the `getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,0,0) in the cartesian coordinate system.
+     * In the frenet coordinate system along the `line`, the s value should be 0.5.
+     * If so, the variable `collision_s` should be `std::optional<double>(0.5)`.
+     */
+    // [Snippet_getIntersection2DSValue_with_point_0_0_0]
     {
-      const auto s = line.getIntersection2DSValue(
+      const auto collision_s = line.getIntersection2DSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0), false);
-      EXPECT_TRUE(s);
-      if (s) {
-        EXPECT_DOUBLE_EQ(s.value(), 0.5);
+      EXPECT_TRUE(collision_s);
+      if (collision_s) {
+        EXPECT_DOUBLE_EQ(collision_s.value(), 0.5);
       }
     }
-    /// @note Get intersection s value along with line segment. Point (x,y,z) = (0,1,0) is on the line segment.
+    // [Snippet_getIntersection2DSValue_with_point_0_0_0]
+    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_0_0_0
+
+    /**
+     * @note Testing the `getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,1,0) in the cartesian coordinate system.
+     * In the frenet coordinate system along the `line`, the s value should be 1.0.
+     * If so, the variable `collision_s` should be `std::optional<double>(1.0)`.
+     */
+    // [Snippet_getIntersection2DSValue_with_point_0_1_0]
     {
-      const auto s = line.getIntersection2DSValue(
+      const auto collision_s = line.getIntersection2DSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0), false);
-      EXPECT_TRUE(s);
-      if (s) {
-        EXPECT_DOUBLE_EQ(s.value(), 1.0);
+      EXPECT_TRUE(collision_s);
+      if (collision_s) {
+        EXPECT_DOUBLE_EQ(collision_s.value(), 1.0);
       }
     }
-    /// @note If denormalize_s = true, consider length of the line string.
+    // [Snippet_getIntersection2DSValue_with_point_0_1_0]
+    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_0_1_0
+
+    /**
+     * @note Testing the `getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,1,0) in the cartesian coordinate system.
+     * In the frenet coordinate system along the `line`, the s value should be 1.0.
+     * And, the 2nd argument of the `getIntersection2DSValue` (denoramalized_s) is true, so the return value should be 1.0 (noramalized s value.) * 2.0 (length of the `line`) = 2.0.
+     * If so, the variable `collision_s` should be `std::optional<double>(2.0)`.
+     */
+    // [Snippet_getIntersection2DSValue_with_point_0_1_0_denormalized]
     {
-      const auto s = line.getIntersection2DSValue(
+      const auto collision_s = line.getIntersection2DSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0), true);
-      EXPECT_TRUE(s);
-      if (s) {
-        EXPECT_DOUBLE_EQ(s.value(), 2.0);
+      EXPECT_TRUE(collision_s);
+      if (collision_s) {
+        EXPECT_DOUBLE_EQ(collision_s.value(), 2.0);
       }
     }
-    /// @note If denormalize_s = true, consider length of the line string.
+    // [Snippet_getIntersection2DSValue_with_point_0_1_0_denormalized]
+    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_0_1_0_denormalized
+
+    /**
+     * @note Testing the `getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,0,0) in the cartesian coordinate system.
+     * In the frenet coordinate system along the `line`, the s value should be 0.5.
+     * And, the 2nd argument of the `getIntersection2DSValue` (denoramalized_s) is true, so the return value should be 0.5 (noramalized s value.) * 2.0 (length of the `line`) = 1.0.
+     * If so, the variable `collision_s` should be `std::optional<double>(1.0)`.
+     */
+    // [Snippet_getIntersection2DSValue_with_point_0_0_0_denormalized]
     {
-      const auto s = line.getIntersection2DSValue(
+      const auto collision_s = line.getIntersection2DSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0), true);
-      EXPECT_TRUE(s);
-      if (s) {
-        EXPECT_DOUBLE_EQ(s.value(), 1.0);
+      EXPECT_TRUE(collision_s);
+      if (collision_s) {
+        EXPECT_DOUBLE_EQ(collision_s.value(), 1.0);
       }
     }
-    /// @note Get intersection s value along with line segment. Point (x,y,z) = (1,0,0) is not on the line segment.
+    // [Snippet_getIntersection2DSValue_with_point_0_0_0_denormalized]
+    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_0_0_0_denormalized
+
+    /**
+     * @note Testing the `getIntersection2DSValue` function can find that the point with (x,y,z) = (1,0,0) in the cartesian coordinate system does not collide to `line.`.
+     * If the function works valid, the variable `collision_s` should be `std::nullopt`.
+     */
+    // [Snippet_getIntersection2DSValue_with_point_1_0_0]
     {
-      const auto s = line.getIntersection2DSValue(
+      const auto collision_s = line.getIntersection2DSValue(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0), false);
-      EXPECT_FALSE(s);
+      EXPECT_FALSE(collision_s);
     }
-    /// @note Checking intersection for 2 same line segment.
+    // [Snippet_getIntersection2DSValue_with_point_1_0_0]
+    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_1_0_0
+
+    /**
+     * @note Testing the `getIntersection2D` function can detect erorrs getting intersection with exact same line segment.
+     * In this case, any s value can be a intersection point, so we cannot return single value.
+     */
+    // [Snippet_getIntersection2D_with_line]
     {
-      EXPECT_THROW(
-        line.getIntersection2D(math::geometry::LineSegment(
-          geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
-          geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0))),
-        common::SimulationError);
+      EXPECT_THROW(line.getIntersection2D(line), common::SimulationError);
     }
-    /// @note Checking intersection for 1 line segment and part of it.
+    // [Snippet_getIntersection2D_with_line]
+    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2D_with_line
+
+
+    /**
+     * @note Testing the `getIntersection2D` function can detect erorrs getting intersection with part of the line segment `line`.
+     * In this case, any s value can be a intersection point, so we cannot return single value.
+     */
+    // [Snippet_getIntersection2D_with_part_of_line]
     {
       EXPECT_THROW(
         line.getIntersection2D(math::geometry::LineSegment(
@@ -193,29 +243,18 @@ TEST(LineSegment, getIntersection2DSValue)
           geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))),
         common::SimulationError);
     }
-    /**
-     *           y
-     *           ^
-     *           |
-     *           + (x,y,z) = (0,1,0)
-     *           $
-     *           $
-     *           $       (x,y,z) = (1,0,0)
-     * --+=======+=======+------------> x
-     *   (x,y,z) = (-1,0,0)
-     *           $
-     *           $
-     *           + (x,y,z) = (0,-1,0)
-     * 
-     * -----------------------------------------------------------
-     * $$$$$$$$$$$$$ Line segment
-     * ============= Line segment
-     */
+    // [Snippet_getIntersection2D_with_part_of_line]
+    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2D_with_part_of_line
+
+    /// @note @note Testing the `getIntersection2D` function can find collision with the line segment with start point (x,y,z) = (1,0,0) and end point (x,y,z) = (-1,0,0) in the cartesian coordinate system and `line`.
+    // [Snippet_getIntersection2D_line_1_0_0_-1_0_0]
     {
       EXPECT_TRUE(line.getIntersection2D(math::geometry::LineSegment(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0),
         geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(0).z(0))));
     }
+    // [Snippet_getIntersection2D_line_1_0_0_-1_0_0]
+    /// @snippet test/test_line_segment.cpp Snippet_getIntersection2D_line_1_0_0_-1_0_0
   }
 }
 
