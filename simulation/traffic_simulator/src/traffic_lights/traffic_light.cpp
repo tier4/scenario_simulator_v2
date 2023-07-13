@@ -166,21 +166,6 @@ auto operator<<(std::ostream & os, const TrafficLight::Bulb & bulb) -> std::ostr
             << std::get<TrafficLight::Shape>(bulb.value);
 }
 
-auto demangle(const char * name) -> std::string
-{
-#ifdef __GNUC__
-  int failed = 0;
-
-  std::unique_ptr<char, decltype(&std::free)> demangled{
-    abi::__cxa_demangle(name, nullptr, nullptr, &failed),
-    [](void * x) noexcept -> void { std::free(x); }};
-
-  return std::string(failed ? name : demangled.get());
-#else
-  return std::string(name);
-#endif
-}
-
 template <typename TrafficLightBulbMessageType>
 TrafficLight::Bulb::operator TrafficLightBulbMessageType() const
 {
@@ -195,9 +180,8 @@ TrafficLight::Bulb::operator TrafficLightBulbMessageType() const
       case Color::white:
         return TrafficLightBulbMessageType::WHITE;
       default:
-        throw common::SyntaxError(
-          std::get<Color>(value),
-          " is not supported as a color for ", demangle(typeid(TrafficLightBulbMessageType))),".");
+        throw common::SyntaxError(std::get<Color>(value), " is not supported as a color for.");
+        // TODO
     }
   };
 
@@ -258,18 +242,18 @@ TrafficLight::TrafficLight(const std::int64_t way_id, hdmap_utils::HdMapUtils & 
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
-      map_manager.getTrafficLightBulbPosition(id, "green")),
+      map_manager.getTrafficLightBulbPosition(way_id, "green")),
     std::make_pair(
       Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(),
-      map_manager.getTrafficLightBulbPosition(id, "yellow")),
+      map_manager.getTrafficLightBulbPosition(way_id, "yellow")),
     std::make_pair(
       Bulb(Color::red, Status::solid_on, Shape::circle).hash(),
-      map_manager.getTrafficLightBulbPosition(id, "red")),
+      map_manager.getTrafficLightBulbPosition(way_id, "red")),
   }
 {
-  if (not map_manager.isTrafficLight(id)) {
+  if (not map_manager.isTrafficLight(way_id)) {
     throw common::scenario_simulator_exception::Error(
-      "Given lanelet ID ", id, " is not a traffic light ID.");
+      "Given lanelet ID ", way_id, " is not a traffic light ID.");
   }
 }
 

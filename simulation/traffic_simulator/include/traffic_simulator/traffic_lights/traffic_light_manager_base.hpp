@@ -35,7 +35,7 @@ class TrafficLightManagerBase
 protected:
   using LaneletID = std::int64_t;
 
-  std::unordered_map<LaneletID, std::shared_ptr<TrafficLightBase>> traffic_lights_;
+  std::unordered_map<LaneletID, TrafficLight> traffic_lights_;
 
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
 
