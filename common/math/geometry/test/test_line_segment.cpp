@@ -20,75 +20,88 @@
 
 #include "expect_eq_macros.hpp"
 
+/// @brief In this test case, testing the `getPoint` function can find the point on the line segment with start point (x,y,z) = (0,0,0) and end point (x,y,z) = (1,1,1) in the cartesian coordinate system. (variable name `line`).
 TEST(LineSegmentTest, GetPoint)
 {
   {
-    /**
-     * y
-     * ^
-     * |    + P1 = (1,1,1)
-     * |   $
-     * |  $
-     * | $
-     * |$
-     * +-------> x
-     * P0 = (0,0,0)
-     * 
-     * -----------------------------------------------------------
-     * $$$$$$$$$ Line segment (start point is P0, end point is P1)
-     */
     math::geometry::LineSegment line(
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
-    /// @note if s = 0, the value should be start point.
+    /// @note If s = 0 and denormalize_s = false, the return value of the `getPoint` function should be a start point of the `line`.
+    /// If the `denormalize_s = false`, the return value `s` of the function is normalized and in range `s = [0,1]`.
+    // [Snippet_getPoint_with_s_0]
     EXPECT_POINT_EQ(
       line.getPoint(0, false), geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0));
-    /// @note if s = 1, and denormalize_s = false, the value should be end point.
+    // [Snippet_getPoint_with_s_0]
+    /// @snippet test/test_line_segment.cpp Snippet_getPoint_with_s_0
+
+    /// @note If s = 0 and denormalize_s = false, the return value of the `getPoint` function should be a end point of the `line`.
+    /// If the `denormalize_s = false`, the return value `s` of the function is normalized and in range `s = [0,1]`.
+    // [Snippet_getPoint_with_s_1]
     EXPECT_POINT_EQ(
       line.getPoint(1, false), geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
-    /// @note if s is not in range s = [0,1], getPoint function should be throw error.
-    EXPECT_THROW(line.getPoint(2, false), common::SimulationError);
-    EXPECT_THROW(line.getPoint(2, true), common::SimulationError);
-    EXPECT_THROW(line.getPoint(-1, false), common::SimulationError);
-    EXPECT_THROW(line.getPoint(-1, true), common::SimulationError);
-    /// @note if s = std::hypot((0,0,0), (1,1,1)), and denormalize_s = true, the value should be end point.
+    // [Snippet_getPoint_with_s_1]
+    /// @snippet test/test_line_segment.cpp Snippet_getPoint_with_s_1
+
+    /// @note If s = sqrt(3) and denormalize_s = true, the return value of the `getPoint` function should be a end point of the `line`.
+    /// If the `denormalize_s = true`, the return value `s` is denormalized and it returns the value `s` times the length of the curve.
+    // [Snippet_getPoint_with_sqrt_3_denormalized]
     EXPECT_POINT_EQ(
       line.getPoint(std::sqrt(3), true),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(1));
-    EXPECT_DOUBLE_EQ(line.getLength(), std::sqrt(3));
+    // [Snippet_getPoint_with_sqrt_3_denormalized]
+    /// @snippet test/test_line_segment.cpp Snippet_getPoint_with_sqrt_3_denormalized
+
+    /// @note If s is not in range s = [0,1], testing the `getPoint` function can throw error. If s is not in range s = [0,1], it means the point is not on the line.
+    // [Snippet_getPoint_out_of_range]
+    EXPECT_THROW(line.getPoint(2, false), common::SimulationError);
+    EXPECT_THROW(line.getPoint(-1, false), common::SimulationError);
+    // [Snippet_getPoint_out_of_range]
+    /// @snippet test/test_line_segment.cpp Snippet_getPoint_out_of_range
+
+    /// @note If s is not in range s = [0,sqrt(3)] and denormalize, testing the `getPoint` function can throw error. If s is not in range s = [0,sqrt(3)], it means the point is not on the line.
+    // [Snippet_getPoint_out_of_range_with_denormalize]
+    EXPECT_THROW(line.getPoint(2, true), common::SimulationError);
+    EXPECT_THROW(line.getPoint(-1, true), common::SimulationError);
+    EXPECT_NO_THROW(line.getPoint(0, true));
+    EXPECT_NO_THROW(line.getPoint(std::sqrt(3.0), true));
+    // [Snippet_getPoint_out_of_range_with_denormalize]
+    /// @snippet test/test_line_segment.cpp Snippet_getPoint_out_of_range_with_denormalize
   }
 }
 
+/// @brief In this test case, testing the `getPose` function can find the pose on the line segment with start point (x,y,z) = (0,0,0) and end point (x,y,z) = (0,0,1) in the cartesian coordinate system. (variable name `line`).
 TEST(LineSegment, GetPose)
 {
   {
-    /**
-     * z      y
-     * ^     /
-     * + (0,0,1)
-     * $   /
-     * $  /
-     * $ /
-     * $/
-     * +-------> x
-     * P0 = (0,0,0)
-     * 
-     * -----------------------------------------------------------
-     * $$$$$$$$$ Line segment (start point is P0, end point is P1)
-     */
     math::geometry::LineSegment line(
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0),
       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1));
-    /// @note if s = 0, the value should be start point.
+    /// @note When the `s = 0`, the return value of the `getPose` function should be a start point of the `line`.
+    /// Orientation should be defined by the direction of the `line`, so the orientation should be parallel to the z axis.
+    // [Snippet_getPose_with_s_0]
     EXPECT_POSE_EQ(
       line.getPose(0, false),
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
         .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
+    // [Snippet_getPose_with_s_0]
+    /// @snippet test/test_line_segment.cpp Snippet_getPose_with_s_0
+
+    /// @note When the `s = 1`, the return value of the `getPose` function should be an end point of the `line`. 
+    /// Orientation should be defined by the direction of the `line`, so the orientation should be parallel to the z axis.
+    // [Snippet_getPose_with_s_1]
+    EXPECT_POSE_EQ(
+      line.getPose(1, false),
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1))
+        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
+    // [Snippet_getPose_with_s_1]
+    /// @snippet test/test_line_segment.cpp Snippet_getPose_with_s_1
   }
 }
 
-/// @brief In this test case, we check collision with the point and the line segment with start point (x,y,z) = (0,-1,0) and end point (x,y,z) = (0,1,0) in the cartesian coordinate system. (variable name "line").
+/// @brief In this test case, we check collision with the point and the line segment with start point (x,y,z) = (0,-1,0) and end point (x,y,z) = (0,1,0) in the cartesian coordinate system. (variable name `line`).
 TEST(LineSegment, isIntersect2D)
 {
   {
@@ -132,7 +145,7 @@ TEST(LineSegment, isIntersect2D)
   }
 }
 
-/// @brief In this test case, we check collision with the line segment with start point (x,y,z) = (0,-1,0) and end point (x,y,z) = (0,1,0) in the cartesian coordinate system. (variable name "line").
+/// @brief In this test case, we check collision with the line segment with start point (x,y,z) = (0,-1,0) and end point (x,y,z) = (0,1,0) in the cartesian coordinate system. (variable name `line`).
 TEST(LineSegment, getIntersection2DSValue)
 {
   {
