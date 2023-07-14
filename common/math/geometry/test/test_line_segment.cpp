@@ -236,7 +236,7 @@ TEST(LineSegment, getIntersection2DSValue)
     /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_1_0_0
 
     /**
-     * @note Testing the `LineSegment::getIntersection2D` function can throw erorr getting intersection with exact same line segment.
+     * @note Testing the `LineSegment::getIntersection2D` function can throw error getting intersection with exact same line segment.
      * In this case, any s value can be a intersection point, so we cannot return single value.
      */
     // [Snippet_getIntersection2D_with_line]
