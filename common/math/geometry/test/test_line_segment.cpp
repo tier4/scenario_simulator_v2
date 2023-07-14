@@ -189,7 +189,7 @@ TEST(LineSegment, getIntersection2DSValue)
     /**
      * @note Testing the `LineSegment::getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,1,0) in the cartesian coordinate system.
      * In the frenet coordinate system along the `line`, the s value should be 1.0.
-     * And, the 2nd argument of the `LineSegment::getIntersection2DSValue` (denoramalized_s) is true, so the return value should be 1.0 (noramalized s value.) * 2.0 (length of the `line`) = 2.0.
+     * And, the 2nd argument of the `LineSegment::getIntersection2DSValue` (denormalized_s) is true, so the return value should be 1.0 (normalized s value.) * 2.0 (length of the `line`) = 2.0.
      * If so, the variable `collision_s` should be `std::optional<double>(2.0)`.
      */
     // [Snippet_getIntersection2DSValue_with_point_0_1_0_denormalized]
@@ -207,7 +207,7 @@ TEST(LineSegment, getIntersection2DSValue)
     /**
      * @note Testing the `LineSegment::getIntersection2DSValue` function can find a collision with the point with (x,y,z) = (0,0,0) in the cartesian coordinate system.
      * In the frenet coordinate system along the `line`, the s value should be 0.5.
-     * And, the 2nd argument of the `LineSegment::getIntersection2DSValue` (denoramalized_s) is true, so the return value should be 0.5 (noramalized s value.) * 2.0 (length of the `line`) = 1.0.
+     * And, the 2nd argument of the `LineSegment::getIntersection2DSValue` (denormalized_s) is true, so the return value should be 0.5 (normalized s value.) * 2.0 (length of the `line`) = 1.0.
      * If so, the variable `collision_s` should be `std::optional<double>(1.0)`.
      */
     // [Snippet_getIntersection2DSValue_with_point_0_0_0_denormalized]
@@ -236,7 +236,7 @@ TEST(LineSegment, getIntersection2DSValue)
     /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_1_0_0
 
     /**
-     * @note Testing the `LineSegment::getIntersection2D` function can detect erorrs getting intersection with exact same line segment.
+     * @note Testing the `LineSegment::getIntersection2D` function can throw erorr getting intersection with exact same line segment.
      * In this case, any s value can be a intersection point, so we cannot return single value.
      */
     // [Snippet_getIntersection2D_with_line]
@@ -247,7 +247,7 @@ TEST(LineSegment, getIntersection2DSValue)
     /// @snippet test/test_line_segment.cpp Snippet_getIntersection2D_with_line
 
     /**
-     * @note Testing the `LineSegment::getIntersection2D` function can detect erorrs getting intersection with part of the line segment `line`.
+     * @note Testing the `LineSegment::getIntersection2D` function can throw error getting intersection with part of the line segment `line`.
      * In this case, any s value can be a intersection point, so we cannot return single value.
      */
     // [Snippet_getIntersection2D_with_part_of_line]
