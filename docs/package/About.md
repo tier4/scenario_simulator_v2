@@ -61,7 +61,7 @@ Package for visualizing the result of the simulation.
 - [Examples](/scenario_simulator_v2-docs/package/openscenario_visualization/markdown/Examples)
 
 ## Math packages
-Packages for calcularing geometry.
+Packages for calculating geometry.
 
 - [Classes](/scenario_simulator_v2-docs/package/geometry/markdown/Classes)
 - [Namespaces](/scenario_simulator_v2-docs/package/geometry/markdown/Namespaces)
