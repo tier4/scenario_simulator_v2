@@ -28,7 +28,7 @@ Scenario:
       path: $(find-pkg-share scenario_test_runner)/test/scenario/simple.xosc
     }
   - {
-      path: $(find-pkg-share scenario_test_runner)/test/scenario/failure.yaml
+      path: $(find-pkg-share scenario_test_runner)/test/scenario/minimal.yaml
     }
   - {
       path: $(find-pkg-share scenario_test_runner)/test/scenario/success.yaml,
