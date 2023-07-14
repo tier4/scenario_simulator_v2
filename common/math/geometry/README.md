@@ -23,3 +23,7 @@ If you find a case that the shape is a point but s is not equal to 0, please not
 Some of functions in the geometry package have `denormalize_s` argument with bool type.
 If the `denormalize_s = false`, the return value `s` of the function is normalized and in range `s = [0,1]`.
 If the `denormalize_s = true`, the return value `s` is denormalized and it returns the value `s` times the length of the curve.
+
+\warning
+__A catmull-rom spline curve consists of multiple hermite curves. Each hermite curve has a different length.__
+__So, the catmull-rom spline curve can not normalize its length and frenet coordinate of catmull-rom spline curve is always denormalized.__
