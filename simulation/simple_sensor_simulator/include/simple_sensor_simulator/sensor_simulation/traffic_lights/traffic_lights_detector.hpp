@@ -32,11 +32,12 @@ namespace traffic_lights
 class TrafficLightsDetector
 {
 public:
-  TrafficLightsDetector(std::string topic_name, rclcpp::Node & node);
+  TrafficLightsDetector(const std::string & topic_name, rclcpp::Node & node);
 
   auto updateFrame(
     const rclcpp::Time & current_ros_time,
-    std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> new_traffic_light_state) -> void;
+    const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & new_traffic_light_state)
+    -> void;
 
 private:
   const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::SharedPtr

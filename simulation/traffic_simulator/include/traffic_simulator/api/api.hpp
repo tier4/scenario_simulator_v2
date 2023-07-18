@@ -139,7 +139,8 @@ public:
   auto spawn(
     const std::string & name, const Pose & pose,
     const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
-    const std::string & behavior = PedestrianBehavior::defaultBehavior(), std::string model3d = "")
+    const std::string & behavior = PedestrianBehavior::defaultBehavior(),
+    const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       using traffic_simulator::entity::PedestrianEntity;
@@ -167,7 +168,8 @@ public:
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
-    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters, std::string model3d = "")
+    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters,
+    const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       using traffic_simulator::entity::MiscObjectEntity;

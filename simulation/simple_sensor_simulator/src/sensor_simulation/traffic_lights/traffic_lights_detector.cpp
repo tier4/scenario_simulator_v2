@@ -18,7 +18,7 @@ namespace simple_sensor_simulator
 {
 namespace traffic_lights
 {
-TrafficLightsDetector::TrafficLightsDetector(std::string topic_name, rclcpp::Node & node)
+TrafficLightsDetector::TrafficLightsDetector(const std::string & topic_name, rclcpp::Node & node)
 : traffic_light_state_array_publisher_(
     rclcpp::create_publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>(
       node, topic_name, rclcpp::QoS(10).transient_local()))
@@ -27,7 +27,8 @@ TrafficLightsDetector::TrafficLightsDetector(std::string topic_name, rclcpp::Nod
 
 auto TrafficLightsDetector::updateFrame(
   const rclcpp::Time & current_ros_time,
-  std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> traffic_light_state) -> void
+  const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & traffic_light_state)
+  -> void
 {
   autoware_auto_perception_msgs::msg::TrafficSignalArray msg;
   msg.header.frame_id = "camera_link";  // DIRTY HACK!!!
