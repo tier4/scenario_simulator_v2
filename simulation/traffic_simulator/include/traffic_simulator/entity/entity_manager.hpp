@@ -132,9 +132,7 @@ public:
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");
         architecture_type == "awf/universe") {
-      return std::make_shared<
-        ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
-        std::forward<decltype(xs)>(xs)...);
+      return std::make_shared<ConventionalTrafficLightManager>(std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),
@@ -148,9 +146,7 @@ public:
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");
         architecture_type == "awf/universe") {
-      return std::make_shared<
-        V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
-        std::forward<decltype(xs)>(xs)...);
+      return std::make_shared<V2ITrafficLightManager>(std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),
