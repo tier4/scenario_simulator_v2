@@ -45,7 +45,6 @@
 
 namespace openscenario_visualization
 {
-
 struct Condition
 {
   std::string current_evaluation;

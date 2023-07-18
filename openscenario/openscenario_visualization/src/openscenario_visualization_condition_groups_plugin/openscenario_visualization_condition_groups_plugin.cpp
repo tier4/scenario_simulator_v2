@@ -27,7 +27,6 @@
 
 namespace openscenario_visualization
 {
-
 VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
 : condition_groups_collection_ptr_(std::make_shared<std::vector<ConditionGroups>>())
 {
