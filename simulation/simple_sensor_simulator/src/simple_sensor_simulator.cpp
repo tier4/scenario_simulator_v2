@@ -118,13 +118,13 @@ void ScenarioSimulator::updateFrame(
   std::vector<traffic_simulator_msgs::EntityStatus> entity_status;
   std::transform(
     entity_status_.begin(), entity_status_.end(), std::back_inserter(entity_status),
-    [this](auto & kv) {
+    [this](const auto & map_element) {
       traffic_simulator_msgs::EntityStatus status;
-      *status.mutable_pose() = kv.second.pose();
-      *status.mutable_action_status() = kv.second.action_status();
-      *status.mutable_name() = kv.second.name();
-      *status.mutable_type() = kv.second.type();
-      *status.mutable_subtype() = kv.second.subtype();
+      *status.mutable_pose() = map_element.second.pose();
+      *status.mutable_action_status() = map_element.second.action_status();
+      *status.mutable_name() = map_element.second.name();
+      *status.mutable_type() = map_element.second.type();
+      *status.mutable_subtype() = map_element.second.subtype();
       *status.mutable_bounding_box() = getBoundingBox(status.name());
       return status;
     });
