@@ -62,7 +62,6 @@ RelativeObjectPosition::operator NativeWorldPosition() const
   // Make entity reference pose in world pose
   const auto reference_pose = makeNativeRelativeWorldPosition(original_pose, reference);
 
-  // get offset point in reference pose
   geometry_msgs::msg::Point point_in_reference{};
   point_in_reference.x = dx;
   point_in_reference.y = dy;
