@@ -59,7 +59,7 @@ RelativeObjectPosition::operator NativeWorldPosition() const
   original_pose.orientation.z = 0;
   original_pose.orientation.w = 1;
 
-  // get entity reference pose in world pose
+  // Make entity reference pose in world pose
   const auto reference_pose = makeNativeRelativeWorldPosition(original_pose, reference);
 
   // get offset point in reference pose
