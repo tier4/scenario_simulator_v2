@@ -49,29 +49,29 @@ RelativeObjectPosition::operator NativeLanePosition() const
 
 RelativeObjectPosition::operator NativeWorldPosition() const
 {
-  // Make world origin pose
-  geometry_msgs::msg::Pose original_pose{};
-  original_pose.position.x = 0;
-  original_pose.position.y = 0;
-  original_pose.position.z = 0;
-  original_pose.orientation.x = 0;
-  original_pose.orientation.y = 0;
-  original_pose.orientation.z = 0;
-  original_pose.orientation.w = 1;
+  geometry_msgs::msg::Pose world_origin_pose{};
+  world_origin_pose.position.x = 0;
+  world_origin_pose.position.y = 0;
+  world_origin_pose.position.z = 0;
+  world_origin_pose.orientation.x = 0;
+  world_origin_pose.orientation.y = 0;
+  world_origin_pose.orientation.z = 0;
+  world_origin_pose.orientation.w = 1;
 
-  // Make entity reference pose in world pose
-  const auto reference_pose = makeNativeRelativeWorldPosition(original_pose, reference);
+  const auto reference_pose_in_world =
+    makeNativeRelativeWorldPosition(world_origin_pose, entity_ref);
 
-  geometry_msgs::msg::Point point_in_reference{};
-  point_in_reference.x = dx;
-  point_in_reference.y = dy;
-  point_in_reference.z = dz;
+  geometry_msgs::msg::Point target_point_in_entity_ref{};
+  target_point_in_entity_ref.x = dx;
+  target_point_in_entity_ref.y = dy;
+  target_point_in_entity_ref.z = dz;
 
-  geometry_msgs::msg::Pose pose_in_world{};
-  pose_in_world.position = math::geometry::transformPoint(reference_pose, point_in_reference);
-  pose_in_world.orientation = original_pose.orientation;
+  geometry_msgs::msg::Pose target_pose_in_world{};
+  target_pose_in_world.position =
+    math::geometry::transformPoint(reference_pose_in_world, target_point_in_entity_ref);
+  target_pose_in_world.orientation = world_origin_pose.orientation;
 
-  return pose_in_world;
+  return target_pose_in_world;
 }
 
 }  // namespace syntax
