@@ -15,7 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#if __has_include(<autoware_perception_msgs/msg/traffic_signal_array.hpp>)
+
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -24,10 +26,11 @@
 
 namespace traffic_simulator
 {
-template <typename Message>
 class V2ITrafficLightManager : public TrafficLightManagerBase
 {
-  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
+  using MessageType = autoware_perception_msgs::msg::TrafficSignalArray;
+
+  const rclcpp::Publisher<MessageType>::SharedPtr traffic_light_state_array_publisher_;
 
 public:
   template <typename Node>
@@ -35,16 +38,30 @@ public:
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
     const std::string & map_frame = "map")
   : TrafficLightManagerBase(node, hdmap, map_frame),
-    traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
+    traffic_light_state_array_publisher_(rclcpp::create_publisher<MessageType>(
+      node, "/v2x/traffic_signals", rclcpp::QoS(10).transient_local()))
   {
   }
 
 private:
   static auto name() -> const char *;
 
-  auto publishTrafficLightStateArray() const -> void override;
+  auto publishTrafficLightStateArray() const -> void override
+  {
+    MessageType traffic_light_state_array;
+    {
+      traffic_light_state_array.stamp = clock_ptr_->now();
+      for (const auto & [id, traffic_light] : getTrafficLights()) {
+        traffic_light_state_array.signals.push_back(
+          static_cast<autoware_perception_msgs::msg::TrafficSignal>(traffic_light));
+      }
+    }
+    traffic_light_state_array_publisher_->publish(traffic_light_state_array);
+  }
 };
 
 }  // namespace traffic_simulator
+
+#endif
+
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_
