@@ -16,27 +16,5 @@
 
 namespace traffic_simulator
 {
-template <>
-auto ConventionalTrafficLightManager<
-  autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
-  -> void
-{
-  autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;
-  {
-    traffic_light_state_array.header.frame_id = "camera_link";  // DIRTY HACK!!!
-    traffic_light_state_array.header.stamp = clock_ptr_->now();
-    for (const auto & [id, traffic_light] : getTrafficLights()) {
-      traffic_light_state_array.signals.push_back(
-        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light));
-    }
-  }
-  traffic_light_state_array_publisher_->publish(traffic_light_state_array);
-}
 
-template <>
-auto ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name()
-  -> const char *
-{
-  return "/perception/traffic_light_recognition/traffic_signals";
-}
 }  // namespace traffic_simulator

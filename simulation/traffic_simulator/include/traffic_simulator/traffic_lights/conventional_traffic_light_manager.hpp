@@ -45,15 +45,6 @@ private:
 
   auto publishTrafficLightStateArray() const -> void override;
 };
-
-template <>
-auto ConventionalTrafficLightManager<
-  autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
-  -> void;
-
-template <>
-auto ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name()
-  -> const char *;
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__CONVENTIONAL_TRAFFIC_LIGHT_MANAGER_HPP_
