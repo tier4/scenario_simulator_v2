@@ -52,7 +52,7 @@ auto TeleportAction::run() noexcept -> void {}
 auto TeleportAction::start() const -> void
 {
   for (const auto & object : global().entities->objects(actors)) {
-    if (not global().entities->ref(object).as<ScenarioObject>().is_added) {
+    if (not global().entities->isAdded(object)) {
       AddEntityAction(local(), position)(object);  // NOTE: TIER IV extension
     } else {
       teleport(object, position);
