@@ -68,10 +68,8 @@ RelativeObjectPosition::operator NativeWorldPosition() const
   point_in_reference.y = dy;
   point_in_reference.z = dz;
 
-  // calculate offset pose in world pose
-  const auto point_in_world = math::geometry::transformPoint(reference_pose, point_in_reference);
   geometry_msgs::msg::Pose pose_in_world{};
-  pose_in_world.position = point_in_world;
+  pose_in_world.position = math::geometry::transformPoint(reference_pose, point_in_reference);
   pose_in_world.orientation = original_pose.orientation;
 
   return pose_in_world;
