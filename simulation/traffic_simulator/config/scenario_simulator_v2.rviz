@@ -2916,6 +2916,10 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /simulation/debug_marker
           Value: true
+        - Class: openscenario_visualization/VisualizationConditionGroups
+          Name: VisualizationConditionGroups
+          Topic: /simulation/context
+          Value: true
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Entity Marker
