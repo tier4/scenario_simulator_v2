@@ -2906,22 +2906,6 @@ Visualization Manager:
       Displays:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
-          Name: Debug Marker
-          Namespaces:
-            {}
-          Topic:
-            Depth: 5
-            Durability Policy: Volatile
-            History Policy: Keep Last
-            Reliability Policy: Reliable
-            Value: /simulation/debug_marker
-          Value: true
-        - Class: openscenario_visualization/VisualizationConditionGroups
-          Name: VisualizationConditionGroups
-          Topic: /simulation/context
-          Value: true
-        - Class: rviz_default_plugins/MarkerArray
-          Enabled: true
           Name: Entity Marker
           Namespaces:
             ego: true
@@ -2956,6 +2940,22 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /simulation/traffic_light/marker
           Value: true
+        - Class: openscenario_visualization/VisualizationConditionGroups
+          Name: Condition Group
+          Topic: /simulation/context
+          Value: true
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: true
+          Name: Debug Marker
+          Namespaces:
+            {}
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /simulation/debug_marker
+          Value: false
         - Class: rviz_common/Group
           Displays:
             - Alpha: 0.9990000128746033
