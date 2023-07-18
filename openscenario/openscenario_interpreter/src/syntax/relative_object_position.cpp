@@ -49,7 +49,7 @@ RelativeObjectPosition::operator NativeLanePosition() const
 
 RelativeObjectPosition::operator NativeWorldPosition() const
 {
-  // get world origin pose
+  // Make world origin pose
   geometry_msgs::msg::Pose original_pose{};
   original_pose.position.x = 0;
   original_pose.position.y = 0;
