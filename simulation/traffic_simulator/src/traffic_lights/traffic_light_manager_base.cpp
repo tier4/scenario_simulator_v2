@@ -68,12 +68,12 @@ auto TrafficLightManagerBase::update(const double) -> void
   drawMarkers();
 }
 
-auto TrafficLightManagerBase::createTimer(double publish_rate) -> void
+auto TrafficLightManagerBase::createPublishTimer(double publish_rate) -> void
 {
-  if (!timer_) {
+  if (!publish_timer_) {
     publish_rate_ = publish_rate;
     using namespace std::chrono_literals;
-    timer_ = rclcpp::create_timer(
+    publish_timer_ = rclcpp::create_timer(
       node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
       [this]() -> void { update(1.0 / publish_rate_); });
   }
@@ -83,12 +83,12 @@ auto TrafficLightManagerBase::resetPublishRate(double publish_rate) -> void
 {
   if (publish_rate_ != publish_rate) {
     publish_rate_ = publish_rate;
-    if (timer_ && not timer_->is_canceled()) {
-      timer_->cancel();
+    if (publish_timer_ && not publish_timer_->is_canceled()) {
+      publish_timer_->cancel();
     }
 
     using namespace std::chrono_literals;
-    timer_ = rclcpp::create_timer(
+    publish_timer_ = rclcpp::create_timer(
       node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
       [this]() -> void { update(1.0 / publish_rate_); });
   }

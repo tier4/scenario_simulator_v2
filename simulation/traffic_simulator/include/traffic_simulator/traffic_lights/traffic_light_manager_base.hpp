@@ -45,7 +45,9 @@ protected:
 
   const std::string map_frame_;
 
-  rclcpp::TimerBase::SharedPtr timer_ = nullptr;
+  rclcpp::TimerBase::SharedPtr publish_timer_ = nullptr;
+
+  rclcpp::TimerBase::SharedPtr initialize_timer_ = nullptr;
 
   const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
 
@@ -65,6 +67,8 @@ protected:
     node_base_interface_(node->get_node_base_interface()),
     node_timers_interface_(node->get_node_timers_interface())
   {
+    using namespace std::chrono_literals;
+    initialize_timer_ = node->create_wall_timer(1s, [this]() -> void { initialize(); });
   }
 
   auto deleteAllMarkers() const -> void;
@@ -112,7 +116,7 @@ public:
 
   auto hasAnyLightChanged() -> bool;
 
-  auto createTimer(double update_rate) -> void;
+  auto createPublishTimer(double update_rate) -> void;
 
   auto resetPublishRate(double update_rate) -> void;
 
