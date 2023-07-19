@@ -49,7 +49,7 @@ LineSegment::~LineSegment() {}
 
 /**
  * @brief Get point on the line segment from s value.
- * @param s s value in coordinate along line segment.
+ * @param s Normalized s value in coordinate along line segment.
  * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return geometry_msgs::msg::Point 
  */
@@ -82,7 +82,7 @@ auto LineSegment::getPoint(const double s, const bool denormalize_s) const
 
 /**
  * @brief Get pose on the line segment from s value. Orientation of thee return value was calculated from the vector of the line segment.
- * @param s s value in coordinate along line segment.
+ * @param s Normalized s value in coordinate along line segment.
  * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
  * @return geometry_msgs::msg::Pose 
  */
@@ -302,7 +302,7 @@ auto LineSegment::denormalize(
 
 /**
  * @brief Denormalize s value in coordinate along line segment.
- * @param s s value in coordinate along line segment.
+ * @param s Normalize s value in coordinate along line segment.
  * @return double Denormalized s value.
  */
 auto LineSegment::denormalize(const double s) const -> double
