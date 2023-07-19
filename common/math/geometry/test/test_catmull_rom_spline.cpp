@@ -120,6 +120,7 @@ TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
     // [Snippet_GetCollisionWith1ControlPoint_with_0_1_0_0_-1_0]
     /// @snippet test/test_catmull_rom_spline.cpp Snippet_GetCollisionWith1ControlPoint_with_0_1_0_0_-1_0
   }
+  
   {
     /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find that the `spline` and a line segment with start point (x,y,z) = (1,1,0) and end point (x,y,z) = (1,-1,0) does not collide.
     /// If `CatmullRomSpline::getCollisionPointIn2D` function works expected, it is std::nullopt;
