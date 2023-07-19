@@ -189,7 +189,14 @@ public:
       makeConventionalTrafficLightManager(hdmap_utils_ptr_, node)),
     v2i_traffic_light_manager_ptr_(makeV2ITrafficLightManager(hdmap_utils_ptr_, node))
   {
+    v2i_traffic_light_manager_ptr_->finishInitialization();
     updateHdmapMarker();
+    while (not conventional_traffic_light_manager_ptr_->hasInitialized()) {
+      //      rclcpp::spin_some(node);
+      using namespace std::chrono_literals;
+      rclcpp::sleep_for(500ms);
+    }
+    conventional_traffic_light_manager_ptr_->finishInitialization();
   }
 
   ~EntityManager() = default;
