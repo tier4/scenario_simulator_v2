@@ -280,8 +280,8 @@ auto CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double 
 /**
  * @brief Get collision point in 2D (x and y)
  * @param polygon points of polygons.
- * @param search_backward 
- * @return std::optional<double> 
+ * @param search_backward If true, return collision points with maximum s value. If false, return collision points with minimum s value.
+ * @return std::optional<double> Denormalized s values along the frenet coordinate of the spline curve.
  */
 auto CatmullRomSpline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
