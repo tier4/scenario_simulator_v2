@@ -25,6 +25,7 @@
 #include <memory>
 #include <optional>
 #include <regex>
+#include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <stdexcept>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -410,7 +411,8 @@ struct TrafficLight
             bulb));
       }
     } else {
-      throw common::Error("Unsupported message type for traffic signal.");
+      throw common::scenario_simulator_exception::Error(
+        "Unsupported message type for traffic signal.");
     }
     return traffic_signal;
   }

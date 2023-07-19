@@ -44,8 +44,6 @@ public:
   }
 
 private:
-  static auto name() -> const char *;
-
   auto publishTrafficLightStateArray() const -> void override
   {
     MessageType traffic_light_state_array;
@@ -58,6 +56,9 @@ private:
     }
     traffic_light_state_array_publisher_->publish(traffic_light_state_array);
   }
+
+protected:
+  void initialize() override { has_initialized_ = true; }
 };
 
 }  // namespace traffic_simulator
