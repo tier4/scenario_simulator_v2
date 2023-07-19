@@ -403,8 +403,11 @@ struct TrafficLight
                            autoware_perception_msgs::msg::TrafficSignal>) {
       traffic_signal.traffic_signal_id = relation_id;
       for (auto && bulb : bulbs) {
+        // the typename autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type
+        // may be TrafficSignalElement or TrafficLightElement depending on the version
         traffic_signal.elements.push_back(
-          static_cast<autoware_perception_msgs::msg::TrafficLightElement>(bulb));
+          static_cast<autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type>(
+            bulb));
       }
     } else {
       throw common::Error("Unsupported message type for traffic signal.");
