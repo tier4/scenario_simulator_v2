@@ -332,7 +332,7 @@ auto CatmullRomSpline::getCollisionPointIn2D(
           "contact the developer of traffic_simulator.");
       }
       if (const auto s_value = line_segments_[0].getIntersection2DSValue(line)) {
-        s_value_candidates.emplace_back(s_value.value());
+        s_value_candidates.push_back(s_value.value());
       }
     }
     if (s_value_candidates.empty()) {
