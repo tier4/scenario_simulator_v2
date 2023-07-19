@@ -120,7 +120,8 @@ public:
         req.set_asset_key(model3d);
         simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
-        req.set_initial_speed(0.0);  // TODO: Should be filled from function API
+        /// @todo Should be filled from function API
+        req.set_initial_speed(0.0);
         zeromq_client_.call(req, res);
         return res.result().success();
       }
