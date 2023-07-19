@@ -66,6 +66,7 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
     // [Snippet_getCollisionPointIn2D_with_1_1_0_-1_-1_0]
     /// @snippet test/test_catmull_rom_spline.cpp Snippet_getCollisionPointIn2D_with_1_1_0_-1_-1_0
   }
+
   {
     /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find the collision point with `spline` and a line segment with start point (x,y,z) = (1,1,0) and end point (x,y,z) = (0,-1,0).
     /// `collision_s` variable in the test case is the denormalized s value in frenet coordinate along the `spline` curve.
@@ -82,6 +83,7 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
     // [Snippet_getCollisionPointIn2D_with_1_1_0_0_-1_0]
     /// @snippet test/test_catmull_rom_spline.cpp Snippet_getCollisionPointIn2D_with_1_1_0_0_-1_0
   }
+
   {
     /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find that the `spline` and a line segment with start point (x,y,z) = (1,1,0) and end point (x,y,z) = (0,-1,0) does not collide.
     /// If `CatmullRomSpline::getCollisionPointIn2D` function works expected, it is std::nullopt;
