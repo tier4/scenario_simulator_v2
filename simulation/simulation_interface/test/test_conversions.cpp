@@ -336,6 +336,7 @@ TEST(Conversion, EntityStatus)
   simulation_interface::toProto(status, proto);
   EXPECT_ENTITY_STATUS_EQ(status, proto);
   status = traffic_simulator_msgs::msg::EntityStatus();
+  EXPECT_TRUE(status.lanelet_pose_valid);
   EXPECT_FALSE(proto.lanelet_pose_valid());
   simulation_interface::toMsg(proto, status);
   EXPECT_ENTITY_STATUS_EQ(status, proto);
