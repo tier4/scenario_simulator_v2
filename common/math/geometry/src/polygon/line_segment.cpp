@@ -262,7 +262,7 @@ auto LineSegment::getSlope() const -> double
  * @brief Get squared distance (Square of euclidean distance) between specified 3D point and specified 3D point on line segment in 2D. (x,y)
  * @param point Specified 3D point
  * @param S value of specified 3D point in coordinate along line segment.
- * @param denormalize_s If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
+ * @param denormalize_s If true, the s value is denormalized. If false, the s value should be normalized in range [0,1].
  * @return double 
  */
 auto LineSegment::getSquaredDistanceIn2D(
@@ -276,7 +276,7 @@ auto LineSegment::getSquaredDistanceIn2D(
  * @brief Get 3D vector from specified 3D point to specified 3D point on line segment.
  * @param point Specified 3D point
  * @param s S value of specified 3D point in coordinate along line segment.
- * @param denormalize_s If true, consider the length of the line segment. If false, the s value should be normalized in range [0,1].
+ * @param denormalize_s If true, the s value is denormalized. If false, the s value should be normalized in range [0,1].
  * @return geometry_msgs::msg::Vector3 
  */
 auto LineSegment::getSquaredDistanceVector(
