@@ -45,6 +45,7 @@
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/conventional_traffic_light_manager.hpp>
 #include <traffic_simulator/traffic_lights/v2i_traffic_light_manager.hpp>
+#include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -54,6 +55,18 @@
 #include <utility>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
+
+/// @todo find some shared space for this function
+template <typename T>
+static auto getParameter(const std::string & name, T value = {})
+{
+  rclcpp::Node node{"get_parameter", "simulation"};
+
+  node.declare_parameter<T>(name, value);
+  node.get_parameter<T>(name, value);
+
+  return value;
+}
 
 namespace traffic_simulator
 {
@@ -248,6 +261,7 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
+  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
@@ -409,6 +423,9 @@ public:
   auto setEntityStatus(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &)
     -> void;
 
+  auto setEntityStatusExternally(
+    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &) -> void;
+
   void setVerbose(const bool verbose);
 
   template <typename Entity, typename Pose, typename Parameters, typename... Ts>
@@ -439,7 +456,7 @@ public:
 
       entity_status.time = getCurrentTime();
 
-      entity_status.name = parameters.name;
+      entity_status.name = name;
 
       entity_status.bounding_box = parameters.bounding_box;
 
