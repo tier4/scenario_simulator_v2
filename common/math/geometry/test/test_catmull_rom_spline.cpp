@@ -85,8 +85,8 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
   }
 
   {
-    /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find that the `spline` and a line segment with start point (x,y,z) = (1,1,0) and end point (x,y,z) = (0,-1,0) does not collide.
-    /// If `CatmullRomSpline::getCollisionPointIn2D` function works expected, it is std::nullopt;
+    /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find that the `spline` and a line segment with start point (x,y,z) = (0,1,0) and end point (x,y,z) = (0,0.2,0) does not collide.
+    /// If `CatmullRomSpline::getCollisionPointIn2D` function works expected, it returns std::nullopt;
     // [Snippet_getCollisionPointIn2D_with_0_1_0_0_02_0]
     const auto collision_s = spline.getCollisionPointIn2D(
       {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
@@ -120,10 +120,10 @@ TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
     // [Snippet_GetCollisionWith1ControlPoint_with_0_1_0_0_-1_0]
     /// @snippet test/test_catmull_rom_spline.cpp Snippet_GetCollisionWith1ControlPoint_with_0_1_0_0_-1_0
   }
-  
+
   {
     /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find that the `spline` and a line segment with start point (x,y,z) = (1,1,0) and end point (x,y,z) = (1,-1,0) does not collide.
-    /// If `CatmullRomSpline::getCollisionPointIn2D` function works expected, it is std::nullopt;
+    /// If `CatmullRomSpline::getCollisionPointIn2D` function works expected, it returns std::nullopt;
     // [Snippet_GetCollisionWith1ControlPoint_with_1_1_0_1_-1_0]
     EXPECT_FALSE(spline.getCollisionPointIn2D(
       {geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(0),
