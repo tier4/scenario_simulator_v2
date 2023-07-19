@@ -290,6 +290,13 @@ auto LineSegment::getSquaredDistanceVector(
     .z(point.z - point_on_line.z);
 }
 
+/**
+ * @brief Denormalize s value in coordinate along line segment.
+ * @param s Normalized s value in coordinate along line segment.
+ * @param throw_error_on_out_of_range If true, throw error when the normalized s value is not in range [0,1].
+ * If false, return std::nullopt;
+ * @return std::optional<double> Denormalize s value. If the `throw_error_on_out_of_range = true` and the normalized s value is not in range [0,1] it is std::nullopt;
+ */
 auto LineSegment::denormalize(
   const std::optional<double> & s, const bool throw_error_on_out_of_range) const
   -> std::optional<double>
@@ -302,7 +309,7 @@ auto LineSegment::denormalize(
 
 /**
  * @brief Denormalize s value in coordinate along line segment.
- * @param s Normalize s value in coordinate along line segment.
+ * @param s Normalized s value in coordinate along line segment.
  * @return double Denormalized s value.
  */
 auto LineSegment::denormalize(const double s) const -> double
