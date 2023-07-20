@@ -47,13 +47,10 @@ protected:
 
   rclcpp::TimerBase::SharedPtr publish_timer_ = nullptr;
 
-  rclcpp::TimerBase::SharedPtr initialize_timer_ = nullptr;
-
+  // node interfaces for creating timer
   const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
 
   const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
-
-  const rclcpp::node_interfaces::NodeGraphInterface::SharedPtr node_graph_interface_;
 
   double publish_rate_ = 0.0;
 
@@ -67,11 +64,8 @@ protected:
     hdmap_(hdmap),
     map_frame_(map_frame),
     node_base_interface_(node->get_node_base_interface()),
-    node_timers_interface_(node->get_node_timers_interface()),
-    node_graph_interface_(node->get_node_graph_interface())
+    node_timers_interface_(node->get_node_timers_interface())
   {
-    using namespace std::chrono_literals;
-    initialize_timer_ = node->create_wall_timer(1s, [this]() -> void { initialize(); });
   }
 
   auto deleteAllMarkers() const -> void;
@@ -97,14 +91,16 @@ public:
 
   auto getTrafficLights() -> auto & { return traffic_lights_; }
 
+  // Note: lanelet_id can be either a way ID or a relation ID.
   auto getTrafficLights(const LaneletID lanelet_id)
     -> std::vector<std::reference_wrapper<TrafficLight>>
   {
     std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
 
     if (hdmap_->isTrafficLightRelation(lanelet_id)) {
-      for (auto && traffic_light : hdmap_->getTrafficLightRelation(lanelet_id)->trafficLights()) {
-        traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
+      for (auto && traffic_light_element :
+           hdmap_->getTrafficLightRelation(lanelet_id)->trafficLights()) {
+        traffic_lights.emplace_back(getTrafficLight(traffic_light_element.id()));
       }
     } else if (hdmap_->isTrafficLight(lanelet_id)) {
       traffic_lights.emplace_back(getTrafficLight(lanelet_id));
@@ -124,26 +120,6 @@ public:
   auto resetPublishRate(double update_rate) -> void;
 
   auto update(const double) -> void;
-
-  void finishInitialization() { initialize_timer_->cancel(); }
-
-  bool hasInitialized() const { return has_initialized_; }
-
-protected:
-  auto getTopicTypeList(const std::string & topic_name) const -> std::vector<std::string>
-  {
-    auto topic_names_and_types = node_graph_interface_->get_topic_names_and_types();
-    if (auto topic_types = topic_names_and_types.find(topic_name);
-        topic_types != topic_names_and_types.end()) {
-      return topic_types->second;
-    } else {
-      return std::vector<std::string>();
-    }
-  }
-
-  bool has_initialized_ = false;
-
-  virtual void initialize() = 0;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_

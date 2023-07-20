@@ -142,10 +142,15 @@ public:
   template <typename... Ts>
   auto makeConventionalTrafficLightManager(Ts &&... xs) -> std::shared_ptr<TrafficLightManagerBase>
   {
-    if (const auto architecture_type =
-          getParameter<std::string>("architecture_type", "awf/universe");
-        architecture_type == "awf/universe") {
-      return std::make_shared<ConventionalTrafficLightManager>(std::forward<decltype(xs)>(xs)...);
+    const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
+    if (architecture_type == "awf/universe") {
+      return std::make_shared<
+        ConventionalTrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
+        std::forward<decltype(xs)>(xs)...);
+    } else if (architecture_type == "awf/universe/2023.08") {
+      return std::make_shared<
+        ConventionalTrafficLightManager<autoware_perception_msgs::msg::TrafficSignalArray>>(
+        std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),
@@ -158,8 +163,10 @@ public:
   {
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");
-        architecture_type == "awf/universe") {
-      return std::make_shared<V2ITrafficLightManager>(std::forward<decltype(xs)>(xs)...);
+        architecture_type.find("awf/universe") != std::string::npos) {
+      return std::make_shared<
+        V2ITrafficLightManager<autoware_perception_msgs::msg::TrafficSignalArray>>(
+        std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),
@@ -189,14 +196,6 @@ public:
       makeConventionalTrafficLightManager(hdmap_utils_ptr_, node)),
     v2i_traffic_light_manager_ptr_(makeV2ITrafficLightManager(hdmap_utils_ptr_, node))
   {
-    v2i_traffic_light_manager_ptr_->finishInitialization();
-    updateHdmapMarker();
-    while (not conventional_traffic_light_manager_ptr_->hasInitialized()) {
-      //      rclcpp::spin_some(node);
-      using namespace std::chrono_literals;
-      rclcpp::sleep_for(500ms);
-    }
-    conventional_traffic_light_manager_ptr_->finishInitialization();
   }
 
   ~EntityManager() = default;
