@@ -30,6 +30,7 @@ TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
   p1.x = 1;
   auto points = {p0, p1};
   auto spline = math::geometry::CatmullRomSpline(points);
+  EXPECT_DOUBLE_EQ(spline.getLength(), 1);
   // [Snippet_construct_spline]
   /// @snippet test/test_catmull_rom_spline.cpp Snippet_construct_spline
 
