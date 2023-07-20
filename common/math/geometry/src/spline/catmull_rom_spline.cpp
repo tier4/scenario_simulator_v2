@@ -123,7 +123,7 @@ auto CatmullRomSpline::getTrajectory(
 }
 
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
-: control_points(control_points), line_segments_(getLineSegments(control_points))
+: control_points(control_points), line_segments_(getLineSegments(control_points)), total_length_(0)
 {
   switch (control_points.size()) {
     case 0:
@@ -134,7 +134,6 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       break;
     /// @note In this case, spline is interpreted as point.
     case 1:
-      total_length_ = 0;
       break;
     /// @note In this case, spline is interpreted as line segment.
     case 2:
