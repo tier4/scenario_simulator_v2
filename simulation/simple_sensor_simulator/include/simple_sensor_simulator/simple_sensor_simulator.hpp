@@ -141,6 +141,7 @@ private:
   std::shared_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
 
   bool isEgo(const std::string & name);
+  bool isEntityExists(const std::string & name);
 };
 }  // namespace simple_sensor_simulator
 

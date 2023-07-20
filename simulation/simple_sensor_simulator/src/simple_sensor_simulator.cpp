@@ -14,6 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <algorithm>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <limits>
 #include <memory>
@@ -314,16 +315,49 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
       return misc_object.bounding_box();
     }
   }
-  return traffic_simulator_msgs::BoundingBox();
+
+  THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
 }
 
 bool ScenarioSimulator::isEgo(const std::string & name)
 {
+  if (not isEntityExists(name)) {
+    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
+  }
   for (const auto & ego : ego_vehicles_) {
     if (ego.name() == name) {
       return true;
     }
   }
+  return false;
+}
+
+bool ScenarioSimulator::isEntityExists(const std::string & name)
+{
+  if (std::find_if(ego_vehicles_.begin(), ego_vehicles_.end(), [&name](const auto & ego) {
+        return ego.name() == name;
+      }) != ego_vehicles_.end()) {
+    return true;
+  }
+
+  if (std::find_if(vehicles_.begin(), vehicles_.end(), [&name](const auto & vehicle) {
+        return vehicle.name() == name;
+      }) != vehicles_.end()) {
+    return true;
+  }
+
+  if (std::find_if(pedestrians_.begin(), pedestrians_.end(), [&name](const auto & pedestrian) {
+        return pedestrian.name() == name;
+      }) != pedestrians_.end()) {
+    return true;
+  }
+
+  if (std::find_if(misc_objects_.begin(), misc_objects_.end(), [&name](const auto & misc_object) {
+        return misc_object.name() == name;
+      }) != misc_objects_.end()) {
+    return true;
+  }
+
   return false;
 }
 }  // namespace simple_sensor_simulator
