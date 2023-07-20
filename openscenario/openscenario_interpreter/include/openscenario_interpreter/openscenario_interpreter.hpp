@@ -130,7 +130,9 @@ public:
 
     boost::apply_visitor(
       overload(
-        [&](const common::junit::Pass &) { results.testsuite(suite_name).testcase(case_name); },
+        [&](const common::junit::Pass & it) {
+          results.testsuite(suite_name).testcase(case_name).pass.push_back(it);
+        },
         [&](const common::junit::Failure & it) {
           results.testsuite(suite_name).testcase(case_name).failure.push_back(it);
         },
