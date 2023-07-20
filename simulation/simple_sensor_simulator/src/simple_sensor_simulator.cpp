@@ -222,7 +222,6 @@ void ScenarioSimulator::despawnEntity(
       found = true;
     }
   }
-  vehicles_ = vehicles;
   std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians;
   for (const auto & pedestrian : pedestrians_) {
     if (pedestrian.name() != req.name()) {
@@ -231,7 +230,6 @@ void ScenarioSimulator::despawnEntity(
       found = true;
     }
   }
-  pedestrians_ = pedestrians;
   std::vector<traffic_simulator_msgs::MiscObjectParameters> misc_objects;
   for (const auto & misc_object : misc_objects_) {
     if (misc_object.name() != req.name()) {
@@ -240,12 +238,18 @@ void ScenarioSimulator::despawnEntity(
       found = true;
     }
   }
-  misc_objects_ = misc_objects;
   if (found) {
     entity_status_.erase(req.name());
     if (isEgo(req.name())) {
       ego_entity_simulation_.reset();
     }
+  }
+
+  vehicles_ = vehicles;
+  pedestrians_ = pedestrians;
+  misc_objects_ = misc_objects;
+
+  if (found) {
     res.mutable_result()->set_success(true);
   } else {
     res.mutable_result()->set_success(false);
