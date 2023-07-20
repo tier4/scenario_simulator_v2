@@ -134,9 +134,11 @@ CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> 
       break;
     /// @note In this case, spline is interpreted as point.
     case 1:
+      total_length_ = 0;
       break;
     /// @note In this case, spline is interpreted as line segment.
     case 2:
+      total_length_ = line_segments_[0].getLength();
       break;
     /// @note In this case, spline is interpreted as curve.
     default:
