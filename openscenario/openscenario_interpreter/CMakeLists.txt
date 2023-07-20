@@ -32,7 +32,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/record.cpp
   src/scope.cpp)
 
-target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
+target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml ${YAML_CPP_LIBRARIES})
 
 # workaround to allow deprecated header to build on both galactic and humble
 if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)

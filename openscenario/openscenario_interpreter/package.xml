@@ -17,6 +17,7 @@
   <depend>nlohmann-json-dev</depend>
   <depend>openscenario_interpreter_msgs</depend>
   <depend>pugixml-dev</depend>
+  <depend>yaml-cpp</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>scenario_simulator_exception</depend>

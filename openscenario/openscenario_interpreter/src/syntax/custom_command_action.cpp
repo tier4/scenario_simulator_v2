@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <yaml-cpp/yaml.h>
+#include <nlohmann/json.hpp>
+
 #include <iterator>  // std::distance
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/posix/fork_exec.hpp>
@@ -21,6 +24,8 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element.hpp>
+#include <openscenario_interpreter_msgs/msg/context.hpp>
+#include "rclcpp/rclcpp.hpp"
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -213,10 +218,119 @@ struct ExitSuccess : public CustomCommand
 
 struct ExitFailure : public CustomCommand
 {
-  using CustomCommand::CustomCommand;
+  struct Condition
+  {
+    std::string current_evaluation;
+    std::string current_value;
+    std::string type;
+  };
 
-  auto start(const Scope &) -> void override { throw SpecialAction<EXIT_FAILURE>(); }
+  struct ConditionGroup
+  {
+    std::vector<Condition> conditions;
+  };
+
+  struct ConditionGroups
+  {
+    std::string groups_name;
+    std::vector<ConditionGroup> condition_groups;
+  };
+
+  using CustomCommand::CustomCommand;
+  using Context = openscenario_interpreter_msgs::msg::Context;
+  using json = nlohmann::json;
+  using ConditionGroupsCollection = std::vector<ConditionGroups>;
+
+  rclcpp::Subscription<Context>::SharedPtr subscription_;
+  std::string message_;
+  ConditionGroupsCollection condition_groups_collection_; 
+
+  auto start(const Scope &) -> void override {
+    auto node = std::make_shared<rclcpp::Node>("exit_failure");
+    // Subscribe to the topic
+    subscription_ = node->create_subscription<Context>(
+        "/simulation/context",
+        rclcpp::QoS(10).transient_local(),
+        [this](Context::UniquePtr msg_ptr) {
+          if (!msg_ptr) return;
+
+          YAML::Node data;
+          try {
+            data = YAML::Load(msg_ptr->data);
+          } catch (const std::exception & e) {
+            throw std::runtime_error(std::string("Failed to load YAML: ") + e.what());
+          }
+
+          int unnamed_event_counter = 1;
+          condition_groups_collection_.clear();
+
+          auto stories = data["OpenSCENARIO"]["Storyboard"]["Story"];
+          for (const auto & story : stories) {
+            for (const auto & act : story["Act"]) {
+              for (const auto & maneuver_group : act["ManeuverGroup"]) {
+                for (const auto & maneuver : maneuver_group["Maneuver"]) {
+                  for (const auto & event : maneuver["Event"]) {
+                    if (event["StartTrigger"] && event["StartTrigger"]["ConditionGroup"]) {
+                      std::string event_name;
+                      try {
+                        event_name = event["name"].as<std::string>();
+                      } catch (const YAML::BadConversion & e) {
+                        event_name = "";
+                      }
+                      if (event_name.empty()) {
+                        event_name = "ConditionGroup" + std::to_string(unnamed_event_counter++);
+                      }
+
+                      ConditionGroups condition_groups_msg;
+                      condition_groups_msg.groups_name = event_name;
+
+                      for (const auto & condition_group_node : event["StartTrigger"]["ConditionGroup"]) {
+                        ConditionGroup condition_group_msg;
+
+                        for (const auto & condition_node : condition_group_node["Condition"]) {
+                          Condition condition_msg;
+                          condition_msg.current_evaluation = condition_node["currentEvaluation"].as<std::string>();
+                          condition_msg.current_value = condition_node["currentValue"].as<std::string>();
+                          condition_msg.type = condition_node["type"].as<std::string>();
+
+                          condition_group_msg.conditions.push_back(condition_msg);
+                        }
+
+                        condition_groups_msg.condition_groups.push_back(condition_group_msg);
+                      }
+                      condition_groups_collection_.push_back(condition_groups_msg);
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          std::ostringstream context_ss;
+          for (const auto & condition_groups : condition_groups_collection_) {
+            context_ss << std::fixed << std::setprecision(0)
+                      << "Condition Groups Name: " << condition_groups.groups_name << std::endl;
+            for (const auto & condition_group : condition_groups.condition_groups) {
+              for (const auto & condition : condition_group.conditions) {
+                context_ss << "  Current Evaluation: " << condition.current_evaluation << std::endl
+                          << "  Current Value: " << condition.current_value << std::endl
+                          << "  Type: " << condition.type << std::endl;
+              }
+            }
+            context_ss << std::endl;
+          }
+          throw std::runtime_error(context_ss.str());
+        });
+
+    // Spin until a message is received
+    for (int i = 0; i < 10 && message_.empty(); ++i) {
+      rclcpp::spin_some(node);
+      rclcpp::sleep_for(std::chrono::milliseconds(100));
+    }
+    throw SpecialAction<EXIT_FAILURE>();
+  }
 };
+
 
 struct PrintParameter : public CustomCommand
 {
