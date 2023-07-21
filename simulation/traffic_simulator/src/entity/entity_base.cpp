@@ -755,7 +755,7 @@ auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 }
 
 void EntityBase::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & traffic_light_manager)
+  const std::shared_ptr<traffic_simulator::TrafficLightManager> & traffic_light_manager)
 {
   traffic_light_manager_ = traffic_light_manager;
 }

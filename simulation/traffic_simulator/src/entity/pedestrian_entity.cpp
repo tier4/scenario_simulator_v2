@@ -176,7 +176,7 @@ void PedestrianEntity::setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUti
 }
 
 void PedestrianEntity::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
+  const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
 {
   EntityBase::setTrafficLightManager(ptr);
   behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
