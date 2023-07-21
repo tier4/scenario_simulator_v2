@@ -26,7 +26,7 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <unordered_map>
@@ -89,7 +89,7 @@ public:
       BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>(
         "entity_type_list"),
       BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManagerBase>>(
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>(
         "traffic_light_manager"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints")};
@@ -112,7 +112,7 @@ public:
 protected:
   traffic_simulator::behavior::Request request;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
-  std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager;
+  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager;
   traffic_simulator_msgs::msg::EntityStatus entity_status;
   double current_time;
   double step_time;

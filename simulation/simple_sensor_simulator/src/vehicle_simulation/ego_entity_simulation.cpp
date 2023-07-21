@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <concealer/autoware_universe.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 
 namespace vehicle_simulation
 {
@@ -31,10 +31,12 @@ static auto getParameter(const std::string & name, T value = {})
 }
 
 EgoEntitySimulation::EgoEntitySimulation(
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time)
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
-  vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
+  vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
+  hdmap_utils_ptr_(hdmap_utils)
 {
 }
 
@@ -295,6 +297,7 @@ auto EgoEntitySimulation::setInitialStatus(const traffic_simulator_msgs::msg::En
 auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
 {
   traffic_simulator_msgs::msg::EntityStatus status;
+  status.name = status_.name;
   status.time = time;
   status.type = status_.type;
   status.bounding_box = status_.bounding_box;
@@ -303,6 +306,36 @@ auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
   status.action_status.accel = getCurrentAccel(step_time);
   status.action_status.linear_jerk = getLinearJerk(step_time);
 
+  fillLaneletDataAndSnapZToLanelet(status);
   setStatus(status);
+}
+
+auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
+  traffic_simulator_msgs::msg::EntityStatus & status) -> void
+{
+  const auto unique_route_lanelets =
+    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+
+  if (unique_route_lanelets.empty()) {
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+  } else {
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+    if (!lanelet_pose) {
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+    }
+  }
+  if (lanelet_pose) {
+    math::geometry::CatmullRomSpline spline(
+      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+    if (const auto s_value = spline.getSValue(status.pose)) {
+      status.pose.position.z = spline.getPoint(s_value.value()).z;
+    }
+  }
+
+  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
+  if (status.lanelet_pose_valid) {
+    status.lanelet_pose = lanelet_pose.value();
+  }
 }
 }  // namespace vehicle_simulation

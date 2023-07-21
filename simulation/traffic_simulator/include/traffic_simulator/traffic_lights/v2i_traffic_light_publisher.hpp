@@ -20,53 +20,50 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 
 namespace traffic_simulator
 {
-template <typename TrafficLightArrayMessageType>
-class V2ITrafficLightManager : public TrafficLightManagerBase
+class TrafficLightManager;
+
+template <typename Message>
+class V2ITrafficLightPublisher : public ConfigurableRateUpdater
 {
-  const typename rclcpp::Publisher<TrafficLightArrayMessageType>::SharedPtr publisher_;
+  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
+  const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
+  const std::string sensor_frame_;
 
 public:
-  template <typename Node>
-  explicit V2ITrafficLightManager(
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
-    const std::string & map_frame = "map")
-  : TrafficLightManagerBase(node, hdmap, map_frame), publisher_([node]() {
-      if constexpr (std::is_same_v<
-                      TrafficLightArrayMessageType,
-                      autoware_perception_msgs::msg::TrafficSignalArray>) {
-        return node->template create_publisher<TrafficLightArrayMessageType>(
-          "/v2x/traffic_signals", rclcpp::QoS(10).transient_local());
-      } else {
-        static_assert(true, "Unsupported message type");
-      }
-    }())
+  template <typename NodePointer>
+  explicit V2ITrafficLightPublisher(
+    const std::shared_ptr<TrafficLightManager> & traffic_light_manager,
+    const std::string & topic_name, const NodePointer & node,
+    const std::string & sensor_frame = "camera_link")
+  : ConfigurableRateUpdater(node),
+    traffic_light_state_array_publisher_(
+      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
+    traffic_light_manager_(traffic_light_manager),
+    sensor_frame_(sensor_frame)
   {
   }
 
 private:
-  auto publishTrafficLightStateArray() const -> void override
-  {
-    TrafficLightArrayMessageType traffic_light_array_message;
+  virtual auto update() -> void override {
+    Message traffic_light_array_message;
     if constexpr (std::is_same_v<
-                    TrafficLightArrayMessageType,
+                    Message,
                     autoware_perception_msgs::msg::TrafficSignalArray>) {
       traffic_light_array_message.stamp = clock_ptr_->now();
       for (const auto & [id, traffic_light] : getTrafficLights()) {
         traffic_light_array_message.signals.push_back(
-          static_cast<typename TrafficLightArrayMessageType::_signals_type::value_type>(
+          static_cast<typename Message::_signals_type::value_type>(
             traffic_light));
       }
     } else {
       // not reachable, because of static_assert in constructor
     }
-    publisher_->publish(traffic_light_array_message);
+    traffic_light_state_array_publisher_->publish(traffic_light_array_message);
   }
 };
-
 }  // namespace traffic_simulator
-
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_

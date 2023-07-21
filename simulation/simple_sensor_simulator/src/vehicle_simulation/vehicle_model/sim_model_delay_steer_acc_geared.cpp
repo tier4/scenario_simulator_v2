@@ -13,9 +13,10 @@
 // limitations under the License.
 
 #include <algorithm>
-#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc.hpp>
+#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model_delay_steer_acc_geared.hpp>
 
-SimModelDelaySteerAcc::SimModelDelaySteerAcc(
+SimModelDelaySteerAccGeared::SimModelDelaySteerAccGeared(
   double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant)
@@ -34,18 +35,18 @@ SimModelDelaySteerAcc::SimModelDelaySteerAcc(
   initializeInputQueue(dt);
 }
 
-double SimModelDelaySteerAcc::getX() { return state_(IDX::X); }
-double SimModelDelaySteerAcc::getY() { return state_(IDX::Y); }
-double SimModelDelaySteerAcc::getYaw() { return state_(IDX::YAW); }
-double SimModelDelaySteerAcc::getVx() { return state_(IDX::VX); }
-double SimModelDelaySteerAcc::getVy() { return 0.0; }
-double SimModelDelaySteerAcc::getAx() { return state_(IDX::ACCX); }
-double SimModelDelaySteerAcc::getWz()
+double SimModelDelaySteerAccGeared::getX() { return state_(IDX::X); }
+double SimModelDelaySteerAccGeared::getY() { return state_(IDX::Y); }
+double SimModelDelaySteerAccGeared::getYaw() { return state_(IDX::YAW); }
+double SimModelDelaySteerAccGeared::getVx() { return state_(IDX::VX); }
+double SimModelDelaySteerAccGeared::getVy() { return 0.0; }
+double SimModelDelaySteerAccGeared::getAx() { return state_(IDX::ACCX); }
+double SimModelDelaySteerAccGeared::getWz()
 {
   return state_(IDX::VX) * std::tan(state_(IDX::STEER)) / wheelbase_;
 }
-double SimModelDelaySteerAcc::getSteer() { return state_(IDX::STEER); }
-void SimModelDelaySteerAcc::update(const double & dt)
+double SimModelDelaySteerAccGeared::getSteer() { return state_(IDX::STEER); }
+void SimModelDelaySteerAccGeared::update(const double & dt)
 {
   Eigen::VectorXd delayed_input = Eigen::VectorXd::Zero(dim_u_);
 
@@ -56,12 +57,18 @@ void SimModelDelaySteerAcc::update(const double & dt)
   delayed_input(IDX_U::STEER_DES) = steer_input_queue_.front();
   steer_input_queue_.pop_front();
 
+  const auto prev_state = state_;
   updateRungeKutta(dt, delayed_input);
 
+  // take velocity limit explicitly
   state_(IDX::VX) = std::max(-vx_lim_, std::min(state_(IDX::VX), vx_lim_));
+
+  // consider gear
+  // update position and velocity first, and then acceleration is calculated naturally
+  updateStateWithGear(state_, prev_state, gear_, dt);
 }
 
-void SimModelDelaySteerAcc::initializeInputQueue(const double & dt)
+void SimModelDelaySteerAccGeared::initializeInputQueue(const double & dt)
 {
   size_t acc_input_queue_size = static_cast<size_t>(round(acc_delay_ / dt));
   acc_input_queue_.resize(acc_input_queue_size);
@@ -72,7 +79,7 @@ void SimModelDelaySteerAcc::initializeInputQueue(const double & dt)
   std::fill(steer_input_queue_.begin(), steer_input_queue_.end(), 0.0);
 }
 
-Eigen::VectorXd SimModelDelaySteerAcc::calcModel(
+Eigen::VectorXd SimModelDelaySteerAccGeared::calcModel(
   const Eigen::VectorXd & state, const Eigen::VectorXd & input)
 {
   auto sat = [](double val, double u, double l) { return std::max(std::min(val, u), l); };
@@ -95,4 +102,39 @@ Eigen::VectorXd SimModelDelaySteerAcc::calcModel(
   d_state(IDX::ACCX) = -(acc - acc_des) / acc_time_constant_;
 
   return d_state;
+}
+
+void SimModelDelaySteerAccGeared::updateStateWithGear(
+  Eigen::VectorXd & state, const Eigen::VectorXd & prev_state, const uint8_t gear, const double dt)
+{
+  const auto setStopState = [&]() {
+    state(IDX::VX) = 0.0;
+    state(IDX::X) = prev_state(IDX::X);
+    state(IDX::Y) = prev_state(IDX::Y);
+    state(IDX::YAW) = prev_state(IDX::YAW);
+    state(IDX::ACCX) = (state(IDX::VX) - prev_state(IDX::VX)) / std::max(dt, 1.0e-5);
+  };
+
+  using autoware_auto_vehicle_msgs::msg::GearCommand;
+  if (
+    gear == GearCommand::DRIVE || gear == GearCommand::DRIVE_2 || gear == GearCommand::DRIVE_3 ||
+    gear == GearCommand::DRIVE_4 || gear == GearCommand::DRIVE_5 || gear == GearCommand::DRIVE_6 ||
+    gear == GearCommand::DRIVE_7 || gear == GearCommand::DRIVE_8 || gear == GearCommand::DRIVE_9 ||
+    gear == GearCommand::DRIVE_10 || gear == GearCommand::DRIVE_11 ||
+    gear == GearCommand::DRIVE_12 || gear == GearCommand::DRIVE_13 ||
+    gear == GearCommand::DRIVE_14 || gear == GearCommand::DRIVE_15 ||
+    gear == GearCommand::DRIVE_16 || gear == GearCommand::DRIVE_17 ||
+    gear == GearCommand::DRIVE_18 || gear == GearCommand::LOW || gear == GearCommand::LOW_2) {
+    if (state(IDX::VX) < 0.0) {
+      setStopState();
+    }
+  } else if (gear == GearCommand::REVERSE || gear == GearCommand::REVERSE_2) {
+    if (state(IDX::VX) > 0.0) {
+      setStopState();
+    }
+  } else if (gear == GearCommand::PARK) {
+    setStopState();
+  } else {
+    setStopState();
+  }
 }
