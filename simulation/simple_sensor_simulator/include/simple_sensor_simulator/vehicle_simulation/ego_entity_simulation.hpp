@@ -17,9 +17,8 @@
 
 #include <concealer/autoware.hpp>
 #include <memory>
-#include <traffic_simulator/api/configuration.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 
@@ -36,8 +35,10 @@ enum class VehicleModelType {
 
 class EgoEntitySimulation
 {
+public:
   const std::unique_ptr<concealer::Autoware> autoware;
 
+private:
   const VehicleModelType vehicle_model_type_;
 
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
@@ -55,6 +56,10 @@ class EgoEntitySimulation
 
   traffic_simulator_msgs::msg::EntityStatus status_;
 
+public:
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+
+private:
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
@@ -68,7 +73,9 @@ class EgoEntitySimulation
 public:
   auto setAutowareStatus() -> void;
 
-  explicit EgoEntitySimulation(const traffic_simulator_msgs::msg::VehicleParameters &, double);
+  explicit EgoEntitySimulation(
+    const traffic_simulator_msgs::msg::VehicleParameters &, double,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 
@@ -81,6 +88,8 @@ public:
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
   auto updateStatus(double time, double step_time) -> void;
+
+  auto fillLaneletDataAndSnapZToLanelet(traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 };
 }  // namespace vehicle_simulation
 

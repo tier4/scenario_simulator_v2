@@ -20,39 +20,39 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 
 namespace traffic_simulator
 {
+class TrafficLightManager;
+
 template <typename Message>
-class V2ITrafficLightManager : public TrafficLightManagerBase
+class V2ITrafficLightPublisher : public ConfigurableRateUpdater
 {
   const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
+  const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
+  const std::string sensor_frame_;
 
 public:
-  template <typename Node>
-  explicit V2ITrafficLightManager(
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap, const Node & node,
-    const std::string & map_frame = "map")
-  : TrafficLightManagerBase(node, hdmap, map_frame),
+  template <typename NodePointer>
+  explicit V2ITrafficLightPublisher(
+    const std::shared_ptr<TrafficLightManager> & traffic_light_manager,
+    const std::string & topic_name, const NodePointer & node,
+    const std::string & sensor_frame = "camera_link")
+  : ConfigurableRateUpdater(node),
     traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<Message>(node, name(), rclcpp::QoS(10).transient_local()))
+      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
+    traffic_light_manager_(traffic_light_manager),
+    sensor_frame_(sensor_frame)
   {
   }
 
 private:
-  static auto name() -> const char *;
-
-  auto publishTrafficLightStateArray() const -> void override;
+  virtual auto update() -> void override;
 };
 
 template <>
-auto V2ITrafficLightManager<
-  autoware_auto_perception_msgs::msg::TrafficSignalArray>::publishTrafficLightStateArray() const
+auto V2ITrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::update()
   -> void;
-
-template <>
-auto V2ITrafficLightManager<autoware_auto_perception_msgs::msg::TrafficSignalArray>::name() -> const
-  char *;
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_
