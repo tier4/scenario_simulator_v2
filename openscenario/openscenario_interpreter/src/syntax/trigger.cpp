@@ -44,6 +44,18 @@ auto Trigger::evaluate() -> Object
       }));
 }
 
+std::string Trigger::activeConditionGroupDescription()
+{
+  std::string out{};
+  for (auto it = begin(); it != end(); ++it) {
+    ConditionGroup & conditionGroup = *it;
+    for (auto itt = conditionGroup.begin(); itt != conditionGroup.end(); ++itt) {
+      if (itt->current_value) out += "\"" + itt->name + "\": " + itt->description() + " ";
+    }
+  }
+  return out;
+}
+
 auto operator<<(nlohmann::json & json, const Trigger & datum) -> nlohmann::json &
 {
   json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));

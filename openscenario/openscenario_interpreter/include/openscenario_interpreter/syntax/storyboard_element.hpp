@@ -15,14 +15,15 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 
-#include <cstddef>
-#include <limits>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <openscenario_interpreter/syntax/trigger.hpp>
+
+#include <cstddef>
+#include <limits>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -185,85 +186,89 @@ public:
     return current_state == state;
   }
 
-  auto evaluate()
+  virtual auto evaluate() -> Object
   {
     if (stop_trigger.evaluate().as<Boolean>()) {
       override();
     }
 
-    // NOTE: https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
+    // NOTE:
+    // https://releases.asam.net/OpenSCENARIO/1.0.0/ASAM_OpenSCENARIO_BS-1-2_User-Guide_V1-0-0.html#_states_and_transitions_of_storyboardelements
 
     // NOTE: The fooTransition state must not return from case fooTransition
     // because it is a waypoint in the transition to barState.
 
   dispatch:
     switch (state().as<StoryboardElementState>()) {
-      case StoryboardElementState::standbyState: /* ----------------------------
-        *
-        *  This is the default initialization state of a StoryboardElement.
-        *  When it is in this state, the runtime instantiation of the
-        *  StoryboardElement is ready to execute once given a startTrigger. A
-        *  runtime instantiation of any StoryboardElement is created once its
-        *  parent element is in the standbyState. From the standbyState, the
-        *  Story element instantaneously transitions into the runningState.
-        *
-        * ------------------------------------------------------------------- */
+      case StoryboardElementState::
+        standbyState: /* ----------------------------
+                       *
+                       *  This is the default initialization state of a StoryboardElement.
+                       *  When it is in this state, the runtime instantiation of the
+                       *  StoryboardElement is ready to execute once given a startTrigger. A
+                       *  runtime instantiation of any StoryboardElement is created once its
+                       *  parent element is in the standbyState. From the standbyState, the
+                       *  Story element instantaneously transitions into the runningState.
+                       *
+                       * ------------------------------------------------------------------- */
         if (start_trigger.evaluate().as<Boolean>() and transitionTo(start_transition)) {
           goto dispatch;
         } else {
           return current_state;
         }
 
-      case StoryboardElementState::startTransition: /* -------------------------
-        *
-        *  The startTransition symbolizes that the execution of the runtime
-        *  instantiation is now starting. The startTransition can be used in
-        *  conditions to trigger based on this transition.
-        *
-        * ------------------------------------------------------------------- */
+      case StoryboardElementState::
+        startTransition: /* -------------------------
+                          *
+                          *  The startTransition symbolizes that the execution of the runtime
+                          *  instantiation is now starting. The startTransition can be used in
+                          *  conditions to trigger based on this transition.
+                          *
+                          * ------------------------------------------------------------------- */
         start();
         if (transitionTo(running_state)) ++current_execution_count;
         goto dispatch;
 
-      case StoryboardElementState::runningState: /* ----------------------------
-        *
-        *  The runningState symbolizes that the execution of the runtime
-        *  instantiation is now ongoing and has not yet accomplished its goal.
-        *
-        *  The concept of accomplishing a goal varies depending on the type of
-        *  StoryboardElement under consideration:
-        *
-        *  Action
-        *    An Action's goal is a function of the Action type and cannot be
-        *    generalized. Accomplishing an Action's goal will involve meeting
-        *    some arbitrary prerequisites related with the Action type (for
-        *    example, a SpeedAction accomplishes its goal when the considered
-        *    Entity is travelling at the prescribed speed). If an Action is
-        *    acting on an EntitySelection, all instances of Entity within the
-        *    selection have to complete in order to reach the completeState of
-        *    the Action.
-        *
-        *  Event
-        *    An Event's goal is accomplished when all its Actions are in the
-        *    completeState.
-        *
-        *  Maneuver
-        *    A Maneuver's goal is accomplished when all its Events are in the
-        *    completeState.
-        *
-        *  ManeuverGroup
-        *    A ManeuverGroup's goal is accomplished when all its Maneuvers are
-        *    in the completeState.
-        *
-        *  Act
-        *    An Act's goal is accomplished when all its ManeuverGroups are in
-        *    the completeState.
-        *
-        *  Story
-        *    A Story's goal is accomplished when all its Acts are in the
-        *    completeState.
-        *
-        * ------------------------------------------------------------------- */
+      case StoryboardElementState::
+        runningState: /* ----------------------------
+                       *
+                       *  The runningState symbolizes that the execution of the runtime
+                       *  instantiation is now ongoing and has not yet accomplished its goal.
+                       *
+                       *  The concept of accomplishing a goal varies depending on the type of
+                       *  StoryboardElement under consideration:
+                       *
+                       *  Action
+                       *    An Action's goal is a function of the Action type and cannot be
+                       *    generalized. Accomplishing an Action's goal will involve meeting
+                       *    some arbitrary prerequisites related with the Action type (for
+                       *    example, a SpeedAction accomplishes its goal when the considered
+                       *    Entity is travelling at the prescribed speed). If an Action is
+                       *    acting on an EntitySelection, all instances of Entity within the
+                       *    selection have to complete in order to reach the completeState of
+                       *    the Action.
+                       *
+                       *  Event
+                       *    An Event's goal is accomplished when all its Actions are in the
+                       *    completeState.
+                       *
+                       *  Maneuver
+                       *    A Maneuver's goal is accomplished when all its Events are in the
+                       *    completeState.
+                       *
+                       *  ManeuverGroup
+                       *    A ManeuverGroup's goal is accomplished when all its Maneuvers are
+                       *    in the completeState.
+                       *
+                       *  Act
+                       *    An Act's goal is accomplished when all its ManeuverGroups are in
+                       *    the completeState.
+                       *
+                       *  Story
+                       *    A Story's goal is accomplished when all its Acts are in the
+                       *    completeState.
+                       *
+                       * ------------------------------------------------------------------- */
         if (run(), accomplished()) {
           transitionTo(end_transition);
           goto dispatch;
@@ -271,68 +276,72 @@ public:
           return current_state;
         }
 
-      case StoryboardElementState::endTransition: /* ---------------------------
-        *
-        *  The endTransition occurs when the runtime instantiation of the
-        *  StoryboardElement accomplishes its goal. Once the endTransition
-        *  occurs, a check for completeness is made. A positive outcome moves
-        *  the state machine to the completeState, whereas a negative outcome
-        *  moves the state machine to the standbyState. The endTransition can
-        *  be used in conditions to trigger based on this transition.
-        *
-        * -------------------------------------------------------------------- */
+      case StoryboardElementState::
+        endTransition: /* ---------------------------
+                        *
+                        *  The endTransition occurs when the runtime instantiation of the
+                        *  StoryboardElement accomplishes its goal. Once the endTransition
+                        *  occurs, a check for completeness is made. A positive outcome moves
+                        *  the state machine to the completeState, whereas a negative outcome
+                        *  moves the state machine to the standbyState. The endTransition can
+                        *  be used in conditions to trigger based on this transition.
+                        *
+                        * -------------------------------------------------------------------- */
         transitionTo(
           current_execution_count < maximum_execution_count ? standby_state : complete_state);
         goto dispatch;
 
-      case StoryboardElementState::completeState: /* ---------------------------
-        *
-        *  The completeState signals that the runtime instantiation of the
-        *  StoryboardElement cannot reach a running state without external
-        *  interference. If the affected runtime instantiation of the
-        *  StoryboardElement is defined with a maximumExecutionCount, to be
-        *  complete implies that there are no more executions left to run, or a
-        *  stopTransition has occurred.
-        *
-        *  Checking for completeness involves verifying if the given runtime
-        *  instantiation of the StoryboardElement still has executions left
-        *  upon finishing the runningState. This check returns false if there
-        *  are executions left. This check returns true if there are no
-        *  executions left, or if the maximumExecutionCount is not defined in
-        *  the StoryboardElement.
-        *
-        *  Resetting the completeState can only be achieved externally by the
-        *  parent StoryboardElement whose child is in the completeState. This
-        *  may only occur if the parent initiates a new execution.
-        *
-        * -------------------------------------------------------------------- */
+      case StoryboardElementState::
+        completeState: /* ---------------------------
+                        *
+                        *  The completeState signals that the runtime instantiation of the
+                        *  StoryboardElement cannot reach a running state without external
+                        *  interference. If the affected runtime instantiation of the
+                        *  StoryboardElement is defined with a maximumExecutionCount, to be
+                        *  complete implies that there are no more executions left to run, or a
+                        *  stopTransition has occurred.
+                        *
+                        *  Checking for completeness involves verifying if the given runtime
+                        *  instantiation of the StoryboardElement still has executions left
+                        *  upon finishing the runningState. This check returns false if there
+                        *  are executions left. This check returns true if there are no
+                        *  executions left, or if the maximumExecutionCount is not defined in
+                        *  the StoryboardElement.
+                        *
+                        *  Resetting the completeState can only be achieved externally by the
+                        *  parent StoryboardElement whose child is in the completeState. This
+                        *  may only occur if the parent initiates a new execution.
+                        *
+                        * -------------------------------------------------------------------- */
         return current_state;
 
-      case StoryboardElementState::skipTransition: /* --------------------------
-        *
-        *  Transition marking the moment an element is asked to move to the
-        *  runningState but is instead skipped so it remains in the
-        *  standbyState (only for Event instances). The skipTransition can be
-        *  used in conditions to trigger based on this transition.
-        *
-        * ------------------------------------------------------------------- */
+      case StoryboardElementState::
+        skipTransition: /* --------------------------
+                         *
+                         *  Transition marking the moment an element is asked to move to the
+                         *  runningState but is instead skipped so it remains in the
+                         *  standbyState (only for Event instances). The skipTransition can be
+                         *  used in conditions to trigger based on this transition.
+                         *
+                         * ------------------------------------------------------------------- */
         throw Error("UNIMPLEMENTED!");
 
       default:
-      case StoryboardElementState::stopTransition: /* --------------------------
-        *
-        *  The stopTransition marks the reception of a stopTrigger or the
-        *  storyboard element is overridden (applicable for Event and Action).
-        *  This implies that the stopTransition cannot be reached other than
-        *  with an external intervention to the runtime instantiation of the
-        *  StoryboardElement.
-        *
-        *  When a runtime instantiation of a StoryboardElement goes through a
-        *  stopTransition, all of its child elements are also forced to go
-        *  through the same transition. The stopTransition can be used in
-        *  conditions to trigger based on this transition.
-        *
-        * ------------------------------------------------------------------- */
+      case StoryboardElementState::
+        stopTransition: /* --------------------------
+                         *
+                         *  The stopTransition marks the reception of a stopTrigger or the
+                         *  storyboard element is overridden (applicable for Event and Action).
+                         *  This implies that the stopTransition cannot be reached other than
+                         *  with an external intervention to the runtime instantiation of the
+                         *  StoryboardElement.
+                         *
+                         *  When a runtime instantiation of a StoryboardElement goes through a
+                         *  stopTransition, all of its child elements are also forced to go
+                         *  through the same transition. The stopTransition can be used in
+                         *  conditions to trigger based on this transition.
+                         *
+                         * ------------------------------------------------------------------- */
         if (not accomplished()) {
           stop();
         }

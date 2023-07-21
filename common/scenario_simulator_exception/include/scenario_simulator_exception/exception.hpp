@@ -16,6 +16,8 @@
 #define SCENARIO_SIMULATOR_EXCEPTION__EXCEPTION_HPP_
 
 #include <scenario_simulator_exception/concatenate.hpp>
+
+#include <memory>
 #include <stdexcept>
 #include <utility>
 
@@ -36,6 +38,79 @@ struct Error : public std::runtime_error
   {                                     \
     using Error::Error;                 \
   }
+
+struct Core
+{
+  Core(std::string name, std::string description)
+  : _name{name}, _anonymous{name.empty()}, _description{description}
+  {
+  }
+
+  auto description(std::string path) const -> std::string
+  {
+    std::string prolog =
+      "Simulation failure: CustomCommandAction typed \"exitFailure\" was triggered by the ";
+    if (_anonymous) {
+      return prolog + "anonymous condition (" + path + "): " + _description;
+    } else
+      return prolog + "Condition named " + _name + ": " + _description;
+  }
+
+private:
+  bool _anonymous;
+  std::string _name;
+  std::string _description;
+};
+
+struct ScenarioError : public std::runtime_error
+{
+  std::shared_ptr<ScenarioError> const _inner;
+
+  ScenarioError(ScenarioError const &) = default;
+
+  template <typename T>
+  explicit ScenarioError(std::string name, T && x)
+  : source_name(!name.empty() ? "\"" + name + "\"" : ""),
+    std::runtime_error{concatenate(std::forward<decltype(x)>(x))},
+    _inner{nullptr},
+    _core{nullptr}
+  {
+  }
+
+  template <typename T>
+  explicit ScenarioError(std::string name, T && x, ScenarioError const & inner)
+  : source_name(!name.empty() ? "\"" + name + "\"" : ""),
+    std::runtime_error{concatenate(std::forward<decltype(x)>(x))},
+    _inner{std::make_shared<ScenarioError>(inner)},
+    _core{inner._core}
+  {
+  }
+
+  auto setCoreSource(std::string name, std::string description) -> void
+  {
+    if (!_core) _core = std::make_shared<Core>(name, description);
+  }
+
+  auto description() const -> std::string
+  {
+    if (_inner) {
+      return what() + _inner->description();
+    } else {
+      return what();
+    }
+  }
+
+  std::string getDescription() const
+  {
+    std::string what = description();
+    return _core ? _core->description(what) : "No error core defined. Path:" + what;
+  }
+
+  std::string source_name;
+
+private:
+  std::shared_ptr<Core> _core;
+};
 
 // Autoware encountered some problem that led to a simulation failure.
 DEFINE_ERROR_CATEGORY(AutowareError);

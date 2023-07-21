@@ -152,6 +152,13 @@ public:
       return thunk();
     }
 
+    catch (const ScenarioError & error) {
+      const auto what = error.getDescription();
+      isFailureIntended() ? set<common::junit::Pass>()
+                          : set<common::junit::Error>("ScenarioError", what);
+      return handle(error);
+    }
+
     catch (const SpecialAction<EXIT_SUCCESS> & action)  // from CustomCommandAction::exitSuccess
     {
       const auto what = "Expected " + intended_result;

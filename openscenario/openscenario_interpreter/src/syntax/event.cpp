@@ -55,6 +55,17 @@ auto Event::start() -> void
   }
 }
 
+auto Event::evaluate() -> Object
+{
+  try {
+    return StoryboardElement::evaluate();
+  } catch (const SpecialAction<EXIT_FAILURE> & action) {
+    auto error = ScenarioError(name, "[path to condition]");
+    error.setCoreSource(name, start_trigger.activeConditionGroupDescription());
+    throw error;
+  }
+}
+
 auto operator<<(nlohmann::json & json, const Event & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;

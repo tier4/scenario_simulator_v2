@@ -34,6 +34,21 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
   });
 }
 
+auto Story::run() -> void
+{
+  int index{0};
+  for (auto && act : elements) {
+    try {
+      assert(act.is_also<Act>());
+      act.evaluate();
+      index++;
+    } catch (const ScenarioError & e) {
+      throw ScenarioError(
+        name, ".Act[" + (!e.source_name.empty() ? e.source_name : std::to_string(index)) + "]", e);
+    }
+  }
+}
+
 auto operator<<(nlohmann::json & json, const Story & story) -> nlohmann::json &
 {
   json["name"] = story.name;

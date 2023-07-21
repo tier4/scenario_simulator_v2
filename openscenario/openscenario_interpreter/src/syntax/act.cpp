@@ -31,6 +31,23 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
   });
 }
 
+auto Act::run() -> void
+{
+  int index{0};
+  for (auto && maneuver_group : elements) {
+    try {
+      assert(maneuver_group.is_also<ManeuverGroup>());
+      maneuver_group.evaluate();
+      index++;
+    } catch (const ScenarioError & e) {
+      throw ScenarioError(
+        name,
+        ".ManeuverGroup[" + (!e.source_name.empty() ? e.source_name : std::to_string(index)) + "]",
+        e);
+    }
+  }
+}
+
 auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &
 {
   json["name"] = datum.name;

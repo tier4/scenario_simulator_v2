@@ -29,6 +29,22 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
   });
 }
 
+auto Maneuver::run() -> void
+{
+  int index{0};
+  for (auto && event : elements) {
+    try {
+      assert(event.is_also<Event>());
+      event.evaluate();
+      index++;
+    } catch (const ScenarioError & e) {
+      throw ScenarioError(
+        name, ".Event[" + (!e.source_name.empty() ? e.source_name : std::to_string(index)) + "]",
+        e);
+    }
+  }
+}
+
 auto Maneuver::overrideEvents() -> void
 {
   for (auto && element : elements) {

@@ -31,6 +31,7 @@ namespace openscenario_interpreter
 {
 using common::AutowareError;
 using common::Error;
+using common::ScenarioError;
 using common::SemanticError;
 using common::SimulationError;
 using common::SyntaxError;

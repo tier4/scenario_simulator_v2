@@ -47,6 +47,8 @@ struct Trigger : public std::list<ConditionGroup>
   {
   }
 
+  std::string activeConditionGroupDescription();
+
   auto evaluate() -> Object;
 };
 

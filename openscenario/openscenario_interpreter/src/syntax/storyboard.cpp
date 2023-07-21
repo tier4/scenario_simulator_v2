@@ -44,8 +44,16 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 
 auto Storyboard::run() -> void
 {
+  int index{0};
   for (auto && story : elements) {
-    story.evaluate();
+    try {
+      story.evaluate();
+      index++;
+    } catch (const ScenarioError & e) {
+      throw ScenarioError(
+        name, ".Story[" + (!e.source_name.empty() ? e.source_name : std::to_string(index)) + "]",
+        e);
+    }
   }
 }
 
