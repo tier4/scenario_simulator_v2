@@ -100,6 +100,7 @@ void ScenarioSimulator::initialize(
   ego_vehicles_ = {};
   vehicles_ = {};
   pedestrians_ = {};
+  misc_objects_ = {};
 }
 
 void ScenarioSimulator::updateFrame(
@@ -213,31 +214,35 @@ void ScenarioSimulator::despawnEntity(
   simulation_api_schema::DespawnEntityResponse & res)
 {
   bool found = false;
-  res = simulation_api_schema::DespawnEntityResponse();
+  auto emplaceIfRequestedEntity = [&](const auto & entity, auto & container) {
+    if (entity.name() != req.name()) {
+      container.emplace_back(entity);
+    } else {
+      found = true;
+    }
+  };
+
+  std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles;
-  for (const auto & vehicle : vehicles_) {
-    if (vehicle.name() != req.name()) {
-      vehicles.emplace_back(vehicle);
-    } else {
-      found = true;
-    }
-  }
   std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians;
-  for (const auto & pedestrian : pedestrians_) {
-    if (pedestrian.name() != req.name()) {
-      pedestrians.emplace_back(pedestrian);
-    } else {
-      found = true;
-    }
-  }
   std::vector<traffic_simulator_msgs::MiscObjectParameters> misc_objects;
-  for (const auto & misc_object : misc_objects_) {
-    if (misc_object.name() != req.name()) {
-      misc_objects.emplace_back(misc_object);
-    } else {
-      found = true;
-    }
+
+  for (const auto & ego_vehicle : ego_vehicles_) {
+    emplaceIfRequestedEntity(ego_vehicle, ego_vehicles);
   }
+
+  for (const auto & vehicle : vehicles_) {
+    emplaceIfRequestedEntity(vehicle, vehicles);
+  }
+
+  for (const auto & pedestrian : pedestrians_) {
+    emplaceIfRequestedEntity(pedestrian, pedestrians);
+  }
+
+  for (const auto & misc_object : misc_objects_) {
+    emplaceIfRequestedEntity(misc_object, misc_objects);
+  }
+
   if (found) {
     entity_status_.erase(req.name());
     if (isEgo(req.name())) {
@@ -245,15 +250,13 @@ void ScenarioSimulator::despawnEntity(
     }
   }
 
-  vehicles_ = vehicles;
-  pedestrians_ = pedestrians;
-  misc_objects_ = misc_objects;
+  ego_vehicles_ = std::move(ego_vehicles);
+  vehicles_ = std::move(vehicles);
+  pedestrians_ = std::move(pedestrians);
+  misc_objects_ = std::move(misc_objects);
 
-  if (found) {
-    res.mutable_result()->set_success(true);
-  } else {
-    res.mutable_result()->set_success(false);
-  }
+  res = simulation_api_schema::DespawnEntityResponse();
+  res.mutable_result()->set_success(found);
 }
 
 void ScenarioSimulator::attachDetectionSensor(
