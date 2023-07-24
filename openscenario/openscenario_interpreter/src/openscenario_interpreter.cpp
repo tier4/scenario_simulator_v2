@@ -38,7 +38,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
-  output_directory("/tmp")
+  output_directory("/tmp"),
+  is_record_enabled(false)
 {
   DECLARE_PARAMETER(intended_result);
   DECLARE_PARAMETER(local_frame_rate);
@@ -109,6 +110,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(local_real_time_factor);
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
+      is_record_enabled = getParameter<bool>("record", true);
 
       script = std::make_shared<OpenScenario>(osc_path);
 
@@ -205,7 +207,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         return Interpreter::Result::FAILURE;  // => Inactive
       },
       [&]() {
-        if (getParameter<bool>("record", true)) {
+        if (is_record_enabled) {
           // clang-format off
           record::start(
             "-a",
@@ -304,7 +306,8 @@ auto Interpreter::reset() -> void
 
   scenarios.pop_front();
 
-  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+  // NOTE: Error on simulation is not error of the interpreter; so we print error messages into
+  // INFO_STREAM.
   boost::apply_visitor(
     overload(
       [&](const common::junit::Pass & result) { RCLCPP_INFO_STREAM(get_logger(), result); },
@@ -312,7 +315,7 @@ auto Interpreter::reset() -> void
       [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
     result);
 
-  if (getParameter<bool>("record", true)) {
+  if (is_record_enabled) {
     record::stop();
   }
 }
