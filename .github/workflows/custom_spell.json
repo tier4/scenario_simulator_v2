@@ -4,7 +4,6 @@
     "*/**/CHANGELOG.rst",
     "external/lanelet2_matching/**",
     "openscenario/openscenario_utility/openscenario_utility/resources/*.xsd",
-    // The following file contains a misspelling of "euclidian", which is specified in the XML Schema of OpenSCENARIO 1.2
     "test_runner/scenario_test_runner/scenario/spawn_relative_object_position.yaml"
   ],
   "words": [
