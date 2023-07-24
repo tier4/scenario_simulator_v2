@@ -166,7 +166,8 @@ public:
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
   virtual auto requestFollowTrajectory(
-    const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &) -> void;
+    const std::shared_ptr<follow_trajectory::Parameter<traffic_simulator_msgs::msg::Polyline>> &)
+    -> void;
 
   virtual void requestWalkStraight();
 

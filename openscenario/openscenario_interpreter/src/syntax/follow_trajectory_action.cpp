@@ -78,7 +78,7 @@ auto FollowTrajectoryAction::start() -> void
   for (const auto & actor : actors) {
     auto repack_trajectory = [this]() {
       if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>()) {
-        auto polyline = traffic_simulator::follow_trajectory::Polyline();
+        auto polyline = traffic_simulator_msgs::msg::Polyline();
         for (auto && vertex :
              trajectory_ref.trajectory.as<Trajectory>().shape.as<Polyline>().vertices) {
           auto message = traffic_simulator_msgs::msg::Vertex();
@@ -89,7 +89,8 @@ auto FollowTrajectoryAction::start() -> void
              behavior of always returning false for any comparison and
              propagating the value even if a quadratic operation is performed.
           */
-          message.time = time_reference.as<Timing>().offset + time_reference.as<Timing>().scale * vertex.time;
+          message.time =
+            time_reference.as<Timing>().offset + time_reference.as<Timing>().scale * vertex.time;
           message.position = static_cast<geometry_msgs::msg::Pose>(vertex.position);
           polyline.vertices.push_back(message);
         }
@@ -100,15 +101,16 @@ auto FollowTrajectoryAction::start() -> void
     };
 
     applyFollowTrajectoryAction(
-      actor, std::make_shared<traffic_simulator::follow_trajectory::Parameter<
-               traffic_simulator::follow_trajectory::Polyline>>(
-               initial_distance_offset,
-               trajectory_following_mode.following_mode == FollowingMode::position,
-               time_reference.as<Timing>().domain_absolute_relative == ReferenceContext::absolute
-                 ? 0.0
-                 : evaluateSimulationTime(),
-               trajectory_ref.trajectory.as<Trajectory>().closed,  //
-               repack_trajectory()));
+      actor,
+      std::make_shared<
+        traffic_simulator::follow_trajectory::Parameter<traffic_simulator_msgs::msg::Polyline>>(
+        initial_distance_offset,
+        trajectory_following_mode.following_mode == FollowingMode::position,
+        time_reference.as<Timing>().domain_absolute_relative == ReferenceContext::absolute
+          ? 0.0
+          : evaluateSimulationTime(),
+        trajectory_ref.trajectory.as<Trajectory>().closed,  //
+        repack_trajectory()));
   }
 }
 }  // namespace syntax

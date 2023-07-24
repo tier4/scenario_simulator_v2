@@ -19,17 +19,12 @@
 #include <optional>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
-#include <traffic_simulator_msgs/msg/vertex.hpp>
+#include <traffic_simulator_msgs/msg/polyline.hpp>
 
 namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-struct Polyline
-{
-  std::vector<traffic_simulator_msgs::msg::Vertex> vertices;
-};
-
 template <typename Shape>
 struct Parameter  // OpenSCENARIO 1.2 FollowTrajectoryAction
 {
@@ -68,8 +63,8 @@ struct Parameter  // OpenSCENARIO 1.2 FollowTrajectoryAction
 
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus &,
-  std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<
-    traffic_simulator::follow_trajectory::Polyline>> &,
+  std::shared_ptr<
+    traffic_simulator::follow_trajectory::Parameter<traffic_simulator_msgs::msg::Polyline>> &,
   const traffic_simulator_msgs::msg::BehaviorParameter &, double step_time)
   -> std::optional<traffic_simulator_msgs::msg::EntityStatus>;
 }  // namespace follow_trajectory

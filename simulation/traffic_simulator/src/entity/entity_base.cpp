@@ -666,7 +666,8 @@ void EntityBase::requestSpeedChange(
 }
 
 auto EntityBase::requestFollowTrajectory(
-  const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &) -> void
+  const std::shared_ptr<follow_trajectory::Parameter<traffic_simulator_msgs::msg::Polyline>> &)
+  -> void
 {
   THROW_SEMANTIC_ERROR(
     getEntityTypename(), " type entities do not support follow trajectory action.");

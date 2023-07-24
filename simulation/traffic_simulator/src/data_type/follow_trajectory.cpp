@@ -43,8 +43,9 @@ auto any(F f, T && x, Ts &&... xs)
 
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<
-    traffic_simulator::follow_trajectory::Polyline>> & trajectory_parameter,
+  std::shared_ptr<
+    traffic_simulator::follow_trajectory::Parameter<traffic_simulator_msgs::msg::Polyline>> &
+    trajectory_parameter,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time)
   -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
