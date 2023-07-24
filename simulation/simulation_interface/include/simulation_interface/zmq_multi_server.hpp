@@ -42,10 +42,6 @@ public:
       simulation_api_schema::UpdateFrameResponse &)>
       update_frame_func,
     std::function<void(
-      const simulation_api_schema::UpdateSensorFrameRequest &,
-      simulation_api_schema::UpdateSensorFrameResponse &)>
-      update_sensor_frame_func,
-    std::function<void(
       const simulation_api_schema::SpawnVehicleEntityRequest &,
       simulation_api_schema::SpawnVehicleEntityResponse &)>
       spawn_vehicle_entity_func,
@@ -98,10 +94,6 @@ private:
     const simulation_api_schema::UpdateFrameRequest &,
     simulation_api_schema::UpdateFrameResponse &)>
     update_frame_func_;
-  std::function<void(
-    const simulation_api_schema::UpdateSensorFrameRequest &,
-    simulation_api_schema::UpdateSensorFrameResponse &)>
-    update_sensor_frame_func_;
   std::function<void(
     const simulation_api_schema::SpawnVehicleEntityRequest &,
     simulation_api_schema::SpawnVehicleEntityResponse &)>

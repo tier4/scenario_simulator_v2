@@ -52,10 +52,12 @@ public:
     return std::nullopt;
   }
 
-  auto getRouteLanelets(const double) -> std::vector<std::int64_t> override
+  auto getRouteLanelets(double) const -> std::vector<std::int64_t> override
   {
     THROW_SEMANTIC_ERROR("getRouteLanelets function cannot not use in MiscObjectEntity");
   }
+
+  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus &) const -> void override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override
   {
