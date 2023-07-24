@@ -34,7 +34,7 @@ auto ScenarioDefinition::evaluate() -> Object
   try {
     return storyboard.evaluate();
   } catch (const ScenarioError & e) {
-    throw ScenarioError("", "OpenSCENARIO." + e.source_name, e);
+    throw ScenarioError("OpenSCENARIO", e);
   }
 }
 

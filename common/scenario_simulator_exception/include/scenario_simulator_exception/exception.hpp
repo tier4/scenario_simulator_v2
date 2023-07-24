@@ -42,48 +42,109 @@ struct Error : public std::runtime_error
 struct Core
 {
   Core(std::string name, std::string description)
-  : _name{name}, _anonymous{name.empty()}, _description{description}
+  : _name{name}, _description{description}, _anonymous{name.empty()}, _single{true}
   {
   }
 
-  auto description(std::string path) const -> std::string
+  Core(std::vector<std::pair<std::string, std::string>> conditions_list)
+  : _single{conditions_list.size() == 1}
+  {
+    _anonymous = std::any_of(conditions_list.begin(), conditions_list.end(), [](const auto & pair) {
+      return pair.first.empty();
+    });
+
+    if (_single) {
+      _name = "\"" + conditions_list.at(0).first + "\"";
+      _description = conditions_list.at(0).second;
+    } else {
+      int index{0};
+      for (const auto & condition : conditions_list) {
+        _name += "\"" + condition.first + "\", ";
+        if (!_anonymous) {
+          _description += "{\"" + condition.first + "\": " + condition.second + "}, ";
+        } else {
+          _description += "{\"" + std::to_string(index++) + "\": " + condition.second + "}, ";
+        }
+      }
+      _name.erase(_name.length() - 2);
+      _description.erase(_description.length() - 2);
+    }
+  }
+
+  auto log() const -> const std::string & { return _log; }
+
+  auto logUpdate(std::string path) -> std::string
   {
     std::string prolog =
       "Simulation failure: CustomCommandAction typed \"exitFailure\" was triggered by the ";
-    if (_anonymous) {
-      return prolog + "anonymous condition (" + path + "): " + _description;
-    } else
-      return prolog + "Condition named " + _name + ": " + _description;
+    if (_anonymous && _single) {
+      _log = prolog + "anonymous condition (" + path + ".Condition[0]): " + _description;
+    } else if (_single) {
+      _log = prolog + "Condition named " + _name + ": " + _description;
+    } else if (_anonymous && !_single) {
+      _log = prolog + "anonymous conditions (" + path + ".Condition[...]): " + _description;
+    } else {
+      _log = prolog + "Conditions named {" + _name + "}: " + _description;
+    }
+    return _log;
   }
 
 private:
-  bool _anonymous;
+  bool _anonymous{false}, _single{true};
   std::string _name;
   std::string _description;
+  std::string _log;
 };
 
 struct ScenarioError : public std::runtime_error
 {
-  std::shared_ptr<ScenarioError> const _inner;
-
   ScenarioError(ScenarioError const &) = default;
 
-  template <typename T>
-  explicit ScenarioError(std::string name, T && x)
-  : source_name(!name.empty() ? "\"" + name + "\"" : ""),
-    std::runtime_error{concatenate(std::forward<decltype(x)>(x))},
+  explicit ScenarioError(std::string source_name, int index, std::string name)
+  : _source_name{source_name},
+    _index{index},
     _inner{nullptr},
-    _core{nullptr}
+    _core{nullptr},
+    std::runtime_error{ScenarioError::formatName("", index, name)}
   {
   }
 
-  template <typename T>
-  explicit ScenarioError(std::string name, T && x, ScenarioError const & inner)
-  : source_name(!name.empty() ? "\"" + name + "\"" : ""),
-    std::runtime_error{concatenate(std::forward<decltype(x)>(x))},
-    _inner{std::make_shared<ScenarioError>(inner)},
-    _core{inner._core}
+  explicit ScenarioError(std::string name, ScenarioError const & inner)
+  : _inner{std::make_shared<ScenarioError>(inner)},
+    _core{inner._core},
+    std::runtime_error{ScenarioError::formatName(inner._source_name, name)}
   {
+  }
+
+  explicit ScenarioError(
+    std::string source_name, int index, std::string name, ScenarioError const & inner)
+  : _source_name{source_name},
+    _index{index},
+    _inner{std::make_shared<ScenarioError>(inner)},
+    _core{inner._core},
+    std::runtime_error{ScenarioError::formatName(inner._source_name, index, name)}
+  {
+  }
+
+  static auto formatName(std::string inner_source_name, std::string name) -> std::string
+  {
+    if (!inner_source_name.empty())
+      return name + "." + inner_source_name;
+    else
+      return name;
+  }
+
+  static auto formatName(std::string inner_source_name, int index, std::string name) -> std::string
+  {
+    if (!inner_source_name.empty())
+      return "." + name + "[\"" + inner_source_name + "\"]";
+    else
+      return "." + name + "[" + std::to_string(index) + "]";
+  }
+
+  auto setCoreSource(std::vector<std::pair<std::string, std::string>> conditions_list) -> void
+  {
+    if (!_core) _core = std::make_shared<Core>(conditions_list);
   }
 
   auto setCoreSource(std::string name, std::string description) -> void
@@ -91,25 +152,31 @@ struct ScenarioError : public std::runtime_error
     if (!_core) _core = std::make_shared<Core>(name, description);
   }
 
-  auto description() const -> std::string
+  auto recursiveWhat() const -> std::string
   {
     if (_inner) {
-      return what() + _inner->description();
+      return std::runtime_error::what() + _inner->recursiveWhat();
     } else {
-      return what();
+      return std::runtime_error::what();
     }
   }
 
-  std::string getDescription() const
+  const char * what() const noexcept override
   {
-    std::string what = description();
-    return _core ? _core->description(what) : "No error core defined. Path:" + what;
+    if (_core) {
+      _core->logUpdate(recursiveWhat());
+      return _core->log().c_str();
+    } else
+      return "No error core defined";
   }
 
-  std::string source_name;
+  std::string _source_name{""};
+  int _index{-1};
 
 private:
   std::shared_ptr<Core> _core;
+  std::shared_ptr<ScenarioError> const _inner;
+  std::string _description;
 };
 
 // Autoware encountered some problem that led to a simulation failure.

@@ -108,15 +108,24 @@ auto InitActions::startInstantaneousActions() -> void
 
 auto InitActions::startNonInstantaneousActions() -> void
 {
-  // we don't call global actions here, because they are all instantaneous actions
-  for (auto && e : user_defined_actions) {
-    auto & user_defined_action = e.as<UserDefinedAction>();
-    if (not user_defined_action.endsImmediately()) {
-      user_defined_action.start();
+  try {
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("#######"), "run startNonInstantaneousActions: ");
+    // we don't call global actions here, because they are all instantaneous actions
+    for (auto && e : user_defined_actions) {
+      auto & user_defined_action = e.as<UserDefinedAction>();
+      if (not user_defined_action.endsImmediately()) {
+        user_defined_action.start();
+      }
     }
-  }
-  for (auto && e : privates) {
-    e.as<Private>().startNonInstantaneousActions();
+    for (auto && e : privates) {
+      e.as<Private>().startNonInstantaneousActions();
+    }
+
+  } catch (...) {
+    RCLCPP_WARN_STREAM(
+      rclcpp::get_logger("#######"),
+      "throw " << typeid(std::current_exception()).name() << " startNonInstantaneousActions ");
+    throw;
   }
 }
 
@@ -140,15 +149,22 @@ auto InitActions::runInstantaneousActions() -> void
 
 auto InitActions::runNonInstantaneousActions() -> void
 {
-  // we don't call global actions here, because they are all instantaneous actions
-  for (auto && e : user_defined_actions) {
-    auto & user_defined_action = e.as<UserDefinedAction>();
-    if (not user_defined_action.endsImmediately()) {
-      user_defined_action.run();
+  try {
+    // we don't call global actions here, because they are all instantaneous actions
+    for (auto && e : user_defined_actions) {
+      auto & user_defined_action = e.as<UserDefinedAction>();
+      if (not user_defined_action.endsImmediately()) {
+        user_defined_action.run();
+      }
     }
-  }
-  for (auto && e : privates) {
-    e.as<Private>().runNonInstantaneousActions();
+    for (auto && e : privates) {
+      e.as<Private>().runNonInstantaneousActions();
+    }
+  } catch (...) {
+    RCLCPP_WARN_STREAM(
+      rclcpp::get_logger("#######"),
+      "throw " << typeid(std::current_exception()).name() << " runNonInstantaneousActions ");
+    throw;
   }
 }
 

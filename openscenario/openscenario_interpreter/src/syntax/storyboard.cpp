@@ -50,9 +50,7 @@ auto Storyboard::run() -> void
       story.evaluate();
       index++;
     } catch (const ScenarioError & e) {
-      throw ScenarioError(
-        name, ".Story[" + (!e.source_name.empty() ? e.source_name : std::to_string(index)) + "]",
-        e);
+      throw ScenarioError(name, index, "Story", e);
     }
   }
 }

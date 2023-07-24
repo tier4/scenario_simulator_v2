@@ -24,7 +24,8 @@ Event::Event(const pugi::xml_node & node, Scope & scope, Maneuver & maneuver)
 : Scope(readAttribute<String>("name", node, scope), scope),
   StoryboardElement(
     readAttribute<UnsignedInt>("maximumExecutionCount", node, local(), UnsignedInt(1)),
-    // If there is no "StartTrigger" in the "Event", the default StartTrigger that always returns true is used.
+    // If there is no "StartTrigger" in the "Event", the default StartTrigger that always returns
+    // true is used.
     readElement<Trigger>("StartTrigger", node, local(), Trigger({ConditionGroup()}))),
   priority(readAttribute<Priority>("priority", node, local())),
   parent_maneuver(maneuver)
@@ -60,8 +61,10 @@ auto Event::evaluate() -> Object
   try {
     return StoryboardElement::evaluate();
   } catch (const SpecialAction<EXIT_FAILURE> & action) {
-    auto error = ScenarioError(name, "[path to condition]");
-    error.setCoreSource(name, start_trigger.activeConditionGroupDescription());
+    auto index = start_trigger.activeConditionGroupIndex();
+    auto error = ScenarioError(name, index, "StartTrigger.ConditionGroup");
+    error.setCoreSource(start_trigger.activeConditionGroupDescription());
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("XXXXX"), "core set");
     throw error;
   }
 }

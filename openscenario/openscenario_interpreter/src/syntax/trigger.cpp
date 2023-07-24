@@ -35,25 +35,45 @@ auto Trigger::evaluate() -> Object
    *
    * ---------------------------------------------------------------------- */
   // NOTE: Don't use std::any_of; Intentionally does not short-circuit evaluation.
-  return asBoolean(
-    current_value = std::accumulate(
-      std::begin(*this), std::end(*this), false,
-      [&](auto && lhs, ConditionGroup & condition_group) {
-        const auto rhs = condition_group.evaluate();
-        return lhs or rhs.as<Boolean>();
-      }));
+  try {
+    return asBoolean(
+      current_value = std::accumulate(
+        std::begin(*this), std::end(*this), false,
+        [&](auto && lhs, ConditionGroup & condition_group) {
+          const auto rhs = condition_group.evaluate();
+          return lhs or rhs.as<Boolean>();
+        }));
+  } catch (...) {
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("#######"), "throw Trigger evaluate");
+    throw;
+  }
 }
 
-std::string Trigger::activeConditionGroupDescription()
+auto Trigger::activeConditionGroupIndex() const -> int
 {
-  std::string out{};
-  for (auto it = begin(); it != end(); ++it) {
-    ConditionGroup & conditionGroup = *it;
-    for (auto itt = conditionGroup.begin(); itt != conditionGroup.end(); ++itt) {
-      if (itt->current_value) out += "\"" + itt->name + "\": " + itt->description() + " ";
-    }
+  int index{0};
+  for (auto it = begin(); it != end(); ++it, ++index) {
+    ConditionGroup const & cgroup = *it;
+    bool all_conditions_true = std::all_of(
+      cgroup.begin(), cgroup.end(), [](const Condition & c) { return c.current_value; });
+    if (all_conditions_true) break;
   }
-  return out;
+  return index;
+}
+
+auto Trigger::activeConditionGroupDescription() const
+  -> std::vector<std::pair<std::string, std::string>>
+{
+  auto it = begin();
+  std::advance(it, activeConditionGroupIndex());
+  ConditionGroup const & cgroup = *it;
+  RCLCPP_WARN_STREAM(
+    rclcpp::get_logger("XXXXX"),
+    "size: " << cgroup.size() << " index: " << activeConditionGroupIndex());
+  std::vector<std::pair<std::string, std::string>> list;
+  for (auto itt = cgroup.begin(); itt != cgroup.end(); ++itt)
+    list.push_back(std::make_pair(itt->name, itt->description()));
+  return list;
 }
 
 auto operator<<(nlohmann::json & json, const Trigger & datum) -> nlohmann::json &

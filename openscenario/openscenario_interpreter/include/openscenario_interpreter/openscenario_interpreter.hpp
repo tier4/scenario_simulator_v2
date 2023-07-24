@@ -15,11 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
-#include <boost/variant.hpp>
-#include <chrono>
-#include <lifecycle_msgs/msg/state.hpp>
-#include <lifecycle_msgs/msg/transition.hpp>
-#include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
@@ -27,17 +22,26 @@
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/utility/execution_timer.hpp>
 #include <openscenario_interpreter/utility/visibility.hpp>
-#include <openscenario_interpreter_msgs/msg/context.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_lifecycle/lifecycle_node.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simple_junit/junit5.hpp>
+
+#include <lifecycle_msgs/msg/state.hpp>
+#include <lifecycle_msgs/msg/transition.hpp>
+#include <openscenario_interpreter_msgs/msg/context.hpp>
+
+#include <boost/variant.hpp>
+
+#include <chrono>
+#include <memory>
 #include <utility>
 
 #define INTERPRETER_INFO_STREAM(...) \
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
 
-// NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+// NOTE: Error on simulation is not error of the interpreter; so we print error messages into
+// INFO_STREAM.
 #define INTERPRETER_ERROR_STREAM(...) \
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << __VA_ARGS__ << "\x1b[0m")
 
@@ -153,9 +157,8 @@ public:
     }
 
     catch (const ScenarioError & error) {
-      const auto what = error.getDescription();
       isFailureIntended() ? set<common::junit::Pass>()
-                          : set<common::junit::Error>("ScenarioError", what);
+                          : set<common::junit::Error>("ScenarioError", error.what());
       return handle(error);
     }
 

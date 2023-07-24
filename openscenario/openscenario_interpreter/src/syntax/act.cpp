@@ -40,10 +40,7 @@ auto Act::run() -> void
       maneuver_group.evaluate();
       index++;
     } catch (const ScenarioError & e) {
-      throw ScenarioError(
-        name,
-        ".ManeuverGroup[" + (!e.source_name.empty() ? e.source_name : std::to_string(index)) + "]",
-        e);
+      throw ScenarioError(name, index, "ManeuverGroup", e);
     }
   }
 }

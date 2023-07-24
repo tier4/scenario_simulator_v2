@@ -38,9 +38,7 @@ auto Maneuver::run() -> void
       event.evaluate();
       index++;
     } catch (const ScenarioError & e) {
-      throw ScenarioError(
-        name, ".Event[" + (!e.source_name.empty() ? e.source_name : std::to_string(index)) + "]",
-        e);
+      throw ScenarioError(name, index, "Event", e);
     }
   }
 }
