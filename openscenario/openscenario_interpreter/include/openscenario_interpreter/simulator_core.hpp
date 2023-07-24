@@ -61,6 +61,7 @@ public:
   static auto deactivate() -> void
   {
     if (active()) {
+      core->despawnEntities();
       core->closeZMQConnection();
       core.reset();
     }

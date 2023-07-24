@@ -43,6 +43,16 @@ bool API::despawn(const std::string & name)
   return true;
 }
 
+bool API::despawnEntities()
+{
+  bool result = true;
+  auto entities = getEntityNames();
+  for (const auto & entity : entities) {
+    if (!despawn(entity)) result = false;
+  }
+  return result;
+}
+
 geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
 {
   auto status = getEntityStatus(name);
