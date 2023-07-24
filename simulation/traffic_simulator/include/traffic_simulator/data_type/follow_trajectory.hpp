@@ -19,26 +19,15 @@
 #include <optional>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/vertex.hpp>
 
 namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-struct Vertex
-{
-  double time;
-
-  geometry_msgs::msg::Pose position;
-
-  explicit Vertex(const double time, const geometry_msgs::msg::Pose & position)
-  : time(time), position(position)
-  {
-  }
-};
-
 struct Polyline
 {
-  std::vector<Vertex> vertices;
+  std::vector<traffic_simulator_msgs::msg::Vertex> vertices;
 };
 
 template <typename Shape>

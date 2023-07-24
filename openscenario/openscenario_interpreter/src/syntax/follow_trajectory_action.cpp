@@ -81,17 +81,17 @@ auto FollowTrajectoryAction::start() -> void
         auto polyline = traffic_simulator::follow_trajectory::Polyline();
         for (auto && vertex :
              trajectory_ref.trajectory.as<Trajectory>().shape.as<Polyline>().vertices) {
-          polyline.vertices.emplace_back(
-            /*
-               If Vertex.time is unspecified, nan is set as the default value
-               (see the openscenario_interpreter::syntax::Vertex constructor).
-               This was deliberately chosen because of the convenience of nan's
-               behavior of always returning false for any comparison and
-               propagating the value even if a quadratic operation is
-               performed.
-            */
-            time_reference.as<Timing>().offset + time_reference.as<Timing>().scale * vertex.time,
-            static_cast<geometry_msgs::msg::Pose>(vertex.position));
+          auto message = traffic_simulator_msgs::msg::Vertex();
+          /*
+             If Vertex.time is unspecified, nan is set as the default value
+             (see the openscenario_interpreter::syntax::Vertex constructor).
+             This was deliberately chosen because of the convenience of nan's
+             behavior of always returning false for any comparison and
+             propagating the value even if a quadratic operation is performed.
+          */
+          message.time = time_reference.as<Timing>().offset + time_reference.as<Timing>().scale * vertex.time;
+          message.position = static_cast<geometry_msgs::msg::Pose>(vertex.position);
+          polyline.vertices.push_back(message);
         }
         return polyline;
       } else {
