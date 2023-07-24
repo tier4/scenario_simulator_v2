@@ -2,8 +2,8 @@
 Changelog for package status_monitor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2023-07-24)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
 * Merge branch 'pzyskowski/660/ego-entity-split' into pzyskowski/660/zmq-interface-change
 * Merge remote-tracking branch 'origin/master' into feat/v2i_custom_command_action

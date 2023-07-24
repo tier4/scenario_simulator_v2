@@ -2,8 +2,8 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2023-07-24)
+------------------
 * Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl
 * Merge pull request `#1025 <https://github.com/tier4/scenario_simulator_v2/issues/1025>`_ from tier4/hotfix/add_start_planner_for_rtc
 * clang format

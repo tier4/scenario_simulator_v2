@@ -2,8 +2,8 @@
 Changelog for package do_nothing_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2023-07-24)
+------------------
 * Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl
 * renamed traffic light manager base
 * Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change-impl
