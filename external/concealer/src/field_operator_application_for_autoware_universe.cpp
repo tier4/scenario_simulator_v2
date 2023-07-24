@@ -103,40 +103,54 @@ auto listup(const Tuples & tuples) -> lister<N, Tuples>
   return lister<N, Tuples>(tuples);
 }
 
-#define DEFINE_DATA_MEMBER_DETECTOR(NAME)                                     \
-  template <typename T, typename = void>                                      \
-  struct Has##NAME : public std::false_type                                   \
-  {                                                                           \
-  };                                                                          \
-                                                                              \
-  template <typename T>                                                       \
-  struct Has##NAME<T, std::void_t<decltype(T::NAME)>> : public std::true_type \
-  {                                                                           \
+#define DEFINE_STATIC_DATA_MEMBER_DETECTOR(NAME)                                    \
+  template <typename T, typename = void>                                            \
+  struct HasStatic##NAME : public std::false_type                                   \
+  {                                                                                 \
+  };                                                                                \
+                                                                                    \
+  template <typename T>                                                             \
+  struct HasStatic##NAME<T, std::void_t<decltype(T::NAME)>> : public std::true_type \
+  {                                                                                 \
   }
 
-DEFINE_DATA_MEMBER_DETECTOR(NONE);
-DEFINE_DATA_MEMBER_DETECTOR(LANE_CHANGE_LEFT);
-DEFINE_DATA_MEMBER_DETECTOR(LANE_CHANGE_RIGHT);
-DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_LEFT);
-DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_RIGHT);
-DEFINE_DATA_MEMBER_DETECTOR(GOAL_PLANNER);
-DEFINE_DATA_MEMBER_DETECTOR(START_PLANNER);
-DEFINE_DATA_MEMBER_DETECTOR(PULL_OUT);
-DEFINE_DATA_MEMBER_DETECTOR(TRAFFIC_LIGHT);
-DEFINE_DATA_MEMBER_DETECTOR(INTERSECTION);
-DEFINE_DATA_MEMBER_DETECTOR(INTERSECTION_OCCLUSION);
-DEFINE_DATA_MEMBER_DETECTOR(CROSSWALK);
-DEFINE_DATA_MEMBER_DETECTOR(BLIND_SPOT);
-DEFINE_DATA_MEMBER_DETECTOR(DETECTION_AREA);
-DEFINE_DATA_MEMBER_DETECTOR(NO_STOPPING_AREA);
-DEFINE_DATA_MEMBER_DETECTOR(OCCLUSION_SPOT);
-DEFINE_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_LEFT);
-DEFINE_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_RIGHT);
-DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_LEFT);
-DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_RIGHT);
-DEFINE_DATA_MEMBER_DETECTOR(NO_DRIVABLE_LANE);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(NONE);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(GOAL_PLANNER);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(START_PLANNER);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(PULL_OUT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(TRAFFIC_LIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION_OCCLUSION);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(CROSSWALK);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(BLIND_SPOT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(DETECTION_AREA);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_STOPPING_AREA);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(OCCLUSION_SPOT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_DRIVABLE_LANE);
 
-#undef DEFINE_DATA_MEMBER_DETECTOR
+#undef DEFINE_STATIC_DATA_MEMBER_DETECTOR
+
+/**
+ * NOTE: for changes from `distance` to start/finish distance
+ * see https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+ */
+template <typename T, typename = void>
+struct Hasdistance : public std::false_type
+{
+};
+
+template <typename T>
+struct Hasdistance<T, std::void_t<decltype(std::declval<T>().distance)>> : public std::true_type
+{
+};
 
 template <typename T>
 auto toModuleType(const std::string & module_name)
@@ -145,7 +159,7 @@ auto toModuleType(const std::string & module_name)
     std::unordered_map<std::string, std::uint8_t> module_type_map;
 
 #define EMPLACE(IDENTIFIER)                              \
-  if constexpr (Has##IDENTIFIER<T>::value) {             \
+  if constexpr (HasStatic##IDENTIFIER<T>::value) {       \
     module_type_map.emplace(#IDENTIFIER, T::IDENTIFIER); \
   }                                                      \
   static_assert(true)
@@ -216,13 +230,27 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
         [type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
          command_type = to_command_type(command)](const auto & cooperate_status) {
           /**
-           *  NOTE : the finish_distance filter is set to over -20.0,
-           *  because some valid rtc statuses has negative finish_distance due to the errors of localization or numerical calculation.
-           *  This threshold is advised by a member of TIER IV planning and control team.
+           *  NOTE1: the finish_distance filter is set to over -20.0,
+           *  because some valid rtc statuses has negative finish_distance due to the errors of
+           * localization or numerical calculation. This threshold is advised by a member of TIER IV
+           * planning and control team.
            */
-          return cooperate_status.module.type == type &&
-                 command_type != cooperate_status.command_status.type &&
-                 cooperate_status.finish_distance >= -20.0;
+
+          /**
+           * NOTE2: The difference in the variable referred as a distance is the impact of the
+           * message specification changes in the following URL.
+           * This was also decided after consulting with a member of TIER IV planning and control team.
+           * ref: https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+           */
+          if constexpr (Hasdistance<decltype(latest_cooperate_status_array)>::value) {
+            return cooperate_status.module.type == type &&
+                   command_type != cooperate_status.command_status.type &&
+                   cooperate_status.distance >= -20.0;
+          } else {
+            return cooperate_status.module.type == type &&
+                   command_type != cooperate_status.command_status.type &&
+                   cooperate_status.finish_distance >= -20.0;
+          }
         });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
     std::stringstream what;
