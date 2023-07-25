@@ -436,7 +436,8 @@ public:
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
 
-  auto setEntityStatusExternally(const std::string & name, const CanonicalizedEntityStatus &) -> void;
+  auto setEntityStatusExternally(const std::string & name, const CanonicalizedEntityStatus &)
+    -> void;
 
   void setVerbose(const bool verbose);
 

@@ -221,7 +221,8 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk) -> void final;
+  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
+    -> void final;
 
   const std::string name;
 

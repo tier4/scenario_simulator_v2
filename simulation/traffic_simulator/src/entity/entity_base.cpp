@@ -224,7 +224,8 @@ auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool includ
     lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
       status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);
   } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status_non_canonicalized.pose, unique_route_lanelets, 1.0);
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(status_non_canonicalized.pose, unique_route_lanelets, 1.0);
     if (!lanelet_pose) {
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
         status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);

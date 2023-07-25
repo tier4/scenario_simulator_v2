@@ -247,7 +247,8 @@ std::optional<CanonicalizedEntityStatus> API::updateEntityStatusInSim(
 
   if (res.result().success()) {
     simulation_interface::toMsg(res.status().pose(), status_non_canonicalized.pose);
-    simulation_interface::toMsg(res.status().action_status(), status_non_canonicalized.action_status);
+    simulation_interface::toMsg(
+      res.status().action_status(), status_non_canonicalized.action_status);
     // Temporarily deinitialize lanelet pose as it should be correctly filled from here
     status_non_canonicalized.lanelet_pose_valid = false;
     status_non_canonicalized.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
