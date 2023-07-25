@@ -223,7 +223,7 @@ bool isValidCooperateStatus(
    * This was also decided after consulting with a member of TIER IV planning and control team.
    * ref: https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
    */
-  if constexpr (Hasdistance<CooperateStatusType>::value) {
+  if constexpr (HasDistance<CooperateStatusType>::value) {
     return cooperate_status.module.type == module_type &&
            command_type != cooperate_status.command_status.type &&
            cooperate_status.distance >= -20.0;
