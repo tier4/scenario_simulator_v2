@@ -148,7 +148,7 @@ struct HasDistance : public std::false_type
 };
 
 template <typename T>
-struct Hasdistance<T, std::void_t<decltype(std::declval<T>().distance)>> : public std::true_type
+struct HasDistance<T, std::void_t<decltype(std::declval<T>().distance)>> : public std::true_type
 {
 };
 
