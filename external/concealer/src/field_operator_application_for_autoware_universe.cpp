@@ -211,8 +211,8 @@ bool isValidCooperateStatus(
   const CooperateStatusType & cooperate_status, std::uint8_t command_type, std::uint8_t module_type)
 {
   /**
-   *  NOTE1: the finish_distance filter is set to over -20.0,
-   *  because some valid rtc statuses has negative finish_distance due to the errors of
+   * NOTE1: the finish_distance filter is set to over -20.0,
+   * because some valid rtc statuses has negative finish_distance due to the errors of
    * localization or numerical calculation. This threshold is advised by a member of TIER IV
    * planning and control team.
    */
