@@ -331,7 +331,7 @@ OpenSCENARIO:
                                     EntityCondition:
                                       RelativeDistanceCondition:
                                         entityRef: Npc2
-                                        relativeDistanceType: euclidianDistance
+                                        relativeDistanceType: euclidianDistance  # cspell:disable-line
                                         coordinateSystem: entity
                                         value: 0.01
                                         freespace: false
