@@ -3056,10 +3056,10 @@ Visualization Manager:
                 Value: /perception/occupancy_grid_map/map_updates
               Use Timestamp: false
               Value: false
-          Enabled: true
+          Enabled: false
           Name: Simple Sensor Simulator
-      Enabled: true
-      Name: Simulation
+      Enabled: false
+      Name: scenario simulator v2 information
   Enabled: true
   Global Options:
     Background Color: 10; 10; 10
