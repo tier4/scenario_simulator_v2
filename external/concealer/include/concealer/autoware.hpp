@@ -64,6 +64,8 @@ public:
     autoware_auto_control_msgs::msg::AckermannControlCommand,
     autoware_auto_vehicle_msgs::msg::GearCommand> = 0;
 
+  virtual auto getRouteLanelets() const -> std::vector<std::int64_t> = 0;
+
   auto set(const geometry_msgs::msg::Accel &) -> void;
 
   auto set(const geometry_msgs::msg::Twist &) -> void;

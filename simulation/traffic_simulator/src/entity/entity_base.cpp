@@ -213,6 +213,38 @@ auto EntityBase::getLaneletPose(double matching_distance) const
   return std::nullopt;
 }
 
+auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk) -> void
+{
+  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
+
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  auto status_non_canonicalized = static_cast<EntityStatus>(status);
+
+  if (unique_route_lanelets.empty()) {
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+      status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);
+  } else {
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status_non_canonicalized.pose, unique_route_lanelets, 1.0);
+    if (!lanelet_pose) {
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+        status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);
+    }
+  }
+  if (lanelet_pose) {
+    math::geometry::CatmullRomSpline spline(
+      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+    if (const auto s_value = spline.getSValue(status_non_canonicalized.pose)) {
+      status_non_canonicalized.pose.position.z = spline.getPoint(s_value.value()).z;
+    }
+  }
+
+  status_non_canonicalized.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
+  if (status_non_canonicalized.lanelet_pose_valid) {
+    status_non_canonicalized.lanelet_pose = lanelet_pose.value();
+  }
+  status = CanonicalizedEntityStatus(status_non_canonicalized, hdmap_utils_ptr_);
+}
+
 auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
   -> geometry_msgs::msg::Pose
 {
@@ -703,7 +735,7 @@ auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 }
 
 void EntityBase::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & traffic_light_manager)
+  const std::shared_ptr<traffic_simulator::TrafficLightManager> & traffic_light_manager)
 {
   traffic_light_manager_ = traffic_light_manager;
 }

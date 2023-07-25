@@ -146,6 +146,12 @@
   EXPECT_LANELET_POSE_EQ(MSG.lanelet_pose, PROTO.lanelet_pose());    \
   EXPECT_EQ(MSG.lanelet_pose_valid, PROTO.lanelet_pose_valid());
 
+#define EXPECT_SENT_ENTITY_STATUS_EQ(MSG, PROTO)                     \
+  EXPECT_DOUBLE_EQ(MSG.time, PROTO.time());                          \
+  EXPECT_STREQ(MSG.name.c_str(), PROTO.name().c_str());              \
+  EXPECT_ACTION_STATUS_EQ(MSG.action_status, PROTO.action_status()); \
+  EXPECT_POSE_EQ(MSG.pose, PROTO.pose());
+
 /**
  * @brief Expect equal macros for autoware related messages.
  */

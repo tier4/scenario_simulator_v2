@@ -80,7 +80,7 @@ This document contains step-by-step instruction on how to build and run [AWF Aut
    vehicle_model:=sample_vehicle
    ``` 
    
-   To modify parameters of random testing, please check documentation of ![random_test_runner](random_test_runner/README.md)
+   To modify parameters of random testing, please check documentation of [random_test_runner](random_test_runner/README.md)
 
 #### cpp scenario demo
    This demo does not use Autoware. the ego vehicle is interpreted as an NPC.

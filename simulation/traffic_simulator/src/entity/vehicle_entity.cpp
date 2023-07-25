@@ -290,10 +290,16 @@ void VehicleEntity::setBehaviorParameter(
 }
 
 void VehicleEntity::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
+  const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
 {
   EntityBase::setTrafficLightManager(ptr);
   behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
 }
+
+auto VehicleEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
+{
+  EntityBase::fillLaneletPose(status, false);
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator
