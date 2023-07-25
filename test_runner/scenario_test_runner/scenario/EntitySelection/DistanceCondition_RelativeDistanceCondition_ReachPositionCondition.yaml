@@ -34,9 +34,12 @@ OpenSCENARIO:
         Vehicle:
           <<: *default-vehicle
     EntitySelection:
-      - name: npcs
+      - name: npc_0_1
         Members:
           EntityRef: [ entityRef: npc0, entityRef: npc1 ]
+      - name: npc_0_2
+        Members:
+          EntityRef: [ entityRef: npc0, entityRef: npc2 ]
   Storyboard:
     Init:
       Actions:
@@ -127,7 +130,7 @@ OpenSCENARIO:
                                   ByEntityCondition:
                                     TriggeringEntities:
                                       triggeringEntitiesRule: all
-                                      EntityRef: [ entityRef: npcs ]
+                                      EntityRef: [ entityRef: npc_0_1 ]
                                     EntityCondition:
                                       DistanceCondition:
                                         freespace: False
@@ -139,6 +142,35 @@ OpenSCENARIO:
                                             roadId: ''
                                             laneId: '34513'
                                             s: 20
+                                            offset: 0
+                                            Orientation: { type: relative, h: 0, p: 0, r: 0 }
+                  - name: 'reach_position_test'
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'test(ReachPositionCondition Satisfied)'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef: [ entityRef: npc_0_2 ]
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        tolerance: 15
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34513'
+                                            s: 10
                                             offset: 0
                                             Orientation: { type: relative, h: 0, p: 0, r: 0 }
                   - name: 'relative_distance_test'
@@ -159,7 +191,7 @@ OpenSCENARIO:
                                   ByEntityCondition:
                                     TriggeringEntities:
                                       triggeringEntitiesRule: all
-                                      EntityRef: [ entityRef: npcs ]
+                                      EntityRef: [ entityRef: npc_0_1 ]
                                     EntityCondition:
                                       RelativeDistanceCondition:
                                         entityRef: npc2
@@ -205,6 +237,14 @@ OpenSCENARIO:
                                   ByValueCondition:
                                     StoryboardElementStateCondition:
                                       storyboardElementRef: distance_test
+                                      storyboardElementType: action
+                                      state: completeState
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: reach_position_test
                                       storyboardElementType: action
                                       state: completeState
                                 - name: ''
