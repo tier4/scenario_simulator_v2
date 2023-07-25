@@ -20,7 +20,7 @@
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/follow_trajectory.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
@@ -72,7 +72,7 @@ public:
   DEFINE_GETTER_SETTER(StepTime, "step_time", double)
   DEFINE_GETTER_SETTER(TargetSpeed, "target_speed", std::optional<double>)
   DEFINE_GETTER_SETTER(LaneChangeParameters, "lane_change_parameters", traffic_simulator::lane_change::Parameter)
-  DEFINE_GETTER_SETTER(TrafficLightManager, "traffic_light_manager", std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
+  DEFINE_GETTER_SETTER(TrafficLightManager, "traffic_light_manager", std::shared_ptr<traffic_simulator::TrafficLightManager>)
   DEFINE_GETTER_SETTER(UpdatedStatus, "updated_status", traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(VehicleParameters, "vehicle_parameters", traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints, "waypoints", traffic_simulator_msgs::msg::WaypointsArray)

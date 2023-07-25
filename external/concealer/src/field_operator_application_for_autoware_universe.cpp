@@ -120,6 +120,7 @@ DEFINE_DATA_MEMBER_DETECTOR(LANE_CHANGE_RIGHT);
 DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_LEFT);
 DEFINE_DATA_MEMBER_DETECTOR(AVOIDANCE_RIGHT);
 DEFINE_DATA_MEMBER_DETECTOR(GOAL_PLANNER);
+DEFINE_DATA_MEMBER_DETECTOR(START_PLANNER);
 DEFINE_DATA_MEMBER_DETECTOR(PULL_OUT);
 DEFINE_DATA_MEMBER_DETECTOR(TRAFFIC_LIGHT);
 DEFINE_DATA_MEMBER_DETECTOR(INTERSECTION);
@@ -160,6 +161,7 @@ auto toModuleType(const std::string & module_name)
     EMPLACE(AVOIDANCE_LEFT);
     EMPLACE(AVOIDANCE_RIGHT);
     EMPLACE(GOAL_PLANNER);
+    EMPLACE(START_PLANNER);
     EMPLACE(PULL_OUT);
     EMPLACE(TRAFFIC_LIGHT);
     EMPLACE(INTERSECTION);
@@ -211,13 +213,24 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
   if (const auto cooperate_status = std::find_if(
         latest_cooperate_status_array.statuses.begin(),
         latest_cooperate_status_array.statuses.end(),
-        [type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name)](
-          const auto & cooperate_status) { return cooperate_status.module.type == type; });
+        [type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
+         command_type = to_command_type(command)](const auto & cooperate_status) {
+          /**
+           *  NOTE : the finish_distance filter is set to over -20.0,
+           *  because some valid rtc statuses has negative finish_distance due to the errors of localization or numerical calculation.
+           *  This threshold is advised by a member of TIER IV planning and control team.
+           */
+          return cooperate_status.module.type == type &&
+                 command_type != cooperate_status.command_status.type &&
+                 cooperate_status.finish_distance >= -20.0;
+        });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
-    throw common::Error(
-      "Failed to send a cooperate command: Cannot find a request to cooperate for module ",
-      std::quoted(module_name),
-      ". Please check if the situation is such that the request occurs when sending.");
+    std::stringstream what;
+    what
+      << "Failed to send a cooperate command: Cannot find a valid request to cooperate for module "
+      << std::quoted(module_name) << " and command " << std::quoted(command) << "."
+      << "Please check if the situation is such that the request occurs when sending.";
+    throw common::Error(what.str());
   } else {
     tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
     cooperate_command.module = cooperate_status->module;

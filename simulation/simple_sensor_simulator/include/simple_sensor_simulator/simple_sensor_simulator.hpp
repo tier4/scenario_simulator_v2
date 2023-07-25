@@ -18,6 +18,7 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 
+#include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <map>
@@ -26,9 +27,11 @@
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
+#include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
 #include <string>
 #include <thread>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
 
@@ -116,9 +119,6 @@ private:
   void attachOccupancyGridSensor(
     const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
     simulation_api_schema::AttachOccupancyGridSensorResponse & res);
-  void updateSensorFrame(
-    const simulation_api_schema::UpdateSensorFrameRequest & req,
-    simulation_api_schema::UpdateSensorFrameResponse & res);
   void updateTrafficLights(
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);
@@ -132,8 +132,16 @@ private:
   double current_time_;
   rclcpp::Time current_ros_time_;
   bool initialized_;
-  std::vector<traffic_simulator_msgs::EntityStatus> entity_status_;
+  std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
+  std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> traffic_signals_states_;
+  traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string & name);
   zeromq::MultiServer server_;
+  geographic_msgs::msg::GeoPoint getOrigin();
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+  std::shared_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
+
+  bool isEgo(const std::string & name);
+  bool isEntityExists(const std::string & name);
 };
 }  // namespace simple_sensor_simulator
 
