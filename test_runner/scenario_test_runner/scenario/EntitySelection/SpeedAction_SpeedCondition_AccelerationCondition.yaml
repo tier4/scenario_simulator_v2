@@ -23,7 +23,7 @@ OpenSCENARIO:
           BoundingBox:
             Center: { x: 0, y: 0, z: 0 }
             Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
-          Performance: { maxSpeed: 30, maxAcceleration: INF, maxDeceleration: INF }
+          Performance: { maxSpeed: INF, maxAcceleration: INF, maxDeceleration: INF }
           Axles:
             FrontAxle: { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX:  1, positionZ: 0.3 }
             RearAxle:  { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX: -1, positionZ: 0.3 }
@@ -32,10 +32,13 @@ OpenSCENARIO:
       - name: npc1
         Vehicle:
           <<: *default-vehicle
+      - name: npc2
+        Vehicle:
+          <<: *default-vehicle
     EntitySelection:
       - name: npcs_ref
         Members:
-          EntityRef: [ entityRef: npc0, entityRef: npc1 ]
+          EntityRef: [ entityRef: npc1, entityRef: npc2 ]
       - name: npcs_by_type
         Members:
           ByType: [ objectType: vehicle ]
@@ -44,6 +47,29 @@ OpenSCENARIO:
       Actions:
         Private:
           - entityRef: npc0
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 20
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+          - entityRef: npc1
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -66,7 +92,7 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 0
-          - entityRef: npc1
+          - entityRef: npc2
             PrivateAction:
               - TeleportAction:
                   Position:
@@ -98,7 +124,7 @@ OpenSCENARIO:
                 name: ''
                 Actors:
                   selectTriggeringEntities: false
-                  EntityRef: [ entityRef: npcs_ref ]
+                  EntityRef: [ entityRef: npcs_ref, entityRef: npc0 ]
                 Maneuver:
                   - name: ''
                     Event:
@@ -153,7 +179,29 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ''
+                                - name: 'Acceleration'
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: npcs_by_type
+                                    EntityCondition:
+                                      AccelerationCondition:
+                                        rule: greaterThan
+                                        value: 9
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'test(AccelerationCondtition Satisfied)'
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: 'Speed'
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -165,6 +213,16 @@ OpenSCENARIO:
                                       SpeedCondition:
                                         rule: equalTo
                                         value: 50
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'test(SpeedCondition Satisfied)'
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none
