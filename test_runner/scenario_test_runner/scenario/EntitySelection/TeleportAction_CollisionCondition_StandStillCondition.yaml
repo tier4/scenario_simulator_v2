@@ -51,12 +51,30 @@ OpenSCENARIO:
                       s: 20
                       offset: 0
                       Orientation: { type: relative, h: 0, p: 0, r: 0 }
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
           - entityRef: npcs
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
                       <<: *collision-position
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
     Story:
       - name: ''
         Act:
@@ -68,15 +86,15 @@ OpenSCENARIO:
                   selectTriggeringEntities: false
                   EntityRef: []
                 Maneuver:
-                  - name: ''
+                  - name: 'collision_test'
                     Event:
                       - name: ''
                         priority: parallel
                         Action:
-                          - name: collision_test_0
+                          - name: ''
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: 'test(collision, npcs, npc0)'
+                                type: 'test(CollisionCondition1 Satisfied)'
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -90,15 +108,13 @@ OpenSCENARIO:
                                     EntityCondition:
                                       CollisionCondition:
                                         EntityRef: { entityRef: npc0 }
-                  - name: ''
-                    Event:
                       - name: ''
                         priority: parallel
                         Action:
                           - name: collision_test_1
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: 'test(collision, npc1, npc2)'
+                                type: 'test(CollisionCondition1 Satisfied)'
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -112,6 +128,28 @@ OpenSCENARIO:
                                     EntityCondition:
                                       CollisionCondition:
                                         EntityRef: { entityRef: npc2 }
+                  - name: 'stand_still_test'
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'test(StandStillCondition Satisfied)'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef: [ entityRef: npcs, entityRef: npc0 ]
+                                    EntityCondition:
+                                      StandStillCondition:
+                                        duration: 5
             StartTrigger:
               ConditionGroup:
                 - Condition:
@@ -149,7 +187,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     StoryboardElementStateCondition:
-                                      storyboardElementRef: collision_test_0
+                                      storyboardElementRef: collision_test
                                       storyboardElementType: action
                                       state: completeState
                                 - name: ''
@@ -157,7 +195,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     StoryboardElementStateCondition:
-                                      storyboardElementRef: collision_test_1
+                                      storyboardElementRef: stand_still_test
                                       storyboardElementType: action
                                       state: completeState
                       - name: ''
