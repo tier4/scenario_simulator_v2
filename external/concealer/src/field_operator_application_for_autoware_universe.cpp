@@ -143,7 +143,7 @@ DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_DRIVABLE_LANE);
  * see https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
  */
 template <typename T, typename = void>
-struct Hasdistance : public std::false_type
+struct HasDistance : public std::false_type
 {
 };
 
