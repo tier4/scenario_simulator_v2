@@ -331,8 +331,10 @@ OpenSCENARIO:
                                     EntityCondition:
                                       RelativeDistanceCondition:
                                         entityRef: Npc2
+                                        # cspell:disable
                                         # "euclidian" is a typo but it is specified in the XML Schema of OpenSCENARIO 1.2
-                                        relativeDistanceType: euclidianDistance  # cspell:disable-line
+                                        relativeDistanceType: euclidianDistance
+                                        # cspell:enable
                                         coordinateSystem: entity
                                         value: 0.01
                                         freespace: false
