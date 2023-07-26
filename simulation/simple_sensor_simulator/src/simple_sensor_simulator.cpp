@@ -100,6 +100,7 @@ void ScenarioSimulator::initialize(
   ego_vehicles_ = {};
   vehicles_ = {};
   pedestrians_ = {};
+  entity_status_ = {};
 }
 
 void ScenarioSimulator::updateFrame(
