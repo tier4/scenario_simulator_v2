@@ -36,12 +36,12 @@ struct Parameter  // OpenSCENARIO 1.2 FollowTrajectoryAction
   bool dynamic_constraints_ignorable;
 
   /*
-     This variable is set to nullopt if the time information defined for the
+     This variable is set to NaN if the time information defined for the
      waypoint is absolute simulation time. Otherwise, if the time information
      defined for the waypoint is relative time, this variable will be filled
      with the offset from zero simulation time.
   */
-  std::optional<double> base_time;
+  double base_time;
 
   bool closed;
 
@@ -51,7 +51,7 @@ struct Parameter  // OpenSCENARIO 1.2 FollowTrajectoryAction
 
   explicit Parameter(
     const double initial_distance_offset, const bool dynamic_constraints_ignorable,
-    const std::optional<double> base_time, const bool closed, const Shape & shape)
+    const double base_time, const bool closed, const Shape & shape)
   : initial_distance_offset(initial_distance_offset),
     dynamic_constraints_ignorable(dynamic_constraints_ignorable),
     base_time(base_time),

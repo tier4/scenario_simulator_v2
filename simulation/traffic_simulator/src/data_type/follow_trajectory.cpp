@@ -74,15 +74,15 @@ auto makeUpdatedStatus(
        Relative time starts from the start of FollowTrajectoryAction or from
        the time of reaching the previous "waypoint with arrival time".
 
-        Note: static_cast<bool>(trajectory_parameter->base_time) means
-        "Timing.domainAbsoluteRelative is relative".
+       Note: not std::isnan(trajectory_parameter->base_time) means
+       "Timing.domainAbsoluteRelative is relative".
 
-        Note: not std::isnan(trajectory_parameter->shape.vertices.front().time)
-        means "The waypoint about to be popped is the waypoint with the
-        specified arrival time".
+       Note: not std::isnan(trajectory_parameter->shape.vertices.front().time)
+       means "The waypoint about to be popped is the waypoint with the
+       specified arrival time".
     */
     if (
-      trajectory_parameter->base_time and
+      not std::isnan(trajectory_parameter->base_time) and
       not std::isnan(trajectory_parameter->shape.vertices.front().time)) {
       trajectory_parameter->base_time = entity_status.time;
     }
@@ -136,7 +136,7 @@ auto makeUpdatedStatus(
     */
     const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
       hypot(position, target_position),
-      (trajectory_parameter->base_time ? *trajectory_parameter->base_time : 0.0) +
+      (not std::isnan(trajectory_parameter->base_time) ? trajectory_parameter->base_time : 0.0) +
         trajectory_parameter->shape.vertices.front().time - entity_status.time);
     /*
        This clause is to avoid division-by-zero errors in later clauses with
@@ -170,7 +170,7 @@ auto makeUpdatedStatus(
           };
 
           if (const auto remaining_time =
-                (trajectory_parameter->base_time ? *trajectory_parameter->base_time : 0.0) +
+                (not std::isnan(trajectory_parameter->base_time) ? trajectory_parameter->base_time : 0.0) +
                 first_waypoint_with_arrival_time_specified->time - entity_status.time;
               /*
                  The condition below should ideally be remaining_time < 0.
@@ -200,7 +200,7 @@ auto makeUpdatedStatus(
               " failed to reach the trajectory waypoint at the specified time. The specified time "
               "is ",
               first_waypoint_with_arrival_time_specified->time, " (in ",
-              (trajectory_parameter->base_time ? "absolute" : "relative"),
+              (not std::isnan(trajectory_parameter->base_time) ? "absolute" : "relative"),
               " simulation time). This may be due to unrealistic conditions of arrival time "
               "specification compared to vehicle parameters and dynamic constraints.");
           } else {
