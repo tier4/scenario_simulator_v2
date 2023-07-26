@@ -2,8 +2,8 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2023-07-26)
+------------------
 * Merge pull request `#1037 <https://github.com/tier4/scenario_simulator_v2/issues/1037>`_ from tier4/fix/junit-missing-count
 * Change test suite of JUnit
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action

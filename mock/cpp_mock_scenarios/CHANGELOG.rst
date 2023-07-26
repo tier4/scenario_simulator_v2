@@ -2,8 +2,8 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2023-07-26)
+------------------
 * moved vehicle simulation to simple sensor simulator
 * traffic light test (to be reverted)
 * Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change-impl
