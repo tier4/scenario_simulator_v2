@@ -25,6 +25,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/PedestrianParameters.msg
   msg/Performance.msg
   msg/Polyline.msg
+  msg/PolylineTrajectory.msg
   msg/VehicleParameters.msg
   msg/Vertex.msg
   msg/WaypointsArray.msg

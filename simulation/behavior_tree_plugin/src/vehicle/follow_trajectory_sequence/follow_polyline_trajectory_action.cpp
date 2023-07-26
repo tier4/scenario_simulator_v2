@@ -64,8 +64,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       not trajectory_parameter) {
     return BT::NodeStatus::FAILURE;
   } else if (
-    const auto updated_status =
-      makeUpdatedStatus(entity_status, trajectory_parameter, behavior_parameter, step_time)) {
+    const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
+      entity_status, trajectory_parameter, behavior_parameter, step_time)) {
     setOutput("updated_status", *updated_status);
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));

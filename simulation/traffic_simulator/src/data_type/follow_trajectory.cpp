@@ -43,9 +43,7 @@ auto any(F f, T && x, Ts &&... xs)
 
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  std::shared_ptr<
-    traffic_simulator::follow_trajectory::Parameter<traffic_simulator_msgs::msg::Polyline>> &
-    trajectory_parameter,
+  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory_parameter,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time)
   -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
@@ -170,7 +168,8 @@ auto makeUpdatedStatus(
           };
 
           if (const auto remaining_time =
-                (not std::isnan(trajectory_parameter->base_time) ? trajectory_parameter->base_time : 0.0) +
+                (not std::isnan(trajectory_parameter->base_time) ? trajectory_parameter->base_time
+                                                                 : 0.0) +
                 first_waypoint_with_arrival_time_specified->time - entity_status.time;
               /*
                  The condition below should ideally be remaining_time < 0.

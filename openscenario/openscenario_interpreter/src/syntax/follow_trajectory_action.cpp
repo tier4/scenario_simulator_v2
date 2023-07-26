@@ -100,17 +100,19 @@ auto FollowTrajectoryAction::start() -> void
       }
     };
 
-    applyFollowTrajectoryAction(
-      actor,
-      std::make_shared<
-        traffic_simulator::follow_trajectory::Parameter<traffic_simulator_msgs::msg::Polyline>>(
-        initial_distance_offset,
-        trajectory_following_mode.following_mode == FollowingMode::position,
-        time_reference.as<Timing>().domain_absolute_relative == ReferenceContext::absolute
-          ? 0.0
-          : evaluateSimulationTime(),
-        trajectory_ref.trajectory.as<Trajectory>().closed,  //
-        repack_trajectory()));
+    auto parameter = std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>();
+
+    parameter->initial_distance_offset = initial_distance_offset;
+    parameter->dynamic_constraints_ignorable =
+      trajectory_following_mode.following_mode == FollowingMode::position;
+    parameter->base_time =
+      time_reference.as<Timing>().domain_absolute_relative == ReferenceContext::absolute
+        ? std::numeric_limits<double>::quiet_NaN()
+        : evaluateSimulationTime();
+    parameter->closed = trajectory_ref.trajectory.as<Trajectory>().closed;
+    parameter->shape = repack_trajectory();
+
+    applyFollowTrajectoryAction(actor, parameter);
   }
 }
 }  // namespace syntax
