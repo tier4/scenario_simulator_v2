@@ -23,7 +23,7 @@ namespace vehicle
 {
 struct FollowPolylineTrajectoryAction : public VehicleActionNode
 {
-  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> trajectory_parameter;
+  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory;
 
   std::optional<double> target_speed;
 
