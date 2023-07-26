@@ -2,8 +2,8 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.7.0 (2023-07-26)
+------------------
 * Merge pull request `#1044 <https://github.com/tier4/scenario_simulator_v2/issues/1044>`_ from tier4/hotfix/recover_backward_compatibility_1025
 * Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
 * Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
