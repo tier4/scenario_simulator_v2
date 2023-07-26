@@ -49,7 +49,7 @@ auto FollowPolylineTrajectoryAction::calculateObstacle(
 auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 {
   auto ports = VehicleActionNode::providedPorts();
-  ports.emplace(BT::InputPort<decltype(trajectory_parameter)>("polyline_trajectory_parameter"));
+  ports.emplace(BT::InputPort<decltype(trajectory_parameter)>("polyline_trajectory"));
   ports.emplace(BT::InputPort<decltype(target_speed)>("target_speed"));
   return ports;
 }
@@ -58,8 +58,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
-      not getInput<decltype(trajectory_parameter)>(
-        "polyline_trajectory_parameter", trajectory_parameter) or
+      not getInput<decltype(trajectory_parameter)>("polyline_trajectory", trajectory_parameter) or
       not getInput<decltype(target_speed)>("target_speed", target_speed) or
       not trajectory_parameter) {
     return BT::NodeStatus::FAILURE;
