@@ -2,6 +2,24 @@
 
 ## Difference between the latest release and master
 
+Major Changes :race_car: :red_car: :blue_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
 ## Version 0.7.0
 
 Major Changes :race_car: :red_car: :blue_car:
