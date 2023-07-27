@@ -119,9 +119,7 @@ class EntityManager
 
   const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
   const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
-  const std::shared_ptr<
-    V2ITrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>>
-    v2i_traffic_light_publisher_ptr_;
+  const std::shared_ptr<ConfigurableRateUpdater> v2i_traffic_light_publisher_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -144,24 +142,24 @@ public:
     return origin;
   }
 
-  template <typename... Ts>
-  auto makeConventionalTrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
-  {
-    const auto architecture_type =
-      getParameter<std::string>("architecture_type", "awf/universe");
-    if (architecture_type == "awf/universe") {
-      return std::make_shared<ConventionalTrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
-    } else if (architecture_type == "awf/universe/2023.08"){
-      return std::make_shared<ConventionalTrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
-    } else {
-      throw common::SemanticError(
-        "Unexpected architecture_type ", std::quoted(architecture_type),
-        " given for conventional traffic lights simulation.");
-    }
-  }
+//  template <typename... Ts>
+//  auto makeConventionalTrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
+//  {
+//    const auto architecture_type =
+//      getParameter<std::string>("architecture_type", "awf/universe");
+//    if (architecture_type == "awf/universe") {
+//      return std::make_shared<ConventionalTrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
+//    } else if (architecture_type == "awf/universe/2023.08"){
+//      return std::make_shared<ConventionalTrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
+//    } else {
+//      throw common::SemanticError(
+//        "Unexpected architecture_type ", std::quoted(architecture_type),
+//        " given for conventional traffic lights simulation.");
+//    }
+//  }
 
   template <typename... Ts>
-  auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
+  auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<ConfigurableRateUpdater>
   {
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");
