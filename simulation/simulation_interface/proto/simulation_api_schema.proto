@@ -27,6 +27,13 @@ message Result {
 }
 
 /**
+ * Parameter configuration of the traffic light detector emulator
+ **/
+message TrafficLightDetectorEmulatorConfiguration {
+  string architecture_type = 1;        // Autoware architecture type.
+}
+
+/**
  * Parameter configuration of the lidar sensor
  **/
 message LidarConfiguration {
@@ -186,6 +193,20 @@ message UpdateEntityStatusRequest {
 message UpdateEntityStatusResponse {
   Result result = 1;                       // Result of [UpdateEntityStatusRequest](#UpdateEntityStatusRequest)
   UpdatedEntityStatus status = 2;          // Updated entity status in sensor/dynamics simulator
+}
+
+/**
+ * Requests attaching a traffic light detector emulator.
+ **/
+message AttachTrafficLightDetectorEmulatorRequest {
+  TrafficLightDetectorEmulatorConfiguration configuration = 1; // Configuration of the traffic light detector emulator.
+}
+
+/**
+ * Response of attaching a traffic light detector emulator.
+ **/
+message AttachTrafficLightDetectorEmulatorResponse {
+  Result result = 1; // Result of [AttachTrafficLightDetectorEmulatorRequest](#AttachTrafficLightDetectorEmulatorRequest)
 }
 
 /**

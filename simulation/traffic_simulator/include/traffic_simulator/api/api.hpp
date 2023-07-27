@@ -234,6 +234,9 @@ public:
   bool reachPosition(
     const std::string & name, const std::string & target_name, const double tolerance) const;
 
+  bool attachTrafficLightDetectorEmulator(
+    const simulation_api_schema::TrafficLightDetectorEmulatorConfiguration &);
+
   bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
   bool attachLidarSensor(
     const std::string &, const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
