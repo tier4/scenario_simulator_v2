@@ -18,16 +18,15 @@
 namespace traffic_simulator
 {
 template <>
-auto V2ITrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::update()
+auto V2ITrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::update()
   -> void
 {
-  autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;
+  autoware_perception_msgs::msg::TrafficSignalArray traffic_light_state_array;
   {
-    traffic_light_state_array.header.frame_id = sensor_frame_;
-    traffic_light_state_array.header.stamp = clock_ptr_->now();
+    traffic_light_state_array.stamp = clock_ptr_->now();
     for (const auto & [id, traffic_light] : traffic_light_manager_->getTrafficLights()) {
       traffic_light_state_array.signals.push_back(
-        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light));
+        static_cast<autoware_perception_msgs::msg::TrafficSignal>(traffic_light));
     }
   }
   traffic_light_state_array_publisher_->publish(traffic_light_state_array);
