@@ -29,10 +29,6 @@ MultiServer::MultiServer(
     simulation_api_schema::UpdateFrameResponse &)>
     update_frame_func,
   std::function<void(
-    const simulation_api_schema::UpdateSensorFrameRequest &,
-    simulation_api_schema::UpdateSensorFrameResponse &)>
-    update_sensor_frame_func,
-  std::function<void(
     const simulation_api_schema::SpawnVehicleEntityRequest &,
     simulation_api_schema::SpawnVehicleEntityResponse &)>
     spawn_vehicle_entity_func,
@@ -73,7 +69,6 @@ MultiServer::MultiServer(
   socket_(context_, type_),
   initialize_func_(initialize_func),
   update_frame_func_(update_frame_func),
-  update_sensor_frame_func_(update_sensor_frame_func),
   spawn_vehicle_entity_func_(spawn_vehicle_entity_func),
   spawn_pedestrian_entity_func_(spawn_pedestrian_entity_func),
   spawn_misc_object_entity_func_(spawn_misc_object_entity_func),
@@ -111,12 +106,6 @@ void MultiServer::poll()
         simulation_api_schema::UpdateFrameResponse response;
         update_frame_func_(proto.update_frame(), response);
         *sim_response.mutable_update_frame() = response;
-        break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateSensorFrame: {
-        simulation_api_schema::UpdateSensorFrameResponse response;
-        update_sensor_frame_func_(proto.update_sensor_frame(), response);
-        *sim_response.mutable_update_sensor_frame() = response;
         break;
       }
       case simulation_api_schema::SimulationRequest::RequestCase::kSpawnVehicleEntity: {

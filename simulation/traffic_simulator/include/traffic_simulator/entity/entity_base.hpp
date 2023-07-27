@@ -29,7 +29,7 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/job/job_list.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -197,7 +197,7 @@ public:
   virtual auto setLinearVelocity(const double linear_velocity) -> void;
 
   virtual void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> &);
 
   virtual auto activateOutOfRangeJob(
     double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
@@ -228,7 +228,7 @@ protected:
   traffic_simulator_msgs::msg::EntityStatus status_before_update_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-  std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
+  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;
 
   bool npc_logic_started_ = false;
   double stand_still_duration_ = 0.0;

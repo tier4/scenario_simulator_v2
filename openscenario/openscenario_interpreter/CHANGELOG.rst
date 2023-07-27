@@ -2,6 +2,102 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.0 (2023-07-26)
+------------------
+* Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl
+* Merge pull request `#1037 <https://github.com/tier4/scenario_simulator_v2/issues/1037>`_ from tier4/fix/junit-missing-count
+* Fix: JUnit format output contain wrong case count
+* do nothing plugin fix
+* clang format
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change-impl
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge pull request `#906 <https://github.com/tier4/scenario_simulator_v2/issues/906>`_ from tier4/feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge pull request `#1013 <https://github.com/tier4/scenario_simulator_v2/issues/1013>`_ from tier4/feature/rtc_custom_command_action
+* Update accomplished to return false if it is the first call after start
+* Update `follow_trajectory::Parameter` to hold base time
+* Rename data member `Parameter<>::timing_is_absolute`
+* chore: revert CMakeLists.txt in openscenario_interpreter
+* refactor: define sendCooperateCommand in NonStandardOperation
+* Update `FollowTrajectoryAction::accomplished` to work correctly
+* feat: implement RequestToCorporateCommandAction
+* feat(concealer): implement rtc module name conversion
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change
+* Lipsticks
+* feat(openscenario_interpreter): add empty implementation of ApplyRequestToCorporateAction
+* Update to properly calculate remaining time when timing is relative
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge remote-tracking branch 'tier4/master' into pzyskowski/660/ego-entity-split
+* Merge pull request `#1004 <https://github.com/tier4/scenario_simulator_v2/issues/1004>`_ from tier4/feat/v2i_custom_command_action
+* pedestrian and misc object models passed
+* model3d sent via zmq
+* refactor(traffic_simulator, openscenario_interpreter): unify usage timing of plural forms
+* refactor(traffic_simulator, openscenario_interpreter): use reset instead of apply
+* refactor(traffic_simulator, openscenario_interpreter): rename some variable & function name
+* chore(openscenario_interpreter): fix order of command list of CustomCommandAction
+* Merge remote-tracking branch 'origin/master' into feat/v2i_custom_command_action
+* refactor(openscenario_interpreter): ApplyV2ISignalStateAction::start
+* Merge pull request `#1002 <https://github.com/tier4/scenario_simulator_v2/issues/1002>`_ from tier4/feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* refactor: rename traffic_relation to traffic_lights
+* refactor: move method related to traffic signals from CoordinateConversion to NonStandardOperation
+* fix: typo
+* Merge branch 'pzyskowski/660/ego-entity-split' into pzyskowski/660/zmq-interface-change
+* feat: implement update publish rate for V2ITrafficSignalState
+* Update `FunctionCallExpression` to accept `@` as part of function name
+* Cleanup `ApplyFaultInjectionAction<>::start`
+* Merge remote-tracking branch 'origin/master' into feat/v2i_custom_command_action
+* feat(traffic_simulator): implement update publish rate function for traffic lights
+* refactor(traffic_simulator): forward getTrafficLights function to each type of traffic lights
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Lipsticks
+* Add experimental custom command `FaultInjectionAction@v2`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge pull request `#969 <https://github.com/tier4/scenario_simulator_v2/issues/969>`_ from RobotecAI/pzyskowski/660/concealer-split
+* feat(traffic_simulator): enable to set state in V2ITrafficSignalStateAction
+* Delete prints that are worthless to the user
+* feat(traffic_simulator): add empty implementation of V2ITrafficSignalStateAction
+* Update `behavior_plugin` to receive Parameter via `shared_ptr`
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* clang format
+* applied AutowareUser name change to FOA
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Update `FollowPolylineTrajectoryAction` to work if `time` unspecified
+* Update `FollowPolylineTrajectoryAction` to receive parameter
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Lipsticks
+* Update syntax `FollowTrajectoryAction` to request behavior `FollowTrajectory`
+* Rename data member `Polyline::vertex` to `vertices`
+* Update syntax `FollowTrajectoryAction` to hold `Scope`
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, Piotr Zyskowski, Tatsuya Yamasaki, f0reachARR, yamacir-kit
+
 0.6.8 (2023-05-09)
 ------------------
 * Merge pull request `#990 <https://github.com/tier4/scenario_simulator_v2/issues/990>`_ from tier4/fix/cspell_errors

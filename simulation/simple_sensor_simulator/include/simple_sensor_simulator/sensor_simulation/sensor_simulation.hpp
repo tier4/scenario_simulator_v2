@@ -23,6 +23,7 @@
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/occupancy_grid/occupancy_grid_sensor.hpp>
+#include <simple_sensor_simulator/sensor_simulation/traffic_lights/traffic_lights_detector.hpp>
 #include <vector>
 
 namespace simple_sensor_simulator
@@ -30,6 +31,12 @@ namespace simple_sensor_simulator
 class SensorSimulation
 {
 public:
+  explicit SensorSimulation(rclcpp::Node & node)
+  {
+    traffic_lights_detectors_.emplace_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
+      "/perception/traffic_light_recognition/traffic_signals", node));
+  }
+
   auto attachLidarSensor(
     const double current_simulation_time,
     const simulation_api_schema::LidarConfiguration & configuration, rclcpp::Node & node) -> void
@@ -85,12 +92,14 @@ public:
 
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & status);
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status,
+    const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & traffic_signals);
 
 private:
   std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
   std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
   std::vector<std::unique_ptr<OccupancyGridSensorBase>> occupancy_grid_sensors_;
+  std::vector<std::unique_ptr<traffic_lights::TrafficLightsDetector>> traffic_lights_detectors_;
 };
 }  // namespace simple_sensor_simulator
 
