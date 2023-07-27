@@ -113,8 +113,8 @@ try {
         applyAddEntityAction(
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeObjectPosition>()),
-          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian)),
-          traffic_simulator::PedestrianBehavior::defaultBehavior(), pedestrian.model3d;
+          static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian),
+          traffic_simulator::PedestrianBehavior::defaultBehavior(), pedestrian.model3d);
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
