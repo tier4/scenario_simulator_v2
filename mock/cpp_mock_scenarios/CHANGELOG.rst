@@ -2,6 +2,44 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.0 (2023-07-26)
+------------------
+* moved vehicle simulation to simple sensor simulator
+* traffic light test (to be reverted)
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change-impl
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'tier4/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'master' into feature/rtc_custom_command_action
+* Merge pull request `#1011 <https://github.com/tier4/scenario_simulator_v2/issues/1011>`_ from tier4/feature/do_nothing_plugin
+* fix comment
+* fix cmake lint error
+* remove unused white line
+* add description for test case
+* add test case for loading do_nothing plugin
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge remote-tracking branch 'tier4/master' into pzyskowski/660/ego-entity-split
+* Merge pull request `#1004 <https://github.com/tier4/scenario_simulator_v2/issues/1004>`_ from tier4/feat/v2i_custom_command_action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'pzyskowski/660/ego-entity-split' into pzyskowski/660/zmq-interface-change
+* Merge remote-tracking branch 'origin/master' into feat/v2i_custom_command_action
+* refactor(traffic_simulator): forward getTrafficLights function to each type of traffic lights
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, Piotr Zyskowski, yamacir-kit
+
 0.6.8 (2023-05-09)
 ------------------
 * Merge pull request `#979 <https://github.com/tier4/scenario_simulator_v2/issues/979>`_ from RobotecAI/ref/AJD-696_clean_up_metics_traffic_sim
