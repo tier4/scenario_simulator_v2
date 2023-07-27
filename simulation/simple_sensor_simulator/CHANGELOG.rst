@@ -2,6 +2,55 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.0 (2023-07-26)
+------------------
+* Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl
+* Refactor: When despawnEntity() is called, firstly check if entity isEgo() and then assign vectors with removed entity
+* Introduce ifEntityExists() method. Throw error if entity not exists
+* Change variable name. Add const guard
+* Add const &
+* Change including from  to <>
+* Add explicit keyword
+* galactic build fix
+* added deprecated tf2 messages flag to sss cmakelists
+* code cleanup
+* moved vehicle simulation to simple sensor simulator
+* clang format
+* trafic lights moved to simple sensor simulation in unelegant manner
+* moved EES to SSS
+* EES initialized in SSS
+* initializing hdmautils in sss
+* lanelet2 map passing via zmq
+* entity status zmq update
+* utilizing updated entity data
+* map to keep entity status in sss; zmq entity update takes one entity at a time
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* further removed updatesensorframe from zmq interface
+* merged UpdateSensorFrame into UpdateFrameRequest
+* Merge branch 'pzyskowski/660/ego-entity-split' into pzyskowski/660/zmq-interface-change
+* Merge remote-tracking branch 'origin/master' into feat/v2i_custom_command_action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Contributors: Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Piotr Zyskowski, yamacir-kit
+
 0.6.8 (2023-05-09)
 ------------------
 * Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim

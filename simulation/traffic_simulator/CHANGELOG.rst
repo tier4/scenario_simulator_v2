@@ -2,6 +2,253 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.0 (2023-07-26)
+------------------
+* Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl
+* Change comment do doxygen style
+* Add const &
+* Add const &
+* Merge pull request `#1032 <https://github.com/tier4/scenario_simulator_v2/issues/1032>`_ from tier4/feature/update-rviz-config
+* Update simulation/traffic_simulator/config/scenario_simulator_v2.rviz
+* Update traffic_simulator rviz config
+* renamed V2ITrafficLightManager to V2ITrafficLightPublisher
+* do nothing plugin fix
+* typo fix
+* typo fix, unnecessary test removed
+* setting rate for v2i marker
+* code cleanup
+* reset rviz configuration
+* moved vehicle simulation to simple sensor simulator
+* setting publshing rate for marker as well
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change-impl
+* clang format
+* traffic lights cleanup
+* topic configurable from v2i publishers constructor
+* decoupled marker publishing from v2i publishing
+* v2i manager renamed to publisher
+* conventional traffic lights manager no longer used
+* traffic marker publisher class filled
+* traffic ligth marker publisher added
+* traffic light manager passed to publishers
+* Merge pull request `#998 <https://github.com/tier4/scenario_simulator_v2/issues/998>`_ from RobotecAI/pzyskowski/660/ego-entity-split
+* renamed traffic light manager src file
+* moved timer and publishing related fields to time class
+* renamed traffic manager base filename
+* renamed traffic light manager base
+* introduced configured updater as an intermediate class
+* trafic lights moved to simple sensor simulation in unelegant manner
+* Refactor fillLaneletPose() to pure virtual
+* Remove step_time parameter from EgoEntity constructor
+* Add @note to comment
+* Change throwing message. Remove __FILE_\_, __LINE\_\_
+* traffic lights interface change; test fix
+* Move fillLaneletPose() to EntityBase as virtual method. Implement fillLaneletPose() for EgoEntity
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change-impl
+* brought back working version with SSS (break working with AWSIM)
+* Add additional comment slash
+* add todo comment
+* Move funcionality from EntityBase::fillLaneletPose() to EntityManager::fillEgoLaneletPose() because the funcionality is suppose to be use only by EGO entity
+* Remove EgoEntity::getCurrentTwist() which implementation is the same as EntityBase::getCurrentTwist()
+* Fix formatting
+* Change assert() to THROW_SIMULATION_ERROR
+* Change THROW_SEMANTIC_ERROR to THROW_SIMULATION_ERROR
+* Change function name from refillEntityStatusWithLaneletData() to fillLaneletPose()
+* Add todo to comment
+* Code style fix
+* Merge remote-tracking branch 'robo/pzyskowski/660/ego-entity-split' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge pull request `#906 <https://github.com/tier4/scenario_simulator_v2/issues/906>`_ from tier4/feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier4/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'master' into feature/rtc_custom_command_action
+* Merge pull request `#1011 <https://github.com/tier4/scenario_simulator_v2/issues/1011>`_ from tier4/feature/do_nothing_plugin
+* Update `follow_trajectory::Parameter` to hold base time
+* Rename data member `Parameter<>::timing_is_absolute`
+* Merge pull request `#1009 <https://github.com/tier4/scenario_simulator_v2/issues/1009>`_ from tier4/fix/hdmap_utils/get_stop_lines
+* Fix code style divergence
+* Update `EntityBase::requestFollowTrajectory` to throw exception
+* Remove follow clothoid and NURBS trajectory action
+* reintroduced entity publishing
+* working changes
+* fix space line
+* fix space line
+* add getStopLineIdsOnPath function
+* changes to work only with AWSIM
+* moved EES to SSS
+* EES initialized in SSS
+* re refilling lanelet
+* pose and action status overwritten by data received over zmq
+* returning updated status from sim
+* ego status updated before frame update
+* updateing statu sin sim function accepts status
+* split ego and other entities updating
+* single entity status setting
+* update entities before frame update
+* fix(traffic_sim): fix getRouteLanelets as a valid virtual
+* lanelet2 map passing via zmq
+* lanelet refill in EES
+* add doNothing()
+* using hdmap utils from EES
+* using route from EES
+* moved lanelet filling to TS api
+* use passed state instead of internal state to refill lanelet id
+* added hdmaputils to EES
+* Merge remote-tracking branch 'robo/pzyskowski/660/ego-entity-split' into pzyskowski/660/zmq-interface-change
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change
+* entity status zmq update
+* delete space
+* getStopLinesOnPath() changed from private to public
+* Update to properly calculate remaining time when timing is relative
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge remote-tracking branch 'tier4/master' into pzyskowski/660/ego-entity-split
+* fix(traffic_sim): fix missing Oz ll2 correction  in setAutowareState
+* fix(traffic_sim): add setStatus to ego - fix missing setAutowareStatus
+* feat(traffic_sim): add refill status with ll2 method
+* Merge pull request `#1004 <https://github.com/tier4/scenario_simulator_v2/issues/1004>`_ from tier4/feat/v2i_custom_command_action
+* pedestrian and misc object models passed
+* removed uncalled status updates to EES
+* model3d sent via zmq
+* added unique key, pose and initial speed to the spawn vehicle
+* refactor(traffic_simulator, openscenario_interpreter): unify usage timing of plural forms
+* refactor(traffic_simulator, openscenario_interpreter): use reset instead of apply
+* refactor(traffic_simulator, openscenario_interpreter): rename some variable & function name
+* refactor(traffic_simulator): reduce the scope of the variable
+* refactor(traffic_simulator): reduce the scope of the variable
+* refactor(traffic_simulator): rename TrafficLightManagerBase::start into createTimer
+* chore(traffic_simulator): delete unused codes
+* refactor(traffic_simulator): optimize includes of v2i_traffic_light_manager.cpp
+* refactor(traffic_simulator): optimize includes of conventional_traffic_light_manager.hpp
+* refactor(traffic_simulator): optimize includes of v2i_traffic_light_manager.hpp
+* refactor(traffic_simulator): append const to member variable of TrafficLightManagerBase
+* removed updated entity entirely
+* utilizing updated entity data
+* map to keep entity status in sss; zmq entity update takes one entity at a time
+* chore: apply linter
+* chore: apply linter
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* merged UpdateSensorFrame into UpdateFrameRequest
+* refactor
+* chore: delete unused code
+* chore: fix include guard
+* Merge branch 'pzyskowski/660/ego-entity-split' into pzyskowski/660/zmq-interface-change
+* feat: implement update publish rate for V2ITrafficSignalState
+* Merge remote-tracking branch 'origin/master' into feat/v2i_custom_command_action
+* feat(traffic_simulator): add TrafficLightManagerBase::start
+* feat(traffic_simulator): implement update publish rate function for traffic lights
+* refactor(traffic_simulator): forward getTrafficLights function to each type of traffic lights
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* refactor(traffic_simulator): forward getTrafficLights function to each type of traffic lights
+* refactor(traffic_simulator): rename getTrafficRelation to getTrafficLights
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge pull request `#969 <https://github.com/tier4/scenario_simulator_v2/issues/969>`_ from RobotecAI/pzyskowski/660/concealer-split
+* feat(traffic_simulator): add empty implementation of V2ITrafficSignalStateAction
+* refactor(traffic_simulator): implement switching of traffic light managers
+* chore: update traffic light manager tests
+* feat(traffic_simulator): add V2ITrafficLightManager
+* refactor(traffic_simulator): devide traffic light manager into 2 files
+* Update `behavior_plugin` to receive Parameter via `shared_ptr`
+* starting speed simplified
+* initial speed fix
+* initialize changed
+* clang format
+* spell fix
+* spelling, style fixes
+* clang format
+* onUpdate changed to update in EES
+* npc logic started logic fix
+* spawn cleanup, despawn fix
+* simplified ego status setting
+* moved ego simulation to api
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* moved EES outside traffic_simulator namespace
+* clang format
+* npc_logic_started not taken into accoung in EES
+* Revert "in progress"
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* clang format
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* using existing AutwoareUnvierse class template for FOAFor template
+* clang format
+* made concealer namespace unnecesary in FOA template parameter
+* clang format
+* renamed files after AutowareUser class change name
+* applied AutowareUser name change to FOA
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* in progress
+* extracted EES from EE
+* missing rethrow
+* get twist and pose without EES in EE
+* using external status setting
+* externaly set status
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* localization and vehicle state topics published on dedicated therad
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* setInitialState introduced
+* add lanelet pose to entity status
+* extracted setStateInternal
+* EES setStatus uses internal state
+* moved EES update to begining of EE update
+* update previous and publish autoware moved
+* made more fields private
+* currentTwist taken from EES state
+* using pose from EES in getCurrentPose
+* moved status update to EES
+* using state inside EES
+* entity status in EES
+* removed internal state from EES (ego entity simulation)
+* made the status generation time equal to curren sim time
+* privatized some of the ego entity simulation
+* moved previous values and autoware update
+* jerk taken from ego entity sim
+* part of onUpdate moved to ego entity simulation
+* removed spin at the end of an update, moved spin after entity base update
+* getCurrentTwist used from ego_entity_simulation
+* using getCurrentAccel from ego entity simulation
+* setAutowareState from ego entity simulation
+* getCurrentPose used from ego_entity_simulation
+* requestSpeedChange used from EgoEntitySimulation
+* fields from within ego entity simulation
+* made it work
+* ego entity simulation class
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* added small comments
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* clang format
+* removed update function from user side of concelear
+* setVelocityRepor, setOdometry, current_pose and current_velocity moved
+* setGearSign, getsetGearCommand, getVehicleCommand separated
+* acceleration, steering report and velocity moved
+* removed timer for autoware update
+* extracted getAcceleration
+* renamde AutowareUniverse to AutowareUniverseUser
+* renamed Autoware to AutowareUser
+* renamed autoware to autoware_user
+* concealer in main thread
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Cleanup
+* Update `FollowPolylineTrajectoryAction` to receive parameter
+* Add accessors for `Follow*TrajectoryAction` to `BehaviorPluginBase`
+* Fix typo
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Update enumeration `traffic_simulator::behavior::Request`
+* Add new behavior request `Request::FOLLOW_TRAJECTORY`
+* Add new API `requestFollowTrajectory`
+* Add new struct `follow_trajectory::Parameter` for behavior plugin
+* Contributors: Dawid Moszynski, Dawid Moszyński, Kosuke Takeuchi, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Piotr Zyskowski, Tatsuya Yamasaki, hrjp, kosuke55, yamacir-kit
+
 0.6.8 (2023-05-09)
 ------------------
 * Merge pull request `#979 <https://github.com/tier4/scenario_simulator_v2/issues/979>`_ from RobotecAI/ref/AJD-696_clean_up_metics_traffic_sim
