@@ -95,7 +95,7 @@ jobs:
           mkdir -p ./markdown/Classes
           doxybook2 --input ./build/ --output ./markdown -c config.json
       - name: Generate documentation
-        run: mkdocs build
+        run: poetry run mkdocs build
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
