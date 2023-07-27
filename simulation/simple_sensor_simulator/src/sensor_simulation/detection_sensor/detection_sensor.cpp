@@ -27,22 +27,16 @@
 
 namespace simple_sensor_simulator
 {
-auto DetectionSensorBase::getDetectedObjects(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
-  -> std::vector<std::string>
+
+auto DetectionSensorBase::isWithinRange(
+  const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pose2, double range) const -> bool
 {
-  std::vector<std::string> detected_objects;
-  const auto pose = getSensorPose(statuses);
-  for (const auto & status : statuses) {
-    if (double distance = std::hypot(
-          status.pose().position().x() - pose.position().x(),
-          status.pose().position().y() - pose.position().y(),
-          status.pose().position().z() - pose.position().z());
-        status.name() != configuration_.entity() && distance <= configuration_.range()) {
-      detected_objects.emplace_back(status.name());
-    }
-  }
-  return detected_objects;
+  auto distanceX = pose1.position().x() - pose2.position().x();
+  auto distanceY = pose1.position().y() - pose2.position().y();
+  auto distanceZ = pose1.position().z() - pose2.position().z();
+
+  double distance = std::hypot(distanceX, distanceY, distanceZ);
+  return distance <= range;
 }
 
 auto DetectionSensorBase::getSensorPose(
@@ -56,6 +50,59 @@ auto DetectionSensorBase::getSensorPose(
     }
   }
   throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
+}
+
+auto DetectionSensorBase::getEntityPose(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & entity_statuses,
+  const std::string & entity_string) const -> geometry_msgs::Pose
+{
+  for (const auto & entity_status : entity_statuses) {
+    if (entity_status.name() == entity_string) {
+      return entity_status.pose();
+    }
+  }
+
+  auto errorMessage =
+    configuration_.detect_all_objects_in_range()
+      ? "Filtered object is not includes in entity statuses"
+      : "Detected object by lidar sensor is not included in lidar detected entity";
+
+  throw SimulationRuntimeError(errorMessage);
+}
+
+auto DetectionSensorBase::getDetectedObjects(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
+  -> std::vector<std::string>
+{
+  std::vector<std::string> detected_objects;
+  const auto pose = getSensorPose(statuses);
+
+  for (const auto & status : statuses) {
+    if (status.name() != configuration_.entity() && isWithinRange(status.pose(), pose, 300.0)) {
+      detected_objects.emplace_back(status.name());
+    }
+  }
+
+  return detected_objects;
+}
+
+auto DetectionSensorBase::filterObjectsBySensorRange(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & entity_statuses,
+  const std::vector<std::string> & selected_entity_strings,
+  const double detection_sensor_range) const -> std::vector<std::string>
+{
+  std::vector<std::string> detected_objects;
+  const auto sensor_pose = getSensorPose(entity_statuses);
+
+  for (const auto & selected_entity_status : selected_entity_strings) {
+    const auto selected_entity_pose = getEntityPose(entity_statuses, selected_entity_status);
+    if (
+      selected_entity_status != configuration_.entity() &&
+      isWithinRange(selected_entity_pose, sensor_pose, detection_sensor_range)) {
+      detected_objects.emplace_back(selected_entity_status);
+    }
+  }
+  return detected_objects;
 }
 
 template <>
@@ -84,8 +131,13 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     return object_classification;
   };
   if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
-    const std::vector<std::string> detected_objects{
-      configuration_.filter_by_range() ? getDetectedObjects(statuses) : lidar_detected_entity};
+    std::vector<std::string> detected_objects;
+    auto detected_entities = configuration_.detect_all_objects_in_range()
+                               ? getDetectedObjects(statuses)
+                               : lidar_detected_entity;
+
+    detected_objects =
+      filterObjectsBySensorRange(statuses, detected_entities, configuration_.range());
     autoware_auto_perception_msgs::msg::DetectedObjects msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = "map";

@@ -45,7 +45,7 @@ message DetectionSensorConfiguration {
   double update_duration = 2;           // Update duration of the detection sensor. (unit : second)
   double range = 3;                     // Sensor detection range. (unit : meter)
   string architecture_type = 4;         // Autoware architecture type.
-  bool filter_by_range = 5;             // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
+  bool detect_all_objects_in_range = 5;             // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
   double pos_noise_stddev = 6;          // standard deviation of position noise.
   int32 random_seed = 7;                // random_seed for noise generation.
   double probability_of_lost = 8;       // probability of lost recognition. (0.0 ~ 1.0)
@@ -63,7 +63,7 @@ message OccupancyGridSensorConfiguration {
   uint32 height = 5;            // Height of the occupancy grid. (unit : pixel)
   string architecture_type = 6; // Autoware architecture type.
   double range = 7;             // Sensor detection range. (unit : meter)
-  bool filter_by_range = 8;     // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
+  bool detect_all_objects_in_range = 8;     // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
 }
 
 /**

@@ -42,6 +42,17 @@ protected:
   {
   }
 
+  auto isWithinRange(
+    const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pose2, double range) const
+    -> bool;
+
+  auto filterObjectsBySensorRange(
+    const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::vector<std::string> &,
+    const double) const -> std::vector<std::string>;
+
+  auto getEntityPose(const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::string &)
+    const -> geometry_msgs::Pose;
+
   auto getDetectedObjects(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
     -> std::vector<std::string>;
 
@@ -95,6 +106,7 @@ template <>
 auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
   const std::vector<std::string> & lidar_detected_entity) -> void;
+
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
