@@ -62,6 +62,9 @@ public:
     const simulation_api_schema::UpdateEntityStatusRequest & req,
     simulation_api_schema::UpdateEntityStatusResponse & res);
   void call(
+    const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & req,
+    simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse & res);
+  void call(
     const simulation_api_schema::AttachLidarSensorRequest & req,
     simulation_api_schema::AttachLidarSensorResponse & res);
   void call(

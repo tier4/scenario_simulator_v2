@@ -323,6 +323,7 @@ message SimulationRequest {
     AttachDetectionSensorRequest attach_detection_sensor = 9;
     AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsRequest update_traffic_lights = 11;
+    AttachTrafficLightDetectorEmulatorRequest attach_traffic_light_detector_emulator = 12;
   }
 }
 
@@ -343,5 +344,6 @@ message SimulationResponse {
     AttachDetectionSensorResponse attach_detection_sensor = 10;
     AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 11;
     UpdateTrafficLightsResponse update_traffic_lights = 12;
+    AttachTrafficLightDetectorEmulatorResponse attach_traffic_light_detector_emulator = 13;
   }
 }

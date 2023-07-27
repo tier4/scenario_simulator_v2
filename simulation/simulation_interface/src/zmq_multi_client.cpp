@@ -136,6 +136,19 @@ void MultiClient::call(
   }
 }
 void MultiClient::call(
+  const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & req,
+  simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse & res)
+{
+        if (is_running) {
+        simulation_api_schema::SimulationRequest sim_request;
+        simulation_api_schema::SimulationResponse sim_response;
+
+        *sim_request.mutable_attach_traffic_light_detector_emulator() = req;
+        call(sim_request, sim_response);
+        res = sim_response.attach_traffic_light_detector_emulator();
+        }
+}
+void MultiClient::call(
   const simulation_api_schema::AttachLidarSensorRequest & req,
   simulation_api_schema::AttachLidarSensorResponse & res)
 {
