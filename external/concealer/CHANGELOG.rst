@@ -2,6 +2,118 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.0 (2023-07-26)
+------------------
+* Merge pull request `#1044 <https://github.com/tier4/scenario_simulator_v2/issues/1044>`_ from tier4/hotfix/recover_backward_compatibility_1025
+* Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* fix(concealer): compile errors
+* fix(concealer): recover backward-compatibility for tier4_rtc_msgs
+* Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl
+* Merge pull request `#1025 <https://github.com/tier4/scenario_simulator_v2/issues/1025>`_ from tier4/hotfix/add_start_planner_for_rtc
+* clang format
+* chore: delete output for debug
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change-impl
+* brought back working version with SSS (break working with AWSIM)
+* chore: apply linter
+* refactor: update debug message
+* refactor: refactor rtc status filter
+* fix: fix rtc status command_status filter
+* chore: update rtc status filter
+* fix: improve rtc status filter
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Update field_operator_application_for_autoware_universe.cpp
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge pull request `#1013 <https://github.com/tier4/scenario_simulator_v2/issues/1013>`_ from tier4/feature/rtc_custom_command_action
+* chore: apply yamasaki-san's patch
+* refactor:
+* chore: fix clang-format error
+* fix(concealer): support for modules that may or may not exist
+* refactor:
+* chore: delete unused function in FieldOperatorApplicationFor<AutowareUniverse>
+* refactor: define sendCooperateCommand in NonStandardOperation
+* fix(concealer): delete PULL_OUT
+* feat: implement RequestToCorporateCommandAction
+* working set goal and drive
+* working changes
+* feat(concealer): implement rtc module name conversion
+* debug autoware launch command
+* fix(concealer): fix compile error
+* feat(concealer): implement FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommands
+* using route from EES
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'pzyskowski/660/ego-entity-split' into pzyskowski/660/zmq-interface-change
+* Merge remote-tracking branch 'origin/master' into feat/v2i_custom_command_action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge pull request `#969 <https://github.com/tier4/scenario_simulator_v2/issues/969>`_ from RobotecAI/pzyskowski/660/concealer-split
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* clang format
+* using existing AutwoareUnvierse class template for FOAFor template
+* clang format
+* made concealer namespace unnecesary in FOA template parameter
+* clang format
+* renamed files after AutowareUser class change name
+* applied AutowareUser name change to FOA
+* applied review comment
+* removed question about is_stop_requested
+* style, compactness fixes
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* atomic initialization fix
+* accel, twist and pose threading fix
+* clang format
+* localization and vehicle state topics published on dedicated therad
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* ego entity simulation class
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* clang format
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* minor style changes - comments only
+* removed unnecessary logs
+* clang format
+* threading fix, style fix
+* SubscriberWrapper implementation unification
+* formatting fix
+* brought setndSIGINT back to protected
+* removed friendliness between Autoware and ContinuouosTransformBroadcaster
+* clang format
+* thread safe subscriber wrapper
+* unified subscriber intefrace
+* removed dirty hack file
+* Comments describing autoware class added
+* removed unnecessary reference symbol
+* clang format
+* code cleanup
+* in progress
+* cleared dirty hack file
+* removed update function from user side of concelear
+* setTurnIndicatorReport moved, getTurnIndicatorCommand copied
+* setVelocityRepor, setOdometry, current_pose and current_velocity moved
+* setControlModeReport moved
+* setGearSign, getsetGearCommand, getVehicleCommand separated
+* acceleration, steering report and velocity moved
+* removed timer for autoware update
+* chagned all publishers to wrapper
+* publisher wrapper
+* extracted getAcceleration
+* subscriber wrapper
+* simulator wrapper
+* renamed concelaer node to concealer_suer
+* renamde AutowareUniverse to AutowareUniverseUser
+* adjusted header guards
+* renamed Autoware to AutowareUser
+* renamed autoware to autoware_user
+* removed unnecessary includes
+* removed atomics from sub and pubs in concealer
+* concealer in main thread
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.6.8 (2023-05-09)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/interpreter/model3d-field
