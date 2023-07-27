@@ -5,7 +5,6 @@ description = "A scenario-based simulation framework for Autoware"
 authors = ["Masaya Kataoka <ms.kataoka@gmail.com>"]
 license = "Apache 2.0"
 readme = "README.md"
-packages = [{include = "scenario_simulator_v2"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
