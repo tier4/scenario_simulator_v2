@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "scenario-simulator-v2"
+name = "docs"
 version = "0.7.0"
 description = "A scenario-based simulation framework for Autoware"
 authors = ["Masaya Kataoka <ms.kataoka@gmail.com>"]
