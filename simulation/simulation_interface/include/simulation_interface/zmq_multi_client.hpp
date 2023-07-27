@@ -47,9 +47,6 @@ public:
     const simulation_api_schema::UpdateFrameRequest & req,
     simulation_api_schema::UpdateFrameResponse & res);
   void call(
-    const simulation_api_schema::UpdateSensorFrameRequest & req,
-    simulation_api_schema::UpdateSensorFrameResponse & res);
-  void call(
     const simulation_api_schema::SpawnVehicleEntityRequest & req,
     simulation_api_schema::SpawnVehicleEntityResponse & res);
   void call(
