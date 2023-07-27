@@ -206,7 +206,7 @@ OpenSCENARIO:
                                       roadId: ''
                                       laneId: '34696'
                                       s: 30
-                                      offset: 0
+                                      offset: -1
                                       Orientation:
                                         type: relative
                                         h: 0
@@ -266,7 +266,7 @@ OpenSCENARIO:
                                     RelativeObjectPosition:
                                       entityRef: ego
                                       dx: 20
-                                      dy: 0
+                                      dy: -1
                                       dz: 0
                                       Orientation:
                                         type: relative
