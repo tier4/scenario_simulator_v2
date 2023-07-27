@@ -150,6 +150,61 @@ TEST(CatmullRomSpline, GetSValue)
   EXPECT_FALSE(spline.getSValue(p, 3));
 }
 
+TEST(CatmullRomSpline, GetSValue2)
+{
+  geometry_msgs::msg::Point p0;
+  p0.x = 89122.2;
+  p0.y = 43364.1;
+  p0.z = 3.13364;
+  geometry_msgs::msg::Point p1;
+  p1.x = 89122.5;
+  p1.y = 43363.8;
+  p1.z = 3.13364;
+  geometry_msgs::msg::Point p2;
+  p2.x = 89122.8;
+  p2.y = 43363.4;
+  p2.z = 3.13364;
+  geometry_msgs::msg::Point p3;
+  p3.x = 89123.1;
+  p3.y = 43363.0;
+  p3.z = 3.13364;
+  geometry_msgs::msg::Point p4;
+  p4.x = 89123.4;
+  p4.y = 43362.6;
+  p4.z = 3.13364;
+  auto points = {p0, p1, p2, p3, p4};
+  auto spline = math::geometry::CatmullRomSpline(points);
+  geometry_msgs::msg::Pose p;
+  p.position.x = 89122.8;
+  p.position.y = 43363.4;
+  p.position.z = 3.13364;
+  p.orientation.x = -0.0159808;
+  p.orientation.y = -0.00566353;
+  p.orientation.z = -0.453507;
+  p.orientation.w = 0.891092;
+  {
+    const auto result = spline.getSValue(p);
+    EXPECT_TRUE(result);
+    if (result) {
+      EXPECT_DOUBLE_EQ(result.value(), 0.92433178422155371);
+    }
+  }
+  p.position.x = 89122.5;
+  p.position.y = 43363.8;
+  p.position.z = 3.13364;
+  p.orientation.x = 0.0159365;
+  p.orientation.y = -0.00578704;
+  p.orientation.z = -0.446597;
+  p.orientation.w = 0.894575;
+  {
+    const auto result = spline.getSValue(p);
+    EXPECT_TRUE(result);
+    if (result) {
+      EXPECT_DOUBLE_EQ(result.value(), 0.42440442127906564);
+    }
+  }
+}
+
 TEST(CatmullRomSpline, GetTrajectory)
 {
   geometry_msgs::msg::Point p0;

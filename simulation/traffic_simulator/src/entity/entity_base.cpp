@@ -48,7 +48,7 @@ EntityBase::EntityBase(
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
 
-auto EntityBase::asAutoware() const -> concealer::Autoware &
+auto EntityBase::asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &
 {
   throw common::Error(
     "An operation was requested for Entity ", std::quoted(name),
@@ -212,6 +212,39 @@ auto EntityBase::getLaneletPose(double matching_distance) const
   }
   return std::nullopt;
 }
+
+auto EntityBase::fillLaneletPose(
+  traffic_simulator_msgs::msg::EntityStatus & status, bool include_crosswalk) const -> void
+{
+  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
+
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+
+  if (unique_route_lanelets.empty()) {
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+      status.pose, getStatus().bounding_box, include_crosswalk, 1.0);
+  } else {
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+    if (!lanelet_pose) {
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+        status.pose, getStatus().bounding_box, include_crosswalk, 1.0);
+    }
+  }
+  if (lanelet_pose) {
+    math::geometry::CatmullRomSpline spline(
+      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+    if (const auto s_value = spline.getSValue(status.pose)) {
+      status.pose.position.z = spline.getPoint(s_value.value()).z;
+    }
+  }
+
+  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
+  if (status.lanelet_pose_valid) {
+    status.lanelet_pose = lanelet_pose.value();
+  }
+}
+
+auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
 
 auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
   -> geometry_msgs::msg::Pose
@@ -619,6 +652,13 @@ void EntityBase::requestSpeedChange(
   }
 }
 
+auto EntityBase::requestFollowTrajectory(
+  const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &) -> void
+{
+  THROW_SEMANTIC_ERROR(
+    getEntityTypename(), " type entities do not support follow trajectory action.");
+}
+
 void EntityBase::requestWalkStraight()
 {
   THROW_SEMANTIC_ERROR(getEntityTypename(), " type entities do not support WalkStraightAction");
@@ -696,7 +736,7 @@ auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 }
 
 void EntityBase::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & traffic_light_manager)
+  const std::shared_ptr<traffic_simulator::TrafficLightManager> & traffic_light_manager)
 {
   traffic_light_manager_ = traffic_light_manager;
 }

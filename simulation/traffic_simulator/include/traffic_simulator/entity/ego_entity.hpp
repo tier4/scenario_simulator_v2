@@ -18,70 +18,35 @@
 #include <algorithm>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <boost/filesystem.hpp>
-#include <concealer/autoware_universe.hpp>
+#include <concealer/autoware.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <memory>
 #include <optional>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/vehicle_model/sim_model.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
-
-template <typename T>
-auto getParameter(const std::string & name, T value = {})
-{
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  node.declare_parameter<T>(name, value);
-  node.get_parameter<T>(name, value);
-
-  return value;
-}
 
 namespace traffic_simulator
 {
 namespace entity
 {
-enum class VehicleModelType {
-  DELAY_STEER_ACC,
-  DELAY_STEER_ACC_GEARED,
-  DELAY_STEER_VEL,
-  IDEAL_STEER_ACC,
-  IDEAL_STEER_ACC_GEARED,
-  IDEAL_STEER_VEL,
-};
-
 class EgoEntity : public VehicleEntity
 {
-  const std::unique_ptr<concealer::Autoware> autoware;
+  const std::unique_ptr<concealer::FieldOperatorApplication> field_operator_application;
 
-  const VehicleModelType vehicle_model_type_;
+  static auto makeFieldOperatorApplication(const Configuration &)
+    -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
-  const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
-
-  std::optional<geometry_msgs::msg::Pose> initial_pose_;
-
-  std::optional<double> previous_linear_velocity_, previous_angular_velocity_;
-
-  static auto getVehicleModelType() -> VehicleModelType;
-
-  static auto makeAutoware(const Configuration &) -> std::unique_ptr<concealer::Autoware>;
-
-  static auto makeSimulationModel(
-    const VehicleModelType, const double step_time,
-    const traffic_simulator_msgs::msg::VehicleParameters &)
-    -> const std::shared_ptr<SimModelInterface>;
+  traffic_simulator_msgs::msg::EntityStatus externally_updated_status_;
 
 public:
   explicit EgoEntity() = delete;
 
   explicit EgoEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
-    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
-    const double step_time);
+    const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 
@@ -93,13 +58,11 @@ public:
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
 
-  auto asAutoware() const -> concealer::Autoware & override;
+  auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication & override;
 
   auto getCurrentAction() const -> std::string override;
 
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
-
-  auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
@@ -114,7 +77,7 @@ public:
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteLanelets() const -> std::vector<std::int64_t>;
+  auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
@@ -143,7 +106,7 @@ public:
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
 
-  auto setStatus(const CanonicalizedEntityStatus & status) -> void override;
+  auto setStatusExternally(const CanonicalizedEntityStatus & status) -> void;
 
   void requestSpeedChange(double, bool continuous) override;
 
@@ -151,6 +114,8 @@ public:
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   auto setVelocityLimit(double) -> void override;
+
+  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

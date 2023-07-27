@@ -99,7 +99,7 @@ auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::
   return behavior_plugin_ptr_->getObstacle();
 }
 
-auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t>
+auto VehicleEntity::getRouteLanelets(double horizon) const -> std::vector<std::int64_t>
 {
   if (status_.laneMatchingSucceed()) {
     return route_planner_.getRouteLanelets(
@@ -220,6 +220,14 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   requestAssignRoute(route);
 }
 
+auto VehicleEntity::requestFollowTrajectory(
+  const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> & parameter)
+  -> void
+{
+  behavior_plugin_ptr_->setFollowPolylineTrajectoryParameter(parameter);
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+}
+
 void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
@@ -282,10 +290,17 @@ void VehicleEntity::setBehaviorParameter(
 }
 
 void VehicleEntity::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr)
+  const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
 {
   EntityBase::setTrafficLightManager(ptr);
   behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
 }
+
+auto VehicleEntity::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const
+  -> void
+{
+  EntityBase::fillLaneletPose(status, false);
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator

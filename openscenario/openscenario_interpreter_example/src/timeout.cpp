@@ -123,7 +123,7 @@ int main(const int argc, char const * const * const argv)
     std::chrono::milliseconds(100), [&]() { publisher->publish(make_message(status)); });
 #else
   std::cout
-    << "The ability to have ROS2 topics as values for `UserDefinedValueCondition` is enabled only "
+    << "The ability to have ROS 2 topics as values for `UserDefinedValueCondition` is enabled only "
        "when the `UserDefinedValue` type is present in the `tier4_simulation_msgs` package."
     << std::endl;
 #endif

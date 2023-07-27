@@ -42,6 +42,10 @@ struct Configuration
 
   std::string simulator_host = "localhost";
 
+  double conventional_traffic_light_publish_rate = 30.0;
+
+  double v2i_traffic_light_publish_rate = 10.0;
+
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  This setting comes from the argument of the same name (= `map_path`) in

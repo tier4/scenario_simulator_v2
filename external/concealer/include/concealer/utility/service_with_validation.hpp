@@ -16,7 +16,7 @@
 #define CONCEALER__SERVICE_WITH_VALIDATION_HPP_
 
 #include <chrono>
-#include <concealer/autoware.hpp>
+#include <concealer/field_operator_application.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
@@ -27,7 +27,8 @@ template <typename T>
 class ServiceWithValidation
 {
 public:
-  explicit ServiceWithValidation(const std::string & service_name, Autoware & autoware)
+  explicit ServiceWithValidation(
+    const std::string & service_name, FieldOperatorApplication & autoware)
   : service_name(service_name),
     logger(autoware.get_logger()),
     client(autoware.create_client<T>(service_name, rmw_qos_profile_default)),

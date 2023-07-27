@@ -35,6 +35,7 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
@@ -96,13 +97,14 @@ public:
   auto spawn(
     const std::string & name, const Pose & pose,
     const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-    const std::string & behavior = VehicleBehavior::defaultBehavior())
+    const std::string & behavior = VehicleBehavior::defaultBehavior(),
+    const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration, clock_.getStepTime());
+                 name, pose, parameters, configuration);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, behavior);
@@ -117,7 +119,11 @@ public:
         simulation_api_schema::SpawnVehicleEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
+        req.set_asset_key(model3d);
+        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
+        /// @todo Should be filled from function API
+        req.set_initial_speed(0.0);
         zeromq_client_.call(req, res);
         return res.result().success();
       }
@@ -126,11 +132,19 @@ public:
     return register_to_entity_manager() and register_to_environment_simulator();
   }
 
+  geometry_msgs::msg::Pose toMapPose(const geometry_msgs::msg::Pose & pose) { return pose; }
+
+  geometry_msgs::msg::Pose toMapPose(const traffic_simulator_msgs::msg::LaneletPose & pose)
+  {
+    return entity_manager_ptr_->getHdmapUtils()->toMapPose(pose).pose;
+  }
+
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
     const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
-    const std::string & behavior = PedestrianBehavior::defaultBehavior())
+    const std::string & behavior = PedestrianBehavior::defaultBehavior(),
+    const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       using traffic_simulator::entity::PedestrianEntity;
@@ -145,6 +159,8 @@ public:
         simulation_api_schema::SpawnPedestrianEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
+        req.set_asset_key(model3d);
+        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         zeromq_client_.call(req, res);
         return res.result().success();
       }
@@ -156,7 +172,8 @@ public:
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
-    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
+    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters,
+    const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       using traffic_simulator::entity::MiscObjectEntity;
@@ -171,6 +188,8 @@ public:
         simulation_api_schema::SpawnMiscObjectEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
+        req.set_asset_key(model3d);
+        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         zeromq_client_.call(req, res);
         return res.result().success();
       }
@@ -250,7 +269,7 @@ public:
   }                                                                        \
   static_assert(true, "")
 
-  FORWARD_TO_ENTITY_MANAGER(asAutoware);
+  FORWARD_TO_ENTITY_MANAGER(asFieldOperatorApplication);
   FORWARD_TO_ENTITY_MANAGER(cancelRequest);
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
@@ -274,9 +293,10 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficLight);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficLights);
-  FORWARD_TO_ENTITY_MANAGER(getTrafficRelationReferees);
+  FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
+  FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLights);
+  FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
+  FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
@@ -286,6 +306,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
+  FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
@@ -295,6 +316,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
+  FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
+  FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
+  FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 #undef FORWARD_TO_ENTITY_MANAGER
@@ -308,8 +332,9 @@ public:
     -> std::optional<CanonicalizedLaneletPose>;
 
 private:
-  bool updateSensorFrame();
   bool updateEntityStatusInSim();
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> updateEntityStatusInSim(
+    const std::string & entity_name, traffic_simulator_msgs::msg::EntityStatus status);
   bool updateTrafficLightsInSim();
 
   const Configuration configuration;

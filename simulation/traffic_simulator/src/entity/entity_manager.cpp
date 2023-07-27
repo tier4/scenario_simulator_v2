@@ -522,7 +522,8 @@ void EntityManager::requestLaneChange(
 
 bool EntityManager::trafficLightsChanged()
 {
-  return traffic_light_manager_ptr_->hasAnyLightChanged();
+  return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
+         v2i_traffic_light_manager_ptr_->hasAnyLightChanged();
 }
 
 void EntityManager::requestSpeedChange(
@@ -576,6 +577,18 @@ auto EntityManager::setEntityStatus(
   }
 }
 
+auto EntityManager::setEntityStatusExternally(
+  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+{
+  if (not isEgo(name)) {
+    THROW_SEMANTIC_ERROR(
+      "You cannot set entity status externally to the vehicle other than ego named ",
+      std::quoted(name), ".");
+  } else {
+    dynamic_cast<EgoEntity *>(entities_[name].get())->setStatusExternally(status);
+  }
+}
+
 void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;
@@ -611,7 +624,11 @@ void EntityManager::update(const double current_time, const double step_time)
   current_time_ = current_time;
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
-    traffic_light_manager_ptr_->update(step_time_);
+    conventional_traffic_light_marker_publisher_ptr_->createTimer(
+      configuration.conventional_traffic_light_publish_rate);
+    v2i_traffic_light_publisher_ptr_->createTimer(configuration.v2i_traffic_light_publish_rate);
+    v2i_traffic_light_marker_publisher_ptr_->createTimer(
+      configuration.v2i_traffic_light_publish_rate);
   }
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
@@ -672,5 +689,6 @@ void EntityManager::startNpcLogic()
     it->second->startNpcLogic();
   }
 }
+
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -22,6 +22,8 @@ extra:
 plugins:
   - search
   - git-revision-date-localized
+  - redirects:
+      redirect_maps:
 
 copyright: "Copyright &copy; 2022 TIER IV, Inc."
 
@@ -61,9 +63,6 @@ nav:
       - Scenario Writing Tips: user_guide/ScenarioTips.md
       - Scenario Editor:
           - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
-          - user_guide/scenario_editor/CreateSimpleScenario.md
-          - user_guide/scenario_editor/EditExistingScenario.md
-          - user_guide/scenario_editor/ChangeCoordinate.md
           - Place an entity to relative position: user_guide/scenario_editor/RelativePosition.md
       - Scenario Test Runner:
           - Overview: user_guide/scenario_test_runner/ScenarioTestRunner.md

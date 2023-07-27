@@ -4,6 +4,50 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
+| Feature              | Brief summary                                                                                                         | Category            | Pull request                                                    | Contributor                                   |
+|----------------------|-----------------------------------------------------------------------------------------------------------------------|---------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| Canonicalize lanelet | Canonicalize lanelet pose and re-calculate s value when the s value in lanelet pose under 0 or over lanelet's length. | `traffic_simulator` | [#924](https://github.com/tier4/scenario_simulator_v2/pull/924) | [hakuturu583](https://github.com/hakuturu583) |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+## Version 0.7.0
+
+Major Changes :race_car: :red_car: :blue_car:
+
+| Feature                                                  | Brief summary                                                                                                                                             | Category                                        | Pull request                                                      | Contributor                                   |
+|----------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------------|
+| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Added `FaultInjectionAction@v2`, a CustomCommandAction for raising a fault injection event with specified error level.                                    | `openscenario_interpreter`                      | [#1002](https://github.com/tier4/scenario_simulator_v2/pull/1002) | [yamacir-kit](https://github.com/yamacir-kit) |
+| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Added `V2ITrafficSignalStateAction`, an implementation of `TrafficSignalState` for V2I traffic signals.                                                   | `openscenario_interpreter`, `traffic_simulator` | [#1004](https://github.com/tier4/scenario_simulator_v2/pull/1004) | [HansRobo](https://github.com/HansRobo)       |
+| Add do noting behavior plugin                            | Add do nothing behavior for driving the simulator from Autoware rosbag data.                                                                              | `do_nothing_plugin`,`traffic_simulator`         | [#1001](https://github.com/tier4/scenario_simulator_v2/pull/1011) | [hakuturu583](https://github.com/hakuturu583) |
+| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Added `RequestToCooperateCommandAction@v1`, a CustomCommandAction to simulate an operation by humans or external applications for a request to cooperate. | `openscenario_interpreter`, `concealer`         | [#1013](https://github.com/tier4/scenario_simulator_v2/pull/1013) | [HansRobo](https://github.com/HansRobo)       |
+| + OpenSCENARIO 1.2 `FollowTrajectoryAction`              | Support `FollowTrajectoryAction` only for vehicle entities directly controlled by the simulator.                                                          | `openscenario_interpreter`, `traffic_simulator` | [#906](https://github.com/tier4/scenario_simulator_v2/pull/906)   | [yamacir-kit](https://github.com/yamacir-kit) |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+## Version 0.6.8
+
+Major Changes :race_car: :red_car: :blue_car:
+
 | Feature                                                              | Brief summary                                                                                                                                                                                            | Category                   | Pull request                                                    | Contributor                                   |
 |----------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------|-----------------------------------------------------------------|-----------------------------------------------|
 | Jerk simulation and planning                                         | Start supporting jerk simulation and enable limit jerk while effecting `API::requestSpeedChange` function.                                                                                               | `traffic_simulator`        | [#909](https://github.com/tier4/scenario_simulator_v2/pull/909) | [hakuturu583](https://github.com/hakuturu583) |
@@ -18,17 +62,16 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature                                  | Brief summary                                                                                                  | Category                                    | Pull request                                                    | Contributor                                   |
-|------------------------------------------|----------------------------------------------------------------------------------------------------------------|---------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------|
-| Behavior "stop"                          | Update NPC behavior and avoid overrun.                                                                         | `traffic_simulator`, `behavior_tree_plugin` | [#946](https://github.com/tier4/scenario_simulator_v2/pull/946) | [hakuturu583](https://github.com/hakuturu583) |
-| `vehicle_model`                          | Import bug fixes from `simple_planning_simulator` in Autoware.Universe for `vehicle_model`.                    | `traffic_simulator`                         | [#936](https://github.com/tier4/scenario_simulator_v2/pull/936) | [HansRobo](https://github.com/HansRobo)       |
-| Next/previous lanelet                    | Enable get next/previous lanelet with `road_shoulder` subtype.                                                 | `traffic_simulator`                         | [#963](https://github.com/tier4/scenario_simulator_v2/pull/963) | [hakuturu583](https://github.com/hakuturu583) |
-| Clamp lanelet while specify lanelet pose | Clamp lanelet pose and re-calculate s value when the s value in lanelet pose under 0 or over lanelet's length. | `traffic_simulator`                         | [#924](https://github.com/tier4/scenario_simulator_v2/pull/924) | [hakuturu583](https://github.com/hakuturu583) |
+| Feature               | Brief summary                                                                               | Category                                    | Pull request                                                    | Contributor                                   |
+|-----------------------|---------------------------------------------------------------------------------------------|---------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------|
+| Behavior "stop"       | Update NPC behavior and avoid overrun.                                                      | `traffic_simulator`, `behavior_tree_plugin` | [#946](https://github.com/tier4/scenario_simulator_v2/pull/946) | [hakuturu583](https://github.com/hakuturu583) |
+| `vehicle_model`       | Import bug fixes from `simple_planning_simulator` in Autoware.Universe for `vehicle_model`. | `traffic_simulator`                         | [#936](https://github.com/tier4/scenario_simulator_v2/pull/936) | [HansRobo](https://github.com/HansRobo)       |
+| Next/previous lanelet | Enable get next/previous lanelet with `road_shoulder` subtype.                              | `traffic_simulator`                         | [#963](https://github.com/tier4/scenario_simulator_v2/pull/963) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 
 | Feature                                  | Brief summary                                                                                                               | Category                                | Pull request                                                    | Contributor                                   |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- | --------------------------------------------------------------- | --------------------------------------------- |
+|------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|-----------------------------------------------------------------|-----------------------------------------------|
 | `topic_status_checker`                   | Delete `topic_status_checker` package.                                                                                      | common                                  | [#921](https://github.com/tier4/scenario_simulator_v2/pull/921) | [HansRobo](https://github.com/HansRobo)       |
 | Health check                             | Supported a function to monitor whether the running simulator has become unresponsive.                                      | common                                  | [#932](https://github.com/tier4/scenario_simulator_v2/pull/932) | [yamacir-kit](https://github.com/yamacir-kit) |
 | OpenSCENARIO `UserDefinedValueCondition` | Remove the message type package `openscenario_msgs` and moved its contents to an external repository `tier4_autoware_msgs`. | `openscenario_interpreter`              | [#874](https://github.com/tier4/scenario_simulator_v2/pull/874) | [yamacir-kit](https://github.com/yamacir-kit) |
@@ -36,6 +79,7 @@ Minor Tweaks :oncoming_police_car:
 | OpenSCENARIO `UserDefinedValueCondition` | Support ADAPI interface for minimum-risk-maneuver state with backward compatibility for legacy emergency state              | `openscenario_interpreter`, `concealer` | [#975](https://github.com/tier4/scenario_simulator_v2/pull/975) | [HansRobo](https://github.com/HansRobo)       |
 | Port management                          | Change communication between `traffic_simulator` and `simple_sensor_simulator` from multi-port to single-port.              | `simulation_interface`                  | [#981](https://github.com/tier4/scenario_simulator_v2/pull/981) | [dmoszynski](https://github.com/dmoszynski)   |
 | OpenSCENARIO `model3d` in entity object  | Add `model3d` attribute parsing in entity objects.                                                                          | `openscenario_interpreter`              | [#977](https://github.com/tier4/scenario_simulator_v2/pull/977) | [f0reachARR](https://github.com/f0reachARR)   |
+
 ## Version 0.6.7
 
 Major Changes :race_car: :red_car: :blue_car:
@@ -134,7 +178,7 @@ Major Changes :race_car: :red_car: :blue_car:
 | Feature                                       | Brief summary                                                                                                                                                            | Category                                                          | Pull request                                                    | Contributor                                   |
 |-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------------------------------|-----------------------------------------------|
 | Entity label publisher                        | Enable specify and publish NPC semantic information such as `MOTORCYCLE`, `TRUCK`, `BUS`.                                                                                | `traffic_simulator`                                               | [#726](https://github.com/tier4/scenario_simulator_v2/pull/726) | [hakuturu583](https://github.com/hakuturu583) |
-| ROS2 Launch XML-like substitution syntax      | Add new substitution syntax `$(ros2 <argument>...)`.                                                                                                                     | `openscenario_interpreter`                                        | [#727](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
+| ROS 2 Launch XML-like substitution syntax     | Add new substitution syntax `$(ros2 <argument>...)`.                                                                                                                     | `openscenario_interpreter`                                        | [#727](https://github.com/tier4/scenario_simulator_v2/pull/727) | [yamacir-kit](https://github.com/yamacir-kit) |
 | `Filter by range` option                      | Add `filter by range` option for detection sensor. If false, simulate detection result by lidar detection. If true, simulate detection result by range.                  | `traffic_simulator`                                               | [#729](https://github.com/tier4/scenario_simulator_v2/pull/729) | [hakuturu583](https://github.com/hakuturu583) |
 | Optimization of the trajectory calculation    | Hermite curve optimization, entities' trajectories calculated only when route changes                                                                                    | `traffic_simulator`, `behavior_tree_plugin`                       | [#708](https://github.com/tier4/scenario_simulator_v2/pull/708) | [danielm1405](https://github.com/danielm1405) |
 | OpenSCENARIO `Controller.Properties.Property` | Support new controller property `isClairvoyant`.                                                                                                                         | `openscenario_interpreter`                                        | [#735](https://github.com/tier4/scenario_simulator_v2/pull/735) | [yamacir-kit](https://github.com/yamacir-kit) |
@@ -162,7 +206,7 @@ Minor Tweaks :oncoming_police_car:
 ## Version 0.6.3
 - Speed up metrics manger class in order to reduce frame-rate dropping problem. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/680))
 - Fix problem in warping NPCs spawned in world coordinate. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/686))
-- End of support for ROS2 Foxy and Autoware.Auto ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/696)).
+- End of support for ROS 2 Foxy and Autoware.Auto ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/696)).
 - Fix problem in ideal steer acc geared dynamics model. Vehicle was pulled back very slowly even if the vehicle is stopped. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/698))
 - Fix problem in getFrontEntityName function, consider yaw difference while stopping at crossing entity. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/703))
 - Fix problem in delay steer acc geared dynamics model. Vehicle was pulled back very slowly even if the vehicle is stopped. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/707))
@@ -207,7 +251,7 @@ Minor Tweaks :oncoming_police_car:
 - Add NPC Behavior Plugin and Behavior-Tree Plugin for Vehicle and Pedestrian. ([link](https://github.com/tier4/scenario_simulator_v2/pull/566))
 - Rename package `openscenario_msgs` to `traffic_simulator_msgs`
 - Start supporting galactic environment with Docker. ([link](https://github.com/tier4/scenario_simulator_v2/pull/576))
-- Update `UserDefinedValueCondition` to subscribe ROS2 topic if path-like name given ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/567)).
+- Update `UserDefinedValueCondition` to subscribe ROS 2 topic if path-like name given ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/567)).
 - Add new package `openscenario_msgs` ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/567)).
 - Add getNearbyLaneletIds and filterLaneletIds function in HdMapUtils class. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/585))
 - Fix calculating way of longitudinal distance. If forward distance and backward distance was calculated, choose smaller one. ([pull request](https://github.com/tier4/scenario_simulator_v2/pull/586))
@@ -289,7 +333,7 @@ Minor Tweaks :oncoming_police_car:
 - Update AcquirePositionAction to support WorldPosition as destination.
 - Update syntax 'RoadNetwork.LogicFile' to allow user to specify the directory that contains `lanelet2_map.osm`.
 - Check boost::none in TargetSpeedPlanner class.
-- Add ROS2 galactic support.
+- Add ROS 2 galactic support.
 - Update EgoEntity to publish self-position as PoseWithCovarianceStamped.
 
 ## Version 0.3.0

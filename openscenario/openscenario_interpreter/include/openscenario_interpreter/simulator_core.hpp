@@ -184,12 +184,6 @@ public:
       position.rpy.z = std::numeric_limits<double>::quiet_NaN();
       return position;
     }
-
-    template <typename... Ts>
-    static auto toWayIDs(Ts &&... xs) -> decltype(auto)
-    {
-      return core->getTrafficRelationReferees(std::forward<decltype(xs)>(xs)...);
-    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
@@ -290,7 +284,7 @@ public:
           return configuration;
         }());
 
-        core->asAutoware(entity_ref)
+        core->asFieldOperatorApplication(entity_ref)
           .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
       }
     }
@@ -305,6 +299,12 @@ public:
     static auto applyDeleteEntityAction(Ts &&... xs)
     {
       return core->despawn(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto applyFollowTrajectoryAction(Ts &&... xs)
+    {
+      return core->requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -409,9 +409,9 @@ public:
     }
 
     template <typename... Ts>
-    static auto asAutoware(Ts &&... xs) -> decltype(auto)
+    static auto asFieldOperatorApplication(Ts &&... xs) -> decltype(auto)
     {
-      return core->asAutoware(std::forward<decltype(xs)>(xs)...);
+      return core->asFieldOperatorApplication(std::forward<decltype(xs)>(xs)...);
     }
 
     static auto activateNonUserDefinedControllers() -> decltype(auto)
@@ -444,6 +444,37 @@ public:
       } else {
         return Double::nan();
       }
+    }
+
+    template <typename... Ts>
+    static auto getConventionalTrafficLights(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getConventionalTrafficLights(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto getV2ITrafficLights(Ts &&... xs) -> decltype(auto)
+    {
+      return core->getV2ITrafficLights(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto resetConventionalTrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->resetConventionalTrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto resetV2ITrafficLightPublishRate(Ts &&... xs) -> decltype(auto)
+    {
+      return core->resetV2ITrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto sendCooperateCommand(Ts &&... xs) -> decltype(auto)
+    {
+      return asFieldOperatorApplication(core->getEgoName())
+        .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
     }
   };
 };

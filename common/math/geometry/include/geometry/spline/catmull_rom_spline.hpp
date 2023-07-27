@@ -42,7 +42,7 @@ public:
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution, double offset = 0.0) const;
   std::optional<double> getSValue(
-    const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0);
+    const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0) const;
   double getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, double s) const;
   geometry_msgs::msg::Vector3 getSquaredDistanceVector(
     const geometry_msgs::msg::Point & point, double s) const;
@@ -58,6 +58,7 @@ public:
     double width, double s, double z_offset = 0) const;
   const std::vector<geometry_msgs::msg::Point> getPolygon(
     double width, size_t num_points = 30, double z_offset = 0);
+  const std::vector<geometry_msgs::msg::Point> control_points;
 
 private:
   const std::vector<geometry_msgs::msg::Point> getRightBounds(
@@ -73,7 +74,6 @@ private:
   std::vector<double> length_list_;
   std::vector<double> maximum_2d_curvatures_;
   double total_length_;
-  const std::vector<geometry_msgs::msg::Point> control_points;
 };
 }  // namespace geometry
 }  // namespace math

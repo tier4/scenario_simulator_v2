@@ -2,6 +2,199 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.0 (2023-07-26)
+------------------
+* Merge pull request `#1044 <https://github.com/tier4/scenario_simulator_v2/issues/1044>`_ from tier4/hotfix/recover_backward_compatibility_1025
+* Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Update external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* fix(concealer): compile errors
+* fix(concealer): recover backward-compatibility for tier4_rtc_msgs
+* Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl
+* Merge pull request `#1025 <https://github.com/tier4/scenario_simulator_v2/issues/1025>`_ from tier4/hotfix/add_start_planner_for_rtc
+* clang format
+* chore: delete output for debug
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change-impl
+* brought back working version with SSS (break working with AWSIM)
+* chore: apply linter
+* refactor: update debug message
+* refactor: refactor rtc status filter
+* fix: fix rtc status command_status filter
+* chore: update rtc status filter
+* fix: improve rtc status filter
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Update field_operator_application_for_autoware_universe.cpp
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge pull request `#1013 <https://github.com/tier4/scenario_simulator_v2/issues/1013>`_ from tier4/feature/rtc_custom_command_action
+* chore: apply yamasaki-san's patch
+* refactor:
+* chore: fix clang-format error
+* fix(concealer): support for modules that may or may not exist
+* refactor:
+* chore: delete unused function in FieldOperatorApplicationFor<AutowareUniverse>
+* refactor: define sendCooperateCommand in NonStandardOperation
+* fix(concealer): delete PULL_OUT
+* feat: implement RequestToCorporateCommandAction
+* working set goal and drive
+* working changes
+* feat(concealer): implement rtc module name conversion
+* debug autoware launch command
+* fix(concealer): fix compile error
+* feat(concealer): implement FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommands
+* using route from EES
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'pzyskowski/660/ego-entity-split' into pzyskowski/660/zmq-interface-change
+* Merge remote-tracking branch 'origin/master' into feat/v2i_custom_command_action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge pull request `#969 <https://github.com/tier4/scenario_simulator_v2/issues/969>`_ from RobotecAI/pzyskowski/660/concealer-split
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* clang format
+* using existing AutwoareUnvierse class template for FOAFor template
+* clang format
+* made concealer namespace unnecesary in FOA template parameter
+* clang format
+* renamed files after AutowareUser class change name
+* applied AutowareUser name change to FOA
+* applied review comment
+* removed question about is_stop_requested
+* style, compactness fixes
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* atomic initialization fix
+* accel, twist and pose threading fix
+* clang format
+* localization and vehicle state topics published on dedicated therad
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* ego entity simulation class
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* clang format
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* minor style changes - comments only
+* removed unnecessary logs
+* clang format
+* threading fix, style fix
+* SubscriberWrapper implementation unification
+* formatting fix
+* brought setndSIGINT back to protected
+* removed friendliness between Autoware and ContinuouosTransformBroadcaster
+* clang format
+* thread safe subscriber wrapper
+* unified subscriber intefrace
+* removed dirty hack file
+* Comments describing autoware class added
+* removed unnecessary reference symbol
+* clang format
+* code cleanup
+* in progress
+* cleared dirty hack file
+* removed update function from user side of concelear
+* setTurnIndicatorReport moved, getTurnIndicatorCommand copied
+* setVelocityRepor, setOdometry, current_pose and current_velocity moved
+* setControlModeReport moved
+* setGearSign, getsetGearCommand, getVehicleCommand separated
+* acceleration, steering report and velocity moved
+* removed timer for autoware update
+* chagned all publishers to wrapper
+* publisher wrapper
+* extracted getAcceleration
+* subscriber wrapper
+* simulator wrapper
+* renamed concelaer node to concealer_suer
+* renamde AutowareUniverse to AutowareUniverseUser
+* adjusted header guards
+* renamed Autoware to AutowareUser
+* renamed autoware to autoware_user
+* removed unnecessary includes
+* removed atomics from sub and pubs in concealer
+* concealer in main thread
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
+0.6.8 (2023-05-09)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/model3d-field
+* Merge branch 'master' into feature/interpreter/environment
+* Merge branch 'master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge branch 'master' into fix/cleanup_code
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/AJD-697_improve_port_management_zmq
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/delay_in_condition
+* Merge pull request `#978 <https://github.com/tier4/scenario_simulator_v2/issues/978>`_ from tier4/feature/interpreter/relative-heading-condition
+* Merge remote-tracking branch 'origin/master' into clean-dicts
+* Merge branch 'master' into feature/interpreter/model3d-field
+* Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
+* Merge branch 'master' into feature/noise_delay_object
+* Rename `service_with_validation.h` to `service_with_validation.hpp`
+* Fix missing header include
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/relative-heading-condition
+* Merge pull request `#975 <https://github.com/tier4/scenario_simulator_v2/issues/975>`_ from tier4/emergency-state/backwardcompatibility-1
+* refactor(concealer)
+* refactor(concealer): delete mrm merger
+* fix build errors & linter errors
+* refactor(concealer): divide callback function
+* Use adapi as default
+* Use adapi as default
+* Merge remote-tracking branch 'origin/master' into emergency-state/backwardcompatibility-1
+* Merge remote-tracking branch 'origin/emergency-state/latest' into emergency-state/backwardcompatibility-1
+* Fix msg name
+* use __has_include
+* modify CMakeLists.txt
+* Merge pull request `#965 <https://github.com/tier4/scenario_simulator_v2/issues/965>`_ from tier4/emergency-state/latest-behavior
+* feat(concealer): implement MRM behavior interface
+* chore: delete commented line in package.xml
+* chore: add debug messages
+* feat(concealer): change mrm state behavior when no source exists
+* feat(concealer): add MinimumRiskManeuverMerger
+* feat(concealer): add MinimumRiskManeuverMerger
+* refactor(concealer): delete unused operator overload
+* Merge branch 'master' into import/universe-2437
+* chore(concealer): apply linter
+* feat(concealer): implement EmergencyState interface for Autoware.Universe
+* refactor(concealer): update EmergencyState interface for Autoware
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/alive-monitoring
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge branch 'master' into feature/get_lateral_distance
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge pull request `#927 <https://github.com/tier4/scenario_simulator_v2/issues/927>`_ from tier4/chore/remove_had_map_rouute
+* chore: apply ament_clang_format
+* feat(concealer): branch MrmState type depending on whether there is　autoware_adapi_v1_msgs
+* feat(concealer): branch MrmState type depending on whether there is　autoware_adapi_v1_msgs
+* chore: add autoware_adapi_v1_msgs as an option
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* Merge remote-tracking branch 'origin/master' into feature/traveled_distance_as_api
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge pull request `#930 <https://github.com/tier4/scenario_simulator_v2/issues/930>`_ from tier4/emergency-state/import-pr929
+* fix(concealer): remove unnecessary wait for autoware states
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge pull request `#929 <https://github.com/tier4/scenario_simulator_v2/issues/929>`_ from mitsudome-r/fix/remove-unnecessary-waits
+* Merge branch 'master' into feature/simple_noise_simulator
+* fix(concealer): remove unnecessary wait for autoware states
+* chore(concealer): remove unused had_map_route msg
+* Merge remote-tracking branch 'origin/master' into feature/empty/parameter_value_distribution-fixed
+* Merge remote-tracking branch 'origin/master' into feature/add_setgoalposes_api
+* chore: apply clang-format
+* fix!(UserDefinedValueCondition): convert mrm state to emergency state
+* fix!(concealer): use MrmState instead of EmergencyState
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/jerk_planning
+* Merge remote-tracking branch 'origin/master' into fix/cleanup_code
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/user-defined-value-condition
+* Merge remote-tracking branch 'origin/master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into feature/improve_occupancy_grid_algorithm
+* Merge branch 'master' into fix_wrong_merge
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/use_job_in_standstill_duration
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, MasayaKataoka, Shota Minami, Tatsuya Yamasaki, f0reachARR, hrjp, kosuke55, kyoichi-sugahara, mitsudome-r, yamacir-kit
+
 0.6.7 (2022-11-17)
 ------------------
 * refactor(preprocessor): modify struct name
