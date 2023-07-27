@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__DATA_TYPE__FOLLOW_TRAJECTORY_HPP_
-#define TRAFFIC_SIMULATOR__DATA_TYPE__FOLLOW_TRAJECTORY_HPP_
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_
 
-#include <geometry_msgs/msg/pose.hpp>
 #include <optional>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -33,4 +32,4 @@ auto makeUpdatedStatus(
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__DATA_TYPE__FOLLOW_TRAJECTORY_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_

@@ -17,8 +17,8 @@
 
 #include <optional>
 #include <string>
+#include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
-#include <traffic_simulator/data_type/follow_trajectory.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
