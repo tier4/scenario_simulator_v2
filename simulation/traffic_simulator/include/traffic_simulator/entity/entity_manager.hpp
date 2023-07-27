@@ -142,21 +142,21 @@ public:
     return origin;
   }
 
-//  template <typename... Ts>
-//  auto makeConventionalTrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
-//  {
-//    const auto architecture_type =
-//      getParameter<std::string>("architecture_type", "awf/universe");
-//    if (architecture_type == "awf/universe") {
-//      return std::make_shared<ConventionalTrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
-//    } else if (architecture_type == "awf/universe/2023.08"){
-//      return std::make_shared<ConventionalTrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
-//    } else {
-//      throw common::SemanticError(
-//        "Unexpected architecture_type ", std::quoted(architecture_type),
-//        " given for conventional traffic lights simulation.");
-//    }
-//  }
+  //  template <typename... Ts>
+  //  auto makeConventionalTrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
+  //  {
+  //    const auto architecture_type =
+  //      getParameter<std::string>("architecture_type", "awf/universe");
+  //    if (architecture_type == "awf/universe") {
+  //      return std::make_shared<ConventionalTrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
+  //    } else if (architecture_type == "awf/universe/2023.08"){
+  //      return std::make_shared<ConventionalTrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
+  //    } else {
+  //      throw common::SemanticError(
+  //        "Unexpected architecture_type ", std::quoted(architecture_type),
+  //        " given for conventional traffic lights simulation.");
+  //    }
+  //  }
 
   template <typename... Ts>
   auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<ConfigurableRateUpdater>
@@ -164,7 +164,9 @@ public:
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");
         architecture_type.find("awf/universe") != std::string::npos) {
-      return std::make_shared<V2ITrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
+      return std::make_shared<
+        V2ITrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
+        std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),
@@ -190,7 +192,8 @@ public:
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    conventional_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
+    conventional_traffic_light_manager_ptr_(
+      std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
     conventional_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(conventional_traffic_light_manager_ptr_, node)),
     v2i_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),

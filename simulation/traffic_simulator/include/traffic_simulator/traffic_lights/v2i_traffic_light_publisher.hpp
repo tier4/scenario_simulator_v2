@@ -48,16 +48,14 @@ public:
   }
 
 private:
-  virtual auto update() -> void override {
+  virtual auto update() -> void override
+  {
     Message traffic_light_array_message;
-    if constexpr (std::is_same_v<
-                    Message,
-                    autoware_perception_msgs::msg::TrafficSignalArray>) {
+    if constexpr (std::is_same_v<Message, autoware_perception_msgs::msg::TrafficSignalArray>) {
       traffic_light_array_message.stamp = clock_ptr_->now();
       for (const auto & [id, traffic_light] : traffic_light_manager_->getTrafficLights()) {
         traffic_light_array_message.signals.push_back(
-          static_cast<typename Message::_signals_type::value_type>(
-            traffic_light));
+          static_cast<typename Message::_signals_type::value_type>(traffic_light));
       }
     } else {
       static_assert(true, "Unsupported message type");
