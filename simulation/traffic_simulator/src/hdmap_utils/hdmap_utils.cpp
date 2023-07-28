@@ -135,7 +135,7 @@ auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
     }
   };
 
-  /// @note If s value unders 0, it means this pose is on the previous lanelet.
+  /// @note If s value under 0, it means this pose is on the previous lanelet.
   if (lanelet_pose.s < 0) {
     return canonicalize_to_previous_lanelet(lanelet_pose);
   }
