@@ -3059,7 +3059,7 @@ Visualization Manager:
           Enabled: false
           Name: Simple Sensor Simulator
       Enabled: false
-      Name: scenario simulator v2 information
+      Name: Simulation
   Enabled: true
   Global Options:
     Background Color: 10; 10; 10
