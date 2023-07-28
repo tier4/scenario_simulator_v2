@@ -253,14 +253,24 @@ auto EntityManager::getLongitudinalDistance(
   bool include_adjacent_lanelet, bool include_opposite_direction) -> std::optional<double>
 {
   if (!include_adjacent_lanelet) {
-    auto forward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
-      static_cast<LaneletPose>(from), static_cast<LaneletPose>(to));
+    auto to_canonicalized = static_cast<LaneletPose>(to);
+    if (to.hasAlternativeLaneletPose()) {
+      if (
+        const auto to_canonicalized_optional = to.getAlternativeLaneletPoseBaseOnShortestRouteFrom(
+          static_cast<LaneletPose>(from), hdmap_utils_ptr_)) {
+        to_canonicalized = to_canonicalized_optional.value();
+      }
+    }
 
-    auto backward_distance = hdmap_utils_ptr_->getLongitudinalDistance(
-      static_cast<LaneletPose>(to), static_cast<LaneletPose>(from));
+    const auto forward_distance =
+      hdmap_utils_ptr_->getLongitudinalDistance(static_cast<LaneletPose>(from), to_canonicalized);
+
+    const auto backward_distance =
+      hdmap_utils_ptr_->getLongitudinalDistance(to_canonicalized, static_cast<LaneletPose>(from));
 
     if (forward_distance && backward_distance) {
-      return std::min(forward_distance.value(), std::abs(backward_distance.value()));
+      return forward_distance.value() > backward_distance.value() ? -backward_distance.value()
+                                                                  : forward_distance.value();
     } else if (forward_distance) {
       return forward_distance.value();
     } else if (backward_distance) {
