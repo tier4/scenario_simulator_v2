@@ -80,7 +80,8 @@ EgoEntity::EgoEntity(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
-  field_operator_application(makeFieldOperatorApplication(configuration))
+  field_operator_application(makeFieldOperatorApplication(configuration)),
+  externally_updated_status_(entity_status)
 {
 }
 
