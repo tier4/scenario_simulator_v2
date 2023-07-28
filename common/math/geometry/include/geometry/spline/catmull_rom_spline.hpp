@@ -45,7 +45,8 @@ public:
     const double offset = 0.0) const -> std::vector<geometry_msgs::msg::Point>;
   auto getSValue(const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0) const
     -> std::optional<double>;
-  double getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, const double s) const;
+  auto getSquaredDistanceIn2D(const geometry_msgs::msg::Point & point, const double s) const
+    -> double;
   auto getSquaredDistanceVector(const geometry_msgs::msg::Point & point, const double s) const
     -> geometry_msgs::msg::Vector3;
   auto getCollisionPointIn2D(
