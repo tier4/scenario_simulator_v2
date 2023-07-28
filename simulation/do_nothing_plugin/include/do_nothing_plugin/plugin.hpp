@@ -73,11 +73,11 @@ public:                                                                \
 private:                                                               \
   TYPE FIELD_NAME;
   // clang-format off
-  DEFINE_GETTER_SETTER(CurrentTime,       double,                                         current_time_)
-  DEFINE_GETTER_SETTER(StepTime,          double,                                         step_time_)
-  DEFINE_GETTER_SETTER(EntityStatus,      traffic_simulator_msgs::msg::EntityStatus,      entity_status_)
-  DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter, behavior_parameter_)
-  DEFINE_GETTER_SETTER(UpdatedStatus,     traffic_simulator_msgs::msg::EntityStatus,      updated_status_)
+  DEFINE_GETTER_SETTER(CurrentTime,       double,                                                          current_time_)
+  DEFINE_GETTER_SETTER(StepTime,          double,                                                          step_time_)
+  DEFINE_GETTER_SETTER(EntityStatus,      std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>,   entity_status_)
+  DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter,                  behavior_parameter_)
+  DEFINE_GETTER_SETTER(UpdatedStatus,     std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>,   updated_status_)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };

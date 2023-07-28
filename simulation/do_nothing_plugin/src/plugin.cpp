@@ -20,7 +20,8 @@ void DoNothingBehavior::configure(const rclcpp::Logger &) {}
 
 void DoNothingBehavior::update(double current_time, double)
 {
-  entity_status_.time = current_time;
+  entity_status_ = traffic_simulator::CanonicalizedEntityStatus(
+    static_cast<traffic_simulator::EntityStatus>(*entity_status_).set__time(current_time));
   setUpdatedStatus(entity_status_);
 }
 

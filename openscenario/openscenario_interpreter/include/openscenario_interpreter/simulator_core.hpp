@@ -72,7 +72,7 @@ public:
   {
   protected:
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
-    static auto convert(const geometry_msgs::msg::Pose & pose)
+    static auto convert(const geometry_msgs::msg::Pose & pose) -> T
     {
       if (const auto result = core->toLaneletPose(pose, false); result) {
         return result.value();
