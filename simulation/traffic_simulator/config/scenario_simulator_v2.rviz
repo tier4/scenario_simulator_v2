@@ -2906,6 +2906,18 @@ Visualization Manager:
       Displays:
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
+          Name: Debug Marker
+          Namespaces:
+            {}
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /simulation/debug_marker
+          Value: true
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: true
           Name: Entity Marker
           Namespaces:
             ego: true
@@ -3060,7 +3072,7 @@ Visualization Manager:
                 Value: /perception/occupancy_grid_map/map_updates
               Use Timestamp: false
               Value: false
-          Enabled: false
+          Enabled: true
           Name: Simple Sensor Simulator
       Enabled: false
       Name: Simulation
