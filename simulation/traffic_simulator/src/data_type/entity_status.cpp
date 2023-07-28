@@ -72,6 +72,11 @@ auto CanonicalizedEntityStatus::canonicalize(
   return canonicalized;
 }
 
+auto CanonicalizedEntityStatus::getName() const noexcept -> std::string
+{
+  return entity_status_.name;
+}
+
 auto CanonicalizedEntityStatus::getBoundingBox() const noexcept
   -> traffic_simulator_msgs::msg::BoundingBox
 {

@@ -54,6 +54,7 @@ public:
   auto setLinearJerk(double) -> void;
   auto getLinearJerk() const noexcept -> double;
   auto getTime() const noexcept -> double;
+  auto getName() const noexcept -> std::string;
 
 private:
   auto canonicalize(

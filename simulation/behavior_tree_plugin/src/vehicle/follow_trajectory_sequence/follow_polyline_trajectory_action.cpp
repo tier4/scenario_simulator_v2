@@ -29,7 +29,7 @@ auto FollowPolylineTrajectoryAction::calculateWaypoints()
   -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   auto waypoints = traffic_simulator_msgs::msg::WaypointsArray();
-  waypoints.waypoints.push_back(entity_status.pose.position);
+  waypoints.waypoints.push_back(entity_status->getMapPose().position);
   for (const auto & vertex : parameter->shape.vertices) {
     waypoints.waypoints.push_back(vertex.position.position);
   }
@@ -108,7 +108,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         time".
     */
     if (parameter->base_time and not std::isnan(parameter->shape.vertices.front().time)) {
-      parameter->base_time = entity_status.time;
+      parameter->base_time = entity_status->getTime();
     }
 
     if (std::rotate(
@@ -135,12 +135,14 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     return BT::NodeStatus::FAILURE;
   } else if (parameter->shape.vertices.empty()) {
     return BT::NodeStatus::SUCCESS;
-  } else if (const auto position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
+  } else if (const auto position = entity_status->getMapPose().position;
+             any(is_infinity_or_nan, position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name), " coordinate value contains NaN or infinity. The value is [",
-      position.x, ", ", position.y, ", ", position.z, "].");
+      std::quoted(entity_status->getName()),
+      " coordinate value contains NaN or infinity. The value is [", position.x, ", ", position.y,
+      ", ", position.z, "].");
   } else if (
     /*
        We've made sure that parameter->shape.vertices is not empty, so a
@@ -152,7 +154,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name),
+      std::quoted(entity_status->getName()),
       "'s target position coordinate value contains NaN or infinity. The value is [",
       target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
   } else if (
@@ -163,7 +165,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
       hypot(position, target_position), (parameter->base_time ? *parameter->base_time : 0.0) +
                                           parameter->shape.vertices.front().time -
-                                          entity_status.time);
+                                          entity_status->getTime());
     /*
        This clause is to avoid division-by-zero errors in later clauses with
        distance_to_front_waypoint as the denominator if the distance
@@ -196,7 +198,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
           if (const auto remaining_time = (parameter->base_time ? *parameter->base_time : 0.0) +
                                           first_waypoint_with_arrival_time_specified->time -
-                                          entity_status.time;
+                                          entity_status->getTime();
               /*
                  The condition below should ideally be remaining_time < 0.
 
@@ -221,7 +223,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
               */
               remaining_time < -step_time) {
             throw common::Error(
-              "Vehicle ", std::quoted(entity_status.name),
+              "Vehicle ", std::quoted(entity_status->getName()),
               " failed to reach the trajectory waypoint at the specified time. The specified time "
               "is ",
               first_waypoint_with_arrival_time_specified->time, " (in ",
@@ -242,13 +244,13 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     isApproximatelyEqualTo(distance, 0.0)) {
     pop();
     return tick();
-  } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
+  } else if (const auto acceleration = entity_status->getAccel().linear.x;  // [m/s^2]
              isinf(acceleration) or isnan(acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name), "'s acceleration value is NaN or infinity. The value is ",
-      acceleration, ".");
+      std::quoted(entity_status->getName()),
+      "'s acceleration value is NaN or infinity. The value is ", acceleration, ".");
   } else if (const auto max_acceleration = std::min(
                acceleration /* [m/s^2] */ +
                  behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
@@ -258,7 +260,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name),
+      std::quoted(entity_status->getName()),
       "'s maximum acceleration value is NaN or infinity. The value is ", max_acceleration, ".");
   } else if (const auto min_acceleration = std::max(
                acceleration /* [m/s^2] */ -
@@ -269,15 +271,15 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name),
+      std::quoted(entity_status->getName()),
       "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ".");
-  } else if (const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
+  } else if (const auto speed = entity_status->getTwist().linear.x;  // [m/s]
              isinf(speed) or isnan(speed)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ", speed,
-      ".");
+      std::quoted(entity_status->getName()), "'s speed value is NaN or infinity. The value is ",
+      speed, ".");
   } else if (
     /*
        The desired acceleration is the acceleration at which the destination
@@ -320,7 +322,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name),
+      std::quoted(entity_status->getName()),
       "'s desired acceleration value contains NaN or infinity. The value is ", desired_acceleration,
       ".");
   } else if (
@@ -335,8 +337,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name), "'s desired speed value is NaN or infinity. The value is ",
-      desired_speed, ".");
+      std::quoted(entity_status->getName()),
+      "'s desired speed value is NaN or infinity. The value is ", desired_speed, ".");
   } else if (const auto desired_velocity =
                [&]() {
                  /*
@@ -363,7 +365,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(entity_status.name),
+      std::quoted(entity_status->getName()),
       "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
       desired_velocity.y, ", ", desired_velocity.z, "].");
   } else {
@@ -502,8 +504,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
         return tick();  // tail recursion
       } else {
         throw common::SimulationError(
-          "Vehicle ", std::quoted(entity_status.name), " arrived at the waypoint in trajectory ",
-          remaining_time_to_front_waypoint,
+          "Vehicle ", std::quoted(entity_status->getName()),
+          " arrived at the waypoint in trajectory ", remaining_time_to_front_waypoint,
           " seconds earlier than the specified time. This may be due to unrealistic conditions of "
           "arrival time specification compared to vehicle parameters and dynamic constraints.");
       }
@@ -518,7 +520,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
     velocity = truncate(velocity + steering, desired_speed);
 
-    auto updated_status = entity_status;
+    auto updated_status = static_cast<traffic_simulator::EntityStatus>(*entity_status);
 
     updated_status.pose.position += velocity * step_time;
 
@@ -538,22 +540,21 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 
     updated_status.action_status.twist.angular =
       quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
-        entity_status.pose.orientation, updated_status.pose.orientation)) /
+        entity_status->getMapPose().orientation, updated_status.pose.orientation)) /
       step_time;
 
     updated_status.action_status.accel.linear =
-      (updated_status.action_status.twist.linear - entity_status.action_status.twist.linear) /
-      step_time;
+      (updated_status.action_status.twist.linear - entity_status->getTwist().linear) / step_time;
 
     updated_status.action_status.accel.angular =
-      (updated_status.action_status.twist.angular - entity_status.action_status.twist.angular) /
-      step_time;
+      (updated_status.action_status.twist.angular - entity_status->getTwist().angular) / step_time;
 
-    updated_status.time = entity_status.time + step_time;
+    updated_status.time = entity_status->getTime() + step_time;
 
     updated_status.lanelet_pose_valid = false;
 
-    setOutput("updated_status", updated_status);
+    setOutput(
+      "updated_status", traffic_simulator::CanonicalizedEntityStatus(updated_status, hdmap_utils));
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
 

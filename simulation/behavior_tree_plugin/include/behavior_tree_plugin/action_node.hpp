@@ -84,7 +84,7 @@ public:
       BT::InputPort<std::optional<double>>("target_speed"),
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("entity_status"),
-      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManagerBase>>("traffic_light_manager"),
+      BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>("traffic_light_manager"),
       BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>("entity_type_list"),
       BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
