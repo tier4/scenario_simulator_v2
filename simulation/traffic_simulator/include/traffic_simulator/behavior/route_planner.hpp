@@ -23,26 +23,28 @@
 
 namespace traffic_simulator
 {
+/// @brief This class cache waypoints and planning waypoints.
+/// @todo Currently, in order to cache waypoints, cancelRoute() member function has const. This class should be refactored.
 class RoutePlanner
 {
 public:
   explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   auto getRouteLanelets(const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon = 100)
-    -> std::vector<std::int64_t>;
+    const -> std::vector<std::int64_t>;
 
   auto setWaypoints(const std::vector<CanonicalizedLaneletPose> & waypoints) -> void;
 
-  auto cancelRoute() -> void;
+  auto cancelRoute() const -> void;
   auto getGoalPoses() const -> std::vector<CanonicalizedLaneletPose>;
   auto getGoalPosesInWorldFrame() const -> std::vector<geometry_msgs::msg::Pose>;
 
 private:
-  auto cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void;
+  auto cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose) const -> void;
 
-  auto updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void;
+  auto updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) const -> void;
 
-  std::optional<std::vector<std::int64_t>> route_;
+  mutable std::optional<std::vector<std::int64_t>> route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
   /*
@@ -50,7 +52,7 @@ private:
      elements for getGoalPoses, so we use std::deque instead of std::queue
      which is not iterable.
   */
-  std::deque<traffic_simulator::CanonicalizedLaneletPose> waypoint_queue_;
+  mutable std::deque<traffic_simulator::CanonicalizedLaneletPose> waypoint_queue_;
 };
 }  // namespace traffic_simulator
 

@@ -233,24 +233,26 @@ bool API::updateTrafficLightsInSim()
   return res.result().success();
 }
 
-std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatusInSim(
-  const std::string & entity_name, traffic_simulator_msgs::msg::EntityStatus status)
+std::optional<CanonicalizedEntityStatus> API::updateEntityStatusInSim(
+  const std::string & entity_name, const CanonicalizedEntityStatus & status)
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
   simulation_api_schema::EntityStatus proto;
-  status.name = entity_name;
-  simulation_interface::toProto(status, *req.mutable_status());
+  auto ros_msg = static_cast<EntityStatus>(status);
+  ros_msg.name = entity_name;
+  simulation_interface::toProto(ros_msg, *req.mutable_status());
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
 
   if (res.result().success()) {
-    simulation_interface::toMsg(res.status().pose(), status.pose);
-    simulation_interface::toMsg(res.status().action_status(), status.action_status);
+    simulation_interface::toMsg(res.status().pose(), ros_msg.pose);
+    simulation_interface::toMsg(res.status().action_status(), ros_msg.action_status);
     // Temporarily deinitialize lanelet pose as it should be correctly filled from here
-    status.lanelet_pose_valid = false;
-    status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-    return status;
+    ros_msg.lanelet_pose_valid = false;
+    ros_msg.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    return std::optional<CanonicalizedEntityStatus>(
+      CanonicalizedEntityStatus(ros_msg, entity_manager_ptr_->getHdmapUtils()));
   }
   return std::nullopt;
 }
@@ -286,8 +288,8 @@ bool API::updateFrame()
       ego_status = *ego_status_opt;
     }
     /// @note apply additional status data (from ll2) to ego_entity_simulation_ for this update
-    entity_manager_ptr_->fillLaneletPose(ego_name, ego_status);
-    entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
+    entity_manager_ptr_->setEntityStatusExternally(
+      ego_name, entity_manager_ptr_->fillLaneletPose(ego_name, ego_status));
   }
 
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());

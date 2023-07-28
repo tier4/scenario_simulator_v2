@@ -213,38 +213,40 @@ auto EntityBase::getLaneletPose(double matching_distance) const
   return std::nullopt;
 }
 
-auto EntityBase::fillLaneletPose(
-  traffic_simulator_msgs::msg::EntityStatus & status, bool include_crosswalk) const -> void
+auto EntityBase::fillLaneletPose(const CanonicalizedEntityStatus & status, bool include_crosswalk)
+  const -> CanonicalizedEntityStatus
 {
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
+
+  auto raw_status = static_cast<EntityStatus>(status);
 
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
   if (unique_route_lanelets.empty()) {
     lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      status.pose, getStatus().bounding_box, include_crosswalk, 1.0);
+      status.getMapPose(), getBoundingBox(), include_crosswalk, 1.0);
   } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.getMapPose(), unique_route_lanelets, 1.0);
     if (!lanelet_pose) {
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        status.pose, getStatus().bounding_box, include_crosswalk, 1.0);
+        status.getMapPose(), getBoundingBox(), include_crosswalk, 1.0);
     }
   }
   if (lanelet_pose) {
     math::geometry::CatmullRomSpline spline(
       hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
-    if (const auto s_value = spline.getSValue(status.pose)) {
-      status.pose.position.z = spline.getPoint(s_value.value()).z;
+    if (const auto s_value = spline.getSValue(status.getMapPose())) {
+      raw_status.pose.position.z = spline.getPoint(s_value.value()).z;
     }
   }
-
-  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-  if (status.lanelet_pose_valid) {
-    status.lanelet_pose = lanelet_pose.value();
+  if (status.laneMatchingSucceed()) {
+    raw_status.lanelet_pose_valid = true;
+    raw_status.lanelet_pose = lanelet_pose.value();
+  } else {
+    raw_status.lanelet_pose_valid = false;
   }
+  return CanonicalizedEntityStatus(raw_status, hdmap_utils_ptr_);
 }
-
-auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
 
 auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
   -> geometry_msgs::msg::Pose

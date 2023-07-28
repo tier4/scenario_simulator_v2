@@ -89,10 +89,10 @@ void MiscObjectEntity::requestSpeedChange(
   THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
 }
 
-auto MiscObjectEntity::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const
-  -> void
+auto MiscObjectEntity::fillLaneletPose(const CanonicalizedEntityStatus & status) const
+  -> CanonicalizedEntityStatus
 {
-  EntityBase::fillLaneletPose(status, false);
+  return EntityBase::fillLaneletPose(status, false);
 }
 
 }  // namespace entity

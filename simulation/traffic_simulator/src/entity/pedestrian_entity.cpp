@@ -224,10 +224,10 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
   setBehaviorParameter(behavior_parameter);
 }
 
-auto PedestrianEntity::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const
-  -> void
+auto PedestrianEntity::fillLaneletPose(const CanonicalizedEntityStatus & status) const
+  -> CanonicalizedEntityStatus
 {
-  EntityBase::fillLaneletPose(status, true);
+  return EntityBase::fillLaneletPose(status, true);
 }
 
 void PedestrianEntity::onUpdate(double current_time, double step_time)

@@ -39,13 +39,14 @@ class EgoEntity : public VehicleEntity
   static auto makeFieldOperatorApplication(const Configuration &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
-  traffic_simulator_msgs::msg::EntityStatus externally_updated_status_;
+  CanonicalizedEntityStatus externally_updated_status_;
 
 public:
   explicit EgoEntity() = delete;
 
   explicit EgoEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &);
 
   explicit EgoEntity(EgoEntity &&) = delete;
@@ -61,8 +62,6 @@ public:
   auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication & override;
 
   auto getCurrentAction() const -> std::string override;
-
-  auto getCurrentPose() const -> geometry_msgs::msg::Pose;
 
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
@@ -115,7 +114,8 @@ public:
 
   auto setVelocityLimit(double) -> void override;
 
-  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void override;
+  auto fillLaneletPose(const CanonicalizedEntityStatus & status) const
+    -> CanonicalizedEntityStatus override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

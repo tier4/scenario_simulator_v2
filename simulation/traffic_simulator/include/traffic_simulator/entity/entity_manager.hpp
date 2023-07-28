@@ -436,8 +436,8 @@ public:
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
 
-  auto setEntityStatusExternally(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &) -> void;
+  auto setEntityStatusExternally(const std::string & name, const CanonicalizedEntityStatus &)
+    -> void;
 
   void setVerbose(const bool verbose);
 
@@ -500,9 +500,8 @@ public:
                   name, makeEntityStatus(), hdmap_utils_ptr_, parameters,
                   std::forward<decltype(xs)>(xs)...));
         success) {
-      iter->second->setHdMapUtils(hdmap_utils_ptr_);
       // FIXME: this ignores V2I traffic lights
-      iter->second->setTrafficLightManager(traffic_light_manager_ptr_);
+      iter->second->setTrafficLightManager(v2i_traffic_light_manager_ptr_);
       if (npc_logic_started_ && not isEgo(name)) {
         iter->second->startNpcLogic();
       }

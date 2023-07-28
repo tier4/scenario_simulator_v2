@@ -79,7 +79,7 @@ EgoEntity::EgoEntity(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration)
-: VehicleEntity(name, entity_status, parameters),
+: VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
   field_operator_application(makeFieldOperatorApplication(configuration))
 {
 }
@@ -106,72 +106,6 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
   parameter.dynamic_constraints.max_acceleration = 0;
   parameter.dynamic_constraints.max_deceleration = 0;
   return parameter;
-}
-
-auto EgoEntity::getEntityStatus(const double time, const double step_time) const
-  -> const CanonicalizedEntityStatus
-{
-  EntityStatus status;
-  {
-    status.time = time;
-    status.type = getEntityType();
-    status.bounding_box = getBoundingBox();
-    status.pose = getCurrentPose();
-    status.action_status.twist = getCurrentTwist();
-    status.action_status.accel = [&]() {
-      geometry_msgs::msg::Accel accel;
-      if (previous_angular_velocity_) {
-        accel.linear.x = vehicle_model_ptr_->getAx();
-        accel.angular.z =
-          (vehicle_model_ptr_->getWz() - previous_angular_velocity_.value()) / step_time;
-      }
-      return accel;
-    }();
-
-    const auto unique_route_lanelets =
-      traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-
-    std::optional<LaneletPose> lanelet_pose;
-
-    /**
-     * lanelet ids from Autoware route topic was assigned in unique_route_lanelets
-    */
-    if (unique_route_lanelets.empty()) {
-      /**
-      * @note Hard coded parameter. 1.0 is a matching threshold for lanelet. 
-      * In this branch, try to matching ego entity considering bounding box.
-      */
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
-    } else {
-      /**
-      * @note Hard coded parameter. 1.0 is a matching threshold for lanelet. 
-      * In this branch, try to matching ego entity to specified lanelet_ids from Autoware route topic.
-      */
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
-      if (!lanelet_pose) {
-        /**
-        * @note Hard coded parameter. 1.0 is a matching threshold for lanelet. 
-        * In this branch, try to matching ego entity considering bounding box.
-        */
-        lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, getBoundingBox(), false, 1.0);
-      }
-    }
-
-    if (lanelet_pose) {
-      math::geometry::CatmullRomSpline spline(
-        hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
-      if (const auto s_value = spline.getSValue(status.pose)) {
-        status.pose.position.z = spline.getPoint(s_value.value()).z;
-      }
-    }
-
-    status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-    if (status.lanelet_pose_valid) {
-      status.lanelet_pose = lanelet_pose.value();
-    }
-  }
-
-  return traffic_simulator::CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
 }
 
 auto EgoEntity::getEntityTypename() const -> const std::string &
@@ -207,8 +141,6 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) const -> std::vector
 
   return ids;
 }
-
-auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose { return status_.pose; }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
@@ -265,7 +197,7 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 
   if (not field_operator_application->initialized()) {
-    field_operator_application->initialize(getStatus().pose);
+    field_operator_application->initialize(getMapPose());
     field_operator_application->plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
@@ -316,31 +248,7 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 {
 }
 
-auto EgoEntity::setStatus(const CanonicalizedEntityStatus & status) -> void
-{
-  VehicleEntity::setStatus(status);
-
-  const auto current_pose = getMapPose();
-
-  if (autoware->initialized()) {
-    autoware->set([this]() {
-      geometry_msgs::msg::Accel message;
-      message.linear.x = vehicle_model_ptr_->getAx();
-      return message;
-    }());
-
-    autoware->set(current_pose);
-
-    autoware->set(getCurrentTwist());
-  }
-
-  if (not initial_pose_) {
-    initial_pose_ = current_pose;
-  }
-}
-
-auto EgoEntity::setStatusExternally(const traffic_simulator_msgs::msg::EntityStatus & status)
-  -> void
+auto EgoEntity::setStatusExternally(const CanonicalizedEntityStatus & status) -> void
 {
   externally_updated_status_ = status;
 }
@@ -360,9 +268,10 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
   field_operator_application->setVelocityLimit(value);
 }
 
-auto EgoEntity::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+auto EgoEntity::fillLaneletPose(const CanonicalizedEntityStatus & status) const
+  -> CanonicalizedEntityStatus
 {
-  EntityBase::fillLaneletPose(status, false);
+  return EntityBase::fillLaneletPose(status, false);
 }
 
 }  // namespace entity

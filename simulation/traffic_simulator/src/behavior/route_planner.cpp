@@ -31,7 +31,8 @@ auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & wa
 }
 
 auto RoutePlanner::getRouteLanelets(
-  const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon) -> std::vector<std::int64_t>
+  const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon) const
+  -> std::vector<std::int64_t>
 {
   const auto lanelet_pose = static_cast<LaneletPose>(entity_lanelet_pose);
   // If the queue is not empty, calculating route from the entity_lanelet_pose to waypoint_queue_.front()
@@ -52,13 +53,13 @@ auto RoutePlanner::getRouteLanelets(
   return hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
 }
 
-void RoutePlanner::cancelRoute()
+void RoutePlanner::cancelRoute() const
 {
   waypoint_queue_.clear();
   route_ = std::nullopt;
 }
 
-void RoutePlanner::cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose)
+void RoutePlanner::cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose) const
 {
   while (true) {
     if (waypoint_queue_.empty()) {
@@ -92,7 +93,7 @@ auto RoutePlanner::getGoalPoses() const -> std::vector<CanonicalizedLaneletPose>
   return goal_poses;
 }
 
-auto RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void
+auto RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) const -> void
 {
   if (waypoint_queue_.front() <= entity_lanelet_pose) {
     cancelWaypoint(entity_lanelet_pose);

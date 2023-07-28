@@ -578,7 +578,7 @@ auto EntityManager::setEntityStatus(
 }
 
 auto EntityManager::setEntityStatusExternally(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+  const std::string & name, const CanonicalizedEntityStatus & status) -> void
 {
   if (not isEgo(name)) {
     THROW_SEMANTIC_ERROR(
