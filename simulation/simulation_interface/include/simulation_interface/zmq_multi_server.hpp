@@ -76,7 +76,11 @@ public:
     std::function<void(
       const simulation_api_schema::UpdateTrafficLightsRequest &,
       simulation_api_schema::UpdateTrafficLightsResponse &)>
-      update_traffic_lights_func);
+      update_traffic_lights_func,
+    std::function<void(
+      const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest &,
+      simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse &)>
+      attach_traffic_light_detector_emulator_func);
   ~MultiServer();
 
 private:
@@ -130,6 +134,10 @@ private:
     const simulation_api_schema::UpdateTrafficLightsRequest &,
     simulation_api_schema::UpdateTrafficLightsResponse &)>
     update_traffic_lights_func_;
+  std::function<void(
+    const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest &,
+    simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse &)>
+    attach_traffic_light_detector_emulator_func_;
 };
 }  // namespace zeromq
 

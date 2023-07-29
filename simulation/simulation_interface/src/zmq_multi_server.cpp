@@ -63,7 +63,11 @@ MultiServer::MultiServer(
   std::function<void(
     const simulation_api_schema::UpdateTrafficLightsRequest &,
     simulation_api_schema::UpdateTrafficLightsResponse &)>
-    update_traffic_lights_func)
+    update_traffic_lights_func,
+  std::function<void(
+    const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest &,
+    simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse &)>
+    attach_traffic_light_detector_emulator_func)
 : context_(zmqpp::context()),
   type_(zmqpp::socket_type::reply),
   socket_(context_, type_),
@@ -77,7 +81,8 @@ MultiServer::MultiServer(
   attach_lidar_sensor_func_(attach_lidar_sensor_func),
   attach_detection_sensor_func_(attach_detection_sensor_func),
   attach_occupancy_grid_sensor_func_(attach_occupancy_sensor_func),
-  update_traffic_lights_func_(update_traffic_lights_func)
+  update_traffic_lights_func_(update_traffic_lights_func),
+  attach_traffic_light_detector_emulator_func_(attach_traffic_light_detector_emulator_func)
 {
   socket_.bind(simulation_interface::getEndPoint(protocol, hostname, socket_port));
   poller_.add(socket_);
@@ -160,6 +165,14 @@ void MultiServer::poll()
         simulation_api_schema::UpdateTrafficLightsResponse response;
         update_traffic_lights_func_(proto.update_traffic_lights(), response);
         *sim_response.mutable_update_traffic_lights() = response;
+        break;
+      }
+      case simulation_api_schema::SimulationRequest::RequestCase::
+        kAttachTrafficLightDetectorEmulator: {
+        simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse response;
+        attach_traffic_light_detector_emulator_func_(
+          proto.attach_traffic_light_detector_emulator(), response);
+        *sim_response.mutable_attach_traffic_light_detector_emulator() = response;
         break;
       }
       case simulation_api_schema::SimulationRequest::RequestCase::REQUEST_NOT_SET: {

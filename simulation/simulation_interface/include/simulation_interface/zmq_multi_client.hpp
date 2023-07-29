@@ -76,6 +76,9 @@ public:
   void call(
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);
+  void call(
+        const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & req,
+    simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse & res);
 
   const simulation_interface::TransportProtocol protocol;
   const std::string hostname;
