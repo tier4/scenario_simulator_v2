@@ -529,36 +529,39 @@ TEST(Conversion, LaneletPose)
 
 TEST(Conversion, TrafficSignal)
 {
-  using TrafficLightMsg = autoware_auto_perception_msgs::msg::TrafficLight;
+  using TrafficLightMsg = autoware_auto_perception_msgs::msg::TrafficSignal;
+  using TrafficLightBulbMsg = autoware_auto_perception_msgs::msg::TrafficLight;
   std::vector<std::pair<std::uint8_t, simulation_api_schema::TrafficLight::Status>> statuses = {
-    {TrafficLightMsg::SOLID_OFF, simulation_api_schema::TrafficLight_Status_SOLID_OFF},
-    {TrafficLightMsg::SOLID_ON, simulation_api_schema::TrafficLight_Status_SOLID_ON},
-    {TrafficLightMsg::FLASHING, simulation_api_schema::TrafficLight_Status_FLASHING},
-    {TrafficLightMsg::UNKNOWN, simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS}};
+    {TrafficLightBulbMsg::SOLID_OFF, simulation_api_schema::TrafficLight_Status_SOLID_OFF},
+    {TrafficLightBulbMsg::SOLID_ON, simulation_api_schema::TrafficLight_Status_SOLID_ON},
+    {TrafficLightBulbMsg::FLASHING, simulation_api_schema::TrafficLight_Status_FLASHING},
+    {TrafficLightBulbMsg::UNKNOWN, simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS}};
 
   std::vector<std::pair<std::uint8_t, simulation_api_schema::TrafficLight::Shape>> shapes = {
-    {TrafficLightMsg::CIRCLE, simulation_api_schema::TrafficLight_Shape_CIRCLE},
-    {TrafficLightMsg::LEFT_ARROW, simulation_api_schema::TrafficLight_Shape_LEFT_ARROW},
-    {TrafficLightMsg::RIGHT_ARROW, simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW},
-    {TrafficLightMsg::UP_ARROW, simulation_api_schema::TrafficLight_Shape_UP_ARROW},
+    {TrafficLightBulbMsg::CIRCLE, simulation_api_schema::TrafficLight_Shape_CIRCLE},
+    {TrafficLightBulbMsg::LEFT_ARROW, simulation_api_schema::TrafficLight_Shape_LEFT_ARROW},
+    {TrafficLightBulbMsg::RIGHT_ARROW, simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW},
+    {TrafficLightBulbMsg::UP_ARROW, simulation_api_schema::TrafficLight_Shape_UP_ARROW},
     /// @note Enums below are not supported yet in some platforms. I temporarily disabled them
-    // {TrafficLightMsg::UP_LEFT_ARROW, simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW},
-    // {TrafficLightMsg::UP_RIGHT_ARROW, simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW},
-    {TrafficLightMsg::DOWN_ARROW, simulation_api_schema::TrafficLight_Shape_DOWN_ARROW},
-    {TrafficLightMsg::DOWN_LEFT_ARROW, simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW},
-    {TrafficLightMsg::DOWN_RIGHT_ARROW, simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW},
-    {TrafficLightMsg::CROSS, simulation_api_schema::TrafficLight_Shape_CROSS},
-    {TrafficLightMsg::UNKNOWN, simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE}};
+    // {TrafficLightBulbMsg::UP_LEFT_ARROW, simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW},
+    // {TrafficLightBulbMsg::UP_RIGHT_ARROW, simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW},
+    {TrafficLightBulbMsg::DOWN_ARROW, simulation_api_schema::TrafficLight_Shape_DOWN_ARROW},
+    {TrafficLightBulbMsg::DOWN_LEFT_ARROW,
+     simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW},
+    {TrafficLightBulbMsg::DOWN_RIGHT_ARROW,
+     simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW},
+    {TrafficLightBulbMsg::CROSS, simulation_api_schema::TrafficLight_Shape_CROSS},
+    {TrafficLightBulbMsg::UNKNOWN, simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE}};
 
   std::vector<std::pair<std::uint8_t, simulation_api_schema::TrafficLight::Color>> colors = {
-    {TrafficLightMsg::RED, simulation_api_schema::TrafficLight_Color_RED},
-    {TrafficLightMsg::AMBER, simulation_api_schema::TrafficLight_Color_AMBER},
-    {TrafficLightMsg::GREEN, simulation_api_schema::TrafficLight_Color_GREEN},
-    {TrafficLightMsg::WHITE, simulation_api_schema::TrafficLight_Color_WHITE},
-    {TrafficLightMsg::UNKNOWN, simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR},
+    {TrafficLightBulbMsg::RED, simulation_api_schema::TrafficLight_Color_RED},
+    {TrafficLightBulbMsg::AMBER, simulation_api_schema::TrafficLight_Color_AMBER},
+    {TrafficLightBulbMsg::GREEN, simulation_api_schema::TrafficLight_Color_GREEN},
+    {TrafficLightBulbMsg::WHITE, simulation_api_schema::TrafficLight_Color_WHITE},
+    {TrafficLightBulbMsg::UNKNOWN, simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR},
   };
 
-  float max_confidence = 3.0f * TrafficLightMsg::UNKNOWN;
+  float max_confidence = 3.0f * TrafficLightBulbMsg::UNKNOWN;
 
   for (const auto & status : statuses) {
     for (const auto & shape : shapes) {
@@ -566,7 +569,7 @@ TEST(Conversion, TrafficSignal)
         float confidence =
           static_cast<float>(status.first + shape.first + color.first) / max_confidence;
 
-        TrafficLightMsg traffic_light_msg;
+        TrafficLightBulbMsg traffic_light_msg;
         traffic_light_msg.status = status.first;
         traffic_light_msg.shape = shape.first;
         traffic_light_msg.color = color.first;
@@ -577,7 +580,10 @@ TEST(Conversion, TrafficSignal)
         traffic_signal_msg.map_primitive_id = 101;
 
         simulation_api_schema::TrafficSignal proto;
-        EXPECT_NO_THROW(simulation_interface::toProto(traffic_signal_msg, proto));
+        EXPECT_NO_THROW(
+          (simulation_interface::toProto<
+            autoware_auto_perception_msgs::msg::TrafficSignal,
+            autoware_auto_perception_msgs::msg::TrafficLight>(traffic_signal_msg, proto)));
         EXPECT_EQ(
           traffic_signal_msg.lights.size(),
           static_cast<std::size_t>(proto.traffic_light_status().size()));
@@ -588,7 +594,10 @@ TEST(Conversion, TrafficSignal)
         EXPECT_FLOAT_EQ(proto.traffic_light_status().Get(0).confidence(), confidence);
 
         autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal_msg_back;
-        EXPECT_NO_THROW(simulation_interface::toMsg(proto, traffic_signal_msg_back));
+        EXPECT_NO_THROW(
+          (simulation_interface::toMsg<
+            autoware_auto_perception_msgs::msg::TrafficSignal,
+            autoware_auto_perception_msgs::msg::TrafficLight>(proto, traffic_signal_msg_back)));
         EXPECT_EQ(
           static_cast<std::size_t>(proto.traffic_light_status().size()),
           traffic_signal_msg.lights.size());
