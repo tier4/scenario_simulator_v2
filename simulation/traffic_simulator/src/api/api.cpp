@@ -194,15 +194,11 @@ bool API::initialize(double realtime_factor, double step_time)
 bool API::attachTrafficLightDetectorEmulator(
   const simulation_api_schema::TrafficLightDetectorEmulatorConfiguration & configuration)
 {
-  if (configuration.standalone_mode) {
-    return true;
-  } else {
-    simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest req;
-    simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse res;
-    *req.mutable_configuration() = configuration;
-    zeromq_client_.call(req, res);
-    return res.result().success();
-  }
+  simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest req;
+  simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse res;
+  *req.mutable_configuration() = configuration;
+  zeromq_client_.call(req, res);
+  return res.result().success();
 }
 
 bool API::attachDetectionSensor(
@@ -268,7 +264,7 @@ bool API::updateTrafficLightsInSim()
   if (entity_manager_ptr_->trafficLightsChanged()) {
     for (const auto & [id, traffic_light] : entity_manager_ptr_->getConventionalTrafficLights()) {
       simulation_api_schema::TrafficSignal state;
-      simulation_interface::toProto(
+      simulation_interface::toProto<autoware_auto_perception_msgs::msg::TrafficSignal, autoware_auto_perception_msgs::msg::TrafficLight>(
         static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
       *req.add_states() = state;
     }

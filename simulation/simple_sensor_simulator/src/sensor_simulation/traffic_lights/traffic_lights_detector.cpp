@@ -18,22 +18,30 @@ namespace simple_sensor_simulator
 {
 namespace traffic_lights
 {
-TrafficLightsDetector::TrafficLightsDetector(const std::string & topic_name, rclcpp::Node & node)
+
+template <>
+TrafficLightsDetector<autoware_auto_perception_msgs::msg::TrafficSignalArray>::
+  TrafficLightsDetector(const std::string & topic_name, rclcpp::Node & node)
 : traffic_light_state_array_publisher_(
     rclcpp::create_publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>(
       node, topic_name, rclcpp::QoS(10).transient_local()))
 {
 }
 
-auto TrafficLightsDetector::updateFrame(
+template <>
+auto TrafficLightsDetector<autoware_auto_perception_msgs::msg::TrafficSignalArray>::updateFrame(
   const rclcpp::Time & current_ros_time,
-  const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & traffic_light_state)
-  -> void
+  const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & request) -> void
 {
   autoware_auto_perception_msgs::msg::TrafficSignalArray msg;
   msg.header.frame_id = "camera_link";  // DIRTY HACK!!!
   msg.header.stamp = current_ros_time;
-  msg.signals = std::move(traffic_light_state);
+  for (const auto & traffic_light : request.traffic_lights) {
+    autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
+    traffic_signal.id = traffic_light.id;
+    traffic_signal.state = traffic_light.state;
+    msg.signals.push_back(traffic_signal);
+  }
   traffic_light_state_array_publisher_->publish(msg);
 }
 }  // namespace traffic_lights

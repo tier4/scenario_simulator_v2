@@ -290,7 +290,7 @@ void ScenarioSimulator::updateTrafficLights(
   traffic_signals_states_.clear();
   for (const auto & traffic_signal_proto : req.states()) {
     autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
-    simulation_interface::toMsg(traffic_signal_proto, traffic_signal);
+    simulation_interface::toMsg<autoware_auto_perception_msgs::msg::TrafficSignal, autoware_auto_perception_msgs::msg::TrafficLight>(traffic_signal_proto, traffic_signal);
     traffic_signals_states_.emplace_back(traffic_signal);
   }
   res = simulation_api_schema::UpdateTrafficLightsResponse();

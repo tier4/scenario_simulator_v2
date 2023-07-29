@@ -19,28 +19,45 @@
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <simulation_interface/conversions.hpp>
 
 namespace simple_sensor_simulator
 {
 namespace traffic_lights
 {
+class TrafficLightsDetectorBase{
+public:
+  virtual auto updateFrame(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & request)
+    -> void = 0;
+
+};
+
+
 /** @brief Implements traffic lights detector mechanism simulation
  * Currently it only allows to set traffic lights state and publish them on predefined topic
  * Future implementations might, for example, publish only traffic lights that are in a specific FoV of a camera sensor
  * Further refactoring would be required, however, to achieve this.
  */
-class TrafficLightsDetector
+tempalte<typename TrafficSignalArrayMessage>
+class TrafficLightsDetector : public TrafficLightsDetectorBase
 {
 public:
-  TrafficLightsDetector(const std::string & topic_name, rclcpp::Node & node);
+  TrafficLightsDetector(const std::string & topic_name, rclcpp::Node & node)
+  : traffic_light_state_array_publisher_(
+      rclcpp::create_publisher<TrafficSignalArrayMessage>(
+        node, topic_name, rclcpp::QoS(10).transient_local()))
+  {
+  }
 
   auto updateFrame(
     const rclcpp::Time & current_ros_time,
-    const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & new_traffic_light_state)
-    -> void;
+    const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & request)
+    -> void override;
 
 private:
-  const rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::SharedPtr
+  const rclcpp::Publisher<TrafficSignalArrayMessage>::SharedPtr
     traffic_light_state_array_publisher_;
 };
 }  // namespace traffic_lights
