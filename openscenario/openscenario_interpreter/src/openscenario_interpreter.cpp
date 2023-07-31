@@ -39,13 +39,14 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   local_real_time_factor(1.0),
   osc_path(""),
   output_directory("/tmp"),
-  is_record_enabled(false)
+  record(false)
 {
   DECLARE_PARAMETER(intended_result);
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
+  DECLARE_PARAMETER(record);
 }
 
 Interpreter::~Interpreter() {}
@@ -110,7 +111,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(local_real_time_factor);
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
-      is_record_enabled = getParameter<bool>("record", true);
+      GET_PARAMETER(record);
 
       script = std::make_shared<OpenScenario>(osc_path);
 
@@ -207,7 +208,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         return Interpreter::Result::FAILURE;  // => Inactive
       },
       [&]() {
-        if (is_record_enabled) {
+        if (record) {
           // clang-format off
           record::start(
             "-a",
@@ -315,7 +316,7 @@ auto Interpreter::reset() -> void
       [&](const common::junit::Error & result) { RCLCPP_INFO_STREAM(get_logger(), result); }),
     result);
 
-  if (is_record_enabled) {
+  if (record) {
     record::stop();
   }
 }

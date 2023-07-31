@@ -62,6 +62,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   String output_directory;
 
+  bool record;
+
   std::shared_ptr<OpenScenario> script;
 
   std::list<std::shared_ptr<ScenarioDefinition>> scenarios;
@@ -77,8 +79,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
   using Result = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
   bool waiting_for_engagement_to_be_completed = false;  // NOTE: DIRTY HACK!!!
-
-  bool is_record_enabled;
 
 public:
   OPENSCENARIO_INTERPRETER_PUBLIC
