@@ -285,6 +285,7 @@ std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatus
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   simulation_api_schema::EntityStatus proto;
+  status.name = entity_name;
   simulation_interface::toProto(status, proto);
   *req.add_status() = proto;
 
