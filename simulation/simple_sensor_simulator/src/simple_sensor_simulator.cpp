@@ -101,6 +101,7 @@ void ScenarioSimulator::initialize(
   vehicles_ = {};
   pedestrians_ = {};
   misc_objects_ = {};
+  entity_status_ = {};
 }
 
 void ScenarioSimulator::updateFrame(
