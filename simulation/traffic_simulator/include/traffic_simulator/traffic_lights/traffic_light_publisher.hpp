@@ -19,6 +19,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <simulation_interface/conversions.hpp>
 
 namespace traffic_simulator
 {
@@ -46,7 +47,7 @@ public:
       rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())), hdmap_utils_(hdmap_utils){
   }
 
-  auto publish(const rclcpp::Time & current_ros_time, const simulation_api_schema::UpdateTrafficLightsRequest & request) override -> void;
+  auto publish(const rclcpp::Time & current_ros_time, const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void override;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_

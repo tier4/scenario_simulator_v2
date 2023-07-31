@@ -603,7 +603,7 @@ void EntityManager::update(const double current_time, const double step_time)
   current_time_ = current_time;
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
-    conventional_traffic_light_marker_updater_.createTimer(configuration.conventional_traffic_light_publish_rate);
+    conventional_traffic_light_updater_.createTimer(configuration.conventional_traffic_light_publish_rate);
     v2i_traffic_light_updater_.createTimer(configuration.v2i_traffic_light_publish_rate);
   }
   auto type_list = getEntityTypeList();

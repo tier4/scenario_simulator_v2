@@ -45,6 +45,7 @@
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -54,6 +55,7 @@
 #include <utility>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 
 /// @todo find some shared space for this function
 template <typename T>

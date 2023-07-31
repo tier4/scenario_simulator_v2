@@ -23,6 +23,7 @@ class TrafficLightMarkerPublisher
 {
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr marker_pub_;
   const std::string map_frame_;
+  const rclcpp::Clock::SharedPtr clock_ptr_;
   const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
 
   auto deleteAllMarkers() const -> void;
@@ -33,12 +34,11 @@ public:
   explicit TrafficLightMarkerPublisher(
     const std::shared_ptr<TrafficLightManager> & traffic_light_manager, const NodePointer & node,
     const std::string & map_frame = "map")
-  : ConfigurableRateUpdater(node),
-    marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
+  : marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "traffic_light/marker", rclcpp::QoS(1).transient_local())),
     map_frame_(map_frame),
-    traffic_light_manager_(traffic_light_manager),
-    updater_(node, [this]() { update(); }])
+    clock_ptr_(node->get_clock()),
+    traffic_light_manager_(traffic_light_manager)
   {
   }
 

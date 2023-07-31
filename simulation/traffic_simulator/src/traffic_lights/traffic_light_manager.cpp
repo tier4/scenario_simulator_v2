@@ -78,7 +78,7 @@ auto TrafficLightManager::getTrafficLights(const LaneletID lanelet_id)
 auto TrafficLightManager::generateUpdateTrafficLightsRequest() -> simulation_api_schema::UpdateTrafficLightsRequest{
         simulation_api_schema::UpdateTrafficLightsRequest update_traffic_lights_request;
         for (auto && [lanelet_id, traffic_light] : traffic_lights_) {
-          *update_traffic_lights_request.add_status() = static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
+          *update_traffic_lights_request.add_states() = static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
         }
         return update_traffic_lights_request;
 }

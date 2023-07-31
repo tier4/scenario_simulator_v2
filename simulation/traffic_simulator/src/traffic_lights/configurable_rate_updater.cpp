@@ -29,8 +29,8 @@ auto ConfigurableRateUpdater::createTimer(double update_rate) -> void
 
 auto ConfigurableRateUpdater::resetUpdateRate(double update_rate) -> void
 {
-  if (publish_rate_ != publish_rate) {
-    publish_rate_ = publish_rate;
+  if (update_rate_ != update_rate) {
+    update_rate_ = update_rate;
     if (timer_ && not timer_->is_canceled()) {
       timer_->cancel();
     }
