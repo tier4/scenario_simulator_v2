@@ -27,8 +27,6 @@ class ConfigurableRateUpdater
   const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
   double update_rate_ = 0.0;
   const std::function<void()> callback_func_;
-
-protected:
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
 public:
@@ -36,8 +34,8 @@ public:
   ConfigurableRateUpdater(const NodePointer & node, std::function<void()> callback_func)
   : node_base_interface_(node->get_node_base_interface()),
     node_timers_interface_(node->get_node_timers_interface()),
-    clock_ptr_(node->get_clock()),
-    callback_func_(callback_func)
+    callback_func_(callback_func),
+    clock_ptr_(node->get_clock())
   {
   }
 
