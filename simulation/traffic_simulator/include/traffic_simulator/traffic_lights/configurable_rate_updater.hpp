@@ -26,7 +26,7 @@ class ConfigurableRateUpdater
   rclcpp::TimerBase::SharedPtr timer_ = nullptr;
   const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
   const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
-  double publish_rate_ = 0.0;
+  double update_rate_ = 0.0;
   const std::function<void()> callback_func_;
 
 protected:
@@ -44,7 +44,9 @@ public:
 
   auto createTimer(double update_rate) -> void;
 
-  auto resetPublishRate(double update_rate) -> void;
+  auto resetUpdateRate(double update_rate) -> void;
+
+  auto getUpdateRate() const -> double { return update_rate_; }
 };
 }  // namespace traffic_simulator
 

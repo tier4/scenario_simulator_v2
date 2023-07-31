@@ -15,7 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
 
-#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 
 namespace traffic_simulator
@@ -28,11 +27,8 @@ class TrafficLightMarkerPublisher
 
   auto deleteAllMarkers() const -> void;
   auto drawMarkers() const -> void;
-  auto update() -> void;
 
 public:
-  ConfigurableRateUpdater updater_;
-
   template <typename NodePointer>
   explicit TrafficLightMarkerPublisher(
     const std::shared_ptr<TrafficLightManager> & traffic_light_manager, const NodePointer & node,
@@ -45,6 +41,8 @@ public:
     updater_(node, [this]() { update(); }])
   {
   }
+
+  auto publish() -> void;
 };
 
 }  // namespace traffic_simulator

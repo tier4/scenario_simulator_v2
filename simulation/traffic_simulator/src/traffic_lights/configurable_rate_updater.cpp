@@ -16,18 +16,18 @@
 
 namespace traffic_simulator
 {
-auto ConfigurableRateUpdater::createTimer(double publish_rate) -> void
+auto ConfigurableRateUpdater::createTimer(double update_rate) -> void
 {
   if (!timer_) {
-    publish_rate_ = publish_rate;
+    update_rate_ = update_rate;
     using namespace std::chrono_literals;
     timer_ = rclcpp::create_timer(
-      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / update_rate_,
       [this]() -> void { callback_func_(); });
   }
 }
 
-auto ConfigurableRateUpdater::resetPublishRate(double publish_rate) -> void
+auto ConfigurableRateUpdater::resetUpdateRate(double update_rate) -> void
 {
   if (publish_rate_ != publish_rate) {
     publish_rate_ = publish_rate;
@@ -37,7 +37,7 @@ auto ConfigurableRateUpdater::resetPublishRate(double publish_rate) -> void
 
     using namespace std::chrono_literals;
     timer_ = rclcpp::create_timer(
-      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
+      node_base_interface_, node_timers_interface_, clock_ptr_, 1s / update_rate_,
       [this]() -> void { callback_func_(); });
   }
 }

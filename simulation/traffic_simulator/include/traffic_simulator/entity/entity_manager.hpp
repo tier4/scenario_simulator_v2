@@ -120,6 +120,7 @@ class EntityManager
   const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
   const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
   const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_publisher_ptr_;
+  ConfigurableRateUpdater v2i_traffic_light_updater_, conventional_traffic_light_updater_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -200,7 +201,14 @@ public:
     v2i_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
     v2i_traffic_light_publisher_ptr_(
-      makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_))
+      makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_)),
+    v2i_traffic_light_updater_(node, [this]() {
+        v2i_traffic_light_marker_publisher_ptr_->publish();
+        v2i_traffic_light_publisher_ptr_->publish(clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
+    }),
+    conventional_traffic_light_updater_(node, [this]() {
+        conventional_traffic_light_marker_publisher_ptr_->publish();
+    })
   {
     updateHdmapMarker();
   }
@@ -229,13 +237,12 @@ public:
 
   auto resetConventionalTrafficLightPublishRate(double rate) -> void
   {
-    conventional_traffic_light_marker_publisher_ptr_->resetPublishRate(rate);
+    conventional_traffic_light_updater_.resetUpdateRate(rate);
   }
 
   auto resetV2ITrafficLightPublishRate(double rate) -> void
   {
-    v2i_traffic_light_marker_publisher_ptr_->resetPublishRate(rate);
-    v2i_traffic_light_publisher_ptr_->resetPublishRate(rate);
+    v2i_traffic_light_updater_.resetUpdateRate(rate);
   }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
