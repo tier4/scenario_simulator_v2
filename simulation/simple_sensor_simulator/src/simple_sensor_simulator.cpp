@@ -213,50 +213,27 @@ void ScenarioSimulator::despawnEntity(
   const simulation_api_schema::DespawnEntityRequest & req,
   simulation_api_schema::DespawnEntityResponse & res)
 {
-  bool found = false;
-  auto emplaceIfRequestedEntity = [&](const auto & entity, auto & container) {
-    if (entity.name() != req.name()) {
-      container.emplace_back(entity);
-    } else {
-      found = true;
-    }
+  auto remove_despawn_requested_entity_from = [&](auto & v) {
+    const auto size = std::size(v);
+    v.erase(
+      std::remove_if(
+        std::begin(v), std::end(v),
+        [&](const auto & entity) { return entity.name() == req.name(); }),
+      std::end(v));
+    return size != std::size(v);  // true if something removed.
   };
-
-  std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles;
-  std::vector<traffic_simulator_msgs::VehicleParameters> vehicles;
-  std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians;
-  std::vector<traffic_simulator_msgs::MiscObjectParameters> misc_objects;
-
-  for (const auto & ego_vehicle : ego_vehicles_) {
-    emplaceIfRequestedEntity(ego_vehicle, ego_vehicles);
+  const auto ego_entity_was_removed = remove_despawn_requested_entity_from(ego_vehicles_);
+  if (ego_entity_was_removed) {
+    ego_entity_simulation_.reset();
   }
-
-  for (const auto & vehicle : vehicles_) {
-    emplaceIfRequestedEntity(vehicle, vehicles);
-  }
-
-  for (const auto & pedestrian : pedestrians_) {
-    emplaceIfRequestedEntity(pedestrian, pedestrians);
-  }
-
-  for (const auto & misc_object : misc_objects_) {
-    emplaceIfRequestedEntity(misc_object, misc_objects);
-  }
-
-  if (found) {
+  const auto any_entity_was_removed = ego_entity_was_removed or
+                                      remove_despawn_requested_entity_from(vehicles_) or
+                                      remove_despawn_requested_entity_from(pedestrians_) or
+                                      remove_despawn_requested_entity_from(misc_objects_);
+  if (any_entity_was_removed) {
     entity_status_.erase(req.name());
-    if (isEgo(req.name())) {
-      ego_entity_simulation_.reset();
-    }
   }
-
-  ego_vehicles_ = std::move(ego_vehicles);
-  vehicles_ = std::move(vehicles);
-  pedestrians_ = std::move(pedestrians);
-  misc_objects_ = std::move(misc_objects);
-
-  res = simulation_api_schema::DespawnEntityResponse();
-  res.mutable_result()->set_success(found);
+  res.mutable_result()->set_success(any_entity_was_removed);
 }
 
 void ScenarioSimulator::attachDetectionSensor(
