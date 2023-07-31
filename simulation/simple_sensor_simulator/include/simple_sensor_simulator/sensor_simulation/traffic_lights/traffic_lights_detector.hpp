@@ -28,39 +28,26 @@ namespace simple_sensor_simulator
 {
 namespace traffic_lights
 {
-class TrafficLightsDetectorBase
-{
-public:
-  virtual auto updateFrame(
-    const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void = 0;
-};
-
 /** @brief Implements traffic lights detector mechanism simulation
  * Currently it only allows to set traffic lights state and publish them on predefined topic
- * Future implementations might, for example, publish only traffic lights that are in a specific FoV of a camera sensor
- * Further refactoring would be required, however, to achieve this.
+ * Future implementations might, for example, publish only traffic lights that are in a specific FoV
+ * of a camera sensor Further refactoring would be required, however, to achieve this.
  */
-template <typename TrafficSignalArrayMessage>
 class TrafficLightsDetector
-: public TrafficLightsDetectorBase,
-  public traffic_simulator::TrafficLightPublisher<TrafficSignalArrayMessage>
 {
+  const std::shared_ptr<traffic_simulator::TrafficLightPublisherBase> publisher_;
+
 public:
-  TrafficLightsDetector(
-    const std::string & topic_name, rclcpp::Node & node,
-    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils = nullptr)
-  : TrafficLightsDetectorBase(),
-    traffic_simulator::TrafficLightPublisher<TrafficSignalArrayMessage>(
-      topic_name, &node, hdmap_utils)
+  TrafficLightsDetector(std::shared_ptr<traffic_simulator::TrafficLightPublisherBase> publisher)
+  : publisher_(publisher)
   {
   }
 
   auto updateFrame(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void override
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
   {
-    this->publish(current_ros_time, request);
+    publisher_->publish(current_ros_time, request);
   }
 };
 }  // namespace traffic_lights
