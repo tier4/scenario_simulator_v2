@@ -31,11 +31,7 @@ namespace simple_sensor_simulator
 class SensorSimulation
 {
 public:
-  explicit SensorSimulation(rclcpp::Node & node)
-  {
-    traffic_lights_detectors_.emplace_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
-      "/perception/traffic_light_recognition/traffic_signals", node));
-  }
+  explicit SensorSimulation(rclcpp::Node & node) {}
 
   auto attachLidarSensor(
     const double current_simulation_time,
@@ -90,6 +86,29 @@ public:
     }
   }
 
+  auto attachTrafficLightsDetectorEmulator(
+    const double current_simulation_time,
+    const simulation_api_schema::TrafficLightDetectorEmulatorConfiguration & configuration,
+    rclcpp::Node & node, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils) -> void
+  {
+    if (configuration.architecture_type() == "awf/universe") {
+      using Message = autoware_auto_perception_msgs::msg::TrafficSignalArray;
+      traffic_lights_detectors_.push_back(
+        std::make_unique<traffic_lights::TrafficLightsDetector<Message>>(
+          "/perception/traffic_light_recognition/traffic_signals", node, hdmap_utils));
+    } else if (configuration.architecture_type() == "awf/universe/2023.08") {
+      using Message = autoware_perception_msgs::msg::TrafficSignalArray;
+      traffic_lights_detectors_.push_back(
+        std::make_unique<traffic_lights::TrafficLightsDetector<Message>>(
+          "/perception/traffic_light_recognition/traffic_signals", node, hdmap_utils));
+    } else {
+      std::stringstream ss;
+      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
+         << " given.";
+      throw std::runtime_error(ss.str());
+    }
+  }
+
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,
     const std::vector<traffic_simulator_msgs::EntityStatus> & status,
@@ -99,7 +118,7 @@ private:
   std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
   std::vector<std::unique_ptr<DetectionSensorBase>> detection_sensors_;
   std::vector<std::unique_ptr<OccupancyGridSensorBase>> occupancy_grid_sensors_;
-  std::vector<std::unique_ptr<traffic_lights::TrafficLightsDetector>> traffic_lights_detectors_;
+  std::vector<std::unique_ptr<traffic_lights::TrafficLightsDetectorBase>> traffic_lights_detectors_;
 };
 }  // namespace simple_sensor_simulator
 

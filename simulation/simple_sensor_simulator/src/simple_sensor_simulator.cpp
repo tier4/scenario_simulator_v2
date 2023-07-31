@@ -57,7 +57,10 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
       &ScenarioSimulator::attachOccupancyGridSensor, this, std::placeholders::_1,
       std::placeholders::_2),
     std::bind(
-      &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2))
+      &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2),
+    std::bind(
+      &ScenarioSimulator::attachTrafficLightDetectorEmulator, this, std::placeholders::_1,
+      std::placeholders::_2))
 {
 }
 
@@ -287,13 +290,17 @@ void ScenarioSimulator::updateTrafficLights(
   const simulation_api_schema::UpdateTrafficLightsRequest & req,
   simulation_api_schema::UpdateTrafficLightsResponse & res)
 {
-  traffic_signals_states_.clear();
-  for (const auto & traffic_signal_proto : req.states()) {
-    autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
-    simulation_interface::toMsg<autoware_auto_perception_msgs::msg::TrafficSignal, autoware_auto_perception_msgs::msg::TrafficLight>(traffic_signal_proto, traffic_signal);
-    traffic_signals_states_.emplace_back(traffic_signal);
-  }
+  traffic_signals_states_ = req;
   res = simulation_api_schema::UpdateTrafficLightsResponse();
+  res.mutable_result()->set_success(true);
+}
+
+void ScenarioSimulator::attachTrafficLightDetectorEmulator(
+  const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & req,
+  simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse & res)
+{
+  res = simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse();
+  sensor_sim_.attachTrafficLightsDetectorEmulator(current_time_, req.configuration(), *this, hdmap_utils_);
   res.mutable_result()->set_success(true);
 }
 

@@ -122,6 +122,9 @@ private:
   void updateTrafficLights(
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);
+  void attachTrafficLightDetectorEmulator(
+    const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & req,
+    simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse & res);
   int getSocketPort();
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;

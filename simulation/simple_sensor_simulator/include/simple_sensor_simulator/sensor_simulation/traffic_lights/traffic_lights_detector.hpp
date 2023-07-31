@@ -46,7 +46,7 @@ class TrafficLightsDetector : public TrafficLightsDetectorBase, public traffic_s
 {
 public:
   TrafficLightsDetector(const std::string & topic_name, rclcpp::Node & node, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils = nullptr)
-  : TrafficLightsDetectorBase(), traffic_simulator::TrafficLightPublisher<TrafficSignalArrayMessage>(topic_name, node, hdmap_utils)
+  : TrafficLightsDetectorBase(), traffic_simulator::TrafficLightPublisher<TrafficSignalArrayMessage>(topic_name, &node, hdmap_utils)
   {
   }
 
