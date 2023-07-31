@@ -37,7 +37,7 @@ public:
     const double current_simulation_time,
     const simulation_api_schema::LidarConfiguration & configuration, rclcpp::Node & node) -> void
   {
-    if (configuration.architecture_type() == "awf/universe") {
+    if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
         node.create_publisher<sensor_msgs::msg::PointCloud2>(
@@ -55,7 +55,7 @@ public:
     const simulation_api_schema::DetectionSensorConfiguration & configuration, rclcpp::Node & node)
     -> void
   {
-    if (configuration.architecture_type() == "awf/universe") {
+    if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
       using Message = autoware_auto_perception_msgs::msg::DetectedObjects;
       detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
@@ -73,7 +73,7 @@ public:
     const simulation_api_schema::OccupancyGridSensorConfiguration & configuration,
     rclcpp::Node & node) -> void
   {
-    if (configuration.architecture_type() == "awf/universe") {
+    if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
       using Message = nav_msgs::msg::OccupancyGrid;
       occupancy_grid_sensors_.push_back(std::make_unique<OccupancyGridSensor<Message>>(
         current_simulation_time, configuration,

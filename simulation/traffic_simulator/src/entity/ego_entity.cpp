@@ -50,7 +50,7 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
   if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-      architecture_type == "awf/universe") {
+      architecture_type.find("awf/universe") != std::string::npos) {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<
