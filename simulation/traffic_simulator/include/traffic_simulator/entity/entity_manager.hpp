@@ -44,7 +44,7 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
-#include <traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -119,7 +119,7 @@ class EntityManager
 
   const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
   const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
-  const std::shared_ptr<ConfigurableRateUpdater> v2i_traffic_light_publisher_ptr_;
+  const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_publisher_ptr_;
 
   using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
@@ -159,13 +159,13 @@ public:
   //  }
 
   template <typename... Ts>
-  auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<ConfigurableRateUpdater>
+  auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
   {
     if (const auto architecture_type =
           getParameter<std::string>("architecture_type", "awf/universe");
         architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_shared<
-        V2ITrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
+        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
@@ -200,7 +200,7 @@ public:
     v2i_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
     v2i_traffic_light_publisher_ptr_(
-      makeV2ITrafficLightPublisher(v2i_traffic_light_manager_ptr_, "/v2x/traffic_signals", node))
+      makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_))
   {
     updateHdmapMarker();
   }
