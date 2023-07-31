@@ -35,6 +35,7 @@ message LidarConfiguration {
   repeated double vertical_angles = 3; // Vertical resolutions of the lidar. (unit : radian)
   double scan_duration = 4;            // Scan duration of the lidar. (unit: second)
   string architecture_type = 5;        // Autoware architecture type.
+  double lidar_sensor_delay = 6;       // lidar sensor delay. (unit : second) It delays publishing timing.
 }
 
 /**

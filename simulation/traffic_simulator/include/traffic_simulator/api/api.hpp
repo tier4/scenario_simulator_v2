@@ -236,7 +236,8 @@ public:
 
   bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
   bool attachLidarSensor(
-    const std::string &, const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
+    const std::string &, const double lidar_sensor_delay,
+    const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
 
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
   bool attachDetectionSensor(
