@@ -9,6 +9,7 @@ rules:
 
     # will be ignored only by this rule
     ignore:
+      - docs/__init__.py
       - docs/image/inter_process_communication.drawio
       - docs/image/what_is_scenario_testing_framework.drawio
       - openscenario/openscenario_utility/openscenario_utility/__init__.py
