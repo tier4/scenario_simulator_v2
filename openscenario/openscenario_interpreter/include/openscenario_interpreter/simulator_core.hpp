@@ -278,6 +278,13 @@ public:
           return configuration;
         }());
 
+        core->attachTrafficLightDetectorEmulator([&]() {
+          simulation_api_schema::TrafficLightDetectorEmulatorConfiguration configuration;
+          configuration.set_architecture_type(
+            getParameter<std::string>("architecture_type", "awf/universe"));
+          return configuration;
+        }());
+
         core->asFieldOperatorApplication(entity_ref)
           .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
       }
