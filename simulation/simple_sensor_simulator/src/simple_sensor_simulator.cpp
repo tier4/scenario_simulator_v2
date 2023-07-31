@@ -100,6 +100,7 @@ void ScenarioSimulator::initialize(
   ego_vehicles_ = {};
   vehicles_ = {};
   pedestrians_ = {};
+  misc_objects_ = {};
 }
 
 void ScenarioSimulator::updateFrame(
@@ -148,17 +149,22 @@ void ScenarioSimulator::updateEntityStatus(
     res.add_status()->CopyFrom(updated_status);
   };
 
-  if (req.status_size() == 1 && isEgo(req.status(0).name())) {
-    assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
-    ego_entity_simulation_->update(current_time_ + step_time_, step_time_, req.npc_logic_started());
-    simulation_api_schema::EntityStatus status;
-    simulation_interface::toProto(ego_entity_simulation_->getStatus(), status);
-    entity_status_[req.status(0).name()] = status;
-    copyStatusToResponse(status);
-  } else {
-    for (const auto & status : req.status()) {
-      entity_status_[status.name()] = status;
-      copyStatusToResponse(status);
+  for (const auto & status : req.status()) {
+    try {
+      if (isEgo(status.name())) {
+        assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
+        ego_entity_simulation_->update(
+          current_time_ + step_time_, step_time_, req.npc_logic_started());
+        simulation_api_schema::EntityStatus ego_status;
+        simulation_interface::toProto(ego_entity_simulation_->getStatus(), ego_status);
+        entity_status_.at(status.name()) = ego_status;
+        copyStatusToResponse(ego_status);
+      } else {
+        entity_status_.at(status.name()) = status;
+        copyStatusToResponse(status);
+      }
+    } catch (const std::out_of_range & e) {
+      THROW_SEMANTIC_ERROR("Entity ", std::quoted(status.name()), " does not exist");
     }
   }
 
@@ -175,6 +181,7 @@ void ScenarioSimulator::spawnVehicleEntity(
   }
   if (req.is_ego()) {
     ego_vehicles_.emplace_back(req.parameters());
+    entity_status_.insert({req.parameters().name(), simulation_api_schema::EntityStatus{}});
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
@@ -188,6 +195,7 @@ void ScenarioSimulator::spawnVehicleEntity(
     ego_entity_simulation_->setInitialStatus(initial_status);
   } else {
     vehicles_.emplace_back(req.parameters());
+    entity_status_.insert({req.parameters().name(), simulation_api_schema::EntityStatus{}});
   }
   res = simulation_api_schema::SpawnVehicleEntityResponse();
   res.mutable_result()->set_success(true);
@@ -199,6 +207,7 @@ void ScenarioSimulator::spawnPedestrianEntity(
   simulation_api_schema::SpawnPedestrianEntityResponse & res)
 {
   pedestrians_.emplace_back(req.parameters());
+  entity_status_.insert({req.parameters().name(), simulation_api_schema::EntityStatus{}});
   res = simulation_api_schema::SpawnPedestrianEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
@@ -209,6 +218,7 @@ void ScenarioSimulator::spawnMiscObjectEntity(
   simulation_api_schema::SpawnMiscObjectEntityResponse & res)
 {
   misc_objects_.emplace_back(req.parameters());
+  entity_status_.insert({req.parameters().name(), simulation_api_schema::EntityStatus{}});
   res = simulation_api_schema::SpawnMiscObjectEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
@@ -346,31 +356,7 @@ bool ScenarioSimulator::isEgo(const std::string & name)
 
 bool ScenarioSimulator::isEntityExists(const std::string & name)
 {
-  if (std::find_if(ego_vehicles_.begin(), ego_vehicles_.end(), [&name](const auto & ego) {
-        return ego.name() == name;
-      }) != ego_vehicles_.end()) {
-    return true;
-  }
-
-  if (std::find_if(vehicles_.begin(), vehicles_.end(), [&name](const auto & vehicle) {
-        return vehicle.name() == name;
-      }) != vehicles_.end()) {
-    return true;
-  }
-
-  if (std::find_if(pedestrians_.begin(), pedestrians_.end(), [&name](const auto & pedestrian) {
-        return pedestrian.name() == name;
-      }) != pedestrians_.end()) {
-    return true;
-  }
-
-  if (std::find_if(misc_objects_.begin(), misc_objects_.end(), [&name](const auto & misc_object) {
-        return misc_object.name() == name;
-      }) != misc_objects_.end()) {
-    return true;
-  }
-
-  return false;
+  return entity_status_.find(name) != entity_status_.end();
 }
 }  // namespace simple_sensor_simulator
 
