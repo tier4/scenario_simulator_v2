@@ -23,9 +23,7 @@
 #include <traffic_simulator_msgs.pb.h>
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <autoware_perception_msgs/msg/traffic_signal.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -186,105 +184,6 @@ auto toProto(
     autoware_auto_vehicle_msgs::msg::GearCommand> &,
   traffic_simulator_msgs::VehicleCommand &) -> void;
 
-//void toProto(
-//  const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
-//  simulation_api_schema::TrafficSignal & proto);
-//
-//void toMsg(
-//  const simulation_api_schema::TrafficSignal & proto,
-//  autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state);
-
-//template <typename TrafficLightMessageType>
-//void toProto(
-//  const TrafficLightMessageType & traffic_light_state, simulation_api_schema::TrafficSignal & proto);
-
-template <typename TrafficLightMessageType, typename TrafficLightBulbMessageType>
-void toProto(
-  const TrafficLightMessageType & traffic_light_state, simulation_api_schema::TrafficSignal & proto)
-{
-  {
-    auto convert_color = [](auto color) {
-      switch (color) {
-        case TrafficLightBulbMessageType::RED:
-          return simulation_api_schema::TrafficLight_Color_RED;
-        case TrafficLightBulbMessageType::AMBER:
-          return simulation_api_schema::TrafficLight_Color_AMBER;
-        case TrafficLightBulbMessageType::GREEN:
-          return simulation_api_schema::TrafficLight_Color_GREEN;
-        case TrafficLightBulbMessageType::WHITE:
-          return simulation_api_schema::TrafficLight_Color_WHITE;
-        default:
-          return simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
-      }
-    };
-
-    auto convert_shape = [](auto shape) {
-      switch (shape) {
-        case TrafficLightBulbMessageType::CIRCLE:
-          return simulation_api_schema::TrafficLight_Shape_CIRCLE;
-        case TrafficLightBulbMessageType::LEFT_ARROW:
-          return simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
-        case TrafficLightBulbMessageType::RIGHT_ARROW:
-          return simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
-        case TrafficLightBulbMessageType::UP_ARROW:
-          return simulation_api_schema::TrafficLight_Shape_UP_ARROW;
-          /// @note Enums below are not supported yet in some platforms. I temporarily disabled them
-          //  case TrafficLightBulbMessageType::UP_LEFT_ARROW:
-          //    return simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
-          //  case TrafficLightBulbMessageType::UP_RIGHT_ARROW:
-          //    return simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
-        case TrafficLightBulbMessageType::DOWN_ARROW:
-          return simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
-        case TrafficLightBulbMessageType::DOWN_LEFT_ARROW:
-          return simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
-        case TrafficLightBulbMessageType::DOWN_RIGHT_ARROW:
-          return simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
-        case TrafficLightBulbMessageType::CROSS:
-          return simulation_api_schema::TrafficLight_Shape_CROSS;
-        default:
-          return simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
-      }
-    };
-
-    auto convert_status = [](auto status) {
-      switch (status) {
-        case TrafficLightBulbMessageType::SOLID_OFF:
-          return simulation_api_schema::TrafficLight_Status_SOLID_OFF;
-        case TrafficLightBulbMessageType::SOLID_ON:
-          return simulation_api_schema::TrafficLight_Status_SOLID_ON;
-        case TrafficLightBulbMessageType::FLASHING:
-          return simulation_api_schema::TrafficLight_Status_FLASHING;
-        default:
-          return simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
-      }
-    };
-
-    auto convert_traffic_light = [convert_status, convert_shape, convert_color](
-                                   const TrafficLightBulbMessageType & traffic_light) {
-      simulation_api_schema::TrafficLight traffic_light_proto;
-      traffic_light_proto.set_status(convert_status(traffic_light.status));
-      traffic_light_proto.set_shape(convert_shape(traffic_light.shape));
-      traffic_light_proto.set_color(convert_color(traffic_light.color));
-      traffic_light_proto.set_confidence(traffic_light.confidence);
-      return traffic_light_proto;
-    };
-
-    if constexpr (std::is_same_v<
-                    TrafficLightMessageType, autoware_auto_perception_msgs::msg::TrafficSignal>) {
-      proto.set_id(traffic_light_state.map_primitive_id);
-      for (const auto & traffic_light_bulb : traffic_light_state.lights) {
-        *proto.add_traffic_light_status() = convert_traffic_light(traffic_light_bulb);
-      }
-    } else if constexpr (std::is_same_v<
-                           TrafficLightMessageType, autoware_perception_msgs::msg::TrafficSignal>) {
-      proto.set_id(traffic_light_state.traffic_signal_id);
-      for (const auto & traffic_light_bulb : traffic_light_state.elements) {
-        *proto.add_traffic_light_status() = convert_traffic_light(traffic_light_bulb);
-      }
-    }
-  }
-}
-
 template <typename TrafficLightBulbMessageType>
 void toTrafficLightBulbMsg(
   const simulation_api_schema::TrafficLight & proto,
@@ -352,93 +251,6 @@ void toTrafficLightBulbMsg(
   traffic_light_bulb_state.color = convert_color(proto.color());
   traffic_light_bulb_state.confidence = proto.confidence();
 }
-
-template <typename TrafficLightMessageType, typename TrafficLightBulbMessageType>
-void toMsg(
-  const simulation_api_schema::TrafficSignal & proto, TrafficLightMessageType & traffic_light_state)
-{
-  using namespace simulation_api_schema;
-  auto convert_color = [](auto color) {
-    switch (color) {
-      case simulation_api_schema::TrafficLight_Color_RED:
-        return TrafficLightBulbMessageType::RED;
-      case simulation_api_schema::TrafficLight_Color_AMBER:
-        return TrafficLightBulbMessageType::AMBER;
-      case simulation_api_schema::TrafficLight_Color_GREEN:
-        return TrafficLightBulbMessageType::GREEN;
-      case simulation_api_schema::TrafficLight_Color_WHITE:
-        return TrafficLightBulbMessageType::WHITE;
-      default:
-        return TrafficLightBulbMessageType::UNKNOWN;
-    }
-  };
-
-  auto convert_shape = [](auto shape) {
-    switch (shape) {
-      case simulation_api_schema::TrafficLight_Shape_CIRCLE:
-        return TrafficLightBulbMessageType::CIRCLE;
-      case simulation_api_schema::TrafficLight_Shape_LEFT_ARROW:
-        return TrafficLightBulbMessageType::LEFT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW:
-        return TrafficLightBulbMessageType::RIGHT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_UP_ARROW:
-        return TrafficLightBulbMessageType::UP_ARROW;
-        /// @note Enums below are not supported yet in some platforms. I temporarily disabled them
-        //  case simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW:
-        //    return TrafficLightBulbMessageType::UP_LEFT_ARROW;
-        //  case simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW:
-        //    return TrafficLightBulbMessageType::UP_RIGHT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_DOWN_ARROW:
-        return TrafficLightBulbMessageType::DOWN_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW:
-        return TrafficLightBulbMessageType::DOWN_LEFT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW:
-        return TrafficLightBulbMessageType::DOWN_RIGHT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_CROSS:
-        return TrafficLightBulbMessageType::CROSS;
-      default:
-        return TrafficLightBulbMessageType::UNKNOWN;
-    }
-  };
-
-  auto convert_status = [](auto status) {
-    switch (status) {
-      case simulation_api_schema::TrafficLight_Status_SOLID_OFF:
-        return TrafficLightBulbMessageType::SOLID_OFF;
-      case simulation_api_schema::TrafficLight_Status_SOLID_ON:
-        return TrafficLightBulbMessageType::SOLID_ON;
-      case simulation_api_schema::TrafficLight_Status_FLASHING:
-        return TrafficLightBulbMessageType::FLASHING;
-      default:
-        return TrafficLightBulbMessageType::UNKNOWN;
-    }
-  };
-
-  auto convert_traffic_light = [convert_status, convert_shape, convert_color](
-                                 const simulation_api_schema::TrafficLight & traffic_light) {
-    TrafficLightBulbMessageType message;
-    message.status = convert_status(traffic_light.status());
-    message.shape = convert_shape(traffic_light.shape());
-    message.color = convert_color(traffic_light.color());
-    message.confidence = traffic_light.confidence();
-    return message;
-  };
-
-  if constexpr (std::is_same_v<
-                  TrafficLightMessageType, autoware_auto_perception_msgs::msg::TrafficSignal>) {
-    traffic_light_state.map_primitive_id = proto.id();
-    for (const auto & traffic_light : proto.traffic_light_status()) {
-      traffic_light_state.lights.emplace_back(convert_traffic_light(traffic_light));
-    }
-  } else if constexpr (std::is_same_v<
-                         TrafficLightMessageType, autoware_perception_msgs::msg::TrafficSignal>) {
-    traffic_light_state.traffic_signal_id = proto.id();
-    for (const auto & traffic_light : proto.traffic_light_status()) {
-      traffic_light_state.elements.emplace_back(convert_traffic_light(traffic_light));
-    }
-  }
-}
-
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_
