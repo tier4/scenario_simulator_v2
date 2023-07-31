@@ -21,8 +21,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
-#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 
 namespace simple_sensor_simulator
 {
@@ -42,17 +42,24 @@ public:
  * Further refactoring would be required, however, to achieve this.
  */
 template <typename TrafficSignalArrayMessage>
-class TrafficLightsDetector : public TrafficLightsDetectorBase, public traffic_simulator::TrafficLightPublisher<TrafficSignalArrayMessage>
+class TrafficLightsDetector
+: public TrafficLightsDetectorBase,
+  public traffic_simulator::TrafficLightPublisher<TrafficSignalArrayMessage>
 {
 public:
-  TrafficLightsDetector(const std::string & topic_name, rclcpp::Node & node, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils = nullptr)
-  : TrafficLightsDetectorBase(), traffic_simulator::TrafficLightPublisher<TrafficSignalArrayMessage>(topic_name, &node, hdmap_utils)
+  TrafficLightsDetector(
+    const std::string & topic_name, rclcpp::Node & node,
+    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils = nullptr)
+  : TrafficLightsDetectorBase(),
+    traffic_simulator::TrafficLightPublisher<TrafficSignalArrayMessage>(
+      topic_name, &node, hdmap_utils)
   {
   }
 
   auto updateFrame(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void override{
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void override
+  {
     this->publish(current_ros_time, request);
   }
 };

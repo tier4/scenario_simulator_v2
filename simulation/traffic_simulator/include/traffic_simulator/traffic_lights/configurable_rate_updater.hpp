@@ -18,7 +18,6 @@
 #include <functional>
 #include <rclcpp/rclcpp.hpp>
 
-
 namespace traffic_simulator
 {
 class ConfigurableRateUpdater

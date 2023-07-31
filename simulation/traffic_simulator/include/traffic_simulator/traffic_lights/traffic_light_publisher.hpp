@@ -17,37 +17,42 @@
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <simulation_interface/conversions.hpp>
 
 namespace traffic_simulator
 {
-class TrafficLightManager;
-
-
 class TrafficLightPublisherBase
 {
 public:
-  virtual auto publish(const rclcpp::Time & current_ros_time, const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void = 0;
+  virtual auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void = 0;
 };
 
 template <typename Message>
-class TrafficLightPublisher: public TrafficLightPublisherBase{
+class TrafficLightPublisher : public TrafficLightPublisherBase
+{
   const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+
 public:
   template <typename NodePointer>
   explicit TrafficLightPublisher(
-    const std::shared_ptr<TrafficLightManager> & traffic_light_manager,
-    const std::string & topic_name, const NodePointer & node, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils = nullptr):
- TrafficLightPublisherBase(),
+    const std::string & topic_name, const NodePointer & node,
+    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils = nullptr)
+  : TrafficLightPublisherBase(),
     traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())), hdmap_utils_(hdmap_utils){
+      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
+    hdmap_utils_(hdmap_utils)
+  {
   }
 
-  auto publish(const rclcpp::Time & current_ros_time, const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void override;
+  auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void override;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_

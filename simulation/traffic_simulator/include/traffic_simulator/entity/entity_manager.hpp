@@ -25,6 +25,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #endif
 
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
@@ -43,9 +44,9 @@
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
+#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
-#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -55,7 +56,6 @@
 #include <utility>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 
 /// @todo find some shared space for this function
 template <typename T>
@@ -204,13 +204,15 @@ public:
       std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
     v2i_traffic_light_publisher_ptr_(
       makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_)),
-    v2i_traffic_light_updater_(node, [this]() {
+    v2i_traffic_light_updater_(
+      node,
+      [this]() {
         v2i_traffic_light_marker_publisher_ptr_->publish();
-        v2i_traffic_light_publisher_ptr_->publish(clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
-    }),
-    conventional_traffic_light_updater_(node, [this]() {
-        conventional_traffic_light_marker_publisher_ptr_->publish();
-    })
+        v2i_traffic_light_publisher_ptr_->publish(
+          clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
+      }),
+    conventional_traffic_light_updater_(
+      node, [this]() { conventional_traffic_light_marker_publisher_ptr_->publish(); })
   {
     updateHdmapMarker();
   }
@@ -237,7 +239,8 @@ public:
 
 #undef FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
 
-  auto generateUpdateRequestForConventionalTrafficLights(){
+  auto generateUpdateRequestForConventionalTrafficLights()
+  {
     return conventional_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest();
   }
 

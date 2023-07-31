@@ -300,7 +300,8 @@ void ScenarioSimulator::attachTrafficLightDetectorEmulator(
   simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse & res)
 {
   res = simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse();
-  sensor_sim_.attachTrafficLightsDetectorEmulator(current_time_, req.configuration(), *this, hdmap_utils_);
+  sensor_sim_.attachTrafficLightsDetectorEmulator(
+    current_time_, req.configuration(), *this, hdmap_utils_);
   res.mutable_result()->set_success(true);
 }
 

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 
 namespace traffic_simulator
 {
@@ -33,7 +33,8 @@ auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArra
     for (auto bulb_status : traffic_light.traffic_light_status()) {
       using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
       TrafficLightBulbType light_bulb_msg;
-      simulation_interface::toTrafficLightBulbMsg<TrafficLightBulbType>(bulb_status, light_bulb_msg);
+      simulation_interface::toTrafficLightBulbMsg<TrafficLightBulbType>(
+        bulb_status, light_bulb_msg);
       traffic_light_msg.lights.push_back(light_bulb_msg);
     }
     msg.signals.push_back(traffic_light_msg);
@@ -55,9 +56,11 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
     //    traffic_signal. = traffic_light.id();
     // TODO
     for (auto bulb_status : traffic_light.traffic_light_status()) {
-      using TrafficLightBulbType = autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
+      using TrafficLightBulbType =
+        autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
       TrafficLightBulbType light_bulb_msg;
-      simulation_interface::toTrafficLightBulbMsg<TrafficLightBulbType>(bulb_status, light_bulb_msg);
+      simulation_interface::toTrafficLightBulbMsg<TrafficLightBulbType>(
+        bulb_status, light_bulb_msg);
       traffic_light_msg.elements.push_back(light_bulb_msg);
     }
     msg.signals.push_back(traffic_light_msg);

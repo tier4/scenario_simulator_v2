@@ -252,75 +252,75 @@ struct TrafficLight
 
     friend auto operator<<(std::ostream & os, const Bulb & bulb) -> std::ostream &;
 
-//    template <typename TrafficLightBulbMessageType>
-//    explicit operator TrafficLightBulbMessageType() const
-//    {
-//      auto color = [this]() {
-//        switch (std::get<Color>(value).value) {
-//          case Color::green:
-//            return TrafficLightBulbMessageType::GREEN;
-//          case Color::yellow:
-//            return TrafficLightBulbMessageType::AMBER;
-//          case Color::red:
-//            return TrafficLightBulbMessageType::RED;
-//          case Color::white:
-//            return TrafficLightBulbMessageType::WHITE;
-//          default:
-//            throw common::SyntaxError(std::get<Color>(value), " is not supported as a color for.");
-//            // TODO
-//        }
-//      };
-//
-//      auto status = [this]() {
-//        switch (std::get<Status>(value).value) {
-//          case Status::solid_on:
-//            return TrafficLightBulbMessageType::SOLID_ON;
-//          case Status::solid_off:
-//            return TrafficLightBulbMessageType::SOLID_OFF;
-//          case Status::flashing:
-//            return TrafficLightBulbMessageType::FLASHING;
-//          case Status::unknown:
-//            return TrafficLightBulbMessageType::UNKNOWN;
-//          default:
-//            throw common::SyntaxError(
-//              std::get<Status>(value),
-//              " is not supported as a status for "
-//              "autoware_auto_perception_msgs::msg::TrafficLight.");
-//        }
-//      };
-//
-//      auto shape = [this]() {
-//        switch (std::get<Shape>(value).value) {
-//          case Shape::circle:
-//            return TrafficLightBulbMessageType::CIRCLE;
-//          case Shape::cross:
-//            return TrafficLightBulbMessageType::CROSS;
-//          case Shape::left:
-//            return TrafficLightBulbMessageType::LEFT_ARROW;
-//          case Shape::down:
-//            return TrafficLightBulbMessageType::DOWN_ARROW;
-//          case Shape::up:
-//            return TrafficLightBulbMessageType::UP_ARROW;
-//          case Shape::right:
-//            return TrafficLightBulbMessageType::RIGHT_ARROW;
-//          case Shape::lower_left:
-//            return TrafficLightBulbMessageType::DOWN_LEFT_ARROW;
-//          case Shape::lower_right:
-//            return TrafficLightBulbMessageType::DOWN_RIGHT_ARROW;
-//          default:
-//            throw common::SyntaxError(
-//              std::get<Shape>(value),
-//              " is not supported as a shape for autoware_auto_perception_msgs::msg::TrafficLight.");
-//        }
-//      };
-//
-//      TrafficLightBulbMessageType traffic_light_bulb;
-//      traffic_light_bulb.color = color();
-//      traffic_light_bulb.status = status();
-//      traffic_light_bulb.shape = shape();
-//      traffic_light_bulb.confidence = 1.0;
-//      return traffic_light_bulb;
-//    }
+    //    template <typename TrafficLightBulbMessageType>
+    //    explicit operator TrafficLightBulbMessageType() const
+    //    {
+    //      auto color = [this]() {
+    //        switch (std::get<Color>(value).value) {
+    //          case Color::green:
+    //            return TrafficLightBulbMessageType::GREEN;
+    //          case Color::yellow:
+    //            return TrafficLightBulbMessageType::AMBER;
+    //          case Color::red:
+    //            return TrafficLightBulbMessageType::RED;
+    //          case Color::white:
+    //            return TrafficLightBulbMessageType::WHITE;
+    //          default:
+    //            throw common::SyntaxError(std::get<Color>(value), " is not supported as a color for.");
+    //            // TODO
+    //        }
+    //      };
+    //
+    //      auto status = [this]() {
+    //        switch (std::get<Status>(value).value) {
+    //          case Status::solid_on:
+    //            return TrafficLightBulbMessageType::SOLID_ON;
+    //          case Status::solid_off:
+    //            return TrafficLightBulbMessageType::SOLID_OFF;
+    //          case Status::flashing:
+    //            return TrafficLightBulbMessageType::FLASHING;
+    //          case Status::unknown:
+    //            return TrafficLightBulbMessageType::UNKNOWN;
+    //          default:
+    //            throw common::SyntaxError(
+    //              std::get<Status>(value),
+    //              " is not supported as a status for "
+    //              "autoware_auto_perception_msgs::msg::TrafficLight.");
+    //        }
+    //      };
+    //
+    //      auto shape = [this]() {
+    //        switch (std::get<Shape>(value).value) {
+    //          case Shape::circle:
+    //            return TrafficLightBulbMessageType::CIRCLE;
+    //          case Shape::cross:
+    //            return TrafficLightBulbMessageType::CROSS;
+    //          case Shape::left:
+    //            return TrafficLightBulbMessageType::LEFT_ARROW;
+    //          case Shape::down:
+    //            return TrafficLightBulbMessageType::DOWN_ARROW;
+    //          case Shape::up:
+    //            return TrafficLightBulbMessageType::UP_ARROW;
+    //          case Shape::right:
+    //            return TrafficLightBulbMessageType::RIGHT_ARROW;
+    //          case Shape::lower_left:
+    //            return TrafficLightBulbMessageType::DOWN_LEFT_ARROW;
+    //          case Shape::lower_right:
+    //            return TrafficLightBulbMessageType::DOWN_RIGHT_ARROW;
+    //          default:
+    //            throw common::SyntaxError(
+    //              std::get<Shape>(value),
+    //              " is not supported as a shape for autoware_auto_perception_msgs::msg::TrafficLight.");
+    //        }
+    //      };
+    //
+    //      TrafficLightBulbMessageType traffic_light_bulb;
+    //      traffic_light_bulb.color = color();
+    //      traffic_light_bulb.status = status();
+    //      traffic_light_bulb.shape = shape();
+    //      traffic_light_bulb.confidence = 1.0;
+    //      return traffic_light_bulb;
+    //    }
 
     explicit operator simulation_api_schema::TrafficLight() const
     {
@@ -462,35 +462,35 @@ struct TrafficLight
 
   friend auto operator<<(std::ostream & os, const TrafficLight & traffic_light) -> std::ostream &;
 
-//  template <typename TrafficSignalMessageType>
-//  explicit operator TrafficSignalMessageType() const
-//  {
-//    TrafficSignalMessageType traffic_signal;
-//
-//    if constexpr (std::is_same_v<
-//                    TrafficSignalMessageType, autoware_auto_perception_msgs::msg::TrafficSignal>) {
-//      traffic_signal.map_primitive_id = way_id;
-//      for (auto && bulb : bulbs) {
-//        traffic_signal.lights.push_back(
-//          static_cast<autoware_auto_perception_msgs::msg::TrafficLight>(bulb));
-//      }
-//    } else if constexpr (std::is_same_v<
-//                           TrafficSignalMessageType,
-//                           autoware_perception_msgs::msg::TrafficSignal>) {
-//      traffic_signal.traffic_signal_id = relation_id;
-//      for (auto && bulb : bulbs) {
-//        // the typename autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type
-//        // may be TrafficSignalElement or TrafficLightElement depending on the version
-//        traffic_signal.elements.push_back(
-//          static_cast<autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type>(
-//            bulb));
-//      }
-//    } else {
-//      throw common::scenario_simulator_exception::Error(
-//        "Unsupported message type for traffic signal.");
-//    }
-//    return traffic_signal;
-//  }
+  //  template <typename TrafficSignalMessageType>
+  //  explicit operator TrafficSignalMessageType() const
+  //  {
+  //    TrafficSignalMessageType traffic_signal;
+  //
+  //    if constexpr (std::is_same_v<
+  //                    TrafficSignalMessageType, autoware_auto_perception_msgs::msg::TrafficSignal>) {
+  //      traffic_signal.map_primitive_id = way_id;
+  //      for (auto && bulb : bulbs) {
+  //        traffic_signal.lights.push_back(
+  //          static_cast<autoware_auto_perception_msgs::msg::TrafficLight>(bulb));
+  //      }
+  //    } else if constexpr (std::is_same_v<
+  //                           TrafficSignalMessageType,
+  //                           autoware_perception_msgs::msg::TrafficSignal>) {
+  //      traffic_signal.traffic_signal_id = relation_id;
+  //      for (auto && bulb : bulbs) {
+  //        // the typename autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type
+  //        // may be TrafficSignalElement or TrafficLightElement depending on the version
+  //        traffic_signal.elements.push_back(
+  //          static_cast<autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type>(
+  //            bulb));
+  //      }
+  //    } else {
+  //      throw common::scenario_simulator_exception::Error(
+  //        "Unsupported message type for traffic signal.");
+  //    }
+  //    return traffic_signal;
+  //  }
 
   explicit operator simulation_api_schema::TrafficSignal() const
   {
