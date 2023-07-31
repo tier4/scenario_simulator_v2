@@ -57,11 +57,13 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
     using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
     TrafficLightType traffic_light_msg;
 
-    if(auto relation_id = id_conversion_cache_map.find(traffic_light.id()); relation_id!= id_conversion_cache_map.end()) {
+    if (auto relation_id = id_conversion_cache_map.find(traffic_light.id());
+        relation_id != id_conversion_cache_map.end()) {
       // use cached relation_id if the conversion is already cached
       traffic_light_msg.traffic_signal_id = relation_id->second;
-    }else {
-      traffic_light_msg.traffic_signal_id = hdmap_utils_->getTrafficLightRelationIDFromWayID(traffic_light.id());
+    } else {
+      traffic_light_msg.traffic_signal_id =
+        hdmap_utils_->getTrafficLightRelationIDFromWayID(traffic_light.id());
       // cache the conversion
       id_conversion_cache_map[traffic_light.id()] = traffic_light_msg.traffic_signal_id;
     }
