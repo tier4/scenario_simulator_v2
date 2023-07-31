@@ -259,15 +259,9 @@ bool API::attachLidarSensor(const std::string & entity_name, const helper::Lidar
 
 bool API::updateTrafficLightsInSim()
 {
-  simulation_api_schema::UpdateTrafficLightsRequest req;
   simulation_api_schema::UpdateTrafficLightsResponse res;
   if (entity_manager_ptr_->trafficLightsChanged()) {
-    for (const auto & [id, traffic_light] : entity_manager_ptr_->getConventionalTrafficLights()) {
-      simulation_api_schema::TrafficSignal state;
-      simulation_interface::toProto<autoware_auto_perception_msgs::msg::TrafficSignal, autoware_auto_perception_msgs::msg::TrafficLight>(
-        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
-      *req.add_states() = state;
-    }
+    auto req = entity_manager_ptr_->generateUpdateRequestForConventionalTrafficLights();
     zeromq_client_.call(req, res);
   }
   // TODO handle response

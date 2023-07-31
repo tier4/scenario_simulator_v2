@@ -51,7 +51,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic_lights/traffic_light_manager.cpp
   src/traffic_lights/configurable_rate_updater.cpp
   src/traffic_lights/traffic_light_marker_publisher.cpp
-  src/traffic_lights/v2i_traffic_light_publisher.cpp
+  src/traffic_lights/traffic_light_publisher.cpp
 )
 
 target_link_libraries(traffic_simulator

@@ -235,6 +235,10 @@ public:
 
 #undef FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
 
+  auto generateUpdateRequestForConventionalTrafficLights(){
+    return conventional_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest();
+  }
+
   auto resetConventionalTrafficLightPublishRate(double rate) -> void
   {
     conventional_traffic_light_updater_.resetUpdateRate(rate);
