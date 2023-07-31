@@ -93,7 +93,7 @@ public:
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,
     const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & traffic_signals);
+    const simulation_api_schema::UpdateTrafficLightsRequest & update_traffic_lights_request);
 
 private:
   std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
