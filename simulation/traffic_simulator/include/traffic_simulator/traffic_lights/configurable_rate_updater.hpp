@@ -15,8 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__CONFIGURABLE_RATE_UPDATER_HPP
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__CONFIGURABLE_RATE_UPDATER_HPP
 
+#include <functional>
 #include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+
 
 namespace traffic_simulator
 {
@@ -26,24 +27,24 @@ class ConfigurableRateUpdater
   const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
   const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
   double publish_rate_ = 0.0;
+  const std::function<void()> callback_func_;
 
 protected:
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
 public:
   template <typename NodePointer>
-  ConfigurableRateUpdater(const NodePointer & node)
+  ConfigurableRateUpdater(const NodePointer & node, std::function<void()> callback_func)
   : node_base_interface_(node->get_node_base_interface()),
     node_timers_interface_(node->get_node_timers_interface()),
-    clock_ptr_(node->get_clock())
+    clock_ptr_(node->get_clock()),
+    callback_func_(callback_func)
   {
   }
 
   auto createTimer(double update_rate) -> void;
 
   auto resetPublishRate(double update_rate) -> void;
-
-  virtual auto update() -> void = 0;
 };
 }  // namespace traffic_simulator
 

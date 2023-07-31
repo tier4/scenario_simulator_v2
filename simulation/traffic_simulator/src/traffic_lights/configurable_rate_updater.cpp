@@ -23,7 +23,7 @@ auto ConfigurableRateUpdater::createTimer(double publish_rate) -> void
     using namespace std::chrono_literals;
     timer_ = rclcpp::create_timer(
       node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
-      [this]() -> void { update(); });
+      [this]() -> void { callback_func_(); });
   }
 }
 
@@ -38,7 +38,7 @@ auto ConfigurableRateUpdater::resetPublishRate(double publish_rate) -> void
     using namespace std::chrono_literals;
     timer_ = rclcpp::create_timer(
       node_base_interface_, node_timers_interface_, clock_ptr_, 1s / publish_rate_,
-      [this]() -> void { update(); });
+      [this]() -> void { callback_func_(); });
   }
 }
 }  // namespace traffic_simulator
