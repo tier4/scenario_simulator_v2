@@ -329,7 +329,7 @@ public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
 private:
-  bool updateEntityStatusInSim();
+  bool updateNonEgoEntitiesStatusInSim();
   std::optional<traffic_simulator_msgs::msg::EntityStatus> updateEntityStatusInSim(
     const std::string & entity_name, traffic_simulator_msgs::msg::EntityStatus status);
   bool updateTrafficLightsInSim();

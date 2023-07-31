@@ -264,38 +264,45 @@ bool API::updateTrafficLightsInSim()
   return res.result().success();
 }
 
+bool API::updateNonEgoEntitiesStatusInSim()
+{
+  simulation_api_schema::UpdateEntityStatusRequest req;
+  req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
+  for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
+    auto status = entity_manager_ptr_->getEntityStatus(entity_name);
+    simulation_api_schema::EntityStatus proto;
+    simulation_interface::toProto(status, proto);
+    *req.add_status() = proto;
+  }
+  simulation_api_schema::UpdateEntityStatusResponse res;
+  zeromq_client_.call(req, res);
+  return res.result().success();
+}
+
 std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatusInSim(
   const std::string & entity_name, traffic_simulator_msgs::msg::EntityStatus status)
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
-  simulation_api_schema::EntityStatus proto;
-  status.name = entity_name;
-  simulation_interface::toProto(status, *req.mutable_status());
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
+  simulation_api_schema::EntityStatus proto;
+  simulation_interface::toProto(status, proto);
+  *req.add_status() = proto;
+
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
 
-  if (res.result().success()) {
-    simulation_interface::toMsg(res.status().pose(), status.pose);
-    simulation_interface::toMsg(res.status().action_status(), status.action_status);
+  if (res.result().success() && req.status_size() == 1) {
+    assert(
+      res.status(0).name() == entity_name &&
+      "The entity name in response is different from the name in request!");
+    simulation_interface::toMsg(res.status(0).pose(), status.pose);
+    simulation_interface::toMsg(res.status(0).action_status(), status.action_status);
     // Temporarily deinitialize lanelet pose as it should be correctly filled from here
     status.lanelet_pose_valid = false;
     status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
     return status;
   }
   return std::nullopt;
-}
-
-bool API::updateEntityStatusInSim()
-{
-  bool success = true;
-  for (const auto & name : entity_manager_ptr_->getEntityNames()) {
-    if (!entity_manager_ptr_->isEgo(name)) {
-      success &= static_cast<bool>(
-        updateEntityStatusInSim(name, entity_manager_ptr_->getEntityStatus(name)));
-    }
-  }
-  return success;
 }
 
 bool API::updateFrame()
@@ -325,7 +332,7 @@ bool API::updateFrame()
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
-    if (!updateEntityStatusInSim()) {
+    if (!updateNonEgoEntitiesStatusInSim()) {
       return false;
     }
     if (!updateTrafficLightsInSim()) {

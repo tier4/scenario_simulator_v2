@@ -147,6 +147,7 @@ auto EntityManager::getEntityStatus(const std::string & name) const
     THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   } else {
     auto entity_status = iter->second->getStatus();
+    assert(entity_status.name == name && "The entity name in status is different from key!");
     entity_status.action_status.current_action = getCurrentAction(name);
     entity_status.time = current_time_;
     return entity_status;

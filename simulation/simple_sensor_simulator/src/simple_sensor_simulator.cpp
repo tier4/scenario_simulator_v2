@@ -139,23 +139,29 @@ void ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
-  if (isEgo(req.status().name())) {
-    if (ego_entity_simulation_) {
-      ego_entity_simulation_->update(
-        current_time_ + step_time_, step_time_, req.npc_logic_started());
-    }
+  res = simulation_api_schema::UpdateEntityStatusResponse();
+  auto copyStatusToResponse = [&](const simulation_api_schema::EntityStatus & status) {
+    simulation_api_schema::UpdatedEntityStatus updated_status;
+    updated_status.set_name(status.name());
+    updated_status.mutable_action_status()->CopyFrom(status.action_status());
+    updated_status.mutable_pose()->CopyFrom(status.pose());
+    res.add_status()->CopyFrom(updated_status);
+  };
+
+  if (req.status_size() == 1 && isEgo(req.status(0).name())) {
+    assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
+    ego_entity_simulation_->update(current_time_ + step_time_, step_time_, req.npc_logic_started());
     simulation_api_schema::EntityStatus status;
     simulation_interface::toProto(ego_entity_simulation_->getStatus(), status);
-    entity_status_[req.status().name()] = status;
+    entity_status_[req.status(0).name()] = status;
+    copyStatusToResponse(status);
   } else {
-    entity_status_[req.status().name()] = req.status();
+    for (const auto & status : req.status()) {
+      entity_status_[status.name()] = status;
+      copyStatusToResponse(status);
+    }
   }
-  const simulation_api_schema::EntityStatus & updated_entity_status =
-    entity_status_[req.status().name()];
-  res = simulation_api_schema::UpdateEntityStatusResponse();
-  res.mutable_status()->set_name(updated_entity_status.name());
-  res.mutable_status()->mutable_action_status()->CopyFrom(updated_entity_status.action_status());
-  res.mutable_status()->mutable_pose()->CopyFrom(updated_entity_status.pose());
+
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
 }
@@ -325,14 +331,16 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
 
 bool ScenarioSimulator::isEgo(const std::string & name)
 {
-  if (not isEntityExists(name)) {
-    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
-  }
   for (const auto & ego : ego_vehicles_) {
     if (ego.name() == name) {
       return true;
     }
   }
+
+  if (not isEntityExists(name)) {
+    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
+  }
+
   return false;
 }
 
