@@ -448,7 +448,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
   }
 }
 
-
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
   const autoware_adapi_v1_msgs::msg::MrmState & message) -> void
 {

@@ -18,7 +18,6 @@ namespace concealer
 {
 AutowareUniverse::AutowareUniverse()
 : getAckermannControlCommand("/control/command/control_cmd", *this),
-  // getControlCommand("/api/external/set/command/local/control", *this),
   getGearCommandImpl("/control/command/gear_cmd", *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", *this),
   getPathWithLaneId(
