@@ -1,19 +1,56 @@
-# Visualizing Internal Information of the Simulator
+# **Visualizing the Internal Information of the Simulator**
 
-This document describes certain features for visualizing the internal information of `scenario_simulator_v2` using rviz. The information held by `scenario_simulator_v2` and the information sent to the evaluation target autonomous driving system (in this case, Autoware) may not always match. Therefore, it is crucial to accurately understand what the currently displayed information represents. Furthermore, we also provide a simple feature to visualize the status and type of conditions defined in the scenario file, which can be helpful for debugging. Please note that the visualization feature is currently under development and may change in the future. **This document is based on information as of July 2023.**
+This document provides instructions for users on how to visualize the internal information of `scenario_simulator_v2` using rviz. It also covers features that can be beneficial for analyzing this information. Please note, **this document is based on information up to version v0.7.0**.
 
-## Recognition of Entities
+## Table of Contents
 
-Firstly, it should be clear that not all Entities (such as ego vehicle, other vehicles, pedestrians, etc.) defined internally by `scenario_simulator_v2` are accurately transmitted to the target autonomous driving system. For instance, while moving other vehicles are recognized by `simple_sensor_simulator` and transmitted to Autoware, the recognition logic is designed to simply emulate the operation of sensors. Therefore, in certain cases such as when entities are at a very long distance, they may not be recognized or may be transmitted with recognition errors. For these reasons, visualizing only the internal information of `scenario_simulator_v2` could result in overlooking the fact that Autoware might be operating without recognizing these entities, potentially leading to errors in scenario analysis. You can visualize the Entity information held internally by `scenario_simulator_v2` by checking the `Entity Marker` checkbox in the `Simulator internal information` box, as shown in the figure below.
+- [**Visualizing the Internal Information of the Simulator**](#visualizing-the-internal-information-of-the-simulator)
+  - [Table of Contents](#table-of-contents)
+  - [**Visualizing Entity Information**](#visualizing-entity-information)
+  - [**Visualizing the Status of ConditionGroups**](#visualizing-the-status-of-conditiongroups)
 
-<div style="text-align:center;">
-  <img src="../image/entity_marker.png" width="600">
-</div>
+## **Visualizing Entity Information**
 
-## Visualizing the Status of ConditionGroup
+WIP
 
-You can check the fulfillment status of the `ConditionGroup` defined in the scenario file on rviz. If an `Event name` is defined for `ConditionGroup`, that name is reflected. If it is blank, names such as `ConditionGroups1`,`ConditionGroups2`,`ConditionGroups3` etc. are automatically assigned. However, it's important to note that with this information alone, it is not possible to determine whether each `ConditionGroups` is linked to a success or failure condition. Therefore, if you want to check this information when visualizing in rviz, it is recommended to explicitly define the `Event name` as `SuccessCondition` etc. when creating the scenario file. Visualization of the fulfillment status can be done by checking the `ConditionGroup` checkbox, as shown in the figure below.
+## **Visualizing the Status of ConditionGroups**
 
-<div style="text-align:center;">
-  <img src="../image/condition_group.png" width="600">
-</div>
+`ConditionGroup`s defined in the scenario file can be checked on rviz, a visualization tool.
+
+A `ConditionGroup` acts as a trigger for events described in the scenario. A `ConditionGroup` is deemed true when all its sub-Conditions are fulfilled. Furthermore, event triggers can have multiple `ConditionGroup`s. If the evaluation of any one `ConditionGroup` becomes true, the trigger is activated.
+
+One usage example is to display `ConditionGroup`s at the moment the scenario fails. This allows you to analyze the cause of the failure.
+
+The display structure is as follows, and allows multiple Conditions to be included in one `ConditionGroup`:
+
+```markdown
+Condition Group Name: xxx
+Current Evaluation: xxx
+Current Value: true/false
+Type: ReachPositionCondition, CollisionCondition, etc.
+Current Evaluation:
+Current Value:
+Type:
+︙
+Condition Group Name: xxx
+Current Evaluation: xxx
+Current Value: true/false
+Type: ReachPositionCondition, CollisionCondition, etc.
+Current Evaluation:
+Current Value:
+Type:
+︙
+```
+
+Each condition is described using three elements:
+
+- **Current Evaluation**: Current achievement status
+- **Current Value**: The fulfillment status of the condition expressed in true/false
+- **Type**: Types of conditions, such as `ReachPositionCondition`, `CollisionCondition`, etc.
+
+To visualize the achievement status, check the `ConditionGroup` checkbox as demonstrated in the image below. 
+![condition group visualization](../image/condition_group.png "condition group visualization")") 
+
+If an `Event name` is defined in the `ConditionGroup`, that name will be reflected. If left blank, names like `ConditionGroup1`, `ConditionGroup2`, `ConditionGroup3`, etc. are automatically assigned. However, this information alone doesn't clarify if each `ConditionGroup` is linked to success or failure conditions. Therefore, when visualizing with rviz and you want this information to be apparent, we recommend explicitly defining the `Event name` as `SuccessCondition` or similar when creating the scenario file.
+
+---
