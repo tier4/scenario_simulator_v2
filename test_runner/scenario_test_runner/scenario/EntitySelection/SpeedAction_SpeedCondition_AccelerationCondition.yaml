@@ -195,7 +195,7 @@ OpenSCENARIO:
                           - name: ''
                             UserDefinedAction:
                               CustomCommandAction:
-                                type: 'test(AccelerationCondtition Satisfied)'
+                                type: 'test(AccelerationCondition Satisfied)'
                       - name: ''
                         priority: parallel
                         StartTrigger:
