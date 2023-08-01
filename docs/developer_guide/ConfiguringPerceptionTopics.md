@@ -130,39 +130,6 @@ not supported.
 `"0.0"`, meaning no randomization.
 
 **[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPositionStandardDeviation.yaml)** -
-
-## Property `*PublishingDelay`
-**Summary** - Delays the publication of the perception topic by the specified
-number of seconds. There are two perception topic delay properties.
-
-- `detectedObjectPublishingDelay` delays the publication of detected object.
-- `pointcloudPublishingDelay` delays the publication of no_ground pointcloud.
-
-**Purpose** - In a real vehicle, the perception topic is generated through the
-processing of a sensing and perception module. However, in `scenario_simulator_v2`,
-these processes are simplified. Detected objects are directly outputted as they
-are from the simulator's objects, and no_ground pointcloud is the result of a
-simple ray tracing. While this is suitable for testing planning and control modules
-in an idealized environment, it does not account for the processing delays in
-perception in a real vehicle. These properties can introduce an arbitrary delay
-in the perception topic to simulate these real-world delays.
-
-**Specification** - For each frame, if the current stamp exceeds the set time
-from the topic's stamp, the topic is published, thereby implementing the delay.
-This could result in a maximum error of 2/FPS. Also, the order of topics to be
-published is guaranteed to be the same as when there is no delay.
-Since the delay is set to the same value for each object, it is not possible to
-delay only a specific object.
-
-**Note** - This feature sets the delay from when the perception results are
-obtained in `scenario_simulator_v2` to when they are published. Note that there
-are other potential sources of delay, such as frame rates becoming unstable,
-and delays in pub/sub.
-
-**Default behavior** - If the property is not defined, the default value is
-`"0.0"`, indicating no delay.
-
-**[Example of detectedObjectPublishingDelay](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPositionStandardDeviation.yaml)** -
 ```
         ObjectController:
           Controller:
@@ -175,7 +142,44 @@ and delays in pub/sub.
                   value: "3"
 ```
 
-**[Example of pointcloudPublishingDelay](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPublishingDelay.yaml)** -
+## Property `detectedObjectPublishingDelay`
+
+**Summary** - Delays the publication of the perception topic by the specified
+number of seconds.
+
+**Purpose** - Normally, Autoware reflects the surrounding situation in the
+steering operation by processing the data in the order of the sensing module,
+perception module, planning module, and vehicle driver. However, when not
+connected with AWSIM, `scenario_simulator_v2` skips the sensing module and
+perception module and directly generates the data of the perception result, and
+sends it to the planning module. This behavior is desirable as a test of the
+planning module, but on the other hand, there is a problem that the time until
+the perception result is generated is unrealistically fast in response to
+changes in the environment surrounding the vehicle. This property works around
+this problem by setting an interval of the specified number of seconds between
+`scenario_simulator_v2` generating a perception result and publishing it.
+
+**Specification** - The property's value must be a positive real number. The
+unit is seconds. It is an error if the value is negative.　Since the delay is
+set to the same value for each topic, it is not possible to delay only a
+specific topic.
+
+**Guarantee** - This delay setting ensures that `scenario_simulator_v2`
+publishes the perception results in a consistent order. They are published
+according to their original order. However, while `scenario_simulator_v2`
+guarantees to publish in order, it does not guarantee that it reaches the
+planning module in order. This is because the arrival order of topics in ROS 2
+is not guaranteed.
+
+**Note** - This feature only adjusts the interval between ssv2 generating a
+perception result and publishing it. Note that there is another kind of delay
+between when `scenario_simulator_v2` publishes the perception result and when
+it reaches the planning module.
+
+**Default behavior** - If the property is not specified, the default value is
+`"0.0"`, meaning no delay.
+
+**[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPublishingDelay.yaml)** -
 ```
         ObjectController:
           Controller:
@@ -218,31 +222,4 @@ deterministic.
               Property:
                 - name: "randomSeed"
                   value: "0"
-```
-
-## Property `detectionSensorRange`
-
-**Summary** - Specifies the range within which a sensor can detect objects.
-
-**Purpose** - The purpose of the detectionSensorRange property is to replicate the limits of recognition distance that exist in actual sensors on the simulator. By running simulations with varying values of this property, it can be used to determine requirements such as the minimum recognition distance needed in specific use cases.
-
-**Specification** - The detectionSensorRange property sets the detectable range for objects using the ego vehicle as the center, forming a circle with a radius equal to the detectionSensorRange value in meters. Ideally, the range should consider only objects that are both within this circle and detected by Lidar, in order to avoid detecting occluded objects. **However, the current specification detects all objects within the set range, without considering factors such as occlusion.Please note that there is room for discussion and modification regarding this part of the specification.**
-
-**Default behavior** - If the property is not specified, the default value is `"300.0"`, indicating a sensor detection range of 300 meters.
-
-**Note** - To ensure that objects within the recognition distance are detected by this property, it's necessary to explicitly set another property, isClairvoyant, to true. If this is not done, the value of detectionSensorRange will not be reflected in the simulator's behavior and only objects detected by the lidar will be outputted.
-
-**[Example of detectionSensorRange]([https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectionSensorRange.yaml])** -
-```
-        ObjectController:
-          Controller:
-            name: '...'
-            Properties:
-              Property:
-                - name: "isEgo"
-                  value: "true"
-                - name: "detectionSensorRange"
-                  value: "50"
-                - name: "isClairvoyant"
-                  value: "true"
 ```
