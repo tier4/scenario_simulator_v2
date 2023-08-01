@@ -12,6 +12,8 @@ on:
       - '!.github/**'
       - '.github/workflows/BuildAndRun.yaml'
       - '!mkdocs.yml'
+      - '!pyproject.toml'
+      - '!poetry.lock'
   push:
     branches:
       - master
