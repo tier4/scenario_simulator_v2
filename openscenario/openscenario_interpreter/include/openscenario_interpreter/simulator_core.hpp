@@ -245,8 +245,7 @@ public:
       }());
 
       if (controller.isUserDefinedController()) {
-        core->attachLidarSensor(
-          entity_ref, controller.properties.template get<Double>("pointcloudPublishingDelay"));
+        core->attachLidarSensor(entity_ref);
 
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
