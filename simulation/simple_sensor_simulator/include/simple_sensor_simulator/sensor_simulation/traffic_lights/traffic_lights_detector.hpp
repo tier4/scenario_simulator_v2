@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_PUBLISHER_HPP
-#define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_PUBLISHER_HPP
+#ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_DETECTOR_HPP_
+#define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_DETECTOR_HPP_
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
@@ -47,10 +44,23 @@ public:
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
   {
+    static int count = 0;
+    count++;
+    if (count % 30 == 0) {
+      std::stringstream ss;
+      for (auto traffic_light : request.states()) {
+        ss << "id: " << traffic_light.id();
+        for (auto state : traffic_light.traffic_light_status()) {
+          ss << ", state: " << state.color();
+        }
+        ss << std::endl;
+      }
+      std::cout << ss.str() << std::endl;
+    }
     publisher_->publish(current_ros_time, request);
   }
 };
 }  // namespace traffic_lights
 }  // namespace simple_sensor_simulator
 
-#endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_PUBLISHER_HPP
+#endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__TRAFFIC_LIGHTS__TRAFFIC_LIGHTS_DETECTOR_HPP_

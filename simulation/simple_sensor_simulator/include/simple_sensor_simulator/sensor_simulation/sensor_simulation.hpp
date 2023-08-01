@@ -17,6 +17,8 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
