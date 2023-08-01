@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__READER__NAMEREF_HPP_
-#define OPENSCENARIO_INTERPRETER__READER__NAMEREF_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__READER__NAME_REF_HPP_
+#define OPENSCENARIO_INTERPRETER__READER__NAME_REF_HPP_
 
 #include <boost/range/adaptors.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
@@ -54,4 +54,4 @@ auto readNameRef(
 }  // namespace reader
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__READER__NAMEREF_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__READER__NAME_REF_HPP_
