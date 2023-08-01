@@ -256,10 +256,10 @@ void ScenarioSimulator::despawnEntity(
     }
   }
   if (found) {
-    entity_status_.erase(req.name());
     if (isEgo(req.name())) {
       ego_entity_simulation_.reset();
     }
+    entity_status_.erase(req.name());
   }
 
   vehicles_ = vehicles;
