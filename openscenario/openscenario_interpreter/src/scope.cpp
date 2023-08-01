@@ -135,13 +135,13 @@ auto Scope::insert(const Name & identifier, const Object & object) -> void
   return frame->define(identifier, object);
 }
 
-auto Scope::entities(bool allow_entity_selecition, bool allow_misc_external)
+auto Scope::entities(bool allow_entity_selection, bool allow_misc_external)
   -> std::list<std::string>
 {
   auto entity_list = std::list<std::string>();
   for (const auto & [entity, object] : scenario_definition->entities->entities) {
     if (
-      (allow_entity_selecition or not object.is<EntitySelection>()) and
+      (allow_entity_selection or not object.is<EntitySelection>()) and
       (allow_misc_external or
        not(object.is<MiscObject>() or object.is<ExternalObjectReference>()))) {
       entity_list.push_back(entity);

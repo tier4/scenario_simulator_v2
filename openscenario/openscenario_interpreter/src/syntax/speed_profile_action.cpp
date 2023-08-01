@@ -27,7 +27,7 @@ inline namespace syntax
 SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
   // NOTE: OpenSCENARIO User Guide does not state whether `EntitySelection` is allowed
-  // for `SpeedProfileAciton.entityRef`. It seems `EntitySelection` can be used only when
+  // for `SpeedProfileAction.entityRef`. It seems `EntitySelection` can be used only when
   // it is the subject of any actions or conditions, so I left default allowance of entities
   // and `EntitySelection` is not allowed here.
   entity_ref(readNameRef("entityRef", node, scope, scope.entities(), String())),
