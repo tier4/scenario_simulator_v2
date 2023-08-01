@@ -56,7 +56,7 @@ auto TimeHeadwayCondition::evaluate() -> Object
     auto objects = global().entities->objects({triggering_entity});
     std::transform(
       std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
-      [&](const auto & object) { return evaluateTimeHeadway(object, entity_ref); });
+      [&](const auto & object) { return evaluateTimeHeadway(entity_ref, object); });
 
     return not objects.empty() and std::all_of(
                                      std::begin(results.back()), std::end(results.back()),
