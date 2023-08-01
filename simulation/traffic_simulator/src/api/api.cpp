@@ -241,10 +241,13 @@ bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & li
   }
 }
 
-bool API::attachLidarSensor(const std::string & entity_name, const helper::LidarType lidar_type)
+bool API::attachLidarSensor(
+  const std::string & entity_name, const double lidar_sensor_delay,
+  const helper::LidarType lidar_type)
 {
   return attachLidarSensor(helper::constructLidarConfiguration(
-    lidar_type, entity_name, getParameter<std::string>("architecture_type", "awf/universe")));
+    lidar_type, entity_name, getParameter<std::string>("architecture_type", "awf/universe"),
+    lidar_sensor_delay));
 }
 
 bool API::updateTrafficLightsInSim()

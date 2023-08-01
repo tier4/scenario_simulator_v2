@@ -2,6 +2,87 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.7.0 (2023-07-26)
+------------------
+* Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl
+* renamed traffic manager base filename
+* renamed traffic light manager base
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change-impl
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge pull request `#906 <https://github.com/tier4/scenario_simulator_v2/issues/906>`_ from tier4/feature/traffic_simulator/follow-trajectory-action
+* Cleanup
+* Restored an accidentally deleted config installation
+* Move some vector3 related functions into package `geometry`
+* Move some arithmetic functions into new package `arithmetic`
+* Cleanup
+* Update `tick` to check if `desired_velocity` contains infinity or NaN
+* Update `tick` to check if intermidiate values are infinity and NaN
+* Update `tick` to check distance to front waypoint is approlimately zero
+* Update `follow_trajectory::Parameter` to hold base time
+* Cleanup
+* Remove data member `FollowPolylineTrajectoryAction::direction`
+* Update `FollowPolylineTrajectoryAction::calculateWaypoints`
+* Rename data member `Parameter<>::timing_is_absolute`
+* Rename local function `absolute` to `to_simulation_time`
+* Remove follow clothoid and NURBS trajectory action
+* Add a comment to unimplemented dummy function `calculateObstacle`
+* Add a comment to unimplemented dummy function `calculateObstacle`
+* Lipsticks
+* Lipsticks
+* Add some test scenarios
+* Lipsticks
+* Update `FollowTrajectoryAction::accomplished` to work correctly
+* Relax the condition for determining delay for the specified arrival time
+* Lipsticks
+* Improve time remaining calculation and speed planning
+* Add some notes
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/zmq-interface-change
+* Update the arrival condition to correctly detect early arrivals
+* Update to properly calculate remaining time when timing is relative
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* Merge remote-tracking branch 'tier4/master' into pzyskowski/660/ego-entity-split
+* Update the arrival decision to be made in the middle of the loop
+* Merge pull request `#1004 <https://github.com/tier4/scenario_simulator_v2/issues/1004>`_ from tier4/feat/v2i_custom_command_action
+* Cleanup member function `FollowPolylineTrajectoryAction::tick`
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'pzyskowski/660/ego-entity-split' into pzyskowski/660/zmq-interface-change
+* Merge remote-tracking branch 'origin/master' into feat/v2i_custom_command_action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/fault-injection
+* Merge remote-tracking branch 'origin/master' into fix/get_s_value
+* refactor(traffic_simulator): implement switching of traffic light managers
+* Simplify outermost condition of `FollowPolylineTrajectoryAction::tick`
+* Update `behavior_plugin` to receive Parameter via `shared_ptr`
+* Merge branch 'pzyskowski/660/concealer-split' into pzyskowski/660/ego-entity-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'tier/master' into pzyskowski/660/concealer-split
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Update `FollowPolylineTrajectoryAction` to consider `max_deceleration_rate`
+* Add closure `exhausted`, `advance` and `discard`
+* Lipsticks
+* Update FollowPolylineTrajectoryAction to respect time limits, albeit imperfectly
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Lipsticks
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Lipsticks
+* Update `FollowPolylineTrajectoryAction` to respect dynamic_constraints
+* Cleanup
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Update `FollowPolylineTrajectoryAction` to work if `time` unspecified
+* Update `FollowPolylineTrajectoryAction` to receive parameter
+* Add accessors for `Follow*TrajectoryAction` to `BehaviorPluginBase`
+* Update enumeration `traffic_simulator::behavior::Request`
+* Add new behavior request `Request::FOLLOW_TRAJECTORY`
+* Add new VehicleActionNode `FollowPolylineTrajectoryAction`
+* Add new VehicleActionNode `FollowNurbsTrajectoryAction`
+* Add new VehicleActionNode `FollowClothoidTrajectoryAction`
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.6.8 (2023-05-09)
 ------------------
 * Merge remote-tracking branch 'origin/master' into ref/AJD-696_clean_up_metics_traffic_sim
