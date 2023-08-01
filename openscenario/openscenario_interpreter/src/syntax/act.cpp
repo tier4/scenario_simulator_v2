@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/act.hpp>
 #include <openscenario_interpreter/syntax/maneuver_group.hpp>
 
@@ -33,14 +34,14 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
 
 auto Act::run() -> void
 {
-  int index{0};
+  size_t index{0};
   for (auto && maneuver_group : elements) {
     try {
       assert(maneuver_group.is_also<ManeuverGroup>());
       maneuver_group.evaluate();
       index++;
-    } catch (const ScenarioError & e) {
-      throw ScenarioError(name, index, "ManeuverGroup", e);
+    } catch (const ScenarioFailure & e) {
+      throw ScenarioFailure(name, index, "ManeuverGroup", e);
     }
   }
 }

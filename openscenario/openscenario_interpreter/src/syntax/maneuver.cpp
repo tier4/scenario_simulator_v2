@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 
@@ -31,14 +32,14 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
 
 auto Maneuver::run() -> void
 {
-  int index{0};
+  size_t index{0};
   for (auto && event : elements) {
     try {
       assert(event.is_also<Event>());
       event.evaluate();
       index++;
-    } catch (const ScenarioError & e) {
-      throw ScenarioError(name, index, "Event", e);
+    } catch (const ScenarioFailure & e) {
+      throw ScenarioFailure(name, index, "Event", e);
     }
   }
 }

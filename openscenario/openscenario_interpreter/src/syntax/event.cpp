@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 
 namespace openscenario_interpreter
@@ -62,7 +63,7 @@ auto Event::evaluate() -> Object
     return StoryboardElement::evaluate();
   } catch (const SpecialAction<EXIT_FAILURE> & action) {
     auto index = start_trigger.activeConditionGroupIndex();
-    auto error = ScenarioError(name, index, "StartTrigger.ConditionGroup");
+    auto error = ScenarioFailure(name, index, "StartTrigger.ConditionGroup");
     error.setCoreSource(start_trigger.activeConditionGroupDescription());
     RCLCPP_WARN_STREAM(rclcpp::get_logger("XXXXX"), "core set");
     throw error;

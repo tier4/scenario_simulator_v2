@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/act.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
@@ -36,14 +37,14 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
 
 auto Story::run() -> void
 {
-  int index{0};
+  size_t index{0};
   for (auto && act : elements) {
     try {
       assert(act.is_also<Act>());
       act.evaluate();
       index++;
-    } catch (const ScenarioError & e) {
-      throw ScenarioError(name, index, "Act", e);
+    } catch (const ScenarioFailure & e) {
+      throw ScenarioFailure(name, index, "Act", e);
     }
   }
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/action.hpp>
 #include <openscenario_interpreter/syntax/init_actions.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
@@ -95,12 +96,22 @@ auto InitActions::startInstantaneousActions() -> void
   for (auto && e : global_actions) {
     e.as<GlobalAction>().start();
   }
-  for (auto && e : user_defined_actions) {
-    auto & user_defined_action = e.as<UserDefinedAction>();
-    if (user_defined_action.endsImmediately()) {
-      user_defined_action.start();
+
+  size_t index{0};
+  try {
+    for (auto && e : user_defined_actions) {
+      auto & user_defined_action = e.as<UserDefinedAction>();
+      if (user_defined_action.endsImmediately()) {
+        user_defined_action.start();
+      }
+      index++;
     }
+  } catch (const SpecialAction<EXIT_FAILURE> & action) {
+    auto error = ScenarioFailure("Init", index, "Actions.UserDefinedAction");
+    error.setInitActionAsSource();
+    throw error;
   }
+
   for (auto && e : privates) {
     e.as<Private>().startInstantaneousActions();
   }

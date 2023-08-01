@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/init.hpp>
 
 namespace openscenario_interpreter
@@ -24,18 +25,31 @@ Init::Init(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto Init::endsImmediately() const -> bool { return actions.endsImmediately(); }
+auto Init::endsImmediately() const -> bool
+{
+  return actions.endsImmediately();
+}
 
 auto Init::evaluateInstantaneousActions() -> Object
 {
-  actions.startInstantaneousActions();
-  actions.runInstantaneousActions();
+  try {
+    actions.startInstantaneousActions();
+    actions.runInstantaneousActions();
+  } catch (const ScenarioFailure & e) {
+    throw ScenarioFailure("OpenSCENARIO.Storyboard", e);
+  }
   return unspecified;
 }
 
-auto Init::runNonInstantaneousActions() -> void { actions.runNonInstantaneousActions(); }
+auto Init::runNonInstantaneousActions() -> void
+{
+  actions.runNonInstantaneousActions();
+}
 
-auto Init::startNonInstantaneousActions() -> void { actions.startNonInstantaneousActions(); }
+auto Init::startNonInstantaneousActions() -> void
+{
+  actions.startNonInstantaneousActions();
+}
 
 auto operator<<(nlohmann::json & json, const Init & datum) -> nlohmann::json &
 {

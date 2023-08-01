@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/maneuver_group.hpp>
 
 namespace openscenario_interpreter
@@ -37,14 +38,14 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
 
 auto ManeuverGroup::run() -> void
 {
-  int index{0};
+  size_t index{0};
   for (auto && maneuver : elements) {
     try {
       assert(maneuver.is_also<Maneuver>());
       maneuver.evaluate();
       index++;
-    } catch (const ScenarioError & e) {
-      throw ScenarioError(name, index, "Maneuver", e);
+    } catch (const ScenarioFailure & e) {
+      throw ScenarioFailure(name, index, "Maneuver", e);
     }
   }
 }

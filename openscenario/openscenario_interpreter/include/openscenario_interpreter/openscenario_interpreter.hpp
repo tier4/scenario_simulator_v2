@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__OPENSCENARIO_INTERPRETER_HPP_
 
 #include <openscenario_interpreter/console/escape_sequence.hpp>
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
@@ -156,9 +157,9 @@ public:
       return thunk();
     }
 
-    catch (const ScenarioError & error) {
+    catch (const ScenarioFailure & error) {
       isFailureIntended() ? set<common::junit::Pass>()
-                          : set<common::junit::Error>("ScenarioError", error.what());
+                          : set<common::junit::Error>("ScenarioFailure", error.what());
       return handle(error);
     }
 

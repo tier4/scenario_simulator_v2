@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
@@ -33,8 +34,8 @@ auto ScenarioDefinition::evaluate() -> Object
   road_network.evaluate();
   try {
     return storyboard.evaluate();
-  } catch (const ScenarioError & e) {
-    throw ScenarioError("OpenSCENARIO", e);
+  } catch (const ScenarioFailure & e) {
+    throw ScenarioFailure("OpenSCENARIO", e);
   }
 }
 

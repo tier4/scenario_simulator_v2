@@ -15,10 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__ERROR_HPP_
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
-#include <exception>
-#include <iomanip>
 #include <openscenario_interpreter/utility/demangle.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+
+#include <exception>
+#include <iomanip>
 #include <stdexcept>
 
 #define LINE() \
@@ -31,7 +32,6 @@ namespace openscenario_interpreter
 {
 using common::AutowareError;
 using common::Error;
-using common::ScenarioError;
 using common::SemanticError;
 using common::SimulationError;
 using common::SyntaxError;

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/global_action.hpp>
@@ -44,13 +45,13 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 
 auto Storyboard::run() -> void
 {
-  int index{0};
+  size_t index{0};
   for (auto && story : elements) {
     try {
       story.evaluate();
       index++;
-    } catch (const ScenarioError & e) {
-      throw ScenarioError(name, index, "Story", e);
+    } catch (const ScenarioFailure & e) {
+      throw ScenarioFailure(name, index, "Story", e);
     }
   }
 }
