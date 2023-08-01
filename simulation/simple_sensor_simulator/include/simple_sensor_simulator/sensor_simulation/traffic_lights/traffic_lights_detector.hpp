@@ -44,19 +44,6 @@ public:
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
   {
-    static int count = 0;
-    count++;
-    if (count % 30 == 0) {
-      std::stringstream ss;
-      for (auto traffic_light : request.states()) {
-        ss << "id: " << traffic_light.id();
-        for (auto state : traffic_light.traffic_light_status()) {
-          ss << ", state: " << state.color();
-        }
-        ss << std::endl;
-      }
-      std::cout << ss.str() << std::endl;
-    }
     publisher_->publish(current_ros_time, request);
   }
 };
