@@ -145,22 +145,6 @@ public:
     return origin;
   }
 
-  //  template <typename... Ts>
-  //  auto makeConventionalTrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
-  //  {
-  //    const auto architecture_type =
-  //      getParameter<std::string>("architecture_type", "awf/universe");
-  //    if (architecture_type == "awf/universe") {
-  //      return std::make_shared<ConventionalTrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
-  //    } else if (architecture_type == "awf/universe/2023.08"){
-  //      return std::make_shared<ConventionalTrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(std::forward<decltype(xs)>(xs)...);
-  //    } else {
-  //      throw common::SemanticError(
-  //        "Unexpected architecture_type ", std::quoted(architecture_type),
-  //        " given for conventional traffic lights simulation.");
-  //    }
-  //  }
-
   template <typename... Ts>
   auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
   {
