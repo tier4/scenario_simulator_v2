@@ -47,14 +47,11 @@ auto LaneChangeAction::accomplished() -> bool
 {
   return std::all_of(
     std::begin(accomplishments), std::end(accomplishments), [&](auto & accomplishment) {
-      const auto is_lane_changing = [&](const auto & actor) {
-        auto objects = global().entities->objects({actor});
-        return std::all_of(std::begin(objects), std::end(objects), [](const auto & object) {
-          return evaluateCurrentState(object) == "lane_change";
-        });
-      };
+      auto objects = global().entities->objects({accomplishment.first});
       return accomplishment.second or
-             (accomplishment.second = not is_lane_changing(accomplishment.first));
+             (accomplishment.second = not std::all_of(
+                std::begin(objects), std::end(objects),
+                [](const auto & object) { return evaluateCurrentState(object) == "lane_change"; }));
     });
 }
 
