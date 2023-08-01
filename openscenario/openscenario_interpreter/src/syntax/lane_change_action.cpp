@@ -70,13 +70,13 @@ auto LaneChangeAction::start() -> void
   for (const auto & accomplishment : accomplishments) {
     for (const auto & object : global().entities->objects({accomplishment.first})) {
       if (lane_change_target.is<AbsoluteTargetLane>()) {
-        return applyLaneChangeAction(
+        applyLaneChangeAction(
           object, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
           static_cast<traffic_simulator::lane_change::TrajectoryShape>(
             lane_change_action_dynamics.dynamics_shape),
           static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
       } else {
-        return applyLaneChangeAction(
+        applyLaneChangeAction(
           object, static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
           static_cast<traffic_simulator::lane_change::TrajectoryShape>(
             lane_change_action_dynamics.dynamics_shape),
