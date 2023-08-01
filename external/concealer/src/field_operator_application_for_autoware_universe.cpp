@@ -292,9 +292,11 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
         initial_pose_msg.header.frame_id = "map";
         initial_pose_msg.pose.pose = initial_pose;
 
-        auto request = std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
-        std::vector<geometry_msgs::msg::PoseWithCovarianceStamped> stamped_poses = {initial_pose_msg};
-        request->pose.push_back(initial_pose_msg) ;
+        auto request =
+          std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
+        std::vector<geometry_msgs::msg::PoseWithCovarianceStamped> stamped_poses = {
+          initial_pose_msg};
+        request->pose.push_back(initial_pose_msg);
         requestInitialPose(request);
       });
 
@@ -384,20 +386,21 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double v
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
 {
-#define IF(IDENTIFIER, RETURN)                             \
-  if (getAutowareState().state == tier4_system_msgs::msg::AutowareState::IDENTIFIER) \
-    { return #RETURN; }
+#define IF(IDENTIFIER, RETURN)                                                         \
+  if (getAutowareState().state == tier4_system_msgs::msg::AutowareState::IDENTIFIER) { \
+    return #RETURN;                                                                    \
+  }
 
-    IF(INITIALIZING_VEHICLE, INITIALIZING)
-    IF(WAITING_FOR_ROUTE, WAITING_FOR_ROUTE)
-    IF(PLANNING, PLANNING)
-    IF(WAITING_FOR_ENGAGE, WAITING_FOR_ENGAGE)
-    IF(DRIVING, DRIVING)
-    IF(ARRIVAL_GOAL, ARRIVED_GOAL)
-    IF(EMERGENCY, EMERGENCY)
-    IF(FINALIZING, FINALIZING)
+  IF(INITIALIZING_VEHICLE, INITIALIZING)
+  IF(WAITING_FOR_ROUTE, WAITING_FOR_ROUTE)
+  IF(PLANNING, PLANNING)
+  IF(WAITING_FOR_ENGAGE, WAITING_FOR_ENGAGE)
+  IF(DRIVING, DRIVING)
+  IF(ARRIVAL_GOAL, ARRIVED_GOAL)
+  IF(EMERGENCY, EMERGENCY)
+  IF(FINALIZING, FINALIZING)
 
-    return "";
+  return "";
 #undef IF
 }
 
