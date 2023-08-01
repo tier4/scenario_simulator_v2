@@ -4,9 +4,9 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-|---------|---------------|----------|--------------|-------------|
-|         |               |          |              |             |
+| Feature                            | Brief summary                                                                 | Category                   | Pull request                                                      | Contributor                         |
+|------------------------------------|-------------------------------------------------------------------------------|----------------------------|-------------------------------------------------------------------|-------------------------------------|
+| OpenSCENARIO 1.2 `EntitySelection` | Added `EntitySelection` and modified some classes to be able to cope with it. | `openscenario_interpreter` | [#1059](https://github.com/tier4/scenario_simulator_v2/pull/1059) | [shouth](https://github.com/shouth) |
 
 Bug Fixes:bug:
 
