@@ -1,14 +1,28 @@
 ScenarioModifiers:
-  ScenarioModifier: []
+  ScenarioModifier:
+    - name: __tier4_modifier_IS_CLAIRVOYANT
+      list:
+        - 'false'
+        - 'true'
+    - name: __tier4_modifier_DETECTION_SENSOR_RANGE
+      list:
+        - 300
+        - 10
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 1
-    date: "2023-06-30T20:52:04.803Z"
-    description: ""
+    date: '2023-08-01T03:52:40.495Z'
+    description: ''
     author: Kyoichi Sugahara
   ParameterDeclarations:
-    ParameterDeclaration: []
+    ParameterDeclaration:
+      - name: IS_CLAIRVOYANT
+        parameterType: string
+        value: __tier4_modifier_IS_CLAIRVOYANT
+      - name: DETECTION_SENSOR_RANGE
+        parameterType: double
+        value: __tier4_modifier_DETECTION_SENSOR_RANGE
   CatalogLocations:
     CatalogLocation: []
   RoadNetwork:
@@ -20,7 +34,7 @@ OpenSCENARIO:
     ScenarioObject:
       - name: ego
         Vehicle:
-          name: ""
+          name: ''
           vehicleCategory: car
           BoundingBox:
             Center:
@@ -28,8 +42,8 @@ OpenSCENARIO:
               y: 0
               z: 1.25
             Dimensions:
-              width: 1.83
               length: 4.77
+              width: 1.83
               height: 2.5
           Performance:
             maxSpeed: 50
@@ -52,18 +66,18 @@ OpenSCENARIO:
             Property: []
         ObjectController:
           Controller:
-            name: ""
+            name: ''
             Properties:
               Property:
-                - name: "isEgo"
-                  value: "true"
-                - name: "detectionSensorRange"
-                  value: "50"
-                - name: "isClairvoyant"
-                  value: "true"
+                - name: isEgo
+                  value: 'true'
+                - name: detectionSensorRange
+                  value: $DETECTION_SENSOR_RANGE
+                - name: isClairvoyant
+                  value: $IS_CLAIRVOYANT
       - name: Npc1
         Vehicle:
-          name: ""
+          name: ''
           vehicleCategory: car
           BoundingBox:
             Center:
@@ -71,8 +85,8 @@ OpenSCENARIO:
               y: 0
               z: 1.25
             Dimensions:
-              width: 1.8
               length: 4
+              width: 1.8
               height: 2.5
           Performance:
             maxSpeed: 50
@@ -95,7 +109,118 @@ OpenSCENARIO:
             Property: []
         ObjectController:
           Controller:
-            name: ""
+            name: ''
+            Properties:
+              Property: []
+      - name: Npc2
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              length: 0.2
+              width: 0.5
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 0.5
+              positionX: 0.1
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 0.5
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: Npc3
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              length: 4
+              width: 1.8
+              height: 2.5
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 2
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
+      - name: Npc4
+        Vehicle:
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              length: 20
+              width: 1.8
+              height: 10
+          Performance:
+            maxSpeed: 50
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 10
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 0.5236
+              wheelDiameter: 0.6
+              trackWidth: 1.8
+              positionX: 0
+              positionZ: 0.3
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ''
             Properties:
               Property: []
   Storyboard:
@@ -107,87 +232,202 @@ OpenSCENARIO:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      roadId: ""
-                      laneId: "34513"
-                      s: 1
-                      offset: 0
+                      roadId: ''
+                      laneId: '34976'
+                      s: 19.9759
+                      offset: 0.1573
                       Orientation:
                         type: relative
                         h: 0
-                        p: 0
+                        p: -0.0
                         r: 0
               - RoutingAction:
                   AcquirePositionAction:
                     Position:
                       LanePosition:
-                        roadId: ""
-                        laneId: "34513"
-                        s: 20
+                        roadId: ''
+                        laneId: '34976'
+                        s: 25.7795
                         offset: 0
                         Orientation:
                           type: relative
                           h: 0
-                          p: 0
+                          p: -0.0
                           r: 0
           - entityRef: Npc1
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      roadId: ""
-                      laneId: "34513"
-                      s: 30
+                      roadId: ''
+                      laneId: '34981'
+                      s: 4.9731
                       offset: 0
                       Orientation:
                         type: relative
                         h: 0
-                        p: 0
+                        p: -0.0
                         r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
               - ControllerAction:
                   AssignControllerAction:
                     Controller:
-                      name: ""
+                      name: ''
                       Properties:
                         Property:
                           - name: maxSpeed
-                            value: "5"
+                            value: '0'
+          - entityRef: Npc2
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34600'
+                      s: 20
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '34420'
+                        s: 8.3774
+                        offset: 0.2051
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: -0.0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 5.55
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '5.55'
+          - entityRef: Npc3
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34408'
+                      s: 15
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '0'
+          - entityRef: Npc4
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34564'
+                      s: 9.0924
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '0'
     Story:
-      - name: ""
+      - name: ''
         Act:
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
-                name: ""
+                name: ''
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
                     - entityRef: ego
                 Maneuver:
-                  - name: ""
+                  - name: ''
                     Event:
-                      - name: ""
+                      - name: ''
                         priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ""
+                                - name: ''
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 100
+                                      value: 30
                                       rule: greaterThan
                         Action:
-                          - name: ""
+                          - name: ''
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: exitSuccess
-                      - name: ""
+                      - name: ''
                         priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ""
+                                - name: ''
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
@@ -195,7 +435,7 @@ OpenSCENARIO:
                                       value: 180
                                       rule: greaterThan
                             - Condition:
-                                - name: ""
+                                - name: ''
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -207,15 +447,54 @@ OpenSCENARIO:
                                       CollisionCondition:
                                         EntityRef:
                                           entityRef: Npc1
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Npc2
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Npc3
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef:
+                                          entityRef: Npc4
                         Action:
-                          - name: ""
+                          - name: ''
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: exitFailure
             StartTrigger:
               ConditionGroup:
                 - Condition:
-                    - name: ""
+                    - name: ''
                       delay: 0
                       conditionEdge: none
                       ByValueCondition:
