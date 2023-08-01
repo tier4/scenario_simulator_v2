@@ -12,7 +12,7 @@ OpenSCENARIO:
   FileHeader:
     revMajor: 1
     revMinor: 1
-    date: '2023-08-01T03:52:40.495Z'
+    date: '2023-08-01T04:36:06.720Z'
     description: ''
     author: Kyoichi Sugahara
   ParameterDeclarations:
@@ -81,9 +81,9 @@ OpenSCENARIO:
           vehicleCategory: car
           BoundingBox:
             Center:
-              x: 0
+              x: 1.3
               y: 0
-              z: 1.25
+              z: 1.2
             Dimensions:
               length: 4
               width: 1.8
@@ -118,12 +118,12 @@ OpenSCENARIO:
           vehicleCategory: car
           BoundingBox:
             Center:
-              x: 0
+              x: 1.3
               y: 0
-              z: 0
+              z: 1.2
             Dimensions:
-              length: 0.2
-              width: 0.5
+              length: 4
+              width: 1.8
               height: 2.5
           Performance:
             maxSpeed: 50
@@ -133,13 +133,13 @@ OpenSCENARIO:
             FrontAxle:
               maxSteering: 0.5236
               wheelDiameter: 0.6
-              trackWidth: 0.5
-              positionX: 0.1
+              trackWidth: 1.8
+              positionX: 2
               positionZ: 0.3
             RearAxle:
               maxSteering: 0.5236
               wheelDiameter: 0.6
-              trackWidth: 0.5
+              trackWidth: 1.8
               positionX: 0
               positionZ: 0.3
           Properties:
@@ -186,19 +186,19 @@ OpenSCENARIO:
             name: ''
             Properties:
               Property: []
-      - name: Npc4
+      - name: Trailer0
         Vehicle:
           name: ''
-          vehicleCategory: car
+          vehicleCategory: trailer
           BoundingBox:
             Center:
               x: 0
               y: 0
               z: 0
             Dimensions:
-              length: 20
-              width: 1.8
-              height: 10
+              length: 12
+              width: 2.5
+              height: 2.5
           Performance:
             maxSpeed: 50
             maxAcceleration: INF
@@ -207,13 +207,13 @@ OpenSCENARIO:
             FrontAxle:
               maxSteering: 0.5236
               wheelDiameter: 0.6
-              trackWidth: 1.8
-              positionX: 10
+              trackWidth: 2.5
+              positionX: 6
               positionZ: 0.3
             RearAxle:
               maxSteering: 0.5236
               wheelDiameter: 0.6
-              trackWidth: 1.8
+              trackWidth: 2.5
               positionX: 0
               positionZ: 0.3
           Properties:
@@ -234,8 +234,8 @@ OpenSCENARIO:
                     LanePosition:
                       roadId: ''
                       laneId: '34976'
-                      s: 19.9759
-                      offset: 0.1573
+                      s: 19.5058
+                      offset: -0.0434
                       Orientation:
                         type: relative
                         h: 0
@@ -247,8 +247,8 @@ OpenSCENARIO:
                       LanePosition:
                         roadId: ''
                         laneId: '34976'
-                        s: 25.7795
-                        offset: 0
+                        s: 25.7478
+                        offset: -0.1624
                         Orientation:
                           type: relative
                           h: 0
@@ -260,40 +260,9 @@ OpenSCENARIO:
                   Position:
                     LanePosition:
                       roadId: ''
-                      laneId: '34981'
-                      s: 4.9731
-                      offset: 0
-                      Orientation:
-                        type: relative
-                        h: 0
-                        p: -0.0
-                        r: 0
-              - LongitudinalAction:
-                  SpeedAction:
-                    SpeedActionDynamics:
-                      dynamicsDimension: time
-                      value: 0
-                      dynamicsShape: step
-                    SpeedActionTarget:
-                      AbsoluteTargetSpeed:
-                        value: 0
-              - ControllerAction:
-                  AssignControllerAction:
-                    Controller:
-                      name: ''
-                      Properties:
-                        Property:
-                          - name: maxSpeed
-                            value: '0'
-          - entityRef: Npc2
-            PrivateAction:
-              - TeleportAction:
-                  Position:
-                    LanePosition:
-                      roadId: ''
                       laneId: '34600'
-                      s: 20
-                      offset: 0
+                      s: 17.2391
+                      offset: 0.0565
                       Orientation:
                         type: relative
                         h: 0
@@ -305,8 +274,8 @@ OpenSCENARIO:
                       LanePosition:
                         roadId: ''
                         laneId: '34420'
-                        s: 8.3774
-                        offset: 0.2051
+                        s: 6.0366
+                        offset: 0
                         Orientation:
                           type: relative
                           h: 0
@@ -329,15 +298,15 @@ OpenSCENARIO:
                         Property:
                           - name: maxSpeed
                             value: '5.55'
-          - entityRef: Npc3
+          - entityRef: Npc2
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
                       roadId: ''
-                      laneId: '34408'
-                      s: 15
-                      offset: 0
+                      laneId: '34981'
+                      s: 4.7125
+                      offset: -0.04
                       Orientation:
                         type: relative
                         h: 0
@@ -360,14 +329,45 @@ OpenSCENARIO:
                         Property:
                           - name: maxSpeed
                             value: '0'
-          - entityRef: Npc4
+          - entityRef: Npc3
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34408'
+                      s: 16.6451
+                      offset: 0.0924
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+              - ControllerAction:
+                  AssignControllerAction:
+                    Controller:
+                      name: ''
+                      Properties:
+                        Property:
+                          - name: maxSpeed
+                            value: '0'
+          - entityRef: Trailer0
             PrivateAction:
               - TeleportAction:
                   Position:
                     LanePosition:
                       roadId: ''
                       laneId: '34564'
-                      s: 9.0924
+                      s: 4.5404
                       offset: 0
                       Orientation:
                         type: relative
@@ -413,10 +413,25 @@ OpenSCENARIO:
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none
-                                  ByValueCondition:
-                                    SimulationTimeCondition:
-                                      value: 30
-                                      rule: greaterThan
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '34976'
+                                            s: 25.7478
+                                            offset: -0.1624
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: -0.0
+                                              r: 0
+                                        tolerance: 1
                         Action:
                           - name: ''
                             UserDefinedAction:
@@ -485,7 +500,7 @@ OpenSCENARIO:
                                     EntityCondition:
                                       CollisionCondition:
                                         EntityRef:
-                                          entityRef: Npc4
+                                          entityRef: Trailer0
                         Action:
                           - name: ''
                             UserDefinedAction:
