@@ -74,31 +74,30 @@ int ScenarioSimulator::getSocketPort()
   return get_parameter("port").as_int();
 }
 
-void ScenarioSimulator::initialize(
-  const simulation_api_schema::InitializeRequest & req,
-  simulation_api_schema::InitializeResponse & res)
+auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeRequest & req)
+  -> simulation_api_schema::InitializeResponse
 {
   initialized_ = true;
   realtime_factor_ = req.realtime_factor();
   step_time_ = req.step_time();
   hdmap_utils_ = std::make_shared<hdmap_utils::HdMapUtils>(req.lanelet2_map_path(), getOrigin());
-  res = simulation_api_schema::InitializeResponse();
+  auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
   ego_vehicles_ = {};
   vehicles_ = {};
   pedestrians_ = {};
+  return res;
 }
 
-void ScenarioSimulator::updateFrame(
-  const simulation_api_schema::UpdateFrameRequest & req,
-  simulation_api_schema::UpdateFrameResponse & res)
+auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequest & req)
+  -> simulation_api_schema::UpdateFrameResponse
 {
-  res = simulation_api_schema::UpdateFrameResponse();
+  auto res = simulation_api_schema::UpdateFrameResponse();
   if (!initialized_) {
     res.mutable_result()->set_description("simulator have not initialized yet.");
     res.mutable_result()->set_success(false);
-    return;
+    return res;
   }
   current_time_ = req.current_time();
   builtin_interfaces::msg::Time t;
@@ -121,11 +120,12 @@ void ScenarioSimulator::updateFrame(
     current_time_, current_ros_time_, entity_status, traffic_signals_states_);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
+  return res;
 }
 
-void ScenarioSimulator::updateEntityStatus(
-  const simulation_api_schema::UpdateEntityStatusRequest & req,
-  simulation_api_schema::UpdateEntityStatusResponse & res)
+auto ScenarioSimulator::updateEntityStatus(
+  const simulation_api_schema::UpdateEntityStatusRequest & req)
+  -> simulation_api_schema::UpdateEntityStatusResponse
 {
   if (isEgo(req.status().name())) {
     if (ego_entity_simulation_) {
@@ -140,17 +140,18 @@ void ScenarioSimulator::updateEntityStatus(
   }
   const simulation_api_schema::EntityStatus & updated_entity_status =
     entity_status_[req.status().name()];
-  res = simulation_api_schema::UpdateEntityStatusResponse();
+  auto res = simulation_api_schema::UpdateEntityStatusResponse();
   res.mutable_status()->set_name(updated_entity_status.name());
   res.mutable_status()->mutable_action_status()->CopyFrom(updated_entity_status.action_status());
   res.mutable_status()->mutable_pose()->CopyFrom(updated_entity_status.pose());
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
+  return res;
 }
 
-void ScenarioSimulator::spawnVehicleEntity(
-  const simulation_api_schema::SpawnVehicleEntityRequest & req,
-  simulation_api_schema::SpawnVehicleEntityResponse & res)
+auto ScenarioSimulator::spawnVehicleEntity(
+  const simulation_api_schema::SpawnVehicleEntityRequest & req)
+  -> simulation_api_schema::SpawnVehicleEntityResponse
 {
   if (ego_vehicles_.size() != 0 && req.is_ego()) {
     throw SimulationRuntimeError("multi ego does not support");
@@ -171,37 +172,39 @@ void ScenarioSimulator::spawnVehicleEntity(
   } else {
     vehicles_.emplace_back(req.parameters());
   }
-  res = simulation_api_schema::SpawnVehicleEntityResponse();
+  auto res = simulation_api_schema::SpawnVehicleEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
+  return res;
 }
 
-void ScenarioSimulator::spawnPedestrianEntity(
-  const simulation_api_schema::SpawnPedestrianEntityRequest & req,
-  simulation_api_schema::SpawnPedestrianEntityResponse & res)
+auto ScenarioSimulator::spawnPedestrianEntity(
+  const simulation_api_schema::SpawnPedestrianEntityRequest & req)
+  -> simulation_api_schema::SpawnPedestrianEntityResponse
 {
   pedestrians_.emplace_back(req.parameters());
-  res = simulation_api_schema::SpawnPedestrianEntityResponse();
+  auto res = simulation_api_schema::SpawnPedestrianEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
+  return res;
 }
 
-void ScenarioSimulator::spawnMiscObjectEntity(
-  const simulation_api_schema::SpawnMiscObjectEntityRequest & req,
-  simulation_api_schema::SpawnMiscObjectEntityResponse & res)
+auto ScenarioSimulator::spawnMiscObjectEntity(
+  const simulation_api_schema::SpawnMiscObjectEntityRequest & req)
+  -> simulation_api_schema::SpawnMiscObjectEntityResponse
 {
   misc_objects_.emplace_back(req.parameters());
-  res = simulation_api_schema::SpawnMiscObjectEntityResponse();
+  auto res = simulation_api_schema::SpawnMiscObjectEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
+  return res;
 }
 
-void ScenarioSimulator::despawnEntity(
-  const simulation_api_schema::DespawnEntityRequest & req,
-  simulation_api_schema::DespawnEntityResponse & res)
+auto ScenarioSimulator::despawnEntity(const simulation_api_schema::DespawnEntityRequest & req)
+  -> simulation_api_schema::DespawnEntityResponse
 {
   bool found = false;
-  res = simulation_api_schema::DespawnEntityResponse();
+  auto res = simulation_api_schema::DespawnEntityResponse();
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles;
   for (const auto & vehicle : vehicles_) {
     if (vehicle.name() != req.name()) {
@@ -242,38 +245,42 @@ void ScenarioSimulator::despawnEntity(
   } else {
     res.mutable_result()->set_success(false);
   }
+  return res;
 }
 
-void ScenarioSimulator::attachDetectionSensor(
-  const simulation_api_schema::AttachDetectionSensorRequest & req,
-  simulation_api_schema::AttachDetectionSensorResponse & res)
+auto ScenarioSimulator::attachDetectionSensor(
+  const simulation_api_schema::AttachDetectionSensorRequest & req)
+  -> simulation_api_schema::AttachDetectionSensorResponse
 {
   sensor_sim_.attachDetectionSensor(current_time_, req.configuration(), *this);
-  res = simulation_api_schema::AttachDetectionSensorResponse();
+  auto res = simulation_api_schema::AttachDetectionSensorResponse();
   res.mutable_result()->set_success(true);
+  return res;
 }
 
-void ScenarioSimulator::attachLidarSensor(
-  const simulation_api_schema::AttachLidarSensorRequest & req,
-  simulation_api_schema::AttachLidarSensorResponse & res)
+auto ScenarioSimulator::attachLidarSensor(
+  const simulation_api_schema::AttachLidarSensorRequest & req)
+  -> simulation_api_schema::AttachLidarSensorResponse
 {
   sensor_sim_.attachLidarSensor(current_time_, req.configuration(), *this);
-  res = simulation_api_schema::AttachLidarSensorResponse();
+  auto res = simulation_api_schema::AttachLidarSensorResponse();
   res.mutable_result()->set_success(true);
+  return res;
 }
 
-void ScenarioSimulator::attachOccupancyGridSensor(
-  const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
-  simulation_api_schema::AttachOccupancyGridSensorResponse & res)
+auto ScenarioSimulator::attachOccupancyGridSensor(
+  const simulation_api_schema::AttachOccupancyGridSensorRequest & req)
+  -> simulation_api_schema::AttachOccupancyGridSensorResponse
 {
-  res = simulation_api_schema::AttachOccupancyGridSensorResponse();
+  auto res = simulation_api_schema::AttachOccupancyGridSensorResponse();
   sensor_sim_.attachOccupancyGridSensor(current_time_, req.configuration(), *this);
   res.mutable_result()->set_success(true);
+  return res;
 }
 
-void ScenarioSimulator::updateTrafficLights(
-  const simulation_api_schema::UpdateTrafficLightsRequest & req,
-  simulation_api_schema::UpdateTrafficLightsResponse & res)
+auto ScenarioSimulator::updateTrafficLights(
+  const simulation_api_schema::UpdateTrafficLightsRequest & req)
+  -> simulation_api_schema::UpdateTrafficLightsResponse
 {
   traffic_signals_states_.clear();
   for (const auto & traffic_signal_proto : req.states()) {
@@ -281,8 +288,9 @@ void ScenarioSimulator::updateTrafficLights(
     simulation_interface::toMsg(traffic_signal_proto, traffic_signal);
     traffic_signals_states_.emplace_back(traffic_signal);
   }
-  res = simulation_api_schema::UpdateTrafficLightsResponse();
+  auto res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
+  return res;
 }
 
 auto ScenarioSimulator::followPolylineTrajectory(

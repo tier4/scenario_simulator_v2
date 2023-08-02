@@ -56,10 +56,9 @@ private:
   zmqpp::poller poller_;
   zmqpp::socket socket_;
 
-#define DEFINE_FUNCTION_TYPE(TYPENAME)                \
-  using TYPENAME = std::function<void(                \
-    const simulation_api_schema::TYPENAME##Request &, \
-    simulation_api_schema::TYPENAME##Response &)>
+#define DEFINE_FUNCTION_TYPE(TYPENAME)                                      \
+  using TYPENAME = std::function<simulation_api_schema::TYPENAME##Response( \
+    const simulation_api_schema::TYPENAME##Request &)>
 
   DEFINE_FUNCTION_TYPE(Initialize);
   DEFINE_FUNCTION_TYPE(UpdateFrame);
@@ -72,10 +71,7 @@ private:
   DEFINE_FUNCTION_TYPE(AttachDetectionSensor);
   DEFINE_FUNCTION_TYPE(AttachOccupancyGridSensor);
   DEFINE_FUNCTION_TYPE(UpdateTrafficLights);
-
-  using FollowPolylineTrajectory =
-    std::function<simulation_api_schema::FollowPolylineTrajectoryResponse(
-      const simulation_api_schema::FollowPolylineTrajectoryRequest &)>;
+  DEFINE_FUNCTION_TYPE(FollowPolylineTrajectory);
 
 #undef DEFINE_FUNCTION_TYPE
 

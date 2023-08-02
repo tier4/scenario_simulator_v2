@@ -89,39 +89,39 @@ public:
 
 private:
   SensorSimulation sensor_sim_;
-  void initialize(
-    const simulation_api_schema::InitializeRequest & req,
-    simulation_api_schema::InitializeResponse & res);
-  void updateFrame(
-    const simulation_api_schema::UpdateFrameRequest & req,
-    simulation_api_schema::UpdateFrameResponse & res);
-  void updateEntityStatus(
-    const simulation_api_schema::UpdateEntityStatusRequest & req,
-    simulation_api_schema::UpdateEntityStatusResponse & res);
-  void spawnVehicleEntity(
-    const simulation_api_schema::SpawnVehicleEntityRequest & req,
-    simulation_api_schema::SpawnVehicleEntityResponse & res);
-  void spawnPedestrianEntity(
-    const simulation_api_schema::SpawnPedestrianEntityRequest & req,
-    simulation_api_schema::SpawnPedestrianEntityResponse & res);
-  void spawnMiscObjectEntity(
-    const simulation_api_schema::SpawnMiscObjectEntityRequest &,
-    simulation_api_schema::SpawnMiscObjectEntityResponse &);
-  void despawnEntity(
-    const simulation_api_schema::DespawnEntityRequest & req,
-    simulation_api_schema::DespawnEntityResponse & res);
-  void attachDetectionSensor(
-    const simulation_api_schema::AttachDetectionSensorRequest & req,
-    simulation_api_schema::AttachDetectionSensorResponse & res);
-  void attachLidarSensor(
-    const simulation_api_schema::AttachLidarSensorRequest & req,
-    simulation_api_schema::AttachLidarSensorResponse & res);
-  void attachOccupancyGridSensor(
-    const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
-    simulation_api_schema::AttachOccupancyGridSensorResponse & res);
-  void updateTrafficLights(
-    const simulation_api_schema::UpdateTrafficLightsRequest & req,
-    simulation_api_schema::UpdateTrafficLightsResponse & res);
+
+  auto initialize(const simulation_api_schema::InitializeRequest &)
+    -> simulation_api_schema::InitializeResponse;
+
+  auto updateFrame(const simulation_api_schema::UpdateFrameRequest &)
+    -> simulation_api_schema::UpdateFrameResponse;
+
+  auto updateEntityStatus(const simulation_api_schema::UpdateEntityStatusRequest &)
+    -> simulation_api_schema::UpdateEntityStatusResponse;
+
+  auto spawnVehicleEntity(const simulation_api_schema::SpawnVehicleEntityRequest &)
+    -> simulation_api_schema::SpawnVehicleEntityResponse;
+
+  auto spawnPedestrianEntity(const simulation_api_schema::SpawnPedestrianEntityRequest &)
+    -> simulation_api_schema::SpawnPedestrianEntityResponse;
+
+  auto spawnMiscObjectEntity(const simulation_api_schema::SpawnMiscObjectEntityRequest &)
+    -> simulation_api_schema::SpawnMiscObjectEntityResponse;
+
+  auto despawnEntity(const simulation_api_schema::DespawnEntityRequest &)
+    -> simulation_api_schema::DespawnEntityResponse;
+
+  auto attachDetectionSensor(const simulation_api_schema::AttachDetectionSensorRequest &)
+    -> simulation_api_schema::AttachDetectionSensorResponse;
+
+  auto attachLidarSensor(const simulation_api_schema::AttachLidarSensorRequest &)
+    -> simulation_api_schema::AttachLidarSensorResponse;
+
+  auto attachOccupancyGridSensor(const simulation_api_schema::AttachOccupancyGridSensorRequest &)
+    -> simulation_api_schema::AttachOccupancyGridSensorResponse;
+
+  auto updateTrafficLights(const simulation_api_schema::UpdateTrafficLightsRequest &)
+    -> simulation_api_schema::UpdateTrafficLightsResponse;
 
   auto followPolylineTrajectory(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
     -> simulation_api_schema::FollowPolylineTrajectoryResponse;

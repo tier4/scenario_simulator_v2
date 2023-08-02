@@ -30,73 +30,49 @@ void MultiServer::poll()
     socket_.receive(sim_request);
     auto proto = toProto<simulation_api_schema::SimulationRequest>(sim_request);
     switch (proto.request_case()) {
-      case simulation_api_schema::SimulationRequest::RequestCase::kInitialize: {
-        simulation_api_schema::InitializeResponse response;
-        std::get<Initialize>(functions_)(proto.initialize(), response);
-        *sim_response.mutable_initialize() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kInitialize:
+        *sim_response.mutable_initialize() = std::get<Initialize>(functions_)(proto.initialize());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateFrame: {
-        simulation_api_schema::UpdateFrameResponse response;
-        std::get<UpdateFrame>(functions_)(proto.update_frame(), response);
-        *sim_response.mutable_update_frame() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateFrame:
+        *sim_response.mutable_update_frame() =
+          std::get<UpdateFrame>(functions_)(proto.update_frame());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kSpawnVehicleEntity: {
-        simulation_api_schema::SpawnVehicleEntityResponse response;
-        std::get<SpawnVehicleEntity>(functions_)(proto.spawn_vehicle_entity(), response);
-        *sim_response.mutable_spawn_vehicle_entity() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kSpawnVehicleEntity:
+        *sim_response.mutable_spawn_vehicle_entity() =
+          std::get<SpawnVehicleEntity>(functions_)(proto.spawn_vehicle_entity());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kSpawnPedestrianEntity: {
-        simulation_api_schema::SpawnPedestrianEntityResponse response;
-        std::get<SpawnPedestrianEntity>(functions_)(proto.spawn_pedestrian_entity(), response);
-        *sim_response.mutable_spawn_pedestrian_entity() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kSpawnPedestrianEntity:
+        *sim_response.mutable_spawn_pedestrian_entity() =
+          std::get<SpawnPedestrianEntity>(functions_)(proto.spawn_pedestrian_entity());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kSpawnMiscObjectEntity: {
-        simulation_api_schema::SpawnMiscObjectEntityResponse response;
-        std::get<SpawnMiscObjectEntity>(functions_)(proto.spawn_misc_object_entity(), response);
-        *sim_response.mutable_spawn_misc_object_entity() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kSpawnMiscObjectEntity:
+        *sim_response.mutable_spawn_misc_object_entity() =
+          std::get<SpawnMiscObjectEntity>(functions_)(proto.spawn_misc_object_entity());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kDespawnEntity: {
-        simulation_api_schema::DespawnEntityResponse response;
-        std::get<DespawnEntity>(functions_)(proto.despawn_entity(), response);
-        *sim_response.mutable_despawn_entity() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kDespawnEntity:
+        *sim_response.mutable_despawn_entity() =
+          std::get<DespawnEntity>(functions_)(proto.despawn_entity());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateEntityStatus: {
-        simulation_api_schema::UpdateEntityStatusResponse response;
-        std::get<UpdateEntityStatus>(functions_)(proto.update_entity_status(), response);
-        *sim_response.mutable_update_entity_status() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateEntityStatus:
+        *sim_response.mutable_update_entity_status() =
+          std::get<UpdateEntityStatus>(functions_)(proto.update_entity_status());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kAttachLidarSensor: {
-        simulation_api_schema::AttachLidarSensorResponse response;
-        std::get<AttachLidarSensor>(functions_)(proto.attach_lidar_sensor(), response);
-        *sim_response.mutable_attach_lidar_sensor() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kAttachLidarSensor:
+        *sim_response.mutable_attach_lidar_sensor() =
+          std::get<AttachLidarSensor>(functions_)(proto.attach_lidar_sensor());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kAttachDetectionSensor: {
-        simulation_api_schema::AttachDetectionSensorResponse response;
-        std::get<AttachDetectionSensor>(functions_)(proto.attach_detection_sensor(), response);
-        *sim_response.mutable_attach_detection_sensor() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kAttachDetectionSensor:
+        *sim_response.mutable_attach_detection_sensor() =
+          std::get<AttachDetectionSensor>(functions_)(proto.attach_detection_sensor());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kAttachOccupancyGridSensor: {
-        simulation_api_schema::AttachOccupancyGridSensorResponse response;
-        std::get<AttachOccupancyGridSensor>(functions_)(
-          proto.attach_occupancy_grid_sensor(), response);
-        *sim_response.mutable_attach_occupancy_grid_sensor() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kAttachOccupancyGridSensor:
+        *sim_response.mutable_attach_occupancy_grid_sensor() =
+          std::get<AttachOccupancyGridSensor>(functions_)(proto.attach_occupancy_grid_sensor());
         break;
-      }
-      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateTrafficLights: {
-        simulation_api_schema::UpdateTrafficLightsResponse response;
-        std::get<UpdateTrafficLights>(functions_)(proto.update_traffic_lights(), response);
-        *sim_response.mutable_update_traffic_lights() = response;
+      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateTrafficLights:
+        *sim_response.mutable_update_traffic_lights() =
+          std::get<UpdateTrafficLights>(functions_)(proto.update_traffic_lights());
         break;
-      }
       case simulation_api_schema::SimulationRequest::RequestCase::kFollowPolylineTrajectory:
         *sim_response.mutable_follow_polyline_trajectory() =
           std::get<FollowPolylineTrajectory>(functions_)(proto.follow_polyline_trajectory());
