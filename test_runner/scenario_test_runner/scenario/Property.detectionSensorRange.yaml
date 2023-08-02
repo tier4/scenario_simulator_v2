@@ -2,8 +2,8 @@ ScenarioModifiers:
   ScenarioModifier:
     - name: __tier4_modifier_IS_CLAIRVOYANT
       list:
-        - 'false'
         - 'true'
+        - 'false'
     - name: __tier4_modifier_DETECTION_SENSOR_RANGE
       list:
         - 300
@@ -85,8 +85,8 @@ OpenSCENARIO:
               y: 0
               z: 1.2
             Dimensions:
-              length: 4
-              width: 1.8
+              length: 0.5
+              width: 0.5
               height: 2.5
           Performance:
             maxSpeed: 50
@@ -289,7 +289,7 @@ OpenSCENARIO:
                       dynamicsShape: step
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
-                        value: 5.55
+                        value: 1.38
               - ControllerAction:
                   AssignControllerAction:
                     Controller:
@@ -297,7 +297,7 @@ OpenSCENARIO:
                       Properties:
                         Property:
                           - name: maxSpeed
-                            value: '5.55'
+                            value: '1.38'
           - entityRef: Npc2
             PrivateAction:
               - TeleportAction:
@@ -413,25 +413,10 @@ OpenSCENARIO:
                                 - name: ''
                                   delay: 0
                                   conditionEdge: none
-                                  ByEntityCondition:
-                                    TriggeringEntities:
-                                      triggeringEntitiesRule: any
-                                      EntityRef:
-                                        - entityRef: ego
-                                    EntityCondition:
-                                      ReachPositionCondition:
-                                        Position:
-                                          LanePosition:
-                                            roadId: ''
-                                            laneId: '34976'
-                                            s: 25.7478
-                                            offset: -0.1624
-                                            Orientation:
-                                              type: relative
-                                              h: 0
-                                              p: -0.0
-                                              r: 0
-                                        tolerance: 1
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 70
+                                      rule: greaterThan
                         Action:
                           - name: ''
                             UserDefinedAction:
