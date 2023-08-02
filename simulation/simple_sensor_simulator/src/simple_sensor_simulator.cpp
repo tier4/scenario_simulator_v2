@@ -34,30 +34,17 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
   sensor_sim_(*this),
   server_(
     simulation_interface::protocol, simulation_interface::HostName::ANY, getSocketPort(),
-    std::bind(&ScenarioSimulator::initialize, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(&ScenarioSimulator::updateFrame, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::spawnVehicleEntity, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::spawnPedestrianEntity, this, std::placeholders::_1,
-      std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::spawnMiscObjectEntity, this, std::placeholders::_1,
-      std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::despawnEntity, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::updateEntityStatus, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::attachLidarSensor, this, std::placeholders::_1, std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::attachDetectionSensor, this, std::placeholders::_1,
-      std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::attachOccupancyGridSensor, this, std::placeholders::_1,
-      std::placeholders::_2),
-    std::bind(
-      &ScenarioSimulator::updateTrafficLights, this, std::placeholders::_1, std::placeholders::_2))
+    [this](auto &&... xs) { return initialize(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return updateFrame(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return spawnVehicleEntity(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return spawnPedestrianEntity(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return spawnMiscObjectEntity(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return despawnEntity(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return updateEntityStatus(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return attachLidarSensor(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); })
 {
 }
 
