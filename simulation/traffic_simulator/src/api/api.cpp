@@ -35,10 +35,8 @@ bool API::despawn(const std::string & name)
   }
   if (not configuration.standalone_mode) {
     simulation_api_schema::DespawnEntityRequest req;
-    simulation_api_schema::DespawnEntityResponse res;
     req.set_name(name);
-    zeromq_client_.call(req, res);
-    return res.result().success();
+    return zeromq_client_.call(req).result().success();
   }
   return true;
 }
@@ -185,9 +183,7 @@ bool API::initialize(double realtime_factor, double step_time)
     req.set_initialize_time(clock_.getCurrentSimulationTime());
     simulation_interface::toProto(clock_.getCurrentRosTime(), *req.mutable_initialize_ros_time());
     req.set_lanelet2_map_path(configuration.lanelet2_map_path().string());
-    simulation_api_schema::InitializeResponse res;
-    zeromq_client_.call(req, res);
-    return res.result().success();
+    return zeromq_client_.call(req).result().success();
   }
 }
 
@@ -198,10 +194,8 @@ bool API::attachDetectionSensor(
     return true;
   } else {
     simulation_api_schema::AttachDetectionSensorRequest req;
-    simulation_api_schema::AttachDetectionSensorResponse res;
     *req.mutable_configuration() = sensor_configuration;
-    zeromq_client_.call(req, res);
-    return res.result().success();
+    return zeromq_client_.call(req).result().success();
   }
 }
 
@@ -221,10 +215,8 @@ bool API::attachOccupancyGridSensor(
     return true;
   } else {
     simulation_api_schema::AttachOccupancyGridSensorRequest req;
-    simulation_api_schema::AttachOccupancyGridSensorResponse res;
     *req.mutable_configuration() = sensor_configuration;
-    zeromq_client_.call(req, res);
-    return res.result().success();
+    return zeromq_client_.call(req).result().success();
   }
 }
 
@@ -234,10 +226,8 @@ bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & li
     return true;
   } else {
     simulation_api_schema::AttachLidarSensorRequest req;
-    simulation_api_schema::AttachLidarSensorResponse res;
     *req.mutable_configuration() = lidar_configuration;
-    zeromq_client_.call(req, res);
-    return res.result().success();
+    return zeromq_client_.call(req).result().success();
   }
 }
 
@@ -253,7 +243,6 @@ bool API::attachLidarSensor(
 bool API::updateTrafficLightsInSim()
 {
   simulation_api_schema::UpdateTrafficLightsRequest req;
-  simulation_api_schema::UpdateTrafficLightsResponse res;
   if (entity_manager_ptr_->trafficLightsChanged()) {
     for (const auto & [id, traffic_light] : entity_manager_ptr_->getConventionalTrafficLights()) {
       simulation_api_schema::TrafficSignal state;
@@ -261,10 +250,10 @@ bool API::updateTrafficLightsInSim()
         static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
       *req.add_states() = state;
     }
-    zeromq_client_.call(req, res);
+    return zeromq_client_.call(req).result().success();
   }
   // TODO handle response
-  return res.result().success();
+  return simulation_api_schema::UpdateTrafficLightsResponse().result().success();
 }
 
 std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatusInSim(
@@ -275,10 +264,7 @@ std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatus
   status.name = entity_name;
   simulation_interface::toProto(status, *req.mutable_status());
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-  simulation_api_schema::UpdateEntityStatusResponse res;
-  zeromq_client_.call(req, res);
-
-  if (res.result().success()) {
+  if (auto res = zeromq_client_.call(req); res.result().success()) {
     simulation_interface::toMsg(res.status().pose(), status.pose);
     simulation_interface::toMsg(res.status().action_status(), status.action_status);
     // Temporarily deinitialize lanelet pose as it should be correctly filled from here
@@ -338,9 +324,7 @@ bool API::updateFrame()
     req.set_current_time(clock_.getCurrentSimulationTime());
     simulation_interface::toProto(
       clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
-    simulation_api_schema::UpdateFrameResponse res;
-    zeromq_client_.call(req, res);
-    if (!res.result().success()) {
+    if (not zeromq_client_.call(req).result().success()) {
       return false;
     }
     entity_manager_ptr_->broadcastEntityTransform();

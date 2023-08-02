@@ -114,7 +114,6 @@ public:
         return true;
       } else {
         simulation_api_schema::SpawnVehicleEntityRequest req;
-        simulation_api_schema::SpawnVehicleEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
@@ -122,8 +121,7 @@ public:
         req.set_is_ego(behavior == VehicleBehavior::autoware());
         /// @todo Should be filled from function API
         req.set_initial_speed(0.0);
-        zeromq_client_.call(req, res);
-        return res.result().success();
+        return zeromq_client_.call(req).result().success();
       }
     };
 
@@ -154,13 +152,11 @@ public:
         return true;
       } else {
         simulation_api_schema::SpawnPedestrianEntityRequest req;
-        simulation_api_schema::SpawnPedestrianEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
         simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
-        zeromq_client_.call(req, res);
-        return res.result().success();
+        return zeromq_client_.call(req).result().success();
       }
     };
 
@@ -183,13 +179,11 @@ public:
         return true;
       } else {
         simulation_api_schema::SpawnMiscObjectEntityRequest req;
-        simulation_api_schema::SpawnMiscObjectEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
         simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
-        zeromq_client_.call(req, res);
-        return res.result().success();
+        return zeromq_client_.call(req).result().success();
       }
     };
 
