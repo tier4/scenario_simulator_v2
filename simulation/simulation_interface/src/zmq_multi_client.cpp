@@ -40,15 +40,14 @@ void MultiClient::closeConnection()
 
 MultiClient::~MultiClient() { closeConnection(); }
 
-void MultiClient::call(
-  const simulation_api_schema::SimulationRequest & req,
-  simulation_api_schema::SimulationResponse & res)
+auto MultiClient::call(const simulation_api_schema::SimulationRequest & req)
+  -> simulation_api_schema::SimulationResponse
 {
   zmqpp::message message = toZMQ(req);
   socket_.send(message);
   zmqpp::message buffer;
   socket_.receive(buffer);
-  res = toProto<simulation_api_schema::SimulationResponse>(buffer);
+  return toProto<simulation_api_schema::SimulationResponse>(buffer);
 }
 
 void MultiClient::call(
@@ -57,106 +56,96 @@ void MultiClient::call(
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_initialize() = req;
-    call(sim_request, sim_response);
-    res = sim_response.initialize();
+    res = call(sim_request).initialize();
   }
 }
+
 void MultiClient::call(
   const simulation_api_schema::UpdateFrameRequest & req,
   simulation_api_schema::UpdateFrameResponse & res)
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_update_frame() = req;
-    call(sim_request, sim_response);
-    res = sim_response.update_frame();
+    res = call(sim_request).update_frame();
   }
 }
+
 void MultiClient::call(
   const simulation_api_schema::SpawnVehicleEntityRequest & req,
   simulation_api_schema::SpawnVehicleEntityResponse & res)
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_spawn_vehicle_entity() = req;
-    call(sim_request, sim_response);
-    res = sim_response.spawn_vehicle_entity();
+    res = call(sim_request).spawn_vehicle_entity();
   }
 }
+
 void MultiClient::call(
   const simulation_api_schema::SpawnPedestrianEntityRequest & req,
   simulation_api_schema::SpawnPedestrianEntityResponse & res)
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_spawn_pedestrian_entity() = req;
-    call(sim_request, sim_response);
-    res = sim_response.spawn_pedestrian_entity();
+    res = call(sim_request).spawn_pedestrian_entity();
   }
 }
+
 void MultiClient::call(
   const simulation_api_schema::SpawnMiscObjectEntityRequest & req,
   simulation_api_schema::SpawnMiscObjectEntityResponse & res)
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_spawn_misc_object_entity() = req;
-    call(sim_request, sim_response);
-    res = sim_response.spawn_misc_object_entity();
+    res = call(sim_request).spawn_misc_object_entity();
   }
 }
+
 void MultiClient::call(
   const simulation_api_schema::DespawnEntityRequest & req,
   simulation_api_schema::DespawnEntityResponse & res)
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_despawn_entity() = req;
-    call(sim_request, sim_response);
-    res = sim_response.despawn_entity();
+    res = call(sim_request).despawn_entity();
   }
 }
+
 void MultiClient::call(
   const simulation_api_schema::UpdateEntityStatusRequest & req,
   simulation_api_schema::UpdateEntityStatusResponse & res)
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_update_entity_status() = req;
-    call(sim_request, sim_response);
-    res = sim_response.update_entity_status();
+    res = call(sim_request).update_entity_status();
   }
 }
+
 void MultiClient::call(
   const simulation_api_schema::AttachLidarSensorRequest & req,
   simulation_api_schema::AttachLidarSensorResponse & res)
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_attach_lidar_sensor() = req;
-    call(sim_request, sim_response);
-    res = sim_response.attach_lidar_sensor();
+    res = call(sim_request).attach_lidar_sensor();
   }
 }
+
 void MultiClient::call(
   const simulation_api_schema::AttachDetectionSensorRequest & req,
   simulation_api_schema::AttachDetectionSensorResponse & res)
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_attach_detection_sensor() = req;
-    call(sim_request, sim_response);
-    res = sim_response.attach_detection_sensor();
+    res = call(sim_request).attach_detection_sensor();
   }
 }
 
@@ -166,10 +155,8 @@ void MultiClient::call(
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_attach_occupancy_grid_sensor() = req;
-    call(sim_request, sim_response);
-    res = sim_response.attach_occupancy_grid_sensor();
+    res = call(sim_request).attach_occupancy_grid_sensor();
   }
 }
 
@@ -179,11 +166,20 @@ void MultiClient::call(
 {
   if (is_running) {
     simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
     *sim_request.mutable_update_traffic_lights() = req;
-    call(sim_request, sim_response);
-    res = sim_response.update_traffic_lights();
+    res = call(sim_request).update_traffic_lights();
   }
 }
 
+auto MultiClient::call(const simulation_api_schema::FollowPolylineTrajectoryRequest & request)
+  -> simulation_api_schema::FollowPolylineTrajectoryResponse
+{
+  if (is_running) {
+    auto simulation_request = simulation_api_schema::SimulationRequest();
+    *simulation_request.mutable_follow_polyline_trajectory() = request;
+    return call(simulation_request).follow_polyline_trajectory();
+  } else {
+    return {};
+  }
+}
 }  // namespace zeromq

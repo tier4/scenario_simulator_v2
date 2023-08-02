@@ -44,7 +44,8 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return attachLidarSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
-    [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); })
+    [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); })
 {
 }
 
@@ -282,6 +283,16 @@ void ScenarioSimulator::updateTrafficLights(
   }
   res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
+}
+
+auto ScenarioSimulator::followPolylineTrajectory(
+  const simulation_api_schema::FollowPolylineTrajectoryRequest &)
+  -> simulation_api_schema::FollowPolylineTrajectoryResponse
+{
+  auto response = simulation_api_schema::FollowPolylineTrajectoryResponse();
+  response.mutable_result()->set_success(true);
+  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  return response;
 }
 
 traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std::string & name)

@@ -35,11 +35,14 @@ public:
   explicit MultiClient(
     const simulation_interface::TransportProtocol & protocol, const std::string & hostname,
     const unsigned int socket_port);
+
   ~MultiClient();
+
   void closeConnection();
-  void call(
-    const simulation_api_schema::SimulationRequest & req,
-    simulation_api_schema::SimulationResponse & res);
+
+  auto call(const simulation_api_schema::SimulationRequest &)
+    -> simulation_api_schema::SimulationResponse;
+
   void call(
     const simulation_api_schema::InitializeRequest & req,
     simulation_api_schema::InitializeResponse & res);
@@ -73,6 +76,9 @@ public:
   void call(
     const simulation_api_schema::UpdateTrafficLightsRequest & req,
     simulation_api_schema::UpdateTrafficLightsResponse & res);
+
+  auto call(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
+    -> simulation_api_schema::FollowPolylineTrajectoryResponse;
 
   const simulation_interface::TransportProtocol protocol;
   const std::string hostname;

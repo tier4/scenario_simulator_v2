@@ -73,12 +73,16 @@ private:
   DEFINE_FUNCTION_TYPE(AttachOccupancyGridSensor);
   DEFINE_FUNCTION_TYPE(UpdateTrafficLights);
 
+  using FollowPolylineTrajectory =
+    std::function<simulation_api_schema::FollowPolylineTrajectoryResponse(
+      const simulation_api_schema::FollowPolylineTrajectoryRequest &)>;
+
 #undef DEFINE_FUNCTION_TYPE
 
   std::tuple<
     Initialize, UpdateFrame, SpawnVehicleEntity, SpawnPedestrianEntity, SpawnMiscObjectEntity,
     DespawnEntity, UpdateEntityStatus, AttachLidarSensor, AttachDetectionSensor,
-    AttachOccupancyGridSensor, UpdateTrafficLights>
+    AttachOccupancyGridSensor, UpdateTrafficLights, FollowPolylineTrajectory>
     functions_;
 };
 }  // namespace zeromq
