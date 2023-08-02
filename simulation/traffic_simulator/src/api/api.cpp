@@ -271,11 +271,11 @@ bool API::updateNonEgoEntitiesStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
+
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
+    if (entity_manager_ptr_->isEgo(entity_name)) continue;
     auto status = entity_manager_ptr_->getEntityStatus(entity_name);
-    simulation_api_schema::EntityStatus proto;
-    simulation_interface::toProto(status, proto);
-    *req.add_status() = proto;
+    simulation_interface::toProto(status, *req.add_status());
   }
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
@@ -287,10 +287,8 @@ std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatus
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-  simulation_api_schema::EntityStatus proto;
   status.name = entity_name;
-  simulation_interface::toProto(status, proto);
-  *req.add_status() = proto;
+  simulation_interface::toProto(status, *req.add_status());
 
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);

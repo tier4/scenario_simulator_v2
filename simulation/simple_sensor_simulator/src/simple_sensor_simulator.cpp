@@ -143,11 +143,10 @@ void ScenarioSimulator::updateEntityStatus(
 {
   res = simulation_api_schema::UpdateEntityStatusResponse();
   auto copyStatusToResponse = [&](const simulation_api_schema::EntityStatus & status) {
-    simulation_api_schema::UpdatedEntityStatus updated_status;
-    updated_status.set_name(status.name());
-    updated_status.mutable_action_status()->CopyFrom(status.action_status());
-    updated_status.mutable_pose()->CopyFrom(status.pose());
-    res.add_status()->CopyFrom(updated_status);
+    auto updated_status = res.add_status();
+    updated_status->set_name(status.name());
+    updated_status->mutable_action_status()->CopyFrom(status.action_status());
+    updated_status->mutable_pose()->CopyFrom(status.pose());
   };
 
   for (const auto & status : req.status()) {

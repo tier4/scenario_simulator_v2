@@ -132,7 +132,7 @@ private:
   double current_time_;
   rclcpp::Time current_ros_time_;
   bool initialized_;
-  std::unordered_map<std::string, simulation_api_schema::EntityStatus> entity_status_;
+  std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
   std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> traffic_signals_states_;
   traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string & name);
   zeromq::MultiServer server_;
