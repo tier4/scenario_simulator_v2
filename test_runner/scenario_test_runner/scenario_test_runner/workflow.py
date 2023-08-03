@@ -33,14 +33,6 @@ def substitute_ros_package(pathname: Path):
         sub("\\$\\(find-pkg-share\\s+([^\\)]+)\\)", find_pkg_share, str(pathname))
     )
 
-
-class Expect(IntEnum):
-
-    success = 0
-    failure = 1
-    error = 2
-
-
 class Scenario:
     """
     Manages a scenario given as an element of workflow.yaml.
@@ -50,15 +42,11 @@ class Scenario:
     path: Path
         The path to a scenario.
 
-    expect: Expect
-
     """
 
-    def __init__(self, path: Path, expect: Expect, frame_rate: float):
+    def __init__(self, path: Path, frame_rate: float):
 
         self.path = substitute_ros_package(path).resolve()
-
-        self.expect = expect
 
         self.frame_rate = frame_rate
 
@@ -134,7 +122,6 @@ class Workflow:
                     scenarios.append(
                         Scenario(
                             each["path"],
-                            Expect[each["expect"] if "expect" in each else "success"],
                             each["frame-rate"]
                             if "frame-rate" in each
                             else self.global_frame_rate,
