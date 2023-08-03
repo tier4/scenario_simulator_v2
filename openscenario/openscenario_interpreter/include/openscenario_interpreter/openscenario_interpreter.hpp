@@ -37,7 +37,8 @@
 #define INTERPRETER_INFO_STREAM(...) \
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
 
-// NOTE: Error on simulation is not error of the interpreter; so we print error messages into INFO_STREAM.
+// NOTE: Error on simulation is not error of the interpreter; so we print error messages into
+// INFO_STREAM.
 #define INTERPRETER_ERROR_STREAM(...) \
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[1;31m" << __VA_ARGS__ << "\x1b[0m")
 
@@ -60,6 +61,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
   String osc_path;
 
   String output_directory;
+
+  bool record;
 
   std::shared_ptr<OpenScenario> script;
 
