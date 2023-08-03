@@ -34,14 +34,12 @@ namespace openscenario_interpreter
 Interpreter::Interpreter(const rclcpp::NodeOptions & options)
 : rclcpp_lifecycle::LifecycleNode("openscenario_interpreter", options),
   publisher_of_context(create_publisher<Context>("context", rclcpp::QoS(1).transient_local())),
-  intended_result("success"),
   local_frame_rate(30),
   local_real_time_factor(1.0),
   osc_path(""),
   output_directory("/tmp"),
   record(false)
 {
-  DECLARE_PARAMETER(intended_result);
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
@@ -60,12 +58,6 @@ auto Interpreter::currentScenarioDefinition() const -> const std::shared_ptr<Sce
 {
   return scenarios.front();
 }
-
-auto Interpreter::isAnErrorIntended() const -> bool { return intended_result == "error"; }
-
-auto Interpreter::isFailureIntended() const -> bool { return intended_result == "failure"; }
-
-auto Interpreter::isSuccessIntended() const -> bool { return intended_result == "success"; }
 
 auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configuration
 {
@@ -106,7 +98,6 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       std::this_thread::sleep_for(std::chrono::seconds(1));  // NOTE: Wait for parameters to be set.
 
-      GET_PARAMETER(intended_result);
       GET_PARAMETER(local_frame_rate);
       GET_PARAMETER(local_real_time_factor);
       GET_PARAMETER(osc_path);

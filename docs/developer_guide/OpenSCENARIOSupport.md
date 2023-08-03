@@ -134,7 +134,7 @@ Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh` co
 
 The termination ignores the StoryboardElement's lifecycle transition (that is, it means that `StoryboardElementStateCondition` cannot be used to prevent or detect the execution of this command).
 
-The terminated scenario determines the final success / failure / error by collating the called command with the expected simulation result specified in `expect` of the [workflow file](../user_guide/scenario_test_runner/HowToWriteWorkflowFile.md).
+The terminated scenario determines the final success / failure / error.
 
 **Currently, simulation results are notified by simply writing to standard output as text. This notification method is temporary and will change in the near future.**
 
