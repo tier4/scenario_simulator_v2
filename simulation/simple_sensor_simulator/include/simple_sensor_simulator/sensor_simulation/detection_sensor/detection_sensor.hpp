@@ -43,7 +43,7 @@ protected:
   }
 
   auto isWithinRange(
-    const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pose2, const double range) const
+    const geometry_msgs::Position & position1, const geometry_msgs::Position & position2, const double range) const
     -> bool;
 
   auto filterObjectsBySensorRange(

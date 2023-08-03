@@ -28,13 +28,12 @@
 namespace simple_sensor_simulator
 {
 auto DetectionSensorBase::isWithinRange(
-  const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pose2, const double range) const -> bool
+  const geometry_msgs::Position & position1, const geometry_msgs::Position & position2, const double range) const -> bool
 {
-  auto distanceX = pose1.position().x() - pose2.position().x();
-  auto distanceY = pose1.position().y() - pose2.position().y();
-  auto distanceZ = pose1.position().z() - pose2.position().z();
+  auto from = {position1.x(), position1.y(), position1.z()};
+  auto to = {position2.x(), position2.y(), position2.z()};
 
-  double distance = std::hypot(distanceX, distanceY, distanceZ);
+  double distance = math::geometry::hypot(from, to);
   return distance <= range;
 }
 
@@ -75,7 +74,7 @@ auto DetectionSensorBase::getDetectedObjects(
   const auto pose = getSensorPose(statuses);
 
   for (const auto & status : statuses) {
-    if (status.name() != configuration_.entity() && isWithinRange(status.pose(), pose, 300.0)) {
+    if (status.name() != configuration_.entity() && isWithinRange(status.pose().position, pose.position, 300.0)) {
       detected_objects.emplace_back(status.name());
     }
   }
