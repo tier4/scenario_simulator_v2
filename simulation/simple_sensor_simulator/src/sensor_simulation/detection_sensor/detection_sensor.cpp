@@ -28,7 +28,7 @@
 namespace simple_sensor_simulator
 {
 auto DetectionSensorBase::isWithinRange(
-  const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pose2, double range) const -> bool
+  const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pose2, const double range) const -> bool
 {
   auto distanceX = pose1.position().x() - pose2.position().x();
   auto distanceY = pose1.position().y() - pose2.position().y();
