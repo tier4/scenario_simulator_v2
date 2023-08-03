@@ -120,7 +120,7 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
   const std::string & entity, const std::string & architecture_type, const double update_duration,
-  const double range = 300.0, bool detect_all_objects_in_range = false,
+  const double range = 300.0, const bool detect_all_objects_in_range = false,
   const double pos_noise_stddev = 0, const int random_seed = 0,
   const double probability_of_lost = 0, const double object_recognition_delay = 0);
 }  // namespace helper
