@@ -49,7 +49,7 @@ public:
     primitive_ptrs_.emplace(name, std::move(primitive_ptr));
   }
   const sensor_msgs::msg::PointCloud2 raycast(
-    std::string frame_id, const rclcpp::Time & stamp, geometry_msgs::msg::Pose origin,
+    const std::string & frame_id, const rclcpp::Time & stamp, const geometry_msgs::msg::Pose & origin,
     double max_distance = 300, double min_distance = 0);
   const std::vector<std::string> & getDetectedObject() const;
   void setDirection(
