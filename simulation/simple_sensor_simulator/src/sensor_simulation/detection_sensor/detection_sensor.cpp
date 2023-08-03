@@ -61,12 +61,10 @@ auto DetectionSensorBase::getEntityPose(
     }
   }
 
-  auto errorMessage =
+  throw SimulationRuntimeError(
     configuration_.detect_all_objects_in_range()
       ? "Filtered object is not includes in entity statuses"
-      : "Detected object by lidar sensor is not included in lidar detected entity";
-
-  throw SimulationRuntimeError(errorMessage);
+      : "Detected object by lidar sensor is not included in lidar detected entity");
 }
 
 auto DetectionSensorBase::getDetectedObjects(
