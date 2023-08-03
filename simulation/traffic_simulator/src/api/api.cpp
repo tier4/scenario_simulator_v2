@@ -350,6 +350,21 @@ void API::startNpcLogic()
   clock_.onNpcLogicStart();
 }
 
+auto API::requestFollowTrajectory(
+  const std::string & name,
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory) -> bool
+{
+  if (entity_manager_ptr_->isEgo(name)) {
+    auto request = simulation_api_schema::FollowPolylineTrajectoryRequest();
+    *request.mutable_name() = name;
+    *request.mutable_trajectory() = simulation_interface::toProtobufMessage(*trajectory);
+    return zeromq_client_.call(request).result().success();
+  } else {
+    entity_manager_ptr_->requestFollowTrajectory(name, trajectory);
+    return true;
+  }
+}
+
 void API::requestLaneChange(const std::string & name, const std::int64_t & lanelet_id)
 {
   entity_manager_ptr_->requestLaneChange(name, lanelet_id);
