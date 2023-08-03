@@ -43,6 +43,13 @@ bool API::despawn(const std::string & name)
   return true;
 }
 
+bool API::despawnEntities()
+{
+  auto entities = getEntityNames();
+  return std::all_of(
+    entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
+}
+
 auto API::setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status)
   -> void
 {

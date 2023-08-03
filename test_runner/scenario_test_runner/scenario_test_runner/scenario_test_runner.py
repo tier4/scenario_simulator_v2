@@ -32,7 +32,6 @@ from rclpy.executors import ExternalShutdownException
 from shutil import rmtree
 from sys import exit
 from typing import List
-from workflow import Expect
 from workflow import Scenario
 from workflow import Workflow
 from workflow import substitute_ros_package
@@ -49,7 +48,7 @@ def convert_scenarios_to_xosc(scenarios: List[Scenario], output_directory: Path)
 
         else:  # == '.yaml' or == '.yml'
             for path in convert(each.path, output_directory / each.path.stem, False):
-                result.append(Scenario(path, each.expect, each.frame_rate))
+                result.append(Scenario(path, each.frame_rate))
 
     return result
 
@@ -187,7 +186,6 @@ class ScenarioTestRunner(LifecycleController):
 
                     if future.result() is not None:
                         result = Scenario(future.result().path,
-                                          Expect(future.result().expect),
                                           future.result().frame_rate)
                         self.print_debug("derived : " + str(future.result().path))
                         preprocessed_scenarios.append(result)
@@ -238,7 +236,6 @@ class ScenarioTestRunner(LifecycleController):
                 )
 
                 self.configure_node(
-                    expect=each.expect,
                     frame_rate=each.frame_rate,
                     output_directory=self.output_directory,
                     real_time_factor=self.global_real_time_factor,
@@ -270,7 +267,6 @@ class ScenarioTestRunner(LifecycleController):
 
         request = Load.Request()
         request.path = str(scenario.path.absolute())
-        request.expect = scenario.expect
         request.frame_rate = scenario.frame_rate
 
         future = self.load_preprocessor_client.call_async(request)
@@ -340,7 +336,6 @@ def main(args=None):
         test_runner.run_scenarios(
             [Scenario(
                 substitute_ros_package(args.scenario).resolve(),
-                Expect["success"],
                 args.global_frame_rate,
             )]
         )
