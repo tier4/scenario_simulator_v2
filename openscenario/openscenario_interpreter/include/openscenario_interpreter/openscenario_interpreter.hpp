@@ -56,8 +56,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   const rclcpp_lifecycle::LifecyclePublisher<Context>::SharedPtr publisher_of_context;
 
-  String intended_result;
-
   double local_frame_rate;
 
   double local_real_time_factor;
@@ -65,6 +63,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
   String osc_path;
 
   String output_directory;
+
+  bool record;
 
   std::shared_ptr<OpenScenario> script;
 
@@ -97,12 +97,6 @@ public:
   auto engageable() const -> bool;
 
   auto engaged() const -> bool;
-
-  auto isAnErrorIntended() const -> bool;
-
-  auto isFailureIntended() const -> bool;
-
-  auto isSuccessIntended() const -> bool;
 
   auto makeCurrentConfiguration() const -> traffic_simulator::Configuration;
 
@@ -165,48 +159,39 @@ public:
 
     catch (const SpecialAction<EXIT_SUCCESS> & action)  // from CustomCommandAction::exitSuccess
     {
-      const auto what = "Expected " + intended_result;
-      isSuccessIntended() ? set<common::junit::Pass>()
-                          : set<common::junit::Failure>("UnintendedSuccess", what);
+      set<common::junit::Pass>();
       return handle(action);
     }
 
     catch (const SpecialAction<EXIT_FAILURE> & action)  // from CustomCommandAction::exitFailure
     {
-      const auto what = "Expected " + intended_result;
-      isFailureIntended() ? set<common::junit::Pass>()
-                          : set<common::junit::Failure>("Failure", what);
+      set<common::junit::Failure>("Simulation failure", "Expected success");
       return handle(action);
     }
 
     catch (const AutowareError & error) {
-      isAnErrorIntended() ? set<common::junit::Pass>()
-                          : set<common::junit::Error>("AutowareError", error.what());
+      set<common::junit::Error>("AutowareError", error.what());
       return handle(error);
     }
 
     catch (const SemanticError & error) {
-      isAnErrorIntended() ? set<common::junit::Pass>()
-                          : set<common::junit::Error>("SemanticError", error.what());
+      set<common::junit::Error>("SemanticError", error.what());
       return handle(error);
     }
 
     catch (const SimulationError & error) {
-      isAnErrorIntended() ? set<common::junit::Pass>()
-                          : set<common::junit::Error>("SimulationError", error.what());
+      set<common::junit::Error>("SimulationError", error.what());
       return handle(error);
     }
 
     catch (const SyntaxError & error) {
-      isAnErrorIntended() ? set<common::junit::Pass>()
-                          : set<common::junit::Error>("SyntaxError", error.what());
+      set<common::junit::Error>("SyntaxError", error.what());
       return handle(error);
     }
 
     catch (const std::exception & error)  // NOTE: MUST BE LAST OF CATCH STATEMENTS.
     {
-      isAnErrorIntended() ? set<common::junit::Pass>()
-                          : set<common::junit::Error>("InternalError", error.what());
+      set<common::junit::Error>("InternalError", error.what());
       return handle(error);
     }
 
