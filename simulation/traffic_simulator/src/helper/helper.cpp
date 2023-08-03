@@ -95,12 +95,13 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   const LidarType type, const std::string & entity, const std::string & architecture_type,
-  const double horizontal_resolution)
+  const double lidar_sensor_delay, const double horizontal_resolution)
 {
   simulation_api_schema::LidarConfiguration configuration;
   configuration.set_horizontal_resolution(horizontal_resolution);
   configuration.set_architecture_type(architecture_type);
   configuration.set_entity(entity);
+  configuration.set_lidar_sensor_delay(lidar_sensor_delay);
   switch (type) {
     case LidarType::VLP16:
       configuration.set_scan_duration(0.1);

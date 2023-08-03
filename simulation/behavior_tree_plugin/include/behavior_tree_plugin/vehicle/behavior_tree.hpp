@@ -60,7 +60,7 @@ public:
   DEFINE_GETTER_SETTER(EntityTypeList,                    EntityTypeDict)
   DEFINE_GETTER_SETTER(GoalPoses,                         std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(EntityStatus,                      std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
-  DEFINE_GETTER_SETTER(FollowPolylineTrajectoryParameter, std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Polyline>>)
+  DEFINE_GETTER_SETTER(PolylineTrajectory,                std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
   DEFINE_GETTER_SETTER(HdMapUtils,                        std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,              traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(Obstacle,                          std::optional<traffic_simulator_msgs::msg::Obstacle>)
