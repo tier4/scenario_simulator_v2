@@ -56,20 +56,26 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
+  if (!trajectory_follower) {
+    trajectory_follower = std::make_unique<traffic_simulator::behavior::PositionModePolylineTrajectoryFollower>();
+  }
+
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
       not getInput<decltype(target_speed)>("target_speed", target_speed) or
       not polyline_trajectory) {
+    trajectory_follower.reset();
     return BT::NodeStatus::FAILURE;
-  } else if (
-    const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-      entity_status, polyline_trajectory, behavior_parameter, step_time)) {
+  } else if (trajectory_follower->setParameters(entity_status, behavior_parameter, step_time);
+             const auto updated_status =
+               trajectory_follower->followTrajectory(polyline_trajectory)) {
     setOutput("updated_status", *updated_status);
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
     return BT::NodeStatus::RUNNING;
   } else {
+    trajectory_follower.reset();
     return BT::NodeStatus::SUCCESS;
   }
 }
