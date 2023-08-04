@@ -335,7 +335,7 @@ public:
 private:
   bool updateNonEgoEntitiesStatusInSim();
   std::optional<CanonicalizedEntityStatus> updateEntityStatusInSim(
-    const std::string & entity_name, const CanonicalizedEntityStatus &status);
+    const std::string & entity_name, const CanonicalizedEntityStatus & status);
   bool updateTrafficLightsInSim();
 
   const Configuration configuration;

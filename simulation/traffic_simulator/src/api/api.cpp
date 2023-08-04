@@ -12,17 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/api/api.hpp>
-
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <limits>
 #include <memory>
 #include <optional>
+#include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
+#include <traffic_simulator/api/api.hpp>
 
 namespace traffic_simulator
 {
