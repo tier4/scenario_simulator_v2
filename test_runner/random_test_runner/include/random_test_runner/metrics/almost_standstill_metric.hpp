@@ -25,20 +25,20 @@
 class AlmostStandstillMetric
 {
 public:
-  bool isAlmostStandingStill(const traffic_simulator_msgs::msg::EntityStatus & status)
+  bool isAlmostStandingStill(const traffic_simulator::CanonicalizedEntityStatus & status)
   {
     if (!last_status_) {
       last_status_ = status;
       return false;
     }
 
-    if (status.time - last_status_->time > last_data_timeout_) {
+    if (status.getTime() - last_status_->getTime() > last_data_timeout_) {
       last_status_.reset();
       return false;
     }
 
-    if (status.action_status.twist.linear.x < linear_velocity_threshold_) {
-      almost_standstill_time_ += status.time - last_status_->time;
+    if (status.getTwist().linear.x < linear_velocity_threshold_) {
+      almost_standstill_time_ += status.getTime() - last_status_->getTime();
     } else {
       almost_standstill_time_ = 0.0;
     }
@@ -58,7 +58,7 @@ private:
   const double last_data_timeout_ = 2.0;
 
   double almost_standstill_time_ = 0.0;
-  std::optional<traffic_simulator_msgs::msg::EntityStatus> last_status_;
+  std::optional<traffic_simulator::CanonicalizedEntityStatus> last_status_;
 };
 
 #endif  // RANDOM_TEST_RUNNER__ALMOST_STANDSTILL_METRIC_H
