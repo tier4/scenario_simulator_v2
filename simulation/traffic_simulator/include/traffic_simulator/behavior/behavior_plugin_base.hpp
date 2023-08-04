@@ -17,10 +17,10 @@
 
 #include <optional>
 #include <string>
+#include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
-#include <traffic_simulator/data_type/follow_trajectory.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
@@ -60,7 +60,7 @@ public:
   DEFINE_GETTER_SETTER(BehaviorParameter, "behavior_parameter", traffic_simulator_msgs::msg::BehaviorParameter)
   DEFINE_GETTER_SETTER(EntityStatus, "entity_status", traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(EntityTypeList, "entity_type_list", EntityTypeDict)
-  DEFINE_GETTER_SETTER(FollowPolylineTrajectoryParameter, "polyline_trajectory_parameter", std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<traffic_simulator::follow_trajectory::Polyline>>)
+  DEFINE_GETTER_SETTER(PolylineTrajectory, "polyline_trajectory", std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
   DEFINE_GETTER_SETTER(GoalPoses, "goal_poses", std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils, "hdmap_utils", std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(Obstacle, "obstacle", std::optional<traffic_simulator_msgs::msg::Obstacle>)
@@ -72,7 +72,7 @@ public:
   DEFINE_GETTER_SETTER(StepTime, "step_time", double)
   DEFINE_GETTER_SETTER(TargetSpeed, "target_speed", std::optional<double>)
   DEFINE_GETTER_SETTER(LaneChangeParameters, "lane_change_parameters", traffic_simulator::lane_change::Parameter)
-  DEFINE_GETTER_SETTER(TrafficLightManager, "traffic_light_manager", std::shared_ptr<traffic_simulator::TrafficLightManagerBase>)
+  DEFINE_GETTER_SETTER(TrafficLightManager, "traffic_light_manager", std::shared_ptr<traffic_simulator::TrafficLightManager>)
   DEFINE_GETTER_SETTER(UpdatedStatus, "updated_status", traffic_simulator_msgs::msg::EntityStatus)
   DEFINE_GETTER_SETTER(VehicleParameters, "vehicle_parameters", traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints, "waypoints", traffic_simulator_msgs::msg::WaypointsArray)

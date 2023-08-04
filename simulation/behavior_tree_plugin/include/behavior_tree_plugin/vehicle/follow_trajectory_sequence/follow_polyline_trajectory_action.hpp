@@ -23,14 +23,9 @@ namespace vehicle
 {
 struct FollowPolylineTrajectoryAction : public VehicleActionNode
 {
-  using Parameter = std::shared_ptr<traffic_simulator::follow_trajectory::Parameter<
-    traffic_simulator::follow_trajectory::Polyline>>;
-
-  Parameter parameter;
+  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory;
 
   std::optional<double> target_speed;
-
-  geometry_msgs::msg::Vector3 velocity;  // world coordinate
 
   using VehicleActionNode::VehicleActionNode;
 

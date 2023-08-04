@@ -22,13 +22,14 @@
 #include <optional>
 #include <queue>
 #include <string>
+#include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
-#include <traffic_simulator/data_type/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/job/job_list.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -113,7 +114,10 @@ public:
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
-  virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
+  virtual auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> = 0;
+
+  virtual auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const
+    -> void = 0;
 
   /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
 
@@ -162,7 +166,7 @@ public:
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
   virtual auto requestFollowTrajectory(
-    const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &) -> void;
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void;
 
   virtual void requestWalkStraight();
 
@@ -193,7 +197,7 @@ public:
   virtual auto setLinearVelocity(const double linear_velocity) -> void;
 
   virtual void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> &);
 
   virtual auto activateOutOfRangeJob(
     double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
@@ -211,6 +215,9 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
+  virtual auto fillLaneletPose(
+    traffic_simulator_msgs::msg::EntityStatus & status, bool include_crosswalk) const -> void final;
+
   const std::string name;
 
   bool verbose;
@@ -221,7 +228,7 @@ protected:
   traffic_simulator_msgs::msg::EntityStatus status_before_update_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-  std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
+  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;
 
   bool npc_logic_started_ = false;
   double stand_still_duration_ = 0.0;

@@ -27,15 +27,13 @@ struct Scenario
   Scenario() = default;
 
   explicit Scenario(const boost::filesystem::path & path, int expect, double frame_rate)
-  : path(path), expect(expect), frame_rate(frame_rate)
+  : path(path), frame_rate(frame_rate)
   {
   }
 
   boost::filesystem::path path;
 
-  int expect;
-
-  double frame_rate;
+  float frame_rate;
 };
 
 class Preprocessor
