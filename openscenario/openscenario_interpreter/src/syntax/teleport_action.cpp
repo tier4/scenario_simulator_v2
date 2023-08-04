@@ -61,8 +61,15 @@ auto TeleportAction::teleport(const EntityRef & entity_ref, const Position & pos
     [&](const RelativeWorldPosition & position) {
       return applyTeleportAction(
         entity_ref,
-        position.reference,  // name
-        position,            // geometry_msgs::msg::Point
+        position.entity_ref,  // name
+        position,             // geometry_msgs::msg::Point
+        position.orientation);
+    },
+    [&](const RelativeObjectPosition & position) {
+      return applyTeleportAction(
+        entity_ref,
+        position.entity_ref,  // name
+        position,             // geometry_msgs::msg::Point
         position.orientation);
     },
     [&](const LanePosition & position) {

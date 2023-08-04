@@ -197,6 +197,7 @@ public:
   }
 
   bool despawn(const std::string & name);
+  bool despawnEntities();
 
   traffic_simulator_msgs::msg::EntityStatus getEntityStatus(const std::string & name);
 
