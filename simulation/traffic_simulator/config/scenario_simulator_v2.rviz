@@ -3056,9 +3056,9 @@ Visualization Manager:
                 Value: /perception/occupancy_grid_map/map_updates
               Use Timestamp: false
               Value: false
-          Enabled: true
+          Enabled: false
           Name: Simple Sensor Simulator
-      Enabled: true
+      Enabled: false
       Name: Simulation
   Enabled: true
   Global Options:
