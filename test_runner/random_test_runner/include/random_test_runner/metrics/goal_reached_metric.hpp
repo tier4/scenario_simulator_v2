@@ -27,13 +27,13 @@
 class GoalReachedMetric
 {
 public:
-  bool isGoalReached(const traffic_simulator_msgs::msg::EntityStatus & status)
+  bool isGoalReached(const traffic_simulator::CanonicalizedEntityStatus & status)
   {
     if (!goal_pose_) {
       return false;
     }
 
-    geometry_msgs::msg::Point current_position = status.pose.position;
+    geometry_msgs::msg::Point current_position = status.getMapPose().position;
     geometry_msgs::msg::Point goal_position = goal_pose_->position;
 
     if (distance(current_position, goal_position) < goal_reaching_accuracy_threshold_) {

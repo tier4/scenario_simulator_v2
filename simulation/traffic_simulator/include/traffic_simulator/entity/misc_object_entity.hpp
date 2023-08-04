@@ -27,7 +27,8 @@ class MiscObjectEntity : public EntityBase
 {
 public:
   explicit MiscObjectEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::string & name, const CanonicalizedEntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::MiscObjectParameters &);
 
   void onUpdate(double, double) override;
@@ -37,6 +38,13 @@ public:
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
+  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override
+  {
+    static traffic_simulator_msgs::msg::EntityType type;
+    type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
+    return type;
+  }
+
   auto getEntityTypename() const -> const std::string & override
   {
     static const std::string result = "MiscObjectEntity";
@@ -45,19 +53,19 @@ public:
 
   ~MiscObjectEntity() override = default;
 
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses() override { return {}; }
+  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override { return {}; }
 
   std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
     return std::nullopt;
   }
 
-  auto getRouteLanelets(double) const -> std::vector<std::int64_t> override
+  auto getRouteLanelets(double) -> std::vector<std::int64_t> override
   {
     THROW_SEMANTIC_ERROR("getRouteLanelets function cannot not use in MiscObjectEntity");
   }
 
-  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus &) const -> void override;
+  auto fillLaneletPose(CanonicalizedEntityStatus &) -> void override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override
   {
@@ -68,7 +76,7 @@ public:
 
   void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool) override;
 
-  void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override
   {
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
@@ -78,7 +86,7 @@ public:
     THROW_SEMANTIC_ERROR("requestAssignRoute function cannot not use in MiscObjectEntity");
   }
 
-  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override
+  void requestAcquirePosition(const CanonicalizedLaneletPose &) override
   {
     THROW_SEMANTIC_ERROR("requestAcquirePosition function cannot not use in MiscObjectEntity");
   }

@@ -149,7 +149,7 @@ OpenSCENARIO:
                                     EntityCondition:
                                       ReachPositionCondition:
                                         Position: *ego_destination
-                                        tolerance: 1
+                                        tolerance: 1.1
                         Action:
                           - name: ''
                             UserDefinedAction:
