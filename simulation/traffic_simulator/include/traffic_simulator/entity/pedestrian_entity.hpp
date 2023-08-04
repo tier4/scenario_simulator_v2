@@ -81,7 +81,7 @@ public:
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr) override;
 
   void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> & ptr) override;
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr) override;
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
 
@@ -105,13 +105,15 @@ public:
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
-  auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
+  auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> override;
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
   auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
+
+  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void override;
 
   const std::string plugin_name;
 

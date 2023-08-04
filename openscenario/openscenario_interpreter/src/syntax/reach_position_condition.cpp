@@ -61,6 +61,11 @@ auto ReachPositionCondition::evaluate() -> Object
         triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
       return std::hypot(pose.position.x, pose.position.y);
     },
+    [&](const RelativeObjectPosition & position, auto && triggering_entity) {
+      const auto pose = makeNativeRelativeWorldPosition(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
+      return std::hypot(pose.position.x, pose.position.y);
+    },
     [&](const LanePosition & position, auto && triggering_entity) {
       const auto pose = makeNativeRelativeWorldPosition(
         triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));

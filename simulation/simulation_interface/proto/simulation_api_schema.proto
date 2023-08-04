@@ -7,6 +7,18 @@ import "traffic_simulator_msgs.proto";
 package simulation_api_schema;
 
 /**
+ * Entity status passed over the protobuf interface
+ **/
+message EntityStatus {
+  traffic_simulator_msgs.EntityType type = 1;            // Type of the entity.
+  traffic_simulator_msgs.EntitySubtype subtype = 2;      // subtype of the entity.
+  double time = 3;                                       // Current simulation time.
+  string name = 4;                                       // Name of the entity.
+  traffic_simulator_msgs.ActionStatus action_status = 5; // Action status of the entity.
+  geometry_msgs.Pose pose = 6;                           // Pose in map coordinate of the entity.
+}
+
+/**
  * Result of the request
  **/
 message Result {
@@ -23,6 +35,7 @@ message LidarConfiguration {
   repeated double vertical_angles = 3; // Vertical resolutions of the lidar. (unit : radian)
   double scan_duration = 4;            // Scan duration of the lidar. (unit: second)
   string architecture_type = 5;        // Autoware architecture type.
+  double lidar_sensor_delay = 6;       // lidar sensor delay. (unit : second) It delays publishing timing.
 }
 
 /**
@@ -67,8 +80,11 @@ message UpdatedEntityStatus {
  * Requests initializing simulation.
  **/
 message InitializeRequest {
-  double realtime_factor = 1; // Realtime factor of the simulation.
-  double step_time = 2;       // Step time of the simulation.
+  double realtime_factor = 1;                      // Realtime factor of the simulation.
+  double step_time = 2;                            // Step time of the simulation.
+  double initialize_time = 3;                      // Simulation time at initialization
+  builtin_interfaces.Time initialize_ros_time = 4; // ROS time at initialization
+  string lanelet2_map_path = 5;                    // Path to lanelet2 map file
 }
 
 /**
@@ -98,7 +114,10 @@ message UpdateFrameResponse {
  **/
 message SpawnVehicleEntityRequest {
   traffic_simulator_msgs.VehicleParameters parameters = 1; // Parameters of vehicle entity.
-  bool is_ego = 2;                                    // If true, the entity is Ego vehicle. (Autoware vehicle.)
+  bool is_ego = 2;                                         // If true, the entity is Ego vehicle. (Autoware vehicle.)
+  string asset_key = 3;                                    // Asset key of the entity simulator entity
+  geometry_msgs.Pose pose = 4;                             // Entity initial pose
+  double initial_speed = 5;                                // Entity initial speed
 }
 
 /**
@@ -113,6 +132,8 @@ message SpawnVehicleEntityResponse {
  **/
 message SpawnPedestrianEntityRequest {
   traffic_simulator_msgs.PedestrianParameters parameters = 1; // Parameters of pedestrian entity.
+  string asset_key = 2;                                       // Asset key of the entity simulator entity
+  geometry_msgs.Pose pose = 3;                                // Entity initial pose
 }
 
 /**
@@ -127,6 +148,8 @@ message SpawnPedestrianEntityResponse {
  **/
 message SpawnMiscObjectEntityRequest {
   traffic_simulator_msgs.MiscObjectParameters parameters = 1; // Parameters of misc object entity.
+  string asset_key = 2;                                       // Asset key of the entity simulator entity
+  geometry_msgs.Pose pose = 3;                                // Entity initial pose
 }
 
 /**
@@ -154,10 +177,8 @@ message DespawnEntityResponse {
  * Requests updating entity status.
  **/
 message UpdateEntityStatusRequest {
-  repeated traffic_simulator_msgs.EntityStatus status = 1;                 // List of updated entity status in traffic simulator.
-  traffic_simulator_msgs.VehicleCommand vehicle_command = 2;               // Autoware (Ego)'s vehicle command
-  traffic_simulator_msgs.EntityStatus ego_entity_status_before_update = 3; // Entity status of ego entity before running vehicle model
-  bool ego_entity_status_before_update_is_empty = 4;                       // If True,ego entity status before update is empty.
+  EntityStatus status = 1;                 // Updated entity status in traffic simulator.
+  bool npc_logic_started = 2;              // Npc logic started flag
 }
 
 /**
@@ -165,7 +186,7 @@ message UpdateEntityStatusRequest {
  **/
 message UpdateEntityStatusResponse {
   Result result = 1;                       // Result of [UpdateEntityStatusRequest](#UpdateEntityStatusRequest)
-  repeated UpdatedEntityStatus status = 2; // List of updated entity status in sensor/dynamics simulator.
+  UpdatedEntityStatus status = 2;          // Updated entity status in sensor/dynamics simulator
 }
 
 /**
@@ -210,46 +231,52 @@ message AttachOccupancyGridSensorResponse {
   Result result = 1; // Result of [AttachOccupancyGridSensorRequest](#AttachOccupancyGridRequest)
 }
 
-/**
- * Requests updating a frame of sensor simulation.
- **/
-message UpdateSensorFrameRequest {
-  double current_time = 1;                      // Current simulation timestamp.
-  builtin_interfaces.Time current_ros_time = 2; // Current ROS time
-}
-
-/**
- * Response of updating a frame of sensor simulation.
- **/
-message UpdateSensorFrameResponse {
-  Result result = 1; // Result of [UpdateSensorFrameRequest](#UpdateSensorFrameRequest)
-}
-
-
-message TrafficLightState {
-  message LampState {
-    enum State {
-      UNKNOWN = 0;
-      RED = 1;
-      GREEN = 2;
-      YELLOW = 3;
-      LEFT = 4;
-      RIGHT = 5;
-      UP = 6;
-      DOWN = 7;
-    }
-    State type = 1;
-    float confidence = 2;
+message TrafficLight {
+  enum Color {
+    RED = 0;
+    AMBER = 1;
+    GREEN = 2;
+    WHITE = 3;
+    UNKNOWN_COLOR = 4;
   }
+
+  enum Shape {
+    CIRCLE = 0;
+    LEFT_ARROW = 1;
+    RIGHT_ARROW = 2;
+    UP_ARROW = 3;
+    UP_LEFT_ARROW = 4;
+    UP_RIGHT_ARROW = 5;
+    DOWN_ARROW = 6;
+    DOWN_LEFT_ARROW = 7;
+    DOWN_RIGHT_ARROW = 8;
+    CROSS = 9;
+    UNKNOWN_SHAPE = 10;
+  }
+
+  enum Status {
+    SOLID_OFF = 0;
+    SOLID_ON = 1;
+    FLASHING = 2;
+    UNKNOWN_STATUS = 3;
+  }
+
+  Color color = 1;
+  Shape shape = 2;
+  Status status = 3;
+  float confidence = 4;
+}
+
+message TrafficSignal {
   int32 id = 1;
-  repeated LampState lamp_states = 2;
+  repeated TrafficLight traffic_light_status = 2;
 }
 
 /**
  * Requests updating traffic lights in simulation.
  **/
 message UpdateTrafficLightsRequest {
-  repeated TrafficLightState states = 1;
+  repeated TrafficSignal states = 1;
 }
 
 /**
@@ -267,16 +294,15 @@ message SimulationRequest {
   oneof request {
     InitializeRequest initialize = 1;
     UpdateFrameRequest update_frame = 2;
-    UpdateSensorFrameRequest update_sensor_frame = 3;
-    SpawnVehicleEntityRequest spawn_vehicle_entity = 4;
-    SpawnPedestrianEntityRequest spawn_pedestrian_entity = 5;
-    SpawnMiscObjectEntityRequest  spawn_misc_object_entity = 6;
-    DespawnEntityRequest despawn_entity = 7;
-    UpdateEntityStatusRequest update_entity_status = 8;
-    AttachLidarSensorRequest attach_lidar_sensor = 9;
-    AttachDetectionSensorRequest attach_detection_sensor = 10;
-    AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 11;
-    UpdateTrafficLightsRequest update_traffic_lights = 12;
+    SpawnVehicleEntityRequest spawn_vehicle_entity = 3;
+    SpawnPedestrianEntityRequest spawn_pedestrian_entity = 4;
+    SpawnMiscObjectEntityRequest  spawn_misc_object_entity = 5;
+    DespawnEntityRequest despawn_entity = 6;
+    UpdateEntityStatusRequest update_entity_status = 7;
+    AttachLidarSensorRequest attach_lidar_sensor = 8;
+    AttachDetectionSensorRequest attach_detection_sensor = 9;
+    AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 10;
+    UpdateTrafficLightsRequest update_traffic_lights = 11;
   }
 }
 
@@ -288,7 +314,6 @@ message SimulationResponse {
   oneof response {
     InitializeResponse initialize = 1;
     UpdateFrameResponse update_frame = 2;
-    UpdateSensorFrameResponse update_sensor_frame = 3;
     SpawnVehicleEntityResponse spawn_vehicle_entity = 4;
     SpawnPedestrianEntityResponse spawn_pedestrian_entity = 5;
     SpawnMiscObjectEntityResponse  spawn_misc_object_entity = 6;

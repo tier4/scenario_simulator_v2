@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/lane_position.hpp>
+#include <openscenario_interpreter/syntax/relative_object_position.hpp>
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
 #include <openscenario_interpreter/syntax/world_position.hpp>
 #include <pugixml.hpp>
@@ -50,9 +51,9 @@ struct Position : public ComplexType
 
 DEFINE_LAZY_VISITOR(
   Position,
-  CASE(WorldPosition),          //
-  CASE(RelativeWorldPosition),  //
-  // CASE(RelativeObjectPosition),
+  CASE(WorldPosition),           //
+  CASE(RelativeWorldPosition),   //
+  CASE(RelativeObjectPosition),  //
   // CASE(RoadPosition),
   // CASE(RelativeRoadPosition),
   CASE(LanePosition),
@@ -62,9 +63,9 @@ DEFINE_LAZY_VISITOR(
 
 DEFINE_LAZY_VISITOR(
   const Position,
-  CASE(WorldPosition),          //
-  CASE(RelativeWorldPosition),  //
-  // CASE(RelativeObjectPosition),
+  CASE(WorldPosition),           //
+  CASE(RelativeWorldPosition),   //
+  CASE(RelativeObjectPosition),  //
   // CASE(RoadPosition),
   // CASE(RelativeRoadPosition),
   CASE(LanePosition),

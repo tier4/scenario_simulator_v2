@@ -61,6 +61,7 @@ public:
   static auto deactivate() -> void
   {
     if (active()) {
+      core->despawnEntities();
       core->closeZMQConnection();
       core.reset();
     }
@@ -245,7 +246,8 @@ public:
       }());
 
       if (controller.isUserDefinedController()) {
-        core->attachLidarSensor(entity_ref);
+        core->attachLidarSensor(
+          entity_ref, controller.properties.template get<Double>("pointcloudPublishingDelay"));
 
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;

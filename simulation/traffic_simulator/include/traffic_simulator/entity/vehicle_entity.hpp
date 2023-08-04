@@ -83,13 +83,13 @@ public:
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
+  auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &);
+  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
@@ -98,8 +98,7 @@ public:
   void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override;
 
   auto requestFollowTrajectory(
-    const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &)
-    -> void override;
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 
   void requestLaneChange(const std::int64_t to_lanelet_id) override;
 
@@ -118,7 +117,9 @@ public:
   void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &) override;
 
   void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> &) override;
+
+  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void override;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
