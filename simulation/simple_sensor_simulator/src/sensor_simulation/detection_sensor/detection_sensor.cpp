@@ -29,11 +29,14 @@
 namespace simple_sensor_simulator
 {
 auto DetectionSensorBase::isWithinRange(
-  const geometry_msgs::msg::Point & position1, const geometry_msgs::msg::Point & position2, const double range) const -> bool
+  const geometry_msgs::Point & point1, const geometry_msgs::Point & point2, const double range) const -> bool
 {
-  Eigen::Vector3d from {position1.x, position1.y, position1.z};
-  Eigen::Vector3d to {position2.x, position2.y, position2.z};
-  return math::geometry::hypot(from, to) <= range;
+  auto distanceX = point1.x() - point2.x();
+  auto distanceY = point1.y() - point2.y();
+  auto distanceZ = point1.z() - point2.z();
+
+  double distance = std::hypot(distanceX, distanceY, distanceZ);
+  return distance <= range;
 }
 
 auto DetectionSensorBase::getSensorPose(
@@ -73,11 +76,7 @@ auto DetectionSensorBase::getDetectedObjects(
   const auto pose = getSensorPose(statuses);
 
   for (const auto & status : statuses) {
-    geometry_msgs::msg::Point position1 = status.pose().position();
-    geometry_msgs::msg::Point position2 = pose.position();
-    if (
-      status.name() != configuration_.entity() &&
-      isWithinRange(position1, position2, 300.0)) {
+    if (status.name() != configuration_.entity() && isWithinRange(status.pose().position(), pose.position(), 300.0)) {
       detected_objects.emplace_back(status.name());
     }
   }
@@ -97,8 +96,7 @@ auto DetectionSensorBase::filterObjectsBySensorRange(
     const auto selected_entity_pose = getEntityPose(entity_statuses, selected_entity_status);
     if (
       selected_entity_status != configuration_.entity() &&
-      isWithinRange(
-        selected_entity_pose.position(), sensor_pose.position(), detection_sensor_range)) {
+      isWithinRange(selected_entity_pose.position(), sensor_pose.position(), detection_sensor_range)) {
       detected_objects.emplace_back(selected_entity_status);
     }
   }
