@@ -18,6 +18,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <geometry/vector3/hypot.hpp>
 #include <memory>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
@@ -28,13 +29,11 @@
 namespace simple_sensor_simulator
 {
 auto DetectionSensorBase::isWithinRange(
-  const geometry_msgs::Position & position1, const geometry_msgs::Position & position2, const double range) const -> bool
+  const geometry_msgs::msg::Point & position1, const geometry_msgs::msg::Point & position2, const double range) const -> bool
 {
-  auto from = {position1.x(), position1.y(), position1.z()};
-  auto to = {position2.x(), position2.y(), position2.z()};
-
-  double distance = math::geometry::hypot(from, to);
-  return distance <= range;
+  Eigen::Vector3d from {position1.x, position1.y, position1.z};
+  Eigen::Vector3d to {position2.x, position2.y, position2.z};
+  return math::geometry::hypot(from, to) <= range;
 }
 
 auto DetectionSensorBase::getSensorPose(
@@ -74,7 +73,11 @@ auto DetectionSensorBase::getDetectedObjects(
   const auto pose = getSensorPose(statuses);
 
   for (const auto & status : statuses) {
-    if (status.name() != configuration_.entity() && isWithinRange(status.pose().position, pose.position, 300.0)) {
+    geometry_msgs::msg::Point position1 = status.pose().position();
+    geometry_msgs::msg::Point position2 = pose.position();
+    if (
+      status.name() != configuration_.entity() &&
+      isWithinRange(position1, position2, 300.0)) {
       detected_objects.emplace_back(status.name());
     }
   }
@@ -94,7 +97,8 @@ auto DetectionSensorBase::filterObjectsBySensorRange(
     const auto selected_entity_pose = getEntityPose(entity_statuses, selected_entity_status);
     if (
       selected_entity_status != configuration_.entity() &&
-      isWithinRange(selected_entity_pose, sensor_pose, detection_sensor_range)) {
+      isWithinRange(
+        selected_entity_pose.position(), sensor_pose.position(), detection_sensor_range)) {
       detected_objects.emplace_back(selected_entity_status);
     }
   }

@@ -88,7 +88,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   // construct a `set` of detected object names to look up entities later
   auto detected_entities = std::set<std::string>();
   {
-    if (configuration_.detect_all_objects_in_range()) {
+    if (configuration_.filter_by_range()) {
       auto v = getDetectedObjects(status);
       detected_entities.insert(v.begin(), v.end());
     } else {
