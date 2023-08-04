@@ -12,6 +12,7 @@
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
   <depend>ament_index_cpp</depend>
+  <depend>arithmetic</depend>
   <depend>concealer</depend>
   <depend>color_names</depend>
   <depend>geographic_msgs</depend>

@@ -28,8 +28,9 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
-  src/behavior/route_planner.cpp
+  src/behavior/follow_trajectory.cpp
   src/behavior/longitudinal_speed_planning.cpp
+  src/behavior/route_planner.cpp
   src/color_utils/color_utils.cpp
   src/data_type/behavior.cpp
   src/data_type/lane_change.cpp
@@ -47,9 +48,9 @@ ament_auto_add_library(traffic_simulator SHARED
   src/simulation_clock/simulation_clock.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
+  src/traffic_lights/configurable_rate_updater.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
-  src/traffic_lights/configurable_rate_updater.cpp
   src/traffic_lights/traffic_light_marker_publisher.cpp
   src/traffic_lights/traffic_light_publisher.cpp
 )
