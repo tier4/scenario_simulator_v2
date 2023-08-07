@@ -48,7 +48,11 @@ private:
     // LCOV_EXCL_START
     const auto lanelet_pose = api_.getLaneletPose("ego");
     const auto traveled_distance = api_.getTraveledDistance("ego");
-    const auto difference = std::abs(lanelet_pose->s - traveled_distance);
+    if (!lanelet_pose) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    const auto difference = std::abs(
+      static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).s - traveled_distance);
     if (difference > std::numeric_limits<double>::epsilon()) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
@@ -62,7 +66,8 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters());
+      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 0, 0)),
+      getVehicleParameters());
     api_.setLinearVelocity("ego", 3);
     api_.requestSpeedChange("ego", 3, true);
   }

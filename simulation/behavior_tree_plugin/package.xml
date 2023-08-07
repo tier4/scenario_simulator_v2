@@ -9,7 +9,6 @@
 
   <buildtool_depend>ament_cmake_auto</buildtool_depend>
 
-  <depend>arithmetic</depend>
   <depend>behaviortree_cpp_v3</depend>
   <depend>geometry</depend>
   <depend>pluginlib</depend>
