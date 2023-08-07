@@ -16,6 +16,7 @@
 #define CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
@@ -47,8 +48,6 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
-  PublisherWrapper<geometry_msgs::msg::PoseStamped>               setCheckpoint;
-  PublisherWrapper<geometry_msgs::msg::PoseStamped>               setGoalPose;
   PublisherWrapper<geometry_msgs::msg::PoseWithCovarianceStamped> setInitialPose;
 
   SubscriberWrapper<autoware_auto_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
@@ -61,6 +60,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>         requestCooperateCommands;
   ServiceWithValidation<tier4_external_api_msgs::srv::Engage>           requestEngage;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>    requestSetRoutePoints;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit> requestSetVelocityLimit;
 
   Cooperator current_cooperator = Cooperator::simulator;
@@ -108,8 +108,6 @@ public:
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    setCheckpoint("/planning/mission_planning/checkpoint", *this),
-    setGoalPose("/planning/mission_planning/goal", *this),
     setInitialPose("/initialpose", *this),
     getAutowareState("/autoware/state", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
@@ -121,6 +119,7 @@ public:
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/external/set/engage", *this),
+    requestSetRoutePoints("/api/routing/set_route_points", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
   // clang-format on

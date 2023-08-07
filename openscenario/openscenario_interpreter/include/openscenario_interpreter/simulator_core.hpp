@@ -288,6 +288,11 @@ public:
 
         core->asFieldOperatorApplication(entity_ref)
           .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
+
+        core->asFieldOperatorApplication(entity_ref)
+          .declare_parameter<bool>(
+            "allow_goal_modification",
+            controller.properties.template get<Boolean>("allowGoalModification"));
       }
     }
 

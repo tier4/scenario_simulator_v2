@@ -313,10 +313,22 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
 
   task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
-    setGoalPose(route.back());
+
+    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>();
+
+    request->header = route.back().header;
+
+    request->option.allow_goal_modification =
+      get_parameter("allow_goal_modification").get_value<bool>();
+
+    request->goal = route.back().pose;
+
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-      setCheckpoint(each);
+      request->waypoints.push_back(each.pose);
     }
+
+    requestSetRoutePoints(request);
+
     waitForAutowareStateToBeWaitingForEngage();
   });
 }
