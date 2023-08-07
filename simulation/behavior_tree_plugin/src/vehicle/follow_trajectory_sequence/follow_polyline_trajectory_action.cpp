@@ -68,7 +68,9 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       not polyline_trajectory) {
     trajectory_follower.reset();
     return BT::NodeStatus::FAILURE;
-  } else if (trajectory_follower->setParameters(entity_status, behavior_parameter, step_time);
+  } else if (trajectory_follower->setParameters(
+               static_cast<traffic_simulator::EntityStatus>(*entity_status), behavior_parameter,
+               step_time);
              const auto updated_status =
                trajectory_follower->followTrajectory(polyline_trajectory)) {
     setOutput(
