@@ -1,89 +1,110 @@
-#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__TRAJECTORY_FOLLOWER_HPP_
-#define TRAFFIC_SIMULATOR__BEHAVIOR__TRAJECTORY_FOLLOWER_HPP_
+// Copyright 2023 TIER IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
-#include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
+#ifndef TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
+#define TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
+
 #include <optional>
-#include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
+#include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
+#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 
 namespace traffic_simulator
 {
-namespace behavior
+namespace follow_trajectory
 {
-
 class PolylineTrajectoryFollower
 {
 public:
   PolylineTrajectoryFollower() = default;
   ~PolylineTrajectoryFollower() = default;
 
-  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_m;
+  auto setParameters(
+    const traffic_simulator_msgs::msg::EntityStatus &,
+    const traffic_simulator_msgs::msg::BehaviorParameter &, const double,
+    const std::optional<traffic_simulator_msgs::msg::VehicleParameters> & vehicle_parameters =
+      std::nullopt) -> void;
+
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> followTrajectory(
+    std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & polyline_trajectory);
+
+protected:
+  auto getCurrentPosition() const -> geometry_msgs::msg::Point;
+  auto getTargetPosition() const -> geometry_msgs::msg::Point;
+  auto getCurrentAcceleration() const -> double;
+  auto getAccelerationLimits(const double acceleration) const -> std::tuple<double, double>;
+  auto getCurrentSpeed() const -> double;
+  auto getTimeRemainingToFrontWaypoint(
+    double remaining_time_to_front_waypoint, double distance_to_front_waypoint,
+    double desired_speed) const -> std::optional<double>;
+  void discardTheFrontWaypointFromTrajectory();
+
+  auto createUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & velocity) const
+    -> traffic_simulator_msgs::msg::EntityStatus;
+
+  virtual auto getUpdatedVelocity(
+    const geometry_msgs::msg::Vector3 & desired_velocity, double desired_speed) const
+    -> geometry_msgs::msg::Vector3 = 0;
+  virtual auto getDesiredAcceleration(
+    double remaining_time, double acceleration, double distance, double speed) const -> double = 0;
+  virtual auto getDesiredSpeed(
+    double desired_acceleration, double min_acceleration, double max_acceleration,
+    double speed) const -> double = 0;
+  virtual auto getDesiredVelocity(
+    const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
+    double desired_speed) const -> geometry_msgs::msg::Vector3 = 0;
+  virtual auto getDistanceAndTimeToFrontWaypoint(
+    const geometry_msgs::msg::Point & target_position,
+    const geometry_msgs::msg::Point & position) const
+    -> std::optional<std::tuple<double, double>> = 0;
+  virtual auto getDistanceAndTimeToWaypointWithSpecifiedTime(
+    double distance_to_front_waypoint) const -> std::optional<std::tuple<double, double>> = 0;
+
+  double step_time_m;
   traffic_simulator_msgs::msg::EntityStatus entity_status_m;
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_m;
   std::optional<traffic_simulator_msgs::msg::VehicleParameters> vehicle_parameters_m;
-  double step_time_m;
-
-  std::optional<traffic_simulator_msgs::msg::EntityStatus> followTrajectory(std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & polyline_trajectory);
-
-  auto getCurrentPosition() -> geometry_msgs::msg::Point;
-  auto getTargetPosition() -> geometry_msgs::msg::Point;
-  auto getCurrentAcceleration() -> double;
-  auto getAccelerationLimits(double acceleration) -> std::tuple<double, double>;
-  auto getCurrentSpeed() -> double;
-  auto getTimeRemainingToFrontWaypoint(
-    double remaining_time_to_front_waypoint, double distance_to_front_waypoint,
-    double desired_speed) -> std::optional<double>;
-  auto createUpdatedEntityStatus(geometry_msgs::msg::Vector3 velocity)
-    -> traffic_simulator_msgs::msg::EntityStatus;
-  auto setParameters(
-    const traffic_simulator_msgs::msg::EntityStatus &,
-    const traffic_simulator_msgs::msg::BehaviorParameter &, double,
-    std::optional<traffic_simulator_msgs::msg::VehicleParameters> vehicle_parameters = std::nullopt)
-    -> void;
-
-  virtual auto getUpdatedVelocity(
-    geometry_msgs::msg::Vector3 desired_velocity, double desired_speed)
-    -> geometry_msgs::msg::Vector3 = 0;
-  virtual auto getDesiredAcceleration(
-    double remaining_time, double acceleration, double distance, double speed) -> double = 0;
-  virtual auto getDesiredSpeed(
-    double desired_acceleration, double min_acceleration, double max_acceleration, double speed)
-    -> double = 0;
-  virtual auto getDesiredVelocity(
-    const geometry_msgs::msg::Point target_position, const geometry_msgs::msg::Point position,
-    double desired_speed) -> geometry_msgs::msg::Vector3 = 0;
-  virtual auto getDistanceAndTimeToFrontWaypoint(
-    const geometry_msgs::msg::Point target_position, const geometry_msgs::msg::Point position)
-    -> std::optional<std::tuple<double, double>> = 0;
-  virtual auto getDistanceAndTimeToWaypointWithSpecifiedTime(double distance_to_front_waypoint)
-    -> std::optional<std::tuple<double, double>> = 0;
-
-private:
-  void discardTheFrontWaypointFromTrajectory();
+  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_m;
 };
 
 class PositionModePolylineTrajectoryFollower : public PolylineTrajectoryFollower
 {
 public:
   PositionModePolylineTrajectoryFollower() : PolylineTrajectoryFollower(){};
+
+private:
   virtual auto getUpdatedVelocity(
-    geometry_msgs::msg::Vector3 desired_velocity, double desired_speed)
+    const geometry_msgs::msg::Vector3 & desired_velocity, double desired_speed) const
     -> geometry_msgs::msg::Vector3 override;
   virtual auto getDesiredAcceleration(
-    double remaining_time, double acceleration, double distance, double speed) -> double override;
-  virtual auto getDesiredSpeed(
-    double desired_acceleration, double min_acceleration, double max_acceleration, double speed)
+    double remaining_time, double acceleration, double distance, double speed) const
     -> double override;
+  virtual auto getDesiredSpeed(
+    double desired_acceleration, double min_acceleration, double max_acceleration,
+    double speed) const -> double override;
   virtual auto getDesiredVelocity(
-    const geometry_msgs::msg::Point target_position, const geometry_msgs::msg::Point position,
-    double desired_speed) -> geometry_msgs::msg::Vector3 override;
+    const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
+    double desired_speed) const -> geometry_msgs::msg::Vector3 override;
   virtual auto getDistanceAndTimeToFrontWaypoint(
-    const geometry_msgs::msg::Point target_position, const geometry_msgs::msg::Point position)
+    const geometry_msgs::msg::Point & target_position,
+    const geometry_msgs::msg::Point & position) const
     -> std::optional<std::tuple<double, double>> override;
-  virtual auto getDistanceAndTimeToWaypointWithSpecifiedTime(double distance_to_front_waypoint)
-    -> std::optional<std::tuple<double, double>> override;
+  virtual auto getDistanceAndTimeToWaypointWithSpecifiedTime(
+    double distance_to_front_waypoint) const -> std::optional<std::tuple<double, double>> override;
 };
-
-}  // namespace behavior
+}  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
-#endif  // BEHAVIOR_TREE_PLUGIN__VEHICLE__TRAJECTORY_FOLLOWER_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER_HPP_

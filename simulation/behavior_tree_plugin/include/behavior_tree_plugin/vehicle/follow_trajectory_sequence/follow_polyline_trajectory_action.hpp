@@ -30,8 +30,9 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
 
   using VehicleActionNode::VehicleActionNode;
 
-  std::unique_ptr<traffic_simulator::behavior::PolylineTrajectoryFollower> trajectory_follower;
-  
+  std::unique_ptr<traffic_simulator::follow_trajectory::PolylineTrajectoryFollower>
+    trajectory_follower;
+
   auto calculateWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto calculateObstacle(const traffic_simulator_msgs::msg::WaypointsArray &)

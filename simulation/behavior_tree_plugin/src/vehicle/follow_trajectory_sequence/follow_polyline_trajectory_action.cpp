@@ -57,7 +57,8 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
   if (!trajectory_follower) {
-    trajectory_follower = std::make_unique<traffic_simulator::behavior::PositionModePolylineTrajectoryFollower>();
+    trajectory_follower = std::make_unique<
+      traffic_simulator::follow_trajectory::PositionModePolylineTrajectoryFollower>();
   }
 
   if (getBlackBoardValues();

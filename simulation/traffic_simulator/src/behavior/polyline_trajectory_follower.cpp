@@ -1,17 +1,18 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <arithmetic/floating_point/comparison.hpp>
-#include <traffic_simulator/behavior/polyline_trajectory_follower.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <geometry/vector3/truncate.hpp>
 #include <iostream>
+#include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/behavior/polyline_trajectory_follower.hpp>
 
 namespace traffic_simulator
 {
-namespace behavior
+namespace follow_trajectory
 {
 template <typename F, typename T, typename... Ts>
 auto any(F f, T && x, Ts &&... xs)
@@ -29,61 +30,60 @@ auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::is
 
 auto PolylineTrajectoryFollower::setParameters(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time,
-  std::optional<traffic_simulator_msgs::msg::VehicleParameters>
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time,
+  const std::optional<traffic_simulator_msgs::msg::VehicleParameters> &
     vehicle_parameters /* = std::nullopt */) -> void
 {
+  entity_status_m = entity_status;
   behavior_parameter_m = behavior_parameter;
   step_time_m = step_time;
   vehicle_parameters_m = vehicle_parameters;
-  entity_status_m = entity_status;
 }
 
 std::optional<traffic_simulator_msgs::msg::EntityStatus>
-PolylineTrajectoryFollower::followTrajectory(std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & polyline_trajectory)
+PolylineTrajectoryFollower::followTrajectory(
+  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & polyline_trajectory)
 {
-  if (polyline_trajectory_m->shape.vertices.empty()) {
+  if (polyline_trajectory->shape.vertices.empty()) {
     return std::nullopt;
   }
-
   polyline_trajectory_m = polyline_trajectory;
-
-  auto position = getCurrentPosition();
-  auto target_position = getTargetPosition();
-  auto front_waypoint_data = getDistanceAndTimeToFrontWaypoint(target_position, position);
-
+  const auto position = getCurrentPosition();
+  const auto target_position = getTargetPosition();
+  const auto front_waypoint_data = getDistanceAndTimeToFrontWaypoint(target_position, position);
   if (!front_waypoint_data) {
     discardTheFrontWaypointFromTrajectory();
     return followTrajectory(polyline_trajectory_m);
   }
+  const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] =
+    front_waypoint_data.value();
 
-  auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = front_waypoint_data.value();
-  auto timed_waypoint_data =
+  const auto timed_waypoint_data =
     getDistanceAndTimeToWaypointWithSpecifiedTime(distance_to_front_waypoint);
-
   if (!timed_waypoint_data) {
     discardTheFrontWaypointFromTrajectory();
     return followTrajectory(polyline_trajectory_m);
   }
+  const auto [distance_to_timed_waypoint, remaining_time_to_timed_waypoint] =
+    timed_waypoint_data.value();
 
-  auto [distance_to_timed_waypoint, remaining_time_to_timed_waypoint] = timed_waypoint_data.value();
-  auto acceleration = getCurrentAcceleration();
-  auto [min_acceleration, max_acceleration] = getAccelerationLimits(acceleration);
-  auto speed = getCurrentSpeed();
-  auto desired_acceleration = getDesiredAcceleration(
+  const auto acceleration = getCurrentAcceleration();
+  const auto [min_acceleration, max_acceleration] = getAccelerationLimits(acceleration);
+  const auto speed = getCurrentSpeed();
+  const auto desired_acceleration = getDesiredAcceleration(
     remaining_time_to_timed_waypoint, acceleration, distance_to_timed_waypoint, speed);
-  auto desired_speed =
+  const auto desired_speed =
     getDesiredSpeed(desired_acceleration, min_acceleration, max_acceleration, speed);
-  auto desired_velocity = getDesiredVelocity(target_position, position, desired_speed);
-  auto remaining_time_to_arrival_to_front_waypoint = getTimeRemainingToFrontWaypoint(
-    remaining_time_to_front_waypoint, distance_to_front_waypoint, desired_speed);
+  const auto desired_velocity = getDesiredVelocity(target_position, position, desired_speed);
 
+  const auto remaining_time_to_arrival_to_front_waypoint = getTimeRemainingToFrontWaypoint(
+    remaining_time_to_front_waypoint, distance_to_front_waypoint, desired_speed);
   if (!remaining_time_to_arrival_to_front_waypoint) {
     discardTheFrontWaypointFromTrajectory();
     return followTrajectory(polyline_trajectory_m);
   }
 
-  auto velocity = getUpdatedVelocity(desired_velocity, desired_speed);
+  const auto velocity = getUpdatedVelocity(desired_velocity, desired_speed);
 
   if constexpr (false) {
     // clang-format off
@@ -175,7 +175,7 @@ PolylineTrajectoryFollower::followTrajectory(std::shared_ptr<traffic_simulator_m
   return createUpdatedEntityStatus(velocity);
 }
 
-auto PolylineTrajectoryFollower::getCurrentPosition() -> geometry_msgs::msg::Point
+auto PolylineTrajectoryFollower::getCurrentPosition() const -> geometry_msgs::msg::Point
 {
   const auto position = entity_status_m.pose.position;
 
@@ -191,7 +191,7 @@ auto PolylineTrajectoryFollower::getCurrentPosition() -> geometry_msgs::msg::Poi
   return position;
 }
 
-auto PolylineTrajectoryFollower::getTargetPosition() -> geometry_msgs::msg::Point
+auto PolylineTrajectoryFollower::getTargetPosition() const -> geometry_msgs::msg::Point
 {
   /*
        We've made sure that polyline_trajectory_m->shape.vertices is not empty,
@@ -211,11 +211,11 @@ auto PolylineTrajectoryFollower::getTargetPosition() -> geometry_msgs::msg::Poin
   return target_position;
 }
 
-auto PolylineTrajectoryFollower::getCurrentAcceleration() -> double
+auto PolylineTrajectoryFollower::getCurrentAcceleration() const -> double
 {
   const auto acceleration = entity_status_m.action_status.accel.linear.x;  // m/s^2
 
-  if (isinf(acceleration) or isnan(acceleration)) {
+  if (std::isinf(acceleration) or std::isnan(acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -225,7 +225,7 @@ auto PolylineTrajectoryFollower::getCurrentAcceleration() -> double
   return acceleration;
 }
 
-auto PolylineTrajectoryFollower::getAccelerationLimits(double acceleration)
+auto PolylineTrajectoryFollower::getAccelerationLimits(double acceleration) const
   -> std::tuple<double, double>
 {
   const auto max_acceleration = std::min(
@@ -234,7 +234,7 @@ auto PolylineTrajectoryFollower::getAccelerationLimits(double acceleration)
         step_time_m /* [s] */,
     +behavior_parameter_m.dynamic_constraints.max_acceleration /* [m/s^2] */);
 
-  if (isinf(max_acceleration) or isnan(max_acceleration)) {
+  if (std::isinf(max_acceleration) or std::isnan(max_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -248,7 +248,7 @@ auto PolylineTrajectoryFollower::getAccelerationLimits(double acceleration)
         step_time_m /* [s] */,
     -behavior_parameter_m.dynamic_constraints.max_deceleration /* [m/s^2] */);
 
-  if (isinf(min_acceleration) or isnan(min_acceleration)) {
+  if (std::isinf(min_acceleration) or std::isnan(min_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -259,10 +259,10 @@ auto PolylineTrajectoryFollower::getAccelerationLimits(double acceleration)
   return std::make_tuple(min_acceleration, max_acceleration);
 }
 
-auto PolylineTrajectoryFollower::getCurrentSpeed() -> double
+auto PolylineTrajectoryFollower::getCurrentSpeed() const -> double
 {
   const auto speed = entity_status_m.action_status.twist.linear.x;  // [m/s]
-  if (isinf(speed) or isnan(speed)) {
+  if (std::isinf(speed) or std::isnan(speed)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -273,8 +273,8 @@ auto PolylineTrajectoryFollower::getCurrentSpeed() -> double
 }
 
 auto PolylineTrajectoryFollower::getTimeRemainingToFrontWaypoint(
-  double remaining_time_to_front_waypoint, double distance_to_front_waypoint, double desired_speed)
-  -> std::optional<double>
+  double remaining_time_to_front_waypoint, double distance_to_front_waypoint,
+  double desired_speed) const -> std::optional<double>
 {
   /*
        It's okay for this value to be infinite.
@@ -339,8 +339,8 @@ auto PolylineTrajectoryFollower::getTimeRemainingToFrontWaypoint(
   return remaining_time_to_arrival_to_front_waypoint;
 }
 
-auto PolylineTrajectoryFollower::createUpdatedEntityStatus(geometry_msgs::msg::Vector3 velocity)
-  -> traffic_simulator_msgs::msg::EntityStatus
+auto PolylineTrajectoryFollower::createUpdatedEntityStatus(
+  const geometry_msgs::msg::Vector3 & velocity) const -> traffic_simulator_msgs::msg::EntityStatus
 {
   using math::geometry::operator/;
   using math::geometry::operator-;
@@ -386,7 +386,8 @@ auto PolylineTrajectoryFollower::createUpdatedEntityStatus(geometry_msgs::msg::V
 }
 
 auto PositionModePolylineTrajectoryFollower::getUpdatedVelocity(
-  geometry_msgs::msg::Vector3 desired_velocity, double desired_speed) -> geometry_msgs::msg::Vector3
+  const geometry_msgs::msg::Vector3 & desired_velocity, double desired_speed) const
+  -> geometry_msgs::msg::Vector3
 {
   using math::geometry::operator*;
   using math::geometry::operator-;
@@ -409,7 +410,7 @@ auto PositionModePolylineTrajectoryFollower::getUpdatedVelocity(
 }
 
 auto PositionModePolylineTrajectoryFollower::getDesiredAcceleration(
-  double remaining_time, double acceleration, double distance, double speed) -> double
+  double remaining_time, double acceleration, double distance, double speed) const -> double
 {
   /*
        The desired acceleration is the acceleration at which the destination
@@ -461,7 +462,7 @@ auto PositionModePolylineTrajectoryFollower::getDesiredAcceleration(
 }
 
 auto PositionModePolylineTrajectoryFollower::getDesiredSpeed(
-  double desired_acceleration, double min_acceleration, double max_acceleration, double speed)
+  double desired_acceleration, double min_acceleration, double max_acceleration, double speed) const
   -> double
 {
   /*
@@ -482,8 +483,8 @@ auto PositionModePolylineTrajectoryFollower::getDesiredSpeed(
 }
 
 auto PositionModePolylineTrajectoryFollower::getDesiredVelocity(
-  const geometry_msgs::msg::Point target_position, const geometry_msgs::msg::Point position,
-  double desired_speed) -> geometry_msgs::msg::Vector3
+  const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
+  double desired_speed) const -> geometry_msgs::msg::Vector3
 {
   using math::geometry::operator-;
   using math::geometry::operator*;
@@ -503,9 +504,9 @@ auto PositionModePolylineTrajectoryFollower::getDesiredVelocity(
   return desired_velocity;
 }
 
-std::optional<std::tuple<double, double>>
-PositionModePolylineTrajectoryFollower::getDistanceAndTimeToFrontWaypoint(
-  const geometry_msgs::msg::Point target_position, const geometry_msgs::msg::Point position)
+auto PositionModePolylineTrajectoryFollower::getDistanceAndTimeToFrontWaypoint(
+  const geometry_msgs::msg::Point & target_position,
+  const geometry_msgs::msg::Point & position) const -> std::optional<std::tuple<double, double>>
 {
   const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
     math::geometry::hypot(position, target_position),
@@ -523,7 +524,7 @@ PositionModePolylineTrajectoryFollower::getDistanceAndTimeToFrontWaypoint(
 }
 
 auto PositionModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpecifiedTime(
-  double distance_to_front_waypoint) -> std::optional<std::tuple<double, double>>
+  double distance_to_front_waypoint) const -> std::optional<std::tuple<double, double>>
 {
   const auto [distance, remaining_time] = [&]() {
     if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
@@ -549,7 +550,8 @@ auto PositionModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpe
       };
 
       if (const auto remaining_time =
-            (not std::isnan(polyline_trajectory_m->base_time) ? polyline_trajectory_m->base_time : 0.0) +
+            (not std::isnan(polyline_trajectory_m->base_time) ? polyline_trajectory_m->base_time
+                                                              : 0.0) +
             first_waypoint_with_arrival_time_specified->time - entity_status_m.time;
           /*
                 The condition below should ideally be remaining_time < 0.
@@ -618,20 +620,20 @@ auto PolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory() -> void
   //         specified arrival time".
   //
 
-    if (
-      not std::isnan(polyline_trajectory_m->base_time) and
-      not std::isnan(polyline_trajectory_m->shape.vertices.front().time)) {
-      polyline_trajectory_m->base_time = entity_status_m.time;
-    }
+  if (
+    not std::isnan(polyline_trajectory_m->base_time) and
+    not std::isnan(polyline_trajectory_m->shape.vertices.front().time)) {
+    polyline_trajectory_m->base_time = entity_status_m.time;
+  }
 
-    if (std::rotate(
-          std::begin(polyline_trajectory_m->shape.vertices),
-          std::begin(polyline_trajectory_m->shape.vertices) + 1,
-          std::end(polyline_trajectory_m->shape.vertices));
-        not polyline_trajectory_m->closed) {
-      polyline_trajectory_m->shape.vertices.pop_back();
-    }
+  if (std::rotate(
+        std::begin(polyline_trajectory_m->shape.vertices),
+        std::begin(polyline_trajectory_m->shape.vertices) + 1,
+        std::end(polyline_trajectory_m->shape.vertices));
+      not polyline_trajectory_m->closed) {
+    polyline_trajectory_m->shape.vertices.pop_back();
+  }
 }
 
-}  // namespace behavior
-}  // namespace trafiic_simulator
+}  // namespace follow_trajectory
+}  // namespace traffic_simulator
