@@ -29,7 +29,8 @@
 namespace simple_sensor_simulator
 {
 auto DetectionSensorBase::isWithinRange(
-  const geometry_msgs::Point & point1, const geometry_msgs::Point & point2, const double range) const -> bool
+  const geometry_msgs::Point & point1, const geometry_msgs::Point & point2,
+  const double range) const -> bool
 {
   auto distanceX = point1.x() - point2.x();
   auto distanceY = point1.y() - point2.y();
@@ -76,7 +77,9 @@ auto DetectionSensorBase::getDetectedObjects(
   const auto pose = getSensorPose(statuses);
 
   for (const auto & status : statuses) {
-    if (status.name() != configuration_.entity() && isWithinRange(status.pose().position(), pose.position(), 300.0)) {
+    if (
+      status.name() != configuration_.entity() &&
+      isWithinRange(status.pose().position(), pose.position(), 300.0)) {
       detected_objects.emplace_back(status.name());
     }
   }
@@ -96,7 +99,8 @@ auto DetectionSensorBase::filterObjectsBySensorRange(
     const auto selected_entity_pose = getEntityPose(entity_statuses, selected_entity_status);
     if (
       selected_entity_status != configuration_.entity() &&
-      isWithinRange(selected_entity_pose.position(), sensor_pose.position(), detection_sensor_range)) {
+      isWithinRange(
+        selected_entity_pose.position(), sensor_pose.position(), detection_sensor_range)) {
       detected_objects.emplace_back(selected_entity_status);
     }
   }

@@ -43,8 +43,8 @@ protected:
   }
 
   auto isWithinRange(
-    const geometry_msgs::Point & point1, const geometry_msgs::Point & point2, const double range) const
-    -> bool;
+    const geometry_msgs::Point & point1, const geometry_msgs::Point & point2,
+    const double range) const -> bool;
 
   auto filterObjectsBySensorRange(
     const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::vector<std::string> &,
