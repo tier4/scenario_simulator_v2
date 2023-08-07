@@ -55,7 +55,6 @@ public:
           response->path = "no output";
         } else {
           response->path = preprocessed_scenarios.front().string();
-          response->expect = 1;
           response->frame_rate = 30.0;
           preprocessed_scenarios.pop();
         }
