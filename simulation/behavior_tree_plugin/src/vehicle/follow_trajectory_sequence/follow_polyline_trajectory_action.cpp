@@ -22,7 +22,7 @@ auto FollowPolylineTrajectoryAction::calculateWaypoints()
   -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   auto waypoints = traffic_simulator_msgs::msg::WaypointsArray();
-  waypoints.waypoints.push_back(entity_status.pose.position);
+  waypoints.waypoints.push_back(entity_status->getMapPose().position);
   for (const auto & vertex : polyline_trajectory->shape.vertices) {
     waypoints.waypoints.push_back(vertex.position.position);
   }
@@ -71,7 +71,10 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   } else if (trajectory_follower->setParameters(entity_status, behavior_parameter, step_time);
              const auto updated_status =
                trajectory_follower->followTrajectory(polyline_trajectory)) {
-    setOutput("updated_status", *updated_status);
+    setOutput(
+      "updated_status",
+      std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+        traffic_simulator::CanonicalizedEntityStatus(*updated_status, hdmap_utils)));
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
     return BT::NodeStatus::RUNNING;

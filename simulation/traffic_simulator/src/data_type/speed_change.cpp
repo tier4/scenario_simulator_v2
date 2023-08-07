@@ -31,18 +31,17 @@ static_assert(std::is_copy_assignable_v<RelativeTargetSpeed>);
 static_assert(std::is_move_assignable_v<RelativeTargetSpeed>);
 
 double RelativeTargetSpeed::getAbsoluteValue(
-  const traffic_simulator_msgs::msg::EntityStatus & status,
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & other_status)
-  const
+  const CanonicalizedEntityStatus & status,
+  const std::unordered_map<std::string, CanonicalizedEntityStatus> & other_status) const
 {
   if (const auto iter = other_status.find(reference_entity_name); iter == other_status.end()) {
-    if (status.name == reference_entity_name) {
+    if (static_cast<EntityStatus>(status).name == reference_entity_name) {
       switch (type) {
         default:
         case Type::DELTA:
-          return status.action_status.twist.linear.x + value;
+          return status.getTwist().linear.x + value;
         case Type::FACTOR:
-          return status.action_status.twist.linear.x * value;
+          return status.getTwist().linear.x * value;
       }
     } else {
       THROW_SEMANTIC_ERROR(
@@ -55,9 +54,9 @@ double RelativeTargetSpeed::getAbsoluteValue(
     switch (type) {
       default:
       case Type::DELTA:
-        return iter->second.action_status.twist.linear.x + value;
+        return iter->second.getTwist().linear.x + value;
       case Type::FACTOR:
-        return iter->second.action_status.twist.linear.x * value;
+        return iter->second.getTwist().linear.x * value;
     }
   }
 }

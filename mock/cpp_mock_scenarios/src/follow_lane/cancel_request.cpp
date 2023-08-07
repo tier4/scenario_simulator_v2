@@ -42,7 +42,9 @@ private:
   void onUpdate() override
   {
     if (api_.reachPosition(
-          "ego", traffic_simulator::helper::constructLaneletPose(34513, 30, 0, 0, 0, 0), 3.0)) {
+          "ego",
+          api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 30, 0, 0, 0, 0)),
+          3.0)) {
       api_.cancelRequest("ego");
       canceled = true;
     }
@@ -53,12 +55,13 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
+      "ego",
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 7);
     api_.requestSpeedChange("ego", 7, true);
-    const geometry_msgs::msg::Pose goal_pose =
-      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 0, 0, 0, 0, 0));
+    const geometry_msgs::msg::Pose goal_pose = api_.toMapPose(
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34408, 0, 0, 0, 0, 0)));
     api_.requestAcquirePosition("ego", goal_pose);
   }
 };
