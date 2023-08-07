@@ -21,38 +21,6 @@
 #include "../catalogs.hpp"
 #include "../expect_eq_macros.hpp"
 
-/*
-TEST(VEHICLE_ENTITY, GET_VEHICLE_COMMAND)
-{
-  traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
-  EXPECT_THROW(entity.getVehicleCommand(), common::SimulationError);
-}
-
-TEST(VEHICLE_ENTITY, SET_STATUS)
-{
-  traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
-  traffic_simulator_msgs::msg::EntityStatus status;
-  status.lanelet_pose = traffic_simulator::helper::constructLaneletPose(34741, 0, 0);
-  status.action_status = traffic_simulator::helper::constructActionStatus(3);
-  status.bounding_box = entity.getBoundingBox();
-  EXPECT_NO_THROW(entity.setStatus(status));
-}
-
-TEST(VEHICLE_ENTITY, UPDATE_ENTITY_TIMESTAMP)
-{
-  traffic_simulator::entity::VehicleEntity entity("vehicle", getVehicleParameters());
-  EXPECT_NO_THROW(entity.updateEntityStatusTimestamp(3));
-  traffic_simulator_msgs::msg::EntityStatus status;
-  status.lanelet_pose = traffic_simulator::helper::constructLaneletPose(34741, 0, 0);
-  status.action_status = traffic_simulator::helper::constructActionStatus(3);
-  status.bounding_box = entity.getBoundingBox();
-  EXPECT_NO_THROW(entity.setStatus(status));
-  EXPECT_DOUBLE_EQ(entity.getStatus().time, 0.0);
-  EXPECT_NO_THROW(entity.updateEntityStatusTimestamp(3));
-  EXPECT_DOUBLE_EQ(entity.getStatus().time, 3.0);
-}
-*/
-
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);

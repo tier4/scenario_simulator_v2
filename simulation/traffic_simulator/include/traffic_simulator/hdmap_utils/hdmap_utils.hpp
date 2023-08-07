@@ -52,6 +52,7 @@
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -65,6 +66,18 @@ class HdMapUtils
 {
 public:
   explicit HdMapUtils(const boost::filesystem::path &, const geographic_msgs::msg::GeoPoint &);
+
+  auto gelAllCanonicalizedLaneletPoses(
+    const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+    -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
+  auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+    -> std::tuple<
+      std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<std::int64_t>>;
+  auto canonicalizeLaneletPose(
+    const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
+    const std::vector<std::int64_t> & route_lanelets) const
+    -> std::tuple<
+      std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<std::int64_t>>;
 
   autoware_auto_mapping_msgs::msg::HADMapBin toMapBin() const;
   void insertMarkerArray(
@@ -84,23 +97,29 @@ public:
   std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
     const geometry_msgs::msg::Pose & pose, const std::vector<std::int64_t> & lanelet_ids,
     double matching_distance = 1.0) const;
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> toLaneletPoses(
+    const geometry_msgs::msg::Pose & pose, std::int64_t lanelet_id, double matching_distance = 5.0,
+    bool include_opposite_direction = true) const;
   std::optional<std::int64_t> matchToLane(
     const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
     bool include_crosswalk, double reduction_ratio = 0.8) const;
   geometry_msgs::msg::PoseStamped toMapPose(
-    std::int64_t lanelet_id, double s, double offset,
-    const geometry_msgs::msg::Quaternion & quat) const;
-  geometry_msgs::msg::PoseStamped toMapPose(
     const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const;
-  geometry_msgs::msg::PoseStamped toMapPose(std::int64_t lanelet_id, double s, double offset) const;
   double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const;
   std::vector<std::int64_t> getLaneletIds() const;
   std::vector<std::int64_t> getNextLaneletIds(
     std::int64_t lanelet_id, const std::string & turn_direction) const;
   std::vector<std::int64_t> getNextLaneletIds(std::int64_t lanelet_id) const;
+  std::vector<std::int64_t> getNextLaneletIds(
+    const std::vector<std::int64_t> & lanelet_id, const std::string & turn_direction) const;
+  std::vector<std::int64_t> getNextLaneletIds(const std::vector<std::int64_t> & lanelet_id) const;
   std::vector<std::int64_t> getPreviousLaneletIds(
     std::int64_t lanelet_id, const std::string & turn_direction) const;
   std::vector<std::int64_t> getPreviousLaneletIds(std::int64_t lanelet_id) const;
+  std::vector<std::int64_t> getPreviousLaneletIds(
+    const std::vector<std::int64_t> & lanelet_ids, const std::string & turn_direction) const;
+  std::vector<std::int64_t> getPreviousLaneletIds(
+    const std::vector<std::int64_t> & lanelet_ids) const;
   std::optional<int64_t> getLaneChangeableLaneletId(
     std::int64_t lanelet_id, traffic_simulator::lane_change::Direction direction) const;
   std::optional<int64_t> getLaneChangeableLaneletId(
@@ -120,8 +139,6 @@ public:
   std::optional<double> getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
     const traffic_simulator_msgs::msg::LaneletPose & to) const;
-  std::optional<double> getLongitudinalDistance(
-    std::int64_t from_lanelet_id, double from_s, std::int64_t to_lanelet_id, double to_s) const;
   double getSpeedLimit(const std::vector<std::int64_t> & lanelet_ids) const;
   bool isInRoute(std::int64_t lanelet_id, const std::vector<std::int64_t> & route) const;
   std::vector<std::int64_t> getFollowingLanelets(
@@ -200,6 +217,12 @@ public:
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along) const;
   std::vector<geometry_msgs::msg::Point> getLeftBound(std::int64_t lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getRightBound(std::int64_t lanelet_id) const;
+  auto getLeftLaneletIds(
+    std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type,
+    bool include_opposite_direction = true) const -> std::vector<std::int64_t>;
+  auto getRightLaneletIds(
+    std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type,
+    bool include_opposite_direction = true) const -> std::vector<std::int64_t>;
 
   using LaneletId = std::int64_t;
 
@@ -215,7 +238,6 @@ private:
     const traffic_simulator_msgs::msg::LaneletPose & to_pose,
     const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
     double tangent_vector_size = 100) const;
-
   /** @defgroup cache
    *  Declared mutable for caching
    */
@@ -225,6 +247,15 @@ private:
   mutable LaneletLengthCache lanelet_length_cache_;
   // @}
 
+  template <typename Lanelet>
+  std::vector<std::int64_t> getLaneletIds(const std::vector<Lanelet> & lanelets) const
+  {
+    std::vector<std::int64_t> ids;
+    std::transform(
+      lanelets.begin(), lanelets.end(), std::back_inserter(ids),
+      [](const Lanelet & lanelet) { return lanelet.id(); });
+    return ids;
+  }
   std::vector<lanelet::AutowareTrafficLightConstPtr> getTrafficLights(
     const std::int64_t traffic_light_id) const;
   std::vector<std::pair<double, lanelet::Lanelet>> excludeSubtypeLanelets(
@@ -260,7 +291,6 @@ private:
   std::vector<double> calculateSegmentDistances(
     const lanelet::ConstLineString3d & line_string) const;
   std::vector<lanelet::Lanelet> getLanelets(const std::vector<std::int64_t> & lanelet_ids) const;
-  std::vector<std::int64_t> getLaneletIds(const std::vector<lanelet::Lanelet> & lanelets) const;
   lanelet::BasicPoint2d toPoint2d(const geometry_msgs::msg::Point & point) const;
   lanelet::BasicPolygon2d absoluteHull(
     const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const;
