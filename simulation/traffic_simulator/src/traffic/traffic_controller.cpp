@@ -25,6 +25,7 @@
 
 #include <memory>
 #include <string>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <utility>
@@ -54,7 +55,7 @@ void TrafficController::autoSink()
 {
   for (const auto & lanelet_id : hdmap_utils_->getLaneletIds()) {
     if (hdmap_utils_->getNextLaneletIds(lanelet_id).empty()) {
-      traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
+      LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = hdmap_utils_->getLaneletLength(lanelet_id);
       const auto pose = hdmap_utils_->toMapPose(lanelet_pose);

@@ -18,6 +18,7 @@
 #include <simulation_api_schema.pb.h>
 
 #include <memory>
+#include <queue>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
@@ -56,6 +57,8 @@ class LidarSensor : public LidarSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
+  std::queue<std::pair<sensor_msgs::msg::PointCloud2, double>> queue_pointcloud_;
+
   auto raycast(const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
     -> T;
 
@@ -74,9 +77,17 @@ public:
   {
     if (current_time - last_update_stamp_ - configuration_.scan_duration() >= -0.002) {
       last_update_stamp_ = current_time;
-      publisher_ptr_->publish(raycast(status, stamp));
+      queue_pointcloud_.push(std::make_pair(raycast(status, stamp), current_time));
     } else {
       detected_objects_ = {};
+    }
+
+    if (
+      !queue_pointcloud_.empty() &&
+      current_time - queue_pointcloud_.front().second >= configuration_.lidar_sensor_delay()) {
+      const auto pointcloud = queue_pointcloud_.front().first;
+      queue_pointcloud_.pop();
+      publisher_ptr_->publish(pointcloud);
     }
   }
 
