@@ -33,7 +33,6 @@ struct ScenarioSet
   explicit ScenarioSet(openscenario_preprocessor_msgs::srv::Load::Request & load_request)
   {
     path = load_request.path;
-    expect = load_request.expect;
     frame_rate = load_request.frame_rate;
   }
 
@@ -41,14 +40,11 @@ struct ScenarioSet
   {
     openscenario_preprocessor_msgs::srv::Derive::Response response;
     response.path = path;
-    response.expect = expect;
     response.frame_rate = frame_rate;
     return response;
   }
 
   std::string path;
-
-  int expect;
 
   float frame_rate;
 };
