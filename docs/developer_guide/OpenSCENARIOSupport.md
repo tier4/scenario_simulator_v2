@@ -374,7 +374,7 @@ See also section [Scoping](#scoping).
 |:-----------------------|:-----------:|
 | WorldPosition          |      ✔      |
 | RelativeWorldPosition  | Unsupported |
-| RelativeObjectPosition | Unsupported |
+| RelativeObjectPosition |      ✔      |
 | RoadPosition           | Unsupported |
 | RelativeRoadPosition   | Unsupported |
 | LanePosition           |      ✔      |

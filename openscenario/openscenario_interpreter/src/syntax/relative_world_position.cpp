@@ -22,7 +22,7 @@ inline namespace syntax
 {
 RelativeWorldPosition::RelativeWorldPosition(const pugi::xml_node & node, Scope & scope)
 : orientation(readElement<Orientation>("Orientation", node, scope)),
-  reference(readAttribute<EntityRef>("entityRef", node, scope)),
+  entity_ref(readAttribute<EntityRef>("entityRef", node, scope)),
   dx(readAttribute<Double>("dx", node, scope)),
   dy(readAttribute<Double>("dy", node, scope)),
   dz(readAttribute<Double>("dz", node, scope, Double()))
