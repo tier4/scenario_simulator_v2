@@ -39,13 +39,14 @@ class EgoEntity : public VehicleEntity
   static auto makeFieldOperatorApplication(const Configuration &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
-  traffic_simulator_msgs::msg::EntityStatus externally_updated_status_;
+  CanonicalizedEntityStatus externally_updated_status_;
 
 public:
   explicit EgoEntity() = delete;
 
   explicit EgoEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::string & name, const CanonicalizedEntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &);
 
   explicit EgoEntity(EgoEntity &&) = delete;
@@ -69,21 +70,25 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
+  auto getEntityStatus(const double, const double) const -> const CanonicalizedEntityStatus;
+
+  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
+
   auto getEntityTypename() const -> const std::string & override;
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteLanelets(double horizon = 100) const -> std::vector<std::int64_t> override;
+  auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) override;
+  void requestAcquirePosition(const CanonicalizedLaneletPose &) override;
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
-  void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override;
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
@@ -102,7 +107,7 @@ public:
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
 
-  auto setStatusExternally(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+  auto setStatusExternally(const CanonicalizedEntityStatus & status) -> void;
 
   void requestSpeedChange(double, bool continuous) override;
 
@@ -111,7 +116,7 @@ public:
 
   auto setVelocityLimit(double) -> void override;
 
-  auto fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void override;
+  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -78,20 +78,21 @@ auto FollowTrajectoryAction::start() -> void
   for (const auto & actor : actors) {
     auto repack_trajectory = [this]() {
       if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>()) {
-        auto polyline = traffic_simulator::follow_trajectory::Polyline();
+        auto polyline = traffic_simulator_msgs::msg::Polyline();
         for (auto && vertex :
              trajectory_ref.trajectory.as<Trajectory>().shape.as<Polyline>().vertices) {
-          polyline.vertices.emplace_back(
-            /*
-               If Vertex.time is unspecified, nan is set as the default value
-               (see the openscenario_interpreter::syntax::Vertex constructor).
-               This was deliberately chosen because of the convenience of nan's
-               behavior of always returning false for any comparison and
-               propagating the value even if a quadratic operation is
-               performed.
-            */
-            time_reference.as<Timing>().offset + time_reference.as<Timing>().scale * vertex.time,
-            static_cast<geometry_msgs::msg::Pose>(vertex.position));
+          auto message = traffic_simulator_msgs::msg::Vertex();
+          /*
+             If Vertex.time is unspecified, nan is set as the default value
+             (see the openscenario_interpreter::syntax::Vertex constructor).
+             This was deliberately chosen because of the convenience of nan's
+             behavior of always returning false for any comparison and
+             propagating the value even if a quadratic operation is performed.
+          */
+          message.time =
+            time_reference.as<Timing>().offset + time_reference.as<Timing>().scale * vertex.time;
+          message.position = static_cast<geometry_msgs::msg::Pose>(vertex.position);
+          polyline.vertices.push_back(message);
         }
         return polyline;
       } else {
@@ -99,16 +100,19 @@ auto FollowTrajectoryAction::start() -> void
       }
     };
 
-    applyFollowTrajectoryAction(
-      actor, std::make_shared<traffic_simulator::follow_trajectory::Parameter<
-               traffic_simulator::follow_trajectory::Polyline>>(
-               initial_distance_offset,
-               trajectory_following_mode.following_mode == FollowingMode::position,
-               time_reference.as<Timing>().domain_absolute_relative == ReferenceContext::absolute
-                 ? 0.0
-                 : evaluateSimulationTime(),
-               trajectory_ref.trajectory.as<Trajectory>().closed,  //
-               repack_trajectory()));
+    auto parameter = std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>();
+
+    parameter->initial_distance_offset = initial_distance_offset;
+    parameter->dynamic_constraints_ignorable =
+      trajectory_following_mode.following_mode == FollowingMode::position;
+    parameter->base_time =
+      time_reference.as<Timing>().domain_absolute_relative == ReferenceContext::absolute
+        ? std::numeric_limits<double>::quiet_NaN()
+        : evaluateSimulationTime();
+    parameter->closed = trajectory_ref.trajectory.as<Trajectory>().closed;
+    parameter->shape = repack_trajectory();
+
+    applyFollowTrajectoryAction(actor, parameter);
   }
 }
 }  // namespace syntax

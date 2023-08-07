@@ -92,19 +92,22 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34513, 5, 0, 0, 0, 0),
+      "ego",
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 5, 0, 0, 0, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 3, true);
 
     api_.spawn(
-      "front", traffic_simulator::helper::constructLaneletPose(34513, 10, 1, 0, 0, 0),
+      "front",
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 10, 1, 0, 0, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("front", 10);
     api_.requestSpeedChange("front", 3, true);
 
     api_.spawn(
-      "behind", traffic_simulator::helper::constructLaneletPose(34513, 0, -1, 0, 0, 0),
+      "behind",
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0, -1, 0, 0, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("behind", 10);
     api_.requestSpeedChange("behind", 3, true);
