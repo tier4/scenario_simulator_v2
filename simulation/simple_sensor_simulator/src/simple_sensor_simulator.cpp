@@ -88,6 +88,7 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   vehicles_ = {};
   pedestrians_ = {};
   misc_objects_ = {};
+  entity_status_ = {};
   return res;
 }
 
