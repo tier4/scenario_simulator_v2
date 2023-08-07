@@ -36,8 +36,8 @@ public:
         openscenario_preprocessor_msgs::srv::Load::Response::SharedPtr response) -> void {
         auto lock = std::lock_guard(preprocessed_scenarios_mutex);
         try {
-          preprocessScenario(openscenario_preprocessor::Scenario(
-            request->path, request->expect, request->frame_rate));
+          preprocessScenario(
+            openscenario_preprocessor::Scenario(request->path, request->frame_rate));
           response->has_succeeded = true;
           response->message = "success";
         } catch (std::exception & e) {
@@ -56,7 +56,6 @@ public:
           response->path = "no output";
         } else {
           response->path = preprocessed_scenarios.front().path.string();
-          response->expect = preprocessed_scenarios.front().expect;
           response->frame_rate = preprocessed_scenarios.front().frame_rate;
           preprocessed_scenarios.pop();
         }

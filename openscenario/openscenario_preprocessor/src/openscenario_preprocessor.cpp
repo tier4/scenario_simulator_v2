@@ -71,7 +71,7 @@ void Preprocessor::preprocessScenario(const Scenario & scenario)
 
         derived_script.save_file(derived_scenario_path.c_str());
 
-        preprocessed_scenarios.emplace(derived_scenario_path, scenario.expect, scenario.frame_rate);
+        preprocessed_scenarios.emplace(derived_scenario_path, scenario.frame_rate);
       }
     } else {
       std::stringstream what;
