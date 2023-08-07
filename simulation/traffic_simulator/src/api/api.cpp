@@ -50,19 +50,8 @@ bool API::despawnEntities()
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
 
-geometry_msgs::msg::Pose API::getEntityPose(const std::string & name)
-{
-  auto status = getEntityStatus(name);
-  return status.pose;
-}
-
-traffic_simulator_msgs::msg::EntityStatus API::getEntityStatus(const std::string & name)
-{
-  return entity_manager_ptr_->getEntityStatus(name);
-}
-
-auto API::setEntityStatus(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+auto API::setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status)
+  -> void
 {
   entity_manager_ptr_->setEntityStatus(name, status);
 }
@@ -84,20 +73,21 @@ auto API::setEntityStatus(
   const geometry_msgs::msg::Pose & relative_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  const auto pose = entity_manager_ptr_->getMapPose(reference_entity_name, relative_pose);
-  traffic_simulator_msgs::msg::EntityStatus status;
+  EntityStatus status;
   status.time = clock_.getCurrentSimulationTime();
-  status.pose = pose;
-  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
-    pose, entity_manager_ptr_->getEntityStatus(reference_entity_name).bounding_box, false);
+  status.pose =
+    entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
   status.action_status = action_status;
-  if (lanelet_pose) {
+  if (
+    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
+      status.pose, getBoundingBox(reference_entity_name), false)) {
     status.lanelet_pose_valid = true;
     status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
+    status.lanelet_pose = traffic_simulator::LaneletPose();
   }
-  entity_manager_ptr_->setEntityStatus(name, status);
+  entity_manager_ptr_->setEntityStatus(name, canonicalize(status));
 }
 
 std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
@@ -106,42 +96,21 @@ std::optional<double> API::getTimeHeadway(const std::string & from, const std::s
   if (pose.position.x > 0) {
     return std::nullopt;
   }
-  traffic_simulator_msgs::msg::EntityStatus to_status = getEntityStatus(to);
-  double ret = (pose.position.x * -1) / (to_status.action_status.twist.linear.x);
+  double ret = (pose.position.x * -1) / (getCurrentTwist(to).linear.x);
   if (std::isnan(ret)) {
     return std::numeric_limits<double>::infinity();
   }
   return ret;
 }
 
-bool API::reachPosition(
-  const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance)
-{
-  return entity_manager_ptr_->reachPosition(name, target_pose, tolerance);
-}
-
-bool API::reachPosition(
-  const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & target_pose,
-  const double tolerance)
-{
-  return entity_manager_ptr_->reachPosition(
-    name, target_pose.lanelet_id, target_pose.s, target_pose.offset, tolerance);
-}
-
-bool API::reachPosition(
-  const std::string & name, const std::string & target_name, const double tolerance) const
-{
-  return entity_manager_ptr_->reachPosition(name, target_name, tolerance);
-}
-
 auto API::setEntityStatus(
-  const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
+  const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  traffic_simulator_msgs::msg::EntityStatus status;
-  status.lanelet_pose = lanelet_pose;
+  EntityStatus status;
+  status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose);
   status.lanelet_pose_valid = true;
-  status.bounding_box = entity_manager_ptr_->getEntityStatus(name).bounding_box;
+  status.bounding_box = getBoundingBox(name);
   status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
   status.name = name;
   const auto current_time = getCurrentTime();
@@ -151,17 +120,17 @@ auto API::setEntityStatus(
     status.time = 0;
   }
   status.action_status = action_status;
-  setEntityStatus(name, status);
+  setEntityStatus(name, canonicalize(status));
 }
 
 auto API::setEntityStatus(
   const std::string & name, const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
-    map_pose, entity_manager_ptr_->getEntityStatus(name).bounding_box, false);
-  traffic_simulator_msgs::msg::EntityStatus status;
-  if (lanelet_pose) {
+  EntityStatus status;
+  if (
+    const auto lanelet_pose =
+      entity_manager_ptr_->toLaneletPose(map_pose, getBoundingBox(name), false)) {
     status.lanelet_pose = lanelet_pose.value();
   } else {
     status.lanelet_pose_valid = false;
@@ -175,8 +144,8 @@ auto API::setEntityStatus(
   } else {
     status.time = 0;
   }
-  status.bounding_box = entity_manager_ptr_->getEntityStatus(name).bounding_box;
-  setEntityStatus(name, status);
+  status.bounding_box = getBoundingBox(name);
+  setEntityStatus(name, canonicalize(status));
 }
 
 bool API::initialize(double realtime_factor, double step_time)
@@ -273,24 +242,26 @@ bool API::updateTrafficLightsInSim()
   return res.result().success();
 }
 
-std::optional<traffic_simulator_msgs::msg::EntityStatus> API::updateEntityStatusInSim(
-  const std::string & entity_name, traffic_simulator_msgs::msg::EntityStatus status)
+std::optional<CanonicalizedEntityStatus> API::updateEntityStatusInSim(
+  const std::string & entity_name, const CanonicalizedEntityStatus & status)
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
   simulation_api_schema::EntityStatus proto;
-  status.name = entity_name;
-  simulation_interface::toProto(status, *req.mutable_status());
+  auto status_non_canonicalized = static_cast<EntityStatus>(status);
+  status_non_canonicalized.name = entity_name;
+  simulation_interface::toProto(status_non_canonicalized, *req.mutable_status());
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
 
   if (res.result().success()) {
-    simulation_interface::toMsg(res.status().pose(), status.pose);
-    simulation_interface::toMsg(res.status().action_status(), status.action_status);
+    simulation_interface::toMsg(res.status().pose(), status_non_canonicalized.pose);
+    simulation_interface::toMsg(
+      res.status().action_status(), status_non_canonicalized.action_status);
     // Temporarily deinitialize lanelet pose as it should be correctly filled from here
-    status.lanelet_pose_valid = false;
-    status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-    return status;
+    status_non_canonicalized.lanelet_pose_valid = false;
+    status_non_canonicalized.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    return std::make_optional(canonicalize(status_non_canonicalized));
   }
   return std::nullopt;
 }
@@ -403,5 +374,30 @@ void API::requestLaneChange(
   const lane_change::Constraint & constraint)
 {
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
+}
+
+auto API::canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose) const
+  -> CanonicalizedLaneletPose
+{
+  return CanonicalizedLaneletPose(
+    may_non_canonicalized_lanelet_pose, entity_manager_ptr_->getHdmapUtils());
+}
+
+auto API::canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
+  -> CanonicalizedEntityStatus
+{
+  return CanonicalizedEntityStatus(
+    may_non_canonicalized_entity_status, entity_manager_ptr_->getHdmapUtils());
+}
+
+auto API::toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
+  -> std::optional<CanonicalizedLaneletPose>
+{
+  if (
+    const auto pose =
+      entity_manager_ptr_->getHdmapUtils()->toLaneletPose(map_pose, include_crosswalk)) {
+    return canonicalize(pose.value());
+  }
+  return std::nullopt;
 }
 }  // namespace traffic_simulator

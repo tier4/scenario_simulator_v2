@@ -17,6 +17,7 @@
 
 #include <deque>
 #include <memory>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
 
@@ -27,29 +28,21 @@ class RoutePlanner
 public:
   explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
-  std::vector<std::int64_t> getRouteLanelets(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints, double horizon = 100);
+  auto getRouteLanelets(const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon = 100)
+    -> std::vector<std::int64_t>;
 
-  std::vector<std::int64_t> getRouteLanelets(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose, double horizon = 100);
+  auto setWaypoints(const std::vector<CanonicalizedLaneletPose> & waypoints) -> void;
 
-  std::vector<std::int64_t> getRouteLanelets(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose, double horizon = 100);
-
-  void cancelGoal();
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> getGoalPoses();
-  std::vector<geometry_msgs::msg::Pose> getGoalPosesInWorldFrame();
+  auto cancelRoute() -> void;
+  auto getGoalPoses() const -> std::vector<CanonicalizedLaneletPose>;
+  auto getGoalPosesInWorldFrame() const -> std::vector<geometry_msgs::msg::Pose>;
 
 private:
-  void cancelGoal(const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose);
+  auto cancelWaypoint(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void;
 
-  void plan(
-    const traffic_simulator_msgs::msg::LaneletPose & entity_lanelet_pose,
-    const traffic_simulator_msgs::msg::LaneletPose & target_lanelet_pose);
+  auto updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void;
 
-  std::optional<std::vector<std::int64_t>> whole_route_;
+  std::optional<std::vector<std::int64_t>> route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
   /*
@@ -57,7 +50,7 @@ private:
      elements for getGoalPoses, so we use std::deque instead of std::queue
      which is not iterable.
   */
-  std::deque<traffic_simulator_msgs::msg::LaneletPose> waypoint_queue_;
+  std::deque<traffic_simulator::CanonicalizedLaneletPose> waypoint_queue_;
 };
 }  // namespace traffic_simulator
 

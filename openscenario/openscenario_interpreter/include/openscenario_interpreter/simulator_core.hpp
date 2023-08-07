@@ -26,7 +26,7 @@
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
@@ -35,9 +35,9 @@ using NativeWorldPosition = geometry_msgs::msg::Pose;
 
 using NativeRelativeWorldPosition = NativeWorldPosition;
 
-using NativeLanePosition = traffic_simulator_msgs::msg::LaneletPose;
+using NativeLanePosition = traffic_simulator::CanonicalizedLaneletPose;
 
-using NativeRelativeLanePosition = NativeLanePosition;
+using NativeRelativeLanePosition = traffic_simulator::LaneletPose;
 
 class SimulatorCore
 {
@@ -90,6 +90,12 @@ public:
       }
     }
 
+    static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
+      -> traffic_simulator::CanonicalizedLaneletPose
+    {
+      return core->canonicalize(non_canonicalized);
+    }
+
     template <
       typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
     static auto convert(const NativeLanePosition & native_lane_position)
@@ -100,7 +106,7 @@ public:
     template <typename OSCLanePosition>
     static auto makeNativeLanePosition(const OSCLanePosition & osc_lane_position)
     {
-      NativeLanePosition native_lane_position;
+      traffic_simulator::LaneletPose native_lane_position;
       native_lane_position.lanelet_id =
         boost::lexical_cast<std::int64_t>(osc_lane_position.lane_id);
       native_lane_position.s = osc_lane_position.s;
@@ -108,7 +114,7 @@ public:
       native_lane_position.rpy.x = osc_lane_position.orientation.r;
       native_lane_position.rpy.y = osc_lane_position.orientation.p;
       native_lane_position.rpy.z = osc_lane_position.orientation.h;
-      return native_lane_position;
+      return canonicalize(native_lane_position);
     }
 
     template <typename OSCWorldPosition>
@@ -170,7 +176,7 @@ public:
         }
       };
 
-      NativeRelativeLanePosition position;
+      traffic_simulator::LaneletPose position;
       position.lanelet_id = std::numeric_limits<std::int64_t>::max();
       position.s = s(from, to);
       position.offset = t(from, to);
@@ -334,7 +340,7 @@ public:
     template <typename... Ts>
     static auto evaluateAcceleration(Ts &&... xs)
     {
-      return core->getEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.accel.linear.x;
+      return core->getCurrentAccel(std::forward<decltype(xs)>(xs)...).linear.x;
     }
 
     template <typename... Ts>
@@ -368,7 +374,7 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return core->getEntityStatus(std::forward<decltype(xs)>(xs)...).action_status.twist.linear.x;
+      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear.x;
     }
 
     template <typename... Ts>
@@ -433,9 +439,9 @@ public:
     template <typename EntityRef>
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
-      if (auto entity_status = core->getEntityStatus(entity_ref);
-          entity_status.lanelet_pose_valid) {
-        return static_cast<Double>(std::abs(entity_status.lanelet_pose.rpy.z));
+      if (auto lanelet_pose = core->getLaneletPose(entity_ref)) {
+        return static_cast<Double>(
+          std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).rpy.z));
       } else {
         return Double::nan();
       }
