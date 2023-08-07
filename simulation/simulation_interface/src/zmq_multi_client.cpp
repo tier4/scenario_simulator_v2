@@ -76,18 +76,6 @@ void MultiClient::call(
   }
 }
 void MultiClient::call(
-  const simulation_api_schema::UpdateSensorFrameRequest & req,
-  simulation_api_schema::UpdateSensorFrameResponse & res)
-{
-  if (is_running) {
-    simulation_api_schema::SimulationRequest sim_request;
-    simulation_api_schema::SimulationResponse sim_response;
-    *sim_request.mutable_update_sensor_frame() = req;
-    call(sim_request, sim_response);
-    res = sim_response.update_sensor_frame();
-  }
-}
-void MultiClient::call(
   const simulation_api_schema::SpawnVehicleEntityRequest & req,
   simulation_api_schema::SpawnVehicleEntityResponse & res)
 {

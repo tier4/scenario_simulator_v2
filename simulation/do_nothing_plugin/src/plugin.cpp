@@ -20,7 +20,7 @@ void DoNothingBehavior::configure(const rclcpp::Logger &) {}
 
 void DoNothingBehavior::update(double current_time, double)
 {
-  entity_status_.time = current_time;
+  entity_status_->setTime(current_time);
   setUpdatedStatus(entity_status_);
 }
 

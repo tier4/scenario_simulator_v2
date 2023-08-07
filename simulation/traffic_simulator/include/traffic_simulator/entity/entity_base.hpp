@@ -22,13 +22,15 @@
 #include <optional>
 #include <queue>
 #include <string>
+#include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
-#include <traffic_simulator/data_type/follow_trajectory.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/job/job_list.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_manager_base.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -47,7 +49,9 @@ namespace entity
 class EntityBase
 {
 public:
-  explicit EntityBase(const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &);
+  explicit EntityBase(
+    const std::string & name, const CanonicalizedEntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   virtual ~EntityBase() = default;
 
@@ -57,13 +61,36 @@ public:
 
   virtual void cancelRequest();
 
+#define DEFINE_GETTER(NAME, TYPE, RETURN_VARIABLE) \
+  /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
+
+  // clang-format off
+  DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        static_cast<EntityStatus>(getStatus()).bounding_box)
+  DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       static_cast<EntityStatus>(getStatus()).action_status.accel)
+  DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       static_cast<EntityStatus>(getStatus()).action_status.twist)
+  DEFINE_GETTER(DynamicConstraints,       traffic_simulator_msgs::msg::DynamicConstraints, getBehaviorParameter().dynamic_constraints)
+  DEFINE_GETTER(EntityStatusBeforeUpdate, const CanonicalizedEntityStatus &,               status_before_update_)
+  DEFINE_GETTER(EntitySubtype,            traffic_simulator_msgs::msg::EntitySubtype,      static_cast<EntityStatus>(getStatus()).subtype)
+  DEFINE_GETTER(LinearJerk,               double,                                          static_cast<EntityStatus>(getStatus()).action_status.linear_jerk)
+  DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        static_cast<EntityStatus>(getStatus()).pose)
+  DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
+  DEFINE_GETTER(Status,                   const CanonicalizedEntityStatus &,               status_)
+  DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
+  // clang-format on
+#undef DEFINE_GETTER
+
+#define DEFINE_CHECK_FUNCTION(FUNCTION_NAME, BOOL_VARIABLE) \
+  /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
+
+  // clang-format off
+  DEFINE_CHECK_FUNCTION(isNpcLogicStarted,   npc_logic_started_)
+  DEFINE_CHECK_FUNCTION(laneMatchingSucceed, status_.laneMatchingSucceed())
+  // clang-format on
+#undef DEFINE_CHECK_FUNCTION
+
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 
   virtual auto getCurrentAction() const -> std::string = 0;
-
-  /*   */ auto getCurrentAccel() const -> geometry_msgs::msg::Accel;
-
-  /*   */ auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
   /*   */ auto getDistanceToLaneBound() -> double;
 
@@ -85,43 +112,30 @@ public:
 
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
-  virtual auto getDynamicConstraints() const
-    -> const traffic_simulator_msgs::msg::DynamicConstraints;
-
   virtual auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
 
-  /*   */ auto getEntityStatusBeforeUpdate() const
-    -> const traffic_simulator_msgs::msg::EntityStatus &;
+  virtual auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & = 0;
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
-  /*   */ auto getTraveledDistance() const -> double;
+  virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
 
-  virtual auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> = 0;
-
-  /*   */ auto getLinearJerk() const -> double;
-
-  /*   */ auto getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+  /*   */ auto getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
 
   /*   */ auto getLaneletPose(double matching_distance) const
-    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    -> std::optional<CanonicalizedLaneletPose>;
 
-  /*   */ auto getMapPose() const -> geometry_msgs::msg::Pose;
-
-  /*   */ auto getMapPose(const geometry_msgs::msg::Pose &) -> geometry_msgs::msg::Pose;
+  /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
+    -> geometry_msgs::msg::Pose;
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
-  virtual auto getRouteLanelets(const double horizon = 100) -> std::vector<std::int64_t> = 0;
+  virtual auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> = 0;
 
-  /*   */ auto getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &;
-
-  /*   */ auto getStandStillDuration() const -> double;
+  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
-
-  /*   */ auto isNpcLogicStarted() const -> bool;
 
   virtual void onUpdate(double current_time, double step_time);
 
@@ -129,12 +143,11 @@ public:
 
   /*   */ void resetDynamicConstraints();
 
-  virtual void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &) = 0;
+  virtual void requestAcquirePosition(const CanonicalizedLaneletPose &) = 0;
 
   virtual void requestAcquirePosition(const geometry_msgs::msg::Pose &) = 0;
 
-  virtual void requestAssignRoute(
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) = 0;
+  virtual void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) = 0;
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
@@ -162,7 +175,7 @@ public:
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
   virtual auto requestFollowTrajectory(
-    const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &) -> void;
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void;
 
   virtual void requestWalkStraight();
 
@@ -181,19 +194,16 @@ public:
   /*   */ void setEntityTypeList(
     const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);
 
-  virtual void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+  /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
-  /*   */ void setOtherStatus(
-    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> &);
-
-  virtual auto setStatus(const traffic_simulator_msgs::msg::EntityStatus &) -> void;
+  virtual auto setStatus(const CanonicalizedEntityStatus &) -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 
   virtual auto setLinearVelocity(const double linear_velocity) -> void;
 
   virtual void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &);
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> &);
 
   virtual auto activateOutOfRangeJob(
     double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
@@ -203,7 +213,7 @@ public:
 
   virtual void startNpcLogic();
 
-  /*   */ void stopAtEndOfRoad();
+  /*   */ void stopAtCurrentPosition();
 
   /*   */ void updateEntityStatusTimestamp(const double current_time);
 
@@ -211,23 +221,26 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
+  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
+    -> void final;
+
   const std::string name;
 
   bool verbose;
 
 protected:
-  traffic_simulator_msgs::msg::EntityStatus status_;
+  CanonicalizedEntityStatus status_;
 
-  traffic_simulator_msgs::msg::EntityStatus status_before_update_;
+  CanonicalizedEntityStatus status_before_update_;
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-  std::shared_ptr<traffic_simulator::TrafficLightManagerBase> traffic_light_manager_;
+  std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;
 
   bool npc_logic_started_ = false;
   double stand_still_duration_ = 0.0;
   double traveled_distance_ = 0.0;
 
-  std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> other_status_;
+  std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
   std::optional<double> target_speed_;

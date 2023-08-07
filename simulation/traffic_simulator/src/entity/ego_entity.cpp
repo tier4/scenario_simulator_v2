@@ -34,99 +34,16 @@ namespace traffic_simulator
 {
 namespace entity
 {
-auto toString(const VehicleModelType datum) -> std::string
+/// @todo find some shared space for this function
+template <typename T>
+static auto getParameter(const std::string & name, T value = {})
 {
-#define BOILERPLATE(IDENTIFIER)      \
-  case VehicleModelType::IDENTIFIER: \
-    return #IDENTIFIER
+  rclcpp::Node node{"get_parameter", "simulation"};
 
-  switch (datum) {
-    BOILERPLATE(DELAY_STEER_ACC);
-    BOILERPLATE(DELAY_STEER_ACC_GEARED);
-    BOILERPLATE(DELAY_STEER_VEL);
-    BOILERPLATE(IDEAL_STEER_ACC);
-    BOILERPLATE(IDEAL_STEER_ACC_GEARED);
-    BOILERPLATE(IDEAL_STEER_VEL);
-  }
+  node.declare_parameter<T>(name, value);
+  node.get_parameter<T>(name, value);
 
-#undef BOILERPLATE
-
-  THROW_SIMULATION_ERROR("Unsupported vehicle model type, failed to convert to string");
-}
-
-auto EgoEntity::getVehicleModelType() -> VehicleModelType
-{
-  const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-
-  const auto vehicle_model_type =
-    getParameter<std::string>("vehicle_model_type", "IDEAL_STEER_VEL");
-
-  static const std::unordered_map<std::string, VehicleModelType> table{
-    {"DELAY_STEER_ACC", VehicleModelType::DELAY_STEER_ACC},
-    {"DELAY_STEER_ACC_GEARED", VehicleModelType::DELAY_STEER_ACC_GEARED},
-    {"DELAY_STEER_VEL", VehicleModelType::DELAY_STEER_VEL},
-    {"IDEAL_STEER_ACC", VehicleModelType::IDEAL_STEER_ACC},
-    {"IDEAL_STEER_ACC_GEARED", VehicleModelType::IDEAL_STEER_ACC_GEARED},
-    {"IDEAL_STEER_VEL", VehicleModelType::IDEAL_STEER_VEL},
-  };
-
-  const auto iter = table.find(vehicle_model_type);
-
-  if (iter != std::end(table)) {
-    return iter->second;
-  } else {
-    THROW_SEMANTIC_ERROR("Unsupported vehicle_model_type ", vehicle_model_type, " specified");
-  }
-}
-
-auto EgoEntity::makeSimulationModel(
-  const VehicleModelType vehicle_model_type, const double step_time,
-  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
-  -> const std::shared_ptr<SimModelInterface>
-{
-  // clang-format off
-  const auto acc_time_constant   = getParameter<double>("acc_time_constant",     0.1);
-  const auto acc_time_delay      = getParameter<double>("acc_time_delay",        0.1);
-  const auto steer_lim           = getParameter<double>("steer_lim",            parameters.axles.front_axle.max_steering);  // 1.0
-  const auto steer_rate_lim      = getParameter<double>("steer_rate_lim",        5.0);
-  const auto steer_time_constant = getParameter<double>("steer_time_constant",   0.27);
-  const auto steer_time_delay    = getParameter<double>("steer_time_delay",      0.24);
-  const auto vel_lim             = getParameter<double>("vel_lim",              parameters.performance.max_speed);  // 50.0
-  const auto vel_rate_lim        = getParameter<double>("vel_rate_lim",         parameters.performance.max_acceleration);  // 7.0
-  const auto vel_time_constant   = getParameter<double>("vel_time_constant",     0.1);
-  const auto vel_time_delay      = getParameter<double>("vel_time_delay",        0.1);
-  const auto wheel_base          = getParameter<double>("wheel_base",           parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
-  // clang-format on
-
-  switch (vehicle_model_type) {
-    case VehicleModelType::DELAY_STEER_ACC:
-      return std::make_shared<SimModelDelaySteerAcc>(
-        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
-        acc_time_constant, steer_time_delay, steer_time_constant);
-
-    case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      return std::make_shared<SimModelDelaySteerAccGeared>(
-        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,
-        acc_time_constant, steer_time_delay, steer_time_constant);
-
-    case VehicleModelType::DELAY_STEER_VEL:
-      return std::make_shared<SimModelDelaySteerVel>(
-        vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, vel_time_delay,
-        vel_time_constant, steer_time_delay, steer_time_constant);
-
-    case VehicleModelType::IDEAL_STEER_ACC:
-      return std::make_shared<SimModelIdealSteerAcc>(wheel_base);
-
-    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-      return std::make_shared<SimModelIdealSteerAccGeared>(wheel_base);
-
-    case VehicleModelType::IDEAL_STEER_VEL:
-      return std::make_shared<SimModelIdealSteerVel>(wheel_base);
-
-    default:
-      THROW_SEMANTIC_ERROR(
-        "Unsupported vehicle_model_type ", toString(vehicle_model_type), " specified");
-  }
+  return value;
 }
 
 auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration)
@@ -158,14 +75,13 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
 }
 
 EgoEntity::EgoEntity(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::string & name, const CanonicalizedEntityStatus & entity_status,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-  const Configuration & configuration, const double step_time)
-: VehicleEntity(name, entity_status, parameters),
+  const Configuration & configuration)
+: VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
   field_operator_application(makeFieldOperatorApplication(configuration)),
-  autoware(std::make_unique<concealer::AutowareUniverse>()),
-  vehicle_model_type_(getVehicleModelType()),
-  vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters))
+  externally_updated_status_(entity_status)
 {
 }
 
@@ -193,63 +109,17 @@ auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::Beh
   return parameter;
 }
 
-auto EgoEntity::getEntityStatus(const double time, const double step_time) const
-  -> const traffic_simulator_msgs::msg::EntityStatus
-{
-  traffic_simulator_msgs::msg::EntityStatus status;
-  {
-    status.time = time;
-    status.type = getStatus().type;
-    status.bounding_box = getStatus().bounding_box;
-    status.pose = getCurrentPose();
-    status.action_status.twist = getCurrentTwist();
-    status.action_status.accel = [&]() {
-      geometry_msgs::msg::Accel accel;
-      if (previous_angular_velocity_) {
-        accel.linear.x = vehicle_model_ptr_->getAx();
-        accel.angular.z =
-          (vehicle_model_ptr_->getWz() - previous_angular_velocity_.value()) / step_time;
-      }
-      return accel;
-    }();
-
-    const auto unique_route_lanelets =
-      traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-
-    std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-
-    if (unique_route_lanelets.empty()) {
-      lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
-    } else {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
-      if (!lanelet_pose) {
-        lanelet_pose =
-          hdmap_utils_ptr_->toLaneletPose(status.pose, getStatus().bounding_box, false, 1.0);
-      }
-    }
-
-    if (lanelet_pose) {
-      math::geometry::CatmullRomSpline spline(
-        hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
-      if (const auto s_value = spline.getSValue(status.pose)) {
-        status.pose.position.z = spline.getPoint(s_value.value()).z;
-      }
-    }
-
-    status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-    if (status.lanelet_pose_valid) {
-      status.lanelet_pose = lanelet_pose.value();
-    }
-  }
-
-  return status;
-}
-
 auto EgoEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "EgoEntity";
   return result;
+}
+
+auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
+{
+  static traffic_simulator_msgs::msg::EntityType type;
+  type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+  return type;
 }
 
 auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
@@ -257,7 +127,7 @@ auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obst
   return std::nullopt;
 }
 
-auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
+auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ids{};
 
@@ -266,45 +136,14 @@ auto EgoEntity::getRouteLanelets() const -> std::vector<std::int64_t>
           field_operator_application.get());
       universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
-      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+      ids += point.lane_ids;
     }
   }
 
   return ids;
 }
 
-auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
-{
-  Eigen::VectorXd relative_position(3);
-  relative_position(0) = vehicle_model_ptr_->getX();
-  relative_position(1) = vehicle_model_ptr_->getY();
-  relative_position(2) = 0.0;
-  relative_position =
-    quaternion_operation::getRotationMatrix(initial_pose_->orientation) * relative_position;
-
-  geometry_msgs::msg::Pose current_pose;
-  current_pose.position.x = initial_pose_.value().position.x + relative_position(0);
-  current_pose.position.y = initial_pose_.value().position.y + relative_position(1);
-  current_pose.position.z = initial_pose_.value().position.z + relative_position(2);
-  current_pose.orientation = [this]() {
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0;
-    rpy.y = 0;
-    rpy.z = vehicle_model_ptr_->getYaw();
-    return initial_pose_.value().orientation *
-           quaternion_operation::convertEulerAngleToQuaternion(rpy);
-  }();
-
-  return current_pose;
-}
-
-auto EgoEntity::getCurrentTwist() const -> geometry_msgs::msg::Twist
-{
-  geometry_msgs::msg::Twist current_twist;
-  current_twist.linear.x = vehicle_model_ptr_->getVx();
-  current_twist.angular.z = vehicle_model_ptr_->getWz();
-  return current_twist;
-}
+auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose { return status_.getMapPose(); }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
@@ -313,65 +152,19 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  field_operator_application->rethrow();
-  autoware->rethrow();
-
-  field_operator_application->spinSome();
-
   EntityBase::onUpdate(current_time, step_time);
+  setStatus(externally_updated_status_);
 
-  if (npc_logic_started_) {
-    Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
-
-    switch (vehicle_model_type_) {
-      case VehicleModelType::DELAY_STEER_ACC:
-      case VehicleModelType::IDEAL_STEER_ACC:
-        input << autoware->getGearSign() * autoware->getAcceleration(),
-          autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input << autoware->getGearSign() * autoware->getAcceleration(),
-          autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::DELAY_STEER_VEL:
-      case VehicleModelType::IDEAL_STEER_VEL:
-        input << autoware->getVelocity(), autoware->getSteeringAngle();
-        break;
-
-      default:
-        THROW_SEMANTIC_ERROR(
-          "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
-    }
-
-    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
-    vehicle_model_ptr_->setInput(input);
-    vehicle_model_ptr_->update(step_time);
-  }
-
-  auto entity_status = getEntityStatus(current_time + step_time, step_time);
-  if (previous_linear_velocity_) {
-    entity_status.action_status.linear_jerk =
-      (vehicle_model_ptr_->getVx() - previous_linear_velocity_.value()) / step_time;
-  } else {
-    entity_status.action_status.linear_jerk = 0;
-  }
-  setStatus(entity_status);
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
-  previous_linear_velocity_ = vehicle_model_ptr_->getVx();
-  previous_angular_velocity_ = vehicle_model_ptr_->getWz();
-
+  field_operator_application->rethrow();
   field_operator_application->spinSome();
 
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void EgoEntity::requestAcquirePosition(
-  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
+void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
   requestAssignRoute({lanelet_pose});
 }
@@ -381,13 +174,12 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
   requestAssignRoute({map_pose});
 }
 
-void EgoEntity::requestAssignRoute(
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
+void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
 {
   std::vector<geometry_msgs::msg::Pose> route;
 
   for (const auto & waypoint : waypoints) {
-    route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint).pose);
+    route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
 
   requestAssignRoute(route);
@@ -408,7 +200,7 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 
   if (not field_operator_application->initialized()) {
-    field_operator_application->initialize(getStatus().pose);
+    field_operator_application->initialize(getMapPose());
     field_operator_application->plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
@@ -459,58 +251,14 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 {
 }
 
-auto EgoEntity::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+auto EgoEntity::setStatusExternally(const CanonicalizedEntityStatus & status) -> void
 {
-  VehicleEntity::setStatus(status);
-
-  const auto current_pose = getStatus().pose;
-
-  if (field_operator_application->initialized()) {
-    autoware->set([this]() {
-      geometry_msgs::msg::Accel message;
-      message.linear.x = vehicle_model_ptr_->getAx();
-      return message;
-    }());
-
-    autoware->set(current_pose);
-
-    autoware->set(getCurrentTwist());
-  }
-
-  if (not initial_pose_) {
-    initial_pose_ = current_pose;
-  }
+  externally_updated_status_ = status;
 }
 
 void EgoEntity::requestSpeedChange(double value, bool)
 {
-  Eigen::VectorXd v(vehicle_model_ptr_->getDimX());
-
-  switch (vehicle_model_type_) {
-    case VehicleModelType::DELAY_STEER_ACC:
-    case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      v << 0, 0, 0, field_operator_application->restrictTargetSpeed(value), 0, 0;
-      break;
-
-    case VehicleModelType::IDEAL_STEER_ACC:
-    case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-      v << 0, 0, 0, field_operator_application->restrictTargetSpeed(value);
-      break;
-
-    case VehicleModelType::IDEAL_STEER_VEL:
-      v << 0, 0, 0;
-      break;
-
-    case VehicleModelType::DELAY_STEER_VEL:
-      v << 0, 0, 0, field_operator_application->restrictTargetSpeed(value), 0;
-      break;
-
-    default:
-      THROW_SEMANTIC_ERROR(
-        "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
-  }
-
-  vehicle_model_ptr_->setState(v);
+  field_operator_application->restrictTargetSpeed(value);
 }
 
 void EgoEntity::requestSpeedChange(
@@ -522,5 +270,11 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
   field_operator_application->setVelocityLimit(value);
 }
+
+auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
+{
+  EntityBase::fillLaneletPose(status, false);
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator

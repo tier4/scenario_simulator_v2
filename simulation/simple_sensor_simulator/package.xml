@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>0.6.8</version>
+  <version>0.7.0</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -47,6 +47,9 @@
   <depend>simulation_interface</depend>
   <depend>traffic_simulator_msgs</depend>
   <depend>visualization_msgs</depend>
+  <depend>geographic_msgs</depend>
+  <depend>traffic_simulator</depend>
+
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_cmake_clang_format</test_depend>

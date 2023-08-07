@@ -8,6 +8,9 @@
   "words": [
     "ARGN",
     "AUTORCC",
+    "Canonicalized",
+    "canonicalizing",
+    "classname",
     "DBOOST",
     "DBUILD",
     "DWITH_INTEGRATION_TEST",
@@ -30,6 +33,7 @@
     "piotr",
     "pluggable",
     "protos",
+    "pyproject",
     "randomizer",
     "randomizers",
     "subspline",

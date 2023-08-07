@@ -60,7 +60,8 @@ public:
   };
 
   explicit VehicleEntity(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus &,
+    const std::string & name, const CanonicalizedEntityStatus &,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &,
     const std::string & plugin_name = BuiltinBehavior::defaultBehavior());
 
@@ -77,9 +78,11 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
+  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
+
   auto getEntityTypename() const -> const std::string & override;
 
-  auto getGoalPoses() -> std::vector<traffic_simulator_msgs::msg::LaneletPose> override;
+  auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> override;
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
@@ -89,17 +92,16 @@ public:
 
   void onUpdate(double current_time, double step_time) override;
 
-  void requestAcquirePosition(const traffic_simulator_msgs::msg::LaneletPose &);
+  void requestAcquirePosition(const CanonicalizedLaneletPose &);
 
   void requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
-  void requestAssignRoute(const std::vector<traffic_simulator_msgs::msg::LaneletPose> &) override;
+  void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
 
   auto requestFollowTrajectory(
-    const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &)
-    -> void override;
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 
   void requestLaneChange(const std::int64_t to_lanelet_id) override;
 
@@ -115,17 +117,17 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
-  void setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> &) override;
-
   void setTrafficLightManager(
-    const std::shared_ptr<traffic_simulator::TrafficLightManagerBase> &) override;
+    const std::shared_ptr<traffic_simulator::TrafficLightManager> &) override;
+
+  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
 
   const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;
 
-  std::shared_ptr<traffic_simulator::RoutePlanner> route_planner_ptr_;
+  traffic_simulator::RoutePlanner route_planner_;
 
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 

@@ -36,10 +36,10 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
   return status;
 }
 
-traffic_simulator_msgs::msg::LaneletPose constructLaneletPose(
+LaneletPose constructLaneletPose(
   std::int64_t lanelet_id, double s, double offset, double roll, double pitch, double yaw)
 {
-  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
+  LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s;
   lanelet_pose.offset = offset;
@@ -97,12 +97,13 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   const LidarType type, const std::string & entity, const std::string & architecture_type,
-  const double horizontal_resolution)
+  const double lidar_sensor_delay, const double horizontal_resolution)
 {
   simulation_api_schema::LidarConfiguration configuration;
   configuration.set_horizontal_resolution(horizontal_resolution);
   configuration.set_architecture_type(architecture_type);
   configuration.set_entity(entity);
+  configuration.set_lidar_sensor_delay(lidar_sensor_delay);
   switch (type) {
     case LidarType::VLP16:
       configuration.set_scan_duration(0.1);
@@ -164,8 +165,7 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(
-  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose)
+std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPose & ll_pose)
 {
   os << "lanelet id : " << ll_pose.lanelet_id << "\ns : " << ll_pose.s;
   return os;

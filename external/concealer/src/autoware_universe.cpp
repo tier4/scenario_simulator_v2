@@ -20,6 +20,8 @@ AutowareUniverse::AutowareUniverse()
 : getAckermannControlCommand("/control/command/control_cmd", *this),
   getGearCommandImpl("/control/command/gear_cmd", *this),
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", *this),
+  getPathWithLaneId(
+    "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this),
   setAcceleration("/localization/acceleration", *this),
   setOdometry("/localization/kinematic_state", *this),
   setSteeringReport("/vehicle/status/steering_status", *this),
@@ -165,5 +167,14 @@ auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
   autoware_auto_vehicle_msgs::msg::GearCommand>
 {
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
+}
+
+auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
+{
+  std::vector<std::int64_t> ids{};
+  for (const auto & point : getPathWithLaneId().points) {
+    std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+  }
+  return ids;
 }
 }  // namespace concealer

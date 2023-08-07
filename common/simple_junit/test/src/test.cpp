@@ -71,7 +71,7 @@ TEST(SIMPLE_JUNIT, PASS)
 {
   common::junit::JUnit5 junit;
   junit.testsuite("example_suites");
-  junit.testsuite("example_suite").testcase("example_case");
+  junit.testsuite("example_suite").testcase("example_case").pass.push_back(common::junit::Pass());
   junit.write_to("result_pass.junit.xml", "  ");
   EXPECT_TEXT_FILE_EQ(
     "result_pass.junit.xml",
