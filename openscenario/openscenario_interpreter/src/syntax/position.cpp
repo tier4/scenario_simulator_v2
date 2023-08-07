@@ -55,9 +55,10 @@ Position::operator NativeLanePosition() const
   return apply<NativeLanePosition>(
     overload(
       // clang-format off
-      [&](const         WorldPosition & position) { return static_cast<NativeLanePosition>(position); },
-      [&](const RelativeWorldPosition & position) { return static_cast<NativeLanePosition>(position); },
-      [&](const          LanePosition & position) { return static_cast<NativeLanePosition>(position); }
+      [&](const         WorldPosition  & position) { return static_cast<NativeLanePosition>(position); },
+      [&](const RelativeWorldPosition  & position) { return static_cast<NativeLanePosition>(position); },
+      [&](const RelativeObjectPosition & position) { return static_cast<NativeLanePosition>(position); },
+      [&](const          LanePosition  & position) { return static_cast<NativeLanePosition>(position); }
       // clang-format on
       ),
     *this);
