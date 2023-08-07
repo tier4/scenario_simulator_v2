@@ -98,7 +98,7 @@ public:
       traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
         std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
           "/perception/traffic_light_recognition/traffic_signals", &node, hdmap_utils)));
-    } else if (configuration.architecture_type() == "awf/universe/2023.08") {
+    } else if (configuration.architecture_type() == "awf/universe/20230800") {
       using Message = autoware_perception_msgs::msg::TrafficSignalArray;
       traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
         std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
