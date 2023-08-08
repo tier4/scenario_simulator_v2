@@ -65,7 +65,9 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
                  "rviz_config:=" + ((rviz_config == "")
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
-                 "scenario_simulation:=true", "perception/enable_traffic_light:=false")
+                 "scenario_simulation:=true",
+                 "perception/enable_traffic_light:=" +
+                   std::string((architecture_type == "awf/universe/20230800") ? "true" : "false"))
              : std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
   } else {
