@@ -172,6 +172,21 @@ void ScenarioSimulator::updateEntityStatus(
   res.mutable_result()->set_description("");
 }
 
+template <typename SpawnRequestType>
+void ScenarioSimulator::insertEntitySpawnedStatus(
+  const SpawnRequestType & spawn_request, const traffic_simulator_msgs::EntityType::Enum & type,
+  const traffic_simulator_msgs::EntitySubtype::Enum & subtype)
+{
+  simulation_api_schema::EntityStatus init_status;
+  init_status.mutable_type()->set_type(type);
+  init_status.mutable_subtype()->set_value(subtype);
+  init_status.set_time(current_time_);
+  init_status.set_name(spawn_request.parameters().name());
+  init_status.mutable_action_status()->set_current_action("initializing");
+  init_status.mutable_pose()->CopyFrom(spawn_request.pose());
+  entity_status_.insert({spawn_request.parameters().name(), init_status});
+}
+
 void ScenarioSimulator::spawnVehicleEntity(
   const simulation_api_schema::SpawnVehicleEntityRequest & req,
   simulation_api_schema::SpawnVehicleEntityResponse & res)
@@ -179,9 +194,10 @@ void ScenarioSimulator::spawnVehicleEntity(
   if (ego_vehicles_.size() != 0 && req.is_ego()) {
     throw SimulationRuntimeError("multi ego does not support");
   }
+  auto entity_type = traffic_simulator_msgs::EntityType::VEHICLE;
   if (req.is_ego()) {
+    entity_type = traffic_simulator_msgs::EntityType::EGO;
     ego_vehicles_.emplace_back(req.parameters());
-    entity_status_.insert({req.parameters().name(), simulation_api_schema::EntityStatus{}});
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
@@ -190,13 +206,12 @@ void ScenarioSimulator::spawnVehicleEntity(
     initial_status.name = parameters.name;
     simulation_interface::toMsg(req.pose(), initial_status.pose);
     initial_status.bounding_box = parameters.bounding_box;
-
     ego_entity_simulation_->fillLaneletDataAndSnapZToLanelet(initial_status);
     ego_entity_simulation_->setInitialStatus(initial_status);
   } else {
     vehicles_.emplace_back(req.parameters());
-    entity_status_.insert({req.parameters().name(), simulation_api_schema::EntityStatus{}});
   }
+  insertEntitySpawnedStatus(req, entity_type, traffic_simulator_msgs::EntitySubtype::UNKNOWN);
   res = simulation_api_schema::SpawnVehicleEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
@@ -207,7 +222,9 @@ void ScenarioSimulator::spawnPedestrianEntity(
   simulation_api_schema::SpawnPedestrianEntityResponse & res)
 {
   pedestrians_.emplace_back(req.parameters());
-  entity_status_.insert({req.parameters().name(), simulation_api_schema::EntityStatus{}});
+  insertEntitySpawnedStatus(
+    req, traffic_simulator_msgs::EntityType::PEDESTRIAN,
+    traffic_simulator_msgs::EntitySubtype::UNKNOWN);
   res = simulation_api_schema::SpawnPedestrianEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
@@ -218,7 +235,9 @@ void ScenarioSimulator::spawnMiscObjectEntity(
   simulation_api_schema::SpawnMiscObjectEntityResponse & res)
 {
   misc_objects_.emplace_back(req.parameters());
-  entity_status_.insert({req.parameters().name(), simulation_api_schema::EntityStatus{}});
+  insertEntitySpawnedStatus(
+    req, traffic_simulator_msgs::EntityType::PEDESTRIAN,
+    traffic_simulator_msgs::EntitySubtype::UNKNOWN);
   res = simulation_api_schema::SpawnMiscObjectEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");

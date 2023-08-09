@@ -261,6 +261,8 @@ bool API::updateNonEgoEntitiesStatusInSim()
 std::optional<CanonicalizedEntityStatus> API::updateEntityStatusInSim(
   const std::string & entity_name, const CanonicalizedEntityStatus & status)
 {
+  constexpr int single_status_update = 1;
+
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   auto status_non_canonicalized = static_cast<EntityStatus>(status);
@@ -270,13 +272,15 @@ std::optional<CanonicalizedEntityStatus> API::updateEntityStatusInSim(
   simulation_api_schema::UpdateEntityStatusResponse res;
   zeromq_client_.call(req, res);
 
-  if (res.result().success() && req.status_size() == 1) {
+  // The method updates a single entity status, so a single status is expected in response
+  if (res.result().success() && req.status_size() == single_status_update) {
+    auto first_status = res.status(0);
     assert(
-      res.status(0).name() == entity_name &&
+      first_status.name() == entity_name &&
       "The entity name in response is different from the name in request!");
-    simulation_interface::toMsg(res.status(0).pose(), status_non_canonicalized.pose);
+    simulation_interface::toMsg(first_status.pose(), status_non_canonicalized.pose);
     simulation_interface::toMsg(
-      res.status(0).action_status(), status_non_canonicalized.action_status);
+      first_status.action_status(), status_non_canonicalized.action_status);
     // Temporarily deinitialize lanelet pose as it should be correctly filled from here
     status_non_canonicalized.lanelet_pose_valid = false;
     status_non_canonicalized.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();

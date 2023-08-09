@@ -98,6 +98,10 @@ private:
   void updateEntityStatus(
     const simulation_api_schema::UpdateEntityStatusRequest & req,
     simulation_api_schema::UpdateEntityStatusResponse & res);
+  template <typename SpawnRequestType>
+  void insertEntitySpawnedStatus(
+    const SpawnRequestType & spawn_request, const traffic_simulator_msgs::EntityType::Enum & type,
+    const traffic_simulator_msgs::EntitySubtype::Enum & subtype);
   void spawnVehicleEntity(
     const simulation_api_schema::SpawnVehicleEntityRequest & req,
     simulation_api_schema::SpawnVehicleEntityResponse & res);
