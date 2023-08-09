@@ -286,6 +286,20 @@ message UpdateTrafficLightsResponse {
   Result result = 1; // Result of [DespawnEntityRequest](#DespawnEntityRequest)
 }
 
+/**
+ * Request to make an entity follow a trajectory.
+ **/
+message FollowPolylineTrajectoryRequest {
+  string name = 1;
+  traffic_simulator_msgs.PolylineTrajectory trajectory = 2;
+}
+
+/**
+ * Response whether the entity's trajectory following request has been accepted.
+ **/
+message FollowPolylineTrajectoryResponse {
+  Result result = 1;
+}
 
 /**
  * Universal message for Request
@@ -303,6 +317,7 @@ message SimulationRequest {
     AttachDetectionSensorRequest attach_detection_sensor = 9;
     AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsRequest update_traffic_lights = 11;
+    FollowPolylineTrajectoryRequest follow_polyline_trajectory = 12;
   }
 }
 
@@ -314,14 +329,15 @@ message SimulationResponse {
   oneof response {
     InitializeResponse initialize = 1;
     UpdateFrameResponse update_frame = 2;
-    SpawnVehicleEntityResponse spawn_vehicle_entity = 4;
-    SpawnPedestrianEntityResponse spawn_pedestrian_entity = 5;
-    SpawnMiscObjectEntityResponse  spawn_misc_object_entity = 6;
-    DespawnEntityResponse despawn_entity = 7;
-    UpdateEntityStatusResponse update_entity_status = 8;
-    AttachLidarSensorResponse attach_lidar_sensor = 9;
-    AttachDetectionSensorResponse attach_detection_sensor = 10;
-    AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 11;
-    UpdateTrafficLightsResponse update_traffic_lights = 12;
+    SpawnVehicleEntityResponse spawn_vehicle_entity = 3;
+    SpawnPedestrianEntityResponse spawn_pedestrian_entity = 4;
+    SpawnMiscObjectEntityResponse  spawn_misc_object_entity = 5;
+    DespawnEntityResponse despawn_entity = 6;
+    UpdateEntityStatusResponse update_entity_status = 7;
+    AttachLidarSensorResponse attach_lidar_sensor = 8;
+    AttachDetectionSensorResponse attach_detection_sensor = 9;
+    AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 10;
+    UpdateTrafficLightsResponse update_traffic_lights = 11;
+    FollowPolylineTrajectoryResponse follow_polyline_trajectory = 12;
   }
 }
