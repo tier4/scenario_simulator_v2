@@ -313,15 +313,9 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
 
 bool ScenarioSimulator::isEgo(const std::string & name)
 {
-  if (not isEntityExists(name)) {
-    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
-  }
-  for (const auto & ego : ego_vehicles_) {
-    if (ego.name() == name) {
-      return true;
-    }
-  }
-  return false;
+  return std::find_if(std::begin(ego_vehicles_), std::end(ego_vehicles_), [&](auto && entity) {
+           return entity.name() == name;
+         }) != std::end(ego_vehicles_);
 }
 
 bool ScenarioSimulator::isEntityExists(const std::string & name)
