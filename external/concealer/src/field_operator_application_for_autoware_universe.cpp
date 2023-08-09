@@ -51,9 +51,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
   }
 
   if (not request->commands.empty()) {
-    task_queue.delay([this, request]() {
-//      requestCooperateCommands(request);
-    });
+    task_queue.delay([this, request]() { requestCooperateCommands(request); });
   }
 }
 
@@ -425,7 +423,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
     request->velocity = velocity_limit;
     // We attempt to resend the service up to 30 times, but this number of times was determined by
     // heuristics, not for any technical reason
-//    requestSetVelocityLimit(request, 30);
+    requestSetVelocityLimit(request, 30);
   });
 }
 
