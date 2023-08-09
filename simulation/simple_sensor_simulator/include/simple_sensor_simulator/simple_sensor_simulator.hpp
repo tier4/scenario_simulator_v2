@@ -15,25 +15,27 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SIMPLE_SENSOR_SIMULATOR_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SIMPLE_SENSOR_SIMULATOR_HPP_
 
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2_ros/transform_broadcaster.h>
-
-#include <geographic_msgs/msg/geo_point.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/transform_stamped.hpp>
-#include <map>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
 #include <simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp>
 #include <simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <simulation_interface/zmq_multi_server.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+
+#include <geographic_msgs/msg/geo_point.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
+
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
+
+#include <map>
+#include <memory>
 #include <string>
 #include <thread>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
 
 #if __cplusplus
 extern "C" {
@@ -89,43 +91,48 @@ public:
 
 private:
   SensorSimulation sensor_sim_;
-  void initialize(
-    const simulation_api_schema::InitializeRequest & req,
-    simulation_api_schema::InitializeResponse & res);
-  void updateFrame(
-    const simulation_api_schema::UpdateFrameRequest & req,
-    simulation_api_schema::UpdateFrameResponse & res);
-  void updateEntityStatus(
-    const simulation_api_schema::UpdateEntityStatusRequest & req,
-    simulation_api_schema::UpdateEntityStatusResponse & res);
+
+  auto initialize(const simulation_api_schema::InitializeRequest &)
+    -> simulation_api_schema::InitializeResponse;
+
+  auto updateFrame(const simulation_api_schema::UpdateFrameRequest &)
+    -> simulation_api_schema::UpdateFrameResponse;
+
+  auto updateEntityStatus(const simulation_api_schema::UpdateEntityStatusRequest &)
+    -> simulation_api_schema::UpdateEntityStatusResponse;
+
+  auto spawnVehicleEntity(const simulation_api_schema::SpawnVehicleEntityRequest &)
+    -> simulation_api_schema::SpawnVehicleEntityResponse;
+
   template <typename SpawnRequestType>
-  void insertEntitySpawnedStatus(
+  auto insertEntitySpawnedStatus(
     const SpawnRequestType & spawn_request, const traffic_simulator_msgs::EntityType::Enum & type,
-    const traffic_simulator_msgs::EntitySubtype::Enum & subtype);
-  void spawnVehicleEntity(
-    const simulation_api_schema::SpawnVehicleEntityRequest & req,
-    simulation_api_schema::SpawnVehicleEntityResponse & res);
-  void spawnPedestrianEntity(
-    const simulation_api_schema::SpawnPedestrianEntityRequest & req,
-    simulation_api_schema::SpawnPedestrianEntityResponse & res);
-  void spawnMiscObjectEntity(
-    const simulation_api_schema::SpawnMiscObjectEntityRequest &,
-    simulation_api_schema::SpawnMiscObjectEntityResponse &);
-  void despawnEntity(
-    const simulation_api_schema::DespawnEntityRequest & req,
-    simulation_api_schema::DespawnEntityResponse & res);
-  void attachDetectionSensor(
-    const simulation_api_schema::AttachDetectionSensorRequest & req,
-    simulation_api_schema::AttachDetectionSensorResponse & res);
-  void attachLidarSensor(
-    const simulation_api_schema::AttachLidarSensorRequest & req,
-    simulation_api_schema::AttachLidarSensorResponse & res);
-  void attachOccupancyGridSensor(
-    const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
-    simulation_api_schema::AttachOccupancyGridSensorResponse & res);
-  void updateTrafficLights(
-    const simulation_api_schema::UpdateTrafficLightsRequest & req,
-    simulation_api_schema::UpdateTrafficLightsResponse & res);
+    const traffic_simulator_msgs::EntitySubtype::Enum & subtype) -> void;
+
+  auto spawnPedestrianEntity(const simulation_api_schema::SpawnPedestrianEntityRequest &)
+    -> simulation_api_schema::SpawnPedestrianEntityResponse;
+
+  auto spawnMiscObjectEntity(const simulation_api_schema::SpawnMiscObjectEntityRequest &)
+    -> simulation_api_schema::SpawnMiscObjectEntityResponse;
+
+  auto despawnEntity(const simulation_api_schema::DespawnEntityRequest &)
+    -> simulation_api_schema::DespawnEntityResponse;
+
+  auto attachDetectionSensor(const simulation_api_schema::AttachDetectionSensorRequest &)
+    -> simulation_api_schema::AttachDetectionSensorResponse;
+
+  auto attachLidarSensor(const simulation_api_schema::AttachLidarSensorRequest &)
+    -> simulation_api_schema::AttachLidarSensorResponse;
+
+  auto attachOccupancyGridSensor(const simulation_api_schema::AttachOccupancyGridSensorRequest &)
+    -> simulation_api_schema::AttachOccupancyGridSensorResponse;
+
+  auto updateTrafficLights(const simulation_api_schema::UpdateTrafficLightsRequest &)
+    -> simulation_api_schema::UpdateTrafficLightsResponse;
+
+  auto followPolylineTrajectory(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
+    -> simulation_api_schema::FollowPolylineTrajectoryResponse;
+
   int getSocketPort();
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
