@@ -321,8 +321,6 @@ struct TrafficLight
 
   const std::int64_t way_id;
 
-  const std::int64_t relation_id;
-
   std::set<Bulb> bulbs;
 
   const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
@@ -351,7 +349,7 @@ struct TrafficLight
       }
     };
 
-    for (auto && bulb : bulbs) {
+    for (const auto & bulb : bulbs) {
       if (optional_position(bulb).has_value() and bulb.is(Shape::Category::circle)) {
         visualization_msgs::msg::Marker marker;
         marker.header.stamp = now;
@@ -389,7 +387,9 @@ struct TrafficLight
     simulation_api_schema::TrafficSignal traffic_signal_proto;
 
     traffic_signal_proto.set_id(way_id);
-    for (auto && bulb : bulbs) {
+    std::cout << "serialize traffic signal id: " << way_id << ", bulb num: " << bulbs.size()
+              << std::endl;
+    for (const auto & bulb : bulbs) {
       *traffic_signal_proto.add_traffic_light_status() =
         static_cast<simulation_api_schema::TrafficLight>(bulb);
     }

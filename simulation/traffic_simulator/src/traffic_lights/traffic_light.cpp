@@ -166,9 +166,24 @@ auto operator<<(std::ostream & os, const TrafficLight::Bulb & bulb) -> std::ostr
             << std::get<TrafficLight::Shape>(bulb.value);
 }
 
-TrafficLight::TrafficLight(const std::int64_t way_id, hdmap_utils::HdMapUtils & map_manager)
-: way_id(way_id),
-  relation_id(map_manager.getTrafficLightRelationIDFromWayID(way_id)),
+TrafficLight::TrafficLight(const std::int64_t lanelet_id, hdmap_utils::HdMapUtils & map_manager)
+: way_id([&]() {
+    if (map_manager.isTrafficLight(lanelet_id)) {
+      return lanelet_id;
+    } else {
+      // lanelet::RoleName::Refers
+      if (auto traffic_light_members = map_manager.getTrafficLightRelation(lanelet_id)
+                                         ->getParameters<lanelet::ConstLineString3d>("refers");
+          traffic_light_members.size() > 0) {
+        // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.
+        // This is because the output can be guaranteed for the original relation id by the way id.
+        return traffic_light_members.front().id();
+      } else {
+        throw common::SyntaxError(
+          "Given lanelet ID ", lanelet_id, " is neither relation id nor way id.");
+      }
+    }
+  }()),
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
@@ -181,9 +196,6 @@ TrafficLight::TrafficLight(const std::int64_t way_id, hdmap_utils::HdMapUtils & 
       map_manager.getTrafficLightBulbPosition(way_id, "red")),
   }
 {
-  if (not map_manager.isTrafficLight(way_id)) {
-    throw common::SyntaxError("Given lanelet ID ", way_id, " is not a traffic light ID.");
-  }
 }
 
 auto TrafficLight::set(const std::string & states) -> void
