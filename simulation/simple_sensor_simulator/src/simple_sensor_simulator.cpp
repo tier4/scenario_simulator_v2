@@ -276,12 +276,17 @@ auto ScenarioSimulator::updateTrafficLights(
 }
 
 auto ScenarioSimulator::followPolylineTrajectory(
-  const simulation_api_schema::FollowPolylineTrajectoryRequest &)
+  const simulation_api_schema::FollowPolylineTrajectoryRequest & request)
   -> simulation_api_schema::FollowPolylineTrajectoryResponse
 {
   auto response = simulation_api_schema::FollowPolylineTrajectoryResponse();
-  response.mutable_result()->set_success(true);
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  if (ego_entity_simulation_ and isEgo(request.name())) {
+    ego_entity_simulation_->polyline_trajectory =
+      simulation_interface::toROS2Message(request.trajectory());
+    response.mutable_result()->set_success(true);
+  } else {
+    response.mutable_result()->set_success(false);
+  }
   return response;
 }
 
