@@ -23,6 +23,7 @@
 #include <simulation_interface/constants.hpp>
 #include <string>
 #include <thread>
+#include <tuple>
 #include <zmqpp/zmqpp.hpp>
 
 namespace zeromq
@@ -30,57 +31,20 @@ namespace zeromq
 class MultiServer
 {
 public:
+  template <typename... Ts>
   explicit MultiServer(
     const simulation_interface::TransportProtocol & protocol,
-    const simulation_interface::HostName & hostname, const unsigned int socket_port,
-    std::function<void(
-      const simulation_api_schema::InitializeRequest &,
-      simulation_api_schema::InitializeResponse &)>
-      initialize_func,
-    std::function<void(
-      const simulation_api_schema::UpdateFrameRequest &,
-      simulation_api_schema::UpdateFrameResponse &)>
-      update_frame_func,
-    std::function<void(
-      const simulation_api_schema::SpawnVehicleEntityRequest &,
-      simulation_api_schema::SpawnVehicleEntityResponse &)>
-      spawn_vehicle_entity_func,
-    std::function<void(
-      const simulation_api_schema::SpawnPedestrianEntityRequest &,
-      simulation_api_schema::SpawnPedestrianEntityResponse &)>
-      spawn_pedestrian_entity_func,
-    std::function<void(
-      const simulation_api_schema::SpawnMiscObjectEntityRequest &,
-      simulation_api_schema::SpawnMiscObjectEntityResponse &)>
-      spawn_misc_object_entity_func,
-    std::function<void(
-      const simulation_api_schema::DespawnEntityRequest &,
-      simulation_api_schema::DespawnEntityResponse &)>
-      despawn_entity_func,
-    std::function<void(
-      const simulation_api_schema::UpdateEntityStatusRequest &,
-      simulation_api_schema::UpdateEntityStatusResponse &)>
-      update_entity_status_func,
-    std::function<void(
-      const simulation_api_schema::AttachLidarSensorRequest &,
-      simulation_api_schema::AttachLidarSensorResponse &)>
-      attach_lidar_sensor_func,
-    std::function<void(
-      const simulation_api_schema::AttachDetectionSensorRequest &,
-      simulation_api_schema::AttachDetectionSensorResponse &)>
-      attach_detection_sensor_func,
-    std::function<void(
-      const simulation_api_schema::AttachOccupancyGridSensorRequest &,
-      simulation_api_schema::AttachOccupancyGridSensorResponse &)>
-      attach_occupancy_sensor_func,
-    std::function<void(
-      const simulation_api_schema::UpdateTrafficLightsRequest &,
-      simulation_api_schema::UpdateTrafficLightsResponse &)>
-      update_traffic_lights_func,
-    std::function<void(
-      const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest &,
-      simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse &)>
-      attach_traffic_light_detector_emulator_func);
+    const simulation_interface::HostName & hostname, const unsigned int socket_port, Ts &&... xs)
+  : context_(zmqpp::context()),
+    type_(zmqpp::socket_type::reply),
+    socket_(context_, type_),
+    functions_(std::forward<decltype(xs)>(xs)...)
+  {
+    socket_.bind(simulation_interface::getEndPoint(protocol, hostname, socket_port));
+    poller_.add(socket_);
+    thread_ = std::thread(&MultiServer::start_poll, this);
+  }
+
   ~MultiServer();
 
 private:
@@ -91,53 +55,32 @@ private:
   const zmqpp::socket_type type_;
   zmqpp::poller poller_;
   zmqpp::socket socket_;
-  std::function<void(
-    const simulation_api_schema::InitializeRequest &, simulation_api_schema::InitializeResponse &)>
-    initialize_func_;
-  std::function<void(
-    const simulation_api_schema::UpdateFrameRequest &,
-    simulation_api_schema::UpdateFrameResponse &)>
-    update_frame_func_;
-  std::function<void(
-    const simulation_api_schema::SpawnVehicleEntityRequest &,
-    simulation_api_schema::SpawnVehicleEntityResponse &)>
-    spawn_vehicle_entity_func_;
-  std::function<void(
-    const simulation_api_schema::SpawnPedestrianEntityRequest &,
-    simulation_api_schema::SpawnPedestrianEntityResponse &)>
-    spawn_pedestrian_entity_func_;
-  std::function<void(
-    const simulation_api_schema::SpawnMiscObjectEntityRequest &,
-    simulation_api_schema::SpawnMiscObjectEntityResponse &)>
-    spawn_misc_object_entity_func_;
-  std::function<void(
-    const simulation_api_schema::DespawnEntityRequest &,
-    simulation_api_schema::DespawnEntityResponse &)>
-    despawn_entity_func_;
-  std::function<void(
-    const simulation_api_schema::UpdateEntityStatusRequest &,
-    simulation_api_schema::UpdateEntityStatusResponse &)>
-    update_entity_status_func_;
-  std::function<void(
-    const simulation_api_schema::AttachLidarSensorRequest &,
-    simulation_api_schema::AttachLidarSensorResponse &)>
-    attach_lidar_sensor_func_;
-  std::function<void(
-    const simulation_api_schema::AttachDetectionSensorRequest &,
-    simulation_api_schema::AttachDetectionSensorResponse &)>
-    attach_detection_sensor_func_;
-  std::function<void(
-    const simulation_api_schema::AttachOccupancyGridSensorRequest &,
-    simulation_api_schema::AttachOccupancyGridSensorResponse &)>
-    attach_occupancy_grid_sensor_func_;
-  std::function<void(
-    const simulation_api_schema::UpdateTrafficLightsRequest &,
-    simulation_api_schema::UpdateTrafficLightsResponse &)>
-    update_traffic_lights_func_;
-  std::function<void(
-    const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest &,
-    simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse &)>
-    attach_traffic_light_detector_emulator_func_;
+
+#define DEFINE_FUNCTION_TYPE(TYPENAME)                                      \
+  using TYPENAME = std::function<simulation_api_schema::TYPENAME##Response( \
+    const simulation_api_schema::TYPENAME##Request &)>
+
+  DEFINE_FUNCTION_TYPE(Initialize);
+  DEFINE_FUNCTION_TYPE(UpdateFrame);
+  DEFINE_FUNCTION_TYPE(SpawnVehicleEntity);
+  DEFINE_FUNCTION_TYPE(SpawnPedestrianEntity);
+  DEFINE_FUNCTION_TYPE(SpawnMiscObjectEntity);
+  DEFINE_FUNCTION_TYPE(DespawnEntity);
+  DEFINE_FUNCTION_TYPE(UpdateEntityStatus);
+  DEFINE_FUNCTION_TYPE(AttachLidarSensor);
+  DEFINE_FUNCTION_TYPE(AttachDetectionSensor);
+  DEFINE_FUNCTION_TYPE(AttachOccupancyGridSensor);
+  DEFINE_FUNCTION_TYPE(UpdateTrafficLights);
+  DEFINE_FUNCTION_TYPE(FollowPolylineTrajectory);
+  DEFINE_FUNCTION_TYPE(AttachTrafficLightDetectorEmulator);
+
+#undef DEFINE_FUNCTION_TYPE
+
+  std::tuple<
+    Initialize, UpdateFrame, SpawnVehicleEntity, SpawnPedestrianEntity, SpawnMiscObjectEntity,
+    DespawnEntity, UpdateEntityStatus, AttachLidarSensor, AttachDetectionSensor,
+    AttachOccupancyGridSensor, UpdateTrafficLights, FollowPolylineTrajectory, AttachTrafficLightDetectorEmulator>
+    functions_;
 };
 }  // namespace zeromq
 

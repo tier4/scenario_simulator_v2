@@ -116,7 +116,6 @@ public:
         return true;
       } else {
         simulation_api_schema::SpawnVehicleEntityRequest req;
-        simulation_api_schema::SpawnVehicleEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
@@ -124,8 +123,7 @@ public:
         req.set_is_ego(behavior == VehicleBehavior::autoware());
         /// @todo Should be filled from function API
         req.set_initial_speed(0.0);
-        zeromq_client_.call(req, res);
-        return res.result().success();
+        return zeromq_client_.call(req).result().success();
       }
     };
 
@@ -156,13 +154,11 @@ public:
         return true;
       } else {
         simulation_api_schema::SpawnPedestrianEntityRequest req;
-        simulation_api_schema::SpawnPedestrianEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
         simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
-        zeromq_client_.call(req, res);
-        return res.result().success();
+        return zeromq_client_.call(req).result().success();
       }
     };
 
@@ -185,13 +181,11 @@ public:
         return true;
       } else {
         simulation_api_schema::SpawnMiscObjectEntityRequest req;
-        simulation_api_schema::SpawnMiscObjectEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
         simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
-        zeromq_client_.call(req, res);
-        return res.result().success();
+        return zeromq_client_.call(req).result().success();
       }
     };
 
@@ -246,6 +240,10 @@ public:
   double getCurrentTime() const noexcept { return clock_.getCurrentScenarioTime(); }
 
   void startNpcLogic();
+
+  auto requestFollowTrajectory(
+    const std::string &, const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &)
+    -> bool;
 
   void requestLaneChange(const std::string & name, const std::int64_t & lanelet_id);
 
@@ -311,7 +309,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
-  FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);

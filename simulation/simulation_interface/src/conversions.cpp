@@ -603,4 +603,66 @@ auto toProto(
   toProto(std::get<1>(message), *proto.mutable_gear_command());
 }
 
+
+auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex & message)
+  -> traffic_simulator_msgs::Vertex
+{
+  auto proto = traffic_simulator_msgs::Vertex();
+  proto.set_time(message.time);
+  toProto(message.position, *proto.mutable_position());
+  return proto;
+}
+
+auto toROS2Message(const traffic_simulator_msgs::Vertex & proto)
+  -> traffic_simulator_msgs::msg::Vertex
+{
+  auto message = traffic_simulator_msgs::msg::Vertex();
+  message.time = proto.time();
+  toMsg(proto.position(), message.position);
+  return message;
+}
+
+auto toProtobufMessage(const traffic_simulator_msgs::msg::Polyline & message)
+  -> traffic_simulator_msgs::Polyline
+{
+  auto proto = traffic_simulator_msgs::Polyline();
+  for (const auto & vertex : message.vertices) {
+    *proto.add_vertices() = toProtobufMessage(vertex);
+  }
+  return proto;
+}
+
+auto toROS2Message(const traffic_simulator_msgs::Polyline & proto)
+  -> traffic_simulator_msgs::msg::Polyline
+{
+  auto message = traffic_simulator_msgs::msg::Polyline();
+  for (const auto & vertex : proto.vertices()) {
+    message.vertices.push_back(toROS2Message(vertex));
+  }
+  return message;
+}
+
+auto toProtobufMessage(const traffic_simulator_msgs::msg::PolylineTrajectory & message)
+  -> traffic_simulator_msgs::PolylineTrajectory
+{
+  auto proto = traffic_simulator_msgs::PolylineTrajectory();
+  proto.set_initial_distance_offset(message.initial_distance_offset);
+  proto.set_dynamic_constraints_ignorable(message.dynamic_constraints_ignorable);
+  proto.set_base_time(message.base_time);
+  proto.set_closed(message.closed);
+  *proto.mutable_shape() = toProtobufMessage(message.shape);
+  return proto;
+}
+
+auto toROS2Message(const traffic_simulator_msgs::PolylineTrajectory & proto)
+  -> traffic_simulator_msgs::msg::PolylineTrajectory
+{
+  auto message = traffic_simulator_msgs::msg::PolylineTrajectory();
+  message.initial_distance_offset = proto.initial_distance_offset();
+  message.dynamic_constraints_ignorable = proto.dynamic_constraints_ignorable();
+  message.base_time = proto.base_time();
+  message.closed = proto.closed();
+  message.shape = toROS2Message(proto.shape());
+  return message;
+}
 }  // namespace simulation_interface
