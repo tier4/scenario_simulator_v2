@@ -48,6 +48,7 @@
 #include <traffic_simulator_msgs/msg/misc_object_parameters.hpp>
 #include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
 #include <traffic_simulator_msgs/msg/performance.hpp>
+#include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 #include <zmqpp/zmqpp.hpp>
@@ -192,6 +193,23 @@ void toProto(
 void toMsg(
   const simulation_api_schema::TrafficSignal & proto,
   autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state);
+
+auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex &)
+  -> traffic_simulator_msgs::Vertex;
+
+auto toROS2Message(const traffic_simulator_msgs::Vertex &) -> traffic_simulator_msgs::msg::Vertex;
+
+auto toProtobufMessage(const traffic_simulator_msgs::msg::Polyline &)
+  -> traffic_simulator_msgs::Polyline;
+
+auto toROS2Message(const traffic_simulator_msgs::Polyline &)
+  -> traffic_simulator_msgs::msg::Polyline;
+
+auto toProtobufMessage(const traffic_simulator_msgs::msg::PolylineTrajectory &)
+  -> traffic_simulator_msgs::PolylineTrajectory;
+
+auto toROS2Message(const traffic_simulator_msgs::PolylineTrajectory &)
+  -> traffic_simulator_msgs::msg::PolylineTrajectory;
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_
