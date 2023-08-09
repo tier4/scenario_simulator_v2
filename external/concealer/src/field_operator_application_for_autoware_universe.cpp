@@ -316,7 +316,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
     setGoalPose(route.back());
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-//      setCheckpoint(each);
+      setCheckpoint(each);
     }
     waitForAutowareStateToBeWaitingForEngage();
   });
