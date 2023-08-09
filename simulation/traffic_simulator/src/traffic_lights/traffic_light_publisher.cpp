@@ -73,8 +73,6 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
         using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
         TrafficLightType traffic_light_msg;
         traffic_light_msg.traffic_signal_id = relation_id;
-        std::cout << "traffic_light_msg.traffic_signal_id: " << traffic_light_msg.traffic_signal_id
-                  << std::endl;
 
         for (auto bulb_status : traffic_light.traffic_light_status()) {
           using TrafficLightBulbType =

@@ -387,8 +387,6 @@ struct TrafficLight
     simulation_api_schema::TrafficSignal traffic_signal_proto;
 
     traffic_signal_proto.set_id(way_id);
-    std::cout << "serialize traffic signal id: " << way_id << ", bulb num: " << bulbs.size()
-              << std::endl;
     for (const auto & bulb : bulbs) {
       *traffic_signal_proto.add_traffic_light_status() =
         static_cast<simulation_api_schema::TrafficLight>(bulb);
