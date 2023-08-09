@@ -19,18 +19,22 @@ namespace traffic_simulator
 namespace entity
 {
 MiscObjectEntity::MiscObjectEntity(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::string & name, const CanonicalizedEntityStatus & entity_status,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::MiscObjectParameters &)
-: EntityBase(name, entity_status)
+: EntityBase(name, entity_status, hdmap_utils_ptr)
 {
 }
 
 void MiscObjectEntity::onUpdate(double, double)
 {
-  status_.action_status.accel = geometry_msgs::msg::Accel();
-  status_.action_status.twist = geometry_msgs::msg::Twist();
-  status_.action_status.current_action = "static";
-  status_before_update_ = status_;
+  auto status = static_cast<EntityStatus>(status_);
+  status.action_status.twist = geometry_msgs::msg::Twist();
+  status.action_status.accel = geometry_msgs::msg::Accel();
+  status.action_status.linear_jerk = 0;
+  status.action_status.current_action = "static";
+  status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
+  status_before_update_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string
@@ -38,7 +42,7 @@ auto MiscObjectEntity::getCurrentAction() const -> std::string
   if (not npc_logic_started_) {
     return "waiting";
   } else {
-    return status_.action_status.current_action;
+    return static_cast<EntityStatus>(status_).action_status.current_action;
   }
 }
 
@@ -84,5 +88,11 @@ void MiscObjectEntity::requestSpeedChange(
 {
   THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
 }
+
+auto MiscObjectEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
+{
+  EntityBase::fillLaneletPose(status, false);
+}
+
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -22,8 +22,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Add comment
         run: |
-          gh pr comment  "$PR_NUMBER" --edit-last --body "This PR breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364" \
-          || gh pr comment  "$PR_NUMBER" --body "This PR breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364"
+          gh pr comment  "$PR_NUMBER" --edit-last --body "This PR may breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364" \
+          || gh pr comment  "$PR_NUMBER" --body "This PR may breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}

@@ -67,6 +67,220 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
   }
 }
 
+template <auto N, typename Tuples>
+struct lister
+{
+  std::reference_wrapper<const Tuples> tuples;
+
+  explicit lister(const Tuples & tuples) : tuples(std::cref(tuples)) {}
+};
+
+template <auto N, typename Tuples>
+auto operator<<(std::ostream & ostream, const lister<N, Tuples> & lister) -> std::ostream &
+{
+  for (auto iterator = std::begin(lister.tuples.get()); iterator != std::end(lister.tuples.get());
+       ++iterator) {
+    switch (std::distance(iterator, std::end(lister.tuples.get()))) {
+      case 1:
+        return ostream << std::get<N>(*iterator);
+
+      case 2:
+        ostream << std::get<N>(*iterator) << " and ";
+        break;
+
+      default:
+        ostream << std::get<N>(*iterator) << ", ";
+        break;
+    }
+  }
+
+  return ostream;
+}
+
+template <auto N, typename Tuples>
+auto listup(const Tuples & tuples) -> lister<N, Tuples>
+{
+  return lister<N, Tuples>(tuples);
+}
+
+#define DEFINE_STATIC_DATA_MEMBER_DETECTOR(NAME)                                    \
+  template <typename T, typename = void>                                            \
+  struct HasStatic##NAME : public std::false_type                                   \
+  {                                                                                 \
+  };                                                                                \
+                                                                                    \
+  template <typename T>                                                             \
+  struct HasStatic##NAME<T, std::void_t<decltype(T::NAME)>> : public std::true_type \
+  {                                                                                 \
+  }
+
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(NONE);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(LANE_CHANGE_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(GOAL_PLANNER);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(START_PLANNER);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(PULL_OUT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(TRAFFIC_LIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(INTERSECTION_OCCLUSION);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(CROSSWALK);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(BLIND_SPOT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(DETECTION_AREA);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_STOPPING_AREA);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(OCCLUSION_SPOT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(EXT_REQUEST_LANE_CHANGE_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_LEFT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_RIGHT);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_DRIVABLE_LANE);
+
+#undef DEFINE_STATIC_DATA_MEMBER_DETECTOR
+
+/**
+ * NOTE: for changes from `distance` to start/finish distance
+ * see https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+ */
+template <typename T, typename = void>
+struct HasDistance : public std::false_type
+{
+};
+
+template <typename T>
+struct HasDistance<T, std::void_t<decltype(std::declval<T>().distance)>> : public std::true_type
+{
+};
+
+template <typename T>
+auto toModuleType(const std::string & module_name)
+{
+  static const std::unordered_map<std::string, std::uint8_t> module_type_map = [&]() {
+    std::unordered_map<std::string, std::uint8_t> module_type_map;
+
+#define EMPLACE(IDENTIFIER)                              \
+  if constexpr (HasStatic##IDENTIFIER<T>::value) {       \
+    module_type_map.emplace(#IDENTIFIER, T::IDENTIFIER); \
+  }                                                      \
+  static_assert(true)
+
+    /*
+       The following elements are in order of definition in the
+       tier4_rtc_msgs/msg/Module.msg file. Of course, unordered_map doesn't
+       preserve the insertion order, so the order itself doesn't matter.
+    */
+    EMPLACE(NONE);
+    EMPLACE(LANE_CHANGE_LEFT);
+    EMPLACE(LANE_CHANGE_RIGHT);
+    EMPLACE(AVOIDANCE_LEFT);
+    EMPLACE(AVOIDANCE_RIGHT);
+    EMPLACE(GOAL_PLANNER);
+    EMPLACE(START_PLANNER);
+    EMPLACE(PULL_OUT);
+    EMPLACE(TRAFFIC_LIGHT);
+    EMPLACE(INTERSECTION);
+    EMPLACE(INTERSECTION_OCCLUSION);
+    EMPLACE(CROSSWALK);
+    EMPLACE(BLIND_SPOT);
+    EMPLACE(DETECTION_AREA);
+    EMPLACE(NO_STOPPING_AREA);
+    EMPLACE(OCCLUSION_SPOT);
+    EMPLACE(EXT_REQUEST_LANE_CHANGE_LEFT);
+    EMPLACE(EXT_REQUEST_LANE_CHANGE_RIGHT);
+    EMPLACE(AVOIDANCE_BY_LC_LEFT);
+    EMPLACE(AVOIDANCE_BY_LC_RIGHT);
+    EMPLACE(NO_DRIVABLE_LANE);
+
+#undef EMPLACE
+
+    return module_type_map;
+  }();
+
+  if (const auto module_type = module_type_map.find(module_name);
+      module_type == module_type_map.end()) {
+    throw common::Error(
+      "Unexpected module name for tier4_rtc_msgs::msg::Module: ", module_name,
+      ". One of the following module names is expected: ", listup<0>(module_type_map), ".");
+  } else {
+    return module_type->second;
+  }
+}
+
+template <typename CooperateStatusType>
+bool isValidCooperateStatus(
+  const CooperateStatusType & cooperate_status, std::uint8_t command_type, std::uint8_t module_type)
+{
+  /**
+   * NOTE1: the finish_distance filter is set to over -20.0,
+   * because some valid rtc statuses has negative finish_distance due to the errors of
+   * localization or numerical calculation. This threshold is advised by a member of TIER IV
+   * planning and control team.
+   */
+
+  /**
+   * NOTE2: The difference in the variable referred as a distance is the impact of the
+   * message specification changes in the following URL.
+   * This was also decided after consulting with a member of TIER IV planning and control team.
+   * ref: https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+   */
+  if constexpr (HasDistance<CooperateStatusType>::value) {
+    return cooperate_status.module.type == module_type &&
+           command_type != cooperate_status.command_status.type &&
+           cooperate_status.distance >= -20.0;
+  } else {
+    return cooperate_status.module.type == module_type &&
+           command_type != cooperate_status.command_status.type &&
+           cooperate_status.finish_distance >= -20.0;
+  }
+}
+
+auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
+  const std::string & module_name, const std::string & command) -> void
+{
+  auto to_command_type = [](const auto & command) {
+    static const std::unordered_map<std::string, std::uint8_t> command_type_map = {
+      {"ACTIVATE", tier4_rtc_msgs::msg::Command::ACTIVATE},
+      {"DEACTIVATE", tier4_rtc_msgs::msg::Command::DEACTIVATE},
+    };
+    if (const auto command_type = command_type_map.find(command);
+        command_type == command_type_map.end()) {
+      throw common::Error(
+        "Unexpected command for tier4_rtc_msgs::msg::Command: ", command,
+        ", One of the following commands is expected: ", listup<0>(command_type_map), ".");
+    } else {
+      return command_type->second;
+    }
+  };
+
+  if (const auto cooperate_status = std::find_if(
+        latest_cooperate_status_array.statuses.begin(),
+        latest_cooperate_status_array.statuses.end(),
+        [module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
+         command_type = to_command_type(command)](const auto & cooperate_status) {
+          return isValidCooperateStatus<tier4_rtc_msgs::msg::CooperateStatus>(
+            cooperate_status, command_type, module_type);
+        });
+      cooperate_status == latest_cooperate_status_array.statuses.end()) {
+    std::stringstream what;
+    what
+      << "Failed to send a cooperate command: Cannot find a valid request to cooperate for module "
+      << std::quoted(module_name) << " and command " << std::quoted(command) << "."
+      << "Please check if the situation is such that the request occurs when sending.";
+    throw common::Error(what.str());
+  } else {
+    tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
+    cooperate_command.module = cooperate_status->module;
+    cooperate_command.uuid = cooperate_status->uuid;
+    cooperate_command.command.type = to_command_type(command);
+
+    auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
+    request->stamp = latest_cooperate_status_array.stamp;
+    request->commands.push_back(cooperate_command);
+
+    task_queue.delay([this, request]() { requestCooperateCommands(request); });
+  }
+}
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   const geometry_msgs::msg::Pose & initial_pose) -> void
 {

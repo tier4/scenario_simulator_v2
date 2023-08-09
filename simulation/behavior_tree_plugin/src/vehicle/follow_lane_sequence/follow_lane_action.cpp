@@ -39,17 +39,16 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> FollowLaneAction::cal
 
 const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWaypoints()
 {
-  if (!entity_status.lanelet_pose_valid) {
+  if (!entity_status->laneMatchingSucceed()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  if (entity_status.action_status.twist.linear.x >= 0) {
+  if (entity_status->getTwist().linear.x >= 0) {
     traffic_simulator_msgs::msg::WaypointsArray waypoints;
+    const auto lanelet_pose = entity_status->getLaneletPose();
     waypoints.waypoints = reference_trajectory->getTrajectory(
-      entity_status.lanelet_pose.s, entity_status.lanelet_pose.s + getHorizon(), 1.0,
-      entity_status.lanelet_pose.offset);
+      lanelet_pose.s, lanelet_pose.s + getHorizon(), 1.0, lanelet_pose.offset);
     trajectory = std::make_unique<math::geometry::CatmullRomSubspline>(
-      reference_trajectory, entity_status.lanelet_pose.s,
-      entity_status.lanelet_pose.s + getHorizon());
+      reference_trajectory, lanelet_pose.s, lanelet_pose.s + getHorizon());
     return waypoints;
   } else {
     return traffic_simulator_msgs::msg::WaypointsArray();
@@ -58,10 +57,9 @@ const traffic_simulator_msgs::msg::WaypointsArray FollowLaneAction::calculateWay
 
 void FollowLaneAction::getBlackBoardValues()
 {
-  traffic_simulator_msgs::msg::LaneletPose target_lanelet_pose;
+  traffic_simulator::LaneletPose target_lanelet_pose;
   VehicleActionNode::getBlackBoardValues();
-  if (!getInput<traffic_simulator_msgs::msg::LaneletPose>(
-        "target_lanelet_pose", target_lanelet_pose)) {
+  if (!getInput<traffic_simulator::LaneletPose>("target_lanelet_pose", target_lanelet_pose)) {
     target_lanelet_pose_ = std::nullopt;
   } else {
     target_lanelet_pose_ = target_lanelet_pose;
@@ -76,8 +74,9 @@ BT::NodeStatus FollowLaneAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (!entity_status.lanelet_pose_valid) {
-    setOutput("updated_status", stopAtEndOfRoad());
+  if (!entity_status->laneMatchingSucceed()) {
+    stopEntity();
+    setOutput("updated_status", entity_status);
     return BT::NodeStatus::RUNNING;
   }
   const auto waypoints = calculateWaypoints();
@@ -130,11 +129,11 @@ BT::NodeStatus FollowLaneAction::tick()
   if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
-  auto updated_status = calculateUpdatedEntityStatus(target_speed.value());
-  setOutput("updated_status", updated_status);
-  const auto obstacle = calculateObstacle(waypoints);
+  setOutput(
+    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+                        calculateUpdatedEntityStatus(target_speed.value())));
   setOutput("waypoints", waypoints);
-  setOutput("obstacle", obstacle);
+  setOutput("obstacle", calculateObstacle(waypoints));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace follow_lane_sequence

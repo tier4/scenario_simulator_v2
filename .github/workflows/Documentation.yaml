@@ -25,8 +25,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
-      - name: Install
-        run: pip3 install mkdocs mkdocs-material pymdown-extensions fontawesome_markdown markdown python-markdown-math plantuml-markdown mkdocs-codeinclude-plugin mkdocs-git-revision-date-localized-plugin plantuml
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.5.1"
+      - name: install
+        run: poetry install --no-interaction
       - name: Install doxygen/depends of doxybook
         run: sudo apt install -y doxygen wget
       - name: Wget package
@@ -92,14 +95,14 @@ jobs:
           mkdir -p ./markdown/Classes
           doxybook2 --input ./build/ --output ./markdown -c config.json
       - name: Generate documentation
-        run: mkdocs build
-      - name: "Upload Artifact"
+        run: poetry run mkdocs build
+      - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: site
           path: site
           retention-days: 1
-      - name: Publish Report
+      - name: Publish Documentation
         if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
         uses: peaceiris/actions-gh-pages@v3
         with:

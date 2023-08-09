@@ -50,7 +50,7 @@ TEST(HELPER, POSE)
 TEST(HELPER, LANELET_POSE)
 {
   const auto lanelet_pose = traffic_simulator::helper::constructLaneletPose(5, 10, 2, 0, 0, 0);
-  traffic_simulator_msgs::msg::LaneletPose expected_pose;
+  traffic_simulator::LaneletPose expected_pose;
   expected_pose.lanelet_id = 5;
   expected_pose.s = 10.0;
   expected_pose.offset = 2.0;

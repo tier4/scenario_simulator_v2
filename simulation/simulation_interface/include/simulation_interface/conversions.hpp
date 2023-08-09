@@ -48,6 +48,7 @@
 #include <traffic_simulator_msgs/msg/misc_object_parameters.hpp>
 #include <traffic_simulator_msgs/msg/pedestrian_parameters.hpp>
 #include <traffic_simulator_msgs/msg/performance.hpp>
+#include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 #include <zmqpp/zmqpp.hpp>
@@ -147,9 +148,15 @@ void toMsg(
   traffic_simulator_msgs::msg::EntitySubtype & subtype);
 void toProto(
   const traffic_simulator_msgs::msg::EntityStatus & status,
+  simulation_api_schema::EntityStatus & proto);
+void toProto(
+  const traffic_simulator_msgs::msg::EntityStatus & status,
   traffic_simulator_msgs::EntityStatus & proto);
 void toMsg(
   const traffic_simulator_msgs::EntityStatus & proto,
+  traffic_simulator_msgs::msg::EntityStatus & status);
+void toMsg(
+  const simulation_api_schema::EntityStatus & proto,
   traffic_simulator_msgs::msg::EntityStatus & status);
 void toProto(
   const builtin_interfaces::msg::Duration & duration, builtin_interfaces::Duration & proto);
@@ -181,7 +188,28 @@ auto toProto(
 
 void toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
-  simulation_api_schema::TrafficLightState & proto);
+  simulation_api_schema::TrafficSignal & proto);
+
+void toMsg(
+  const simulation_api_schema::TrafficSignal & proto,
+  autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state);
+
+auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex &)
+  -> traffic_simulator_msgs::Vertex;
+
+auto toROS2Message(const traffic_simulator_msgs::Vertex &) -> traffic_simulator_msgs::msg::Vertex;
+
+auto toProtobufMessage(const traffic_simulator_msgs::msg::Polyline &)
+  -> traffic_simulator_msgs::Polyline;
+
+auto toROS2Message(const traffic_simulator_msgs::Polyline &)
+  -> traffic_simulator_msgs::msg::Polyline;
+
+auto toProtobufMessage(const traffic_simulator_msgs::msg::PolylineTrajectory &)
+  -> traffic_simulator_msgs::PolylineTrajectory;
+
+auto toROS2Message(const traffic_simulator_msgs::PolylineTrajectory &)
+  -> traffic_simulator_msgs::msg::PolylineTrajectory;
 }  // namespace simulation_interface
 
 #endif  // SIMULATION_INTERFACE__CONVERSIONS_HPP_

@@ -21,6 +21,7 @@
 #include <openscenario_interpreter/syntax/trajectory_following_mode.hpp>
 #include <openscenario_interpreter/syntax/trajectory_ref.hpp>
 #include <pugixml.hpp>
+#include <traffic_simulator/behavior/follow_trajectory.hpp>
 
 namespace openscenario_interpreter
 {
@@ -52,7 +53,10 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct FollowTrajectoryAction
+struct FollowTrajectoryAction : private Scope,
+                                private SimulatorCore::ActionApplication,
+                                private SimulatorCore::ConditionEvaluation,
+                                private SimulatorCore::NonStandardOperation
 {
   const Double initial_distance_offset;
 
@@ -62,9 +66,11 @@ struct FollowTrajectoryAction
 
   const TrajectoryRef trajectory_ref;
 
+  std::unordered_map<String, Boolean> accomplishments;
+
   explicit FollowTrajectoryAction(const pugi::xml_node &, Scope &);
 
-  static auto accomplished() noexcept -> bool;
+  /*  */ auto accomplished() -> bool;
 
   static auto endsImmediately() noexcept -> bool;
 

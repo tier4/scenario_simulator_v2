@@ -30,9 +30,12 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
@@ -66,7 +69,7 @@ public:
     entity_manager_ptr_(std::make_shared<EntityManager>(node, configuration)),
     traffic_controller_ptr_(std::make_shared<traffic_simulator::traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
-      [this](const auto & name) { return API::getEntityPose(name); },
+      [this](const auto & name) { return API::getMapPose(name); },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
@@ -94,13 +97,14 @@ public:
   auto spawn(
     const std::string & name, const Pose & pose,
     const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-    const std::string & behavior = VehicleBehavior::defaultBehavior())
+    const std::string & behavior = VehicleBehavior::defaultBehavior(),
+    const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration, clock_.getStepTime());
+                 name, pose, parameters, configuration);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, behavior);
@@ -112,23 +116,33 @@ public:
         return true;
       } else {
         simulation_api_schema::SpawnVehicleEntityRequest req;
-        simulation_api_schema::SpawnVehicleEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
+        req.set_asset_key(model3d);
+        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
-        zeromq_client_.call(req, res);
-        return res.result().success();
+        /// @todo Should be filled from function API
+        req.set_initial_speed(0.0);
+        return zeromq_client_.call(req).result().success();
       }
     };
 
     return register_to_entity_manager() and register_to_environment_simulator();
   }
 
+  geometry_msgs::msg::Pose toMapPose(const geometry_msgs::msg::Pose & pose) { return pose; }
+
+  geometry_msgs::msg::Pose toMapPose(const traffic_simulator_msgs::msg::LaneletPose & pose)
+  {
+    return entity_manager_ptr_->getHdmapUtils()->toMapPose(pose).pose;
+  }
+
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
     const traffic_simulator_msgs::msg::PedestrianParameters & parameters,
-    const std::string & behavior = PedestrianBehavior::defaultBehavior())
+    const std::string & behavior = PedestrianBehavior::defaultBehavior(),
+    const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       using traffic_simulator::entity::PedestrianEntity;
@@ -140,11 +154,11 @@ public:
         return true;
       } else {
         simulation_api_schema::SpawnPedestrianEntityRequest req;
-        simulation_api_schema::SpawnPedestrianEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
-        zeromq_client_.call(req, res);
-        return res.result().success();
+        req.set_asset_key(model3d);
+        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
+        return zeromq_client_.call(req).result().success();
       }
     };
 
@@ -154,7 +168,8 @@ public:
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
-    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters)
+    const traffic_simulator_msgs::msg::MiscObjectParameters & parameters,
+    const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
       using traffic_simulator::entity::MiscObjectEntity;
@@ -166,11 +181,11 @@ public:
         return true;
       } else {
         simulation_api_schema::SpawnMiscObjectEntityRequest req;
-        simulation_api_schema::SpawnMiscObjectEntityResponse res;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
-        zeromq_client_.call(req, res);
-        return res.result().success();
+        req.set_asset_key(model3d);
+        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
+        return zeromq_client_.call(req).result().success();
       }
     };
 
@@ -178,19 +193,15 @@ public:
   }
 
   bool despawn(const std::string & name);
+  bool despawnEntities();
 
-  traffic_simulator_msgs::msg::EntityStatus getEntityStatus(const std::string & name);
-
-  geometry_msgs::msg::Pose getEntityPose(const std::string & name);
-
-  auto setEntityStatus(
-    const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
   auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
   auto setEntityStatus(
-    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
+    const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       traffic_simulator::helper::constructActionStatus()) -> void;
   auto setEntityStatus(
@@ -207,17 +218,10 @@ public:
 
   std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
-  bool reachPosition(
-    const std::string & name, const geometry_msgs::msg::Pose & target_pose, const double tolerance);
-  bool reachPosition(
-    const std::string & name, const traffic_simulator_msgs::msg::LaneletPose & target_pose,
-    const double tolerance);
-  bool reachPosition(
-    const std::string & name, const std::string & target_name, const double tolerance) const;
-
   bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
   bool attachLidarSensor(
-    const std::string &, const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
+    const std::string &, const double lidar_sensor_delay,
+    const helper::LidarType = traffic_simulator::helper::LidarType::VLP16);
 
   bool attachDetectionSensor(const simulation_api_schema::DetectionSensorConfiguration &);
   bool attachDetectionSensor(
@@ -233,6 +237,10 @@ public:
   double getCurrentTime() const noexcept { return clock_.getCurrentScenarioTime(); }
 
   void startNpcLogic();
+
+  auto requestFollowTrajectory(
+    const std::string &, const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &)
+    -> bool;
 
   void requestLaneChange(const std::string & name, const std::int64_t & lanelet_id);
 
@@ -266,6 +274,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
@@ -275,10 +284,13 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getDistanceToRightLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
+  FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
+  FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
-  FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLateralDistance);
+  FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
+  FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
@@ -289,6 +301,8 @@ public:
   FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
+  FORWARD_TO_ENTITY_MANAGER(laneMatchingSucceed);
+  FORWARD_TO_ENTITY_MANAGER(reachPosition);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
@@ -303,14 +317,22 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
-  FORWARD_TO_ENTITY_MANAGER(toLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 #undef FORWARD_TO_ENTITY_MANAGER
 
+  auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
+    -> CanonicalizedLaneletPose;
+  auto canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
+    -> CanonicalizedEntityStatus;
+
+  auto toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
+    -> std::optional<CanonicalizedLaneletPose>;
+
 private:
-  bool updateSensorFrame();
   bool updateEntityStatusInSim();
+  std::optional<CanonicalizedEntityStatus> updateEntityStatusInSim(
+    const std::string & entity_name, const CanonicalizedEntityStatus & status);
   bool updateTrafficLightsInSim();
 
   const Configuration configuration;
