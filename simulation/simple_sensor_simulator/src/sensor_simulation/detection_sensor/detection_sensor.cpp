@@ -24,7 +24,7 @@
 #include <simulation_interface/conversions.hpp>
 #include <string>
 #include <vector>
-#include "perception_utils/conversion.hpp"
+#include "object_recognition_utils/conversion.hpp"
 
 namespace simple_sensor_simulator
 {
@@ -179,7 +179,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         simulation_interface::toMsg(
           status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
         object.shape.type = object.shape.BOUNDING_BOX;
-        auto gt_object = perception_utils::toTrackedObject(object); // there are no id for this object
+        auto gt_object = object_recognition_utils::toTrackedObject(object); // there are no id for this object
         // get uuid from string
         gt_object.object_id = generateUUID(status.name());
 
