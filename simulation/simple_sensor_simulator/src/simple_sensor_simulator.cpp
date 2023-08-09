@@ -326,31 +326,14 @@ bool ScenarioSimulator::isEgo(const std::string & name)
 
 bool ScenarioSimulator::isEntityExists(const std::string & name)
 {
-  if (std::find_if(ego_vehicles_.begin(), ego_vehicles_.end(), [&name](const auto & ego) {
-        return ego.name() == name;
-      }) != ego_vehicles_.end()) {
-    return true;
-  }
+  auto is_the_entity_contained_in = [&](auto && entities) {
+    return std::find_if(std::begin(entities), std::end(entities), [&](auto && entity) {
+             return entity.name() == name;
+           }) != std::end(entities);
+  };
 
-  if (std::find_if(vehicles_.begin(), vehicles_.end(), [&name](const auto & vehicle) {
-        return vehicle.name() == name;
-      }) != vehicles_.end()) {
-    return true;
-  }
-
-  if (std::find_if(pedestrians_.begin(), pedestrians_.end(), [&name](const auto & pedestrian) {
-        return pedestrian.name() == name;
-      }) != pedestrians_.end()) {
-    return true;
-  }
-
-  if (std::find_if(misc_objects_.begin(), misc_objects_.end(), [&name](const auto & misc_object) {
-        return misc_object.name() == name;
-      }) != misc_objects_.end()) {
-    return true;
-  }
-
-  return false;
+  return is_the_entity_contained_in(ego_vehicles_) or is_the_entity_contained_in(vehicles_) or
+         is_the_entity_contained_in(pedestrians_) or is_the_entity_contained_in(misc_objects_);
 }
 }  // namespace simple_sensor_simulator
 
