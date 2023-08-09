@@ -46,7 +46,9 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
-    [this](auto &&... xs) { return attachTrafficLightDetectorEmulator(std::forward<decltype(xs)>(xs)...); })
+    [this](auto &&... xs) {
+      return attachTrafficLightDetectorEmulator(std::forward<decltype(xs)>(xs)...);
+    })
 {
 }
 

@@ -79,7 +79,8 @@ private:
   std::tuple<
     Initialize, UpdateFrame, SpawnVehicleEntity, SpawnPedestrianEntity, SpawnMiscObjectEntity,
     DespawnEntity, UpdateEntityStatus, AttachLidarSensor, AttachDetectionSensor,
-    AttachOccupancyGridSensor, UpdateTrafficLights, FollowPolylineTrajectory, AttachTrafficLightDetectorEmulator>
+    AttachOccupancyGridSensor, UpdateTrafficLights, FollowPolylineTrajectory,
+    AttachTrafficLightDetectorEmulator>
     functions_;
 };
 }  // namespace zeromq

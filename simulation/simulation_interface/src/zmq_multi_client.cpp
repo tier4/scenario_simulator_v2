@@ -202,7 +202,7 @@ auto MultiClient::call(
     auto simulation_request = simulation_api_schema::SimulationRequest();
     *simulation_request.mutable_attach_traffic_light_detector_emulator() = request;
     return call(simulation_request).attach_traffic_light_detector_emulator();
-  }else{
+  } else {
     return {};
   }
 }

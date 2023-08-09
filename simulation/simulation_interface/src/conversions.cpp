@@ -603,7 +603,6 @@ auto toProto(
   toProto(std::get<1>(message), *proto.mutable_gear_command());
 }
 
-
 auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex & message)
   -> traffic_simulator_msgs::Vertex
 {
