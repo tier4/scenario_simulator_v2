@@ -149,7 +149,8 @@ auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
   }
 }
 
-// If route is not specified, the lanelet_id with the lowest array index is used as a candidate for canonicalize destination.
+// If route is not specified, the lanelet_id with the lowest array index is used as a candidate for
+// canonicalize destination.
 auto HdMapUtils::canonicalizeLaneletPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> std::tuple<
@@ -2050,22 +2051,22 @@ auto HdMapUtils::getTrafficLightRelation(const LaneletId lanelet_id) const
     lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 
-auto HdMapUtils::getTrafficLightRelationIDFromWayID(const LaneletId traffic_light_way_id) const
-  -> LaneletId
+auto HdMapUtils::getTrafficLightRelationIDsFromWayID(const LaneletId traffic_light_way_id) const
+  -> std::vector<LaneletId>
 {
   assert(isTrafficLight(traffic_light_way_id));
+  std::vector<LaneletId> traffic_light_relation_ids;
   for (const auto & regulatory_element : lanelet_map_ptr_->regulatoryElementLayer) {
     if (regulatory_element->attribute(lanelet::AttributeName::Subtype).value() == "traffic_light") {
       for (const auto & ref_member :
            regulatory_element->getParameters<lanelet::ConstLineString3d>("refers")) {
         if (ref_member.id() == traffic_light_way_id) {
-          return regulatory_element->id();
+          traffic_light_relation_ids.push_back(regulatory_element->id());
         }
       }
     }
   }
-  throw std::runtime_error(
-    "No traffic light relation found for way id " + std::to_string(traffic_light_way_id));
+  return traffic_light_relation_ids;
 }
 
 std::vector<geometry_msgs::msg::Point> HdMapUtils::toPolygon(
