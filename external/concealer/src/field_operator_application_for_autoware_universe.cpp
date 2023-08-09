@@ -51,7 +51,9 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
   }
 
   if (not request->commands.empty()) {
-    task_queue.delay([this, request]() { requestCooperateCommands(request); });
+    task_queue.delay([this, request]() {
+//      requestCooperateCommands(request);
+    });
   }
 }
 
@@ -291,7 +293,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
         initial_pose_msg.header.stamp = get_clock()->now();
         initial_pose_msg.header.frame_id = "map";
         initial_pose_msg.pose.pose = initial_pose;
-        return setInitialPose(initial_pose_msg);
+//        return setInitialPose(initial_pose_msg);
+        return;
       });
 
       // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
@@ -315,7 +318,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
     setGoalPose(route.back());
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-      setCheckpoint(each);
+//      setCheckpoint(each);
     }
     waitForAutowareStateToBeWaitingForEngage();
   });
@@ -422,7 +425,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
     request->velocity = velocity_limit;
     // We attempt to resend the service up to 30 times, but this number of times was determined by
     // heuristics, not for any technical reason
-    requestSetVelocityLimit(request, 30);
+//    requestSetVelocityLimit(request, 30);
   });
 }
 
