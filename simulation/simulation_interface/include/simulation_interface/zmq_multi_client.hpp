@@ -86,8 +86,6 @@ private:
   zmqpp::context context_;
   const zmqpp::socket_type type_;
   zmqpp::socket socket_;
-
-  bool is_running = true;
 };
 }  // namespace zeromq
 
