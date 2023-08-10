@@ -32,8 +32,11 @@ public:
   static BT::PortsList providedPorts()
   {
     BT::PortsList ports = {
+      // clang-format off
       BT::InputPort<traffic_simulator_msgs::msg::BehaviorParameter>("behavior_parameter"),
-      BT::InputPort<traffic_simulator_msgs::msg::PedestrianParameters>("pedestrian_parameters")};
+      BT::InputPort<traffic_simulator_msgs::msg::PedestrianParameters>("pedestrian_parameters"),
+      // clang-format on
+    };
     BT::PortsList parent_ports = entity_behavior::ActionNode::providedPorts();
     for (const auto & parent_port : parent_ports) {
       ports.emplace(parent_port.first, parent_port.second);
@@ -42,16 +45,16 @@ public:
   }
   traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
   auto calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
-    -> traffic_simulator_msgs::msg::EntityStatus;
+    -> traffic_simulator::CanonicalizedEntityStatus;
   auto calculateUpdatedEntityStatus(double target_speed) const
-    -> traffic_simulator_msgs::msg::EntityStatus;
+    -> traffic_simulator::CanonicalizedEntityStatus;
 
 protected:
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
 
 private:
   auto estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
-    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+    -> std::optional<traffic_simulator::CanonicalizedLaneletPose>;
 };
 }  // namespace entity_behavior
 
