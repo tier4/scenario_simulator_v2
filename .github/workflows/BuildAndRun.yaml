@@ -30,6 +30,12 @@ jobs:
       matrix:
         rosdistro: [galactic, humble]
     steps:
+      - name: Install Clang-Format (version 16.0.0)
+        run: |
+          apt update
+          apt install -y python3-pip
+          pip3 install clang-format==16.0.0
+        shell: bash
       - name: suppress warnings
         run: |
           git config --global --add safe.directory '*'
@@ -62,8 +68,7 @@ jobs:
       - name: Resolve rosdep
         run: |
           cd ~/ros2_ws
-          apt-get update
-          apt install -y python3-pip
+          apt update
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
         shell: bash
