@@ -227,7 +227,7 @@ auto ScenarioSimulator::spawnMiscObjectEntity(
 {
   misc_objects_.emplace_back(req.parameters());
   insertEntitySpawnedStatus(
-    req, traffic_simulator_msgs::EntityType::PEDESTRIAN,
+    req, traffic_simulator_msgs::EntityType::MISC_OBJECT,
     traffic_simulator_msgs::EntitySubtype::UNKNOWN);
   auto res = simulation_api_schema::SpawnMiscObjectEntityResponse();
   res.mutable_result()->set_success(true);
