@@ -114,24 +114,24 @@ You can get unique key for each data by calling `BehaviorPluginBase::get(FOO)Key
 Getter are named as get(FOO), such as `BehaviorPluginClass::getDriverModel();`.  
 Setters are named as set(Foo), such as `BehaviorPluginClass::setDriverModel(traffic_simulator_msgs::msg::DriverModel);`.
 
-| Name                 | Description                                           | Type                                                         |
-|----------------------|-------------------------------------------------------|--------------------------------------------------------------|
-| DebugMarker          | Rviz marker for debugging NPC behavior                | `std::vector<visualization_msgs::msg::Marker>`               |
-| DriverModel          | Driver behavior parameters                            | `traffic_simulator_msgs::msg::DriverModel`                   |
-| EntityStatus         | Entity status of the NPC you want to control          | `traffic_simulator_msgs::msg::EntityStatus`                  |
-| EntityTypeList       | Dictionary of NPC name and it's type.                 | `EntityTypeDict`                                             |
-| GoalPoses            | Goal poses of entity.                                 | `std::vector<geometry_msgs::msg::Pose>`                      |
-| HdMapUtils           | Shared pointer of HdMapUtils class.                   | `std::shared_ptr<hdmap_utils::HdMapUtils>`                   |
-| Obstacle             | Target obstacle of your NPC.                          | `std::optional<traffic_simulator_msgs::msg::Obstacle>`       |
-| OtherEntityStatus    | Dictionary of other entity status.                    | `EntityStatusDict`                                           |
-| PedestrianParameters | Entity parameters for pedestrian.                     | `traffic_simulator_msgs::msg::PedestrianParameters`          |
-| Request              | Request to the NPC you want to control                | `std::string`                                                |
-| RouteLanelets        | Lanelet ids on entity route                           | `std::vector<std::int64_t>`                                  |
-| ReferenceTrajectory  | Trajectory precalculated for RouteLanelets.           | `std::shared_ptr<math::geometry::CatmullRomSpline>` |
-| StepTime             | Step time of the simulation.                          | `double`                                                     |
-| TargetSpeed          | Target speed of the NPC you want to control           | `std::optional<double>`                                      |
-| ToLaneletId          | Goal lanelet ID                                       | `std::int64_t`                                               |
-| TrafficLightManager  | Shared pointer to the traffic light manager           | `std::shared_ptr<traffic_simulator::TrafficLightManager>`    |
-| UpdatedStatus        | Updated entity status of the NPC you want to control. | `traffic_simulator_msgs::msg::EntityStatus`                  |
-| VehicleParameters    | Parameters of vehicle entity.                         | `traffic_simulator_msgs::msg::VehicleParameters`             |
-| Waypoints            | Waypoints of the NPC you want to control.             | `traffic_simulator_msgs::msg::WaypointsArray`                |
+| Name                 | Description                                           | Type                                                            |
+|----------------------|-------------------------------------------------------|-----------------------------------------------------------------|
+| DebugMarker          | Rviz marker for debugging NPC behavior                | `std::vector<visualization_msgs::msg::Marker>`                  |
+| DriverModel          | Driver behavior parameters                            | `traffic_simulator_msgs::msg::DriverModel`                      |
+| EntityStatus         | Entity status of the NPC you want to control          | `std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>` |
+| EntityTypeList       | Dictionary of NPC name and it's type.                 | `EntityTypeDict`                                                |
+| GoalPoses            | Goal poses of entity.                                 | `std::vector<geometry_msgs::msg::Pose>`                         |
+| HdMapUtils           | Shared pointer of HdMapUtils class.                   | `std::shared_ptr<hdmap_utils::HdMapUtils>`                      |
+| Obstacle             | Target obstacle of your NPC.                          | `std::optional<traffic_simulator_msgs::msg::Obstacle>`          |
+| OtherEntityStatus    | Dictionary of other entity status.                    | `EntityStatusDict`                                              |
+| PedestrianParameters | Entity parameters for pedestrian.                     | `traffic_simulator_msgs::msg::PedestrianParameters`             |
+| Request              | Request to the NPC you want to control                | `std::string`                                                   |
+| RouteLanelets        | Lanelet ids on entity route                           | `std::vector<std::int64_t>`                                     |
+| ReferenceTrajectory  | Trajectory precalculated for RouteLanelets.           | `std::shared_ptr<math::geometry::CatmullRomSpline>`             |
+| StepTime             | Step time of the simulation.                          | `double`                                                        |
+| TargetSpeed          | Target speed of the NPC you want to control           | `std::optional<double>`                                         |
+| ToLaneletId          | Goal lanelet ID                                       | `std::int64_t`                                                  |
+| TrafficLightManager  | Shared pointer to the traffic light manager           | `std::shared_ptr<traffic_simulator::TrafficLightManager>`       |
+| UpdatedStatus        | Updated entity status of the NPC you want to control. | `std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>` |
+| VehicleParameters    | Parameters of vehicle entity.                         | `traffic_simulator_msgs::msg::VehicleParameters`                |
+| Waypoints            | Waypoints of the NPC you want to control.             | `traffic_simulator_msgs::msg::WaypointsArray`                   |

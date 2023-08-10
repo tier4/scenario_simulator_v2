@@ -44,19 +44,19 @@ void VehicleActionNode::getBlackBoardValues()
 }
 
 auto VehicleActionNode::calculateUpdatedEntityStatus(double target_speed) const
-  -> traffic_simulator_msgs::msg::EntityStatus
+  -> traffic_simulator::CanonicalizedEntityStatus
 {
   return ActionNode::calculateUpdatedEntityStatus(
     target_speed, behavior_parameter.dynamic_constraints);
 }
 
 auto VehicleActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
-  -> traffic_simulator_msgs::msg::EntityStatus
+  -> traffic_simulator::CanonicalizedEntityStatus
 {
   if (target_speed > vehicle_parameters.performance.max_speed) {
     target_speed = vehicle_parameters.performance.max_speed;
   } else {
-    target_speed = entity_status.action_status.twist.linear.x;
+    target_speed = entity_status->getTwist().linear.x;
   }
   return ActionNode::calculateUpdatedEntityStatusInWorldFrame(
     target_speed, behavior_parameter.dynamic_constraints);
