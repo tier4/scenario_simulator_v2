@@ -45,7 +45,10 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); },
-    [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); })
+    [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) {
+      return attachTrafficLightDetectorEmulator(std::forward<decltype(xs)>(xs)...);
+    })
 {
 }
 
@@ -264,12 +267,7 @@ auto ScenarioSimulator::updateTrafficLights(
   const simulation_api_schema::UpdateTrafficLightsRequest & req)
   -> simulation_api_schema::UpdateTrafficLightsResponse
 {
-  traffic_signals_states_.clear();
-  for (const auto & traffic_signal_proto : req.states()) {
-    autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
-    simulation_interface::toMsg(traffic_signal_proto, traffic_signal);
-    traffic_signals_states_.emplace_back(traffic_signal);
-  }
+  traffic_signals_states_ = req;
   auto res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
   return res;
@@ -282,6 +280,17 @@ auto ScenarioSimulator::followPolylineTrajectory(
   auto response = simulation_api_schema::FollowPolylineTrajectoryResponse();
   response.mutable_result()->set_success(true);
   std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  return response;
+}
+
+auto ScenarioSimulator::attachTrafficLightDetectorEmulator(
+  const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & req)
+  -> simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse
+{
+  auto response = simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse();
+  sensor_sim_.attachTrafficLightsDetectorEmulator(
+    current_time_, req.configuration(), *this, hdmap_utils_);
+  response.mutable_result()->set_success(true);
   return response;
 }
 

@@ -126,6 +126,10 @@ private:
   auto followPolylineTrajectory(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
     -> simulation_api_schema::FollowPolylineTrajectoryResponse;
 
+  auto attachTrafficLightDetectorEmulator(
+    const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest &)
+    -> simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse;
+
   int getSocketPort();
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
@@ -137,7 +141,7 @@ private:
   rclcpp::Time current_ros_time_;
   bool initialized_;
   std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
-  std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> traffic_signals_states_;
+  simulation_api_schema::UpdateTrafficLightsRequest traffic_signals_states_;
   traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string & name);
   zeromq::MultiServer server_;
   geographic_msgs::msg::GeoPoint getOrigin();

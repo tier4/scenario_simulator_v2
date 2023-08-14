@@ -36,6 +36,7 @@
   <exec_depend>tf2</exec_depend>
 
   <depend>autoware_auto_perception_msgs</depend>
+  <depend>autoware_perception_msgs</depend>
   <depend>boost</depend>
   <depend>eigen</depend>
   <depend>embree</depend>

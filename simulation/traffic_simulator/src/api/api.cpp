@@ -163,6 +163,14 @@ bool API::initialize(double realtime_factor, double step_time)
   }
 }
 
+bool API::attachTrafficLightDetectorEmulator(
+  const simulation_api_schema::TrafficLightDetectorEmulatorConfiguration & configuration)
+{
+  simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest req;
+  *req.mutable_configuration() = configuration;
+  return zeromq_client_.call(req).result().success();
+}
+
 bool API::attachDetectionSensor(
   const simulation_api_schema::DetectionSensorConfiguration & sensor_configuration)
 {
@@ -218,18 +226,13 @@ bool API::attachLidarSensor(
 
 bool API::updateTrafficLightsInSim()
 {
-  simulation_api_schema::UpdateTrafficLightsRequest req;
   if (entity_manager_ptr_->trafficLightsChanged()) {
-    for (const auto & [id, traffic_light] : entity_manager_ptr_->getConventionalTrafficLights()) {
-      simulation_api_schema::TrafficSignal state;
-      simulation_interface::toProto(
-        static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
-      *req.add_states() = state;
-    }
+    auto req = entity_manager_ptr_->generateUpdateRequestForConventionalTrafficLights();
     return zeromq_client_.call(req).result().success();
+  } else {
+    // TODO handle response
+    return true;
   }
-  // TODO handle response
-  return simulation_api_schema::UpdateTrafficLightsResponse().result().success();
 }
 
 std::optional<CanonicalizedEntityStatus> API::updateEntityStatusInSim(

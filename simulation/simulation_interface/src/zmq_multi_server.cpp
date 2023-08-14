@@ -77,6 +77,12 @@ void MultiServer::poll()
         *sim_response.mutable_follow_polyline_trajectory() =
           std::get<FollowPolylineTrajectory>(functions_)(proto.follow_polyline_trajectory());
         break;
+      case simulation_api_schema::SimulationRequest::RequestCase::
+        kAttachTrafficLightDetectorEmulator:
+        *sim_response.mutable_attach_traffic_light_detector_emulator() =
+          std::get<AttachTrafficLightDetectorEmulator>(functions_)(
+            proto.attach_traffic_light_detector_emulator());
+        break;
       case simulation_api_schema::SimulationRequest::RequestCase::REQUEST_NOT_SET: {
         THROW_SIMULATION_ERROR("No case defined for oneof in SimulationRequest message");
       }

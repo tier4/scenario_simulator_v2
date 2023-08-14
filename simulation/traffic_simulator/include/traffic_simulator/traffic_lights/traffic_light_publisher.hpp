@@ -12,47 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_
-#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_
+#ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_
+#define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_
 
-#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 
 namespace traffic_simulator
 {
-class TrafficLightManager;
+class TrafficLightPublisherBase
+{
+public:
+  virtual auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void = 0;
+};
 
 template <typename Message>
-class V2ITrafficLightPublisher : public ConfigurableRateUpdater
+class TrafficLightPublisher : public TrafficLightPublisherBase
 {
   const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
-  const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
-  const std::string sensor_frame_;
+
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
 
 public:
   template <typename NodePointer>
-  explicit V2ITrafficLightPublisher(
-    const std::shared_ptr<TrafficLightManager> & traffic_light_manager,
+  explicit TrafficLightPublisher(
     const std::string & topic_name, const NodePointer & node,
-    const std::string & sensor_frame = "camera_link")
-  : ConfigurableRateUpdater(node),
+    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils = nullptr)
+  : TrafficLightPublisherBase(),
     traffic_light_state_array_publisher_(
       rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
-    traffic_light_manager_(traffic_light_manager),
-    sensor_frame_(sensor_frame)
+    hdmap_utils_(hdmap_utils)
   {
   }
 
-private:
-  virtual auto update() -> void override;
+  auto publish(
+    const rclcpp::Time & current_ros_time,
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void override;
 };
-
-template <>
-auto V2ITrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::update()
-  -> void;
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_MANAGER_HPP_
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_

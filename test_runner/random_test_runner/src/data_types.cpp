@@ -31,7 +31,7 @@ ArchitectureType architectureTypeFromString(const std::string & architecture_typ
 {
   if (architecture_type_str == "awf/auto") {
     return ArchitectureType::AWF_AUTO;
-  } else if (architecture_type_str == "awf/universe") {
+  } else if (architecture_type_str.find("awf/universe") != std::string::npos) {
     return ArchitectureType::AWF_UNIVERSE;
   } else if (architecture_type_str == "tier4/proposal") {
     return ArchitectureType::TIER4_PROPOSAL;

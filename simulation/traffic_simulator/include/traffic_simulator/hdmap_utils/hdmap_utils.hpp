@@ -227,8 +227,10 @@ public:
   using LaneletId = std::int64_t;
 
   auto isTrafficLight(const LaneletId) const -> bool;
-  auto isTrafficRelation(const LaneletId) const -> bool;
-  auto getTrafficRelation(const LaneletId) const -> lanelet::TrafficLight::Ptr;
+  auto isTrafficLightRelation(const LaneletId) const -> bool;
+  auto getTrafficLightRelation(const LaneletId) const -> lanelet::TrafficLight::Ptr;
+
+  auto getTrafficLightRelationIDsFromWayID(const LaneletId) const -> std::vector<LaneletId>;
 
 private:
   math::geometry::HermiteCurve getLaneChangeTrajectory(

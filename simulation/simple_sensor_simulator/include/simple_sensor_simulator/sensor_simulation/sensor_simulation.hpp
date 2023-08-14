@@ -17,6 +17,8 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -31,17 +33,13 @@ namespace simple_sensor_simulator
 class SensorSimulation
 {
 public:
-  explicit SensorSimulation(rclcpp::Node & node)
-  {
-    traffic_lights_detectors_.emplace_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
-      "/perception/traffic_light_recognition/traffic_signals", node));
-  }
+  explicit SensorSimulation(rclcpp::Node & node) {}
 
   auto attachLidarSensor(
     const double current_simulation_time,
     const simulation_api_schema::LidarConfiguration & configuration, rclcpp::Node & node) -> void
   {
-    if (configuration.architecture_type() == "awf/universe") {
+    if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
       lidar_sensors_.push_back(std::make_unique<LidarSensor<sensor_msgs::msg::PointCloud2>>(
         current_simulation_time, configuration,
         node.create_publisher<sensor_msgs::msg::PointCloud2>(
@@ -59,7 +57,7 @@ public:
     const simulation_api_schema::DetectionSensorConfiguration & configuration, rclcpp::Node & node)
     -> void
   {
-    if (configuration.architecture_type() == "awf/universe") {
+    if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
       using Message = autoware_auto_perception_msgs::msg::DetectedObjects;
       detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
@@ -77,7 +75,7 @@ public:
     const simulation_api_schema::OccupancyGridSensorConfiguration & configuration,
     rclcpp::Node & node) -> void
   {
-    if (configuration.architecture_type() == "awf/universe") {
+    if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
       using Message = nav_msgs::msg::OccupancyGrid;
       occupancy_grid_sensors_.push_back(std::make_unique<OccupancyGridSensor<Message>>(
         current_simulation_time, configuration,
@@ -90,10 +88,33 @@ public:
     }
   }
 
+  auto attachTrafficLightsDetectorEmulator(
+    const double current_simulation_time,
+    const simulation_api_schema::TrafficLightDetectorEmulatorConfiguration & configuration,
+    rclcpp::Node & node, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils) -> void
+  {
+    if (configuration.architecture_type() == "awf/universe") {
+      using Message = autoware_auto_perception_msgs::msg::TrafficSignalArray;
+      traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
+        std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
+          "/perception/traffic_light_recognition/traffic_signals", &node, hdmap_utils)));
+    } else if (configuration.architecture_type() == "awf/universe/20230800") {
+      using Message = autoware_perception_msgs::msg::TrafficSignalArray;
+      traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
+        std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
+          "/perception/traffic_light_recognition/internal/traffic_signals", &node, hdmap_utils)));
+    } else {
+      std::stringstream ss;
+      ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
+         << " given.";
+      throw std::runtime_error(ss.str());
+    }
+  }
+
   void updateSensorFrame(
     double current_time, const rclcpp::Time & current_ros_time,
     const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & traffic_signals);
+    const simulation_api_schema::UpdateTrafficLightsRequest & update_traffic_lights_request);
 
 private:
   std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
