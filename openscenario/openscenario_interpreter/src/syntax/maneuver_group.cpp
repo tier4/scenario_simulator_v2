@@ -38,8 +38,7 @@ ManeuverGroup::ManeuverGroup(const pugi::xml_node & node, Scope & scope)
 
 auto ManeuverGroup::run() -> void
 {
-  size_t index{0};
-  for (auto && maneuver : elements) {
+  for (size_t index{0}; auto && maneuver : elements) {
     try {
       assert(maneuver.is_also<Maneuver>());
       maneuver.evaluate();

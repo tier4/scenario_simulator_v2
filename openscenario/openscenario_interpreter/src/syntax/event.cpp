@@ -62,11 +62,11 @@ auto Event::evaluate() -> Object
   try {
     return StoryboardElement::evaluate();
   } catch (const SpecialAction<EXIT_FAILURE> & action) {
-    auto index = start_trigger.activeConditionGroupIndex();
-    auto error = ScenarioFailure(name, index, "StartTrigger.ConditionGroup");
-    error.setCoreSource(start_trigger.activeConditionGroupDescription());
-    RCLCPP_WARN_STREAM(rclcpp::get_logger("XXXXX"), "core set");
-    throw error;
+    auto condition_group_index = start_trigger.activeConditionGroupIndex();
+    auto detailed_error =
+      ScenarioFailure(name, condition_group_index, "StartTrigger.ConditionGroup");
+    detailed_error.setCoreSource(start_trigger.activeConditionGroupDescription());
+    throw detailed_error;
   }
 }
 

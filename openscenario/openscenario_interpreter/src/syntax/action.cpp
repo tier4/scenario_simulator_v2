@@ -32,10 +32,7 @@ Action::Action(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto Action::accomplished() const -> bool
-{
-  return ComplexType::accomplished();
-}
+auto Action::accomplished() const -> bool { return ComplexType::accomplished(); }
 
 auto Action::endsImmediately() const -> bool
 {

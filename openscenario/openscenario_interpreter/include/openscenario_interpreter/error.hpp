@@ -15,11 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__ERROR_HPP_
 #define OPENSCENARIO_INTERPRETER__ERROR_HPP_
 
-#include <openscenario_interpreter/utility/demangle.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-
 #include <exception>
 #include <iomanip>
+#include <openscenario_interpreter/utility/demangle.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 
 #define LINE() \

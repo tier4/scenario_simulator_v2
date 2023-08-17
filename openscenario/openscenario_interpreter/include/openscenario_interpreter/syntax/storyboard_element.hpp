@@ -15,15 +15,14 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__STORYBOARD_ELEMENT_HPP_
 
+#include <cstddef>
+#include <limits>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/storyboard_element_state.hpp>
 #include <openscenario_interpreter/syntax/trigger.hpp>
-
-#include <cstddef>
-#include <limits>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
@@ -200,8 +199,7 @@ public:
 
   dispatch:
     switch (state().as<StoryboardElementState>()) {
-      case StoryboardElementState::
-        standbyState: /* ----------------------------
+      case StoryboardElementState::standbyState: /* ----------------------------
                        *
                        *  This is the default initialization state of a StoryboardElement.
                        *  When it is in this state, the runtime instantiation of the
@@ -217,8 +215,7 @@ public:
           return current_state;
         }
 
-      case StoryboardElementState::
-        startTransition: /* -------------------------
+      case StoryboardElementState::startTransition: /* -------------------------
                           *
                           *  The startTransition symbolizes that the execution of the runtime
                           *  instantiation is now starting. The startTransition can be used in
@@ -229,8 +226,7 @@ public:
         if (transitionTo(running_state)) ++current_execution_count;
         goto dispatch;
 
-      case StoryboardElementState::
-        runningState: /* ----------------------------
+      case StoryboardElementState::runningState: /* ----------------------------
                        *
                        *  The runningState symbolizes that the execution of the runtime
                        *  instantiation is now ongoing and has not yet accomplished its goal.
@@ -276,8 +272,7 @@ public:
           return current_state;
         }
 
-      case StoryboardElementState::
-        endTransition: /* ---------------------------
+      case StoryboardElementState::endTransition: /* ---------------------------
                         *
                         *  The endTransition occurs when the runtime instantiation of the
                         *  StoryboardElement accomplishes its goal. Once the endTransition
@@ -291,8 +286,7 @@ public:
           current_execution_count < maximum_execution_count ? standby_state : complete_state);
         goto dispatch;
 
-      case StoryboardElementState::
-        completeState: /* ---------------------------
+      case StoryboardElementState::completeState: /* ---------------------------
                         *
                         *  The completeState signals that the runtime instantiation of the
                         *  StoryboardElement cannot reach a running state without external
@@ -315,8 +309,7 @@ public:
                         * -------------------------------------------------------------------- */
         return current_state;
 
-      case StoryboardElementState::
-        skipTransition: /* --------------------------
+      case StoryboardElementState::skipTransition: /* --------------------------
                          *
                          *  Transition marking the moment an element is asked to move to the
                          *  runningState but is instead skipped so it remains in the
@@ -327,8 +320,7 @@ public:
         throw Error("UNIMPLEMENTED!");
 
       default:
-      case StoryboardElementState::
-        stopTransition: /* --------------------------
+      case StoryboardElementState::stopTransition: /* --------------------------
                          *
                          *  The stopTransition marks the reception of a stopTrigger or the
                          *  storyboard element is overridden (applicable for Event and Action).

@@ -25,10 +25,7 @@ Init::Init(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto Init::endsImmediately() const -> bool
-{
-  return actions.endsImmediately();
-}
+auto Init::endsImmediately() const -> bool { return actions.endsImmediately(); }
 
 auto Init::evaluateInstantaneousActions() -> Object
 {
@@ -36,20 +33,14 @@ auto Init::evaluateInstantaneousActions() -> Object
     actions.startInstantaneousActions();
     actions.runInstantaneousActions();
   } catch (const ScenarioFailure & e) {
-    throw ScenarioFailure("OpenSCENARIO.Storyboard", e);
+    throw ScenarioFailure("OpenSCENARIO.Storyboard.Init", e);
   }
   return unspecified;
 }
 
-auto Init::runNonInstantaneousActions() -> void
-{
-  actions.runNonInstantaneousActions();
-}
+auto Init::runNonInstantaneousActions() -> void { actions.runNonInstantaneousActions(); }
 
-auto Init::startNonInstantaneousActions() -> void
-{
-  actions.startNonInstantaneousActions();
-}
+auto Init::startNonInstantaneousActions() -> void { actions.startNonInstantaneousActions(); }
 
 auto operator<<(nlohmann::json & json, const Init & datum) -> nlohmann::json &
 {

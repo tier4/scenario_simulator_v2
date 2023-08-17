@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/syntax/user_defined_action.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
-
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -43,6 +42,16 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
   }
 }
 
+auto InitActions::evaluate() -> Object
+{
+  try {
+    return StoryboardElement::evaluate();
+  } catch (const SpecialAction<EXIT_FAILURE> & action) {
+    RCLCPP_WARN_STREAM(rclcpp::get_logger("XXXXX"), "InitActions evaluate!!");
+    throw;
+  }
+}
+
 auto InitActions::accomplished() const -> bool
 {
   auto global_actions_accomplished = std::all_of(
@@ -60,10 +69,7 @@ auto InitActions::accomplished() const -> bool
 }
 
 // this function should be called by StoryboardElement
-auto InitActions::run() -> void
-{
-  runNonInstantaneousActions();
-}
+auto InitActions::run() -> void { runNonInstantaneousActions(); }
 
 auto InitActions::endsImmediately() const -> bool
 {
@@ -85,10 +91,7 @@ auto InitActions::endsImmediately() const -> bool
 }
 
 // this function should be called by StoryboardElement
-auto InitActions::start() -> void
-{
-  startNonInstantaneousActions();
-}
+auto InitActions::start() -> void { startNonInstantaneousActions(); }
 
 // this function should be called before simulation time starts
 auto InitActions::startInstantaneousActions() -> void
@@ -97,19 +100,18 @@ auto InitActions::startInstantaneousActions() -> void
     e.as<GlobalAction>().start();
   }
 
-  size_t index{0};
-  try {
-    for (auto && e : user_defined_actions) {
+  for (size_t index{0}; auto && e : user_defined_actions) {
+    try {
       auto & user_defined_action = e.as<UserDefinedAction>();
       if (user_defined_action.endsImmediately()) {
         user_defined_action.start();
       }
       index++;
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      auto error = ScenarioFailure("Actions", index, "UserDefinedAction");
+      error.setInitActionAsSource();
+      throw error;
     }
-  } catch (const SpecialAction<EXIT_FAILURE> & action) {
-    auto error = ScenarioFailure("Init", index, "Actions.UserDefinedAction");
-    error.setInitActionAsSource();
-    throw error;
   }
 
   for (auto && e : privates) {

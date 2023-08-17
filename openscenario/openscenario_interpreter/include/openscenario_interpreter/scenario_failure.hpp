@@ -15,141 +15,133 @@
 #ifndef OPENSCENARIO_INTERPRETER__SCENARIO_FAILURE_HPP_
 #define OPENSCENARIO_INTERPRETER__SCENARIO_FAILURE_HPP_
 
-#include <openscenario_interpreter/utility/demangle.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-
 #include <exception>
 #include <iomanip>
+#include <openscenario_interpreter/error.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
+#include <openscenario_interpreter/utility/demangle.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
+
+#include "syntax/custom_command_action.hpp"
 
 namespace openscenario_interpreter
 {
 
 struct ScenarioFailure : public std::runtime_error
 {
+private:
   struct CoreSource
   {
-    CoreSource(bool init_action_source) : init_action_{init_action_source} {}
+    CoreSource() : without_condition_{true} {}
 
-    CoreSource(std::vector<std::pair<std::string, std::string>> conditions_list)
-    : single_{conditions_list.size() == 1}
+    CoreSource(const std::vector<std::pair<std::string, std::string>> & conditions_list)
+    : single_{conditions_list.size() == 1}, without_condition_{false}
     {
       anonymous_ = std::any_of(
         conditions_list.begin(), conditions_list.end(),
         [](const auto & pair) { return pair.first.empty(); });
 
-      std::stringstream name, description;
+      std::stringstream element_name, description;
       if (single_) {
-        name << std::quoted(conditions_list.front().first);
+        element_name << std::quoted(conditions_list.front().first);
         description << conditions_list.front().second;
       } else {
-        for (size_t index = 0; const auto & condition : conditions_list) {
-          name << std::quoted(condition.first) << ", ";
-          description << "{" << std::quoted(anonymous_ ? std::to_string(index++) : condition.first)
-                      << ": " << condition.second << "}, ";
+        for (size_t i = 0; const auto & condition : conditions_list) {
+          element_name << std::quoted(condition.first);
+          description << "{" << std::quoted(anonymous_ ? std::to_string(i++) : condition.first)
+                      << ": " << condition.second << "}";
+          if (&condition != &conditions_list.back()) {
+            element_name << ", ";
+            description << ", ";
+          }
         }
-        name.seekp(-2, std::ios_base::end);
-        description.seekp(-2, std::ios_base::end);
+        element_name_ = element_name.str();
+        description_ = description.str();
       }
-      name_ = name.str();
-      description_ = description.str();
     }
 
     auto log() const -> const std::string & { return log_; }
 
-    auto logUpdate(std::string path) -> std::string
+    auto logUpdate(const std::string & path) -> std::string
     {
       std::stringstream log;
       log << "CustomCommandAction typed " << std::quoted("exitFailure") << " was triggered by the ";
-      if (init_action_) {
-        log << "anonymous init action (" << path << ")";
+      if (without_condition_) {
+        log << " action (" << path << ")";
       } else if (anonymous_ && single_) {
         log << "anonymous condition (" << path << ".Condition[0]): " << description_;
       } else if (single_) {
-        log << "Condition named " << name_ << ": " << description_;
+        log << "Condition named " << element_name_ << ": " << description_;
       } else if (anonymous_) {
         log << "anonymous conditions (" << path << ".Condition[...]): " << description_;
       } else {
-        log << "Conditions named {" << name_ << "}: " << description_;
+        log << "Conditions named {" << element_name_ << "}: " << description_;
       }
       log_ = log.str();
       return log_;
     }
 
   private:
-    bool anonymous_{false}, single_{true}, init_action_{false};
-    std::string name_;
+    bool anonymous_{false}, single_{true}, without_condition_{false};
+    std::string element_name_;
     std::string description_;
     std::string log_;
   };
 
-  ScenarioFailure(ScenarioFailure const &) = default;
+public:
+  ScenarioFailure()
+  : source_name_{""}, element_index_{0}, inner_{nullptr}, core_{nullptr}, std::runtime_error{""} {};
+  ScenarioFailure(const ScenarioFailure &) = default;
 
   // Constructor with no inner object -- first object
-  explicit ScenarioFailure(std::string source_name, int index, std::string name)
+  explicit ScenarioFailure(
+    const std::string & source_name, int element_index, const std::string & element_name)
   : source_name_{source_name},
-    index_{index},
+    element_index_{element_index},
     inner_{nullptr},
     core_{nullptr},
-    std::runtime_error{ScenarioFailure::formatName("", index, name)}
+    std::runtime_error{ScenarioFailure::formatName("", element_index, element_name)}
   {
   }
 
   // Constructor with inner object and current source (to be forwarded) -- intermediate object
   explicit ScenarioFailure(
-    std::string source_name, int index, std::string name, ScenarioFailure const & inner)
+    const std::string & source_name, int element_index, const std::string & element_name,
+    ScenarioFailure const & inner)
   : source_name_{source_name},
-    index_{index},
+    element_index_{element_index},
     inner_{std::make_shared<ScenarioFailure>(inner)},
     core_{inner.core_},
-    std::runtime_error{ScenarioFailure::formatName(inner.source_name_, index, name)}
+    std::runtime_error{ScenarioFailure::formatName(inner.source_name_, element_index, element_name)}
   {
   }
 
   // Constructor with inner but without current source -- last object
-  explicit ScenarioFailure(std::string name, ScenarioFailure const & inner)
+  explicit ScenarioFailure(const std::string & element_name, const ScenarioFailure & inner)
   : source_name_{""},
-    index_{0},
+    element_index_{0},
     inner_{std::make_shared<ScenarioFailure>(inner)},
     core_{inner.core_},
-    std::runtime_error{ScenarioFailure::formatName(inner.source_name_, name)}
+    std::runtime_error{ScenarioFailure::formatName(inner.source_name_, element_name)}
   {
   }
 
-  static auto formatName(const std::string & inner_source_name, const std::string & name)
-    -> std::string
+  auto setCoreSource(const std::vector<std::pair<std::string, std::string>> & conditions_list)
+    -> void
   {
-    return inner_source_name.empty() ? name : name + "." + inner_source_name;
-  }
-
-  static auto formatName(const std::string & inner_source_name, int index, const std::string & name)
-    -> std::string
-  {
-    std::stringstream ss;
-    if (!inner_source_name.empty())
-      ss << '.' << name << "[" << std::quoted(inner_source_name) << "]";
+    if (!core_)
+      core_ = std::make_shared<CoreSource>(conditions_list);
     else
-      ss << '.' << name << '[' << index << ']';
-    return ss.str();
-  }
-
-  auto setCoreSource(std::vector<std::pair<std::string, std::string>> conditions_list) -> void
-  {
-    if (!core_) core_ = std::make_shared<CoreSource>(conditions_list);
+      throw Error("The scenario result core has already been instantiated.");
   }
 
   auto setInitActionAsSource() -> void
   {
-    if (!core_) core_ = std::make_shared<CoreSource>(true);
-  }
-
-  auto recursiveWhat() const -> std::string
-  {
-    if (inner_) {
-      return std::runtime_error::what() + inner_->recursiveWhat();
-    } else {
-      return std::runtime_error::what();
-    }
+    if (!core_)
+      core_ = std::make_shared<CoreSource>();
+    else
+      throw Error("The scenario result core has already been instantiated.");
   }
 
   const char * what() const noexcept override
@@ -157,19 +149,40 @@ struct ScenarioFailure : public std::runtime_error
     if (core_) {
       core_->logUpdate(recursiveWhat());
       return core_->log().c_str();
-    } else
-      return "No error core defined";
+    }
+    return "No core defined";
   }
 
-  std::string source_name_;
-  int index_;
-
 private:
+  auto recursiveWhat() const -> std::string
+  {
+    if (inner_) return std::runtime_error::what() + inner_->recursiveWhat();
+    return std::runtime_error::what();
+  }
+
+  static auto formatName(const std::string & inner_source_name, const std::string & element_name)
+    -> std::string
+  {
+    return inner_source_name.empty() ? element_name : element_name + "." + inner_source_name;
+  }
+
+  static auto formatName(
+    const std::string & inner_source_name, int element_index, const std::string & element_name)
+    -> std::string
+  {
+    std::stringstream ss;
+    if (!inner_source_name.empty())
+      ss << '.' << element_name << "[" << std::quoted(inner_source_name) << "]";
+    else
+      ss << '.' << element_name << '[' << element_index << ']';
+    return ss.str();
+  }
+
   std::shared_ptr<CoreSource> core_;
   const std::shared_ptr<const ScenarioFailure> inner_;
-  std::string description_;
+  const std::string source_name_;
+  const int element_index_;
 };
 
 }  // namespace openscenario_interpreter
-
 #endif  // OPENSCENARIO_INTERPRETER__SCENARIO_FAILURE_HPP_
