@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_OBJECT_POSITION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_OBJECT_POSITION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
@@ -27,9 +27,9 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeWorldPosition --------------------------------------------------
+/* ---- RelativeObjectPosition 1.2 ---------------------------------------------
  *
- *  <xsd:complexType name="RelativeWorldPosition">
+ *  <xsd:complexType name="RelativeObjectPosition">
  *    <xsd:all>
  *      <xsd:element name="Orientation" type="Orientation" minOccurs="0"/>
  *    </xsd:all>
@@ -40,7 +40,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeWorldPosition : private SimulatorCore::CoordinateSystemConversion
+struct RelativeObjectPosition : private SimulatorCore::CoordinateSystemConversion
 {
   const Orientation orientation;
 
@@ -48,7 +48,7 @@ struct RelativeWorldPosition : private SimulatorCore::CoordinateSystemConversion
 
   const Double dx, dy, dz;
 
-  explicit RelativeWorldPosition(const pugi::xml_node &, Scope &);
+  explicit RelativeObjectPosition(const pugi::xml_node &, Scope &);
 
   operator geometry_msgs::msg::Point() const;
 
@@ -59,4 +59,4 @@ struct RelativeWorldPosition : private SimulatorCore::CoordinateSystemConversion
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_WORLD_POSITION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_OBJECT_POSITION_HPP_
