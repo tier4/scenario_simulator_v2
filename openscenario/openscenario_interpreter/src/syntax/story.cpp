@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/act.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -42,8 +42,8 @@ auto Story::run() -> void
       assert(act.is_also<Act>());
       act.evaluate();
       index++;
-    } catch (const ScenarioFailure & e) {
-      throw ScenarioFailure(name, index, "Act", e);
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>(name, index, "Act", action);
     }
   }
 }

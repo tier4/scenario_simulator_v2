@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/global_action.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
@@ -49,8 +49,8 @@ auto Storyboard::run() -> void
     try {
       story.evaluate();
       if (story.is<Story>()) index++;
-    } catch (const ScenarioFailure & e) {
-      throw ScenarioFailure(name, index, "Story", e);
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>(name, index, "Story", action);
     }
   }
 }

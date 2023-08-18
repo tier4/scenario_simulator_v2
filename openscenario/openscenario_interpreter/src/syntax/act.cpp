@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/act.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/maneuver_group.hpp>
 
 namespace openscenario_interpreter
@@ -39,8 +39,8 @@ auto Act::run() -> void
       assert(maneuver_group.is_also<ManeuverGroup>());
       maneuver_group.evaluate();
       index++;
-    } catch (const ScenarioFailure & e) {
-      throw ScenarioFailure(name, index, "ManeuverGroup", e);
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>(name, index, "ManeuverGroup", action);
     }
   }
 }

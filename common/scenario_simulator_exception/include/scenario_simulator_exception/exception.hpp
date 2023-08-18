@@ -15,9 +15,8 @@
 #ifndef SCENARIO_SIMULATOR_EXCEPTION__EXCEPTION_HPP_
 #define SCENARIO_SIMULATOR_EXCEPTION__EXCEPTION_HPP_
 
-#include <scenario_simulator_exception/concatenate.hpp>
-
 #include <memory>
+#include <scenario_simulator_exception/concatenate.hpp>
 #include <stdexcept>
 #include <utility>
 

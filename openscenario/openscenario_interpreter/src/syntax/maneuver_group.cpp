@@ -14,7 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/scenario_failure.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/maneuver_group.hpp>
 
 namespace openscenario_interpreter
@@ -43,8 +43,8 @@ auto ManeuverGroup::run() -> void
       assert(maneuver.is_also<Maneuver>());
       maneuver.evaluate();
       index++;
-    } catch (const ScenarioFailure & e) {
-      throw ScenarioFailure(name, index, "Maneuver", e);
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>(name, index, "Maneuver", action);
     }
   }
 }

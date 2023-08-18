@@ -35,18 +35,13 @@ auto Trigger::evaluate() -> Object
    *
    * ---------------------------------------------------------------------- */
   // NOTE: Don't use std::any_of; Intentionally does not short-circuit evaluation.
-  try {
-    return asBoolean(
-      current_value = std::accumulate(
-        std::begin(*this), std::end(*this), false,
-        [&](auto && lhs, ConditionGroup & condition_group) {
-          const auto rhs = condition_group.evaluate();
-          return lhs or rhs.as<Boolean>();
-        }));
-  } catch (...) {
-    RCLCPP_WARN_STREAM(rclcpp::get_logger("#######"), "throw Trigger evaluate");
-    throw;
-  }
+  return asBoolean(
+    current_value = std::accumulate(
+      std::begin(*this), std::end(*this), false,
+      [&](auto && lhs, ConditionGroup & condition_group) {
+        const auto rhs = condition_group.evaluate();
+        return lhs or rhs.as<Boolean>();
+      }));
 }
 
 auto Trigger::activeConditionGroupIndex() const -> int
@@ -67,13 +62,10 @@ auto Trigger::activeConditionGroupDescription() const
   auto it = begin();
   std::advance(it, activeConditionGroupIndex());
   ConditionGroup const & cgroup = *it;
-  RCLCPP_WARN_STREAM(
-    rclcpp::get_logger("XXXXX"),
-    "size: " << cgroup.size() << " index: " << activeConditionGroupIndex());
-  std::vector<std::pair<std::string, std::string>> list;
+  std::vector<std::pair<std::string, std::string>> name_description_vec;
   for (auto itt = cgroup.begin(); itt != cgroup.end(); ++itt)
-    list.push_back(std::make_pair(itt->name, itt->description()));
-  return list;
+    name_description_vec.push_back(std::make_pair(itt->name, itt->description()));
+  return name_description_vec;
 }
 
 auto operator<<(nlohmann::json & json, const Trigger & datum) -> nlohmann::json &

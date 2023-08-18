@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/scenario_failure.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 
@@ -37,8 +37,8 @@ auto Maneuver::run() -> void
       assert(event.is_also<Event>());
       event.evaluate();
       index++;
-    } catch (const ScenarioFailure & e) {
-      throw ScenarioFailure(name, index, "Event", e);
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>(name, index, "Event", action);
     }
   }
 }

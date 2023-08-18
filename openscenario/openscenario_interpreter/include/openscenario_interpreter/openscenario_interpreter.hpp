@@ -21,7 +21,6 @@
 #include <lifecycle_msgs/msg/transition.hpp>
 #include <memory>
 #include <openscenario_interpreter/console/escape_sequence.hpp>
-#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
@@ -154,15 +153,9 @@ public:
       return handle(action);
     }
 
-    catch (
-      const ScenarioFailure & error) {  // from CustomCommandAction::exitFailure with description
-      set<common::junit::Failure>("ScenarioFailure", error.what());
-      return handle(error);
-    }
-
     catch (const SpecialAction<EXIT_FAILURE> & action)  // from CustomCommandAction::exitFailure
     {
-      set<common::junit::Failure>("Simulation failure", "Expected success");
+      set<common::junit::Failure>("Simulation failure", action.what());
       return handle(action);
     }
 

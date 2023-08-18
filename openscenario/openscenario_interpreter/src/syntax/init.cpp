@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/scenario_failure.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/init.hpp>
 
 namespace openscenario_interpreter
@@ -32,8 +32,8 @@ auto Init::evaluateInstantaneousActions() -> Object
   try {
     actions.startInstantaneousActions();
     actions.runInstantaneousActions();
-  } catch (const ScenarioFailure & e) {
-    throw ScenarioFailure("OpenSCENARIO.Storyboard.Init", e);
+  } catch (const SpecialAction<EXIT_FAILURE> & action) {
+    throw SpecialAction<EXIT_FAILURE>("OpenSCENARIO.Storyboard.Init", action);
   }
   return unspecified;
 }

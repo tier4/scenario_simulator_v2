@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CUSTOM_COMMAND_ACTION_HPP_
 
+#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <pugixml.hpp>
@@ -32,6 +33,14 @@ inline namespace syntax
 template <int Value>
 struct SpecialAction : public std::integral_constant<int, Value>
 {
+};
+
+template <>
+struct SpecialAction<EXIT_FAILURE> : public std::integral_constant<int, EXIT_FAILURE>,
+                                     public ScenarioFailure
+{
+  using ScenarioFailure::ScenarioFailure;
+  SpecialAction(const ScenarioFailure & failure) : ScenarioFailure{failure} {}
 };
 
 struct CustomCommand

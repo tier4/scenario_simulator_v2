@@ -14,7 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/scenario_failure.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 
 namespace openscenario_interpreter
@@ -63,10 +63,10 @@ auto Event::evaluate() -> Object
     return StoryboardElement::evaluate();
   } catch (const SpecialAction<EXIT_FAILURE> & action) {
     auto condition_group_index = start_trigger.activeConditionGroupIndex();
-    auto detailed_error =
-      ScenarioFailure(name, condition_group_index, "StartTrigger.ConditionGroup");
-    detailed_error.setCoreSource(start_trigger.activeConditionGroupDescription());
-    throw detailed_error;
+    auto detailed_action =
+      SpecialAction<EXIT_FAILURE>(name, condition_group_index, "StartTrigger.ConditionGroup");
+    detailed_action.setCoreSource(start_trigger.activeConditionGroupDescription());
+    throw detailed_action;
   }
 }
 

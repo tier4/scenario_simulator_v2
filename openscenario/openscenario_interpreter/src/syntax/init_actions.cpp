@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/scenario_failure.hpp>
 #include <openscenario_interpreter/syntax/action.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/init_actions.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/syntax/user_defined_action.hpp>
@@ -42,15 +42,7 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto InitActions::evaluate() -> Object
-{
-  try {
-    return StoryboardElement::evaluate();
-  } catch (const SpecialAction<EXIT_FAILURE> & action) {
-    RCLCPP_WARN_STREAM(rclcpp::get_logger("XXXXX"), "InitActions evaluate!!");
-    throw;
-  }
-}
+auto InitActions::evaluate() -> Object { return StoryboardElement::evaluate(); }
 
 auto InitActions::accomplished() const -> bool
 {
@@ -108,9 +100,9 @@ auto InitActions::startInstantaneousActions() -> void
       }
       index++;
     } catch (const SpecialAction<EXIT_FAILURE> & action) {
-      auto error = ScenarioFailure("Actions", index, "UserDefinedAction");
-      error.setInitActionAsSource();
-      throw error;
+      auto detailed_action = SpecialAction<EXIT_FAILURE>("Actions", index, "UserDefinedAction");
+      detailed_action.setInitActionAsSource();
+      throw detailed_action;
     }
   }
 
@@ -121,24 +113,14 @@ auto InitActions::startInstantaneousActions() -> void
 
 auto InitActions::startNonInstantaneousActions() -> void
 {
-  try {
-    RCLCPP_WARN_STREAM(rclcpp::get_logger("#######"), "run startNonInstantaneousActions: ");
-    // we don't call global actions here, because they are all instantaneous actions
-    for (auto && e : user_defined_actions) {
-      auto & user_defined_action = e.as<UserDefinedAction>();
-      if (not user_defined_action.endsImmediately()) {
-        user_defined_action.start();
-      }
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (not user_defined_action.endsImmediately()) {
+      user_defined_action.start();
     }
-    for (auto && e : privates) {
-      e.as<Private>().startNonInstantaneousActions();
-    }
-
-  } catch (...) {
-    RCLCPP_WARN_STREAM(
-      rclcpp::get_logger("#######"),
-      "throw " << typeid(std::current_exception()).name() << " startNonInstantaneousActions ");
-    throw;
+  }
+  for (auto && e : privates) {
+    e.as<Private>().startNonInstantaneousActions();
   }
 }
 
@@ -162,22 +144,15 @@ auto InitActions::runInstantaneousActions() -> void
 
 auto InitActions::runNonInstantaneousActions() -> void
 {
-  try {
-    // we don't call global actions here, because they are all instantaneous actions
-    for (auto && e : user_defined_actions) {
-      auto & user_defined_action = e.as<UserDefinedAction>();
-      if (not user_defined_action.endsImmediately()) {
-        user_defined_action.run();
-      }
+  // we don't call global actions here, because they are all instantaneous actions
+  for (auto && e : user_defined_actions) {
+    auto & user_defined_action = e.as<UserDefinedAction>();
+    if (not user_defined_action.endsImmediately()) {
+      user_defined_action.run();
     }
-    for (auto && e : privates) {
-      e.as<Private>().runNonInstantaneousActions();
-    }
-  } catch (...) {
-    RCLCPP_WARN_STREAM(
-      rclcpp::get_logger("#######"),
-      "throw " << typeid(std::current_exception()).name() << " runNonInstantaneousActions ");
-    throw;
+  }
+  for (auto && e : privates) {
+    e.as<Private>().runNonInstantaneousActions();
   }
 }
 

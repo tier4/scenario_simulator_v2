@@ -41,33 +41,12 @@ auto Action::endsImmediately() const -> bool
 
 auto Action::run() -> void
 {
-  try {
-    RCLCPP_WARN_STREAM(rclcpp::get_logger("#######"), "run Action: " << name);
-    return apply<void>([](auto && action) { return action.run(); }, *this);
-  } catch (...) {
-    RCLCPP_WARN_STREAM(
-      rclcpp::get_logger("#######"),
-      "throw " << typeid(std::current_exception()).name() << " run Action " << name);
-    throw;
-  }
+  return apply<void>([](auto && action) { return action.run(); }, *this);
 }
 
 auto Action::start() -> void
 {
-  try {
-    RCLCPP_WARN_STREAM(rclcpp::get_logger("#######"), "start Action: " << name);
-    return apply<void>([](auto && action) { return action.start(); }, *this);
-  } catch (const SpecialAction<EXIT_FAILURE> & action) {
-    RCLCPP_WARN_STREAM(
-      rclcpp::get_logger("#######"), "throw " << typeid(std::current_exception()).name()
-                                              << " start Action - SpecialAction" << name);
-    throw;
-  } catch (...) {
-    RCLCPP_WARN_STREAM(
-      rclcpp::get_logger("#######"),
-      "throw " << typeid(std::current_exception()).name() << " start Action " << name);
-    throw;
-  }
+  return apply<void>([](auto && action) { return action.start(); }, *this);
 }
 
 auto Action::stop() -> void
