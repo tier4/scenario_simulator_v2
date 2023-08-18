@@ -17,21 +17,19 @@
 
 namespace traffic_simulator
 {
-SimulationClock::SimulationClock()
+SimulationClock::SimulationClock(double realtime_factor, double frame_rate)
 : rclcpp::Clock(RCL_ROS_TIME),
   use_raw_clock(true),
+  realtime_factor(realtime_factor),
+  frame_rate(frame_rate),
   step_time_duration_(rclcpp::Duration::from_seconds(0)),
   initialized_(false),
   is_npc_logic_started_(false)
 {
-}
-
-auto SimulationClock::initialize(double initial_simulation_time, double step_time) -> void
-{
   initialized_ = true;
-  initial_simulation_time_ = initial_simulation_time;
-  current_simulation_time_ = initial_simulation_time_;
-  step_time_ = step_time;
+  initial_simulation_time_ = 0;
+  current_simulation_time_ = 0;
+  step_time_ = 1.0 / frame_rate * realtime_factor;
   step_time_duration_ = rclcpp::Duration::from_seconds(step_time_);
   time_on_initialize_ = now();
 }

@@ -146,15 +146,13 @@ auto API::setEntityStatus(
   setEntityStatus(name, canonicalize(status));
 }
 
-bool API::initialize(double realtime_factor, double step_time)
+bool API::initialize(double realtime_factor, double)
 {
-  clock_.initialize(-1 * configuration.initialize_duration, step_time);
-
   if (configuration.standalone_mode) {
     return true;
   } else {
     simulation_api_schema::InitializeRequest req;
-    req.set_step_time(step_time);
+    req.set_step_time(clock_.getStepTime());
     req.set_realtime_factor(realtime_factor);
     req.set_initialize_time(clock_.getCurrentSimulationTime());
     simulation_interface::toProto(clock_.getCurrentRosTime(), *req.mutable_initialize_ros_time());

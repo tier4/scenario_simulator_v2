@@ -23,7 +23,7 @@ namespace traffic_simulator
 class SimulationClock : rclcpp::Clock
 {
 public:
-  explicit SimulationClock();
+  explicit SimulationClock(double realtime_factor = 1.0, double frame_rate = 30);
 
   auto getCurrentRosTime() -> rclcpp::Time;
 
@@ -35,13 +35,15 @@ public:
 
   auto getStepTime() const { return step_time_; }
 
-  auto initialize(double initial_simulation_time, double step_time) -> void;
-
   auto onNpcLogicStart() -> void;
 
   auto update() -> void;
 
   const bool use_raw_clock;
+
+  double realtime_factor;
+
+  double frame_rate;
 
 private:
   rclcpp::Duration step_time_duration_;
