@@ -14,6 +14,7 @@
 
 #include <concealer/autoware_universe.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
+#include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
 namespace vehicle_simulation
@@ -177,11 +178,65 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
+#define LINE() \
+  std::cout << "\x1b[33m" __FILE__ "\x1b[31m:\x1b[36m" << __LINE__ << "\x1b[0m" << std::endl
+
+#define PRINT(...) std::cout << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
+
 void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_started)
 {
   autoware->rethrow();
 
   if (npc_logic_started) {
+    if (auto status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
+          status_, polyline_trajectory, traffic_simulator_msgs::msg::BehaviorParameter(),
+          step_time);
+        status) {
+      // const auto previous_status = status_;
+      //
+      // const auto previous_linear_velocity = previous_linear_velocity_;
+
+      auto world_relative_position = [&]() -> Eigen::VectorXd {
+        auto v = Eigen::VectorXd(3);
+        v(0) = status->pose.position.x - initial_pose_.position.x;
+        v(1) = status->pose.position.y - initial_pose_.position.y;
+        v(2) = status->pose.position.z - initial_pose_.position.z;
+        return quaternion_operation::getRotationMatrix(initial_pose_.orientation).transpose() * v;
+      }();
+
+      const auto yaw = [&]() {
+        return 0.0;  // Dummy value.
+      }();
+
+      const auto vx = [&]() {
+        auto traveled_distance = std::hypot(
+          status->pose.position.x - status_.pose.position.x,
+          status->pose.position.y - status_.pose.position.y,
+          status->pose.position.z - status_.pose.position.z);
+        auto v = Eigen::VectorXd(3);
+        v(0) = traveled_distance / step_time;
+        v(1) = 0;
+        v(2) = 0;
+        v = quaternion_operation::getRotationMatrix(initial_pose_.orientation).transpose() * v;
+        return v(0) - (previous_linear_velocity_ ? *previous_linear_velocity_ : 0.0);
+      }();
+
+      auto v = Eigen::VectorXd(vehicle_model_ptr_->getDimX());
+
+      v(0) = world_relative_position(0);
+      v(1) = world_relative_position(1);
+      v(2) = yaw;
+      v(3) = vx;
+
+      vehicle_model_ptr_->setState(v);
+
+      setStatus(*status);
+
+      updatePreviousValues();
+
+      return;
+    }
+
     Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
 
     switch (vehicle_model_type_) {
