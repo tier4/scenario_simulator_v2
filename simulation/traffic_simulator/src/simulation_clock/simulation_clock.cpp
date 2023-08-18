@@ -23,10 +23,8 @@ SimulationClock::SimulationClock(double realtime_factor, double frame_rate)
   realtime_factor(realtime_factor),
   frame_rate(frame_rate),
   step_time_duration_(rclcpp::Duration::from_seconds(0)),
-  initialized_(false),
   is_npc_logic_started_(false)
 {
-  initialized_ = true;
   current_simulation_time_ = 0;
   step_time_ = 1.0 / frame_rate * realtime_factor;
   step_time_duration_ = rclcpp::Duration::from_seconds(step_time_);
@@ -35,9 +33,6 @@ SimulationClock::SimulationClock(double realtime_factor, double frame_rate)
 
 auto SimulationClock::update() -> void
 {
-  if (!initialized_) {
-    THROW_SIMULATION_ERROR("SimulationClock has not been initialized yet.");
-  }
   current_simulation_time_ = current_simulation_time_ + step_time_;
 }
 
@@ -50,9 +45,6 @@ auto SimulationClock::getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock
 
 auto SimulationClock::getCurrentRosTime() -> rclcpp::Time
 {
-  if (!initialized_) {
-    THROW_SIMULATION_ERROR("SimulationClock has not been initialized yet.");
-  }
   if (use_raw_clock) {
     return now();
   } else {

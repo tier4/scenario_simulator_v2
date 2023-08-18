@@ -51,7 +51,6 @@ private:
   double current_simulation_time_;
   double step_time_;
   double scenario_time_offset_;
-  bool initialized_;
   bool is_npc_logic_started_;
 };
 }  // namespace traffic_simulator
