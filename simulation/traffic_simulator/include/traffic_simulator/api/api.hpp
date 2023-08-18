@@ -63,8 +63,8 @@ class API
   using EntityManager = traffic_simulator::entity::EntityManager;
 
 public:
-  template <class NodeT, class AllocatorT = std::allocator<void>>
-  explicit API(NodeT && node, const Configuration & configuration = Configuration())
+  template <typename NodeT, typename AllocatorT = std::allocator<void>>
+  explicit API(NodeT && node, const Configuration & configuration)
   : configuration(configuration),
     entity_manager_ptr_(std::make_shared<EntityManager>(node, configuration)),
     traffic_controller_ptr_(std::make_shared<traffic_simulator::traffic::TrafficController>(
@@ -76,6 +76,7 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
+    clock_(),
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
