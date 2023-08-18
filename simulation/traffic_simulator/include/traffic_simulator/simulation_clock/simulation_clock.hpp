@@ -23,15 +23,24 @@ namespace traffic_simulator
 class SimulationClock : rclcpp::Clock
 {
 public:
-  SimulationClock(rcl_clock_type_t clock_type = RCL_ROS_TIME, bool use_raw_clock = true);
-  void initialize(double initial_simulation_time, double step_time);
-  void update();
-  double getCurrentSimulationTime() const { return current_simulation_time_; }
-  double getCurrentScenarioTime() const;
-  double getStepTime() const { return step_time_; }
-  void onNpcLogicStart();
-  const rclcpp::Time getCurrentRosTime();
-  const rosgraph_msgs::msg::Clock getCurrentRosTimeAsMsg();
+  explicit SimulationClock();
+
+  auto getCurrentRosTime() -> rclcpp::Time;
+
+  auto getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock;
+
+  auto getCurrentScenarioTime() const -> double;
+
+  auto getCurrentSimulationTime() const { return current_simulation_time_; }
+
+  auto getStepTime() const { return step_time_; }
+
+  auto initialize(double initial_simulation_time, double step_time) -> void;
+
+  auto onNpcLogicStart() -> void;
+
+  auto update() -> void;
+
   const bool use_raw_clock;
 
 private:

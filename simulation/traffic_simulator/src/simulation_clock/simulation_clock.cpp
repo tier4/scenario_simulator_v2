@@ -17,16 +17,16 @@
 
 namespace traffic_simulator
 {
-SimulationClock::SimulationClock(rcl_clock_type_t clock_type, bool use_raw_clock)
-: rclcpp::Clock(clock_type),
-  use_raw_clock(use_raw_clock),
+SimulationClock::SimulationClock()
+: rclcpp::Clock(RCL_ROS_TIME),
+  use_raw_clock(true),
   step_time_duration_(rclcpp::Duration::from_seconds(0)),
   initialized_(false),
   is_npc_logic_started_(false)
 {
 }
 
-void SimulationClock::initialize(double initial_simulation_time, double step_time)
+auto SimulationClock::initialize(double initial_simulation_time, double step_time) -> void
 {
   initialized_ = true;
   initial_simulation_time_ = initial_simulation_time;
@@ -36,7 +36,7 @@ void SimulationClock::initialize(double initial_simulation_time, double step_tim
   time_on_initialize_ = now();
 }
 
-void SimulationClock::update()
+auto SimulationClock::update() -> void
 {
   if (!initialized_) {
     THROW_SIMULATION_ERROR("SimulationClock has not been initialized yet.");
@@ -44,14 +44,14 @@ void SimulationClock::update()
   current_simulation_time_ = current_simulation_time_ + step_time_;
 }
 
-const rosgraph_msgs::msg::Clock SimulationClock::getCurrentRosTimeAsMsg()
+auto SimulationClock::getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock
 {
   rosgraph_msgs::msg::Clock clock;
   clock.clock = getCurrentRosTime();
   return clock;
 }
 
-const rclcpp::Time SimulationClock::getCurrentRosTime()
+auto SimulationClock::getCurrentRosTime() -> rclcpp::Time
 {
   if (!initialized_) {
     THROW_SIMULATION_ERROR("SimulationClock has not been initialized yet.");
@@ -64,7 +64,7 @@ const rclcpp::Time SimulationClock::getCurrentRosTime()
   }
 }
 
-void SimulationClock::onNpcLogicStart()
+auto SimulationClock::onNpcLogicStart() -> void
 {
   if (is_npc_logic_started_) {
     THROW_SIMULATION_ERROR(
@@ -74,7 +74,7 @@ void SimulationClock::onNpcLogicStart()
   scenario_time_offset_ = getCurrentSimulationTime();
 }
 
-double SimulationClock::getCurrentScenarioTime() const
+auto SimulationClock::getCurrentScenarioTime() const -> double
 {
   if (!is_npc_logic_started_) {
     return std::numeric_limits<double>::quiet_NaN();
