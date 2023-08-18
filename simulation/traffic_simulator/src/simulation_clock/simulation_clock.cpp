@@ -22,18 +22,13 @@ SimulationClock::SimulationClock(double realtime_factor, double frame_rate)
   use_raw_clock(true),
   realtime_factor(realtime_factor),
   frame_rate(frame_rate),
-  step_time_duration_(rclcpp::Duration::from_seconds(0)),
-  is_npc_logic_started_(false)
+  time_on_initialize(now())
 {
-  current_simulation_time_ = 0;
-  step_time_ = 1.0 / frame_rate * realtime_factor;
-  step_time_duration_ = rclcpp::Duration::from_seconds(step_time_);
-  time_on_initialize_ = now();
 }
 
 auto SimulationClock::update() -> void
 {
-  current_simulation_time_ = current_simulation_time_ + step_time_;
+  current_simulation_time_ = current_simulation_time_ + getStepTime();
 }
 
 auto SimulationClock::getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock
@@ -48,7 +43,7 @@ auto SimulationClock::getCurrentRosTime() -> rclcpp::Time
   if (use_raw_clock) {
     return now();
   } else {
-    return time_on_initialize_ + rclcpp::Duration::from_seconds(current_simulation_time_);
+    return time_on_initialize + rclcpp::Duration::from_seconds(current_simulation_time_);
   }
 }
 

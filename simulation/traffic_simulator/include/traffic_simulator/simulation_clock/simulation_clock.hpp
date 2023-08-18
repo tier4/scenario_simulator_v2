@@ -33,7 +33,7 @@ public:
 
   auto getCurrentSimulationTime() const { return current_simulation_time_; }
 
-  auto getStepTime() const { return step_time_; }
+  auto getStepTime() const { return 1.0 / frame_rate * realtime_factor; }
 
   auto onNpcLogicStart() -> void;
 
@@ -45,13 +45,14 @@ public:
 
   double frame_rate;
 
+  const rclcpp::Time time_on_initialize;
+
 private:
-  rclcpp::Duration step_time_duration_;
-  rclcpp::Time time_on_initialize_;
-  double current_simulation_time_;
-  double step_time_;
+  double current_simulation_time_ = 0;
+
   double scenario_time_offset_;
-  bool is_npc_logic_started_;
+
+  bool is_npc_logic_started_ = false;
 };
 }  // namespace traffic_simulator
 
