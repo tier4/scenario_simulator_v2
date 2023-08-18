@@ -17,13 +17,7 @@
 
 #include <exception>
 #include <iomanip>
-#include <openscenario_interpreter/error.hpp>
-#include <openscenario_interpreter/syntax/custom_command_action.hpp>
-#include <openscenario_interpreter/utility/demangle.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <stdexcept>
-
-#include "syntax/custom_command_action.hpp"
 
 namespace openscenario_interpreter
 {
@@ -33,16 +27,16 @@ struct ScenarioFailure : public std::runtime_error
 private:
   struct CoreSource
   {
-    CoreSource() : without_condition_{true} {}
+    CoreSource() = default;
 
-    CoreSource(const std::vector<std::pair<std::string, std::string>> & conditions_list)
-    : single_{conditions_list.size() == 1}, without_condition_{false}
+    explicit CoreSource(const std::vector<std::pair<std::string, std::string>> & conditions_list)
+    : single_{conditions_list.size() == 1}
     {
       anonymous_ = std::any_of(
         conditions_list.begin(), conditions_list.end(),
         [](const auto & pair) { return pair.first.empty(); });
 
-      std::stringstream element_name, description;
+      std::stringstream element_name(""), description("");
       if (single_) {
         element_name << std::quoted(conditions_list.front().first);
         description << conditions_list.front().second;
@@ -56,25 +50,25 @@ private:
             description << ", ";
           }
         }
-        element_name_ = element_name.str();
-        description_ = description.str();
       }
+      element_name_ = element_name.str();
+      description_ = description.str();
     }
 
     auto log() const -> const std::string & { return log_; }
 
-    auto logUpdate(const std::string & path) -> std::string
+    auto logUpdate(const std::string & trigger_path) -> std::string
     {
       std::stringstream log;
       log << "CustomCommandAction typed " << std::quoted("exitFailure") << " was triggered by the ";
-      if (without_condition_) {
-        log << " action (" << path << ")";
-      } else if (anonymous_ && single_) {
-        log << "anonymous condition (" << path << ".Condition[0]): " << description_;
+      if (element_name_.empty()) {
+        log << "action (" << trigger_path << ")";
+      } else if (single_ && anonymous_) {
+        log << "anonymous condition (" << trigger_path << ".Condition[0]): " << description_;
       } else if (single_) {
         log << "Condition named " << element_name_ << ": " << description_;
       } else if (anonymous_) {
-        log << "anonymous conditions (" << path << ".Condition[...]): " << description_;
+        log << "anonymous conditions (" << trigger_path << ".Condition[...]): " << description_;
       } else {
         log << "Conditions named {" << element_name_ << "}: " << description_;
       }
@@ -84,46 +78,49 @@ private:
 
   private:
     bool anonymous_{false}, single_{true}, without_condition_{false};
-    std::string element_name_;
-    std::string description_;
-    std::string log_;
+    std::string element_name_{""};
+    std::string description_{""};
+    std::string log_{""};
   };
 
 public:
-  ScenarioFailure()
-  : source_name_{""}, element_index_{0}, inner_{nullptr}, core_{nullptr}, std::runtime_error{""} {};
+  ScenarioFailure() : std::runtime_error{""} {};
+  ~ScenarioFailure() = default;
   ScenarioFailure(const ScenarioFailure &) = default;
+  ScenarioFailure & operator=(const ScenarioFailure &) = default;
+  ScenarioFailure(ScenarioFailure &&) = default;
+  ScenarioFailure & operator=(ScenarioFailure &&) = default;
 
   // Constructor with no inner object -- first object
-  explicit ScenarioFailure(
+  ScenarioFailure(
     const std::string & source_name, int element_index, const std::string & element_name)
   : source_name_{source_name},
-    element_index_{element_index},
     inner_{nullptr},
     core_{nullptr},
-    std::runtime_error{ScenarioFailure::formatName("", element_index, element_name)}
+    std::runtime_error{ScenarioFailure::formatSubpath("", element_index, element_name)}
   {
   }
 
   // Constructor with inner object and current source (to be forwarded) -- intermediate object
-  explicit ScenarioFailure(
+  ScenarioFailure(
     const std::string & source_name, int element_index, const std::string & element_name,
     ScenarioFailure const & inner)
   : source_name_{source_name},
-    element_index_{element_index},
+
     inner_{std::make_shared<ScenarioFailure>(inner)},
     core_{inner.core_},
-    std::runtime_error{ScenarioFailure::formatName(inner.source_name_, element_index, element_name)}
+    std::runtime_error{
+      ScenarioFailure::formatSubpath(inner.source_name_, element_index, element_name)}
   {
   }
 
   // Constructor with inner but without current source -- last object
-  explicit ScenarioFailure(const std::string & element_name, const ScenarioFailure & inner)
+  ScenarioFailure(const std::string & element_name, const ScenarioFailure & inner)
   : source_name_{""},
-    element_index_{0},
+
     inner_{std::make_shared<ScenarioFailure>(inner)},
     core_{inner.core_},
-    std::runtime_error{ScenarioFailure::formatName(inner.source_name_, element_name)}
+    std::runtime_error{ScenarioFailure::formatSubpath(inner.source_name_, element_name)}
   {
   }
 
@@ -160,28 +157,28 @@ private:
     return std::runtime_error::what();
   }
 
-  static auto formatName(const std::string & inner_source_name, const std::string & element_name)
+  static auto formatSubpath(const std::string & inner_source_name, const std::string & element_name)
     -> std::string
   {
     return inner_source_name.empty() ? element_name : element_name + "." + inner_source_name;
   }
 
-  static auto formatName(
+  static auto formatSubpath(
     const std::string & inner_source_name, int element_index, const std::string & element_name)
     -> std::string
   {
-    std::stringstream ss;
+    std::stringstream ss("");
+    ss << '.' << element_name;
     if (!inner_source_name.empty())
-      ss << '.' << element_name << "[" << std::quoted(inner_source_name) << "]";
+      ss << "[" << std::quoted(inner_source_name) << "]";
     else
-      ss << '.' << element_name << '[' << element_index << ']';
+      ss << '[' << element_index << ']';
     return ss.str();
   }
 
-  std::shared_ptr<CoreSource> core_;
-  const std::shared_ptr<const ScenarioFailure> inner_;
-  const std::string source_name_;
-  const int element_index_;
+  std::shared_ptr<CoreSource> core_{nullptr};
+  const std::shared_ptr<const ScenarioFailure> inner_{nullptr};
+  const std::string source_name_{""};
 };
 
 }  // namespace openscenario_interpreter
