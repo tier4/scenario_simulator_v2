@@ -49,7 +49,6 @@ private:
   rclcpp::Duration step_time_duration_;
   rclcpp::Time time_on_initialize_;
   double current_simulation_time_;
-  double initial_simulation_time_;
   double step_time_;
   double scenario_time_offset_;
   bool initialized_;

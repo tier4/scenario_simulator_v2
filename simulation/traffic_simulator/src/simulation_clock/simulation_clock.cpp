@@ -27,7 +27,6 @@ SimulationClock::SimulationClock(double realtime_factor, double frame_rate)
   is_npc_logic_started_(false)
 {
   initialized_ = true;
-  initial_simulation_time_ = 0;
   current_simulation_time_ = 0;
   step_time_ = 1.0 / frame_rate * realtime_factor;
   step_time_duration_ = rclcpp::Duration::from_seconds(step_time_);
@@ -57,8 +56,7 @@ auto SimulationClock::getCurrentRosTime() -> rclcpp::Time
   if (use_raw_clock) {
     return now();
   } else {
-    return time_on_initialize_ +
-           rclcpp::Duration::from_seconds(current_simulation_time_ - initial_simulation_time_);
+    return time_on_initialize_ + rclcpp::Duration::from_seconds(current_simulation_time_);
   }
 }
 
