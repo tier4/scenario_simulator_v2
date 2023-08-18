@@ -50,6 +50,9 @@ public:
     -> std::optional<double>;
   auto getIntersection2D(const LineSegment & line) const
     -> std::optional<geometry_msgs::msg::Point>;
+  auto getSValue(
+    const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
+    -> std::optional<double>;
   auto getVector() const -> geometry_msgs::msg::Vector3;
   auto getNormalVector() const -> geometry_msgs::msg::Vector3;
   auto get2DVector() const -> geometry_msgs::msg::Vector3;

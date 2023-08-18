@@ -402,16 +402,43 @@ auto CatmullRomSpline::getSValue(
   const geometry_msgs::msg::Pose & pose, const double threshold_distance) const
   -> std::optional<double>
 {
-  double s = 0;
-  for (size_t i = 0; i < curves_.size(); i++) {
-    auto s_value = curves_[i].getSValue(pose, threshold_distance, true);
-    if (s_value) {
-      s = s + s_value.value();
-      return s;
-    }
-    s = s + curves_[i].getLength();
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "If this message was displayed, something completely unexpected happens.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      if (
+        std::pow(control_points[0].x - pose.position.x, 2) +
+          std::pow(control_points[0].y - pose.position.y, 2) <=
+        std::numeric_limits<double>::epsilon()) {
+        return 0.0;
+      }
+      return std::nullopt;
+    case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be 1 when the spline have 2 control points.",
+          "Something completely unexpected happened.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
+      return line_segments_[0].getSValue(pose, threshold_distance, true);
+    case 3:
+      double s = 0;
+      for (size_t i = 0; i < curves_.size(); i++) {
+        auto s_value = curves_[i].getSValue(pose, threshold_distance, true);
+        if (s_value) {
+          s = s + s_value.value();
+          return s;
+        }
+        s = s + curves_[i].getLength();
+      }
+      return std::nullopt;
   }
-  return std::nullopt;
 }
 
 auto CatmullRomSpline::getSquaredDistanceIn2D(

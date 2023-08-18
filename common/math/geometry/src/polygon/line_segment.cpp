@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <geometry/transform.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <optional>
@@ -108,6 +109,19 @@ auto LineSegment::getPose(const double s, const bool denormalize_s) const
 auto LineSegment::isIntersect2D(const geometry_msgs::msg::Point & point) const -> bool
 {
   return getIntersection2DSValue(point, true) ? true : false;
+}
+
+auto LineSegment::getSValue(
+  const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
+  -> std::optional<double>
+{
+  return getIntersection2DSValue(
+    LineSegment(
+      math::geometry::transformPoint(
+        pose, geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(threshold_distance).z(0)),
+      math::geometry::transformPoint(
+        pose, geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-threshold_distance).z(0))),
+    denormalize_s);
 }
 
 /**
