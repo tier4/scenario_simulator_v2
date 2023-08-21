@@ -72,7 +72,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   EntityStatus status;
-  status.time = clock_.getCurrentSimulationTime();
+  status.time = clock_.getCurrentScenarioTime();
   status.pose =
     entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
   status.action_status = action_status;
@@ -111,10 +111,7 @@ auto API::setEntityStatus(
   status.bounding_box = getBoundingBox(name);
   status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
   status.name = name;
-  const auto current_time = getCurrentTime();
-  if (std::isnan(current_time)) {
-    status.time = current_time;
-  } else {
+  if (status.time = clock_.getCurrentScenarioTime(); std::isnan(status.time)) {
     status.time = 0;
   }
   status.action_status = action_status;
@@ -136,10 +133,7 @@ auto API::setEntityStatus(
   status.pose = map_pose;
   status.name = name;
   status.action_status = action_status;
-  const auto current_time = getCurrentTime();
-  if (std::isnan(current_time)) {
-    status.time = current_time;
-  } else {
+  if (status.time = clock_.getCurrentScenarioTime(); std::isnan(status.time)) {
     status.time = 0;
   }
   status.bounding_box = getBoundingBox(name);
@@ -254,6 +248,7 @@ bool API::updateFrame()
     if (configuration.standalone_mode) {
       THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
     }
+
     if (not entity_manager_ptr_->isEgoSpawned()) {
       THROW_SIMULATION_ERROR(
         "This exception is basically not supposed to be sent. Contact the developer as there is "
@@ -271,7 +266,7 @@ bool API::updateFrame()
     entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
   }
 
-  entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
+  entity_manager_ptr_->update(clock_.getCurrentScenarioTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
@@ -281,11 +276,12 @@ bool API::updateFrame()
     if (!updateTrafficLightsInSim()) {
       return false;
     }
-    simulation_api_schema::UpdateFrameRequest req;
-    req.set_current_time(clock_.getCurrentSimulationTime());
+    simulation_api_schema::UpdateFrameRequest request;
+    request.set_current_simulation_time(clock_.getCurrentSimulationTime());
+    request.set_current_scenario_time(clock_.getCurrentScenarioTime());
     simulation_interface::toProto(
-      clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
-    if (not zeromq_client_.call(req).result().success()) {
+      clock_.getCurrentRosTimeAsMsg().clock, *request.mutable_current_ros_time());
+    if (not zeromq_client_.call(request).result().success()) {
       return false;
     }
     entity_manager_ptr_->broadcastEntityTransform();

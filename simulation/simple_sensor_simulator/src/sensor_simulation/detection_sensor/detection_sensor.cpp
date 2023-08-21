@@ -74,8 +74,10 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::apply
 
 template <>
 auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
-  const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
-  const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity) -> void
+  const double current_simulation_time,
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
+  const rclcpp::Time & current_ros_time, const std::vector<std::string> & lidar_detected_entities)
+  -> void
 {
   auto makeObjectClassification = [](const auto & label) {
     autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
@@ -83,13 +85,15 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     object_classification.probability = 1;
     return object_classification;
   };
-  if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
-    const std::vector<std::string> detected_objects{
-      configuration_.filter_by_range() ? getDetectedObjects(statuses) : lidar_detected_entity};
+  if (
+    current_simulation_time - previous_simulation_time_ - configuration_.update_duration() >=
+    -0.002) {
+    const std::vector<std::string> detected_objects =
+      configuration_.filter_by_range() ? getDetectedObjects(statuses) : lidar_detected_entities;
     autoware_auto_perception_msgs::msg::DetectedObjects msg;
-    msg.header.stamp = stamp;
+    msg.header.stamp = current_ros_time;
     msg.header.frame_id = "map";
-    last_update_stamp_ = current_time;
+    previous_simulation_time_ = current_simulation_time;
     for (const auto & status : statuses) {
       if (
         std::find(detected_objects.begin(), detected_objects.end(), status.name()) !=
@@ -164,9 +168,11 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
       }
     }
 
-    queue_objects_.push(std::make_pair(msg, current_time));
+    queue_objects_.push(std::make_pair(msg, current_simulation_time));
     autoware_auto_perception_msgs::msg::DetectedObjects delayed_objects;
-    if (current_time - queue_objects_.front().second >= configuration_.object_recognition_delay()) {
+    if (
+      current_simulation_time - queue_objects_.front().second >=
+      configuration_.object_recognition_delay()) {
       delayed_objects = queue_objects_.front().first;
       queue_objects_.pop();
     }

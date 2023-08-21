@@ -31,14 +31,14 @@ namespace simple_sensor_simulator
 class DetectionSensorBase
 {
 protected:
-  double last_update_stamp_;
+  double previous_simulation_time_;
 
   simulation_api_schema::DetectionSensorConfiguration configuration_;
 
   explicit DetectionSensorBase(
-    const double last_update_stamp,
+    const double current_simulation_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration)
-  : last_update_stamp_(last_update_stamp), configuration_(configuration)
+  : previous_simulation_time_(current_simulation_time), configuration_(configuration)
   {
   }
 
@@ -52,8 +52,9 @@ public:
   virtual ~DetectionSensorBase() = default;
 
   virtual void update(
-    const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    const std::vector<std::string> & lidar_detected_entity) = 0;
+    const double current_simulation_time, const std::vector<traffic_simulator_msgs::EntityStatus> &,
+    const rclcpp::Time & current_ros_time,
+    const std::vector<std::string> & lidar_detected_entities) = 0;
 };
 
 template <typename T>
@@ -70,10 +71,10 @@ class DetectionSensor : public DetectionSensorBase
 
 public:
   explicit DetectionSensor(
-    const double current_time,
+    const double current_simulation_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher)
-  : DetectionSensorBase(current_time, configuration),
+  : DetectionSensorBase(current_simulation_time, configuration),
     publisher_ptr_(publisher),
     random_engine_(configuration.random_seed())
   {
