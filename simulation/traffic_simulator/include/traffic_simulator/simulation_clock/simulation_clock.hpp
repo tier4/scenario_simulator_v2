@@ -37,6 +37,8 @@ public:
 
   auto onNpcLogicStart() -> void;
 
+  auto started() const { return not std::isnan(scenario_time_offset_); }
+
   auto update() -> void;
 
   const bool use_raw_clock;
@@ -50,9 +52,7 @@ public:
 private:
   double current_simulation_time_ = 0;
 
-  double scenario_time_offset_;
-
-  bool is_npc_logic_started_ = false;
+  double scenario_time_offset_ = std::numeric_limits<double>::quiet_NaN();
 };
 }  // namespace traffic_simulator
 
