@@ -19,6 +19,7 @@
 #include <geometry/transform.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <iostream>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -69,14 +70,14 @@ auto LineSegment::getPoint(const double s, const bool denormalize_s) const
       "Invalid S value is specified, while getting point on a line segment.",
       "The range of s_normalized value should be in range [0,", getLength(), "].",
       "But, your values are = ", s, " and length = ", getLength(),
-      "This message is not originally intended to be displayed, if you see it, please "
+      " This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   } else {
     THROW_SIMULATION_ERROR(
       "Invalid S value is specified, while getting point on a line segment.",
       "The range of s_normalized value should be in range [0,1].", "But, your values are = ", s,
       " and length = ", getLength(),
-      "This message is not originally intended to be displayed, if you see it, please "
+      " This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   }
 }
@@ -199,9 +200,9 @@ auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool d
     if (!isIntersect2D(line)) {
       return std::optional<double>();
     }
-    const auto det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
-                     (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
-    const auto s =
+    const double det = (start_point.x - end_point.x) * (line.end_point.y - line.start_point.y) -
+                       (line.end_point.x - line.start_point.x) * (start_point.y - end_point.y);
+    const double s =
       1 - ((line.end_point.y - line.start_point.y) * (line.end_point.x - end_point.x) +
            (line.start_point.x - line.end_point.x) * (line.end_point.y - end_point.y)) /
             det;
@@ -212,7 +213,7 @@ auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool d
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     }
-    return s;
+    return (0 <= s && s <= 1) ? std::optional<double>(s) : std::optional<double>();
   };
   return denormalize_s ? denormalize(get_s_normalized(line)) : get_s_normalized(line);
 }
