@@ -28,9 +28,22 @@ namespace traffic_simulator
 namespace entity
 {
 EntityBase::EntityBase(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status)
-: name(name), verbose(true), status_(entity_status), status_before_update_(status_)
+  const std::string & name, const CanonicalizedEntityStatus & entity_status,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+: name(name),
+  verbose(true),
+  status_(entity_status),
+  status_before_update_(status_),
+  hdmap_utils_ptr_(hdmap_utils_ptr),
+  npc_logic_started_(false)
 {
+  if (name != static_cast<EntityStatus>(entity_status).name) {
+    THROW_SIMULATION_ERROR(
+      "The name of the entity does not match the name of the entity listed in entity_status.",
+      " The name of the entity is ", name,
+      " and the name of the entity listed in entity_status is ",
+      static_cast<EntityStatus>(entity_status).name);
+  }
 }
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
@@ -47,62 +60,52 @@ void EntityBase::cancelRequest() {}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
-  const auto status = getStatus();
+  const auto bounding_box = getBoundingBox();
 
   std::vector<geometry_msgs::msg::Point> points_bbox;
   geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
 
-  p0.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p0.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p0.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p0.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p0.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p0.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p0);
 
-  p1.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p1.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p1.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p1.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p1.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p1.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p1);
 
-  p2.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p2.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p2.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p2.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p2.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p2.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p2);
 
-  p3.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p3.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p3.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p3.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p3.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p3.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p3);
 
-  p4.x = status.bounding_box.center.x + status.bounding_box.dimensions.x * 0.5;
-  p4.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p4.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p4.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p4.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p4.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p4);
 
-  p5.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p5.y = status.bounding_box.center.y + status.bounding_box.dimensions.y * 0.5;
-  p5.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p5.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p5.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p5.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p5);
 
-  p6.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p6.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p6.z = status.bounding_box.center.z + status.bounding_box.dimensions.z * 0.5;
+  p6.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p6.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p6.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p6);
 
-  p7.x = status.bounding_box.center.x - status.bounding_box.dimensions.x * 0.5;
-  p7.y = status.bounding_box.center.y - status.bounding_box.dimensions.y * 0.5;
-  p7.z = status.bounding_box.center.z - status.bounding_box.dimensions.z * 0.5;
+  p7.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p7.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p7.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
   points_bbox.emplace_back(p7);
 
   return math::geometry::get2DConvexHull(points_bbox);
-}
-
-auto EntityBase::getCurrentAccel() const -> geometry_msgs::msg::Accel
-{
-  return getStatus().action_status.accel;
-}
-
-auto EntityBase::getCurrentTwist() const -> geometry_msgs::msg::Twist
-{
-  return getStatus().action_status.twist;
 }
 
 auto EntityBase::getDistanceToLaneBound() -> double
@@ -183,94 +186,76 @@ auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & l
   return *std::min_element(distances.begin(), distances.end());
 }
 
-auto EntityBase::getDynamicConstraints() const
-  -> const traffic_simulator_msgs::msg::DynamicConstraints
+auto EntityBase::getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
 {
-  return getBehaviorParameter().dynamic_constraints;
-}
-
-auto EntityBase::getEntityStatusBeforeUpdate() const
-  -> const traffic_simulator_msgs::msg::EntityStatus &
-{
-  return status_before_update_;
-}
-
-auto EntityBase::getLinearJerk() const -> double { return getStatus().action_status.linear_jerk; }
-
-auto EntityBase::getLaneletPose() const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
-{
-  if (status_.lanelet_pose_valid) {
-    return status_.lanelet_pose;
+  if (laneMatchingSucceed()) {
+    return CanonicalizedLaneletPose(status_.getLaneletPose(), hdmap_utils_ptr_);
   }
   return std::nullopt;
 }
 
 auto EntityBase::getLaneletPose(double matching_distance) const
-  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+  -> std::optional<CanonicalizedLaneletPose>
 {
-  if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getStatus().type.type) {
-    return hdmap_utils_ptr_->toLaneletPose(
-      getMapPose(), getStatus().bounding_box, true, matching_distance);
+  if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getEntityType().type) {
+    if (
+      const auto lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), true, matching_distance)) {
+      return CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_);
+    }
   } else {
-    return hdmap_utils_ptr_->toLaneletPose(
-      getMapPose(), getStatus().bounding_box, false, matching_distance);
+    if (
+      const auto lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), false, matching_distance)) {
+      return CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_);
+    }
   }
+  return std::nullopt;
 }
 
-auto EntityBase::fillLaneletPose(
-  traffic_simulator_msgs::msg::EntityStatus & status, bool include_crosswalk) const -> void
+auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk) -> void
 {
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
 
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  auto status_non_canonicalized = static_cast<EntityStatus>(status);
 
   if (unique_route_lanelets.empty()) {
     lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      status.pose, getStatus().bounding_box, include_crosswalk, 1.0);
+      status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);
   } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(status_non_canonicalized.pose, unique_route_lanelets, 1.0);
     if (!lanelet_pose) {
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        status.pose, getStatus().bounding_box, include_crosswalk, 1.0);
+        status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);
     }
   }
   if (lanelet_pose) {
     math::geometry::CatmullRomSpline spline(
       hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
-    if (const auto s_value = spline.getSValue(status.pose)) {
-      status.pose.position.z = spline.getPoint(s_value.value()).z;
+    if (const auto s_value = spline.getSValue(status_non_canonicalized.pose)) {
+      status_non_canonicalized.pose.position.z = spline.getPoint(s_value.value()).z;
     }
   }
 
-  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-  if (status.lanelet_pose_valid) {
-    status.lanelet_pose = lanelet_pose.value();
+  status_non_canonicalized.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
+  if (status_non_canonicalized.lanelet_pose_valid) {
+    status_non_canonicalized.lanelet_pose = lanelet_pose.value();
   }
+  status = CanonicalizedEntityStatus(status_non_canonicalized, hdmap_utils_ptr_);
 }
 
-auto EntityBase::getMapPose() const -> geometry_msgs::msg::Pose { return getStatus().pose; }
-
-auto EntityBase::getMapPose(const geometry_msgs::msg::Pose & relative_pose)
+auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
   -> geometry_msgs::msg::Pose
 {
   tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(getStatus().pose, ref_transform);
+  tf2::fromMsg(getMapPose(), ref_transform);
   tf2::fromMsg(relative_pose, relative_transform);
   geometry_msgs::msg::Pose ret;
   tf2::toMsg(ref_transform * relative_transform, ret);
   return ret;
 }
-
-auto EntityBase::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &
-{
-  return status_;
-}
-
-auto EntityBase::getStandStillDuration() const -> double { return stand_still_duration_; }
-
-auto EntityBase::getTraveledDistance() const -> double { return traveled_distance_; }
-
-auto EntityBase::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
 {
@@ -316,25 +301,27 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::Constraint & constraint)
 {
   std::int64_t reference_lanelet_id = 0;
-  if (target.entity_name == name) {
-    if (!getStatus().lanelet_pose_valid) {
+  const auto lanelet_pose = getLaneletPose();
+  if (lanelet_pose && target.entity_name == name) {
+    if (!lanelet_pose) {
       THROW_SEMANTIC_ERROR(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");
     }
-    reference_lanelet_id = getStatus().lanelet_pose.lanelet_id;
+    reference_lanelet_id = static_cast<LaneletPose>(lanelet_pose.value()).lanelet_id;
   } else {
     if (other_status_.find(target.entity_name) == other_status_.end()) {
       THROW_SEMANTIC_ERROR(
         "Target entity : ", target.entity_name, " does not exist. Please check ",
         target.entity_name, " exists.");
     }
-    if (!other_status_.at(target.entity_name).lanelet_pose_valid) {
+    if (!other_status_.at(target.entity_name).laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");
     }
-    reference_lanelet_id = other_status_.at(target.entity_name).lanelet_pose.lanelet_id;
+    reference_lanelet_id =
+      static_cast<EntityStatus>(other_status_.at(target.entity_name)).lanelet_pose.lanelet_id;
   }
   const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
     reference_lanelet_id, target.direction, target.shift);
@@ -666,7 +653,7 @@ void EntityBase::requestSpeedChange(
 }
 
 auto EntityBase::requestFollowTrajectory(
-  const std::shared_ptr<follow_trajectory::Parameter<follow_trajectory::Polyline>> &) -> void
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void
 {
   THROW_SEMANTIC_ERROR(
     getEntityTypename(), " type entities do not support follow trajectory action.");
@@ -691,13 +678,8 @@ void EntityBase::setEntityTypeList(
   entity_type_list_ = entity_type_list;
 }
 
-void EntityBase::setHdMapUtils(const std::shared_ptr<hdmap_utils::HdMapUtils> & ptr)
-{
-  hdmap_utils_ptr_ = ptr;
-}
-
 void EntityBase::setOtherStatus(
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityStatus> & status)
+  const std::unordered_map<std::string, CanonicalizedEntityStatus> & status)
 {
   other_status_.clear();
   for (const auto & [other_name, other_status] : status) {
@@ -720,9 +702,9 @@ void EntityBase::setOtherStatus(
   }
 }
 
-auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void
+auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
 {
-  auto new_status = status;
+  auto new_status = static_cast<EntityStatus>(status);
 
   /*
      FIXME: DIRTY HACK!!!
@@ -732,26 +714,25 @@ auto EntityBase::setStatus(const traffic_simulator_msgs::msg::EntityStatus & sta
      for the lack of set status.
   */
   new_status.name = name;
-  new_status.type = status_.type;
-  new_status.subtype = status_.subtype;
-  new_status.bounding_box = status_.bounding_box;
+  new_status.type = getEntityType();
+  new_status.subtype = getEntitySubtype();
+  new_status.bounding_box = getBoundingBox();
   new_status.action_status.current_action = getCurrentAction();
-
-  status_ = new_status;
+  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
-  auto status = getStatus();
+  auto status = static_cast<EntityStatus>(getStatus());
   status.action_status.twist.linear.x = linear_velocity;
-  setStatus(status);
+  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 {
-  auto status = getStatus();
+  auto status = static_cast<EntityStatus>(getStatus());
   status.action_status.accel.linear.x = linear_acceleration;
-  setStatus(status);
+  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 void EntityBase::setTrafficLightManager(
@@ -776,22 +757,22 @@ void EntityBase::activateOutOfRangeJob(
      */
     [this, tolerance, max_velocity, min_velocity, min_acceleration, max_acceleration, min_jerk,
      max_jerk](double) {
-      auto velocity_ = status_.action_status.twist.linear.x;
-      auto accel_ = status_.action_status.accel.linear.x;
-      auto jerk_ = status_.action_status.linear_jerk;
-      if (!(min_velocity <= velocity_ + tolerance && velocity_ - tolerance <= max_velocity)) {
+      const auto velocity = getCurrentTwist().linear.x;
+      const auto accel = getCurrentAccel().linear.x;
+      const auto jerk = getLinearJerk();
+      if (!(min_velocity <= velocity + tolerance && velocity - tolerance <= max_velocity)) {
         THROW_SPECIFICATION_VIOLATION(
-          "Entity: ", name, " - current velocity (which is ", velocity_,
+          "Entity: ", name, " - current velocity (which is ", velocity,
           ") is out of range (which is [", min_velocity, ", ", max_velocity, "])");
       }
-      if (!(min_acceleration <= accel_ + tolerance && accel_ - tolerance <= max_acceleration)) {
+      if (!(min_acceleration <= accel + tolerance && accel - tolerance <= max_acceleration)) {
         THROW_SPECIFICATION_VIOLATION(
-          "Entity: ", name, " - current acceleration (which is ", accel_,
+          "Entity: ", name, " - current acceleration (which is ", accel,
           ") is out of range (which is [", min_acceleration, ", ", max_acceleration, "])");
       }
-      if (!(min_jerk <= jerk_ + tolerance && jerk_ - tolerance <= max_jerk)) {
+      if (!(min_jerk <= jerk + tolerance && jerk - tolerance <= max_jerk)) {
         THROW_SPECIFICATION_VIOLATION(
-          "Entity: ", name, " - current jerk (which is ", jerk_, ") is out of range (which is [",
+          "Entity: ", name, " - current jerk (which is ", jerk, ") is out of range (which is [",
           min_jerk, ", ", max_jerk, "])");
       }
       return false;
@@ -806,27 +787,30 @@ auto EntityBase::setVelocityLimit(double) -> void {}
 
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
-void EntityBase::stopAtEndOfRoad()
+void EntityBase::stopAtCurrentPosition()
 {
-  status_.action_status.twist = geometry_msgs::msg::Twist();
-  status_.action_status.accel = geometry_msgs::msg::Accel();
-  status_.action_status.linear_jerk = 0;
+  auto status = static_cast<EntityStatus>(getStatus());
+  status.action_status.twist = geometry_msgs::msg::Twist();
+  status.action_status.accel = geometry_msgs::msg::Accel();
+  status.action_status.linear_jerk = 0;
+  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
-  status_.time = current_time;
+  auto status = static_cast<EntityStatus>(getStatus());
+  status.time = current_time;
+  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
 }
 
 auto EntityBase::updateStandStillDuration(const double step_time) -> double
 {
   if (
     npc_logic_started_ and
-    std::abs(status_.action_status.twist.linear.x) <= std::numeric_limits<double>::epsilon()) {
+    std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
     return stand_still_duration_ += step_time;
-  } else {
-    return stand_still_duration_ = 0.0;
   }
+  return stand_still_duration_ = 0.0;
 }
 
 auto EntityBase::updateTraveledDistance(const double step_time) -> double

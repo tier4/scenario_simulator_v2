@@ -19,6 +19,7 @@
 
 #include <numeric>
 #include <ostream>
+#include <traffic_simulator/data_type/entity_status.hpp>
 
 #include "spdlog/fmt/fmt.h"
 #include "traffic_simulator_msgs/msg/action_status.hpp"
@@ -122,7 +123,7 @@ DEFINE_FMT_FORMATTER(
   v.current_action, v.twist, v.accel)
 
 DEFINE_FMT_FORMATTER(
-  traffic_simulator_msgs::msg::EntityStatus,
+  traffic_simulator::EntityStatus,
   "name {}, lanelet_pose: {}, pose: {}, action_status:{}"
   "time {}: lanelet_pose_valid: {}, type: {}",
   v.name, v.lanelet_pose, v.pose, v.action_status, v.time, v.lanelet_pose_valid, v.type)

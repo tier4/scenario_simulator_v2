@@ -44,7 +44,7 @@ struct RelativeWorldPosition : private SimulatorCore::CoordinateSystemConversion
 {
   const Orientation orientation;
 
-  const String reference;
+  const String entity_ref;
 
   const Double dx, dy, dz;
 

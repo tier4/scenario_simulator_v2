@@ -54,8 +54,7 @@ auto AssignRouteAction::start() -> void
 {
   for (const auto & object : global().entities->objects(actors)) {
     applyAssignRouteAction(
-      object,
-      static_cast<std::vector<traffic_simulator_msgs::msg::LaneletPose>>(route.as<const Route>()));
+      object, static_cast<std::vector<NativeLanePosition>>(route.as<const Route>()));
   }
 }
 }  // namespace syntax

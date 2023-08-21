@@ -33,12 +33,13 @@ auto AcquirePositionAction::start() -> void
       return applyAcquirePositionAction(object, static_cast<geometry_msgs::msg::Pose>(position));
     },
     [](const RelativeWorldPosition & position, auto && object) {
-      return applyAcquirePositionAction(
-        object, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
+      return applyAcquirePositionAction(object, static_cast<NativeLanePosition>(position));
+    },
+    [](const RelativeObjectPosition & position, auto && object) {
+      return applyAcquirePositionAction(object, static_cast<NativeLanePosition>(position));
     },
     [](const LanePosition & position, auto && object) {
-      return applyAcquirePositionAction(
-        object, static_cast<traffic_simulator_msgs::msg::LaneletPose>(position));
+      return applyAcquirePositionAction(object, static_cast<NativeLanePosition>(position));
     });
 
   for (const auto & object : global().entities->objects(actors)) {
