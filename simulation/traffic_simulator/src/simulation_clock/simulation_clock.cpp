@@ -44,18 +44,13 @@ auto SimulationClock::getCurrentRosTime() -> rclcpp::Time
   }
 }
 
-auto SimulationClock::onNpcLogicStart() -> void
+auto SimulationClock::start() -> void
 {
   if (started()) {
     THROW_SIMULATION_ERROR(
       "npc logic is already started. Please check simulation clock instance was destroyed.");
   } else {
-    scenario_time_offset_ = getCurrentSimulationTime();
+    frame_offset_ = frame_;
   }
-}
-
-auto SimulationClock::getCurrentScenarioTime() const -> double
-{
-  return getCurrentSimulationTime() - scenario_time_offset_;
 }
 }  // namespace traffic_simulator

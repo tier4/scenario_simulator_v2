@@ -308,7 +308,7 @@ void API::startNpcLogic()
     THROW_SIMULATION_ERROR("NPC logics are already started.");
   }
   entity_manager_ptr_->startNpcLogic();
-  clock_.onNpcLogicStart();
+  clock_.start();
 }
 
 auto API::requestFollowTrajectory(

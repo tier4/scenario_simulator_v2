@@ -29,15 +29,15 @@ public:
 
   auto getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock;
 
-  auto getCurrentScenarioTime() const -> double;
+  auto getCurrentScenarioTime() const { return (frame_ - frame_offset_) / frame_rate; }
 
   auto getCurrentSimulationTime() const { return frame_ / frame_rate; }
 
-  auto getStepTime() const { return 1.0 / frame_rate * realtime_factor; }
+  auto getStepTime() const { return realtime_factor / frame_rate; }
 
-  auto onNpcLogicStart() -> void;
+  auto start() -> void;
 
-  auto started() const { return not std::isnan(scenario_time_offset_); }
+  auto started() const { return not std::isnan(frame_offset_); }
 
   auto update() -> void;
 
@@ -50,9 +50,9 @@ public:
   const rclcpp::Time time_on_initialize;
 
 private:
-  std::size_t frame_ = 0;
+  double frame_ = 0;
 
-  double scenario_time_offset_ = std::numeric_limits<double>::quiet_NaN();
+  double frame_offset_ = std::numeric_limits<double>::quiet_NaN();
 };
 }  // namespace traffic_simulator
 
