@@ -26,7 +26,7 @@ SimulationClock::SimulationClock(double realtime_factor, double frame_rate)
 {
 }
 
-auto SimulationClock::update() -> void { current_simulation_time_ += getStepTime(); }
+auto SimulationClock::update() -> void { ++frame_; }
 
 auto SimulationClock::getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock
 {
@@ -40,7 +40,7 @@ auto SimulationClock::getCurrentRosTime() -> rclcpp::Time
   if (use_raw_clock) {
     return now();
   } else {
-    return time_on_initialize + rclcpp::Duration::from_seconds(current_simulation_time_);
+    return time_on_initialize + rclcpp::Duration::from_seconds(getCurrentSimulationTime());
   }
 }
 

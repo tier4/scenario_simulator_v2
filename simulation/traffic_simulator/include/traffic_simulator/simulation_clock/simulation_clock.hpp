@@ -31,7 +31,7 @@ public:
 
   auto getCurrentScenarioTime() const -> double;
 
-  auto getCurrentSimulationTime() const { return current_simulation_time_; }
+  auto getCurrentSimulationTime() const { return frame_ / frame_rate; }
 
   auto getStepTime() const { return 1.0 / frame_rate * realtime_factor; }
 
@@ -50,7 +50,7 @@ public:
   const rclcpp::Time time_on_initialize;
 
 private:
-  double current_simulation_time_ = 0;
+  std::size_t frame_ = 0;
 
   double scenario_time_offset_ = std::numeric_limits<double>::quiet_NaN();
 };

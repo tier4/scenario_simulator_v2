@@ -14,6 +14,8 @@
 //
 // Co-developed by TIER IV, Inc. and Robotec.AI sp. z o.o.
 
+#include <spdlog/fmt/fmt.h>
+
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/optional/optional_io.hpp>
 #include <memory>
@@ -22,7 +24,6 @@
 #include <random_test_runner/random_test_runner.hpp>
 #include <random_test_runner/test_randomizer.hpp>
 #include <rclcpp/logger.hpp>
-#include <spdlog/fmt/fmt.h>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
