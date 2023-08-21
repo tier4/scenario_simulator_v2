@@ -81,7 +81,18 @@ public:
       simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
     setVerbose(configuration.verbose);
-    initialize(clock_.realtime_factor, clock_.getStepTime());
+
+    if (configuration.standalone_mode) {
+      simulation_api_schema::InitializeRequest request;
+      request.set_initialize_time(clock_.getCurrentSimulationTime());
+      request.set_lanelet2_map_path(configuration.lanelet2_map_path().string());
+      request.set_realtime_factor(clock_.realtime_factor);
+      request.set_step_time(clock_.getStepTime());
+      simulation_interface::toProto(clock_.getCurrentRosTime(), *request.mutable_initialize_ros_time());
+      if (not zeromq_client_.call(request).result().success()) {
+        throw common::SimulationError("Failed to initialize simulator by InitializeRequest");
+      }
+    }
   }
 
   template <typename Node>
@@ -231,8 +242,6 @@ public:
     double object_recognition_delay, int random_seed = 0);
 
   bool attachOccupancyGridSensor(const simulation_api_schema::OccupancyGridSensorConfiguration &);
-
-  bool initialize(double realtime_factor, double step_time);
 
   bool updateFrame();
 

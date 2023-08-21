@@ -146,21 +146,6 @@ auto API::setEntityStatus(
   setEntityStatus(name, canonicalize(status));
 }
 
-bool API::initialize(double realtime_factor, double)
-{
-  if (configuration.standalone_mode) {
-    return true;
-  } else {
-    simulation_api_schema::InitializeRequest req;
-    req.set_step_time(clock_.getStepTime());
-    req.set_realtime_factor(realtime_factor);
-    req.set_initialize_time(clock_.getCurrentSimulationTime());
-    simulation_interface::toProto(clock_.getCurrentRosTime(), *req.mutable_initialize_ros_time());
-    req.set_lanelet2_map_path(configuration.lanelet2_map_path().string());
-    return zeromq_client_.call(req).result().success();
-  }
-}
-
 bool API::attachDetectionSensor(
   const simulation_api_schema::DetectionSensorConfiguration & sensor_configuration)
 {
