@@ -80,7 +80,7 @@ public:
   {
     setVerbose(configuration.verbose);
 
-    if (configuration.standalone_mode) {
+    if (not configuration.standalone_mode) {
       simulation_api_schema::InitializeRequest request;
       request.set_initialize_time(clock_.getCurrentSimulationTime());
       request.set_lanelet2_map_path(configuration.lanelet2_map_path().string());
