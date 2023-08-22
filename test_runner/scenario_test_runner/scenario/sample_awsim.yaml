@@ -1,5 +1,7 @@
 ScenarioModifiers:
-  ScenarioModifier: []
+  ScenarioModifier:
+    - name: POSE_IN_LANE
+      list: [10.0, 50.0]
 OpenSCENARIO:
   FileHeader:
     revMajor: 1
@@ -84,7 +86,7 @@ OpenSCENARIO:
                     LanePosition:
                       roadId: ''
                       laneId: '225'
-                      s: 8.7029
+                      s: POSE_IN_LANE
                       offset: -0.1748
                       Orientation:
                         type: relative
