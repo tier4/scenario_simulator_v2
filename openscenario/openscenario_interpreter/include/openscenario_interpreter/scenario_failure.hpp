@@ -105,7 +105,6 @@ public:
     const std::string & source_name, int element_index, const std::string & element_name,
     ScenarioFailure const & inner)
   : source_name_{source_name},
-
     inner_{std::make_shared<ScenarioFailure>(inner)},
     core_{inner.core_},
     std::runtime_error{
@@ -116,7 +115,6 @@ public:
   // Constructor with inner but without current source -- last object
   ScenarioFailure(const std::string & element_name, const ScenarioFailure & inner)
   : source_name_{""},
-
     inner_{std::make_shared<ScenarioFailure>(inner)},
     core_{inner.core_},
     std::runtime_error{ScenarioFailure::formatSubpath(inner.source_name_, element_name)}
