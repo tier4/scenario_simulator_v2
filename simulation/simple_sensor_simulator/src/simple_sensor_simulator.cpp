@@ -133,7 +133,7 @@ auto ScenarioSimulator::updateEntityStatus(
   if (isEgo(req.status().name())) {
     if (ego_entity_simulation_) {
       ego_entity_simulation_->update(
-        current_simulation_time_ + step_time_, step_time_, req.npc_logic_started());
+        current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
     }
     simulation_api_schema::EntityStatus status;
     simulation_interface::toProto(ego_entity_simulation_->getStatus(), status);
