@@ -21,7 +21,6 @@
 
 namespace openscenario_interpreter
 {
-
 struct ScenarioFailure : public std::runtime_error
 {
 private:

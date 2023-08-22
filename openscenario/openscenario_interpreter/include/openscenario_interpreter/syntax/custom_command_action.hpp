@@ -26,10 +26,8 @@
 
 namespace openscenario_interpreter
 {
-
 inline namespace syntax
 {
-
 template <int Value>
 struct SpecialAction : public std::integral_constant<int, Value>
 {
