@@ -43,6 +43,17 @@ protected:
   {
   }
 
+  auto isWithinRange(
+    const geometry_msgs::Point & point1, const geometry_msgs::Point & point2,
+    const double range) const -> bool;
+
+  auto filterObjectsBySensorRange(
+    const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::vector<std::string> &,
+    const double) const -> std::vector<std::string>;
+
+  auto getEntityPose(const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::string &)
+    const -> geometry_msgs::Pose;
+
   auto getDetectedObjects(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
     -> std::vector<std::string>;
 
