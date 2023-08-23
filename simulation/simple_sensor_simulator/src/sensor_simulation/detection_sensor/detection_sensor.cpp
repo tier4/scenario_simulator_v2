@@ -18,6 +18,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <geometry/vector3/hypot.hpp>
 #include <memory>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
@@ -27,22 +28,16 @@
 
 namespace simple_sensor_simulator
 {
-auto DetectionSensorBase::getDetectedObjects(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
-  -> std::vector<std::string>
+auto DetectionSensorBase::isWithinRange(
+  const geometry_msgs::Point & point1, const geometry_msgs::Point & point2,
+  const double range) const -> bool
 {
-  std::vector<std::string> detected_objects;
-  const auto pose = getSensorPose(statuses);
-  for (const auto & status : statuses) {
-    if (double distance = std::hypot(
-          status.pose().position().x() - pose.position().x(),
-          status.pose().position().y() - pose.position().y(),
-          status.pose().position().z() - pose.position().z());
-        status.name() != configuration_.entity() && distance <= configuration_.range()) {
-      detected_objects.emplace_back(status.name());
-    }
-  }
-  return detected_objects;
+  auto distanceX = point1.x() - point2.x();
+  auto distanceY = point1.y() - point2.y();
+  auto distanceZ = point1.z() - point2.z();
+
+  double distance = std::hypot(distanceX, distanceY, distanceZ);
+  return distance <= range;
 }
 
 auto DetectionSensorBase::getSensorPose(
@@ -56,6 +51,60 @@ auto DetectionSensorBase::getSensorPose(
     }
   }
   throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
+}
+
+auto DetectionSensorBase::getEntityPose(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & entity_statuses,
+  const std::string & entity_string) const -> geometry_msgs::Pose
+{
+  for (const auto & entity_status : entity_statuses) {
+    if (entity_status.name() == entity_string) {
+      return entity_status.pose();
+    }
+  }
+
+  throw SimulationRuntimeError(
+    configuration_.detect_all_objects_in_range()
+      ? "Filtered object is not includes in entity statuses"
+      : "Detected object by lidar sensor is not included in lidar detected entity");
+}
+
+auto DetectionSensorBase::getDetectedObjects(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
+  -> std::vector<std::string>
+{
+  std::vector<std::string> detected_objects;
+  const auto pose = getSensorPose(statuses);
+
+  for (const auto & status : statuses) {
+    if (
+      status.name() != configuration_.entity() &&
+      isWithinRange(status.pose().position(), pose.position(), 300.0)) {
+      detected_objects.emplace_back(status.name());
+    }
+  }
+
+  return detected_objects;
+}
+
+auto DetectionSensorBase::filterObjectsBySensorRange(
+  const std::vector<traffic_simulator_msgs::EntityStatus> & entity_statuses,
+  const std::vector<std::string> & selected_entity_strings,
+  const double detection_sensor_range) const -> std::vector<std::string>
+{
+  std::vector<std::string> detected_objects;
+  const auto sensor_pose = getSensorPose(entity_statuses);
+
+  for (const auto & selected_entity_status : selected_entity_strings) {
+    const auto selected_entity_pose = getEntityPose(entity_statuses, selected_entity_status);
+    if (
+      selected_entity_status != configuration_.entity() &&
+      isWithinRange(
+        selected_entity_pose.position(), sensor_pose.position(), detection_sensor_range)) {
+      detected_objects.emplace_back(selected_entity_status);
+    }
+  }
+  return detected_objects;
 }
 
 template <>
@@ -88,8 +137,11 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
   if (
     current_simulation_time - previous_simulation_time_ - configuration_.update_duration() >=
     -0.002) {
-    const std::vector<std::string> detected_objects =
-      configuration_.filter_by_range() ? getDetectedObjects(statuses) : lidar_detected_entities;
+    const std::vector<std::string> detected_objects = filterObjectsBySensorRange(
+      statuses,
+      configuration_.detect_all_objects_in_range() ? getDetectedObjects(statuses)
+                                                   : lidar_detected_entities,
+      configuration_.range());
     autoware_auto_perception_msgs::msg::DetectedObjects msg;
     msg.header.stamp = current_ros_time;
     msg.header.frame_id = "map";

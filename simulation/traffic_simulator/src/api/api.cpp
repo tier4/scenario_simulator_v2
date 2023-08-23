@@ -153,12 +153,14 @@ bool API::attachDetectionSensor(
 }
 
 bool API::attachDetectionSensor(
-  const std::string & entity_name, double pos_noise_stddev, double probability_of_lost,
-  double object_recognition_delay, int random_seed)
+  const std::string & entity_name, double detection_sensor_range, bool detect_all_objects_in_range,
+  double pos_noise_stddev, int random_seed, double probability_of_lost,
+  double object_recognition_delay)
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
-    entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1, 300, false,
-    pos_noise_stddev, random_seed, probability_of_lost, object_recognition_delay));
+    entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1,
+    detection_sensor_range, detect_all_objects_in_range, pos_noise_stddev, random_seed,
+    probability_of_lost, object_recognition_delay));
 }
 
 bool API::attachOccupancyGridSensor(
