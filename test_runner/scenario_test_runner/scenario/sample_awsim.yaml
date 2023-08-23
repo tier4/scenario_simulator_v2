@@ -17,9 +17,7 @@ OpenSCENARIO:
         path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
   RoadNetwork:
     LogicFile:
-      filepath: /home/pzyskowski/projects/tier/660/AWSIM/map/nishishinjuku_autoware_map/lanelet2_map.osm
-    SceneGraphFile:
-      filepath: /home/pzyskowski/projects/tier/660/AWSIM/map/nishishinjuku_autoware_map/pointcloud_map.pcd
+      filepath: $(ros2 pkg prefix --share shinjuku_map)/map
     TrafficSignals:
       TrafficSignalController: []
   Entities:
