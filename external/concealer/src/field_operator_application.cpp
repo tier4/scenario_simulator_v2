@@ -109,13 +109,12 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
           return value;
         };
         auto timeout = timespec();
-        timeout.tv_sec = sigterm_timeout(0);
+        timeout.tv_sec = sigterm_timeout(5);
         timeout.tv_nsec = 0;
         return timeout;
       }();
 
-      while ((0 < timeout.tv_sec ? sigtimedwait(&sigset, nullptr, &timeout)
-                                 : sigwaitinfo(&sigset, nullptr)) < 0) {
+      if (sigtimedwait(&sigset, nullptr, &timeout) < 0) {
         switch (errno) {
           case EINTR:
             /*
@@ -123,6 +122,10 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
                shall be documented in system documentation whether this error
                causes these functions to fail.
             */
+            RCLCPP_ERROR_STREAM(
+              get_logger(),
+              "The wait for Autoware launch process termination was interrupted by an unblocked, "
+              "caught signal.");
             break;
 
           case EAGAIN:
@@ -130,8 +133,7 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
                No signal specified by set was generated within the specified
                timeout period.
             */
-            AUTOWARE_ERROR_STREAM(
-              "Shutting down Autoware: (2/3) Autoware launch process does not respond. Kill it.");
+            RCLCPP_ERROR_STREAM(get_logger(), "Autoware launch process does not respond. Kill it.");
             kill(process_id, SIGKILL);
             break;
 
@@ -141,8 +143,11 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
                The timeout argument specified a tv_nsec value less than zero or
                greater than or equal to 1000 million.
             */
-            AUTOWARE_SYSTEM_ERROR("sigtimedwait");
-            std::exit(EXIT_FAILURE);
+            RCLCPP_ERROR_STREAM(
+              get_logger(),
+              "The parameter sigterm_timeout specified a value less than zero or greater than or "
+              "equal to 1000 million.");
+            break;
         }
       }
     }
