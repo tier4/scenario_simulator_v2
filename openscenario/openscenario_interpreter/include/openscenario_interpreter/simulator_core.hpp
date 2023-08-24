@@ -266,7 +266,7 @@ public:
           configuration.set_probability_of_lost(controller.properties.template get<Double>("detectedObjectMissingProbability"));
           configuration.set_random_seed(controller.properties.template get<UnsignedInteger>("randomSeed"));
           configuration.set_range(controller.properties.template get<Double>("detectionSensorRange",300.0));
-          configuration.set_enable_ground_truth_delay(controller.properties.template get<Boolean>("isEnableDetectedObjectGroundTruthDelay"));
+          configuration.set_object_recognition_ground_truth_delay(controller.properties.template get<Double>("detectedObjectGroundTruthPublishingDelay"));
           configuration.set_update_duration(0.1);
           // clang-format on
           return configuration;

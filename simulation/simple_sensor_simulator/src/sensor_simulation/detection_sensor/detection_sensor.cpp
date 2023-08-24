@@ -267,7 +267,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
       ground_truth_publisher = std::dynamic_pointer_cast<
         rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>>(
         ground_truth_publisher_base_ptr_);
-    if (not configuration_.enable_ground_truth_delay()) {
+    if (not configuration_.object_recognition_ground_truth_delay()) {
       ground_truth_publisher->publish(ground_truth_msg);
     }
 
@@ -291,7 +291,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 
     publisher_ptr_->publish(noised_msg);
 
-    if (configuration_.enable_ground_truth_delay()) {
+    if (configuration_.object_recognition_ground_truth_delay()) {
       ground_truth_publisher->publish(delayed_ground_truth_msg);
     }
   }
