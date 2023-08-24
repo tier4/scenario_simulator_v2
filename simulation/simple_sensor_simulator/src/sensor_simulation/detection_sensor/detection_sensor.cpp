@@ -254,29 +254,29 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
       }
     }
 
-    static std::queue<std::pair<
-      std::pair<
-        autoware_auto_perception_msgs::msg::DetectedObjects,
-        autoware_auto_perception_msgs::msg::TrackedObjects>,
-      double>>
-      queue_objects;
+    static std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects,double>> queue_objects;
+    static std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects,double>> queue_ground_truth_objects;
 
-    queue_objects.push(std::make_pair(std::make_pair(msg, ground_truth_msg), current_time));
+    queue_objects.push(std::make_pair(msg, current_time));
+    queue_ground_truth_objects.push(std::make_pair(ground_truth_msg, current_time));
 
     static rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
       ground_truth_publisher = std::dynamic_pointer_cast<
         rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>>(
         ground_truth_publisher_base_ptr_);
-    if (not configuration_.object_recognition_ground_truth_delay()) {
-      ground_truth_publisher->publish(ground_truth_msg);
-    }
 
     autoware_auto_perception_msgs::msg::DetectedObjects delayed_msg;
     autoware_auto_perception_msgs::msg::TrackedObjects delayed_ground_truth_msg;
+
     if (current_time - queue_objects.front().second >= configuration_.object_recognition_delay()) {
-      delayed_msg = queue_objects.front().first.first;
-      delayed_ground_truth_msg = queue_objects.front().first.second;
+      delayed_msg = queue_objects.front().first;
+      delayed_ground_truth_msg = queue_ground_truth_objects.front().first;
       queue_objects.pop();
+    }
+
+    if (current_time - queue_ground_truth_objects.front().second >= configuration_.object_recognition_ground_truth_delay()) {
+      delayed_ground_truth_msg = queue_ground_truth_objects.front().first;
+      queue_ground_truth_objects.pop();
     }
 
     autoware_auto_perception_msgs::msg::DetectedObjects noised_msg;
@@ -291,9 +291,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 
     publisher_ptr_->publish(noised_msg);
 
-    if (configuration_.object_recognition_ground_truth_delay()) {
-      ground_truth_publisher->publish(delayed_ground_truth_msg);
-    }
+    ground_truth_publisher->publish(delayed_ground_truth_msg);
   }
 }
 }  // namespace simple_sensor_simulator
