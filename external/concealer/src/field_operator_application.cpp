@@ -106,16 +106,30 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
 
       while (sigtimedwait(&mask, NULL, &timeout) < 0) {
         switch (errno) {
-          case EINTR:  // Interrupted by a signal other than SIGCHLD.
+          case EINTR:
+            /*
+               The wait was interrupted by an unblocked, caught signal. It
+               shall be documented in system documentation whether this error
+               causes these functions to fail.
+            */
             break;
 
           case EAGAIN:
+            /*
+               No signal specified by set was generated within the specified
+               timeout period.
+            */
             AUTOWARE_ERROR_STREAM(
               "Shutting down Autoware: (2/3) Autoware launch process does not respond. Kill it.");
             kill(process_id, SIGKILL);
             break;
 
           default:
+          case EINVAL:
+            /*
+               The timeout argument specified a tv_nsec value less than zero or
+               greater than or equal to 1000 million.
+            */
             AUTOWARE_SYSTEM_ERROR("sigtimedwait");
             std::exit(EXIT_FAILURE);
         }
