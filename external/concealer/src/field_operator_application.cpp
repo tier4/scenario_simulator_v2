@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <exception>
 #include <scenario_simulator_exception/exception.hpp>
+#include <system_error>
 
 namespace concealer
 {
@@ -85,26 +86,36 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
 
     AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Terminating Autoware.");
     {
-      sigset_t mask{};
-      {
-        sigset_t orig_mask{};
-
-        sigemptyset(&mask);
-        sigaddset(&mask, SIGCHLD);
-
-        if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0) {
-          AUTOWARE_SYSTEM_ERROR("sigprocmask");
+      const auto sigset = [this]() {
+        if (auto signal_set = sigset_t();
+            sigemptyset(&signal_set) or sigaddset(&signal_set, SIGCHLD)) {
+          RCLCPP_ERROR_STREAM(
+            get_logger(), std::system_error(errno, std::system_category()).what());
           std::exit(EXIT_FAILURE);
+        } else if (auto error = pthread_sigmask(SIG_BLOCK, &signal_set, nullptr)) {
+          RCLCPP_ERROR_STREAM(
+            get_logger(), std::system_error(error, std::system_category()).what());
+          std::exit(EXIT_FAILURE);
+        } else {
+          return signal_set;
         }
-      }
+      }();
 
-      timespec timeout{};
-      {
-        timeout.tv_sec = 5;
+      const auto timeout = [this]() {
+        auto sigterm_timeout = [this](auto value) {
+          auto node = rclcpp::Node("get_parameter_sigterm_timeout", "simulation");
+          node.declare_parameter<int>("sigterm_timeout", value);
+          node.get_parameter<int>("sigterm_timeout", value);
+          return value;
+        };
+        auto timeout = timespec();
+        timeout.tv_sec = sigterm_timeout(0);
         timeout.tv_nsec = 0;
-      }
+        return timeout;
+      }();
 
-      while (sigtimedwait(&mask, NULL, &timeout) < 0) {
+      while ((0 < timeout.tv_sec ? sigtimedwait(&sigset, nullptr, &timeout)
+                                 : sigwaitinfo(&sigset, nullptr)) < 0) {
         switch (errno) {
           case EINTR:
             /*

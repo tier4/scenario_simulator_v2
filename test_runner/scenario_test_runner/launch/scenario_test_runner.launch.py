@@ -109,11 +109,12 @@ def launch_setup(context, *args, **kwargs):
             {"record": record},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
+            {"sigterm_timeout": sigterm_timeout},
             {"vehicle_model": vehicle_model},
         ]
         parameters += make_vehicle_parameters()
         return parameters
-    
+
     def make_vehicle_parameters():
         parameters = []
 
@@ -170,7 +171,7 @@ def launch_setup(context, *args, **kwargs):
             name="simple_sensor_simulator",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=[{"port": port}]+make_vehicle_parameters(),
+            parameters=make_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         LifecycleNode(
