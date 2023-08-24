@@ -51,6 +51,8 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
   auto ports = VehicleActionNode::providedPorts();
   ports.emplace(BT::InputPort<decltype(polyline_trajectory)>("polyline_trajectory"));
   ports.emplace(BT::InputPort<decltype(target_speed)>("target_speed"));
+  ports.emplace(BT::InputPort<decltype(vehicle_parameters)>("vehicle_parameters"));
+
   return ports;
 }
 
@@ -58,19 +60,20 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
   if (!trajectory_follower) {
     trajectory_follower = std::make_unique<
-      traffic_simulator::follow_trajectory::PositionModePolylineTrajectoryFollower>();
+      traffic_simulator::follow_trajectory::FollowModePolylineTrajectoryFollower>();
   }
 
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
       not getInput<decltype(target_speed)>("target_speed", target_speed) or
+      not getInput<decltype(vehicle_parameters)>("vehicle_parameters", vehicle_parameters) or
       not polyline_trajectory) {
     trajectory_follower.reset();
     return BT::NodeStatus::FAILURE;
   } else if (trajectory_follower->setParameters(
                static_cast<traffic_simulator::EntityStatus>(*entity_status), behavior_parameter,
-               step_time);
+               step_time, vehicle_parameters);
              const auto updated_status =
                trajectory_follower->followTrajectory(polyline_trajectory)) {
     setOutput(

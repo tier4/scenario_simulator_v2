@@ -49,11 +49,10 @@ protected:
   auto getTimeRemainingToFrontWaypoint(
     double remaining_time_to_front_waypoint, double distance_to_front_waypoint,
     double desired_speed) const -> std::optional<double>;
-  void discardTheFrontWaypointFromTrajectory();
 
-  auto createUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & velocity) const
-    -> traffic_simulator_msgs::msg::EntityStatus;
-
+  virtual void discardTheFrontWaypointFromTrajectory() = 0;
+  virtual auto createUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & velocity) const
+    -> traffic_simulator_msgs::msg::EntityStatus = 0;
   virtual auto getUpdatedVelocity(
     const geometry_msgs::msg::Vector3 & desired_velocity, double desired_speed) const
     -> geometry_msgs::msg::Vector3 = 0;
@@ -64,7 +63,7 @@ protected:
     double speed) const -> double = 0;
   virtual auto getDesiredVelocity(
     const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
-    double desired_speed) const -> geometry_msgs::msg::Vector3 = 0;
+    double desired_speed) -> geometry_msgs::msg::Vector3 = 0;
   virtual auto getDistanceAndTimeToFrontWaypoint(
     const geometry_msgs::msg::Point & target_position,
     const geometry_msgs::msg::Point & position) const
@@ -96,13 +95,52 @@ private:
     double speed) const -> double override;
   virtual auto getDesiredVelocity(
     const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
-    double desired_speed) const -> geometry_msgs::msg::Vector3 override;
+    double desired_speed) -> geometry_msgs::msg::Vector3 override;
   virtual auto getDistanceAndTimeToFrontWaypoint(
     const geometry_msgs::msg::Point & target_position,
     const geometry_msgs::msg::Point & position) const
     -> std::optional<std::tuple<double, double>> override;
   virtual auto getDistanceAndTimeToWaypointWithSpecifiedTime(
     double distance_to_front_waypoint) const -> std::optional<std::tuple<double, double>> override;
+  virtual auto createUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & velocity) const
+    -> traffic_simulator_msgs::msg::EntityStatus override;
+
+  virtual void discardTheFrontWaypointFromTrajectory() override;
+
+};
+
+class FollowModePolylineTrajectoryFollower : public PolylineTrajectoryFollower
+{
+public:
+  FollowModePolylineTrajectoryFollower() : PolylineTrajectoryFollower(){};
+
+private:
+  virtual auto getUpdatedVelocity(
+    const geometry_msgs::msg::Vector3 & desired_velocity, double desired_speed) const
+    -> geometry_msgs::msg::Vector3 override;
+  virtual auto getDesiredAcceleration(
+    double remaining_time, double acceleration, double distance, double speed) const
+    -> double override;
+  virtual auto getDesiredSpeed(
+    double desired_acceleration, double min_acceleration, double max_acceleration,
+    double speed) const -> double override;
+  virtual auto getDesiredVelocity(
+    const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
+    double desired_speed) -> geometry_msgs::msg::Vector3 override;
+  virtual auto getDistanceAndTimeToFrontWaypoint(
+    const geometry_msgs::msg::Point & target_position,
+    const geometry_msgs::msg::Point & position) const
+    -> std::optional<std::tuple<double, double>> override;
+  virtual auto getDistanceAndTimeToWaypointWithSpecifiedTime(
+    double distance_to_front_waypoint) const -> std::optional<std::tuple<double, double>> override;
+  virtual auto createUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & velocity) const
+    -> traffic_simulator_msgs::msg::EntityStatus override;
+
+  virtual void discardTheFrontWaypointFromTrajectory() override;
+
+
+  std::optional<geometry_msgs::msg::Point> previous_target;
+  double steering = 0.0;
 };
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator

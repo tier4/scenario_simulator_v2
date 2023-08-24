@@ -61,6 +61,7 @@ PolylineTrajectoryFollower::followTrajectory(
   if (polyline_trajectory->shape.vertices.empty()) {
     return std::nullopt;
   }
+
   polyline_trajectory_m = polyline_trajectory;
   const auto position = getCurrentPosition();
   const auto target_position = getTargetPosition();
@@ -97,7 +98,7 @@ PolylineTrajectoryFollower::followTrajectory(
     return followTrajectory(polyline_trajectory_m);
   }
 
-  const auto velocity = getUpdatedVelocity(desired_velocity, desired_speed);
+  const auto velocity = getUpdatedVelocity(desired_velocity, desired_speed); 
 
   if constexpr (false) {
     // clang-format off
@@ -185,7 +186,6 @@ PolylineTrajectoryFollower::followTrajectory(
                 << std::endl;
     // clang-format on
   }
-
   return createUpdatedEntityStatus(velocity);
 }
 
@@ -353,7 +353,7 @@ auto PolylineTrajectoryFollower::getTimeRemainingToFrontWaypoint(
   return remaining_time_to_arrival_to_front_waypoint;
 }
 
-auto PolylineTrajectoryFollower::createUpdatedEntityStatus(
+auto PositionModePolylineTrajectoryFollower::createUpdatedEntityStatus(
   const geometry_msgs::msg::Vector3 & velocity) const -> traffic_simulator_msgs::msg::EntityStatus
 {
   using math::geometry::operator/;
@@ -387,7 +387,7 @@ auto PolylineTrajectoryFollower::createUpdatedEntityStatus(
   updated_status.action_status.accel.linear =
     (updated_status.action_status.twist.linear - entity_status_m.action_status.twist.linear) /
     step_time_m;
-
+  
   updated_status.action_status.accel.angular =
     (updated_status.action_status.twist.angular - entity_status_m.action_status.twist.angular) /
     step_time_m;
@@ -395,7 +395,6 @@ auto PolylineTrajectoryFollower::createUpdatedEntityStatus(
   updated_status.time = entity_status_m.time + step_time_m;
 
   updated_status.lanelet_pose_valid = false;
-
   return updated_status;
 }
 
@@ -498,7 +497,7 @@ auto PositionModePolylineTrajectoryFollower::getDesiredSpeed(
 
 auto PositionModePolylineTrajectoryFollower::getDesiredVelocity(
   const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
-  double desired_speed) const -> geometry_msgs::msg::Vector3
+  double desired_speed) -> geometry_msgs::msg::Vector3
 {
   using math::geometry::operator-;
   using math::geometry::operator*;
@@ -615,7 +614,7 @@ auto PositionModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpe
   return std::make_tuple(distance, remaining_time);
 }
 
-auto PolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory() -> void
+void PositionModePolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory()
 {
   //        The OpenSCENARIO standard does not define the behavior when the value of
   //        Timing.domainAbsoluteRelative is "relative". The standard only states
@@ -647,6 +646,365 @@ auto PolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory() -> void
       not polyline_trajectory_m->closed) {
     polyline_trajectory_m->shape.vertices.pop_back();
   }
+}
+
+auto FollowModePolylineTrajectoryFollower::getDistanceAndTimeToFrontWaypoint(
+  const geometry_msgs::msg::Point & target_position,
+  const geometry_msgs::msg::Point & position) const -> std::optional<std::tuple<double, double>>
+{
+  // todo distance and time to traget
+
+  const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
+    math::geometry::hypot(position, target_position), // TODO DIFFERENT DISTANCE CALCULATION
+    (not std::isnan(polyline_trajectory_m->base_time) ? polyline_trajectory_m->base_time : 0.0) +
+      polyline_trajectory_m->shape.vertices.front().time - entity_status_m.time);
+  /*
+       This clause is to avoid division-by-zero errors in later clauses with
+       distance_to_front_waypoint as the denominator if the distance
+       miraculously becomes zero.
+    */
+  // if (math::arithmetic::isApproximatelyEqualTo(distance_to_front_waypoint, 0.0)) {
+  //   return std::nullopt;
+  // }
+  if(std::abs(distance_to_front_waypoint) <= 2.0)
+  {
+    return std::nullopt;
+  }
+  return std::make_tuple(distance_to_front_waypoint, remaining_time_to_front_waypoint);
+}
+
+auto FollowModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpecifiedTime(
+  double distance_to_front_waypoint) const -> std::optional<std::tuple<double, double>>
+{
+  const auto [distance, remaining_time] = [&]() {
+    if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
+          std::begin(polyline_trajectory_m->shape.vertices),
+          std::end(polyline_trajectory_m->shape.vertices),
+          [](auto && vertex) { return not std::isnan(vertex.time); });
+        first_waypoint_with_arrival_time_specified !=
+        std::end(polyline_trajectory_m->shape.vertices)) {
+      /*
+            Note for anyone working on adding support for followingMode follow
+            to this function (FollowPolylineTrajectoryAction::tick) in the
+            future: if followingMode is follow, this distance calculation may be
+            inappropriate.
+        */
+      auto total_distance_to = [&](auto last) {
+        auto total_distance = 0.0;
+        for (auto iter = std::begin(polyline_trajectory_m->shape.vertices);
+             0 < std::distance(iter, last); ++iter) {
+          total_distance +=
+            math::geometry::hypot(iter->position.position, std::next(iter)->position.position);
+        }
+        return total_distance;
+      };
+
+      if (const auto remaining_time =
+            (not std::isnan(polyline_trajectory_m->base_time) ? polyline_trajectory_m->base_time
+                                                              : 0.0) +
+            first_waypoint_with_arrival_time_specified->time - entity_status_m.time;
+          /*
+                The condition below should ideally be remaining_time < 0.
+
+                The simulator runs at a constant frame rate, so the step time is
+                1/FPS. If the simulation time is an accumulation of step times
+                expressed as rational numbers, times that are integer multiples
+                of the frame rate will always be exact integer seconds.
+                Therefore, the timing of remaining_time == 0 always exists, and
+                the velocity planning of this member function (tick) aims to
+                reach the waypoint exactly at that timing. So the ideal timeout
+                condition is remaining_time < 0.
+
+                But actually the step time is expressed as a float and the
+                simulation time is its accumulation. As a result, it is not
+                guaranteed that there will be times when the simulation time is
+                exactly zero. For example, remaining_time == -0.00006 and it was
+                judged to be out of time.
+
+                For the above reasons, the condition is remaining_time <
+                -step_time. In other words, the conditions are such that a delay
+                of 1 step time is allowed.
+            */
+          remaining_time < -step_time_m) {
+        // throw common::Error(
+        //   "Vehicle ", std::quoted(entity_status_m.name),
+        //   " failed to reach the trajectory waypoint at the specified time. The specified time "
+        //   "is ",
+        //   first_waypoint_with_arrival_time_specified->time, " (in ",
+        //   (not std::isnan(polyline_trajectory_m->base_time) ? "absolute" : "relative"),
+        //   " simulation time). This may be due to unrealistic conditions of arrival time "
+        //   "specification compared to vehicle parameters and dynamic constraints.");
+        return std::make_tuple(
+          distance_to_front_waypoint +
+            total_distance_to(first_waypoint_with_arrival_time_specified),
+          remaining_time + step_time_m);
+      } else {
+        return std::make_tuple(
+          distance_to_front_waypoint +
+            total_distance_to(first_waypoint_with_arrival_time_specified),
+          remaining_time);
+      }
+    } else {
+      return std::make_tuple(distance_to_front_waypoint, std::numeric_limits<double>::infinity());
+    }
+  }();
+  // if (math::arithmetic::isApproximatelyEqualTo(distance, 0.0)) {
+  //   return std::nullopt;
+  // }
+  if(std::abs(distance) <= 2.0)
+  {
+    return std::nullopt;
+  }
+  return std::make_tuple(distance, remaining_time);
+}
+
+auto FollowModePolylineTrajectoryFollower::createUpdatedEntityStatus(
+  const geometry_msgs::msg::Vector3 & velocity) const -> traffic_simulator_msgs::msg::EntityStatus
+{
+  using math::geometry::operator/;
+  using math::geometry::operator-;
+  using math::geometry::operator*;
+  using math::geometry::operator+=;
+
+  auto updated_status = entity_status_m;
+
+  auto position_change = [&](){
+    geometry_msgs::msg::Vector3 change;
+    change.x = std::cos(quaternion_operation::convertQuaternionToEulerAngle(updated_status.pose.orientation).z) * math::geometry::norm(velocity) * step_time_m;
+    change.y = std::sin(quaternion_operation::convertQuaternionToEulerAngle(updated_status.pose.orientation).z) * math::geometry::norm(velocity) * step_time_m;
+    change.z = 0.0;
+    return change;
+  }();
+
+  updated_status.pose.position += position_change;
+
+  updated_status.pose.orientation = [&]() {
+    geometry_msgs::msg::Vector3 direction;
+    direction.x = 0;
+    direction.y = 0;
+    direction.z = quaternion_operation::convertQuaternionToEulerAngle(updated_status.pose.orientation).z + math::geometry::norm(velocity) * std::tan(steering) * step_time_m / vehicle_parameters_m.value().axles.front_axle.position_x;
+    
+    return quaternion_operation::convertEulerAngleToQuaternion(direction);
+  }();
+
+  updated_status.action_status.twist.linear.x = math::geometry::norm(velocity);
+
+  updated_status.action_status.twist.linear.y = 0;
+
+  updated_status.action_status.twist.linear.z = 0;
+
+  updated_status.action_status.twist.angular =
+    quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
+      entity_status_m.pose.orientation, updated_status.pose.orientation)) /
+    step_time_m;
+
+  updated_status.action_status.accel.linear =
+    (updated_status.action_status.twist.linear - entity_status_m.action_status.twist.linear) /
+    step_time_m;
+  
+  updated_status.action_status.accel.angular =
+    (updated_status.action_status.twist.angular - entity_status_m.action_status.twist.angular) /
+    step_time_m;
+
+  updated_status.time = entity_status_m.time + step_time_m;
+
+  updated_status.lanelet_pose_valid = false;
+
+  return updated_status;
+}
+
+void FollowModePolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory()
+{
+  //        The OpenSCENARIO standard does not define the behavior when the value of
+  //        Timing.domainAbsoluteRelative is "relative". The standard only states
+  //        "Definition of time value context as either absolute or relative", and
+  //        it is completely unclear when the relative time starts.
+
+  //        This implementation has interpreted the specification as follows:
+  //        Relative time starts from the start of FollowTrajectoryAction or from
+  //        the time of reaching the previous "waypoint with arrival time".
+  //
+
+  if (
+    not std::isnan(polyline_trajectory_m->base_time) and
+    not std::isnan(polyline_trajectory_m->shape.vertices.front().time)) {
+    polyline_trajectory_m->base_time = entity_status_m.time;
+  }
+
+  previous_target = polyline_trajectory_m->shape.vertices.front().position.position;
+
+  if (std::rotate(
+        std::begin(polyline_trajectory_m->shape.vertices),
+        std::begin(polyline_trajectory_m->shape.vertices) + 1,
+        std::end(polyline_trajectory_m->shape.vertices));
+      not polyline_trajectory_m->closed) {
+        std::cout<<"pop back"<<std::endl;
+    polyline_trajectory_m->shape.vertices.pop_back();
+  }
+}
+
+auto FollowModePolylineTrajectoryFollower::getDesiredAcceleration(
+  double remaining_time, double acceleration, double distance, double speed) const -> double
+{
+  // if( remaining_time == acceleration && distance == speed)
+  // {
+  //   std::cout<<":00"<<std::endl;
+  // }
+  // return 0.05;
+  /*
+       The desired acceleration is the acceleration at which the destination
+       can be reached exactly at the specified time (= time remaining at zero).
+
+       If no arrival time is specified for subsequent waypoints, there is no
+       need to accelerate or decelerate, so the current acceleration will be
+       the desired speed.
+    */
+  const double desired_acceleration = [&]() {
+    if (std::isinf(remaining_time)) {
+      return acceleration;  /// @todo Accelerate to match speed with `target_speed`.
+    } else {
+      /*
+                        v [m/s]
+                          ^
+                          |
+            desired_speed +   /|
+                          |  / |
+                          | /  |
+                    speed +/   |
+                          |    |
+                          |    |
+                          +----+-------------> t [s]
+                        0     remaining_time
+
+            desired_speed = speed + desired_acceleration * remaining_time
+
+            distance = (speed + desired_speed) * remaining_time * 1/2
+
+                    = (speed + speed + desired_acceleration * remaining_time) * remaining_time * 1/2
+
+                    = speed * remaining_time + desired_acceleration * remaining_time^2 * 1/2
+        */
+      return 2 * distance / std::pow(remaining_time, 2) - 2 * speed / remaining_time;
+    }
+  }();
+
+  if (std::isinf(desired_acceleration) or std::isnan(desired_acceleration)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(entity_status_m.name),
+      "'s desired acceleration value contains NaN or infinity. The value is ", desired_acceleration,
+      ".");
+  }
+
+  return desired_acceleration;
+}
+
+auto FollowModePolylineTrajectoryFollower::getDesiredSpeed(
+  double desired_acceleration, double min_acceleration, double max_acceleration, double speed) const
+  -> double
+{
+  // if( desired_acceleration == min_acceleration && max_acceleration == speed)
+  // {
+  //   return 0.05;
+  // }
+  // return 0.05;
+    /*
+       However, the desired acceleration is unrealistically large in terms of
+       vehicle performance and dynamic constraints, so it is clamped to a
+       realistic value.
+    */
+  const auto desired_speed =
+    speed + std::clamp(desired_acceleration, min_acceleration, max_acceleration) * step_time_m;
+  if (std::isinf(desired_speed) or std::isnan(desired_speed)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(entity_status_m.name), "'s desired speed value is NaN or infinity. The value is ",
+      desired_speed, ".");
+  }
+  return desired_speed;
+}
+
+double normalizeAngle(double angle) {
+    angle = std::fmod(angle + M_PI, 2.0 * M_PI) - M_PI;
+    if (angle > M_PI / 2.0) {
+        angle = M_PI - angle;
+    } else if (angle < -M_PI / 2.0) {
+        angle = -M_PI - angle;
+    }
+    return angle;
+}
+
+auto FollowModePolylineTrajectoryFollower::getDesiredVelocity(
+  const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
+  double desired_speed) -> geometry_msgs::msg::Vector3
+{
+  using math::geometry::operator-;
+  using math::geometry::operator*;
+  using math::geometry::operator+;
+
+  auto theta = quaternion_operation::convertQuaternionToEulerAngle(entity_status_m.pose.orientation).z;
+  auto front_axle_position = [&]() {
+    geometry_msgs::msg::Vector3 front_axle_coords;
+    front_axle_coords.x = position.x + std::cos(theta)*vehicle_parameters_m.value().axles.front_axle.position_x;
+    front_axle_coords.y = position.y + std::sin(theta)*vehicle_parameters_m.value().axles.front_axle.position_x;
+    front_axle_coords.z = 0.0;
+    return front_axle_coords;
+  }();
+
+
+  if (!previous_target)
+  {
+    previous_target = geometry_msgs::msg::Point();
+    previous_target->x = front_axle_position.x;
+    previous_target->y = front_axle_position.y;
+    previous_target->z = front_axle_position.z;
+  }
+
+  auto a = previous_target.value().y - target_position.y;
+  auto b = target_position.x - previous_target.value().x;
+  auto c = previous_target.value().x*target_position.y - target_position.x*previous_target.value().y;
+
+  auto gain = 1;
+  auto parameter = 1;
+  auto heading_error = std::remainder(std::atan2(-1*a,b) - theta, 2*M_PI);
+  auto cross_track_error = -1*(a*front_axle_position.x + b*front_axle_position.y + c)/std::sqrt(a*a + b*b);
+
+  
+  auto cross_track_steering = std::atan2(gain*cross_track_error,(parameter + desired_speed));
+  auto steering_input = heading_error + cross_track_steering;
+
+  steering_input = std::clamp(steering_input, vehicle_parameters_m.value().axles.front_axle.max_steering * -1, vehicle_parameters_m.value().axles.front_axle.max_steering);
+
+  steering = steering_input;
+  geometry_msgs::msg::Vector3 desired_velocity;
+  desired_velocity.x = std::cos(theta);
+  desired_velocity.y = std::sin(theta);
+  desired_velocity.z = 0.0;
+  desired_velocity = math::geometry::normalize(desired_velocity) * desired_speed;
+
+  if (any(is_infinity_or_nan, desired_velocity)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(entity_status_m.name),
+      "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
+      desired_velocity.y, ", ", desired_velocity.z, "].");
+  }
+
+  return desired_velocity;
+}
+
+auto FollowModePolylineTrajectoryFollower::getUpdatedVelocity(
+  const geometry_msgs::msg::Vector3 & desired_velocity, double desired_speed) const
+  -> geometry_msgs::msg::Vector3
+{
+  if( desired_speed == 0.0)
+  {
+    std::cout<<"0"<<std::endl;
+  }
+  return desired_velocity;
 }
 
 }  // namespace follow_trajectory
