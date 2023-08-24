@@ -254,8 +254,10 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
       }
     }
 
-    static std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects,double>> queue_objects;
-    static std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects,double>> queue_ground_truth_objects;
+    static std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
+      queue_objects;
+    static std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
+      queue_ground_truth_objects;
 
     queue_objects.push(std::make_pair(msg, current_time));
     queue_ground_truth_objects.push(std::make_pair(ground_truth_msg, current_time));
@@ -274,7 +276,9 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
       queue_objects.pop();
     }
 
-    if (current_time - queue_ground_truth_objects.front().second >= configuration_.object_recognition_ground_truth_delay()) {
+    if (
+      current_time - queue_ground_truth_objects.front().second >=
+      configuration_.object_recognition_ground_truth_delay()) {
       delayed_ground_truth_msg = queue_ground_truth_objects.front().first;
       queue_ground_truth_objects.pop();
     }
