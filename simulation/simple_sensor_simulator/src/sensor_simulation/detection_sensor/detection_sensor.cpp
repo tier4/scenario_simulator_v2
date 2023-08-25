@@ -126,7 +126,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::apply
 
 unique_identifier_msgs::msg::UUID generateUUIDMsg(const std::string & input)
 {
-  static boost::uuids::string_generator generate_uuid;
+  static auto generate_uuid = boost::uuids::name_generator(boost::uuids::random_generator()());
   const auto uuid = generate_uuid(input);
 
   unique_identifier_msgs::msg::UUID uuid_msg;
