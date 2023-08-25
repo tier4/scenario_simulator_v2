@@ -17,8 +17,6 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
-#include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
 #include <memory>
 #include <queue>
 #include <random>
