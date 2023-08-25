@@ -216,6 +216,15 @@ bool API::attachLidarSensor(
     lidar_sensor_delay));
 }
 
+bool API::updateTimeInSim()
+{
+  simulation_api_schema::UpdateFrameRequest req;
+  req.set_current_time(clock_.getCurrentSimulationTime());
+  simulation_interface::toProto(
+    clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
+  return zeromq_client_.call(req).result().success();
+}
+
 bool API::updateTrafficLightsInSim()
 {
   simulation_api_schema::UpdateTrafficLightsRequest req;
@@ -232,101 +241,65 @@ bool API::updateTrafficLightsInSim()
   return simulation_api_schema::UpdateTrafficLightsResponse().result().success();
 }
 
-bool API::updateNonEgoEntitiesStatusInSim()
+bool API::updateEntitiesStatusInSim()
 {
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
-    if (entity_manager_ptr_->isEgo(entity_name)) continue;
-    auto status = entity_manager_ptr_->getEntityStatus(entity_name);
-    simulation_interface::toProto(static_cast<EntityStatus>(status), *req.add_status());
+    auto entity_status = entity_manager_ptr_->getEntityStatus(entity_name);
+    simulation_interface::toProto(static_cast<EntityStatus>(entity_status), *req.add_status());
   }
-  return zeromq_client_.call(req).result().success();
-}
-
-std::optional<CanonicalizedEntityStatus> API::updateEntityStatusInSim(
-  const std::string & entity_name, const CanonicalizedEntityStatus & status)
-{
-  constexpr int single_status_update = 1;
-
-  simulation_api_schema::UpdateEntityStatusRequest req;
-  req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-  auto status_non_canonicalized = static_cast<EntityStatus>(status);
-  status_non_canonicalized.name = entity_name;
-  simulation_interface::toProto(status_non_canonicalized, *req.add_status());
 
   simulation_api_schema::UpdateEntityStatusResponse res;
-  // The method updates a single entity status, so a single status is expected in response
-  if (auto res = zeromq_client_.call(req);
-      res.result().success() && req.status_size() == single_status_update) {
-    auto first_status = res.status(0);
-    assert(
-      first_status.name() == entity_name &&
-      "The entity name in response is different from the name in request!");
-    simulation_interface::toMsg(first_status.pose(), status_non_canonicalized.pose);
-    simulation_interface::toMsg(
-      first_status.action_status(), status_non_canonicalized.action_status);
-    // Temporarily deinitialize lanelet pose as it should be correctly filled from here
-    status_non_canonicalized.lanelet_pose_valid = false;
-    status_non_canonicalized.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-    return std::make_optional(canonicalize(status_non_canonicalized));
+  if (auto res = zeromq_client_.call(req); res.result().success()) {
+    for (const auto & res_status : res.status()) {
+      auto name = res_status.name();
+      auto entity_status = static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name));
+      simulation_interface::toMsg(res_status.pose(), entity_status.pose);
+      simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
+
+      // temporarily deinitialize lanelet pose as it should be correctly filled from here
+      entity_status.lanelet_pose_valid = false;
+      entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+
+      auto canonicalized = canonicalize(entity_status);
+      /// @note apply additional status data (from ll2) and then set status
+      entity_manager_ptr_->fillLaneletPose(name, canonicalized);
+      if (entity_manager_ptr_->isEgo(name)) {
+        entity_manager_ptr_->setEntityStatusExternally(name, canonicalized);
+      } else {
+        entity_manager_ptr_->setEntityStatus(name, canonicalized);
+      }
+    }
+    return true;
   }
-  return std::nullopt;
+  return false;
 }
 
 bool API::updateFrame()
 {
-  if (entity_manager_ptr_->isEgoSpawned()) {
-    if (configuration.standalone_mode) {
-      THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
-    }
-    if (not entity_manager_ptr_->isEgoSpawned()) {
-      THROW_SIMULATION_ERROR(
-        "This exception is basically not supposed to be sent. Contact the developer as there is "
-        "some kind of bug.");
-    }
+  if (configuration.standalone_mode && entity_manager_ptr_->isEgoSpawned()) {
+    THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
+  }
 
-    auto ego_name = entity_manager_ptr_->getEgoName();
-    auto ego_status = entity_manager_ptr_->getEntityStatus(ego_name);
-    auto ego_status_opt = updateEntityStatusInSim(entity_manager_ptr_->getEgoName(), ego_status);
-    if (ego_status_opt) {
-      ego_status = *ego_status_opt;
-    }
-    /// @note apply additional status data (from ll2) to ego_entity_simulation_ for this update
-    entity_manager_ptr_->fillLaneletPose(ego_name, ego_status);
-    entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
+  if (!updateEntitiesStatusInSim()) {
+    return false;
   }
 
   entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
-    if (!updateNonEgoEntitiesStatusInSim()) {
+    if (!updateTrafficLightsInSim() || !updateTimeInSim()) {
       return false;
     }
-    if (!updateTrafficLightsInSim()) {
-      return false;
-    }
-    simulation_api_schema::UpdateFrameRequest req;
-    req.set_current_time(clock_.getCurrentSimulationTime());
-    simulation_interface::toProto(
-      clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
-    if (not zeromq_client_.call(req).result().success()) {
-      return false;
-    }
-    entity_manager_ptr_->broadcastEntityTransform();
-    clock_.update();
-    clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
-    debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    return true;
-  } else {
-    entity_manager_ptr_->broadcastEntityTransform();
-    clock_.update();
-    clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
-    debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-    return true;
   }
+
+  entity_manager_ptr_->broadcastEntityTransform();
+  clock_.update();
+  clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
+  debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
+  return true;
 }
 
 void API::startNpcLogic()
