@@ -99,16 +99,6 @@ public:
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> & lidar_detected_entity) -> void override;
 };
-
-template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
-  autoware_auto_perception_msgs::msg::DetectedObject)
-  -> autoware_auto_perception_msgs::msg::DetectedObject;
-
-template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
-  const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-  const std::vector<std::string> & lidar_detected_entity) -> void;
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_

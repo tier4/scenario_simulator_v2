@@ -15,6 +15,7 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
+#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
 #include <boost/uuid/string_generator.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -144,6 +145,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     object_classification.probability = 1;
     return object_classification;
   };
+
   if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
     std::vector<std::string> detected_objects;
     auto detected_entities = configuration_.detect_all_objects_in_range()
@@ -152,10 +154,14 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 
     detected_objects =
       filterObjectsBySensorRange(statuses, detected_entities, configuration_.range());
+
     autoware_auto_perception_msgs::msg::DetectedObjects msg;
-    autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = "map";
+
+    autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_msg;
+    ground_truth_msg.header = msg.header;
+
     last_update_stamp_ = current_time;
     for (const auto & status : statuses) {
       if (
@@ -205,6 +211,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
               autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
             break;
         }
+
         simulation_interface::toMsg(status.bounding_box().dimensions(), object.shape.dimensions);
         geometry_msgs::msg::Pose pose;
         simulation_interface::toMsg(status.pose(), pose);
