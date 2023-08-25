@@ -196,6 +196,8 @@ auto LineSegment::getIntersection2DSValue(
 auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool denormalize_s) const
   -> std::optional<double>
 {
+  /// @note Hard coded parameter, this parameter describes the torelance of the range of s value (-s_tolerance ~ 1.0 + s_tolerance)
+  constexpr double s_tolerance = 1e-10;
   const auto get_s_normalized = [this](const auto & line) -> std::optional<double> {
     if (!isIntersect2D(line)) {
       return std::optional<double>();
@@ -213,7 +215,9 @@ auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool d
         "This message is not originally intended to be displayed, if you see it, please "
         "contact the developer of traffic_simulator.");
     }
-    return (0 <= s && s <= 1) ? std::optional<double>(s) : std::optional<double>();
+    return (-s_tolerance <= s && s <= 1 + s_tolerance)
+             ? std::optional<double>(std::clamp(s, 0.0, 1.0))
+             : std::optional<double>();
   };
   return denormalize_s ? denormalize(get_s_normalized(line)) : get_s_normalized(line);
 }
