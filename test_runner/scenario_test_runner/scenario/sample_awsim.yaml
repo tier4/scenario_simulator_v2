@@ -73,6 +73,23 @@ OpenSCENARIO:
             name: ''
             Properties:
               Property: []
+      - name: MiscObjectPlaceholder
+        MiscObject:
+          name: ''
+          miscObjectCategory: obstacle
+          model3d: "human"
+          mass: 1.0
+          BoundingBox:
+            Center:
+              x: 0.2
+              y: 0.15
+              z: 0.0
+            Dimensions:
+              width: 0.4
+              length: 0.3
+              height: 1.8
+          Properties:
+            Property: []
   Storyboard:
     Init:
       Actions:
@@ -127,6 +144,20 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 2
+          - entityRef: MiscObjectPlaceholder
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '226'
+                      s: 35.4153
+                      offset: 0.002
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: -0.0
+                        r: 0
     Story:
       - name: ''
         Act:
