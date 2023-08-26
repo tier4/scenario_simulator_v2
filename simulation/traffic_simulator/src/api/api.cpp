@@ -260,17 +260,16 @@ bool API::updateEntitiesStatusInSim()
       simulation_interface::toMsg(res_status.pose(), entity_status.pose);
       simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
 
-      // temporarily deinitialize lanelet pose as it should be correctly filled from here
-      entity_status.lanelet_pose_valid = false;
-      entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-
-      auto canonicalized = canonicalize(entity_status);
-      /// @note apply additional status data (from ll2) and then set status
-      entity_manager_ptr_->fillLaneletPose(name, canonicalized);
       if (entity_manager_ptr_->isEgo(name)) {
+        // temporarily deinitialize lanelet pose as it should be correctly filled from here
+        entity_status.lanelet_pose_valid = false;
+        entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+        auto canonicalized = canonicalize(entity_status);
+        /// @note apply additional status data (from ll2) and then set status
+        entity_manager_ptr_->fillLaneletPose(name, canonicalized);
         entity_manager_ptr_->setEntityStatusExternally(name, canonicalized);
       } else {
-        entity_manager_ptr_->setEntityStatus(name, canonicalized);
+        entity_manager_ptr_->setEntityStatus(name, canonicalize(entity_status));
       }
     }
     return true;
