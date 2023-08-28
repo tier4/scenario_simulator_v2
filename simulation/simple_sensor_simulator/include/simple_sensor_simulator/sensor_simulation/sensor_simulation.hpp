@@ -17,6 +17,8 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
@@ -33,7 +35,11 @@ namespace simple_sensor_simulator
 class SensorSimulation
 {
 public:
-  explicit SensorSimulation(rclcpp::Node & node) {}
+  explicit SensorSimulation(rclcpp::Node & node)
+  {
+    traffic_lights_detectors_.emplace_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
+      "/perception/traffic_light_recognition/traffic_signals", node));
+  }
 
   auto attachLidarSensor(
     const double current_simulation_time,
@@ -59,9 +65,12 @@ public:
   {
     if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
       using Message = autoware_auto_perception_msgs::msg::DetectedObjects;
+      using GroundTruthMessage = autoware_auto_perception_msgs::msg::TrackedObjects;
       detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
-        node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1)));
+        node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1),
+        node.create_publisher<GroundTruthMessage>(
+          "/perception/object_recognition/ground_truth/objects", 1)));
     } else {
       std::stringstream ss;
       ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
