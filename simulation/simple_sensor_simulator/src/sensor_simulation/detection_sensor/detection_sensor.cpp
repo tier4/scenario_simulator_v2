@@ -15,6 +15,9 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
+#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
+#include <boost/uuid/string_generator.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -121,6 +124,16 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::apply
   return detected_object;
 }
 
+unique_identifier_msgs::msg::UUID generateUUIDMsg(const std::string & input)
+{
+  static auto generate_uuid = boost::uuids::name_generator(boost::uuids::random_generator()());
+  const auto uuid = generate_uuid(input);
+
+  unique_identifier_msgs::msg::UUID uuid_msg;
+  std::copy(uuid.begin(), uuid.end(), uuid_msg.uuid.begin());
+  return uuid_msg;
+}
+
 template <>
 auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
@@ -132,6 +145,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     object_classification.probability = 1;
     return object_classification;
   };
+
   if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
     std::vector<std::string> detected_objects;
     auto detected_entities = configuration_.detect_all_objects_in_range()
@@ -140,9 +154,14 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 
     detected_objects =
       filterObjectsBySensorRange(statuses, detected_entities, configuration_.range());
+
     autoware_auto_perception_msgs::msg::DetectedObjects msg;
     msg.header.stamp = stamp;
     msg.header.frame_id = "map";
+
+    autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_msg;
+    ground_truth_msg.header = msg.header;
+
     last_update_stamp_ = current_time;
     for (const auto & status : statuses) {
       if (
@@ -192,6 +211,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
               autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
             break;
         }
+
         simulation_interface::toMsg(status.bounding_box().dimensions(), object.shape.dimensions);
         geometry_msgs::msg::Pose pose;
         simulation_interface::toMsg(status.pose(), pose);
@@ -211,20 +231,78 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
           status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
         object.shape.type = object.shape.BOUNDING_BOX;
 
-        if (auto probability_of_lost = std::uniform_real_distribution();
-            probability_of_lost(random_engine_) > configuration_.probability_of_lost()) {
-          msg.objects.push_back(applyPositionNoise(object));
-        }
+        msg.objects.push_back(object);
+
+        // ref: https://github.com/autowarefoundation/autoware.universe/blob/main/common/perception_utils/src/conversion.cpp
+        static auto toTrackedObject =
+          [&](
+            const std::string & name,
+            const autoware_auto_perception_msgs::msg::DetectedObject & detected_object)
+          -> autoware_auto_perception_msgs::msg::TrackedObject {
+          autoware_auto_perception_msgs::msg::TrackedObject tracked_object;
+          tracked_object.existence_probability = detected_object.existence_probability;
+
+          tracked_object.classification = detected_object.classification;
+
+          tracked_object.kinematics.pose_with_covariance =
+            detected_object.kinematics.pose_with_covariance;
+          tracked_object.kinematics.twist_with_covariance =
+            detected_object.kinematics.twist_with_covariance;
+          tracked_object.kinematics.orientation_availability =
+            detected_object.kinematics.orientation_availability;
+
+          tracked_object.shape = detected_object.shape;
+          tracked_object.object_id = generateUUIDMsg(name);
+
+          return tracked_object;
+        };
+
+        ground_truth_msg.objects.push_back(toTrackedObject(status.name(), object));
       }
     }
 
-    queue_objects_.push(std::make_pair(msg, current_time));
-    autoware_auto_perception_msgs::msg::DetectedObjects delayed_objects;
-    if (current_time - queue_objects_.front().second >= configuration_.object_recognition_delay()) {
-      delayed_objects = queue_objects_.front().first;
-      queue_objects_.pop();
+    static std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
+      queue_objects;
+    static std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
+      queue_ground_truth_objects;
+
+    queue_objects.push(std::make_pair(msg, current_time));
+    queue_ground_truth_objects.push(std::make_pair(ground_truth_msg, current_time));
+
+    static rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
+      ground_truth_publisher = std::dynamic_pointer_cast<
+        rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>>(
+        ground_truth_publisher_base_ptr_);
+
+    autoware_auto_perception_msgs::msg::DetectedObjects delayed_msg;
+    autoware_auto_perception_msgs::msg::TrackedObjects delayed_ground_truth_msg;
+
+    if (current_time - queue_objects.front().second >= configuration_.object_recognition_delay()) {
+      delayed_msg = queue_objects.front().first;
+      delayed_ground_truth_msg = queue_ground_truth_objects.front().first;
+      queue_objects.pop();
     }
-    publisher_ptr_->publish(delayed_objects);
+
+    if (
+      current_time - queue_ground_truth_objects.front().second >=
+      configuration_.object_recognition_ground_truth_delay()) {
+      delayed_ground_truth_msg = queue_ground_truth_objects.front().first;
+      queue_ground_truth_objects.pop();
+    }
+
+    autoware_auto_perception_msgs::msg::DetectedObjects noised_msg;
+    noised_msg.header = delayed_msg.header;
+    noised_msg.objects.reserve(delayed_msg.objects.size());
+    for (const auto & object : delayed_msg.objects) {
+      if (auto probability_of_lost = std::uniform_real_distribution();
+          probability_of_lost(random_engine_) > configuration_.probability_of_lost()) {
+        noised_msg.objects.push_back(applyPositionNoise(object));
+      }
+    }
+
+    publisher_ptr_->publish(noised_msg);
+
+    ground_truth_publisher->publish(delayed_ground_truth_msg);
   }
 }
 }  // namespace simple_sensor_simulator
