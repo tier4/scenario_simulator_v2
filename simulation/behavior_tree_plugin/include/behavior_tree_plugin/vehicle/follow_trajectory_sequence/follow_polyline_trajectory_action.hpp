@@ -16,7 +16,8 @@
 #define BEHAVIOR_TREE_PLUGIN__VEHICLE__FOLLOW_POLYLINE_TRAJECTORY_ACTION_HPP_
 
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
-#include <traffic_simulator/behavior/polyline_trajectory_follower.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/follow_mode_polyline_trajectory_follower.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/position_mode_polyline_trajectory_follower.hpp>
 
 namespace entity_behavior
 {

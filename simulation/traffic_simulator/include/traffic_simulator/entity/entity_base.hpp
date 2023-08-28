@@ -22,7 +22,7 @@
 #include <optional>
 #include <queue>
 #include <string>
-#include <traffic_simulator/behavior/follow_trajectory.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/polyline_trajectory_follower.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>

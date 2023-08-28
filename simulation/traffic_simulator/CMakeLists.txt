@@ -28,9 +28,11 @@ ament_auto_find_build_dependencies()
 
 ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
-  src/behavior/follow_trajectory.cpp
   src/behavior/longitudinal_speed_planning.cpp
-  src/behavior/polyline_trajectory_follower.cpp
+  src/behavior/follow_trajectory/polyline_trajectory_follower.cpp
+  src/behavior/follow_trajectory/follow_mode_polyline_trajectory_follower.cpp
+  src/behavior/follow_trajectory/position_mode_polyline_trajectory_follower.cpp
+  src/behavior/follow_trajectory/vehicle_model.cpp
   src/behavior/route_planner.cpp
   src/color_utils/color_utils.cpp
   src/data_type/behavior.cpp
