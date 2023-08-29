@@ -4,9 +4,10 @@
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <geometry/vector3/truncate.hpp>
-#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory/position_mode_polyline_trajectory_follower.hpp>
+
+#include <iostream>
 
 namespace traffic_simulator
 {
@@ -17,7 +18,7 @@ auto PositionModePolylineTrajectoryFollower::setParameters(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time)
   -> void
 {
-  vehicle = Vehicle(entity_status);
+  vehicle = std::make_unique<Vehicle>(entity_status);
   behavior_parameter_m = behavior_parameter;
   step_time_m = step_time;
 }
@@ -50,11 +51,11 @@ PositionModePolylineTrajectoryFollower::followTrajectory(
   const auto [target_position, desired_speed] = target_and_speed_data.value();
 
   const auto desired_velocity =
-    getDesiredVelocity(target_position, vehicle.getCurrentPosition(), desired_speed);
+    getDesiredVelocity(target_position, vehicle->getCurrentPosition(), desired_speed);
 
   const auto velocity = getUpdatedVelocity(desired_velocity, desired_speed);
 
-  return vehicle.createUpdatedStatus(velocity, step_time_m);
+  return vehicle->createUpdatedStatus(velocity, step_time_m);
 }
 
 auto PositionModePolylineTrajectoryFollower::getUpdatedVelocity(
@@ -65,7 +66,7 @@ auto PositionModePolylineTrajectoryFollower::getUpdatedVelocity(
   using math::geometry::operator-;
   using math::geometry::operator+;
 
-  const auto current_velocity = vehicle.getOrientation() * vehicle.getCurrentSpeed();
+  const auto current_velocity = vehicle->getOrientation() * vehicle->getCurrentSpeed();
 
   /*
        Note: If obstacle avoidance is to be implemented, the steering behavior
@@ -81,7 +82,7 @@ auto PositionModePolylineTrajectoryFollower::getUpdatedVelocity(
 
 auto PositionModePolylineTrajectoryFollower::getDesiredVelocity(
   const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
-  double desired_speed) -> geometry_msgs::msg::Vector3
+  double desired_speed) const -> geometry_msgs::msg::Vector3
 {
   using math::geometry::operator-;
   using math::geometry::operator*;
@@ -93,7 +94,7 @@ auto PositionModePolylineTrajectoryFollower::getDesiredVelocity(
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(vehicle.getName()),
+      std::quoted(vehicle->getName()),
       "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
       desired_velocity.y, ", ", desired_velocity.z, "].");
   }
@@ -108,7 +109,7 @@ auto PositionModePolylineTrajectoryFollower::getDistanceAndTimeToFrontWaypoint(
   const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
     math::geometry::hypot(position, target_position),
     (not std::isnan(polyline_trajectory_m->base_time) ? polyline_trajectory_m->base_time : 0.0) +
-      polyline_trajectory_m->shape.vertices.front().time - vehicle.getTime());
+      polyline_trajectory_m->shape.vertices.front().time - vehicle->getTime());
   /*
        This clause is to avoid division-by-zero errors in later clauses with
        distance_to_front_waypoint as the denominator if the distance
@@ -149,7 +150,7 @@ auto PositionModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpe
       if (const auto remaining_time =
             (not std::isnan(polyline_trajectory_m->base_time) ? polyline_trajectory_m->base_time
                                                               : 0.0) +
-            first_waypoint_with_arrival_time_specified->time - vehicle.getTime();
+            first_waypoint_with_arrival_time_specified->time - vehicle->getTime();
           /*
                 The condition below should ideally be remaining_time < 0.
 
@@ -174,7 +175,7 @@ auto PositionModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpe
             */
           remaining_time < -step_time_m) {
         throw common::Error(
-          "Vehicle ", std::quoted(vehicle.getName()),
+          "Vehicle ", std::quoted(vehicle->getName()),
           " failed to reach the trajectory waypoint at the specified time. The specified time "
           "is ",
           first_waypoint_with_arrival_time_specified->time, " (in ",
@@ -198,7 +199,7 @@ auto PositionModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpe
   return std::make_tuple(distance, remaining_time);
 }
 
-void PositionModePolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory() const
+void PositionModePolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory()
 {
   //        The OpenSCENARIO standard does not define the behavior when the value of
   //        Timing.domainAbsoluteRelative is "relative". The standard only states
@@ -220,7 +221,7 @@ void PositionModePolylineTrajectoryFollower::discardTheFrontWaypointFromTrajecto
   if (
     not std::isnan(polyline_trajectory_m->base_time) and
     not std::isnan(polyline_trajectory_m->shape.vertices.front().time)) {
-    polyline_trajectory_m->base_time = vehicle.getTime();
+    polyline_trajectory_m->base_time = vehicle->getTime();
   }
 
   if (std::rotate(

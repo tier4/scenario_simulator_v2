@@ -21,7 +21,6 @@
 #include <openscenario_interpreter/syntax/trajectory_following_mode.hpp>
 #include <openscenario_interpreter/syntax/trajectory_ref.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator/behavior/follow_trajectory.hpp>
 
 namespace openscenario_interpreter
 {

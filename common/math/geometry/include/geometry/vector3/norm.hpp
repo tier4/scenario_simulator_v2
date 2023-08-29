@@ -17,6 +17,8 @@
 
 #include <geometry/vector3/is_like_vector3.hpp>
 
+#include <cmath>
+
 namespace math
 {
 namespace geometry

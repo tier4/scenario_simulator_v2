@@ -11,34 +11,35 @@ namespace follow_trajectory
 class FollowModePolylineTrajectoryFollower : public PolylineTrajectoryFollower
 {
 public:
-  FollowModePolylineTrajectoryFollower() : PolylineTrajectoryFollower(){};
+  FollowModePolylineTrajectoryFollower() = default;
+  ~FollowModePolylineTrajectoryFollower() = default;
 
-  virtual std::optional<traffic_simulator_msgs::msg::EntityStatus> followTrajectory(
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> followTrajectory(
     std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & polyline_trajectory)
     override;
 
-  virtual auto setParameters(
+  auto setParameters(
     const traffic_simulator_msgs::msg::EntityStatus &,
     const traffic_simulator_msgs::msg::BehaviorParameter &, const double,
     const traffic_simulator_msgs::msg::VehicleParameters & vehicle_parameters) -> void override;
-  virtual auto setParameters(
+  auto setParameters(
     const traffic_simulator_msgs::msg::EntityStatus &,
     const traffic_simulator_msgs::msg::BehaviorParameter &, const double) -> void override;
 
 private:
-  virtual auto getDistanceAndTimeToFrontWaypoint(
+  auto getDistanceAndTimeToFrontWaypoint(
     const geometry_msgs::msg::Point & target_position,
     const geometry_msgs::msg::Point & position) const
     -> std::optional<std::tuple<double, double>> override;
-  virtual auto getDistanceAndTimeToWaypointWithSpecifiedTime(
-    double distance_to_front_waypoint) const -> std::optional<std::tuple<double, double>> override;
+  auto getDistanceAndTimeToWaypointWithSpecifiedTime(double distance_to_front_waypoint) const
+    -> std::optional<std::tuple<double, double>> override;
 
-  virtual void discardTheFrontWaypointFromTrajectory() const override;
+  void discardTheFrontWaypointFromTrajectory() override;
 
-  auto getSteering(const geometry_msgs::msg::Point & target_position, double desired_speed)
+  auto getSteering(const geometry_msgs::msg::Point & target_position, double desired_speed) const
     -> double;
 
-  mutable std::optional<geometry_msgs::msg::Point> previous_target;
+  std::optional<geometry_msgs::msg::Point> previous_target{std::nullopt};
 };
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator

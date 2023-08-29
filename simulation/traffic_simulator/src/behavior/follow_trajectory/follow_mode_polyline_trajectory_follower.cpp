@@ -1,8 +1,9 @@
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
-#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory/follow_mode_polyline_trajectory_follower.hpp>
+
+#include <iostream>
 
 namespace traffic_simulator
 {
@@ -15,8 +16,8 @@ auto FollowModePolylineTrajectoryFollower::setParameters(
   [[maybe_unused]] const double step_time) -> void
 {
   throw common::Error(
-    "Vehicle parameters not set with FollowModeTrajectoryFollower for entity: ",
-    std::quoted(entity_status.name), ".");
+    "Unable to set parameters for FollowModeTrajectoryFollower without vehicle_parameters, ",
+    "entity name: ", std::quoted(entity_status.name));
 }
 
 auto FollowModePolylineTrajectoryFollower::setParameters(
@@ -24,8 +25,10 @@ auto FollowModePolylineTrajectoryFollower::setParameters(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, const double step_time,
   const traffic_simulator_msgs::msg::VehicleParameters & vehicle_parameters) -> void
 {
-  vehicle = Vehicle(entity_status, vehicle_parameters);
+  traffic_simulator_msgs::msg::EntityStatus tmp = entity_status;
+  vehicle = std::make_unique<Vehicle>(entity_status, vehicle_parameters);
   behavior_parameter_m = behavior_parameter;
+  previous_target = vehicle->getFrontPosition();
   step_time_m = step_time;
 }
 
@@ -49,7 +52,7 @@ FollowModePolylineTrajectoryFollower::followTrajectory(
 
   const auto desired_steering = getSteering(target_position, desired_speed);
 
-  return vehicle.createUpdatedStatus(desired_steering, desired_speed, step_time_m);
+  return vehicle->createUpdatedStatus(desired_steering, desired_speed, step_time_m);
 }
 
 auto FollowModePolylineTrajectoryFollower::getDistanceAndTimeToFrontWaypoint(
@@ -61,7 +64,7 @@ auto FollowModePolylineTrajectoryFollower::getDistanceAndTimeToFrontWaypoint(
   const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
     math::geometry::hypot(position, target_position),  // TODO DIFFERENT DISTANCE CALCULATION
     (not std::isnan(polyline_trajectory_m->base_time) ? polyline_trajectory_m->base_time : 0.0) +
-      polyline_trajectory_m->shape.vertices.front().time - vehicle.getTime());
+      polyline_trajectory_m->shape.vertices.front().time - vehicle->getTime());
   /*
        This clause is to avoid division-by-zero errors in later clauses with
        distance_to_front_waypoint as the denominator if the distance
@@ -104,7 +107,7 @@ auto FollowModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpeci
       if (const auto remaining_time =
             (not std::isnan(polyline_trajectory_m->base_time) ? polyline_trajectory_m->base_time
                                                               : 0.0) +
-            first_waypoint_with_arrival_time_specified->time - vehicle.getTime();
+            first_waypoint_with_arrival_time_specified->time - vehicle->getTime();
           /*
                 The condition below should ideally be remaining_time < 0.
 
@@ -127,10 +130,10 @@ auto FollowModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpeci
                 -step_time. In other words, the conditions are such that a delay
                 of 1 step time is allowed.
             */
-          /* 
-            @todo This condition allows the vehicle to ignore the time limit. 
-            It is done in this way because the distance is not calculated properly 
-            and the velocity is not accurate. If the vehicle reaches the time 
+          /*
+            @todo This condition allows the vehicle to ignore the time limit.
+            It is done in this way because the distance is not calculated properly
+            and the velocity is not accurate. If the vehicle reaches the time
             limit step_time_m is added to the time.
         */
           remaining_time < -step_time_m) {
@@ -155,7 +158,7 @@ auto FollowModePolylineTrajectoryFollower::getDistanceAndTimeToWaypointWithSpeci
   return std::make_tuple(distance, remaining_time);
 }
 
-void FollowModePolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory() const
+void FollowModePolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory()
 {
   //        The OpenSCENARIO standard does not define the behavior when the value of
   //        Timing.domainAbsoluteRelative is "relative". The standard only states
@@ -170,7 +173,7 @@ void FollowModePolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory
   if (
     not std::isnan(polyline_trajectory_m->base_time) and
     not std::isnan(polyline_trajectory_m->shape.vertices.front().time)) {
-    polyline_trajectory_m->base_time = vehicle.getTime();
+    polyline_trajectory_m->base_time = vehicle->getTime();
   }
 
   previous_target = polyline_trajectory_m->shape.vertices.front().position.position;
@@ -186,15 +189,11 @@ void FollowModePolylineTrajectoryFollower::discardTheFrontWaypointFromTrajectory
 }
 
 auto FollowModePolylineTrajectoryFollower::getSteering(
-  const geometry_msgs::msg::Point & target_position, double desired_speed) -> double
+  const geometry_msgs::msg::Point & target_position, double desired_speed) const -> double
 {
   using math::geometry::operator-;
   using math::geometry::operator*;
   using math::geometry::operator+;
-
-  if (!previous_target) {
-    previous_target = vehicle.getFrontPosition();
-  }
 
   auto a = previous_target.value().y - target_position.y;
   auto b = target_position.x - previous_target.value().x;
@@ -203,22 +202,23 @@ auto FollowModePolylineTrajectoryFollower::getSteering(
 
   auto gain = 1;
   auto parameter = 1;
-  auto heading_error = std::remainder(std::atan2(-1 * a, b) - vehicle.getOrientation().z, 2 * M_PI);
+  auto heading_error =
+    std::remainder(std::atan2(-1 * a, b) - vehicle->getOrientation().z, 2 * M_PI);
   auto cross_track_error =
-    -1 * (a * vehicle.getFrontPosition().x + b * vehicle.getFrontPosition().y + c) /
+    -1 * (a * vehicle->getFrontPosition().x + b * vehicle->getFrontPosition().y + c) /
     std::sqrt(a * a + b * b);
 
   auto cross_track_steering = std::atan2(gain * cross_track_error, (parameter + desired_speed));
   auto steering_input = heading_error + cross_track_steering;
 
   steering_input =
-    std::clamp(steering_input, vehicle.getMaxSteering() * -1, vehicle.getMaxSteering());
+    std::clamp(steering_input, vehicle->getMaxSteering() * -1, vehicle->getMaxSteering());
 
   if (any(is_infinity_or_nan, steering_input)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
-      std::quoted(vehicle.getName()), "'s steering input contains NaN or infinity. The value is ",
+      std::quoted(vehicle->getName()), "'s steering input contains NaN or infinity. The value is ",
       steering_input, ".");
   }
 

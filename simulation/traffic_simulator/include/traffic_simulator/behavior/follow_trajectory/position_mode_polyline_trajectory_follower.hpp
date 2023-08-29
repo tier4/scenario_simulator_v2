@@ -11,16 +11,17 @@ namespace follow_trajectory
 class PositionModePolylineTrajectoryFollower : public PolylineTrajectoryFollower
 {
 public:
-  PositionModePolylineTrajectoryFollower() : PolylineTrajectoryFollower(){};
+  PositionModePolylineTrajectoryFollower() = default;
+  ~PositionModePolylineTrajectoryFollower() = default;
 
-  virtual std::optional<traffic_simulator_msgs::msg::EntityStatus> followTrajectory(
+  std::optional<traffic_simulator_msgs::msg::EntityStatus> followTrajectory(
     std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & polyline_trajectory)
     override;
-  virtual auto setParameters(
+  auto setParameters(
     const traffic_simulator_msgs::msg::EntityStatus &,
     const traffic_simulator_msgs::msg::BehaviorParameter &, const double,
     const traffic_simulator_msgs::msg::VehicleParameters & vehicle_parameters) -> void override;
-  virtual auto setParameters(
+  auto setParameters(
     const traffic_simulator_msgs::msg::EntityStatus &,
     const traffic_simulator_msgs::msg::BehaviorParameter &, const double) -> void override;
 
@@ -28,19 +29,19 @@ private:
   auto getUpdatedVelocity(
     const geometry_msgs::msg::Vector3 & desired_velocity, double desired_speed) const
     -> geometry_msgs::msg::Vector3;
-  virtual auto getDistanceAndTimeToFrontWaypoint(
+  auto getDistanceAndTimeToFrontWaypoint(
     const geometry_msgs::msg::Point & target_position,
     const geometry_msgs::msg::Point & position) const
     -> std::optional<std::tuple<double, double>> override;
-  virtual auto getDistanceAndTimeToWaypointWithSpecifiedTime(
-    double distance_to_front_waypoint) const -> std::optional<std::tuple<double, double>> override;
+  auto getDistanceAndTimeToWaypointWithSpecifiedTime(double distance_to_front_waypoint) const
+    -> std::optional<std::tuple<double, double>> override;
   auto createUpdatedEntityStatus(const geometry_msgs::msg::Vector3 & velocity) const
     -> traffic_simulator_msgs::msg::EntityStatus;
-  virtual void discardTheFrontWaypointFromTrajectory() const override;
+  void discardTheFrontWaypointFromTrajectory() override;
 
   auto getDesiredVelocity(
     const geometry_msgs::msg::Point & target_position, const geometry_msgs::msg::Point & position,
-    double desired_speed) -> geometry_msgs::msg::Vector3;
+    double desired_speed) const -> geometry_msgs::msg::Vector3;
 };
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
