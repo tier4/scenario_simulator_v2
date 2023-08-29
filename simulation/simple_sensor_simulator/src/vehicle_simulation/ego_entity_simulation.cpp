@@ -225,14 +225,32 @@ void EgoEntitySimulation::update(
         return v(0) - (previous_linear_velocity_ ? *previous_linear_velocity_ : 0.0);
       }();
 
-      auto v = Eigen::VectorXd(vehicle_model_ptr_->getDimX());
+      switch (auto v = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
+        case VehicleModelType::DELAY_STEER_ACC:
+        case VehicleModelType::DELAY_STEER_ACC_GEARED:
+          v(5) = 0;  // ax
+          [[fallthrough]];
 
-      v(0) = world_relative_position(0);
-      v(1) = world_relative_position(1);
-      v(2) = yaw;
-      v(3) = vx;
+        case VehicleModelType::DELAY_STEER_VEL:
+          v(4) = 0;  // wz
+          [[fallthrough]];
 
-      vehicle_model_ptr_->setState(v);
+        case VehicleModelType::IDEAL_STEER_ACC:
+        case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+          v(3) = vx;
+          [[fallthrough]];
+
+        case VehicleModelType::IDEAL_STEER_VEL:
+          v(0) = world_relative_position(0);
+          v(1) = world_relative_position(1);
+          v(2) = yaw;
+          vehicle_model_ptr_->setState(v);
+          break;
+
+        default:
+          THROW_SEMANTIC_ERROR(
+            "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
+      }
 
       setStatus(*status);
 
