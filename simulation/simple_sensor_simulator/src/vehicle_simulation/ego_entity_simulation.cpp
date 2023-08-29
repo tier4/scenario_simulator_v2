@@ -188,20 +188,28 @@ void EgoEntitySimulation::update(
           status_, polyline_trajectory, traffic_simulator_msgs::msg::BehaviorParameter(),
           step_time);
         status) {
-      // const auto previous_status = status_;
-      //
-      // const auto previous_linear_velocity = previous_linear_velocity_;
+      using quaternion_operation::convertQuaternionToEulerAngle;
+      using quaternion_operation::getRotationMatrix;
 
       auto world_relative_position = [&]() -> Eigen::VectorXd {
         auto v = Eigen::VectorXd(3);
         v(0) = status->pose.position.x - initial_pose_.position.x;
         v(1) = status->pose.position.y - initial_pose_.position.y;
         v(2) = status->pose.position.z - initial_pose_.position.z;
-        return quaternion_operation::getRotationMatrix(initial_pose_.orientation).transpose() * v;
+        return getRotationMatrix(initial_pose_.orientation).transpose() * v;
       }();
 
       const auto yaw = [&]() {
-        return 0.0;  // Dummy value.
+        const auto q = Eigen::Quaterniond(
+          getRotationMatrix(initial_pose_.orientation).transpose() *
+          getRotationMatrix(status->pose.orientation));
+        geometry_msgs::msg::Quaternion relative_orientation;
+        relative_orientation.x = q.x();
+        relative_orientation.y = q.y();
+        relative_orientation.z = q.z();
+        relative_orientation.w = q.w();
+        return convertQuaternionToEulerAngle(relative_orientation).z -
+               (previous_linear_velocity_ ? *previous_angular_velocity_ : 0) * step_time;
       }();
 
       const auto vx = [&]() {
@@ -213,7 +221,7 @@ void EgoEntitySimulation::update(
         v(0) = traveled_distance / step_time;
         v(1) = 0;
         v(2) = 0;
-        v = quaternion_operation::getRotationMatrix(initial_pose_.orientation).transpose() * v;
+        v = getRotationMatrix(initial_pose_.orientation).transpose() * v;
         return v(0) - (previous_linear_velocity_ ? *previous_linear_velocity_ : 0.0);
       }();
 
