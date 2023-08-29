@@ -178,12 +178,8 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
-#define LINE() \
-  std::cout << "\x1b[33m" __FILE__ "\x1b[31m:\x1b[36m" << __LINE__ << "\x1b[0m" << std::endl
-
-#define PRINT(...) std::cout << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
-
-void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_started)
+void EgoEntitySimulation::update(
+  double current_scenario_time, double step_time, bool npc_logic_started)
 {
   autoware->rethrow();
 
@@ -242,19 +238,20 @@ void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_s
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC:
-        input << autoware->getGearSign() * autoware->getAcceleration(),
-          autoware->getSteeringAngle();
+        input(0) = autoware->getGearSign() * autoware->getAcceleration();
+        input(1) = autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input << autoware->getGearSign() * autoware->getAcceleration(),
-          autoware->getSteeringAngle();
+        input(0) = autoware->getGearSign() * autoware->getAcceleration();
+        input(1) = autoware->getSteeringAngle();
         break;
 
       case VehicleModelType::DELAY_STEER_VEL:
       case VehicleModelType::IDEAL_STEER_VEL:
-        input << autoware->getVelocity(), autoware->getSteeringAngle();
+        input(0) = autoware->getVelocity();
+        input(1) = autoware->getSteeringAngle();
         break;
 
       default:
@@ -267,7 +264,7 @@ void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_s
     vehicle_model_ptr_->update(step_time);
   }
 
-  updateStatus(time, step_time);
+  updateStatus(current_scenario_time, step_time);
   updatePreviousValues();
 }
 
