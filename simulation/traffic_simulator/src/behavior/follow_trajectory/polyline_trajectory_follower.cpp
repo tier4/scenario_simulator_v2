@@ -14,23 +14,23 @@
 
 #include <arithmetic/floating_point/comparison.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory/polyline_trajectory_follower.hpp>
-
-#include <iostream>
 
 namespace traffic_simulator
 {
 namespace follow_trajectory
 {
 
-auto PolylineTrajectoryFollower::getTargetPositionAndDesiredSpeed()
+auto PolylineTrajectoryFollower::getTargetPositionAndDesiredSpeed(
+  const geometry_msgs::msg::Point & current_position)
   -> std::optional<std::tuple<geometry_msgs::msg::Point, double>>
 {
   const auto target_position = getTargetPosition();
 
   const auto front_waypoint_data =
-    getDistanceAndTimeToFrontWaypoint(target_position, vehicle->getCurrentPosition());
+    getDistanceAndTimeToFrontWaypoint(target_position, current_position);
   if (!front_waypoint_data) {
     discardTheFrontWaypointFromTrajectory();
     return std::nullopt;
@@ -50,10 +50,10 @@ auto PolylineTrajectoryFollower::getTargetPositionAndDesiredSpeed()
     timed_waypoint_data.value();
 
   const auto speed = vehicle->getCurrentSpeed();
-  const auto acceleration = vehicle->getCurrentAcceleration();
-  const auto [min_acceleration, max_acceleration] = getAccelerationLimits(acceleration);
+  const auto [min_acceleration, max_acceleration] = vehicle->getAccelerationLimits(step_time_m);
   const auto desired_acceleration = getDesiredAcceleration(
-    remaining_time_to_timed_waypoint, acceleration, distance_to_timed_waypoint, speed);
+    remaining_time_to_timed_waypoint, vehicle->getCurrentAcceleration(), distance_to_timed_waypoint,
+    speed);
   const auto desired_speed =
     getDesiredSpeed(desired_acceleration, min_acceleration, max_acceleration, speed);
 
@@ -85,40 +85,6 @@ auto PolylineTrajectoryFollower::getTargetPosition() const -> geometry_msgs::msg
       target_position.x, ", ", target_position.y, ", ", target_position.z, "].");
   }
   return target_position;
-}
-
-auto PolylineTrajectoryFollower::getAccelerationLimits(double acceleration) const
-  -> std::tuple<double, double>
-{
-  const auto max_acceleration = std::min(
-    acceleration /* [m/s^2] */ +
-      behavior_parameter_m.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
-        step_time_m /* [s] */,
-    +behavior_parameter_m.dynamic_constraints.max_acceleration /* [m/s^2] */);
-
-  if (std::isinf(max_acceleration) or std::isnan(max_acceleration)) {
-    throw common::Error(
-      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Vehicle ",
-      std::quoted(vehicle->getName()),
-      "'s maximum acceleration value is NaN or infinity. The value is ", max_acceleration, ".");
-  }
-
-  const auto min_acceleration = std::max(
-    acceleration /* [m/s^2] */ -
-      behavior_parameter_m.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
-        step_time_m /* [s] */,
-    -behavior_parameter_m.dynamic_constraints.max_deceleration /* [m/s^2] */);
-
-  if (std::isinf(min_acceleration) or std::isnan(min_acceleration)) {
-    throw common::Error(
-      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
-      "following information to the developer: Vehicle ",
-      std::quoted(vehicle->getName()),
-      "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ".");
-  }
-
-  return std::make_tuple(min_acceleration, max_acceleration);
 }
 
 auto PolylineTrajectoryFollower::getTimeRemainingToFrontWaypoint(

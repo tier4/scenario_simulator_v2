@@ -1,12 +1,11 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE_MODEL_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__VEHICLE_MODEL_HPP_
 
+#include <optional>
 #include <traffic_simulator/behavior/follow_trajectory/utils.hpp>
-
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-
-#include <optional>
 
 namespace traffic_simulator
 {
@@ -17,17 +16,25 @@ class Vehicle
 {
 public:
   Vehicle() = default;
-  explicit Vehicle(const traffic_simulator_msgs::msg::EntityStatus & entity_status)
-  : status{entity_status}, vehicle_parameters{std::nullopt} {};
+  explicit Vehicle(
+    const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+    const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter)
+  : status{entity_status},
+    behavior_parameter{behavior_parameter},
+    vehicle_parameters{std::nullopt} {};
   Vehicle(
     const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+    const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
     const traffic_simulator_msgs::msg::VehicleParameters & vehicle_parameters)
-  : status{entity_status}, vehicle_parameters{vehicle_parameters} {};
+  : status{entity_status},
+    behavior_parameter{behavior_parameter},
+    vehicle_parameters{vehicle_parameters} {};
 
   auto getCurrentPosition() const -> geometry_msgs::msg::Point;
   auto getFrontPosition() const -> geometry_msgs::msg::Point;
   auto getCurrentSpeed() const -> double;
   auto getCurrentAcceleration() const -> double;
+  auto getAccelerationLimits(double step_time) const -> std::tuple<double, double>;
   auto getName() const -> std::string;
   auto getTime() const -> double;
   auto getMaxSteering() const -> double;
@@ -41,6 +48,7 @@ public:
 
 private:
   const traffic_simulator_msgs::msg::EntityStatus status;
+  const traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   const std::optional<const traffic_simulator_msgs::msg::VehicleParameters> vehicle_parameters;
 };
 

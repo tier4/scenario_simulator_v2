@@ -1,9 +1,9 @@
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory/vehicle_model.hpp>
-
-#include <quaternion_operation/quaternion_operation.h>
 
 namespace traffic_simulator
 {
@@ -137,6 +137,39 @@ auto Vehicle::getCurrentAcceleration() const -> double
   return acceleration;
 }
 
+auto Vehicle::getAccelerationLimits(double step_time) const -> std::tuple<double, double>
+{
+  const auto max_acceleration = std::min(
+    getCurrentAcceleration() /* [m/s^2] */ +
+      behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
+        step_time /* [s] */,
+    +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
+
+  if (std::isinf(max_acceleration) or std::isnan(max_acceleration)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(getName()), "'s maximum acceleration value is NaN or infinity. The value is ",
+      max_acceleration, ".");
+  }
+
+  const auto min_acceleration = std::max(
+    getCurrentAcceleration() /* [m/s^2] */ -
+      behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
+        step_time /* [s] */,
+    -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */);
+
+  if (std::isinf(min_acceleration) or std::isnan(min_acceleration)) {
+    throw common::Error(
+      "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
+      "following information to the developer: Vehicle ",
+      std::quoted(getName()), "'s minimum acceleration value is NaN or infinity. The value is ",
+      min_acceleration, ".");
+  }
+
+  return std::make_tuple(min_acceleration, max_acceleration);
+}
+
 auto Vehicle::getCurrentSpeed() const -> double
 {
   const auto speed = status.action_status.twist.linear.x;  // [m/s]
@@ -149,15 +182,9 @@ auto Vehicle::getCurrentSpeed() const -> double
   return speed;
 }
 
-auto Vehicle::getName() const -> std::string
-{
-  return status.name;
-}
+auto Vehicle::getName() const -> std::string { return status.name; }
 
-auto Vehicle::getTime() const -> double
-{
-  return status.time;
-}
+auto Vehicle::getTime() const -> double { return status.time; }
 
 auto Vehicle::getMaxSteering() const -> double
 {

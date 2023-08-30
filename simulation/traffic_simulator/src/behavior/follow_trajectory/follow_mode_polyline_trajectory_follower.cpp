@@ -1,9 +1,8 @@
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory/follow_mode_polyline_trajectory_follower.hpp>
-
-#include <iostream>
 
 namespace traffic_simulator
 {
@@ -26,8 +25,7 @@ auto FollowModePolylineTrajectoryFollower::setParameters(
   const traffic_simulator_msgs::msg::VehicleParameters & vehicle_parameters) -> void
 {
   traffic_simulator_msgs::msg::EntityStatus tmp = entity_status;
-  vehicle = std::make_unique<Vehicle>(entity_status, vehicle_parameters);
-  behavior_parameter_m = behavior_parameter;
+  vehicle = std::make_unique<Vehicle>(entity_status, behavior_parameter, vehicle_parameters);
   previous_target = vehicle->getFrontPosition();
   step_time_m = step_time;
 }
@@ -42,7 +40,7 @@ FollowModePolylineTrajectoryFollower::followTrajectory(
 
   polyline_trajectory_m = polyline_trajectory;
 
-  auto target_and_speed_data = getTargetPositionAndDesiredSpeed();
+  auto target_and_speed_data = getTargetPositionAndDesiredSpeed(vehicle->getFrontPosition());
 
   if (!target_and_speed_data) {
     return followTrajectory(polyline_trajectory_m);

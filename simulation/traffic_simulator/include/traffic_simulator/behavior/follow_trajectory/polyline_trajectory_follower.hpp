@@ -15,14 +15,12 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__POLYLINE_TRAJECTORY_FOLLOWER_HPP_
 
+#include <optional>
 #include <traffic_simulator/behavior/follow_trajectory/vehicle_model.hpp>
-
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-
-#include <optional>
 
 namespace traffic_simulator
 {
@@ -47,7 +45,6 @@ public:
 
 protected:
   auto getTargetPosition() const -> geometry_msgs::msg::Point;
-  auto getAccelerationLimits(double acceleration) const -> std::tuple<double, double>;
   auto getTimeRemainingToFrontWaypoint(
     double remaining_time_to_front_waypoint, double distance_to_front_waypoint,
     double desired_speed) const -> std::optional<double>;
@@ -56,7 +53,7 @@ protected:
     double speed) const -> double;
   auto getDesiredAcceleration(
     double remaining_time, double acceleration, double distance, double speed) const -> double;
-  auto getTargetPositionAndDesiredSpeed()
+  auto getTargetPositionAndDesiredSpeed(const geometry_msgs::msg::Point & current_position)
     -> std::optional<std::tuple<geometry_msgs::msg::Point, double>>;
 
   virtual void discardTheFrontWaypointFromTrajectory() = 0;
@@ -68,7 +65,6 @@ protected:
     double distance_to_front_waypoint) const -> std::optional<std::tuple<double, double>> = 0;
 
   double step_time_m{0.0};
-  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_m;
   std::unique_ptr<Vehicle> vehicle{nullptr};
   std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_m{nullptr};
 };
