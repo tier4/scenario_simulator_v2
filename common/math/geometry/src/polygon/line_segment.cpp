@@ -196,7 +196,7 @@ auto LineSegment::getIntersection2DSValue(
 auto LineSegment::getIntersection2DSValue(const LineSegment & line, const bool denormalize_s) const
   -> std::optional<double>
 {
-  /// @note Hard coded parameter, this parameter describes the torelance of the range of s value (-s_tolerance ~ 1.0 + s_tolerance)
+  /// @note Hard coded parameter, this parameter describes the tolerance of the range of s value (-s_tolerance ~ 1.0 + s_tolerance)
   constexpr double s_tolerance = 1e-10;
   const auto get_s_normalized = [this](const auto & line) -> std::optional<double> {
     if (!isIntersect2D(line)) {
