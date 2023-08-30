@@ -16,6 +16,8 @@
 #define BEHAVIOR_TREE_PLUGIN__VEHICLE__FOLLOW_POLYLINE_TRAJECTORY_ACTION_HPP_
 
 #include <behavior_tree_plugin/vehicle/vehicle_action_node.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/follow_mode_polyline_trajectory_follower.hpp>
+#include <traffic_simulator/behavior/follow_trajectory/position_mode_polyline_trajectory_follower.hpp>
 
 namespace entity_behavior
 {
@@ -28,6 +30,9 @@ struct FollowPolylineTrajectoryAction : public VehicleActionNode
   std::optional<double> target_speed;
 
   using VehicleActionNode::VehicleActionNode;
+
+  std::unique_ptr<traffic_simulator::follow_trajectory::PolylineTrajectoryFollower>
+    trajectory_follower;
 
   auto calculateWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
