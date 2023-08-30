@@ -69,7 +69,6 @@ void TestExecutor::initialize()
   RCLCPP_INFO_STREAM(logger_, message);
   scenario_completed_ = false;
 
-  api_->initialize(1.0, 0.05);
   api_->updateFrame();
 
   if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {

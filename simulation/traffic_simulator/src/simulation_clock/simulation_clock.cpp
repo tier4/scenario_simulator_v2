@@ -17,68 +17,40 @@
 
 namespace traffic_simulator
 {
-SimulationClock::SimulationClock(rcl_clock_type_t clock_type, bool use_raw_clock)
-: rclcpp::Clock(clock_type),
-  use_raw_clock(use_raw_clock),
-  step_time_duration_(rclcpp::Duration::from_seconds(0)),
-  initialized_(false),
-  is_npc_logic_started_(false)
+SimulationClock::SimulationClock(double realtime_factor, double frame_rate)
+: rclcpp::Clock(RCL_ROS_TIME),
+  use_raw_clock(true),
+  realtime_factor(realtime_factor),
+  frame_rate(frame_rate),
+  time_on_initialize(now())
 {
 }
 
-void SimulationClock::initialize(double initial_simulation_time, double step_time)
-{
-  initialized_ = true;
-  initial_simulation_time_ = initial_simulation_time;
-  current_simulation_time_ = initial_simulation_time_;
-  step_time_ = step_time;
-  step_time_duration_ = rclcpp::Duration::from_seconds(step_time_);
-  time_on_initialize_ = now();
-}
+auto SimulationClock::update() -> void { ++frame_; }
 
-void SimulationClock::update()
-{
-  if (!initialized_) {
-    THROW_SIMULATION_ERROR("SimulationClock has not been initialized yet.");
-  }
-  current_simulation_time_ = current_simulation_time_ + step_time_;
-}
-
-const rosgraph_msgs::msg::Clock SimulationClock::getCurrentRosTimeAsMsg()
+auto SimulationClock::getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock
 {
   rosgraph_msgs::msg::Clock clock;
   clock.clock = getCurrentRosTime();
   return clock;
 }
 
-const rclcpp::Time SimulationClock::getCurrentRosTime()
+auto SimulationClock::getCurrentRosTime() -> rclcpp::Time
 {
-  if (!initialized_) {
-    THROW_SIMULATION_ERROR("SimulationClock has not been initialized yet.");
-  }
   if (use_raw_clock) {
     return now();
   } else {
-    return time_on_initialize_ +
-           rclcpp::Duration::from_seconds(current_simulation_time_ - initial_simulation_time_);
+    return time_on_initialize + rclcpp::Duration::from_seconds(getCurrentSimulationTime());
   }
 }
 
-void SimulationClock::onNpcLogicStart()
+auto SimulationClock::start() -> void
 {
-  if (is_npc_logic_started_) {
+  if (started()) {
     THROW_SIMULATION_ERROR(
       "npc logic is already started. Please check simulation clock instance was destroyed.");
+  } else {
+    frame_offset_ = frame_;
   }
-  is_npc_logic_started_ = true;
-  scenario_time_offset_ = getCurrentSimulationTime();
-}
-
-double SimulationClock::getCurrentScenarioTime() const
-{
-  if (!is_npc_logic_started_) {
-    return std::numeric_limits<double>::quiet_NaN();
-  }
-  return getCurrentSimulationTime() - scenario_time_offset_;
 }
 }  // namespace traffic_simulator

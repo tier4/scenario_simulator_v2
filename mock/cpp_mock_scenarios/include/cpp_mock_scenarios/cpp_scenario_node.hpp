@@ -73,7 +73,6 @@ private:
       // configuration.lanelet2_map_file = "lanelet2_map_with_private_road_and_walkway_ele_fix.osm";
       configuration.scenario_path = scenario_filename;
       configuration.verbose = verbose;
-      configuration.initialize_duration = 0;
     }
     checkConfiguration(configuration);
     return configuration;
