@@ -46,9 +46,9 @@ OpenSCENARIO:
               y: 0
               z: 0.75
             Dimensions:
-              width: 1.3
-              length: 4.77
-              height: 1.5
+              width: 1.475
+              length: 3.395
+              height: 1.8
           Performance:
             maxSpeed: 50
             maxAcceleration: INF
