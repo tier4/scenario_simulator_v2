@@ -212,82 +212,59 @@ void EgoEntitySimulation::update(
                (previous_linear_velocity_ ? *previous_angular_velocity_ : 0) * step_time;
       }();
 
-      const auto vx = [&]() {
-        auto traveled_distance = std::hypot(
-          status->pose.position.x - status_.pose.position.x,
-          status->pose.position.y - status_.pose.position.y,
-          status->pose.position.z - status_.pose.position.z);
-        auto v = Eigen::VectorXd(3);
-        v(0) = traveled_distance / step_time;
-        v(1) = 0;
-        v(2) = 0;
-        v = getRotationMatrix(initial_pose_.orientation).transpose() * v;
-        return v(0) - (previous_linear_velocity_ ? *previous_linear_velocity_ : 0.0);
-      }();
-
-      switch (auto v = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
+      switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
         case VehicleModelType::DELAY_STEER_ACC:
         case VehicleModelType::DELAY_STEER_ACC_GEARED:
-          v(5) = 0;  // ax
+          state(5) = status->action_status.accel.linear.x;
           [[fallthrough]];
 
         case VehicleModelType::DELAY_STEER_VEL:
-          v(4) = 0;  // wz
+          state(4) = 0;
           [[fallthrough]];
 
         case VehicleModelType::IDEAL_STEER_ACC:
         case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-          v(3) = vx;
+          state(3) = status->action_status.twist.linear.x;
           [[fallthrough]];
 
         case VehicleModelType::IDEAL_STEER_VEL:
-          v(0) = world_relative_position(0);
-          v(1) = world_relative_position(1);
-          v(2) = yaw;
-          vehicle_model_ptr_->setState(v);
+          state(0) = world_relative_position(0);
+          state(1) = world_relative_position(1);
+          state(2) = yaw;
+          vehicle_model_ptr_->setState(state);
           break;
 
         default:
           THROW_SEMANTIC_ERROR(
             "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
       }
+    } else {
+      auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
-      setStatus(*status);
+      switch (vehicle_model_type_) {
+        case VehicleModelType::DELAY_STEER_ACC:
+        case VehicleModelType::DELAY_STEER_ACC_GEARED:
+        case VehicleModelType::IDEAL_STEER_ACC:
+        case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+          input(0) = autoware->getGearSign() * autoware->getAcceleration();
+          input(1) = autoware->getSteeringAngle();
+          break;
 
-      updatePreviousValues();
+        case VehicleModelType::DELAY_STEER_VEL:
+        case VehicleModelType::IDEAL_STEER_VEL:
+          input(0) = autoware->getVelocity();
+          input(1) = autoware->getSteeringAngle();
+          break;
 
-      return;
+        default:
+          THROW_SEMANTIC_ERROR(
+            "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
+      }
+
+      vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+      vehicle_model_ptr_->setInput(input);
+      vehicle_model_ptr_->update(step_time);
     }
-
-    Eigen::VectorXd input(vehicle_model_ptr_->getDimU());
-
-    switch (vehicle_model_type_) {
-      case VehicleModelType::DELAY_STEER_ACC:
-      case VehicleModelType::IDEAL_STEER_ACC:
-        input(0) = autoware->getGearSign() * autoware->getAcceleration();
-        input(1) = autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::DELAY_STEER_ACC_GEARED:
-      case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input(0) = autoware->getGearSign() * autoware->getAcceleration();
-        input(1) = autoware->getSteeringAngle();
-        break;
-
-      case VehicleModelType::DELAY_STEER_VEL:
-      case VehicleModelType::IDEAL_STEER_VEL:
-        input(0) = autoware->getVelocity();
-        input(1) = autoware->getSteeringAngle();
-        break;
-
-      default:
-        THROW_SEMANTIC_ERROR(
-          "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
-    }
-
-    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
-    vehicle_model_ptr_->setInput(input);
-    vehicle_model_ptr_->update(step_time);
   }
 
   updateStatus(current_scenario_time, step_time);
@@ -376,7 +353,7 @@ auto EgoEntitySimulation::updateStatus(double current_scenario_time, double step
 {
   traffic_simulator_msgs::msg::EntityStatus status;
   status.name = status_.name;
-  status.time = current_scenario_time;
+  status.time = std::isnan(current_scenario_time) ? 0 : current_scenario_time;
   status.type = status_.type;
   status.bounding_box = status_.bounding_box;
   status.pose = getCurrentPose();

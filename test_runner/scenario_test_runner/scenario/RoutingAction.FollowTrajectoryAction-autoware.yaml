@@ -135,7 +135,7 @@ OpenSCENARIO:
                                                     s: 1
                                                     offset: 0
                                                     Orientation: *ORIENTATION_ZERO
-                                              - time: 30
+                                              - time: 15
                                                 Position:
                                                   LanePosition:
                                                     roadId: ''
@@ -204,7 +204,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 30
+                                      value: 60
                                       rule: greaterThan
                         Action:
                           - name: ''
