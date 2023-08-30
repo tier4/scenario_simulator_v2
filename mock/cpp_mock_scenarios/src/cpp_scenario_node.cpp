@@ -22,7 +22,7 @@ CppScenarioNode::CppScenarioNode(
   const std::string & lanelet2_map_file, const std::string & scenario_filename, const bool verbose,
   const rclcpp::NodeOptions & option)
 : Node(node_name, option),
-  api_(this, configure(map_path, lanelet2_map_file, scenario_filename, verbose)),
+  api_(this, configure(map_path, lanelet2_map_file, scenario_filename, verbose), 1.0, 20),
   scenario_filename_(scenario_filename),
   exception_expect_(false)
 {
@@ -52,7 +52,6 @@ void CppScenarioNode::update()
 
 void CppScenarioNode::start()
 {
-  api_.initialize(1.0, 0.05);
   onInitialize();
   api_.startNpcLogic();
   using namespace std::chrono_literals;

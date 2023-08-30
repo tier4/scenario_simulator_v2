@@ -49,8 +49,8 @@ public:
     const Node & node, const traffic_simulator::Configuration & configuration, Ts &&... xs) -> void
   {
     if (not active()) {
-      core = std::make_unique<traffic_simulator::API>(node, configuration);
-      core->initialize(std::forward<decltype(xs)>(xs)...);
+      core = std::make_unique<traffic_simulator::API>(
+        node, configuration, std::forward<decltype(xs)>(xs)...);
     } else {
       throw Error("The simulator core has already been instantiated.");
     }
