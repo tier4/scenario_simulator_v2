@@ -19,6 +19,8 @@
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -59,9 +61,12 @@ public:
   {
     if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
       using Message = autoware_auto_perception_msgs::msg::DetectedObjects;
+      using GroundTruthMessage = autoware_auto_perception_msgs::msg::TrackedObjects;
       detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
-        node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1)));
+        node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1),
+        node.create_publisher<GroundTruthMessage>(
+          "/perception/object_recognition/ground_truth/objects", 1)));
     } else {
       std::stringstream ss;
       ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
@@ -111,10 +116,10 @@ public:
     }
   }
 
-  void updateSensorFrame(
-    double current_time, const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const simulation_api_schema::UpdateTrafficLightsRequest & update_traffic_lights_request);
+  auto updateSensorFrame(
+    double current_simulation_time, const rclcpp::Time & current_ros_time,
+    const std::vector<traffic_simulator_msgs::EntityStatus> &,
+    const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & traffic_signals) -> void;
 
 private:
   std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;
