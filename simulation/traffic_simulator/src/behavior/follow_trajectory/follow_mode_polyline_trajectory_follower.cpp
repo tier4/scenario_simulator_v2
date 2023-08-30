@@ -1,9 +1,8 @@
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
+#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory/follow_mode_polyline_trajectory_follower.hpp>
-
-#include <iostream>
 
 namespace traffic_simulator
 {
