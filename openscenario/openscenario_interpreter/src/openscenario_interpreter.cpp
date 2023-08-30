@@ -209,8 +209,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
         }
 
         SimulatorCore::activate(
-          shared_from_this(), makeCurrentConfiguration(), local_real_time_factor,
-          1 / local_frame_rate * local_real_time_factor);
+          shared_from_this(), makeCurrentConfiguration(), local_real_time_factor, local_frame_rate);
 
         /*
            DIRTY HACK!

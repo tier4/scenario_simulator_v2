@@ -133,7 +133,8 @@ private:
   std::vector<traffic_simulator_msgs::MiscObjectParameters> misc_objects_;
   double realtime_factor_;
   double step_time_;
-  double current_time_;
+  double current_simulation_time_;
+  double current_scenario_time_;
   rclcpp::Time current_ros_time_;
   bool initialized_;
   std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
