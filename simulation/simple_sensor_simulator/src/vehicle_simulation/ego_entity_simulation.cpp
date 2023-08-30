@@ -177,7 +177,8 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
-void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_started)
+void EgoEntitySimulation::update(
+  double current_scenario_time, double step_time, bool npc_logic_started)
 {
   autoware->rethrow();
 
@@ -212,7 +213,7 @@ void EgoEntitySimulation::update(double time, double step_time, bool npc_logic_s
     vehicle_model_ptr_->update(step_time);
   }
 
-  updateStatus(time, step_time);
+  updateStatus(current_scenario_time, step_time);
   updatePreviousValues();
 }
 
@@ -294,11 +295,11 @@ auto EgoEntitySimulation::setInitialStatus(const traffic_simulator_msgs::msg::En
   initial_pose_ = status_.pose;
 }
 
-auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
+auto EgoEntitySimulation::updateStatus(double current_scenario_time, double step_time) -> void
 {
   traffic_simulator_msgs::msg::EntityStatus status;
   status.name = status_.name;
-  status.time = time;
+  status.time = current_scenario_time;
   status.type = status_.type;
   status.bounding_box = status_.bounding_box;
   status.pose = getCurrentPose();

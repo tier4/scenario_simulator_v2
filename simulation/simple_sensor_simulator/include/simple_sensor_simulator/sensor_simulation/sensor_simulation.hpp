@@ -120,10 +120,10 @@ public:
     }
   }
 
-  void updateSensorFrame(
-    double current_time, const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const simulation_api_schema::UpdateTrafficLightsRequest & update_traffic_lights_request);
+  auto updateSensorFrame(
+    double current_simulation_time, const rclcpp::Time & current_ros_time,
+    const std::vector<traffic_simulator_msgs::EntityStatus> &,
+    const simulation_api_schema::UpdateTrafficLightsRequest &) -> void;
 
 private:
   std::vector<std::unique_ptr<LidarSensorBase>> lidar_sensors_;

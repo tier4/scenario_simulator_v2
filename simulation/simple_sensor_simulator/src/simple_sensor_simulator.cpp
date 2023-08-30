@@ -87,11 +87,11 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
-  ego_vehicles_ = {};
-  vehicles_ = {};
-  pedestrians_ = {};
-  misc_objects_ = {};
-  entity_status_ = {};
+  ego_vehicles_.clear();
+  vehicles_.clear();
+  pedestrians_.clear();
+  misc_objects_.clear();
+  entity_status_.clear();
   return res;
 }
 
@@ -104,7 +104,8 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
     res.mutable_result()->set_success(false);
     return res;
   }
-  current_time_ = req.current_time();
+  current_simulation_time_ = req.current_simulation_time();
+  current_scenario_time_ = req.current_scenario_time();
   builtin_interfaces::msg::Time t;
   simulation_interface::toMsg(req.current_ros_time(), t);
   current_ros_time_ = t;
@@ -122,7 +123,7 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
       return status;
     });
   sensor_sim_.updateSensorFrame(
-    current_time_, current_ros_time_, entity_status, traffic_signals_states_);
+    current_simulation_time_, current_ros_time_, entity_status, traffic_signals_states_);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
   return res;
@@ -135,7 +136,7 @@ auto ScenarioSimulator::updateEntityStatus(
   if (isEgo(req.status().name())) {
     if (ego_entity_simulation_) {
       ego_entity_simulation_->update(
-        current_time_ + step_time_, step_time_, req.npc_logic_started());
+        current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
     }
     simulation_api_schema::EntityStatus status;
     simulation_interface::toProto(ego_entity_simulation_->getStatus(), status);
@@ -237,7 +238,7 @@ auto ScenarioSimulator::attachDetectionSensor(
   const simulation_api_schema::AttachDetectionSensorRequest & req)
   -> simulation_api_schema::AttachDetectionSensorResponse
 {
-  sensor_sim_.attachDetectionSensor(current_time_, req.configuration(), *this);
+  sensor_sim_.attachDetectionSensor(current_simulation_time_, req.configuration(), *this);
   auto res = simulation_api_schema::AttachDetectionSensorResponse();
   res.mutable_result()->set_success(true);
   return res;
@@ -247,7 +248,7 @@ auto ScenarioSimulator::attachLidarSensor(
   const simulation_api_schema::AttachLidarSensorRequest & req)
   -> simulation_api_schema::AttachLidarSensorResponse
 {
-  sensor_sim_.attachLidarSensor(current_time_, req.configuration(), *this);
+  sensor_sim_.attachLidarSensor(current_simulation_time_, req.configuration(), *this);
   auto res = simulation_api_schema::AttachLidarSensorResponse();
   res.mutable_result()->set_success(true);
   return res;
@@ -258,7 +259,7 @@ auto ScenarioSimulator::attachOccupancyGridSensor(
   -> simulation_api_schema::AttachOccupancyGridSensorResponse
 {
   auto res = simulation_api_schema::AttachOccupancyGridSensorResponse();
-  sensor_sim_.attachOccupancyGridSensor(current_time_, req.configuration(), *this);
+  sensor_sim_.attachOccupancyGridSensor(current_simulation_time_, req.configuration(), *this);
   res.mutable_result()->set_success(true);
   return res;
 }
