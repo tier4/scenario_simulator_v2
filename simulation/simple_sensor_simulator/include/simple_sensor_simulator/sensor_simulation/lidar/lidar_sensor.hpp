@@ -30,15 +30,17 @@ namespace simple_sensor_simulator
 class LidarSensorBase
 {
 protected:
-  double last_update_stamp_;
+  double previous_simulation_time_;
+
   simulation_api_schema::LidarConfiguration configuration_;
 
   Raycaster raycaster_;
   std::vector<std::string> detected_objects_;
 
   explicit LidarSensorBase(
-    const double last_update_stamp, const simulation_api_schema::LidarConfiguration & configuration)
-  : last_update_stamp_(last_update_stamp), configuration_(configuration)
+    const double current_simulation_time,
+    const simulation_api_schema::LidarConfiguration & configuration)
+  : previous_simulation_time_(current_simulation_time), configuration_(configuration)
   {
   }
 
@@ -46,8 +48,8 @@ public:
   virtual ~LidarSensorBase() = default;
 
   virtual auto update(
-    const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &)
-    -> void = 0;
+    const double current_simulation_time, const std::vector<traffic_simulator_msgs::EntityStatus> &,
+    const rclcpp::Time & current_ros_time) -> void = 0;
 
   auto getDetectedObjects() const -> const std::vector<std::string> & { return detected_objects_; }
 };
@@ -64,27 +66,33 @@ class LidarSensor : public LidarSensorBase
 
 public:
   explicit LidarSensor(
-    const double current_time, const simulation_api_schema::LidarConfiguration & configuration,
+    const double current_simulation_time,
+    const simulation_api_schema::LidarConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
-  : LidarSensorBase(current_time, configuration), publisher_ptr_(publisher_ptr)
+  : LidarSensorBase(current_simulation_time, configuration), publisher_ptr_(publisher_ptr)
   {
     raycaster_.setDirection(configuration);
   }
 
   auto update(
-    const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const rclcpp::Time & stamp) -> void override
+    const double current_simulation_time,
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status,
+    const rclcpp::Time & current_ros_time) -> void override
   {
-    if (current_time - last_update_stamp_ - configuration_.scan_duration() >= -0.002) {
-      last_update_stamp_ = current_time;
-      queue_pointcloud_.push(std::make_pair(raycast(status, stamp), current_time));
+    if (
+      current_simulation_time - previous_simulation_time_ - configuration_.scan_duration() >=
+      -0.002) {
+      previous_simulation_time_ = current_simulation_time;
+      queue_pointcloud_.push(
+        std::make_pair(raycast(status, current_ros_time), current_simulation_time));
     } else {
-      detected_objects_ = {};
+      detected_objects_.clear();
     }
 
     if (
-      !queue_pointcloud_.empty() &&
-      current_time - queue_pointcloud_.front().second >= configuration_.lidar_sensor_delay()) {
+      not queue_pointcloud_.empty() and
+      current_simulation_time - queue_pointcloud_.front().second >=
+        configuration_.lidar_sensor_delay()) {
       const auto pointcloud = queue_pointcloud_.front().first;
       queue_pointcloud_.pop();
       publisher_ptr_->publish(pointcloud);

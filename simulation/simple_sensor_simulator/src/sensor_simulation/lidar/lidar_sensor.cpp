@@ -26,40 +26,46 @@ namespace simple_sensor_simulator
 {
 template <>
 auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp)
-  -> sensor_msgs::msg::PointCloud2
+  const std::vector<traffic_simulator_msgs::EntityStatus> & entities,
+  const rclcpp::Time & current_ros_time) -> sensor_msgs::msg::PointCloud2
 {
   std::optional<geometry_msgs::msg::Pose> ego_pose;
-  for (const auto & s : status) {
-    if (configuration_.entity() == s.name()) {
+
+  for (const auto & entity : entities) {
+    if (configuration_.entity() == entity.name()) {
       geometry_msgs::msg::Pose pose;
-      simulation_interface::toMsg(s.pose(), pose);
+      simulation_interface::toMsg(entity.pose(), pose);
       ego_pose = pose;
     } else {
       geometry_msgs::msg::Pose pose;
-      simulation_interface::toMsg(s.pose(), pose);
+      simulation_interface::toMsg(entity.pose(), pose);
       auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
       geometry_msgs::msg::Point center_point;
-      simulation_interface::toMsg(s.bounding_box().center(), center_point);
+      simulation_interface::toMsg(entity.bounding_box().center(), center_point);
       Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
       center = rotation * center;
       pose.position.x = pose.position.x + center.x();
       pose.position.y = pose.position.y + center.y();
       pose.position.z = pose.position.z + center.z();
       raycaster_.addPrimitive<simple_sensor_simulator::primitives::Box>(
-        s.name(), s.bounding_box().dimensions().x(), s.bounding_box().dimensions().y(),
-        s.bounding_box().dimensions().z(), pose);
+        entity.name(),                           //
+        entity.bounding_box().dimensions().x(),  //
+        entity.bounding_box().dimensions().y(),  //
+        entity.bounding_box().dimensions().z(),  //
+        pose);
     }
   }
+
   if (ego_pose) {
     std::vector<double> vertical_angles;
-    for (const auto v : configuration_.vertical_angles()) {
-      vertical_angles.emplace_back(v);
+    for (const auto vertical_angle : configuration_.vertical_angles()) {
+      vertical_angles.push_back(vertical_angle);
     }
-    const auto pointcloud = raycaster_.raycast("base_link", stamp, ego_pose.value());
+    const auto pointcloud = raycaster_.raycast("base_link", current_ros_time, ego_pose.value());
     detected_objects_ = raycaster_.getDetectedObject();
     return pointcloud;
+  } else {
+    throw simple_sensor_simulator::SimulationRuntimeError("failed to find ego vehicle");
   }
-  throw simple_sensor_simulator::SimulationRuntimeError("failed to found ego vehicle");
 }
 }  // namespace simple_sensor_simulator
