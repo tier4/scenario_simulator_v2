@@ -372,11 +372,11 @@ auto EgoEntitySimulation::setInitialStatus(const traffic_simulator_msgs::msg::En
   initial_pose_ = status_.pose;
 }
 
-auto EgoEntitySimulation::updateStatus(double time, double step_time) -> void
+auto EgoEntitySimulation::updateStatus(double current_scenario_time, double step_time) -> void
 {
   traffic_simulator_msgs::msg::EntityStatus status;
   status.name = status_.name;
-  status.time = time;
+  status.time = current_scenario_time;
   status.type = status_.type;
   status.bounding_box = status_.bounding_box;
   status.pose = getCurrentPose();

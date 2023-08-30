@@ -136,8 +136,10 @@ unique_identifier_msgs::msg::UUID generateUUIDMsg(const std::string & input)
 
 template <>
 auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
-  const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
-  const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity) -> void
+  const double current_simulation_time,
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
+  const rclcpp::Time & current_ros_time, const std::vector<std::string> & lidar_detected_entities)
+  -> void
 {
   auto makeObjectClassification = [](const auto & label) {
     autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
@@ -146,23 +148,24 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     return object_classification;
   };
 
-  if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
-    std::vector<std::string> detected_objects;
-    auto detected_entities = configuration_.detect_all_objects_in_range()
-                               ? getDetectedObjects(statuses)
-                               : lidar_detected_entity;
-
-    detected_objects =
-      filterObjectsBySensorRange(statuses, detected_entities, configuration_.range());
+  if (
+    current_simulation_time - previous_simulation_time_ - configuration_.update_duration() >=
+    -0.002) {
+    const std::vector<std::string> detected_objects = filterObjectsBySensorRange(
+      statuses,
+      configuration_.detect_all_objects_in_range() ? getDetectedObjects(statuses)
+                                                   : lidar_detected_entities,
+      configuration_.range());
 
     autoware_auto_perception_msgs::msg::DetectedObjects msg;
-    msg.header.stamp = stamp;
+    msg.header.stamp = current_ros_time;
     msg.header.frame_id = "map";
 
     autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_msg;
     ground_truth_msg.header = msg.header;
 
-    last_update_stamp_ = current_time;
+    previous_simulation_time_ = current_simulation_time;
+
     for (const auto & status : statuses) {
       if (
         std::find(detected_objects.begin(), detected_objects.end(), status.name()) !=
@@ -266,8 +269,8 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     static std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
       queue_ground_truth_objects;
 
-    queue_objects.push(std::make_pair(msg, current_time));
-    queue_ground_truth_objects.push(std::make_pair(ground_truth_msg, current_time));
+    queue_objects.push(std::make_pair(msg, current_simulation_time));
+    queue_ground_truth_objects.push(std::make_pair(ground_truth_msg, current_simulation_time));
 
     static rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
       ground_truth_publisher = std::dynamic_pointer_cast<
@@ -277,14 +280,16 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     autoware_auto_perception_msgs::msg::DetectedObjects delayed_msg;
     autoware_auto_perception_msgs::msg::TrackedObjects delayed_ground_truth_msg;
 
-    if (current_time - queue_objects.front().second >= configuration_.object_recognition_delay()) {
+    if (
+      current_simulation_time - queue_objects.front().second >=
+      configuration_.object_recognition_delay()) {
       delayed_msg = queue_objects.front().first;
       delayed_ground_truth_msg = queue_ground_truth_objects.front().first;
       queue_objects.pop();
     }
 
     if (
-      current_time - queue_ground_truth_objects.front().second >=
+      current_simulation_time - queue_ground_truth_objects.front().second >=
       configuration_.object_recognition_ground_truth_delay()) {
       delayed_ground_truth_msg = queue_ground_truth_objects.front().first;
       queue_ground_truth_objects.pop();

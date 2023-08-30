@@ -99,8 +99,9 @@ message InitializeResponse {
  * Requests updating simulation frame.
  **/
 message UpdateFrameRequest {
-  double current_time = 1;                      // Current simulation time
-  builtin_interfaces.Time current_ros_time = 2; // Current ROS time
+  double current_simulation_time = 1;
+  double current_scenario_time = 2;
+  builtin_interfaces.Time current_ros_time = 3;
 }
 
 /**
