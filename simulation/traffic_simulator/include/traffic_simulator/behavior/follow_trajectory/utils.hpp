@@ -1,8 +1,9 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__UTILS_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__UTILS_HPP_
 
-#include <cmath>
 #include <geometry/vector3/is_like_vector3.hpp>
+
+#include <cmath>
 
 namespace traffic_simulator
 {
@@ -25,4 +26,4 @@ inline auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or 
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
-#endif  //TRAFFIC_SIMULATOR__BEHAVIOR__UTILS_HPP_
+#endif  // TRAFFIC_SIMULATOR__BEHAVIOR__UTILS_HPP_
