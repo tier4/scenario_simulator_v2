@@ -22,7 +22,6 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-
 auto PolylineTrajectoryFollower::getTargetPositionAndDesiredSpeed(
   const geometry_msgs::msg::Point & current_position)
   -> std::optional<std::tuple<geometry_msgs::msg::Point, double>>

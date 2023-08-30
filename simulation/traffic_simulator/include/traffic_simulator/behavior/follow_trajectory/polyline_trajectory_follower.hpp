@@ -26,7 +26,6 @@ namespace traffic_simulator
 {
 namespace follow_trajectory
 {
-
 class PolylineTrajectoryFollower
 {
 public:
