@@ -45,7 +45,7 @@ private:
     if (api_.entityExists("bob") && api_.checkCollision("ego", "bob")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    if (t <= 1.0) {
+    if (t == 1.0) {
       if (t != api_.getCurrentTwist("bob").linear.x) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }

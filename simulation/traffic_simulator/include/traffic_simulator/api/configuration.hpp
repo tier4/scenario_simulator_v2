@@ -38,8 +38,6 @@ struct Configuration
 
   bool standalone_mode = false;
 
-  double initialize_duration = 0;
-
   std::string simulator_host = "localhost";
 
   double conventional_traffic_light_publish_rate = 30.0;

@@ -35,10 +35,8 @@ bool API::despawn(const std::string & name)
   }
   if (not configuration.standalone_mode) {
     simulation_api_schema::DespawnEntityRequest req;
-    simulation_api_schema::DespawnEntityResponse res;
     req.set_name(name);
-    zeromq_client_.call(req, res);
-    return res.result().success();
+    return zeromq_client_.call(req).result().success();
   }
   return true;
 }
@@ -74,7 +72,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   EntityStatus status;
-  status.time = clock_.getCurrentSimulationTime();
+  status.time = clock_.getCurrentScenarioTime();
   status.pose =
     entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
   status.action_status = action_status;
@@ -113,10 +111,7 @@ auto API::setEntityStatus(
   status.bounding_box = getBoundingBox(name);
   status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
   status.name = name;
-  const auto current_time = getCurrentTime();
-  if (std::isnan(current_time)) {
-    status.time = current_time;
-  } else {
+  if (status.time = clock_.getCurrentScenarioTime(); std::isnan(status.time)) {
     status.time = 0;
   }
   status.action_status = action_status;
@@ -138,33 +133,11 @@ auto API::setEntityStatus(
   status.pose = map_pose;
   status.name = name;
   status.action_status = action_status;
-  const auto current_time = getCurrentTime();
-  if (std::isnan(current_time)) {
-    status.time = current_time;
-  } else {
+  if (status.time = clock_.getCurrentScenarioTime(); std::isnan(status.time)) {
     status.time = 0;
   }
   status.bounding_box = getBoundingBox(name);
   setEntityStatus(name, canonicalize(status));
-}
-
-bool API::initialize(double realtime_factor, double step_time)
-{
-  clock_.initialize(-1 * configuration.initialize_duration, step_time);
-
-  if (configuration.standalone_mode) {
-    return true;
-  } else {
-    simulation_api_schema::InitializeRequest req;
-    req.set_step_time(step_time);
-    req.set_realtime_factor(realtime_factor);
-    req.set_initialize_time(clock_.getCurrentSimulationTime());
-    simulation_interface::toProto(clock_.getCurrentRosTime(), *req.mutable_initialize_ros_time());
-    req.set_lanelet2_map_path(configuration.lanelet2_map_path().string());
-    simulation_api_schema::InitializeResponse res;
-    zeromq_client_.call(req, res);
-    return res.result().success();
-  }
 }
 
 bool API::attachDetectionSensor(
@@ -174,20 +147,20 @@ bool API::attachDetectionSensor(
     return true;
   } else {
     simulation_api_schema::AttachDetectionSensorRequest req;
-    simulation_api_schema::AttachDetectionSensorResponse res;
     *req.mutable_configuration() = sensor_configuration;
-    zeromq_client_.call(req, res);
-    return res.result().success();
+    return zeromq_client_.call(req).result().success();
   }
 }
 
 bool API::attachDetectionSensor(
-  const std::string & entity_name, double pos_noise_stddev, double probability_of_lost,
-  double object_recognition_delay, int random_seed)
+  const std::string & entity_name, double detection_sensor_range, bool detect_all_objects_in_range,
+  double pos_noise_stddev, int random_seed, double probability_of_lost,
+  double object_recognition_delay)
 {
   return attachDetectionSensor(helper::constructDetectionSensorConfiguration(
-    entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1, 300, false,
-    pos_noise_stddev, random_seed, probability_of_lost, object_recognition_delay));
+    entity_name, getParameter<std::string>("architecture_type", "awf/universe"), 0.1,
+    detection_sensor_range, detect_all_objects_in_range, pos_noise_stddev, random_seed,
+    probability_of_lost, object_recognition_delay));
 }
 
 bool API::attachOccupancyGridSensor(
@@ -197,10 +170,8 @@ bool API::attachOccupancyGridSensor(
     return true;
   } else {
     simulation_api_schema::AttachOccupancyGridSensorRequest req;
-    simulation_api_schema::AttachOccupancyGridSensorResponse res;
     *req.mutable_configuration() = sensor_configuration;
-    zeromq_client_.call(req, res);
-    return res.result().success();
+    return zeromq_client_.call(req).result().success();
   }
 }
 
@@ -210,10 +181,8 @@ bool API::attachLidarSensor(const simulation_api_schema::LidarConfiguration & li
     return true;
   } else {
     simulation_api_schema::AttachLidarSensorRequest req;
-    simulation_api_schema::AttachLidarSensorResponse res;
     *req.mutable_configuration() = lidar_configuration;
-    zeromq_client_.call(req, res);
-    return res.result().success();
+    return zeromq_client_.call(req).result().success();
   }
 }
 
@@ -229,7 +198,6 @@ bool API::attachLidarSensor(
 bool API::updateTrafficLightsInSim()
 {
   simulation_api_schema::UpdateTrafficLightsRequest req;
-  simulation_api_schema::UpdateTrafficLightsResponse res;
   if (entity_manager_ptr_->trafficLightsChanged()) {
     for (const auto & [id, traffic_light] : entity_manager_ptr_->getConventionalTrafficLights()) {
       simulation_api_schema::TrafficSignal state;
@@ -237,10 +205,10 @@ bool API::updateTrafficLightsInSim()
         static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light), state);
       *req.add_states() = state;
     }
-    zeromq_client_.call(req, res);
+    return zeromq_client_.call(req).result().success();
   }
   // TODO handle response
-  return res.result().success();
+  return simulation_api_schema::UpdateTrafficLightsResponse().result().success();
 }
 
 std::optional<CanonicalizedEntityStatus> API::updateEntityStatusInSim(
@@ -252,10 +220,7 @@ std::optional<CanonicalizedEntityStatus> API::updateEntityStatusInSim(
   status_non_canonicalized.name = entity_name;
   simulation_interface::toProto(status_non_canonicalized, *req.mutable_status());
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-  simulation_api_schema::UpdateEntityStatusResponse res;
-  zeromq_client_.call(req, res);
-
-  if (res.result().success()) {
+  if (auto res = zeromq_client_.call(req); res.result().success()) {
     simulation_interface::toMsg(res.status().pose(), status_non_canonicalized.pose);
     simulation_interface::toMsg(
       res.status().action_status(), status_non_canonicalized.action_status);
@@ -285,6 +250,7 @@ bool API::updateFrame()
     if (configuration.standalone_mode) {
       THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
     }
+
     if (not entity_manager_ptr_->isEgoSpawned()) {
       THROW_SIMULATION_ERROR(
         "This exception is basically not supposed to be sent. Contact the developer as there is "
@@ -302,7 +268,7 @@ bool API::updateFrame()
     entity_manager_ptr_->setEntityStatusExternally(ego_name, ego_status);
   }
 
-  entity_manager_ptr_->update(clock_.getCurrentSimulationTime(), clock_.getStepTime());
+  entity_manager_ptr_->update(clock_.getCurrentScenarioTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
@@ -312,13 +278,12 @@ bool API::updateFrame()
     if (!updateTrafficLightsInSim()) {
       return false;
     }
-    simulation_api_schema::UpdateFrameRequest req;
-    req.set_current_time(clock_.getCurrentSimulationTime());
+    simulation_api_schema::UpdateFrameRequest request;
+    request.set_current_simulation_time(clock_.getCurrentSimulationTime());
+    request.set_current_scenario_time(clock_.getCurrentScenarioTime());
     simulation_interface::toProto(
-      clock_.getCurrentRosTimeAsMsg().clock, *req.mutable_current_ros_time());
-    simulation_api_schema::UpdateFrameResponse res;
-    zeromq_client_.call(req, res);
-    if (!res.result().success()) {
+      clock_.getCurrentRosTimeAsMsg().clock, *request.mutable_current_ros_time());
+    if (not zeromq_client_.call(request).result().success()) {
       return false;
     }
     entity_manager_ptr_->broadcastEntityTransform();
@@ -341,7 +306,22 @@ void API::startNpcLogic()
     THROW_SIMULATION_ERROR("NPC logics are already started.");
   }
   entity_manager_ptr_->startNpcLogic();
-  clock_.onNpcLogicStart();
+  clock_.start();
+}
+
+auto API::requestFollowTrajectory(
+  const std::string & name,
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory) -> bool
+{
+  if (entity_manager_ptr_->isEgo(name)) {
+    auto request = simulation_api_schema::FollowPolylineTrajectoryRequest();
+    *request.mutable_name() = name;
+    *request.mutable_trajectory() = simulation_interface::toProtobufMessage(*trajectory);
+    return zeromq_client_.call(request).result().success();
+  } else {
+    entity_manager_ptr_->requestFollowTrajectory(name, trajectory);
+    return true;
+  }
 }
 
 void API::requestLaneChange(const std::string & name, const std::int64_t & lanelet_id)
