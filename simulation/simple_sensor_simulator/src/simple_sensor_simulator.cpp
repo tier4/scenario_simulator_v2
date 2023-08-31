@@ -31,7 +31,6 @@ namespace simple_sensor_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("simple_sensor_simulator", options),
-  sensor_sim_(*this),
   server_(
     simulation_interface::protocol, simulation_interface::HostName::ANY, getSocketPort(),
     [this](auto &&... xs) { return initialize(std::forward<decltype(xs)>(xs)...); },
@@ -290,7 +289,7 @@ auto ScenarioSimulator::attachTrafficLightDetectorEmulator(
 {
   auto response = simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse();
   sensor_sim_.attachTrafficLightsDetectorEmulator(
-    current_time_, req.configuration(), *this, hdmap_utils_);
+    current_simulation_time_, req.configuration(), *this, hdmap_utils_);
   response.mutable_result()->set_success(true);
   return response;
 }
