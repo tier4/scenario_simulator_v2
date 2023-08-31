@@ -49,8 +49,8 @@ public:
     const Node & node, const traffic_simulator::Configuration & configuration, Ts &&... xs) -> void
   {
     if (not active()) {
-      core = std::make_unique<traffic_simulator::API>(node, configuration);
-      core->initialize(std::forward<decltype(xs)>(xs)...);
+      core = std::make_unique<traffic_simulator::API>(
+        node, configuration, std::forward<decltype(xs)>(xs)...);
     } else {
       throw Error("The simulator core has already been instantiated.");
     }
@@ -266,6 +266,7 @@ public:
           configuration.set_probability_of_lost(controller.properties.template get<Double>("detectedObjectMissingProbability"));
           configuration.set_random_seed(controller.properties.template get<UnsignedInteger>("randomSeed"));
           configuration.set_range(controller.properties.template get<Double>("detectionSensorRange",300.0));
+          configuration.set_object_recognition_ground_truth_delay(controller.properties.template get<Double>("detectedObjectGroundTruthPublishingDelay"));
           configuration.set_update_duration(0.1);
           // clang-format on
           return configuration;
