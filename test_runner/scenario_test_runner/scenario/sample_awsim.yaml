@@ -73,11 +73,11 @@ OpenSCENARIO:
             name: ''
             Properties:
               Property: []
-      - name: MiscObjectPlaceholder
+      - name: SignBoard
         MiscObject:
           name: ''
           miscObjectCategory: obstacle
-          model3d: "human"
+          model3d: "sign_board"
           mass: 1.0
           BoundingBox:
             Center:
@@ -144,7 +144,7 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 2
-          - entityRef: MiscObjectPlaceholder
+          - entityRef: SignBoard
             PrivateAction:
               - TeleportAction:
                   Position:
