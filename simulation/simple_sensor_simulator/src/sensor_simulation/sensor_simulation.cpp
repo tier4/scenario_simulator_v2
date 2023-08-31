@@ -19,26 +19,28 @@
 
 namespace simple_sensor_simulator
 {
-void SensorSimulation::updateSensorFrame(
-  double current_time, const rclcpp::Time & current_ros_time,
-  const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-  const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & traffic_signals)
+auto SensorSimulation::updateSensorFrame(
+  double current_simulation_time, const rclcpp::Time & current_ros_time,
+  const std::vector<traffic_simulator_msgs::EntityStatus> & entities,
+  const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & traffic_signals) -> void
 {
   std::vector<std::string> lidar_detected_objects = {};
+
   for (auto & sensor : lidar_sensors_) {
-    sensor->update(current_time, status, current_ros_time);
-    const auto objects = sensor->getDetectedObjects();
-    for (const auto & obj : objects) {
-      if (std::count(lidar_detected_objects.begin(), lidar_detected_objects.end(), obj) == 0) {
-        lidar_detected_objects.push_back(obj);
+    sensor->update(current_simulation_time, entities, current_ros_time);
+    for (const auto & object : sensor->getDetectedObjects()) {
+      if (std::count(lidar_detected_objects.begin(), lidar_detected_objects.end(), object) == 0) {
+        lidar_detected_objects.push_back(object);
       }
     }
   }
+
   for (auto & sensor : detection_sensors_) {
-    sensor->update(current_time, status, current_ros_time, lidar_detected_objects);
+    sensor->update(current_simulation_time, entities, current_ros_time, lidar_detected_objects);
   }
+
   for (auto & sensor : occupancy_grid_sensors_) {
-    sensor->update(current_time, status, current_ros_time, lidar_detected_objects);
+    sensor->update(current_simulation_time, entities, current_ros_time, lidar_detected_objects);
   }
 
   for (auto & sensor : traffic_lights_detectors_) {

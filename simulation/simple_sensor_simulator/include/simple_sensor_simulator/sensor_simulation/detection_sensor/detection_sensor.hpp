@@ -17,7 +17,6 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <memory>
 #include <queue>
 #include <random>
@@ -31,16 +30,27 @@ namespace simple_sensor_simulator
 class DetectionSensorBase
 {
 protected:
-  double last_update_stamp_;
+  double previous_simulation_time_;
 
   simulation_api_schema::DetectionSensorConfiguration configuration_;
 
   explicit DetectionSensorBase(
-    const double last_update_stamp,
+    const double current_simulation_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration)
-  : last_update_stamp_(last_update_stamp), configuration_(configuration)
+  : previous_simulation_time_(current_simulation_time), configuration_(configuration)
   {
   }
+
+  auto isWithinRange(
+    const geometry_msgs::Point & point1, const geometry_msgs::Point & point2,
+    const double range) const -> bool;
+
+  auto filterObjectsBySensorRange(
+    const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::vector<std::string> &,
+    const double) const -> std::vector<std::string>;
+
+  auto getEntityPose(const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::string &)
+    const -> geometry_msgs::Pose;
 
   auto getDetectedObjects(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
     -> std::vector<std::string>;
@@ -52,8 +62,9 @@ public:
   virtual ~DetectionSensorBase() = default;
 
   virtual void update(
-    const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    const std::vector<std::string> & lidar_detected_entity) = 0;
+    const double current_simulation_time, const std::vector<traffic_simulator_msgs::EntityStatus> &,
+    const rclcpp::Time & current_ros_time,
+    const std::vector<std::string> & lidar_detected_entities) = 0;
 };
 
 template <typename T>
@@ -61,20 +72,22 @@ class DetectionSensor : public DetectionSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
+  typename rclcpp::PublisherBase::SharedPtr ground_truth_publisher_base_ptr_;
+
   std::mt19937 random_engine_;
 
-  std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>> queue_objects_;
-
-  auto applyPositionNoise(autoware_auto_perception_msgs::msg::DetectedObject)
-    -> autoware_auto_perception_msgs::msg::DetectedObject;
+  auto applyPositionNoise(typename T::_objects_type::value_type) ->
+    typename T::_objects_type::value_type;
 
 public:
   explicit DetectionSensor(
-    const double current_time,
+    const double current_simulation_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
-    const typename rclcpp::Publisher<T>::SharedPtr & publisher)
-  : DetectionSensorBase(current_time, configuration),
+    const typename rclcpp::Publisher<T>::SharedPtr & publisher,
+    const typename rclcpp::PublisherBase::SharedPtr & ground_truth_publisher = nullptr)
+  : DetectionSensorBase(current_simulation_time, configuration),
     publisher_ptr_(publisher),
+    ground_truth_publisher_base_ptr_(ground_truth_publisher),
     random_engine_(configuration.random_seed())
   {
   }
@@ -85,16 +98,6 @@ public:
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
     const std::vector<std::string> & lidar_detected_entity) -> void override;
 };
-
-template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
-  autoware_auto_perception_msgs::msg::DetectedObject)
-  -> autoware_auto_perception_msgs::msg::DetectedObject;
-
-template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
-  const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-  const std::vector<std::string> & lidar_detected_entity) -> void;
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__DETECTION_SENSOR__DETECTION_SENSOR_HPP_
