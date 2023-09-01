@@ -80,6 +80,11 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   initialized_ = true;
   realtime_factor_ = req.realtime_factor();
   step_time_ = req.step_time();
+  current_simulation_time_ = req.initialize_time();
+  current_scenario_time_ = std::numeric_limits<double>::quiet_NaN();
+  builtin_interfaces::msg::Time t;
+  simulation_interface::toMsg(req.initialize_ros_time(), t);
+  current_ros_time_ = t;
   hdmap_utils_ = std::make_shared<hdmap_utils::HdMapUtils>(req.lanelet2_map_path(), getOrigin());
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
