@@ -586,6 +586,11 @@ auto EntityManager::setEntityStatus(
       "You cannot set entity status to the ego vehicle name ", std::quoted(name),
       " after starting scenario.");
   } else {
+    if (!std::isnan(getCurrentTime()) && status.getTime() != getCurrentTime())
+      throw common::Error(
+        "Time in EntityStatus: " + std::to_string(status.getTime()) +
+        " is unequal than EntityManager internal current_time: " +
+        std::to_string(getCurrentTime()));
     entities_.at(name)->setStatus(status);
   }
 }
@@ -598,6 +603,11 @@ auto EntityManager::setEntityStatusExternally(
       "You cannot set entity status externally to the vehicle other than ego named ",
       std::quoted(name), ".");
   } else {
+    if (!std::isnan(getCurrentTime()) && status.getTime() != getCurrentTime())
+      throw common::Error(
+        "Time in EntityStatus: " + std::to_string(status.getTime()) +
+        " is unequal than EntityManager internal current_time: " +
+        std::to_string(getCurrentTime()));
     dynamic_cast<EgoEntity *>(entities_[name].get())->setStatusExternally(status);
   }
 }
@@ -681,6 +691,7 @@ void EntityManager::update(const double current_time, const double step_time)
   if (configuration.verbose) {
     stop_watch_update.print();
   }
+  current_time_ += step_time;
 }
 
 void EntityManager::updateHdmapMarker()
