@@ -72,7 +72,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   EntityStatus status;
-  status.time = clock_.getCurrentScenarioTime();
+  status.time = getCurrentTime();
   status.pose =
     entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
   status.action_status = action_status;
@@ -85,7 +85,7 @@ auto API::setEntityStatus(
     status.lanelet_pose_valid = false;
     status.lanelet_pose = traffic_simulator::LaneletPose();
   }
-  entity_manager_ptr_->setEntityStatus(name, canonicalize(status));
+  setEntityStatus(name, canonicalize(status));
 }
 
 std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
@@ -106,15 +106,13 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   EntityStatus status;
-  status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose);
-  status.lanelet_pose_valid = true;
+  status.time = getCurrentTime();
   status.bounding_box = getBoundingBox(name);
   status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
   status.name = name;
-  if (status.time = clock_.getCurrentScenarioTime(); std::isnan(status.time)) {
-    status.time = 0;
-  }
   status.action_status = action_status;
+  status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose);
+  status.lanelet_pose_valid = true;
   setEntityStatus(name, canonicalize(status));
 }
 
@@ -123,6 +121,11 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   EntityStatus status;
+  status.time = getCurrentTime();
+  status.bounding_box = getBoundingBox(name);
+  status.pose = map_pose;
+  status.name = name;
+  status.action_status = action_status;
   if (
     const auto lanelet_pose =
       entity_manager_ptr_->toLaneletPose(map_pose, getBoundingBox(name), false)) {
@@ -130,13 +133,6 @@ auto API::setEntityStatus(
   } else {
     status.lanelet_pose_valid = false;
   }
-  status.pose = map_pose;
-  status.name = name;
-  status.action_status = action_status;
-  if (status.time = clock_.getCurrentScenarioTime(); std::isnan(status.time)) {
-    status.time = 0;
-  }
-  status.bounding_box = getBoundingBox(name);
   setEntityStatus(name, canonicalize(status));
 }
 
@@ -199,7 +195,7 @@ bool API::updateTimeInSim()
 {
   simulation_api_schema::UpdateFrameRequest request;
   request.set_current_simulation_time(clock_.getCurrentSimulationTime());
-  request.set_current_scenario_time(clock_.getCurrentScenarioTime());
+  request.set_current_scenario_time(getCurrentTime());
   simulation_interface::toProto(
     clock_.getCurrentRosTimeAsMsg().clock, *request.mutable_current_ros_time());
   return zeromq_client_.call(request).result().success();
@@ -247,7 +243,7 @@ bool API::updateEntitiesStatusInSim()
         entity_manager_ptr_->fillLaneletPose(name, canonicalized);
         entity_manager_ptr_->setEntityStatusExternally(name, canonicalized);
       } else {
-        entity_manager_ptr_->setEntityStatus(name, canonicalize(entity_status));
+        setEntityStatus(name, canonicalize(entity_status));
       }
     }
     return true;
@@ -265,7 +261,7 @@ bool API::updateFrame()
     return false;
   }
 
-  entity_manager_ptr_->update(clock_.getCurrentScenarioTime(), clock_.getStepTime());
+  entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
