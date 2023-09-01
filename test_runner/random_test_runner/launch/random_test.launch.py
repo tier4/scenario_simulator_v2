@@ -34,7 +34,7 @@ from launch_ros.actions import Node
 
 
 def architecture_types():
-    return ["awf/auto", "awf/universe", "awf/universe/20230800", "tier4/proposal"]
+    return ["awf/auto", "awf/universe", "awf/universe/20230906", "tier4/proposal"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -46,7 +46,7 @@ def default_autoware_launch_package_of(architecture_type):
     return {
         "awf/auto": "scenario_simulator_launch",
         "awf/universe": "autoware_launch",
-        "awf/universe/20230800": "autoware_launch",
+        "awf/universe/20230906": "autoware_launch",
         "tier4/proposal": "autoware_launch",
     }[architecture_type]
 
@@ -60,7 +60,7 @@ def default_autoware_launch_file_of(architecture_type):
     return {
         "awf/auto": "autoware_auto.launch.py",
         "awf/universe": "planning_simulator.launch.xml",
-        "awf/universe/20230800": "planning_simulator.launch.xml",
+        "awf/universe/20230906": "planning_simulator.launch.xml",
         "tier4/proposal": "planning_simulator.launch.xml",
     }[architecture_type]
 
