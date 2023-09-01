@@ -281,19 +281,17 @@ auto EntityManager::getLongitudinalDistance(
     }
   } else {
     /**
-     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
-     * A matching distance of about 1.5 lane widths is given as the matching distance to match the
-     * Entity present on the adjacent Lanelet.
-     */
+    * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function. 
+    * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
+    */
     auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPose>(from).lanelet_id, 5.0,
       include_opposite_direction);
     from_poses.emplace_back(from);
     /**
-     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
-     * A matching distance of about 1.5 lane widths is given as the matching distance to match the
-     * Entity present on the adjacent Lanelet.
-     */
+    * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function. 
+    * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
+    */
     auto to_poses = hdmap_utils_ptr_->toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPose>(to).lanelet_id, 5.0,
       include_opposite_direction);
