@@ -8,6 +8,8 @@
   <license>Apache License 2.0</license>
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>lanelet2_core</depend>
+  <depend>lanelet2_io</depend>
+  <depend>lanelet2_projection</depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>
