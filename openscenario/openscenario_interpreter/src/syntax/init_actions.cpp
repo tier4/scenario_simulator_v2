@@ -111,9 +111,7 @@ auto InitActions::startInstantaneousActions() -> void
       }
       index++;
     } catch (const SpecialAction<EXIT_FAILURE> & action) {
-      auto detailed_action = SpecialAction<EXIT_FAILURE>("Actions", index, "UserDefinedAction");
-      detailed_action.setInitActionAsSource();
-      throw detailed_action;
+      throw SpecialAction<EXIT_FAILURE>("Actions", index, "UserDefinedAction", "Action");
     }
   }
 

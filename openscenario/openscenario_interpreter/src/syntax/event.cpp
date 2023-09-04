@@ -62,11 +62,9 @@ auto Event::evaluate() -> Object
   try {
     return StoryboardElement::evaluate();
   } catch (const SpecialAction<EXIT_FAILURE> & action) {
-    auto condition_group_index = start_trigger.activeConditionGroupIndex();
-    auto detailed_action =
-      SpecialAction<EXIT_FAILURE>(name, condition_group_index, "StartTrigger.ConditionGroup");
-    detailed_action.setCoreSource(start_trigger.activeConditionGroupDescription());
-    throw detailed_action;
+    throw SpecialAction<EXIT_FAILURE>(
+      name, start_trigger.activeConditionGroupIndex(), "StartTrigger.ConditionGroup", "Condition",
+      start_trigger.activeConditionGroupDescription());
   }
 }
 

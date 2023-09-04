@@ -35,66 +35,101 @@ struct SpecialAction : public std::integral_constant<int, Value>
 };
 
 template <>
-struct SpecialAction<EXIT_FAILURE>
-: public std::integral_constant<int, EXIT_FAILURE>  // public std::runtime_error,
+struct SpecialAction<EXIT_FAILURE> : public std::integral_constant<int, EXIT_FAILURE>
 {
 private:
   struct CoreSource
   {
-    CoreSource() = default;
+    enum class SourceType {
+      UNKNOWN,
+      ANONYMOUS,
+      ANONYMOUS_CONDITION,
+      ANONYMOUS_CONDITIONS,
+      NAMED_CONDITION,
+      NAMED_CONDITIONS
+    };
 
-    explicit CoreSource(const std::vector<std::pair<std::string, std::string>> & conditions_list)
-    : single_{conditions_list.size() == 1}
+    explicit CoreSource(const std::string & trigger_name)
+    : trigger_name_{trigger_name},
+      type_{SourceType::ANONYMOUS},
+      conditions_description_{""},
+      conditions_name_{""}
     {
-      anonymous_ = std::any_of(
-        conditions_list.begin(), conditions_list.end(),
-        [](const auto & pair) { return pair.first.empty(); });
+    }
 
-      std::stringstream element_name(""), description("");
-      if (single_) {
-        element_name << std::quoted(conditions_list.front().first);
-        description << conditions_list.front().second;
+    CoreSource(
+      const std::string & trigger_name,
+      const std::vector<std::pair<std::string, std::string>> & conditions_list)
+    : trigger_name_{trigger_name}
+    {
+      auto anonymous{std::any_of(
+        conditions_list.begin(), conditions_list.end(),
+        [](const auto & condition) { return condition.first.empty(); })};
+
+      std::stringstream conditions_name(""), conditions_description("");
+      if (conditions_list.size() == 1) {
+        type_ = anonymous ? SourceType::ANONYMOUS_CONDITION : SourceType::NAMED_CONDITION;
+        conditions_name << std::quoted(conditions_list.front().first);
+        conditions_description << conditions_list.front().second;
       } else {
-        for (std::size_t i = 0; const auto & condition : conditions_list) {
-          element_name << std::quoted(condition.first);
-          description << "{" << std::quoted(anonymous_ ? std::to_string(i++) : condition.first)
-                      << ": " << condition.second << "}";
+        type_ = anonymous ? SourceType::ANONYMOUS_CONDITIONS : SourceType::NAMED_CONDITIONS;
+        std::size_t i = 0;
+        for (const auto & condition : conditions_list) {
+          conditions_name << std::quoted(condition.first);
+          conditions_description << "{"
+                                 << std::quoted(anonymous ? std::to_string(i++) : condition.first)
+                                 << ": " << condition.second << "}";
           if (&condition != &conditions_list.back()) {
-            element_name << ", ";
-            description << ", ";
+            conditions_name << ", ";
+            conditions_description << ", ";
           }
         }
       }
-      element_name_ = element_name.str();
-      description_ = description.str();
+      conditions_name_ = conditions_name.str();
+      conditions_description_ = conditions_description.str();
     }
 
-    auto log() const -> const std::string & { return log_; }
-
-    auto logUpdate(const std::string & trigger_path) -> std::string
+    auto comprehensiveLog(const std::string & trigger_path) -> std::string
     {
       std::stringstream log;
       log << "CustomCommandAction typed " << std::quoted("exitFailure") << " was triggered by the ";
-      if (element_name_.empty()) {
-        log << "action (" << trigger_path << ")";
-      } else if (single_ && anonymous_) {
-        log << "anonymous condition (" << trigger_path << ".Condition[0]): " << description_;
-      } else if (single_) {
-        log << "Condition named " << element_name_ << ": " << description_;
-      } else if (anonymous_) {
-        log << "anonymous conditions (" << trigger_path << ".Condition[...]): " << description_;
-      } else {
-        log << "Conditions named {" << element_name_ << "}: " << description_;
+      switch (type_) {
+        case SourceType::ANONYMOUS: {
+          log << trigger_name_ << " (" << trigger_path << ")";
+          break;
+        }
+        case SourceType::ANONYMOUS_CONDITION: {
+          log << "anonymous " << trigger_name_ << " (" << trigger_path << "." << trigger_name_
+              << "[0]): " << conditions_description_;
+          break;
+        }
+        case SourceType::NAMED_CONDITION: {
+          log << trigger_name_ << " named " << conditions_name_ << " : " << conditions_description_;
+          break;
+        }
+        case SourceType::ANONYMOUS_CONDITIONS: {
+          log << "anonymous " << trigger_name_ << "s (" << trigger_path << "." << trigger_name_
+              << "[...]): " << conditions_description_;
+          break;
+        }
+        case SourceType::NAMED_CONDITIONS: {
+          log << "named " << trigger_name_ << "s {" << conditions_name_
+              << "}: " << conditions_description_;
+          break;
+        }
+        default: {
+          throw std::runtime_error(
+            "Unsupported case of CoreSource in SpecialAction - this should not happen.");
+        }
       }
-      log_ = log.str();
-      return log_;
+      return log.str();
     }
 
   private:
-    bool anonymous_{false}, single_{true}, without_condition_{false};
-    std::string element_name_{""};
-    std::string description_{""};
-    std::string log_{""};
+    const std::string trigger_name_{""};
+    SourceType type_{SourceType::UNKNOWN};
+    std::string conditions_description_{""};
+    std::string conditions_name_{""};
   };
 
 public:
@@ -105,24 +140,40 @@ public:
   SpecialAction(SpecialAction &&) = default;
   SpecialAction & operator=(SpecialAction &&) = default;
 
-  // Constructor with no inner object -- first object
+  // Constructor with no inner object - first object with conditions_list
   SpecialAction(
-    const std::string & source_name, int element_index, const std::string & element_name)
+    const std::string & source_name, int element_index, const std::string & element_name,
+    const std::string & trigger_name_,
+    const std::vector<std::pair<std::string, std::string>> & conditions_list)
   : source_name_{source_name},
     inner_{nullptr},
-    core_{nullptr},
-    path_{formatPath("", element_index, element_name)}
+    core_{std::make_shared<CoreSource>(trigger_name_, conditions_list)},
+    path_{formatPath("", element_index, element_name)},
+    log_{core_->comprehensiveLog(path_)}
   {
   }
 
-  // Constructor with inner object and current source (to be forwarded) -- intermediate object
+  // Constructor with no inner object - first object without conditions
+  SpecialAction(
+    const std::string & source_name, int element_index, const std::string & element_name,
+    const std::string & trigger_name_)
+  : source_name_{source_name},
+    inner_{nullptr},
+    core_{std::make_shared<CoreSource>(trigger_name_)},
+    path_{formatPath("", element_index, element_name)},
+    log_{core_->comprehensiveLog(path_)}
+  {
+  }
+
+  // Constructor with inner object and current source (to be forwarded) - intermediate object
   SpecialAction(
     const std::string & source_name, int element_index, const std::string & element_name,
     SpecialAction const & inner)
   : source_name_{source_name},
     inner_{std::make_shared<SpecialAction>(inner)},
     core_{inner.core_},
-    path_{formatPath(inner.source_name_, element_index, element_name)}
+    path_{formatPath(inner.source_name_, element_index, element_name)},
+    log_{core_->comprehensiveLog(path_)}
   {
   }
 
@@ -131,35 +182,12 @@ public:
   : source_name_{""},
     inner_{std::make_shared<SpecialAction>(inner)},
     core_{inner.core_},
-    path_{formatPath(inner.source_name_, element_name)}
+    path_{formatPath(inner.source_name_, element_name)},
+    log_{core_->comprehensiveLog(path_)}
   {
   }
 
-  auto setCoreSource(const std::vector<std::pair<std::string, std::string>> & conditions_list)
-    -> void
-  {
-    if (!core_)
-      core_ = std::make_shared<CoreSource>(conditions_list);
-    else
-      throw Error("The scenario result core has already been instantiated.");
-  }
-
-  auto setInitActionAsSource() -> void
-  {
-    if (!core_)
-      core_ = std::make_shared<CoreSource>();
-    else
-      throw Error("The scenario result core has already been instantiated.");
-  }
-
-  const char * what() const noexcept
-  {
-    if (core_) {
-      core_->logUpdate(path_);
-      return core_->log().c_str();
-    }
-    return "No core defined";
-  }
+  const char * what() const noexcept { return log_.c_str(); }
 
 private:
   auto formatPath(const std::string & inner_source_name, const std::string & element_name)
@@ -194,6 +222,7 @@ private:
   std::shared_ptr<CoreSource> core_{nullptr};
   const std::string source_name_{""};
   const std::string path_{""};
+  const std::string log_{""};
 };
 
 struct CustomCommand
