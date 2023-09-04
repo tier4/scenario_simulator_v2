@@ -77,8 +77,7 @@ void MultiServer::poll()
         *sim_response.mutable_follow_polyline_trajectory() =
           std::get<FollowPolylineTrajectory>(functions_)(proto.follow_polyline_trajectory());
         break;
-      case simulation_api_schema::SimulationRequest::RequestCase::
-        kAttachPseudoTrafficLightDetector:
+      case simulation_api_schema::SimulationRequest::RequestCase::kAttachPseudoTrafficLightDetector:
         *sim_response.mutable_attach_pseudo_traffic_light_detector() =
           std::get<AttachPseudoTrafficLightDetector>(functions_)(
             proto.attach_pseudo_traffic_light_detector());

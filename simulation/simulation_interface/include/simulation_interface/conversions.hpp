@@ -188,7 +188,7 @@ auto toProto(
 template <typename TrafficLightBulbMessageType>
 auto toMsg(
   const simulation_api_schema::TrafficLight & proto,
-  TrafficLightBulbMessageType & traffic_light_bulb_state)-> void
+  TrafficLightBulbMessageType & traffic_light_bulb_state) -> void
 {
   using namespace simulation_api_schema;
   auto convert_color = [](auto color) {
