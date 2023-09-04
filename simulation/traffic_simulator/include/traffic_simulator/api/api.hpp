@@ -229,8 +229,8 @@ public:
 
   std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
-  bool attachTrafficLightDetectorEmulator(
-    const simulation_api_schema::TrafficLightDetectorEmulatorConfiguration &);
+  bool attachPseudoTrafficLightDetector(
+    const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &);
 
   bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
   bool attachLidarSensor(

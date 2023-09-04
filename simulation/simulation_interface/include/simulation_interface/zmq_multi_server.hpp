@@ -72,7 +72,7 @@ private:
   DEFINE_FUNCTION_TYPE(AttachOccupancyGridSensor);
   DEFINE_FUNCTION_TYPE(UpdateTrafficLights);
   DEFINE_FUNCTION_TYPE(FollowPolylineTrajectory);
-  DEFINE_FUNCTION_TYPE(AttachTrafficLightDetectorEmulator);
+  DEFINE_FUNCTION_TYPE(AttachPseudoTrafficLightDetector);
 
 #undef DEFINE_FUNCTION_TYPE
 
@@ -80,7 +80,7 @@ private:
     Initialize, UpdateFrame, SpawnVehicleEntity, SpawnPedestrianEntity, SpawnMiscObjectEntity,
     DespawnEntity, UpdateEntityStatus, AttachLidarSensor, AttachDetectionSensor,
     AttachOccupancyGridSensor, UpdateTrafficLights, FollowPolylineTrajectory,
-    AttachTrafficLightDetectorEmulator>
+    AttachPseudoTrafficLightDetector>
     functions_;
 };
 }  // namespace zeromq

@@ -46,7 +46,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) {
-      return attachTrafficLightDetectorEmulator(std::forward<decltype(xs)>(xs)...);
+      return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
     })
 {
 }
@@ -283,11 +283,11 @@ auto ScenarioSimulator::followPolylineTrajectory(
   return response;
 }
 
-auto ScenarioSimulator::attachTrafficLightDetectorEmulator(
-  const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & req)
-  -> simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse
+auto ScenarioSimulator::attachPseudoTrafficLightDetector(
+  const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest & req)
+  -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse
 {
-  auto response = simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse();
+  auto response = simulation_api_schema::AttachPseudoTrafficLightDetectorResponse();
   sensor_sim_.attachTrafficLightsDetectorEmulator(
     current_simulation_time_, req.configuration(), *this, hdmap_utils_);
   response.mutable_result()->set_success(true);

@@ -287,8 +287,8 @@ public:
           return configuration;
         }());
 
-        core->attachTrafficLightDetectorEmulator([&]() {
-          simulation_api_schema::TrafficLightDetectorEmulatorConfiguration configuration;
+        core->attachPseudoTrafficLightDetector([&]() {
+          simulation_api_schema::PseudoTrafficLightDetectorConfiguration configuration;
           configuration.set_architecture_type(
             getParameter<std::string>("architecture_type", "awf/universe"));
           return configuration;

@@ -140,10 +140,10 @@ auto API::setEntityStatus(
   setEntityStatus(name, canonicalize(status));
 }
 
-bool API::attachTrafficLightDetectorEmulator(
-  const simulation_api_schema::TrafficLightDetectorEmulatorConfiguration & configuration)
+bool API::attachPseudoTrafficLightDetector(
+  const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration)
 {
-  simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest req;
+  simulation_api_schema::AttachPseudoTrafficLightDetectorRequest req;
   *req.mutable_configuration() = configuration;
   return zeromq_client_.call(req).result().success();
 }

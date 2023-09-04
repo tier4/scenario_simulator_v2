@@ -33,7 +33,7 @@ auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArra
     for (auto bulb_status : traffic_light.traffic_light_status()) {
       using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
       TrafficLightBulbType light_bulb_msg;
-      simulation_interface::toTrafficLightBulbMsg<TrafficLightBulbType>(
+      simulation_interface::toMsg<TrafficLightBulbType>(
         bulb_status, light_bulb_msg);
       traffic_light_msg.lights.push_back(light_bulb_msg);
     }
@@ -78,7 +78,7 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
           using TrafficLightBulbType =
             autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
           TrafficLightBulbType light_bulb_msg;
-          simulation_interface::toTrafficLightBulbMsg<TrafficLightBulbType>(
+          simulation_interface::toMsg<TrafficLightBulbType>(
             bulb_status, light_bulb_msg);
           traffic_light_msg.elements.push_back(light_bulb_msg);
         }

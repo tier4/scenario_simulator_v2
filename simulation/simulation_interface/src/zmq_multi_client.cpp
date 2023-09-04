@@ -195,13 +195,13 @@ auto MultiClient::call(const simulation_api_schema::FollowPolylineTrajectoryRequ
 }
 
 auto MultiClient::call(
-  const simulation_api_schema::AttachTrafficLightDetectorEmulatorRequest & request)
-  -> simulation_api_schema::AttachTrafficLightDetectorEmulatorResponse
+  const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest & request)
+  -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse
 {
   if (is_running) {
     auto simulation_request = simulation_api_schema::SimulationRequest();
-    *simulation_request.mutable_attach_traffic_light_detector_emulator() = request;
-    return call(simulation_request).attach_traffic_light_detector_emulator();
+    *simulation_request.mutable_attach_pseudo_traffic_light_detector() = request;
+    return call(simulation_request).attach_pseudo_traffic_light_detector();
   } else {
     return {};
   }

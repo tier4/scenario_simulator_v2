@@ -29,7 +29,7 @@ message Result {
 /**
  * Parameter configuration of the traffic light detector emulator
  **/
-message TrafficLightDetectorEmulatorConfiguration {
+message PseudoTrafficLightDetectorConfiguration {
   string architecture_type = 1;        // Autoware architecture type.
 }
 
@@ -201,15 +201,15 @@ message UpdateEntityStatusResponse {
 /**
  * Requests attaching a traffic light detector emulator.
  **/
-message AttachTrafficLightDetectorEmulatorRequest {
-  TrafficLightDetectorEmulatorConfiguration configuration = 1; // Configuration of the traffic light detector emulator.
+message AttachPseudoTrafficLightDetectorRequest {
+  PseudoTrafficLightDetectorConfiguration configuration = 1; // Configuration of the traffic light detector emulator.
 }
 
 /**
  * Response of attaching a traffic light detector emulator.
  **/
-message AttachTrafficLightDetectorEmulatorResponse {
-  Result result = 1; // Result of [AttachTrafficLightDetectorEmulatorRequest](#AttachTrafficLightDetectorEmulatorRequest)
+message AttachPseudoTrafficLightDetectorResponse {
+  Result result = 1; // Result of [AttachPseudoTrafficLightDetectorRequest](#AttachPseudoTrafficLightDetectorRequest)
 }
 
 /**
@@ -341,7 +341,7 @@ message SimulationRequest {
     AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsRequest update_traffic_lights = 11;
     FollowPolylineTrajectoryRequest follow_polyline_trajectory = 12;
-    AttachTrafficLightDetectorEmulatorRequest attach_traffic_light_detector_emulator = 13;
+    AttachPseudoTrafficLightDetectorRequest attach_pseudo_traffic_light_detector = 13;
   }
 }
 
@@ -363,6 +363,6 @@ message SimulationResponse {
     AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsResponse update_traffic_lights = 11;
     FollowPolylineTrajectoryResponse follow_polyline_trajectory = 12;
-    AttachTrafficLightDetectorEmulatorResponse attach_traffic_light_detector_emulator = 13;
+    AttachPseudoTrafficLightDetectorResponse attach_pseudo_traffic_light_detector = 13;
   }
 }
