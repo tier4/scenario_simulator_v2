@@ -45,10 +45,13 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 
 auto Storyboard::run() -> void
 {
-  for (size_t index{0}; auto && story : elements) {
+  std::size_t index{0};
+  for (auto && story : elements) {
     try {
       story.evaluate();
-      if (story.is<Story>()) index++;
+      if (story.is<Story>()) {
+        index++;
+      }
     } catch (const SpecialAction<EXIT_FAILURE> & action) {
       throw SpecialAction<EXIT_FAILURE>(name, index, "Story", action);
     }

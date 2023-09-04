@@ -46,7 +46,7 @@ auto Trigger::evaluate() -> Object
 
 auto Trigger::activeConditionGroupIndex() const -> int
 {
-  size_t index{0};
+  std::size_t index{0};
   for (auto it = begin(); it != end(); ++it, ++index) {
     ConditionGroup const & cgroup = *it;
     bool all_conditions_true = std::all_of(

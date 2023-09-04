@@ -37,7 +37,8 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
 
 auto Story::run() -> void
 {
-  for (size_t index{0}; auto && act : elements) {
+  std::size_t index{0};
+  for (auto && act : elements) {
     try {
       assert(act.is_also<Act>());
       act.evaluate();

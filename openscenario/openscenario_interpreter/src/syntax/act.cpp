@@ -34,7 +34,8 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
 
 auto Act::run() -> void
 {
-  for (size_t index{0}; auto && maneuver_group : elements) {
+  std::size_t index{0};
+  for (auto && maneuver_group : elements) {
     try {
       assert(maneuver_group.is_also<ManeuverGroup>());
       maneuver_group.evaluate();

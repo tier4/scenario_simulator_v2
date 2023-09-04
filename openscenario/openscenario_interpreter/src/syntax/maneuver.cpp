@@ -32,7 +32,8 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
 
 auto Maneuver::run() -> void
 {
-  for (size_t index{0}; auto && event : elements) {
+  std::size_t index{0};
+  for (auto && event : elements) {
     try {
       assert(event.is_also<Event>());
       event.evaluate();
