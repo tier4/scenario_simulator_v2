@@ -363,11 +363,13 @@ public:
   auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &,              double matching_distance) const -> std::optional<double>;
   auto getLateralDistance(const std::string &,              const CanonicalizedLaneletPose &, double matching_distance) const -> std::optional<double>;
   auto getLateralDistance(const std::string &,              const std::string &,              double matching_distance) const -> std::optional<double>;
+  auto getFreespaceLateralDistance(const std::string &,     const CanonicalizedLaneletPose &)                           const -> std::optional<double>;
 
   auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
   auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const std::string &,              bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
   auto getLongitudinalDistance(const std::string &,              const CanonicalizedLaneletPose &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
   auto getLongitudinalDistance(const std::string &,              const std::string &,              bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
+  auto getFreespaceLongitudinalDistance(const std::string &,              const CanonicalizedLaneletPose &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
   // clang-format on
 
   auto getNumberOfEgo() const -> std::size_t;

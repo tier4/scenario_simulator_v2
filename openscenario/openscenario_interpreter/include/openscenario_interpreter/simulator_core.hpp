@@ -185,6 +185,39 @@ public:
       position.rpy.z = std::numeric_limits<double>::quiet_NaN();
       return position;
     }
+
+    template <typename From, typename To>
+    static auto makeNativeFreespaceRelativeLanePosition(const From & from, const To & to)
+    {
+      auto s = [](auto &&... xs) {
+        if (const auto result = core->getFreespaceLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
+            result) {
+          return result.value();
+        } else {
+          return std::numeric_limits<
+            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
+        }
+      };
+
+      auto t = [](auto &&... xs) {
+        if (const auto result = core->getFreespaceLateralDistance(std::forward<decltype(xs)>(xs)...);
+            result) {
+          return *result;
+        } else {
+          return std::numeric_limits<
+            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
+        }
+      };
+
+      traffic_simulator::LaneletPose position;
+      position.lanelet_id = std::numeric_limits<std::int64_t>::max();
+      position.s = s(from, to);
+      position.offset = t(from, to);
+      position.rpy.x = std::numeric_limits<double>::quiet_NaN();
+      position.rpy.y = std::numeric_limits<double>::quiet_NaN();
+      position.rpy.z = std::numeric_limits<double>::quiet_NaN();
+      return position;
+    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5

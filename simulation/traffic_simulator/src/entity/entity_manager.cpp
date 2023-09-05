@@ -248,6 +248,19 @@ auto EntityManager::getLateralDistance(
   return std::nullopt;
 }
 
+auto EntityManager::getFreespaceLateralDistance(
+  const std::string & from, const CanonicalizedLaneletPose & to) const -> std::optional<double>
+{
+  if (const auto from_pose = getLaneletPose(from)) {
+    if (const auto lateral_distance = getLateralDistance(from_pose.value(), to)) {
+      const auto from_bbox = getBoundingBox(from);
+      return lateral_distance.value() - from_bbox.dimensions.y - from_bbox.center.y;
+    }
+    return std::nullopt;
+  }
+  return std::nullopt;
+}
+
 auto EntityManager::getLongitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool include_adjacent_lanelet, bool include_opposite_direction) -> std::optional<double>
@@ -357,6 +370,20 @@ auto EntityManager::getLongitudinalDistance(
       include_opposite_direction);
   } else {
     return std::nullopt;
+  }
+}
+
+auto EntityManager::getFreespaceLongitudinalDistance(
+  const std::string & from, const CanonicalizedLaneletPose & to, bool include_adjacent_lanelet,
+  bool include_opposite_direction) -> std::optional<double>
+{
+  const auto from_pose = getLaneletPose(from);
+  if (!laneMatchingSucceed(from) || !from_pose) {
+    return std::nullopt;
+  } else {
+    const auto from_bbox = getBoundingBox(from);
+    return getLongitudinalDistance(
+      from_pose.value(), to, include_adjacent_lanelet, include_opposite_direction).value() - from_bbox.dimensions.x;
   }
 }
 
