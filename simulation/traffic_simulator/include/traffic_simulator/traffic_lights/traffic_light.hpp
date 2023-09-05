@@ -319,7 +319,7 @@ struct TrafficLight
     }
   };
 
-  const std::int64_t way_id;
+  const LaneletId way_id;
 
   std::set<Bulb> bulbs;
 
