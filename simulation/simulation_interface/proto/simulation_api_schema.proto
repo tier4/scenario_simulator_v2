@@ -179,7 +179,7 @@ message DespawnEntityResponse {
  * Requests updating entity status.
  **/
 message UpdateEntityStatusRequest {
-  EntityStatus status = 1;                 // Updated entity status in traffic simulator.
+  repeated EntityStatus status = 1;        // List of updated entity status in traffic simulator.
   bool npc_logic_started = 2;              // Npc logic started flag
 }
 
@@ -188,7 +188,7 @@ message UpdateEntityStatusRequest {
  **/
 message UpdateEntityStatusResponse {
   Result result = 1;                       // Result of [UpdateEntityStatusRequest](#UpdateEntityStatusRequest)
-  UpdatedEntityStatus status = 2;          // Updated entity status in sensor/dynamics simulator
+  repeated UpdatedEntityStatus status = 2; // List of updated entity status in sensor/dynamics simulator
 }
 
 /**
