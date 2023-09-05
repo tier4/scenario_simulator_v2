@@ -29,9 +29,8 @@ inline namespace syntax
  *  <xsd:complexType name="InitActions">
  *    <xsd:sequence>
  *      <xsd:element name="GlobalAction" type="GlobalAction" minOccurs="0" maxOccurs="unbounded"/>
- *      <xsd:element name="UserDefinedAction" type="UserDefinedAction" minOccurs="0"
- * maxOccurs="unbounded"/> <xsd:element name="Private" minOccurs="0" maxOccurs="unbounded"
- * type="Private"/>
+ *      <xsd:element name="UserDefinedAction" type="UserDefinedAction" minOccurs="0" maxOccurs="unbounded"/>
+ *      <xsd:element name="Private" minOccurs="0" maxOccurs="unbounded" type="Private"/>
  *    </xsd:sequence>
  *  </xsd:complexType>
  *

@@ -30,9 +30,8 @@ inline namespace syntax
  *  <xsd:complexType name="ManeuverGroup">
  *    <xsd:sequence>
  *      <xsd:element name="Actors" type="Actors"/>
- *      <xsd:element name="CatalogReference" type="CatalogReference" minOccurs="0"
- * maxOccurs="unbounded"/> <xsd:element name="Maneuver" type="Maneuver" minOccurs="0"
- * maxOccurs="unbounded"/>
+ *      <xsd:element name="CatalogReference" type="CatalogReference" minOccurs="0" maxOccurs="unbounded"/>
+ *      <xsd:element name="Maneuver" type="Maneuver" minOccurs="0" maxOccurs="unbounded"/>
  *    </xsd:sequence>
  *    <xsd:attribute name="maximumExecutionCount" type="UnsignedInt" use="required"/>
  *    <xsd:attribute name="name" type="String" use="required"/>

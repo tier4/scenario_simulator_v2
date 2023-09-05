@@ -28,8 +28,7 @@ inline namespace syntax
  *
  *  <xsd:complexType name="Trigger">
  *    <xsd:sequence>
- *      <xsd:element name="ConditionGroup" type="ConditionGroup" minOccurs="0"
- * maxOccurs="unbounded"/>
+ *      <xsd:element name="ConditionGroup" type="ConditionGroup" minOccurs="0" maxOccurs="unbounded"/>
  *    </xsd:sequence>
  *  </xsd:complexType>
  *
@@ -49,6 +48,7 @@ struct Trigger : public std::list<ConditionGroup>
   }
 
   auto activeConditionGroupIndex() const -> iterator::difference_type;
+
   auto activeConditionGroupDescription() const -> std::vector<std::pair<std::string, std::string>>;
 
   auto evaluate() -> Object;

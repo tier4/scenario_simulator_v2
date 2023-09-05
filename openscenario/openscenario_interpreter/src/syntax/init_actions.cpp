@@ -68,8 +68,7 @@ auto InitActions::endsImmediately() const -> bool
   auto global_ends_immediately = std::all_of(
     global_actions.begin(), global_actions.end(),
     [=](const Object & e) { return e.as<GlobalAction>().endsImmediately(); });
-  // In this class, there are some implementations that assume all global actions are instantaneous
-  // actions.
+  // In this class, there are some implementations that assume all global actions are instantaneous actions.
   assert(global_ends_immediately);
   auto user_defined_actions_ends_immediately = std::all_of(
     user_defined_actions.begin(), user_defined_actions.end(),
@@ -123,8 +122,7 @@ auto InitActions::startNonInstantaneousActions() -> void
   }
 }
 
-// this function should be called before simulation time starts and after executing
-// startInstantaneousActions()
+// this function should be called before simulation time starts and after executing startInstantaneousActions()
 auto InitActions::runInstantaneousActions() -> void
 {
   for (auto && e : global_actions) {
