@@ -2,6 +2,297 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.0 (2023-09-05)
+------------------
+* Merge pull request `#1058 <https://github.com/tier4/scenario_simulator_v2/issues/1058>`_ from tier4/ref/RJD-553_restore_repeated_update_entity_status
+* ref(entity_manager): remove test exceptions
+* ref(entity_manager): revert comments format
+* fix(follow_trajectory): fix division by zero
+* fix(entity_manager): fix current_time update
+* ref(traffic_simulator): increase readability setting time in api
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge pull request `#1074 <https://github.com/tier4/scenario_simulator_v2/issues/1074>`_ from tier4/fix/clock
+* Merge remote-tracking branch 'origin/master' into fix/clock
+* Merge pull request `#1024 <https://github.com/tier4/scenario_simulator_v2/issues/1024>`_ from tier4/feature/perception_ground_truth
+* fix(traffic_sim): fix nonEgo update - ll2 issue
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* feat(traffic_sim): provide response processing for update of each entity type
+* refactor: change property name from isEnableDetectedObjectGroundTruthDelay to detectedObjectGroundTruthPublishingDelay
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into fix/clock
+* Merge pull request `#1056 <https://github.com/tier4/scenario_simulator_v2/issues/1056>`_ from tier4/feature/interpreter/sensor-detection-range
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* Merge pull request `#1067 <https://github.com/tier4/scenario_simulator_v2/issues/1067>`_ from tier4/fix/rviz_config
+* Rename API `UpdateFrameRequest::current_time` to `current_simulation_time`
+* Rename member function `SimulationClock::onNpcLogicStart` to `start`
+* Update `SimulationClock` to hold total frames instead of elapsed seconds
+* Remove data member `SimulationClock::is_npc_logic_started\_`
+* Fix a501d8b
+* Lipsticks
+* Remove member function `API::initialize`
+* Remove data member `step_time\_` and `step_time_duration\_`
+* Remove data member `SimulationClock::initialized\_`
+* Remove data member `SimulationClock::initial_simulation_time\_`
+* Remove member function `SimulationClock::initialize`
+* Remove all arguments from class `SimulationClock` constructor
+* Remove default argument from class `API` constructor
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* ref(clang): apply clang reformat
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* ref(single_sensor_simulator): apply changes requested in review
+* Merge pull request `#1061 <https://github.com/tier4/scenario_simulator_v2/issues/1061>`_ from tier4/feature/traffic_simulator/follow-trajectory-action-2
+* fix(rviz): rename to goal planner
+* merge lidar publishing delay
+* fix(traffic_sim): revert clang reformat entity_base
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-2
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* ref(traffic_simulator,sss): apply clang_reformat
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge pull request `#1018 <https://github.com/tier4/scenario_simulator_v2/issues/1018>`_ from tier4/fix/longitudinal_distance_fixed_master_merged
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Update simulation/traffic_simulator/include/traffic_simulator/helper/helper.hpp
+* Update simulation/traffic_simulator/src/helper/helper.cpp
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-2
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge pull request `#1046 <https://github.com/tier4/scenario_simulator_v2/issues/1046>`_ from tier4/fix/RJD-554_error_run_scenario_in_row
+* Merge pull request `#1048 <https://github.com/tier4/scenario_simulator_v2/issues/1048>`_ from tier4/refactor/update_rviz_config
+* Update `API::requestFollowTrajectory` to call ZeroMQ client
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* fix(zeromq): ensure single update ego, optimize UpdateEntityStatus
+* Update `MultiClient::call` to return `Response` as return value
+* revert lidar sensor delay's change
+* Merge pull request `#1022 <https://github.com/tier4/scenario_simulator_v2/issues/1022>`_ from tier4/feature/traffic_simulator/follow-trajectory-action
+* merge master branch
+* ref(traffic_simulator): improve despawnEntities
+* Merge remote-tracking branch 'origin/master' into fix/RJD-554_error_run_scenario_in_row
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* fix(traffic_simulator): revert assigning name to entity status
+* ref(zeromq): restore repeated UpdateEntityStatus
+* Merge pull request `#1054 <https://github.com/tier4/scenario_simulator_v2/issues/1054>`_ from tier4/remerge-1023
+* Fix spelling
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Update simulation/traffic_simulator/config/scenario_simulator_v2.rviz
+* apply distance filter for lidar_detected_entity
+* Move file `data_type/follow_trajectory.[ch]pp` into directory `behavior`
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Revert "Revert "Merge pull request `#1023 <https://github.com/tier4/scenario_simulator_v2/issues/1023>`_ from tier4/feat/pointcloud_delay""
+* Rename `trajectory_parameter` to `polyline_trajectory`
+* Rename `FollowPolylineTrajectoryParameter` to `PolylineTrajectory`
+* Add new message type `traffic_simulator_msgs::msg::PolylineTrajectory`
+* Update `follow_trajectory::Parameter::base_time` to not to be `optional`
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Apply clang format
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* update rviz config
+* feat(openscenario_interpreter): add despawnEntities
+* Add new message type `traffic_simulator_msgs::msg::Polyline`
+* Add new message type `traffic_simulator_msgs::msg::Vertex`
+* Merge remote-tracking branch 'origin/master' into feat/relative_object_position
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Add missing comment from master
+* Use CanonicalizedEntityStatus in do_nothing_plugin
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master_fe8503' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'fix/longitudinal_distance' into fix/longitudinal_distance_fixed_master_merged
+* Revert changes
+* add interpreter for detection sensor range
+* Merge pull request `#992 <https://github.com/tier4/scenario_simulator_v2/issues/992>`_ from tier4/fix/longitudinal_distance_fixed
+* Add expected testcase output
+* Use lambda function in getAllCanonicalizedLaneletPoses() function
+* Add const and &
+* Change comment format. Add additional testcases for checking lanelet canonicalization
+* chore: apply clang-format
+* Move `makeUpdatedStatus` into header `data_type/follow_trajectory.hpp`
+* feat: add enable_ground_truth_delay to DetectionSensorConfiguration
+* Merge branch 'fix/longitudinal_distance_fixed' into fix/longitudinal_distance_fixed_master_merged
+* Remove checking if shortest route is empty
+* Add comments to test. Change variables name for readibility
+* Merge branch 'fix/longitudinal_distance_fixed' into fix/longitudinal_distance_fixed_master_merged
+* Check if lanelet poses is empty
+* Apply review feedback
+* Check if an estimated lanelet pose can be canonicalized sucessfully. Remove hardcoded value
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master_6789' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master_4284' into fix/longitudinal_distance_fixed_master_merged
+* Fix gelAllCanonicalizedLaneletPoses(). Improve unit tests
+* Refactor gelAllCanonicalizedLaneletPoses(). Add unit tests for verifying canonicalization
+* Apply clang-format linting
+* Save information about alternative canonicalized lanelet pose. Add method to get alternative lanelet pose base on shortest route. Remove non canonicalized lanelet pose from CanonicalizedLaneletPose class.
+* Save information about non canonicalized lanelet pose in CanonicalizedLaneletPose class.
+* getFollowingLanelets() to the end of ret vector instead to the beginning.
+* Add small offset in order to avoid returning nullopt. Pedestrian is able to stop its moving.
+* Revert calculation of longitudinal distance
+* rename function
+* simplify bool EntityManager::isInLanelet
+* manualy reformat
+* use canonicalized
+* remove static_cast
+* use getLanletPose function
+* simplify code
+* manually format
+* change const
+* add comment
+* remove unused toMapPose function
+* remove getBoundingBox()
+* add description
+* claenup unnecessary member function
+* simplify code
+* use +=
+* fix compile error
+* use inline namespace
+* add setrequest
+* use getTwist function
+* reduce line
+* use const &
+* use auto
+* initialize lanelet pose
+* use canonicalized value in random test runner
+* use canonicalized value
+* simplify code
+* check name
+* remove namespace
+* fix compile errors
+* cleanup code
+* fix compile error
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* rename data type
+* apply reformat
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* fix typo
+* rename data type
+* add comments
+* change other entity status type
+* change port data type
+* fix canonicalize logic
+* fix getting next lanelet algorithum
+* passing canonicalized value into plugin
+* fix typo
+* use Canonicalized Values in traffic_simulator
+* enable cast as geometry_msgs::msg::Pose
+* fix compile error
+* add getEntityType function
+* simplify code
+* fix reformat
+* remove verbose
+* use getLaneletPose function
+* use getMapPose function and simplify code
+* use getMapPose function
+* simplify code
+* use getBoundingBox function
+* use geometry lib
+* use getCurrentAccel/Twist function
+* fix compile error
+* use alias
+* use alias
+* use alias
+* simplify reachPosition
+* remove unused code
+* simplifu code
+* update some functions
+* rename functions
+* simplify code
+* Simplify code
+* fix route planning logic
+* Merge remote-tracking branch 'origin' into fix/longitudinal_distance
+* add operators comparison operator for CanonicalizedLaneletPose class
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* replace type
+* fix compile errors in interpretor
+* fix compile errors in traffic_simulator package
+* add namespace
+* fix clang-format
+* fix compile erros in interpretor
+* fix errors in behavior tree
+* fix compile errors in mock scenarios
+* fix compile errors in traffic_simulator
+* fix compile errors in traffic_simulator
+* add API::canonicalize functions
+* add CanonicalizedEntityStatus class
+* remove empty line
+* check the route is empty
+* add lanelet pose data type
+* cleanup waypoint queue when we cancel route
+* Simplify branching
+* Simplify branching
+* fix compile error
+* rename function
+* Changed functions with names that do not convey the intent of implementation
+* rename to route\_
+* remove debug lines
+* rename to canonicalizeLaneletPose function
+* move to helper.hpp
+* use const &
+* remove unused function
+* add setWaypoints function in route planner class
+* remove nodiscard notation
+* change route plannner from shared pointer to variable.
+* add glog to the mock scenario
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* call sortAndUnique function in the getNextLaneletIds function
+* remove compile errors in std::vector<std::int64_t> HdMapUtils::getPreviousLaneletIds function
+* Update simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Update simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* add include
+* Merge remote-tracking branch 'origin/fix/longitudinal_distance' into fix/longitudinal_distance
+* Update simulation/traffic_simulator/include/traffic_simulator/hdmap_utils/hdmap_utils.hpp
+* add util.hpp
+* Update simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Update simulation/traffic_simulator/include/traffic_simulator/hdmap_utils/hdmap_utils.hpp
+* Update simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Update simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge remote-tracking branch 'origin/fix/longitudinal_distance' into fix/longitudinal_distance
+* add description for hard coded parameter
+* add comment for hard-coded parameter
+* Update simulation/traffic_simulator/src/entity/entity_manager.cpp
+* Update simulation/traffic_simulator/src/entity/entity_manager.cpp
+* Update simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* remove setHdMapUtils from derived class
+* Merge remote-tracking branch 'origin/fix/longitudinal_distance' into fix/longitudinal_distance
+* remove typo
+* Update simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Update simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp
+* remove definition for galactic support
+* update comment for ROS_DISTRO\_* variable
+* fix compile error
+* fix compile error
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* fix reformat
+* Merge remote-tracking branch 'origin' into fix/longitudinal_distance
+* apply reformat
+* update route planner logic in NPC
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'fix/longitudinal_distance' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* remove deprecated function in humble
+* fix get lanelet length ID
+* fix clamp logic
+* fix logic
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* fix get longitudinal distance logic
+* check lanelet pose while requesting assing route
+* enable check lanelet pose while requesting acquire position
+* add clamp lanlet pose step while getting longitudinal distance
+* add to and from pose to candidates
+* fix typo
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* enable clamp while setting status
+* enable clamp lanelet pose while set status function
+* remove debug lines
+* enable passing hd map utils in constructor
+* enable matching with right/left lanelet
+* add getLaneletPoses function
+* add getLeft/RightLaneIds function to the HdMapUtils class
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Kyoichi Sugahara, Lukasz Chojnacki, Masaya Kataoka, Tatsuya Yamasaki, kosuke55, kyoichi-sugahara, yamacir-kit
+
 0.7.0 (2023-07-26)
 ------------------
 * Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl
