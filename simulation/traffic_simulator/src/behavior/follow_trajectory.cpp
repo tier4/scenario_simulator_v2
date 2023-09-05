@@ -205,7 +205,7 @@ auto makeUpdatedStatus(
             return std::make_tuple(
               distance_to_front_waypoint +
                 total_distance_to(first_waypoint_with_arrival_time_specified),
-              remaining_time);
+              remaining_time != 0 ? remaining_time : std::numeric_limits<double>::epsilon());
           }
         } else {
           return std::make_tuple(

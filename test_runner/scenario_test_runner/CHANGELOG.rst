@@ -2,6 +2,79 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.0 (2023-09-05)
+------------------
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge remote-tracking branch 'origin/master' into fix/clock
+* Merge pull request `#1024 <https://github.com/tier4/scenario_simulator_v2/issues/1024>`_ from tier4/feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* docs: add Property.detectedObjectGroundTruthPublishingDelay.yaml
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into fix/clock
+* Merge pull request `#1056 <https://github.com/tier4/scenario_simulator_v2/issues/1056>`_ from tier4/feature/interpreter/sensor-detection-range
+* merge lidar publishing delay
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-2
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge pull request `#1018 <https://github.com/tier4/scenario_simulator_v2/issues/1018>`_ from tier4/fix/longitudinal_distance_fixed_master_merged
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge pull request `#1030 <https://github.com/tier4/scenario_simulator_v2/issues/1030>`_ from tier4/feat/relative_object_position
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-2
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge pull request `#1031 <https://github.com/tier4/scenario_simulator_v2/issues/1031>`_ from tier4/feature/RJD-96_remove_verify_expected_result
+* update scenario files
+* revert lidar sensor delay's change
+* merge master branch
+* export scenario file from scenario editor
+* update scenario file
+* Merge remote-tracking branch 'origin/master' into fix/RJD-554_error_run_scenario_in_row
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge pull request `#1054 <https://github.com/tier4/scenario_simulator_v2/issues/1054>`_ from tier4/remerge-1023
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Update y in test scenario
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Revert "Revert "Merge pull request `#1023 <https://github.com/tier4/scenario_simulator_v2/issues/1023>`_ from tier4/feat/pointcloud_delay""
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* fix cspell:disable
+* Add reason for cspell disable
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Add cspell:disable-line in yaml
+* Merge remote-tracking branch 'origin/master' into feat/relative_object_position
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* fix(workflow): remove failure.yaml scenarios
+* Add test scenario
+* feat(test_runner): remove expect in yamls
+* feat(test_runner, openscenario_preprocessor): remove expect
+* feat(openscenario_interpreter): remove intended_result
+* Increase ReachPositionCondition tolerance distance
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master_fe8503' into fix/longitudinal_distance_fixed_master_merged
+* add interpreter for detection sensor range
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master_6789' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master_4284' into fix/longitudinal_distance_fixed_master_merged
+* fix result checker script
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* fix some files
+* Merge remote-tracking branch 'origin' into fix/longitudinal_distance
+* apply reformat
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Tatsuya Yamasaki, kosuke55, kyoichi-sugahara, yamacir-kit
+
 0.7.0 (2023-07-26)
 ------------------
 * Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl

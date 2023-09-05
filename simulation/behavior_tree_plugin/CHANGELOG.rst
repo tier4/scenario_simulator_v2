@@ -2,6 +2,84 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.0 (2023-09-05)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-2
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge pull request `#1018 <https://github.com/tier4/scenario_simulator_v2/issues/1018>`_ from tier4/fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge pull request `#1022 <https://github.com/tier4/scenario_simulator_v2/issues/1022>`_ from tier4/feature/traffic_simulator/follow-trajectory-action
+* Merge remote-tracking branch 'origin/master' into fix/RJD-554_error_run_scenario_in_row
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Rename `trajectory_parameter` to `polyline_trajectory`
+* Rename `FollowPolylineTrajectoryParameter` to `PolylineTrajectory`
+* Add new message type `traffic_simulator_msgs::msg::PolylineTrajectory`
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Add new message type `traffic_simulator_msgs::msg::Polyline`
+* Merge remote-tracking branch 'origin/master' into feat/relative_object_position
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Fix formating in follow_polyline_trajectory_action.cpp
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'fix/longitudinal_distance' into fix/longitudinal_distance_fixed_master_merged
+* Merge pull request `#992 <https://github.com/tier4/scenario_simulator_v2/issues/992>`_ from tier4/fix/longitudinal_distance_fixed
+* Add @note to comment
+* Use build function for building ros 2 message
+* Move `makeUpdatedStatus` into header `data_type/follow_trajectory.hpp`
+* Rename data member `parameter` to `trajectory_parameter`
+* Cleanup
+* Extract the body of `FollowTrajectoryAction` into a free function
+* Remove data member `FollowPolylineTrajectoryAction::velocity`
+* Merge branch 'fix/longitudinal_distance_fixed' into fix/longitudinal_distance_fixed_master_merged
+* Check if an estimated lanelet pose can be canonicalized sucessfully. Remove hardcoded value
+* Merge branch 'master_6789' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master_4284' into fix/longitudinal_distance_fixed_master_merged
+* use alias
+* fix typo
+* remove getBoundingBox()
+* add description
+* claenup unnecessary member function
+* use empty()
+* fix compile error
+* use inline namespace
+* fix typo
+* add note
+* add note comment
+* fix compile errors
+* clean up ports
+* cleanup code
+* rename data type
+* apply reformat
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* rename data type
+* add comments
+* change other entity status type
+* change port data type
+* fix getting next lanelet algorithum
+* passing canonicalized value into plugin
+* use Canonicalized Values in traffic_simulator
+* fix lanelet_pose_valid flag
+* replace type
+* add namespace
+* fix errors in behavior tree
+* fix problems in getDistanceToTargetEntityPolygon function
+* fix follow lane action
+* fix compile errors in mock scenarios
+* fix compile errors in behavior tree plugin
+* add CanonicalizedEntityStatus class
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, kosuke55, kyoichi-sugahara, yamacir-kit
+
 0.7.0 (2023-07-26)
 ------------------
 * Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl

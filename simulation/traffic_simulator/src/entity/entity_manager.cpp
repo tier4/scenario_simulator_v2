@@ -146,6 +146,7 @@ auto EntityManager::getEntityStatus(const std::string & name) const -> Canonical
     THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   } else {
     auto entity_status = static_cast<EntityStatus>(iter->second->getStatus());
+    assert(entity_status.name == name && "The entity name in status is different from key!");
     entity_status.action_status.current_action = getCurrentAction(name);
     entity_status.time = current_time_;
     return CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_);
@@ -678,6 +679,7 @@ void EntityManager::update(const double current_time, const double step_time)
   if (configuration.verbose) {
     stop_watch_update.print();
   }
+  current_time_ += step_time;
 }
 
 void EntityManager::updateHdmapMarker()
