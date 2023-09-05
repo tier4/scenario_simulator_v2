@@ -208,28 +208,29 @@ auto toMsg(
     }
   };
 
-  auto convert_shape = [](auto shape) {
+  auto convert_shape = [](auto shape) constexpr
+  {
     switch (shape) {
-      case simulation_api_schema::TrafficLight_Shape_CIRCLE:
+      case TrafficLight_Shape_CIRCLE:
         return TrafficLightBulbMessageType::CIRCLE;
-      case simulation_api_schema::TrafficLight_Shape_LEFT_ARROW:
+      case TrafficLight_Shape_LEFT_ARROW:
         return TrafficLightBulbMessageType::LEFT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW:
+      case TrafficLight_Shape_RIGHT_ARROW:
         return TrafficLightBulbMessageType::RIGHT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_UP_ARROW:
+      case TrafficLight_Shape_UP_ARROW:
         return TrafficLightBulbMessageType::UP_ARROW;
         /// @note Enums below are not supported yet in some platforms. I temporarily disabled them
-        //  case simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW:
+        //  case TrafficLight_Shape_UP_LEFT_ARROW:
         //    return TrafficLightBulbMessageType::UP_LEFT_ARROW;
-        //  case simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW:
+        //  case TrafficLight_Shape_UP_RIGHT_ARROW:
         //    return TrafficLightBulbMessageType::UP_RIGHT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_DOWN_ARROW:
+      case TrafficLight_Shape_DOWN_ARROW:
         return TrafficLightBulbMessageType::DOWN_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW:
+      case TrafficLight_Shape_DOWN_LEFT_ARROW:
         return TrafficLightBulbMessageType::DOWN_LEFT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW:
+      case TrafficLight_Shape_DOWN_RIGHT_ARROW:
         return TrafficLightBulbMessageType::DOWN_RIGHT_ARROW;
-      case simulation_api_schema::TrafficLight_Shape_CROSS:
+      case TrafficLight_Shape_CROSS:
         return TrafficLightBulbMessageType::CROSS;
       default:
         return TrafficLightBulbMessageType::UNKNOWN;
