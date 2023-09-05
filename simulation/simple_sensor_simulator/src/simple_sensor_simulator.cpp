@@ -82,6 +82,11 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   initialized_ = true;
   realtime_factor_ = req.realtime_factor();
   step_time_ = req.step_time();
+  current_simulation_time_ = req.initialize_time();
+  current_scenario_time_ = std::numeric_limits<double>::quiet_NaN();
+  builtin_interfaces::msg::Time t;
+  simulation_interface::toMsg(req.initialize_ros_time(), t);
+  current_ros_time_ = t;
   hdmap_utils_ = std::make_shared<hdmap_utils::HdMapUtils>(req.lanelet2_map_path(), getOrigin());
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
@@ -132,26 +137,51 @@ auto ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req)
   -> simulation_api_schema::UpdateEntityStatusResponse
 {
-  if (isEgo(req.status().name())) {
-    if (ego_entity_simulation_) {
-      ego_entity_simulation_->update(
-        current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
-    }
-    simulation_api_schema::EntityStatus status;
-    simulation_interface::toProto(ego_entity_simulation_->getStatus(), status);
-    entity_status_[req.status().name()] = status;
-  } else {
-    entity_status_[req.status().name()] = req.status();
-  }
-  const simulation_api_schema::EntityStatus & updated_entity_status =
-    entity_status_[req.status().name()];
   auto res = simulation_api_schema::UpdateEntityStatusResponse();
-  res.mutable_status()->set_name(updated_entity_status.name());
-  res.mutable_status()->mutable_action_status()->CopyFrom(updated_entity_status.action_status());
-  res.mutable_status()->mutable_pose()->CopyFrom(updated_entity_status.pose());
+  auto copyStatusToResponse = [&](const simulation_api_schema::EntityStatus & status) {
+    auto updated_status = res.add_status();
+    updated_status->set_name(status.name());
+    updated_status->mutable_action_status()->CopyFrom(status.action_status());
+    updated_status->mutable_pose()->CopyFrom(status.pose());
+  };
+
+  for (const auto & status : req.status()) {
+    try {
+      if (isEgo(status.name())) {
+        assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
+        ego_entity_simulation_->update(
+          current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
+        simulation_api_schema::EntityStatus ego_status;
+        simulation_interface::toProto(ego_entity_simulation_->getStatus(), ego_status);
+        entity_status_.at(status.name()) = ego_status;
+        copyStatusToResponse(ego_status);
+      } else {
+        entity_status_.at(status.name()) = status;
+        copyStatusToResponse(status);
+      }
+    } catch (const std::out_of_range & e) {
+      THROW_SEMANTIC_ERROR("Entity ", std::quoted(status.name()), " does not exist");
+    }
+  }
+
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
   return res;
+}
+
+template <typename SpawnRequestType>
+auto ScenarioSimulator::insertEntitySpawnedStatus(
+  const SpawnRequestType & spawn_request, const traffic_simulator_msgs::EntityType::Enum & type,
+  const traffic_simulator_msgs::EntitySubtype::Enum & subtype) -> void
+{
+  simulation_api_schema::EntityStatus init_status;
+  init_status.mutable_type()->set_type(type);
+  init_status.mutable_subtype()->set_value(subtype);
+  init_status.set_time(current_scenario_time_);
+  init_status.set_name(spawn_request.parameters().name());
+  init_status.mutable_action_status()->set_current_action("initializing");
+  init_status.mutable_pose()->CopyFrom(spawn_request.pose());
+  entity_status_.insert({spawn_request.parameters().name(), init_status});
 }
 
 auto ScenarioSimulator::spawnVehicleEntity(
@@ -161,7 +191,9 @@ auto ScenarioSimulator::spawnVehicleEntity(
   if (ego_vehicles_.size() != 0 && req.is_ego()) {
     throw SimulationRuntimeError("multi ego does not support");
   }
+  auto entity_type = traffic_simulator_msgs::EntityType::VEHICLE;
   if (req.is_ego()) {
+    entity_type = traffic_simulator_msgs::EntityType::EGO;
     ego_vehicles_.emplace_back(req.parameters());
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
@@ -171,12 +203,12 @@ auto ScenarioSimulator::spawnVehicleEntity(
     initial_status.name = parameters.name;
     simulation_interface::toMsg(req.pose(), initial_status.pose);
     initial_status.bounding_box = parameters.bounding_box;
-
     ego_entity_simulation_->fillLaneletDataAndSnapZToLanelet(initial_status);
     ego_entity_simulation_->setInitialStatus(initial_status);
   } else {
     vehicles_.emplace_back(req.parameters());
   }
+  insertEntitySpawnedStatus(req, entity_type, traffic_simulator_msgs::EntitySubtype::UNKNOWN);
   auto res = simulation_api_schema::SpawnVehicleEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
@@ -188,6 +220,9 @@ auto ScenarioSimulator::spawnPedestrianEntity(
   -> simulation_api_schema::SpawnPedestrianEntityResponse
 {
   pedestrians_.emplace_back(req.parameters());
+  insertEntitySpawnedStatus(
+    req, traffic_simulator_msgs::EntityType::PEDESTRIAN,
+    traffic_simulator_msgs::EntitySubtype::UNKNOWN);
   auto res = simulation_api_schema::SpawnPedestrianEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
@@ -199,6 +234,9 @@ auto ScenarioSimulator::spawnMiscObjectEntity(
   -> simulation_api_schema::SpawnMiscObjectEntityResponse
 {
   misc_objects_.emplace_back(req.parameters());
+  insertEntitySpawnedStatus(
+    req, traffic_simulator_msgs::EntityType::MISC_OBJECT,
+    traffic_simulator_msgs::EntitySubtype::UNKNOWN);
   auto res = simulation_api_schema::SpawnMiscObjectEntityResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("");
@@ -322,44 +360,22 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
 
 bool ScenarioSimulator::isEgo(const std::string & name)
 {
-  if (not isEntityExists(name)) {
-    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
-  }
   for (const auto & ego : ego_vehicles_) {
     if (ego.name() == name) {
       return true;
     }
   }
+
+  if (not isEntityExists(name)) {
+    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
+  }
+
   return false;
 }
 
 bool ScenarioSimulator::isEntityExists(const std::string & name)
 {
-  if (std::find_if(ego_vehicles_.begin(), ego_vehicles_.end(), [&name](const auto & ego) {
-        return ego.name() == name;
-      }) != ego_vehicles_.end()) {
-    return true;
-  }
-
-  if (std::find_if(vehicles_.begin(), vehicles_.end(), [&name](const auto & vehicle) {
-        return vehicle.name() == name;
-      }) != vehicles_.end()) {
-    return true;
-  }
-
-  if (std::find_if(pedestrians_.begin(), pedestrians_.end(), [&name](const auto & pedestrian) {
-        return pedestrian.name() == name;
-      }) != pedestrians_.end()) {
-    return true;
-  }
-
-  if (std::find_if(misc_objects_.begin(), misc_objects_.end(), [&name](const auto & misc_object) {
-        return misc_object.name() == name;
-      }) != misc_objects_.end()) {
-    return true;
-  }
-
-  return false;
+  return entity_status_.find(name) != entity_status_.end();
 }
 }  // namespace simple_sensor_simulator
 

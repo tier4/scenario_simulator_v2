@@ -102,6 +102,11 @@ private:
   auto spawnVehicleEntity(const simulation_api_schema::SpawnVehicleEntityRequest &)
     -> simulation_api_schema::SpawnVehicleEntityResponse;
 
+  template <typename SpawnRequestType>
+  auto insertEntitySpawnedStatus(
+    const SpawnRequestType & spawn_request, const traffic_simulator_msgs::EntityType::Enum & type,
+    const traffic_simulator_msgs::EntitySubtype::Enum & subtype) -> void;
+
   auto spawnPedestrianEntity(const simulation_api_schema::SpawnPedestrianEntityRequest &)
     -> simulation_api_schema::SpawnPedestrianEntityResponse;
 

@@ -341,9 +341,10 @@ public:
     -> std::optional<CanonicalizedLaneletPose>;
 
 private:
-  bool updateEntityStatusInSim();
-  std::optional<CanonicalizedEntityStatus> updateEntityStatusInSim(
-    const std::string & entity_name, const CanonicalizedEntityStatus & status);
+  bool updateTimeInSim();
+
+  bool updateEntitiesStatusInSim();
+
   bool updateTrafficLightsInSim();
 
   const Configuration configuration;
