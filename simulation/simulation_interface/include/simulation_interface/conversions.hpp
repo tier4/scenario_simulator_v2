@@ -237,13 +237,14 @@ auto toMsg(
     }
   };
 
-  auto convert_status = [](auto status) {
+  auto convert_status = [](auto status) constexpr
+  {
     switch (status) {
-      case simulation_api_schema::TrafficLight_Status_SOLID_OFF:
+      case TrafficLight_Status_SOLID_OFF:
         return TrafficLightBulbMessageType::SOLID_OFF;
-      case simulation_api_schema::TrafficLight_Status_SOLID_ON:
+      case TrafficLight_Status_SOLID_ON:
         return TrafficLightBulbMessageType::SOLID_ON;
-      case simulation_api_schema::TrafficLight_Status_FLASHING:
+      case TrafficLight_Status_FLASHING:
         return TrafficLightBulbMessageType::FLASHING;
       default:
         return TrafficLightBulbMessageType::UNKNOWN;
