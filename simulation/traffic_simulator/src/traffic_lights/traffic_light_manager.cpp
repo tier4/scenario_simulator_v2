@@ -62,7 +62,8 @@ auto TrafficLightManager::getTrafficLights(const LaneletID lanelet_id)
   std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
 
   if (hdmap_->isTrafficLightRegulatoryElement(lanelet_id)) {
-    for (auto && traffic_light : hdmap_->getTrafficLightRegulatoryElement(lanelet_id)->trafficLights()) {
+    for (auto && traffic_light :
+         hdmap_->getTrafficLightRegulatoryElement(lanelet_id)->trafficLights()) {
       traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
     }
   } else if (hdmap_->isTrafficLight(lanelet_id)) {

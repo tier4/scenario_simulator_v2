@@ -230,7 +230,8 @@ public:
   auto isTrafficLightRegulatoryElement(const LaneletId) const -> bool;
   auto getTrafficLightRegulatoryElement(const LaneletId) const -> lanelet::TrafficLight::Ptr;
 
-  auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const LaneletId) const -> std::vector<LaneletId>;
+  auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const LaneletId) const
+    -> std::vector<LaneletId>;
 
 private:
   math::geometry::HermiteCurve getLaneChangeTrajectory(

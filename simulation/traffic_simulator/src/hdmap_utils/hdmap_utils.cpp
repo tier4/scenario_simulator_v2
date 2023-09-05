@@ -2051,8 +2051,8 @@ auto HdMapUtils::getTrafficLightRegulatoryElement(const LaneletId lanelet_id) co
     lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 
-auto HdMapUtils::getTrafficLightRegulatoryElementIDsFromTrafficLight(const LaneletId traffic_light_way_id) const
-  -> std::vector<LaneletId>
+auto HdMapUtils::getTrafficLightRegulatoryElementIDsFromTrafficLight(
+  const LaneletId traffic_light_way_id) const -> std::vector<LaneletId>
 {
   assert(isTrafficLight(traffic_light_way_id));
   std::vector<LaneletId> traffic_light_regulatory_element_ids;
