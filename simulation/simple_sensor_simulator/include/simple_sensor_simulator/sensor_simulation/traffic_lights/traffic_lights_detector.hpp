@@ -35,7 +35,8 @@ class TrafficLightsDetector
   const std::shared_ptr<traffic_simulator::TrafficLightPublisherBase> publisher_;
 
 public:
-  TrafficLightsDetector(std::shared_ptr<traffic_simulator::TrafficLightPublisherBase> publisher)
+  explicit TrafficLightsDetector(
+    const std::shared_ptr<traffic_simulator::TrafficLightPublisherBase> & publisher)
   : publisher_(publisher)
   {
   }
