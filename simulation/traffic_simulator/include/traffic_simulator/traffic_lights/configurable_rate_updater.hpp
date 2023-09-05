@@ -26,7 +26,7 @@ class ConfigurableRateUpdater
   const rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_base_interface_;
   const rclcpp::node_interfaces::NodeTimersInterface::SharedPtr node_timers_interface_;
   double update_rate_ = 0.0;
-  const std::function<void()> callback_func_;
+  const std::function<void()> thunk_;
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
 public:
