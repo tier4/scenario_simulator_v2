@@ -2,8 +2,8 @@
 Changelog for package do_nothing_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.8.0 (2023-09-05)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-2
 * Merge branch 'master' into feature/interpreter/sensor-detection-range

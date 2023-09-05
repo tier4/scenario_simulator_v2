@@ -2,8 +2,8 @@
 Changelog for package openscenario_preprocessor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.8.0 (2023-09-05)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
 * Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
 * Merge branch 'master' into feature/interpreter/sensor-detection-range

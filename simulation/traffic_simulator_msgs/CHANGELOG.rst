@@ -2,8 +2,8 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.8.0 (2023-09-05)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
 * Merge branch 'master' into feature/interpreter/sensor-detection-range
 * Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
