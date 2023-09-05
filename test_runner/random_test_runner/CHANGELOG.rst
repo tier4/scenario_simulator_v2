@@ -2,6 +2,35 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.0 (2023-09-05)
+------------------
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge pull request `#1074 <https://github.com/tier4/scenario_simulator_v2/issues/1074>`_ from tier4/fix/clock
+* Update `SimulationClock` to hold total frames instead of elapsed seconds
+* Fix a501d8b
+* Lipsticks
+* Remove member function `API::initialize`
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-2
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge pull request `#1018 <https://github.com/tier4/scenario_simulator_v2/issues/1018>`_ from tier4/fix/longitudinal_distance_fixed_master_merged
+* Merge remote-tracking branch 'origin/master' into fix/RJD-554_error_run_scenario_in_row
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Merge branch 'master_4284' into fix/longitudinal_distance_fixed_master_merged
+* use canonicalized value in random test runner
+* fix compile errors
+* cleanup code
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* rename data type
+* add namespace
+* fix compile errors in random test runner
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, kyoichi-sugahara, yamacir-kit
+
 0.7.0 (2023-07-26)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
