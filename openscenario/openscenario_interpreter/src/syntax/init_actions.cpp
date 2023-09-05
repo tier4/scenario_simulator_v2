@@ -111,6 +111,7 @@ auto InitActions::startInstantaneousActions() -> void
 
 auto InitActions::startNonInstantaneousActions() -> void
 {
+  // we don't call global actions here, because they are all instantaneous actions
   for (auto && e : user_defined_actions) {
     auto & user_defined_action = e.as<UserDefinedAction>();
     if (not user_defined_action.endsImmediately()) {
