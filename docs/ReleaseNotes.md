@@ -42,6 +42,10 @@ Minor Tweaks :oncoming_police_car:
 
 ## Version 0.7.0
 
+!!! Note
+    In version 0.8.x, we will drop ROS 2 [Galactic Geochelone](https://docs.ros.org/en/rolling/Releases/Release-Galactic-Geochelone.html) support.
+    We recommend to use version 0.7.0 for [Galactic Geochelone](https://docs.ros.org/en/rolling/Releases/Release-Galactic-Geochelone.html) user.
+
 Major Changes :race_car: :red_car: :blue_car:
 
 | Feature                                                  | Brief summary                                                                                                                                             | Category                                        | Pull request                                                      | Contributor                                   |
