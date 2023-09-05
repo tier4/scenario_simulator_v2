@@ -4,6 +4,26 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+## Version 0.8.0
+
+Major Changes :race_car: :red_car: :blue_car:
+
 | Feature                                            | Brief summary                                                                                                                                                          | Category                                              | Pull request                                                      | Contributor                             |
 |----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------|
 | Ground truth topic for perception detected objects | Add ground truth topic for detected objects in `simple_sensor_simulator`. The delay of the topic can be set by `detectedObjectGroundTruthPublishingDelay` in scenario. | `simple_sensor_simulator`, `openscenario_interpreter` | [#1024](https://github.com/tier4/scenario_simulator_v2/pull/1024) | [HansRobo](https://github.com/HansRobo) |
