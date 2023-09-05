@@ -23,7 +23,7 @@ auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArra
   const rclcpp::Time & current_ros_time,
   const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
 {
-  autoware_auto_perception_msgs::msg::TrafficSignalArray msg;
+  autoware_auto_perception_msgs::msg::TrafficSignalArray message;
   using TrafficLightType = autoware_auto_perception_msgs::msg::TrafficSignal;
   msg.header.frame_id = "camera_link";  // DIRTY HACK!!!
   msg.header.stamp = current_ros_time;
