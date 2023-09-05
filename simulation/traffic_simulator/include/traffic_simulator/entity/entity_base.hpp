@@ -62,7 +62,7 @@ public:
   virtual void cancelRequest();
 
 #define DEFINE_GETTER(NAME, TYPE, RETURN_VARIABLE) \
-  /*   */ auto get##NAME() const noexcept -> TYPE { return RETURN_VARIABLE; }
+  /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
 
   // clang-format off
   DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        static_cast<EntityStatus>(getStatus()).bounding_box)
