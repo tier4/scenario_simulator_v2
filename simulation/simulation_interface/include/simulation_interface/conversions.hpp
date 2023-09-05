@@ -191,15 +191,17 @@ auto toMsg(
   TrafficLightBulbMessageType & traffic_light_bulb_state) -> void
 {
   using namespace simulation_api_schema;
-  auto convert_color = [](auto color) {
+
+  auto convert_color = [](auto color) constexpr
+  {
     switch (color) {
-      case simulation_api_schema::TrafficLight_Color_RED:
+      case TrafficLight_Color_RED:
         return TrafficLightBulbMessageType::RED;
-      case simulation_api_schema::TrafficLight_Color_AMBER:
+      case TrafficLight_Color_AMBER:
         return TrafficLightBulbMessageType::AMBER;
-      case simulation_api_schema::TrafficLight_Color_GREEN:
+      case TrafficLight_Color_GREEN:
         return TrafficLightBulbMessageType::GREEN;
-      case simulation_api_schema::TrafficLight_Color_WHITE:
+      case TrafficLight_Color_WHITE:
         return TrafficLightBulbMessageType::WHITE;
       default:
         return TrafficLightBulbMessageType::UNKNOWN;
