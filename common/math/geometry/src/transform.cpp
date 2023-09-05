@@ -14,8 +14,9 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 #include <tf2/LinearMath/Quaternion.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+
 #include <geometry/transform.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 namespace math
 {
