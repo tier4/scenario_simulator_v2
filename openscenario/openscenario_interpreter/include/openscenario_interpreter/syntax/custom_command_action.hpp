@@ -102,7 +102,7 @@ private:
           break;
         }
         case SourceType::NAMED_CONDITION: {
-          log << trigger_name_ << " named " << conditions_name_ << " : " << conditions_description_;
+          log << trigger_name_ << " named " << conditions_name_ << ": " << conditions_description_;
           break;
         }
         case SourceType::ANONYMOUS_CONDITIONS: {
@@ -133,10 +133,6 @@ private:
 public:
   SpecialAction() = default;
   ~SpecialAction() = default;
-  SpecialAction(const SpecialAction &) = default;
-  SpecialAction & operator=(const SpecialAction &) = default;
-  SpecialAction(SpecialAction &&) = default;
-  SpecialAction & operator=(SpecialAction &&) = default;
 
   // Constructor with no inner object - first object with conditions
   SpecialAction(
@@ -222,7 +218,7 @@ private:
   const std::shared_ptr<const CoreSource> core_{nullptr};
   const std::string source_name_{""};
   const std::string path_{""};
-  const std::string log_{""};
+  const std::string log_{"No core source - the path is empty"};
 };
 
 struct CustomCommand

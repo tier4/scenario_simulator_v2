@@ -56,12 +56,10 @@ auto Trigger::activeConditionGroupIndex() const -> iterator::difference_type
 auto Trigger::activeConditionGroupDescription() const
   -> std::vector<std::pair<std::string, std::string>>
 {
-  auto it = begin();
-  std::advance(it, activeConditionGroupIndex());
-  ConditionGroup const & cgroup = *it;
+  const auto & group = *std::next(begin(), activeConditionGroupIndex());
   std::vector<std::pair<std::string, std::string>> name_description_vec;
-  for (auto itt = cgroup.begin(); itt != cgroup.end(); ++itt)
-    name_description_vec.push_back(std::make_pair(itt->name, itt->description()));
+  for (const auto & condition : group)
+    name_description_vec.emplace_back(condition.name, condition.description());
   return name_description_vec;
 }
 
