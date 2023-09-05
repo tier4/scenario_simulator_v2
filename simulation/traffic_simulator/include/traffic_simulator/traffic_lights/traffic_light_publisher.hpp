@@ -42,7 +42,7 @@ public:
   template <typename NodePointer>
   explicit TrafficLightPublisher(
     const std::string & topic_name, const NodePointer & node,
-    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils = nullptr)
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils = nullptr)
   : TrafficLightPublisherBase(),
     traffic_light_state_array_publisher_(
       rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
