@@ -47,24 +47,11 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
   const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
 {
   assert(hdmap_utils_ != nullptr);
-  // cache store for conversion from way_id to relation_id
-  static std::unordered_map<std::int64_t, std::vector<std::int64_t>> id_conversion_cache_map;
 
   autoware_perception_msgs::msg::TrafficSignalArray message;
   message.stamp = current_ros_time;
   for (const auto & traffic_light : request.states()) {
-    auto relation_ids = [&]() -> std::vector<std::int64_t> {
-      if (auto cache = id_conversion_cache_map.find(traffic_light.id());
-          cache != id_conversion_cache_map.end()) {
-        // use cached relation_id if the conversion is already cached
-        return cache->second;
-      } else {
-        auto relation_ids = hdmap_utils_->getTrafficLightRelationIDsFromWayID(traffic_light.id());
-        // cache the conversion
-        id_conversion_cache_map[traffic_light.id()] = relation_ids;
-        return relation_ids;
-      }
-    }();
+    auto relation_ids = hdmap_utils_->getTrafficLightRelationIDsFromWayID(traffic_light.id());
 
     for (auto relation_id : relation_ids) {
       // skip if the traffic light has no bulbs
