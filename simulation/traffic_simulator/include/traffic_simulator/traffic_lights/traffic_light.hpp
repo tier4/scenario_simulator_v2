@@ -319,13 +319,15 @@ struct TrafficLight
     }
   };
 
+  using LaneletId = std::int64_t;
+
   const LaneletId way_id;
 
   std::set<Bulb> bulbs;
 
   const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
 
-  explicit TrafficLight(const std::int64_t, hdmap_utils::HdMapUtils &);
+  explicit TrafficLight(const LaneletId, hdmap_utils::HdMapUtils &);
 
   auto clear() { bulbs.clear(); }
 
