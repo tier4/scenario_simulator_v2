@@ -172,7 +172,7 @@ TrafficLight::TrafficLight(const LaneletId lanelet_id, hdmap_utils::HdMapUtils &
       return lanelet_id;
     } else {
       // lanelet::RoleName::Refers
-      if (auto traffic_light_members = map_manager.getTrafficLightRelation(lanelet_id)
+      if (auto traffic_light_members = map_manager.getTrafficLightRegulatoryElement(lanelet_id)
                                          ->getParameters<lanelet::ConstLineString3d>("refers");
           traffic_light_members.size() > 0) {
         // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.

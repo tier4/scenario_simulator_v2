@@ -51,7 +51,7 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
   autoware_perception_msgs::msg::TrafficSignalArray message;
   message.stamp = current_ros_time;
   for (const auto & traffic_light : request.states()) {
-    auto relation_ids = hdmap_utils_->getTrafficLightRelationIDsFromWayID(traffic_light.id());
+    auto relation_ids = hdmap_utils_->getTrafficLightRegulatoryElementIDsFromTrafficLight(traffic_light.id());
 
     for (auto relation_id : relation_ids) {
       // skip if the traffic light has no bulbs
