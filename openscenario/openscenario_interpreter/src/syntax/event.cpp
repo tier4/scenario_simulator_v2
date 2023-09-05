@@ -63,7 +63,7 @@ auto Event::evaluate() -> Object
     return StoryboardElement::evaluate();
   } catch (const SpecialAction<EXIT_FAILURE> & action) {
     throw SpecialAction<EXIT_FAILURE>(
-      name, start_trigger.activeConditionGroupIndex(), "StartTrigger.ConditionGroup", "Condition",
+      name, "StartTrigger.ConditionGroup", start_trigger.activeConditionGroupIndex(), "Condition",
       start_trigger.activeConditionGroupDescription());
   }
 }

@@ -42,9 +42,9 @@ auto Story::run() -> void
     try {
       assert(act.is_also<Act>());
       act.evaluate();
-      index++;
+      ++index;
     } catch (const SpecialAction<EXIT_FAILURE> & action) {
-      throw SpecialAction<EXIT_FAILURE>(name, index, "Act", action);
+      throw SpecialAction<EXIT_FAILURE>(name, "Act", index, action);
     }
   }
 }

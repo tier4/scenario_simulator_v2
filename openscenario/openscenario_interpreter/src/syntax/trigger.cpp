@@ -44,16 +44,13 @@ auto Trigger::evaluate() -> Object
       }));
 }
 
-auto Trigger::activeConditionGroupIndex() const -> int
+auto Trigger::activeConditionGroupIndex() const -> iterator::difference_type
 {
-  std::size_t index{0};
-  for (auto it = begin(); it != end(); ++it, ++index) {
-    ConditionGroup const & cgroup = *it;
-    bool all_conditions_true = std::all_of(
-      cgroup.begin(), cgroup.end(), [](const Condition & c) { return c.current_value; });
-    if (all_conditions_true) break;
-  }
-  return index;
+  return std::distance(begin(), std::find_if(begin(), end(), [](const auto & group) {
+                         return std::all_of(group.begin(), group.end(), [](const auto & condition) {
+                           return condition.current_value;
+                         });
+                       }));
 }
 
 auto Trigger::activeConditionGroupDescription() const

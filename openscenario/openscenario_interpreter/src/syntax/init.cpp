@@ -32,10 +32,10 @@ auto Init::evaluateInstantaneousActions() -> Object
   try {
     actions.startInstantaneousActions();
     actions.runInstantaneousActions();
+    return unspecified;
   } catch (const SpecialAction<EXIT_FAILURE> & action) {
     throw SpecialAction<EXIT_FAILURE>("OpenSCENARIO.Storyboard.Init", action);
   }
-  return unspecified;
 }
 
 auto Init::runNonInstantaneousActions() -> void { actions.runNonInstantaneousActions(); }

@@ -39,9 +39,9 @@ auto Act::run() -> void
     try {
       assert(maneuver_group.is_also<ManeuverGroup>());
       maneuver_group.evaluate();
-      index++;
+      ++index;
     } catch (const SpecialAction<EXIT_FAILURE> & action) {
-      throw SpecialAction<EXIT_FAILURE>(name, index, "ManeuverGroup", action);
+      throw SpecialAction<EXIT_FAILURE>(name, "ManeuverGroup", index, action);
     }
   }
 }

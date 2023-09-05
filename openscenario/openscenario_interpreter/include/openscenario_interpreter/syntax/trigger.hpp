@@ -48,7 +48,7 @@ struct Trigger : public std::list<ConditionGroup>
   {
   }
 
-  auto activeConditionGroupIndex() const -> int;
+  auto activeConditionGroupIndex() const -> iterator::difference_type;
   auto activeConditionGroupDescription() const -> std::vector<std::pair<std::string, std::string>>;
 
   auto evaluate() -> Object;

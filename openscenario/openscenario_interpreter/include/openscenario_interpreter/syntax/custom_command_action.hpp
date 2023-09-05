@@ -19,10 +19,8 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
-
-#include <tier4_simulation_msgs/msg/simulation_events.hpp>
-
 #include <string>
+#include <tier4_simulation_msgs/msg/simulation_events.hpp>
 #include <vector>
 
 namespace openscenario_interpreter
@@ -89,7 +87,7 @@ private:
       conditions_description_ = conditions_description.str();
     }
 
-    auto comprehensiveLog(const std::string & trigger_path) -> std::string
+    auto comprehensiveLog(const std::string & trigger_path) const -> std::string
     {
       std::stringstream log;
       log << "CustomCommandAction typed " << std::quoted("exitFailure") << " was triggered by the ";
@@ -140,39 +138,39 @@ public:
   SpecialAction(SpecialAction &&) = default;
   SpecialAction & operator=(SpecialAction &&) = default;
 
-  // Constructor with no inner object - first object with conditions_list
+  // Constructor with no inner object - first object with conditions
   SpecialAction(
-    const std::string & source_name, int element_index, const std::string & element_name,
+    const std::string & source_name, const std::string & element_name, int element_index,
     const std::string & trigger_name_,
     const std::vector<std::pair<std::string, std::string>> & conditions_list)
   : source_name_{source_name},
     inner_{nullptr},
     core_{std::make_shared<CoreSource>(trigger_name_, conditions_list)},
-    path_{formatPath("", element_index, element_name)},
+    path_{formatPath(element_name, element_index)},
     log_{core_->comprehensiveLog(path_)}
   {
   }
 
   // Constructor with no inner object - first object without conditions
   SpecialAction(
-    const std::string & source_name, int element_index, const std::string & element_name,
+    const std::string & source_name, const std::string & element_name, int element_index,
     const std::string & trigger_name_)
   : source_name_{source_name},
     inner_{nullptr},
     core_{std::make_shared<CoreSource>(trigger_name_)},
-    path_{formatPath("", element_index, element_name)},
+    path_{formatPath(element_name, element_index)},
     log_{core_->comprehensiveLog(path_)}
   {
   }
 
   // Constructor with inner object and current source (to be forwarded) - intermediate object
   SpecialAction(
-    const std::string & source_name, int element_index, const std::string & element_name,
+    const std::string & source_name, const std::string & element_name, int element_index,
     SpecialAction const & inner)
   : source_name_{source_name},
     inner_{std::make_shared<SpecialAction>(inner)},
     core_{inner.core_},
-    path_{formatPath(inner.source_name_, element_index, element_name)},
+    path_{formatPath(element_name, element_index)},
     log_{core_->comprehensiveLog(path_)}
   {
   }
@@ -182,7 +180,7 @@ public:
   : source_name_{""},
     inner_{std::make_shared<SpecialAction>(inner)},
     core_{inner.core_},
-    path_{formatPath(inner.source_name_, element_name)},
+    path_{formatPath(element_name)},
     log_{core_->comprehensiveLog(path_)}
   {
   }
@@ -190,27 +188,29 @@ public:
   const char * what() const noexcept { return log_.c_str(); }
 
 private:
-  auto formatPath(const std::string & inner_source_name, const std::string & element_name)
-    -> std::string
+  auto formatPath(const std::string & element_name) -> std::string
   {
-    if (inner_) {
-      return (inner_source_name.empty() ? element_name : element_name + "." + inner_source_name) +
-             inner_->path_;
-    } else {
-      return inner_source_name.empty() ? element_name : element_name + "." + inner_source_name;
+    if (!inner_) {
+      return element_name;
     }
+
+    std::stringstream ss("");
+    ss << element_name;
+    if (!inner_->source_name_.empty()) {
+      ss << "." << inner_->source_name_;
+    }
+    ss << inner_->path_;
+    return ss.str();
   }
 
-  auto formatPath(
-    const std::string & inner_source_name, int element_index, const std::string & element_name)
-    -> std::string
+  auto formatPath(const std::string & element_name, int element_index) -> std::string
   {
     std::stringstream ss("");
-    ss << '.' << element_name;
-    if (!inner_source_name.empty()) {
-      ss << "[" << std::quoted(inner_source_name) << "]";
+    ss << '.' << element_name << "[";
+    if (inner_ && !inner_->source_name_.empty()) {
+      ss << std::quoted(inner_->source_name_) << "]";
     } else {
-      ss << '[' << element_index << ']';
+      ss << element_index << ']';
     }
     if (inner_) {
       ss << inner_->path_;
@@ -219,7 +219,7 @@ private:
   }
 
   const std::shared_ptr<const SpecialAction> inner_{nullptr};
-  std::shared_ptr<CoreSource> core_{nullptr};
+  const std::shared_ptr<const CoreSource> core_{nullptr};
   const std::string source_name_{""};
   const std::string path_{""};
   const std::string log_{""};

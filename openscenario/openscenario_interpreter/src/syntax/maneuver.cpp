@@ -37,9 +37,9 @@ auto Maneuver::run() -> void
     try {
       assert(event.is_also<Event>());
       event.evaluate();
-      index++;
+      ++index;
     } catch (const SpecialAction<EXIT_FAILURE> & action) {
-      throw SpecialAction<EXIT_FAILURE>(name, index, "Event", action);
+      throw SpecialAction<EXIT_FAILURE>(name, "Event", index, action);
     }
   }
 }

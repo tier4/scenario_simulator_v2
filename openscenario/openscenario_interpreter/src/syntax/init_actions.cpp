@@ -18,7 +18,6 @@
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/syntax/user_defined_action.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
-
 #include <unordered_map>
 
 namespace openscenario_interpreter
@@ -43,10 +42,7 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
   }
 }
 
-auto InitActions::evaluate() -> Object
-{
-  return StoryboardElement::evaluate();
-}
+auto InitActions::evaluate() -> Object { return StoryboardElement::evaluate(); }
 
 auto InitActions::accomplished() const -> bool
 {
@@ -65,10 +61,7 @@ auto InitActions::accomplished() const -> bool
 }
 
 // this function should be called by StoryboardElement
-auto InitActions::run() -> void
-{
-  runNonInstantaneousActions();
-}
+auto InitActions::run() -> void { runNonInstantaneousActions(); }
 
 auto InitActions::endsImmediately() const -> bool
 {
@@ -90,10 +83,7 @@ auto InitActions::endsImmediately() const -> bool
 }
 
 // this function should be called by StoryboardElement
-auto InitActions::start() -> void
-{
-  startNonInstantaneousActions();
-}
+auto InitActions::start() -> void { startNonInstantaneousActions(); }
 
 // this function should be called before simulation time starts
 auto InitActions::startInstantaneousActions() -> void
@@ -103,15 +93,15 @@ auto InitActions::startInstantaneousActions() -> void
   }
 
   std::size_t index{0};
-  for (auto && e : user_defined_actions) {
+  for (auto && element : user_defined_actions) {
     try {
-      auto & user_defined_action = e.as<UserDefinedAction>();
+      auto & user_defined_action = element.as<UserDefinedAction>();
       if (user_defined_action.endsImmediately()) {
         user_defined_action.start();
       }
-      index++;
+      ++index;
     } catch (const SpecialAction<EXIT_FAILURE> & action) {
-      throw SpecialAction<EXIT_FAILURE>("Actions", index, "UserDefinedAction", "Action");
+      throw SpecialAction<EXIT_FAILURE>("Actions", "UserDefinedAction", index, "Action");
     }
   }
 

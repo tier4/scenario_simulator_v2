@@ -50,10 +50,10 @@ auto Storyboard::run() -> void
     try {
       story.evaluate();
       if (story.is<Story>()) {
-        index++;
+        ++index;
       }
     } catch (const SpecialAction<EXIT_FAILURE> & action) {
-      throw SpecialAction<EXIT_FAILURE>(name, index, "Story", action);
+      throw SpecialAction<EXIT_FAILURE>(name, "Story", index, action);
     }
   }
 }
