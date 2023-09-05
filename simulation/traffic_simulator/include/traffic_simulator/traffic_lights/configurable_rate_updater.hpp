@@ -31,10 +31,10 @@ class ConfigurableRateUpdater
 
 public:
   template <typename NodePointer>
-  ConfigurableRateUpdater(const NodePointer & node, std::function<void()> callback_func)
+  ConfigurableRateUpdater(const NodePointer & node, std::function<void()> thunk)
   : node_base_interface_(node->get_node_base_interface()),
     node_timers_interface_(node->get_node_timers_interface()),
-    callback_func_(callback_func),
+    thunk_(thunk),
     clock_ptr_(node->get_clock())
   {
   }

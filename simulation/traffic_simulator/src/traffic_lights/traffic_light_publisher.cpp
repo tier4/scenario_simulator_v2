@@ -25,20 +25,20 @@ auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArra
 {
   autoware_auto_perception_msgs::msg::TrafficSignalArray message;
   using TrafficLightType = autoware_auto_perception_msgs::msg::TrafficSignal;
-  msg.header.frame_id = "camera_link";  // DIRTY HACK!!!
-  msg.header.stamp = current_ros_time;
+  message.header.frame_id = "camera_link";  // DIRTY HACK!!!
+  message.header.stamp = current_ros_time;
   for (const auto & traffic_light : request.states()) {
-    TrafficLightType traffic_light_msg;
-    traffic_light_msg.map_primitive_id = traffic_light.id();
+    TrafficLightType traffic_light_message;
+    traffic_light_message.map_primitive_id = traffic_light.id();
     for (auto bulb_status : traffic_light.traffic_light_status()) {
       using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
-      TrafficLightBulbType light_bulb_msg;
-      simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_msg);
-      traffic_light_msg.lights.push_back(light_bulb_msg);
+      TrafficLightBulbType light_bulb_message;
+      simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
+      traffic_light_message.lights.push_back(light_bulb_message);
     }
-    msg.signals.push_back(traffic_light_msg);
+    message.signals.push_back(traffic_light_message);
   }
-  traffic_light_state_array_publisher_->publish(msg);
+  traffic_light_state_array_publisher_->publish(message);
 }
 
 template <>
@@ -50,8 +50,8 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
   // cache store for conversion from way_id to relation_id
   static std::unordered_map<std::int64_t, std::vector<std::int64_t>> id_conversion_cache_map;
 
-  autoware_perception_msgs::msg::TrafficSignalArray msg;
-  msg.stamp = current_ros_time;
+  autoware_perception_msgs::msg::TrafficSignalArray message;
+  message.stamp = current_ros_time;
   for (const auto & traffic_light : request.states()) {
     auto relation_ids = [&]() -> std::vector<std::int64_t> {
       if (auto cache = id_conversion_cache_map.find(traffic_light.id());
@@ -70,20 +70,20 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
       // skip if the traffic light has no bulbs
       if (not traffic_light.traffic_light_status().empty()) {
         using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
-        TrafficLightType traffic_light_msg;
-        traffic_light_msg.traffic_signal_id = relation_id;
+        TrafficLightType traffic_light_message;
+        traffic_light_message.traffic_signal_id = relation_id;
 
         for (auto bulb_status : traffic_light.traffic_light_status()) {
           using TrafficLightBulbType =
             autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
-          TrafficLightBulbType light_bulb_msg;
-          simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_msg);
-          traffic_light_msg.elements.push_back(light_bulb_msg);
+          TrafficLightBulbType light_bulb_message;
+          simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
+          traffic_light_message.elements.push_back(light_bulb_message);
         }
-        msg.signals.push_back(traffic_light_msg);
+        message.signals.push_back(traffic_light_message);
       }
     }
   }
-  traffic_light_state_array_publisher_->publish(msg);
+  traffic_light_state_array_publisher_->publish(message);
 }
 }  // namespace traffic_simulator
