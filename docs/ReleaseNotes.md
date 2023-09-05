@@ -4,6 +4,26 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+|---------|---------------|----------|--------------|-------------|
+|         |               |          |              |             |
+
+## Version 0.8.0
+
+Major Changes :race_car: :red_car: :blue_car:
+
 | Feature                                            | Brief summary                                                                                                                                                          | Category                                              | Pull request                                                      | Contributor                             |
 |----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------|
 | Ground truth topic for perception detected objects | Add ground truth topic for detected objects in `simple_sensor_simulator`. The delay of the topic can be set by `detectedObjectGroundTruthPublishingDelay` in scenario. | `simple_sensor_simulator`, `openscenario_interpreter` | [#1024](https://github.com/tier4/scenario_simulator_v2/pull/1024) | [HansRobo](https://github.com/HansRobo) |
@@ -21,6 +41,10 @@ Minor Tweaks :oncoming_police_car:
 |         |               |          |              |             |
 
 ## Version 0.7.0
+
+!!! Note
+    In version 0.8.x, we will drop ROS 2 [Galactic Geochelone](https://docs.ros.org/en/rolling/Releases/Release-Galactic-Geochelone.html) support.
+    We recommend to use version 0.7.0 for [Galactic Geochelone](https://docs.ros.org/en/rolling/Releases/Release-Galactic-Geochelone.html) user.
 
 Major Changes :race_car: :red_car: :blue_car:
 
