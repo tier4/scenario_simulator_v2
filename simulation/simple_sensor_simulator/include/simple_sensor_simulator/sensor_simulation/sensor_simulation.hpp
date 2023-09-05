@@ -91,7 +91,7 @@ public:
     }
   }
 
-  auto attachTrafficLightsDetectorEmulator(
+  auto attachPseudoTrafficLightsDetector(
     const double current_simulation_time,
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration & configuration,
     rclcpp::Node & node, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils) -> void
