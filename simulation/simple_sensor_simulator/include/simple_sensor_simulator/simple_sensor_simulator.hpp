@@ -102,6 +102,11 @@ private:
   auto spawnVehicleEntity(const simulation_api_schema::SpawnVehicleEntityRequest &)
     -> simulation_api_schema::SpawnVehicleEntityResponse;
 
+  template <typename SpawnRequestType>
+  auto insertEntitySpawnedStatus(
+    const SpawnRequestType & spawn_request, const traffic_simulator_msgs::EntityType::Enum & type,
+    const traffic_simulator_msgs::EntitySubtype::Enum & subtype) -> void;
+
   auto spawnPedestrianEntity(const simulation_api_schema::SpawnPedestrianEntityRequest &)
     -> simulation_api_schema::SpawnPedestrianEntityResponse;
 
@@ -126,6 +131,10 @@ private:
   auto followPolylineTrajectory(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
     -> simulation_api_schema::FollowPolylineTrajectoryResponse;
 
+  auto attachPseudoTrafficLightDetector(
+    const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest &)
+    -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse;
+
   int getSocketPort();
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
@@ -133,11 +142,12 @@ private:
   std::vector<traffic_simulator_msgs::MiscObjectParameters> misc_objects_;
   double realtime_factor_;
   double step_time_;
-  double current_time_;
+  double current_simulation_time_;
+  double current_scenario_time_;
   rclcpp::Time current_ros_time_;
   bool initialized_;
   std::map<std::string, simulation_api_schema::EntityStatus> entity_status_;
-  std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> traffic_signals_states_;
+  simulation_api_schema::UpdateTrafficLightsRequest traffic_signals_states_;
   traffic_simulator_msgs::BoundingBox getBoundingBox(const std::string & name);
   zeromq::MultiServer server_;
   geographic_msgs::msg::GeoPoint getOrigin();
