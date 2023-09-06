@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <stdexcept>  // std::out_of_range
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -51,6 +52,8 @@ public:
     -> std::vector<std::reference_wrapper<TrafficLight>>;
 
   auto hasAnyLightChanged() -> bool;
+
+  auto generateUpdateTrafficLightsRequest() -> simulation_api_schema::UpdateTrafficLightsRequest;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
