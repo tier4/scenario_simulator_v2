@@ -75,7 +75,7 @@ public:
       std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<lanelet::Id>>;
   auto canonicalizeLaneletPose(
     const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose,
-    const std::vector<lanelet::Id> & route_lanelets) const
+    const lanelet::Ids & route_lanelets) const
     -> std::tuple<
       std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<lanelet::Id>>;
 
@@ -95,7 +95,7 @@ public:
     const geometry_msgs::msg::Pose & pose, lanelet::Id lanelet_id,
     double matching_distance = 1.0) const;
   std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
-    const geometry_msgs::msg::Pose & pose, const std::vector<lanelet::Id> & lanelet_ids,
+    const geometry_msgs::msg::Pose & pose, const lanelet::Ids & lanelet_ids,
     double matching_distance = 1.0) const;
   std::vector<traffic_simulator_msgs::msg::LaneletPose> toLaneletPoses(
     const geometry_msgs::msg::Pose & pose, lanelet::Id lanelet_id, double matching_distance = 5.0,
@@ -106,30 +106,28 @@ public:
   geometry_msgs::msg::PoseStamped toMapPose(
     const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const;
   double getHeight(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const;
-  std::vector<lanelet::Id> getLaneletIds() const;
-  std::vector<lanelet::Id> getNextLaneletIds(
+  lanelet::Ids getLaneletIds() const;
+  lanelet::Ids getNextLaneletIds(lanelet::Id lanelet_id, const std::string & turn_direction) const;
+  lanelet::Ids getNextLaneletIds(lanelet::Id lanelet_id) const;
+  lanelet::Ids getNextLaneletIds(
+    const lanelet::Ids & lanelet_id, const std::string & turn_direction) const;
+  lanelet::Ids getNextLaneletIds(const lanelet::Ids & lanelet_id) const;
+  lanelet::Ids getPreviousLaneletIds(
     lanelet::Id lanelet_id, const std::string & turn_direction) const;
-  std::vector<lanelet::Id> getNextLaneletIds(lanelet::Id lanelet_id) const;
-  std::vector<lanelet::Id> getNextLaneletIds(
-    const std::vector<lanelet::Id> & lanelet_id, const std::string & turn_direction) const;
-  std::vector<lanelet::Id> getNextLaneletIds(const std::vector<lanelet::Id> & lanelet_id) const;
-  std::vector<lanelet::Id> getPreviousLaneletIds(
-    lanelet::Id lanelet_id, const std::string & turn_direction) const;
-  std::vector<lanelet::Id> getPreviousLaneletIds(lanelet::Id lanelet_id) const;
-  std::vector<lanelet::Id> getPreviousLaneletIds(
-    const std::vector<lanelet::Id> & lanelet_ids, const std::string & turn_direction) const;
-  std::vector<lanelet::Id> getPreviousLaneletIds(
-    const std::vector<lanelet::Id> & lanelet_ids) const;
+  lanelet::Ids getPreviousLaneletIds(lanelet::Id lanelet_id) const;
+  lanelet::Ids getPreviousLaneletIds(
+    const lanelet::Ids & lanelet_ids, const std::string & turn_direction) const;
+  lanelet::Ids getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) const;
   std::optional<int64_t> getLaneChangeableLaneletId(
     lanelet::Id lanelet_id, traffic_simulator::lane_change::Direction direction) const;
   std::optional<int64_t> getLaneChangeableLaneletId(
     lanelet::Id lanelet_id, traffic_simulator::lane_change::Direction direction,
     uint8_t shift) const;
   std::optional<double> getDistanceToStopLine(
-    const std::vector<lanelet::Id> & route_lanelets,
+    const lanelet::Ids & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
   std::optional<double> getDistanceToStopLine(
-    const std::vector<lanelet::Id> & route_lanelets,
+    const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const;
   double getLaneletLength(lanelet::Id lanelet_id) const;
   bool isInLanelet(lanelet::Id lanelet_id, double s) const;
@@ -139,21 +137,20 @@ public:
   std::optional<double> getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
     const traffic_simulator_msgs::msg::LaneletPose & to) const;
-  double getSpeedLimit(const std::vector<lanelet::Id> & lanelet_ids) const;
-  bool isInRoute(lanelet::Id lanelet_id, const std::vector<lanelet::Id> & route) const;
-  std::vector<lanelet::Id> getFollowingLanelets(
+  double getSpeedLimit(const lanelet::Ids & lanelet_ids) const;
+  bool isInRoute(lanelet::Id lanelet_id, const lanelet::Ids & route) const;
+  lanelet::Ids getFollowingLanelets(
     lanelet::Id lanelet_id, double distance = 100, bool include_self = true) const;
-  std::vector<lanelet::Id> getFollowingLanelets(
-    lanelet::Id lanelet_id, const std::vector<lanelet::Id> & candidate_lanelet_ids,
-    double distance = 100, bool include_self = true) const;
-  std::vector<lanelet::Id> getPreviousLanelets(lanelet::Id lanelet_id, double distance = 100) const;
+  lanelet::Ids getFollowingLanelets(
+    lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids, double distance = 100,
+    bool include_self = true) const;
+  lanelet::Ids getPreviousLanelets(lanelet::Id lanelet_id, double distance = 100) const;
   std::vector<geometry_msgs::msg::Point> getCenterPoints(lanelet::Id lanelet_id) const;
-  std::vector<geometry_msgs::msg::Point> getCenterPoints(
-    const std::vector<lanelet::Id> & lanelet_ids) const;
+  std::vector<geometry_msgs::msg::Point> getCenterPoints(const lanelet::Ids & lanelet_ids) const;
   std::shared_ptr<math::geometry::CatmullRomSpline> getCenterPointsSpline(
     lanelet::Id lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> clipTrajectoryFromLaneletIds(
-    lanelet::Id lanelet_id, double s, const std::vector<lanelet::Id> & lanelet_ids,
+    lanelet::Id lanelet_id, double s, const lanelet::Ids & lanelet_ids,
     double forward_distance = 20) const;
   bool canChangeLane(lanelet::Id from_lanelet_id, lanelet::Id to_lanelet_id) const;
   std::optional<std::pair<math::geometry::HermiteCurve, double>> getLaneChangeTrajectory(
@@ -166,38 +163,35 @@ public:
     double forward_distance_threshold) const;
   std::optional<geometry_msgs::msg::Vector3> getTangentVector(
     lanelet::Id lanelet_id, double s) const;
-  std::vector<lanelet::Id> getRoute(lanelet::Id from_lanelet_id, lanelet::Id to_lanelet_id) const;
-  std::vector<lanelet::Id> getConflictingCrosswalkIds(
-    const std::vector<lanelet::Id> & lanelet_ids) const;
-  std::vector<lanelet::Id> getConflictingLaneIds(
-    const std::vector<lanelet::Id> & lanelet_ids) const;
+  lanelet::Ids getRoute(lanelet::Id from_lanelet_id, lanelet::Id to_lanelet_id) const;
+  lanelet::Ids getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) const;
+  lanelet::Ids getConflictingLaneIds(const lanelet::Ids & lanelet_ids) const;
   std::optional<double> getCollisionPointInLaneCoordinate(
     lanelet::Id lanelet_id, lanelet::Id crossing_lanelet_id) const;
   visualization_msgs::msg::MarkerArray generateMarker() const;
-  std::vector<lanelet::Id> getRightOfWayLaneletIds(lanelet::Id lanelet_id) const;
-  std::unordered_map<lanelet::Id, std::vector<lanelet::Id>> getRightOfWayLaneletIds(
-    const std::vector<lanelet::Id> & lanelet_ids) const;
+  lanelet::Ids getRightOfWayLaneletIds(lanelet::Id lanelet_id) const;
+  std::unordered_map<lanelet::Id, lanelet::Ids> getRightOfWayLaneletIds(
+    const lanelet::Ids & lanelet_ids) const;
   std::optional<lanelet::Id> getClosestLaneletId(
     const geometry_msgs::msg::Pose & pose, double distance_thresh = 30.0,
     bool include_crosswalk = false) const;
 
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point & point, double distance_threshold,
-    std::size_t search_count = 5) const -> std::vector<lanelet::Id>;
+    std::size_t search_count = 5) const -> lanelet::Ids;
 
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point & point, double distance_threshold, bool include_crosswalk,
-    std::size_t search_count = 5) const -> std::vector<lanelet::Id>;
+    std::size_t search_count = 5) const -> lanelet::Ids;
 
-  std::vector<lanelet::Id> filterLaneletIds(
-    const std::vector<lanelet::Id> & lanelet_ids, const char subtype[]) const;
+  lanelet::Ids filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]) const;
   std::vector<geometry_msgs::msg::Point> getLaneletPolygon(lanelet::Id lanelet_id) const;
   std::vector<geometry_msgs::msg::Point> getStopLinePolygon(lanelet::Id lanelet_id) const;
-  std::vector<int64_t> getStopLineIdsOnPath(const std::vector<lanelet::Id> & route_lanelets) const;
-  std::vector<lanelet::Id> getTrafficLightIds() const;
+  std::vector<int64_t> getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const;
+  lanelet::Ids getTrafficLightIds() const;
   std::optional<geometry_msgs::msg::Point> getTrafficLightBulbPosition(
     lanelet::Id traffic_light_id, const std::string &) const;
-  std::vector<lanelet::Id> getTrafficLightStopLineIds(const lanelet::Id traffic_light_id) const;
+  lanelet::Ids getTrafficLightStopLineIds(const lanelet::Id traffic_light_id) const;
   std::vector<std::vector<geometry_msgs::msg::Point>> getTrafficLightStopLinesPoints(
     lanelet::Id traffic_light_id) const;
   std::optional<double> getDistanceToTrafficLightStopLine(
@@ -207,13 +201,12 @@ public:
     const math::geometry::CatmullRomSplineInterface & spline,
     const lanelet::Id traffic_light_id) const;
   std::optional<double> getDistanceToTrafficLightStopLine(
-    const std::vector<lanelet::Id> & route_lanelets,
+    const lanelet::Ids & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const;
   std::optional<double> getDistanceToTrafficLightStopLine(
-    const std::vector<lanelet::Id> & route_lanelets,
+    const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const;
-  std::vector<lanelet::Id> getTrafficLightIdsOnPath(
-    const std::vector<lanelet::Id> & route_lanelets) const;
+  lanelet::Ids getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) const;
   traffic_simulator_msgs::msg::LaneletPose getAlongLaneletPose(
     const traffic_simulator_msgs::msg::LaneletPose & from_pose, double along) const;
   std::vector<geometry_msgs::msg::Point> getLeftBound(lanelet::Id lanelet_id) const;
@@ -221,11 +214,11 @@ public:
 
   auto getLeftLaneletIds(
     lanelet::Id lanelet_id, traffic_simulator_msgs::msg::EntityType type,
-    bool include_opposite_direction = true) const -> std::vector<lanelet::Id>;
+    bool include_opposite_direction = true) const -> lanelet::Ids;
 
   auto getRightLaneletIds(
     lanelet::Id lanelet_id, traffic_simulator_msgs::msg::EntityType type,
-    bool include_opposite_direction = true) const -> std::vector<lanelet::Id>;
+    bool include_opposite_direction = true) const -> lanelet::Ids;
 
   auto isTrafficLight(const lanelet::Id) const -> bool;
 
@@ -233,8 +226,7 @@ public:
 
   auto getTrafficLightRegulatoryElement(const lanelet::Id) const -> lanelet::TrafficLight::Ptr;
 
-  auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id) const
-    -> std::vector<lanelet::Id>;
+  auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id) const -> lanelet::Ids;
 
 private:
   math::geometry::HermiteCurve getLaneChangeTrajectory(
@@ -252,9 +244,9 @@ private:
   // @}
 
   template <typename Lanelet>
-  std::vector<lanelet::Id> getLaneletIds(const std::vector<Lanelet> & lanelets) const
+  lanelet::Ids getLaneletIds(const std::vector<Lanelet> & lanelets) const
   {
-    std::vector<lanelet::Id> ids;
+    lanelet::Ids ids;
     std::transform(
       lanelets.begin(), lanelets.end(), std::back_inserter(ids),
       [](const Lanelet & lanelet) { return lanelet.id(); });
@@ -267,11 +259,11 @@ private:
   std::vector<lanelet::Lanelet> filterLanelets(
     const std::vector<lanelet::Lanelet> & lanelets, const char subtype[]) const;
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
-  getTrafficLightRegElementsOnPath(const std::vector<lanelet::Id> & lanelet_ids) const;
+  getTrafficLightRegElementsOnPath(const lanelet::Ids & lanelet_ids) const;
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> getTrafficSignRegElementsOnPath(
-    const std::vector<lanelet::Id> & lanelet_ids) const;
+    const lanelet::Ids & lanelet_ids) const;
   std::vector<lanelet::ConstLineString3d> getStopLinesOnPath(
-    const std::vector<lanelet::Id> & lanelet_ids) const;
+    const lanelet::Ids & lanelet_ids) const;
   geometry_msgs::msg::Vector3 getVectorFromPose(
     const geometry_msgs::msg::Pose & pose, double magnitude) const;
   void mapCallback(const autoware_auto_mapping_msgs::msg::HADMapBin & msg) const;
@@ -294,15 +286,15 @@ private:
     const lanelet::ConstLineString3d & line_string) const;
   std::vector<double> calculateSegmentDistances(
     const lanelet::ConstLineString3d & line_string) const;
-  std::vector<lanelet::Lanelet> getLanelets(const std::vector<lanelet::Id> & lanelet_ids) const;
+  std::vector<lanelet::Lanelet> getLanelets(const lanelet::Ids & lanelet_ids) const;
   lanelet::BasicPoint2d toPoint2d(const geometry_msgs::msg::Point & point) const;
   lanelet::BasicPolygon2d absoluteHull(
     const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose) const;
   std::vector<geometry_msgs::msg::Point> toPolygon(
     const lanelet::ConstLineString3d & line_string) const;
   lanelet::ConstLanelets shoulder_lanelets_;
-  std::vector<lanelet::Id> getNextRoadShoulderLanelet(lanelet::Id lanelet_id) const;
-  std::vector<lanelet::Id> getPreviousRoadShoulderLanelet(lanelet::Id lanelet_id) const;
+  lanelet::Ids getNextRoadShoulderLanelet(lanelet::Id lanelet_id) const;
+  lanelet::Ids getPreviousRoadShoulderLanelet(lanelet::Id lanelet_id) const;
 };
 }  // namespace hdmap_utils
 

@@ -129,9 +129,9 @@ auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obst
   return std::nullopt;
 }
 
-auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> std::vector<lanelet::Id>
+auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
 {
-  std::vector<lanelet::Id> ids{};
+  lanelet::Ids ids{};
 
   if (const auto universe =
         dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(

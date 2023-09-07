@@ -28,8 +28,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const std::vector<lanelet::Id> & route_lanelets)
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
 : entity_status_(canonicalize(may_non_canonicalized_entity_status, hdmap_utils, route_lanelets))
 {
 }
@@ -57,8 +56,8 @@ auto CanonicalizedEntityStatus::canonicalize(
 
 auto CanonicalizedEntityStatus::canonicalize(
   const EntityStatus & may_non_canonicalized_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const std::vector<lanelet::Id> & route_lanelets) -> EntityStatus
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
+  -> EntityStatus
 {
   auto canonicalized = may_non_canonicalized_entity_status;
   if (may_non_canonicalized_entity_status.lanelet_pose_valid) {

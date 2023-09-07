@@ -118,8 +118,7 @@ auto EntityBase::getDistanceToLaneBound(lanelet::Id lanelet_id) const -> double
   return std::min(getDistanceToLeftLaneBound(lanelet_id), getDistanceToRightLaneBound(lanelet_id));
 }
 
-auto EntityBase::getDistanceToLaneBound(const std::vector<lanelet::Id> & lanelet_ids) const
-  -> double
+auto EntityBase::getDistanceToLaneBound(const lanelet::Ids & lanelet_ids) const -> double
 {
   return std::min(
     getDistanceToLeftLaneBound(lanelet_ids), getDistanceToRightLaneBound(lanelet_ids));
@@ -145,8 +144,7 @@ auto EntityBase::getDistanceToLeftLaneBound(lanelet::Id lanelet_id) const -> dou
   }
 }
 
-auto EntityBase::getDistanceToLeftLaneBound(const std::vector<lanelet::Id> & lanelet_ids) const
-  -> double
+auto EntityBase::getDistanceToLeftLaneBound(const lanelet::Ids & lanelet_ids) const -> double
 {
   std::vector<double> distances;
   std::transform(
@@ -176,8 +174,7 @@ auto EntityBase::getDistanceToRightLaneBound(lanelet::Id lanelet_id) const -> do
   }
 }
 
-auto EntityBase::getDistanceToRightLaneBound(const std::vector<lanelet::Id> & lanelet_ids) const
-  -> double
+auto EntityBase::getDistanceToRightLaneBound(const lanelet::Ids & lanelet_ids) const -> double
 {
   std::vector<double> distances;
   std::transform(

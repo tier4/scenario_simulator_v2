@@ -96,19 +96,19 @@ public:
 
   /*   */ auto getDistanceToLaneBound(lanelet::Id lanelet_id) const -> double;
 
-  /*   */ auto getDistanceToLaneBound(const std::vector<lanelet::Id> &) const -> double;
+  /*   */ auto getDistanceToLaneBound(const lanelet::Ids &) const -> double;
 
   /*   */ auto getDistanceToLeftLaneBound() -> double;
 
   /*   */ auto getDistanceToLeftLaneBound(lanelet::Id lanelet_id) const -> double;
 
-  /*   */ auto getDistanceToLeftLaneBound(const std::vector<lanelet::Id> &) const -> double;
+  /*   */ auto getDistanceToLeftLaneBound(const lanelet::Ids &) const -> double;
 
   /*   */ auto getDistanceToRightLaneBound() -> double;
 
   /*   */ auto getDistanceToRightLaneBound(lanelet::Id lanelet_id) const -> double;
 
-  /*   */ auto getDistanceToRightLaneBound(const std::vector<lanelet::Id> &) const -> double;
+  /*   */ auto getDistanceToRightLaneBound(const lanelet::Ids &) const -> double;
 
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
@@ -131,7 +131,7 @@ public:
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
-  virtual auto getRouteLanelets(double horizon = 100) -> std::vector<lanelet::Id> = 0;
+  virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
 

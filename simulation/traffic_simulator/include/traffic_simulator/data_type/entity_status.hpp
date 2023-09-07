@@ -34,7 +34,7 @@ public:
   explicit CanonicalizedEntityStatus(
     const EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const std::vector<lanelet::Id> & route_lanelets);
+    const lanelet::Ids & route_lanelets);
   explicit CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
   CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj)
@@ -63,7 +63,7 @@ private:
   auto canonicalize(
     const EntityStatus & may_non_canonicalized_entity_status,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const std::vector<lanelet::Id> & route_lanelets) -> EntityStatus;
+    const lanelet::Ids & route_lanelets) -> EntityStatus;
   EntityStatus entity_status_;
 };
 }  // namespace entity_status

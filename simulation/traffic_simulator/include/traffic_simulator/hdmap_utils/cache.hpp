@@ -48,14 +48,14 @@ public:
     }
   }
 
-  auto appendData(lanelet::Id from, lanelet::Id to, const std::vector<lanelet::Id> & route) -> void
+  auto appendData(lanelet::Id from, lanelet::Id to, const lanelet::Ids & route) -> void
   {
     std::lock_guard<std::mutex> lock(mutex_);
     data_[{from, to}] = route;
   }
 
 private:
-  std::unordered_map<std::pair<lanelet::Id, lanelet::Id>, std::vector<lanelet::Id>> data_;
+  std::unordered_map<std::pair<lanelet::Id, lanelet::Id>, lanelet::Ids> data_;
 
   std::mutex mutex_;
 };
