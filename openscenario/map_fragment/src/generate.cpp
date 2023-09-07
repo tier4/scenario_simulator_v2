@@ -2,25 +2,28 @@
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
 
+template <typename... Ts>
+auto make_point3d(Ts &&... xs)
+{
+  static lanelet::Id id = 0;
+  auto point = lanelet::Point3d(++id, std::forward<decltype(xs)>(xs)...);
+  point.attributes()["ele"] = 0;
+  return point;
+}
+
 int main()
 {
-  auto point_id = 0;
-
   auto width = 6;
 
   auto length = 1000;
 
-  auto left_begin = lanelet::Point3d(++point_id, 0, -width / 2, 0);
-  left_begin.attributes()["ele"] = 0;
+  auto left_begin = make_point3d(0, -width / 2, 0);
 
-  auto left_end = lanelet::Point3d(++point_id, length, -width / 2, 0);
-  left_end.attributes()["ele"] = 0;
+  auto left_end = make_point3d(length, -width / 2, 0);
 
-  auto right_begin = lanelet::Point3d(++point_id, 0, width / 2, 0);
-  right_begin.attributes()["ele"] = 0;
+  auto right_begin = make_point3d(0, width / 2, 0);
 
-  auto right_end = lanelet::Point3d(++point_id, length, width / 2, 0);
-  right_end.attributes()["ele"] = 0;
+  auto right_end = make_point3d(length, width / 2, 0);
 
   auto linestring_id = 0;
 
