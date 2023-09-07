@@ -111,14 +111,14 @@ TEST(HdMapUtils, RoadShoulder)
   origin.longitude = 139.78066608243;
   hdmap_utils::HdMapUtils hdmap_utils(path, origin);
   const auto next_lanelet_ids = hdmap_utils.getNextLaneletIds(34696);
-  EXPECT_EQ(next_lanelet_ids.size(), static_cast<size_t>(1));
+  EXPECT_EQ(next_lanelet_ids.size(), static_cast<std::size_t>(1));
   if (next_lanelet_ids.size() == 1) {
-    EXPECT_EQ(next_lanelet_ids[0], static_cast<int64_t>(34768));
+    EXPECT_EQ(next_lanelet_ids[0], static_cast<lanelet::Id>(34768));
   }
   const auto previous_lanelet_ids = hdmap_utils.getPreviousLaneletIds(34768);
-  EXPECT_EQ(previous_lanelet_ids.size(), static_cast<size_t>(1));
+  EXPECT_EQ(previous_lanelet_ids.size(), static_cast<std::size_t>(1));
   if (previous_lanelet_ids.size() == 1) {
-    EXPECT_EQ(previous_lanelet_ids[0], static_cast<int64_t>(34696));
+    EXPECT_EQ(previous_lanelet_ids[0], static_cast<lanelet::Id>(34696));
   }
 }
 
