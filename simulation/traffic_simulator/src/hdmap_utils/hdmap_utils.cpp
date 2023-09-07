@@ -810,7 +810,7 @@ std::vector<std::int64_t> HdMapUtils::getFollowingLanelets(
   }
   // clang-format off
   return ret + getFollowingLanelets(
-    candidate_lanelet_ids[candidate_lanelet_ids.size() - 1], 
+    candidate_lanelet_ids[candidate_lanelet_ids.size() - 1],
     distance - total_distance, false);
   // clang-format on
 }
@@ -1258,7 +1258,7 @@ std::optional<std::pair<math::geometry::HermiteCurve, double>> HdMapUtils::getLa
   }
   const auto along_pose = getAlongLaneletPose(from_pose, longitudinal_distance);
   // clang-format off
-  const auto left_point = 
+  const auto left_point =
     toMapPose(traffic_simulator::helper::constructLaneletPose(
       along_pose.lanelet_id, along_pose.s, along_pose.offset + 5.0)).pose.position;
   const auto right_point =
@@ -2022,7 +2022,7 @@ std::vector<lanelet::Lanelet> HdMapUtils::getLanelets(
   return lanelets;
 }
 
-auto HdMapUtils::isTrafficLight(const LaneletId lanelet_id) const -> bool
+auto HdMapUtils::isTrafficLight(const lanelet::Id lanelet_id) const -> bool
 {
   using namespace lanelet;
 
@@ -2036,14 +2036,14 @@ auto HdMapUtils::isTrafficLight(const LaneletId lanelet_id) const -> bool
   return false;
 }
 
-auto HdMapUtils::isTrafficLightRegulatoryElement(const LaneletId lanelet_id) const -> bool
+auto HdMapUtils::isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) const -> bool
 {
   return lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
            lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
 }
 
-auto HdMapUtils::getTrafficLightRegulatoryElement(const LaneletId lanelet_id) const
+auto HdMapUtils::getTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) const
   -> lanelet::TrafficLight::Ptr
 {
   assert(isTrafficLightRegulatoryElement(lanelet_id));
@@ -2052,10 +2052,10 @@ auto HdMapUtils::getTrafficLightRegulatoryElement(const LaneletId lanelet_id) co
 }
 
 auto HdMapUtils::getTrafficLightRegulatoryElementIDsFromTrafficLight(
-  const LaneletId traffic_light_way_id) const -> std::vector<LaneletId>
+  const lanelet::Id traffic_light_way_id) const -> std::vector<lanelet::Id>
 {
   assert(isTrafficLight(traffic_light_way_id));
-  std::vector<LaneletId> traffic_light_regulatory_element_ids;
+  std::vector<lanelet::Id> traffic_light_regulatory_element_ids;
   for (const auto & regulatory_element : lanelet_map_ptr_->regulatoryElementLayer) {
     if (regulatory_element->attribute(lanelet::AttributeName::Subtype).value() == "traffic_light") {
       for (const auto & ref_member :

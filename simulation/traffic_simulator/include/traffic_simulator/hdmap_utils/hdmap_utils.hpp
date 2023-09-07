@@ -224,14 +224,14 @@ public:
     std::int64_t lanelet_id, traffic_simulator_msgs::msg::EntityType type,
     bool include_opposite_direction = true) const -> std::vector<std::int64_t>;
 
-  using LaneletId = std::int64_t;
+  auto isTrafficLight(const lanelet::Id) const -> bool;
 
-  auto isTrafficLight(const LaneletId) const -> bool;
-  auto isTrafficLightRegulatoryElement(const LaneletId) const -> bool;
-  auto getTrafficLightRegulatoryElement(const LaneletId) const -> lanelet::TrafficLight::Ptr;
+  auto isTrafficLightRegulatoryElement(const lanelet::Id) const -> bool;
 
-  auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const LaneletId) const
-    -> std::vector<LaneletId>;
+  auto getTrafficLightRegulatoryElement(const lanelet::Id) const -> lanelet::TrafficLight::Ptr;
+
+  auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id) const
+    -> std::vector<lanelet::Id>;
 
 private:
   math::geometry::HermiteCurve getLaneChangeTrajectory(
