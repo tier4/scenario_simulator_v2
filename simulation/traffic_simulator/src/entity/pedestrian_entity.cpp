@@ -96,7 +96,7 @@ auto PedestrianEntity::getDefaultDynamicConstraints() const
   return default_dynamic_constraints;
 }
 
-auto PedestrianEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t>
+auto PedestrianEntity::getRouteLanelets(double horizon) -> std::vector<lanelet::Id>
 {
   if (status_.laneMatchingSucceed()) {
     return route_planner_.getRouteLanelets(

@@ -29,7 +29,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const std::vector<std::int64_t> & route_lanelets)
+  const std::vector<lanelet::Id> & route_lanelets)
 : entity_status_(canonicalize(may_non_canonicalized_entity_status, hdmap_utils, route_lanelets))
 {
 }
@@ -58,7 +58,7 @@ auto CanonicalizedEntityStatus::canonicalize(
 auto CanonicalizedEntityStatus::canonicalize(
   const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const std::vector<std::int64_t> & route_lanelets) -> EntityStatus
+  const std::vector<lanelet::Id> & route_lanelets) -> EntityStatus
 {
   auto canonicalized = may_non_canonicalized_entity_status;
   if (may_non_canonicalized_entity_status.lanelet_pose_valid) {
@@ -131,7 +131,7 @@ bool isSameLaneletId(const CanonicalizedEntityStatus & s0, const CanonicalizedEn
   return s0.getLaneletPose().lanelet_id == s1.getLaneletPose().lanelet_id;
 }
 
-bool isSameLaneletId(const CanonicalizedEntityStatus & s, const std::int64_t lanelet_id)
+bool isSameLaneletId(const CanonicalizedEntityStatus & s, const lanelet::Id lanelet_id)
 {
   return s.getLaneletPose().lanelet_id == lanelet_id;
 }

@@ -99,7 +99,7 @@ auto VehicleEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::
   return behavior_plugin_ptr_->getObstacle();
 }
 
-auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<std::int64_t>
+auto VehicleEntity::getRouteLanelets(double horizon) -> std::vector<lanelet::Id>
 {
   if (status_.laneMatchingSucceed()) {
     return route_planner_.getRouteLanelets(
@@ -136,7 +136,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setEntityStatus(std::make_unique<CanonicalizedEntityStatus>(status_));
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
 
-    std::vector<std::int64_t> route_lanelets = getRouteLanelets();
+    std::vector<lanelet::Id> route_lanelets = getRouteLanelets();
     behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
 
     // recalculate spline only when input data changes
@@ -227,7 +227,7 @@ auto VehicleEntity::requestFollowTrajectory(
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
 }
 
-void VehicleEntity::requestLaneChange(const std::int64_t to_lanelet_id)
+void VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::LANE_CHANGE);
   const auto parameter = lane_change::Parameter(

@@ -32,7 +32,7 @@ public:
   explicit CanonicalizedLaneletPose(
     const LaneletPose & maybe_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const std::vector<std::int64_t> & route_lanelets);
+    const std::vector<lanelet::Id> & route_lanelets);
   explicit operator LaneletPose() const noexcept { return lanelet_pose_; }
   explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
   bool hasAlternativeLaneletPose() const { return lanelet_poses_.size() > 1; }
@@ -68,7 +68,7 @@ private:
   auto canonicalize(
     const LaneletPose & may_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const std::vector<std::int64_t> & route_lanelets) -> LaneletPose;
+    const std::vector<lanelet::Id> & route_lanelets) -> LaneletPose;
   const LaneletPose lanelet_pose_;
   const std::vector<LaneletPose> lanelet_poses_;
   const geometry_msgs::msg::Pose map_pose_;
@@ -76,7 +76,7 @@ private:
 }  // namespace lanelet_pose
 
 bool isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &);
-bool isSameLaneletId(const CanonicalizedLaneletPose &, const std::int64_t lanelet_id);
+bool isSameLaneletId(const CanonicalizedLaneletPose &, const lanelet::Id lanelet_id);
 
 }  // namespace traffic_simulator
 

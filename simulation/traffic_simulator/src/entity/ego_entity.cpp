@@ -129,9 +129,9 @@ auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obst
   return std::nullopt;
 }
 
-auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> std::vector<std::int64_t>
+auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> std::vector<lanelet::Id>
 {
-  std::vector<std::int64_t> ids{};
+  std::vector<lanelet::Id> ids{};
 
   if (const auto universe =
         dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
@@ -211,7 +211,7 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 }
 
-void EgoEntity::requestLaneChange(const std::int64_t)
+void EgoEntity::requestLaneChange(const lanelet::Id)
 {
   THROW_SEMANTIC_ERROR(
     "From scenario, a lane change was requested to Ego type entity ", std::quoted(name),

@@ -60,7 +60,7 @@ public:
     return std::nullopt;
   }
 
-  auto getRouteLanelets(double) -> std::vector<std::int64_t> override
+  auto getRouteLanelets(double) -> std::vector<lanelet::Id> override
   {
     THROW_SEMANTIC_ERROR("getRouteLanelets function cannot not use in MiscObjectEntity");
   }

@@ -303,7 +303,7 @@ auto API::requestFollowTrajectory(
   }
 }
 
-void API::requestLaneChange(const std::string & name, const std::int64_t & lanelet_id)
+void API::requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id)
 {
   entity_manager_ptr_->requestLaneChange(name, lanelet_id);
 }
