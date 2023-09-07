@@ -85,7 +85,7 @@ HdMapUtils::HdMapUtils(
     lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
-auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
+auto HdMapUtils::getAllCanonicalizedLaneletPoses(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
   -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
@@ -98,7 +98,7 @@ auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
         const auto lanelet_pose_tmp = traffic_simulator::helper::constructLaneletPose(
           id, lanelet_pose.s + getLaneletLength(id), lanelet_pose.offset);
         if (const auto canonicalized_lanelet_poses =
-              gelAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
+              getAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
             canonicalized_lanelet_poses.empty()) {
           canonicalized_all.emplace_back(lanelet_pose_tmp);
         } else {
@@ -120,7 +120,7 @@ auto HdMapUtils::gelAllCanonicalizedLaneletPoses(
         const auto lanelet_pose_tmp = traffic_simulator::helper::constructLaneletPose(
           id, lanelet_pose.s - getLaneletLength(lanelet_pose.lanelet_id), lanelet_pose.offset);
         if (const auto canonicalized_lanelet_poses =
-              gelAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
+              getAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
             canonicalized_lanelet_poses.empty()) {
           canonicalized_all.emplace_back(lanelet_pose_tmp);
         } else {

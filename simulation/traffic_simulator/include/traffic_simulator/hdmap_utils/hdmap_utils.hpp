@@ -84,10 +84,10 @@ public:
 
   auto filterLaneletIds(const lanelet::Ids &, const char subtype[]) const -> lanelet::Ids;
 
-  auto gelAllCanonicalizedLaneletPoses(const traffic_simulator_msgs::msg::LaneletPose &) const
-    -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
-
   auto generateMarker() const -> visualization_msgs::msg::MarkerArray;
+
+  auto getAllCanonicalizedLaneletPoses(const traffic_simulator_msgs::msg::LaneletPose &) const
+    -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto getAlongLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & from, double along)
     const -> traffic_simulator_msgs::msg::LaneletPose;

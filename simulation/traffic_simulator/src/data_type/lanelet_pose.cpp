@@ -24,7 +24,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
   lanelet_poses_(
-    hdmap_utils->gelAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
+    hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
 {
 }
@@ -34,7 +34,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils, route_lanelets)),
   lanelet_poses_(
-    hdmap_utils->gelAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
+    hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
 {
 }

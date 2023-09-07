@@ -203,7 +203,7 @@ TEST(HdMapUtils, Canonicalize)
 }
 
 /**
- * @note Testcase for gelAllCanonicalizedLaneletPoses() function when s < 0
+ * @note Testcase for getAllCanonicalizedLaneletPoses() function when s < 0
  * Following lanelets: 34576 -> 34570 -> 34564
  *                     34981 -> 34636 -> 34564
  *                     34600 -> 34648 -> 34564
@@ -225,7 +225,7 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34564, non_canonicalized_lanelet_s, 0);
   const auto canonicalized_lanelet_poses =
-    hdmap_utils.gelAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
+    hdmap_utils.getAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
   EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(3));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34576);
@@ -246,7 +246,7 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
 }
 
 /**
- * @note Testcase for gelAllCanonicalizedLaneletPoses() function when s > length of lanelet pose
+ * @note Testcase for getAllCanonicalizedLaneletPoses() function when s > length of lanelet pose
  * Following lanelets: 34981 -> 34585 -> 34579
  *                     34981 -> 34636 -> 34564
  *                     34981 -> 34651 -> 34630
@@ -268,7 +268,7 @@ TEST(HdMapUtils, CanonicalizeAllPositive)
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s, 0);
   const auto canonicalized_lanelet_poses =
-    hdmap_utils.gelAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
+    hdmap_utils.getAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
   EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(3));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34579);
@@ -289,7 +289,7 @@ TEST(HdMapUtils, CanonicalizeAllPositive)
 }
 
 /**
- * @note Testcase for gelAllCanonicalizedLaneletPoses() function when s in
+ * @note Testcase for getAllCanonicalizedLaneletPoses() function when s in
  * range [0,length_of_the_lanelet]
  * Canonicalized lanelet pose of (id=34981, s=2) is suppose to be the same
  */
@@ -306,7 +306,7 @@ TEST(HdMapUtils, CanonicalizeAll)
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s, 0);
   const auto canonicalized_lanelet_poses =
-    hdmap_utils.gelAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
+    hdmap_utils.getAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
   EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(1));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34981);
