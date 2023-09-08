@@ -4,32 +4,68 @@
 
 #define PRINT(...) std::cout << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
 
-auto makePoint3d(double x, double y, double z)
+auto makePoint3d(double x, double y, double z, double elevation = 0.0)
 {
   static lanelet::Id id = 0;
   auto point = lanelet::Point3d(++id, x, y, z);
-  point.attributes()["ele"] = 0;
+  point.attributes()["ele"] = elevation;
   return point;
 }
 
-auto makeLineString3d(const lanelet::Point3d & origin, double length)
+auto makeLineString3d(const lanelet::Point3d & origin, double length, double radius)
 {
   static lanelet::Id id = 0;
-  return lanelet::LineString3d(
-    ++id, {origin, makePoint3d(origin.x() + length, origin.y(), origin.z())});
+
+  if (std::isinf(radius)) {
+    return lanelet::LineString3d(
+      ++id, {origin, makePoint3d(origin.x() + length, origin.y(), origin.z())});
+  } else {
+    auto line = lanelet::LineString3d(++id);
+
+    if (M_PI * 2 < length / radius) {
+      PRINT(length / radius);
+      std::exit(EXIT_FAILURE);
+    }
+
+    auto resolution = 100;
+
+    const auto radian_step = length / radius / resolution;
+
+    for (auto radian = 0.0; 0 <= resolution--; radian += radian_step) {
+      std::cout << std::string(80, '-') << std::endl;
+
+      auto x = origin.x() + radius * std::sin(radian);
+      auto y = origin.y() + radius * std::cos(radian) - radius;
+      auto z = origin.z();
+
+      PRINT(x);
+      PRINT(y);
+      PRINT(z);
+
+      line.push_back(makePoint3d(x, y, z));
+    }
+
+    return line;
+  }
 }
 
-auto makeLanelet(double length = 1000, double width = 10, double curvature = 0)
+auto makeLanelet(double length = 1000, double width = 10, double curvature = 0.001)
 {
-  auto x = 0.0;
-  auto y = 0.0;
-  auto z = 0.0;
+  const auto x = 0.0;
+  const auto y = 0.0;
+  const auto z = 0.0;
 
-  auto p1 = makePoint3d(x, y - width / 2, z);
-  auto p2 = makePoint3d(x, y + width / 2, z);
+  const auto p1 = makePoint3d(x, y - width / 2, z);
+  const auto p2 = makePoint3d(x, y + width / 2, z);
+
+  const auto radius = curvature == 0 ? std::numeric_limits<double>::infinity() : 1 / curvature;
+
+  const auto p1_radius = radius - width / 2;
+  const auto p2_radius = radius + width / 2;
 
   static lanelet::Id id = 0;
-  auto lane = lanelet::Lanelet(++id, makeLineString3d(p1, length), makeLineString3d(p2, length));
+  auto lane = lanelet::Lanelet(
+    ++id, makeLineString3d(p1, length, p1_radius), makeLineString3d(p2, length, p2_radius));
   lane.attributes()["subtype"] = "road";
   return lane;
 }
