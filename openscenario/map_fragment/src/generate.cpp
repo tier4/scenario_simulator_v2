@@ -11,6 +11,12 @@ auto makePoint3d(Ts &&... xs)
   return point;
 }
 
+auto makeLineString3d(const lanelet::Point3d & begin, const lanelet::Point3d & end)
+{
+  static lanelet::Id id = 0;
+  return lanelet::LineString3d(++id, {begin, end});
+}
+
 int main()
 {
   auto width = 6;
@@ -25,10 +31,9 @@ int main()
 
   auto right_end = makePoint3d(length, width / 2, 0);
 
-  auto linestring_id = 0;
+  auto left = makeLineString3d(left_begin, left_end);
 
-  auto left = lanelet::LineString3d(++linestring_id, {left_begin, left_end});
-  auto right = lanelet::LineString3d(++linestring_id, {right_begin, right_end});
+  auto right = makeLineString3d(right_begin, right_end);
 
   auto lane_id = 0;
 
