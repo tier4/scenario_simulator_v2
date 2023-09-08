@@ -12,13 +12,14 @@ auto makePoint3d(double x, double y, double z)
   return point;
 }
 
-auto makeLineString3d(const lanelet::Point3d & begin, const lanelet::Point3d & end)
+auto makeLineString3d(const lanelet::Point3d & origin, double length)
 {
   static lanelet::Id id = 0;
-  return lanelet::LineString3d(++id, {begin, end});
+  return lanelet::LineString3d(
+    ++id, {origin, makePoint3d(origin.x() + length, origin.y(), origin.z())});
 }
 
-auto makeLane(double length = 1000, double width = 10, double curvature = 0)
+auto makeLanelet(double length = 1000, double width = 10, double curvature = 0)
 {
   auto x = 0.0;
   auto y = 0.0;
@@ -26,15 +27,10 @@ auto makeLane(double length = 1000, double width = 10, double curvature = 0)
 
   auto p1 = makePoint3d(x, y - width / 2, z);
   auto p2 = makePoint3d(x, y + width / 2, z);
-  auto p3 = makePoint3d(p1.x() + length, p1.y(), p1.z());
-  auto p4 = makePoint3d(p2.x() + length, p2.y(), p2.z());
 
   static lanelet::Id id = 0;
-
-  auto lane = lanelet::Lanelet(++id, makeLineString3d(p1, p3), makeLineString3d(p2, p4));
-
+  auto lane = lanelet::Lanelet(++id, makeLineString3d(p1, length), makeLineString3d(p2, length));
   lane.attributes()["subtype"] = "road";
-
   return lane;
 }
 
@@ -42,7 +38,7 @@ int main()
 {
   auto map = lanelet::LaneletMap();
 
-  map.add(makeLane());
+  map.add(makeLanelet());
 
   lanelet::write(
     "/tmp/lanelet2_map.osm", map,
