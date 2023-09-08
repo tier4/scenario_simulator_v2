@@ -3,7 +3,7 @@
 #include <lanelet2_projection/UTM.h>
 
 template <typename... Ts>
-auto make_point3d(Ts &&... xs)
+auto makePoint3d(Ts &&... xs)
 {
   static lanelet::Id id = 0;
   auto point = lanelet::Point3d(++id, std::forward<decltype(xs)>(xs)...);
@@ -17,13 +17,13 @@ int main()
 
   auto length = 1000;
 
-  auto left_begin = make_point3d(0, -width / 2, 0);
+  auto left_begin = makePoint3d(0, -width / 2, 0);
 
-  auto left_end = make_point3d(length, -width / 2, 0);
+  auto left_end = makePoint3d(length, -width / 2, 0);
 
-  auto right_begin = make_point3d(0, width / 2, 0);
+  auto right_begin = makePoint3d(0, width / 2, 0);
 
-  auto right_end = make_point3d(length, width / 2, 0);
+  auto right_end = makePoint3d(length, width / 2, 0);
 
   auto linestring_id = 0;
 
