@@ -2,11 +2,12 @@
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
 
-template <typename... Ts>
-auto makePoint3d(Ts &&... xs)
+#define PRINT(...) std::cout << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
+
+auto makePoint3d(double x, double y, double z)
 {
   static lanelet::Id id = 0;
-  auto point = lanelet::Point3d(++id, std::forward<decltype(xs)>(xs)...);
+  auto point = lanelet::Point3d(++id, x, y, z);
   point.attributes()["ele"] = 0;
   return point;
 }
@@ -17,32 +18,31 @@ auto makeLineString3d(const lanelet::Point3d & begin, const lanelet::Point3d & e
   return lanelet::LineString3d(++id, {begin, end});
 }
 
-int main()
+auto makeLane(double length = 1000, double width = 10, double curvature = 0)
 {
-  auto width = 6;
+  auto x = 0.0;
+  auto y = 0.0;
+  auto z = 0.0;
 
-  auto length = 1000;
+  auto p1 = makePoint3d(x, y - width / 2, z);
+  auto p2 = makePoint3d(x, y + width / 2, z);
+  auto p3 = makePoint3d(p1.x() + length, p1.y(), p1.z());
+  auto p4 = makePoint3d(p2.x() + length, p2.y(), p2.z());
 
-  auto left_begin = makePoint3d(0, -width / 2, 0);
+  static lanelet::Id id = 0;
 
-  auto left_end = makePoint3d(length, -width / 2, 0);
+  auto lane = lanelet::Lanelet(++id, makeLineString3d(p1, p3), makeLineString3d(p2, p4));
 
-  auto right_begin = makePoint3d(0, width / 2, 0);
-
-  auto right_end = makePoint3d(length, width / 2, 0);
-
-  auto left = makeLineString3d(left_begin, left_end);
-
-  auto right = makeLineString3d(right_begin, right_end);
-
-  auto lane_id = 0;
-
-  auto lane = lanelet::Lanelet(++lane_id, left, right);
   lane.attributes()["subtype"] = "road";
 
+  return lane;
+}
+
+int main()
+{
   auto map = lanelet::LaneletMap();
 
-  map.add(lane);
+  map.add(makeLane());
 
   lanelet::write(
     "/tmp/lanelet2_map.osm", map,
