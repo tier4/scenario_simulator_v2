@@ -10,6 +10,7 @@
   <depend>lanelet2_core</depend>
   <depend>lanelet2_io</depend>
   <depend>lanelet2_projection</depend>
+  <depend>rclcpp</depend>
   <export>
     <build_type>ament_cmake</build_type>
   </export>

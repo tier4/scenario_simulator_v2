@@ -2,6 +2,9 @@
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
 
+#include <filesystem>
+#include <rclcpp/rclcpp.hpp>
+
 #define PRINT(...) std::cout << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
 
 auto makePoint3d(double x, double y, double z, double elevation = 0.0)
@@ -13,7 +16,7 @@ auto makePoint3d(double x, double y, double z, double elevation = 0.0)
 }
 
 auto makeLineString3d(
-  const lanelet::Point3d & origin, double length, double radius, std::size_t resolution = 100)
+  const lanelet::Point3d & origin, double length, double radius, std::size_t resolution)
 {
   static lanelet::Id id = 0;
 
@@ -49,7 +52,7 @@ auto makeLineString3d(
   }
 }
 
-auto makeLanelet(double length = 1000, double width = 10, double curvature = -0.002)
+auto makeLanelet(double length, double width, double curvature, double resolution)
 {
   const auto x = 0.0;
   const auto y = 0.0;
@@ -73,17 +76,41 @@ auto makeLanelet(double length = 1000, double width = 10, double curvature = -0.
 
   static lanelet::Id id = 0;
   auto lane = lanelet::Lanelet(
-    ++id, makeLineString3d(p1, length + p1_offset, p1_radius),
-    makeLineString3d(p2, length + p2_offset, p2_radius));
+    ++id, makeLineString3d(p1, length + p1_offset, p1_radius, resolution),
+    makeLineString3d(p2, length + p2_offset, p2_radius, resolution));
   lane.attributes()["subtype"] = "road";
   return lane;
 }
 
-int main()
+auto main(const int argc, char const * const * const argv) -> int
 {
+  rclcpp::init(argc, argv);
+
+  auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
+
+  auto length = [&]() {
+    node.declare_parameter("length", 100.0);
+    return node.get_parameter("length").as_double();
+  };
+
+  auto width = [&]() {
+    node.declare_parameter("width", 10.0);
+    return node.get_parameter("width").as_double();
+  };
+
+  auto curvature = [&]() {
+    node.declare_parameter("curvature", 0.0);
+    return node.get_parameter("curvature").as_double();
+  };
+
+  auto resolution = [&]() {
+    node.declare_parameter("resolution", 0);
+    return node.get_parameter("resolution").as_int();
+  };
+
   auto map = lanelet::LaneletMap();
 
-  map.add(makeLanelet());
+  map.add(makeLanelet(length(), width(), curvature(), resolution()));
 
   lanelet::write(
     "/tmp/lanelet2_map.osm", map,
