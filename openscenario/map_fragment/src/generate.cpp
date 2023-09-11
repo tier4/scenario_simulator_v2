@@ -2,6 +2,7 @@
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <filesystem>
 #include <rclcpp/rclcpp.hpp>
 
@@ -83,7 +84,7 @@ auto makeLanelet(double length, double width, double curvature, double resolutio
 }
 
 auto main(const int argc, char const * const * const argv) -> int
-{
+try {
   rclcpp::init(argc, argv);
 
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
@@ -104,17 +105,50 @@ auto main(const int argc, char const * const * const argv) -> int
   };
 
   auto resolution = [&]() {
-    node.declare_parameter("resolution", 0);
+    node.declare_parameter("resolution", 100);
     return node.get_parameter("resolution").as_int();
+  };
+
+  auto output_directory = [&]() {
+    node.declare_parameter("output_directory", "/tmp");
+    return std::filesystem::path(node.get_parameter("output_directory").as_string());
   };
 
   auto map = lanelet::LaneletMap();
 
   map.add(makeLanelet(length(), width(), curvature(), resolution()));
 
+  const auto directory = output_directory() / "map_fragment";
+
+  try {
+    if (std::filesystem::remove_all(directory);
+        not std::filesystem::create_directories(directory)) {
+      RCLCPP_ERROR_STREAM(node.get_logger(), "failed to create directory " << directory);
+    }
+  } catch (const std::exception & exception) {
+    RCLCPP_ERROR_STREAM(node.get_logger(), exception.what());
+    return EXIT_FAILURE;
+  }
+
   lanelet::write(
-    "/tmp/lanelet2_map.osm", map,
+    directory / "lanelet2_map.osm", map,
     lanelet::projection::UtmProjector(lanelet::Origin({35.624285, 139.742570})));
 
+  try {
+    std::filesystem::create_symlink(
+      std::filesystem::canonical(
+        std::filesystem::path(ament_index_cpp::get_package_share_directory("kashiwanoha_map")) /
+        "map/pointcloud_map.pcd"),
+      directory / "pointcloud_map.pcd");
+  } catch (const std::exception & exception) {
+    RCLCPP_ERROR_STREAM(node.get_logger(), exception.what());
+    return EXIT_FAILURE;
+  }
+
+  std::cout << directory.c_str() << std::endl;
+
   return EXIT_SUCCESS;
+} catch (const std::exception & exception) {
+  std::cerr << exception.what() << std::endl;
+  return EXIT_FAILURE;
 }
