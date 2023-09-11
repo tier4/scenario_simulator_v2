@@ -34,7 +34,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Waypoint
+struct Waypoint : private SimulatorCore::CoordinateSystemConversion
 {
   const RouteStrategy route_strategy;
 
@@ -42,7 +42,7 @@ struct Waypoint
 
   explicit Waypoint(const pugi::xml_node &, Scope &);
 
-  explicit operator traffic_simulator_msgs::msg::LaneletPose() const;
+  explicit operator NativeLanePosition() const;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -24,6 +24,7 @@
 #include <geometry_msgs/msg/vector3.hpp>
 #include <iostream>
 #include <string>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 #include <unordered_set>
@@ -54,9 +55,9 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
  * @param roll roll value in the lane coordinate
  * @param pitch pitch value in the lane coordinate
  * @param yaw yaw value in the lane coordinate
- * @return traffic_simulator_msgs::msg::LaneletPose
+ * @return LaneletPose
  */
-traffic_simulator_msgs::msg::LaneletPose constructLaneletPose(
+LaneletPose constructLaneletPose(
   std::int64_t lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
   double yaw = 0);
 
@@ -120,14 +121,14 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 
 const simulation_api_schema::DetectionSensorConfiguration constructDetectionSensorConfiguration(
   const std::string & entity, const std::string & architecture_type, const double update_duration,
-  const double range = 300.0, bool filter_by_range = false, const double pos_noise_stddev = 0,
-  const int random_seed = 0, const double probability_of_lost = 0,
-  const double object_recognition_delay = 0);
+  const double range = 300.0, const bool detect_all_objects_in_range = false,
+  const double pos_noise_stddev = 0, const int random_seed = 0,
+  const double probability_of_lost = 0, const double object_recognition_delay = 0,
+  const double object_recognition_ground_truth_delay = 0);
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(
-  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose);
+std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPose & ll_pose);
 
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point);
 
@@ -136,5 +137,31 @@ std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Vector3 &
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternion & quat);
 
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Pose & pose);
+
+template <typename T>
+auto operator+(const std::vector<T> & v0, const std::vector<T> & v1) -> decltype(auto)
+{
+  auto result = v0;
+  result.reserve(v0.size() + v1.size());
+  result.insert(result.end(), v1.begin(), v1.end());
+  return result;
+}
+
+template <typename T>
+auto operator+=(std::vector<T> & v0, const std::vector<T> & v1) -> decltype(auto)
+{
+  v0.reserve(v0.size() + v1.size());
+  v0.insert(v0.end(), v1.begin(), v1.end());
+  return v0;
+}
+
+template <typename T>
+auto sortAndUnique(const std::vector<T> & data) -> std::vector<T>
+{
+  std::vector<T> ret = data;
+  std::sort(ret.begin(), ret.end());
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+  return ret;
+}
 
 #endif  // TRAFFIC_SIMULATOR__HELPER__HELPER_HPP_

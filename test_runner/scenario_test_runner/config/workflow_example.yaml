@@ -1,7 +1,7 @@
 Scenario:
   # - { path: $(find-pkg-share scenario_test_runner)/scenario/collision.yaml }
   # - { path: $(find-pkg-share scenario_test_runner)/scenario/distance-condition.yaml }
-  # - { path: $(find-pkg-share scenario_test_runner)/scenario/success.yaml, expect: success }
+  # - { path: $(find-pkg-share scenario_test_runner)/scenario/success.yaml}
   - path: $(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityCondition.DistanceCondition.yaml
   - path: $(find-pkg-share scenario_test_runner)/scenario/ByEntityCondition.EntityCondition.RelativeDistanceCondition.yaml
   - path: $(find-pkg-share scenario_test_runner)/scenario/ControllerAction.AssignControllerAction.yaml
@@ -14,5 +14,3 @@ Scenario:
   - path: $(find-pkg-share scenario_test_runner)/scenario/minimal.yaml
   - path: $(find-pkg-share scenario_test_runner)/scenario/prefixed-name-reference.yaml
   - path: $(find-pkg-share scenario_test_runner)/scenario/stand-still.yaml
-  - path: $(find-pkg-share scenario_test_runner)/scenario/failure.yaml
-    expect: failure

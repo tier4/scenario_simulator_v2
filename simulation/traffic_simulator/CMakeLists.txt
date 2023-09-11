@@ -33,7 +33,9 @@ ament_auto_add_library(traffic_simulator SHARED
   src/behavior/route_planner.cpp
   src/color_utils/color_utils.cpp
   src/data_type/behavior.cpp
+  src/data_type/entity_status.cpp
   src/data_type/lane_change.cpp
+  src/data_type/lanelet_pose.cpp
   src/data_type/speed_change.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
@@ -52,7 +54,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
   src/traffic_lights/traffic_light_marker_publisher.cpp
-  src/traffic_lights/v2i_traffic_light_publisher.cpp
+  src/traffic_lights/traffic_light_publisher.cpp
 )
 
 target_link_libraries(traffic_simulator
@@ -64,13 +66,6 @@ target_link_libraries(traffic_simulator
   stdc++fs
   Boost::filesystem
   ${PROTOBUF_LIBRARY})
-
-# workaround to allow deprecated header to build on both galactic and humble
-if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
-  target_compile_definitions(traffic_simulator PUBLIC
-    USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
-  )
-endif()
 
 install(
   DIRECTORY config test/catalog test/map

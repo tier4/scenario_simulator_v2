@@ -32,16 +32,16 @@ namespace simple_sensor_simulator
 class OccupancyGridSensorBase
 {
 protected:
-  double last_update_stamp_;
+  double previous_simulation_time_;
 
   simulation_api_schema::OccupancyGridSensorConfiguration configuration_;
 
   std::vector<std::string> detected_objects_;
 
   explicit OccupancyGridSensorBase(
-    const double last_update_stamp,
+    const double current_simulation_time,
     const simulation_api_schema::OccupancyGridSensorConfiguration & configuration)
-  : last_update_stamp_(last_update_stamp), configuration_(configuration)
+  : previous_simulation_time_(current_simulation_time), configuration_(configuration)
   {
   }
 
@@ -52,15 +52,16 @@ public:
    * @brief Update sensor status
    */
   virtual void update(
-    const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    const std::vector<std::string> & lidar_detected_entity) = 0;
+    const double current_simulation_time, const std::vector<traffic_simulator_msgs::EntityStatus> &,
+    const rclcpp::Time & current_ros_time,
+    const std::vector<std::string> & lidar_detected_entities) = 0;
 
   /**
    * @brief List all objects in range of sensor sight
    * @return names of objects in range of sensor sight
    */
   const std::vector<std::string> getDetectedObjects(
-    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+    const std::vector<traffic_simulator_msgs::EntityStatus> &) const;
 
   /**
    * @brief Extract sensor pose from entity statuses
@@ -69,7 +70,7 @@ public:
    * @exception SimulationRuntimeError if `status` does not contain EGO object
    */
   geometry_msgs::Pose getSensorPose(
-    const std::vector<traffic_simulator_msgs::EntityStatus> & status) const;
+    const std::vector<traffic_simulator_msgs::EntityStatus> &) const;
 };
 
 /**
@@ -90,23 +91,27 @@ class OccupancyGridSensor : public OccupancyGridSensorBase
 
 public:
   explicit OccupancyGridSensor(
-    const double current_time,
+    const double current_simulation_time,
     const simulation_api_schema::OccupancyGridSensorConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher_ptr)
-  : OccupancyGridSensorBase(current_time, configuration),
+  : OccupancyGridSensorBase(current_simulation_time, configuration),
     publisher_ptr_(publisher_ptr),
     builder_(configuration.resolution(), configuration.height(), configuration.width())
   {
   }
 
   auto update(
-    const double current_time, const std::vector<traffic_simulator_msgs::EntityStatus> & status,
-    const rclcpp::Time & stamp, const std::vector<std::string> & lidar_detected_entity)
+    const double current_simulation_time,
+    const std::vector<traffic_simulator_msgs::EntityStatus> & entities,
+    const rclcpp::Time & current_ros_time, const std::vector<std::string> & lidar_detected_entities)
     -> void override
   {
-    if (current_time - last_update_stamp_ - configuration_.update_duration() >= -0.002) {
-      last_update_stamp_ = current_time;
-      publisher_ptr_->publish(getOccupancyGrid(status, stamp, lidar_detected_entity));
+    if (
+      current_simulation_time - previous_simulation_time_ - configuration_.update_duration() >=
+      -0.002) {
+      previous_simulation_time_ = current_simulation_time;
+      publisher_ptr_->publish(
+        getOccupancyGrid(entities, current_ros_time, lidar_detected_entities));
     } else {
       detected_objects_ = {};
     }

@@ -57,7 +57,7 @@ message EntitySubtype {
     CAR = 1;        // The entity is car like a passenger vehicle
     TRUCK = 2;      // The entity is truck
     BUS = 3;        // The entity is bus
-    TRAILER = 4;    // The entity is trailer 
+    TRAILER = 4;    // The entity is trailer
     MOTORCYCLE = 5; // The entity is motorcycle
     BICYCLE = 6;    // THe entity is bicycle
     PEDESTRIAN = 7; // The entity is pedestrian
@@ -149,4 +149,30 @@ message Waypoints {
 message VehicleCommand {
   autoware_auto_control_msgs.AckermannControlCommand ackermann_control_command = 1;
   autoware_auto_vehicle_msgs.GearCommand gear_command = 2;
+}
+
+/**
+ * Protobuf definition of traffic_simulator_msgs/msg/Vertex type in ROS 2.
+ **/
+message Vertex {
+  double time = 1;
+  geometry_msgs.Pose position = 2;
+}
+
+/**
+ * Protobuf definition of traffic_simulator_msgs/msg/Polyline type in ROS 2.
+ **/
+message Polyline {
+  repeated Vertex vertices = 1;
+}
+
+/**
+ * Protobuf definition of traffic_simulator_msgs/msg/PolylineTrajectory type in ROS 2.
+ **/
+message PolylineTrajectory {
+  double initial_distance_offset = 1;
+  bool dynamic_constraints_ignorable = 2;
+  double base_time = 3;
+  bool closed = 4;
+  Polyline shape = 5;
 }

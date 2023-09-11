@@ -22,13 +22,15 @@ Perception topics are configurable with the following syntax:
 
 where `<NAME>` and `<VALUE>` can be set to:
 
-| Name                                      | Value                                         | Default | Description                                                                                                           |
-|-------------------------------------------|-----------------------------------------------|:-------:|-----------------------------------------------------------------------------------------------------------------------|
-| `detectedObjectMissingProbability`        | A `double` type value between `0.0` and `1.0` |  `0.0`  | Do not publish the perception topic with the given probability.                                                       |
-| `detectedObjectPositionStandardDeviation` | A positive `double` type value                |  `0.0`  | Randomize the positions of other vehicles included in the perception topic according to the given standard deviation. |
-| `detectedObjectPublishingDelay`           | A positive `double` type value                |  `0.0`  | Delays the publication of the perception topic by the specified number of seconds.                                    |
-| `pointcloudPublishingDelay`               | A positive `double` type value                |  `0.0`  | Delays the publication of the no_ground pointcloud by the specified number of seconds.                                |
-| `randomSeed`                              | A positive `integer` type value               |   `0`   | Specifies the seed value for the random number generator.                                                             |
+| Name                                       | Value                                         | Default | Description                                                                                                                                                                                                           |
+|--------------------------------------------|-----------------------------------------------|:-------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `detectedObjectMissingProbability`         | A `double` type value between `0.0` and `1.0` |  `0.0`  | Do not publish the perception topic with the given probability.                                                                                                                                                       |
+| `detectedObjectPositionStandardDeviation`  | A positive `double` type value                |  `0.0`  | Randomize the positions of other vehicles included in the perception topic according to the given standard deviation.                                                                                                 |
+| `detectedObjectPublishingDelay`            | A positive `double` type value                |  `0.0`  | Delays the publication of the perception topic by the specified number of seconds.                                                                                                                                    |
+| `detectedObjectGroundTruthPublishingDelay` | A positive `double` type value                |  `0.0`  | Delays the publication of the perception ground truth topic by the specified number of seconds.                                                                                                                       |
+| `detectionSensorRange`                     | A positive `double` type value                | `300.0` | Specifies the sensor detection range for detected object.                                                                                                                                                             |
+| `isClairvoyant`                            | A `boolean` type value                        | `false` | Specifies whether the detected object is a Clairvoyant. If this parameter is not defined explicitly, the property of `detectionSensorRange` is not reflected and only detected object detected by lidar is published. |
+| `randomSeed`                               | A positive `integer` type value               |   `0`   | Specifies the seed value for the random number generator.                                                                                                                                                             |
 
 These properties are not exclusive. In other words, multiple properties can be
 specified at the same time. However, these properties only take effect for
@@ -129,39 +131,6 @@ not supported.
 `"0.0"`, meaning no randomization.
 
 **[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPositionStandardDeviation.yaml)** -
-
-## Property `*PublishingDelay`
-**Summary** - Delays the publication of the perception topic by the specified
-number of seconds. There are two perception topic delay properties.
-
-- `detectedObjectPublishingDelay` delays the publication of detected object.
-- `pointcloudPublishingDelay` delays the publication of no_ground pointcloud.
-
-**Purpose** - In a real vehicle, the perception topic is generated through the
-processing of a sensing and perception module. However, in `scenario_simulator_v2`,
-these processes are simplified. Detected objects are directly outputted as they
-are from the simulator's objects, and no_ground pointcloud is the result of a
-simple ray tracing. While this is suitable for testing planning and control modules
-in an idealized environment, it does not account for the processing delays in
-perception in a real vehicle. These properties can introduce an arbitrary delay
-in the perception topic to simulate these real-world delays.
-
-**Specification** - For each frame, if the current stamp exceeds the set time
-from the topic's stamp, the topic is published, thereby implementing the delay.
-This could result in a maximum error of 2/FPS. Also, the order of topics to be
-published is guaranteed to be the same as when there is no delay.
-Since the delay is set to the same value for each object, it is not possible to
-delay only a specific object.
-
-**Note** - This feature sets the delay from when the perception results are
-obtained in `scenario_simulator_v2` to when they are published. Note that there
-are other potential sources of delay, such as frame rates becoming unstable,
-and delays in pub/sub.
-
-**Default behavior** - If the property is not defined, the default value is
-`"0.0"`, indicating no delay.
-
-**[Example of detectedObjectPublishingDelay](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPositionStandardDeviation.yaml)** -
 ```
         ObjectController:
           Controller:
@@ -174,7 +143,44 @@ and delays in pub/sub.
                   value: "3"
 ```
 
-**[Example of pointcloudPublishingDelay](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPublishingDelay.yaml)** -
+## Property `detectedObjectPublishingDelay`
+
+**Summary** - Delays the publication of the perception topic by the specified
+number of seconds.
+
+**Purpose** - Normally, Autoware reflects the surrounding situation in the
+steering operation by processing the data in the order of the sensing module,
+perception module, planning module, and vehicle driver. However, when not
+connected with AWSIM, `scenario_simulator_v2` skips the sensing module and
+perception module and directly generates the data of the perception result, and
+sends it to the planning module. This behavior is desirable as a test of the
+planning module, but on the other hand, there is a problem that the time until
+the perception result is generated is unrealistically fast in response to
+changes in the environment surrounding the vehicle. This property works around
+this problem by setting an interval of the specified number of seconds between
+`scenario_simulator_v2` generating a perception result and publishing it.
+
+**Specification** - The property's value must be a positive real number. The
+unit is seconds. It is an error if the value is negative.　Since the delay is
+set to the same value for each topic, it is not possible to delay only a
+specific topic.
+
+**Guarantee** - This delay setting ensures that `scenario_simulator_v2`
+publishes the perception results in a consistent order. They are published
+according to their original order. However, while `scenario_simulator_v2`
+guarantees to publish in order, it does not guarantee that it reaches the
+planning module in order. This is because the arrival order of topics in ROS 2
+is not guaranteed.
+
+**Note** - This feature only adjusts the interval between ssv2 generating a
+perception result and publishing it. Note that there is another kind of delay
+between when `scenario_simulator_v2` publishes the perception result and when
+it reaches the planning module.
+
+**Default behavior** - If the property is not specified, the default value is
+`"0.0"`, meaning no delay.
+
+**[Example](https://github.com/tier4/scenario_simulator_v2/blob/master/test_runner/scenario_test_runner/scenario/Property.detectedObjectPublishingDelay.yaml)** -
 ```
         ObjectController:
           Controller:
@@ -184,6 +190,43 @@ and delays in pub/sub.
                 - name: "isEgo"
                   value: "true"
                 - name: "detectedObjectPublishingDelay"
+                  value: "3"
+```
+
+## Property `detectedObjectGroundTruthPublishingDelay`
+
+**Summary** - Delays the publication of the perception ground truth topic by the specified
+number of seconds.
+
+**Purpose** - Unlike the detected object's topic, which mimics the actual perception topic,
+the perception ground truth topic's delay does not need to be fine-tuned. On the other hand, in some cases you may want
+to receive the ground truth of perception for evaluation sooner rather
+than later. Also, in some cases, there is a need to receive the perception ground truth topic at the same timing as the
+perception topic with noise. To accommodate these, `simple_sensor_simulator` flexibly delays the perception ground truth
+topic according to the `detectedObjectGroundTruthPublishingDelay` value.
+
+**Specification** - Same as one for `detectedObjectPublishingDelay`
+
+**Guarantee** - Same as one for `detectedObjectPublishingDelay`
+
+**Note** - This feature only adjusts the interval between `scenario_simulator_v2` generating a
+perception ground truth and publishing it. Note that there is another kind of delay
+between when `scenario_simulator_v2` publishes the perception ground truth and when
+it reaches the receiver node.
+
+**Default behavior** - If the property is not specified, the default value is
+`"0.0"`, meaning no delay.
+
+**Example** -
+```
+        ObjectController:
+          Controller:
+            name: '...'
+            Properties:
+              Property:
+                - name: "isEgo"
+                  value: "true"
+                - name: "detectedObjectGroundTruthPublishingDelay"
                   value: "3"
 ```
 
