@@ -12,7 +12,8 @@ auto makePoint3d(double x, double y, double z, double elevation = 0.0)
   return point;
 }
 
-auto makeLineString3d(const lanelet::Point3d & origin, double length, double radius)
+auto makeLineString3d(
+  const lanelet::Point3d & origin, double length, double radius, std::size_t resolution = 100)
 {
   static lanelet::Id id = 0;
 
@@ -27,16 +28,22 @@ auto makeLineString3d(const lanelet::Point3d & origin, double length, double rad
       std::exit(EXIT_FAILURE);
     }
 
-    auto resolution = 100;
-
     const auto radian_step = length / radius / resolution;
 
-    for (auto radian = 0.0; 0 <= resolution--; radian += radian_step) {
+    auto total_length = 0.0;
+
+    for (auto radian = 0.0; 0 < resolution; radian += radian_step, --resolution) {
       auto x = origin.x() + radius * std::sin(radian);
       auto y = origin.y() + radius * std::cos(radian) - radius;
       auto z = origin.z();
       line.push_back(makePoint3d(x, y, z));
+      total_length += radius * radian_step;
     }
+
+    auto x = origin.x() + radius * std::sin(length / radius);
+    auto y = origin.y() + radius * std::cos(length / radius) - radius;
+    auto z = origin.z();
+    line.push_back(makePoint3d(x, y, z));
 
     return line;
   }
