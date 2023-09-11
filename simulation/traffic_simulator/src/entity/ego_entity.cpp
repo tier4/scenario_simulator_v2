@@ -50,7 +50,7 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
   if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-      architecture_type == "awf/universe") {
+      architecture_type.find("awf/universe") != std::string::npos) {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<
@@ -65,7 +65,9 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
                  "rviz_config:=" + ((rviz_config == "")
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
-                 "scenario_simulation:=true", "perception/enable_traffic_light:=false")
+                 "scenario_simulation:=true",
+                 "perception/enable_traffic_light:=" +
+                   std::string((architecture_type >= "awf/universe/20230906") ? "true" : "false"))
              : std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
   } else {

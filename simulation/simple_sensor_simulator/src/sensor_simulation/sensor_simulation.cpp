@@ -22,7 +22,7 @@ namespace simple_sensor_simulator
 auto SensorSimulation::updateSensorFrame(
   double current_simulation_time, const rclcpp::Time & current_ros_time,
   const std::vector<traffic_simulator_msgs::EntityStatus> & entities,
-  const std::vector<autoware_auto_perception_msgs::msg::TrafficSignal> & traffic_signals) -> void
+  const simulation_api_schema::UpdateTrafficLightsRequest & update_traffic_lights_request) -> void
 {
   std::vector<std::string> lidar_detected_objects = {};
 
@@ -44,7 +44,7 @@ auto SensorSimulation::updateSensorFrame(
   }
 
   for (auto & sensor : traffic_lights_detectors_) {
-    sensor->updateFrame(current_ros_time, traffic_signals);
+    sensor->updateFrame(current_ros_time, update_traffic_lights_request);
   }
 }
 }  // namespace simple_sensor_simulator
