@@ -32,16 +32,9 @@ auto makeLineString3d(const lanelet::Point3d & origin, double length, double rad
     const auto radian_step = length / radius / resolution;
 
     for (auto radian = 0.0; 0 <= resolution--; radian += radian_step) {
-      std::cout << std::string(80, '-') << std::endl;
-
       auto x = origin.x() + radius * std::sin(radian);
       auto y = origin.y() + radius * std::cos(radian) - radius;
       auto z = origin.z();
-
-      PRINT(x);
-      PRINT(y);
-      PRINT(z);
-
       line.push_back(makePoint3d(x, y, z));
     }
 
@@ -49,7 +42,7 @@ auto makeLineString3d(const lanelet::Point3d & origin, double length, double rad
   }
 }
 
-auto makeLanelet(double length = 1000, double width = 10, double curvature = 0.001)
+auto makeLanelet(double length = 1000, double width = 10, double curvature = -0.002)
 {
   const auto x = 0.0;
   const auto y = 0.0;
@@ -63,9 +56,18 @@ auto makeLanelet(double length = 1000, double width = 10, double curvature = 0.0
   const auto p1_radius = radius - width / 2;
   const auto p2_radius = radius + width / 2;
 
+  const auto p1_offset = std::isinf(radius) or std::isinf(p1_radius)
+                           ? 0.0
+                           : p1_radius * (length / radius - length / p1_radius);
+
+  const auto p2_offset = std::isinf(radius) or std::isinf(p2_radius)
+                           ? 0.0
+                           : p2_radius * (length / radius - length / p2_radius);
+
   static lanelet::Id id = 0;
   auto lane = lanelet::Lanelet(
-    ++id, makeLineString3d(p1, length, p1_radius), makeLineString3d(p2, length, p2_radius));
+    ++id, makeLineString3d(p1, length + p1_offset, p1_radius),
+    makeLineString3d(p2, length + p2_offset, p2_radius));
   lane.attributes()["subtype"] = "road";
   return lane;
 }
