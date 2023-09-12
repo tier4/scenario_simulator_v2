@@ -110,7 +110,7 @@ try {
   };
 
   auto output_directory = [&]() {
-    node.declare_parameter("output_directory", "/tmp");
+    node.declare_parameter("output_directory", "/tmp/map_fragment");
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   };
 
@@ -118,7 +118,7 @@ try {
 
   map.add(makeLanelet(length(), width(), curvature(), resolution()));
 
-  const auto directory = output_directory() / "map_fragment";
+  const auto directory = output_directory();
 
   try {
     if (std::filesystem::remove_all(directory);
