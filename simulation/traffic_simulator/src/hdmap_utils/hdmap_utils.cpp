@@ -556,7 +556,6 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPos
 std::optional<traffic_simulator_msgs::msg::LaneletPose> HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Pose & pose, std::int64_t lanelet_id, double matching_distance) const
 {
-  RCLCPP_WARN_STREAM(rclcpp::get_logger("hoge"), matching_distance);
   const auto spline = getCenterPointsSpline(lanelet_id);
   const auto s = spline->getSValue(pose, matching_distance);
   if (!s) {
