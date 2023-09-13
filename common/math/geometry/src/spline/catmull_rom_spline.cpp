@@ -427,7 +427,7 @@ auto CatmullRomSpline::getSValue(
           "contact the developer of traffic_simulator.");
       }
       return line_segments_[0].getSValue(pose, threshold_distance, true);
-    case 3:
+    default:
       double s = 0;
       for (size_t i = 0; i < curves_.size(); i++) {
         auto s_value = curves_[i].getSValue(pose, threshold_distance, true);
