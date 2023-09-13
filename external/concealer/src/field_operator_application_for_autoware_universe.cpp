@@ -55,18 +55,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
-  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
-{
-  switch (current_cooperator) {
-    case Cooperator::simulator:
-      return task_queue.delay([=]() { return approve(cooperate_status_array); });
-
-    default:
-      return;
-  }
-}
-
 template <auto N, typename Tuples>
 struct lister
 {
