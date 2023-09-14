@@ -147,6 +147,8 @@ public:
 
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
 
+  auto requestAutoModeForCooperation(std::string, bool) -> void override;
+
   auto restrictTargetSpeed(double) const -> double override;
 
   auto sendCooperateCommand(const std::string &, const std::string &) -> void override;

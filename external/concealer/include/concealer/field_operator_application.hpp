@@ -139,6 +139,8 @@ public:
 
   /*   */ auto initialized() const noexcept { return initialize_was_called; }
 
+  auto requestAutoModeForCooperation(std::string, bool) -> void = 0;
+
   // different autowares accept different initial target speed
   virtual auto restrictTargetSpeed(double) const -> double = 0;
 

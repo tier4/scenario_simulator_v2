@@ -420,6 +420,19 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::str
   current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
 }
 
+auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation(
+  std::string module_name, bool enable) -> void
+{
+  // TODO
+  std::string service_name;
+  ServiceWithValidation<tier4_rtc_msgs::srv::AutoMode> requestAutoMode(service_name, this);
+
+  auto request = std::make_shared<tier4_rtc_msgs::srv::AutoMode::Request>();
+  request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
+  request->enable = enable;
+  requestAutoMode(request);
+}
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
   const autoware_auto_system_msgs::msg::EmergencyState & message) -> void
 {
