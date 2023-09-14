@@ -27,11 +27,6 @@
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 #include <tf2/LinearMath/Matrix3x3.h>
-#ifdef USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#else
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#endif
 
 #include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
 #include <boost/filesystem.hpp>
@@ -48,6 +43,7 @@
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>

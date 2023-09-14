@@ -34,13 +34,6 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME} Boost::filesystem glog pugixml)
 
-# workaround to allow deprecated header to build on both galactic and humble
-if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
-  target_compile_definitions(${PROJECT_NAME} PUBLIC
-    USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
-  )
-endif()
-
 # ------------------------------------------------------------------------------
 #  openscenario_interpreter_node
 # ------------------------------------------------------------------------------
