@@ -24,37 +24,6 @@ FieldOperatorApplicationFor<AutowareUniverse>::~FieldOperatorApplicationFor()
   task_queue.stopAndJoin();
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
-  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
-{
-  auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
-  request->stamp = cooperate_status_array.stamp;
-
-  auto approvable = [](auto && cooperate_status) {
-    return cooperate_status.safe xor
-           (cooperate_status.command_status.type == tier4_rtc_msgs::msg::Command::ACTIVATE);
-  };
-
-  auto flip = [](auto && type) {
-    using Command = tier4_rtc_msgs::msg::Command;
-    return type == Command::ACTIVATE ? Command::DEACTIVATE : Command::ACTIVATE;
-  };
-
-  for (auto && cooperate_status : cooperate_status_array.statuses) {
-    if (approvable(cooperate_status)) {
-      tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
-      cooperate_command.module = cooperate_status.module;
-      cooperate_command.uuid = cooperate_status.uuid;
-      cooperate_command.command.type = flip(cooperate_status.command_status.type);
-      request->commands.push_back(cooperate_command);
-    }
-  }
-
-  if (not request->commands.empty()) {
-    task_queue.delay([this, request]() { requestCooperateCommands(request); });
-  }
-}
-
 template <auto N, typename Tuples>
 struct lister
 {
