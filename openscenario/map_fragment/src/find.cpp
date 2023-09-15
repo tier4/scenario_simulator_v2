@@ -24,41 +24,50 @@ try {
 
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
 
-  auto input_directory = [&]() {
+  const auto input_directory = [&]() {
     node.declare_parameter("input_directory", map_fragment::directory());
     return std::filesystem::path(node.get_parameter("input_directory").as_string());
-  };
+  }();
 
-  auto lanelet2_map = [&]() {
-    node.declare_parameter("lanelet2_map", input_directory() / "lanelet2_map.osm");
+  std::cerr << "input_directory = " << input_directory << std::endl;
+
+  const auto lanelet2_map = [&]() {
+    node.declare_parameter("lanelet2_map", input_directory / "lanelet2_map.osm");
     return node.get_parameter("lanelet2_map").as_string();
-  };
+  }();
 
-  auto type = [&]() {
+  std::cerr << "lanelet2_map = " << lanelet2_map << std::endl;
+
+  const auto type = [&]() {
     node.declare_parameter("type", "lanelet");
     return node.get_parameter("type").as_string();
-  };
+  }();
 
-  auto subtype = [&]() {
+  std::cerr << "type = " << type << std::endl;
+
+  const auto subtype = [&]() {
     node.declare_parameter("subtype", "road");
     return node.get_parameter("subtype").as_string();
-  };
+  }();
+
+  std::cerr << "subtype = " << subtype << std::endl;
 
   auto satisfies_lower_bound_id = [&]() {
-    node.declare_parameter("greater_than", std::numeric_limits<lanelet::Id>::min());
-    return [lower_bound = node.get_parameter("greater_than").as_int()](const auto & lanelet) {
-      return lower_bound < lanelet.id();
-    };
+    node.declare_parameter("greater_than", lanelet::Id());
+    const auto greater_than = node.get_parameter("greater_than").as_int();
+    std::cerr << "greater_than = " << greater_than << std::endl;
+    return
+      [lower_bound = greater_than](const auto & lanelet) { return lower_bound < lanelet.id(); };
   }();
 
   auto satisfies_upper_bound_id = [&]() {
     node.declare_parameter("less_than", std::numeric_limits<lanelet::Id>::max());
-    return [upper_bound = node.get_parameter("less_than").as_int()](const auto & lanelet) {
-      return lanelet.id() < upper_bound;
-    };
+    const auto less_than = node.get_parameter("less_than").as_int();
+    std::cerr << "less_than = " << less_than << std::endl;
+    return [upper_bound = less_than](const auto & lanelet) { return lanelet.id() < upper_bound; };
   }();
 
-  const auto map = lanelet::load(lanelet2_map(), map_fragment::projector());
+  const auto map = lanelet::load(lanelet2_map, map_fragment::projector());
 
   auto finder = [&](const auto & lanelet) {
     auto matches = [&](const auto & attribute, const auto & value) {
@@ -66,11 +75,15 @@ try {
       return iterator != lanelet.attributes().end() and iterator->second == value;
     };
 
-    return matches("type", type()) and            //
-           matches("subtype", subtype()) and      //
+    return matches("type", type) and              //
+           matches("subtype", subtype) and        //
            satisfies_lower_bound_id(lanelet) and  //
            satisfies_upper_bound_id(lanelet);
   };
+
+  std::cerr << "count = "
+            << std::count_if(map->laneletLayer.begin(), map->laneletLayer.end(), finder)
+            << std::endl;
 
   if (auto iterator = std::find_if(map->laneletLayer.begin(), map->laneletLayer.end(), finder);
       iterator != map->laneletLayer.end()) {
