@@ -24,7 +24,6 @@
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
-#include <concealer/cooperator.hpp>
 #include <concealer/field_operator_application.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/utility/publisher_wrapper.hpp>
@@ -64,8 +63,6 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>         requestCooperateCommands;
   ServiceWithValidation<tier4_external_api_msgs::srv::Engage>           requestEngage;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit> requestSetVelocityLimit;
-
-  Cooperator current_cooperator = Cooperator::simulator;
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
@@ -155,8 +152,6 @@ public:
   auto restrictTargetSpeed(double) const -> double override;
 
   auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
-
-  auto setCooperator(const std::string & cooperator) -> void override;
 
   auto setVelocityLimit(double) -> void override;
 };

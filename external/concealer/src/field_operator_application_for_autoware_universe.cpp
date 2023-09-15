@@ -383,12 +383,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::string & cooperator)
-  -> void
-{
-  current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
-}
-
 auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation(
   std::string module_name, bool enable) -> void
 {

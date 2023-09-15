@@ -151,8 +151,6 @@ public:
 
   virtual auto sendCooperateCommand(const std::string &, const std::string &) -> void = 0;
 
-  virtual auto setCooperator(const std::string &) -> void = 0;
-
   virtual auto setVelocityLimit(double) -> void = 0;
 };
 }  // namespace concealer
