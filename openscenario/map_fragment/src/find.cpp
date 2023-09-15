@@ -14,6 +14,7 @@
 
 #include <lanelet2_io/Io.h>
 
+#include <limits>
 #include <map_fragment/map_fragment.hpp>
 #include <rclcpp/rclcpp.hpp>
 
@@ -43,23 +44,41 @@ try {
     return node.get_parameter("subtype").as_string();
   };
 
+  auto satisfies_lower_bound_id = [&]() {
+    node.declare_parameter("greater_than", std::numeric_limits<lanelet::Id>::min());
+    return [lower_bound = node.get_parameter("greater_than").as_int()](const auto & lanelet) {
+      return lower_bound < lanelet.id();
+    };
+  }();
+
+  auto satisfies_upper_bound_id = [&]() {
+    node.declare_parameter("less_than", std::numeric_limits<lanelet::Id>::max());
+    return [upper_bound = node.get_parameter("less_than").as_int()](const auto & lanelet) {
+      return lanelet.id() < upper_bound;
+    };
+  }();
+
   const auto map = lanelet::load(lanelet2_map(), map_fragment::projector());
 
   auto finder = [&](const auto & lanelet) {
-    auto matches_or_not_exists = [&](const auto & attribute, const auto & value) {
+    auto matches = [&](const auto & attribute, const auto & value) {
       auto iterator = lanelet.attributes().find(attribute);
       return iterator != lanelet.attributes().end() and iterator->second == value;
     };
 
-    return matches_or_not_exists("type", type()) and matches_or_not_exists("subtype", subtype());
+    return matches("type", type()) and            //
+           matches("subtype", subtype()) and      //
+           satisfies_lower_bound_id(lanelet) and  //
+           satisfies_upper_bound_id(lanelet);
   };
 
   if (auto iterator = std::find_if(map->laneletLayer.begin(), map->laneletLayer.end(), finder);
       iterator != map->laneletLayer.end()) {
     std::cout << iterator->id() << std::endl;
+    return EXIT_SUCCESS;
+  } else {
+    throw std::runtime_error("not found");
   }
-
-  return EXIT_SUCCESS;
 } catch (const std::exception & exception) {
   std::cerr << exception.what() << std::endl;
   return EXIT_FAILURE;
