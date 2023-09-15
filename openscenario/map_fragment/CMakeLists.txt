@@ -14,7 +14,12 @@ find_package(ament_cmake_auto REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_executable(generate ${CMAKE_CURRENT_SOURCE_DIR}/src/generate.cpp)
+file(GLOB ${PROJECT_NAME}_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+
+foreach(EACH IN LISTS ${PROJECT_NAME}_SOURCES)
+  get_filename_component(STEM ${EACH} NAME_WE)
+  ament_auto_add_executable(${STEM} ${EACH} ${CMAKE_CURRENT_SOURCE_DIR})
+endforeach()
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
