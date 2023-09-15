@@ -35,6 +35,7 @@
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
+#include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 
 namespace concealer
@@ -59,6 +60,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<autoware_auto_planning_msgs::msg::Trajectory>                      getTrajectory;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
 
+  ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>        requestSetRtcAutoMode;
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>         requestCooperateCommands;
   ServiceWithValidation<tier4_external_api_msgs::srv::Engage>           requestEngage;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit> requestSetVelocityLimit;
@@ -114,6 +116,7 @@ public:
     getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
     getTrajectory("/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
+    requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/external/set/engage", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
