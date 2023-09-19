@@ -26,7 +26,7 @@ MiscObjectEntity::MiscObjectEntity(
 {
 }
 
-void MiscObjectEntity::onUpdate(double, double)
+void MiscObjectEntity::onUpdate(double, double step_time)
 {
   auto status = static_cast<EntityStatus>(status_);
   status.action_status.twist = geometry_msgs::msg::Twist();
@@ -35,6 +35,9 @@ void MiscObjectEntity::onUpdate(double, double)
   status.action_status.current_action = "static";
   status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
   status_before_update_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
+  if (npc_logic_started_) {
+    updateStandStillDuration(step_time);
+  }
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string
