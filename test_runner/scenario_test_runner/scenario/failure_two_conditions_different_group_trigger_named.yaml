@@ -4,7 +4,7 @@ OpenSCENARIO:
   FileHeader:
     author: "Moszynski Dawid"
     date: "2023-09-18T09:25:53+02:00"
-    description: "Simulation failure detailed message"
+    description: "This scenario is for testing error handling when the scenario fails, and it cannot succeed."
     revMajor: 0
     revMinor: 0
   ParameterDeclarations:
@@ -59,7 +59,15 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 5
+                                      value: 8
+                                      rule: greaterThan
+                            - Condition:
+                                - name: "SimulationTimeout_6sec"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 6
                                       rule: greaterThan
                         Action:
                           - name: ""
