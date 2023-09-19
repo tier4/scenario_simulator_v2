@@ -293,6 +293,24 @@ public:
             getParameter<std::string>("architecture_type", "awf/universe"));
           return configuration;
         }());
+
+        for (const auto & module : [](std::string manual_modules_string) {
+               manual_modules_string.erase(
+                 std::remove_if(
+                   manual_modules_string.begin(), manual_modules_string.end(),
+                   [](const auto & c) { return std::isspace(c); }),
+                 manual_modules_string.end());
+
+               std::vector<std::string> modules;
+               std::string buffer;
+               std::istringstream modules_stream(manual_modules_string);
+               while (std::getline(modules_stream, buffer, ',')) {
+                 modules.push_back(buffer);
+               }
+               return modules;
+             }(controller.properties.template get<String>("manualModules"))) {
+          core->asFieldOperatorApplication(entity_ref).requestAutoModeForCooperation(module, false);
+        }
       }
     }
 
