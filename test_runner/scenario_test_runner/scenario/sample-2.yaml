@@ -27,9 +27,12 @@ OpenSCENARIO:
       - name: __ego_center_z__
         parameterType: double
         value: '0'
+      - name: lane_length
+        parameterType: double
+        value: 1000.0
       - name: map_path
         parameterType: string
-        value: $(ros2 run map_fragment generate --ros-args -p length:=1000.0 -p curvature:=0.004)
+        value: $(ros2 run map_fragment generate --ros-args -p length:=$(var lane_length) -p curvature:=0.004)
       - name: ego_lane_id
         parameterType: string
         value: $(ros2 run map_fragment find --ros-args -p type:=lanelet -p subtype:=road)
@@ -66,7 +69,7 @@ OpenSCENARIO:
                     LanePosition:
                       roadId: ''
                       laneId: $ego_lane_id
-                      s: 10
+                      s: 1
                       offset: 0
                       Orientation:
                         type: relative
