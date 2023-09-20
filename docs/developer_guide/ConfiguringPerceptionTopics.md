@@ -22,12 +22,15 @@ Perception topics are configurable with the following syntax:
 
 where `<NAME>` and `<VALUE>` can be set to:
 
-| Name                                      | Value                                         | Default | Description                                                                                                           |
-|-------------------------------------------|-----------------------------------------------|:-------:|-----------------------------------------------------------------------------------------------------------------------|
-| `detectedObjectMissingProbability`        | A `double` type value between `0.0` and `1.0` |  `0.0`  | Do not publish the perception topic with the given probability.                                                       |
-| `detectedObjectPositionStandardDeviation` | A positive `double` type value                |  `0.0`  | Randomize the positions of other vehicles included in the perception topic according to the given standard deviation. |
-| `detectedObjectPublishingDelay`           | A positive `double` type value                |  `0.0`  | Delays the publication of the perception topic by the specified number of seconds.                                    |
-| `randomSeed`                              | A positive `integer` type value               |   `0`   | Specifies the seed value for the random number generator.                                                             |
+| Name                                       | Value                                         | Default | Description                                                                                                                                                                                                           |
+|--------------------------------------------|-----------------------------------------------|:-------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `detectedObjectMissingProbability`         | A `double` type value between `0.0` and `1.0` |  `0.0`  | Do not publish the perception topic with the given probability.                                                                                                                                                       |
+| `detectedObjectPositionStandardDeviation`  | A positive `double` type value                |  `0.0`  | Randomize the positions of other vehicles included in the perception topic according to the given standard deviation.                                                                                                 |
+| `detectedObjectPublishingDelay`            | A positive `double` type value                |  `0.0`  | Delays the publication of the perception topic by the specified number of seconds.                                                                                                                                    |
+| `detectedObjectGroundTruthPublishingDelay` | A positive `double` type value                |  `0.0`  | Delays the publication of the perception ground truth topic by the specified number of seconds.                                                                                                                       |
+| `detectionSensorRange`                     | A positive `double` type value                | `300.0` | Specifies the sensor detection range for detected object.                                                                                                                                                             |
+| `isClairvoyant`                            | A `boolean` type value                        | `false` | Specifies whether the detected object is a Clairvoyant. If this parameter is not defined explicitly, the property of `detectionSensorRange` is not reflected and only detected object detected by lidar is published. |
+| `randomSeed`                               | A positive `integer` type value               |   `0`   | Specifies the seed value for the random number generator.                                                                                                                                                             |
 
 These properties are not exclusive. In other words, multiple properties can be
 specified at the same time. However, these properties only take effect for
@@ -187,6 +190,43 @@ it reaches the planning module.
                 - name: "isEgo"
                   value: "true"
                 - name: "detectedObjectPublishingDelay"
+                  value: "3"
+```
+
+## Property `detectedObjectGroundTruthPublishingDelay`
+
+**Summary** - Delays the publication of the perception ground truth topic by the specified
+number of seconds.
+
+**Purpose** - Unlike the detected object's topic, which mimics the actual perception topic,
+the perception ground truth topic's delay does not need to be fine-tuned. On the other hand, in some cases you may want
+to receive the ground truth of perception for evaluation sooner rather
+than later. Also, in some cases, there is a need to receive the perception ground truth topic at the same timing as the
+perception topic with noise. To accommodate these, `simple_sensor_simulator` flexibly delays the perception ground truth
+topic according to the `detectedObjectGroundTruthPublishingDelay` value.
+
+**Specification** - Same as one for `detectedObjectPublishingDelay`
+
+**Guarantee** - Same as one for `detectedObjectPublishingDelay`
+
+**Note** - This feature only adjusts the interval between `scenario_simulator_v2` generating a
+perception ground truth and publishing it. Note that there is another kind of delay
+between when `scenario_simulator_v2` publishes the perception ground truth and when
+it reaches the receiver node.
+
+**Default behavior** - If the property is not specified, the default value is
+`"0.0"`, meaning no delay.
+
+**Example** -
+```
+        ObjectController:
+          Controller:
+            name: '...'
+            Properties:
+              Property:
+                - name: "isEgo"
+                  value: "true"
+                - name: "detectedObjectGroundTruthPublishingDelay"
                   value: "3"
 ```
 

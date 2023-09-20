@@ -35,44 +35,52 @@ public:
   explicit MultiClient(
     const simulation_interface::TransportProtocol & protocol, const std::string & hostname,
     const unsigned int socket_port);
+
   ~MultiClient();
+
   void closeConnection();
-  void call(
-    const simulation_api_schema::SimulationRequest & req,
-    simulation_api_schema::SimulationResponse & res);
-  void call(
-    const simulation_api_schema::InitializeRequest & req,
-    simulation_api_schema::InitializeResponse & res);
-  void call(
-    const simulation_api_schema::UpdateFrameRequest & req,
-    simulation_api_schema::UpdateFrameResponse & res);
-  void call(
-    const simulation_api_schema::SpawnVehicleEntityRequest & req,
-    simulation_api_schema::SpawnVehicleEntityResponse & res);
-  void call(
-    const simulation_api_schema::SpawnPedestrianEntityRequest & req,
-    simulation_api_schema::SpawnPedestrianEntityResponse & res);
-  void call(
-    const simulation_api_schema::SpawnMiscObjectEntityRequest & req,
-    simulation_api_schema::SpawnMiscObjectEntityResponse & res);
-  void call(
-    const simulation_api_schema::DespawnEntityRequest & req,
-    simulation_api_schema::DespawnEntityResponse & res);
-  void call(
-    const simulation_api_schema::UpdateEntityStatusRequest & req,
-    simulation_api_schema::UpdateEntityStatusResponse & res);
-  void call(
-    const simulation_api_schema::AttachLidarSensorRequest & req,
-    simulation_api_schema::AttachLidarSensorResponse & res);
-  void call(
-    const simulation_api_schema::AttachDetectionSensorRequest & req,
-    simulation_api_schema::AttachDetectionSensorResponse & res);
-  void call(
-    const simulation_api_schema::AttachOccupancyGridSensorRequest & req,
-    simulation_api_schema::AttachOccupancyGridSensorResponse & res);
-  void call(
-    const simulation_api_schema::UpdateTrafficLightsRequest & req,
-    simulation_api_schema::UpdateTrafficLightsResponse & res);
+
+  auto call(const simulation_api_schema::SimulationRequest &)
+    -> simulation_api_schema::SimulationResponse;
+
+  auto call(const simulation_api_schema::InitializeRequest &)
+    -> simulation_api_schema::InitializeResponse;
+
+  auto call(const simulation_api_schema::UpdateFrameRequest &)
+    -> simulation_api_schema::UpdateFrameResponse;
+
+  auto call(const simulation_api_schema::SpawnVehicleEntityRequest &)
+    -> simulation_api_schema::SpawnVehicleEntityResponse;
+
+  auto call(const simulation_api_schema::SpawnPedestrianEntityRequest &)
+    -> simulation_api_schema::SpawnPedestrianEntityResponse;
+
+  auto call(const simulation_api_schema::SpawnMiscObjectEntityRequest &)
+    -> simulation_api_schema::SpawnMiscObjectEntityResponse;
+
+  auto call(const simulation_api_schema::DespawnEntityRequest &)
+    -> simulation_api_schema::DespawnEntityResponse;
+
+  auto call(const simulation_api_schema::UpdateEntityStatusRequest &)
+    -> simulation_api_schema::UpdateEntityStatusResponse;
+
+  auto call(const simulation_api_schema::AttachLidarSensorRequest &)
+    -> simulation_api_schema::AttachLidarSensorResponse;
+
+  auto call(const simulation_api_schema::AttachDetectionSensorRequest &)
+    -> simulation_api_schema::AttachDetectionSensorResponse;
+
+  auto call(const simulation_api_schema::AttachOccupancyGridSensorRequest &)
+    -> simulation_api_schema::AttachOccupancyGridSensorResponse;
+
+  auto call(const simulation_api_schema::UpdateTrafficLightsRequest &)
+    -> simulation_api_schema::UpdateTrafficLightsResponse;
+
+  auto call(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
+    -> simulation_api_schema::FollowPolylineTrajectoryResponse;
+
+  auto call(const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest &)
+    -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse;
 
   const simulation_interface::TransportProtocol protocol;
   const std::string hostname;

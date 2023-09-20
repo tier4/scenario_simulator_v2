@@ -50,7 +50,7 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
   if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
-      architecture_type == "awf/universe") {
+      architecture_type.find("awf/universe") != std::string::npos) {
     std::string rviz_config = getParameter<std::string>("rviz_config", "");
     return getParameter<bool>("launch_autoware", true)
              ? std::make_unique<
@@ -65,7 +65,9 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
                  "rviz_config:=" + ((rviz_config == "")
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
-                 "scenario_simulation:=true", "perception/enable_traffic_light:=false")
+                 "scenario_simulation:=true",
+                 "perception/enable_traffic_light:=" +
+                   std::string((architecture_type >= "awf/universe/20230906") ? "true" : "false"))
              : std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
   } else {
@@ -75,11 +77,13 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
 }
 
 EgoEntity::EgoEntity(
-  const std::string & name, const traffic_simulator_msgs::msg::EntityStatus & entity_status,
+  const std::string & name, const CanonicalizedEntityStatus & entity_status,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration)
-: VehicleEntity(name, entity_status, parameters),
-  field_operator_application(makeFieldOperatorApplication(configuration))
+: VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
+  field_operator_application(makeFieldOperatorApplication(configuration)),
+  externally_updated_status_(entity_status)
 {
 }
 
@@ -113,12 +117,19 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
+auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
+{
+  static traffic_simulator_msgs::msg::EntityType type;
+  type.type = traffic_simulator_msgs::msg::EntityType::EGO;
+  return type;
+}
+
 auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
   return std::nullopt;
 }
 
-auto EgoEntity::getRouteLanelets(double /*unused horizon*/) const -> std::vector<std::int64_t>
+auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> std::vector<std::int64_t>
 {
   std::vector<std::int64_t> ids{};
 
@@ -127,14 +138,14 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) const -> std::vector
           field_operator_application.get());
       universe) {
     for (const auto & point : universe->getPathWithLaneId().points) {
-      std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
+      ids += point.lane_ids;
     }
   }
 
   return ids;
 }
 
-auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose { return status_.pose; }
+auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose { return status_.getMapPose(); }
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
@@ -155,8 +166,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   EntityBase::onPostUpdate(current_time, step_time);
 }
 
-void EgoEntity::requestAcquirePosition(
-  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
+void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
 {
   requestAssignRoute({lanelet_pose});
 }
@@ -166,13 +176,12 @@ void EgoEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose
   requestAssignRoute({map_pose});
 }
 
-void EgoEntity::requestAssignRoute(
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & waypoints)
+void EgoEntity::requestAssignRoute(const std::vector<CanonicalizedLaneletPose> & waypoints)
 {
   std::vector<geometry_msgs::msg::Pose> route;
 
   for (const auto & waypoint : waypoints) {
-    route.push_back((*hdmap_utils_ptr_).toMapPose(waypoint).pose);
+    route.push_back(static_cast<geometry_msgs::msg::Pose>(waypoint));
   }
 
   requestAssignRoute(route);
@@ -193,7 +202,7 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 
   if (not field_operator_application->initialized()) {
-    field_operator_application->initialize(getStatus().pose);
+    field_operator_application->initialize(getMapPose());
     field_operator_application->plan(route);
     // NOTE: engage() will be executed at simulation-time 0.
   } else {
@@ -244,8 +253,7 @@ auto EgoEntity::setBehaviorParameter(const traffic_simulator_msgs::msg::Behavior
 {
 }
 
-auto EgoEntity::setStatusExternally(const traffic_simulator_msgs::msg::EntityStatus & status)
-  -> void
+auto EgoEntity::setStatusExternally(const CanonicalizedEntityStatus & status) -> void
 {
   externally_updated_status_ = status;
 }
@@ -265,7 +273,7 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
   field_operator_application->setVelocityLimit(value);
 }
 
-auto EgoEntity::fillLaneletPose(traffic_simulator_msgs::msg::EntityStatus & status) const -> void
+auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
 {
   EntityBase::fillLaneletPose(status, false);
 }

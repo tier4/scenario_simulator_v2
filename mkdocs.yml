@@ -28,6 +28,7 @@ plugins:
 copyright: "Copyright &copy; 2022 TIER IV, Inc."
 
 markdown_extensions:
+  - admonition
   - attr_list
   - codehilite: { guess_lang: false }
   - fontawesome_markdown
@@ -87,3 +88,4 @@ nav:
       - developer_guide/CONTRIBUTING.md
       - developer_guide/Communication.md
       - Package Details: package/About.md
+      - developer_guide/ConfiguringPerceptionTopics.md

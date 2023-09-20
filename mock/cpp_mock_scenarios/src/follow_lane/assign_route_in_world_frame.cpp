@@ -49,15 +49,16 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
+      "ego",
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 10, true);
     std::vector<geometry_msgs::msg::Pose> goal_poses;
-    goal_poses.emplace_back(
-      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 1.0, 0, 0, 0, 0)));
-    goal_poses.emplace_back(
-      api_.toMapPose(traffic_simulator::helper::constructLaneletPose(34408, 10, 0, 0, 0, 0)));
+    goal_poses.emplace_back(api_.toMapPose(
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34408, 1.0, 0, 0, 0, 0))));
+    goal_poses.emplace_back(api_.toMapPose(
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34408, 10, 0, 0, 0, 0))));
     api_.requestAssignRoute("ego", goal_poses);
   }
 };
