@@ -102,61 +102,64 @@ try {
 
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
 
-  auto length = [&]() {
-    node.declare_parameter("length", 100.0);
-    return node.get_parameter("length").as_double();
-  };
+  const auto length_at_least = [&]() {
+    node.declare_parameter("length_at_least", 100.0);
+    return node.get_parameter("length_at_least").as_double();
+  }();
 
-  auto width = [&]() {
+  const auto length = [&]() {
+    node.declare_parameter("length", length_at_least * 1.1);
+    return std::max(length_at_least, node.get_parameter("length").as_double());
+  }();
+
+  const auto width = [&]() {
     node.declare_parameter("width", 10.0);
     return node.get_parameter("width").as_double();
-  };
+  }();
 
-  auto curvature = [&]() {
+  const auto curvature = [&]() {
     node.declare_parameter("curvature", 0.0);
     return node.get_parameter("curvature").as_double();
-  };
+  }();
 
-  auto resolution = [&]() {
+  const auto resolution = [&]() {
     node.declare_parameter("resolution", 100);
     return node.get_parameter("resolution").as_int();
-  };
+  }();
 
-  auto output_directory = [&]() {
+  const auto output_directory = [&]() {
     node.declare_parameter("output_directory", map_fragment::directory());
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
-  };
+  }();
 
   auto map = lanelet::LaneletMap();
 
-  map.add(makeLanelet(length(), width(), curvature(), resolution()));
-
-  const auto directory = output_directory();
+  map.add(makeLanelet(length, width, curvature, resolution));
 
   try {
-    if (std::filesystem::remove_all(directory);
-        not std::filesystem::create_directories(directory)) {
-      RCLCPP_ERROR_STREAM(node.get_logger(), "failed to create directory " << directory);
+    if (std::filesystem::remove_all(output_directory);
+        not std::filesystem::create_directories(output_directory)) {
+      RCLCPP_ERROR_STREAM(node.get_logger(), "failed to create directory " << output_directory);
     }
   } catch (const std::exception & exception) {
     RCLCPP_ERROR_STREAM(node.get_logger(), exception.what());
     return EXIT_FAILURE;
   }
 
-  lanelet::write(directory / "lanelet2_map.osm", map, map_fragment::projector());
+  lanelet::write(output_directory / "lanelet2_map.osm", map, map_fragment::projector());
 
   try {
     std::filesystem::create_symlink(
       std::filesystem::canonical(
         std::filesystem::path(ament_index_cpp::get_package_share_directory("kashiwanoha_map")) /
         "map/pointcloud_map.pcd"),
-      directory / "pointcloud_map.pcd");
+      output_directory / "pointcloud_map.pcd");
   } catch (const std::exception & exception) {
     RCLCPP_ERROR_STREAM(node.get_logger(), exception.what());
     return EXIT_FAILURE;
   }
 
-  std::cout << directory.c_str() << std::endl;
+  std::cout << output_directory.c_str() << std::endl;
 
   return EXIT_SUCCESS;
 } catch (const std::exception & exception) {

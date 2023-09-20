@@ -27,12 +27,15 @@ OpenSCENARIO:
       - name: __ego_center_z__
         parameterType: double
         value: '0'
-      - name: lane_length
+      - name: length
         parameterType: double
         value: 1000.0
+      - name: curvature
+        parameterType: double
+        value: $(ros2 run openscenario_interpreter_example uniform_distribution -0.005 0.005)
       - name: map_path
         parameterType: string
-        value: $(ros2 run map_fragment generate --ros-args -p length:=$(var lane_length) -p curvature:=0.004)
+        value: $(ros2 run map_fragment generate --ros-args -p length_at_least:=$(var length) -p curvature:=$(var curvature))
       - name: ego_lane_id
         parameterType: string
         value: $(ros2 run map_fragment find --ros-args -p type:=lanelet -p subtype:=road)
@@ -82,7 +85,7 @@ OpenSCENARIO:
                       LanePosition:
                         roadId: ''
                         laneId: $ego_lane_id
-                        s: 995
+                        s: $length
                         offset: 0
                         Orientation:
                           type: relative
@@ -122,7 +125,7 @@ OpenSCENARIO:
                                           LanePosition:
                                             roadId: ''
                                             laneId: '1'
-                                            s: 990
+                                            s: $length
                                             offset: 0
                                             Orientation:
                                               type: relative
