@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <behavior_tree_plugin/pedestrian/behavior_tree.hpp>
+#include <behavior_tree_plugin/pedestrian/follow_trajectory_sequence/follow_polyline_trajectory_action.hpp>
 #include <iostream>
 #include <memory>
 #include <pugixml.hpp>
@@ -28,6 +29,7 @@ void PedestrianBehaviorTree::configure(const rclcpp::Logger & logger)
   namespace pedestrian = entity_behavior::pedestrian;
   factory_.registerNodeType<pedestrian::FollowLaneAction>("FollowLane");
   factory_.registerNodeType<pedestrian::WalkStraightAction>("WalkStraightAction");
+  factory_.registerNodeType<pedestrian::FollowPolylineTrajectoryAction>("FollowPolylineTrajectory");
 
   auto base_path = ament_index_cpp::get_package_share_directory("behavior_tree_plugin");
   auto format_path = base_path + "/config/pedestrian_entity_behavior.xml";
