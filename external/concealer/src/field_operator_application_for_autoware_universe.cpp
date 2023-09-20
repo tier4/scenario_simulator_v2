@@ -294,8 +294,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
 
         auto request =
           std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
-        std::vector<geometry_msgs::msg::PoseWithCovarianceStamped> stamped_poses = {
-          initial_pose_msg};
         request->pose.push_back(initial_pose_msg);
         requestInitialPose(request);
       });
