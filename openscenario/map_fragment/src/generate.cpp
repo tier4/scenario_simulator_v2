@@ -27,19 +27,16 @@ try {
 
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
 
-  const auto length_at_least = [&]() {
-    node.declare_parameter("length_at_least", 100.0);
-    return node.get_parameter("length_at_least").as_double();
-  }();
-
-  const auto length = [&]() {
-    node.declare_parameter("length", length_at_least * 1.1);
-    return std::max(length_at_least, node.get_parameter("length").as_double());
-  }();
-
   const auto width = [&]() {
     node.declare_parameter("width", 10.0);
     return node.get_parameter("width").as_double();
+  }();
+
+  const auto length = [&]() {
+    node.declare_parameter("length_at_least", 100.0);
+    const auto length_at_least = node.get_parameter("length_at_least").as_double();
+    node.declare_parameter("length", length_at_least * 1.1);
+    return std::max(length_at_least, node.get_parameter("length").as_double());
   }();
 
   const auto curvature = [&]() {
@@ -59,7 +56,7 @@ try {
 
   auto map = lanelet::LaneletMap();
 
-  map.add(map_fragment::makeLanelet(length, width, curvature, resolution));
+  map.add(map_fragment::makeLanelet(width, length, curvature, resolution));
 
   try {
     if (std::filesystem::remove_all(output_directory);

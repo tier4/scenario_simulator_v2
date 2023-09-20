@@ -80,15 +80,20 @@ auto makeLineString3d(
   }
 }
 
-auto makeLanelet(double length, double width, double curvature, double resolution)
+template <typename... Ts>
+auto makeLanelet(const std::tuple<Ts...> & left, const std::tuple<Ts...> & right)
 {
-  const auto x = 0.0;
-  const auto y = 0.0;
-  const auto z = 0.0;
+  static lanelet::Id id = 0;
+  auto lane =
+    lanelet::Lanelet(++id, std::apply(makeLineString3d, left), std::apply(makeLineString3d, right));
+  lane.attributes()["subtype"] = "road";
+  return lane;
+}
 
-  const auto p1 = makePoint3d(x, y - width / 2, z);
-  const auto p2 = makePoint3d(x, y + width / 2, z);
-
+auto makeLanelet(
+  const lanelet::Point3d & p1, const lanelet::Point3d & p2,  //
+  double width, double length, double curvature, double resolution)
+{
   const auto radius = curvature == 0 ? std::numeric_limits<double>::infinity() : 1 / curvature;
 
   const auto p1_radius = radius - width / 2;
@@ -102,11 +107,22 @@ auto makeLanelet(double length, double width, double curvature, double resolutio
                            ? 0.0
                            : p2_radius * (length / radius - length / p2_radius);
 
-  static lanelet::Id id = 0;
-  auto lane = lanelet::Lanelet(
-    ++id, makeLineString3d(p1, length + p1_offset, p1_radius, resolution),
-    makeLineString3d(p2, length + p2_offset, p2_radius, resolution));
-  lane.attributes()["subtype"] = "road";
-  return lane;
+  return makeLanelet(
+    std::forward_as_tuple(p1, length + p1_offset, p1_radius, resolution),
+    std::forward_as_tuple(p2, length + p2_offset, p2_radius, resolution));
+}
+
+auto makeLanelet(
+  const lanelet::Point3d & origin, double width, double length, double curvature, double resolution)
+{
+  return makeLanelet(
+    makePoint3d(origin.x(), origin.y() - width / 2, origin.z()),
+    makePoint3d(origin.x(), origin.y() + width / 2, origin.z()),  //
+    width, length, curvature, resolution);
+}
+
+auto makeLanelet(double width, double length, double curvature, double resolution)
+{
+  return makeLanelet(makePoint3d(0.0, 0.0, 0.0), width, length, curvature, resolution);
 }
 }  // namespace map_fragment
