@@ -126,7 +126,7 @@ public:
 
 protected:
   const std::string name_;
-  rclcpp::Logger logger_;
+  const rclcpp::Logger logger_;
   Ogre::Overlay * overlay_;
   Ogre::PanelOverlayElement * panel_;
   Ogre::MaterialPtr panel_material_;
