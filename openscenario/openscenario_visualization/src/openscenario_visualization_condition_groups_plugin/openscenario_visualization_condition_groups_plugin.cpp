@@ -202,7 +202,7 @@ void VisualizationConditionGroupsDisplay::loadConditionGroups(const Context::Con
   }
 
   int unnamed_event_counter = 1;
-  condition_groups_collection_ptr_ = std::make_shared<ConditionGroupsCollection>();
+  condition_groups_collection_ptr_->clear();
 
   auto stories = data["OpenSCENARIO"]["Storyboard"]["Story"];
   for (const auto & story : stories) {
