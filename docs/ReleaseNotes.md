@@ -4,9 +4,9 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-|---------|---------------|----------|--------------|-------------|
-|         |               |          |              |             |
+| Feature                                            | Brief summary                                                                                                                                                          | Category                                                                   | Pull request                                                      | Contributor                             |
+|----------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------|
+| Traffic Light Simulation                           | Start supporting to traffic light messages in `autoware_perception_msgs`.                                                                                              | `openscenario_interpreter`, `traffic_simulator`, `simple_sensor_simulator` | [#1027](https://github.com/tier4/scenario_simulator_v2/pull/1027) | [HansRobo](https://github.com/HansRobo) |
 
 Bug Fixes:bug:
 

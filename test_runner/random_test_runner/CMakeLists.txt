@@ -55,13 +55,6 @@ target_link_libraries(random_test_runner
   fmt
 )
 
-# workaround to allow deprecated header to build on both galactic and humble
-if(${tf2_geometry_msgs_VERSION} VERSION_LESS 0.18.0)
-  target_compile_definitions(random_test_runner PUBLIC
-    USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
-  )
-endif()
-
 install(
   DIRECTORY launch rviz include param
   DESTINATION share/${PROJECT_NAME}

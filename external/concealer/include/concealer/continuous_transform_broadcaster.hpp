@@ -15,17 +15,13 @@
 #ifndef CONCEALER__CONTINUOUS_TRANSFORM_BROADCASTER_HPP_
 #define CONCEALER__CONTINUOUS_TRANSFORM_BROADCASTER_HPP_
 
-#ifdef USE_TF2_GEOMETRY_MSGS_DEPRECATED_HEADER
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#else
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#endif
 #include <tf2_ros/buffer.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_ros/transform_listener.h>
 
 #include <chrono>
 #include <geometry_msgs/msg/pose.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
 namespace concealer
 {
