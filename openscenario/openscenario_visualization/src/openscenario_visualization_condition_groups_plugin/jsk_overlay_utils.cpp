@@ -91,7 +91,7 @@ QImage ScopedPixelBuffer::getQImage(OverlayObject & overlay, QColor & bg_color)
 }
 
 OverlayObject::OverlayObject(
-  Ogre::SceneManager * manager, rclcpp::Logger logger, const std::string & name)
+  Ogre::SceneManager * manager, const rclcpp::Logger & logger, const std::string & name)
 : name_(name), logger_(logger)
 {
   rviz_rendering::RenderSystem::get()->prepareOverlays(manager);
