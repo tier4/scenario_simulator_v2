@@ -58,7 +58,7 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
  * @return LaneletPose
  */
 LaneletPose constructLaneletPose(
-  std::int64_t lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
+  lanelet::Id lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
   double yaw = 0);
 
 /**
@@ -123,7 +123,8 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
   const std::string & entity, const std::string & architecture_type, const double update_duration,
   const double range = 300.0, const bool detect_all_objects_in_range = false,
   const double pos_noise_stddev = 0, const int random_seed = 0,
-  const double probability_of_lost = 0, const double object_recognition_delay = 0);
+  const double probability_of_lost = 0, const double object_recognition_delay = 0,
+  const double object_recognition_ground_truth_delay = 0);
 }  // namespace helper
 }  // namespace traffic_simulator
 

@@ -2,6 +2,94 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.8.0 (2023-09-05)
+------------------
+* Merge pull request `#1058 <https://github.com/tier4/scenario_simulator_v2/issues/1058>`_ from tier4/ref/RJD-553_restore_repeated_update_entity_status
+* fix(sss): fix missing initialization
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* Merge pull request `#1074 <https://github.com/tier4/scenario_simulator_v2/issues/1074>`_ from tier4/fix/clock
+* Merge remote-tracking branch 'origin/master' into fix/clock
+* Merge pull request `#1024 <https://github.com/tier4/scenario_simulator_v2/issues/1024>`_ from tier4/feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* refactor: detection_sensor.hpp sensor_simulation.hpp
+* fix: make sure generated uuid is valid
+* refactor: detection_sensor.hpp
+* chore: apply linter
+* feat: add implementation for detectedObjectGroundTruthPublishingDelay
+* refactor: change property name from isEnableDetectedObjectGroundTruthDelay to detectedObjectGroundTruthPublishingDelay
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into fix/clock
+* Merge pull request `#1056 <https://github.com/tier4/scenario_simulator_v2/issues/1056>`_ from tier4/feature/interpreter/sensor-detection-range
+* Update the `simple_sensor_simulator` to pass the scenario time to the ego entity
+* Rename API `UpdateFrameRequest::current_time` to `current_simulation_time`
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* fix(sss): fix mistake - spawned entity type
+* ref(clang): apply clang reformat
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* ref(single_sensor_simulator): apply changes requested in review
+* Merge pull request `#1061 <https://github.com/tier4/scenario_simulator_v2/issues/1061>`_ from tier4/feature/traffic_simulator/follow-trajectory-action-2
+* merge lidar publishing delay
+* reformat
+* Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-2
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* ref(traffic_simulator,sss): apply clang_reformat
+* Merge pull request `#1018 <https://github.com/tier4/scenario_simulator_v2/issues/1018>`_ from tier4/fix/longitudinal_distance_fixed_master_merged
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* revert change for occupancygrid
+* revert change for occupancygrid
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* refactor distance between pose
+* Update simulation/simple_sensor_simulator/src/sensor_simulation/detection_sensor/detection_sensor.cpp
+* Update simulation/simple_sensor_simulator/src/sensor_simulation/detection_sensor/detection_sensor.cpp
+* Update simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp
+* Update simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/lidar/raycaster.hpp
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-2
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* Merge pull request `#1046 <https://github.com/tier4/scenario_simulator_v2/issues/1046>`_ from tier4/fix/RJD-554_error_run_scenario_in_row
+* fix(zeromq): ensure single update ego, optimize UpdateEntityStatus
+* Update `MultiServer` to require API callbacks to return responses as return value
+* Add new simulation API `FollowPolylineTrajectory(Request|Response)`
+* Simplify class `MultiServer` definition
+* revert lidar sensor delay's change
+* apply clang-format
+* fix(sss): reset ego after erase
+* merge master branch
+* ref(sss): add initialize entity_status\_ as empty
+* Merge remote-tracking branch 'origin/master' into fix/RJD-554_error_run_scenario_in_row
+* Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
+* ref(sss): provide Ego update anywhere in the request, speed up isEntityExist
+* ref(sss): optimize despawnEntity method
+* ref(zeromq): restore repeated UpdateEntityStatus
+* Merge pull request `#1054 <https://github.com/tier4/scenario_simulator_v2/issues/1054>`_ from tier4/remerge-1023
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* apply distance filter for lidar_detected_entity
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* Revert "Revert "Merge pull request `#1023 <https://github.com/tier4/scenario_simulator_v2/issues/1023>`_ from tier4/feat/pointcloud_delay""
+* Fix: init also entity_status\_ map
+* Merge branch 'master' into feature/interpreter/sensor-detection-range
+* Merge branch 'master' into fix/longitudinal_distance_fixed_master_merged
+* fix(simple_sensor_simulator): fix despawn ego, ref despawn method
+* Merge remote-tracking branch 'origin/master' into feat/relative_object_position
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action
+* feat(simple_sensor_simulator): implement ground truth delay
+* refactor(simple_sensor_simulator): implement conversion from DetectedObjects to TrackedObjects
+* refactor(simple_sensor_simulator): use template type
+* feat(simple_sensor_simulator): add ground truth publisher to DetectionSensor
+* Merge branch 'master_4284' into fix/longitudinal_distance_fixed_master_merged
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin' into fix/longitudinal_distance
+* Merge remote-tracking branch 'origin/master' into fix/longitudinal_distance
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/longitudinal_distance
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Kyoichi Sugahara, Lukasz Chojnacki, Masaya Kataoka, Tatsuya Yamasaki, kosuke55, kyoichi-sugahara, yamacir-kit
+
 0.7.0 (2023-07-26)
 ------------------
 * Merge pull request `#1028 <https://github.com/tier4/scenario_simulator_v2/issues/1028>`_ from tier4/pzyskowski/660/zmq-interface-change-impl

@@ -15,8 +15,8 @@
 #ifndef GEOMETRY__VECTOR3__HYPOT_HPP_
 #define GEOMETRY__VECTOR3__HYPOT_HPP_
 
+#include <cmath>
 #include <geometry/vector3/is_like_vector3.hpp>
-
 namespace math
 {
 namespace geometry

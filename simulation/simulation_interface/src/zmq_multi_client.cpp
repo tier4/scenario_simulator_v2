@@ -193,4 +193,17 @@ auto MultiClient::call(const simulation_api_schema::FollowPolylineTrajectoryRequ
     return {};
   }
 }
+
+auto MultiClient::call(
+  const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest & request)
+  -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse
+{
+  if (is_running) {
+    auto simulation_request = simulation_api_schema::SimulationRequest();
+    *simulation_request.mutable_attach_pseudo_traffic_light_detector() = request;
+    return call(simulation_request).attach_pseudo_traffic_light_detector();
+  } else {
+    return {};
+  }
+}
 }  // namespace zeromq
