@@ -29,7 +29,8 @@ struct has_data_member_status : public std::false_type
 };
 
 template <typename T>
-struct has_data_member_status<T, std::void_t<decltype(std::declval<T>().status)>> : public std::true_type
+struct has_data_member_status<T, std::void_t<decltype(std::declval<T>().status)>>
+: public std::true_type
 {
 };
 
@@ -42,7 +43,8 @@ struct has_data_member_success : public std::false_type
 };
 
 template <typename T>
-struct has_data_member_success<T, std::void_t<decltype(std::declval<T>().success)>> : public std::true_type
+struct has_data_member_success<T, std::void_t<decltype(std::declval<T>().success)>>
+: public std::true_type
 {
 };
 
@@ -73,7 +75,8 @@ public:
         continue;
       }
       if (const auto & service_call_result = callWithTimeoutValidation(request)) {
-        std::cout << "----------------------------------------------------------------" << std::endl;
+        std::cout << "----------------------------------------------------------------"
+                  << std::endl;
         std::cout << "[Service: " << service_name << "]: get response" << std::endl;
         if constexpr (has_data_member_status_v<typename T::Response>) {
           if constexpr (std::is_same<
@@ -95,10 +98,10 @@ public:
                                 ? ""
                                 : " (" + service_call_status.message + ")"));
             }
-          } else if constexpr (has_data_member_success_v<typename T::Response>)
-          {
-            std::cout << "----------------------------------------------------------------" << std::endl;
-            if(service_call_result->get().success) {
+          } else if constexpr (has_data_member_success_v<typename T::Response>) {
+            std::cout << "----------------------------------------------------------------"
+                      << std::endl;
+            if (service_call_result->get().success) {
               std::cout << "Success: " << std::string("True") << std::endl;
               return;
             } else {
@@ -110,8 +113,9 @@ public:
         } else {
           return;
         }
-      }else{
-        std::cout << "----------------------------------------------------------------" << std::endl;
+      } else {
+        std::cout << "----------------------------------------------------------------"
+                  << std::endl;
         std::cout << "[Service: " << service_name << "]: get timeout and retry" << std::endl;
       }
     }
