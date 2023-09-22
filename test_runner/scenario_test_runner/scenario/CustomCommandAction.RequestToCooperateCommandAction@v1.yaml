@@ -39,6 +39,8 @@ OpenSCENARIO:
                   value: "true"
                 - name: cooperator
                   value: scenario
+                - name: manualModules
+                  value: "START_PLANNER, TRAFFIC_LIGHT, CROSSWALK"
       - name: Npc1
         CatalogReference:
           catalogName: sample_vehicle
@@ -66,7 +68,7 @@ OpenSCENARIO:
                     Position:
                       LanePosition:
                         roadId: ""
-                        laneId: "34630"
+                        laneId: "34579"
                         s: 10
                         offset: 0
                         Orientation:
@@ -163,8 +165,8 @@ OpenSCENARIO:
                                         Position:
                                           LanePosition:
                                             roadId: ""
-                                            laneId: "34630"
-                                            s: 10
+                                            laneId: "34579"
+                                            s: 20
                                             offset: 0
                                             Orientation:
                                               type: relative
