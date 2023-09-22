@@ -79,6 +79,9 @@ public:
   auto call(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
     -> simulation_api_schema::FollowPolylineTrajectoryResponse;
 
+  auto call(const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest &)
+    -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse;
+
   const simulation_interface::TransportProtocol protocol;
   const std::string hostname;
 

@@ -166,94 +166,36 @@ auto operator<<(std::ostream & os, const TrafficLight::Bulb & bulb) -> std::ostr
             << std::get<TrafficLight::Shape>(bulb.value);
 }
 
-TrafficLight::Bulb::operator autoware_auto_perception_msgs::msg::TrafficLight() const
-{
-  auto color = [this]() {
-    switch (std::get<Color>(value).value) {
-      case Color::green:
-        return autoware_auto_perception_msgs::msg::TrafficLight::GREEN;
-      case Color::yellow:
-        return autoware_auto_perception_msgs::msg::TrafficLight::AMBER;
-      case Color::red:
-        return autoware_auto_perception_msgs::msg::TrafficLight::RED;
-      case Color::white:
-        return autoware_auto_perception_msgs::msg::TrafficLight::WHITE;
-      default:
+TrafficLight::TrafficLight(const lanelet::Id lanelet_id, hdmap_utils::HdMapUtils & map_manager)
+: way_id([&]() {
+    if (map_manager.isTrafficLight(lanelet_id)) {
+      return lanelet_id;
+    } else {
+      // lanelet::RoleName::Refers
+      if (auto traffic_light_members = map_manager.getTrafficLightRegulatoryElement(lanelet_id)
+                                         ->getParameters<lanelet::ConstLineString3d>("refers");
+          traffic_light_members.size() > 0) {
+        // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.
+        // This is because the output can be guaranteed for the original relation id by the way id.
+        return traffic_light_members.front().id();
+      } else {
         throw common::SyntaxError(
-          std::get<Color>(value),
-          " is not supported as a color for autoware_auto_perception_msgs::msg::TrafficLight.");
+          "Given lanelet ID ", lanelet_id, " is neither relation id nor way id.");
+      }
     }
-  };
-
-  auto status = [this]() {
-    switch (std::get<Status>(value).value) {
-      case Status::solid_on:
-        return autoware_auto_perception_msgs::msg::TrafficLight::SOLID_ON;
-      case Status::solid_off:
-        return autoware_auto_perception_msgs::msg::TrafficLight::SOLID_OFF;
-      case Status::flashing:
-        return autoware_auto_perception_msgs::msg::TrafficLight::FLASHING;
-      case Status::unknown:
-        return autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN;
-      default:
-        throw common::SyntaxError(
-          std::get<Status>(value),
-          " is not supported as a status for "
-          "autoware_auto_perception_msgs::msg::TrafficLight.");
-    }
-  };
-
-  auto shape = [this]() {
-    switch (std::get<Shape>(value).value) {
-      case Shape::circle:
-        return autoware_auto_perception_msgs::msg::TrafficLight::CIRCLE;
-      case Shape::cross:
-        return autoware_auto_perception_msgs::msg::TrafficLight::CROSS;
-      case Shape::left:
-        return autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW;
-      case Shape::down:
-        return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW;
-      case Shape::up:
-        return autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW;
-      case Shape::right:
-        return autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW;
-      case Shape::lower_left:
-        return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_LEFT_ARROW;
-      case Shape::lower_right:
-        return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_RIGHT_ARROW;
-      default:
-        throw common::SyntaxError(
-          std::get<Shape>(value),
-          " is not supported as a shape for autoware_auto_perception_msgs::msg::TrafficLight.");
-    }
-  };
-
-  autoware_auto_perception_msgs::msg::TrafficLight traffic_light;
-  traffic_light.color = color();
-  traffic_light.status = status();
-  traffic_light.shape = shape();
-  traffic_light.confidence = 1.0;
-  return traffic_light;
-}
-
-TrafficLight::TrafficLight(const std::int64_t id, hdmap_utils::HdMapUtils & map_manager)
-: id(id),
+  }()),
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
-      map_manager.getTrafficLightBulbPosition(id, "green")),
+      map_manager.getTrafficLightBulbPosition(way_id, "green")),
     std::make_pair(
       Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(),
-      map_manager.getTrafficLightBulbPosition(id, "yellow")),
+      map_manager.getTrafficLightBulbPosition(way_id, "yellow")),
     std::make_pair(
       Bulb(Color::red, Status::solid_on, Shape::circle).hash(),
-      map_manager.getTrafficLightBulbPosition(id, "red")),
+      map_manager.getTrafficLightBulbPosition(way_id, "red")),
   }
 {
-  if (not map_manager.isTrafficLight(id)) {
-    throw common::scenario_simulator_exception::Error(
-      "Given lanelet ID ", id, " is not a traffic light ID.");
-  }
 }
 
 auto TrafficLight::set(const std::string & states) -> void
@@ -272,17 +214,6 @@ auto TrafficLight::set(const std::string & states) -> void
     emplace(head);
     set(tail);
   }
-}
-
-TrafficLight::operator autoware_auto_perception_msgs::msg::TrafficSignal() const
-{
-  autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
-  traffic_signal.map_primitive_id = id;
-  for (auto && bulb : bulbs) {
-    traffic_signal.lights.push_back(
-      static_cast<autoware_auto_perception_msgs::msg::TrafficLight>(bulb));
-  }
-  return traffic_signal;
 }
 
 auto operator<<(std::ostream & os, const TrafficLight & traffic_light) -> std::ostream &
