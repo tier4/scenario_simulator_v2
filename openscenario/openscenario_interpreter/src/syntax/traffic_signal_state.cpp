@@ -36,9 +36,9 @@ auto TrafficSignalState::evaluate() const -> Object
   return unspecified;
 }
 
-auto TrafficSignalState::id() const -> LaneletId
+auto TrafficSignalState::id() const -> lanelet::Id
 {
-  return boost::lexical_cast<LaneletId>(traffic_signal_id);
+  return boost::lexical_cast<lanelet::Id>(traffic_signal_id);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
