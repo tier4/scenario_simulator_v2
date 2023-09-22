@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/geometry/LaneletMap.h>
+#include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
 
 #include <filesystem>
@@ -92,9 +94,11 @@ auto makeLanelet(const std::tuple<Ts...> & left, const std::tuple<Ts...> & right
 
 auto makeLanelet(
   const lanelet::Point3d & p1, const lanelet::Point3d & p2,  //
-  double width, double length, double curvature, double resolution)
+  double length, double curvature, double resolution)
 {
   const auto radius = curvature == 0 ? std::numeric_limits<double>::infinity() : 1 / curvature;
+
+  const auto width = lanelet::geometry::distance3d(p1, p2);
 
   const auto p1_radius = radius - width / 2;
   const auto p2_radius = radius + width / 2;
@@ -118,7 +122,13 @@ auto makeLanelet(
   return makeLanelet(
     makePoint3d(origin.x(), origin.y() - width / 2, origin.z()),
     makePoint3d(origin.x(), origin.y() + width / 2, origin.z()),  //
-    width, length, curvature, resolution);
+    length, curvature, resolution);
+}
+
+auto makeLanelet(lanelet::Lanelet & lanelet, double length, double curvature, double resolution)
+{
+  return makeLanelet(
+    lanelet.leftBound().back(), lanelet.rightBound().back(), length, curvature, resolution);
 }
 
 auto makeLanelet(double width, double length, double curvature, double resolution)

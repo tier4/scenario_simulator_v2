@@ -18,6 +18,10 @@
 
 #define DEBUG(...) std::cerr << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
 
+// auto extend(const lanelet::Lanelet & lane)
+// {
+// }
+
 auto main(const int argc, char const * const * const argv) -> int
 try {
   rclcpp::init(argc, argv);
@@ -51,9 +55,12 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  auto map = lanelet::LaneletMap();
+  auto lanelets = lanelet::Lanelets();
 
-  map.add(map_fragment::makeLanelet(width, length, curvature, resolution));
+  lanelets.push_back(map_fragment::makeLanelet(width, length, curvature, resolution));
+  lanelets.push_back(map_fragment::makeLanelet(lanelets.back(), length, 0.01, resolution));
+
+  const auto map = lanelet::utils::createMap(lanelets);
 
   try {
     if (std::filesystem::remove_all(output_directory);
@@ -65,7 +72,7 @@ try {
     return EXIT_FAILURE;
   }
 
-  lanelet::write(output_directory / "lanelet2_map.osm", map, map_fragment::projector());
+  lanelet::write(output_directory / "lanelet2_map.osm", *map, map_fragment::projector());
 
   try {
     std::filesystem::create_symlink(
