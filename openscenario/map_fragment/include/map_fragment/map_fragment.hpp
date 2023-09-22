@@ -19,6 +19,8 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <filesystem>
 
+#define DEBUG(...) std::cerr << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
+
 namespace map_fragment
 {
 auto directory() -> const auto &
@@ -47,37 +49,40 @@ auto makePoint3d(double x, double y, double z, double elevation = 0.0)
   return point;
 }
 
+template <typename... Ts>
+auto makePoint3d(const Eigen::Vector3d & v, Ts &&... xs) -> decltype(auto)
+{
+  return makePoint3d(v.x(), v.y(), v.z(), std::forward<decltype(xs)>(xs)...);
+}
+
 auto makeLineString3d(
-  const lanelet::Point3d & origin, double length, double radius, std::size_t resolution)
+  const lanelet::Point3d & origin, double length, double radius, const Eigen::Matrix3d rotation,
+  std::size_t resolution)
 {
   static lanelet::Id id = 0;
 
   if (std::isinf(radius)) {
-    return lanelet::LineString3d(
-      ++id, {origin, makePoint3d(origin.x() + length, origin.y(), origin.z())});
+    auto point = origin.basicPoint() + rotation * Eigen::Vector3d::UnitX() * length;
+    return lanelet::LineString3d(++id, {origin, makePoint3d(point)});
+  } else if (M_PI * 2 < length / radius) {
+    std::exit(EXIT_FAILURE);
   } else {
     auto line = lanelet::LineString3d(++id);
 
-    if (M_PI * 2 < length / radius) {
-      std::exit(EXIT_FAILURE);
-    }
-
     const auto radian_step = length / radius / resolution;
 
-    auto total_length = 0.0;
+    const auto point3d_at = [&](auto radian) {
+      return makePoint3d(
+        origin.basicPoint() +
+        rotation *
+          Eigen::Vector3d(radius * std::sin(radian), radius * std::cos(radian) - radius, 0));
+    };
 
     for (auto radian = 0.0; 0 < resolution; radian += radian_step, --resolution) {
-      auto x = origin.x() + radius * std::sin(radian);
-      auto y = origin.y() + radius * std::cos(radian) - radius;
-      auto z = origin.z();
-      line.push_back(makePoint3d(x, y, z));
-      total_length += radius * radian_step;
+      line.push_back(point3d_at(radian));
     }
 
-    auto x = origin.x() + radius * std::sin(length / radius);
-    auto y = origin.y() + radius * std::cos(length / radius) - radius;
-    auto z = origin.z();
-    line.push_back(makePoint3d(x, y, z));
+    line.push_back(point3d_at(length / radius));
 
     return line;
   }
@@ -101,24 +106,32 @@ auto makeLanelet(
 
   const auto width = lanelet::geometry::distance3d(p1, p2);
 
-  const auto p1_radius = radius - width / 2;
-  const auto p2_radius = radius + width / 2;
+  const auto p1_radius = radius + width / 2;
+  const auto p2_radius = radius - width / 2;
 
-  auto aligned_length = [&](auto pn_radius) {
+  const auto aligned_length = [&](auto pn_radius) {
     return std::isinf(radius) ? length : length * pn_radius / radius;
   };
 
+  const auto rotation = [&]() {
+    auto r = Eigen::AngleAxisd(0, Eigen::Vector3d::UnitX());
+    auto p = Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY());
+    auto y = Eigen::AngleAxisd(
+      std::atan2(p2.y() - p1.y(), p2.x() - p1.x()) + M_PI / 2, Eigen::Vector3d::UnitZ());
+    return Eigen::Quaterniond(r * p * y).matrix();
+  }();
+
   return makeLanelet(
-    std::forward_as_tuple(p1, aligned_length(p1_radius), p1_radius, resolution),
-    std::forward_as_tuple(p2, aligned_length(p2_radius), p2_radius, resolution));
+    std::forward_as_tuple(p1, aligned_length(p1_radius), p1_radius, rotation, resolution),
+    std::forward_as_tuple(p2, aligned_length(p2_radius), p2_radius, rotation, resolution));
 }
 
 auto makeLanelet(
   const lanelet::Point3d & origin, double width, double length, double curvature, double resolution)
 {
   return makeLanelet(
-    makePoint3d(origin.x(), origin.y() - width / 2, origin.z()),
-    makePoint3d(origin.x(), origin.y() + width / 2, origin.z()),  //
+    makePoint3d(origin.x(), origin.y() + width / 2, origin.z()),
+    makePoint3d(origin.x(), origin.y() - width / 2, origin.z()),  //
     length, curvature, resolution);
 }
 

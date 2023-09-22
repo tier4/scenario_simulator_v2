@@ -15,12 +15,6 @@
 #include <map_fragment/map_fragment.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#define DEBUG(...) std::cerr << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
-
-// auto extend(const lanelet::Lanelet & lane)
-// {
-// }
-
 auto main(const int argc, char const * const * const argv) -> int
 try {
   rclcpp::init(argc, argv);
@@ -57,7 +51,12 @@ try {
   auto lanelets = lanelet::Lanelets();
 
   lanelets.push_back(map_fragment::makeLanelet(width, length, curvature, resolution));
-  lanelets.push_back(map_fragment::makeLanelet(lanelets.back(), length, 0.01, resolution));
+  lanelets.push_back(map_fragment::makeLanelet(lanelets.back(), length, -0.01, resolution));
+  lanelets.push_back(map_fragment::makeLanelet(lanelets.back(), length, +0.05, resolution));
+
+  lanelets.push_back(map_fragment::makeLanelet(lanelets[2], length, 0, resolution));
+  lanelets.push_back(map_fragment::makeLanelet(lanelets[2], length, +0.004, resolution));
+  lanelets.push_back(map_fragment::makeLanelet(lanelets[2], length, -0.004, resolution));
 
   const auto map = lanelet::utils::createMap(lanelets);
 

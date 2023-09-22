@@ -15,8 +15,6 @@
 #include <map_fragment/map_fragment.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#define DEBUG(...) std::cerr << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
-
 auto main(const int argc, char const * const * const argv) -> int
 try {
   rclcpp::init(argc, argv);
