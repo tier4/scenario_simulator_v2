@@ -16,6 +16,7 @@
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <filesystem>
 
 namespace map_fragment
@@ -103,17 +104,13 @@ auto makeLanelet(
   const auto p1_radius = radius - width / 2;
   const auto p2_radius = radius + width / 2;
 
-  const auto p1_offset = std::isinf(radius) or std::isinf(p1_radius)
-                           ? 0.0
-                           : p1_radius * (length / radius - length / p1_radius);
-
-  const auto p2_offset = std::isinf(radius) or std::isinf(p2_radius)
-                           ? 0.0
-                           : p2_radius * (length / radius - length / p2_radius);
+  auto aligned_length = [&](auto pn_radius) {
+    return std::isinf(radius) ? length : length * pn_radius / radius;
+  };
 
   return makeLanelet(
-    std::forward_as_tuple(p1, length + p1_offset, p1_radius, resolution),
-    std::forward_as_tuple(p2, length + p2_offset, p2_radius, resolution));
+    std::forward_as_tuple(p1, aligned_length(p1_radius), p1_radius, resolution),
+    std::forward_as_tuple(p2, aligned_length(p2_radius), p2_radius, resolution));
 }
 
 auto makeLanelet(
@@ -134,5 +131,21 @@ auto makeLanelet(lanelet::Lanelet & lanelet, double length, double curvature, do
 auto makeLanelet(double width, double length, double curvature, double resolution)
 {
   return makeLanelet(makePoint3d(0.0, 0.0, 0.0), width, length, curvature, resolution);
+}
+
+auto write(const lanelet::LaneletMap & map, const std::filesystem::path & output_directory)
+{
+  if (std::filesystem::remove_all(output_directory);
+      not std::filesystem::create_directories(output_directory)) {
+    throw std::runtime_error(std::string("failed to create directory ") + output_directory.c_str());
+  } else {
+    lanelet::write(output_directory / "lanelet2_map.osm", map, projector());
+
+    std::filesystem::create_symlink(
+      std::filesystem::canonical(
+        std::filesystem::path(ament_index_cpp::get_package_share_directory("kashiwanoha_map")) /
+        "map/pointcloud_map.pcd"),
+      output_directory / "pointcloud_map.pcd");
+  }
 }
 }  // namespace map_fragment
