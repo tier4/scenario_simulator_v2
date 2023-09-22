@@ -37,7 +37,7 @@ auto TrafficLightManager::hasAnyLightChanged() -> bool
   //   });
 }
 
-auto TrafficLightManager::getTrafficLight(const LaneletID traffic_light_id) -> TrafficLight &
+auto TrafficLightManager::getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &
 {
   if (auto iter = traffic_lights_.find(traffic_light_id); iter != std::end(traffic_lights_)) {
     return iter->second;
@@ -56,7 +56,7 @@ auto TrafficLightManager::getTrafficLights() const -> const TrafficLightMap &
 
 auto TrafficLightManager::getTrafficLights() -> TrafficLightMap & { return traffic_lights_; }
 
-auto TrafficLightManager::getTrafficLights(const LaneletID lanelet_id)
+auto TrafficLightManager::getTrafficLights(const lanelet::Id lanelet_id)
   -> std::vector<std::reference_wrapper<TrafficLight>>
 {
   std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;

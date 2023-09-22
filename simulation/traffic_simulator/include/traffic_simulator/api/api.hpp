@@ -255,7 +255,7 @@ public:
     const std::string &, const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &)
     -> bool;
 
-  void requestLaneChange(const std::string & name, const std::int64_t & lanelet_id);
+  void requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id);
 
   void requestLaneChange(const std::string & name, const lane_change::Direction & direction);
 

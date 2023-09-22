@@ -312,12 +312,17 @@ auto ScenarioSimulator::updateTrafficLights(
 }
 
 auto ScenarioSimulator::followPolylineTrajectory(
-  const simulation_api_schema::FollowPolylineTrajectoryRequest &)
+  const simulation_api_schema::FollowPolylineTrajectoryRequest & request)
   -> simulation_api_schema::FollowPolylineTrajectoryResponse
 {
   auto response = simulation_api_schema::FollowPolylineTrajectoryResponse();
-  response.mutable_result()->set_success(true);
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
+  if (ego_entity_simulation_ and isEgo(request.name())) {
+    ego_entity_simulation_->polyline_trajectory =
+      simulation_interface::toROS2Message(request.trajectory());
+    response.mutable_result()->set_success(true);
+  } else {
+    response.mutable_result()->set_success(false);
+  }
   return response;
 }
 
@@ -360,17 +365,9 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
 
 bool ScenarioSimulator::isEgo(const std::string & name)
 {
-  for (const auto & ego : ego_vehicles_) {
-    if (ego.name() == name) {
-      return true;
-    }
-  }
-
-  if (not isEntityExists(name)) {
-    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
-  }
-
-  return false;
+  return std::find_if(ego_vehicles_.begin(), ego_vehicles_.end(), [&](auto && entity) {
+           return entity.name() == name;
+         }) != std::end(ego_vehicles_);
 }
 
 bool ScenarioSimulator::isEntityExists(const std::string & name)
