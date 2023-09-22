@@ -386,10 +386,14 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
 auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation(
   std::string module_name, bool enable) -> void
 {
-  auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
-  request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
-  request->enable = enable;
-  requestSetRtcAutoMode(request);
+  task_queue.delay([this, module_name, enable]() {
+    auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
+    request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
+    request->enable = enable;
+    // We attempt to resend the service up to 30 times, but this number of times was determined by
+    // heuristics, not for any technical reason
+    requestSetRtcAutoMode(request, 30);
+  });
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
