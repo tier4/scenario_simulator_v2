@@ -15,7 +15,6 @@
 #include <cmath>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/distance_condition.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
@@ -50,7 +49,7 @@ auto DistanceCondition::description() const -> std::string
 {
   std::stringstream description;
 
-  description << triggering_entities.description() << "'s distance to given position = ";
+  description << std::setprecision(std::numeric_limits<double>::digits10 + 1) << triggering_entities.description() << "'s distance to given position = ";
 
   print_to(description, results);
 
@@ -132,6 +131,36 @@ auto DistanceCondition::distance<
 }
 
 template <>
+auto DistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true>(
+  const EntityRef & triggering_entity) const -> double
+{
+  return apply<double>(
+    overload(
+      [&](const WorldPosition & position) {
+        const auto relative_world = makeNativeRelativeWorldPosition(
+          triggering_entity, static_cast<NativeWorldPosition>(position), true);
+        return std::hypot(relative_world.position.x, relative_world.position.y);
+      },
+      [&](const RelativeWorldPosition & position) {
+        const auto relative_world = makeNativeRelativeWorldPosition(
+          triggering_entity, static_cast<NativeWorldPosition>(position), true);
+        return std::hypot(relative_world.position.x, relative_world.position.y);
+      },
+      [&](const RelativeObjectPosition & position) {
+        const auto relative_world = makeNativeRelativeWorldPosition(
+          triggering_entity, static_cast<NativeWorldPosition>(position), true);
+        return std::hypot(relative_world.position.x, relative_world.position.y);
+      },
+      [&](const LanePosition & position) {
+        const auto relative_world = makeNativeRelativeWorldPosition(
+          triggering_entity, static_cast<NativeWorldPosition>(position), true);
+        return std::hypot(relative_world.position.x, relative_world.position.y);
+      }),
+    position);
+}
+
+template <>
 auto DistanceCondition::distance<  //
   CoordinateSystem::entity, RelativeDistanceType::lateral, false>(
   const EntityRef & triggering_entity) const -> double
@@ -162,6 +191,36 @@ auto DistanceCondition::distance<  //
 }
 
 template <>
+auto DistanceCondition::distance<  //
+  CoordinateSystem::entity, RelativeDistanceType::lateral, true>(
+  const EntityRef & triggering_entity) const -> double
+{
+  return apply<double>(
+    overload(
+      [&](const WorldPosition & position) {
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position), true)
+          .position.y;
+      },
+      [&](const RelativeWorldPosition & position) {
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position), true)
+          .position.y;
+      },
+      [&](const RelativeObjectPosition & position) {
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position), true)
+          .position.y;
+      },
+      [&](const LanePosition & position) {
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position), true)
+          .position.y;
+      }),
+    position);
+}
+
+template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, false>(
   const EntityRef & triggering_entity) const -> double
@@ -186,6 +245,36 @@ auto DistanceCondition::distance<
       [&](const LanePosition & position) {
         return makeNativeRelativeWorldPosition(
                  triggering_entity, static_cast<NativeWorldPosition>(position))
+          .position.x;
+      }),
+    position);
+}
+
+template <>
+auto DistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::longitudinal, true>(
+  const EntityRef & triggering_entity) const -> double
+{
+  return apply<double>(
+    overload(
+      [&](const WorldPosition & position) {
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position), true)
+          .position.x;
+      },
+      [&](const RelativeWorldPosition & position) {
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position), true)
+          .position.x;
+      },
+      [&](const RelativeObjectPosition & position) {
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position), true)
+          .position.x;
+      },
+      [&](const LanePosition & position) {
+        return makeNativeRelativeWorldPosition(
+                 triggering_entity, static_cast<NativeWorldPosition>(position), true)
           .position.x;
       }),
     position);

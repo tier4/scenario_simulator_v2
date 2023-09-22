@@ -81,11 +81,11 @@ OpenSCENARIO:
                                         - entityRef: ego
                                     EntityCondition:
                                       DistanceCondition:
-                                        coordinateSystem: lane
+                                        coordinateSystem: entity
                                         freespace: true
-                                        relativeDistanceType: longitudinal
+                                        relativeDistanceType: euclidianDistance
                                         rule: equalTo
-                                        value: 10
+                                        value: 6.28727
                                         Position: &POSITION_1
                                           LanePosition:
                                             roadId: ""
@@ -107,11 +107,59 @@ OpenSCENARIO:
                                         - entityRef: ego
                                     EntityCondition:
                                       DistanceCondition:
+                                        coordinateSystem: entity
+                                        freespace: true
+                                        relativeDistanceType: longitudinal
+                                        rule: equalTo
+                                        value: 6.26
+                                        Position: *POSITION_1
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: entity
+                                        freespace: true
+                                        relativeDistanceType: lateral
+                                        rule: equalTo
+                                        value: 0.585
+                                        Position: *POSITION_1
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: true
+                                        relativeDistanceType: longitudinal
+                                        rule: equalTo
+                                        value: ${10-(4.77/2)-1.355}
+                                        Position: *POSITION_1
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
                                         coordinateSystem: lane
                                         freespace: true
                                         relativeDistanceType: lateral
                                         rule: equalTo
-                                        value: 1.5
+                                        value: ${1.5-(1.83/2)}
                                         Position: *POSITION_1
                                 - name: ""
                                   delay: 0

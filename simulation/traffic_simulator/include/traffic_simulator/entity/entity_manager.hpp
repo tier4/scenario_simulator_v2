@@ -337,6 +337,12 @@ public:
   auto getBoundingBoxDistance(const std::string & from, const std::string & to)
     -> std::optional<double>;
 
+  // auto getBoundingBoxDistance(const std::string & from, const CanonicalizedLaneletPose & to)
+  //   -> std::optional<double>;
+
+  auto getBoundingBoxDistance(const std::string & from, const geometry_msgs::msg::Pose & to)
+    -> std::optional<double>;
+
   auto getCurrentTime() const noexcept -> double;
 
   auto getDistanceToCrosswalk(const std::string & name, const std::int64_t target_crosswalk_id)
@@ -378,14 +384,14 @@ public:
     -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
 
   // clang-format off
-  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string                  & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string                  & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const CanonicalizedLaneletPose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string                  & from, const CanonicalizedLaneletPose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const CanonicalizedLaneletPose & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to, bool freespace = false) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const std::string                  & to, bool freespace = false) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const std::string                  & from, const geometry_msgs::msg::Pose     & to, bool freespace = false) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const std::string                  & from, const std::string                  & to, bool freespace = false) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const CanonicalizedLaneletPose & to, bool freespace = false) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose     & to, bool freespace = false) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const std::string                  & from, const CanonicalizedLaneletPose & to, bool freespace = false) const -> geometry_msgs::msg::Pose;
+  auto getRelativePose(const CanonicalizedLaneletPose & from, const std::string                  & to, bool freespace = false) const -> geometry_msgs::msg::Pose;
   // clang-format on
 
   auto getStepTime() const noexcept -> double;

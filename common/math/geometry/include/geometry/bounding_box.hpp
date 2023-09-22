@@ -21,20 +21,39 @@
 #include <boost/geometry/algorithms/disjoint.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/numeric/conversion/bounds.hpp>
+#include <boost/foreach.hpp>
 #include <geometry/transform.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <optional>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <vector>
+#include <rclcpp/rclcpp.hpp>
+#include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 
 namespace math
 {
 namespace geometry
 {
+
+typedef boost::geometry::model::d2::point_xy<double> boost_point;
+typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+
 std::optional<double> getPolygonDistance(
   const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
   const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1);
-const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> get2DPolygon(
+std::optional<double> getPolygonDistance(
+  const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
+  const geometry_msgs::msg::Pose & pose1);
+std::optional<geometry_msgs::msg::Pose> getClosestPose(
+  const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
+  const geometry_msgs::msg::Pose & pose1);
+boost_point point_to_segment(boost_point const& p, boost_point const& p1, boost_point const& p2);
+boost_point toBoostPoint(const geometry_msgs::msg::Point & point);
+boost_polygon toBoostPoly(const std::vector<geometry_msgs::msg::Point> & points);
+geometry_msgs::msg::Pose toPose(const boost_point & point);
+geometry_msgs::msg::Pose subtractPoses(const geometry_msgs::msg::Pose & pose1, const geometry_msgs::msg::Pose & pose2);
+const boost_polygon get2DPolygon(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox);
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   traffic_simulator_msgs::msg::BoundingBox bbox, double width_extension_right = 0.0,
