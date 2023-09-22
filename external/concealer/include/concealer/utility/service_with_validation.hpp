@@ -20,6 +20,34 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <tier4_external_api_msgs/msg/response_status.hpp>
+#include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
+#include <type_traits>
+
+template <typename T, typename = void>
+struct has_data_member_status : public std::false_type
+{
+};
+
+template <typename T>
+struct has_data_member_status<T, std::void_t<decltype(std::declval<T>().status)>> : public std::true_type
+{
+};
+
+template <typename T>
+constexpr auto has_data_member_status_v = has_data_member_status<T>::value;
+
+template <typename T, typename = void>
+struct has_data_member_success : public std::false_type
+{
+};
+
+template <typename T>
+struct has_data_member_success<T, std::void_t<decltype(std::declval<T>().success)>> : public std::true_type
+{
+};
+
+template <typename T>
+constexpr auto has_data_member_success_v = has_data_member_success<T>::value;
 
 namespace concealer
 {
@@ -36,33 +64,55 @@ public:
   {
   }
 
-  auto operator()(const typename T::Request::SharedPtr & request) -> void
-  {
-    validateAvailability();
-    callWithTimeoutValidation(request);
-  }
-
-  auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count)
+  auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count = 1)
     -> void
   {
-    validateAvailability();
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
+      if (!client->service_is_ready()) {
+        RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
+        continue;
+      }
       if (const auto & service_call_result = callWithTimeoutValidation(request)) {
-        if (const auto & service_call_status = service_call_result->get()->status;
-            service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
-          RCLCPP_INFO_STREAM(
-            logger, service_name << " service request has been accepted "
-                                 << (service_call_status.message.empty()
-                                       ? "."
-                                       : " (" + service_call_status.message + ")."));
-          return;
+        std::cout << "----------------------------------------------------------------" << std::endl;
+        std::cout << "[Service: " << service_name << "]: get response" << std::endl;
+        if constexpr (has_data_member_status_v<typename T::Response>) {
+          if constexpr (std::is_same<
+                          tier4_external_api_msgs::msg::ResponseStatus,
+                          decltype(T::Response::status)>::value) {
+            if (const auto & service_call_status = service_call_result->get()->status;
+                service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
+              RCLCPP_INFO_STREAM(
+                logger, service_name << " service request has been accepted "
+                                     << (service_call_status.message.empty()
+                                           ? "."
+                                           : " (" + service_call_status.message + ")."));
+              return;
+            } else {
+              RCLCPP_ERROR_STREAM(
+                logger, service_name
+                          << " service request was accepted, but ResponseStatus is FAILURE "
+                          << (service_call_status.message.empty()
+                                ? ""
+                                : " (" + service_call_status.message + ")"));
+            }
+          } else if constexpr (has_data_member_success_v<typename T::Response>)
+          {
+            std::cout << "----------------------------------------------------------------" << std::endl;
+            if(service_call_result->get().success) {
+              std::cout << "Success: " << std::string("True") << std::endl;
+              return;
+            } else {
+              std::cout << "Success: " << std::string("False") << std::endl;
+            }
+          } else {
+            return;
+          }
         } else {
-          RCLCPP_ERROR_STREAM(
-            logger, service_name << " service request was accepted, but ResponseStatus is FAILURE "
-                                 << (service_call_status.message.empty()
-                                       ? ""
-                                       : " (" + service_call_status.message + ")"));
+          return;
         }
+      }else{
+        std::cout << "----------------------------------------------------------------" << std::endl;
+        std::cout << "[Service: " << service_name << "]: get timeout and retry" << std::endl;
       }
     }
     throw common::AutowareError(
@@ -71,14 +121,6 @@ public:
   }
 
 private:
-  auto validateAvailability() -> void
-  {
-    while (!client->service_is_ready()) {
-      RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
-      validation_rate.sleep();
-    }
-  }
-
   auto callWithTimeoutValidation(const typename T::Request::SharedPtr & request)
     -> std::optional<typename rclcpp::Client<T>::SharedFuture>
   {
