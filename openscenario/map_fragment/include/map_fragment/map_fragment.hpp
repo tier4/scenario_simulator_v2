@@ -161,4 +161,11 @@ auto write(const lanelet::LaneletMap & map, const std::filesystem::path & output
       output_directory / "pointcloud_map.pcd");
   }
 }
+
+auto makeCurvature(double arc_length, double degree)
+{
+  auto degree_to_radian = [](auto degree) constexpr { return degree * M_PI / 180; };
+
+  return degree_to_radian(degree) / arc_length;
+}
 }  // namespace map_fragment

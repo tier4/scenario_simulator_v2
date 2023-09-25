@@ -58,6 +58,9 @@ try {
   lanelets.push_back(map_fragment::makeLanelet(lanelets[2], length, +0.004, resolution));
   lanelets.push_back(map_fragment::makeLanelet(lanelets[2], length, -0.004, resolution));
 
+  lanelets.push_back(map_fragment::makeLanelet(
+    lanelets[0], length, map_fragment::makeCurvature(length, 90), resolution));
+
   const auto map = lanelet::utils::createMap(lanelets);
 
   map_fragment::write(*map, output_directory);
