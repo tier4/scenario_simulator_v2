@@ -55,6 +55,15 @@ auto makePoint3d(const Eigen::Vector3d & v, Ts &&... xs) -> decltype(auto)
   return makePoint3d(v.x(), v.y(), v.z(), std::forward<decltype(xs)>(xs)...);
 }
 
+auto makePerpendicularDirection(const lanelet::Point3d p1, const lanelet::Point3d & p2)
+{
+  const auto r = Eigen::AngleAxisd(0, Eigen::Vector3d::UnitX());
+  const auto p = Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY());
+  const auto y = Eigen::AngleAxisd(
+    std::atan2(p2.y() - p1.y(), p2.x() - p1.x()) + M_PI_2, Eigen::Vector3d::UnitZ());
+  return Eigen::Quaterniond(r * p * y).matrix();
+}
+
 auto makeLineString3d(
   const lanelet::Point3d & origin, double length, double radius, const Eigen::Matrix3d rotation,
   std::size_t resolution)
@@ -88,14 +97,18 @@ auto makeLineString3d(
   }
 }
 
+auto makeLanelet(const lanelet::LineString3d & left, const lanelet::LineString3d & right)
+{
+  static lanelet::Id id = 0;
+  auto lane = lanelet::Lanelet(++id, left, right);
+  lane.attributes()["subtype"] = "road";
+  return lane;
+}
+
 template <typename... Ts>
 auto makeLanelet(const std::tuple<Ts...> & left, const std::tuple<Ts...> & right)
 {
-  static lanelet::Id id = 0;
-  auto lane =
-    lanelet::Lanelet(++id, std::apply(makeLineString3d, left), std::apply(makeLineString3d, right));
-  lane.attributes()["subtype"] = "road";
-  return lane;
+  return makeLanelet(std::apply(makeLineString3d, left), std::apply(makeLineString3d, right));
 }
 
 auto makeLanelet(
@@ -113,13 +126,7 @@ auto makeLanelet(
     return std::isinf(radius) ? length : length * pn_radius / radius;
   };
 
-  const auto rotation = [&]() {
-    auto r = Eigen::AngleAxisd(0, Eigen::Vector3d::UnitX());
-    auto p = Eigen::AngleAxisd(0, Eigen::Vector3d::UnitY());
-    auto y = Eigen::AngleAxisd(
-      std::atan2(p2.y() - p1.y(), p2.x() - p1.x()) + M_PI / 2, Eigen::Vector3d::UnitZ());
-    return Eigen::Quaterniond(r * p * y).matrix();
-  }();
+  const auto rotation = makePerpendicularDirection(p1, p2);
 
   return makeLanelet(
     std::forward_as_tuple(p1, aligned_length(p1_radius), p1_radius, rotation, resolution),
