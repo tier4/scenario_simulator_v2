@@ -417,17 +417,17 @@ auto EntityManager::getFreespaceLongitudinalDistance(
   if (!laneMatchingSucceed(from) || !from_pose) {
     return std::nullopt;
   } else {
-    const auto longituginal_distance = getLongitudinalDistance(
+    const auto longitudinal_distance = getLongitudinalDistance(
       from_pose.value(), to, include_adjacent_lanelet, include_opposite_direction);
-    if (longituginal_distance) {
+    if (longitudinal_distance) {
       const auto from_bbox_distances =
         math::geometry::getDistancesFromCenterToEdge(getBoundingBox(from));
-      if (longituginal_distance.value() > 0.0) {
-        return longituginal_distance.value() - from_bbox_distances.front;
-      } else if (longituginal_distance.value() < 0.0) {
-        return longituginal_distance.value() - from_bbox_distances.rear;
+      if (longitudinal_distance.value() > 0.0) {
+        return longitudinal_distance.value() - from_bbox_distances.front;
+      } else if (longitudinal_distance.value() < 0.0) {
+        return longitudinal_distance.value() - from_bbox_distances.rear;
       } else {
-        return longituginal_distance.value();
+        return longitudinal_distance.value();
       }
     }
     return std::nullopt;
@@ -443,10 +443,10 @@ auto EntityManager::getFreespaceLongitudinalDistance(
   if (!laneMatchingSucceed(from) || !from_pose || !laneMatchingSucceed(to) || !to_lanelet_pose) {
     return std::nullopt;
   } else {
-    const auto longituginal_distance = getLongitudinalDistance(
+    const auto longitudinal_distance = getLongitudinalDistance(
       from_pose.value(), to_lanelet_pose.value(), include_adjacent_lanelet,
       include_opposite_direction);
-    if (longituginal_distance) {
+    if (longitudinal_distance) {
       const auto from_bbox_distances =
         math::geometry::getDistancesFromCenterToEdge(getBoundingBox(from));
       const auto to_bbox_distances =
@@ -454,14 +454,14 @@ auto EntityManager::getFreespaceLongitudinalDistance(
       // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "from_bbox_distances front " << from_bbox_distances.front << " rear " << from_bbox_distances.rear);
       // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "to_bbox_distances front " << to_bbox_distances.front << " rear " << to_bbox_distances.rear);
 
-      if (longituginal_distance.value() > 0.0) {
-        return longituginal_distance.value() - std::abs(from_bbox_distances.front) -
+      if (longitudinal_distance.value() > 0.0) {
+        return longitudinal_distance.value() - std::abs(from_bbox_distances.front) -
                std::abs(to_bbox_distances.rear);
-      } else if (longituginal_distance.value() < 0.0) {
-        return longituginal_distance.value() + std::abs(from_bbox_distances.rear) +
+      } else if (longitudinal_distance.value() < 0.0) {
+        return longitudinal_distance.value() + std::abs(from_bbox_distances.rear) +
                std::abs(to_bbox_distances.front);
       } else {
-        return longituginal_distance.value();
+        return longitudinal_distance.value();
       }
     }
     return std::nullopt;
