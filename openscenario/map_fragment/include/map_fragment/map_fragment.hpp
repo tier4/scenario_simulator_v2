@@ -230,19 +230,19 @@ auto makeLaneletLeft(lanelet::Lanelet & lanelet, double resolution)
 {
   return makeLanelet(
     makePoint3d(
-      2 * lanelet.leftBound3d().front().basicPoint() - lanelet.rightBound3d().front().basicPoint()),
-    lanelet.leftBound3d(),  //
-    lanelet::geometry::length(lanelet.leftBound3d()),
+      2 * lanelet.leftBound().front().basicPoint() - lanelet.rightBound().front().basicPoint()),
+    lanelet.leftBound(),  //
+    lanelet::geometry::length(lanelet.leftBound()),
     std::copysign(curvature(lanelet.leftBound()), curveAngle(lanelet)), resolution);
 }
 
 auto makeLaneletRight(lanelet::Lanelet & lanelet, double resolution)
 {
   return makeLanelet(
-    lanelet.rightBound3d(),  //
+    lanelet.rightBound(),  //
     makePoint3d(
-      2 * lanelet.rightBound3d().front().basicPoint() - lanelet.leftBound3d().front().basicPoint()),
-    lanelet::geometry::length(lanelet.rightBound3d()),
+      2 * lanelet.rightBound().front().basicPoint() - lanelet.leftBound().front().basicPoint()),
+    lanelet::geometry::length(lanelet.rightBound()),
     std::copysign(curvature(lanelet.rightBound()), curveAngle(lanelet)), resolution);
 }
 
