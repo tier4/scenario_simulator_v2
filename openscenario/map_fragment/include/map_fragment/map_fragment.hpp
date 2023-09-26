@@ -89,9 +89,9 @@ auto makeLineString3d(
 
     const auto point3d_at = [&](auto radian) {
       return makePoint3d(
-        origin.basicPoint() +
-        rotation *
-          Eigen::Vector3d(radius * std::sin(radian), radius * std::cos(radian) - radius, 0));
+        origin.basicPoint() + rotation * Eigen::Vector3d(
+                                           radius * std::cos(radian - M_PI_2),
+                                           radius * std::sin(radian - M_PI_2) + radius, 0));
     };
 
     for (auto radian = 0.0; 0 < resolution; radian += radian_step, --resolution) {
@@ -126,8 +126,8 @@ auto makeLanelet(
 
   const auto width = lanelet::geometry::distance3d(p1, p2);
 
-  const auto p1_radius = radius + width / 2;
-  const auto p2_radius = radius - width / 2;
+  const auto p1_radius = radius - width / 2;
+  const auto p2_radius = radius + width / 2;
 
   const auto aligned_length = [&](auto pn_radius) {
     return std::isinf(radius) ? length : length * pn_radius / radius;
@@ -148,7 +148,7 @@ auto makeLanelet(
 
   const auto width = lanelet::geometry::distance3d(p1, right.front());
 
-  const auto p1_radius = radius + width;
+  const auto p1_radius = radius - width;
 
   const auto aligned_length = [&](auto pn_radius) {
     return std::isinf(radius) ? length : length * pn_radius / radius;
@@ -168,7 +168,7 @@ auto makeLanelet(
 
   const auto width = lanelet::geometry::distance3d(left.front(), p2);
 
-  const auto p2_radius = radius - width;
+  const auto p2_radius = radius + width;
 
   const auto aligned_length = [&](auto pn_radius) {
     return std::isinf(radius) ? length : length * pn_radius / radius;
@@ -202,8 +202,19 @@ auto makeLanelet(double width, double length, double curvature, double resolutio
 
 auto curveAngle(const lanelet::Lanelet & lanelet)
 {
-  return makePerpendicularAngle(lanelet.leftBound().back(), lanelet.rightBound().back()) -
-         makePerpendicularAngle(lanelet.leftBound().front(), lanelet.rightBound().front());
+  auto canonicalize = [](auto radian) {
+    while (M_PI < radian) {
+      radian -= 2 * M_PI;
+    }
+    while (radian < -M_PI) {
+      radian += 2 * M_PI;
+    }
+    return radian;
+  };
+
+  return canonicalize(
+    makePerpendicularAngle(lanelet.leftBound().back(), lanelet.rightBound().back()) -
+    makePerpendicularAngle(lanelet.leftBound().front(), lanelet.rightBound().front()));
 }
 
 auto curvature(const lanelet::LineString3d & linestring)
@@ -222,7 +233,7 @@ auto makeLaneletLeft(lanelet::Lanelet & lanelet, double resolution)
       2 * lanelet.leftBound3d().front().basicPoint() - lanelet.rightBound3d().front().basicPoint()),
     lanelet.leftBound3d(),  //
     lanelet::geometry::length(lanelet.leftBound3d()),
-    -std::copysign(curvature(lanelet.leftBound()), curveAngle(lanelet)), resolution);
+    std::copysign(curvature(lanelet.leftBound()), curveAngle(lanelet)), resolution);
 }
 
 auto makeLaneletRight(lanelet::Lanelet & lanelet, double resolution)
@@ -232,7 +243,7 @@ auto makeLaneletRight(lanelet::Lanelet & lanelet, double resolution)
     makePoint3d(
       2 * lanelet.rightBound3d().front().basicPoint() - lanelet.leftBound3d().front().basicPoint()),
     lanelet::geometry::length(lanelet.rightBound3d()),
-    -std::copysign(curvature(lanelet.rightBound()), curveAngle(lanelet)), resolution);
+    std::copysign(curvature(lanelet.rightBound()), curveAngle(lanelet)), resolution);
 }
 
 auto write(const lanelet::LaneletMap & map, const std::filesystem::path & output_directory)

@@ -50,22 +50,35 @@ try {
 
   auto lanelets = lanelet::Lanelets();
 
-  lanelets.push_back(map_fragment::makeLanelet(width, length, curvature, resolution));
-  lanelets.push_back(map_fragment::makeLanelet(lanelets.back(), length, -0.01, resolution));
-  lanelets.push_back(map_fragment::makeLanelet(lanelets.back(), length, +0.05, resolution));
+  using map_fragment::makeCurvature;
+  using map_fragment::makeLanelet;
+  using map_fragment::makeLaneletLeft;
+  using map_fragment::makeLaneletRight;
 
-  lanelets.push_back(map_fragment::makeLanelet(lanelets[2], length, 0, resolution));
-  lanelets.push_back(map_fragment::makeLanelet(lanelets[2], length, +0.004, resolution));
-  lanelets.push_back(map_fragment::makeLanelet(lanelets[2], length, -0.004, resolution));
+  lanelets.push_back(makeLanelet(width, length, curvature, resolution));
 
-  lanelets.push_back(map_fragment::makeLanelet(
-    lanelets[0], length, map_fragment::makeCurvature(length, 90), resolution));
+  lanelets.push_back(makeLanelet(lanelets[0], length, makeCurvature(length, +90), resolution));
+  lanelets.push_back(makeLanelet(lanelets[0], length, makeCurvature(length, -90), resolution));
 
-  lanelets.push_back(map_fragment::makeLaneletLeft(lanelets[0], resolution));
-  lanelets.push_back(map_fragment::makeLaneletLeft(lanelets[1], resolution));
+  lanelets.push_back(makeLanelet(lanelets[1], length, 0, resolution));
+  lanelets.push_back(makeLanelet(lanelets[1], length, makeCurvature(length, +180), resolution));
+  lanelets.push_back(makeLanelet(lanelets[1], length, makeCurvature(length, -180), resolution));
 
-  lanelets.push_back(map_fragment::makeLaneletRight(lanelets[0], resolution));
-  lanelets.push_back(map_fragment::makeLaneletRight(lanelets[1], resolution));
+  lanelets.push_back(makeLanelet(lanelets[4], 200, makeCurvature(200, -270), resolution));
+  lanelets.push_back(makeLanelet(lanelets.back(), 200, makeCurvature(200, +270), resolution));
+
+  lanelets.push_back(makeLanelet(lanelets[5], 100, makeCurvature(100, 45), resolution));
+  lanelets.push_back(makeLanelet(lanelets.back(), 50, makeCurvature(50, -90), resolution));
+  lanelets.push_back(makeLanelet(lanelets.back(), 10, 0, resolution));
+
+  lanelets.push_back(makeLaneletLeft(lanelets[0], resolution));
+  lanelets.push_back(makeLaneletRight(lanelets[0], resolution));
+
+  lanelets.push_back(makeLaneletLeft(lanelets[1], resolution));
+  lanelets.push_back(makeLaneletRight(lanelets[1], resolution));
+
+  lanelets.push_back(makeLaneletLeft(lanelets[2], resolution));
+  lanelets.push_back(makeLaneletRight(lanelets[2], resolution));
 
   const auto map = lanelet::utils::createMap(lanelets);
 
