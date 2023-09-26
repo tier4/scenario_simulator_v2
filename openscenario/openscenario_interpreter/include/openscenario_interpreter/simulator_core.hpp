@@ -190,7 +190,8 @@ public:
     static auto makeNativeFreespaceRelativeLanePosition(const From & from, const To & to)
     {
       auto s = [](auto &&... xs) {
-        if (const auto result = core->getFreespaceLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
+        if (const auto result =
+              core->getFreespaceLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
             result) {
           return result.value();
         } else {
@@ -200,7 +201,8 @@ public:
       };
 
       auto t = [](auto &&... xs) {
-        if (const auto result = core->getFreespaceLateralDistance(std::forward<decltype(xs)>(xs)...);
+        if (const auto result =
+              core->getFreespaceLateralDistance(std::forward<decltype(xs)>(xs)...);
             result) {
           return *result;
         } else {

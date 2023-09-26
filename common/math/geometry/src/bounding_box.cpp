@@ -19,10 +19,10 @@
 // headers in Eigen
 #define EIGEN_MPL2_ONLY
 #include <Eigen/Core>
+#include <fstream>
+#include <iostream>
 #include <optional>
 #include <vector>
-#include <iostream>
-#include <fstream>
 
 namespace math
 {
@@ -56,95 +56,95 @@ std::optional<double> getPolygonDistance(
   return std::nullopt;
 }
 
-std::optional<double> getPolygonDistance(
-  const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
-  const geometry_msgs::msg::Pose & pose1)
-{
-  const auto poly0 = get2DPolygon(pose0, bbox0);
-  const auto point1 = boost_point(pose1.position.x, pose1.position.y);
-  if (boost::geometry::intersects(poly0, point1)) {
-    return std::nullopt;
-  }
-  if (boost::geometry::intersects(point1, poly0)) {
-    return std::nullopt;
-  }
-  if (boost::geometry::disjoint(poly0, point1)) {
-    return boost::geometry::distance(poly0, point1);
-  }
-  return std::nullopt;
-}
-
 // inspiration taken from
 // https://stackoverflow.com/questions/62138176/how-to-find-two-points-that-form-closest-distance-between-two-rectangles
-std::optional<geometry_msgs::msg::Pose> getClosestPose(
+std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> getClosestPoses(
   const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
-  const geometry_msgs::msg::Pose & pose1)
+  const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1)
 {
   const auto poly0 = get2DPolygon(pose0, bbox0);
-  const auto point1 = toBoostPoint(pose1.position);
+  const auto poly1 = get2DPolygon(pose1, bbox1);
 
-  if (boost::geometry::intersects(poly0, point1)) {
+  if (boost::geometry::intersects(poly0, poly1)) {
     return std::nullopt;
   }
-  if (boost::geometry::intersects(point1, poly0)) {
+  if (boost::geometry::intersects(poly1, poly0)) {
     return std::nullopt;
   }
-  if (boost::geometry::disjoint(poly0, point1)) {
-// RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"),  "s-----------------------------------------------------------");
-// RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "pose0 " << pose0.position.x << " " << pose0.position.y << "");
-// RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "pose1 " << pose1.position.x << " " << pose1.position.y << "");
+  if (boost::geometry::disjoint(poly0, poly1)) {
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"),  "s-----------------------------------------------------------");
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "pose0 " << pose0.position.x << " " << pose0.position.y << "");
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "pose1 " << pose1.position.x << " " << pose1.position.y << "");
 
-// RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "poly0 " << boost::geometry::wkt(poly0));
-// RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "point1 " << boost::geometry::wkt(point1));
-// RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "dist " << boost::geometry::distance(poly0, point1));
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "poly0 " << boost::geometry::wkt(poly0));
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "poly1 " << boost::geometry::wkt(poly1));
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "dist " << boost::geometry::distance(poly0, poly1));
 
-    auto nearest = boost_point();
-    auto min_d = boost::numeric::bounds<double>::highest();
-    auto segments = boost::make_iterator_range(boost::geometry::segments_begin(poly0), boost::geometry::segments_end(poly0));
-    for (auto&& pq : segments) {
-          auto nearest_point_from_segment = point_to_segment(point1, *pq.first, *pq.second);
-          auto cmpDst = boost::geometry::distance(nearest_point_from_segment,point1);
-            if (cmpDst < min_d) {
-                min_d = cmpDst;
-                nearest = nearest_point_from_segment;
-            }
+    auto point0 = boost_point();
+    auto point1 = boost_point();
+    auto min_distance = boost::numeric::bounds<double>::highest();
+
+    for (auto & [a, b] : {std::tie(poly0, poly1)}) {
+      auto segments = boost::make_iterator_range(
+        boost::geometry::segments_begin(a), boost::geometry::segments_end(a));
+      auto points = boost::make_iterator_range(
+        boost::geometry::points_begin(b), boost::geometry::points_end(b));
+      for (auto && segment : segments) {
+        for (auto && point : points) {
+          auto nearest_point_from_segment =
+            pointToSegmentProjection(point, *segment.first, *segment.second);
+          auto distance = boost::geometry::distance(point, nearest_point_from_segment);
+          if (distance < min_distance) {
+            min_distance = distance;
+            point0 = point;
+            point1 = nearest_point_from_segment;
+          }
+        }
+      }
     }
+
+    // RCLCPP_INFO_STREAM(
+    //   rclcpp::get_logger("relative pose"), "from " << boost::geometry::wkt(point0)
+    //                                          << " at " << min_distance << " to "
+    //                                          << boost::geometry::wkt(point1));
+    // // std::pair<geometry_msgs::msg::Pose> std::make_pair(toPose(nearest), toPose(nearest_projected));
 
     // point_type min_p;
 
-// RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "dist " << boost::geometry::distance(nearest, point1));
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "dist " << boost::geometry::distance(nearest, point1));
     // auto p = geometry_msgs::msg::Pose();
     // p.position.x = nearest.x();
     // p.position.y = nearest.y();
-// RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "f-----------------------------------------------------------");
-    return toPose(nearest);
+    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "f-----------------------------------------------------------");
+    return std::make_pair(toPose(point0), toPose(point1));
   }
   return std::nullopt;
 }
 
-boost_point point_to_segment(boost_point const& p, boost_point const& p1, boost_point const& p2)
+boost_point pointToSegmentProjection(
+  const boost_point & p, const boost_point & p1, const boost_point & p2)
 {
-    boost_point v = p2, w = p;
-    boost::geometry::subtract_point(v, p1);
-    boost::geometry::subtract_point(w, p1);
+  boost_point v = p2, w = p;
+  boost::geometry::subtract_point(v, p1);
+  boost::geometry::subtract_point(w, p1);
 
-    auto const c1 = boost::geometry::dot_product(w, v);
-    if (c1 <= 0)  return p1;
+  auto const c1 = boost::geometry::dot_product(w, v);
+  if (c1 <= 0) return p1;
 
-    auto const c2 = boost::geometry::dot_product(v, v);
-    if (c2 <= c1) return p2;
+  auto const c2 = boost::geometry::dot_product(v, v);
+  if (c2 <= c1) return p2;
 
-    boost_point prj = p1;
-    boost::geometry::multiply_value(v, c1/c2);
-    boost::geometry::add_point(prj, v);
+  boost_point prj = p1;
+  boost::geometry::multiply_value(v, c1 / c2);
+  boost::geometry::add_point(prj, v);
 
-    return prj;
+  return prj;
 }
 
 const boost_polygon get2DPolygon(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox)
 {
-  return toBoostPoly(transformPoints(pose, getPointsFromBbox(bbox)));
+  return toBoostPolygon(transformPoints(pose, getPointsFromBbox(bbox)));
 }
 
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
@@ -152,25 +152,26 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   double width_extension_left, double length_extension_front, double length_extension_rear)
 {
   std::vector<geometry_msgs::msg::Point> points;
+  auto distances_from_center_to_edge = getDistancesFromCenterToEdge(bbox);
   geometry_msgs::msg::Point p0;
-  p0.x = bbox.center.x + bbox.dimensions.x * 0.5 + length_extension_front;
-  p0.y = bbox.center.y + bbox.dimensions.y * 0.5 + width_extension_left;
-  p0.z = bbox.center.z + bbox.dimensions.z * 0.5;
+  p0.x = distances_from_center_to_edge.front + length_extension_front;
+  p0.y = distances_from_center_to_edge.left + width_extension_left;
+  p0.z = distances_from_center_to_edge.up;
   points.emplace_back(p0);
   geometry_msgs::msg::Point p1;
-  p1.x = bbox.center.x - bbox.dimensions.x * 0.5 - length_extension_rear;
-  p1.y = bbox.center.y + bbox.dimensions.y * 0.5 + width_extension_left;
-  p1.z = bbox.center.z + bbox.dimensions.z * 0.5;
+  p1.x = distances_from_center_to_edge.rear - length_extension_rear;
+  p1.y = distances_from_center_to_edge.left + width_extension_left;
+  p1.z = distances_from_center_to_edge.up;
   points.emplace_back(p1);
   geometry_msgs::msg::Point p2;
-  p2.x = bbox.center.x - bbox.dimensions.x * 0.5 - length_extension_rear;
-  p2.y = bbox.center.y - bbox.dimensions.y * 0.5 - width_extension_right;
-  p2.z = bbox.center.z + bbox.dimensions.z * 0.5;
+  p2.x = distances_from_center_to_edge.rear - length_extension_rear;
+  p2.y = distances_from_center_to_edge.right - width_extension_right;
+  p2.z = distances_from_center_to_edge.up;
   points.emplace_back(p2);
   geometry_msgs::msg::Point p3;
-  p3.x = bbox.center.x + bbox.dimensions.x * 0.5 + length_extension_front;
-  p3.y = bbox.center.y - bbox.dimensions.y * 0.5 - width_extension_right;
-  p3.z = bbox.center.z + bbox.dimensions.z * 0.5;
+  p3.x = distances_from_center_to_edge.front + length_extension_front;
+  p3.y = distances_from_center_to_edge.right - width_extension_right;
+  p3.z = distances_from_center_to_edge.up;
   points.emplace_back(p3);
   return points;
 }
@@ -180,8 +181,7 @@ boost_point toBoostPoint(const geometry_msgs::msg::Point & point)
   return boost_point(point.x, point.y);
 }
 
-boost_polygon toBoostPoly(
-  const std::vector<geometry_msgs::msg::Point> & points)
+boost_polygon toBoostPolygon(const std::vector<geometry_msgs::msg::Point> & points)
 {
   boost_polygon poly;
   poly.outer().push_back(toBoostPoint(points[0]));
@@ -201,7 +201,8 @@ geometry_msgs::msg::Pose toPose(const boost_point & point)
   return pose;
 }
 
-geometry_msgs::msg::Pose subtractPoses(const geometry_msgs::msg::Pose & pose1, const geometry_msgs::msg::Pose & pose2)
+geometry_msgs::msg::Pose subtractPoses(
+  const geometry_msgs::msg::Pose & pose1, const geometry_msgs::msg::Pose & pose2)
 {
   auto v = toBoostPoint(pose1.position);
   auto w = toBoostPoint(pose2.position);
@@ -209,6 +210,20 @@ geometry_msgs::msg::Pose subtractPoses(const geometry_msgs::msg::Pose & pose1, c
   boost::geometry::subtract_point(v, w);
 
   return toPose(v);
+}
+
+DistancesFromCenterToEdge getDistancesFromCenterToEdge(
+  const traffic_simulator_msgs::msg::BoundingBox & bbox)
+{
+  DistancesFromCenterToEdge distances;
+  distances.front = bbox.center.x + bbox.dimensions.x * 0.5;
+  distances.rear = bbox.center.x - bbox.dimensions.x * 0.5;
+  distances.left = bbox.center.y + bbox.dimensions.y * 0.5;
+  distances.right = bbox.center.y - bbox.dimensions.y * 0.5;
+  distances.up = bbox.center.z + bbox.dimensions.z * 0.5;
+  distances.down - bbox.center.z - bbox.dimensions.z * 0.5;
+
+  return distances;
 }
 
 }  // namespace geometry

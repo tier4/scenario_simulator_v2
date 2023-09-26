@@ -253,8 +253,44 @@ auto EntityManager::getFreespaceLateralDistance(
 {
   if (const auto from_pose = getLaneletPose(from)) {
     if (const auto lateral_distance = getLateralDistance(from_pose.value(), to)) {
-      const auto from_bbox = getBoundingBox(from);
-      return lateral_distance.value() - (from_bbox.dimensions.y/2);
+      const auto from_bbox_distances =
+        math::geometry::getDistancesFromCenterToEdge(getBoundingBox(from));
+      if (lateral_distance.value() > 0) {
+        return lateral_distance.value() - std::abs(from_bbox_distances.right);
+      } else if (lateral_distance.value() < 0) {
+        return lateral_distance.value() + std::abs(from_bbox_distances.left);
+      } else {
+        return lateral_distance.value();
+      }
+    }
+    return std::nullopt;
+  }
+  return std::nullopt;
+}
+
+auto EntityManager::getFreespaceLateralDistance(
+  const std::string & from, const std::string & to) const -> std::optional<double>
+{
+  const auto from_pose = getLaneletPose(from);
+  const auto to_pose = getLaneletPose(to);
+  if (from_pose and to_pose) {
+    if (const auto lateral_distance = getLateralDistance(from_pose.value(), to_pose.value());
+        lateral_distance) {
+      const auto from_bbox_distances =
+        math::geometry::getDistancesFromCenterToEdge(getBoundingBox(from));
+      const auto to_bbox_distances =
+        math::geometry::getDistancesFromCenterToEdge(getBoundingBox(to));
+      // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "from_bbox_distances left " << from_bbox_distances.left << " right " << from_bbox_distances.right);
+      // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "from_bbox_distances left " << to_bbox_distances.left << " right " << to_bbox_distances.right);
+      if (lateral_distance.value() > 0) {
+        return lateral_distance.value() - std::abs(from_bbox_distances.right) -
+               std::abs(to_bbox_distances.left);
+      } else if (lateral_distance.value() < 0) {
+        return lateral_distance.value() + std::abs(from_bbox_distances.left) +
+               std::abs(to_bbox_distances.right);
+      } else {
+        return lateral_distance.value();
+      }
     }
     return std::nullopt;
   }
@@ -381,9 +417,54 @@ auto EntityManager::getFreespaceLongitudinalDistance(
   if (!laneMatchingSucceed(from) || !from_pose) {
     return std::nullopt;
   } else {
-    const auto from_bbox = getBoundingBox(from);
-    return getLongitudinalDistance(
-      from_pose.value(), to, include_adjacent_lanelet, include_opposite_direction).value() - (from_bbox.dimensions.x/2);
+    const auto longituginal_distance = getLongitudinalDistance(
+      from_pose.value(), to, include_adjacent_lanelet, include_opposite_direction);
+    if (longituginal_distance) {
+      const auto from_bbox_distances =
+        math::geometry::getDistancesFromCenterToEdge(getBoundingBox(from));
+      if (longituginal_distance.value() > 0.0) {
+        return longituginal_distance.value() - from_bbox_distances.front;
+      } else if (longituginal_distance.value() < 0.0) {
+        return longituginal_distance.value() - from_bbox_distances.rear;
+      } else {
+        return longituginal_distance.value();
+      }
+    }
+    return std::nullopt;
+  }
+}
+auto EntityManager::getFreespaceLongitudinalDistance(
+  const std::string & from, const std::string & to, bool include_adjacent_lanelet,
+  bool include_opposite_direction) -> std::optional<double>
+{
+  const auto from_pose = getLaneletPose(from);
+  const auto to_lanelet_pose = getLaneletPose(to);
+
+  if (!laneMatchingSucceed(from) || !from_pose || !laneMatchingSucceed(to) || !to_lanelet_pose) {
+    return std::nullopt;
+  } else {
+    const auto longituginal_distance = getLongitudinalDistance(
+      from_pose.value(), to_lanelet_pose.value(), include_adjacent_lanelet,
+      include_opposite_direction);
+    if (longituginal_distance) {
+      const auto from_bbox_distances =
+        math::geometry::getDistancesFromCenterToEdge(getBoundingBox(from));
+      const auto to_bbox_distances =
+        math::geometry::getDistancesFromCenterToEdge(getBoundingBox(to));
+      // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "from_bbox_distances front " << from_bbox_distances.front << " rear " << from_bbox_distances.rear);
+      // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "to_bbox_distances front " << to_bbox_distances.front << " rear " << to_bbox_distances.rear);
+
+      if (longituginal_distance.value() > 0.0) {
+        return longituginal_distance.value() - std::abs(from_bbox_distances.front) -
+               std::abs(to_bbox_distances.rear);
+      } else if (longituginal_distance.value() < 0.0) {
+        return longituginal_distance.value() + std::abs(from_bbox_distances.rear) +
+               std::abs(to_bbox_distances.front);
+      } else {
+        return longituginal_distance.value();
+      }
+    }
+    return std::nullopt;
   }
 }
 
@@ -417,43 +498,48 @@ auto EntityManager::getObstacle(const std::string & name)
 }
 
 auto EntityManager::getRelativePose(
-  const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to, bool /*freespace*/) const
-  -> geometry_msgs::msg::Pose
+  const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to,
+  bool /*freespace*/) const -> geometry_msgs::msg::Pose
 {
   return math::geometry::getRelativePose(from, to);
 }
 
 auto EntityManager::getRelativePose(
-  const geometry_msgs::msg::Pose & from, const std::string & to, bool freespace) const -> geometry_msgs::msg::Pose
+  const geometry_msgs::msg::Pose & from, const std::string & to, bool freespace) const
+  -> geometry_msgs::msg::Pose
 {
   return getRelativePose(from, getMapPose(to), freespace);
 }
 
 auto EntityManager::getRelativePose(
-  const std::string & from, const geometry_msgs::msg::Pose & to, bool freespace) const -> geometry_msgs::msg::Pose
+  const std::string & from, const geometry_msgs::msg::Pose & to, bool freespace) const
+  -> geometry_msgs::msg::Pose
 {
   if (freespace) {
-    auto closest_point = math::geometry::getClosestPose(getMapPose(from), getBoundingBox(from), to);
-    auto to_relative = getRelativePose(getMapPose(from), closest_point.value());
-    auto closest_relative = getRelativePose(getMapPose(from), to);
-    auto relative = math::geometry::subtractPoses(closest_relative, to_relative);
-
-
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "ss--");
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "closest_pose " << closest_point.value().position.x << " " << closest_point.value().position.y);
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "to           " << to.position.x << " " << to.position.y);
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "relative     " << relative.position.x << " " << relative.position.y);
-    RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "ff--");
-    return relative;
+    traffic_simulator_msgs::msg::BoundingBox bbox_empty;
+    auto closest_points =
+      math::geometry::getClosestPoses(getMapPose(from), getBoundingBox(from), to, bbox_empty);
+    auto from_pose_bbox = getRelativePose(getMapPose(from), closest_points.value().first);
+    auto to_pose_bbox = getRelativePose(getMapPose(from), closest_points.value().second);
+    return math::geometry::subtractPoses(from_pose_bbox, to_pose_bbox);
   } else {
     return getRelativePose(getMapPose(from), to, freespace);
   }
 }
 
-auto EntityManager::getRelativePose(const std::string & from, const std::string & to, bool freespace) const
+auto EntityManager::getRelativePose(
+  const std::string & from, const std::string & to, bool freespace) const
   -> geometry_msgs::msg::Pose
 {
-  return getRelativePose(getMapPose(from), getMapPose(to), freespace);
+  if (freespace) {
+    auto closest_points = math::geometry::getClosestPoses(
+      getMapPose(from), getBoundingBox(from), getMapPose(to), getBoundingBox(to));
+    auto from_pose_bbox = getRelativePose(getMapPose(from), closest_points.value().first);
+    auto to_pose_bbox = getRelativePose(getMapPose(from), closest_points.value().second);
+    return math::geometry::subtractPoses(from_pose_bbox, to_pose_bbox);
+  } else {
+    return getRelativePose(getMapPose(from), getMapPose(to), freespace);
+  }
 }
 
 auto EntityManager::getRelativePose(
@@ -471,13 +557,15 @@ auto EntityManager::getRelativePose(
 }
 
 auto EntityManager::getRelativePose(
-  const std::string & from, const CanonicalizedLaneletPose & to, bool freespace) const -> geometry_msgs::msg::Pose
+  const std::string & from, const CanonicalizedLaneletPose & to, bool freespace) const
+  -> geometry_msgs::msg::Pose
 {
   return getRelativePose(getMapPose(from), toMapPose(to), freespace);
 }
 
 auto EntityManager::getRelativePose(
-  const CanonicalizedLaneletPose & from, const std::string & to, bool freespace) const -> geometry_msgs::msg::Pose
+  const CanonicalizedLaneletPose & from, const std::string & to, bool freespace) const
+  -> geometry_msgs::msg::Pose
 {
   return getRelativePose(toMapPose(from), getMapPose(to), freespace);
 }

@@ -3,7 +3,7 @@ OpenSCENARIO:
     revMajor: 0
     revMinor: 0
     date: "1970-01-01T09:00:00+09:00"
-    author: Test
+    author: Tatsuya Yamasaki
     description: ""
   ParameterDeclarations:
     ParameterDeclaration: []
@@ -17,9 +17,11 @@ OpenSCENARIO:
   Entities:
     ScenarioObject:
       - name: ego
-        CatalogReference:
+        CatalogReference: &SAMPLE_VEHICLE
           catalogName: sample_vehicle
           entryName: sample_vehicle
+      - name: car_1
+        CatalogReference: *SAMPLE_VEHICLE
   Storyboard:
     Init:
       Actions:
@@ -28,17 +30,17 @@ OpenSCENARIO:
             PrivateAction:
               - TeleportAction:
                   Position:
-                    LanePosition:
+                    LanePosition: &EGO_LANE_POSITION
                       roadId: ""
                       laneId: 34513
                       s: 10
-                      offset: -0.5
+                      offset: -1.0
                       Orientation:
                         type: relative
                         h: 0
                         p: 0
                         r: 0
-              - LongitudinalAction:
+              - LongitudinalAction: &SPEED_ACTION_ZERO
                   SpeedAction:
                     SpeedActionDynamics:
                       dynamicsDimension: time
@@ -47,6 +49,40 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 0
+          - entityRef: car_1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition: &CAR_1_LANE_POSITION
+                      << : *EGO_LANE_POSITION
+                      s: 20
+                      offset: 1.0
+              - LongitudinalAction: *SPEED_ACTION_ZERO
+          # - entityRef: car_2
+          #   PrivateAction:
+          #     - TeleportAction:
+          #         Position:
+          #           LanePosition: &CAR_2_LANE_POSITION
+          #             << : *EGO_LANE_POSITION
+          #             s: 20
+          #             offset: -1.0
+          #     - LongitudinalAction: *SPEED_ACTION_ZERO
+          # - entityRef: car_3
+          #   PrivateAction:
+          #     - TeleportAction:
+          #         Position:
+          #           LanePosition:
+          #             << : *CAR_1_LANE_POSITION
+          #             s: 0
+          #     - LongitudinalAction: *SPEED_ACTION_ZERO
+          # - entityRef: car_4
+          #   PrivateAction:
+          #     - TeleportAction:
+          #         Position:
+          #           LanePosition:
+          #             << : *CAR_2_LANE_POSITION
+          #             s: 0
+          #     - LongitudinalAction: *SPEED_ACTION_ZERO
     Story:
       - name: story
         Act:
@@ -80,23 +116,13 @@ OpenSCENARIO:
                                       EntityRef:
                                         - entityRef: ego
                                     EntityCondition:
-                                      DistanceCondition:
+                                      RelativeDistanceCondition:
                                         coordinateSystem: entity
-                                        freespace: true
+                                        entityRef: car_1
+                                        freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
                                         relativeDistanceType: euclidianDistance
                                         rule: equalTo
-                                        value: 6.2855887168861768 #6.28727
-                                        Position: &POSITION_1
-                                          LanePosition:
-                                            roadId: ""
-                                            laneId: 34513
-                                            s: 20
-                                            offset: 1
-                                            Orientation: &DEFAULT_ORIENTATION
-                                              type: relative
-                                              h: 0
-                                              p: 0
-                                              r: 0
+                                        value: 5.2310695926720685
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none
@@ -106,13 +132,13 @@ OpenSCENARIO:
                                       EntityRef:
                                         - entityRef: ego
                                     EntityCondition:
-                                      DistanceCondition:
+                                      RelativeDistanceCondition:
                                         coordinateSystem: entity
-                                        freespace: true
+                                        entityRef: car_1
+                                        freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
                                         relativeDistanceType: longitudinal
                                         rule: equalTo
-                                        value: 6.2583065215658280 #6.26
-                                        Position: *POSITION_1
+                                        value: 5.2283065215597162
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none
@@ -120,15 +146,15 @@ OpenSCENARIO:
                                     TriggeringEntities:
                                       triggeringEntitiesRule: all
                                       EntityRef:
-                                        - entityRef: ego
+                                        - entityRef: car_1
                                     EntityCondition:
-                                      DistanceCondition:
+                                      RelativeDistanceCondition:
                                         coordinateSystem: entity
-                                        freespace: true
+                                        entityRef: ego
+                                        freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
                                         relativeDistanceType: lateral
                                         rule: equalTo
-                                        value: 0.5849999999772990 #0.585
-                                        Position: *POSITION_1
+                                        value: -0.1700000000055297
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none
@@ -138,13 +164,29 @@ OpenSCENARIO:
                                       EntityRef:
                                         - entityRef: ego
                                     EntityCondition:
-                                      DistanceCondition:
+                                      RelativeDistanceCondition:
                                         coordinateSystem: lane
-                                        freespace: true
+                                        entityRef: car_1
+                                        freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
                                         relativeDistanceType: longitudinal
                                         rule: equalTo
-                                        value: 6.26
-                                        Position: *POSITION_1
+                                        value: 5.23
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_1
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
+                                        relativeDistanceType: longitudinal
+                                        rule: equalTo
+                                        value: -5.23
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none
@@ -154,19 +196,35 @@ OpenSCENARIO:
                                       EntityRef:
                                         - entityRef: ego
                                     EntityCondition:
-                                      DistanceCondition:
+                                      RelativeDistanceCondition:
                                         coordinateSystem: lane
-                                        freespace: true
+                                        entityRef: car_1
+                                        freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
                                         relativeDistanceType: lateral
                                         rule: equalTo
-                                        value: 0.585
-                                        Position: *POSITION_1
+                                        value: 0.17
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_1
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
+                                        relativeDistanceType: lateral
+                                        rule: equalTo
+                                        value: -0.17
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 5
+                                      value: 10
                                       rule: greaterThan
                       - name: failure
                         priority: parallel
@@ -183,7 +241,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 7
+                                      value: 20
                                       rule: greaterThan
             StartTrigger:
               ConditionGroup:

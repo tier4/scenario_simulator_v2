@@ -49,7 +49,8 @@ auto DistanceCondition::description() const -> std::string
 {
   std::stringstream description;
 
-  description << std::setprecision(std::numeric_limits<double>::digits10 + 1) << triggering_entities.description() << "'s distance to given position = ";
+  description << std::setprecision(std::numeric_limits<double>::digits10 + 1)
+              << triggering_entities.description() << "'s distance to given position = ";
 
   print_to(description, results);
 
@@ -330,8 +331,7 @@ auto DistanceCondition::distance<  //
 }
 
 template <>
-auto DistanceCondition::distance<
-  CoordinateSystem::lane, RelativeDistanceType::lateral, true>(
+auto DistanceCondition::distance<CoordinateSystem::lane, RelativeDistanceType::lateral, true>(
   const EntityRef & triggering_entity) const -> double
 {
   return apply<double>(
@@ -366,7 +366,7 @@ auto DistanceCondition::distance<
         }
       },
       [&](const LanePosition & position) {
-        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {  
+        if (global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
           return static_cast<traffic_simulator::LaneletPose>(
                    makeNativeFreespaceRelativeLanePosition(
                      triggering_entity, static_cast<NativeLanePosition>(position)))
