@@ -178,7 +178,8 @@ bool isValidCooperateStatus(
    * NOTE2: The difference in the variable referred as a distance is the impact of the
    * message specification changes in the following URL.
    * This was also decided after consulting with a member of TIER IV planning and control team.
-   * ref: https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+   * ref:
+   * https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
    */
   if constexpr (HasDistance<CooperateStatusType>::value) {
     return cooperate_status.module.type == module_type &&
@@ -209,13 +210,26 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     }
   };
 
+  auto is_in_command_history = [this](const auto & cooperate_status) {
+    return std::find_if(
+             cooperate_commands_history.begin(), cooperate_commands_history.end(),
+             [&cooperate_status](const auto & command) {
+               // check module name, uuid and command type
+               return command.module == cooperate_status.module &&
+                      command.uuid == cooperate_status.uuid &&
+                      command.command.type == cooperate_status.command_status.type;
+             }) != cooperate_commands_history.end();
+  };
+
   if (const auto cooperate_status = std::find_if(
         latest_cooperate_status_array.statuses.begin(),
         latest_cooperate_status_array.statuses.end(),
         [module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
-         command_type = to_command_type(command)](const auto & cooperate_status) {
+         command_type = to_command_type(command),
+         is_in_command_history](const auto & cooperate_status) {
           return isValidCooperateStatus<tier4_rtc_msgs::msg::CooperateStatus>(
-            cooperate_status, command_type, module_type);
+                   cooperate_status, command_type, module_type) &&
+                 not is_in_command_history(cooperate_status);
         });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
     std::stringstream what;
@@ -235,6 +249,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     request->commands.push_back(cooperate_command);
 
     task_queue.delay([this, request]() { requestCooperateCommands(request); });
+
+    cooperate_commands_history.push_back(cooperate_command);
   }
 }
 
