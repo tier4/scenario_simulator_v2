@@ -61,7 +61,10 @@ try {
   lanelets.push_back(map_fragment::makeLanelet(
     lanelets[0], length, map_fragment::makeCurvature(length, 90), resolution));
 
-  lanelets.push_back(map_fragment::makeLaneletLeft(lanelets[0], length, curvature, resolution));
+  lanelets.push_back(map_fragment::makeLaneletLeft(lanelets[0], curvature, resolution));
+  lanelets.push_back(map_fragment::makeLaneletLeft(lanelets[1], -0.01, resolution));
+
+  lanelets.push_back(map_fragment::makeLaneletRight(lanelets[0], curvature, resolution));
 
   const auto map = lanelet::utils::createMap(lanelets);
 

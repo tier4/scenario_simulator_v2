@@ -142,7 +142,7 @@ auto makeLanelet(
 
   const auto width = lanelet::geometry::distance3d(p1, right.front());
 
-  const auto p1_radius = radius + width / 2;
+  const auto p1_radius = radius + width * 1.5;
 
   const auto aligned_length = [&](auto pn_radius) {
     return std::isinf(radius) ? length : length * pn_radius / radius;
@@ -152,6 +152,26 @@ auto makeLanelet(
 
   return makeLanelet(
     makeLineString3d(p1, aligned_length(p1_radius), p1_radius, rotation, resolution), right);
+}
+
+auto makeLanelet(
+  const lanelet::LineString3d & left, const lanelet::Point3d & p2,  //
+  double length, double curvature, double resolution)
+{
+  const auto radius = curvature == 0 ? std::numeric_limits<double>::infinity() : 1 / curvature;
+
+  const auto width = lanelet::geometry::distance3d(left.front(), p2);
+
+  const auto p2_radius = radius - width * 1.5;
+
+  const auto aligned_length = [&](auto pn_radius) {
+    return std::isinf(radius) ? length : length * pn_radius / radius;
+  };
+
+  const auto rotation = makePerpendicularDirection(left.front(), p2);
+
+  return makeLanelet(
+    left, makeLineString3d(p2, aligned_length(p2_radius), p2_radius, rotation, resolution));
 }
 
 auto makeLanelet(
@@ -174,13 +194,22 @@ auto makeLanelet(double width, double length, double curvature, double resolutio
   return makeLanelet(makePoint3d(0.0, 0.0, 0.0), width, length, curvature, resolution);
 }
 
-auto makeLaneletLeft(lanelet::Lanelet & lanelet, double length, double curvature, double resolution)
+auto makeLaneletLeft(lanelet::Lanelet & lanelet, double curvature, double resolution)
 {
   return makeLanelet(
     makePoint3d(
       2 * lanelet.leftBound3d().front().basicPoint() - lanelet.rightBound3d().front().basicPoint()),
     lanelet.leftBound3d(),  //
-    length, curvature, resolution);
+    lanelet::geometry::length(lanelet.leftBound3d()), curvature, resolution);
+}
+
+auto makeLaneletRight(lanelet::Lanelet & lanelet, double curvature, double resolution)
+{
+  return makeLanelet(
+    lanelet.rightBound3d(),  //
+    makePoint3d(
+      2 * lanelet.rightBound3d().front().basicPoint() - lanelet.leftBound3d().front().basicPoint()),
+    lanelet::geometry::length(lanelet.rightBound3d()), curvature, resolution);
 }
 
 auto write(const lanelet::LaneletMap & map, const std::filesystem::path & output_directory)
