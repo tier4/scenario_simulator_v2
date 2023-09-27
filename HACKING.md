@@ -28,7 +28,9 @@ XML files that conform to the ASAM OpenSCENARIO 1.2 schema. Note that the
 scenario passed to `openscenario_interpreter` is therefore in ASAM standard
 format (`.xosc`), not the extended format by TIER IV (`.yaml`).
 
-Both scenario files written in the TIER IV extended format (`.yaml`) and standard ASAM OpenSCENARIO 1.2 scenario files (`.xosc`) can be given to `scenario_test_runner`.
+Both scenario files written in the TIER IV extended format (`.yaml`) and
+standard ASAM OpenSCENARIO 1.2 scenario files (`.xosc`) can be given to
+`scenario_test_runner`.
 
 ### `openscenario_interpreter`
 
