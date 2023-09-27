@@ -93,7 +93,8 @@ implementation as well.
 
 ## Development Guide
 
-Please follow the steps below to set up the environment and check the sample scenario behavior.
+Please follow the steps below to set up the environment and check the sample
+scenario behavior.
 
 1.[Build scenario_simulator_v2 with Autoware](https://autowarefoundation.github.io/autoware-documentation/main/tutorials/scenario-simulation/planning-simulation/installation/)
 2.[Run the sample scenario of `scenario_simulator_v2`](https://autowarefoundation.github.io/autoware-documentation/main/tutorials/scenario-simulation/planning-simulation/scenario-test-simulation/)
