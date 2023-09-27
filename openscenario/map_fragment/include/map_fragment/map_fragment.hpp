@@ -24,11 +24,28 @@
 
 namespace map_fragment
 {
+namespace default_value
+{
+/*
+   The following default values are not based on technical basis. It can be
+   any number that a typical scenario test would require.
+*/
+constexpr auto curvature = 0.0;
+
 auto directory() -> const auto &
 {
   static const auto directory = std::filesystem::path("/tmp/map_fragment");
   return directory;
 }
+
+constexpr auto length_at_least = 100.0;
+
+constexpr auto number_of_lanes = 1;
+
+constexpr auto resolution = 100;
+
+constexpr auto width = 10.0;
+}  // namespace default_value
 
 auto origin() -> const auto &
 {

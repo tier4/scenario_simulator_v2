@@ -22,12 +22,14 @@
 
 auto main(const int argc, char const * const * const argv) -> int
 try {
+  using namespace map_fragment;
+
   rclcpp::init(argc, argv);
 
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
 
   const auto input_directory = [&]() {
-    node.declare_parameter("input_directory", map_fragment::directory());
+    node.declare_parameter("input_directory", default_value::directory());
     return std::filesystem::path(node.get_parameter("input_directory").as_string());
   }();
 

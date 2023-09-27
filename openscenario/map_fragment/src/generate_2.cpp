@@ -17,6 +17,8 @@
 
 auto main(const int argc, char const * const * const argv) -> int
 try {
+  using namespace map_fragment;
+
   rclcpp::init(argc, argv);
 
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
@@ -27,33 +29,28 @@ try {
   }();
 
   const auto length = [&]() {
-    node.declare_parameter("length_at_least", 100.0);
+    node.declare_parameter("length_at_least", default_value::length_at_least);
     const auto length_at_least = node.get_parameter("length_at_least").as_double();
     node.declare_parameter("length", length_at_least * 1.1);
     return std::max(length_at_least, node.get_parameter("length").as_double());
   }();
 
   const auto curvature = [&]() {
-    node.declare_parameter("curvature", 0.0);
+    node.declare_parameter("curvature", default_value::curvature);
     return node.get_parameter("curvature").as_double();
   }();
 
   const auto resolution = [&]() {
-    node.declare_parameter("resolution", 100);
+    node.declare_parameter("resolution", default_value::resolution);
     return node.get_parameter("resolution").as_int();
   }();
 
   const auto output_directory = [&]() {
-    node.declare_parameter("output_directory", map_fragment::directory());
+    node.declare_parameter("output_directory", default_value::directory());
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
   auto lanelets = lanelet::Lanelets();
-
-  using map_fragment::makeCurvature;
-  using map_fragment::makeLanelet;
-  using map_fragment::makeLaneletLeft;
-  using map_fragment::makeLaneletRight;
 
   lanelets.push_back(makeLanelet(width, length, curvature, resolution));
 
