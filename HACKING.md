@@ -85,7 +85,11 @@ lacks information on the details of the language's behavior.
 
 ### [XSD description](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/)
 
-Documentation of the structure of each syntax element of ASAM OpenSCENARIO 1.2. Refer to it appropriately when developing `openscenario_interpreter`. However, there are many ambiguous descriptions and many details are left to the simulator implementors. Thus, please refer to the code comments of the implementation as well.
+Documentation of the structure of each syntax element of ASAM OpenSCENARIO 1.2.
+Refer to it appropriately when developing `openscenario_interpreter`. However,
+there are many ambiguous descriptions and many details are left to the
+simulator implementors. Thus, please refer to the code comments of the
+implementation as well.
 
 ## Development Guide
 
