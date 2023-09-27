@@ -34,7 +34,14 @@ standard ASAM OpenSCENARIO 1.2 scenario files (`.xosc`) can be given to
 
 ### `openscenario_interpreter`
 
- The `openscenario_interpreter` is an interpreter for OpenSCENARIO 1.2 scenario definition files in `.xosc` format, corresponding to the OpenSCENARIO Director in The ASAM OpenSCENARIO architecture. It is a naive syntax tree interpreter that parses a scenario definition file by recursive descent parsing, constructs an abstract syntax tree, and evaluates the syntax tree directly. The `openscenario_interpreter` is primarily responsible for interpreting ASAM OpenSCENARIO, since the fundamental part of the simulation, such as coordinates and time management, is managed by the `traffic_simulator`.
+The `openscenario_interpreter` is an interpreter for OpenSCENARIO 1.2 scenario
+definition files in `.xosc` format, corresponding to the OpenSCENARIO Director
+in The ASAM OpenSCENARIO architecture. It is a naive syntax tree interpreter
+that parses a scenario definition file by recursive descent parsing, constructs
+an abstract syntax tree, and evaluates the syntax tree directly. The
+`openscenario_interpreter` is primarily responsible for interpreting ASAM
+OpenSCENARIO, since the fundamental part of the simulation, such as coordinates
+and time management, is managed by the `traffic_simulator`.
 
 ### `traffic_simulator`
 
