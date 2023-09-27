@@ -45,7 +45,21 @@ and time management, is managed by the `traffic_simulator`.
 
 ### `traffic_simulator`
 
-This is a core library for traffic flow simulation, corresponding to the Simulator Core in The ASAM OpenSCENARIO architecture. It is responsible for computing the coordinates and behavior of each entity that appears in the simulation, whereas `openscenario_interpreter` is responsible for parsing scenario files and managing the progress of the scenario. It is clearly differentiated from `openscenario_interpreter`, but `traffic_simulator` itself is a library and is built into `openscenario_interpreter`, so it does not appear as independent software while running the scenario. A lot of processing, except for entity decision making during simulation are pluggable and designed to allow switching the level of simulation detail and computational complexity by connecting simulators with compatible APIs. Currently only `simple_sensor_simulator` is compatible with the `traffic_simulator` API, but work is underway to enable the connection of AWSIM, a high-performance simulator being developed by TIER IV.
+This is a core library for traffic flow simulation, corresponding to the
+Simulator Core in The ASAM OpenSCENARIO architecture. It is responsible for
+computing the coordinates and behavior of each entity that appears in the
+simulation, whereas `openscenario_interpreter` is responsible for parsing
+scenario files and managing the progress of the scenario. It is clearly
+differentiated from `openscenario_interpreter`, but `traffic_simulator` itself
+is a library and is built into `openscenario_interpreter`, so it does not
+appear as independent software while running the scenario.
+
+A lot of processing, except for entity decision making during simulation are
+pluggable and designed to allow switching the level of simulation detail and
+computational complexity by connecting simulators with compatible APIs.
+Currently only `simple_sensor_simulator` is compatible with the
+`traffic_simulator` API, but work is underway to enable the connection of
+AWSIM, a high-performance simulator being developed by TIER IV.
 
 ### `simple_sensor_simulator`
 
