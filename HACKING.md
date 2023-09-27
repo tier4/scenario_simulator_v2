@@ -99,7 +99,14 @@ scenario behavior.
 1.[Build scenario_simulator_v2 with Autoware](https://autowarefoundation.github.io/autoware-documentation/main/tutorials/scenario-simulation/planning-simulation/installation/)
 2.[Run the sample scenario of `scenario_simulator_v2`](https://autowarefoundation.github.io/autoware-documentation/main/tutorials/scenario-simulation/planning-simulation/scenario-test-simulation/)
 
-The sample scenario ([sample.yaml](test_runner/scenario_test_runner/scenario/sample.yaml)) is a very simple one in which an Autoware-controlled vehicle is asked to drive a certain distance along a straight road. Although the content of the scenario is simple, it contains the minimum necessary elements to verify that `scenario_simulator_v2` is able to properly activate Autoware and operate under the scenario. Therefore, if this sample scenario works without any problems, you can be sure that there are no problems in setting up your environment.
+The sample scenario
+([sample.yaml](test_runner/scenario_test_runner/scenario/sample.yaml)) is a
+very simple one in which an Autoware-controlled vehicle is asked to drive a
+certain distance along a straight road. Although the content of the scenario is
+simple, it contains the minimum necessary elements to verify that
+`scenario_simulator_v2` is able to properly activate Autoware and operate under
+the scenario. Therefore, if this sample scenario works without any problems,
+you can be sure that there are no problems in setting up your environment.
 
 The most efficient way to understand the `scenario_simulator_v2` implementation is to trace the process of running the sample scenario from top to bottom. In other words, it's a good idea to start with scenario_test_runner.launch.py and then read the code through `scenario_test_runner`, `openscenario_interpreter`, `traffic_simulator`, and finally `simple_sensor_simulator`. In general, you should be able to grasp the entire process flow of `scenario_simulator_v2` and add or modify features in a day or two.
 
