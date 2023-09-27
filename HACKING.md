@@ -79,7 +79,9 @@ processing beyond sensor simulation have been transferred from
 
 ### [ASAM OpenSCENARIO: User Guide](https://www.asam.net/index.php?eID=dumpFile&t=f&f=4908&token=ae9d9b44ab9257e817072a653b5d5e98ee0babf8)
 
-This document describes the basic concepts of ASAM OpenSCENARIO 1.2. Note that it provides a relatively detailed description of the coordinate system, but lacks information on the details of the language's behavior.
+This document describes the basic concepts of ASAM OpenSCENARIO 1.2. Note that
+it provides a relatively detailed description of the coordinate system, but
+lacks information on the details of the language's behavior.
 
 ### [XSD description](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/)
 
