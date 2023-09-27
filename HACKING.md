@@ -108,6 +108,12 @@ simple, it contains the minimum necessary elements to verify that
 the scenario. Therefore, if this sample scenario works without any problems,
 you can be sure that there are no problems in setting up your environment.
 
-The most efficient way to understand the `scenario_simulator_v2` implementation is to trace the process of running the sample scenario from top to bottom. In other words, it's a good idea to start with scenario_test_runner.launch.py and then read the code through `scenario_test_runner`, `openscenario_interpreter`, `traffic_simulator`, and finally `simple_sensor_simulator`. In general, you should be able to grasp the entire process flow of `scenario_simulator_v2` and add or modify features in a day or two.
+The most efficient way to understand the `scenario_simulator_v2` implementation
+is to trace the process of running the sample scenario from top to bottom. In
+other words, it's a good idea to start with scenario_test_runner.launch.py and
+then read the code through `scenario_test_runner`, `openscenario_interpreter`,
+`traffic_simulator`, and finally `simple_sensor_simulator`. In general, you
+should be able to grasp the entire process flow of `scenario_simulator_v2` and
+add or modify features in a day or two.
 
 If you are unsure about any part of the code, please refer to the detailed documentation of the relevant section accordingly, or contact the developers via an issue in the `scenario_simulator_v2` GitHub repository.
