@@ -27,21 +27,27 @@ OpenSCENARIO:
       - name: __ego_center_z__
         parameterType: double
         value: '0'
+      - name: before_length
+        parameterType: double
+        value: '50.0'
       - name: length
         parameterType: double
-        value: 1000.0
-      - name: curvature
+        value: '100.0'
+      - name: after_length
         parameterType: double
-        value: $(ros2 run openscenario_interpreter_example uniform_distribution -0.005 0.005)
+        value: '50.0'
+      - name: angle
+        parameterType: double
+        value: $(ros2 run openscenario_interpreter_example uniform_distribution -90 90)
       - name: number_of_lanes
         parameterType: unsignedInt
         value: 2
       - name: map_path
         parameterType: string
-        value: $(ros2 run map_fragment lane --ros-args -p length:=$(var length) -p curvature:=$(var curvature) -p number_of_lanes:=$(var number_of_lanes))
+        value: $(ros2 run map_fragment curve --ros-args -p before_length:=$(var before_length) -p length:=$(var length) -p after_length:=$(var after_length) -p angle:=$(var angle))
       - name: ego_lane_id
         parameterType: string
-        value: $(ros2 run map_fragment find --ros-args -p type:=lanelet -p subtype:=road)
+        value: '1'
   CatalogLocations:
     VehicleCatalog:
       Directory:
@@ -84,11 +90,13 @@ OpenSCENARIO:
                         r: 0
               - RoutingAction:
                   AcquirePositionAction:
-                    Position:
+                    Position: &ego_destination
                       LanePosition:
                         roadId: ''
-                        laneId: $ego_lane_id
-                        s: ${ $length - 10 }
+                        # laneId: $ego_lane_id
+                        # s: ${ $before_length + $length + $after_length - 10 }
+                        laneId: '3'
+                        s: ${ $before_length / 2 }
                         offset: 0
                         Orientation:
                           type: relative
@@ -124,17 +132,7 @@ OpenSCENARIO:
                                         - entityRef: ego
                                     EntityCondition:
                                       ReachPositionCondition:
-                                        Position:
-                                          LanePosition:
-                                            roadId: ''
-                                            laneId: $ego_lane_id
-                                            s: ${ $length - 10 }
-                                            offset: 0
-                                            Orientation:
-                                              type: relative
-                                              h: 0
-                                              p: 0
-                                              r: 0
+                                        Position: *ego_destination
                                         tolerance: 1
                         Action:
                           - name: ''
