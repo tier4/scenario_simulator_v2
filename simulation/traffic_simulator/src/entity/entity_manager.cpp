@@ -104,7 +104,7 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
 
 auto EntityManager::getDistanceToCrosswalk(
-  const std::string & name, const std::int64_t target_crosswalk_id) -> std::optional<double>
+  const std::string & name, const lanelet::Id target_crosswalk_id) -> std::optional<double>
 {
   if (entities_.find(name) == entities_.end()) {
     return std::nullopt;
@@ -118,7 +118,7 @@ auto EntityManager::getDistanceToCrosswalk(
 }
 
 auto EntityManager::getDistanceToStopLine(
-  const std::string & name, const std::int64_t target_stop_line_id) -> std::optional<double>
+  const std::string & name, const lanelet::Id target_stop_line_id) -> std::optional<double>
 {
   if (entities_.find(name) == entities_.end()) {
     return std::nullopt;
@@ -281,19 +281,17 @@ auto EntityManager::getLongitudinalDistance(
     }
   } else {
     /**
-     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
-     * A matching distance of about 1.5 lane widths is given as the matching distance to match the
-     * Entity present on the adjacent Lanelet.
-     */
+    * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
+    * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
+    */
     auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPose>(from).lanelet_id, 5.0,
       include_opposite_direction);
     from_poses.emplace_back(from);
     /**
-     * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
-     * A matching distance of about 1.5 lane widths is given as the matching distance to match the
-     * Entity present on the adjacent Lanelet.
-     */
+    * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
+    * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
+    */
     auto to_poses = hdmap_utils_ptr_->toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPose>(to).lanelet_id, 5.0,
       include_opposite_direction);
@@ -472,7 +470,7 @@ bool EntityManager::isEgoSpawned() const
 }
 
 bool EntityManager::isInLanelet(
-  const std::string & name, const std::int64_t lanelet_id, const double tolerance)
+  const std::string & name, const lanelet::Id lanelet_id, const double tolerance)
 {
   const auto status = getEntityStatus(name);
   if (not status.laneMatchingSucceed()) {
@@ -637,11 +635,9 @@ void EntityManager::update(const double current_time, const double step_time)
   current_time_ = current_time;
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
-    conventional_traffic_light_marker_publisher_ptr_->createTimer(
+    conventional_traffic_light_updater_.createTimer(
       configuration.conventional_traffic_light_publish_rate);
-    v2i_traffic_light_publisher_ptr_->createTimer(configuration.v2i_traffic_light_publish_rate);
-    v2i_traffic_light_marker_publisher_ptr_->createTimer(
-      configuration.v2i_traffic_light_publish_rate);
+    v2i_traffic_light_updater_.createTimer(configuration.v2i_traffic_light_publish_rate);
   }
   auto type_list = getEntityTypeList();
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
@@ -681,6 +677,7 @@ void EntityManager::update(const double current_time, const double step_time)
   if (configuration.verbose) {
     stop_watch_update.print();
   }
+  current_time_ += step_time;
 }
 
 void EntityManager::updateHdmapMarker()

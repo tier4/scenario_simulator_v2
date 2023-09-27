@@ -31,7 +31,6 @@ namespace simple_sensor_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("simple_sensor_simulator", options),
-  sensor_sim_(*this),
   server_(
     simulation_interface::protocol, simulation_interface::HostName::ANY, getSocketPort(),
     [this](auto &&... xs) { return initialize(std::forward<decltype(xs)>(xs)...); },
@@ -45,7 +44,10 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); },
-    [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); })
+    [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) {
+      return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
+    })
 {
 }
 
@@ -80,15 +82,20 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   initialized_ = true;
   realtime_factor_ = req.realtime_factor();
   step_time_ = req.step_time();
+  current_simulation_time_ = req.initialize_time();
+  current_scenario_time_ = std::numeric_limits<double>::quiet_NaN();
+  builtin_interfaces::msg::Time t;
+  simulation_interface::toMsg(req.initialize_ros_time(), t);
+  current_ros_time_ = t;
   hdmap_utils_ = std::make_shared<hdmap_utils::HdMapUtils>(req.lanelet2_map_path(), getOrigin());
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
-  ego_vehicles_ = {};
-  vehicles_ = {};
-  pedestrians_ = {};
-  misc_objects_ = {};
-  entity_status_ = {};
+  ego_vehicles_.clear();
+  vehicles_.clear();
+  pedestrians_.clear();
+  misc_objects_.clear();
+  entity_status_.clear();
   return res;
 }
 
@@ -101,7 +108,8 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
     res.mutable_result()->set_success(false);
     return res;
   }
-  current_time_ = req.current_time();
+  current_simulation_time_ = req.current_simulation_time();
+  current_scenario_time_ = req.current_scenario_time();
   builtin_interfaces::msg::Time t;
   simulation_interface::toMsg(req.current_ros_time(), t);
   current_ros_time_ = t;
@@ -119,7 +127,7 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
       return status;
     });
   sensor_sim_.updateSensorFrame(
-    current_time_, current_ros_time_, entity_status, traffic_signals_states_);
+    current_simulation_time_, current_ros_time_, entity_status, traffic_signals_states_);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
   return res;
@@ -142,7 +150,7 @@ auto ScenarioSimulator::updateEntityStatus(
       if (isEgo(status.name())) {
         assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
         ego_entity_simulation_->update(
-          current_time_ + step_time_, step_time_, req.npc_logic_started());
+          current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
         simulation_api_schema::EntityStatus ego_status;
         simulation_interface::toProto(ego_entity_simulation_->getStatus(), ego_status);
         entity_status_.at(status.name()) = ego_status;
@@ -169,7 +177,7 @@ auto ScenarioSimulator::insertEntitySpawnedStatus(
   simulation_api_schema::EntityStatus init_status;
   init_status.mutable_type()->set_type(type);
   init_status.mutable_subtype()->set_value(subtype);
-  init_status.set_time(current_time_);
+  init_status.set_time(current_scenario_time_);
   init_status.set_name(spawn_request.parameters().name());
   init_status.mutable_action_status()->set_current_action("initializing");
   init_status.mutable_pose()->CopyFrom(spawn_request.pose());
@@ -267,7 +275,7 @@ auto ScenarioSimulator::attachDetectionSensor(
   const simulation_api_schema::AttachDetectionSensorRequest & req)
   -> simulation_api_schema::AttachDetectionSensorResponse
 {
-  sensor_sim_.attachDetectionSensor(current_time_, req.configuration(), *this);
+  sensor_sim_.attachDetectionSensor(current_simulation_time_, req.configuration(), *this);
   auto res = simulation_api_schema::AttachDetectionSensorResponse();
   res.mutable_result()->set_success(true);
   return res;
@@ -277,7 +285,7 @@ auto ScenarioSimulator::attachLidarSensor(
   const simulation_api_schema::AttachLidarSensorRequest & req)
   -> simulation_api_schema::AttachLidarSensorResponse
 {
-  sensor_sim_.attachLidarSensor(current_time_, req.configuration(), *this);
+  sensor_sim_.attachLidarSensor(current_simulation_time_, req.configuration(), *this);
   auto res = simulation_api_schema::AttachLidarSensorResponse();
   res.mutable_result()->set_success(true);
   return res;
@@ -288,7 +296,7 @@ auto ScenarioSimulator::attachOccupancyGridSensor(
   -> simulation_api_schema::AttachOccupancyGridSensorResponse
 {
   auto res = simulation_api_schema::AttachOccupancyGridSensorResponse();
-  sensor_sim_.attachOccupancyGridSensor(current_time_, req.configuration(), *this);
+  sensor_sim_.attachOccupancyGridSensor(current_simulation_time_, req.configuration(), *this);
   res.mutable_result()->set_success(true);
   return res;
 }
@@ -297,24 +305,35 @@ auto ScenarioSimulator::updateTrafficLights(
   const simulation_api_schema::UpdateTrafficLightsRequest & req)
   -> simulation_api_schema::UpdateTrafficLightsResponse
 {
-  traffic_signals_states_.clear();
-  for (const auto & traffic_signal_proto : req.states()) {
-    autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
-    simulation_interface::toMsg(traffic_signal_proto, traffic_signal);
-    traffic_signals_states_.emplace_back(traffic_signal);
-  }
+  traffic_signals_states_ = req;
   auto res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
   return res;
 }
 
 auto ScenarioSimulator::followPolylineTrajectory(
-  const simulation_api_schema::FollowPolylineTrajectoryRequest &)
+  const simulation_api_schema::FollowPolylineTrajectoryRequest & request)
   -> simulation_api_schema::FollowPolylineTrajectoryResponse
 {
   auto response = simulation_api_schema::FollowPolylineTrajectoryResponse();
+  if (ego_entity_simulation_ and isEgo(request.name())) {
+    ego_entity_simulation_->polyline_trajectory =
+      simulation_interface::toROS2Message(request.trajectory());
+    response.mutable_result()->set_success(true);
+  } else {
+    response.mutable_result()->set_success(false);
+  }
+  return response;
+}
+
+auto ScenarioSimulator::attachPseudoTrafficLightDetector(
+  const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest & req)
+  -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse
+{
+  auto response = simulation_api_schema::AttachPseudoTrafficLightDetectorResponse();
+  sensor_sim_.attachPseudoTrafficLightsDetector(
+    current_simulation_time_, req.configuration(), *this, hdmap_utils_);
   response.mutable_result()->set_success(true);
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   return response;
 }
 
@@ -346,17 +365,9 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
 
 bool ScenarioSimulator::isEgo(const std::string & name)
 {
-  for (const auto & ego : ego_vehicles_) {
-    if (ego.name() == name) {
-      return true;
-    }
-  }
-
-  if (not isEntityExists(name)) {
-    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
-  }
-
-  return false;
+  return std::find_if(ego_vehicles_.begin(), ego_vehicles_.end(), [&](auto && entity) {
+           return entity.name() == name;
+         }) != std::end(ego_vehicles_);
 }
 
 bool ScenarioSimulator::isEntityExists(const std::string & name)

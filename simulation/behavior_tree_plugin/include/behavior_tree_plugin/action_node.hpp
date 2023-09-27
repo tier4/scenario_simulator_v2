@@ -41,9 +41,9 @@ class ActionNode : public BT::ActionNodeBase
 public:
   ActionNode(const std::string & name, const BT::NodeConfiguration & config);
   ~ActionNode() override = default;
-  auto foundConflictingEntity(const std::vector<std::int64_t> & following_lanelets) const -> bool;
+  auto foundConflictingEntity(const lanelet::Ids & following_lanelets) const -> bool;
   auto getDistanceToConflictingEntity(
-    const std::vector<std::int64_t> & route_lanelets,
+    const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
   auto getFrontEntityName(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<std::string>;
@@ -52,17 +52,16 @@ public:
   auto getDistanceToFrontEntity(const math::geometry::CatmullRomSplineInterface & spline) const
     -> std::optional<double>;
   auto getDistanceToStopLine(
-    const std::vector<std::int64_t> & route_lanelets,
+    const lanelet::Ids & route_lanelets,
     const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>;
   auto getDistanceToTrafficLightStopLine(
-    const std::vector<std::int64_t> & route_lanelets,
+    const lanelet::Ids & route_lanelets,
     const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>;
   auto getRightOfWayEntities() const -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
-  auto getRightOfWayEntities(const std::vector<std::int64_t> & following_lanelets) const
+  auto getRightOfWayEntities(const lanelet::Ids & following_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
-  auto getYieldStopDistance(const std::vector<std::int64_t> & following_lanelets) const
-    -> std::optional<double>;
-  auto getOtherEntityStatus(std::int64_t lanelet_id) const
+  auto getYieldStopDistance(const lanelet::Ids & following_lanelets) const -> std::optional<double>;
+  auto getOtherEntityStatus(lanelet::Id lanelet_id) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
   auto stopEntity() const -> void;
   auto getHorizon() const -> double;
@@ -85,7 +84,7 @@ public:
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("entity_status"),
       BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>("entity_type_list"),
-      BT::InputPort<std::vector<std::int64_t>>("route_lanelets"),
+      BT::InputPort<lanelet::Ids>("route_lanelets"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>("traffic_light_manager"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
@@ -121,7 +120,7 @@ protected:
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> updated_status;
   EntityStatusDict other_entity_status;
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list;
-  std::vector<std::int64_t> route_lanelets;
+  lanelet::Ids route_lanelets;
 
 private:
   auto getDistanceToTargetEntityOnCrosswalk(
@@ -132,11 +131,11 @@ private:
     const traffic_simulator::CanonicalizedEntityStatus & status, double width_extension_right = 0.0,
     double width_extension_left = 0.0, double length_extension_front = 0.0,
     double length_extension_rear = 0.0) const -> std::optional<double>;
-  auto getConflictingEntityStatus(const std::vector<std::int64_t> & following_lanelets) const
+  auto getConflictingEntityStatus(const lanelet::Ids & following_lanelets) const
     -> std::optional<traffic_simulator::CanonicalizedEntityStatus>;
-  auto getConflictingEntityStatusOnCrossWalk(const std::vector<std::int64_t> & route_lanelets) const
+  auto getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
-  auto getConflictingEntityStatusOnLane(const std::vector<std::int64_t> & route_lanelets) const
+  auto getConflictingEntityStatusOnLane(const lanelet::Ids & route_lanelets) const
     -> std::vector<traffic_simulator::CanonicalizedEntityStatus>;
 };
 }  // namespace entity_behavior
