@@ -29,10 +29,8 @@ try {
   }();
 
   const auto length = [&]() {
-    node.declare_parameter("length_at_least", default_value::length_at_least);
-    const auto length_at_least = node.get_parameter("length_at_least").as_double();
-    node.declare_parameter("length", length_at_least * 1.1);
-    return std::max(length_at_least, node.get_parameter("length").as_double());
+    node.declare_parameter("length", default_value::length);
+    return node.get_parameter("length").as_double();
   }();
 
   const auto curvature = [&]() {

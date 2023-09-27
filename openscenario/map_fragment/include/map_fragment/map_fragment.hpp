@@ -38,7 +38,7 @@ auto directory() -> const auto &
   return directory;
 }
 
-constexpr auto length_at_least = 100.0;
+constexpr auto length = 100.0;
 
 constexpr auto number_of_lanes = 1;
 
