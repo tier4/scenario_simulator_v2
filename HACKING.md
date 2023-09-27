@@ -2,7 +2,11 @@
 
 ## Note
 
-This document is written for those who want to participate in the development of `scenario_simulator_v2` or make their own modifications to `scenario_simulator_v2`. Development requires general knowledge of ROS 2 software and robotic systems and a certain level of C++ skills, as well as reading the ASAM OpenSCENARIO standard documentation appropriately.
+This document is written for those who want to participate in the development
+of `scenario_simulator_v2` or make their own modifications to
+`scenario_simulator_v2`. Development requires general knowledge of ROS 2
+software and robotic systems and a certain level of C++ skills, as well as
+reading the ASAM OpenSCENARIO standard documentation appropriately.
 
 ## Prerequisite Knowledge
 
