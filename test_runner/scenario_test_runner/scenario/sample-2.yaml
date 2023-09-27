@@ -33,9 +33,12 @@ OpenSCENARIO:
       - name: curvature
         parameterType: double
         value: $(ros2 run openscenario_interpreter_example uniform_distribution -0.005 0.005)
+      - name: number_of_lanes
+        parameterType: unsignedInt
+        value: 2
       - name: map_path
         parameterType: string
-        value: $(ros2 run map_fragment generate --ros-args -p length_at_least:=$(var length) -p curvature:=$(var curvature))
+        value: $(ros2 run map_fragment lane --ros-args -p length_at_least:=$(var length) -p curvature:=$(var curvature) -p number_of_lanes:=$(var number_of_lanes))
       - name: ego_lane_id
         parameterType: string
         value: $(ros2 run map_fragment find --ros-args -p type:=lanelet -p subtype:=road)
@@ -124,7 +127,7 @@ OpenSCENARIO:
                                         Position:
                                           LanePosition:
                                             roadId: ''
-                                            laneId: '1'
+                                            laneId: $ego_lane_id
                                             s: $length
                                             offset: 0
                                             Orientation:
