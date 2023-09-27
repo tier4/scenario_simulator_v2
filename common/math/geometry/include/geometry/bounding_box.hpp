@@ -17,19 +17,15 @@
 
 #include <boost/assert.hpp>
 #include <boost/assign/list_of.hpp>
-#include <boost/foreach.hpp>
 #include <boost/geometry.hpp>
 #include <boost/geometry/algorithms/disjoint.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/strategies/transform/matrix_transformers.hpp>
 #include <boost/numeric/conversion/bounds.hpp>
 #include <geometry/transform.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <optional>
-#include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
-#include <utility>
 #include <vector>
 
 namespace math

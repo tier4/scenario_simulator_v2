@@ -49,8 +49,7 @@ auto DistanceCondition::description() const -> std::string
 {
   std::stringstream description;
 
-  description << std::setprecision(std::numeric_limits<double>::digits10 + 1)
-              << triggering_entities.description() << "'s distance to given position = ";
+  description << triggering_entities.description() << "'s distance to given position = ";
 
   print_to(description, results);
 

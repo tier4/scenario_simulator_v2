@@ -72,50 +72,27 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
     return std::nullopt;
   }
   if (boost::geometry::disjoint(poly0, poly1)) {
-    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"),  "s-----------------------------------------------------------");
-    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "pose0 " << pose0.position.x << " " << pose0.position.y << "");
-    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "pose1 " << pose1.position.x << " " << pose1.position.y << "");
-
-    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "poly0 " << boost::geometry::wkt(poly0));
-    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "poly1 " << boost::geometry::wkt(poly1));
-    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "dist " << boost::geometry::distance(poly0, poly1));
-
     auto point0 = boost_point();
     auto point1 = boost_point();
     auto min_distance = boost::numeric::bounds<double>::highest();
 
-    for (auto & [a, b] : {std::tie(poly0, poly1)}) {
-      auto segments = boost::make_iterator_range(
-        boost::geometry::segments_begin(a), boost::geometry::segments_end(a));
-      auto points = boost::make_iterator_range(
-        boost::geometry::points_begin(b), boost::geometry::points_end(b));
-      for (auto && segment : segments) {
-        for (auto && point : points) {
-          auto nearest_point_from_segment =
-            pointToSegmentProjection(point, *segment.first, *segment.second);
-          auto distance = boost::geometry::distance(point, nearest_point_from_segment);
-          if (distance < min_distance) {
-            min_distance = distance;
-            point0 = point;
-            point1 = nearest_point_from_segment;
-          }
+    auto segments = boost::make_iterator_range(
+      boost::geometry::segments_begin(poly0), boost::geometry::segments_end(poly0));
+    auto points = boost::make_iterator_range(
+      boost::geometry::points_begin(poly1), boost::geometry::points_end(poly1));
+    for (auto && segment : segments) {
+      for (auto && point : points) {
+        auto nearest_point_from_segment =
+          pointToSegmentProjection(point, *segment.first, *segment.second);
+        auto distance = boost::geometry::distance(point, nearest_point_from_segment);
+        if (distance < min_distance) {
+          min_distance = distance;
+          point0 = point;
+          point1 = nearest_point_from_segment;
         }
       }
     }
 
-    // RCLCPP_INFO_STREAM(
-    //   rclcpp::get_logger("relative pose"), "from " << boost::geometry::wkt(point0)
-    //                                          << " at " << min_distance << " to "
-    //                                          << boost::geometry::wkt(point1));
-    // // std::pair<geometry_msgs::msg::Pose> std::make_pair(toPose(nearest), toPose(nearest_projected));
-
-    // point_type min_p;
-
-    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "dist " << boost::geometry::distance(nearest, point1));
-    // auto p = geometry_msgs::msg::Pose();
-    // p.position.x = nearest.x();
-    // p.position.y = nearest.y();
-    // RCLCPP_INFO_STREAM(rclcpp::get_logger("relative pose"), "f-----------------------------------------------------------");
     return std::make_pair(toPose(point0), toPose(point1));
   }
   return std::nullopt;
@@ -204,12 +181,12 @@ geometry_msgs::msg::Pose toPose(const boost_point & point)
 geometry_msgs::msg::Pose subtractPoses(
   const geometry_msgs::msg::Pose & pose1, const geometry_msgs::msg::Pose & pose2)
 {
-  auto v = toBoostPoint(pose1.position);
-  auto w = toBoostPoint(pose2.position);
+  auto point1 = toBoostPoint(pose1.position);
+  auto point2 = toBoostPoint(pose2.position);
 
-  boost::geometry::subtract_point(v, w);
+  boost::geometry::subtract_point(point1, point2);
 
-  return toPose(v);
+  return toPose(point1);
 }
 
 DistancesFromCenterToEdge getDistancesFromCenterToEdge(

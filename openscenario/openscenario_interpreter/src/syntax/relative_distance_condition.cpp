@@ -44,8 +44,7 @@ auto RelativeDistanceCondition::description() const -> String
 {
   std::stringstream description;
 
-  description << std::setprecision(std::numeric_limits<double>::digits10 + 1)
-              << triggering_entities.description() << "'s relative distance to given entity "
+  description << triggering_entities.description() << "'s relative distance to given entity "
               << entity_ref << " = ";
 
   print_to(description, results);
