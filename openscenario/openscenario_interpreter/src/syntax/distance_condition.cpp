@@ -15,6 +15,7 @@
 #include <cmath>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/distance_condition.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>

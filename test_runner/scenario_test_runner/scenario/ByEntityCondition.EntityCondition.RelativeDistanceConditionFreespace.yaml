@@ -58,31 +58,6 @@ OpenSCENARIO:
                       s: 20
                       offset: 1.0
               - LongitudinalAction: *SPEED_ACTION_ZERO
-          # - entityRef: car_2
-          #   PrivateAction:
-          #     - TeleportAction:
-          #         Position:
-          #           LanePosition: &CAR_2_LANE_POSITION
-          #             << : *EGO_LANE_POSITION
-          #             s: 20
-          #             offset: -1.0
-          #     - LongitudinalAction: *SPEED_ACTION_ZERO
-          # - entityRef: car_3
-          #   PrivateAction:
-          #     - TeleportAction:
-          #         Position:
-          #           LanePosition:
-          #             << : *CAR_1_LANE_POSITION
-          #             s: 0
-          #     - LongitudinalAction: *SPEED_ACTION_ZERO
-          # - entityRef: car_4
-          #   PrivateAction:
-          #     - TeleportAction:
-          #         Position:
-          #           LanePosition:
-          #             << : *CAR_2_LANE_POSITION
-          #             s: 0
-          #     - LongitudinalAction: *SPEED_ACTION_ZERO
     Story:
       - name: story
         Act:

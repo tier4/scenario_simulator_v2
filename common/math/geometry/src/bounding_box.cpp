@@ -19,8 +19,6 @@
 // headers in Eigen
 #define EIGEN_MPL2_ONLY
 #include <Eigen/Core>
-#include <fstream>
-#include <iostream>
 #include <optional>
 #include <vector>
 
