@@ -19,6 +19,8 @@ auto main(const int argc, char const * const * const argv) -> int
 try {
   rclcpp::init(argc, argv);
 
+  using namespace map_fragment;
+
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
 
   const auto width = [&]() {
@@ -43,16 +45,27 @@ try {
     return node.get_parameter("resolution").as_int();
   }();
 
+  const auto number_of_lanes = [&]() {
+    node.declare_parameter("number_of_lanes", 1);
+    return node.get_parameter("number_of_lanes").as_int();
+  }();
+
   const auto output_directory = [&]() {
     node.declare_parameter("output_directory", map_fragment::directory());
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  auto map = lanelet::LaneletMap();
+  auto lanelets = lanelet::Lanelets();
 
-  map.add(map_fragment::makeLanelet(width, length, curvature, resolution));
+  lanelets.push_back(makeLanelet(width, length, curvature, resolution));
 
-  map_fragment::write(map, output_directory);
+  for (auto i = 1; i < number_of_lanes; ++i) {
+    lanelets.push_back(makeLaneletRight(lanelets[0], resolution));
+  }
+
+  const auto map = lanelet::utils::createMap(lanelets);
+
+  map_fragment::write(*map, output_directory);
 
   std::cout << output_directory.c_str() << std::endl;
 
