@@ -63,9 +63,17 @@ AWSIM, a high-performance simulator being developed by TIER IV.
 
 ### `simple_sensor_simulator`
 
-Reference implementation of a simulator conforming to the `traffic_simulator` API. It provides a very simple environmental simulation with emphasis on lightweight execution of simulations.
-Based on the true values of the entities computed by `traffic_simulator`, it computes the recognition information in addition to the LiDAR sensor values and sends it to Autoware.
-Historically, this module was created for sensor simulation, but now a lot of processing beyond sensor simulation have been transferred from `traffic_simulator`.
+Reference implementation of a simulator conforming to the `traffic_simulator`
+API. It provides a very simple environmental simulation with emphasis on
+lightweight execution of simulations.
+
+Based on the true values of the entities computed by `traffic_simulator`, it
+computes the recognition information in addition to the LiDAR sensor values and
+sends it to Autoware.
+
+Historically, this module was created for sensor simulation, but now a lot of
+processing beyond sensor simulation have been transferred from
+`traffic_simulator`.
 
 ## Other Resources
 
