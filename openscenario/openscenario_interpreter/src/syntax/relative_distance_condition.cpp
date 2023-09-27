@@ -76,7 +76,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return makeNativeRelativeWorldPosition(triggering_entity, entity_ref, true).position.x;
+    return makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x;
   } else {
     return Double::nan();
   }
@@ -104,7 +104,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return makeNativeRelativeWorldPosition(triggering_entity, entity_ref, true).position.y;
+    return makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y;
   } else {
     return Double::nan();
   }
@@ -119,8 +119,8 @@ auto RelativeDistanceCondition::distance<
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return std::hypot(
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref, true).position.x,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref, true).position.y);
+      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x,
+      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
   } else {
     return Double::nan();
   }
@@ -167,7 +167,7 @@ auto RelativeDistanceCondition::distance<
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
     return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeFreespaceRelativeLanePosition(triggering_entity, entity_ref))
+             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
       .offset;
   } else {
     return Double::nan();
@@ -199,7 +199,7 @@ auto RelativeDistanceCondition::distance<
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeFreespaceRelativeLanePosition(triggering_entity, entity_ref))
+             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
       .s;
   } else {
     return Double::nan();

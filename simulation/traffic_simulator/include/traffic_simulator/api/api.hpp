@@ -284,6 +284,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLateralDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLongitudinalDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
@@ -296,10 +299,8 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(getLateralDistance);
-  FORWARD_TO_ENTITY_MANAGER(getFreespaceLateralDistance);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
-  FORWARD_TO_ENTITY_MANAGER(getFreespaceLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);

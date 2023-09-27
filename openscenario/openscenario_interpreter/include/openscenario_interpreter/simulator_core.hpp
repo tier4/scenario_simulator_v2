@@ -187,11 +187,11 @@ public:
     }
 
     template <typename From, typename To>
-    static auto makeNativeFreespaceRelativeLanePosition(const From & from, const To & to)
+    static auto makeNativeBoundingBoxRelativeLanePosition(const From & from, const To & to)
     {
       auto s = [](auto &&... xs) {
         if (const auto result =
-              core->getFreespaceLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
+              core->getBoundingBoxLaneLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
             result) {
           return result.value();
         } else {
@@ -202,7 +202,7 @@ public:
 
       auto t = [](auto &&... xs) {
         if (const auto result =
-              core->getFreespaceLateralDistance(std::forward<decltype(xs)>(xs)...);
+              core->getBoundingBoxLaneLateralDistance(std::forward<decltype(xs)>(xs)...);
             result) {
           return *result;
         } else {
@@ -219,6 +219,26 @@ public:
       position.rpy.y = std::numeric_limits<double>::quiet_NaN();
       position.rpy.z = std::numeric_limits<double>::quiet_NaN();
       return position;
+    }
+
+    template <typename... Ts>
+    static auto makeNativeBoundingBoxRelativeWorldPosition(Ts &&... xs)
+    {
+      if (const auto result =
+            SimulatorCore::core->getBoundingBoxRelativePose(std::forward<decltype(xs)>(xs)...);
+          result) {
+        return result.value();
+      } else {
+        geometry_msgs::msg::Pose result_empty{};
+        result_empty.position.x = std::numeric_limits<double>::quiet_NaN();
+        result_empty.position.y = std::numeric_limits<double>::quiet_NaN();
+        result_empty.position.z = std::numeric_limits<double>::quiet_NaN();
+        result_empty.orientation.x = 0;
+        result_empty.orientation.y = 0;
+        result_empty.orientation.z = 0;
+        result_empty.orientation.w = 1;
+        return result_empty;
+      }
     }
   };
 
@@ -387,7 +407,7 @@ public:
     }
 
     template <typename... Ts>
-    static auto evaluateFreespaceEuclideanDistance(Ts &&... xs)  // for RelativeDistanceCondition
+    static auto evaluateBoundingBoxEuclideanDistance(Ts &&... xs)  // for RelativeDistanceCondition
     {
       if (const auto result = core->getBoundingBoxDistance(std::forward<decltype(xs)>(xs)...);
           result) {
