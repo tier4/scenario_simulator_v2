@@ -20,7 +20,13 @@ scenarios as arguments, and passes each scenario to `openscenario_interpreter`
 to evaluate each scenario. Another task of the `scenario_test_runner` is to
 preprocess each scenario file before running the scenario.
 
-TIER IV uses scenarios in YAML format with some extensions to ASAM OpenSCENARIO 1.2. The extended syntax mainly focuses on parameterization features that were not standardized as of OpenSCENARIO 1.0. Processing of the extended syntax by TIER IV is handled by `scenario_test_runner` and the preprocessed scenarios are XML files that conform to the ASAM OpenSCENARIO 1.2 schema. Note that the scenario passed to `openscenario_interpreter` is therefore in ASAM standard format (`.xosc`), not the extended format by TIER IV (`.yaml`).
+TIER IV uses scenarios in YAML format with some extensions to ASAM OpenSCENARIO
+1.2. The extended syntax mainly focuses on parameterization features that were
+not standardized as of OpenSCENARIO 1.0. Processing of the extended syntax by
+TIER IV is handled by `scenario_test_runner` and the preprocessed scenarios are
+XML files that conform to the ASAM OpenSCENARIO 1.2 schema. Note that the
+scenario passed to `openscenario_interpreter` is therefore in ASAM standard
+format (`.xosc`), not the extended format by TIER IV (`.yaml`).
 
 Both scenario files written in the TIER IV extended format (`.yaml`) and standard ASAM OpenSCENARIO 1.2 scenario files (`.xosc`) can be given to `scenario_test_runner`.
 
