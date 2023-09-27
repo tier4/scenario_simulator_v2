@@ -342,6 +342,13 @@ public:
           return configuration;
         }());
 
+        core->attachPseudoTrafficLightDetector([&]() {
+          simulation_api_schema::PseudoTrafficLightDetectorConfiguration configuration;
+          configuration.set_architecture_type(
+            getParameter<std::string>("architecture_type", "awf/universe"));
+          return configuration;
+        }());
+
         core->asFieldOperatorApplication(entity_ref)
           .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
       }

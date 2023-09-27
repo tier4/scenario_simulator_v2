@@ -42,7 +42,7 @@ auto any(F f, T && x, Ts &&... xs)
 
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
-  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & polyline_trajectory,
+  traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time)
   -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
@@ -71,25 +71,25 @@ auto makeUpdatedStatus(
        Relative time starts from the start of FollowTrajectoryAction or from
        the time of reaching the previous "waypoint with arrival time".
 
-       Note: not std::isnan(polyline_trajectory->base_time) means
+       Note: not std::isnan(polyline_trajectory.base_time) means
        "Timing.domainAbsoluteRelative is relative".
 
-       Note: not std::isnan(polyline_trajectory->shape.vertices.front().time)
+       Note: not std::isnan(polyline_trajectory.shape.vertices.front().time)
        means "The waypoint about to be popped is the waypoint with the
        specified arrival time".
     */
     if (
-      not std::isnan(polyline_trajectory->base_time) and
-      not std::isnan(polyline_trajectory->shape.vertices.front().time)) {
-      polyline_trajectory->base_time = entity_status.time;
+      not std::isnan(polyline_trajectory.base_time) and
+      not std::isnan(polyline_trajectory.shape.vertices.front().time)) {
+      polyline_trajectory.base_time = entity_status.time;
     }
 
     if (std::rotate(
-          std::begin(polyline_trajectory->shape.vertices),
-          std::begin(polyline_trajectory->shape.vertices) + 1,
-          std::end(polyline_trajectory->shape.vertices));
-        not polyline_trajectory->closed) {
-      polyline_trajectory->shape.vertices.pop_back();
+          std::begin(polyline_trajectory.shape.vertices),
+          std::begin(polyline_trajectory.shape.vertices) + 1,
+          std::end(polyline_trajectory.shape.vertices));
+        not polyline_trajectory.closed) {
+      polyline_trajectory.shape.vertices.pop_back();
     }
 
     return makeUpdatedStatus(entity_status, polyline_trajectory, behavior_parameter, step_time);
@@ -104,7 +104,7 @@ auto makeUpdatedStatus(
 
      See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
-  if (polyline_trajectory->shape.vertices.empty()) {
+  if (polyline_trajectory.shape.vertices.empty()) {
     return std::nullopt;
   } else if (const auto position = entity_status.pose.position; any(is_infinity_or_nan, position)) {
     throw common::Error(
@@ -114,11 +114,11 @@ auto makeUpdatedStatus(
       position.x, ", ", position.y, ", ", position.z, "].");
   } else if (
     /*
-       We've made sure that polyline_trajectory->shape.vertices is not empty,
-       so a reference to vertices.front() always succeeds. vertices.front() is
+       We've made sure that polyline_trajectory.shape.vertices is not empty, so
+       a reference to vertices.front() always succeeds. vertices.front() is
        referenced only this once in this member function.
     */
-    const auto target_position = polyline_trajectory->shape.vertices.front().position.position;
+    const auto target_position = polyline_trajectory.shape.vertices.front().position.position;
     any(is_infinity_or_nan, target_position)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -133,8 +133,8 @@ auto makeUpdatedStatus(
     */
     const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
       hypot(position, target_position),
-      (not std::isnan(polyline_trajectory->base_time) ? polyline_trajectory->base_time : 0.0) +
-        polyline_trajectory->shape.vertices.front().time - entity_status.time);
+      (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
+        polyline_trajectory.shape.vertices.front().time - entity_status.time);
     /*
        This clause is to avoid division-by-zero errors in later clauses with
        distance_to_front_waypoint as the denominator if the distance
@@ -146,11 +146,11 @@ auto makeUpdatedStatus(
     const auto [distance, remaining_time] =
       [&]() {
         if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
-              std::begin(polyline_trajectory->shape.vertices),
-              std::end(polyline_trajectory->shape.vertices),
+              std::begin(polyline_trajectory.shape.vertices),
+              std::end(polyline_trajectory.shape.vertices),
               [](auto && vertex) { return not std::isnan(vertex.time); });
             first_waypoint_with_arrival_time_specified !=
-            std::end(polyline_trajectory->shape.vertices)) {
+            std::end(polyline_trajectory.shape.vertices)) {
           /*
              Note for anyone working on adding support for followingMode follow
              to this function (FollowPolylineTrajectoryAction::tick) in the
@@ -159,7 +159,7 @@ auto makeUpdatedStatus(
           */
           auto total_distance_to = [&](auto last) {
             auto total_distance = 0.0;
-            for (auto iter = std::begin(polyline_trajectory->shape.vertices);
+            for (auto iter = std::begin(polyline_trajectory.shape.vertices);
                  0 < std::distance(iter, last); ++iter) {
               total_distance += hypot(iter->position.position, std::next(iter)->position.position);
             }
@@ -167,8 +167,8 @@ auto makeUpdatedStatus(
           };
 
           if (const auto remaining_time =
-                (not std::isnan(polyline_trajectory->base_time) ? polyline_trajectory->base_time
-                                                                : 0.0) +
+                (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time
+                                                               : 0.0) +
                 first_waypoint_with_arrival_time_specified->time - entity_status.time;
               /*
                  The condition below should ideally be remaining_time < 0.
@@ -198,14 +198,14 @@ auto makeUpdatedStatus(
               " failed to reach the trajectory waypoint at the specified time. The specified time "
               "is ",
               first_waypoint_with_arrival_time_specified->time, " (in ",
-              (not std::isnan(polyline_trajectory->base_time) ? "absolute" : "relative"),
+              (not std::isnan(polyline_trajectory.base_time) ? "absolute" : "relative"),
               " simulation time). This may be due to unrealistic conditions of arrival time "
               "specification compared to vehicle parameters and dynamic constraints.");
           } else {
             return std::make_tuple(
               distance_to_front_waypoint +
                 total_distance_to(first_waypoint_with_arrival_time_specified),
-              remaining_time);
+              remaining_time != 0 ? remaining_time : std::numeric_limits<double>::epsilon());
           }
         } else {
           return std::make_tuple(
@@ -316,7 +316,7 @@ auto makeUpdatedStatus(
                     variable dynamic_constraints_ignorable. the value of the
                     variable is `followingMode == position`.
                  */
-                 if (polyline_trajectory->dynamic_constraints_ignorable) {
+                 if (polyline_trajectory.dynamic_constraints_ignorable) {
                    return normalize(target_position - position) * desired_speed;  // [m/s]
                  } else {
                    /*
