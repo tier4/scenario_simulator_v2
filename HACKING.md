@@ -116,4 +116,6 @@ then read the code through `scenario_test_runner`, `openscenario_interpreter`,
 should be able to grasp the entire process flow of `scenario_simulator_v2` and
 add or modify features in a day or two.
 
-If you are unsure about any part of the code, please refer to the detailed documentation of the relevant section accordingly, or contact the developers via an issue in the `scenario_simulator_v2` GitHub repository.
+If you are unsure about any part of the code, please refer to the detailed
+documentation of the relevant section accordingly, or contact the developers
+via an issue in the `scenario_simulator_v2` GitHub repository.
