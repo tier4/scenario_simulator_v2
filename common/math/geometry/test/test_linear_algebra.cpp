@@ -15,23 +15,34 @@
 #include <gtest/gtest.h>
 
 #include <geometry/linear_algebra.hpp>
+#include <limits>
 
 #include "expect_eq_macros.hpp"
+
+TEST(LINEAR_ALGEBRA, GET_SIZE_ZERO)
+{
+  geometry_msgs::msg::Vector3 vec;
+  EXPECT_DOUBLE_EQ(math::geometry::getSize(vec), 0.0);
+}
 
 TEST(LINEAR_ALGEBRA, GET_SIZE)
 {
   geometry_msgs::msg::Vector3 vec;
-  EXPECT_DOUBLE_EQ(math::geometry::getSize(vec), 0.0);
   vec.x = 1.0;
   vec.y = 0.0;
   vec.z = 3.0;
   EXPECT_DOUBLE_EQ(math::geometry::getSize(vec), std::sqrt(10.0));
 }
 
-TEST(LINEAR_ALGEBRA, NORMALIZE)
+TEST(LINEAR_ALGEBRA, NORMALIZE_ZERO)
 {
   geometry_msgs::msg::Vector3 vec;
   EXPECT_THROW(math::geometry::normalize(vec), common::SimulationError);
+}
+
+TEST(LINEAR_ALGEBRA, NORMALIZE)
+{
+  geometry_msgs::msg::Vector3 vec;
   vec.x = 1.0;
   vec.y = 0.0;
   vec.z = 3.0;
@@ -42,35 +53,126 @@ TEST(LINEAR_ALGEBRA, NORMALIZE)
   EXPECT_DOUBLE_EQ(math::geometry::getSize(vec), 1.0);
 }
 
-TEST(LINEAR_ALGEBRA, MULTIPLY)
+TEST(LINEAR_ALGEBRA, INNER_PRODUCT)
 {
-  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
-  vec * 1.0;
-  EXPECT_VECTOR3_EQ((vec * 1.0), math::geometry::vector3(0, 3, 1));
-  EXPECT_VECTOR3_EQ((vec * 2.0), math::geometry::vector3(0, 6, 2));
-  EXPECT_VECTOR3_EQ((vec * 2.0), (2.0 * vec));
+  geometry_msgs::msg::Vector3 vec0 = math::geometry::vector3(1, 0, 3),
+                              vec1 = math::geometry::vector3(-1, 0, -3);
+  EXPECT_DOUBLE_EQ(math::geometry::innerProduct(vec0, vec1), -10.0);
 }
 
-TEST(LINEAR_ALGEBRA, ADDITION)
+TEST(LINEAR_ALGEBRA, INNER_PRODUCT_IDENTICAL)
+{
+  geometry_msgs::msg::Vector3 vec0 = math::geometry::vector3(1, 0, 3);
+  EXPECT_DOUBLE_EQ(math::geometry::innerProduct(vec0, vec0), 10.0);
+}
+
+TEST(LINEAR_ALGEBRA, INNER_PRODUCT_ZERO)
+{
+  geometry_msgs::msg::Vector3 vec0, vec1 = math::geometry::vector3(1, 0, 3);
+  EXPECT_DOUBLE_EQ(math::geometry::innerProduct(vec0, vec1), 0.0);
+}
+
+TEST(LINEAR_ALGEBRA, GET_INTERNAL_ANGLE)
+{
+  geometry_msgs::msg::Vector3 vec0 = math::geometry::vector3(1, 0, 3),
+                              vec1 = math::geometry::vector3(-1, 0, -3);
+  EXPECT_DECIMAL_EQ(math::geometry::getInternalAngle(vec0, vec1), M_PI, 1e-6);
+}
+TEST(LINEAR_ALGEBRA, GET_INTERNAL_ANGLE_IDENTICAL)
+{
+  geometry_msgs::msg::Vector3 vec0 = math::geometry::vector3(1, 0, 3);
+  EXPECT_DECIMAL_EQ(math::geometry::getInternalAngle(vec0, vec0), 0.0, 1e-6);
+}
+
+TEST(LINEAR_ALGEBRA, GET_INTERNAL_ANGLE_ZERO)
+{
+  geometry_msgs::msg::Vector3 vec0, vec1 = math::geometry::vector3(1, 0, 3);
+  EXPECT_THROW(math::geometry::getInternalAngle(vec0, vec1), common::SimulationError);
+}
+
+TEST(LINEAR_ALGEBRA, DIVIDE)
 {
   geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
-  EXPECT_VECTOR3_EQ((vec + vec), (2.0 * vec));
+  EXPECT_VECTOR3_EQ((vec / 2.0), math::geometry::vector3(0, 1.5, 0.5));
+}
+
+TEST(LINEAR_ALGEBRA, DIVIDE_ZERO)
+{
+  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
+  vec = vec / 0.0;
+  EXPECT_TRUE(std::isnan(vec.x));
+  EXPECT_TRUE(std::isinf(vec.y));
+  EXPECT_TRUE(std::isinf(vec.z));
+}
+
+TEST(LINEAR_ALGEBRA, MULTIPLY_FIRST)
+{
+  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
+  EXPECT_VECTOR3_EQ((vec * 2.0), math::geometry::vector3(0, 6, 2));
+}
+
+TEST(LINEAR_ALGEBRA, MULTIPLY_SECOND)
+{
+  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
+  EXPECT_VECTOR3_EQ((2.0 * vec), math::geometry::vector3(0, 6, 2));
+}
+
+TEST(LINEAR_ALGEBRA, ADDITION_POINT_VECTOR)
+{
+  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
   geometry_msgs::msg::Point p;
   p.x = 0;
   p.y = 3;
   p.z = 1;
-  EXPECT_VECTOR3_EQ((p + vec), (2.0 * vec));
+  EXPECT_VECTOR3_EQ((p + vec), math::geometry::vector3(0, 6, 2));
 }
 
-TEST(LINEAR_ALGEBRA, SUBTRACTION)
+TEST(LINEAR_ALGEBRA, ADDITION_VECTOR_VECTOR)
 {
   geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
-  EXPECT_VECTOR3_EQ((vec - vec), geometry_msgs::msg::Vector3());
+  EXPECT_VECTOR3_EQ((vec + vec), math::geometry::vector3(0, 6, 2));
+}
+
+TEST(LINEAR_ALGEBRA, ADDITION_POINT_POINT)
+{
+  auto makePoint = [](double x, double y, double z) {
+    geometry_msgs::msg::Point p;
+    p.x = x;
+    p.y = y;
+    p.z = z;
+    return p;
+  };
+  geometry_msgs::msg::Point p0 = makePoint(0, 3, 1), p1 = makePoint(2, 3, 1);
+  EXPECT_VECTOR3_EQ((p0 + p1), makePoint(2, 6, 2));
+}
+
+TEST(LINEAR_ALGEBRA, SUBTRACTION_POINT_VECTOR)
+{
+  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
   geometry_msgs::msg::Point p;
   p.x = 0;
   p.y = 3;
   p.z = 1;
   EXPECT_VECTOR3_EQ((p - vec), geometry_msgs::msg::Vector3());
+}
+
+TEST(LINEAR_ALGEBRA, SUBTRACTION_VECTOR_VECTOR)
+{
+  geometry_msgs::msg::Vector3 vec = math::geometry::vector3(0, 3, 1);
+  EXPECT_VECTOR3_EQ((vec - vec), geometry_msgs::msg::Vector3());
+}
+
+TEST(LINEAR_ALGEBRA, SUBTRACTION_POINT_POINT)
+{
+  auto makePoint = [](double x, double y, double z) {
+    geometry_msgs::msg::Point p;
+    p.x = x;
+    p.y = y;
+    p.z = z;
+    return p;
+  };
+  geometry_msgs::msg::Point p0 = makePoint(0, 3, 1), p1 = makePoint(2, 3, 1);
+  EXPECT_VECTOR3_EQ((p0 - p1), makePoint(-2, 0, 0));
 }
 
 int main(int argc, char ** argv)
