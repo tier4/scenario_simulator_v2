@@ -33,22 +33,22 @@ namespace traffic_simulator
 class TrafficLightManager
 {
 protected:
-  using LaneletID = std::int64_t;
-  using TrafficLightMap = std::unordered_map<LaneletID, TrafficLight>;
+  using TrafficLightMap = std::unordered_map<lanelet::Id, TrafficLight>;
 
   TrafficLightMap traffic_lights_;
+
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
 
 public:
   explicit TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap);
 
-  auto getTrafficLight(const LaneletID traffic_light_id) -> TrafficLight &;
+  auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
 
   auto getTrafficLights() const -> const TrafficLightMap &;
 
   auto getTrafficLights() -> TrafficLightMap &;
 
-  auto getTrafficLights(const LaneletID lanelet_id)
+  auto getTrafficLights(const lanelet::Id lanelet_id)
     -> std::vector<std::reference_wrapper<TrafficLight>>;
 
   auto hasAnyLightChanged() -> bool;

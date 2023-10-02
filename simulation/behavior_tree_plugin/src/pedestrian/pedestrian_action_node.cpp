@@ -70,7 +70,7 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
   std::optional<traffic_simulator::LaneletPose> lanelet_pose;
   if (entity_status->laneMatchingSucceed()) {
     /**
-     * @note Hard coded parameter. 1.0 is a matching threshold for lanelet. 
+     * @note Hard coded parameter. 1.0 is a matching threshold for lanelet.
      * In this branch, try to matching pedestrian entity to specified lanelet_id.
     */
     lanelet_pose =
@@ -86,7 +86,7 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
     /**
      * @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
      * true means considering crosswalk.
-     * In this branch, the algorithm only consider entity pose. 
+     * In this branch, the algorithm only consider entity pose.
     */
     lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);
   }
@@ -99,8 +99,7 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
       return traffic_simulator::CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils);
     } else {
       /// @note If canonicalize failed, set end of road lanelet pose.
-      if (
-        const auto end_of_road_lanelet_id = std::get<std::optional<std::int64_t>>(canonicalized)) {
+      if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
         if (lanelet_pose.value().s < 0) {
           return traffic_simulator::CanonicalizedLaneletPose(
             traffic_simulator_msgs::build<traffic_simulator::LaneletPose>()
