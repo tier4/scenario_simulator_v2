@@ -15,6 +15,7 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_
 
+#include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
@@ -55,6 +56,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>          getAckermannControlCommand;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                         getCooperateStatusArray;
   SubscriberWrapper<autoware_auto_system_msgs::msg::EmergencyState>                    getEmergencyState;
+  SubscriberWrapper<autoware_adapi_v1_msgs::msg::LocalizationInitializationState>      getLocalizationState;
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                             getMrmState;
   SubscriberWrapper<autoware_auto_planning_msgs::msg::Trajectory>                      getTrajectory;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
@@ -116,6 +118,7 @@ public:
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v;
                                                                                             cooperate(v); }),
     getEmergencyState("/system/emergency/emergency_state", *this, [this](const auto & v) { receiveEmergencyState(v); }),
+    getLocalizationState("/api/localization/initialization_state", *this),
     getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
     getTrajectory("/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),

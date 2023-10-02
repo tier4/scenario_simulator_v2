@@ -287,12 +287,15 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBeWaitingForRoute([&]() {
+        if (getLocalizationState().state != autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
+          return;
+        }
         geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
         initial_pose_msg.header.stamp = get_clock()->now();
         initial_pose_msg.header.frame_id = "map";
         initial_pose_msg.pose.pose = initial_pose;
         return setInitialPose(initial_pose_msg);
-      }, std::chrono::seconds(5));
+      });
 
       // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
       // waitForAutowareStateToBeWaitingForRoute([&]() {
