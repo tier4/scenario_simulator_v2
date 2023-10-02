@@ -45,6 +45,12 @@ private:
     if (api_.entityExists("bob") && api_.checkCollision("ego", "bob")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
+    /**
+     * @note The simulation time is internally managed as a fraction and must exactly equal to x.0
+     * in the floating-point literal when the simulation time is an integer multiple of the frame rate frame,
+     * so in this case `std::abs(t - 1.0) <= std::numeric Decides that `t == 1.0` is more appropriate than `std::numeric_limits<double>::epsilon();`.
+     * @sa https://wandbox.org/permlink/dSNRX7K2bQiqSI7P
+     */
     if (t == 1.0) {
       if (t != api_.getCurrentTwist("bob").linear.x) {
         stop(cpp_mock_scenarios::Result::FAILURE);
