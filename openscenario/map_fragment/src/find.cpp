@@ -31,42 +31,33 @@ try {
     return std::filesystem::path(node.get_parameter("input_directory").as_string());
   }();
 
-  std::cerr << "input_directory = " << input_directory << std::endl;
-
   const auto lanelet2_map = [&]() {
     node.declare_parameter("lanelet2_map", input_directory / "lanelet2_map.osm");
     return node.get_parameter("lanelet2_map").as_string();
   }();
-
-  std::cerr << "lanelet2_map = " << lanelet2_map << std::endl;
 
   const auto type = [&]() {
     node.declare_parameter("type", "lanelet");
     return node.get_parameter("type").as_string();
   }();
 
-  std::cerr << "type = " << type << std::endl;
-
   const auto subtype = [&]() {
     node.declare_parameter("subtype", "road");
     return node.get_parameter("subtype").as_string();
   }();
 
-  std::cerr << "subtype = " << subtype << std::endl;
-
   auto satisfies_lower_bound_id = [&]() {
     node.declare_parameter("greater_than", lanelet::Id());
-    const auto greater_than = node.get_parameter("greater_than").as_int();
-    std::cerr << "greater_than = " << greater_than << std::endl;
-    return
-      [lower_bound = greater_than](const auto & lanelet) { return lower_bound < lanelet.id(); };
+    return [lower_bound = node.get_parameter("greater_than").as_int()](const auto & lanelet) {
+      return lower_bound < lanelet.id();
+    };
   }();
 
   auto satisfies_upper_bound_id = [&]() {
     node.declare_parameter("less_than", std::numeric_limits<lanelet::Id>::max());
-    const auto less_than = node.get_parameter("less_than").as_int();
-    std::cerr << "less_than = " << less_than << std::endl;
-    return [upper_bound = less_than](const auto & lanelet) { return lanelet.id() < upper_bound; };
+    return [upper_bound = node.get_parameter("less_than").as_int()](const auto & lanelet) {
+      return lanelet.id() < upper_bound;
+    };
   }();
 
   const auto map = lanelet::load(lanelet2_map, map_fragment::projector());

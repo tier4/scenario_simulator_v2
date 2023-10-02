@@ -53,6 +53,9 @@ try {
 
   std::cout << lanelet::utils::getLaneletLength3d(map->laneletLayer.get(id)) << std::endl;
 
+  DEBUG(lanelet::utils::getLaneletLength2d(map->laneletLayer.get(id)));
+  DEBUG(lanelet::utils::getLaneletLength3d(map->laneletLayer.get(id)));
+
   return EXIT_SUCCESS;
 } catch (const std::exception & exception) {
   std::cerr << exception.what() << std::endl;

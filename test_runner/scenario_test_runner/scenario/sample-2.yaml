@@ -42,6 +42,9 @@ OpenSCENARIO:
       - name: ego_lane_id
         parameterType: string
         value: $(ros2 run map_fragment find --ros-args -p type:=lanelet -p subtype:=road)
+      - name: ego_lane_length
+        parameterType: double
+        value: $(ros2 run map_fragment length --ros-args -p id:=$(var ego_lane_id))
   CatalogLocations:
     VehicleCatalog:
       Directory:
@@ -84,11 +87,11 @@ OpenSCENARIO:
                         r: 0
               - RoutingAction:
                   AcquirePositionAction:
-                    Position:
+                    Position: &DESTINATION
                       LanePosition:
                         roadId: ''
                         laneId: $ego_lane_id
-                        s: ${ $length - 10 }
+                        s: ${ $ego_lane_length - 10 }
                         offset: 0
                         Orientation:
                           type: relative
@@ -124,17 +127,7 @@ OpenSCENARIO:
                                         - entityRef: ego
                                     EntityCondition:
                                       ReachPositionCondition:
-                                        Position:
-                                          LanePosition:
-                                            roadId: ''
-                                            laneId: $ego_lane_id
-                                            s: ${ $length - 10 }
-                                            offset: 0
-                                            Orientation:
-                                              type: relative
-                                              h: 0
-                                              p: 0
-                                              r: 0
+                                        Position: *DESTINATION
                                         tolerance: 1
                         Action:
                           - name: ''

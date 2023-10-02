@@ -38,6 +38,8 @@ try {
     return node.get_parameter("curvature").as_double();
   }();
 
+  DEBUG(curvature);
+
   const auto resolution = [&]() {
     node.declare_parameter("resolution", default_value::resolution);
     return node.get_parameter("resolution").as_int();
