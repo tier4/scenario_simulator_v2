@@ -12,7 +12,6 @@
 
 # external packages
 external/*
-!external/lanelet2_matching
 !external/concealer
 
 # auto-generated files

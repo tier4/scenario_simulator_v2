@@ -315,7 +315,7 @@ auto DistanceCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     results.push_back(distance(triggering_entity));
-    return rule(results.back(), value);
+    return rule(static_cast<double>(results.back()), value);
   }));
 }
 }  // namespace syntax

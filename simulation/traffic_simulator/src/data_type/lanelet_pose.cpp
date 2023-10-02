@@ -24,18 +24,17 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
   lanelet_poses_(
-    hdmap_utils->gelAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
+    hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
 {
 }
 
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPose & maybe_non_canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const std::vector<std::int64_t> & route_lanelets)
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils, route_lanelets)),
   lanelet_poses_(
-    hdmap_utils->gelAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
+    hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
 {
 }
@@ -62,8 +61,8 @@ auto CanonicalizedLaneletPose::canonicalize(
 
 auto CanonicalizedLaneletPose::canonicalize(
   const LaneletPose & may_non_canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const std::vector<std::int64_t> & route_lanelets) -> LaneletPose
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
+  -> LaneletPose
 {
   if (
     const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
@@ -88,7 +87,7 @@ auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
   if (lanelet_poses_.empty()) {
     return std::nullopt;
   }
-  std::vector<std::int64_t> shortest_route =
+  lanelet::Ids shortest_route =
     hdmap_utils->getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
   LaneletPose alternative_lanelet_pose = lanelet_poses_[0];
   for (const auto & laneletPose : lanelet_poses_) {
@@ -109,8 +108,8 @@ bool isSameLaneletId(
   return static_cast<LaneletPose>(p0).lanelet_id == static_cast<LaneletPose>(p1).lanelet_id;
 }
 
-bool isSameLaneletId(
-  const lanelet_pose::CanonicalizedLaneletPose & p, const std::int64_t lanelet_id)
+auto isSameLaneletId(const lanelet_pose::CanonicalizedLaneletPose & p, const lanelet::Id lanelet_id)
+  -> bool
 {
   return static_cast<LaneletPose>(p).lanelet_id == lanelet_id;
 }
