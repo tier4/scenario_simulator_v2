@@ -42,7 +42,7 @@ auto TrafficLightMarkerPublisher::drawMarkers() const -> void
   marker_pub_->publish(marker_array);
 }
 
-auto TrafficLightMarkerPublisher::update() -> void
+auto TrafficLightMarkerPublisher::publish() -> void
 {
   if (traffic_light_manager_->hasAnyLightChanged()) {
     deleteAllMarkers();

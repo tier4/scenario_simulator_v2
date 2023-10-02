@@ -31,7 +31,6 @@ namespace simple_sensor_simulator
 {
 ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
 : Node("simple_sensor_simulator", options),
-  sensor_sim_(*this),
   server_(
     simulation_interface::protocol, simulation_interface::HostName::ANY, getSocketPort(),
     [this](auto &&... xs) { return initialize(std::forward<decltype(xs)>(xs)...); },
@@ -45,7 +44,10 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); },
-    [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); })
+    [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) {
+      return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
+    })
 {
 }
 
@@ -303,24 +305,35 @@ auto ScenarioSimulator::updateTrafficLights(
   const simulation_api_schema::UpdateTrafficLightsRequest & req)
   -> simulation_api_schema::UpdateTrafficLightsResponse
 {
-  traffic_signals_states_.clear();
-  for (const auto & traffic_signal_proto : req.states()) {
-    autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
-    simulation_interface::toMsg(traffic_signal_proto, traffic_signal);
-    traffic_signals_states_.emplace_back(traffic_signal);
-  }
+  traffic_signals_states_ = req;
   auto res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
   return res;
 }
 
 auto ScenarioSimulator::followPolylineTrajectory(
-  const simulation_api_schema::FollowPolylineTrajectoryRequest &)
+  const simulation_api_schema::FollowPolylineTrajectoryRequest & request)
   -> simulation_api_schema::FollowPolylineTrajectoryResponse
 {
   auto response = simulation_api_schema::FollowPolylineTrajectoryResponse();
+  if (ego_entity_simulation_ and isEgo(request.name())) {
+    ego_entity_simulation_->polyline_trajectory =
+      simulation_interface::toROS2Message(request.trajectory());
+    response.mutable_result()->set_success(true);
+  } else {
+    response.mutable_result()->set_success(false);
+  }
+  return response;
+}
+
+auto ScenarioSimulator::attachPseudoTrafficLightDetector(
+  const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest & req)
+  -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse
+{
+  auto response = simulation_api_schema::AttachPseudoTrafficLightDetectorResponse();
+  sensor_sim_.attachPseudoTrafficLightsDetector(
+    current_simulation_time_, req.configuration(), *this, hdmap_utils_);
   response.mutable_result()->set_success(true);
-  std::cout << __FILE__ << ":" << __LINE__ << std::endl;
   return response;
 }
 
@@ -352,17 +365,9 @@ traffic_simulator_msgs::BoundingBox ScenarioSimulator::getBoundingBox(const std:
 
 bool ScenarioSimulator::isEgo(const std::string & name)
 {
-  for (const auto & ego : ego_vehicles_) {
-    if (ego.name() == name) {
-      return true;
-    }
-  }
-
-  if (not isEntityExists(name)) {
-    THROW_SEMANTIC_ERROR("Entity : ", std::quoted(name), " does not exist");
-  }
-
-  return false;
+  return std::find_if(ego_vehicles_.begin(), ego_vehicles_.end(), [&](auto && entity) {
+           return entity.name() == name;
+         }) != std::end(ego_vehicles_);
 }
 
 bool ScenarioSimulator::isEntityExists(const std::string & name)

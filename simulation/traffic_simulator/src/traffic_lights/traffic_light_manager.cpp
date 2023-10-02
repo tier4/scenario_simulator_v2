@@ -37,7 +37,7 @@ auto TrafficLightManager::hasAnyLightChanged() -> bool
   //   });
 }
 
-auto TrafficLightManager::getTrafficLight(const LaneletID traffic_light_id) -> TrafficLight &
+auto TrafficLightManager::getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &
 {
   if (auto iter = traffic_lights_.find(traffic_light_id); iter != std::end(traffic_lights_)) {
     return iter->second;
@@ -56,13 +56,14 @@ auto TrafficLightManager::getTrafficLights() const -> const TrafficLightMap &
 
 auto TrafficLightManager::getTrafficLights() -> TrafficLightMap & { return traffic_lights_; }
 
-auto TrafficLightManager::getTrafficLights(const LaneletID lanelet_id)
+auto TrafficLightManager::getTrafficLights(const lanelet::Id lanelet_id)
   -> std::vector<std::reference_wrapper<TrafficLight>>
 {
   std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
 
-  if (hdmap_->isTrafficRelation(lanelet_id)) {
-    for (auto && traffic_light : hdmap_->getTrafficRelation(lanelet_id)->trafficLights()) {
+  if (hdmap_->isTrafficLightRegulatoryElement(lanelet_id)) {
+    for (auto && traffic_light :
+         hdmap_->getTrafficLightRegulatoryElement(lanelet_id)->trafficLights()) {
       traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
     }
   } else if (hdmap_->isTrafficLight(lanelet_id)) {
@@ -73,6 +74,17 @@ auto TrafficLightManager::getTrafficLights(const LaneletID lanelet_id)
   }
 
   return traffic_lights;
+}
+
+auto TrafficLightManager::generateUpdateTrafficLightsRequest()
+  -> simulation_api_schema::UpdateTrafficLightsRequest
+{
+  simulation_api_schema::UpdateTrafficLightsRequest update_traffic_lights_request;
+  for (auto && [lanelet_id, traffic_light] : traffic_lights_) {
+    *update_traffic_lights_request.add_states() =
+      static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
+  }
+  return update_traffic_lights_request;
 }
 
 }  // namespace traffic_simulator

@@ -94,21 +94,21 @@ public:
 
   /*   */ auto getDistanceToLaneBound() -> double;
 
-  /*   */ auto getDistanceToLaneBound(std::int64_t lanelet_id) const -> double;
+  /*   */ auto getDistanceToLaneBound(lanelet::Id lanelet_id) const -> double;
 
-  /*   */ auto getDistanceToLaneBound(const std::vector<std::int64_t> &) const -> double;
+  /*   */ auto getDistanceToLaneBound(const lanelet::Ids &) const -> double;
 
   /*   */ auto getDistanceToLeftLaneBound() -> double;
 
-  /*   */ auto getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double;
+  /*   */ auto getDistanceToLeftLaneBound(lanelet::Id lanelet_id) const -> double;
 
-  /*   */ auto getDistanceToLeftLaneBound(const std::vector<std::int64_t> &) const -> double;
+  /*   */ auto getDistanceToLeftLaneBound(const lanelet::Ids &) const -> double;
 
   /*   */ auto getDistanceToRightLaneBound() -> double;
 
-  /*   */ auto getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double;
+  /*   */ auto getDistanceToRightLaneBound(lanelet::Id lanelet_id) const -> double;
 
-  /*   */ auto getDistanceToRightLaneBound(const std::vector<std::int64_t> &) const -> double;
+  /*   */ auto getDistanceToRightLaneBound(const lanelet::Ids &) const -> double;
 
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
@@ -131,7 +131,7 @@ public:
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
-  virtual auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> = 0;
+  virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
 
@@ -151,7 +151,7 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const std::int64_t){};
+  virtual void requestLaneChange(const lanelet::Id){};
 
   virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
 

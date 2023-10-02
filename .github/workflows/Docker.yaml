@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 180
     strategy:
       matrix:
-        rosdistro: [galactic, humble]
+        rosdistro: [humble]
     steps:
       - uses: actions/checkout@v3
 

@@ -23,7 +23,6 @@
 #include <traffic_simulator_msgs.pb.h>
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
@@ -186,13 +185,77 @@ auto toProto(
     autoware_auto_vehicle_msgs::msg::GearCommand> &,
   traffic_simulator_msgs::VehicleCommand &) -> void;
 
-void toProto(
-  const autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state,
-  simulation_api_schema::TrafficSignal & proto);
+template <typename TrafficLightBulbMessageType>
+auto toMsg(
+  const simulation_api_schema::TrafficLight & proto,
+  TrafficLightBulbMessageType & traffic_light_bulb_state) -> void
+{
+  using namespace simulation_api_schema;
 
-void toMsg(
-  const simulation_api_schema::TrafficSignal & proto,
-  autoware_auto_perception_msgs::msg::TrafficSignal & traffic_light_state);
+  auto convert_color = [](auto color) constexpr
+  {
+    switch (color) {
+      case TrafficLight_Color_RED:
+        return TrafficLightBulbMessageType::RED;
+      case TrafficLight_Color_AMBER:
+        return TrafficLightBulbMessageType::AMBER;
+      case TrafficLight_Color_GREEN:
+        return TrafficLightBulbMessageType::GREEN;
+      case TrafficLight_Color_WHITE:
+        return TrafficLightBulbMessageType::WHITE;
+      default:
+        return TrafficLightBulbMessageType::UNKNOWN;
+    }
+  };
+
+  auto convert_shape = [](auto shape) constexpr
+  {
+    switch (shape) {
+      case TrafficLight_Shape_CIRCLE:
+        return TrafficLightBulbMessageType::CIRCLE;
+      case TrafficLight_Shape_LEFT_ARROW:
+        return TrafficLightBulbMessageType::LEFT_ARROW;
+      case TrafficLight_Shape_RIGHT_ARROW:
+        return TrafficLightBulbMessageType::RIGHT_ARROW;
+      case TrafficLight_Shape_UP_ARROW:
+        return TrafficLightBulbMessageType::UP_ARROW;
+        /// @note Enums below are not supported yet in some platforms. I temporarily disabled them
+        //  case TrafficLight_Shape_UP_LEFT_ARROW:
+        //    return TrafficLightBulbMessageType::UP_LEFT_ARROW;
+        //  case TrafficLight_Shape_UP_RIGHT_ARROW:
+        //    return TrafficLightBulbMessageType::UP_RIGHT_ARROW;
+      case TrafficLight_Shape_DOWN_ARROW:
+        return TrafficLightBulbMessageType::DOWN_ARROW;
+      case TrafficLight_Shape_DOWN_LEFT_ARROW:
+        return TrafficLightBulbMessageType::DOWN_LEFT_ARROW;
+      case TrafficLight_Shape_DOWN_RIGHT_ARROW:
+        return TrafficLightBulbMessageType::DOWN_RIGHT_ARROW;
+      case TrafficLight_Shape_CROSS:
+        return TrafficLightBulbMessageType::CROSS;
+      default:
+        return TrafficLightBulbMessageType::UNKNOWN;
+    }
+  };
+
+  auto convert_status = [](auto status) constexpr
+  {
+    switch (status) {
+      case TrafficLight_Status_SOLID_OFF:
+        return TrafficLightBulbMessageType::SOLID_OFF;
+      case TrafficLight_Status_SOLID_ON:
+        return TrafficLightBulbMessageType::SOLID_ON;
+      case TrafficLight_Status_FLASHING:
+        return TrafficLightBulbMessageType::FLASHING;
+      default:
+        return TrafficLightBulbMessageType::UNKNOWN;
+    }
+  };
+
+  traffic_light_bulb_state.status = convert_status(proto.status());
+  traffic_light_bulb_state.shape = convert_shape(proto.shape());
+  traffic_light_bulb_state.color = convert_color(proto.color());
+  traffic_light_bulb_state.confidence = proto.confidence();
+}
 
 auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex &)
   -> traffic_simulator_msgs::Vertex;
