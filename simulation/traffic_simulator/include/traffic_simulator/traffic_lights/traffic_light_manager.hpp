@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <simulation_interface/conversions.hpp>
 #include <stdexcept>  // std::out_of_range
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -32,25 +33,27 @@ namespace traffic_simulator
 class TrafficLightManager
 {
 protected:
-  using LaneletID = std::int64_t;
-  using TrafficLightMap = std::unordered_map<LaneletID, TrafficLight>;
+  using TrafficLightMap = std::unordered_map<lanelet::Id, TrafficLight>;
 
   TrafficLightMap traffic_lights_;
+
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
 
 public:
   explicit TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap);
 
-  auto getTrafficLight(const LaneletID traffic_light_id) -> TrafficLight &;
+  auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
 
   auto getTrafficLights() const -> const TrafficLightMap &;
 
   auto getTrafficLights() -> TrafficLightMap &;
 
-  auto getTrafficLights(const LaneletID lanelet_id)
+  auto getTrafficLights(const lanelet::Id lanelet_id)
     -> std::vector<std::reference_wrapper<TrafficLight>>;
 
   auto hasAnyLightChanged() -> bool;
+
+  auto generateUpdateTrafficLightsRequest() -> simulation_api_schema::UpdateTrafficLightsRequest;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_

@@ -229,6 +229,9 @@ public:
 
   std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
+  bool attachPseudoTrafficLightDetector(
+    const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &);
+
   bool attachLidarSensor(const simulation_api_schema::LidarConfiguration &);
   bool attachLidarSensor(
     const std::string &, const double lidar_sensor_delay,
@@ -252,7 +255,7 @@ public:
     const std::string &, const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &)
     -> bool;
 
-  void requestLaneChange(const std::string & name, const std::int64_t & lanelet_id);
+  void requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id);
 
   void requestLaneChange(const std::string & name, const lane_change::Direction & direction);
 
