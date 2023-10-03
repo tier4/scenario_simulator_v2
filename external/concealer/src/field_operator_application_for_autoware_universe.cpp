@@ -287,7 +287,9 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBeWaitingForRoute([&]() {
-        if (getLocalizationState().state != autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
+        if (
+          getLocalizationState().state !=
+          autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
           return;
         }
         geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
