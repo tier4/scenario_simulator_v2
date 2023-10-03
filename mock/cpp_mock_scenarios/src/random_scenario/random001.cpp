@@ -71,7 +71,11 @@ private:
     }
 
     const auto spawn_and_cross_pedestrian = [&](const auto & entity_name, const auto lanelet_id) {
-      if (!api_.entityExists(entity_name)) {
+      if (
+        !api_.entityExists(entity_name) &&
+        api_.reachPosition(
+          "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 15.0)),
+          5.0)) {
         api_.spawn(
           entity_name,
           api_.canonicalize(traffic_simulator::helper::constructLaneletPose(lanelet_id, 0.0)),
