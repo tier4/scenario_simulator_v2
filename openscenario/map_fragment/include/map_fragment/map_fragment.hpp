@@ -217,8 +217,17 @@ auto makeLanelet(double width, double length, double curvature, double resolutio
   return makeLanelet(makePoint3d(0.0, 0.0, 0.0), width, length, curvature, resolution);
 }
 
-auto curveAngle(const lanelet::Lanelet & lanelet)
+auto length(const lanelet::LineString3d & linestring) -> double
 {
+  return lanelet::geometry::length(linestring);
+}
+
+template <typename Point>
+auto angle2d(const Point & p0, const Point & p1, const Point & p2)
+{
+  auto angle2d = [](const auto & v, const auto & w) {
+    return std::atan2(w.y() - v.y(), w.x() - v.x());
+  };
   auto canonicalize = [](auto radian) {
     while (M_PI < radian) {
       radian -= 2 * M_PI;
@@ -228,18 +237,28 @@ auto curveAngle(const lanelet::Lanelet & lanelet)
     }
     return radian;
   };
-
   return canonicalize(
-    makePerpendicularAngle(lanelet.leftBound().back(), lanelet.rightBound().back()) -
-    makePerpendicularAngle(lanelet.leftBound().front(), lanelet.rightBound().front()));
+    angle2d(p1.basicPoint(), p2.basicPoint()) - angle2d(p0.basicPoint(), p1.basicPoint()));
 }
 
-auto curvature(const lanelet::LineString3d & linestring)
+auto curvature2d(const lanelet::LineString3d & points)
 {
-  if (linestring.size() < 3) {
+  if (points.size() < 3) {
     return 0.0;
   } else {
-    return lanelet::geometry::curvature2d(linestring[0], linestring[1], linestring[2]);
+    auto angle = 0.0;
+
+    for (auto iter = points.begin(); std::next(iter, 2) != points.end(); ++iter) {
+      angle += angle2d(*std::next(iter, 0), *std::next(iter, 1), *std::next(iter, 2));
+    }
+
+    const auto arc_length = length(points);
+
+    const auto arc_angle = angle * (points.size() - 1) / (points.size() - 2);
+
+    const auto curvature_radius = arc_length / arc_angle;
+
+    return 1 / curvature_radius;
   }
 }
 
@@ -248,19 +267,17 @@ auto makeLaneletLeft(lanelet::Lanelet & lanelet, double resolution)
   return makeLanelet(
     makePoint3d(
       2 * lanelet.leftBound().front().basicPoint() - lanelet.rightBound().front().basicPoint()),
-    lanelet.leftBound(),  //
-    lanelet::geometry::length(lanelet.leftBound()),
-    std::copysign(curvature(lanelet.leftBound()), curveAngle(lanelet)), resolution);
+    lanelet.leftBound(), lanelet::geometry::length(lanelet.leftBound()),
+    curvature2d(lanelet.leftBound()), resolution);
 }
 
 auto makeLaneletRight(lanelet::Lanelet & lanelet, double resolution)
 {
   return makeLanelet(
-    lanelet.rightBound(),  //
+    lanelet.rightBound(),
     makePoint3d(
       2 * lanelet.rightBound().front().basicPoint() - lanelet.leftBound().front().basicPoint()),
-    lanelet::geometry::length(lanelet.rightBound()),
-    std::copysign(curvature(lanelet.rightBound()), curveAngle(lanelet)), resolution);
+    lanelet::geometry::length(lanelet.rightBound()), curvature2d(lanelet.rightBound()), resolution);
 }
 
 auto write(const lanelet::LaneletMap & map, const std::filesystem::path & output_directory)
