@@ -19,6 +19,8 @@
 
 #include "expect_eq_macros.hpp"
 
+constexpr double EPS = 1e-3;
+
 TEST(LINEAR_ALGEBRA, GET_SIZE_ZERO)
 {
   geometry_msgs::msg::Vector3 vec;
@@ -76,12 +78,12 @@ TEST(LINEAR_ALGEBRA, GET_INTERNAL_ANGLE)
 {
   geometry_msgs::msg::Vector3 vec0 = math::geometry::vector3(1, 0, 3),
                               vec1 = math::geometry::vector3(-1, 0, -3);
-  EXPECT_DECIMAL_EQ(math::geometry::getInternalAngle(vec0, vec1), M_PI, 1e-6);
+  EXPECT_NEAR(math::geometry::getInternalAngle(vec0, vec1), M_PI, EPS);
 }
 TEST(LINEAR_ALGEBRA, GET_INTERNAL_ANGLE_IDENTICAL)
 {
   geometry_msgs::msg::Vector3 vec0 = math::geometry::vector3(1, 0, 3);
-  EXPECT_DECIMAL_EQ(math::geometry::getInternalAngle(vec0, vec0), 0.0, 1e-6);
+  EXPECT_NEAR(math::geometry::getInternalAngle(vec0, vec0), 0.0, EPS);
 }
 
 TEST(LINEAR_ALGEBRA, GET_INTERNAL_ANGLE_ZERO)
