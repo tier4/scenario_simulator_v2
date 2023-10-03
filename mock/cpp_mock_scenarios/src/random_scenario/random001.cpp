@@ -44,11 +44,11 @@ private:
       api_.spawn(
         entity_name,
         api_.canonicalize(
-          traffic_simulator::helper::constructLaneletPose(34462, spawn_s_value, 0, 0, 0, 0)),
+          traffic_simulator::helper::constructLaneletPose(34513, spawn_s_value, 0, 0, 0, 0)),
         getVehicleParameters());
       api_.requestSpeedChange(entity_name, 10, true);
       api_.setLinearVelocity(entity_name, 10);
-      api_.requestLaneChange(entity_name, 34462);
+      api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
     };
 
     if (api_.isInLanelet("ego", 34684, 0.1)) {
@@ -56,19 +56,54 @@ private:
         spawn_and_change_lane("lane_following_0", 0.0);
       }
       if (!api_.entityExists("lane_following_1")) {
-        spawn_and_change_lane("lane_following_1", 5.0);
+        spawn_and_change_lane("lane_following_1", 7.0);
       }
     }
+    if (api_.isInLanelet("ego", 34606, 0.1)) {
+      api_.requestAcquirePosition(
+        "ego",
+        api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34681, 0, 0, 0, 0, 0)));
+    }
+    if (api_.isInLanelet("ego", 34681, 0.1)) {
+      api_.requestAcquirePosition(
+        "ego",
+        api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0)));
+    }
+
+    const auto spawn_and_cross_pedestrian = [&](const auto & entity_name, const auto lanelet_id) {
+      if (!api_.entityExists(entity_name)) {
+        api_.spawn(
+          entity_name,
+          api_.canonicalize(traffic_simulator::helper::constructLaneletPose(lanelet_id, 0.0)),
+          getPedestrianParameters());
+      }
+    };
+    spawn_and_cross_pedestrian("pedestrian_0", 34385);
+    spawn_and_cross_pedestrian("pedestrian_1", 34392);
   }
   void onInitialize() override
   {
+    const auto spawn_road_parking_vehicle =
+      [&](const auto & entity_name, const auto spawn_s_value, const auto offset) {
+        api_.spawn(
+          entity_name,
+          api_.canonicalize(
+            traffic_simulator::helper::constructLaneletPose(34705, spawn_s_value, offset, 0, 0, 0)),
+          getVehicleParameters());
+        api_.requestSpeedChange(entity_name, 0, true);
+      };
+    spawn_road_parking_vehicle("road_parking_0", 10.0, 2.3);
+    spawn_road_parking_vehicle("road_parking_1", 5.0, 2.3);
+
     api_.spawn(
       "ego",
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0)),
       getVehicleParameters());
     api_.requestAcquirePosition(
-      "lane_following_0",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34531, 0, 0, 0, 0, 0)));
+      "ego",
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0)));
+    api_.requestSpeedChange("ego", 15, true);
+    api_.setLinearVelocity("ego", 15);
   }
 };
 
