@@ -74,7 +74,7 @@ private:
       if (
         !api_.entityExists(entity_name) &&
         !api_.reachPosition(
-          "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, .0)),
+          "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 25.0)),
           5.0)) {
         api_.spawn(
           entity_name,
