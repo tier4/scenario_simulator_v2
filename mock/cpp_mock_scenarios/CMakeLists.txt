@@ -51,6 +51,7 @@ if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/metrics)
   add_subdirectory(src/move_backward)
   add_subdirectory(src/pedestrian)
+  add_subdirectory(src/random_scenario)
   add_subdirectory(src/speed_planning)
 endif()
 
