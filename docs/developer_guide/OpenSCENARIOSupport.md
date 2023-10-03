@@ -264,7 +264,7 @@ OpenSCENARIO standards.
 | ByEntityCondition.EntityCondition.**TraveledDistanceCondition** |  Unsupported   |                                              |                      |
 | ByEntityCondition.EntityCondition.**ReachPositionCondition**    |       ✔        | See [here](#reachpositioncondition)          | deprecated from v1.2 |
 | ByEntityCondition.EntityCondition.**DistanceCondition**         |       ✔        | See [here](#distancecondition)               |                      |
-| ByEntityCondition.EntityCondition.**RelativeDistanceCondition** |       ✔        | See [here](#relativedistancecondition)       |                      |
+| ByEntityCondition.EntityCondition.**RelativeDistanceCondition** |       ✔        |                                              |                      |
 | ByValueCondition.**ParameterCondition**                         |       ✔        |                                              |                      |
 | ByValueCondition.**TimeOfDayCondition**                         |  Unsupported   |                                              |                      |
 | ByValueCondition.**SimulationTimeCondition**                    |       ✔        | No                                           |                      |
@@ -320,12 +320,8 @@ OpenSCENARIO standards.
 
 ### DistanceCondition
 
-- Currently, the values of attribute "freespace" and "alongRoute" are ignored and always behave as if freespace="false" and alongRoute="false" were specified.
+- Currently, the values of attribute "alongRoute" is ignored and always behave as if alongRoute="false" was specified.
 - Currently, **only LanePosition and WorldPosition** can be specified for the element of Position of DistanceCondition.
-
-### RelativeDistanceCondition
-
-- Currently, the values of attribute "freespace" is ignored and always behave as if freespace="false" was specified.
 
 ### StoryboardElementStateCondition
 
