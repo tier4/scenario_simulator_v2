@@ -38,16 +38,14 @@ try {
     return node.get_parameter("curvature").as_double();
   }();
 
-  DEBUG(curvature);
+  const auto number_of_lanes = [&]() {
+    node.declare_parameter("number_of_lanes", default_value::number_of_lanes);
+    return node.get_parameter("number_of_lanes").as_int();
+  }();
 
   const auto resolution = [&]() {
     node.declare_parameter("resolution", default_value::resolution);
     return node.get_parameter("resolution").as_int();
-  }();
-
-  const auto number_of_lanes = [&]() {
-    node.declare_parameter("number_of_lanes", default_value::number_of_lanes);
-    return node.get_parameter("number_of_lanes").as_int();
   }();
 
   const auto output_directory = [&]() {

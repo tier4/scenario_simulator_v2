@@ -48,6 +48,11 @@ try {
     return makeCurvature(length, node.get_parameter("angle").as_double());
   }();
 
+  const auto number_of_lanes = [&]() {
+    node.declare_parameter("number_of_lanes", default_value::number_of_lanes);
+    return node.get_parameter("number_of_lanes").as_int();
+  }();
+
   const auto resolution = [&]() {
     node.declare_parameter("resolution", default_value::resolution);
     return node.get_parameter("resolution").as_int();
@@ -63,6 +68,16 @@ try {
   lanelets.push_back(makeLanelet(width, before_length, 0, resolution));
   lanelets.push_back(makeLanelet(lanelets.back(), length, curvature, resolution));
   lanelets.push_back(makeLanelet(lanelets.back(), after_length, 0, resolution));
+
+  for (auto i = 1; i < number_of_lanes; ++i) {
+    lanelets.push_back(makeLaneletRight(lanelets[lanelets.size() - 3], resolution));
+
+    lanelets.push_back(
+      makeLaneletRight(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
+
+    lanelets.push_back(
+      makeLaneletRight(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
+  }
 
   const auto map = lanelet::utils::createMap(lanelets);
 

@@ -275,22 +275,34 @@ auto curvature2d(const lanelet::LineString3d & points)
   }
 }
 
-auto makeLaneletLeft(lanelet::Lanelet & lanelet, double resolution)
+auto makeLaneletLeft(lanelet::Lanelet & right, double resolution)
 {
   return makeLanelet(
     makePoint3d(
-      2 * lanelet.leftBound().front().basicPoint() - lanelet.rightBound().front().basicPoint()),
-    lanelet.leftBound(), lanelet::geometry::length(lanelet.leftBound()),
-    curvature2d(lanelet.leftBound()), resolution);
+      2 * right.leftBound().front().basicPoint() - right.rightBound().front().basicPoint()),
+    right.leftBound(), length(right.leftBound()), curvature2d(right.leftBound()), resolution);
 }
 
-auto makeLaneletRight(lanelet::Lanelet & lanelet, double resolution)
+auto makeLaneletLeft(lanelet::Lanelet & right, lanelet::Lanelet & previous, double resolution)
 {
   return makeLanelet(
-    lanelet.rightBound(),
-    makePoint3d(
-      2 * lanelet.rightBound().front().basicPoint() - lanelet.leftBound().front().basicPoint()),
-    lanelet::geometry::length(lanelet.rightBound()), curvature2d(lanelet.rightBound()), resolution);
+    previous.leftBound().back(), right.leftBound(), length(right.leftBound()),
+    curvature2d(right.leftBound()), resolution);
+}
+
+auto makeLaneletRight(lanelet::Lanelet & left, double resolution)
+{
+  return makeLanelet(
+    left.rightBound(),
+    makePoint3d(2 * left.rightBound().front().basicPoint() - left.leftBound().front().basicPoint()),
+    length(left.rightBound()), curvature2d(left.rightBound()), resolution);
+}
+
+auto makeLaneletRight(lanelet::Lanelet & left, lanelet::Lanelet & previous, double resolution)
+{
+  return makeLanelet(
+    left.rightBound(), previous.rightBound().back(), length(left.rightBound()),
+    curvature2d(left.rightBound()), resolution);
 }
 
 auto write(const lanelet::LaneletMap & map, const std::filesystem::path & output_directory)
