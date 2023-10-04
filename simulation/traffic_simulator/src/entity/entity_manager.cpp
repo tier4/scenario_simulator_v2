@@ -164,7 +164,11 @@ auto EntityManager::getEntityTypeList() const
 {
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> ret;
   for (auto && [name, entity] : entities_) {
-    ret.emplace(name, getEntityType(name));
+    auto type = getEntityType(name);
+    if (type.type == DeletedEntity::ENTITY_TYPE_ID) {
+      continue;
+    }
+    ret.emplace(name, type);
   }
   return ret;
 }

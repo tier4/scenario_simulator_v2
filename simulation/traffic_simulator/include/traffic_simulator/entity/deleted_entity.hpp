@@ -26,6 +26,9 @@ namespace entity
 class DeletedEntity : public EntityBase
 {
 public:
+  // Dummy ID for internal use
+  static constexpr uint8_t ENTITY_TYPE_ID = 0xFF;
+
   explicit DeletedEntity(
     const std::string & name, const CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &);
@@ -40,7 +43,7 @@ public:
   auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override
   {
     static traffic_simulator_msgs::msg::EntityType type;
-    type.type = traffic_simulator_msgs::msg::EntityType::DELETED;
+    type.type = ENTITY_TYPE_ID;  // Dummy ID for internal use
     return type;
   }
 
