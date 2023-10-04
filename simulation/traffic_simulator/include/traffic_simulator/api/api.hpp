@@ -287,6 +287,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLateralDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLongitudinalDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
