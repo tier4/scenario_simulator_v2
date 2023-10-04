@@ -239,6 +239,7 @@ public:
   }                                                                   \
   static_assert(true, "")
 
+  FORWARD_TO_HDMAP_UTILS(getLaneletLength);
   FORWARD_TO_HDMAP_UTILS(toLaneletPose);
   // FORWARD_TO_HDMAP_UTILS(toMapPose);
 

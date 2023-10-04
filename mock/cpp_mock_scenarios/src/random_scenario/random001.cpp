@@ -42,12 +42,43 @@ public:
 private:
   std::shared_ptr<random001::ParamListener> param_listener_;
   random001::Params params_;
+  void spawnRoadParkingVehicles()
+  {
+    const auto spawn_road_parking_vehicle =
+      [&](const auto & entity_index, const auto offset, const auto number_of_vehicles) {
+        std::string entity_name = "road_parking_" + std::to_string(entity_index);
+        constexpr lanelet::Id spawn_lanelet_id = 34705;
+        api_.spawn(
+          entity_name,
+          api_.canonicalize(traffic_simulator::helper::constructLaneletPose(
+            spawn_lanelet_id,
+            static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
+              api_.getLaneletLength(spawn_lanelet_id),
+            0, 0, 0)),
+          getVehicleParameters());
+        api_.requestSpeedChange(entity_name, 0, true);
+      };
+    for (int i = 0; i < params_.random_parameters.road_parking_vehicle.number_of_vehicle; i++) {
+      spawn_road_parking_vehicle(
+        i, 2.3, params_.random_parameters.road_parking_vehicle.number_of_vehicle);
+    }
+  }
+
+  void despawnRoadParkingVehicles()
+  {
+    for (int i = 0; i < params_.random_parameters.road_parking_vehicle.number_of_vehicle; i++) {
+      api_.despawn("road_parking_" + std::to_string(i));
+    }
+  }
+
   void onUpdate() override
   {
     [&]() {
       if (param_listener_->is_old(params_)) {
+        despawnRoadParkingVehicles();
         param_listener_->refresh_dynamic_parameters();
         params_ = param_listener_->get_params();
+        spawnRoadParkingVehicles();
       }
     }();
 
@@ -100,17 +131,7 @@ private:
   {
     params_ = param_listener_->get_params();
 
-    const auto spawn_road_parking_vehicle =
-      [&](const auto & entity_name, const auto spawn_s_value, const auto offset) {
-        api_.spawn(
-          entity_name,
-          api_.canonicalize(
-            traffic_simulator::helper::constructLaneletPose(34705, spawn_s_value, offset, 0, 0, 0)),
-          getVehicleParameters());
-        api_.requestSpeedChange(entity_name, 0, true);
-      };
-    spawn_road_parking_vehicle("road_parking_0", 10.0, 2.3);
-    spawn_road_parking_vehicle("road_parking_1", 5.0, 2.3);
+    spawnRoadParkingVehicles();
 
     api_.spawn(
       "ego",
