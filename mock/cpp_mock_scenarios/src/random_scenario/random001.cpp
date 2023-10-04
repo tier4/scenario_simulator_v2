@@ -138,6 +138,11 @@ private:
       std::string entity_name = "pedestrian" + std::to_string(entity_index);
       constexpr lanelet::Id lanelet_id = 34392;
       if (
+        api_.entityExists(entity_name) &&
+        std::abs(api_.getCurrentAccel(entity_name).linear.x) <= 0.01) {
+        api_.despawn(entity_name);
+      }
+      if (
         !api_.entityExists(entity_name) &&
         !api_.reachPosition(
           "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 25.0)),
@@ -152,8 +157,9 @@ private:
           api_.canonicalize(traffic_simulator::helper::constructLaneletPose(
             lanelet_id, 0.0, offset_distribution(engine_))),
           getPedestrianParameters());
-        api_.requestSpeedChange(entity_name, speed_distribution(engine_), true);
-        api_.setLinearVelocity(entity_name, speed_distribution(engine_));
+        const auto speed = speed_distribution(engine_);
+        api_.requestSpeedChange(entity_name, speed, true);
+        api_.setLinearVelocity(entity_name, speed);
       }
     };
     // spawn_and_cross_pedestrian("pedestrian_0", 34385);
