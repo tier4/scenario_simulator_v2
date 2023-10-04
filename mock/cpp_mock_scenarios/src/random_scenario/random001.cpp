@@ -33,14 +33,24 @@ public:
   explicit RandomScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option)
+      "lanelet2_map.osm", __FILE__, false, option),
+    param_listener_(std::make_shared<random001::ParamListener>(get_node_parameters_interface()))
   {
     start();
   }
 
 private:
+  std::shared_ptr<random001::ParamListener> param_listener_;
+  random001::Params params_;
   void onUpdate() override
   {
+    [&]() {
+      if (param_listener_->is_old(params_)) {
+        param_listener_->refresh_dynamic_parameters();
+        params_ = param_listener_->get_params();
+      }
+    }();
+
     const auto spawn_and_change_lane = [&](const auto & entity_name, const auto spawn_s_value) {
       api_.spawn(
         entity_name,
@@ -88,6 +98,8 @@ private:
   }
   void onInitialize() override
   {
+    params_ = param_listener_->get_params();
+
     const auto spawn_road_parking_vehicle =
       [&](const auto & entity_name, const auto spawn_s_value, const auto offset) {
         api_.spawn(
