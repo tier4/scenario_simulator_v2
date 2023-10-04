@@ -46,6 +46,8 @@ private:
   random001::Params params_;
   std::random_device seed_gen_;
   std::mt19937 engine_;
+  double lane_change_position = 0.0;
+  bool lane_change_requested = false;
   void spawnRoadParkingVehicles()
   {
     std::normal_distribution<> normal_dist(
@@ -116,15 +118,23 @@ private:
         const auto speed = speed_distribution(engine_);
         api_.requestSpeedChange(entity_name, speed, true);
         api_.setLinearVelocity(entity_name, speed);
+        std::uniform_real_distribution<> lane_change_position_distribution(
+          0.0, api_.getLaneletLength(34684));
+        lane_change_position = lane_change_position_distribution(engine_);
+        lane_change_requested = false;
       }
-      api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
+      const auto lanelet_pose = api_.getLaneletPose("ego");
+      if (
+        lanelet_pose &&
+        std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).s) >=
+          lane_change_position) {
+        api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
+        lane_change_requested = true;
+      }
     };
 
     if (api_.isInLanelet("ego", 34684, 0.1)) {
       spawn_and_change_lane("lane_following_0", 0.0);
-      //   if (!api_.entityExists("lane_following_1")) {
-      //     spawn_and_change_lane("lane_following_1", 7.0);
-      //   }
     }
 
     if (api_.isInLanelet("ego", 34606, 0.1)) {
