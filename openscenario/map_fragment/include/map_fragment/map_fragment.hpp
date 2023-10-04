@@ -15,6 +15,8 @@
 #include <lanelet2_core/geometry/LaneletMap.h>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
+#include <lanelet2_traffic_rules/TrafficRules.h>
+#include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <filesystem>
@@ -57,6 +59,20 @@ auto projector() -> const auto &
 {
   static const auto projector = lanelet::projection::UtmProjector(origin());
   return projector;
+}
+
+auto vehicleTrafficRules() -> const auto &
+{
+  static const auto rules = lanelet::traffic_rules::TrafficRulesFactory::create(
+    lanelet::Locations::Germany, lanelet::Participants::Vehicle);
+  return *rules;
+}
+
+auto pedestrianTrafficRules() -> const auto &
+{
+  static const auto rules = lanelet::traffic_rules::TrafficRulesFactory::create(
+    lanelet::Locations::Germany, lanelet::Participants::Pedestrian);
+  return *rules;
 }
 
 auto makePoint3d(double x, double y, double z, double elevation = 0.0)
@@ -111,7 +127,9 @@ auto makeLineString3d(
                                            radius * std::sin(radian - M_PI_2) + radius, 0));
     };
 
-    for (auto radian = 0.0; 0 < resolution; radian += radian_step, --resolution) {
+    line.push_back(origin);
+
+    for (auto radian = radian_step; 1 < resolution; radian += radian_step, --resolution) {
       line.push_back(point3d_at(radian));
     }
 
@@ -125,14 +143,9 @@ auto makeLanelet(const lanelet::LineString3d & left, const lanelet::LineString3d
 {
   static lanelet::Id id = 0;
   auto lane = lanelet::Lanelet(++id, left, right);
-  lane.attributes()["subtype"] = "road";
+  lane.attributes()[lanelet::AttributeName::Subtype] = lanelet::AttributeValueString::Road;
+  lane.attributes()[lanelet::AttributeName::OneWay] = false;
   return lane;
-}
-
-template <typename... Ts>
-[[deprecated]] auto makeLanelet(const std::tuple<Ts...> & left, const std::tuple<Ts...> & right)
-{
-  return makeLanelet(std::apply(makeLineString3d, left), std::apply(makeLineString3d, right));
 }
 
 auto makeLanelet(
@@ -153,8 +166,8 @@ auto makeLanelet(
   const auto rotation = makePerpendicularDirection(p1, p2);
 
   return makeLanelet(
-    std::forward_as_tuple(p1, aligned_length(p1_radius), p1_radius, rotation, resolution),
-    std::forward_as_tuple(p2, aligned_length(p2_radius), p2_radius, rotation, resolution));
+    makeLineString3d(p1, aligned_length(p1_radius), p1_radius, rotation, resolution),
+    makeLineString3d(p2, aligned_length(p2_radius), p2_radius, rotation, resolution));
 }
 
 auto makeLanelet(

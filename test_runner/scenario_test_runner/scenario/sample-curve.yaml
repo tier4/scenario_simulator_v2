@@ -90,13 +90,11 @@ OpenSCENARIO:
                         r: 0
               - RoutingAction:
                   AcquirePositionAction:
-                    Position: &ego_destination
+                    Position: &DESTINATION
                       LanePosition:
                         roadId: ''
-                        # laneId: $ego_lane_id
-                        # s: ${ $before_length + $length + $after_length - 10 }
-                        laneId: '3'
-                        s: ${ $before_length / 2 }
+                        laneId: $ego_lane_id
+                        s: ${ $before_length + $length + $after_length - 10 }
                         offset: 0
                         Orientation:
                           type: relative
@@ -132,7 +130,7 @@ OpenSCENARIO:
                                         - entityRef: ego
                                     EntityCondition:
                                       ReachPositionCondition:
-                                        Position: *ego_destination
+                                        Position: *DESTINATION
                                         tolerance: 1
                         Action:
                           - name: ''
