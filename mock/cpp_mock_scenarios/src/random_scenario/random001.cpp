@@ -24,6 +24,7 @@
 
 // headers in STL
 #include <memory>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -34,7 +35,8 @@ public:
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option),
-    param_listener_(std::make_shared<random001::ParamListener>(get_node_parameters_interface()))
+    param_listener_(std::make_shared<random001::ParamListener>(get_node_parameters_interface())),
+    engine_(seed_gen_())
   {
     start();
   }
@@ -42,8 +44,12 @@ public:
 private:
   std::shared_ptr<random001::ParamListener> param_listener_;
   random001::Params params_;
+  std::random_device seed_gen_;
+  std::mt19937 engine_;
   void spawnRoadParkingVehicles()
   {
+    std::normal_distribution<> normal_dist(
+      0.0, params_.random_parameters.road_parking_vehicle.s_variance);
     const auto spawn_road_parking_vehicle =
       [&](const auto & entity_index, const auto offset, const auto number_of_vehicles) {
         std::string entity_name = "road_parking_" + std::to_string(entity_index);
@@ -53,14 +59,18 @@ private:
           api_.canonicalize(traffic_simulator::helper::constructLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
-              api_.getLaneletLength(spawn_lanelet_id),
-            0, 0, 0)),
+                api_.getLaneletLength(spawn_lanelet_id) +
+              normal_dist(engine_),
+            offset, 0, 0)),
           getVehicleParameters());
         api_.requestSpeedChange(entity_name, 0, true);
       };
+    std::uniform_real_distribution<> dist(
+      params_.random_parameters.road_parking_vehicle.min_offset,
+      params_.random_parameters.road_parking_vehicle.max_offset);
     for (int i = 0; i < params_.random_parameters.road_parking_vehicle.number_of_vehicle; i++) {
       spawn_road_parking_vehicle(
-        i, 2.3, params_.random_parameters.road_parking_vehicle.number_of_vehicle);
+        i, dist(engine_), params_.random_parameters.road_parking_vehicle.number_of_vehicle);
     }
   }
 

@@ -25,8 +25,14 @@ random001:
           bounds<>: [-2.5, 2.5]
       min_offset:
         type: double
-        default_value: 1.0
+        default_value: 2.0
         description: "Minimum offset of the road parking vehicle"
         read_only: false
         validation: 
           bounds<>: [-2.5, 2.5]
+      s_variance:
+        type: double
+        default_value: 1.0
+        description: "Variance of the normal distribution of the s value in the road parking vehicle."
+        validation:
+          bounds<>: [0.0, 2.5]
