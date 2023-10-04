@@ -81,11 +81,22 @@ private:
     }
   }
 
+  void despawnCrossingPedestrians()
+  {
+    for (int i = 0; i < params_.random_parameters.crossing_pedestrian.number_of_pedestrian; i++) {
+      std::string entity_name = "pedestrian" + std::to_string(i);
+      if (api_.entityExists(entity_name)) {
+        api_.despawn(entity_name);
+      }
+    }
+  }
+
   void onUpdate() override
   {
     [&]() {
       if (param_listener_->is_old(params_)) {
         despawnRoadParkingVehicles();
+        despawnCrossingPedestrians();
         param_listener_->refresh_dynamic_parameters();
         params_ = param_listener_->get_params();
         spawnRoadParkingVehicles();
@@ -111,6 +122,7 @@ private:
         spawn_and_change_lane("lane_following_1", 7.0);
       }
     }
+
     if (api_.isInLanelet("ego", 34606, 0.1)) {
       api_.requestAcquirePosition(
         "ego",
@@ -122,20 +134,33 @@ private:
         api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0)));
     }
 
-    const auto spawn_and_cross_pedestrian = [&](const auto & entity_name, const auto lanelet_id) {
+    const auto spawn_and_cross_pedestrian = [&](const auto & entity_index) {
+      std::string entity_name = "pedestrian" + std::to_string(entity_index);
+      constexpr lanelet::Id lanelet_id = 34392;
       if (
         !api_.entityExists(entity_name) &&
         !api_.reachPosition(
           "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 25.0)),
           5.0)) {
+        std::normal_distribution<> offset_distribution(
+          0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
+        std::uniform_real_distribution<> speed_distribution(
+          params_.random_parameters.crossing_pedestrian.min_speed,
+          params_.random_parameters.crossing_pedestrian.max_speed);
         api_.spawn(
           entity_name,
-          api_.canonicalize(traffic_simulator::helper::constructLaneletPose(lanelet_id, 0.0)),
+          api_.canonicalize(traffic_simulator::helper::constructLaneletPose(
+            lanelet_id, 0.0, offset_distribution(engine_))),
           getPedestrianParameters());
+        api_.requestSpeedChange(entity_name, speed_distribution(engine_), true);
+        api_.setLinearVelocity(entity_name, speed_distribution(engine_));
       }
     };
-    spawn_and_cross_pedestrian("pedestrian_0", 34385);
-    spawn_and_cross_pedestrian("pedestrian_1", 34392);
+    // spawn_and_cross_pedestrian("pedestrian_0", 34385);
+    spawn_and_cross_pedestrian(0);
+    for (int i = 0; i < params_.random_parameters.crossing_pedestrian.number_of_pedestrian; i++) {
+      spawn_and_cross_pedestrian(i);
+    }
   }
   void onInitialize() override
   {
