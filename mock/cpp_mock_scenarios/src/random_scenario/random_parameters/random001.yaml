@@ -1,0 +1,31 @@
+random001:
+  crossing_pedestrian:
+    number_of_pedestrian:
+      type: int
+      default_value: 2
+      description: "Number of crossing pedestrian on crosswalk."
+      read_only: false
+      validation: 
+        gt_eq<>: [0]
+  road_parking_vehicle:
+    number_of_vehicle:
+      type: int
+      default_value: 2
+      description: "Number of parking vehicle in road side."
+      read_only: false
+      validation: 
+        gt_eq<>: [0]
+    max_offset:
+      type: double
+      default_value: 2.5
+      description: "Maximum offset of the road parking vehicle"
+      read_only: false
+      validation: 
+        gt_eq<>: [-2.5]
+    min_offset:
+      type: double
+      default_value: 2.5
+      description: "Minimum offset of the road parking vehicle"
+      read_only: false
+      validation: 
+        gt_eq<>: [-2.5]
