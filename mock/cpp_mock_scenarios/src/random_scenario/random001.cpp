@@ -104,23 +104,27 @@ private:
     }();
 
     const auto spawn_and_change_lane = [&](const auto & entity_name, const auto spawn_s_value) {
-      api_.spawn(
-        entity_name,
-        api_.canonicalize(
-          traffic_simulator::helper::constructLaneletPose(34513, spawn_s_value, 0, 0, 0, 0)),
-        getVehicleParameters());
-      api_.requestSpeedChange(entity_name, 10, true);
-      api_.setLinearVelocity(entity_name, 10);
+      if (!api_.entityExists(entity_name)) {
+        api_.spawn(
+          entity_name,
+          api_.canonicalize(
+            traffic_simulator::helper::constructLaneletPose(34513, spawn_s_value, 0, 0, 0, 0)),
+          getVehicleParameters());
+        std::uniform_real_distribution<> speed_distribution(
+          params_.random_parameters.lane_following_vehicle.min_speed,
+          params_.random_parameters.lane_following_vehicle.max_speed);
+        const auto speed = speed_distribution(engine_);
+        api_.requestSpeedChange(entity_name, speed, true);
+        api_.setLinearVelocity(entity_name, speed);
+      }
       api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
     };
 
     if (api_.isInLanelet("ego", 34684, 0.1)) {
-      if (!api_.entityExists("lane_following_0")) {
-        spawn_and_change_lane("lane_following_0", 0.0);
-      }
-      if (!api_.entityExists("lane_following_1")) {
-        spawn_and_change_lane("lane_following_1", 7.0);
-      }
+      spawn_and_change_lane("lane_following_0", 0.0);
+      //   if (!api_.entityExists("lane_following_1")) {
+      //     spawn_and_change_lane("lane_following_1", 7.0);
+      //   }
     }
 
     if (api_.isInLanelet("ego", 34606, 0.1)) {
@@ -137,11 +141,6 @@ private:
     const auto spawn_and_cross_pedestrian = [&](const auto & entity_index) {
       std::string entity_name = "pedestrian" + std::to_string(entity_index);
       constexpr lanelet::Id lanelet_id = 34392;
-      if (
-        api_.entityExists(entity_name) &&
-        std::abs(api_.getCurrentAccel(entity_name).linear.x) <= 0.01) {
-        api_.despawn(entity_name);
-      }
       if (
         !api_.entityExists(entity_name) &&
         !api_.reachPosition(
