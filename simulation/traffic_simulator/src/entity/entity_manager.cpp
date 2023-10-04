@@ -86,7 +86,13 @@ visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 
 bool EntityManager::despawnEntity(const std::string & name)
 {
-  return entityExists(name) && entities_.erase(name);
+  if (!entityExists(name)) {
+    return false;
+  }
+
+  entities_[name].reset(new DeletedEntity(name, getEntityStatus(name), hdmap_utils_ptr_));
+
+  return true;
 }
 
 bool EntityManager::entityExists(const std::string & name)
