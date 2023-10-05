@@ -1434,39 +1434,102 @@ auto HdMapUtils::getLateralDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>
 {
-  const auto route = getRoute(from.lanelet_id, to.lanelet_id);
-  if (route.empty()) {
+  if(const auto distances = getLaneDistances(from, to)) {
+    return distances->second;
+  } else {
     return std::nullopt;
   }
-  return to.offset - from.offset;
+}
+
+auto HdMapUtils::getLaneDistances(
+  const traffic_simulator_msgs::msg::LaneletPose & from,
+  const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<std::pair<double, double>>
+{
+  if (from.lanelet_id == to.lanelet_id) {
+    if (from.s > to.s) {
+      return std::nullopt;
+    } else {
+      return std::make_optional<std::pair<double, double>>({to.s - from.s, to.offset - from.offset});
+    }
+  } else {
+    // list up side lanelets of "from" lanelet
+    lanelet::Ids from_side_lanelets;
+    traffic_simulator_msgs::msg::EntityType type;
+    type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+    from_side_lanelets.push_back(from.lanelet_id);
+    if (auto left_lanelets = getLeftLaneletIds(from.lanelet_id, type); not left_lanelets.empty()) {
+      from_side_lanelets.insert(
+        from_side_lanelets.end(), left_lanelets.begin(), left_lanelets.end());
+    }
+    if (auto right_lanelets = getRightLaneletIds(from.lanelet_id, type);
+        not right_lanelets.empty()) {
+      from_side_lanelets.insert(
+        from_side_lanelets.end(), right_lanelets.begin(), right_lanelets.end());
+    }
+
+    auto get_route_length = [&](const auto & route, const auto & from, const auto & to) -> double {
+      double distance = 0.;
+      for (const auto lanelet_id : route) {
+        if (lanelet_id == from.lanelet_id) {
+          distance = getLaneletLength(from.lanelet_id) - from.s;
+        } else if (lanelet_id == to.lanelet_id) {
+          distance = distance + to.s;
+        } else {
+          distance = distance + getLaneletLength(lanelet_id);
+        }
+      }
+      return distance;
+    };
+
+    // calculate distance between each side lanelet and "to" lanelet and get the shortest distance
+    // Note: The reason why we calculate distances from not only "from" lanelet but also
+    //       side lanelets of "from" lanelet, is to avoid getting wrong distance in looping lanelet map.
+    //       In looping lanelet map, the routing-graph can route the path without lane-changes
+    //       by going around the map.
+    //       In this case, the distance between "from" and "to" will be wrongly long.
+    std::pair<double, double> distances = {std::numeric_limits<double>::max(), 0.};
+    for (const auto & from_side_lanelet : from_side_lanelets) {
+      // The matching distance of 10.0[m] was arbitrarily determined by @Hans_Robo, and the function may not work well on roads wider than this.
+      traffic_simulator_msgs::msg::LaneletPose from_lanelet_pose_on_side_lanelet = *toLaneletPose(toMapPose(from).pose, from_side_lanelet, 10.0);
+
+      double route_distance = [&]() -> double {
+        if (from_lanelet_pose_on_side_lanelet.lanelet_id == to.lanelet_id) {
+          if (from_lanelet_pose_on_side_lanelet.s > to.s) {
+            return std::numeric_limits<double>::max();
+          } else {
+            return to.s - from_lanelet_pose_on_side_lanelet.s;
+          }
+        } else if (const auto route = getRoute(from_side_lanelet, to.lanelet_id);
+                   not route.empty()) {
+          return get_route_length(route, from_lanelet_pose_on_side_lanelet, to);
+        } else {
+          return std::numeric_limits<double>::max();
+        }
+      }();
+
+      if (route_distance < distances.first) {
+        distances.first = route_distance;
+        distances.second = to.offset - from_lanelet_pose_on_side_lanelet.offset;
+      }
+    }
+
+    if (distances.first != std::numeric_limits<double>::max()) {
+      return std::make_optional(distances);
+    } else {
+      return std::nullopt;
+    }
+  }
 }
 
 auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>
 {
-  if (from.lanelet_id == to.lanelet_id) {
-    if (from.s > to.s) {
-      return std::nullopt;
-    } else {
-      return to.s - from.s;
-    }
-  }
-  const auto route = getRoute(from.lanelet_id, to.lanelet_id);
-  if (route.empty()) {
+  if(const auto distances = getLaneDistances(from, to)) {
+    return distances->first;
+  } else {
     return std::nullopt;
   }
-  double distance = 0;
-  for (const auto lanelet_id : route) {
-    if (lanelet_id == from.lanelet_id) {
-      distance = getLaneletLength(from.lanelet_id) - from.s;
-    } else if (lanelet_id == to.lanelet_id) {
-      distance = distance + to.s;
-    } else {
-      distance = distance + getLaneletLength(lanelet_id);
-    }
-  }
-  return distance;
 }
 
 auto HdMapUtils::toMapBin() const -> autoware_auto_mapping_msgs::msg::HADMapBin

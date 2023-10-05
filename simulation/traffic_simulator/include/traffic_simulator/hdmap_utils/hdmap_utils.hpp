@@ -164,6 +164,10 @@ public:
 
   auto getLaneletPolygon(lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
+  auto getLaneDistances(
+    const traffic_simulator_msgs::msg::LaneletPose & from,
+    const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<std::pair<double, double>>;
+
   auto getLateralDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
     const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>;
