@@ -126,43 +126,43 @@ private:
         lane_change_position = lane_change_position_distribution(engine_);
         lane_change_requested = false;
       }
-      const auto lanelet_pose = api_.getLaneletPose("ego");
-      /// Checking the ego entity overs the lane change position.
-      if (
-        lanelet_pose &&
-        static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).lanelet_id == 34684 &&
-        std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).s) >=
-          lane_change_position) {
-        api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
-        lane_change_requested = true;
-      }
+      // const auto lanelet_pose = api_.getLaneletPose("ego");
+      // /// Checking the ego entity overs the lane change position.
+      // if (
+      //   lanelet_pose &&
+      //   static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).lanelet_id == 34684 &&
+      //   std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).s) >=
+      //     lane_change_position) {
+      //   api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
+      //   lane_change_requested = true;
+      // }
     };
 
-    if (api_.isInLanelet("ego", 34684, 0.1)) {
-      spawn_and_change_lane("lane_following_0", 0.0);
-    }
+    // if (api_.isInLanelet("ego", 34684, 0.1)) {
+    //   spawn_and_change_lane("lane_following_0", 0.0);
+    // }
 
     /// Sending loop route to the ego entity.
-    if (api_.isInLanelet("ego", 34606, 0.1)) {
-      api_.requestAcquirePosition(
-        "ego",
-        api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34681, 0, 0, 0, 0, 0)));
-    }
-    if (api_.isInLanelet("ego", 34681, 0.1)) {
-      api_.requestAcquirePosition(
-        "ego",
-        api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0)));
-    }
+    // if (api_.isInLanelet("ego", 34606, 0.1)) {
+    //   api_.requestAcquirePosition(
+    //     "ego",
+    //     api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34681, 0, 0, 0, 0, 0)));
+    // }
+    // if (api_.isInLanelet("ego", 34681, 0.1)) {
+    //   api_.requestAcquirePosition(
+    //     "ego",
+    //     api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0)));
+    // }
 
     /// Spawn and cross pedestrian if it does not exist and ego entity does not exists on lane "34576"
     const auto spawn_and_cross_pedestrian = [&](const auto & entity_index) {
       std::string entity_name = "pedestrian" + std::to_string(entity_index);
       constexpr lanelet::Id lanelet_id = 34392;
       if (
-        !api_.entityExists(entity_name) &&
-        !api_.reachPosition(
+        !api_.entityExists(entity_name) && true
+        /*!api_.reachPosition(
           "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 25.0)),
-          5.0)) {
+          5.0)*/) {
         std::normal_distribution<> offset_distribution(
           0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
         std::uniform_real_distribution<> speed_distribution(
