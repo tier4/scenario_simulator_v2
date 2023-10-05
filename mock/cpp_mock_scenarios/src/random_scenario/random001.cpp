@@ -158,9 +158,10 @@ private:
     //                  traffic_simulator::helper::constructLaneletPose(34690, 10, 0, 0, 0, 0)));
     //     }
     //     if (static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).lanelet_id == 34690) {
+    //       std::cout << __FILE__ << "," << __LINE__ << std::endl;
     //       api_.requestAcquirePosition(
     //         "ego", api_.canonicalize(
-    //                  traffic_simulator::helper::constructLaneletPose(34621, 5, 0, 0, 0, 0)));
+    //                  traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0)));
     //     }
     //     if (static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).lanelet_id == 34621) {
     //       api_.requestAcquirePosition(
@@ -176,10 +177,10 @@ private:
       std::string entity_name = "pedestrian" + std::to_string(entity_index);
       constexpr lanelet::Id lanelet_id = 34392;
       if (
-        !api_.entityExists(entity_name) && true
-        /*!api_.reachPosition(
+        !api_.entityExists(entity_name) &&
+        !api_.reachPosition(
           "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 25.0)),
-          5.0)*/) {
+          5.0)) {
         std::normal_distribution<> offset_distribution(
           0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
         std::uniform_real_distribution<> speed_distribution(
