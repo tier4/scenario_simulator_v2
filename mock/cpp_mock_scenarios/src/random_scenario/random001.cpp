@@ -189,15 +189,20 @@ private:
     /// Spawn road parking vehicle with initial parameters.
     spawnRoadParkingVehicles();
 
-    api_.spawn(
-      "ego",
+    spawnEgoEntity(
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0)),
+      {api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0))},
       getVehicleParameters());
-    api_.requestAcquirePosition(
-      "ego",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0)));
-    api_.requestSpeedChange("ego", 10, true);
-    api_.setLinearVelocity("ego", 10);
+
+    // api_.spawn(
+    //   "ego",
+    //   api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0)),
+    //   getVehicleParameters());
+    // api_.requestAcquirePosition(
+    //   "ego",
+    //   api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0)));
+    // api_.requestSpeedChange("ego", 10, true);
+    // api_.setLinearVelocity("ego", 10);
   }
 };
 
