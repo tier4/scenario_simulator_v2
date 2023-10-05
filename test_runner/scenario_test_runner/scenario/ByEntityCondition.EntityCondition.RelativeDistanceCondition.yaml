@@ -28,6 +28,16 @@ OpenSCENARIO:
         CatalogReference: *SAMPLE_VEHICLE
       - name: car_4
         CatalogReference: *SAMPLE_VEHICLE
+      - name: car_5
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: car_6
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: car_7
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: car_8
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: car_9
+        CatalogReference: *SAMPLE_VEHICLE
   Storyboard:
     Init:
       Actions:
@@ -88,6 +98,81 @@ OpenSCENARIO:
                     LanePosition:
                       << : *CAR_2_LANE_POSITION
                       s: 0
+              - LongitudinalAction: *SPEED_ACTION_ZERO
+          - entityRef: car_5
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34507
+                      s: 10
+                      offset: 0.0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction: *SPEED_ACTION_ZERO
+          - entityRef: car_6
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34468
+                      s: 20
+                      offset: 0.0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction: *SPEED_ACTION_ZERO
+          - entityRef: car_7
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34468
+                      s: 30
+                      offset: 0.0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction: *SPEED_ACTION_ZERO
+          - entityRef: car_8
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34507
+                      s: 40
+                      offset: 0.0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction: *SPEED_ACTION_ZERO
+          - entityRef: car_9
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34606
+                      s: 10
+                      offset: 0.0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
               - LongitudinalAction: *SPEED_ACTION_ZERO
     Story:
       - name: story
@@ -181,6 +266,70 @@ OpenSCENARIO:
                                         relativeDistanceType: lateral
                                         rule: equalTo
                                         value: 0.5
+                                - name: "check longitudinal distance without looped route (correct : 10m, incorrect: over 200m)"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_5
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: car_6
+                                        freespace: false # True: distance is measured between closest bounding box points. False: reference point distance is used.
+                                        relativeDistanceType: longitudinal
+                                        rule: lessThan
+                                        value: 12.0
+                                - name: "check lateral distance without looped route (correct : -3m, incorrect: 0m)"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_5
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: car_6
+                                        freespace: false # True: distance is measured between closest bounding box points. False: reference point distance is used.
+                                        relativeDistanceType: lateral
+                                        rule: lessThan
+                                        value: -1.0
+                                - name: "check longitudinal distance that needs lane change and avoids looped measurement (correct : 44m, incorrect: over 150[m])"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_7
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: car_6
+                                        freespace: false # True: distance is measured between closest bounding box points. False: reference point distance is used.
+                                        relativeDistanceType: longitudinal
+                                        rule: lessThan
+                                        value: 100
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_8
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: car_9
+                                        freespace: false # True: distance is measured between closest bounding box points. False: reference point distance is used.
+                                        relativeDistanceType: longitudinal
+                                        rule: lessThan
+                                        value: 50
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none
