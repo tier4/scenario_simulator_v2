@@ -19,10 +19,8 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
-
-#include <tier4_simulation_msgs/msg/simulation_events.hpp>
-
 #include <string>
+#include <tier4_simulation_msgs/msg/simulation_events.hpp>
 #include <vector>
 
 namespace openscenario_interpreter
