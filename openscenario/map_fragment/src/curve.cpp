@@ -71,12 +71,22 @@ try {
 
   for (auto i = 1; i < number_of_lanes; ++i) {
     lanelets.push_back(makeLaneletRight(lanelets[lanelets.size() - 3], resolution));
-
     lanelets.push_back(
       makeLaneletRight(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
-
     lanelets.push_back(
       makeLaneletRight(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
+  }
+
+  lanelets.push_back(makeInvertedLaneletLeft(lanelets.back(), resolution));
+  lanelets.push_back(
+    makeInvertedLaneletLeft(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
+  lanelets.push_back(
+    makeInvertedLaneletLeft(lanelets[lanelets.size() - 5], lanelets.back(), resolution));
+
+  for (auto i = 1; i < number_of_lanes; ++i) {
+    lanelets.push_back(makeLaneletLeft(lanelets[lanelets.size() - 3], resolution));
+    lanelets.push_back(makeLaneletLeft(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
+    lanelets.push_back(makeLaneletLeft(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
   }
 
   const auto map = lanelet::utils::createMap(lanelets);

@@ -290,6 +290,22 @@ auto makeLaneletLeft(lanelet::Lanelet & right, lanelet::Lanelet & previous, doub
     curvature2d(right.leftBound()), resolution);
 }
 
+auto makeInvertedLaneletLeft(lanelet::Lanelet & right, double resolution)
+{
+  return makeLanelet(
+    makePoint3d(2 * right.rightBound().back().basicPoint() - right.leftBound().back().basicPoint()),
+    right.rightBound().invert(), length(right.rightBound().invert()),
+    curvature2d(right.rightBound().invert()), resolution);
+}
+
+auto makeInvertedLaneletLeft(
+  lanelet::Lanelet & right, lanelet::Lanelet & previous, double resolution)
+{
+  return makeLanelet(
+    previous.leftBound().back(), right.rightBound().invert(), length(right.rightBound().invert()),
+    curvature2d(right.rightBound().invert()), resolution);
+}
+
 auto makeLaneletRight(lanelet::Lanelet & left, double resolution)
 {
   return makeLanelet(
