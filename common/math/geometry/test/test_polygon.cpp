@@ -18,30 +18,19 @@
 
 #include "expect_eq_macros.hpp"
 
+geometry_msgs::msg::Point makePoint(double x, double y, double z = 0)
+{
+  geometry_msgs::msg::Point p;
+  p.x = x;
+  p.y = y;
+  p.z = z;
+  return p;
+}
+
 TEST(Polygon, filterByAxis)
 {
-  std::vector<geometry_msgs::msg::Point> points;
-  geometry_msgs::msg::Point p0;
-  {
-    p0.x = 5.0;
-    p0.y = 2.0;
-    p0.z = 3.0;
-  }
-  points.emplace_back(p0);
-  geometry_msgs::msg::Point p1;
-  {
-    p1.x = 1.0;
-    p1.y = 4.0;
-    p1.z = 5.0;
-  }
-  points.emplace_back(p1);
-  geometry_msgs::msg::Point p2;
-  {
-    p2.x = -1.0;
-    p2.y = 2.0;
-    p2.z = -3.0;
-  }
-  points.emplace_back(p2);
+  std::vector<geometry_msgs::msg::Point> points{
+    makePoint(5, 2, 3), makePoint(1, 4, 5), makePoint(-1, 2, -3)};
   std::vector<double> values;
   values = math::geometry::filterByAxis(points, math::geometry::Axis::X);
   EXPECT_DOUBLE_EQ(values[0], 5);
@@ -57,75 +46,34 @@ TEST(Polygon, filterByAxis)
   EXPECT_DOUBLE_EQ(values[2], -3);
 }
 
-TEST(Polygon, GetMinMaxValue)
+TEST(Polygon, GetMinValue)
 {
-  std::vector<geometry_msgs::msg::Point> points;
-  geometry_msgs::msg::Point p0;
-  {
-    p0.x = 5.0;
-    p0.y = 2.0;
-    p0.z = 3.0;
-  }
-  points.emplace_back(p0);
-  geometry_msgs::msg::Point p1;
-  {
-    p1.x = 1.0;
-    p1.y = 4.0;
-    p1.z = 5.0;
-  }
-  points.emplace_back(p1);
-  geometry_msgs::msg::Point p2;
-  {
-    p2.x = -1.0;
-    p2.y = 2.0;
-    p2.z = -3.0;
-  }
-  points.emplace_back(p2);
+  std::vector<geometry_msgs::msg::Point> points{
+    makePoint(5, 2, 3), makePoint(1, 4, 5), makePoint(-1, 2, -3)};
   EXPECT_DOUBLE_EQ(math::geometry::getMaxValue(points, math::geometry::Axis::X), 5);
-  EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::X), -1);
   EXPECT_DOUBLE_EQ(math::geometry::getMaxValue(points, math::geometry::Axis::Y), 4);
-  EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::Y), 2);
   EXPECT_DOUBLE_EQ(math::geometry::getMaxValue(points, math::geometry::Axis::Z), 5);
+}
+
+TEST(Polygon, getMinValue)
+{
+  std::vector<geometry_msgs::msg::Point> points{
+    makePoint(5, 2, 3), makePoint(1, 4, 5), makePoint(-1, 2, -3)};
+  EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::X), -1);
+  EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::Y), 2);
   EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::Z), -3);
 }
 
 TEST(Polygon, get2DConvexHull)
 {
-  std::vector<geometry_msgs::msg::Point> points;
-  geometry_msgs::msg::Point p0;
-  {
-    p0.x = 2.0;
-    p0.y = 2.0;
-    p0.z = 0.0;
-  }
-  points.emplace_back(p0);
-  geometry_msgs::msg::Point p1;
-  {
-    p1.x = -2.0;
-    p1.y = 2.0;
-    p1.z = 0.0;
-  }
-  points.emplace_back(p1);
-  geometry_msgs::msg::Point p2;
-  {
-    p2.x = -2.0;
-    p2.y = -2.0;
-    p2.z = 0.0;
-  }
-  points.emplace_back(p2);
-  geometry_msgs::msg::Point p3;
-  {
-    p3.x = -1.0;
-    p3.y = 0.0;
-    p3.z = 0.0;
-  }
-  points.emplace_back(p3);
+  std::vector<geometry_msgs::msg::Point> points{
+    makePoint(2, 2), makePoint(-2, 2), makePoint(-2, -2), makePoint(-1, 0)};
   const auto hull = math::geometry::get2DConvexHull(points);
   EXPECT_EQ(hull.size(), static_cast<size_t>(4));
-  EXPECT_POINT_EQ(hull[0], p2);
-  EXPECT_POINT_EQ(hull[1], p1);
-  EXPECT_POINT_EQ(hull[2], p0);
-  EXPECT_POINT_EQ(hull[3], p2);
+  EXPECT_POINT_EQ(hull[0], points[2]);
+  EXPECT_POINT_EQ(hull[1], points[1]);
+  EXPECT_POINT_EQ(hull[2], points[0]);
+  EXPECT_POINT_EQ(hull[3], points[2]);
 }
 
 int main(int argc, char ** argv)
