@@ -19,8 +19,10 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <pugixml.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <string>
+
 #include <tier4_simulation_msgs/msg/simulation_events.hpp>
+
+#include <string>
 #include <vector>
 
 namespace openscenario_interpreter
@@ -33,192 +35,141 @@ struct SpecialAction : public std::integral_constant<int, Value>
 };
 
 template <>
-struct SpecialAction<EXIT_FAILURE> : public std::integral_constant<int, EXIT_FAILURE>
+class SpecialAction<EXIT_FAILURE> : public std::integral_constant<int, EXIT_FAILURE>,
+                                    public std::runtime_error
 {
-private:
-  struct CoreSource
+  const std::function<std::string(const std::string &)> make_message;
+  const std::string source_name;
+  const std::string path;
+
+  template <typename... Ts>
+  static auto concatenate(Ts &&... xs)
   {
-    enum class SourceType {
-      UNKNOWN,
-      ANONYMOUS,
-      ANONYMOUS_CONDITION,
-      ANONYMOUS_CONDITIONS,
-      NAMED_CONDITION,
-      NAMED_CONDITIONS
-    };
+    std::stringstream ss;
+    (ss << ... << xs);
+    return ss.str();
+  }
 
-    explicit CoreSource(const std::string & trigger_name)
-    : trigger_name_{trigger_name},
-      type_{SourceType::ANONYMOUS},
-      conditions_description_{""},
-      conditions_name_{""}
+  template <typename Container>
+  struct comma_separated
+  {
+    const Container & container;
+    const std::function<void(std::ostream &, const typename Container::value_type &)> print;
+
+    template <typename Printer>
+    explicit comma_separated(const Container & container, Printer && print)
+    : container{container}, print{std::forward<decltype(print)>(print)}
     {
     }
 
-    CoreSource(
-      const std::string & trigger_name,
-      const std::vector<std::pair<std::string, std::string>> & conditions_list)
-    : trigger_name_{trigger_name}
+    friend auto operator<<(std::ostream & os, const comma_separated & cs) -> std::ostream &
     {
-      auto anonymous{std::any_of(
-        conditions_list.begin(), conditions_list.end(),
-        [](const auto & condition) { return condition.first.empty(); })};
-
-      std::stringstream conditions_name(""), conditions_description("");
-      if (conditions_list.size() == 1) {
-        type_ = anonymous ? SourceType::ANONYMOUS_CONDITION : SourceType::NAMED_CONDITION;
-        conditions_name << std::quoted(conditions_list.front().first);
-        conditions_description << conditions_list.front().second;
-      } else {
-        type_ = anonymous ? SourceType::ANONYMOUS_CONDITIONS : SourceType::NAMED_CONDITIONS;
-        std::size_t i = 0;
-        for (const auto & condition : conditions_list) {
-          conditions_name << std::quoted(condition.first);
-          conditions_description << "{"
-                                 << std::quoted(anonymous ? std::to_string(i++) : condition.first)
-                                 << ": " << condition.second << "}";
-          if (&condition != &conditions_list.back()) {
-            conditions_name << ", ";
-            conditions_description << ", ";
-          }
-        }
+      auto separator = "";
+      for (const auto & value : cs.container) {
+        os << std::exchange(separator, ", ");
+        cs.print(os, value);
       }
-      conditions_name_ = conditions_name.str();
-      conditions_description_ = conditions_description.str();
+      return os;
     }
-
-    auto comprehensiveLog(const std::string & trigger_path) const -> std::string
-    {
-      std::stringstream log;
-      log << "CustomCommandAction typed " << std::quoted("exitFailure") << " was triggered by the ";
-      switch (type_) {
-        case SourceType::ANONYMOUS: {
-          log << trigger_name_ << " (" << trigger_path << ")";
-          break;
-        }
-        case SourceType::ANONYMOUS_CONDITION: {
-          log << "anonymous " << trigger_name_ << " (" << trigger_path << "." << trigger_name_
-              << "[0]): " << conditions_description_;
-          break;
-        }
-        case SourceType::NAMED_CONDITION: {
-          log << trigger_name_ << " named " << conditions_name_ << ": " << conditions_description_;
-          break;
-        }
-        case SourceType::ANONYMOUS_CONDITIONS: {
-          log << "anonymous " << trigger_name_ << "s (" << trigger_path << "." << trigger_name_
-              << "[...]): " << conditions_description_;
-          break;
-        }
-        case SourceType::NAMED_CONDITIONS: {
-          log << "named " << trigger_name_ << "s {" << conditions_name_
-              << "}: " << conditions_description_;
-          break;
-        }
-        default: {
-          throw std::runtime_error(
-            "Unsupported case of CoreSource in SpecialAction - this should not happen.");
-        }
-      }
-      return log.str();
-    }
-
-  private:
-    const std::string trigger_name_{""};
-    SourceType type_{SourceType::UNKNOWN};
-    std::string conditions_description_{""};
-    std::string conditions_name_{""};
   };
 
-public:
-  SpecialAction() = default;
-  ~SpecialAction() = default;
+  template <typename Conditions>
+  static auto makeMessage(
+    const std::string & trigger_name, const std::string & trigger_path,
+    const Conditions & conditions)
+  {
+    std::stringstream what;
+    what << "CustomCommandAction typed " << std::quoted("exitFailure") << " was triggered by the ";
+    const auto anonymous = std::any_of(
+      conditions.begin(), conditions.end(),
+      [](const auto & condition) { return condition.first.empty(); });
+    switch (conditions.size()) {
+      case 0:
+        what << trigger_name << " (" << trigger_path << ")";
+        break;
+      case 1:
+        if (anonymous) {
+          what << "anonymous " << trigger_name << " (" << trigger_path << "." << trigger_name
+               << "[0]): " << conditions[0].second;
+        } else {
+          what << trigger_name << " named " << std::quoted(conditions[0].first) << ": "
+               << conditions[0].second;
+        }
+        break;
+      default:
+        if (anonymous) {
+          what << "anonymous " << trigger_name << "s (" << trigger_path << "." << trigger_name
+               << "[...]): "
+               << comma_separated(conditions, [i = 0](auto & os, const auto & condition) mutable {
+                    os << '{' << std::quoted(std::to_string(i++)) << ": " << condition.second
+                       << '}';
+                  });
+        } else {
+          what << "named " << trigger_name << "s {"
+               << comma_separated(
+                    conditions,
+                    [](auto & os, const auto & condition) { os << std::quoted(condition.first); })
+               << "}: " << comma_separated(conditions, [](auto & os, const auto & condition) {
+                    os << '{' << std::quoted(condition.first) << ": " << condition.second << '}';
+                  });
+        }
+        break;
+    }
+    return what.str();
+  }
 
-  // Constructor with no inner object - first object with conditions
-  SpecialAction(
-    const std::string & source_name, const std::string & element_name, int element_index,
-    const std::string & trigger_name_,
-    const std::vector<std::pair<std::string, std::string>> & conditions_list)
-  : source_name_{source_name},
-    inner_{nullptr},
-    core_{std::make_shared<CoreSource>(trigger_name_, conditions_list)},
-    path_{formatPath(element_name, element_index)},
-    log_{core_->comprehensiveLog(path_)}
+public:
+  SpecialAction()
+  : std::runtime_error{
+      "CustomCommandAction typed \"exitFailure\" was triggered on an unexpected code path. This is "
+      "a simulator bug. Report this to the simulator developer."}
   {
   }
 
-  // Constructor with no inner object - first object without conditions
-  SpecialAction(
+  explicit SpecialAction(
+    const std::function<std::string(const std::string &)> & make_message,
+    const std::string & source_name, const std::string & path)
+  : std::runtime_error{make_message(path)},
+    make_message{make_message},
+    source_name{source_name},
+    path{path}
+  {
+  }
+
+  // Constructor with no inner object - first object with conditions
+  explicit SpecialAction(
     const std::string & source_name, const std::string & element_name, int element_index,
-    const std::string & trigger_name_)
-  : source_name_{source_name},
-    inner_{nullptr},
-    core_{std::make_shared<CoreSource>(trigger_name_)},
-    path_{formatPath(element_name, element_index)},
-    log_{core_->comprehensiveLog(path_)}
+    const std::string & trigger_name,
+    const std::vector<std::pair<std::string, std::string>> & conditions = {})
+  : SpecialAction{
+      [trigger_name, conditions](const auto & trigger_path) {
+        return makeMessage(trigger_name, trigger_path, conditions);
+      },
+      source_name, concatenate('.', element_name, '[', element_index, ']')}
   {
   }
 
   // Constructor with inner object and current source (to be forwarded) - intermediate object
-  SpecialAction(
+  explicit SpecialAction(
     const std::string & source_name, const std::string & element_name, int element_index,
     SpecialAction const & inner)
-  : source_name_{source_name},
-    inner_{std::make_shared<SpecialAction>(inner)},
-    core_{inner.core_},
-    path_{formatPath(element_name, element_index)},
-    log_{core_->comprehensiveLog(path_)}
+  : SpecialAction{
+      inner.make_message, source_name,
+      concatenate(
+        '.', element_name, '[',
+        (inner.source_name.empty() ? std::to_string(element_index) : '"' + inner.source_name + '"'),
+        ']', inner.path)}
   {
   }
 
   // Constructor with inner but without current source -- last object
-  SpecialAction(const std::string & element_name, const SpecialAction & inner)
-  : source_name_{""},
-    inner_{std::make_shared<SpecialAction>(inner)},
-    core_{inner.core_},
-    path_{formatPath(element_name)},
-    log_{core_->comprehensiveLog(path_)}
+  explicit SpecialAction(const std::string & element_name, const SpecialAction & inner)
+  : SpecialAction{
+      inner.make_message, "",
+      concatenate(
+        element_name, (inner.source_name.empty() ? "" : "." + inner.source_name), inner.path)}
   {
   }
-
-  const char * what() const noexcept { return log_.c_str(); }
-
-private:
-  auto formatPath(const std::string & element_name) -> std::string
-  {
-    if (!inner_) {
-      return element_name;
-    }
-
-    std::stringstream ss("");
-    ss << element_name;
-    if (!inner_->source_name_.empty()) {
-      ss << "." << inner_->source_name_;
-    }
-    ss << inner_->path_;
-    return ss.str();
-  }
-
-  auto formatPath(const std::string & element_name, int element_index) -> std::string
-  {
-    std::stringstream ss("");
-    ss << '.' << element_name << "[";
-    if (inner_ && !inner_->source_name_.empty()) {
-      ss << std::quoted(inner_->source_name_) << "]";
-    } else {
-      ss << element_index << ']';
-    }
-    if (inner_) {
-      ss << inner_->path_;
-    }
-    return ss.str();
-  }
-
-  const std::shared_ptr<const SpecialAction> inner_{nullptr};
-  const std::shared_ptr<const CoreSource> core_{nullptr};
-  const std::string source_name_{""};
-  const std::string path_{""};
-  const std::string log_{"No core source - the path is empty"};
 };
 
 struct CustomCommand
