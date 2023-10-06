@@ -16,13 +16,44 @@
 
 #include <geometry/spline/hermite_curve.hpp>
 
+constexpr double EPS = 1e-3;
+
+geometry_msgs::msg::Point makePoint(double x, double y, double z = 0)
+{
+  geometry_msgs::msg::Point p;
+  p.x = x;
+  p.y = y;
+  p.z = z;
+  return p;
+}
+
+geometry_msgs::msg::Vector3 makeVector(double x, double y, double z = 0)
+{
+  geometry_msgs::msg::Vector3 v;
+  v.x = x;
+  v.y = y;
+  v.z = z;
+  return v;
+}
+
+geometry_msgs::msg::Pose makePose(
+  double x, double y, double z = 0,
+  geometry_msgs::msg::Quaternion q = geometry_msgs::msg::Quaternion())
+{
+  geometry_msgs::msg::Pose p;
+  p.position.x = x;
+  p.position.y = y;
+  p.position.z = z;
+  p.orientation = q;
+  return p;
+}
+
 TEST(HermiteCurveTest, CheckCollisionToLine)
 {
-  geometry_msgs::msg::Pose start_pose, goal_pose;
-  geometry_msgs::msg::Vector3 start_vec, goal_vec;
-  goal_pose.position.x = 1;
-  start_vec.x = 1;
-  goal_vec.x = 1;
+  geometry_msgs::msg::Pose start_pose = makePose(0, 0);
+  geometry_msgs::msg::Pose goal_pose = makePose(1, 0);
+  geometry_msgs::msg::Vector3 start_vec = makeVector(1, 0);
+  geometry_msgs::msg::Vector3 goal_vec = makeVector(1, 0);
   math::geometry::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
   EXPECT_DOUBLE_EQ(curve.getLength(), 1);
   EXPECT_DOUBLE_EQ(curve.get2DCurvature(0, true), 0);
@@ -40,19 +71,12 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x, 1);
   EXPECT_DOUBLE_EQ(curve.getMaximum2DCurvature(), 0);
   geometry_msgs::msg::Pose p;
-  p.position.x = 0.1;
-  p.position.y = 0;
-  p.position.z = 0;
+  p.position = makePoint(0.1, 0);
   EXPECT_TRUE(curve.getSValue(p, 1, true));
-  EXPECT_TRUE(
-    (curve.getSValue(p, 1, true).value() > 0.099) && (curve.getSValue(p, 1, true).value() < 0.101));
+  EXPECT_NEAR(curve.getSValue(p, 1, true).value(), 0.1, EPS);
   {
-    geometry_msgs::msg::Point start;
-    start.x = 0.1;
-    start.y = 1.0;
-    geometry_msgs::msg::Point goal;
-    goal.x = 0.1;
-    goal.y = -1.0;
+    geometry_msgs::msg::Point start = makePoint(0.1, 1.0);
+    geometry_msgs::msg::Point goal = makePoint(0.1, -1.0);
     auto collision_s = curve.getCollisionPointIn2D(start, goal);
     EXPECT_FALSE(curve.getCollisionPointIn2D({}));
     EXPECT_FALSE(curve.getCollisionPointIn2D({start}));
@@ -62,12 +86,8 @@ TEST(HermiteCurveTest, CheckCollisionToLine)
     }
   }
   {
-    geometry_msgs::msg::Point start;
-    start.x = 0.1;
-    start.y = 1.0;
-    geometry_msgs::msg::Point goal;
-    goal.x = 0.2;
-    goal.y = -1.0;
+    geometry_msgs::msg::Point start = makePoint(0.1, 1.0);
+    geometry_msgs::msg::Point goal = makePoint(0.2, -1.0);
     auto collision_s = curve.getCollisionPointIn2D(start, goal);
     EXPECT_TRUE(collision_s);
     if (collision_s) {
@@ -81,80 +101,52 @@ TEST(HermiteCurveTest, getNewtonMethodStepSize) {}
 TEST(HermiteCurveTest, CheckNormalVector)
 {
   {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
-    geometry_msgs::msg::Pose start_pose, goal_pose;
-    geometry_msgs::msg::Vector3 start_vec, goal_vec;
-    start_pose.position.x = 0;
-    start_pose.position.y = 0;
-    goal_pose.position.x = 1;
-    goal_pose.position.y = 1;
-    start_vec.x = 1;
-    start_vec.y = 0;
-    goal_vec.x = 0;
-    goal_vec.y = 1;
+    geometry_msgs::msg::Pose start_pose = makePose(0, 0);
+    geometry_msgs::msg::Pose goal_pose = makePose(1, 1);
+    geometry_msgs::msg::Vector3 start_vec = makeVector(1, 0);
+    geometry_msgs::msg::Vector3 goal_vec = makeVector(0, 1);
     math::geometry::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
-    double norm = std::sqrt(
-      curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
-      curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
+    double norm =
+      std::hypot(curve.getTangentVector(0.5, false).x, curve.getTangentVector(0.5, false).y);
     EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, 1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, 1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, -1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).y / norm, 1 / std::sqrt(2));
   }
   {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
-    geometry_msgs::msg::Pose start_pose, goal_pose;
-    geometry_msgs::msg::Vector3 start_vec, goal_vec;
-    start_pose.position.x = 0;
-    start_pose.position.y = 0;
-    goal_pose.position.x = 1;
-    goal_pose.position.y = -1;
-    start_vec.x = 1;
-    start_vec.y = 0;
-    goal_vec.x = 0;
-    goal_vec.y = -1;
+    geometry_msgs::msg::Pose start_pose = makePose(0, 0);
+    geometry_msgs::msg::Pose goal_pose = makePose(1, -1);
+    geometry_msgs::msg::Vector3 start_vec = makeVector(1, 0);
+    geometry_msgs::msg::Vector3 goal_vec = makeVector(0, -1);
     math::geometry::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
-    double norm = std::sqrt(
-      curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
-      curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
+    double norm =
+      std::hypot(curve.getTangentVector(0.5, false).x, curve.getTangentVector(0.5, false).y);
     EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, 1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, -1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, 1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).y / norm, 1 / std::sqrt(2));
   }
   {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
-    geometry_msgs::msg::Pose start_pose, goal_pose;
-    geometry_msgs::msg::Vector3 start_vec, goal_vec;
-    start_pose.position.x = 1;
-    start_pose.position.y = 1;
-    goal_pose.position.x = 0;
-    goal_pose.position.y = 0;
-    start_vec.x = 0;
-    start_vec.y = -1;
-    goal_vec.x = -1;
-    goal_vec.y = 0;
+    geometry_msgs::msg::Pose start_pose = makePose(1, 1);
+    geometry_msgs::msg::Pose goal_pose = makePose(0, 0);
+    geometry_msgs::msg::Vector3 start_vec = makeVector(0, -1);
+    geometry_msgs::msg::Vector3 goal_vec = makeVector(-1, 0);
     math::geometry::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
-    double norm = std::sqrt(
-      curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
-      curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
+    double norm =
+      std::hypot(curve.getTangentVector(0.5, false).x, curve.getTangentVector(0.5, false).y);
     EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, -1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, -1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, 1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).y / norm, -1 / std::sqrt(2));
   }
   {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
-    geometry_msgs::msg::Pose start_pose, goal_pose;
-    geometry_msgs::msg::Vector3 start_vec, goal_vec;
-    start_pose.position.x = 1;
-    start_pose.position.y = -1;
-    goal_pose.position.x = 0;
-    goal_pose.position.y = 0;
-    start_vec.x = 0;
-    start_vec.y = 1;
-    goal_vec.x = -1;
-    goal_vec.y = 0;
+    geometry_msgs::msg::Pose start_pose = makePose(1, -1);
+    geometry_msgs::msg::Pose goal_pose = makePose(0, 0);
+    geometry_msgs::msg::Vector3 start_vec = makeVector(0, 1);
+    geometry_msgs::msg::Vector3 goal_vec = makeVector(-1, 0);
     math::geometry::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
-    double norm = std::sqrt(
-      curve.getTangentVector(0.5, false).x * curve.getTangentVector(0.5, false).x +
-      curve.getTangentVector(0.5, false).y * curve.getTangentVector(0.5, false).y);
+    double norm =
+      std::hypot(curve.getTangentVector(0.5, false).x, curve.getTangentVector(0.5, false).y);
     EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, -1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).y / norm, 1 / std::sqrt(2));
     EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, -1 / std::sqrt(2));
