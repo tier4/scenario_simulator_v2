@@ -166,7 +166,7 @@ auto operator<<(std::ostream & os, const TrafficLight::Bulb & bulb) -> std::ostr
             << std::get<TrafficLight::Shape>(bulb.value);
 }
 
-TrafficLight::TrafficLight(const LaneletId lanelet_id, hdmap_utils::HdMapUtils & map_manager)
+TrafficLight::TrafficLight(const lanelet::Id lanelet_id, hdmap_utils::HdMapUtils & map_manager)
 : way_id([&]() {
     if (map_manager.isTrafficLight(lanelet_id)) {
       return lanelet_id;

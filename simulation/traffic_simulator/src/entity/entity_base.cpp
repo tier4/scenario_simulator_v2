@@ -113,13 +113,12 @@ auto EntityBase::getDistanceToLaneBound() -> double
   return std::min(getDistanceToLeftLaneBound(), getDistanceToRightLaneBound());
 }
 
-auto EntityBase::getDistanceToLaneBound(std::int64_t lanelet_id) const -> double
+auto EntityBase::getDistanceToLaneBound(lanelet::Id lanelet_id) const -> double
 {
   return std::min(getDistanceToLeftLaneBound(lanelet_id), getDistanceToRightLaneBound(lanelet_id));
 }
 
-auto EntityBase::getDistanceToLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
-  -> double
+auto EntityBase::getDistanceToLaneBound(const lanelet::Ids & lanelet_ids) const -> double
 {
   return std::min(
     getDistanceToLeftLaneBound(lanelet_ids), getDistanceToRightLaneBound(lanelet_ids));
@@ -130,7 +129,7 @@ auto EntityBase::getDistanceToLeftLaneBound() -> double
   return getDistanceToLeftLaneBound(getRouteLanelets());
 }
 
-auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> double
+auto EntityBase::getDistanceToLeftLaneBound(lanelet::Id lanelet_id) const -> double
 {
   if (const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
@@ -145,13 +144,12 @@ auto EntityBase::getDistanceToLeftLaneBound(std::int64_t lanelet_id) const -> do
   }
 }
 
-auto EntityBase::getDistanceToLeftLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
-  -> double
+auto EntityBase::getDistanceToLeftLaneBound(const lanelet::Ids & lanelet_ids) const -> double
 {
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
+    [this](auto lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
   return *std::min_element(distances.begin(), distances.end());
 }
 
@@ -160,7 +158,7 @@ auto EntityBase::getDistanceToRightLaneBound() -> double
   return getDistanceToRightLaneBound(getRouteLanelets());
 }
 
-auto EntityBase::getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> double
+auto EntityBase::getDistanceToRightLaneBound(lanelet::Id lanelet_id) const -> double
 {
   if (const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
@@ -176,13 +174,12 @@ auto EntityBase::getDistanceToRightLaneBound(std::int64_t lanelet_id) const -> d
   }
 }
 
-auto EntityBase::getDistanceToRightLaneBound(const std::vector<std::int64_t> & lanelet_ids) const
-  -> double
+auto EntityBase::getDistanceToRightLaneBound(const lanelet::Ids & lanelet_ids) const -> double
 {
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [this](std::int64_t lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
+    [this](auto lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
   return *std::min_element(distances.begin(), distances.end());
 }
 
@@ -300,7 +297,7 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const traffic_simulator::lane_change::Constraint & constraint)
 {
-  std::int64_t reference_lanelet_id = 0;
+  lanelet::Id reference_lanelet_id = 0;
   const auto lanelet_pose = getLaneletPose();
   if (lanelet_pose && target.entity_name == name) {
     if (!lanelet_pose) {
