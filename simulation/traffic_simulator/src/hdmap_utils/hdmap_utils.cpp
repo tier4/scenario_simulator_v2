@@ -1434,7 +1434,7 @@ auto HdMapUtils::getLateralDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>
 {
-  if(const auto distances = getLaneDistances(from, to)) {
+  if (const auto distances = getLaneDistances(from, to)) {
     return distances->second;
   } else {
     return std::nullopt;
@@ -1443,13 +1443,15 @@ auto HdMapUtils::getLateralDistance(
 
 auto HdMapUtils::getLaneDistances(
   const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<std::pair<double, double>>
+  const traffic_simulator_msgs::msg::LaneletPose & to) const
+  -> std::optional<std::pair<double, double>>
 {
   if (from.lanelet_id == to.lanelet_id) {
     if (from.s > to.s) {
       return std::nullopt;
     } else {
-      return std::make_optional<std::pair<double, double>>({to.s - from.s, to.offset - from.offset});
+      return std::make_optional<std::pair<double, double>>(
+        {to.s - from.s, to.offset - from.offset});
     }
   } else {
     // list up side lanelets of "from" lanelet
@@ -1490,7 +1492,8 @@ auto HdMapUtils::getLaneDistances(
     std::pair<double, double> distances = {std::numeric_limits<double>::max(), 0.};
     for (const auto & from_side_lanelet : from_side_lanelets) {
       // The matching distance of 10.0[m] was arbitrarily determined by @Hans_Robo, and the function may not work well on roads wider than this.
-      traffic_simulator_msgs::msg::LaneletPose from_lanelet_pose_on_side_lanelet = *toLaneletPose(toMapPose(from).pose, from_side_lanelet, 10.0);
+      traffic_simulator_msgs::msg::LaneletPose from_lanelet_pose_on_side_lanelet =
+        *toLaneletPose(toMapPose(from).pose, from_side_lanelet, 10.0);
 
       double route_distance = [&]() -> double {
         if (from_lanelet_pose_on_side_lanelet.lanelet_id == to.lanelet_id) {
@@ -1525,7 +1528,7 @@ auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>
 {
-  if(const auto distances = getLaneDistances(from, to)) {
+  if (const auto distances = getLaneDistances(from, to)) {
     return distances->first;
   } else {
     return std::nullopt;
