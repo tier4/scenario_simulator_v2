@@ -166,7 +166,8 @@ public:
 
   auto getLaneDistances(
     const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<std::pair<double, double>>;
+    const traffic_simulator_msgs::msg::LaneletPose & to) const
+    -> std::optional<std::pair<double, double>>;
 
   auto getLateralDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
