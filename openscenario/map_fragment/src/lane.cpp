@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <map_fragment/map_fragment.hpp>
+#include <map_fragment/road_segment.hpp>
+// TODO: Add header guards so there is no redefinition
+// #include <map_fragment/map_fragment.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
@@ -53,15 +55,10 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  auto lanelets = lanelet::Lanelets();
+  RoadCrossSectionDescription cross_section_description = {number_of_lanes, width};
+  RoadSegment segment(length, curvature, resolution, cross_section_description);  // TODO: Should we specify origin explicitly?
 
-  lanelets.push_back(makeLanelet(width, length, curvature, resolution));
-
-  for (auto i = 1; i < number_of_lanes; ++i) {
-    lanelets.push_back(makeLaneletRight(lanelets.back(), resolution));
-  }
-
-  const auto map = lanelet::utils::createMap(lanelets);
+  const auto map = lanelet::utils::createMap(segment.getLanelets());
 
   map_fragment::write(*map, output_directory);
 
