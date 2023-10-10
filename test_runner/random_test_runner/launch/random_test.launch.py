@@ -241,7 +241,7 @@ class RandomTestRunnerLaunch(object):
                     namespace="simulation",
                     output="log",
                     arguments=[("__log_level:=warn")],
-                    parameters=[{"port": 6666}],
+                    parameters=[{"port": 8080}],
                 ),
             )
 

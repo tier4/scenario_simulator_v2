@@ -83,7 +83,7 @@ TEST(syntax, dummy) { ASSERT_TRUE(true); }
 // {
 //   using namespace openscenario_interpreter;
 //
-//   OpenSCENARIO osc { XOSC("example.xosc"), "127.0.0.1", 6666 };
+//   OpenSCENARIO osc { XOSC("example.xosc"), "127.0.0.1", 8080 };
 //
 //   // EXPECT_TRUE(osc.element("FileHeader"));
 //   // EXPECT_TRUE(osc.element("ParameterDeclarations"));
@@ -114,7 +114,7 @@ TEST(syntax, dummy) { ASSERT_TRUE(true); }
 // {
 //   using namespace openscenario_interpreter;
 //
-//   OpenSCENARIO osc { XOSC("lane_change.xosc"), "127.0.0.1", 6666 };
+//   OpenSCENARIO osc { XOSC("lane_change.xosc"), "127.0.0.1", 8080 };
 // }
 
 int main(int argc, char ** argv)

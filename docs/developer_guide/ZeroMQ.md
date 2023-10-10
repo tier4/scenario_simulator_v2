@@ -50,7 +50,7 @@ sequenceDiagram
 
 ## Schema of the message
 
-The `traffic_simulator::API` sends a request to the simulator. The request is serialized using protobuf and uses the port specified by the ROS Parameter `port` (default is 6666) to communicate with the simulator.
+The `traffic_simulator::API` sends a request to the simulator. The request is serialized using protobuf and uses the port specified by the ROS Parameter `port` (default is 8080) to communicate with the simulator.
 
 ### Protobuf definition
 
