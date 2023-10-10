@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/act.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/story.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -32,6 +33,20 @@ Story::Story(const pugi::xml_node & node, Scope & scope)
   traverse<1, unbounded>(node, "Act", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Act>(node, local()));
   });
+}
+
+auto Story::run() -> void
+{
+  std::size_t index{0};
+  for (auto && act : elements) {
+    try {
+      assert(act.is_also<Act>());
+      act.evaluate();
+      ++index;
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>(name, "Act", index, action);
+    }
+  }
 }
 
 auto operator<<(nlohmann::json & json, const Story & story) -> nlohmann::json &
