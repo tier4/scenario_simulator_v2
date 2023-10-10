@@ -68,19 +68,16 @@ HermiteCurve::HermiteCurve(
 }
 
 double HermiteCurve::getSquaredDistanceIn2D(
-  const geometry_msgs::msg::Point & point, double s, bool autoscale) const
+  const geometry_msgs::msg::Point & point, double s, bool denormalize_s) const
 {
-  const auto point_on_curve = getPoint(s, autoscale);
-  double x_term = std::pow(point.x - point_on_curve.x, 2);
-  double y_term = std::pow(point.y - point_on_curve.y, 2);
-  double ret = x_term + y_term;
-  return ret;
+  const auto point_on_curve = getPoint(s, denormalize_s);
+  return std::pow(point.x - point_on_curve.x, 2) + std::pow(point.y - point_on_curve.y, 2);
 }
 
 geometry_msgs::msg::Vector3 HermiteCurve::getSquaredDistanceVector(
-  const geometry_msgs::msg::Point & point, double s, bool autoscale) const
+  const geometry_msgs::msg::Point & point, double s, bool denormalize_s) const
 {
-  const auto point_on_curve = getPoint(s, autoscale);
+  const auto point_on_curve = getPoint(s, denormalize_s);
   geometry_msgs::msg::Vector3 ret;
   ret.x = point.x - point_on_curve.x;
   ret.y = point.y - point_on_curve.y;
@@ -184,7 +181,7 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
 }
 
 std::optional<double> HermiteCurve::getSValue(
-  const geometry_msgs::msg::Pose & pose, double threshold_distance, bool autoscale) const
+  const geometry_msgs::msg::Pose & pose, double threshold_distance, bool denormalize_s) const
 {
   geometry_msgs::msg::Point p0, p1;
   p0.y = threshold_distance;
@@ -194,14 +191,14 @@ std::optional<double> HermiteCurve::getSValue(
   if (!s) {
     return std::nullopt;
   }
-  if (autoscale) {
+  if (denormalize_s) {
     return s.value() * getLength();
   }
   return s.value();
 }
 
 const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(
-  double start_s, double end_s, double resolution, bool autoscale) const
+  double start_s, double end_s, double resolution, bool denormalize_s) const
 {
   resolution = std::fabs(resolution);
   if (start_s <= end_s) {
@@ -209,7 +206,7 @@ const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(
     double s = start_s;
     while (s <= end_s) {
       s = s + resolution;
-      ret.emplace_back(getPoint(s, autoscale));
+      ret.emplace_back(getPoint(s, denormalize_s));
     }
     return ret;
   } else {
@@ -217,7 +214,7 @@ const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(
     double s = start_s;
     while (s >= end_s) {
       s = s - resolution;
-      ret.emplace_back(getPoint(s, autoscale));
+      ret.emplace_back(getPoint(s, denormalize_s));
     }
     return ret;
   }
@@ -233,9 +230,9 @@ std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_po
   return ret;
 }
 
-const geometry_msgs::msg::Vector3 HermiteCurve::getNormalVector(double s, bool autoscale) const
+const geometry_msgs::msg::Vector3 HermiteCurve::getNormalVector(double s, bool denormalize_s) const
 {
-  if (autoscale) {
+  if (denormalize_s) {
     s = s / getLength();
   }
   geometry_msgs::msg::Vector3 tangent_vec = getTangentVector(s);
@@ -246,9 +243,9 @@ const geometry_msgs::msg::Vector3 HermiteCurve::getNormalVector(double s, bool a
   return vec;
 }
 
-const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool autoscale) const
+const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool denormalize_s) const
 {
-  if (autoscale) {
+  if (denormalize_s) {
     s = s / getLength();
   }
   geometry_msgs::msg::Vector3 vec;
@@ -258,9 +255,9 @@ const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool 
   return vec;
 }
 
-const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale) const
+const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool denormalize_s) const
 {
-  if (autoscale) {
+  if (denormalize_s) {
     s = s / getLength();
   }
   geometry_msgs::msg::Pose pose;
@@ -274,9 +271,9 @@ const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool autoscale) c
   return pose;
 }
 
-double HermiteCurve::get2DCurvature(double s, bool autoscale) const
+double HermiteCurve::get2DCurvature(double s, bool denormalize_s) const
 {
-  if (autoscale) {
+  if (denormalize_s) {
     s = s / getLength();
   }
   double s2 = s * s;
@@ -335,9 +332,9 @@ double HermiteCurve::getLength(size_t num_points) const
   return ret;
 }
 
-const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool autoscale) const
+const geometry_msgs::msg::Point HermiteCurve::getPoint(double s, bool denormalize_s) const
 {
-  if (autoscale) {
+  if (denormalize_s) {
     s = s / getLength();
   }
   geometry_msgs::msg::Point p;
