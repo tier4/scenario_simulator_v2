@@ -196,7 +196,7 @@ DistancesFromCenterToEdge getDistancesFromCenterToEdge(
   distances.left = bbox.center.y + bbox.dimensions.y * 0.5;
   distances.right = bbox.center.y - bbox.dimensions.y * 0.5;
   distances.up = bbox.center.z + bbox.dimensions.z * 0.5;
-  distances.down - bbox.center.z - bbox.dimensions.z * 0.5;
+  distances.down = bbox.center.z - bbox.dimensions.z * 0.5;
 
   return distances;
 }
