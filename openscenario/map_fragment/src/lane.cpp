@@ -58,7 +58,7 @@ try {
   lanelets.push_back(makeLanelet(width, length, curvature, resolution));
 
   for (auto i = 1; i < number_of_lanes; ++i) {
-    lanelets.push_back(makeLaneletRight(lanelets[0], resolution));
+    lanelets.push_back(makeLaneletRight(lanelets.back(), resolution));
   }
 
   const auto map = lanelet::utils::createMap(lanelets);
