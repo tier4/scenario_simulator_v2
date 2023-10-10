@@ -46,13 +46,34 @@ TEST(Polygon, filterByAxis)
   EXPECT_DOUBLE_EQ(values[2], -3);
 }
 
-TEST(Polygon, GetMinValue)
+TEST(Polygon, filterByAxisEmptyVector)
+{
+  std::vector<geometry_msgs::msg::Point> points;
+  std::vector<double> values;
+  values = math::geometry::filterByAxis(points, math::geometry::Axis::X);
+  EXPECT_TRUE(values.empty());
+  values = math::geometry::filterByAxis(points, math::geometry::Axis::Y);
+  EXPECT_TRUE(values.empty());
+  values = math::geometry::filterByAxis(points, math::geometry::Axis::Z);
+  EXPECT_TRUE(values.empty());
+}
+
+TEST(Polygon, getMaxValue)
 {
   std::vector<geometry_msgs::msg::Point> points{
     makePoint(5, 2, 3), makePoint(1, 4, 5), makePoint(-1, 2, -3)};
   EXPECT_DOUBLE_EQ(math::geometry::getMaxValue(points, math::geometry::Axis::X), 5);
   EXPECT_DOUBLE_EQ(math::geometry::getMaxValue(points, math::geometry::Axis::Y), 4);
   EXPECT_DOUBLE_EQ(math::geometry::getMaxValue(points, math::geometry::Axis::Z), 5);
+}
+
+TEST(Polygon, getMaxValueEmptyVector)
+{
+  std::vector<geometry_msgs::msg::Point> points;
+  // FIXME: std::runtime_error is temporary and should be replaced with the one used in getMaxValue()
+  EXPECT_THROW(math::geometry::getMaxValue(points, math::geometry::Axis::X), std::runtime_error);
+  EXPECT_THROW(math::geometry::getMaxValue(points, math::geometry::Axis::Y), std::runtime_error);
+  EXPECT_THROW(math::geometry::getMaxValue(points, math::geometry::Axis::Z), std::runtime_error);
 }
 
 TEST(Polygon, getMinValue)
@@ -62,6 +83,15 @@ TEST(Polygon, getMinValue)
   EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::X), -1);
   EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::Y), 2);
   EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::Z), -3);
+}
+
+TEST(Polygon, getMinValueEmptyVector)
+{
+  std::vector<geometry_msgs::msg::Point> points;
+  // FIXME: std::runtime_error is temporary and should be replaced with the one used in getMinValue()
+  EXPECT_THROW(math::geometry::getMinValue(points, math::geometry::Axis::X), std::runtime_error);
+  EXPECT_THROW(math::geometry::getMinValue(points, math::geometry::Axis::Y), std::runtime_error);
+  EXPECT_THROW(math::geometry::getMinValue(points, math::geometry::Axis::Z), std::runtime_error);
 }
 
 TEST(Polygon, get2DConvexHull)
@@ -74,6 +104,26 @@ TEST(Polygon, get2DConvexHull)
   EXPECT_POINT_EQ(hull[1], points[1]);
   EXPECT_POINT_EQ(hull[2], points[0]);
   EXPECT_POINT_EQ(hull[3], points[2]);
+}
+
+TEST(Polygon, get2DConvexHullIdle)
+{
+  std::vector<geometry_msgs::msg::Point> points{
+    makePoint(2, 2), makePoint(-2, 2), makePoint(-2, -2), makePoint(2, -2)};
+  const auto hull = math::geometry::get2DConvexHull(points);
+  EXPECT_EQ(hull.size(), static_cast<size_t>(5));
+  EXPECT_POINT_EQ(hull[0], points[2]);
+  EXPECT_POINT_EQ(hull[1], points[1]);
+  EXPECT_POINT_EQ(hull[2], points[0]);
+  EXPECT_POINT_EQ(hull[3], points[3]);
+  EXPECT_POINT_EQ(hull[4], points[2]);
+}
+
+TEST(Polygon, get2DConvexHullEmpty)
+{
+  std::vector<geometry_msgs::msg::Point> points;
+  const auto hull = math::geometry::get2DConvexHull(points);
+  EXPECT_TRUE(hull.empty());
 }
 
 int main(int argc, char ** argv)
