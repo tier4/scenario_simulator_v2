@@ -349,7 +349,8 @@ public:
           return configuration;
         }());
 
-        for (const auto & module : [](std::string manual_modules_string) {
+        for (const auto & module :
+             [](std::string manual_modules_string) {
                manual_modules_string.erase(
                  std::remove_if(
                    manual_modules_string.begin(), manual_modules_string.end(),
@@ -363,7 +364,8 @@ public:
                  modules.push_back(buffer);
                }
                return modules;
-             }(controller.properties.template get<String>("manualModules"))) {
+             }(controller.properties.template get<String>(
+               "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions"))) {
           core->asFieldOperatorApplication(entity_ref).requestAutoModeForCooperation(module, false);
         }
       }

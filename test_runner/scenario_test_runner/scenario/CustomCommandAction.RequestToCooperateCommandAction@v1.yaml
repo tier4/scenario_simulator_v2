@@ -39,7 +39,7 @@ OpenSCENARIO:
                   value: "true"
                 - name: cooperator
                   value: scenario
-                - name: manualModules
+                - name: featureIdentifiersRequiringExternalPermissionForAutonomousDecisions
                   value: "START_PLANNER, TRAFFIC_LIGHT, CROSSWALK"
       - name: Npc1
         CatalogReference:
