@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 #include <openscenario_interpreter/syntax/maneuver.hpp>
 
@@ -27,6 +28,20 @@ Maneuver::Maneuver(const pugi::xml_node & node, Scope & scope)
   traverse<1, unbounded>(node, "Event", [&](auto && node) {
     return elements.push_back(readStoryboardElement<Event>(node, local(), *this));
   });
+}
+
+auto Maneuver::run() -> void
+{
+  std::size_t index{0};
+  for (auto && event : elements) {
+    try {
+      assert(event.is_also<Event>());
+      event.evaluate();
+      ++index;
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>(name, "Event", index, action);
+    }
+  }
 }
 
 auto Maneuver::overrideEvents() -> void
