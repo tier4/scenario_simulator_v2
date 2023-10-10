@@ -1,0 +1,80 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader:
+    author: "Moszynski Dawid"
+    date: "2023-09-18T09:25:53+02:00"
+    description: "This scenario is for testing error handling when the scenario fails, and it cannot succeed."
+    revMajor: 0
+    revMinor: 0
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+  Storyboard:
+    Init:
+      Actions:
+    Story:
+      - name: ""
+        Act:
+          - name: ""
+            ManeuverGroup:
+              - name: ""
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ""
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 15
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: "SimulationTimeout_6sec"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 6
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
