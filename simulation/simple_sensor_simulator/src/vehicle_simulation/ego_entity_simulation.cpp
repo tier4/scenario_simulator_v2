@@ -385,6 +385,15 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
       hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
     if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.value()).z;
+      const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
+        spline.getPose(s_value.value()).orientation);
+      const auto original_rpy =
+        quaternion_operation::convertQuaternionToEulerAngle(status.pose.orientation);
+      status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+        geometry_msgs::build<geometry_msgs::msg::Vector3>().x(rpy.x).y(original_rpy.y).z(rpy.z));
+      lanelet_pose->rpy =
+        quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
+          spline.getPose(s_value.value()).orientation, status.pose.orientation));
     }
   }
 
