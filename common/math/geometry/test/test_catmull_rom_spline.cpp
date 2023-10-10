@@ -19,6 +19,121 @@
 
 #include "expect_eq_macros.hpp"
 
+/// @brief Testing the `CatmullRomSpline::getCollisionPointIn2D` function works valid.
+/// In this test case, number of the control points of the catmull-rom spline (variable name `spline`) is 2, so the shape of the value `spline` is line segment.
+TEST(CatmullRomSpline, GetCollisionWith2ControlPoints)
+{
+  /// @note The `spline` has control points p0 and p1. Control point p0 is point (x,y,z) = (0,0,0) and control point p1 is point (x,y,z) = (1,0,0) in the cartesian coordinate system.
+  // [Snippet_construct_spline]
+  geometry_msgs::msg::Point p0;
+  geometry_msgs::msg::Point p1;
+  p1.x = 1;
+  auto points = {p0, p1};
+  auto spline = math::geometry::CatmullRomSpline(points);
+  EXPECT_DOUBLE_EQ(spline.getLength(), 1);
+  // [Snippet_construct_spline]
+  /// @snippet test/test_catmull_rom_spline.cpp Snippet_construct_spline
+
+  {
+    /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find the collision point with `spline` and a line segment with start point (x,y,z) = (0,1,0) and end point (x,y,z) = (0,-1,0).
+    /// `collision_s` variable in the test case is the denormalized s value in frenet coordinate along the `spline` curve.
+    /// The collision point is in (x,y,z) = (0,0,0) in the cartesian coordinate system and the point is in `s=0.0`,
+    /// So the return value of the `CatmullRomSpline::getCollisionPointIn2D` function (variable name `collision_s`) should be std::optional<double>(0.0)
+    // [Snippet_getCollisionPointIn2D_with_0_1_0_0_-1_0]
+    const auto collision_s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0)});
+    EXPECT_TRUE(collision_s);
+    if (collision_s) {
+      EXPECT_DOUBLE_EQ(collision_s.value(), 0.0);
+    }
+    // [Snippet_getCollisionPointIn2D_with_0_1_0_0_-1_0]
+    /// @snippet test/test_catmull_rom_spline.cpp Snippet_getCollisionPointIn2D_with_0_1_0_0_-1_0
+  }
+
+  {
+    /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find the collision point with `spline` and a line segment with start point (x,y,z) = (1,1,0) and end point (x,y,z) = (-1,-1,0).
+    /// `collision_s` variable in the test case is the denormalized s value in frenet coordinate along the `spline` curve.
+    /// The collision point is in (x,y,z) = (0,0,0) in the cartesian coordinate system and the point is in `s=0.0`,
+    /// So the return value of the `CatmullRomSpline::getCollisionPointIn2D` function (variable name `collision_s`) should be std::optional<double>(0.0)
+    // [Snippet_getCollisionPointIn2D_with_1_1_0_-1_-1_0]
+    const auto collision_s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(-1).z(0)});
+    EXPECT_TRUE(collision_s);
+    if (collision_s) {
+      EXPECT_DOUBLE_EQ(collision_s.value(), 0.0);
+    }
+    // [Snippet_getCollisionPointIn2D_with_1_1_0_-1_-1_0]
+    /// @snippet test/test_catmull_rom_spline.cpp Snippet_getCollisionPointIn2D_with_1_1_0_-1_-1_0
+  }
+
+  {
+    /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find the collision point with `spline` and a line segment with start point (x,y,z) = (1,1,0) and end point (x,y,z) = (0,-1,0).
+    /// `collision_s` variable in the test case is the denormalized s value in frenet coordinate along the `spline` curve.
+    /// The collision point is in (x,y,z) = (0,0.5,0) in the cartesian coordinate system and the point is in `s=0.5`,
+    /// So the return value of the `CatmullRomSpline::getCollisionPointIn2D` function (variable name `collision_s`) should be std::optional<double>(0.5)
+    // [Snippet_getCollisionPointIn2D_with_1_1_0_0_-1_0]
+    const auto collision_s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0)});
+    EXPECT_TRUE(collision_s);
+    if (collision_s) {
+      EXPECT_DOUBLE_EQ(collision_s.value(), 0.5);
+    }
+    // [Snippet_getCollisionPointIn2D_with_1_1_0_0_-1_0]
+    /// @snippet test/test_catmull_rom_spline.cpp Snippet_getCollisionPointIn2D_with_1_1_0_0_-1_0
+  }
+
+  {
+    /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find that the `spline` and a line segment with start point (x,y,z) = (0,1,0) and end point (x,y,z) = (0,0.2,0) does not collide.
+    /// If `CatmullRomSpline::getCollisionPointIn2D` function works expected, it returns std::nullopt;
+    // [Snippet_getCollisionPointIn2D_with_0_1_0_0_02_0]
+    const auto collision_s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0.2).z(0)});
+    EXPECT_FALSE(collision_s);
+    // [Snippet_getCollisionPointIn2D_with_0_1_0_0_02_0]
+    /// @snippet test/test_catmull_rom_spline.cpp Snippet_getCollisionPointIn2D_with_0_1_0_0_02_0
+  }
+}
+
+/// @brief Testing the `CatmullRomSpline::getCollisionPointIn2D` function works valid
+/// In this test case, number of the control points of the catmull-rom spline (variable name `spline`) is 1, so the shape of the value `spline` is single point.
+TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
+{
+  /// @note The variable `spline` has control point with point (x,y,z) = (0,1,0) in the cartesian coordinate system. So, `spline` is same as point (x,y,z) = (0,1,0).
+  auto spline = math::geometry::CatmullRomSpline(
+    {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0)});
+  {
+    /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find the collision point with `spline` and a line segment with start point (x,y,z) = (0,1,0) and end point (x,y,z) = (0,-1,0).
+    /// `collision_s` variable in the test case is the denormalized s value in frenet coordinate along the `spline` curve.
+    /// The collision point is in (x,y,z) = (0,0,0) in the cartesian coordinate system and the point is in `s=0.0`,
+    /// So the return value of the `CatmullRomSpline::getCollisionPointIn2D` function (variable name `collision_s`) should be std::optional<double>(0.0)
+    // [Snippet_GetCollisionWith1ControlPoint_with_0_1_0_0_-1_0]
+    const auto collision_s = spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0)});
+    EXPECT_TRUE(collision_s);
+    if (collision_s) {
+      EXPECT_DOUBLE_EQ(collision_s.value(), 0.0);
+    }
+    // [Snippet_GetCollisionWith1ControlPoint_with_0_1_0_0_-1_0]
+    /// @snippet test/test_catmull_rom_spline.cpp Snippet_GetCollisionWith1ControlPoint_with_0_1_0_0_-1_0
+  }
+
+  {
+    /// @note Testing the `CatmullRomSpline::getCollisionPointIn2D` function can find that the `spline` and a line segment with start point (x,y,z) = (1,1,0) and end point (x,y,z) = (1,-1,0) does not collide.
+    /// If `CatmullRomSpline::getCollisionPointIn2D` function works expected, it returns std::nullopt;
+    // [Snippet_GetCollisionWith1ControlPoint_with_1_1_0_1_-1_0]
+    EXPECT_FALSE(spline.getCollisionPointIn2D(
+      {geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1).z(0),
+       geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(-1).z(0)}));
+    // [Snippet_GetCollisionWith1ControlPoint_with_1_1_0_1_-1_0]
+    /// @snippet test/test_catmull_rom_spline.cpp Snippet_GetCollisionWith1ControlPoint_with_1_1_0_1_-1_0
+  }
+}
+
 TEST(CatmullRomSpline, GetCollisionPointIn2D)
 {
   geometry_msgs::msg::Point p0;
@@ -234,9 +349,6 @@ TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointsAreNotEnough)
 {
   EXPECT_THROW(
     math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
-    common::SemanticError);
-  EXPECT_THROW(
-    math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(1)),
     common::SemanticError);
 }
 

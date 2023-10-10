@@ -33,7 +33,8 @@ class CatmullRomSubspline : public CatmullRomSplineInterface
 {
 public:
   explicit CatmullRomSubspline(
-    std::shared_ptr<math::geometry::CatmullRomSpline> spline, double start_s, double end_s)
+    std::shared_ptr<math::geometry::CatmullRomSpline> spline, const double start_s,
+    const double end_s)
   : spline_(spline), start_s_(start_s), end_s_(end_s)
   {
   }
@@ -41,8 +42,8 @@ public:
   double getLength() const override;
 
   std::optional<double> getCollisionPointIn2D(
-    const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
-    bool close_start_end = true) const override;
+    const std::vector<geometry_msgs::msg::Point> & polygon,
+    const bool search_backward = false) const override;
 
 private:
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
