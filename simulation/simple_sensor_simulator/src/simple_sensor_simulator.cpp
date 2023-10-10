@@ -72,7 +72,7 @@ ScenarioSimulator::~ScenarioSimulator() {}
 
 int ScenarioSimulator::getSocketPort()
 {
-  if (!has_parameter("port")) declare_parameter("port", 8080);
+  if (!has_parameter("port")) declare_parameter("port", 5555);
   return get_parameter("port").as_int();
 }
 
