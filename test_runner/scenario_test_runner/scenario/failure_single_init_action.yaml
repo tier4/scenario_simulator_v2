@@ -1,0 +1,34 @@
+OpenSCENARIO:
+  FileHeader:
+    author: "Moszynski Dawid"
+    date: "2023-09-18T09:25:53+02:00"
+    description: "This scenario is for testing error handling when the scenario fails, and it cannot succeed."
+    revMajor: 0
+    revMinor: 0
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+  RoadNetwork:
+    LogicFile:
+      filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm"
+  Entities:
+  Storyboard:
+    Init:
+      Actions:
+        UserDefinedAction:
+          - CustomCommandAction:
+              type: exitFailure
+    Story:
+      - name: ""
+        Act:
+          - name: ""
+            ManeuverGroup:
+              - name: ""
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+            StartTrigger:
+              ConditionGroup: []
+    StopTrigger:
+      ConditionGroup: []
