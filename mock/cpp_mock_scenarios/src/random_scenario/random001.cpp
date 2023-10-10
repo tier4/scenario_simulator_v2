@@ -195,6 +195,9 @@ private:
         api_.requestSpeedChange(entity_name, speed, true);
         api_.setLinearVelocity(entity_name, speed);
       }
+      if (api_.entityExists(entity_name) && api_.getStandStillDuration(entity_name) >= 0.5) {
+        api_.despawn(entity_name);
+      }
     };
     for (int i = 0; i < params_.random_parameters.crossing_pedestrian.number_of_pedestrian; i++) {
       spawn_and_cross_pedestrian(i);
