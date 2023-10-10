@@ -113,10 +113,14 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
       const auto other_status = getOtherEntityStatus(right_of_way_id);
       if (!other_status.empty() && entity_status->laneMatchingSucceed()) {
         const auto lanelet_pose = entity_status->getLaneletPose();
-        auto distance = hdmap_utils->getLongitudinalDistance(
+        const auto distance_forward = hdmap_utils->getLongitudinalDistance(
           lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
-        if (distance) {
-          distances.insert(distance.value());
+        const auto distance_backward = hdmap_utils->getLongitudinalDistance(
+          traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
+        if (distance_forward) {
+          distances.insert(distance_forward.value());
+        } else if (distance_backward) {
+          distances.insert(-distance_backward.value());
         }
       }
     }
