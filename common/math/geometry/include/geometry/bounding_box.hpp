@@ -21,6 +21,7 @@
 #include <boost/geometry/algorithms/disjoint.hpp>
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/numeric/conversion/bounds.hpp>
 #include <geometry/transform.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <optional>
@@ -31,15 +32,42 @@ namespace math
 {
 namespace geometry
 {
+
+typedef boost::geometry::model::d2::point_xy<double> boost_point;
+typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+
+struct DistancesFromCenterToEdge
+{
+  double front;
+  double rear;
+  double right;
+  double left;
+  double up;
+  double down;
+};
+
 std::optional<double> getPolygonDistance(
   const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
   const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1);
-const boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> get2DPolygon(
+std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> getClosestPoses(
+  const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
+  const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1);
+boost_point pointToSegmentProjection(
+  const boost_point & p, const boost_point & p1, const boost_point & p2);
+boost_point toBoostPoint(const geometry_msgs::msg::Point & point);
+boost_polygon toBoostPolygon(const std::vector<geometry_msgs::msg::Point> & points);
+geometry_msgs::msg::Pose toPose(const boost_point & point);
+geometry_msgs::msg::Pose subtractPoses(
+  const geometry_msgs::msg::Pose & pose1, const geometry_msgs::msg::Pose & pose2);
+const boost_polygon get2DPolygon(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox);
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   traffic_simulator_msgs::msg::BoundingBox bbox, double width_extension_right = 0.0,
   double width_extension_left = 0.0, double length_extension_front = 0.0,
   double length_extension_rear = 0.0);
+DistancesFromCenterToEdge getDistancesFromCenterToEdge(
+  const traffic_simulator_msgs::msg::BoundingBox & bbox);
+
 }  // namespace geometry
 }  // namespace math
 

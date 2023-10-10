@@ -75,9 +75,6 @@ public:
         continue;
       }
       if (const auto & service_call_result = callWithTimeoutValidation(request)) {
-        std::cout << "----------------------------------------------------------------"
-                  << std::endl;
-        std::cout << "[Service: " << service_name << "]: get response" << std::endl;
         if constexpr (has_data_member_status_v<typename T::Response>) {
           if constexpr (std::is_same<
                           tier4_external_api_msgs::msg::ResponseStatus,
@@ -98,25 +95,31 @@ public:
                                 ? ""
                                 : " (" + service_call_status.message + ")"));
             }
-          } else if constexpr (has_data_member_success_v<typename T::Response>) {
-            std::cout << "----------------------------------------------------------------"
-                      << std::endl;
-            if (service_call_result->get().success) {
-              std::cout << "Success: " << std::string("True") << std::endl;
-              return;
-            } else {
-              std::cout << "Success: " << std::string("False") << std::endl;
-            }
           } else {
+            RCLCPP_INFO_STREAM(
+              logger,
+              service_name
+                << " service request was accepted, but Response::status is unknown type..."); "
+                        << (service_call_status.message.empty()
             return;
           }
+        } else if constexpr (has_data_member_success_v<typename T::Response>) {
+          if (service_call_result->get()->success) {
+            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
+            return;
+          } else {
+            RCLCPP_ERROR_STREAM(
+              logger, service_name
+                        << " service request has been accepted, but Response::success is false.");
+          }
         } else {
+          RCLCPP_INFO_STREAM(
+            logger, service_name << " service request has been accepted, but Response has no "
+                                    "status or success member to validate the response.");
           return;
         }
       } else {
-        std::cout << "----------------------------------------------------------------"
-                  << std::endl;
-        std::cout << "[Service: " << service_name << "]: get timeout and retry" << std::endl;
+        // timeout
       }
     }
     throw common::AutowareError(

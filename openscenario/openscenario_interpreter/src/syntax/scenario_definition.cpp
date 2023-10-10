@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 
 namespace openscenario_interpreter
@@ -31,7 +32,11 @@ ScenarioDefinition::ScenarioDefinition(const pugi::xml_node & node, Scope & scop
 auto ScenarioDefinition::evaluate() -> Object
 {
   road_network.evaluate();
-  return storyboard.evaluate();
+  try {
+    return storyboard.evaluate();
+  } catch (const SpecialAction<EXIT_FAILURE> & action) {
+    throw SpecialAction<EXIT_FAILURE>("OpenSCENARIO", action);
+  }
 }
 
 auto operator<<(std::ostream & os, const ScenarioDefinition & datum) -> std::ostream &

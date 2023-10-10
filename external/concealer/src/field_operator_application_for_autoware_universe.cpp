@@ -264,7 +264,11 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
         initial_pose_msg.header.stamp = get_clock()->now();
         initial_pose_msg.header.frame_id = "map";
         initial_pose_msg.pose.pose = initial_pose;
-        return setInitialPose(initial_pose_msg);
+
+        auto request =
+          std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
+        request->pose.push_back(initial_pose_msg);
+        requestInitialPose(request);
       });
 
       // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
@@ -286,10 +290,19 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
 
   task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
-    setGoalPose(route.back());
+
+    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>();
+
+    request->header = route.back().header;
+
+    request->goal = route.back().pose;
+
     for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-      setCheckpoint(each);
+      request->waypoints.push_back(each.pose);
     }
+
+    requestSetRoutePoints(request);
+
     waitForAutowareStateToBeWaitingForEngage();
   });
 }
@@ -344,26 +357,22 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double v
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
 {
-  using autoware_auto_system_msgs::msg::AutowareState;
-
-#define CASE(IDENTIFIER)          \
-  case AutowareState::IDENTIFIER: \
-    return #IDENTIFIER
-
-  switch (getAutowareState().state) {
-    CASE(INITIALIZING);
-    CASE(WAITING_FOR_ROUTE);
-    CASE(PLANNING);
-    CASE(WAITING_FOR_ENGAGE);
-    CASE(DRIVING);
-    CASE(ARRIVED_GOAL);
-    CASE(FINALIZING);
-
-    default:
-      return "";
+#define IF(IDENTIFIER, RETURN)                                                         \
+  if (getAutowareState().state == tier4_system_msgs::msg::AutowareState::IDENTIFIER) { \
+    return #RETURN;                                                                    \
   }
 
-#undef CASE
+  IF(INITIALIZING_VEHICLE, INITIALIZING)
+  IF(WAITING_FOR_ROUTE, WAITING_FOR_ROUTE)
+  IF(PLANNING, PLANNING)
+  IF(WAITING_FOR_ENGAGE, WAITING_FOR_ENGAGE)
+  IF(DRIVING, DRIVING)
+  IF(ARRIVAL_GOAL, ARRIVED_GOAL)
+  IF(EMERGENCY, EMERGENCY)
+  IF(FINALIZING, FINALIZING)
+
+  return "";
+#undef IF
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const -> std::string
@@ -413,26 +422,11 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
-  const autoware_auto_system_msgs::msg::EmergencyState & message) -> void
+  const tier4_external_api_msgs::msg::Emergency & message) -> void
 {
-#define CASE(IDENTIFIER)                                           \
-  case autoware_auto_system_msgs::msg::EmergencyState::IDENTIFIER: \
-    minimum_risk_maneuver_state = #IDENTIFIER;                     \
-    break
-
-  switch (message.state) {
-    CASE(MRM_FAILED);
-    CASE(MRM_OPERATING);
-    CASE(MRM_SUCCEEDED);
-    CASE(NORMAL);
-    CASE(OVERRIDE_REQUESTING);
-
-    default:
-      throw common::Error("Unsupported MrmState::state, number: ", static_cast<int>(message.state));
+  if (message.emergency) {
+    throw common::Error("Emergency state received");
   }
-
-  minimum_risk_maneuver_behavior = "";
-#undef CASE
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
