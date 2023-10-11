@@ -136,6 +136,9 @@ private:
     -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse;
 
   int getSocketPort();
+
+  bool considerLaneletSlope();
+
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
   std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians_;

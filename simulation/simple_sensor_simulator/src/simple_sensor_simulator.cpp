@@ -76,6 +76,14 @@ int ScenarioSimulator::getSocketPort()
   return get_parameter("port").as_int();
 }
 
+bool ScenarioSimulator::considerLaneletSlope()
+{
+  if (!has_parameter("consider_lanelet_slope")) {
+    declare_parameter("consider_lanelet_slope", false);
+  }
+  return get_parameter("consider_lanelet_slope").as_bool();
+}
+
 auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeRequest & req)
   -> simulation_api_schema::InitializeResponse
 {
