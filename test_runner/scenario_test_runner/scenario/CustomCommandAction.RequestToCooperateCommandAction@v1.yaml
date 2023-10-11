@@ -38,7 +38,7 @@ OpenSCENARIO:
                 - name: isClairvoyant
                   value: "true"
                 - name: featureIdentifiersRequiringExternalPermissionForAutonomousDecisions
-                  value: "START_PLANNER, TRAFFIC_LIGHT, CROSSWALK"
+                  value: "TRAFFIC_LIGHT, CROSSWALK"
       - name: Npc1
         CatalogReference:
           catalogName: sample_vehicle
@@ -102,6 +102,14 @@ OpenSCENARIO:
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: RequestToCooperateCommandAction@v1(TRAFFIC_LIGHT, ACTIVATE)
+                          - name: "approve first CROSSWALK request"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: RequestToCooperateCommandAction@v1(CROSSWALK, ACTIVATE)
+                          - name: "approve second CROSSWALK request"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: RequestToCooperateCommandAction@v1(CROSSWALK, ACTIVATE)
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
