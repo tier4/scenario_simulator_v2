@@ -99,6 +99,9 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
+  auto requestFollowTrajectory(
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
+
   std::string getCurrentAction() const override;
 
   auto getDefaultDynamicConstraints() const
