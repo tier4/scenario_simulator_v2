@@ -28,8 +28,8 @@
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
-#include <concealer/utility/autoware_stream.hpp>
-#include <concealer/utility/visibility.hpp>
+#include <concealer/autoware_stream.hpp>
+#include <concealer/visibility.hpp>
 #include <exception>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
