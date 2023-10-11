@@ -366,7 +366,15 @@ public:
                return modules;
              }(controller.properties.template get<String>(
                "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions"))) {
-          core->asFieldOperatorApplication(entity_ref).requestAutoModeForCooperation(module, false);
+          try {
+            core->asFieldOperatorApplication(entity_ref)
+              .requestAutoModeForCooperation(module, false);
+          } catch (const Error & error) {
+            throw Error(
+              "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions is not "
+              "supported in this environment: ",
+              error.what());
+          }
         }
       }
     }
