@@ -31,9 +31,9 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-|---------|---------------|----------|--------------|-------------|
-|         |               |          |              |             |
+| Feature                                                  | Brief summary                                                                               | Category    | Pull request                                                      | Contributor                             |
+|----------------------------------------------------------|---------------------------------------------------------------------------------------------|-------------|-------------------------------------------------------------------|-----------------------------------------|
+| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Add history filter to avoid send same RTC commands in `RequestToCooperateCommandAction@v1`. | `concealer` | [#1106](https://github.com/tier4/scenario_simulator_v2/pull/1106) | [HansRobo](https://github.com/HansRobo) |
 
 Minor Tweaks :oncoming_police_car:
 
