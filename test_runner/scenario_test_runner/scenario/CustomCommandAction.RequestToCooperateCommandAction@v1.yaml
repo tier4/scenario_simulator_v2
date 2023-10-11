@@ -37,8 +37,6 @@ OpenSCENARIO:
                   value: "true"
                 - name: isClairvoyant
                   value: "true"
-                - name: cooperator
-                  value: scenario
                 - name: featureIdentifiersRequiringExternalPermissionForAutonomousDecisions
                   value: "START_PLANNER, TRAFFIC_LIGHT, CROSSWALK"
       - name: Npc1
