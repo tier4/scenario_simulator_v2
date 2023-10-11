@@ -111,11 +111,11 @@ public:
     getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
     getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
-    requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/external/set/engage", *this),
     requestInitialPose("/api/localization/initialize", *this),
     requestSetRoutePoints("/api/routing/set_route_points", *this),
+    requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
   // clang-format on
