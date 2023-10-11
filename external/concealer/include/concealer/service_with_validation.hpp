@@ -15,6 +15,7 @@
 #ifndef CONCEALER__SERVICE_WITH_VALIDATION_HPP_
 #define CONCEALER__SERVICE_WITH_VALIDATION_HPP_
 
+#include <autoware_adapi_v1_msgs/msg/response_status.hpp>
 #include <chrono>
 #include <concealer/field_operator_application.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -92,11 +93,27 @@ public:
                                 ? ""
                                 : " (" + service_call_status.message + ")"));
             }
+          } else if constexpr (std::is_same_v<
+                                 autoware_adapi_v1_msgs::msg::ResponseStatus,
+                                 decltype(T::Response::status)>) {
+            if (const auto & service_call_status = service_call_result->get()->status;
+                service_call_status.success) {
+              RCLCPP_INFO_STREAM(
+                logger, service_name << " service request has been accepted "
+                                     << (service_call_status.message.empty()
+                                           ? "."
+                                           : " (" + service_call_status.message + ")."));
+              return;
+            } else {
+              RCLCPP_ERROR_STREAM(
+                logger, service_name
+                          << " service request was accepted, but ResponseStatus::success is false "
+                          << (service_call_status.message.empty()
+                                ? ""
+                                : " (" + service_call_status.message + ")"));
+            }
           } else {
-            RCLCPP_INFO_STREAM(
-              logger, service_name
-                        << " service request was accepted, but the type of Response::status is "
-                           "not tier4_external_api_msgs::msg::ResponseStatus.");
+            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
             return;
           }
         } else if constexpr (has_data_member_success_v<typename T::Response>) {
@@ -110,18 +127,13 @@ public:
                           << " service request has been accepted, but Response::success is false.");
             }
           } else {
-            RCLCPP_INFO_STREAM(
-              logger, service_name << " service request was accepted, but the type of "
-                                      "Response::success is not boolean.");
+            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
+            return;
           }
         } else {
-          RCLCPP_INFO_STREAM(
-            logger, service_name << " service request has been accepted, but Response has no "
-                                    "status or success member to validate the response.");
+          RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
           return;
         }
-      } else {
-        // timeout
       }
     }
     throw common::AutowareError(
@@ -151,8 +163,11 @@ private:
   }
 
   const std::string service_name;
+
   rclcpp::Logger logger;
+
   typename rclcpp::Client<T>::SharedPtr client;
+
   rclcpp::WallRate validation_rate;
 };
 }  // namespace concealer
