@@ -210,15 +210,17 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     }
   };
 
-  auto is_in_command_history = [this](const auto & cooperate_status) {
+  static std::vector<tier4_rtc_msgs::msg::CooperateStatus> used_cooperate_statuses;
+  auto is_used_cooperate_status = [this](const auto & cooperate_status) {
     return std::find_if(
-             cooperate_commands_history.begin(), cooperate_commands_history.end(),
-             [&cooperate_status](const auto & command) {
+             used_cooperate_statuses.begin(), used_cooperate_statuses.end(),
+             [&cooperate_status](const auto & used_cooperate_status) {
                // check module name, uuid and command type
-               return command.module == cooperate_status.module &&
-                      command.uuid == cooperate_status.uuid &&
-                      command.command.type == cooperate_status.command_status.type;
-             }) != cooperate_commands_history.end();
+               return used_cooperate_status.module == cooperate_status.module &&
+                      used_cooperate_status.uuid == cooperate_status.uuid &&
+                      used_cooperate_status.command_status.type ==
+                        cooperate_status.command_status.type;
+             }) != used_cooperate_statuses.end();
   };
 
   if (const auto cooperate_status = std::find_if(
@@ -226,10 +228,10 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
         latest_cooperate_status_array.statuses.end(),
         [module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
          command_type = to_command_type(command),
-         is_in_command_history](const auto & cooperate_status) {
+         is_used_cooperate_status](const auto & cooperate_status) {
           return isValidCooperateStatus<tier4_rtc_msgs::msg::CooperateStatus>(
                    cooperate_status, command_type, module_type) &&
-                 not is_in_command_history(cooperate_status);
+                 not is_used_cooperate_status(cooperate_status);
         });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
     std::stringstream what;
@@ -248,9 +250,17 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     request->stamp = latest_cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
+    std::stringstream what;
+    what << "Sending a cooperate command: module " << std::quoted(module_name) << " and command "
+         << std::quoted(command) << ". ( uuid: ";
+    for (const auto & uuid : cooperate_command.uuid.uuid) {
+      what << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(uuid);
+    }
+    RCLCPP_INFO_STREAM(get_logger(), what.str());
+
     task_queue.delay([this, request]() { requestCooperateCommands(request); });
 
-    cooperate_commands_history.push_back(cooperate_command);
+    used_cooperate_statuses.push_back(*cooperate_status);
   }
 }
 
@@ -404,7 +414,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
     request->velocity = velocity_limit;
     // We attempt to resend the service up to 30 times, but this number of times was determined by
     // heuristics, not for any technical reason
-    requestSetVelocityLimit(request, 30);
+    requestSetVelocityLimit(request, 60);
   });
 }
 

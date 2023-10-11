@@ -66,8 +66,6 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
-  std::vector<tier4_rtc_msgs::msg::CooperateCommand> cooperate_commands_history;
-
   std::string minimum_risk_maneuver_state;
 
   std::string minimum_risk_maneuver_behavior;
