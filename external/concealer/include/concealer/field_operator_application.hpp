@@ -25,10 +25,10 @@
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <chrono>
+#include <concealer/autoware_stream.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
-#include <concealer/autoware_stream.hpp>
 #include <concealer/visibility.hpp>
 #include <exception>
 #include <geometry_msgs/msg/accel.hpp>
