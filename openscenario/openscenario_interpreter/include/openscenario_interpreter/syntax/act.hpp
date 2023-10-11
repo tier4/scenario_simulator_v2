@@ -41,6 +41,8 @@ struct Act : public Scope, public StoryboardElement
 {
   explicit Act(const pugi::xml_node &, Scope &);
 
+  auto run() -> void override;
+
   friend auto operator<<(nlohmann::json &, const Act &) -> nlohmann::json &;
 };
 }  // namespace syntax
