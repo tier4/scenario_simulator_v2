@@ -69,10 +69,9 @@ public:
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count = 1)
     -> void
   {
+    validateAvailability();
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
-      if (!client->service_is_ready()) {
-        RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
-      } else if (const auto & service_call_result = callWithTimeoutValidation(request)) {
+      if (const auto & service_call_result = callWithTimeoutValidation(request)) {
         if constexpr (has_data_member_status_v<typename T::Response>) {
           if constexpr (std::is_same_v<
                           tier4_external_api_msgs::msg::ResponseStatus,
@@ -131,6 +130,14 @@ public:
   }
 
 private:
+  auto validateAvailability() -> void
+  {
+    while (!client->service_is_ready()) {
+      RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
+      validation_rate.sleep();
+    }
+  }
+
   auto callWithTimeoutValidation(const typename T::Request::SharedPtr & request)
     -> std::optional<typename rclcpp::Client<T>::SharedFuture>
   {
