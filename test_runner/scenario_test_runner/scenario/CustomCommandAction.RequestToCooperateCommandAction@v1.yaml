@@ -95,7 +95,7 @@ OpenSCENARIO:
                 Maneuver:
                   - name: ""
                     Event:
-                      - name: ""
+                      - name: "send multiple RTC Commands in same timing"
                         priority: parallel
                         Action:
                           - name: "approve TRAFFIC_LIGHT request"
@@ -172,7 +172,7 @@ OpenSCENARIO:
                                           LanePosition:
                                             roadId: ""
                                             laneId: "34579"
-                                            s: 20
+                                            s: 10
                                             offset: 0
                                             Orientation:
                                               type: relative
