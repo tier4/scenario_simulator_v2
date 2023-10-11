@@ -15,6 +15,13 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_USER_HPP_
 
+#if defined __has_include
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
+#include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
+#define USE_AUTOWARE_LOCALIZATION_STATE
+#endif
+#endif
+
 #include <autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
@@ -54,7 +61,9 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>          getAckermannControlCommand;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                         getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                           getEmergencyState;
+#ifdef USE_AUTOWARE_LOCALIZATION_STATE
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::LocalizationInitializationState>      getLocalizationState;
+#endif
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                             getMrmState;
   SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                              getTrajectory;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
@@ -116,7 +125,9 @@ public:
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v;
                                                                                             cooperate(v); }),
     getEmergencyState("/api/external/get/emergency", *this, [this](const auto & v) { receiveEmergencyState(v); }),
+#ifdef USE_AUTOWARE_LOCALIZATION_STATE
     getLocalizationState("/api/localization/initialization_state", *this),
+#endif
     getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
     getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),

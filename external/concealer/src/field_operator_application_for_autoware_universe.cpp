@@ -287,11 +287,14 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBeWaitingForRoute([&]() {
+
+#ifdef USE_AUTOWARE_LOCALIZATION_STATE
         if (
           getLocalizationState().state !=
           autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
           return;
         }
+#endif
         geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
         initial_pose_msg.header.stamp = get_clock()->now();
         initial_pose_msg.header.frame_id = "map";
