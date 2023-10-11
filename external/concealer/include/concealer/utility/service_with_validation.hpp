@@ -99,8 +99,7 @@ public:
             RCLCPP_INFO_STREAM(
               logger,
               service_name
-                << " service request was accepted, but Response::status is unknown type..."); "
-                        << (service_call_status.message.empty()
+                << " service request was accepted, but Response::status is unknown type...");
             return;
           }
         } else if constexpr (has_data_member_success_v<typename T::Response>) {
