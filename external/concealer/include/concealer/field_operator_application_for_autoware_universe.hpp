@@ -57,11 +57,11 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                              getTrajectory;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
 
-  ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>        requestSetRtcAutoMode;
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>               requestCooperateCommands;
-  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>     requestEngage;
+  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                 requestEngage;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::InitializeLocalization>  requestInitialPose;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>          requestSetRoutePoints;
+  ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>              requestSetRtcAutoMode;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>       requestSetVelocityLimit;
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;

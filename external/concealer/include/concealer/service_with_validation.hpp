@@ -72,13 +72,11 @@ public:
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
       if (!client->service_is_ready()) {
         RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
-        continue;
-      }
-      if (const auto & service_call_result = callWithTimeoutValidation(request)) {
+      } else if (const auto & service_call_result = callWithTimeoutValidation(request)) {
         if constexpr (has_data_member_status_v<typename T::Response>) {
-          if constexpr (std::is_same<
+          if constexpr (std::is_same_v<
                           tier4_external_api_msgs::msg::ResponseStatus,
-                          decltype(T::Response::status)>::value) {
+                          decltype(T::Response::status)>) {
             if (const auto & service_call_status = service_call_result->get()->status;
                 service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
               RCLCPP_INFO_STREAM(
@@ -97,19 +95,25 @@ public:
             }
           } else {
             RCLCPP_INFO_STREAM(
-              logger,
-              service_name
-                << " service request was accepted, but Response::status is unknown type...");
+              logger, service_name
+                        << " service request was accepted, but the type of Response::status is "
+                           "not tier4_external_api_msgs::msg::ResponseStatus.");
             return;
           }
         } else if constexpr (has_data_member_success_v<typename T::Response>) {
-          if (service_call_result->get()->success) {
-            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
-            return;
+          if constexpr (std::is_same_v<bool, decltype(T::Response::success)>) {
+            if (service_call_result->get()->success) {
+              RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
+              return;
+            } else {
+              RCLCPP_ERROR_STREAM(
+                logger, service_name
+                          << " service request has been accepted, but Response::success is false.");
+            }
           } else {
-            RCLCPP_ERROR_STREAM(
-              logger, service_name
-                        << " service request has been accepted, but Response::success is false.");
+            RCLCPP_INFO_STREAM(
+              logger, service_name << " service request was accepted, but the type of "
+                                      "Response::success is not boolean.");
           }
         } else {
           RCLCPP_INFO_STREAM(
