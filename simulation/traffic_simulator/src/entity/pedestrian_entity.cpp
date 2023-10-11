@@ -77,6 +77,13 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   requestAssignRoute(route);
 }
 
+auto PedestrianEntity::requestFollowTrajectory(
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
+{
+  behavior_plugin_ptr_->setPolylineTrajectory(parameter);
+  behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+}
+
 std::string PedestrianEntity::getCurrentAction() const
 {
   if (!npc_logic_started_) {
