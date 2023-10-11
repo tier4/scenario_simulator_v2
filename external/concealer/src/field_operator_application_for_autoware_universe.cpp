@@ -14,6 +14,7 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <concealer/is_package_exists.hpp>
 
 namespace concealer
 {
@@ -395,14 +396,23 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
 auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation(
   std::string module_name, bool enable) -> void
 {
-  task_queue.delay([this, module_name, enable]() {
-    auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
-    request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
-    request->enable = enable;
-    // We attempt to resend the service up to 30 times, but this number of times was determined by
-    // heuristics, not for any technical reason
-    requestSetRtcAutoMode(request, 30);
-  });
+  // Note: The implementation of this function will not work properly
+  //       if the `rtc_auto_mode_manager` package is present.
+  if (not isPackageExists("rtc_auto_mode_manager")) {
+    task_queue.delay([this, module_name, enable]() {
+      auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
+      request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
+      request->enable = enable;
+      // We attempt to resend the service up to 30 times, but this number of times was determined by
+      // heuristics, not for any technical reason
+      requestSetRtcAutoMode(request, 30);
+    });
+  } else {
+    throw common::Error(
+      "FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation is not "
+      "supported "
+      "in this environment, because rtc_auto_mode_manager is present.");
+  }
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
