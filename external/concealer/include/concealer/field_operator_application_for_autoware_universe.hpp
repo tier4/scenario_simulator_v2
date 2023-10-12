@@ -83,7 +83,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
   auto is##NAME() const noexcept                             \
   {                                                          \
-    using tier4_system_msgs::msg::AutowareState;     \
+    using tier4_system_msgs::msg::AutowareState;             \
     return getAutowareState().state == AutowareState::VALUE; \
   }                                                          \
   static_assert(true, "")

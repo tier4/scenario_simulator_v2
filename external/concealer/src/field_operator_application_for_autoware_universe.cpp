@@ -310,6 +310,35 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   }
 }
 
+template <typename T, typename = void>
+struct has_data_member_option : public std::false_type
+{
+};
+
+template <typename T>
+struct has_data_member_option<T, std::void_t<decltype(std::declval<T>().option)>>
+: public std::true_type
+{
+};
+
+template <typename... Ts>
+inline constexpr auto has_data_member_option_v = has_data_member_option<Ts...>::value;
+
+template <typename T, typename = void>
+struct has_data_member_allow_goal_modification : public std::false_type
+{
+};
+
+template <typename T>
+struct has_data_member_allow_goal_modification<
+  T, std::void_t<decltype(std::declval<T>().allow_goal_modification)>> : public std::true_type
+{
+};
+
+template <typename... Ts>
+inline constexpr auto has_data_member_allow_goal_modification_v =
+  has_data_member_allow_goal_modification<Ts...>::value;
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
   const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
@@ -322,8 +351,25 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
 
     request->header = route.back().header;
 
-    request->option.allow_goal_modification =
-      get_parameter("allow_goal_modification").get_value<bool>();
+    /*
+       NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type was
+       created on 2022/09/05 [1], and the autoware_adapi_v1_msgs::msg::Option
+       type data member was added to the
+       autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type on 2023/04/12
+       [2]. Therefore, we cannot expect
+       autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always have a
+       data member `option`.
+
+       [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
+       [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
+    */
+    if constexpr (
+      has_data_member_option_v<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request> and
+      has_data_member_allow_goal_modification_v<
+        decltype(std::declval<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>().option)>) {
+      request->option.allow_goal_modification =
+        get_parameter("allow_goal_modification").get_value<bool>();
+    }
 
     request->goal = route.back().pose;
 
@@ -467,8 +513,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
     CASE(NORMAL, minimum_risk_maneuver_state);
     CASE(UNKNOWN, minimum_risk_maneuver_state);
     default:
-      throw common::Error(
-        "Unsupported MrmState::state, number: ", static_cast<int>(message.state));
+      throw common::Error("Unsupported MrmState::state, number: ", static_cast<int>(message.state));
   }
 
   switch (message.behavior) {
