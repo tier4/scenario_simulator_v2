@@ -253,22 +253,13 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
         auto request =
           std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
         request->pose.push_back(initial_pose_msg);
-        // call service without timeout validation
         try {
           return requestInitialPose(request);
-        } catch (const decltype(requestInitialPose)::TimeoutError & error) {
+        } catch (const decltype(requestInitialPose)::TimeoutError &) {
+          // ignore timeout error because this service is validated by Autoware state transition.
           return;
         }
       });
-
-      // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
-      // waitForAutowareStateToBeWaitingForRoute([&]() {
-      //   auto request = std::make_shared<InitializePose::Request>();
-      //   request->pose.header.stamp = get_clock()->now();
-      //   request->pose.header.frame_id = "map";
-      //   request->pose.pose.pose = initial_pose;
-      //   requestInitializePose(request);
-      // });
     });
   }
 }
@@ -305,7 +296,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
       request->engage = true;
       try {
         return requestEngage(request);
-      } catch (const decltype(requestEngage)::TimeoutError & error) {
+      } catch (const decltype(requestEngage)::TimeoutError &) {
         // ignore timeout error because this service is validated by Autoware state transition.
         return;
       }
