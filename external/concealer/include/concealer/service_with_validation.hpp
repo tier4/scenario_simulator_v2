@@ -59,11 +59,12 @@ class ServiceWithValidation
 {
 public:
   explicit ServiceWithValidation(
-    const std::string & service_name, FieldOperatorApplication & autoware)
+    const std::string & service_name, FieldOperatorApplication & autoware,
+    const std::chrono::nanoseconds validation_interval = std::chrono::seconds(1))
   : service_name(service_name),
     logger(autoware.get_logger()),
     client(autoware.create_client<T>(service_name, rmw_qos_profile_default)),
-    validation_rate(std::chrono::seconds(1))
+    validation_rate(validation_interval)
   {
   }
 
@@ -163,7 +164,7 @@ private:
     -> std::optional<typename rclcpp::Client<T>::SharedFuture>
   {
     if (auto future = client->async_send_request(request);
-        future.wait_for(std::chrono::seconds(1)) == std::future_status::ready) {
+        future.wait_for(validation_rate.period()) == std::future_status::ready) {
       return future;
     } else {
       RCLCPP_ERROR_STREAM(logger, service_name << " service request has timed out.");
