@@ -49,19 +49,19 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
-  SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                     getMrmState;
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>  getAckermannControlCommand;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>    getTurnIndicatorsCommandImpl;
-  SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                   getEmergencyState;
-  SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                      getTrajectory;
-  SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                 getCooperateStatusArray;
   SubscriberWrapper<tier4_system_msgs::msg::AutowareState, ThreadSafety::safe> getAutowareState;
+  SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                 getCooperateStatusArray;
+  SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                   getEmergencyState;
+  SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                     getMrmState;
+  SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                      getTrajectory;
+  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>    getTurnIndicatorsCommandImpl;
 
+  ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                requestCooperateCommands;
+  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                  requestEngage;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::InitializeLocalization>   requestInitialPose;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>           requestSetRoutePoints;
-  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                  requestEngage;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>        requestSetVelocityLimit;
-  ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                requestCooperateCommands;
   // clang-format on
 
   Cooperator current_cooperator = Cooperator::simulator;
@@ -110,8 +110,8 @@ public:
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    getAutowareState("/api/iv_msgs/autoware/state", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
+    getAutowareState("/api/iv_msgs/autoware/state", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v; cooperate(v); }),
     getEmergencyState("/api/external/get/emergency", *this, [this](const auto & v) { receiveEmergencyState(v); }),
     getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
