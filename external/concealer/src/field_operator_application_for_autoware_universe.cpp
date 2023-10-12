@@ -253,7 +253,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
         auto request =
           std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
         request->pose.push_back(initial_pose_msg);
-        requestInitialPose(request);
+        // call service without timeout validation
+        try {
+          return requestInitialPose(request);
+        }catch (const decltype(requestInitialPose)::TimeoutError & error){
+          return;
+        }
       });
 
       // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
