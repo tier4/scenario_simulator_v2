@@ -14,6 +14,8 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <concealer/has_data_member_allow_goal_modification.hpp>
+#include <concealer/has_data_member_option.hpp>
 
 namespace concealer
 {
@@ -309,35 +311,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
     });
   }
 }
-
-template <typename T, typename = void>
-struct has_data_member_option : public std::false_type
-{
-};
-
-template <typename T>
-struct has_data_member_option<T, std::void_t<decltype(std::declval<T>().option)>>
-: public std::true_type
-{
-};
-
-template <typename... Ts>
-inline constexpr auto has_data_member_option_v = has_data_member_option<Ts...>::value;
-
-template <typename T, typename = void>
-struct has_data_member_allow_goal_modification : public std::false_type
-{
-};
-
-template <typename T>
-struct has_data_member_allow_goal_modification<
-  T, std::void_t<decltype(std::declval<T>().allow_goal_modification)>> : public std::true_type
-{
-};
-
-template <typename... Ts>
-inline constexpr auto has_data_member_allow_goal_modification_v =
-  has_data_member_allow_goal_modification<Ts...>::value;
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
   const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
