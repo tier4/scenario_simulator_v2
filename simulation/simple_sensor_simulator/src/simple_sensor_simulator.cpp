@@ -204,7 +204,7 @@ auto ScenarioSimulator::spawnVehicleEntity(
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
-      parameters, step_time_, hdmap_utils_);
+      parameters, step_time_, hdmap_utils_, consider_lanelet_slope_);
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
     simulation_interface::toMsg(req.pose(), initial_status.pose);

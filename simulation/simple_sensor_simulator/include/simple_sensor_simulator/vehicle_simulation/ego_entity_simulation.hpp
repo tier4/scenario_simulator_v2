@@ -43,7 +43,6 @@ public:
 
 private:
   const VehicleModelType vehicle_model_type_;
-
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
   std::optional<double> previous_linear_velocity_, previous_angular_velocity_;
@@ -61,6 +60,7 @@ private:
 
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+  const bool consider_lanelet_slope;
 
 private:
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
@@ -78,7 +78,8 @@ public:
 
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
+    const bool consider_lanelet_slope);
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 
