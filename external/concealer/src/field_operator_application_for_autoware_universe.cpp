@@ -256,7 +256,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
         // call service without timeout validation
         try {
           return requestInitialPose(request);
-        }catch (const decltype(requestInitialPose)::TimeoutError & error){
+        } catch (const decltype(requestInitialPose)::TimeoutError & error) {
           return;
         }
       });
@@ -303,7 +303,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
     waitForAutowareStateToBeDriving([this]() {
       auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
-      requestEngage(request);
+      try {
+        return requestEngage(request);
+      } catch (const decltype(requestEngage)::TimeoutError & error) {
+        // ignore timeout error because this service is validated by Autoware state transition.
+        return;
+      }
     });
   });
 }
