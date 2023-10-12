@@ -47,7 +47,13 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) {
       return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
-    })
+    }),
+  consider_lanelet_slope_([&]() {
+    if (!has_parameter("consider_lanelet_slope")) {
+      declare_parameter("consider_lanelet_slope", false);
+    }
+    return get_parameter("consider_lanelet_slope").as_bool();
+  }())
 {
 }
 
@@ -74,14 +80,6 @@ int ScenarioSimulator::getSocketPort()
 {
   if (!has_parameter("port")) declare_parameter("port", 5555);
   return get_parameter("port").as_int();
-}
-
-bool ScenarioSimulator::considerLaneletSlope()
-{
-  if (!has_parameter("consider_lanelet_slope")) {
-    declare_parameter("consider_lanelet_slope", false);
-  }
-  return get_parameter("consider_lanelet_slope").as_bool();
 }
 
 auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeRequest & req)
