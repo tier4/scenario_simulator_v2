@@ -63,6 +63,7 @@ def launch_setup(context, *args, **kwargs):
     architecture_type               = LaunchConfiguration("architecture_type",              default="awf/universe")
     autoware_launch_file            = LaunchConfiguration("autoware_launch_file",           default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package         = LaunchConfiguration("autoware_launch_package",        default=default_autoware_launch_package_of(architecture_type.perform(context)))
+    consider_lanelet_slope          = LaunchConfiguration("consider_lanelet_slope",         default=False)
     global_frame_rate               = LaunchConfiguration("global_frame_rate",              default=30.0)
     global_real_time_factor         = LaunchConfiguration("global_real_time_factor",        default=1.0)
     global_timeout                  = LaunchConfiguration("global_timeout",                 default=180)
@@ -84,6 +85,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"architecture_type       := {architecture_type.perform(context)}")
     print(f"autoware_launch_file    := {autoware_launch_file.perform(context)}")
     print(f"autoware_launch_package := {autoware_launch_package.perform(context)}")
+    print(f"consider_lanelet_slope  := {consider_lanelet_slope(context)}")
     print(f"global_frame_rate       := {global_frame_rate.perform(context)}")
     print(f"global_real_time_factor := {global_real_time_factor.perform(context)}")
     print(f"global_timeout          := {global_timeout.perform(context)}")
@@ -134,6 +136,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("architecture_type",       default_value=architecture_type      ),
         DeclareLaunchArgument("autoware_launch_file",    default_value=autoware_launch_file   ),
         DeclareLaunchArgument("autoware_launch_package", default_value=autoware_launch_package),
+        DeclareLaunchArgument("consider_lanelet_slope",  default_value=consider_lanelet_slope ),
         DeclareLaunchArgument("global_frame_rate",       default_value=global_frame_rate      ),
         DeclareLaunchArgument("global_real_time_factor", default_value=global_real_time_factor),
         DeclareLaunchArgument("global_timeout",          default_value=global_timeout         ),
@@ -172,7 +175,9 @@ def launch_setup(context, *args, **kwargs):
             name="simple_sensor_simulator",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=[{"port": port}]+make_vehicle_parameters(),
+            parameters=[
+                {"port": port, "consider_lanelet_slope": consider_lanelet_slope}
+            ] + make_vehicle_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         LifecycleNode(
