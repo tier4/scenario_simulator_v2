@@ -67,8 +67,9 @@ public:
   {
   }
 
-  auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count = 1)
-    -> void
+  auto operator()(
+    const typename T::Request::SharedPtr & request,
+    std::size_t attempts_count = 1, bool enable_timeout_validation = true) -> void
   {
     validateAvailability();
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
@@ -136,9 +137,14 @@ public:
         }
       }
     }
-    throw common::AutowareError(
-      "Requested the service ", service_name, " ", attempts_count,
-      " times, but was not successful.");
+    std::stringstream what;
+    what << "Requested the service " << service_name << " " << attempts_count
+         << " times, but was not successful.";
+    if (enable_timeout_validation) {
+      throw common::AutowareError(what.str());
+    } else {
+      RCLCPP_ERROR(logger, what.str().c_str());
+    }
   }
 
 private:
