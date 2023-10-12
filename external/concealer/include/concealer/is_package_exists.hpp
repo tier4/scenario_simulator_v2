@@ -17,6 +17,6 @@
 
 namespace concealer
 {
-auto isPackageExists(const std::string & package_name) -> bool;
+auto isPackageExists(const std::string & package_name) noexcept -> bool;
 }  // namespace concealer
 #endif  // CONCEALER__IS_PACKAGE_EXISTS_HPP_
