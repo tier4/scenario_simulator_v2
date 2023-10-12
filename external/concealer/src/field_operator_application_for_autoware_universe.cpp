@@ -400,7 +400,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   // Note: The implementation of this function will not work properly
   //       if the `rtc_auto_mode_manager` package is present.
   if (not isPackageExists("rtc_auto_mode_manager")) {
-    task_queue.delay([&]() {
+    task_queue.delay([this, module_name, enable]() {
       auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
       request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
       request->enable = enable;
