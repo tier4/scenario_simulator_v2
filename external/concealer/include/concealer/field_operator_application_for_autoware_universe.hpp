@@ -114,7 +114,8 @@ public:
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/external/set/engage", *this),
     requestInitialPose("/api/localization/initialize", *this),
-    requestSetRoutePoints("/api/routing/set_route_points", *this),
+    // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
+    requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
