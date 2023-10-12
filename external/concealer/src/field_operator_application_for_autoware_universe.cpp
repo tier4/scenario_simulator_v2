@@ -395,12 +395,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation(
-  std::string module_name, bool enable) -> void
+  const std::string & module_name, bool enable) -> void
 {
   // Note: The implementation of this function will not work properly
   //       if the `rtc_auto_mode_manager` package is present.
   if (not isPackageExists("rtc_auto_mode_manager")) {
-    task_queue.delay([this, module_name, enable]() {
+    task_queue.delay([&]() {
       auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
       request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
       request->enable = enable;
