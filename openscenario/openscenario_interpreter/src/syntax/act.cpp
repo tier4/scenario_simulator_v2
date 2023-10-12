@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/act.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/maneuver_group.hpp>
 
 namespace openscenario_interpreter
@@ -29,6 +30,20 @@ Act::Act(const pugi::xml_node & node, Scope & scope)
   traverse<1, unbounded>(node, "ManeuverGroup", [&](auto && node) {
     return elements.push_back(readStoryboardElement<ManeuverGroup>(node, local()));
   });
+}
+
+auto Act::run() -> void
+{
+  std::size_t index{0};
+  for (auto && maneuver_group : elements) {
+    try {
+      assert(maneuver_group.is_also<ManeuverGroup>());
+      maneuver_group.evaluate();
+      ++index;
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>(name, "ManeuverGroup", index, action);
+    }
+  }
 }
 
 auto operator<<(nlohmann::json & json, const Act & datum) -> nlohmann::json &

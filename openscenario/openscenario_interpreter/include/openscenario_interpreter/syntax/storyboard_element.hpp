@@ -185,7 +185,7 @@ public:
     return current_state == state;
   }
 
-  auto evaluate()
+  virtual auto evaluate() -> Object
   {
     if (stop_trigger.evaluate().as<Boolean>()) {
       override();
