@@ -56,6 +56,158 @@ auto RelativeDistanceCondition::description() const -> String
   return description.str();
 }
 
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x;
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x;
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y;
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y;
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
+  true>(const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return std::hypot(
+      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x,
+      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
+  false>(const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return std::hypot(
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
+    return static_cast<traffic_simulator::LaneletPose>(
+             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
+      .offset;
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
+    return static_cast<traffic_simulator::LaneletPose>(
+             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
+      .offset;
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return static_cast<traffic_simulator::LaneletPose>(
+             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
+      .s;
+  } else {
+    return Double::nan();
+  }
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
+  const EntityRef & triggering_entity) -> double
+{
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
+    return static_cast<traffic_simulator::LaneletPose>(
+             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
+      .s;
+  } else {
+    return Double::nan();
+  }
+}
+
 #define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)            \
   switch (coordinate_system) {                             \
     case CoordinateSystem::entity:                         \
@@ -116,103 +268,13 @@ auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) ->
   return Double::nan();
 }
 
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  false>(const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::hypot(
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  true>(const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return evaluateFreespaceEuclideanDistance(triggering_entity, entity_ref);
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
-      .offset;
-  } else {
-    return Double::nan();
-  }
-}
-
-template <>
-auto RelativeDistanceCondition::distance<
-  CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
-{
-  if (
-    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
-      .s;
-  } else {
-    return Double::nan();
-  }
-}
-
 auto RelativeDistanceCondition::evaluate() -> Object
 {
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     results.push_back(distance(triggering_entity));
-    return rule(results.back(), value);
+    return rule(static_cast<double>(results.back()), value);
   }));
 }
 }  // namespace syntax
