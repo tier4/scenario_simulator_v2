@@ -288,7 +288,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBeWaitingForRoute([&]() {
 
-#ifdef USE_AUTOWARE_LOCALIZATION_STATE
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
         if (
           getLocalizationState().state !=
           autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
