@@ -15,7 +15,7 @@
 #include <lanelet2_core/geometry/LaneletMap.h>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
-#include <lanelet2_traffic_rules/TrafficRules.h>
+#include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>

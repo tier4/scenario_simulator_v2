@@ -44,4 +44,3 @@ try {
   std::cerr << exception.what() << std::endl;
   return EXIT_FAILURE;
 }
-
