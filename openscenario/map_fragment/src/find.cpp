@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <lanelet2_io/Io.h>
-
-#include <limits>
 #include <map_fragment/map_fragment.hpp>
 #include <rclcpp/rclcpp.hpp>
 
