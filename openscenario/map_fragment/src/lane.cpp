@@ -55,10 +55,22 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  RoadCrossSectionDescription cross_section_description = {number_of_lanes, width};
-  RoadSegment segment(length, curvature, resolution, cross_section_description);  // TODO: Should we specify origin explicitly?
+  ParametricCurve::Ptr guide_curve;
+  if (curvature == 0.0)
+  {
+    guide_curve = std::make_shared<Straight>(length);
+  }
+  else
+  {
+    auto radius = 1 / curvature;
+    auto angle = length * curvature;
+    guide_curve = std::make_shared<Arc>(radius, angle);
+  }
 
-  const auto map = lanelet::utils::createMap(segment.getLanelets());
+  RoadCrossSectionDescription cross_section_description = {number_of_lanes, width};
+  RoadSegment segment(guide_curve, cross_section_description);
+
+  const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
 
   map_fragment::write(*map, output_directory);
 

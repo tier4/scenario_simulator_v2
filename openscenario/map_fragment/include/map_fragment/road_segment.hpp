@@ -17,6 +17,7 @@
 
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <map_fragment/map_fragment.hpp>
+#include <map_fragment/geometry.hpp>
 
 namespace map_fragment
 {
@@ -31,22 +32,20 @@ class RoadCrossSection
   lanelet::Points3d points_;
 
 public:
-  RoadCrossSection(RoadCrossSectionDescription description, // TODO: name for the origin coordinate system
-                   double origin_x,
-                   double origin_y,
-                   double h)
+  RoadCrossSection(RoadCrossSectionDescription description, // TODO: name for the origin coordinate system'
+                   Point2d origin,
+                   UnitVector2d tangent_vector)
   {
-
-    auto cross_section_width = description.number_of_lanes * description.lane_width;
-
-    auto x = origin_x + cross_section_width / 2 * std::sin(h);
-    auto y = origin_y - cross_section_width / 2 * std::cos(h);
+    auto n = description.number_of_lanes;
+    auto w = description.lane_width;
+    auto normal_vector = rotate(tangent_vector, M_PI / 2);
 
     for (auto i = 0; i < description.number_of_lanes + 1; i++)
     {
-      points_.push_back(makePoint3d(x, y, 0.));
-      x -= description.lane_width * std::sin(h);
-      y += description.lane_width * std::cos(h);
+      auto lateral_position = (i - n / 2) * w;
+      auto p = origin + normal_vector * lateral_position;
+      points_.push_back(makePoint3d(p.x(), p.y(), 0.));
+
     }
   }
 
@@ -58,26 +57,21 @@ public:
 
 class RoadSegment
 {
-  lanelet::Lanelets lanelets_;
+  ParametricCurve::Ptr guide_curve_;
+  RoadCrossSectionDescription cross_section_description_;
 
 public:
-  RoadSegment(double length,
-              double curvature,
-              int resolution,
+  RoadSegment(ParametricCurve::Ptr guide_curve,
               RoadCrossSectionDescription cross_section_description)
+    : guide_curve_(guide_curve)
+    , cross_section_description_(cross_section_description)
   {
+  }
 
-    //  TODO Make sure resolution >= 2
-    //  TODO Make sure length > 0
-
-    auto step = length / (resolution - 1);
-
-    // TODO Allow to initialize origin with custom values
-    auto x = 0.0;
-    auto y = 0.0;
-    auto h = 0.0;
-
-    auto n = cross_section_description.number_of_lanes + 1;
+  const lanelet::Lanelets getLanelets(double resolution)
+  {
+    lanelet::Lanelets lanelets;
+    auto n = cross_section_description_.number_of_lanes + 1;
 
     // TODO Find a cleaner way to do this
     std::vector<lanelet::LineString3d> lane_boundaries(n);
@@ -88,30 +82,27 @@ public:
 
     for (auto i = 0; i < resolution; i++)
     {
-      RoadCrossSection cross_section(cross_section_description, x, y, h);
+      auto t = i / (resolution - 1);
+      auto position = guide_curve_->getPosition(t);
+      auto tangent_vector = guide_curve_->getTangentVector(t);
+
+      RoadCrossSection cross_section(cross_section_description_, position, tangent_vector);
       auto cross_section_points = cross_section.getPoints();
 
-      for (auto j = 0; j < cross_section_description.number_of_lanes + 1; j++)
+      for (auto j = 0; j < cross_section_description_.number_of_lanes + 1; j++)
       {
         lane_boundaries[j].push_back(cross_section_points[j]);
       }
-
-      x += step * std::cos(h);
-      y += step * std::sin(h);
-      h += step * curvature;
     }
 
-    for (auto i = 0; i < cross_section_description.number_of_lanes; i++)
+    for (auto i = 0; i < cross_section_description_.number_of_lanes; i++)
     {
-      lanelets_.push_back(makeLanelet(
+      lanelets.push_back(makeLanelet(
         lane_boundaries[i],
         lane_boundaries[i + 1]));
     }
-  }
 
-  const lanelet::Lanelets getLanelets()
-  { // TODO: return as smart pointer?
-    return lanelets_;
+    return lanelets;
   }
 }; // class RoadSegment
 
