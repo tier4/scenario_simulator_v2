@@ -15,6 +15,7 @@
 #ifndef CONCEALER__SERVICE_WITH_VALIDATION_HPP_
 #define CONCEALER__SERVICE_WITH_VALIDATION_HPP_
 
+#include <autoware_adapi_v1_msgs/msg/response_status.hpp>
 #include <chrono>
 #include <concealer/field_operator_application.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -58,21 +59,30 @@ class ServiceWithValidation
 {
 public:
   explicit ServiceWithValidation(
-    const std::string & service_name, FieldOperatorApplication & autoware)
+    const std::string & service_name, FieldOperatorApplication & autoware,
+    const std::chrono::nanoseconds validation_interval = std::chrono::seconds(1))
   : service_name(service_name),
     logger(autoware.get_logger()),
     client(autoware.create_client<T>(service_name, rmw_qos_profile_default)),
-    validation_rate(std::chrono::seconds(1))
+    validation_rate(validation_interval)
   {
   }
+
+  class TimeoutError : public common::Error
+  {
+  public:
+    template <typename... Ts>
+    TimeoutError(Ts &&... xs) : common::Error(std::forward<decltype(xs)>(xs)...)
+    {
+    }
+  };
 
   auto operator()(const typename T::Request::SharedPtr & request, std::size_t attempts_count = 1)
     -> void
   {
+    validateAvailability();
     for (std::size_t attempt = 0; attempt < attempts_count; ++attempt, validation_rate.sleep()) {
-      if (!client->service_is_ready()) {
-        RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
-      } else if (const auto & service_call_result = callWithTimeoutValidation(request)) {
+      if (const auto & service_call_result = callWithTimeoutValidation(request)) {
         if constexpr (has_data_member_status_v<typename T::Response>) {
           if constexpr (std::is_same_v<
                           tier4_external_api_msgs::msg::ResponseStatus,
@@ -93,11 +103,27 @@ public:
                                 ? ""
                                 : " (" + service_call_status.message + ")"));
             }
+          } else if constexpr (std::is_same_v<
+                                 autoware_adapi_v1_msgs::msg::ResponseStatus,
+                                 decltype(T::Response::status)>) {
+            if (const auto & service_call_status = service_call_result->get()->status;
+                service_call_status.success) {
+              RCLCPP_INFO_STREAM(
+                logger, service_name << " service request has been accepted "
+                                     << (service_call_status.message.empty()
+                                           ? "."
+                                           : " (" + service_call_status.message + ")."));
+              return;
+            } else {
+              RCLCPP_ERROR_STREAM(
+                logger, service_name
+                          << " service request was accepted, but ResponseStatus::success is false "
+                          << (service_call_status.message.empty()
+                                ? ""
+                                : " (" + service_call_status.message + ")"));
+            }
           } else {
-            RCLCPP_INFO_STREAM(
-              logger, service_name
-                        << " service request was accepted, but the type of Response::status is "
-                           "not tier4_external_api_msgs::msg::ResponseStatus.");
+            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
             return;
           }
         } else if constexpr (has_data_member_success_v<typename T::Response>) {
@@ -111,31 +137,34 @@ public:
                           << " service request has been accepted, but Response::success is false.");
             }
           } else {
-            RCLCPP_INFO_STREAM(
-              logger, service_name << " service request was accepted, but the type of "
-                                      "Response::success is not boolean.");
+            RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
+            return;
           }
         } else {
-          RCLCPP_INFO_STREAM(
-            logger, service_name << " service request has been accepted, but Response has no "
-                                    "status or success member to validate the response.");
+          RCLCPP_INFO_STREAM(logger, service_name << " service request has been accepted.");
           return;
         }
-      } else {
-        // timeout
       }
     }
-    throw common::AutowareError(
-      "Requested the service ", service_name, " ", attempts_count,
+    throw TimeoutError(
+      "Requested the service ", std::quoted(service_name), " ", attempts_count,
       " times, but was not successful.");
   }
 
 private:
+  auto validateAvailability() -> void
+  {
+    while (!client->service_is_ready()) {
+      RCLCPP_INFO_STREAM(logger, service_name << " service is not ready.");
+      validation_rate.sleep();
+    }
+  }
+
   auto callWithTimeoutValidation(const typename T::Request::SharedPtr & request)
     -> std::optional<typename rclcpp::Client<T>::SharedFuture>
   {
     if (auto future = client->async_send_request(request);
-        future.wait_for(std::chrono::seconds(1)) == std::future_status::ready) {
+        future.wait_for(validation_rate.period()) == std::future_status::ready) {
       return future;
     } else {
       RCLCPP_ERROR_STREAM(logger, service_name << " service request has timed out.");
@@ -144,8 +173,11 @@ private:
   }
 
   const std::string service_name;
+
   rclcpp::Logger logger;
+
   typename rclcpp::Client<T>::SharedPtr client;
+
   rclcpp::WallRate validation_rate;
 };
 }  // namespace concealer

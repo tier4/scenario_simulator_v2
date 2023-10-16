@@ -279,17 +279,13 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
         auto request =
           std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
         request->pose.push_back(initial_pose_msg);
-        requestInitialPose(request);
+        try {
+          return requestInitialPose(request);
+        } catch (const decltype(requestInitialPose)::TimeoutError &) {
+          // ignore timeout error because this service is validated by Autoware state transition.
+          return;
+        }
       });
-
-      // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
-      // waitForAutowareStateToBeWaitingForRoute([&]() {
-      //   auto request = std::make_shared<InitializePose::Request>();
-      //   request->pose.header.stamp = get_clock()->now();
-      //   request->pose.header.frame_id = "map";
-      //   request->pose.pose.pose = initial_pose;
-      //   requestInitializePose(request);
-      // });
     });
   }
 }
@@ -324,7 +320,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
     waitForAutowareStateToBeDriving([this]() {
       auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
-      requestEngage(request);
+      try {
+        return requestEngage(request);
+      } catch (const decltype(requestEngage)::TimeoutError &) {
+        // ignore timeout error because this service is validated by Autoware state transition.
+        return;
+      }
     });
   });
 }
@@ -413,14 +414,14 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
   task_queue.delay([this, velocity_limit]() {
     auto request = std::make_shared<tier4_external_api_msgs::srv::SetVelocityLimit::Request>();
     request->velocity = velocity_limit;
-    // We attempt to resend the service up to 60 times, but this number of times was determined by
+    // We attempt to resend the service up to 30 times, but this number of times was determined by
     // heuristics, not for any technical reason
-    requestSetVelocityLimit(request, 60);
+    requestSetVelocityLimit(request, 30);
   });
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation(
-  std::string module_name, bool enable) -> void
+  const std::string & module_name, bool enable) -> void
 {
   // Note: The implementation of this function will not work properly
   //       if the `rtc_auto_mode_manager` package is present.

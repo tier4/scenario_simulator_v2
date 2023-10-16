@@ -15,7 +15,7 @@
 #include <ament_index_cpp/get_package_prefix.hpp>
 #include <concealer/is_package_exists.hpp>
 
-auto concealer::isPackageExists(const std::string & package_name) -> bool
+auto concealer::isPackageExists(const std::string & package_name) noexcept -> bool
 {
   try {
     ament_index_cpp::get_package_prefix(package_name);
