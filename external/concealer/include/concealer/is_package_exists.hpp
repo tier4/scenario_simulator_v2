@@ -12,23 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__COOPERATOR_HPP_
-#define CONCEALER__COOPERATOR_HPP_
-
-#include <boost/lexical_cast.hpp>
-#include <istream>
-#include <unordered_map>
+#ifndef CONCEALER__IS_PACKAGE_EXISTS_HPP_
+#define CONCEALER__IS_PACKAGE_EXISTS_HPP_
 
 namespace concealer
 {
-enum class Cooperator {
-  simulator,  // DEFAULT
-  scenario,
-};
-
-auto operator>>(std::istream &, Cooperator &) -> std::istream &;
-
-auto operator<<(std::ostream &, const Cooperator &) -> std::ostream &;
+auto isPackageExists(const std::string & package_name) noexcept -> bool;
 }  // namespace concealer
-
-#endif  // CONCEALER__COOPERATOR_HPP_
+#endif  // CONCEALER__IS_PACKAGE_EXISTS_HPP_
