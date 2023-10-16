@@ -250,14 +250,6 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     request->stamp = latest_cooperate_status_array.stamp;
     request->commands.push_back(cooperate_command);
 
-    std::stringstream what;
-    what << "Sending a cooperate command: module " << std::quoted(module_name) << " and command "
-         << std::quoted(command) << ". ( uuid: ";
-    for (const auto & uuid : cooperate_command.uuid.uuid) {
-      what << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(uuid);
-    }
-    RCLCPP_INFO_STREAM(get_logger(), what.str());
-
     task_queue.delay([this, request]() { requestCooperateCommands(request); });
 
     used_cooperate_statuses.push_back(*cooperate_status);
