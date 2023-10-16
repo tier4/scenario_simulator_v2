@@ -25,11 +25,11 @@
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <chrono>
+#include <concealer/autoware_stream.hpp>
 #include <concealer/launch.hpp>
 #include <concealer/task_queue.hpp>
 #include <concealer/transition_assertion.hpp>
-#include <concealer/utility/autoware_stream.hpp>
-#include <concealer/utility/visibility.hpp>
+#include <concealer/visibility.hpp>
 #include <exception>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -139,6 +139,8 @@ public:
 
   /*   */ auto initialized() const noexcept { return initialize_was_called; }
 
+  virtual auto requestAutoModeForCooperation(const std::string &, bool) -> void = 0;
+
   // different autowares accept different initial target speed
   virtual auto restrictTargetSpeed(double) const -> double = 0;
 
@@ -148,8 +150,6 @@ public:
   virtual auto rethrow() const noexcept(false) -> void;
 
   virtual auto sendCooperateCommand(const std::string &, const std::string &) -> void = 0;
-
-  virtual auto setCooperator(const std::string &) -> void = 0;
 
   virtual auto setVelocityLimit(double) -> void = 0;
 };
