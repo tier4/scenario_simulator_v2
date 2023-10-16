@@ -49,6 +49,7 @@
 | `/api/autoware/set/velocity_limit` | [`tier4_external_api_msgs/srv/SetVelocityLimit`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_external_api_msgs/srv/SetVelocityLimit.srv) |      |
 | `/api/external/set/engage`         | [`tier4_external_api_msgs/srv/Engage`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_external_api_msgs/srv/Engage.srv)                     |      |
 | `/api/external/set/rtc_commands`   | [`tier4_rtc_msgs/srv/CooperateCommands`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_rtc_msgs/srv/CooperateCommands.srv)                 |      |
+| `/api/external/set/rtc_auto_mode`  | [`tier4_rtc_msgs/srv/AutoModeWithModule`](https://github.com/tier4/tier4_autoware_msgs/blob/tier4/universe/tier4_rtc_msgs/srv/AutoModeWithModule.srv)               |      |
 
 
 

@@ -25,6 +25,7 @@
   <depend>tier4_system_msgs</depend>
 
   <!-- Common -->
+  <depend>ament_index_cpp</depend>
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
   <depend>rclcpp</depend>

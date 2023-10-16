@@ -18,10 +18,10 @@ With this simulation, we can get lidar point-cloud data based on simple ray-cast
 
 ### Interfaces
 
-| interface                                   | type                                   | note                                                                 |
-|---------------------------------------------|----------------------------------------|----------------------------------------------------------------------|
-| `traffic_simulator::API::attachLidarSensor` | C++ traffic simulator API interface    |                                                                      |
-| `attach_lidar_sensor`                       | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](ZeroMQ.md)<br/>TCP Port : 5563 |  
+| interface                                   | type                                   | note                                             |
+|---------------------------------------------|----------------------------------------|--------------------------------------------------|
+| `traffic_simulator::API::attachLidarSensor` | C++ traffic simulator API interface    |                                                  |
+| `attach_lidar_sensor`                       | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](ZeroMQ.md) |
 
 ### Configuration
 
@@ -44,10 +44,10 @@ This enables us to reduce computational resources when we want to test Autoware'
 
 ### Interfaces
 
-| interface                                           | type                                   | note                                                                 |
-|-----------------------------------------------------|----------------------------------------|----------------------------------------------------------------------|
-| `traffic_simulator::API::attachOccupancyGridSensor` | C++ traffic simulator API interface    |                                                                      |
-| `attach_occupancy_grid_sensor`                      | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](ZeroMQ.md)<br/>TCP Port : 5565 |  
+| interface                                           | type                                   | note                                             |
+|-----------------------------------------------------|----------------------------------------|--------------------------------------------------|
+| `traffic_simulator::API::attachOccupancyGridSensor` | C++ traffic simulator API interface    |                                                  |
+| `attach_occupancy_grid_sensor`                      | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](ZeroMQ.md) |
 
 ### Occupancy Grid Values
 
@@ -55,7 +55,7 @@ This enables us to reduce computational resources when we want to test Autoware'
 |----------------|-------|---------------------------------------------------------------------|
 | occupied grid  | 100   | a grid determined by a simulated lidar sensor that an object exists |
 | invisible grid | 50    | a grid that is out of range or occlusion of simulated lidar sensor  |
-| empty grid     | 0     | an empty grid proved by a simulated ray-cast passing through        |    
+| empty grid     | 0     | an empty grid proved by a simulated ray-cast passing through        |
 
 
 
@@ -69,10 +69,10 @@ This also enables you to reduce computational resources when you want to test Au
 
 ### Interfaces
 
-| interface                                       | type                                   | note                                                                 |
-|-------------------------------------------------|----------------------------------------|----------------------------------------------------------------------|
-| `traffic_simulator::API::attachDetectionSensor` | C++ traffic simulator API interface    |                                                                      |
-| `attach_detection_sensor`                       | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](ZeroMQ.md)<br/>TCP Port : 5564 |  
+| interface                                       | type                                   | note                                             |
+|-------------------------------------------------|----------------------------------------|--------------------------------------------------|
+| `traffic_simulator::API::attachDetectionSensor` | C++ traffic simulator API interface    |                                                  |
+| `attach_detection_sensor`                       | ZeroMQ traffic simulator API interface | See [ZeroMQ Interfaces documentation](ZeroMQ.md) |
 
 
 ### Configuration
