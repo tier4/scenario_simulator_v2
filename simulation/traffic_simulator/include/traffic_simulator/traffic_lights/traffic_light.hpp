@@ -214,14 +214,20 @@ struct TrafficLight
 
     using Hash = std::uint32_t;  // (Color::Value << 8 + 16) | (Status::Value << 16) | Shape::Value
 
-    constexpr Bulb(const Value value) : value(value) {}
+    const float confidence;
 
-    constexpr Bulb(const Color color = {}, const Status status = {}, const Shape shape = {})
-    : Bulb(std::forward_as_tuple(color, status, shape))
+    constexpr Bulb(const Value value, float confidence = 1.f) : value(value), confidence(confidence)
     {
     }
 
-    Bulb(const std::string & name) : Bulb(make(name)) {}
+    constexpr Bulb(
+      const Color color = {}, const Status status = {}, const Shape shape = {},
+      float confidence = 1.f)
+    : Bulb(std::forward_as_tuple(color, status, shape), confidence)
+    {
+    }
+
+    Bulb(const std::string & name, float confidence = 1.f) : Bulb(make(name), confidence) {}
 
     auto make(const std::string & s) -> Value;
 
@@ -313,7 +319,7 @@ struct TrafficLight
       traffic_light_bulb_proto.set_status(status());
       traffic_light_bulb_proto.set_shape(shape());
       traffic_light_bulb_proto.set_color(color());
-      traffic_light_bulb_proto.set_confidence(1.0);
+      traffic_light_bulb_proto.set_confidence(confidence);
 
       return traffic_light_bulb_proto;
     }
