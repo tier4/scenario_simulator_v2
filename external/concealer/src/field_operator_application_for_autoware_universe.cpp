@@ -436,8 +436,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   } else {
     throw common::Error(
       "FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation is not "
-      "supported "
-      "in this environment, because rtc_auto_mode_manager is present.");
+      "supported in this environment, because rtc_auto_mode_manager is present.");
   }
 }
 
