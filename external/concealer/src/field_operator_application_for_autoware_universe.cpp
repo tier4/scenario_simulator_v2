@@ -179,8 +179,7 @@ bool isValidCooperateStatus(
    * NOTE2: The difference in the variable referred as a distance is the impact of the
    * message specification changes in the following URL.
    * This was also decided after consulting with a member of TIER IV planning and control team.
-   * ref:
-   * https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+   * ref: https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
    */
   if constexpr (HasDistance<CooperateStatusType>::value) {
     return cooperate_status.module.type == module_type &&
