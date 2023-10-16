@@ -14,6 +14,7 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <concealer/is_package_exists.hpp>
 
 namespace concealer
 {
@@ -22,49 +23,6 @@ FieldOperatorApplicationFor<AutowareUniverse>::~FieldOperatorApplicationFor()
   shutdownAutoware();
   // All tasks should be complete before the services used in them will be deinitialized.
   task_queue.stopAndJoin();
-}
-
-auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
-  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
-{
-  auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
-  request->stamp = cooperate_status_array.stamp;
-
-  auto approvable = [](auto && cooperate_status) {
-    return cooperate_status.safe xor
-           (cooperate_status.command_status.type == tier4_rtc_msgs::msg::Command::ACTIVATE);
-  };
-
-  auto flip = [](auto && type) {
-    using Command = tier4_rtc_msgs::msg::Command;
-    return type == Command::ACTIVATE ? Command::DEACTIVATE : Command::ACTIVATE;
-  };
-
-  for (auto && cooperate_status : cooperate_status_array.statuses) {
-    if (approvable(cooperate_status)) {
-      tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
-      cooperate_command.module = cooperate_status.module;
-      cooperate_command.uuid = cooperate_status.uuid;
-      cooperate_command.command.type = flip(cooperate_status.command_status.type);
-      request->commands.push_back(cooperate_command);
-    }
-  }
-
-  if (not request->commands.empty()) {
-    task_queue.delay([this, request]() { requestCooperateCommands(request); });
-  }
-}
-
-auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
-  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
-{
-  switch (current_cooperator) {
-    case Cooperator::simulator:
-      return task_queue.delay([=]() { return approve(cooperate_status_array); });
-
-    default:
-      return;
-  }
 }
 
 template <auto N, typename Tuples>
@@ -303,17 +261,13 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
         auto request =
           std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
         request->pose.push_back(initial_pose_msg);
-        requestInitialPose(request);
+        try {
+          return requestInitialPose(request);
+        } catch (const decltype(requestInitialPose)::TimeoutError &) {
+          // ignore timeout error because this service is validated by Autoware state transition.
+          return;
+        }
       });
-
-      // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
-      // waitForAutowareStateToBeWaitingForRoute([&]() {
-      //   auto request = std::make_shared<InitializePose::Request>();
-      //   request->pose.header.stamp = get_clock()->now();
-      //   request->pose.header.frame_id = "map";
-      //   request->pose.pose.pose = initial_pose;
-      //   requestInitializePose(request);
-      // });
     });
   }
 }
@@ -348,7 +302,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
     waitForAutowareStateToBeDriving([this]() {
       auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
-      requestEngage(request);
+      try {
+        return requestEngage(request);
+      } catch (const decltype(requestEngage)::TimeoutError &) {
+        // ignore timeout error because this service is validated by Autoware state transition.
+        return;
+      }
     });
   });
 }
@@ -443,10 +402,26 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::string & cooperator)
-  -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation(
+  const std::string & module_name, bool enable) -> void
 {
-  current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
+  // Note: The implementation of this function will not work properly
+  //       if the `rtc_auto_mode_manager` package is present.
+  if (not isPackageExists("rtc_auto_mode_manager")) {
+    task_queue.delay([this, module_name, enable]() {
+      auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
+      request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
+      request->enable = enable;
+      // We attempt to resend the service up to 30 times, but this number of times was determined by
+      // heuristics, not for any technical reason
+      requestSetRtcAutoMode(request, 30);
+    });
+  } else {
+    throw common::Error(
+      "FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation is not "
+      "supported "
+      "in this environment, because rtc_auto_mode_manager is present.");
+  }
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(

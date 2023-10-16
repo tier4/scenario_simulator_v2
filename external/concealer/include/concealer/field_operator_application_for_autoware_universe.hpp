@@ -28,18 +28,18 @@
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
-#include <concealer/cooperator.hpp>
 #include <concealer/field_operator_application.hpp>
+#include <concealer/publisher_wrapper.hpp>
+#include <concealer/service_with_validation.hpp>
+#include <concealer/subscriber_wrapper.hpp>
 #include <concealer/task_queue.hpp>
-#include <concealer/utility/publisher_wrapper.hpp>
-#include <concealer/utility/service_with_validation.hpp>
-#include <concealer/utility/subscriber_wrapper.hpp>
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
 #include <tier4_planning_msgs/msg/trajectory.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
+#include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 #include <tier4_system_msgs/msg/autoware_state.hpp>
 
@@ -65,18 +65,13 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
 
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>               requestCooperateCommands;
-  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>     requestEngage;
+  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                 requestEngage;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::InitializeLocalization>  requestInitialPose;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>          requestSetRoutePoints;
+  ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>              requestSetRtcAutoMode;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>       requestSetVelocityLimit;
 
-  Cooperator current_cooperator = Cooperator::simulator;
-
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
-
-  auto approve(const tier4_rtc_msgs::msg::CooperateStatusArray &) -> void;
-
-  auto cooperate(const tier4_rtc_msgs::msg::CooperateStatusArray &) -> void;
 
   std::string minimum_risk_maneuver_state;
 
@@ -118,8 +113,7 @@ public:
     // clang-format off
     getAutowareState("/api/iv_msgs/autoware/state", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
-    getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v;
-                                                                                            cooperate(v); }),
+    getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", *this, [this](const auto & v) { receiveEmergencyState(v); }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
     getLocalizationState("/api/localization/initialization_state", *this),
@@ -130,7 +124,9 @@ public:
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/external/set/engage", *this),
     requestInitialPose("/api/localization/initialize", *this),
-    requestSetRoutePoints("/api/routing/set_route_points", *this),
+    // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
+    requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
+    requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
   // clang-format on
@@ -162,11 +158,11 @@ public:
 
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
 
+  auto requestAutoModeForCooperation(const std::string &, bool) -> void override;
+
   auto restrictTargetSpeed(double) const -> double override;
 
   auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
-
-  auto setCooperator(const std::string & cooperator) -> void override;
 
   auto setVelocityLimit(double) -> void override;
 };
