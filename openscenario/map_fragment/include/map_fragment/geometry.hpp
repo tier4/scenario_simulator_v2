@@ -15,40 +15,91 @@
 #ifndef MAP_FRAGMENT__GEOMETRY__HPP_
 #define MAP_FRAGMENT__GEOMETRY__HPP_
 
-#include <boost/geometry/geometries/point_xy.hpp>
 #include <cmath>
 #include <string>
+#include <algorithm>
+#include <memory>
+#include <stdexcept>
 
 namespace map_fragment
 {
 
-using Point2d = boost::geometry::model::d2::point_xy<double>;
-using Vector2d = boost::geometry::model::d2::point_xy<double>;
-using UnitVector2d = Vector2d;  // TODO
+struct Point2d
+{
+  double x = 0;
+  double y = 0;
+};
+
+struct Vector2d
+{
+  double x = 0;
+  double y = 0;
+};
 
 Point2d operator+(Point2d a, Vector2d const& b)
 {
-  a.x(a.x() + b.x());
-  a.y(a.y() + b.y());
+  a.x += b.x;
+  a.y += b.y;
   return a;
 }
 
 Vector2d operator*(Vector2d v, double const& multiplier)
 {
-  v.x(v.x() * multiplier);
-  v.y(v.y() * multiplier);
+  v.x *= multiplier;
+  v.y *= multiplier;
   return v;
 }
 
 Vector2d operator-(Point2d const& a, Point2d const& b)
 {
-  return Vector2d(a.x() - b.x(),
-                  a.y() - b.y());
+  return {a.x - b.x, a.y - b.y};
+}
+
+Vector2d operator+(Vector2d const& a, Vector2d const& b)
+{
+  return {a.x + b.x, a.y + b.y};
 }
 
 Vector2d rotate(Vector2d v, double angle) {
-  return Vector2d(v.x() * std::cos(angle) - v.y() * std::sin(angle),
-                  v.x() * std::sin(angle) + v.y() * std::cos(angle));
+  return {
+    v.x * std::cos(angle) - v.y * std::sin(angle),
+    v.x * std::sin(angle) + v.y * std::cos(angle)
+  };
+}
+
+Point2d rotate(Point2d p, double angle)
+{
+  Point2d p0 = {0, 0};
+  return p0 + rotate(p - p0, angle);
+}
+
+double calculateAngle(Vector2d v)
+{
+  return std::atan2(v.y, v.x);
+}
+
+struct Transformation2d
+{
+  Vector2d translation;
+  double rotation;
+};  // struct Transformation2d
+
+Point2d applyTransformation(Point2d p, Transformation2d t)
+{
+  return rotate(p, t.rotation) + t.translation;
+}
+
+Vector2d applyTransformation(Vector2d v, Transformation2d t)
+{
+  return rotate(v, t.rotation);
+}
+
+Transformation2d chainTransformations(Transformation2d first, Transformation2d second)
+{
+  Transformation2d t;
+  t.translation = first.translation + rotate(second.translation, first.rotation);
+  t.rotation = first.rotation + second.rotation;
+  return t;
 }
 
 /**
@@ -77,7 +128,7 @@ public:
   /**
    * Calculate curve tangent vector for given parameter t ∈ [0, 1]
    */
-  UnitVector2d getTangentVector(double t)
+  Vector2d getTangentVector(double t)
   {
     validateCurveParameterOrThrow(t);
 
@@ -87,8 +138,9 @@ public:
 
 private:
   virtual Point2d getPosition_(double t) = 0;
-  virtual UnitVector2d getTangentVector_(double t) = 0;
+  virtual Vector2d getTangentVector_(double t) = 0;
 
+protected:
   void validateCurveParameterOrThrow(double t)
   {
     if (!(0 <= t && t <= 1)) {
@@ -122,12 +174,12 @@ public:
 private:
   virtual Point2d getPosition_(double t) override
   {
-    return Point2d(t * length_, 0);
+    return {t * length_, 0};
   }
   
-  virtual UnitVector2d getTangentVector_(double) override
+  virtual Vector2d getTangentVector_(double) override
   {
-    return UnitVector2d(1, 0);
+    return {1, 0};
   }
 };  // class Straight
 
@@ -160,30 +212,94 @@ public:
       );
     }
 
-    if (angle > 0)
-    {
-      center_ = Point2d(0, radius);
-    }
-
-    else
-    {
-      center_ = Point2d(0, -radius);
-    }
+    center_.y = angle > 0 ? radius : -radius;
   }
   
 private:
   virtual Point2d getPosition_(double t) override
   {
     auto theta = t * angle_;
-    return center_ + rotate(Point2d(0, 0) - center_, theta);
+    Point2d origin = {0, 0};
+    return center_ + rotate(origin - center_, theta);
   }
   
-  virtual UnitVector2d getTangentVector_(double t) override
+  virtual Vector2d getTangentVector_(double t) override
   {
     auto theta = t * angle_;
-    return rotate(Vector2d(1, 0), theta);
+    Vector2d v = {1, 0};
+    return rotate(v, theta);
   }
 };  // class Arc
+
+/**
+ * Combination of two or more component curves, chained after one another
+ */
+class CombinedCurve : public ParametricCurve
+{
+  std::vector<ParametricCurve::Ptr> curves_;
+  std::vector<Transformation2d> transformations_;
+
+public:
+  CombinedCurve(std::vector<ParametricCurve::Ptr> curves)
+    : curves_(curves)
+  {
+    if (curves.size() < 2)
+    {
+      throw std::invalid_argument(
+        "Number of curves to be combined must be two or more. Actual number: "
+        + std::to_string(curves.size())
+      );
+    }
+
+    Transformation2d current_transformation;
+
+    for (const auto& curve : curves)
+    {
+      transformations_.push_back(current_transformation);
+      
+      Point2d origin = {0, 0};
+      Transformation2d local_transformation = {
+        curve->getPosition(1.0) - origin,
+        calculateAngle(curve->getTangentVector(1.0))
+      };
+
+      current_transformation = chainTransformations(current_transformation,
+                                                    local_transformation);
+    }
+  }
+
+private:
+  virtual Point2d getPosition_(double t) override
+  {
+    auto [curve_id, curve_t] = getCurveIdAndParameter(t);
+    auto curve = curves_[curve_id];
+    auto transformation = transformations_[curve_id];
+
+    return applyTransformation(curve->getPosition(curve_t), transformation);
+  }
+
+  virtual Vector2d getTangentVector_(double t) override
+  {
+    auto [curve_id, curve_t] = getCurveIdAndParameter(t);
+    auto curve = curves_[curve_id];
+    auto transformation = transformations_[curve_id];
+
+    return applyTransformation(curve->getTangentVector(curve_t), transformation);
+  }
+
+  std::pair<unsigned long, double> getCurveIdAndParameter(double t) {
+    validateCurveParameterOrThrow(t);
+    
+    auto range_width_per_curve = 1. / curves_.size();
+    auto curve_id = std::min(
+      static_cast<unsigned long>(t / range_width_per_curve),
+      curves_.size() - 1);
+    auto curve_t = t / range_width_per_curve - curve_id;
+
+    return std::make_pair(curve_id, curve_t);
+  }
+};  // class CombinedCurve
+
 
 }  // namespace map_fragment
 

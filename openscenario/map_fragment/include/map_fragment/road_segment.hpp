@@ -34,7 +34,7 @@ class RoadCrossSection
 public:
   RoadCrossSection(RoadCrossSectionDescription description, // TODO: name for the origin coordinate system'
                    Point2d origin,
-                   UnitVector2d tangent_vector)
+                   Vector2d tangent_vector)
   {
     auto n = description.number_of_lanes;
     auto w = description.lane_width;
@@ -44,7 +44,7 @@ public:
     {
       auto lateral_position = (i - n / 2) * w;
       auto p = origin + normal_vector * lateral_position;
-      points_.push_back(makePoint3d(p.x(), p.y(), 0.));
+      points_.push_back(makePoint3d(p.x, p.y, 0.));
 
     }
   }
