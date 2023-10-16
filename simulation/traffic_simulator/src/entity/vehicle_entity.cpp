@@ -159,6 +159,8 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
         hdmap_utils_ptr_->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s) {
         stopAtCurrentPosition();
+        updateStandStillDuration(step_time);
+        updateTraveledDistance(step_time);
         return;
       }
     }

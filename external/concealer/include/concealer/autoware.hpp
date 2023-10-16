@@ -20,7 +20,7 @@
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
-#include <concealer/utility/visibility.hpp>
+#include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
