@@ -85,7 +85,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"architecture_type       := {architecture_type.perform(context)}")
     print(f"autoware_launch_file    := {autoware_launch_file.perform(context)}")
     print(f"autoware_launch_package := {autoware_launch_package.perform(context)}")
-    print(f"consider_lanelet_slope  := {consider_lanelet_slope(context)}")
+    print(f"consider_lanelet_slope  := {consider_lanelet_slope.perform(context)}")
     print(f"global_frame_rate       := {global_frame_rate.perform(context)}")
     print(f"global_real_time_factor := {global_real_time_factor.perform(context)}")
     print(f"global_timeout          := {global_timeout.perform(context)}")

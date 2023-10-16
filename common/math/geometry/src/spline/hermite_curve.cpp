@@ -263,8 +263,8 @@ const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool denormalize_
   geometry_msgs::msg::Pose pose;
   geometry_msgs::msg::Vector3 tangent_vec = getTangentVector(s, false);
   geometry_msgs::msg::Vector3 rpy;
-  rpy.x = 0.0;
-  rpy.y = 0.0;
+  rpy.x = 0;
+  rpy.y = std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y));
   rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
   pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
   pose.position = getPoint(s);

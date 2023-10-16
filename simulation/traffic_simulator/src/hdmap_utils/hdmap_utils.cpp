@@ -1404,7 +1404,7 @@ auto HdMapUtils::toMapPose(const traffic_simulator_msgs::msg::LaneletPose & lane
     const auto tangent_vec = spline->getTangentVector(pose->s);
     geometry_msgs::msg::Vector3 rpy;
     rpy.x = 0.0;
-    rpy.y = 0.0;
+    rpy.y = std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y));
     rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
     ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy) *
                            quaternion_operation::convertEulerAngleToQuaternion(pose->rpy);

@@ -96,8 +96,10 @@ auto LineSegment::getPose(const double s, const bool denormalize_s) const
     .orientation([this]() -> geometry_msgs::msg::Quaternion {
       const auto tangent_vec = getVector();
       return quaternion_operation::convertEulerAngleToQuaternion(
-        geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(
-          std::atan2(tangent_vec.y, tangent_vec.x)));
+        geometry_msgs::build<geometry_msgs::msg::Vector3>()
+          .x(0.0)
+          .y(std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)))
+          .z(std::atan2(tangent_vec.y, tangent_vec.x)));
     }());
 }
 

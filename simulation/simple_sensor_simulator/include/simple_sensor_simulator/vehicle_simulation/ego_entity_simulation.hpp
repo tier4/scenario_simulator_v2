@@ -78,8 +78,7 @@ public:
 
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &,
-    const bool consider_lanelet_slope);
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const bool consider_lanelet_slope);
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 
