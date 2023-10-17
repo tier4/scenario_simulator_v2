@@ -349,6 +349,11 @@ public:
           return configuration;
         }());
 
+        core->asFieldOperatorApplication(entity_ref)
+          .declare_parameter<bool>(
+            "allow_goal_modification",
+            controller.properties.template get<Boolean>("allowGoalModification"));
+
         for (const auto & module :
              [](std::string manual_modules_string) {
                manual_modules_string.erase(

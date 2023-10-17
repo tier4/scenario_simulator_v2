@@ -53,23 +53,24 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
-  SubscriberWrapper<tier4_system_msgs::msg::AutowareState, ThreadSafety::safe>         getAutowareState;
-  SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>          getAckermannControlCommand;
-  SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                         getCooperateStatusArray;
-  SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                           getEmergencyState;
+  SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
+  SubscriberWrapper<tier4_system_msgs::msg::AutowareState, ThreadSafety::safe>    getAutowareState;
+  SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
+  SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
-  SubscriberWrapper<autoware_adapi_v1_msgs::msg::LocalizationInitializationState>      getLocalizationState;
+  SubscriberWrapper<autoware_adapi_v1_msgs::msg::LocalizationInitializationState> getLocalizationState;
 #endif
-  SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                             getMrmState;
-  SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                              getTrajectory;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>            getTurnIndicatorsCommandImpl;
+  SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                        getMrmState;
+  SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                         getTrajectory;
+  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>       getTurnIndicatorsCommandImpl;
 
-  ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>               requestCooperateCommands;
-  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                 requestEngage;
-  ServiceWithValidation<autoware_adapi_v1_msgs::srv::InitializeLocalization>  requestInitialPose;
-  ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>          requestSetRoutePoints;
-  ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>              requestSetRtcAutoMode;
-  ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>       requestSetVelocityLimit;
+  ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                   requestCooperateCommands;
+  ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                     requestEngage;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::InitializeLocalization>      requestInitialPose;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>              requestSetRoutePoints;
+  ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>                  requestSetRtcAutoMode;
+  ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>           requestSetVelocityLimit;
+  // clang-format on
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
 
@@ -84,7 +85,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 #define DEFINE_STATE_PREDICATE(NAME, VALUE)                  \
   auto is##NAME() const noexcept                             \
   {                                                          \
-    using tier4_system_msgs::msg::AutowareState;     \
+    using tier4_system_msgs::msg::AutowareState;             \
     return getAutowareState().state == AutowareState::VALUE; \
   }                                                          \
   static_assert(true, "")
@@ -111,8 +112,8 @@ public:
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    getAutowareState("/api/iv_msgs/autoware/state", *this),
     getAckermannControlCommand("/control/command/control_cmd", *this),
+    getAutowareState("/api/iv_msgs/autoware/state", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", *this, [this](const auto & v) { receiveEmergencyState(v); }),
 #if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
