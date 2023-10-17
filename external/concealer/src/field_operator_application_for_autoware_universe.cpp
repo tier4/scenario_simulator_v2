@@ -210,12 +210,17 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     }
   };
 
+  /**
+   * NOTE: Used cooperate statuses will be deleted correctly in Autoware side and provided via topic update.
+   *       But, their update rate (typ. 10Hz) is lower than the one of scenario_simulator_v2.
+   *       So, we need to check cooperate statuses if they are used or not in scenario_simulator_v2 side
+   *       to avoid sending the same cooperate command when sending multiple commands between updates of cooperate statuses.
+   */
   static std::vector<tier4_rtc_msgs::msg::CooperateStatus> used_cooperate_statuses;
   auto is_used_cooperate_status = [this](const auto & cooperate_status) {
     return std::find_if(
              used_cooperate_statuses.begin(), used_cooperate_statuses.end(),
              [&cooperate_status](const auto & used_cooperate_status) {
-               // check module name, uuid and command type
                return used_cooperate_status.module == cooperate_status.module &&
                       used_cooperate_status.uuid == cooperate_status.uuid &&
                       used_cooperate_status.command_status.type ==
