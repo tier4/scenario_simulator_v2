@@ -71,12 +71,12 @@ math::geometry::HermiteCurve makeLine2()
 }
 
 /// @brief Helper function generating curve: p(0,0) v(1,0)-> p(1,1) v(0,1)
-math::geometry::HermiteCurve makeCurve1()
+math::geometry::HermiteCurve makeCurve1(bool concave_upward = true)
 {
   geometry_msgs::msg::Pose start_pose = makePose(0, 0);
   geometry_msgs::msg::Pose goal_pose = makePose(1, 1);
-  geometry_msgs::msg::Vector3 start_vec = makeVector(1, 0);
-  geometry_msgs::msg::Vector3 goal_vec = makeVector(0, 1);
+  geometry_msgs::msg::Vector3 start_vec = concave_upward ? makeVector(1, 0) : makeVector(0, 1);
+  geometry_msgs::msg::Vector3 goal_vec = concave_upward ? makeVector(0, 1) : makeVector(1, 0);
   return math::geometry::HermiteCurve(start_pose, goal_pose, start_vec, goal_vec);
 }
 
@@ -154,7 +154,7 @@ TEST(HermiteCurveTest, initializationParams)
 
 TEST(HermiteCurveTest, getTrajectoryZero)
 {
-  auto curve = makeLine1();
+  const auto curve = makeLine1();
   EXPECT_NO_THROW(auto trajectory = curve.getTrajectory(0));
   auto trajectory = curve.getTrajectory(0);
   EXPECT_TRUE(trajectory.empty());
@@ -162,7 +162,7 @@ TEST(HermiteCurveTest, getTrajectoryZero)
 
 TEST(HermiteCurveTest, getTrajectory)
 {
-  auto curve = makeLine1();
+  const auto curve = makeLine1();
   EXPECT_NO_THROW(auto trajectory = curve.getTrajectory(3));
   auto trajectory = curve.getTrajectory(3);
   EXPECT_EQ(trajectory.size(), size_t(3));
@@ -188,7 +188,7 @@ TEST(HermiteCurveTest, getTrajectoryReversed)
 
 TEST(HermiteCurveTest, getTrajectoryPast1)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
   EXPECT_NO_THROW(auto trajectory = curve.getTrajectory(0.0, 1.0, 0.1, false));
   auto trajectory = curve.getTrajectory(0.0, 1.0, 0.1, false);
   std::vector<geometry_msgs::msg::Point> ans(10);
@@ -212,7 +212,7 @@ TEST(HermiteCurveTest, getTrajectoryPast1)
 
 TEST(HermiteCurveTest, getTrajectoryPast2)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
   EXPECT_NO_THROW(auto trajectory = curve.getTrajectory(0, std::sqrt(2) * 2, 0.1, true));
   auto trajectory = curve.getTrajectory(0, std::sqrt(2) * 2, 0.1 * std::sqrt(2) * 2, true);
   std::vector<geometry_msgs::msg::Point> ans(10);
@@ -236,7 +236,7 @@ TEST(HermiteCurveTest, getTrajectoryPast2)
 
 TEST(HermiteCurveTest, getPointLine)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   // The uncertainty of the calculations is high because the parameter space is equidistant
   // interpolated, which does not translate into equidistant spline interpolation
@@ -273,7 +273,7 @@ TEST(HermiteCurveTest, getPointCurve)
 
 TEST(HermiteCurveTest, get2DCurvatureLine)
 {
-  auto curve = makeLine1();
+  const auto curve = makeLine1();
   EXPECT_DOUBLE_EQ(curve.get2DCurvature(0, true), 0);
   EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.1, true), 0);
   EXPECT_DOUBLE_EQ(curve.get2DCurvature(0.2, true), 0);
@@ -289,41 +289,49 @@ TEST(HermiteCurveTest, get2DCurvatureLine)
 
 TEST(HermiteCurveTest, get2DCurvatureCurve)
 {
-  auto curve = makeCurve1();
   constexpr double eps = 0.01;
-  EXPECT_NEAR(curve.get2DCurvature(0.0, false), 4.0, eps);
-  EXPECT_NEAR(curve.get2DCurvature(0.5, false), 0.45, eps);
-  EXPECT_NEAR(curve.get2DCurvature(1.0, false), 4.0, eps);
+  const auto curve1 = makeCurve1();
+  EXPECT_NEAR(curve1.get2DCurvature(0.0, false), 4.0, eps);
+  EXPECT_NEAR(curve1.get2DCurvature(0.5, false), 0.45, eps);
+  EXPECT_NEAR(curve1.get2DCurvature(1.0, false), 4.0, eps);
+
+  const auto curve2 = makeCurve1(false);
+  EXPECT_NEAR(curve2.get2DCurvature(0.0, false), -4.0, eps);
+  EXPECT_NEAR(curve2.get2DCurvature(0.5, false), -0.45, eps);
+  EXPECT_NEAR(curve2.get2DCurvature(1.0, false), -4.0, eps);
 }
 
 TEST(HermiteCurveTest, getMaximum2DCurvatureLine)
 {
-  auto curve = makeLine1();
+  const auto curve = makeLine1();
   EXPECT_DOUBLE_EQ(curve.getMaximum2DCurvature(), 0.0);
 }
 
 TEST(HermiteCurveTest, getMaximum2DCurvatureCurve)
 {
-  auto curve = makeCurve1();
   constexpr double eps = 0.01;
-  EXPECT_NEAR(curve.getMaximum2DCurvature(), 4.0, eps);
+  const auto curve1 = makeCurve1();
+  EXPECT_NEAR(curve1.getMaximum2DCurvature(), 4.0, eps);
+
+  const auto curve2 = makeCurve1(false);
+  EXPECT_NEAR(curve2.getMaximum2DCurvature(), -4.0, eps);
 }
 
 TEST(HermiteCurveTest, getLengthNoParameter)
 {
-  auto curve = makeLine1();
+  const auto curve = makeLine1();
   EXPECT_NEAR(curve.getLength(), 1.0, EPS);
 }
 
 TEST(HermiteCurveTest, getLengthParameter)
 {
-  auto curve = makeLine1();
+  const auto curve = makeLine1();
   EXPECT_NEAR(curve.getLength(1000), 1.0, EPS);
 }
 
 TEST(HermiteCurveTest, getSValue)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   const auto s0 = curve.getSValue(makePose(0, 0), 1, false);
   EXPECT_TRUE(s0);
@@ -338,7 +346,7 @@ TEST(HermiteCurveTest, getSValue)
 
 TEST(HermiteCurveTest, getSValueAutoscale)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   const auto s0 = curve.getSValue(makePose(0, 0), 1, true);
   EXPECT_TRUE(s0);
@@ -353,7 +361,7 @@ TEST(HermiteCurveTest, getSValueAutoscale)
 
 TEST(HermiteCurveTest, getSquaredDistanceIn2D)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   EXPECT_NEAR(curve.getSquaredDistanceIn2D(makePoint(2, 0), 0.5, false), 2.0, EPS);
   EXPECT_NEAR(curve.getSquaredDistanceIn2D(makePoint(2, 0), 1.0, false), 4.0, EPS);
@@ -362,7 +370,7 @@ TEST(HermiteCurveTest, getSquaredDistanceIn2D)
 
 TEST(HermiteCurveTest, getSquaredDistanceIn2DZeroDistance)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   EXPECT_NEAR(curve.getSquaredDistanceIn2D(makePoint(2, 2), std::sqrt(2) * 2.0, true), 0.0, EPS);
   EXPECT_NEAR(curve.getSquaredDistanceIn2D(makePoint(1, 1), std::sqrt(2), true), 0.0, EPS);
@@ -371,7 +379,7 @@ TEST(HermiteCurveTest, getSquaredDistanceIn2DZeroDistance)
 
 TEST(HermiteCurveTest, getSquaredDistanceVector)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   const auto p0 = curve.getSquaredDistanceVector(makePoint(2, 0), 0.5, false);
   EXPECT_POINT_NEAR(p0, makePoint(1, -1, 0), EPS);
@@ -383,7 +391,7 @@ TEST(HermiteCurveTest, getSquaredDistanceVector)
 
 TEST(HermiteCurveTest, getSquaredDistanceVectorZeroDistance)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   const auto p0 = curve.getSquaredDistanceVector(makePoint(2, 2), std::sqrt(2) * 2.0, true);
   EXPECT_POINT_NEAR(p0, makePoint(0, 0, 0), EPS);
@@ -395,7 +403,7 @@ TEST(HermiteCurveTest, getSquaredDistanceVectorZeroDistance)
 
 TEST(HermiteCurveTest, getCollisionPointIn2DLine)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   constexpr double eps = 0.1;
   const auto s = curve.getCollisionPointIn2D(makePoint(1, 0), makePoint(0, 1));
@@ -405,7 +413,7 @@ TEST(HermiteCurveTest, getCollisionPointIn2DLine)
 
 TEST(HermiteCurveTest, getCollisionPointIn2DLineNoCollision)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   const auto s = curve.getCollisionPointIn2D(makePoint(1, 0), makePoint(2, 1));
   EXPECT_FALSE(s);
@@ -413,7 +421,7 @@ TEST(HermiteCurveTest, getCollisionPointIn2DLineNoCollision)
 
 TEST(HermiteCurveTest, getCollisionPointIn2DCurve)
 {
-  auto curve = makeCurve1();
+  const auto curve = makeCurve1();
 
   constexpr double eps = 0.1;
   const auto s0 = curve.getCollisionPointIn2D(makePoint(1, 0), makePoint(0, 1));
@@ -431,7 +439,7 @@ TEST(HermiteCurveTest, getCollisionPointIn2DCurve)
 
 TEST(HermiteCurveTest, getCollisionPointIn2DCurveEdge)
 {
-  auto curve = makeCurve1();
+  const auto curve = makeCurve1();
 
   constexpr double eps = 0.1;
   const auto s = curve.getCollisionPointIn2D(makePoint(-1, 1), makePoint(1, -1));
@@ -441,7 +449,7 @@ TEST(HermiteCurveTest, getCollisionPointIn2DCurveEdge)
 
 TEST(HermiteCurveTest, getCollisionPointIn2DVectorWrongCases)
 {
-  auto curve = makeCurve1();
+  const auto curve = makeCurve1();
 
   std::vector<geometry_msgs::msg::Point> polygon;
   EXPECT_FALSE(curve.getCollisionPointIn2D(polygon));
@@ -451,7 +459,7 @@ TEST(HermiteCurveTest, getCollisionPointIn2DVectorWrongCases)
 
 TEST(HermiteCurveTest, getCollisionPointIn2DVectorOneCollision)
 {
-  auto curve = makeLine1();
+  const auto curve = makeLine1();
 
   std::vector<geometry_msgs::msg::Point> polygon(4);
   polygon[0] = makePoint(0.5, 0.5);
@@ -466,7 +474,7 @@ TEST(HermiteCurveTest, getCollisionPointIn2DVectorOneCollision)
 
 TEST(HermiteCurveTest, getCollisionPointIn2DVectorMultipleCollisions)
 {
-  auto curve = makeLine2();
+  const auto curve = makeLine2();
 
   std::vector<geometry_msgs::msg::Point> polygon(4);
   polygon[0] = makePoint(1, 0);
@@ -492,7 +500,7 @@ TEST(HermiteCurveTest, getNewtonMethodStepSize) {}
 
 TEST(HermiteCurveTest, getTangentVector1)
 {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
-  auto curve = makeCurve1();
+  const auto curve = makeCurve1();
   double norm =
     std::hypot(curve.getTangentVector(0.5, false).x, curve.getTangentVector(0.5, false).y);
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, 1 / std::sqrt(2));
@@ -501,7 +509,7 @@ TEST(HermiteCurveTest, getTangentVector1)
 
 TEST(HermiteCurveTest, getTangentVector2)
 {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
-  auto curve = makeCurve2();
+  const auto curve = makeCurve2();
   double norm =
     std::hypot(curve.getTangentVector(0.5, false).x, curve.getTangentVector(0.5, false).y);
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, 1 / std::sqrt(2));
@@ -510,7 +518,7 @@ TEST(HermiteCurveTest, getTangentVector2)
 
 TEST(HermiteCurveTest, getTangentVector3)
 {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
-  auto curve = makeCurve3();
+  const auto curve = makeCurve3();
   double norm =
     std::hypot(curve.getTangentVector(0.5, false).x, curve.getTangentVector(0.5, false).y);
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, -1 / std::sqrt(2));
@@ -519,7 +527,7 @@ TEST(HermiteCurveTest, getTangentVector3)
 
 TEST(HermiteCurveTest, getTangentVector4)
 {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
-  auto curve = makeCurve4();
+  const auto curve = makeCurve4();
   double norm =
     std::hypot(curve.getTangentVector(0.5, false).x, curve.getTangentVector(0.5, false).y);
   EXPECT_DOUBLE_EQ(curve.getTangentVector(0.5, false).x / norm, -1 / std::sqrt(2));
@@ -528,7 +536,7 @@ TEST(HermiteCurveTest, getTangentVector4)
 
 TEST(HermiteCurveTest, getTangentVectorAutoscale1)
 {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
-  auto curve = makeCurve1();
+  const auto curve = makeCurve1();
   constexpr double eps = 0.1;
   double norm =
     std::hypot(curve.getTangentVector(0.75, true).x, curve.getTangentVector(0.75, true).y);
@@ -538,7 +546,7 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale1)
 
 TEST(HermiteCurveTest, getTangentVectorAutoscale2)
 {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
-  auto curve = makeCurve2();
+  const auto curve = makeCurve2();
   constexpr double eps = 0.1;
   double norm =
     std::hypot(curve.getTangentVector(0.75, true).x, curve.getTangentVector(0.75, true).y);
@@ -548,7 +556,7 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale2)
 
 TEST(HermiteCurveTest, getTangentVectorAutoscale3)
 {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
-  auto curve = makeCurve3();
+  const auto curve = makeCurve3();
   constexpr double eps = 0.1;
   double norm =
     std::hypot(curve.getTangentVector(0.75, true).x, curve.getTangentVector(0.75, true).y);
@@ -558,7 +566,7 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale3)
 
 TEST(HermiteCurveTest, getTangentVectorAutoscale4)
 {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
-  auto curve = makeCurve4();
+  const auto curve = makeCurve4();
   constexpr double eps = 0.1;
   double norm =
     std::hypot(curve.getTangentVector(0.75, true).x, curve.getTangentVector(0.75, true).y);
@@ -568,7 +576,7 @@ TEST(HermiteCurveTest, getTangentVectorAutoscale4)
 
 TEST(HermiteCurveTest, getNormalVector1)
 {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
-  auto curve = makeCurve1();
+  const auto curve = makeCurve1();
   double norm =
     std::hypot(curve.getNormalVector(0.5, false).x, curve.getNormalVector(0.5, false).y);
   EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, -1 / std::sqrt(2));
@@ -577,7 +585,7 @@ TEST(HermiteCurveTest, getNormalVector1)
 
 TEST(HermiteCurveTest, getNormalVector2)
 {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
-  auto curve = makeCurve2();
+  const auto curve = makeCurve2();
   double norm =
     std::hypot(curve.getNormalVector(0.5, false).x, curve.getNormalVector(0.5, false).y);
   EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, 1 / std::sqrt(2));
@@ -586,7 +594,7 @@ TEST(HermiteCurveTest, getNormalVector2)
 
 TEST(HermiteCurveTest, getNormalVector3)
 {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
-  auto curve = makeCurve3();
+  const auto curve = makeCurve3();
   double norm =
     std::hypot(curve.getNormalVector(0.5, false).x, curve.getNormalVector(0.5, false).y);
   EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, 1 / std::sqrt(2));
@@ -595,7 +603,7 @@ TEST(HermiteCurveTest, getNormalVector3)
 
 TEST(HermiteCurveTest, getNormalVector4)
 {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
-  auto curve = makeCurve4();
+  const auto curve = makeCurve4();
   double norm =
     std::hypot(curve.getNormalVector(0.5, false).x, curve.getNormalVector(0.5, false).y);
   EXPECT_DOUBLE_EQ(curve.getNormalVector(0.5, false).x / norm, -1 / std::sqrt(2));
@@ -604,7 +612,7 @@ TEST(HermiteCurveTest, getNormalVector4)
 
 TEST(HermiteCurveTest, getNormalVectorAutoscale1)
 {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
-  auto curve = makeCurve1();
+  const auto curve = makeCurve1();
   constexpr double eps = 0.1;
   double norm =
     std::hypot(curve.getNormalVector(0.75, true).x, curve.getNormalVector(0.75, true).y);
@@ -614,7 +622,7 @@ TEST(HermiteCurveTest, getNormalVectorAutoscale1)
 
 TEST(HermiteCurveTest, getNormalVectorAutoscale2)
 {  //p(0,0) v(1,0)-> p(1,-1) v(0,-1)
-  auto curve = makeCurve2();
+  const auto curve = makeCurve2();
   constexpr double eps = 0.1;
   double norm =
     std::hypot(curve.getNormalVector(0.75, true).x, curve.getNormalVector(0.75, true).y);
@@ -624,7 +632,7 @@ TEST(HermiteCurveTest, getNormalVectorAutoscale2)
 
 TEST(HermiteCurveTest, getNormalVectorAutoscale3)
 {  //p(1,1) v(0,-1)-> p(0,0) v(-1,0)
-  auto curve = makeCurve3();
+  const auto curve = makeCurve3();
   constexpr double eps = 0.1;
   double norm =
     std::hypot(curve.getNormalVector(0.75, true).x, curve.getNormalVector(0.75, true).y);
@@ -634,7 +642,7 @@ TEST(HermiteCurveTest, getNormalVectorAutoscale3)
 
 TEST(HermiteCurveTest, getNormalVectorAutoscale4)
 {  //p(1,-1) v(0,1)-> p(0,0) v(-1,0)
-  auto curve = makeCurve4();
+  const auto curve = makeCurve4();
   constexpr double eps = 0.1;
   double norm =
     std::hypot(curve.getNormalVector(0.75, true).x, curve.getNormalVector(0.75, true).y);
