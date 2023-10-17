@@ -35,15 +35,18 @@ try {
 
   const auto map = lanelet::load(lanelet2_map, map_fragment::projector());
 
-  auto routing_graph = lanelet::routing::RoutingGraph::build(*map, vehicleTrafficRules());
+  const auto routing_graph = lanelet::routing::RoutingGraph::build(*map, vehicleTrafficRules());
 
-  std::list<std::function<bool(const lanelet::Lanelet &)>> constraints{
+  const std::list<std::function<bool(const lanelet::Lanelet &)>> constraints{
     [&]() {
       node.declare_parameter("type", "lanelet");
       const auto type = node.get_parameter("type").as_string();
       return [type](const auto & lanelet) {
-        auto iterator = lanelet.attributes().find("type");
-        return iterator != lanelet.attributes().end() and iterator->second == type;
+        return lanelet.attribute("type") == type or [&]() {
+          std::cerr << "[" << lanelet.id() << "] discarded: The type is not " << type << "."
+                    << std::endl;
+          return false;
+        }();
       };
     }(),
 
@@ -51,28 +54,49 @@ try {
       node.declare_parameter("subtype", "road");
       const auto subtype = node.get_parameter("subtype").as_string();
       return [subtype](const auto & lanelet) {
-        auto iterator = lanelet.attributes().find("subtype");
-        return iterator != lanelet.attributes().end() and iterator->second == subtype;
+        return lanelet.attribute("subtype") == subtype or [&]() {
+          std::cerr << "[" << lanelet.id() << "] discarded: The subtype is not " << subtype << "."
+                    << std::endl;
+          return false;
+        }();
       };
     }(),
 
     [&]() {
-      node.declare_parameter("lane_id_greater_than", lanelet::Id());
-      const auto lower_bound = node.get_parameter("lane_id_greater_than").as_int();
-      return [lower_bound](const auto & lanelet) { return lower_bound < lanelet.id(); };
+      node.declare_parameter("id_greater_than", lanelet::Id());
+      const auto lower_bound = node.get_parameter("id_greater_than").as_int();
+      return [lower_bound](const auto & lanelet) {
+        return lower_bound < lanelet.id() or [&]() {
+          std::cerr << "[" << lanelet.id() << "] discarded: The id is not greater than "
+                    << lower_bound << "." << std::endl;
+          return false;
+        }();
+      };
     }(),
 
     [&]() {
-      node.declare_parameter("lane_id_less_than", std::numeric_limits<lanelet::Id>::max());
-      const auto upper_bound = node.get_parameter("lane_id_less_than").as_int();
-      return [upper_bound](const auto & lanelet) { return lanelet.id() < upper_bound; };
+      node.declare_parameter("id_less_than", std::numeric_limits<lanelet::Id>::max());
+      const auto upper_bound = node.get_parameter("id_less_than").as_int();
+      return [upper_bound](const auto & lanelet) {
+        return lanelet.id() < upper_bound or [&]() {
+          std::cerr << "[" << lanelet.id() << "] discarded: The id is not less than " << upper_bound
+                    << "." << std::endl;
+          return false;
+        }();
+      };
     }(),
 
     [&]() {
       node.declare_parameter("route_length_greater_than", 0.0);
       const auto lower_bound = node.get_parameter("route_length_greater_than").as_double();
       return [&, lower_bound](const auto & lanelet) {
-        return 0 < routing_graph->possiblePaths(lanelet, lower_bound).size();
+        return 0 < routing_graph->possiblePaths(lanelet, lower_bound).size() or [&]() {
+          std::cerr
+            << "[" << lanelet.id()
+            << "] discarded: The length of the path routable from the lanelet is not greater than "
+            << lower_bound << std::endl;
+          return false;
+        }();
       };
     }(),
   };
@@ -82,16 +106,20 @@ try {
       constraints.begin(), constraints.end(), [&](const auto satisfy) { return satisfy(lanelet); });
   };
 
-  const auto count = std::count_if(map->laneletLayer.begin(), map->laneletLayer.end(), satisfy);
-
-  DEBUG(count);
-
-  if (auto iterator = std::find_if(map->laneletLayer.begin(), map->laneletLayer.end(), satisfy);
-      iterator != map->laneletLayer.end()) {
-    std::cout << iterator->id() << std::endl;
-    return EXIT_SUCCESS;
+  if (auto first = std::find_if(map->laneletLayer.begin(), map->laneletLayer.end(), satisfy);
+      first != map->laneletLayer.end()) {
+    if (auto second = std::find_if(std::next(first), map->laneletLayer.end(), satisfy);
+        second != map->laneletLayer.end()) {
+      std::stringstream what;
+      what << "There are " << std::count_if(std::next(second), map->laneletLayer.end(), satisfy) + 2
+           << " lanelets that satisfy the constraints.";
+      throw std::runtime_error(what.str());
+    } else {
+      std::cout << first->id() << std::endl;
+      return EXIT_SUCCESS;
+    }
   } else {
-    throw std::runtime_error("not found");
+    throw std::runtime_error("There is no lanelet that satisfies the constraints.");
   }
 } catch (const std::exception & exception) {
   std::cerr << exception.what() << std::endl;
