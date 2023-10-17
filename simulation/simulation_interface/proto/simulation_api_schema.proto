@@ -27,6 +27,13 @@ message Result {
 }
 
 /**
+ * Parameter configuration of the traffic light detector emulator
+ **/
+message PseudoTrafficLightDetectorConfiguration {
+  string architecture_type = 1;        // Autoware architecture type.
+}
+
+/**
  * Parameter configuration of the lidar sensor
  **/
 message LidarConfiguration {
@@ -42,15 +49,16 @@ message LidarConfiguration {
  * Parameter configuration of the detection sensor
  **/
 message DetectionSensorConfiguration {
-  string entity = 1;                    // Name of the entity which you want to attach detection sensor.
-  double update_duration = 2;           // Update duration of the detection sensor. (unit : second)
-  double range = 3;                     // Sensor detection range. (unit : meter)
-  string architecture_type = 4;         // Autoware architecture type.
-  bool filter_by_range = 5;             // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
-  double pos_noise_stddev = 6;          // standard deviation of position noise.
-  int32 random_seed = 7;                // random_seed for noise generation.
-  double probability_of_lost = 8;       // probability of lost recognition. (0.0 ~ 1.0)
-  double object_recognition_delay = 9;  // object recognition delay. (unit : second) It delays only the position recognition.
+  string entity = 1;                                  // Name of the entity which you want to attach detection sensor.
+  double update_duration = 2;                         // Update duration of the detection sensor. (unit : second)
+  double range = 3;                                   // Sensor detection range. (unit : meter)
+  string architecture_type = 4;                       // Autoware architecture type.
+  bool detect_all_objects_in_range = 5;               // If false, simulator publish detection result only lidar ray was hit. If true, simulator publish detection result of entities in range.
+  double pos_noise_stddev = 6;                        // standard deviation of position noise.
+  int32 random_seed = 7;                              // random_seed for noise generation.
+  double probability_of_lost = 8;                     // probability of lost recognition. (0.0 ~ 1.0)
+  double object_recognition_delay = 9;                // object recognition delay. (unit : second) It delays only the position recognition.
+  double object_recognition_ground_truth_delay = 10;  // object recognition ground truth delay. (unit : second) It delays only the position recognition.
 }
 
 /**
@@ -98,8 +106,9 @@ message InitializeResponse {
  * Requests updating simulation frame.
  **/
 message UpdateFrameRequest {
-  double current_time = 1;                      // Current simulation time
-  builtin_interfaces.Time current_ros_time = 2; // Current ROS time
+  double current_simulation_time = 1;
+  double current_scenario_time = 2;
+  builtin_interfaces.Time current_ros_time = 3;
 }
 
 /**
@@ -177,7 +186,7 @@ message DespawnEntityResponse {
  * Requests updating entity status.
  **/
 message UpdateEntityStatusRequest {
-  EntityStatus status = 1;                 // Updated entity status in traffic simulator.
+  repeated EntityStatus status = 1;        // List of updated entity status in traffic simulator.
   bool npc_logic_started = 2;              // Npc logic started flag
 }
 
@@ -186,7 +195,21 @@ message UpdateEntityStatusRequest {
  **/
 message UpdateEntityStatusResponse {
   Result result = 1;                       // Result of [UpdateEntityStatusRequest](#UpdateEntityStatusRequest)
-  UpdatedEntityStatus status = 2;          // Updated entity status in sensor/dynamics simulator
+  repeated UpdatedEntityStatus status = 2; // List of updated entity status in sensor/dynamics simulator
+}
+
+/**
+ * Requests attaching a traffic light detector emulator.
+ **/
+message AttachPseudoTrafficLightDetectorRequest {
+  PseudoTrafficLightDetectorConfiguration configuration = 1; // Configuration of the traffic light detector emulator.
+}
+
+/**
+ * Response of attaching a traffic light detector emulator.
+ **/
+message AttachPseudoTrafficLightDetectorResponse {
+  Result result = 1; // Result of [AttachPseudoTrafficLightDetectorRequest](#AttachPseudoTrafficLightDetectorRequest)
 }
 
 /**
@@ -318,6 +341,7 @@ message SimulationRequest {
     AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsRequest update_traffic_lights = 11;
     FollowPolylineTrajectoryRequest follow_polyline_trajectory = 12;
+    AttachPseudoTrafficLightDetectorRequest attach_pseudo_traffic_light_detector = 13;
   }
 }
 
@@ -339,5 +363,6 @@ message SimulationResponse {
     AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsResponse update_traffic_lights = 11;
     FollowPolylineTrajectoryResponse follow_polyline_trajectory = 12;
+    AttachPseudoTrafficLightDetectorResponse attach_pseudo_traffic_light_detector = 13;
   }
 }

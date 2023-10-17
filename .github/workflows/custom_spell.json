@@ -2,7 +2,6 @@
   "ignorePaths": [
     "*.drawio",
     "*/**/CHANGELOG.rst",
-    "external/lanelet2_matching/**",
     "openscenario/openscenario_utility/openscenario_utility/resources/*.xsd"
   ],
   "words": [
@@ -18,11 +17,16 @@
     "Masaya",
     "Mersenne",
     "Monic",
+    "NSPACES",
     "Petrich",
+    "PREDEF",
     "TESTRANDOMIZER",
     "Tschirnhaus",
     "classname",
+    "denormalize",
+    "denormalized",
     "engageable",
+    "euclidian",
     "hakuturu",
     "libunwind",
     "npcs",

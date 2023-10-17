@@ -155,7 +155,7 @@ public:
 
     catch (const SpecialAction<EXIT_FAILURE> & action)  // from CustomCommandAction::exitFailure
     {
-      set<common::junit::Failure>("Simulation failure", "Expected success");
+      set<common::junit::Failure>("SimulationFailure", action.what());
       return handle(action);
     }
 

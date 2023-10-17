@@ -99,12 +99,15 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
+  auto requestFollowTrajectory(
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
+
   std::string getCurrentAction() const override;
 
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
-  auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
+  auto getRouteLanelets(double horizon = 100) -> lanelet::Ids override;
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 

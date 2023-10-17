@@ -10,6 +10,7 @@ OpenSCENARIO:
     Vehicle:
       - name: sample_vehicle
         vehicleCategory: car
+        model3d: "lexus_rx450h"
         ParameterDeclarations:
           ParameterDeclaration:
             # https://github.com/autowarefoundation/sample_vehicle_launch/blob/main/sample_vehicle_description/config/simulator_model.param.yaml

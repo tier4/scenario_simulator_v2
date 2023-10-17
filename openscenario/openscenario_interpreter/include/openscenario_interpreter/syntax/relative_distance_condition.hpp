@@ -105,9 +105,13 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const String &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const String &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const String &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           true >(const String &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const String &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      true >(const String &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           false>(const String &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           true >(const String &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const String &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      true >(const String &) -> double;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter

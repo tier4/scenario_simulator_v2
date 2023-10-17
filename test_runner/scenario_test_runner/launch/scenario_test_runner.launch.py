@@ -33,7 +33,7 @@ from scenario_test_runner.shutdown_once import ShutdownOnce
 
 
 def architecture_types():
-    return ["awf/universe"]
+    return ["awf/universe", "awf/universe/20230906"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -43,6 +43,7 @@ def default_autoware_launch_package_of(architecture_type):
         )
     return {
         "awf/universe": "autoware_launch",
+        "awf/universe/20230906": "autoware_launch",
     }[architecture_type]
 
 
@@ -53,6 +54,7 @@ def default_autoware_launch_file_of(architecture_type):
         )
     return {
         "awf/universe": "planning_simulator.launch.xml",
+        "awf/universe/20230906": "planning_simulator.launch.xml",
     }[architecture_type]
 
 
@@ -69,7 +71,7 @@ def launch_setup(context, *args, **kwargs):
     launch_rviz                     = LaunchConfiguration("launch_rviz",                    default=False)
     launch_simple_sensor_simulator  = LaunchConfiguration("launch_simple_sensor_simulator", default=True)
     output_directory                = LaunchConfiguration("output_directory",               default=Path("/tmp"))
-    port                            = LaunchConfiguration("port",                           default=8080)
+    port                            = LaunchConfiguration("port",                           default=5555)
     record                          = LaunchConfiguration("record",                         default=True)
     rviz_config                     = LaunchConfiguration("rviz_config",                    default="")
     scenario                        = LaunchConfiguration("scenario",                       default=Path("/dev/null"))
