@@ -72,7 +72,7 @@ public:
   {
   public:
     template <typename... Ts>
-    TimeoutError(Ts &&... xs) : common::Error(std::forward<decltype(xs)>(xs)...)
+    explicit TimeoutError(Ts &&... xs) : common::Error(std::forward<decltype(xs)>(xs)...)
     {
     }
   };
@@ -90,7 +90,7 @@ public:
             if (const auto & service_call_status = service_call_result->get()->status;
                 service_call_status.code == tier4_external_api_msgs::msg::ResponseStatus::SUCCESS) {
               RCLCPP_INFO_STREAM(
-                logger, service_name << " service request has been accepted "
+                logger, service_name << " service request has been accepted"
                                      << (service_call_status.message.empty()
                                            ? "."
                                            : " (" + service_call_status.message + ")."));
@@ -98,9 +98,9 @@ public:
             } else {
               RCLCPP_ERROR_STREAM(
                 logger, service_name
-                          << " service request was accepted, but ResponseStatus is FAILURE "
+                          << " service request was accepted, but ResponseStatus is FAILURE"
                           << (service_call_status.message.empty()
-                                ? ""
+                                ? "."
                                 : " (" + service_call_status.message + ")"));
             }
           } else if constexpr (std::is_same_v<
@@ -109,7 +109,7 @@ public:
             if (const auto & service_call_status = service_call_result->get()->status;
                 service_call_status.success) {
               RCLCPP_INFO_STREAM(
-                logger, service_name << " service request has been accepted "
+                logger, service_name << " service request has been accepted"
                                      << (service_call_status.message.empty()
                                            ? "."
                                            : " (" + service_call_status.message + ")."));

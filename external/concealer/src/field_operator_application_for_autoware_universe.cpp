@@ -212,13 +212,33 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     }
   };
 
+  /**
+   * NOTE: Used cooperate statuses will be deleted correctly in Autoware side and provided via topic update.
+   *       But, their update rate (typ. 10Hz) is lower than the one of scenario_simulator_v2.
+   *       So, we need to check cooperate statuses if they are used or not in scenario_simulator_v2 side
+   *       to avoid sending the same cooperate command when sending multiple commands between updates of cooperate statuses.
+   */
+  static std::vector<tier4_rtc_msgs::msg::CooperateStatus> used_cooperate_statuses;
+  auto is_used_cooperate_status = [this](const auto & cooperate_status) {
+    return std::find_if(
+             used_cooperate_statuses.begin(), used_cooperate_statuses.end(),
+             [&cooperate_status](const auto & used_cooperate_status) {
+               return used_cooperate_status.module == cooperate_status.module &&
+                      used_cooperate_status.uuid == cooperate_status.uuid &&
+                      used_cooperate_status.command_status.type ==
+                        cooperate_status.command_status.type;
+             }) != used_cooperate_statuses.end();
+  };
+
   if (const auto cooperate_status = std::find_if(
         latest_cooperate_status_array.statuses.begin(),
         latest_cooperate_status_array.statuses.end(),
         [module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
-         command_type = to_command_type(command)](const auto & cooperate_status) {
+         command_type = to_command_type(command),
+         is_used_cooperate_status](const auto & cooperate_status) {
           return isValidCooperateStatus<tier4_rtc_msgs::msg::CooperateStatus>(
-            cooperate_status, command_type, module_type);
+                   cooperate_status, command_type, module_type) &&
+                 not is_used_cooperate_status(cooperate_status);
         });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
     std::stringstream what;
@@ -238,6 +258,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     request->commands.push_back(cooperate_command);
 
     task_queue.delay([this, request]() { requestCooperateCommands(request); });
+
+    used_cooperate_statuses.push_back(*cooperate_status);
   }
 }
 
@@ -441,8 +463,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   } else {
     throw common::Error(
       "FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation is not "
-      "supported "
-      "in this environment, because rtc_auto_mode_manager is present.");
+      "supported in this environment, because rtc_auto_mode_manager is present.");
   }
 }
 
