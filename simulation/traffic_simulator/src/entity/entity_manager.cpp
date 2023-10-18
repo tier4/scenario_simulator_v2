@@ -141,7 +141,11 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};
   for (const auto & each : entities_) {
-    names.push_back(each.first);
+    // Add filter for DeletedEntity because this list is used on SimpleSensorSimulator which do not
+    // know DeletedEntity.
+    if (each.second->getEntityType().type != DeletedEntity::ENTITY_TYPE_ID) {
+      names.push_back(each.first);
+    }
   }
   return names;
 }
@@ -164,11 +168,7 @@ auto EntityManager::getEntityTypeList() const
 {
   std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> ret;
   for (auto && [name, entity] : entities_) {
-    auto type = getEntityType(name);
-    if (type.type == DeletedEntity::ENTITY_TYPE_ID) {
-      continue;
-    }
-    ret.emplace(name, type);
+    ret.emplace(name, getEntityType(name));
   }
   return ret;
 }
