@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include <quaternion_operation/quaternion_operation.h>
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
@@ -84,7 +85,8 @@ TEST(LineSegment, GetPose)
       line.getPose(0, false),
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
-        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
+        .orientation(quaternion_operation::convertEulerAngleToQuaternion(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(-M_PI * 0.5).z(0))));
     // [Snippet_getPose_with_s_0]
     /// @snippet test/test_line_segment.cpp Snippet_getPose_with_s_0
 
@@ -95,7 +97,8 @@ TEST(LineSegment, GetPose)
       line.getPose(1, false),
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1))
-        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
+        .orientation(quaternion_operation::convertEulerAngleToQuaternion(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(-M_PI * 0.5).z(0))));
     // [Snippet_getPose_with_s_1]
     /// @snippet test/test_line_segment.cpp Snippet_getPose_with_s_1
   }
