@@ -1,8 +1,8 @@
 OpenSCENARIO:
   FileHeader:
-    author: "Tatsuya Yamasaki"
-    date: "2022-03-04T18:06:53+09:00"
-    description: "Sample scenario (with Autoware)"
+    author: "Kotaro Yoshimoto"
+    date: "2022-12-09T18:16:53+09:00"
+    description: "Scenario with DeleteEntityAction"
     revMajor: 1
     revMinor: 0
   ParameterDeclarations:
