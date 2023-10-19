@@ -101,26 +101,74 @@ try {
     }(),
   };
 
+  auto filter = [](auto satisfy, auto && iterable, auto current_continuation) -> decltype(auto) {
+    std::vector<typename std::decay_t<decltype(iterable)>::iterator::value_type> values;
+
+    auto filter = [&](auto filter, auto begin, auto end)
+      -> std::invoke_result_t<decltype(current_continuation), decltype(values)> {
+      if (auto first = std::find_if(begin, end, satisfy); first != end) {
+        values.push_back(*first);
+        return filter(filter, std::next(first), end);
+      } else {
+        return current_continuation(values);
+      }
+    };
+
+    return filter(filter, iterable.begin(), iterable.end());
+  };
+
   auto satisfy = [&](const auto & lanelet) {
     return std::all_of(
       constraints.begin(), constraints.end(), [&](const auto satisfy) { return satisfy(lanelet); });
   };
 
-  if (auto first = std::find_if(map->laneletLayer.begin(), map->laneletLayer.end(), satisfy);
-      first != map->laneletLayer.end()) {
-    if (auto second = std::find_if(std::next(first), map->laneletLayer.end(), satisfy);
-        second != map->laneletLayer.end()) {
-      std::stringstream what;
-      what << "There are " << std::count_if(std::next(second), map->laneletLayer.end(), satisfy) + 2
-           << " lanelets that satisfy the constraints.";
-      throw std::runtime_error(what.str());
+  auto receive = [&](auto && results) -> decltype(auto) {
+    if (1 < results.size()) {
+      if (node.declare_parameter("sort_result", false);
+          node.get_parameter("sort_result").as_bool()) {
+        std::sort(results.begin(), results.end(), [](const auto & a, const auto & b) {
+          return a.id() < b.id();
+        });
+      }
+
+      auto all = [&]() {
+        for (const auto & result : results) {
+          std::cout << result.id() << std::endl;
+        }
+      };
+
+      auto any = [&]() { std::cout << results.front().id() << std::endl; };
+
+      auto first = [&]() { std::cout << results.front().id() << std::endl; };
+
+      auto random = [&]() {
+        std::cout << results.front().id() << std::endl;  // TODO
+      };
+
+      node.declare_parameter("select", "only");
+      const auto select = node.get_parameter("select").as_string();
+
+      if (select == "all") {
+        all();
+      } else if (select == "any") {
+        any();
+      } else if (select == "first") {
+        first();
+      } else if (select == "random") {
+        random();
+      } else {
+        std::stringstream what;
+        what << "There are " << results.size() << " candidates that satisfy the constraints.";
+        throw std::runtime_error(what.str());
+      }
+    } else if (0 < results.size()) {
+      std::cout << results.front().id() << std::endl;
     } else {
-      std::cout << first->id() << std::endl;
-      return EXIT_SUCCESS;
+      throw std::runtime_error("There is no candidate that satisfies the constraints.");
     }
-  } else {
-    throw std::runtime_error("There is no lanelet that satisfies the constraints.");
-  }
+  };
+
+  filter(satisfy, map->laneletLayer, receive);
 } catch (const std::exception & exception) {
   std::cerr << exception.what() << std::endl;
   return EXIT_FAILURE;
