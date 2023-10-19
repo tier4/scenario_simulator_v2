@@ -214,8 +214,6 @@ struct TrafficLight
 
     using Hash = std::uint32_t;  // (Color::Value << 8 + 16) | (Status::Value << 16) | Shape::Value
 
-    const float confidence;
-
     constexpr Bulb(const Value value, float confidence = 1.f) : value(value), confidence(confidence)
     {
     }
@@ -319,13 +317,16 @@ struct TrafficLight
       traffic_light_bulb_proto.set_status(status());
       traffic_light_bulb_proto.set_shape(shape());
       traffic_light_bulb_proto.set_color(color());
-      traffic_light_bulb_proto.set_confidence(confidence);
+      // NOTE: confidence will be overwritten in TrafficLight::operator() for simulation_api_schema::TrafficLight
+      //      traffic_light_bulb_proto.set_confidence(1.0);
 
       return traffic_light_bulb_proto;
     }
   };
 
   const lanelet::Id way_id;
+
+  double confidence = 1.0;
 
   std::set<Bulb> bulbs;
 
@@ -386,6 +387,8 @@ struct TrafficLight
 
   auto set(const std::string & states) -> void;
 
+  auto setConfidence(const float confidence) -> void { this->confidence = confidence; }
+
   friend auto operator<<(std::ostream & os, const TrafficLight & traffic_light) -> std::ostream &;
 
   explicit operator simulation_api_schema::TrafficSignal() const
@@ -394,8 +397,9 @@ struct TrafficLight
 
     traffic_signal_proto.set_id(way_id);
     for (const auto & bulb : bulbs) {
-      *traffic_signal_proto.add_traffic_light_status() =
-        static_cast<simulation_api_schema::TrafficLight>(bulb);
+      auto traffic_light_bulb_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
+      traffic_light_bulb_proto.set_confidence(confidence);
+      *traffic_signal_proto.add_traffic_light_status() = traffic_light_bulb_proto;
     }
     return traffic_signal_proto;
   }
