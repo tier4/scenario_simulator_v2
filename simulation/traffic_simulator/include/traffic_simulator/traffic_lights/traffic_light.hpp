@@ -214,18 +214,14 @@ struct TrafficLight
 
     using Hash = std::uint32_t;  // (Color::Value << 8 + 16) | (Status::Value << 16) | Shape::Value
 
-    constexpr Bulb(const Value value, float confidence = 1.f) : value(value), confidence(confidence)
+    constexpr Bulb(const Value value) : value(value) {}
+
+    constexpr Bulb(const Color color = {}, const Status status = {}, const Shape shape = {})
+    : Bulb(std::forward_as_tuple(color, status, shape))
     {
     }
 
-    constexpr Bulb(
-      const Color color = {}, const Status status = {}, const Shape shape = {},
-      float confidence = 1.f)
-    : Bulb(std::forward_as_tuple(color, status, shape), confidence)
-    {
-    }
-
-    Bulb(const std::string & name, float confidence = 1.f) : Bulb(make(name), confidence) {}
+    Bulb(const std::string & name) : Bulb(make(name)) {}
 
     auto make(const std::string & s) -> Value;
 
