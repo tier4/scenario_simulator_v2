@@ -231,6 +231,11 @@ public:
     v2i_traffic_light_updater_.resetUpdateRate(rate);
   }
 
+  auto setTrafficLightConfidence(lanelet::Id id, double confidence) -> void
+  {
+    conventional_traffic_light_manager_ptr_->getTrafficLight(id).setConfidence(confidence);
+  }
+
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   template <typename... Ts>                                           \
   decltype(auto) NAME(Ts &&... xs) const                              \
