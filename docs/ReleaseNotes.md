@@ -4,10 +4,11 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature                                                  | Brief summary                                                                                                                                                                                               | Category                                                                   | Pull request                                                      | Contributor                             |
-|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------|
-| Traffic Light Simulation                                 | Start supporting to traffic light messages in `autoware_perception_msgs`.                                                                                                                                   | `openscenario_interpreter`, `traffic_simulator`, `simple_sensor_simulator` | [#1027](https://github.com/tier4/scenario_simulator_v2/pull/1027) | [HansRobo](https://github.com/HansRobo) |
-| Detailed control of permissions for autonomous decisions | Add `featureIdentifiersRequiringExternalPermissionForAutonomousDecisions` property for ObjectController. scenario_simulator_v2 controls auto_mode of Autoware planning modules by settings in the property. | `openscenario_interpreter`, `concealer`                                    | [#1092](https://github.com/tier4/scenario_simulator_v2/pull/1092) | [HansRobo](https://github.com/HansRobo) |
+| Feature                                                  | Brief summary                                                                                                                                                                                               | Category                                                                   | Pull request                                                      | Contributor                                   |
+|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------------|
+| Traffic Light Simulation                                 | Start supporting to traffic light messages in `autoware_perception_msgs`.                                                                                                                                   | `openscenario_interpreter`, `traffic_simulator`, `simple_sensor_simulator` | [#1027](https://github.com/tier4/scenario_simulator_v2/pull/1027) | [HansRobo](https://github.com/HansRobo)       |
+| Detailed control of permissions for autonomous decisions | Add `featureIdentifiersRequiringExternalPermissionForAutonomousDecisions` property for ObjectController. scenario_simulator_v2 controls auto_mode of Autoware planning modules by settings in the property. | `openscenario_interpreter`, `concealer`                                    | [#1092](https://github.com/tier4/scenario_simulator_v2/pull/1092) | [HansRobo](https://github.com/HansRobo)       |
+| OpenSCENARIO `Controller.Properties.Property`            | Support the property `allowGoalModification` to turn on the Autoware feature `allow_goal_modification`.                                                                                                     | `openscenario_interpreter`, `concealer`                                    | [#997](https://github.com/tier4/scenario_simulator_v2/pull/997)   | [yamacir-kit](https://github.com/yamacir-kit) |
 
 Bug Fixes:bug:
 
@@ -31,9 +32,9 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-|---------|---------------|----------|--------------|-------------|
-|         |               |          |              |             |
+| Feature                                                  | Brief summary                                                                               | Category    | Pull request                                                      | Contributor                             |
+|----------------------------------------------------------|---------------------------------------------------------------------------------------------|-------------|-------------------------------------------------------------------|-----------------------------------------|
+| OpenSCENARIO 1.2 `UserDefinedAction.CustomCommandAction` | Add history filter to avoid send same RTC commands in `RequestToCooperateCommandAction@v1`. | `concealer` | [#1106](https://github.com/tier4/scenario_simulator_v2/pull/1106) | [HansRobo](https://github.com/HansRobo) |
 
 Minor Tweaks :oncoming_police_car:
 
