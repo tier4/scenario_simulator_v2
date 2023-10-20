@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class LaneChangeLeftScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -75,6 +77,7 @@ private:
         traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY, 1.0));
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {

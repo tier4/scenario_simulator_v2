@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class LaneChangeRightScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -62,6 +64,7 @@ private:
     // api_.requestLaneChange("ego", 34462);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {

@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class DecelerateAndFollowScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -72,6 +74,7 @@ private:
     api_.requestSpeedChange("npc", 10, true);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {

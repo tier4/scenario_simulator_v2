@@ -74,6 +74,7 @@ private:
     api_.requestSpeedChange("npc", 10, true);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
@@ -84,5 +85,3 @@ int main(int argc, char * argv[])
   rclcpp::shutdown();
   return 0;
 }
-
-}  // namespace cpp_mock_scenarios

@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class AcquirePositionInWorldFrame : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -61,6 +63,7 @@ private:
     api_.requestAcquirePosition("ego", goal_pose);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {

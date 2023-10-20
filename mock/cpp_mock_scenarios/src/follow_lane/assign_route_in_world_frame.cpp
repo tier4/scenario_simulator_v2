@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class AcquireRouteInWorldFrame : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -62,6 +64,7 @@ private:
     api_.requestAssignRoute("ego", goal_poses);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
