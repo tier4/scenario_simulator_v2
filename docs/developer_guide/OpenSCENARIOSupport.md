@@ -245,7 +245,7 @@ OpenSCENARIO standards.
 | PrivateAction.ControllerAction.**OverrideControllerValueAction**                        |  Unsupported   |                                    |                      |
 | PrivateAction.**TeleportAction**                                                        |       ✔        | See [here](#teleportaction)        |                      |
 | PrivateAction.RoutingAction.**AssignRouteAction**                                       |       ✔        |                                    |                      |
-| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  |  Unsupported   |                                    |                      |
+| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  |       ✔        | See [here](#followtrajectoryaction)|                      |
 | PrivateAction.RoutingAction.**AcquirePositionAction**                                   |       ✔        | See [here](#acquirepositionaction) |                      |
 
 ### Conditions
@@ -264,7 +264,7 @@ OpenSCENARIO standards.
 | ByEntityCondition.EntityCondition.**TraveledDistanceCondition** |  Unsupported   |                                              |                      |
 | ByEntityCondition.EntityCondition.**ReachPositionCondition**    |       ✔        | See [here](#reachpositioncondition)          | deprecated from v1.2 |
 | ByEntityCondition.EntityCondition.**DistanceCondition**         |       ✔        | See [here](#distancecondition)               |                      |
-| ByEntityCondition.EntityCondition.**RelativeDistanceCondition** |       ✔        | See [here](#relativedistancecondition)       |                      |
+| ByEntityCondition.EntityCondition.**RelativeDistanceCondition** |       ✔        |                                              |                      |
 | ByValueCondition.**ParameterCondition**                         |       ✔        |                                              |                      |
 | ByValueCondition.**TimeOfDayCondition**                         |  Unsupported   |                                              |                      |
 | ByValueCondition.**SimulationTimeCondition**                    |       ✔        | No                                           |                      |
@@ -300,6 +300,22 @@ OpenSCENARIO standards.
 - Currently, **only LanePosition** can be specified for element of
   TeleportAction.
 
+### FollowTrajectoryAction
+- Currently, the action handles only "[followingMode](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/FollowingMode.html)" attribute set to  `position` mode.
+
+| followingMode |   Status    |
+|:--------------|:-----------:|
+| position      |      ✔      |
+| follow        | Unsupported |
+
+- Currently, the action only supports [Trajectory](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Trajectory.html) with a [Polyline](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Shape.html) shape.
+
+| Element  |   Status   |
+|:---------|:----------:|
+| Polyline |      ✔     |
+| Clothoid | Unsupported|
+| Nurbs    | Unsupported|
+
 ### AcquirePositionAction
 
 - Currently, **only LanePosition** can be specified for element of
@@ -320,12 +336,8 @@ OpenSCENARIO standards.
 
 ### DistanceCondition
 
-- Currently, the values of attribute "freespace" and "alongRoute" are ignored and always behave as if freespace="false" and alongRoute="false" were specified.
+- Currently, the values of attribute "alongRoute" is ignored and always behave as if alongRoute="false" was specified.
 - Currently, **only LanePosition and WorldPosition** can be specified for the element of Position of DistanceCondition.
-
-### RelativeDistanceCondition
-
-- Currently, the values of attribute "freespace" is ignored and always behave as if freespace="false" was specified.
 
 ### StoryboardElementStateCondition
 

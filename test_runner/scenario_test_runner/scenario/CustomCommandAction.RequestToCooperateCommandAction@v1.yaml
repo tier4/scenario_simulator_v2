@@ -37,8 +37,8 @@ OpenSCENARIO:
                   value: "true"
                 - name: isClairvoyant
                   value: "true"
-                - name: cooperator
-                  value: scenario
+                - name: featureIdentifiersRequiringExternalPermissionForAutonomousDecisions
+                  value: "TRAFFIC_LIGHT, CROSSWALK"
       - name: Npc1
         CatalogReference:
           catalogName: sample_vehicle
@@ -66,7 +66,7 @@ OpenSCENARIO:
                     Position:
                       LanePosition:
                         roadId: ""
-                        laneId: "34630"
+                        laneId: "34579"
                         s: 10
                         offset: 0
                         Orientation:
@@ -95,13 +95,21 @@ OpenSCENARIO:
                 Maneuver:
                   - name: ""
                     Event:
-                      - name: ""
+                      - name: "send multiple RTC Commands in same timing"
                         priority: parallel
                         Action:
                           - name: "approve TRAFFIC_LIGHT request"
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: RequestToCooperateCommandAction@v1(TRAFFIC_LIGHT, ACTIVATE)
+                          - name: "approve first CROSSWALK request"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: RequestToCooperateCommandAction@v1(CROSSWALK, ACTIVATE)
+                          - name: "approve second CROSSWALK request"
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: RequestToCooperateCommandAction@v1(CROSSWALK, ACTIVATE)
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
@@ -163,7 +171,7 @@ OpenSCENARIO:
                                         Position:
                                           LanePosition:
                                             roadId: ""
-                                            laneId: "34630"
+                                            laneId: "34579"
                                             s: 10
                                             offset: 0
                                             Orientation:

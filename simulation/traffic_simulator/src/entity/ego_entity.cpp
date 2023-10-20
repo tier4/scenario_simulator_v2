@@ -65,7 +65,7 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
                  "rviz_config:=" + ((rviz_config == "")
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
-                 "scenario_simulation:=true",
+                 "scenario_simulation:=true", "use_foa:=false",
                  "perception/enable_traffic_light:=" +
                    std::string((architecture_type >= "awf/universe/20230906") ? "true" : "false"))
              : std::make_unique<
@@ -129,9 +129,9 @@ auto EgoEntity::getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obst
   return std::nullopt;
 }
 
-auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> std::vector<std::int64_t>
+auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
 {
-  std::vector<std::int64_t> ids{};
+  lanelet::Ids ids{};
 
   if (const auto universe =
         dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
@@ -211,7 +211,7 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 }
 
-void EgoEntity::requestLaneChange(const std::int64_t)
+void EgoEntity::requestLaneChange(const lanelet::Id)
 {
   THROW_SEMANTIC_ERROR(
     "From scenario, a lane change was requested to Ego type entity ", std::quoted(name),

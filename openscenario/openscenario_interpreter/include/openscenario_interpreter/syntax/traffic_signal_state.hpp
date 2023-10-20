@@ -34,8 +34,6 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 {
-  using LaneletId = std::int64_t;
-
   /* ---- NOTE -----------------------------------------------------------------
    *
    *  ID of the referenced signal in a road network. The signal ID must be
@@ -59,7 +57,7 @@ struct TrafficSignalState : private SimulatorCore::NonStandardOperation
 
   auto evaluate() const -> Object;
 
-  auto id() const -> LaneletId;
+  auto id() const -> lanelet::Id;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

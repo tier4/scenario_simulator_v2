@@ -94,6 +94,17 @@ jobs:
           cd docs/package/openscenario_visualization
           mkdir -p ./markdown/Classes
           doxybook2 --input ./build/ --output ./markdown -c config.json
+      # generating geometry package documentation
+      - name: Generate doxygen for geometry package
+        run: |
+          cd docs/package/geometry
+          doxygen Doxyfile
+      - name: Generate markdown for geometry package
+        run: |
+          export PATH="$PATH:~/doxybook2/bin"
+          cd docs/package/geometry
+          mkdir -p ./markdown/Classes
+          doxybook2 --input ./build/ --output ./markdown -c config.json
       - name: Generate documentation
         run: poetry run mkdocs build
       - name: Upload Artifact

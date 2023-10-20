@@ -16,10 +16,10 @@ ament_auto_find_build_dependencies()
 ament_auto_add_library(${PROJECT_NAME} SHARED
   src/autoware.cpp
   src/autoware_universe.cpp
-  src/cooperator.cpp
   src/execute.cpp
   src/field_operator_application.cpp
   src/field_operator_application_for_autoware_universe.cpp
+  src/is_package_exists.cpp
   src/task_queue.cpp)
 
 target_link_libraries(${PROJECT_NAME}

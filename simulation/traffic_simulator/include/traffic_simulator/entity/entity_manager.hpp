@@ -335,10 +335,10 @@ public:
 
   auto getCurrentTime() const noexcept -> double;
 
-  auto getDistanceToCrosswalk(const std::string & name, const std::int64_t target_crosswalk_id)
+  auto getDistanceToCrosswalk(const std::string & name, const lanelet::Id target_crosswalk_id)
     -> std::optional<double>;
 
-  auto getDistanceToStopLine(const std::string & name, const std::int64_t target_stop_line_id)
+  auto getDistanceToStopLine(const std::string & name, const lanelet::Id target_stop_line_id)
     -> std::optional<double>;
 
   auto getEntityNames() const -> const std::vector<std::string>;
@@ -347,6 +347,20 @@ public:
 
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
+
+  // clang-format off
+  auto getBoundingBoxLaneLateralDistance(const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &, const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &) const -> std::optional<double>;
+  auto getBoundingBoxLaneLateralDistance(const std::string &,              const CanonicalizedLaneletPose &)                                                                                                     const -> std::optional<double>;
+  auto getBoundingBoxLaneLateralDistance(const std::string &,              const std::string &)                                                                                                                  const -> std::optional<double>;
+
+  auto getBoundingBoxLaneLongitudinalDistance(const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &, const CanonicalizedLaneletPose &,      const traffic_simulator_msgs::msg::BoundingBox &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
+  auto getBoundingBoxLaneLongitudinalDistance(const std::string &,              const CanonicalizedLaneletPose &,                 bool include_adjacent_lanelet = false, bool include_opposite_direction = true)                                                                                          -> std::optional<double>;
+  auto getBoundingBoxLaneLongitudinalDistance(const std::string &,              const std::string &,                              bool include_adjacent_lanelet = false, bool include_opposite_direction = true)                                                                                          -> std::optional<double>;
+
+  auto getBoundingBoxRelativePose(const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &, const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &) const -> std::optional<geometry_msgs::msg::Pose>;
+  auto getBoundingBoxRelativePose(const std::string &,              const geometry_msgs::msg::Pose & )                                                                                                    const -> std::optional<geometry_msgs::msg::Pose>;
+  auto getBoundingBoxRelativePose(const std::string &,              const std::string & )                                                                                                                 const -> std::optional<geometry_msgs::msg::Pose>;
+  // clang-format on
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
@@ -414,7 +428,7 @@ public:
 
   const std::string getEgoName() const;
 
-  bool isInLanelet(const std::string & name, const std::int64_t lanelet_id, const double tolerance);
+  bool isInLanelet(const std::string & name, const lanelet::Id lanelet_id, const double tolerance);
 
   bool isStopping(const std::string & name) const;
 

@@ -20,9 +20,12 @@
 
   <!-- TIER IV Autoware.Universe -->
   <depend>tier4_external_api_msgs</depend>
+  <depend>tier4_planning_msgs</depend>
   <depend>tier4_rtc_msgs</depend>
+  <depend>tier4_system_msgs</depend>
 
   <!-- Common -->
+  <depend>ament_index_cpp</depend>
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
   <depend>rclcpp</depend>

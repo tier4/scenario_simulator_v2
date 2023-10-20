@@ -86,7 +86,7 @@ public:
 
   auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override;
 
-  auto getRouteLanelets(double horizon = 100) -> std::vector<std::int64_t> override;
+  auto getRouteLanelets(double horizon = 100) -> lanelet::Ids override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
@@ -103,7 +103,7 @@ public:
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 
-  void requestLaneChange(const std::int64_t to_lanelet_id) override;
+  void requestLaneChange(const lanelet::Id to_lanelet_id) override;
 
   void requestLaneChange(const traffic_simulator::lane_change::Parameter &) override;
 
@@ -131,7 +131,7 @@ private:
 
   std::shared_ptr<math::geometry::CatmullRomSpline> spline_;
 
-  std::vector<std::int64_t> previous_route_lanelets_;
+  lanelet::Ids previous_route_lanelets_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

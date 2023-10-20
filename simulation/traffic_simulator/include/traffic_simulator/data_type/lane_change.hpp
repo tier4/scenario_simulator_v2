@@ -15,6 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__DATA_TYPE__LANE_CHANGE_HPP_
 #define TRAFFIC_SIMULATOR__DATA_TYPE__LANE_CHANGE_HPP_
 
+#include <lanelet2_core/Forward.h>
+
 #include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <type_traits>
@@ -30,11 +32,11 @@ enum class TrajectoryShape { CUBIC = 0, LINEAR = 1 };
 
 struct AbsoluteTarget
 {
-  explicit constexpr AbsoluteTarget(const std::int64_t lanelet_id = 0, const double offset = 0)
+  explicit constexpr AbsoluteTarget(const lanelet::Id lanelet_id = 0, const double offset = 0)
   : lanelet_id(lanelet_id), offset(offset)
   {
   }
-  std::int64_t lanelet_id;
+  lanelet::Id lanelet_id;
   double offset;
 };
 

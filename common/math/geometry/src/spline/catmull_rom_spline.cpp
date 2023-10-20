@@ -27,14 +27,14 @@ namespace math
 {
 namespace geometry
 {
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
-  double width, size_t num_points, double z_offset)
+auto CatmullRomSpline::getPolygon(
+  const double width, const size_t num_points, const double z_offset)
+  -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
   std::vector<geometry_msgs::msg::Point> left_bounds = getLeftBounds(width, num_points, z_offset);
   std::vector<geometry_msgs::msg::Point> right_bounds = getRightBounds(width, num_points, z_offset);
-  size_t num_sections = static_cast<size_t>(left_bounds.size() - 1);
-  for (size_t i = 0; i < num_sections; i++) {
+  for (size_t i = 0; i < static_cast<size_t>(left_bounds.size() - 1); i++) {
     geometry_msgs::msg::Point pr_0 = right_bounds[i];
     geometry_msgs::msg::Point pl_0 = left_bounds[i];
     geometry_msgs::msg::Point pr_1 = right_bounds[i + 1];
@@ -49,194 +49,202 @@ const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getPolygon(
   return points;
 }
 
-const geometry_msgs::msg::Point CatmullRomSpline::getRightBoundsPoint(
-  double width, double s, double z_offset) const
-{
-  geometry_msgs::msg::Vector3 vec = getNormalVector(s);
-  double theta = std::atan2(vec.y, vec.x);
-  geometry_msgs::msg::Point p = getPoint(s);
-  geometry_msgs::msg::Point point;
-  point.x = p.x + 0.5 * width * std::cos(theta);
-  point.y = p.y + 0.5 * width * std::sin(theta);
-  point.z = p.z + z_offset;
-  return point;
-}
-
-const geometry_msgs::msg::Point CatmullRomSpline::getLeftBoundsPoint(
-  double width, double s, double z_offset) const
-{
-  geometry_msgs::msg::Vector3 vec = getNormalVector(s);
-  double theta = std::atan2(vec.y, vec.x);
-  geometry_msgs::msg::Point p = getPoint(s);
-  geometry_msgs::msg::Point point;
-  point.x = p.x - 0.5 * width * std::cos(theta);
-  point.y = p.y - 0.5 * width * std::sin(theta);
-  point.z = p.z + z_offset;
-  return point;
-}
-
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getRightBounds(
-  double width, size_t num_points, double z_offset) const
+auto CatmullRomSpline::getRightBounds(
+  const double width, const size_t num_points, const double z_offset) const
+  -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
   for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
     double s = step_size * static_cast<double>(i);
-    points.emplace_back(getRightBoundsPoint(width, s, z_offset));
+    points.emplace_back(
+      [this](
+        const double width, const double s, const double z_offset) -> geometry_msgs::msg::Point {
+        geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+        double theta = std::atan2(vec.y, vec.x);
+        geometry_msgs::msg::Point p = getPoint(s);
+        geometry_msgs::msg::Point point;
+        point.x = p.x + 0.5 * width * std::cos(theta);
+        point.y = p.y + 0.5 * width * std::sin(theta);
+        point.z = p.z + z_offset;
+        return point;
+      }(width, s, z_offset));
   }
   return points;
 }
 
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getLeftBounds(
-  double width, size_t num_points, double z_offset) const
+auto CatmullRomSpline::getLeftBounds(
+  const double width, const size_t num_points, const double z_offset) const
+  -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
   double step_size = getLength() / static_cast<double>(num_points);
   for (size_t i = 0; i < static_cast<size_t>(num_points + 1); i++) {
     double s = step_size * static_cast<double>(i);
-    points.emplace_back(getLeftBoundsPoint(width, s, z_offset));
+    points.emplace_back(
+      [this](
+        const double width, const double s, const double z_offset) -> geometry_msgs::msg::Point {
+        geometry_msgs::msg::Vector3 vec = getNormalVector(s);
+        double theta = std::atan2(vec.y, vec.x);
+        geometry_msgs::msg::Point p = getPoint(s);
+        geometry_msgs::msg::Point point;
+        point.x = p.x - 0.5 * width * std::cos(theta);
+        point.y = p.y - 0.5 * width * std::sin(theta);
+        point.z = p.z + z_offset;
+        return point;
+      }(width, s, z_offset));
   }
   return points;
 }
 
-const std::vector<geometry_msgs::msg::Point> CatmullRomSpline::getTrajectory(
-  double start_s, double end_s, double resolution, double offset) const
+auto CatmullRomSpline::getTrajectory(
+  const double start_s, const double end_s, const double resolution, const double offset) const
+  -> std::vector<geometry_msgs::msg::Point>
 {
   if (start_s > end_s) {
     std::vector<geometry_msgs::msg::Point> ret;
-    resolution = std::fabs(resolution);
     double s = start_s;
     while (s > end_s) {
-      auto p = getPoint(s, offset);
-      ret.emplace_back(p);
-      s = s - resolution;
+      ret.emplace_back(getPoint(s, offset));
+      s = s - std::fabs(resolution);
     }
-    auto p = getPoint(end_s, offset);
-    ret.emplace_back(p);
+    ret.emplace_back(getPoint(end_s, offset));
     return ret;
   } else {
     std::vector<geometry_msgs::msg::Point> ret;
-    resolution = std::fabs(resolution);
     double s = start_s;
     while (s < end_s) {
-      auto p = getPoint(s, offset);
-      ret.emplace_back(p);
-      s = s + resolution;
+      ret.emplace_back(getPoint(s, offset));
+      s = s + std::fabs(resolution);
     }
-    auto p = getPoint(end_s, offset);
-    ret.emplace_back(p);
+    ret.emplace_back(getPoint(end_s, offset));
     return ret;
   }
 }
 
 CatmullRomSpline::CatmullRomSpline(const std::vector<geometry_msgs::msg::Point> & control_points)
-: control_points(control_points)
+: control_points(control_points), line_segments_(getLineSegments(control_points)), total_length_(0)
 {
-  size_t n = control_points.size() - 1;
-  if (control_points.size() <= 2) {
-    THROW_SEMANTIC_ERROR(
-      control_points.size(),
-      " control points are only exists. At minimum, 3 control points are required");
+  switch (control_points.size()) {
+    case 0:
+      THROW_SEMANTIC_ERROR(
+        "Control points are empty. We cannot determine the shape of the curve.",
+        "This message is not originally intended to be displayed, if you see it, please contact "
+        "the developer of traffic_simulator.");
+      break;
+    /// @note In this case, spline is interpreted as point.
+    case 1:
+      break;
+    /// @note In this case, spline is interpreted as line segment.
+    case 2:
+      total_length_ = line_segments_[0].getLength();
+      break;
+    /// @note In this case, spline is interpreted as curve.
+    default:
+      [this](const auto & control_points) -> void {
+        size_t n = control_points.size() - 1;
+        for (size_t i = 0; i < n; i++) {
+          if (i == 0) {
+            double ax = 0;
+            double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;
+            double cx = -3 * control_points[0].x + 4 * control_points[1].x - control_points[2].x;
+            double dx = 2 * control_points[0].x;
+            double ay = 0;
+            double by = control_points[0].y - 2 * control_points[1].y + control_points[2].y;
+            double cy = -3 * control_points[0].y + 4 * control_points[1].y - control_points[2].y;
+            double dy = 2 * control_points[0].y;
+            double az = 0;
+            double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
+            double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
+            double dz = 2 * control_points[0].z;
+            ax = ax * 0.5;
+            bx = bx * 0.5;
+            cx = cx * 0.5;
+            dx = dx * 0.5;
+            ay = ay * 0.5;
+            by = by * 0.5;
+            cy = cy * 0.5;
+            dy = dy * 0.5;
+            az = az * 0.5;
+            bz = bz * 0.5;
+            cz = cz * 0.5;
+            dz = dz * 0.5;
+            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+          } else if (i == (n - 1)) {
+            double ax = 0;
+            double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
+            double cx = -1 * control_points[i - 1].x + control_points[i + 1].x;
+            double dx = 2 * control_points[i].x;
+            double ay = 0;
+            double by = control_points[i - 1].y - 2 * control_points[i].y + control_points[i + 1].y;
+            double cy = -1 * control_points[i - 1].y + control_points[i + 1].y;
+            double dy = 2 * control_points[i].y;
+            double az = 0;
+            double bz = control_points[i - 1].z - 2 * control_points[i].z + control_points[i + 1].z;
+            double cz = -1 * control_points[i - 1].z + control_points[i + 1].z;
+            double dz = 2 * control_points[i].z;
+            ax = ax * 0.5;
+            bx = bx * 0.5;
+            cx = cx * 0.5;
+            dx = dx * 0.5;
+            ay = ay * 0.5;
+            by = by * 0.5;
+            cy = cy * 0.5;
+            dy = dy * 0.5;
+            az = az * 0.5;
+            bz = bz * 0.5;
+            cz = cz * 0.5;
+            dz = dz * 0.5;
+            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+          } else {
+            double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
+                        3 * control_points[i + 1].x + control_points[i + 2].x;
+            double bx = 2 * control_points[i - 1].x - 5 * control_points[i].x +
+                        4 * control_points[i + 1].x - control_points[i + 2].x;
+            double cx = -control_points[i - 1].x + control_points[i + 1].x;
+            double dx = 2 * control_points[i].x;
+            double ay = -1 * control_points[i - 1].y + 3 * control_points[i].y -
+                        3 * control_points[i + 1].y + control_points[i + 2].y;
+            double by = 2 * control_points[i - 1].y - 5 * control_points[i].y +
+                        4 * control_points[i + 1].y - control_points[i + 2].y;
+            double cy = -control_points[i - 1].y + control_points[i + 1].y;
+            double dy = 2 * control_points[i].y;
+            double az = -1 * control_points[i - 1].z + 3 * control_points[i].z -
+                        3 * control_points[i + 1].z + control_points[i + 2].z;
+            double bz = 2 * control_points[i - 1].z - 5 * control_points[i].z +
+                        4 * control_points[i + 1].z - control_points[i + 2].z;
+            double cz = -control_points[i - 1].z + control_points[i + 1].z;
+            double dz = 2 * control_points[i].z;
+            ax = ax * 0.5;
+            bx = bx * 0.5;
+            cx = cx * 0.5;
+            dx = dx * 0.5;
+            ay = ay * 0.5;
+            by = by * 0.5;
+            cy = cy * 0.5;
+            dy = dy * 0.5;
+            az = az * 0.5;
+            bz = bz * 0.5;
+            cz = cz * 0.5;
+            dz = dz * 0.5;
+            curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
+          }
+        }
+        for (const auto & curve : curves_) {
+          length_list_.emplace_back(curve.getLength());
+          maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
+        }
+        total_length_ = 0;
+        for (const auto & length : length_list_) {
+          total_length_ = total_length_ + length;
+        }
+        checkConnection();
+      }(control_points);
+      break;
   }
-  for (size_t i = 0; i < n; i++) {
-    if (i == 0) {
-      double ax = 0;
-      double bx = control_points[0].x - 2 * control_points[1].x + control_points[2].x;
-      double cx = -3 * control_points[0].x + 4 * control_points[1].x - control_points[2].x;
-      double dx = 2 * control_points[0].x;
-      double ay = 0;
-      double by = control_points[0].y - 2 * control_points[1].y + control_points[2].y;
-      double cy = -3 * control_points[0].y + 4 * control_points[1].y - control_points[2].y;
-      double dy = 2 * control_points[0].y;
-      double az = 0;
-      double bz = control_points[0].z - 2 * control_points[1].z + control_points[2].z;
-      double cz = -3 * control_points[0].z + 4 * control_points[1].z - control_points[2].z;
-      double dz = 2 * control_points[0].z;
-      ax = ax * 0.5;
-      bx = bx * 0.5;
-      cx = cx * 0.5;
-      dx = dx * 0.5;
-      ay = ay * 0.5;
-      by = by * 0.5;
-      cy = cy * 0.5;
-      dy = dy * 0.5;
-      az = az * 0.5;
-      bz = bz * 0.5;
-      cz = cz * 0.5;
-      dz = dz * 0.5;
-      curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
-    } else if (i == (n - 1)) {
-      double ax = 0;
-      double bx = control_points[i - 1].x - 2 * control_points[i].x + control_points[i + 1].x;
-      double cx = -1 * control_points[i - 1].x + control_points[i + 1].x;
-      double dx = 2 * control_points[i].x;
-      double ay = 0;
-      double by = control_points[i - 1].y - 2 * control_points[i].y + control_points[i + 1].y;
-      double cy = -1 * control_points[i - 1].y + control_points[i + 1].y;
-      double dy = 2 * control_points[i].y;
-      double az = 0;
-      double bz = control_points[i - 1].z - 2 * control_points[i].z + control_points[i + 1].z;
-      double cz = -1 * control_points[i - 1].z + control_points[i + 1].z;
-      double dz = 2 * control_points[i].z;
-      ax = ax * 0.5;
-      bx = bx * 0.5;
-      cx = cx * 0.5;
-      dx = dx * 0.5;
-      ay = ay * 0.5;
-      by = by * 0.5;
-      cy = cy * 0.5;
-      dy = dy * 0.5;
-      az = az * 0.5;
-      bz = bz * 0.5;
-      cz = cz * 0.5;
-      dz = dz * 0.5;
-      curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
-    } else {
-      double ax = -1 * control_points[i - 1].x + 3 * control_points[i].x -
-                  3 * control_points[i + 1].x + control_points[i + 2].x;
-      double bx = 2 * control_points[i - 1].x - 5 * control_points[i].x +
-                  4 * control_points[i + 1].x - control_points[i + 2].x;
-      double cx = -control_points[i - 1].x + control_points[i + 1].x;
-      double dx = 2 * control_points[i].x;
-      double ay = -1 * control_points[i - 1].y + 3 * control_points[i].y -
-                  3 * control_points[i + 1].y + control_points[i + 2].y;
-      double by = 2 * control_points[i - 1].y - 5 * control_points[i].y +
-                  4 * control_points[i + 1].y - control_points[i + 2].y;
-      double cy = -control_points[i - 1].y + control_points[i + 1].y;
-      double dy = 2 * control_points[i].y;
-      double az = -1 * control_points[i - 1].z + 3 * control_points[i].z -
-                  3 * control_points[i + 1].z + control_points[i + 2].z;
-      double bz = 2 * control_points[i - 1].z - 5 * control_points[i].z +
-                  4 * control_points[i + 1].z - control_points[i + 2].z;
-      double cz = -control_points[i - 1].z + control_points[i + 1].z;
-      double dz = 2 * control_points[i].z;
-      ax = ax * 0.5;
-      bx = bx * 0.5;
-      cx = cx * 0.5;
-      dx = dx * 0.5;
-      ay = ay * 0.5;
-      by = by * 0.5;
-      cy = cy * 0.5;
-      dy = dy * 0.5;
-      az = az * 0.5;
-      bz = bz * 0.5;
-      cz = cz * 0.5;
-      dz = dz * 0.5;
-      curves_.emplace_back(HermiteCurve(ax, bx, cx, dx, ay, by, cy, dy, az, bz, cz, dz));
-    }
-  }
-  for (const auto & curve : curves_) {
-    length_list_.emplace_back(curve.getLength());
-    maximum_2d_curvatures_.emplace_back(curve.getMaximum2DCurvature());
-  }
-  total_length_ = 0;
-  for (const auto & length : length_list_) {
-    total_length_ = total_length_ + length;
-  }
-  checkConnection();
 }
 
-std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
+auto CatmullRomSpline::getCurveIndexAndS(const double s) const -> std::pair<size_t, double>
 {
   if (s < 0) {
     return std::make_pair(0, s);
@@ -256,7 +264,7 @@ std::pair<size_t, double> CatmullRomSpline::getCurveIndexAndS(double s) const
   THROW_SIMULATION_ERROR("failed to calculate curve index");  // LCOV_EXCL_LINE
 }
 
-double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
+auto CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double s) const -> double
 {
   size_t n = curves_.size();
   double ret = 0;
@@ -270,34 +278,104 @@ double CatmullRomSpline::getSInSplineCurve(size_t curve_index, double s) const
   THROW_SEMANTIC_ERROR("curve index does not match");  // LCOV_EXCL_LINE
 }
 
-std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
-  bool close_start_end) const
+/**
+ * @brief Get collision point in 2D (x and y)
+ * @param polygon points of polygons.
+ * @param search_backward If true, return collision points with maximum s value. If false, return collision points with minimum s value.
+ * @return std::optional<double> Denormalized s values along the frenet coordinate of the spline curve.
+ */
+auto CatmullRomSpline::getCollisionPointIn2D(
+  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
+  -> std::optional<double>
 {
-  size_t n = curves_.size();
-  if (search_backward) {
-    for (size_t i = 0; i < n; i++) {
-      auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward, close_start_end);
-      if (s) {
-        return getSInSplineCurve(n - 1 - i, s.value());
-      }
-    }
-    return std::nullopt;
-  } else {
-    for (size_t i = 0; i < n; i++) {
-      auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward, close_start_end);
-      if (s) {
-        return getSInSplineCurve(i, s.value());
-      }
-    }
-    return std::nullopt;
+  if (polygon.size() <= 1) {
+    THROW_SIMULATION_ERROR(
+      "Number of points in polygon are invalid, it requires more than 2 points but only ",
+      static_cast<int>(polygon.size()), " exists.",
+      " This message is not originally intended to be displayed, if you see it, please contact the "
+      "developer of traffic_simulator.");
   }
-  return std::nullopt;
+  /// @note If the spline has three or more control points.
+  const auto get_collision_point_2d_with_curve =
+    [this](const auto & polygon, const auto search_backward) -> std::optional<double> {
+    size_t n = curves_.size();
+    if (search_backward) {
+      for (size_t i = 0; i < n; i++) {
+        auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward);
+        if (s) {
+          return getSInSplineCurve(n - 1 - i, s.value());
+        }
+      }
+      return std::optional<double>();
+    } else {
+      for (size_t i = 0; i < n; i++) {
+        auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward);
+        if (s) {
+          return std::optional<double>(getSInSplineCurve(i, s.value()));
+        }
+      }
+      return std::optional<double>();
+    }
+    return std::optional<double>();
+  };
+  /// @note If the spline has two control points. (Same as single line segment.)
+  const auto get_collision_point_2d_with_line =
+    [this](const auto & polygon, const auto search_backward) -> std::optional<double> {
+    const auto polygon_lines = getLineSegments(polygon);
+    std::vector<double> s_value_candidates = {};
+    for (const auto & line : getLineSegments(polygon)) {
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be 1 when the spline have 2 control points.",
+          "Something completely unexpected happened.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
+      if (const auto s_value = line_segments_[0].getIntersection2DSValue(line)) {
+        s_value_candidates.push_back(s_value.value());
+      }
+    }
+    if (s_value_candidates.empty()) {
+      return std::optional<double>();
+    }
+    return search_backward
+             ? *std::max_element(s_value_candidates.begin(), s_value_candidates.end())
+             : *std::min_element(s_value_candidates.begin(), s_value_candidates.end());
+  };
+  /// @note If the spline has one control point. (Same as point.)
+  const auto get_collision_point_2d_with_point = [this](const auto & polygon) {
+    const auto polygon_lines = getLineSegments(polygon);
+    for (const auto & line : polygon_lines) {
+      if (line.isIntersect2D(control_points[0])) {
+        return std::optional<double>(0);
+      }
+    }
+    return std::optional<double>();
+  };
+
+  switch (control_points.size()) {
+    case 0:
+      THROW_SEMANTIC_ERROR(
+        "Control points are empty. We cannot determine the shape of the curve.",
+        "This message is not originally intended to be displayed, if you see it, please contact "
+        "the developer of traffic_simulator.");
+      break;
+    /// @note In this case, spline is interpreted as point.
+    case 1:
+      return get_collision_point_2d_with_point(polygon);
+    /// @note In this case, spline is interpreted as line segment.
+    case 2:
+      return get_collision_point_2d_with_line(polygon, search_backward);
+    /// @note In this case, spline is interpreted as curve.
+    default:
+      return get_collision_point_2d_with_curve(polygon, search_backward);
+  }
 }
 
-std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
+auto CatmullRomSpline::getCollisionPointIn2D(
   const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
-  bool search_backward) const
+  const bool search_backward) const -> std::optional<double>
 {
   size_t n = curves_.size();
   if (search_backward) {
@@ -320,42 +398,159 @@ std::optional<double> CatmullRomSpline::getCollisionPointIn2D(
   return std::nullopt;
 }
 
-std::optional<double> CatmullRomSpline::getSValue(
-  const geometry_msgs::msg::Pose & pose, double threshold_distance) const
+auto CatmullRomSpline::getSValue(
+  const geometry_msgs::msg::Pose & pose, const double threshold_distance) const
+  -> std::optional<double>
 {
-  double s = 0;
-  for (size_t i = 0; i < curves_.size(); i++) {
-    auto s_value = curves_[i].getSValue(pose, threshold_distance, true);
-    if (s_value) {
-      s = s + s_value.value();
-      return s;
-    }
-    s = s + curves_[i].getLength();
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "If this message was displayed, something completely unexpected happens.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      if (
+        std::pow(control_points[0].x - pose.position.x, 2) +
+          std::pow(control_points[0].y - pose.position.y, 2) <=
+        std::numeric_limits<double>::epsilon()) {
+        return 0.0;
+      }
+      return std::nullopt;
+    case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be 1 when the spline have 2 control points.",
+          "Something completely unexpected happened.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
+      return line_segments_[0].getSValue(pose, threshold_distance, true);
+    default:
+      double s = 0;
+      for (size_t i = 0; i < curves_.size(); i++) {
+        auto s_value = curves_[i].getSValue(pose, threshold_distance, true);
+        if (s_value) {
+          s = s + s_value.value();
+          return s;
+        }
+        s = s + curves_[i].getLength();
+      }
+      return std::nullopt;
   }
-  return std::nullopt;
 }
 
-double CatmullRomSpline::getSquaredDistanceIn2D(
-  const geometry_msgs::msg::Point & point, double s) const
+auto CatmullRomSpline::getSquaredDistanceIn2D(
+  const geometry_msgs::msg::Point & point, const double s) const -> double
 {
-  const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getSquaredDistanceIn2D(point, index_and_s.second, true);
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "If this message was displayed, something completely unexpected happens.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      if (std::fabs(s) <= std::numeric_limits<double>::epsilon()) {
+        return std::pow(control_points[0].x - point.x, 2) +
+               std::pow(control_points[0].y - point.y, 2);
+      }
+      THROW_SIMULATION_ERROR(
+        "Only 1 control point exists for the spline.",
+        "So only when the s=0 can calculate point."
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be 1 when the spline have 2 control points.",
+          "Something completely unexpected happened.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
+      return line_segments_[0].getSquaredDistanceIn2D(point, s, true);
+    default:
+      const auto index_and_s = getCurveIndexAndS(s);
+      return curves_[index_and_s.first].getSquaredDistanceIn2D(point, index_and_s.second, true);
+  }
 }
 
-geometry_msgs::msg::Vector3 CatmullRomSpline::getSquaredDistanceVector(
-  const geometry_msgs::msg::Point & point, double s) const
+auto CatmullRomSpline::getSquaredDistanceVector(
+  const geometry_msgs::msg::Point & point, const double s) const -> geometry_msgs::msg::Vector3
 {
-  const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getSquaredDistanceVector(point, index_and_s.second, true);
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "If this message was displayed, something completely unexpected happens.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      if (std::fabs(s) <= std::numeric_limits<double>::epsilon()) {
+        return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+          .x(point.x - control_points[0].x)
+          .y(point.y - control_points[0].y)
+          .z(point.z - control_points[0].z);
+      }
+      THROW_SIMULATION_ERROR(
+        "Only 1 control point exists for the spline.",
+        "So only when the s=0 can calculate point."
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be 1 when the spline have 2 control points.",
+          "Something completely unexpected happened.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
+      return line_segments_[0].getSquaredDistanceVector(point, s, true);
+    default:
+      const auto index_and_s = getCurveIndexAndS(s);
+      return curves_[index_and_s.first].getSquaredDistanceVector(point, index_and_s.second, true);
+  }
 }
 
-const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s) const
+auto CatmullRomSpline::getPoint(const double s) const -> geometry_msgs::msg::Point
 {
-  const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getPoint(index_and_s.second, true);
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "If this message was displayed, something completely unexpected happens.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      if (std::fabs(s) <= std::numeric_limits<double>::epsilon()) {
+        return control_points[0];
+      }
+      THROW_SIMULATION_ERROR(
+        "Only 1 control point exists for the spline.",
+        "So only when the s=0 can calculate point."
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be 1 when the spline have 2 control points.",
+          "Something completely unexpected happened.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
+      return line_segments_[0].getPoint(s, true);
+    default:
+      const auto index_and_s = getCurveIndexAndS(s);
+      return curves_[index_and_s.first].getPoint(index_and_s.second, true);
+  }
 }
 
-const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s, double offset) const
+auto CatmullRomSpline::getPoint(const double s, const double offset) const
+  -> geometry_msgs::msg::Point
 {
   geometry_msgs::msg::Vector3 vec = getNormalVector(s);
   double theta = std::atan2(vec.y, vec.x);
@@ -367,7 +562,7 @@ const geometry_msgs::msg::Point CatmullRomSpline::getPoint(double s, double offs
   return point;
 }
 
-double CatmullRomSpline::getMaximum2DCurvature() const
+auto CatmullRomSpline::getMaximum2DCurvature() const -> double
 {
   if (maximum_2d_curvatures_.empty()) {
     THROW_SIMULATION_ERROR("maximum 2D curvature vector size is 0.");  // LCOV_EXCL_LINE
@@ -375,25 +570,103 @@ double CatmullRomSpline::getMaximum2DCurvature() const
   return *std::max_element(maximum_2d_curvatures_.begin(), maximum_2d_curvatures_.end());
 }
 
-const geometry_msgs::msg::Vector3 CatmullRomSpline::getNormalVector(double s) const
+auto CatmullRomSpline::getNormalVector(const double s) const -> geometry_msgs::msg::Vector3
 {
-  const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getNormalVector(index_and_s.second, true);
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "If this message was displayed, something completely unexpected happens.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      THROW_SIMULATION_ERROR(
+        "Only 1 control point exists for the spline.",
+        "So, the normal vector cannot be calculated.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 2:
+      if (0 <= s && s <= getLength()) {
+        return line_segments_[0].getNormalVector();
+      }
+      THROW_SIMULATION_ERROR(
+        "Invalid S value is specified, while getting normal vector.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    default:
+      const auto index_and_s = getCurveIndexAndS(s);
+      return curves_[index_and_s.first].getNormalVector(index_and_s.second, true);
+  }
 }
 
-const geometry_msgs::msg::Vector3 CatmullRomSpline::getTangentVector(double s) const
+auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::msg::Vector3
 {
-  const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "If this message was displayed, something completely unexpected happens.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      THROW_SIMULATION_ERROR(
+        "Only 1 control point exists for the spline.",
+        "So, the tangent vector cannot be calculated.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be 1 when the spline have 2 control points.",
+          "Something completely unexpected happened.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
+      if (0 <= s && s <= getLength()) {
+        return line_segments_[0].getVector();
+      }
+      THROW_SIMULATION_ERROR(
+        "Invalid S value is specified, while getting tangent vector.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    default:
+      const auto index_and_s = getCurveIndexAndS(s);
+      return curves_[index_and_s.first].getTangentVector(index_and_s.second, true);
+  }
 }
 
-const geometry_msgs::msg::Pose CatmullRomSpline::getPose(double s) const
+auto CatmullRomSpline::getPose(const double s) const -> geometry_msgs::msg::Pose
 {
-  const auto index_and_s = getCurveIndexAndS(s);
-  return curves_[index_and_s.first].getPose(index_and_s.second, true);
+  switch (control_points.size()) {
+    case 0:
+      THROW_SIMULATION_ERROR(
+        "Only 0 control point exists for the spline.",
+        "If this message was displayed, something completely unexpected happens.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 1:
+      THROW_SIMULATION_ERROR(
+        "Only 1 control point exists for the spline.", "So, the pose cannot be calculated.",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    case 2:
+      if (static_cast<int>(line_segments_.size()) != 1) {
+        THROW_SIMULATION_ERROR(
+          "Number of the line segments are invalid : ", static_cast<int>(line_segments_.size()),
+          "Number of the line segments should be 1 when the spline have 2 control points.",
+          "Something completely unexpected happened.",
+          "This message is not originally intended to be displayed, if you see it, please "
+          "contact the developer of traffic_simulator.");
+      }
+      return line_segments_[0].getPose(s, true);
+    default:
+      const auto index_and_s = getCurveIndexAndS(s);
+      return curves_[index_and_s.first].getPose(index_and_s.second, true);
+  }
 }
 
-bool CatmullRomSpline::checkConnection() const
+auto CatmullRomSpline::checkConnection() const -> bool
 {
   if (control_points.size() != (curves_.size() + 1)) {
     THROW_SIMULATION_ERROR(                                    // LCOV_EXCL_LINE
@@ -420,7 +693,8 @@ bool CatmullRomSpline::checkConnection() const
   return true;
 }
 
-bool CatmullRomSpline::equals(geometry_msgs::msg::Point p0, geometry_msgs::msg::Point p1) const
+auto CatmullRomSpline::equals(
+  const geometry_msgs::msg::Point & p0, const geometry_msgs::msg::Point & p1) const -> bool
 {
   constexpr double e = std::numeric_limits<float>::epsilon();
   if (std::abs(p0.x - p1.x) > e) {

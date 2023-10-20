@@ -29,7 +29,7 @@ public:
   explicit RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> &);
 
   auto getRouteLanelets(const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon = 100)
-    -> std::vector<std::int64_t>;
+    -> lanelet::Ids;
 
   auto setWaypoints(const std::vector<CanonicalizedLaneletPose> & waypoints) -> void;
 
@@ -42,7 +42,7 @@ private:
 
   auto updateRoute(const CanonicalizedLaneletPose & entity_lanelet_pose) -> void;
 
-  std::optional<std::vector<std::int64_t>> route_;
+  std::optional<lanelet::Ids> route_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
   /*

@@ -255,7 +255,7 @@ public:
     const std::string &, const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &)
     -> bool;
 
-  void requestLaneChange(const std::string & name, const std::int64_t & lanelet_id);
+  void requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id);
 
   void requestLaneChange(const std::string & name, const lane_change::Direction & direction);
 
@@ -287,6 +287,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLateralDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLongitudinalDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);

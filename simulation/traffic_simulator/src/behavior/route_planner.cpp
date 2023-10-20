@@ -31,7 +31,7 @@ auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & wa
 }
 
 auto RoutePlanner::getRouteLanelets(
-  const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon) -> std::vector<std::int64_t>
+  const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon) -> lanelet::Ids
 {
   const auto lanelet_pose = static_cast<LaneletPose>(entity_lanelet_pose);
   // If the queue is not empty, calculating route from the entity_lanelet_pose to waypoint_queue_.front()

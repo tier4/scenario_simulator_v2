@@ -28,50 +28,48 @@ namespace hdmap_utils
 class RouteCache
 {
 public:
-  bool exists(std::int64_t from, std::int64_t to)
+  auto exists(lanelet::Id from, lanelet::Id to)
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    std::pair<std::int64_t, std::int64_t> key;
+    std::pair<lanelet::Id, lanelet::Id> key;
     key.first = from;
     key.second = to;
-    if (data_.find(key) == data_.end()) {
-      return false;
-    }
-    return true;
+    return data_.find(key) != data_.end();
   }
-  std::vector<std::int64_t> getRoute(std::int64_t from, std::int64_t to)
+
+  auto getRoute(lanelet::Id from, lanelet::Id to) -> decltype(auto)
   {
     if (!exists(from, to)) {
       THROW_SIMULATION_ERROR(
         "route from : ", from, " to : ", to, " does not exists on route cache.");
+    } else {
+      std::lock_guard<std::mutex> lock(mutex_);
+      return data_.at({from, to});
     }
-    std::lock_guard<std::mutex> lock(mutex_);
-    const auto ret = data_.at({from, to});
-    return ret;
   }
-  void appendData(std::int64_t from, std::int64_t to, const std::vector<std::int64_t> & route)
+
+  auto appendData(lanelet::Id from, lanelet::Id to, const lanelet::Ids & route) -> void
   {
     std::lock_guard<std::mutex> lock(mutex_);
     data_[{from, to}] = route;
   }
 
 private:
-  std::unordered_map<std::pair<std::int64_t, std::int64_t>, std::vector<std::int64_t>> data_;
+  std::unordered_map<std::pair<lanelet::Id, lanelet::Id>, lanelet::Ids> data_;
+
   std::mutex mutex_;
 };
 
 class CenterPointsCache
 {
 public:
-  bool exists(std::int64_t lanelet_id)
+  auto exists(lanelet::Id lanelet_id) -> bool
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (data_.find(lanelet_id) == data_.end()) {
-      return false;
-    }
-    return true;
+    return data_.find(lanelet_id) != data_.end();
   }
-  std::vector<geometry_msgs::msg::Point> getCenterPoints(std::int64_t lanelet_id)
+
+  auto getCenterPoints(lanelet::Id lanelet_id) -> decltype(auto)
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
@@ -79,7 +77,8 @@ public:
     std::lock_guard<std::mutex> lock(mutex_);
     return data_.at(lanelet_id);
   }
-  std::shared_ptr<math::geometry::CatmullRomSpline> getCenterPointsSpline(std::int64_t lanelet_id)
+
+  auto getCenterPointsSpline(lanelet::Id lanelet_id) -> decltype(auto)
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
@@ -87,7 +86,8 @@ public:
     std::lock_guard<std::mutex> lock(mutex_);
     return splines_[lanelet_id];
   }
-  void appendData(std::int64_t lanelet_id, const std::vector<geometry_msgs::msg::Point> & route)
+
+  auto appendData(lanelet::Id lanelet_id, const std::vector<geometry_msgs::msg::Point> & route)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     data_[lanelet_id] = route;
@@ -95,23 +95,23 @@ public:
   }
 
 private:
-  std::unordered_map<std::int64_t, std::vector<geometry_msgs::msg::Point>> data_;
-  std::unordered_map<std::int64_t, std::shared_ptr<math::geometry::CatmullRomSpline>> splines_;
+  std::unordered_map<lanelet::Id, std::vector<geometry_msgs::msg::Point>> data_;
+
+  std::unordered_map<lanelet::Id, std::shared_ptr<math::geometry::CatmullRomSpline>> splines_;
+
   std::mutex mutex_;
 };
 
 class LaneletLengthCache
 {
 public:
-  bool exists(std::int64_t lanelet_id)
+  auto exists(lanelet::Id lanelet_id)
   {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (data_.find(lanelet_id) == data_.end()) {
-      return false;
-    }
-    return true;
+    return data_.find(lanelet_id) != data_.end();
   }
-  double getLength(std::int64_t lanelet_id)
+
+  auto getLength(lanelet::Id lanelet_id)
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route cache.");
@@ -119,14 +119,16 @@ public:
     std::lock_guard<std::mutex> lock(mutex_);
     return data_[lanelet_id];
   }
-  void appendData(std::int64_t lanelet_id, double length)
+
+  auto appendData(lanelet::Id lanelet_id, double length)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     data_[lanelet_id] = length;
   }
 
 private:
-  std::unordered_map<std::int64_t, double> data_;
+  std::unordered_map<lanelet::Id, double> data_;
+
   std::mutex mutex_;
 };
 }  // namespace hdmap_utils

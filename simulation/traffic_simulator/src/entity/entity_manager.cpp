@@ -104,7 +104,7 @@ auto EntityManager::getBoundingBoxDistance(const std::string & from, const std::
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
 
 auto EntityManager::getDistanceToCrosswalk(
-  const std::string & name, const std::int64_t target_crosswalk_id) -> std::optional<double>
+  const std::string & name, const lanelet::Id target_crosswalk_id) -> std::optional<double>
 {
   if (entities_.find(name) == entities_.end()) {
     return std::nullopt;
@@ -118,7 +118,7 @@ auto EntityManager::getDistanceToCrosswalk(
 }
 
 auto EntityManager::getDistanceToStopLine(
-  const std::string & name, const std::int64_t target_stop_line_id) -> std::optional<double>
+  const std::string & name, const lanelet::Id target_stop_line_id) -> std::optional<double>
 {
   if (entities_.find(name) == entities_.end()) {
     return std::nullopt;
@@ -161,6 +161,129 @@ auto EntityManager::getEntityTypeList() const
     ret.emplace(name, getEntityType(name));
   }
   return ret;
+}
+
+auto EntityManager::getBoundingBoxLaneLateralDistance(
+  const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
+  const CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bbox) const -> std::optional<double>
+{
+  if (const auto lateral_distance = getLateralDistance(from, to); lateral_distance) {
+    const auto from_bbox_distances = math::geometry::getDistancesFromCenterToEdge(from_bbox);
+    const auto to_bbox_distances = math::geometry::getDistancesFromCenterToEdge(to_bbox);
+    auto bbox_distance = 0.0;
+
+    if (lateral_distance.value() > 0) {
+      bbox_distance = -std::abs(from_bbox_distances.right) - std::abs(to_bbox_distances.left);
+    } else if (lateral_distance.value() < 0) {
+      bbox_distance = std::abs(from_bbox_distances.left) + std::abs(to_bbox_distances.right);
+    }
+    return lateral_distance.value() + bbox_distance;
+  }
+  return std::nullopt;
+}
+
+auto EntityManager::getBoundingBoxLaneLateralDistance(
+  const std::string & from, const CanonicalizedLaneletPose & to) const -> std::optional<double>
+{
+  if (const auto from_pose = getLaneletPose(from); from_pose) {
+    traffic_simulator_msgs::msg::BoundingBox bbox_empty;
+    return getBoundingBoxLaneLateralDistance(
+      from_pose.value(), getBoundingBox(from), to, bbox_empty);
+  }
+  return std::nullopt;
+}
+
+auto EntityManager::getBoundingBoxLaneLateralDistance(
+  const std::string & from, const std::string & to) const -> std::optional<double>
+{
+  const auto from_pose = getLaneletPose(from);
+  const auto to_pose = getLaneletPose(to);
+  if (from_pose and to_pose) {
+    return getBoundingBoxLaneLateralDistance(
+      from_pose.value(), getBoundingBox(from), to_pose.value(), getBoundingBox(to));
+  }
+  return std::nullopt;
+}
+
+auto EntityManager::getBoundingBoxLaneLongitudinalDistance(
+  const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
+  const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
+  bool include_adjacent_lanelet, bool include_opposite_direction) -> std::optional<double>
+{
+  if (const auto longitudinal_distance =
+        getLongitudinalDistance(from, to, include_adjacent_lanelet, include_opposite_direction);
+      longitudinal_distance) {
+    const auto from_bbox_distances = math::geometry::getDistancesFromCenterToEdge(from_bbox);
+    const auto to_bbox_distances = math::geometry::getDistancesFromCenterToEdge(to_bbox);
+    auto bbox_distance = 0.0;
+
+    if (longitudinal_distance.value() > 0.0) {
+      bbox_distance = -std::abs(from_bbox_distances.front) - std::abs(to_bbox_distances.rear);
+    } else if (longitudinal_distance.value() < 0.0) {
+      bbox_distance = +std::abs(from_bbox_distances.rear) + std::abs(to_bbox_distances.front);
+    }
+    return longitudinal_distance.value() + bbox_distance;
+  }
+  return std::nullopt;
+}
+
+auto EntityManager::getBoundingBoxLaneLongitudinalDistance(
+  const std::string & from, const CanonicalizedLaneletPose & to, bool include_adjacent_lanelet,
+  bool include_opposite_direction) -> std::optional<double>
+{
+  const auto from_pose = getLaneletPose(from);
+  if (laneMatchingSucceed(from) and from_pose) {
+    traffic_simulator_msgs::msg::BoundingBox bbox_empty;
+    return getBoundingBoxLaneLongitudinalDistance(
+      from_pose.value(), getBoundingBox(from), to, bbox_empty, include_adjacent_lanelet,
+      include_opposite_direction);
+  }
+  return std::nullopt;
+}
+auto EntityManager::getBoundingBoxLaneLongitudinalDistance(
+  const std::string & from, const std::string & to, bool include_adjacent_lanelet,
+  bool include_opposite_direction) -> std::optional<double>
+{
+  const auto from_pose = getLaneletPose(from);
+  const auto to_pose = getLaneletPose(to);
+
+  if (laneMatchingSucceed(from) and from_pose and laneMatchingSucceed(to) and to_pose) {
+    return getBoundingBoxLaneLongitudinalDistance(
+      from_pose.value(), getBoundingBox(from), to_pose.value(), getBoundingBox(to),
+      include_adjacent_lanelet, include_opposite_direction);
+  }
+  return std::nullopt;
+}
+
+auto EntityManager::getBoundingBoxRelativePose(
+  const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
+  const geometry_msgs::msg::Pose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bbox) const
+  -> std::optional<geometry_msgs::msg::Pose>
+{
+  if (const auto closest_points = math::geometry::getClosestPoses(from, from_bbox, to, to_bbox);
+      closest_points) {
+    const auto from_pose_bbox = getRelativePose(from, closest_points.value().first);
+    const auto to_pose_bbox = getRelativePose(from, closest_points.value().second);
+    return math::geometry::subtractPoses(from_pose_bbox, to_pose_bbox);
+  }
+  return std::nullopt;
+}
+
+auto EntityManager::getBoundingBoxRelativePose(
+  const std::string & from, const geometry_msgs::msg::Pose & to) const
+  -> std::optional<geometry_msgs::msg::Pose>
+{
+  traffic_simulator_msgs::msg::BoundingBox bbox_empty;
+  return getBoundingBoxRelativePose(getMapPose(from), getBoundingBox(from), to, bbox_empty);
+}
+
+auto EntityManager::getBoundingBoxRelativePose(
+  const std::string & from, const std::string & to) const -> std::optional<geometry_msgs::msg::Pose>
+{
+  return getBoundingBoxRelativePose(
+    getMapPose(from), getBoundingBox(from), getMapPose(to), getBoundingBox(to));
 }
 
 auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
@@ -281,7 +404,7 @@ auto EntityManager::getLongitudinalDistance(
     }
   } else {
     /**
-    * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function. 
+    * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
     * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
     */
     auto from_poses = hdmap_utils_ptr_->toLaneletPoses(
@@ -289,7 +412,7 @@ auto EntityManager::getLongitudinalDistance(
       include_opposite_direction);
     from_poses.emplace_back(from);
     /**
-    * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function. 
+    * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
     * A matching distance of about 1.5 lane widths is given as the matching distance to match the Entity present on the adjacent Lanelet.
     */
     auto to_poses = hdmap_utils_ptr_->toLaneletPoses(
@@ -470,7 +593,7 @@ bool EntityManager::isEgoSpawned() const
 }
 
 bool EntityManager::isInLanelet(
-  const std::string & name, const std::int64_t lanelet_id, const double tolerance)
+  const std::string & name, const lanelet::Id lanelet_id, const double tolerance)
 {
   const auto status = getEntityStatus(name);
   if (not status.laneMatchingSucceed()) {
