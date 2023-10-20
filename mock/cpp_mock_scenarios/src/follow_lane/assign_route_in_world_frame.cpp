@@ -28,10 +28,10 @@
 
 namespace cpp_mock_scenarios
 {
-class AcquireRouteInWorldFrame : public cpp_mock_scenarios::CppScenarioNode
+class AcquireRouteInWorldFrameScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit AcquireRouteInWorldFrame(const rclcpp::NodeOptions & option)
+  explicit AcquireRouteInWorldFrameScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "assign_route_in_world_frame",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
@@ -70,7 +70,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<AcquireRouteInWorldFrame>(options);
+  auto component = std::make_shared<AcquireRouteInWorldFrameScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

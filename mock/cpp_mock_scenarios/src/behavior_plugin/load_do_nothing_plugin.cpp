@@ -26,11 +26,13 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 /// @note Test case to verify if the do_nothing plugin can be loaded.
-class LoadDoNothingPlugin : public cpp_mock_scenarios::CppScenarioNode
+class LoadDoNothingPluginScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit LoadDoNothingPlugin(const rclcpp::NodeOptions & option)
+  explicit LoadDoNothingPluginScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "crashing_npc", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "private_road_and_walkway_ele_fix/lanelet2_map.osm", __FILE__, false, option)
@@ -62,12 +64,13 @@ private:
       traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<LoadDoNothingPlugin>(options);
+  auto component = std::make_shared<LoadDoNothingPluginScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

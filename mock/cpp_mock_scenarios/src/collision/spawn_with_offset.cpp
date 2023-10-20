@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class SpawnWithOffsetScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -64,6 +66,7 @@ private:
     api_.requestSpeedChange("bob", 0, true);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
