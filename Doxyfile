@@ -1,4 +1,4 @@
-PROJECT_NAME = scenario_simulator_v2
+PROJECT_NAME = scenario_simulator_v2 C++ API
 
 DOXYFILE_ENCODING = UTF-8
 
@@ -12,20 +12,33 @@ GENERATE_HTML          = YES
 GENERATE_LATEX         = NO
 GENERATE_XML           = NO
 
+INPUT                  += README.md
+
 INPUT                  += common/math/geometry
+INPUT                  += common/math/arithmetic
 INPUT                  += common/scenario_simulator_exception
+INPUT                  += common/simple_junit
+INPUT                  += common/status_monitor
+INPUT                  += simulation/traffic_simulator
 
 IMAGE_PATH             += common/math/geometry
+IMAGE_PATH             += common/math/arithmetic
 IMAGE_PATH             += common/scenario_simulator_exception
+IMAGE_PATH             += common/simple_junit
+IMAGE_PATH             += common/status_monitor
+IMAGE_PATH             += simulation/traffic_simulator
 
 EXAMPLE_PATH           += common/math/geometry
 EXAMPLE_PATH           += common/scenario_simulator_exception
+EXAMPLE_PATH           += common/math/arithmetic
+EXAMPLE_PATH           += common/simple_junit
+EXAMPLE_PATH           += common/status_monitor
+EXAMPLE_PATH           += simulation/traffic_simulator
 
 INPUT_ENCODING         = UTF-8
 MACRO_EXPANSION        = YES
 OUTPUT_DIRECTORY       = 
 OUTPUT_LANGUAGE        = English
-PROJECT_NAME           = Scenario Simulator
 RECURSIVE              = YES
 SKIP_FUNCTION_MACROS   = NO
 XML_OUTPUT             = build
@@ -34,15 +47,19 @@ FILE_PATTERNS += *.hpp
 FILE_PATTERNS += *.cpp
 FILE_PATTERNS += *.md
 
-EXPAND_AS_DEFINED += TEST
-EXPAND_AS_DEFINED += EXPECT_DECIMAL_EQ
-EXPAND_AS_DEFINED += EXPECT_POINT_EQ
-EXPAND_AS_DEFINED += EXPECT_VECTOR3_EQ
-EXPAND_AS_DEFINED += EXPECT_QUATERNION_EQ
-EXPAND_AS_DEFINED += EXPECT_POSE_EQ
-EXPAND_AS_DEFINED += EXPECT_LANELET_POSE_EQ
-EXPAND_AS_DEFINED += EXPECT_TWIST_EQ
+EXPAND_AS_DEFINED += DEFINE_ERROR_CATEGORY
 EXPAND_AS_DEFINED += EXPECT_ACCEL_EQ
 EXPAND_AS_DEFINED += EXPECT_ACTION_STATUS_EQ
+EXPAND_AS_DEFINED += EXPECT_DECIMAL_EQ
 EXPAND_AS_DEFINED += EXPECT_DETECTION_SENSOR_CONFIGURATION_EQ
-EXPAND_AS_DEFINED += DEFINE_ERROR_CATEGORY
+EXPAND_AS_DEFINED += EXPECT_LANELET_POSE_EQ
+EXPAND_AS_DEFINED += EXPECT_POINT_EQ
+EXPAND_AS_DEFINED += EXPECT_POSE_EQ
+EXPAND_AS_DEFINED += EXPECT_QUATERNION_EQ
+EXPAND_AS_DEFINED += EXPECT_TWIST_EQ
+EXPAND_AS_DEFINED += EXPECT_VECTOR3_EQ
+EXPAND_AS_DEFINED += TEST
+EXPAND_AS_DEFINED += THROW_ERROR
+EXPAND_AS_DEFINED += THROW_SEMANTIC_ERROR
+EXPAND_AS_DEFINED += THROW_SIMULATION_ERROR
+EXPAND_AS_DEFINED += THROW_SYNTAX_ERROR
