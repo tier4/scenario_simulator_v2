@@ -28,10 +28,10 @@
 
 namespace cpp_mock_scenarios
 {
-class LaneChangeTime : public cpp_mock_scenarios::CppScenarioNode
+class LaneChangeTimeScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit LaneChangeTime(const rclcpp::NodeOptions & option)
+  explicit LaneChangeTimeScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
@@ -82,7 +82,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<LaneChangeTime>(options);
+  auto component = std::make_shared<LaneChangeTimeScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

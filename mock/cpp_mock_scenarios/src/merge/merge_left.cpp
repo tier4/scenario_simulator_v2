@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class MergeLeftScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -70,6 +72,7 @@ private:
     api_.setLinearVelocity("npc", 10);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {

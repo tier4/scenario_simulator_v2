@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class RequestSpeedChangeRelativeScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -75,6 +77,7 @@ private:
       true);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {

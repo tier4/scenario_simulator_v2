@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class GetDistanceInLaneCoordinateScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -113,6 +115,7 @@ private:
     api_.requestSpeedChange("behind", 3, true);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
