@@ -19,6 +19,7 @@ INPUT                  += common/math/arithmetic
 INPUT                  += common/scenario_simulator_exception
 INPUT                  += common/simple_junit
 INPUT                  += common/status_monitor
+INPUT                  += mock/cpp_mock_scenarios
 INPUT                  += simulation/traffic_simulator
 
 IMAGE_PATH             += common/math/geometry
@@ -26,6 +27,7 @@ IMAGE_PATH             += common/math/arithmetic
 IMAGE_PATH             += common/scenario_simulator_exception
 IMAGE_PATH             += common/simple_junit
 IMAGE_PATH             += common/status_monitor
+IMAGE_PATH             += mock/cpp_mock_scenarios
 IMAGE_PATH             += simulation/traffic_simulator
 
 EXAMPLE_PATH           += common/math/geometry
@@ -33,6 +35,7 @@ EXAMPLE_PATH           += common/scenario_simulator_exception
 EXAMPLE_PATH           += common/math/arithmetic
 EXAMPLE_PATH           += common/simple_junit
 EXAMPLE_PATH           += common/status_monitor
+EXAMPLE_PATH           += mock/cpp_mock_scenarios
 EXAMPLE_PATH           += simulation/traffic_simulator
 
 INPUT_ENCODING         = UTF-8

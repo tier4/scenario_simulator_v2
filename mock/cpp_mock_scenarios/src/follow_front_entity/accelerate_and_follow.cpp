@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class AccelerateAndFollowScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -82,3 +84,5 @@ int main(int argc, char * argv[])
   rclcpp::shutdown();
   return 0;
 }
+
+}  // namespace cpp_mock_scenarios
