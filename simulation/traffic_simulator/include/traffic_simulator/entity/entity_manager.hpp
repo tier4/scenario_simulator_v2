@@ -233,7 +233,9 @@ public:
 
   auto setTrafficLightConfidence(lanelet::Id id, double confidence) -> void
   {
-    conventional_traffic_light_manager_ptr_->getTrafficLight(id).setConfidence(confidence);
+    for (auto & traffic_light : conventional_traffic_light_manager_ptr_->getTrafficLights(id)) {
+      traffic_light.get().setConfidence(confidence);
+    }
   }
 
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
