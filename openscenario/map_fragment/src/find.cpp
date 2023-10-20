@@ -37,16 +37,36 @@ try {
 
   const auto routing_graph = lanelet::routing::RoutingGraph::build(*map, vehicleTrafficRules());
 
+  auto is_leftmost = [&](const auto & lanelet) {
+    return routing_graph->leftRelations(lanelet).empty();
+  };
+
+  auto is_rightmost = [&](const auto & lanelet) {
+    auto right_relations = routing_graph->rightRelations(lanelet);
+    return right_relations.empty() or
+           std::any_of(
+             right_relations.begin(), right_relations.end(), [&](const auto & right_relation) {
+               /*
+                  NOTE: The Lanelet returned by rightRelations is not
+                  useful because the directions are aligned regardless of
+                  the original orientation.
+               */
+               return lanelet.rightBound() ==
+                      map->laneletLayer.find(right_relation.lanelet.id())->rightBound().invert();
+             });
+  };
+
   const std::list<std::function<bool(const lanelet::Lanelet &)>> constraints{
     [&]() {
       node.declare_parameter("type", "lanelet");
       const auto type = node.get_parameter("type").as_string();
       return [type](const auto & lanelet) {
-        return lanelet.attribute("type") == type or [&]() {
+        auto discard = [&]() {
           std::cerr << "[" << lanelet.id() << "] discarded: The type is not " << type << "."
                     << std::endl;
           return false;
-        }();
+        };
+        return lanelet.attribute("type") == type or discard();
       };
     }(),
 
@@ -54,11 +74,12 @@ try {
       node.declare_parameter("subtype", "road");
       const auto subtype = node.get_parameter("subtype").as_string();
       return [subtype](const auto & lanelet) {
-        return lanelet.attribute("subtype") == subtype or [&]() {
+        auto discard = [&]() {
           std::cerr << "[" << lanelet.id() << "] discarded: The subtype is not " << subtype << "."
                     << std::endl;
           return false;
-        }();
+        };
+        return lanelet.attribute("subtype") == subtype or discard();
       };
     }(),
 
@@ -66,11 +87,12 @@ try {
       node.declare_parameter("id_greater_than", lanelet::Id());
       const auto lower_bound = node.get_parameter("id_greater_than").as_int();
       return [lower_bound](const auto & lanelet) {
-        return lower_bound < lanelet.id() or [&]() {
+        auto discard = [&]() {
           std::cerr << "[" << lanelet.id() << "] discarded: The id is not greater than "
                     << lower_bound << "." << std::endl;
           return false;
-        }();
+        };
+        return lower_bound < lanelet.id() or discard();
       };
     }(),
 
@@ -78,11 +100,64 @@ try {
       node.declare_parameter("id_less_than", std::numeric_limits<lanelet::Id>::max());
       const auto upper_bound = node.get_parameter("id_less_than").as_int();
       return [upper_bound](const auto & lanelet) {
-        return lanelet.id() < upper_bound or [&]() {
+        auto discard = [&]() {
           std::cerr << "[" << lanelet.id() << "] discarded: The id is not less than " << upper_bound
                     << "." << std::endl;
           return false;
-        }();
+        };
+        return lanelet.id() < upper_bound or discard();
+      };
+    }(),
+
+    [&]() {
+      node.declare_parameter("leftmost", false);
+      const auto constrained = node.get_parameter("leftmost").as_bool();
+      return [&, constrained](const auto & lanelet) {
+        auto discard = [&]() {
+          std::cerr << "[" << lanelet.id()
+                    << "] discarded: There are lanelets to the left of the lanelet." << std::endl;
+          return false;
+        };
+        return not constrained or is_leftmost(lanelet) or discard();
+      };
+    }(),
+
+    [&]() {
+      node.declare_parameter("not_leftmost", false);
+      const auto constrained = node.get_parameter("not_leftmost").as_bool();
+      return [&, constrained](const auto & lanelet) {
+        auto discard = [&]() {
+          std::cerr << "[" << lanelet.id()
+                    << "] discarded: There are lanelets to the left of the lanelet." << std::endl;
+          return false;
+        };
+        return not constrained or not is_leftmost(lanelet) or discard();
+      };
+    }(),
+
+    [&]() {
+      node.declare_parameter("rightmost", false);
+      const auto constrained = node.get_parameter("rightmost").as_bool();
+      return [&, constrained](const auto & lanelet) {
+        auto discard = [&]() {
+          std::cerr << "[" << lanelet.id()
+                    << "] discarded: There are lanelets to the right of the lanelet." << std::endl;
+          return false;
+        };
+        return not constrained or is_rightmost(lanelet) or discard();
+      };
+    }(),
+
+    [&]() {
+      node.declare_parameter("not_rightmost", false);
+      const auto constrained = node.get_parameter("not_rightmost").as_bool();
+      return [&, constrained](const auto & lanelet) {
+        auto discard = [&]() {
+          std::cerr << "[" << lanelet.id()
+                    << "] discarded: There are lanelets to the right of the lanelet." << std::endl;
+          return false;
+        };
+        return not constrained or not is_rightmost(lanelet) or discard();
       };
     }(),
 
@@ -90,20 +165,20 @@ try {
       node.declare_parameter("route_length_greater_than", 0.0);
       const auto lower_bound = node.get_parameter("route_length_greater_than").as_double();
       return [&, lower_bound](const auto & lanelet) {
-        return 0 < routing_graph->possiblePaths(lanelet, lower_bound).size() or [&]() {
+        auto discard = [&]() {
           std::cerr
             << "[" << lanelet.id()
             << "] discarded: The length of the path routable from the lanelet is not greater than "
             << lower_bound << std::endl;
           return false;
-        }();
+        };
+        return 0 < routing_graph->possiblePaths(lanelet, lower_bound).size() or discard();
       };
     }(),
   };
 
   auto filter = [](auto satisfy, auto && iterable, auto current_continuation) -> decltype(auto) {
     std::vector<typename std::decay_t<decltype(iterable)>::iterator::value_type> values;
-
     auto filter = [&](auto filter, auto begin, auto end)
       -> std::invoke_result_t<decltype(current_continuation), decltype(values)> {
       if (auto first = std::find_if(begin, end, satisfy); first != end) {
@@ -113,7 +188,6 @@ try {
         return current_continuation(values);
       }
     };
-
     return filter(filter, iterable.begin(), iterable.end());
   };
 
