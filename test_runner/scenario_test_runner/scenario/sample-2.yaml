@@ -41,7 +41,7 @@ OpenSCENARIO:
         value: $(ros2 run map_fragment lane --ros-args -p length:=$(var length) -p curvature:=$(var curvature) -p number_of_lanes:=$(var number_of_lanes))
       - name: ego_lane_id
         parameterType: string
-        value: $(ros2 run map_fragment find --ros-args -p type:=lanelet -p subtype:=road)
+        value: $(ros2 run map_fragment find --ros-args -p leftmost:=true)
       - name: ego_lane_length
         parameterType: double
         value: $(ros2 run map_fragment length --ros-args -p id:=$(var ego_lane_id))
