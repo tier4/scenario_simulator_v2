@@ -88,7 +88,7 @@ try {
       const auto lower_bound = node.get_parameter("id_greater_than").as_int();
       return [lower_bound](const auto & lanelet) {
         auto discard = [&]() {
-          std::cerr << "[" << lanelet.id() << "] discarded: The id is not greater than "
+          std::cerr << "[" << lanelet.id() << "] discarded: The ID is not greater than "
                     << lower_bound << "." << std::endl;
           return false;
         };
@@ -101,11 +101,29 @@ try {
       const auto upper_bound = node.get_parameter("id_less_than").as_int();
       return [upper_bound](const auto & lanelet) {
         auto discard = [&]() {
-          std::cerr << "[" << lanelet.id() << "] discarded: The id is not less than " << upper_bound
+          std::cerr << "[" << lanelet.id() << "] discarded: The ID is not less than " << upper_bound
                     << "." << std::endl;
           return false;
         };
         return lanelet.id() < upper_bound or discard();
+      };
+    }(),
+
+    [&]() {
+      node.declare_parameter("left_of", lanelet::Id());
+      const auto right_id = node.get_parameter("left_of").as_int();
+      return [&, right_id](const auto & lanelet) {
+        auto is_left_of = [&](auto right_id) {
+          auto right = map->laneletLayer.find(right_id);
+          return right != map->laneletLayer.end() and lanelet::geometry::leftOf(lanelet, *right);
+        };
+        auto discard = [&]() {
+          std::cerr << "[" << lanelet.id()
+                    << "] discarded: The lanelet is not to the left of the lanelet with ID "
+                    << right_id << "." << std::endl;
+          return false;
+        };
+        return not right_id or is_left_of(right_id) or discard();
       };
     }(),
 
