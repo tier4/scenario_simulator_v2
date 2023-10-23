@@ -41,16 +41,16 @@ OpenSCENARIO:
         value: 90 #$(ros2 run openscenario_interpreter_example uniform_distribution -90 90)
       - name: number_of_lanes
         parameterType: unsignedInt
-        value: 2
+        value: 3
       - name: map_path
         parameterType: string
         value: $(ros2 run map_fragment curve --ros-args -p before_length:=$(var before_length) -p length:=$(var length) -p after_length:=$(var after_length) -p angle:=$(var angle) -p number_of_lanes:=$(var number_of_lanes))
       - name: route_length
         parameterType: double
-        value: '100.0'
+        value: '200.0'
       - name: ego_lane_id
         parameterType: string
-        value: $(ros2 run map_fragment find --ros-args -p route_length_greater_than:=$(var route_length) -p select:=any)
+        value: $(ros2 run map_fragment find --ros-args -p route_length_greater_than:=$(var route_length) -p not_leftmost:=true -p not_rightmost:=true)
   CatalogLocations:
     VehicleCatalog:
       Directory:
