@@ -103,7 +103,7 @@ struct ApplyPseudoTrafficSignalDetectorConfidenceSetAction
   {
     static_assert(0 < Version and Version <= 1);
     if (parameters.size() == 2) {
-      setTrafficLightConfidence(std::stoi(parameters.at(0)), std::stod(parameters.at(1)));
+      setConventionalTrafficLightConfidence(std::stoi(parameters.at(0)), std::stod(parameters.at(1)));
     } else {
       throw Error(
         "An unexpected number of arguments were passed to "

@@ -573,9 +573,9 @@ public:
     }
 
     template <typename... Ts>
-    static auto setTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
+    static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
     {
-      return core->setTrafficLightConfidence(std::forward<decltype(xs)>(xs)...);
+      return core->setConventionalTrafficLightConfidence(std::forward<decltype(xs)>(xs)...);
     }
   };
 };
