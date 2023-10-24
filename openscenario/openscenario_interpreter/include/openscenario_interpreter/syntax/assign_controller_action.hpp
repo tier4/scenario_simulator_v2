@@ -46,7 +46,7 @@ struct AssignControllerAction : public ComplexType, private SimulatorCore::Actio
 
   explicit AssignControllerAction(const pugi::xml_node &, Scope &);
 
-  auto operator()(const String &) const -> void;
+  auto operator()(const EntityRef &) const -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

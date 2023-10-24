@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 

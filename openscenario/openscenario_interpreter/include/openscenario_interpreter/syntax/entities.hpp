@@ -17,6 +17,7 @@
 
 #include <list>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <pugixml.hpp>
 #include <set>
@@ -41,9 +42,9 @@ struct Entities
 
   explicit Entities(const pugi::xml_node &, Scope &);
 
-  auto isAdded(const String &) const -> bool;
+  auto isAdded(const EntityRef &) const -> bool;
 
-  auto ref(const String &) const -> Object;
+  auto ref(const EntityRef &) const -> Object;
 
   auto objects(const std::list<String> &) const -> std::set<String>;
 

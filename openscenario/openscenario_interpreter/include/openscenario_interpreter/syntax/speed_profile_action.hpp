@@ -47,7 +47,7 @@ struct SpeedProfileAction : private Scope,  // NOTE: Required for access to acto
      Reference entity. If set, the speed values will be interpreted as relative
      delta to the speed of the referenced entity.
   */
-  const String entity_ref;
+  const EntityRef entity_ref;
 
   /*
      Defines whether to apply strictly linear interpolation between speed
@@ -74,7 +74,7 @@ struct SpeedProfileAction : private Scope,  // NOTE: Required for access to acto
 
   auto accomplished() -> bool;
 
-  auto apply(const String &, const SpeedProfileEntry &) -> void;
+  auto apply(const EntityRef &, const SpeedProfileEntry &) -> void;
 
   auto endsImmediately() const -> bool;
 

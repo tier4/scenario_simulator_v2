@@ -17,7 +17,7 @@
 
 #include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 #include <utility>
 
@@ -34,7 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntityRef : public String
 {
-  EntityRef() = default;
+  EntityRef(const String & string) : String(string) {}
 
   template <typename Candidates>
   explicit EntityRef(const pugi::xml_node & node, Scope & scope, const Candidates & candidates)

@@ -17,7 +17,6 @@
 
 #include <boost/range/adaptors.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/entities.hpp>
 #include <string>
 
 namespace openscenario_interpreter

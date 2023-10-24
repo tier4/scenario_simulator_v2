@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
@@ -45,7 +46,7 @@ auto AddEntityAction::endsImmediately() noexcept -> bool  //
   return true;
 }
 
-auto AddEntityAction::operator()(const String & entity_ref) const -> void
+auto AddEntityAction::operator()(const EntityRef & entity_ref) const -> void
 try {
   const auto entity = global().entities->ref(entity_ref);
 

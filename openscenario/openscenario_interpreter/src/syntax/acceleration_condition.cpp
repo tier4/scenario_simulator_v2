@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/acceleration_condition.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
 namespace openscenario_interpreter

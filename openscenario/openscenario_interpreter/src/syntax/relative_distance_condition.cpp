@@ -58,7 +58,7 @@ auto RelativeDistanceCondition::description() const -> String
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, false>(
-  const String & triggering_entity) -> double
+  const EntityRef & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -72,7 +72,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, true>(
-  const String & triggering_entity) -> double
+  const EntityRef & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -85,7 +85,7 @@ auto RelativeDistanceCondition::distance<
 
 template <>
 auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::lateral, false>(const String & triggering_entity)
+  CoordinateSystem::entity, RelativeDistanceType::lateral, false>(const EntityRef & triggering_entity)
   -> double
 {
   if (
@@ -99,8 +99,8 @@ auto RelativeDistanceCondition::distance<
 
 template <>
 auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::lateral, true>(
-  const String & triggering_entity) -> double
+  CoordinateSystem::entity, RelativeDistanceType::lateral, true>(const EntityRef & triggering_entity)
+  -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -114,7 +114,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true>(
-  const String & triggering_entity) -> double
+  const EntityRef & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -130,7 +130,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(
-  const String & triggering_entity) -> double
+  const EntityRef & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -145,7 +145,7 @@ auto RelativeDistanceCondition::distance<
 
 template <>
 auto RelativeDistanceCondition::distance<
-  CoordinateSystem::lane, RelativeDistanceType::lateral, false>(const String & triggering_entity)
+  CoordinateSystem::lane, RelativeDistanceType::lateral, false>(const EntityRef & triggering_entity)
   -> double
 {
   if (
@@ -159,7 +159,7 @@ auto RelativeDistanceCondition::distance<
 
 template <>
 auto RelativeDistanceCondition::distance<
-  CoordinateSystem::lane, RelativeDistanceType::lateral, true>(const String & triggering_entity)
+  CoordinateSystem::lane, RelativeDistanceType::lateral, true>(const EntityRef & triggering_entity)
   -> double
 {
   if (
@@ -176,7 +176,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, false>(
-  const String & triggering_entity) -> double
+  const EntityRef & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -190,7 +190,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, true>(
-  const String & triggering_entity) -> double
+  const EntityRef & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -239,7 +239,7 @@ auto RelativeDistanceCondition::distance<
 
 #define APPLY(F, ...) F(__VA_ARGS__)
 
-auto RelativeDistanceCondition::distance(const String & triggering_entity) -> double
+auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) -> double
 {
   APPLY(SWITCH_COORDINATE_SYSTEM, SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_FREESPACE, DISTANCE);
   return Double::nan();

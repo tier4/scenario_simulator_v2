@@ -34,7 +34,7 @@ struct DeleteEntityAction : private SimulatorCore::ActionApplication
   {
   }
 
-  auto operator()(const String &) const -> void;
+  auto operator()(const EntityRef &) const -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

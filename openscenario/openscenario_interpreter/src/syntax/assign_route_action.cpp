@@ -16,6 +16,8 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/assign_route_action.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/route.hpp>
 #include <vector>
 

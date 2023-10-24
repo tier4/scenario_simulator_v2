@@ -20,6 +20,7 @@
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
@@ -87,10 +88,10 @@ struct DistanceCondition : private Scope,
 
   auto description() const -> std::string;
 
-  auto distance(const String &) const -> double;
+  auto distance(const EntityRef &) const -> double;
 
   template <CoordinateSystem::value_type, RelativeDistanceType::value_type, bool>
-  auto distance(const String &) const -> double
+  auto distance(const EntityRef &) const -> double
   {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
@@ -102,16 +103,16 @@ struct DistanceCondition : private Scope,
 // cspell: ignore euclidian
 
 // clang-format off
-template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const String &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const String &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const String &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           true >(const String &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const String &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      true >(const String &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           false>(const String &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           true >(const String &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const String &) const -> double;
-template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      true >(const String &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           true >(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      true >(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           true >(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      true >(const EntityRef &) const -> double;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter

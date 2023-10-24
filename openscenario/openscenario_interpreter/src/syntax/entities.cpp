@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 
@@ -36,7 +37,7 @@ Entities::Entities(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto Entities::isAdded(const String & entity_ref) const -> bool
+auto Entities::isAdded(const EntityRef & entity_ref) const -> bool
 {
   auto object_list = objects({entity_ref});
   return std::all_of(std::begin(object_list), std::end(object_list), [&](const String & object) {
@@ -50,7 +51,7 @@ auto Entities::isAdded(const String & entity_ref) const -> bool
   });
 }
 
-auto Entities::ref(const String & entity_ref) const -> Object
+auto Entities::ref(const EntityRef & entity_ref) const -> Object
 {
   if (auto entry = entities.find(entity_ref); entry == std::end(entities)) {
     throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");

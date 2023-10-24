@@ -14,6 +14,8 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/controller_action.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 
 namespace openscenario_interpreter
 {

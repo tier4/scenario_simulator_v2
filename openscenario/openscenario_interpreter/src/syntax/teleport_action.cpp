@@ -16,6 +16,8 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/teleport_action.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -60,7 +62,7 @@ auto TeleportAction::start() const -> void
   }
 }
 
-auto TeleportAction::teleport(const String & entity_ref, const Position & position) -> void
+auto TeleportAction::teleport(const EntityRef & entity_ref, const Position & position) -> void
 {
   auto teleport = overload(
     [&](const WorldPosition & position) {

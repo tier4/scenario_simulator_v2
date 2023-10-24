@@ -16,6 +16,9 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/reader/name_ref.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/speed_profile_action.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
@@ -48,7 +51,7 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
   }
 }
 
-auto SpeedProfileAction::apply(const String & actor, const SpeedProfileEntry & speed_profile_entry)
+auto SpeedProfileAction::apply(const EntityRef & actor, const SpeedProfileEntry & speed_profile_entry)
   -> void
 {
   auto absolute_target_speed = [&]() { return speed_profile_entry.speed; };

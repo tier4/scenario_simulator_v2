@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/position.hpp>
 #include <pugixml.hpp>
 
@@ -49,7 +50,7 @@ struct TeleportAction : private Scope, private SimulatorCore::ActionApplication
 
   /*  */ auto start() const -> void;
 
-  static auto teleport(const String &, const Position &) -> void;
+  static auto teleport(const EntityRef &, const Position &) -> void;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

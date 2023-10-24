@@ -41,7 +41,7 @@ AssignControllerAction::AssignControllerAction(const pugi::xml_node & node, Scop
 {
 }
 
-auto AssignControllerAction::operator()(const String & entity_ref) const -> void
+auto AssignControllerAction::operator()(const EntityRef & entity_ref) const -> void
 {
   if (is<Controller>()) {
     applyAssignControllerAction(entity_ref, as<Controller>());

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/stand_still_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 

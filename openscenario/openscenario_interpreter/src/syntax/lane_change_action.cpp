@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/syntax/absolute_target_lane.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/lane_change_action.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/relative_target_lane.hpp>
 
 namespace openscenario_interpreter
