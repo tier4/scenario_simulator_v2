@@ -51,8 +51,8 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
   }
 }
 
-auto SpeedProfileAction::apply(const EntityRef & actor, const SpeedProfileEntry & speed_profile_entry)
-  -> void
+auto SpeedProfileAction::apply(
+  const EntityRef & actor, const SpeedProfileEntry & speed_profile_entry) -> void
 {
   auto absolute_target_speed = [&]() { return speed_profile_entry.speed; };
 

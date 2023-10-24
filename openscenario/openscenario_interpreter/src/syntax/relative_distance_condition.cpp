@@ -85,8 +85,8 @@ auto RelativeDistanceCondition::distance<
 
 template <>
 auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::lateral, false>(const EntityRef & triggering_entity)
-  -> double
+  CoordinateSystem::entity, RelativeDistanceType::lateral, false>(
+  const EntityRef & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
@@ -99,8 +99,8 @@ auto RelativeDistanceCondition::distance<
 
 template <>
 auto RelativeDistanceCondition::distance<
-  CoordinateSystem::entity, RelativeDistanceType::lateral, true>(const EntityRef & triggering_entity)
-  -> double
+  CoordinateSystem::entity, RelativeDistanceType::lateral, true>(
+  const EntityRef & triggering_entity) -> double
 {
   if (
     global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
