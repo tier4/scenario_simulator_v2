@@ -15,8 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_ITERATOR_HPP_
 #define OPENSCENARIO_INTERPRETER__TYPE_TRAITS__HAS_ITERATOR_HPP_
 
-#include <openscenario_interpreter/type_traits/void_t.hpp>
 #include <iterator>
+#include <openscenario_interpreter/type_traits/void_t.hpp>
 #include <utility>
 
 namespace openscenario_interpreter

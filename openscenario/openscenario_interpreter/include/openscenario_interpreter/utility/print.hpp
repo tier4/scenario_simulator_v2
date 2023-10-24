@@ -17,10 +17,9 @@
 
 #include <iomanip>
 #include <iostream>
-#include <type_traits>
-
-#include <openscenario_interpreter/type_traits/has_stream_output_operator.hpp>
 #include <openscenario_interpreter/type_traits/has_iterator.hpp>
+#include <openscenario_interpreter/type_traits/has_stream_output_operator.hpp>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
@@ -35,7 +34,8 @@ auto print_to(std::ostream & os, const T & value)
 
 template <typename T>
 auto print_to(std::ostream & os, const T & iterable) -> std::enable_if_t<
-  not concepts::HasStreamOutputOperator<T>::value and type_traits::HasIterator<T>::value, std::ostream &>
+  not concepts::HasStreamOutputOperator<T>::value and type_traits::HasIterator<T>::value,
+  std::ostream &>
 {
   os << "[";
   const auto * separator = "";
