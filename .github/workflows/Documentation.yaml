@@ -30,8 +30,6 @@ jobs:
           poetry-version: "1.5.1"
       - name: install
         run: poetry install --no-interaction
-      - name: Install doxygen/depends of doxybook
-        run: sudo apt install -y doxygen wget
       - name: Generate documentation
         run: poetry run mkdocs build
       - name: Upload Artifact
@@ -48,3 +46,18 @@ jobs:
           publish_dir: site
           keep_files: false
           external_repository: tier4/scenario_simulator_v2-docs
+  generate_api_document: 
+    name: Generate API documentation
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2-beta
+      - name: Install doxygen
+        run: sudo apt install -y doxygen
+      - name: Build document
+        run: doxygen Doxyfile
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: api_documentation_site
+          path: html
+          retention-days: 1
