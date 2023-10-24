@@ -229,7 +229,9 @@ public:
   auto insert(const Name &, const Object &) -> void;
 
   // OpenScenario 1.2 Annex B
-  auto entities(bool = false, bool = true) -> std::list<std::string>;
+  auto entities(
+    bool entity_selection_allowed = false,
+    bool misc_object_and_external_object_reference_allowed = true) -> std::list<std::string>;
 };
 }  // namespace openscenario_interpreter
 
