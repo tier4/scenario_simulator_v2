@@ -16,13 +16,14 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_REF_HPP_
 
 #include <openscenario_interpreter/reader/name_ref.hpp>
-#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 #include <utility>
 
 namespace openscenario_interpreter
 {
+class Scope;
+
 inline namespace syntax
 {
 /* ---- EntityRef --------------------------------------------------------------
