@@ -61,7 +61,12 @@ public:
 
   virtual void cancelRequest();
 
-#define DEFINE_GETTER(NAME, TYPE, RETURN_VARIABLE) \
+#define DEFINE_GETTER(NAME, TYPE, RETURN_VARIABLE)              \
+  /**                                                           \
+   @brief Get NAME of the entity.                               \
+   @return NAME of the entity.                                  \
+   @note This function was defined by DEFINE_GETTER function .  \
+   */                                                           \
   /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
 
   // clang-format off

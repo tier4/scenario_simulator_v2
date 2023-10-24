@@ -272,6 +272,11 @@ public:
     const lane_change::Constraint & constraint);
 
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
+  /*!                                                                      \
+   @brief Forward to arguments to the EntityManager::NAME function.        \
+   @return return value of the EntityManager::NAME function.               \
+   @note This function was defined by FORWARD_TO_ENTITY_MANAGER macro.     \
+   */                                                                      \
   template <typename... Ts>                                                \
   decltype(auto) NAME(Ts &&... xs)                                         \
   {                                                                        \
