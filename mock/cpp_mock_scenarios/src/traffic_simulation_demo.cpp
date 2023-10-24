@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class TrafficSimulationDemoScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -146,6 +148,7 @@ private:
 private:
   bool lanechange_executed_;
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
