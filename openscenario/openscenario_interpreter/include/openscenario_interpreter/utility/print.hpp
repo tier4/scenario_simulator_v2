@@ -17,8 +17,8 @@
 
 #include <iomanip>
 #include <iostream>
-#include <openscenario_interpreter/type_traits/iterable.hpp>
 #include <openscenario_interpreter/type_traits/has_stream_output_operator.hpp>
+#include <openscenario_interpreter/type_traits/iterable.hpp>
 #include <type_traits>
 
 namespace openscenario_interpreter
