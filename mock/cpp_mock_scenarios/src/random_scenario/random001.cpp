@@ -54,6 +54,19 @@ private:
       0.0, params_.random_parameters.road_parking_vehicle.s_variance);
     const auto spawn_road_parking_vehicle =
       [&](const auto & entity_index, const auto offset, const auto number_of_vehicles) {
+        const auto get_entity_subtype = [](const std::string & entity_type) {
+          if (entity_type == "car") {
+            return traffic_simulator_msgs::msg::EntitySubtype::CAR;
+          } else if (entity_type == "truck") {
+            return traffic_simulator_msgs::msg::EntitySubtype::TRUCK;
+          } else if (entity_type == "bus") {
+            return traffic_simulator_msgs::msg::EntitySubtype::BUS;
+          } else if (entity_type == "trailer") {
+            return traffic_simulator_msgs::msg::EntitySubtype::TRAILER;
+          }
+          return traffic_simulator_msgs::msg::EntitySubtype::CAR;
+        };
+
         std::string entity_name = "road_parking_" + std::to_string(entity_index);
         constexpr lanelet::Id spawn_lanelet_id = 34705;
         api_.spawn(
@@ -64,7 +77,8 @@ private:
                 api_.getLaneletLength(spawn_lanelet_id) +
               normal_dist(engine_),
             offset, 0, 0)),
-          getVehicleParameters());
+          getVehicleParameters(
+            get_entity_subtype(params_.random_parameters.road_parking_vehicle.entity_type)));
         api_.requestSpeedChange(entity_name, 0, true);
       };
     std::uniform_real_distribution<> dist(
