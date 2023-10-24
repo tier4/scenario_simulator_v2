@@ -32,14 +32,14 @@ SelectedEntityRefs::SelectedEntityRefs(const pugi::xml_node & tree, Scope & scop
 {
 }
 
-auto SelectedEntityRefs::objects(const Entities & entities) -> std::set<String>
+auto SelectedEntityRefs::objects(const Entities & entities) -> std::set<EntityRef>
 {
-  return entities.objects(std::list<String>(std::begin(entityRefs), std::end(entityRefs)));
+  return entities.objects(entityRefs);
 }
 
 auto SelectedEntityRefs::objectTypes(const Entities & entities) -> std::set<ObjectType::value_type>
 {
-  return entities.objectTypes(std::list<String>(std::begin(entityRefs), std::end(entityRefs)));
+  return entities.objectTypes(entityRefs);
 }
 
 SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
@@ -47,9 +47,9 @@ SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
 {
 }
 
-auto SelectedByTypes::objects(const Entities & entities) -> std::set<String>
+auto SelectedByTypes::objects(const Entities & entities) -> std::set<EntityRef>
 {
-  auto selected_entities = std::set<String>();
+  auto selected_entities = std::set<EntityRef>();
   auto object_types = objectTypes(entities);
   for (const auto & [name, object] : entities.entities) {
     if (
@@ -76,9 +76,9 @@ SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
 {
 }
 
-auto SelectedEntities::objects(const Entities & entities) -> std::set<String>
+auto SelectedEntities::objects(const Entities & entities) -> std::set<EntityRef>
 {
-  return apply<std::set<String>>([&](auto & e) { return e.objects(entities); }, *this);
+  return apply<std::set<EntityRef>>([&](auto & e) { return e.objects(entities); }, *this);
 }
 
 auto SelectedEntities::objectTypes(const Entities & entities) -> std::set<ObjectType::value_type>

@@ -46,9 +46,9 @@ struct Entities
 
   auto ref(const EntityRef &) const -> Object;
 
-  auto objects(const std::list<String> &) const -> std::set<String>;
+  auto objects(const std::list<EntityRef> &) const -> std::set<EntityRef>;
 
-  auto objectTypes(const std::list<String> &) const -> std::set<ObjectType::value_type>;
+  auto objectTypes(const std::list<EntityRef> &) const -> std::set<ObjectType::value_type>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

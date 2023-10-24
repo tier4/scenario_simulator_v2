@@ -30,7 +30,7 @@ struct SelectedEntityRefs : public Object
 
   explicit SelectedEntityRefs(const pugi::xml_node &, Scope &);
 
-  auto objects(const Entities &) -> std::set<String>;
+  auto objects(const Entities &) -> std::set<EntityRef>;
 
   auto objectTypes(const Entities &) -> std::set<ObjectType::value_type>;
 };
@@ -41,7 +41,7 @@ struct SelectedByTypes : public Object
 
   explicit SelectedByTypes(const pugi::xml_node &, Scope &);
 
-  auto objects(const Entities &) -> std::set<String>;
+  auto objects(const Entities &) -> std::set<EntityRef>;
 
   auto objectTypes(const Entities &) -> std::set<ObjectType::value_type>;
 };
@@ -60,7 +60,7 @@ struct SelectedEntities : public ComplexType
 {
   explicit SelectedEntities(const pugi::xml_node &, Scope &);
 
-  auto objects(const Entities & entities) -> std::set<String>;
+  auto objects(const Entities & entities) -> std::set<EntityRef>;
 
   auto objectTypes(const Entities & entities) -> std::set<ObjectType::value_type>;
 };

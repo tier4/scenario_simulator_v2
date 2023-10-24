@@ -60,9 +60,9 @@ auto Entities::ref(const EntityRef & entity_ref) const -> Object
   }
 }
 
-auto Entities::objects(const std::list<String> & entity_refs) const -> std::set<String>
+auto Entities::objects(const std::list<EntityRef> & entity_refs) const -> std::set<EntityRef>
 {
-  auto object_set = std::set<String>();
+  auto object_set = std::set<EntityRef>();
   for (auto & entity_ref : entity_refs) {
     if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
       object_set.emplace(entity_ref);
@@ -75,7 +75,7 @@ auto Entities::objects(const std::list<String> & entity_refs) const -> std::set<
   return object_set;
 }
 
-auto Entities::objectTypes(const std::list<String> & entity_refs) const
+auto Entities::objectTypes(const std::list<EntityRef> & entity_refs) const
   -> std::set<ObjectType::value_type>
 {
   auto type_set = std::set<ObjectType::value_type>();
