@@ -72,3 +72,18 @@ random001:
         description: "Variance of the normal distribution of the s value in the road parking vehicle. Distribution type is normal distribution."
         validation:
           bounds<>: [0.0, 2.5]
+      entity_type:
+        type: string
+        default_value: "car"
+        description: "Type of the road parking vehicle entity."
+        read_only: false
+        validation:
+          one_of<>:
+            [
+              [
+                "car",
+                "truck",
+                "bus",
+                "trailer",
+              ],
+            ]
