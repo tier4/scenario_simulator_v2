@@ -26,6 +26,7 @@ INPUT                  += simulation/do_nothing_plugin
 INPUT                  += simulation/simple_sensor_simulator
 INPUT                  += simulation/simulation_interface
 INPUT                  += simulation/traffic_simulator
+INPUT                  += openscenario/openscenario_interpreter
 
 IMAGE_PATH             += common/math/geometry
 IMAGE_PATH             += common/math/arithmetic
@@ -39,6 +40,7 @@ IMAGE_PATH             += simulation/do_nothing_plugin
 IMAGE_PATH             += simulation/simple_sensor_simulator
 IMAGE_PATH             += simulation/simulation_interface
 IMAGE_PATH             += simulation/traffic_simulator
+IMAGE_PATH             += openscenario/openscenario_interpreter
 
 EXAMPLE_PATH           += common/math/geometry
 EXAMPLE_PATH           += common/scenario_simulator_exception
@@ -52,6 +54,7 @@ EXAMPLE_PATH           += simulation/do_nothing_plugin
 EXAMPLE_PATH           += simulation/simple_sensor_simulator
 EXAMPLE_PATH           += simulation/simulation_interface
 EXAMPLE_PATH           += simulation/traffic_simulator
+EXAMPLE_PATH           += openscenario/openscenario_interpreter
 
 INPUT_ENCODING         = UTF-8
 MACRO_EXPANSION        = YES
@@ -65,10 +68,13 @@ FILE_PATTERNS += *.hpp
 FILE_PATTERNS += *.cpp
 FILE_PATTERNS += *.md
 
+EXPAND_AS_DEFINED += BOILERPLATE
+EXPAND_AS_DEFINED += CASE
 EXPAND_AS_DEFINED += DEFINE_CHECK_FUNCTION
 EXPAND_AS_DEFINED += DEFINE_ERROR_CATEGORY
 EXPAND_AS_DEFINED += DEFINE_GETTER
 EXPAND_AS_DEFINED += DEFINE_GETTER_SETTER
+EXPAND_AS_DEFINED += DEFINE_LAZY_VISITOR
 EXPAND_AS_DEFINED += DEFINE_STATIC_DATA_MEMBER_DETECTOR
 EXPAND_AS_DEFINED += EMPLACE
 EXPAND_AS_DEFINED += EXPECT_ACCEL_EQ
