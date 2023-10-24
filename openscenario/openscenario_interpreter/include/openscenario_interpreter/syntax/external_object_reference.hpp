@@ -36,7 +36,6 @@ struct ExternalObjectReference
 
   explicit ExternalObjectReference(const pugi::xml_node & node, Scope & scope);
 };
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
