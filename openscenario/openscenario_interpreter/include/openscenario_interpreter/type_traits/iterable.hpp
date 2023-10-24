@@ -24,12 +24,12 @@ namespace openscenario_interpreter
 inline namespace type_traits
 {
 template <typename T, typename = void>
-struct HasIterator : public std::false_type
+struct Iterable : public std::false_type
 {
 };
 
 template <typename T>
-struct HasIterator<T, void_t<decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()))>>
+struct Iterable<T, void_t<decltype(std::begin(std::declval<T>()), std::end(std::declval<T>()))>>
 : public std::true_type
 {
 };
