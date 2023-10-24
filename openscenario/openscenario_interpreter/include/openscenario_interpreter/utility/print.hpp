@@ -19,37 +19,23 @@
 #include <iostream>
 #include <type_traits>
 
+#include <openscenario_interpreter/type_traits/has_stream_output_operator.hpp>
+#include <openscenario_interpreter/type_traits/has_iterator.hpp>
+
 namespace openscenario_interpreter
 {
 inline namespace utility
 {
-namespace internal
-{
-template <typename T, typename Enabler = void>
-inline constexpr bool has_ostream_operator_v = false;
-template <typename T>
-inline constexpr bool has_ostream_operator_v<
-  T, std::void_t<decltype(std::declval<std::ostream &>() << std::declval<T &>())>> = true;
-
-template <typename T, typename Enabler = void>
-inline constexpr bool is_iterable_v = false;
-template <typename T>
-inline constexpr bool is_iterable_v<
-  T,
-  std::void_t<decltype(std::begin(std::declval<T &>())), decltype(std::end(std::declval<T &>()))>> =
-  true;
-}  // namespace internal
-
 template <typename T>
 auto print_to(std::ostream & os, const T & value)
-  -> std::enable_if_t<internal::has_ostream_operator_v<T>, std::ostream &>
+  -> std::enable_if_t<concepts::HasStreamOutputOperator<T>::value, std::ostream &>
 {
   return os << value;
 }
 
 template <typename T>
 auto print_to(std::ostream & os, const T & iterable) -> std::enable_if_t<
-  not internal::has_ostream_operator_v<T> and internal::is_iterable_v<T>, std::ostream &>
+  not concepts::HasStreamOutputOperator<T>::value and type_traits::HasIterator<T>::value, std::ostream &>
 {
   os << "[";
   const auto * separator = "";
