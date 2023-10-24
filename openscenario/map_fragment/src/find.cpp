@@ -128,6 +128,24 @@ try {
     }(),
 
     [&]() {
+      node.declare_parameter("right_of", lanelet::Id());
+      const auto left_id = node.get_parameter("right_of").as_int();
+      return [&, left_id](const auto & lanelet) {
+        auto is_right_of = [&](auto left_id) {
+          auto left = map->laneletLayer.find(left_id);
+          return left != map->laneletLayer.end() and lanelet::geometry::rightOf(lanelet, *left);
+        };
+        auto discard = [&]() {
+          std::cerr << "[" << lanelet.id()
+                    << "] discarded: The lanelet is not to the right of the lanelet with ID "
+                    << left_id << "." << std::endl;
+          return false;
+        };
+        return not left_id or is_right_of(left_id) or discard();
+      };
+    }(),
+
+    [&]() {
       node.declare_parameter("leftmost", false);
       const auto constrained = node.get_parameter("leftmost").as_bool();
       return [&, constrained](const auto & lanelet) {
