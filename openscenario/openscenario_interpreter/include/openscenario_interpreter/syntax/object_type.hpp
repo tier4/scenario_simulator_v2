@@ -44,9 +44,9 @@ struct ObjectType
   enum value_type {
     vehicle,
 
-    pedestrian,
-    miscellaneous,
     external,
+    miscellaneous,
+    pedestrian,
   } value;
 
   ObjectType() = default;
@@ -57,7 +57,6 @@ struct ObjectType
 auto operator>>(std::istream &, ObjectType &) -> std::istream &;
 
 auto operator<<(std::ostream &, const ObjectType &) -> std::ostream &;
-
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
