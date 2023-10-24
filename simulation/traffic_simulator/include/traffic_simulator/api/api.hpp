@@ -280,6 +280,7 @@ public:
   }                                                                        \
   static_assert(true, "")
 
+  FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
   FORWARD_TO_ENTITY_MANAGER(asFieldOperatorApplication);
   FORWARD_TO_ENTITY_MANAGER(cancelRequest);
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
@@ -308,6 +309,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
+  FORWARD_TO_ENTITY_MANAGER(getMapPoseFromRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
@@ -322,7 +324,8 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
-  FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
+  FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
+  FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setBehaviorParameter);
@@ -330,8 +333,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
-  FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
-  FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 #undef FORWARD_TO_ENTITY_MANAGER

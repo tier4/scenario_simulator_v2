@@ -189,6 +189,7 @@ private:
   }
   void onInitialize() override
   {
+    // api_.setVerbose(true);
     params_ = param_listener_->get_params();
 
     /// Spawn road parking vehicle with initial parameters.
@@ -198,6 +199,14 @@ private:
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0)),
       {api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0))},
       getVehicleParameters());
+    api_.spawn(
+      "parking_outside",
+      api_.getMapPoseFromRelativePose(
+        "ego", geometry_msgs::build<geometry_msgs::msg::Pose>()
+                 .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(15).z(0))
+                 .orientation(geometry_msgs::msg::Quaternion())),
+      getVehicleParameters(),
+      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
   }
 };
 
