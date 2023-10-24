@@ -55,9 +55,9 @@ auto SpeedCondition::evaluate() -> Object
       std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [&](const auto & object) { return evaluateSpeed(object); });
 
-    return not objects.empty() and std::all_of(
-                                     std::begin(results.back()), std::end(results.back()),
-                                     [&](auto speed) { return compare(speed, value); });
+    return std::all_of(std::begin(results.back()), std::end(results.back()), [&](auto speed) {
+      return compare(speed, value);
+    });
   }));
 }
 }  // namespace syntax

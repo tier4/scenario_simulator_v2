@@ -255,9 +255,9 @@ auto RelativeDistanceCondition::evaluate() -> Object
       std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [&](const auto & object) { return distance(object); });
 
-    return not objects.empty() and std::all_of(
-                                     std::begin(results.back()), std::end(results.back()),
-                                     [&](auto distance) { return rule(distance, value); });
+    return std::all_of(std::begin(results.back()), std::end(results.back()), [&](auto distance) {
+      return rule(distance, value);
+    });
   }));
 }
 }  // namespace syntax
