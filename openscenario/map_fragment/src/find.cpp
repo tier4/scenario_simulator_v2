@@ -15,6 +15,7 @@
 #include <map_fragment/constraint.hpp>
 #include <map_fragment/filter.hpp>
 #include <map_fragment/map_fragment.hpp>
+#include <map_fragment/printer.hpp>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
 
@@ -60,52 +61,11 @@ try {
     });
   };
 
-  auto receive = [&](auto && results) -> decltype(auto) {
-    if (1 < results.size()) {
-      auto sort = [&]() {
-        std::sort(results.begin(), results.end(), [](const auto & a, const auto & b) {
-          return a.id() < b.id();
-        });
-      };
+  node.declare_parameter("select", "any");
 
-      auto shuffle = [&]() {
-        auto device = std::random_device();
-        auto engine = std::mt19937(device());
-        std::shuffle(results.begin(), results.end(), engine);
-      };
+  filter(satisfy, map->laneletLayer, loadBasicPrinter(node));
 
-      auto all = [&]() {
-        for (const auto & result : results) {
-          std::cout << result.id() << std::endl;
-        }
-      };
-
-      auto first = [&]() { std::cout << results.front().id() << std::endl; };
-
-      node.declare_parameter("select", "only");
-
-      if (const auto select = node.get_parameter("select").as_string(); select == "all") {
-        sort();
-        all();
-      } else if (select == "any") {
-        shuffle();
-        first();
-      } else if (select == "first") {
-        sort();
-        first();
-      } else {
-        std::stringstream what;
-        what << "There are " << results.size() << " candidates that satisfy the constraints.";
-        throw std::runtime_error(what.str());
-      }
-    } else if (0 < results.size()) {
-      std::cout << results.front().id() << std::endl;
-    } else {
-      throw std::runtime_error("There is no candidate that satisfies the constraints.");
-    }
-  };
-
-  filter(satisfy, map->laneletLayer, receive);
+  return EXIT_SUCCESS;
 } catch (const std::exception & exception) {
   std::cerr << exception.what() << std::endl;
   return EXIT_FAILURE;
