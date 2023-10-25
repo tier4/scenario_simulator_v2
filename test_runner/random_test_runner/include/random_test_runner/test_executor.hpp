@@ -36,7 +36,7 @@ public:
     ArchitectureType architecture_type, rclcpp::Logger logger);
 
   void initialize();
-  void update(double current_time);
+  void update();
   void deinitialize();
   bool scenarioCompleted();
 

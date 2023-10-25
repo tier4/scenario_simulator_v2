@@ -128,8 +128,19 @@ void TestExecutor::initialize()
   }
 }
 
-void TestExecutor::update(double current_time)
+void TestExecutor::update()
 {
+  if (!api_->isEgoSpawned() && !api_->isNpcLogicStarted()) {
+    api_->startNpcLogic();
+  }
+  if (
+    api_->isEgoSpawned() && !api_->isNpcLogicStarted() &&
+    api_->asFieldOperatorApplication(api_->getEgoName()).engageable()) {
+    api_->startNpcLogic();
+  }
+
+  auto current_time = api_->getCurrentTime();
+
   if (!std::isnan(current_time)) {
     bool timeout_reached = current_time >= test_timeout;
     if (timeout_reached) {
