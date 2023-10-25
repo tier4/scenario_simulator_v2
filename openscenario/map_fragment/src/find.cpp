@@ -83,9 +83,8 @@ try {
       auto first = [&]() { std::cout << results.front().id() << std::endl; };
 
       node.declare_parameter("select", "only");
-      const auto select = node.get_parameter("select").as_string();
 
-      if (select == "all") {
+      if (const auto select = node.get_parameter("select").as_string(); select == "all") {
         sort();
         all();
       } else if (select == "any") {

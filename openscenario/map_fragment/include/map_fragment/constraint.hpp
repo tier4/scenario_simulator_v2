@@ -83,25 +83,27 @@ auto loadBasicConstraints(const Node & node)
   }
 
   if (node.has_parameter("left_of")) {
-    const auto right_id = node.get_parameter("left_of").as_int();
-    constraints.emplace("left_of", [right_id](auto && lanelet, auto && map, auto &&) {
-      auto is_left_of = [&](auto right_id) {
-        auto right = map.laneletLayer.find(right_id);
-        return right != map.laneletLayer.end() and lanelet::geometry::leftOf(lanelet, *right);
-      };
-      return not right_id or is_left_of(right_id);
-    });
+    if (const auto right_id = node.get_parameter("left_of").as_int(); right_id) {
+      constraints.emplace("left_of", [right_id](auto && lanelet, auto && map, auto &&) {
+        auto is_left_of = [&](auto right_id) {
+          auto right = map.laneletLayer.find(right_id);
+          return right != map.laneletLayer.end() and lanelet::geometry::leftOf(lanelet, *right);
+        };
+        return is_left_of(right_id);
+      });
+    }
   }
 
   if (node.has_parameter("right_of")) {
-    const auto left_id = node.get_parameter("right_of").as_int();
-    constraints.emplace("right_of", [left_id](auto && lanelet, auto && map, auto &&) {
-      auto is_right_of = [&](auto left_id) {
-        auto left = map.laneletLayer.find(left_id);
-        return left != map.laneletLayer.end() and lanelet::geometry::rightOf(lanelet, *left);
-      };
-      return not left_id or is_right_of(left_id);
-    });
+    if (const auto left_id = node.get_parameter("right_of").as_int(); left_id) {
+      constraints.emplace("right_of", [left_id](auto && lanelet, auto && map, auto &&) {
+        auto is_right_of = [&](auto left_id) {
+          auto left = map.laneletLayer.find(left_id);
+          return left != map.laneletLayer.end() and lanelet::geometry::rightOf(lanelet, *left);
+        };
+        return is_right_of(left_id);
+      });
+    }
   }
 
   if (node.has_parameter("leftmost") and node.get_parameter("leftmost").as_bool()) {
