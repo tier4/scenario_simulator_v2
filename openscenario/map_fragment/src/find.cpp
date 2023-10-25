@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <map_fragment/filter.hpp>
 #include <map_fragment/map_fragment.hpp>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
@@ -212,20 +213,6 @@ try {
         return 0 < routing_graph->possiblePaths(lanelet, lower_bound).size() or discard();
       };
     }(),
-  };
-
-  auto filter = [](auto satisfy, auto && iterable, auto current_continuation) -> decltype(auto) {
-    std::vector<typename std::decay_t<decltype(iterable)>::iterator::value_type> values;
-    auto filter = [&](auto filter, auto begin, auto end)
-      -> std::invoke_result_t<decltype(current_continuation), decltype(values)> {
-      if (auto first = std::find_if(begin, end, satisfy); first != end) {
-        values.push_back(*first);
-        return filter(filter, std::next(first), end);
-      } else {
-        return current_continuation(values);
-      }
-    };
-    return filter(filter, iterable.begin(), iterable.end());
   };
 
   auto satisfy = [&](const auto & lanelet) {
