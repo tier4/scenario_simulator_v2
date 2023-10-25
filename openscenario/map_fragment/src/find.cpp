@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <map_fragment/map_fragment.hpp>
+#include <random>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
@@ -234,12 +235,17 @@ try {
 
   auto receive = [&](auto && results) -> decltype(auto) {
     if (1 < results.size()) {
-      if (node.declare_parameter("sort_result", false);
-          node.get_parameter("sort_result").as_bool()) {
+      auto sort = [&]() {
         std::sort(results.begin(), results.end(), [](const auto & a, const auto & b) {
           return a.id() < b.id();
         });
-      }
+      };
+
+      auto shuffle = [&]() {
+        auto device = std::random_device();
+        auto engine = std::mt19937(device());
+        std::shuffle(results.begin(), results.end(), engine);
+      };
 
       auto all = [&]() {
         for (const auto & result : results) {
@@ -247,25 +253,20 @@ try {
         }
       };
 
-      auto any = [&]() { std::cout << results.front().id() << std::endl; };
-
       auto first = [&]() { std::cout << results.front().id() << std::endl; };
-
-      auto random = [&]() {
-        std::cout << results.front().id() << std::endl;  // TODO
-      };
 
       node.declare_parameter("select", "only");
       const auto select = node.get_parameter("select").as_string();
 
       if (select == "all") {
+        sort();
         all();
       } else if (select == "any") {
-        any();
-      } else if (select == "first") {
+        shuffle();
         first();
-      } else if (select == "random") {
-        random();
+      } else if (select == "first") {
+        sort();
+        first();
       } else {
         std::stringstream what;
         what << "There are " << results.size() << " candidates that satisfy the constraints.";
