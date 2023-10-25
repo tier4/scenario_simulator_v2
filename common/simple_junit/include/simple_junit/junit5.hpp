@@ -225,7 +225,7 @@ struct SimpleTestCase
       current_node.append_attribute("status") = testcase.status.c_str();
     }
 
-    /// @todo implement `skipped` emelent in junit.
+    /// @todo implement `skipped` element in junit.
 
     for (const auto & each : testcase.error) {
       current_node.append_child("error") << each;
