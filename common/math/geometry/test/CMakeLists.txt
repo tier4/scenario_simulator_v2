@@ -1,3 +1,5 @@
+add_subdirectory(vector3)
+
 ament_add_gtest(test_bounding_box test_bounding_box.cpp)
 ament_add_gtest(test_catmull_rom_spline test_catmull_rom_spline.cpp)
 ament_add_gtest(test_collision test_collision.cpp)
