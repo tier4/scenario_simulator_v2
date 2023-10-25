@@ -99,6 +99,8 @@ class RandomTestRunnerLaunch(object):
                 {"default": "/tmp",
                  "description": "Directory to which result.yaml and result.junit.xml files will be placed"},
 
+            "initialize_duration": {"default": 30, "description": "How long test runner will wait for Autoware to initialize"},
+
             # test suite arguments #
             "test_name": {"default": "random_test",
                           "description": "Test name. Used for descriptive purposes only"},
