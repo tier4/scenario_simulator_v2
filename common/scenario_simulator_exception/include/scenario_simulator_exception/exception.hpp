@@ -46,6 +46,9 @@ DEFINE_ERROR_CATEGORY(SemanticError);
 /// @brief A problem occurred that interfered with the continuation of the simulation.
 DEFINE_ERROR_CATEGORY(SimulationError);
 
+/// @brief When simulator detects specification violation in simulation.
+DEFINE_ERROR_CATEGORY(SpecificationViolation);
+
 /// @brief  There is a syntactic error in the description of the scenario. Or you are using a feature that is not yet supported by our implementation.
 DEFINE_ERROR_CATEGORY(SyntaxError);
 
