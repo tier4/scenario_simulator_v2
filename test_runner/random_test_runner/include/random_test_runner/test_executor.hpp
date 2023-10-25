@@ -41,6 +41,8 @@ public:
   bool scenarioCompleted();
 
 private:
+  void executeWithErrorHandling(std::function<void()> func);
+
   std::shared_ptr<traffic_simulator::API> api_;
   TestDescription test_description_;
   const std::string ego_name_ = "ego";
