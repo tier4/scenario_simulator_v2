@@ -87,6 +87,22 @@ void TestExecutor::initialize()
       double constexpr detection_update_duration = 0.1;
       api_->attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
         ego_name_, stringFromArchitectureType(architecture_type_), detection_update_duration));
+
+      api_->attachOccupancyGridSensor([&]() {
+        simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+        configuration.set_architecture_type(stringFromArchitectureType(architecture_type_));
+        configuration.set_entity(ego_name_);
+        configuration.set_filter_by_range(true);
+        configuration.set_height(200);
+        configuration.set_range(300);
+        configuration.set_resolution(0.5);
+        configuration.set_update_duration(0.1);
+        configuration.set_width(200);
+        return configuration;
+      }());
+
+      api_->asFieldOperatorApplication(ego_name_).declare_parameter<bool>(
+        "allow_goal_modification", true);
     }
 
     // XXX dirty hack: wait for autoware system to launch
