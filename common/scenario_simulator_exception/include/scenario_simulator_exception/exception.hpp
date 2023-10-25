@@ -55,6 +55,7 @@ DEFINE_ERROR_CATEGORY(SyntaxError);
 
 #define THROW_SEMANTIC_ERROR(...) /*    */ THROW_ERROR(common::SemanticError, __VA_ARGS__)
 #define THROW_SIMULATION_ERROR(...) /*  */ THROW_ERROR(common::SimulationError, __VA_ARGS__)
+#define THROW_SPECIFICATION_VIOLATION(...) THROW_ERROR(common::SpecificationViolation, __VA_ARGS__)
 #define THROW_SYNTAX_ERROR(...) /*      */ THROW_ERROR(common::SyntaxError, __VA_ARGS__)
 }  // namespace scenario_simulator_exception
 }  // namespace common
