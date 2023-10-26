@@ -47,7 +47,7 @@ private:
           "ego",
           api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 30, 0, 0, 0, 0)),
           3.0)) {
-      api_.CancelRequestScenario("ego");
+      api_.cancelRequest("ego");
       canceled = true;
     }
     if (api_.isInLanelet("ego", 34507, 0.1)) {
@@ -73,7 +73,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<CancelRequestScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::CancelRequestScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

@@ -80,7 +80,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<AccelerateAndFollowScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::AccelerateAndFollowScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

@@ -72,7 +72,9 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<RequestSpeedChangeWithTimeConstraintLinearScenario>(options);
+  auto component =
+    std::make_shared<cpp_mock_scenarios::RequestSpeedChangeWithTimeConstraintLinearScenario>(
+      options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
