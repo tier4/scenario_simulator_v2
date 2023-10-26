@@ -246,7 +246,7 @@ OpenSCENARIO standards.
 | PrivateAction.ControllerAction.**OverrideControllerValueAction**                        |  Unsupported   |                                    |                      |
 | PrivateAction.**TeleportAction**                                                        |       ✔        | See [here](#teleportaction)        |                      |
 | PrivateAction.RoutingAction.**AssignRouteAction**                                       |       ✔        |                                    |                      |
-| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  |  Unsupported   |                                    |                      |
+| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  |       ✔        | See [here](#followtrajectoryaction)|                      |
 | PrivateAction.RoutingAction.**AcquirePositionAction**                                   |       ✔        | See [here](#acquirepositionaction) |                      |
 
 ### Conditions
@@ -300,6 +300,22 @@ OpenSCENARIO standards.
 
 - Currently, **only LanePosition** can be specified for element of
   TeleportAction.
+
+### FollowTrajectoryAction
+- Currently, the action handles only "[followingMode](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/FollowingMode.html)" attribute set to  `position` mode.
+
+| followingMode |   Status    |
+|:--------------|:-----------:|
+| position      |      ✔      |
+| follow        | Unsupported |
+
+- Currently, the action only supports [Trajectory](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Trajectory.html) with a [Polyline](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Shape.html) shape.
+
+| Element  |   Status   |
+|:---------|:----------:|
+| Polyline |      ✔     |
+| Clothoid | Unsupported|
+| Nurbs    | Unsupported|
 
 ### AcquirePositionAction
 
