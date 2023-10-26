@@ -66,6 +66,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           personal_token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
-          publish_dir: site
+          publish_dir: html
           keep_files: false
           external_repository: tier4/scenario_simulator_v2-api-docs
