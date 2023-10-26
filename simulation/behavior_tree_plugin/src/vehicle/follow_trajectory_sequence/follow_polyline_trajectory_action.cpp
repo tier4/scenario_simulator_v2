@@ -13,6 +13,9 @@
 // limitations under the License.
 
 #include <behavior_tree_plugin/vehicle/follow_trajectory_sequence/follow_polyline_trajectory_action.hpp>
+#include <limits>
+
+#define MAX_DOUBLE std::numeric_limits<double>::max()
 
 namespace entity_behavior
 {
@@ -62,7 +65,26 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       not getInput<decltype(target_speed)>("target_speed", target_speed) or
       not polyline_trajectory) {
     return BT::NodeStatus::FAILURE;
-  } else if (
+  }
+
+  /**
+     A workaround for issues with too restrictive acceleration and jerk limits.
+
+     Currently this hack is necessary because:
+     1) behavior_parameter.dynamic_constraints are always assigned default values,
+        ignoring entity configuration in the scenario file;
+     2) even if polyline_trajectory->dynamic_constraints_ignorable == true,
+        the constraints are nevertheless taken into consideration
+        in traffic_simulator::follow_trajectory::makeUpdatedStatus
+
+     @todo Address the above points instead of this workaround.
+  */
+  behavior_parameter.dynamic_constraints.max_acceleration = MAX_DOUBLE;
+  behavior_parameter.dynamic_constraints.max_deceleration = MAX_DOUBLE;
+  behavior_parameter.dynamic_constraints.max_acceleration_rate = MAX_DOUBLE;
+  behavior_parameter.dynamic_constraints.max_deceleration_rate = MAX_DOUBLE;
+
+  if (
     const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
       static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
       behavior_parameter, step_time)) {
