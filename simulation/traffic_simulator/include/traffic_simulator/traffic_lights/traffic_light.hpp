@@ -313,8 +313,8 @@ struct TrafficLight
       traffic_light_bulb_proto.set_status(status());
       traffic_light_bulb_proto.set_shape(shape());
       traffic_light_bulb_proto.set_color(color());
-      // NOTE: confidence will be overwritten in TrafficLight::operator() for simulation_api_schema::TrafficLight
-      //      traffic_light_bulb_proto.set_confidence(1.0);
+      // NOTE: confidence will be overwritten in TrafficLight::operator() for simulation_api_schema::TrafficSignal
+      traffic_light_bulb_proto.set_confidence(1.0);
 
       return traffic_light_bulb_proto;
     }
@@ -382,8 +382,6 @@ struct TrafficLight
   auto empty() const { return bulbs.empty(); }
 
   auto set(const std::string & states) -> void;
-
-  auto setConfidence(const float confidence) -> void { this->confidence = confidence; }
 
   friend auto operator<<(std::ostream & os, const TrafficLight & traffic_light) -> std::ostream &;
 
