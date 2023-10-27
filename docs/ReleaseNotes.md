@@ -17,11 +17,9 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature                                  | Brief summary                                                                                                                                 | Category                                           | Pull request                                                      | Contributor                                   |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
-| Deleted entity management                | Fix crash caused by `DeleteEntityAction` by handling deleted entity explicitly.                                                               | `traffic_simulator`                                | [#1096](https://github.com/tier4/scenario_simulator_v2/pull/1096) | [f0reachARR](https://github.com/f0reachARR)   |
-| OpenSCENARIO `RelativeDistanceCondition` | Restore the behavior of the existing distance measurement mode of RelativeDistanceCondition that was changed in #1095.                        | `openscenario_interpreter`                         | [#1121](https://github.com/tier4/scenario_simulator_v2/pull/1121) | [yamacir-kit](https://github.com/yamacir-kit) |
-| Suppression of duplicate node names      | Fix an issue where nodes with the same name were being created. (especially with temporary nodes for `UserDefinedAction.CustomCommandAction`) | `scenario_test_runner`, `openscenario_interpreter` | [#1126](https://github.com/tier4/scenario_simulator_v2/pull/1126) | [lchojnack](https://github.com/lchojnack)     |
+| Feature                                  | Brief summary                                                                                                          | Category                   | Pull request                                                      | Contributor                                   |
+|------------------------------------------|------------------------------------------------------------------------------------------------------------------------|----------------------------|-------------------------------------------------------------------|-----------------------------------------------|
+| OpenSCENARIO `RelativeDistanceCondition` | Restore the behavior of the existing distance measurement mode of RelativeDistanceCondition that was changed in #1095. | `openscenario_interpreter` | [#1121](https://github.com/tier4/scenario_simulator_v2/pull/1121) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 Minor Tweaks :oncoming_police_car:
 
