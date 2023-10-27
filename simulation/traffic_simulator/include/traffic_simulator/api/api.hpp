@@ -271,6 +271,7 @@ public:
     const lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
+// clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
    @brief Forward to arguments to the EntityManager::NAME function.        \
@@ -284,6 +285,7 @@ public:
     return (*entity_manager_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
   }                                                                        \
   static_assert(true, "")
+  // clang-format on
 
   FORWARD_TO_ENTITY_MANAGER(asFieldOperatorApplication);
   FORWARD_TO_ENTITY_MANAGER(cancelRequest);

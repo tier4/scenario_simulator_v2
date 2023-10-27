@@ -231,6 +231,7 @@ public:
     v2i_traffic_light_updater_.resetUpdateRate(rate);
   }
 
+// clang-format off
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   /*!                                                                 \
    @brief Forward to arguments to the HDMapUtils::NAME function.      \
@@ -243,26 +244,29 @@ public:
     return hdmap_utils_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
   }                                                                   \
   static_assert(true, "")
+  // clang-format on
 
   FORWARD_TO_HDMAP_UTILS(toLaneletPose);
   // FORWARD_TO_HDMAP_UTILS(toMapPose);
 
 #undef FORWARD_TO_HDMAP_UTILS
 
-#define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                     \
-  /*!                                                                          \
-   @brief Forward to arguments to the EntityBase::IDENTIFIER function.         \
-   @return return value of the EntityBase::IDENTIFIER function.                \
-   @note This function was defined by FORWARD_TO_ENTITY macro.    　　　　　　 \
-   */                                                                          \
-  template <typename... Ts>                                                    \
-  decltype(auto) IDENTIFIER(const std::string & name, Ts &&... xs) __VA_ARGS__ \
-  try {                                                                        \
-    return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);  \
-  } catch (const std::out_of_range &) {                                        \
-    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");                 \
-  }                                                                            \
+// clang-format off
+#define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
+  /*!                                                                            \
+   @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
+   @return return value of the EntityBase::IDENTIFIER function.                  \
+   @note This function was defined by FORWARD_TO_ENTITY macro.    　　　　　　   \
+   */                                                                            \
+  template <typename... Ts>                                                      \
+  decltype(auto) IDENTIFIER(const std::string & name, Ts &&... xs) __VA_ARGS__   \
+  try {                                                                          \
+    return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);    \
+  } catch (const std::out_of_range &) {                                          \
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");                   \
+  }                                                                              \
   static_assert(true, "")
+  // clang-format on
 
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
   FORWARD_TO_ENTITY(cancelRequest, );

@@ -34,7 +34,7 @@ enum class Transition {
 struct Constraint
 {
   enum class Type {
-    // @todo Add DISTANCE constraint type. 
+    // @todo Add DISTANCE constraint type.
     LONGITUDINAL_ACCELERATION,
     TIME,
     NONE
