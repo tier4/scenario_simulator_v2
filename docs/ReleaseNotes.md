@@ -12,9 +12,9 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-|---------|---------------|----------|--------------|-------------|
-|         |               |          |              |             |
+| Feature                                  | Brief summary                                                                                                          | Category                   | Pull request                                                      | Contributor                                   |
+|------------------------------------------|------------------------------------------------------------------------------------------------------------------------|----------------------------|-------------------------------------------------------------------|-----------------------------------------------|
+| OpenSCENARIO `RelativeDistanceCondition` | Restore the behavior of the existing distance measurement mode of RelativeDistanceCondition that was changed in #1095. | `openscenario_interpreter` | [#1121](https://github.com/tier4/scenario_simulator_v2/pull/1121) | [yamacir-kit](https://github.com/yamacir-kit) |
 
 Minor Tweaks :oncoming_police_car:
 
