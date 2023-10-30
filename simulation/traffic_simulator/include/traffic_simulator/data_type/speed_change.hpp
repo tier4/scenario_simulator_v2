@@ -26,7 +26,7 @@ namespace speed_change
 enum class Transition {
   // @todo Add CUBIC transition.
   LINEAR,
-  // @todo Add SINUSOIDAL transition type.
+  // @todo Add SINUSOIDAL transition.
   STEP,
   AUTO
 };
