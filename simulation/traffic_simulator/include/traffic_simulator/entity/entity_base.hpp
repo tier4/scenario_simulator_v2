@@ -87,7 +87,7 @@ public:
 // clang-format off
 #define DEFINE_CHECK_FUNCTION(FUNCTION_NAME, BOOL_VARIABLE)            \
   /**                                                                  \
-   @note This function was defined by DEFINE_CHECK_FUNCTION function . \
+   @note This function was defined by DEFINE_CHECK_FUNCTION function.  \
    */                                                                  \
   /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
 
