@@ -15,7 +15,7 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
 
-#include <embree3/rtcore.h>
+#include <embree4/rtcore.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <quaternion_operation/quaternion_operation.h>
 
