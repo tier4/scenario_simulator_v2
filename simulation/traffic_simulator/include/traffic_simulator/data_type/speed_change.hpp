@@ -24,7 +24,7 @@ namespace traffic_simulator
 namespace speed_change
 {
 enum class Transition {
-  // @todo Add CUBIC transition type.
+  // @todo Add CUBIC transition.
   LINEAR,
   // @todo Add SINUSOIDAL transition type.
   STEP,
