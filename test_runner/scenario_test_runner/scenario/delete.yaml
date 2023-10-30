@@ -1,0 +1,350 @@
+OpenSCENARIO:
+  FileHeader:
+    author: "Kotaro Yoshimoto"
+    date: "2022-12-09T18:16:53+09:00"
+    description: "Scenario with DeleteEntityAction"
+    revMajor: 1
+    revMinor: 0
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: random_offset
+        parameterType: double
+        value: 0
+        ConstraintGroup:
+          - ValueConstraint:
+              - rule: lessOrEqual
+                value: 1.0
+              - rule: greaterOrEqual
+                value: -1.0
+
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: ego
+        Vehicle:
+          name: ""
+          vehicleCategory: car
+          ParameterDeclarations:
+            ParameterDeclaration:
+              # https://github.com/autowarefoundation/sample_vehicle_launch/blob/main/sample_vehicle_description/config/simulator_model.param.yaml
+              - { name: vel_lim, parameterType: double, value: 50.0 }
+              - { name: vel_rate_lim, parameterType: double, value: 7.0 }
+              - { name: steer_lim, parameterType: double, value: 1.0 }
+              # https://github.com/autowarefoundation/sample_vehicle_launch/blob/main/sample_vehicle_description/config/vehicle_info.param.yaml
+              - { name: wheel_radius, parameterType: double, value: 0.39 }
+              - { name: wheel_width, parameterType: double, value: 0.42 }
+              - { name: wheel_base, parameterType: double, value: 2.74 }
+              - { name: wheel_tread, parameterType: double, value: 1.63 }
+              - { name: front_overhang, parameterType: double, value: 1.0 }
+              - { name: rear_overhang, parameterType: double, value: 1.03 }
+              - { name: left_overhang, parameterType: double, value: 0.1 }
+              - { name: right_overhang, parameterType: double, value: 0.1 }
+              - { name: vehicle_height, parameterType: double, value: 2.5 }
+          BoundingBox:
+            Center:
+              x: ${ ($front_overhang + $wheel_base + $rear_overhang) / 2 - $rear_overhang }
+              y: 0
+              z: ${ $vehicle_height / 2 }
+            Dimensions:
+              width: ${ $left_overhang + $wheel_tread + $right_overhang }
+              length: ${ $front_overhang + $wheel_base + $rear_overhang }
+              height: $vehicle_height
+          Performance:
+            maxSpeed: $vel_lim
+            maxAcceleration: $vel_rate_lim
+            maxDeceleration: $vel_rate_lim
+          Axles:
+            FrontAxle:
+              maxSteering: $steer_lim
+              wheelDiameter: ${ 2 * $wheel_radius }
+              trackWidth: $wheel_tread
+              positionX: $wheel_base
+              positionZ: $wheel_radius
+            RearAxle:
+              maxSteering: 0
+              wheelDiameter: ${ 2 * $wheel_radius }
+              trackWidth: $wheel_tread
+              positionX: 0
+              positionZ: $wheel_radius
+          Properties:
+            Property: []
+        ObjectController:
+          Controller:
+            name: ""
+            Properties:
+              Property:
+                - { name: isEgo, value: true }
+                - { name: maxJerk, value: 1.5 }
+                - { name: minJerk, value: -1.5 }
+      - name: Npc1
+        Vehicle:
+          name: ""
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              width: 1.8
+              length: 4
+              height: 2.5
+          Performance:
+            maxSpeed: 30
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: 1
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: -1
+              positionZ: 0.3
+          Properties:
+            Property: []
+      - name: Npc2
+        Vehicle:
+          name: ""
+          vehicleCategory: car
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 0
+            Dimensions:
+              width: 1.8
+              length: 4
+              height: 2.5
+          Performance:
+            maxSpeed: 30
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: 1
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: -1
+              positionZ: 0.3
+          Properties:
+            Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34513
+                      s: 1
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ""
+                        laneId: "34507"
+                        s: 50
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 2.778
+          - entityRef: Npc1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34462
+                      s: 1
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+    Story:
+      - name: ""
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ""
+                                            laneId: "34507"
+                                            s: 50
+                                            offset: 0
+                                            Orientation:
+                                              type: relative
+                                              h: 0
+                                              p: 0
+                                              r: 0
+                                        tolerance: 0.5
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: RelativeHeadingCondition(ego, 34507, 50)
+                                      rule: lessThan
+                                      value: 0.1
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    UserDefinedValueCondition:
+                                      name: ego.currentState
+                                      rule: equalTo
+                                      value: ARRIVED_GOAL
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: "spawn"
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: "spawn"
+                        priority: parallel
+                        Action:
+                          - name: ""
+                            GlobalAction:
+                              - EntityAction:
+                                  entityRef: Npc2
+                                  AddEntityAction:
+                                    Position:
+                                      LanePosition:
+                                        roadId: ""
+                                        laneId: 34462
+                                        s: 5
+                                        offset: 0
+                                        Orientation:
+                                          type: relative
+                                          h: 0
+                                          p: 0
+                                          r: 0
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 5
+                          rule: greaterThan
+          - name: "despawn"
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: "despawn"
+                        priority: parallel
+                        Action:
+                          - name: ""
+                            GlobalAction:
+                              - EntityAction:
+                                  entityRef: Npc2
+                                  DeleteEntityAction:
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 7
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup:
+        - Condition:
+            - name: (when (collide? ego npc) ...)
+              delay: 15
+              conditionEdge: none
+              ByEntityCondition:
+                TriggeringEntities:
+                  triggeringEntitiesRule: any
+                  EntityRef: [entityRef: ego]
+                EntityCondition:
+                  CollisionCondition:
+                    EntityRef: { entityRef: Npc2 }

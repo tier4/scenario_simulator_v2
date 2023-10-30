@@ -86,7 +86,13 @@ visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 
 bool EntityManager::despawnEntity(const std::string & name)
 {
-  return entityExists(name) && entities_.erase(name);
+  if (!entityExists(name)) {
+    return false;
+  }
+
+  entities_[name].reset(new DeletedEntity(name, getEntityStatus(name), hdmap_utils_ptr_));
+
+  return true;
 }
 
 bool EntityManager::entityExists(const std::string & name)
@@ -135,7 +141,11 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};
   for (const auto & each : entities_) {
-    names.push_back(each.first);
+    // Add filter for DeletedEntity because this list is used on SimpleSensorSimulator which do not
+    // know DeletedEntity.
+    if (each.second->getEntityType().type != DeletedEntity::ENTITY_TYPE_ID) {
+      names.push_back(each.first);
+    }
   }
   return names;
 }
