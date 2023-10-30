@@ -129,7 +129,7 @@ OpenSCENARIO:
                                         freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
                                         relativeDistanceType: lateral
                                         rule: equalTo
-                                        value: -0.1700000000055297
+                                        value: 0.1700000000055297
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none
