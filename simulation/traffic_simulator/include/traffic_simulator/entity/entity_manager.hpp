@@ -256,7 +256,7 @@ public:
   /*!                                                                            \
    @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
    @return return value of the EntityBase::IDENTIFIER function.                  \
-   @note This function was defined by FORWARD_TO_ENTITY macro.    　　　　　　   \
+   @note This function was defined by FORWARD_TO_ENTITY macro.    　  　　　　　   \
    */                                                                            \
   template <typename... Ts>                                                      \
   decltype(auto) IDENTIFIER(const std::string & name, Ts &&... xs) __VA_ARGS__   \
