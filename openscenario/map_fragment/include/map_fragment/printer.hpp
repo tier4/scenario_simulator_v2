@@ -15,12 +15,15 @@
 #ifndef MAP_FRAGMENT__PRINTER_HPP__
 #define MAP_FRAGMENT__PRINTER_HPP__
 
+#include <algorithm>
+#include <iostream>
 #include <random>
+#include <rclcpp/rclcpp.hpp>
 
 namespace map_fragment
 {
 template <typename Node>
-auto loadBasicPrinter(const Node & node)
+auto loadPrinter(const Node & node)
 {
   const auto select =
     node.has_parameter("select") ? node.get_parameter("select").as_string() : "any";
