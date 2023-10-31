@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__PRINTER_HPP__
-#define MAP_FRAGMENT__PRINTER_HPP__
+#ifndef MAP_FRAGMENT__LOAD_PRINTER_HPP__
+#define MAP_FRAGMENT__LOAD_PRINTER_HPP__
 
 #include <algorithm>
 #include <iostream>
@@ -73,4 +73,4 @@ auto loadPrinter(const Node & node)
 }
 }  // namespace map_fragment
 
-#endif  // MAP_FRAGMENT__PRINTER_HPP__
+#endif  // MAP_FRAGMENT__LOAD_PRINTER_HPP__
