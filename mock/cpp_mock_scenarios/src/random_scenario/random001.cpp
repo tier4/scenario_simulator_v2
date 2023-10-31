@@ -192,18 +192,16 @@ private:
         api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0));
       const auto entity_name = "spawn_nearby_ego";
       if (api_.reachPosition("ego", trigger_position, 20.0) && !api_.entityExists(entity_name)) {
-        std::cout << __FILE__ << "," << __LINE__ << std::endl;
         api_.spawn(
           entity_name,
           api_.getMapPoseFromRelativePose(
             "ego", geometry_msgs::build<geometry_msgs::msg::Pose>()
-                     .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(15).z(0))
+                     .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(-5).z(0))
                      .orientation(geometry_msgs::msg::Quaternion())),
           getVehicleParameters(),
           traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
       }
       if (!api_.reachPosition("ego", trigger_position, 20.0) && api_.entityExists(entity_name)) {
-        std::cout << __FILE__ << "," << __LINE__ << std::endl;
         api_.despawn(entity_name);
       }
     }();
