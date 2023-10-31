@@ -187,11 +187,12 @@ private:
       spawn_and_cross_pedestrian(i);
     }
 
-    const auto spawn_vehicle_in_range = [&]() {
+    [&]() {
       const auto trigger_position =
         api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0));
       const auto entity_name = "spawn_nearby_ego";
       if (api_.reachPosition("ego", trigger_position, 20.0) && !api_.entityExists(entity_name)) {
+        std::cout << __FILE__ << "," << __LINE__ << std::endl;
         api_.spawn(
           entity_name,
           api_.getMapPoseFromRelativePose(
@@ -202,9 +203,10 @@ private:
           traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
       }
       if (!api_.reachPosition("ego", trigger_position, 20.0) && api_.entityExists(entity_name)) {
+        std::cout << __FILE__ << "," << __LINE__ << std::endl;
         api_.despawn(entity_name);
       }
-    };
+    }();
   }
   void onInitialize() override
   {
