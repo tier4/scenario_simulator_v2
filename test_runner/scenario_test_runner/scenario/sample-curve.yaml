@@ -44,13 +44,23 @@ OpenSCENARIO:
         value: 3
       - name: map_path
         parameterType: string
-        value: $(ros2 run map_fragment curve --ros-args -p before_length:=$(var before_length) -p length:=$(var length) -p after_length:=$(var after_length) -p angle:=$(var angle) -p number_of_lanes:=$(var number_of_lanes))
+        value: $(ros2 run map_fragment curve --ros-args
+          -p after_length:=$(var after_length)
+          -p angle:=$(var angle)
+          -p before_length:=$(var before_length)
+          -p length:=$(var length)
+          -p number_of_lanes:=$(var number_of_lanes)
+          )
       - name: route_length
         parameterType: double
         value: '200.0'
       - name: ego_lane_id
         parameterType: string
-        value: $(ros2 run map_fragment find --ros-args -p route_length_greater_than:=$(var route_length) -p not_leftmost:=true -p not_rightmost:=true)
+        value: $(ros2 run map_fragment find --ros-args
+          -p is_not_leftmost:=true
+          -p is_not_rightmost:=true
+          -p route_length_greater_than:=$(var route_length)
+          )
   CatalogLocations:
     VehicleCatalog:
       Directory:

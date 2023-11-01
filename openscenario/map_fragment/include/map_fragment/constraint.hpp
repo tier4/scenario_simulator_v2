@@ -46,7 +46,7 @@ auto isRightmost(
 }
 
 template <typename Node>
-auto loadBasicConstraints(const Node & node)
+auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = "")
 {
   std::unordered_map<
     std::string, std::function<bool(
@@ -54,37 +54,37 @@ auto loadBasicConstraints(const Node & node)
                    const lanelet::routing::RoutingGraph &)>>
     constraints;
 
-  if (node.has_parameter("type")) {
-    const auto type = node.get_parameter("type").as_string();
-    constraints.emplace("type", [type](auto && lanelet, auto &&...) {  //
+  if (const auto name = prefix + "type"; node.has_parameter(name)) {
+    const auto type = node.get_parameter(name).as_string();
+    constraints.emplace(name, [type](auto && lanelet, auto &&...) {  //
       return lanelet.attribute("type") == type;
     });
   }
 
-  if (node.has_parameter("subtype")) {
-    const auto subtype = node.get_parameter("subtype").as_string();
-    constraints.emplace("subtype", [subtype](auto && lanelet, auto &&...) {
+  if (const auto name = prefix + "subtype"; node.has_parameter(name)) {
+    const auto subtype = node.get_parameter(name).as_string();
+    constraints.emplace(name, [subtype](auto && lanelet, auto &&...) {
       return lanelet.attribute("subtype") == subtype;
     });
   }
 
-  if (node.has_parameter("id_greater_than")) {
-    const auto lower_bound = node.get_parameter("id_greater_than").as_int();
-    constraints.emplace("id_greater_than", [lower_bound](auto && lanelet, auto &&...) {
+  if (const auto name = prefix + "id_greater_than"; node.has_parameter(name)) {
+    const auto lower_bound = node.get_parameter(name).as_int();
+    constraints.emplace(name, [lower_bound](auto && lanelet, auto &&...) {  //
       return lower_bound < lanelet.id();
     });
   }
 
-  if (node.has_parameter("id_less_than")) {
-    const auto upper_bound = node.get_parameter("id_less_than").as_int();
-    constraints.emplace("is_less_than", [upper_bound](auto && lanelet, auto &&...) {
+  if (const auto name = prefix + "id_is_less_than"; node.has_parameter(name)) {
+    const auto upper_bound = node.get_parameter(name).as_int();
+    constraints.emplace(name, [upper_bound](auto && lanelet, auto &&...) {  //
       return lanelet.id() < upper_bound;
     });
   }
 
-  if (node.has_parameter("left_of")) {
-    if (const auto right_id = node.get_parameter("left_of").as_int(); right_id) {
-      constraints.emplace("left_of", [right_id](auto && lanelet, auto && map, auto &&) {
+  if (const auto name = prefix + "is_left_of"; node.has_parameter(name)) {
+    if (const auto right_id = node.get_parameter(name).as_int(); right_id) {
+      constraints.emplace(name, [right_id](auto && lanelet, auto && map, auto &&) {
         auto is_left_of = [&](auto right_id) {
           auto right = map.laneletLayer.find(right_id);
           return right != map.laneletLayer.end() and lanelet::geometry::leftOf(lanelet, *right);
@@ -94,9 +94,9 @@ auto loadBasicConstraints(const Node & node)
     }
   }
 
-  if (node.has_parameter("right_of")) {
-    if (const auto left_id = node.get_parameter("right_of").as_int(); left_id) {
-      constraints.emplace("right_of", [left_id](auto && lanelet, auto && map, auto &&) {
+  if (const auto name = prefix + "is_right_of"; node.has_parameter(name)) {
+    if (const auto left_id = node.get_parameter(name).as_int(); left_id) {
+      constraints.emplace(name, [left_id](auto && lanelet, auto && map, auto &&) {
         auto is_right_of = [&](auto left_id) {
           auto left = map.laneletLayer.find(left_id);
           return left != map.laneletLayer.end() and lanelet::geometry::rightOf(lanelet, *left);
@@ -106,36 +106,39 @@ auto loadBasicConstraints(const Node & node)
     }
   }
 
-  if (node.has_parameter("leftmost") and node.get_parameter("leftmost").as_bool()) {
-    constraints.emplace("leftmost", [](auto && lanelet, auto &&, auto && graph) {
+  if (const auto name = prefix + "is_leftmost";
+      node.has_parameter(name) and node.get_parameter(name).as_bool()) {
+    constraints.emplace(name, [](auto && lanelet, auto &&, auto && graph) {  //
       return isLeftmost(graph, lanelet);
     });
   }
 
-  if (node.has_parameter("not_leftmost") and node.get_parameter("not_leftmost").as_bool()) {
-    constraints.emplace("not_leftmost", [](auto && lanelet, auto &&, auto && graph) {
-      return not isLeftmost(graph, lanelet);
-    });
-  }
-
-  if (node.has_parameter("rightmost") and node.get_parameter("rightmost").as_bool()) {
-    constraints.emplace("rightmost", [](auto && lanelet, auto && map, auto && graph) {
+  if (const auto name = prefix + "is_rightmost";
+      node.has_parameter(name) and node.get_parameter(name).as_bool()) {
+    constraints.emplace(name, [](auto && lanelet, auto && map, auto && graph) {
       return isRightmost(map, graph, lanelet);
     });
   }
 
-  if (node.has_parameter("not_rightmost") and node.get_parameter("not_rightmost").as_bool()) {
-    constraints.emplace("not_rightmost", [](auto && lanelet, auto && map, auto && graph) {
+  if (const auto name = prefix + "is_not_leftmost";
+      node.has_parameter(name) and node.get_parameter(name).as_bool()) {
+    constraints.emplace(name, [](auto && lanelet, auto &&, auto && graph) {  //
+      return not isLeftmost(graph, lanelet);
+    });
+  }
+
+  if (const auto name = prefix + "is_not_rightmost";
+      node.has_parameter(name) and node.get_parameter(name).as_bool()) {
+    constraints.emplace(name, [](auto && lanelet, auto && map, auto && graph) {
       return not isRightmost(map, graph, lanelet);
     });
   }
 
-  if (node.has_parameter("route_length_greater_than")) {
-    const auto lower_bound = node.get_parameter("route_length_greater_than").as_double();
-    constraints.emplace(
-      "route_length_greater_than", [lower_bound](auto && lanelet, auto &&, auto && graph) {
-        return 0 < graph.possiblePaths(lanelet, lower_bound).size();
-      });
+  if (const auto name = prefix + "route_length_greater_than"; node.has_parameter(name)) {
+    const auto lower_bound = node.get_parameter(name).as_double();
+    constraints.emplace(name, [lower_bound](auto && lanelet, auto &&, auto && graph) {
+      return 0 < graph.possiblePaths(lanelet, lower_bound).size();
+    });
   }
 
   return constraints;

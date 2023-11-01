@@ -17,7 +17,6 @@
 #include <map_fragment/load_lanelet_map.hpp>
 #include <map_fragment/load_printer.hpp>
 #include <map_fragment/map_fragment.hpp>
-#include <random>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
@@ -38,17 +37,17 @@ try {
 
   node.declare_parameter("type", "lanelet");
   node.declare_parameter("subtype", "road");
-  node.declare_parameter("id_greater_than", lanelet::Id());
-  node.declare_parameter("id_less_than", std::numeric_limits<lanelet::Id>::max());
-  node.declare_parameter("left_of", lanelet::Id());
-  node.declare_parameter("right_of", lanelet::Id());
-  node.declare_parameter("leftmost", false);
-  node.declare_parameter("not_leftmost", false);
-  node.declare_parameter("rightmost", false);
-  node.declare_parameter("not_rightmost", false);
-  node.declare_parameter("route_length_greater_than", 0.0);
+  node.declare_parameter("id_is_greater_than", lanelet::Id());
+  node.declare_parameter("id_is_less_than", std::numeric_limits<lanelet::Id>::max());
+  node.declare_parameter("is_left_of", lanelet::Id());
+  node.declare_parameter("is_right_of", lanelet::Id());
+  node.declare_parameter("is_leftmost", false);
+  node.declare_parameter("is_rightmost", false);
+  node.declare_parameter("is_not_leftmost", false);
+  node.declare_parameter("is_not_rightmost", false);
+  node.declare_parameter("route_length_greater_than", 0.0);  // DEPRECATED
 
-  const auto constraints = loadBasicConstraints(node);
+  const auto constraints = loadLaneletIDConstraints(node);
 
   auto satisfy = [&](const auto & lanelet) {
     return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
@@ -58,7 +57,9 @@ try {
 
   node.declare_parameter("select", "any");
 
-  filter(satisfy, lanelet_map->laneletLayer, loadPrinter(node));
+  const auto print = loadPrinter(node);
+
+  filter(satisfy, lanelet_map->laneletLayer, print);
 
   return EXIT_SUCCESS;
 } catch (const std::exception & exception) {
