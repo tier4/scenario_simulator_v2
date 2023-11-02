@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__LOAD_PRINTER_HPP__
-#define MAP_FRAGMENT__LOAD_PRINTER_HPP__
+#ifndef MAP_FRAGMENT__SELECTOR_HPP__
+#define MAP_FRAGMENT__SELECTOR_HPP__
 
 #include <algorithm>
 #include <iostream>
@@ -37,6 +37,8 @@ auto loadBasicSelector(
 
   return [select, compare, receive](auto && results) -> decltype(auto) {
     if (1 < results.size()) {
+      // cspell: ignore swappables
+
       auto sort = [&](auto && value_swappables) {
         std::sort(value_swappables.begin(), value_swappables.end(), compare);
       };
@@ -130,4 +132,4 @@ auto loadLaneletPathSelector(
 }
 }  // namespace map_fragment
 
-#endif  // MAP_FRAGMENT__LOAD_PRINTER_HPP__
+#endif  // MAP_FRAGMENT__SELECTOR_HPP__

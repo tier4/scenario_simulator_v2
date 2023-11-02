@@ -15,8 +15,8 @@
 #include <map_fragment/constraint.hpp>
 #include <map_fragment/filter.hpp>
 #include <map_fragment/load_lanelet_map.hpp>
-#include <map_fragment/load_printer.hpp>
 #include <map_fragment/map_fragment.hpp>
+#include <map_fragment/selector.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
