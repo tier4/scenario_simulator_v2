@@ -160,7 +160,7 @@ class Straight : public ParametricCurve
   double length_;
 
 public:
-  Straight(double length)
+  explicit Straight(double length)
     : length_(length)
   {
     if (length <= 0.0) {
@@ -193,7 +193,7 @@ class Arc : public ParametricCurve
   Point2d center_;
 
 public:
-  Arc(double radius, double angle)
+  explicit Arc(double radius, double angle)
     : radius_(radius), angle_(angle)
   {
     if (radius <= 0.0)
@@ -240,7 +240,7 @@ class CombinedCurve : public ParametricCurve
   std::vector<Transformation2d> transformations_;
 
 public:
-  CombinedCurve(std::vector<ParametricCurve::Ptr> curves)
+  explicit CombinedCurve(std::vector<ParametricCurve::Ptr> curves)
     : curves_(curves)
   {
     if (curves.size() < 2)
