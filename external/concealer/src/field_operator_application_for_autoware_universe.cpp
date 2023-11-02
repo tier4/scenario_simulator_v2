@@ -14,6 +14,8 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <concealer/has_data_member_allow_goal_modification.hpp>
+#include <concealer/has_data_member_option.hpp>
 #include <concealer/is_package_exists.hpp>
 
 namespace concealer
@@ -210,13 +212,33 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     }
   };
 
+  /**
+   * NOTE: Used cooperate statuses will be deleted correctly in Autoware side and provided via topic update.
+   *       But, their update rate (typ. 10Hz) is lower than the one of scenario_simulator_v2.
+   *       So, we need to check cooperate statuses if they are used or not in scenario_simulator_v2 side
+   *       to avoid sending the same cooperate command when sending multiple commands between updates of cooperate statuses.
+   */
+  static std::vector<tier4_rtc_msgs::msg::CooperateStatus> used_cooperate_statuses;
+  auto is_used_cooperate_status = [this](const auto & cooperate_status) {
+    return std::find_if(
+             used_cooperate_statuses.begin(), used_cooperate_statuses.end(),
+             [&cooperate_status](const auto & used_cooperate_status) {
+               return used_cooperate_status.module == cooperate_status.module &&
+                      used_cooperate_status.uuid == cooperate_status.uuid &&
+                      used_cooperate_status.command_status.type ==
+                        cooperate_status.command_status.type;
+             }) != used_cooperate_statuses.end();
+  };
+
   if (const auto cooperate_status = std::find_if(
         latest_cooperate_status_array.statuses.begin(),
         latest_cooperate_status_array.statuses.end(),
         [module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
-         command_type = to_command_type(command)](const auto & cooperate_status) {
+         command_type = to_command_type(command),
+         is_used_cooperate_status](const auto & cooperate_status) {
           return isValidCooperateStatus<tier4_rtc_msgs::msg::CooperateStatus>(
-            cooperate_status, command_type, module_type);
+                   cooperate_status, command_type, module_type) &&
+                 not is_used_cooperate_status(cooperate_status);
         });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
     std::stringstream what;
@@ -236,6 +258,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     request->commands.push_back(cooperate_command);
 
     task_queue.delay([this, request]() { requestCooperateCommands(request); });
+
+    used_cooperate_statuses.push_back(*cooperate_status);
   }
 }
 
@@ -283,6 +307,26 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
     auto request = std::make_shared<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>();
 
     request->header = route.back().header;
+
+    /*
+       NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type was
+       created on 2022/09/05 [1], and the autoware_adapi_v1_msgs::msg::Option
+       type data member was added to the
+       autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type on 2023/04/12
+       [2]. Therefore, we cannot expect
+       autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always have a
+       data member `option`.
+
+       [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
+       [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
+    */
+    if constexpr (
+      has_data_member_option_v<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request> and
+      has_data_member_allow_goal_modification_v<
+        decltype(std::declval<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>().option)>) {
+      request->option.allow_goal_modification =
+        get_parameter("allow_goal_modification").get_value<bool>();
+    }
 
     request->goal = route.back().pose;
 
@@ -419,8 +463,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   } else {
     throw common::Error(
       "FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation is not "
-      "supported "
-      "in this environment, because rtc_auto_mode_manager is present.");
+      "supported in this environment, because rtc_auto_mode_manager is present.");
   }
 }
 
@@ -447,8 +490,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
     CASE(NORMAL, minimum_risk_maneuver_state);
     CASE(UNKNOWN, minimum_risk_maneuver_state);
     default:
-      throw common::Error(
-        "Unsupported MrmState::state, number : ", static_cast<int>(message.state));
+      throw common::Error("Unsupported MrmState::state, number: ", static_cast<int>(message.state));
   }
 
   switch (message.behavior) {
@@ -458,7 +500,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
     CASE(UNKNOWN, minimum_risk_maneuver_behavior);
     default:
       throw common::Error(
-        "Unsupported MrmState::behavior, number : ", static_cast<int>(message.behavior));
+        "Unsupported MrmState::behavior, number: ", static_cast<int>(message.behavior));
   }
 #undef CASE
 }
