@@ -21,9 +21,7 @@
 
 namespace map_fragment
 {
-inline auto identity = [](auto && x) constexpr {
-  return std::forward<decltype(x)>(x);
-};
+inline auto identity = [](auto && x) constexpr { return std::forward<decltype(x)>(x); };
 
 template <typename Predicate, typename Iterable, typename Continuation = decltype(identity)>
 auto filter_(Predicate satisfy, Iterable && iterable, Continuation continuation = identity)
@@ -49,9 +47,13 @@ inline auto filter = [](auto &&... xs) -> decltype(auto) {
   return filter_(std::forward<decltype(xs)>(xs)...);
 };
 
+// cspell: ignore insertable
+
 inline auto append_back_insertable = [](auto && v1, auto && v2) {
   v1.insert(v1.end(), v2.begin(), v2.end());
 };
+
+// cspell: ignore Appender
 
 template <
   typename Function, typename Iterable, typename Continuation = decltype(identity),

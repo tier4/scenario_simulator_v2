@@ -22,51 +22,63 @@
 
 namespace map_fragment
 {
-inline auto print_datum = [](auto && x) -> std::ostream & {
+inline auto print = [](auto && x) -> std::ostream & {
   return std::cout << std::forward<decltype(x)>(x) << std::endl;
 };
 
-inline auto print_lanelet_id = [](auto && lanelet) -> std::ostream & {
-  return std::cout << lanelet.id() << std::endl;
-};
-
-template <typename Node, typename Receiver = decltype(print_lanelet_id)>
-auto loadBasicSelector(const Node & node, Receiver receive = print_lanelet_id)
+template <typename Node, typename Comparator = std::less<void>, typename Receiver = decltype(print)>
+auto loadBasicSelector(
+  const Node & node, const std::string & prefix = "", const std::string & suffix = "",
+  Receiver receive = print, Comparator compare = {})
 {
-  const auto select =
-    node.has_parameter("select") ? node.get_parameter("select").as_string() : "any";
+  const auto select = node.has_parameter(prefix + "select" + suffix)
+                        ? node.get_parameter(prefix + "select" + suffix).as_string()
+                        : "any";
 
-  return [select, receive](auto && results) -> decltype(auto) {
+  return [select, compare, receive](auto && results) -> decltype(auto) {
     if (1 < results.size()) {
-      auto sort = [&]() {
-        std::sort(results.begin(), results.end(), [](const auto & a, const auto & b) {
-          return a.id() < b.id();
-        });
+      auto sort = [&](auto && value_swappables) {
+        std::sort(value_swappables.begin(), value_swappables.end(), compare);
       };
 
-      auto shuffle = [&]() {
+      auto shuffle = [&](auto && value_swappables) {
         auto device = std::random_device();
         auto engine = std::mt19937(device());
-        std::shuffle(results.begin(), results.end(), engine);
+        std::shuffle(value_swappables.begin(), value_swappables.end(), engine);
       };
 
-      auto all = [&]() {
-        for (const auto & result : results) {
-          receive(result);
+      auto receive_for_each_of = [&](auto && iterable) {
+        for (auto && each : iterable) {
+          receive(std::forward<decltype(each)>(each));
         }
       };
 
-      auto first = [&]() { receive(results.front()); };
+      auto receive_first_of = [&](auto && sequence) { receive(sequence.front()); };
+
+      auto receive_last_of = [&](auto && sequence) { receive(sequence.back()); };
 
       if (select == "all") {
-        sort();
-        all();
+        if constexpr (std::is_const_v<decltype(results)>) {
+          auto copy_of_results = results;
+          sort(copy_of_results);
+          receive_for_each_of(copy_of_results);
+        } else {
+          shuffle(results);
+          receive_for_each_of(results);
+        }
       } else if (select == "any") {
-        shuffle();
-        first();
+        if constexpr (std::is_const_v<decltype(results)>) {
+          auto copy_of_results = results;
+          shuffle(copy_of_results);
+          receive_first_of(copy_of_results);
+        } else {
+          shuffle(results);
+          receive_first_of(results);
+        }
       } else if (select == "first") {
-        sort();
-        first();
+        receive_first_of(results);
+      } else if (select == "last") {
+        receive_last_of(results);
       } else {
         std::stringstream what;
         what << "There are " << results.size() << " candidates that satisfy the constraints.";
@@ -78,6 +90,43 @@ auto loadBasicSelector(const Node & node, Receiver receive = print_lanelet_id)
       throw std::runtime_error("There is no candidate that satisfies the constraints.");
     }
   };
+}
+
+inline auto compare_lanelet_id = [](const auto & a, const auto & b) { return a.id() < b.id(); };
+
+inline auto print_lanelet_id = [](const auto & lanelet) -> std::ostream & {
+  return std::cout << lanelet.id() << std::endl;
+};
+
+template <
+  typename Node, typename Receiver = decltype(print_lanelet_id),
+  typename Comparator = decltype(compare_lanelet_id)>
+auto loadLaneletSelector(
+  const Node & node, const std::string & prefix = "", const std::string & suffix = "",
+  Receiver receive = print_lanelet_id, Comparator compare = compare_lanelet_id)
+{
+  return loadBasicSelector(node, prefix, suffix, receive, compare);
+}
+
+inline auto compare_lanelet_path = [](const auto & a, const auto & b) {
+  return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), compare_lanelet_id);
+};
+
+inline auto print_lanelet_path = [](const auto & lanelet_path) -> std::ostream & {
+  for (auto && lanelet : lanelet_path) {
+    std::cout << lanelet.id() << " ";
+  }
+  return std::cout << std::endl;
+};
+
+template <
+  typename Node, typename Receiver = decltype(print_lanelet_path),
+  typename Comparator = decltype(compare_lanelet_path)>
+auto loadLaneletPathSelector(
+  const Node & node, const std::string & prefix = "", const std::string & suffix = "",
+  Receiver receive = print_lanelet_path, Comparator compare = compare_lanelet_path)
+{
+  return loadBasicSelector(node, prefix, suffix, receive, compare);
 }
 }  // namespace map_fragment
 
