@@ -18,6 +18,29 @@
 #include <geometry/bounding_box.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
+geometry_msgs::msg::Pose makePose(double x, double y, double z = 0.0)
+{
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = x;
+  pose.position.y = y;
+  pose.position.z = z;
+  return pose;
+}
+
+traffic_simulator_msgs::msg::BoundingBox makeBbox(
+  double dim_x, double dim_y, double dim_z = 0.0, double center_x = 0.0, double center_y = 0.0,
+  double center_z = 0.0)
+{
+  traffic_simulator_msgs::msg::BoundingBox bbox;
+  bbox.dimensions.x = dim_x;
+  bbox.dimensions.y = dim_y;
+  bbox.dimensions.z = dim_z;
+  bbox.center.x = center_x;
+  bbox.center.y = center_y;
+  bbox.center.z = center_z;
+  return bbox;
+}
+
 TEST(BoundingBox, getPointsFromBboxDefault)
 {
   geometry_msgs::msg::Pose pose;
@@ -41,11 +64,7 @@ TEST(BoundingBox, getPointsFromBboxDefault)
 TEST(BoundingBox, getPointsFromBboxCustom)
 {
   geometry_msgs::msg::Pose pose;
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.dimensions.x = 5.0;
-  bbox.dimensions.y = 2.0;
-  bbox.dimensions.z = 2.0;
-  bbox.center.x = 1.0;
+  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(5, 2, 2, 1);
   std::vector<geometry_msgs::msg::Point> points =
     math::geometry::getPointsFromBbox(bbox, 1.0, 2.0, 3.0, 4.0);
   ASSERT_EQ(points.size(), size_t(4));
@@ -66,10 +85,7 @@ TEST(BoundingBox, getPointsFromBboxCustom)
 TEST(BoundingBox, get2DPolygonZeroPose)
 {
   geometry_msgs::msg::Pose pose;
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.dimensions.x = 2.0;
-  bbox.dimensions.y = 2.0;
-  bbox.dimensions.z = 2.0;
+  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(2, 2, 2);
   boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =
     math::geometry::get2DPolygon(pose, bbox);
   EXPECT_TRUE(poly.inners().empty());
@@ -88,13 +104,8 @@ TEST(BoundingBox, get2DPolygonZeroPose)
 
 TEST(BoundingBox, get2DPolygonOnlyTranslation)
 {
-  geometry_msgs::msg::Pose pose;
-  pose.position.x = 1.0;
-  pose.position.y = 2.0;
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.dimensions.x = 2.0;
-  bbox.dimensions.y = 2.0;
-  bbox.dimensions.z = 2.0;
+  geometry_msgs::msg::Pose pose = makePose(1, 2);
+  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(2, 2, 2);
   boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =
     math::geometry::get2DPolygon(pose, bbox);
   EXPECT_TRUE(poly.inners().empty());
@@ -113,20 +124,10 @@ TEST(BoundingBox, get2DPolygonOnlyTranslation)
 
 TEST(BoundingBox, get2DPolygonFullPose)
 {
-  geometry_msgs::msg::Pose pose;
-  pose.position.x = 1.0;
-  pose.position.y = 2.0;
-  pose.orientation = quaternion_operation::convertEulerAngleToQuaternion([]() {
-    geometry_msgs::msg::Vector3 vec;
-    vec.x = 0.0;
-    vec.y = 0.0;
-    vec.z = 30.0 * M_PI / 180.0;
-    return vec;
-  }());
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.dimensions.x = 2.0;
-  bbox.dimensions.y = 2.0;
-  bbox.dimensions.z = 2.0;
+  geometry_msgs::msg::Pose pose = makePose(1, 2);
+  pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(30.0 * M_PI / 180.0));
+  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(2, 2, 2);
   boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =
     math::geometry::get2DPolygon(pose, bbox);
   EXPECT_TRUE(poly.inners().empty());
@@ -148,49 +149,27 @@ TEST(BoundingBox, get2DPolygonFullPose)
 TEST(BoundingBox, getPolygonDistanceWithCollision)
 {
   geometry_msgs::msg::Pose pose0;
-  traffic_simulator_msgs::msg::BoundingBox bbox0;
-  bbox0.dimensions.x = 3;
-  bbox0.dimensions.y = 3;
-  bbox0.dimensions.z = 3;
+  traffic_simulator_msgs::msg::BoundingBox bbox0 = makeBbox(3, 3, 3);
   geometry_msgs::msg::Pose pose1;
-  traffic_simulator_msgs::msg::BoundingBox bbox1;
-  bbox1.dimensions.x = 1;
-  bbox1.dimensions.y = 1;
-  bbox1.dimensions.z = 1;
+  traffic_simulator_msgs::msg::BoundingBox bbox1 = makeBbox(1, 1, 1);
   EXPECT_EQ(math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1), std::nullopt);
 }
 
 TEST(BoundingBox, getPolygonDistanceTouch)
 {
   geometry_msgs::msg::Pose pose0;
-  traffic_simulator_msgs::msg::BoundingBox bbox0;
-  bbox0.dimensions.x = 4;
-  bbox0.dimensions.y = 4;
-  bbox0.dimensions.z = 4;
-  geometry_msgs::msg::Pose pose1;
-  pose1.position.x = 3;
-  pose1.position.y = 3;
-  pose1.position.z = 3;
-  traffic_simulator_msgs::msg::BoundingBox bbox1;
-  bbox1.dimensions.x = 2;
-  bbox1.dimensions.y = 2;
-  bbox1.dimensions.z = 2;
+  traffic_simulator_msgs::msg::BoundingBox bbox0 = makeBbox(4, 4, 4);
+  geometry_msgs::msg::Pose pose1 = makePose(3, 3, 3);
+  traffic_simulator_msgs::msg::BoundingBox bbox1 = makeBbox(2, 2, 2);
   EXPECT_EQ(math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1), std::nullopt);
 }
 
 TEST(BoundingBox, getPolygonDistanceWithoutCollision)
 {
   geometry_msgs::msg::Pose pose0;
-  traffic_simulator_msgs::msg::BoundingBox bbox0;
-  bbox0.dimensions.x = 3;
-  bbox0.dimensions.y = 3;
-  bbox0.dimensions.z = 3;
-  geometry_msgs::msg::Pose pose1;
-  pose1.position.y = 5;
-  traffic_simulator_msgs::msg::BoundingBox bbox1;
-  bbox1.dimensions.x = 1;
-  bbox1.dimensions.y = 1;
-  bbox1.dimensions.z = 1;
+  traffic_simulator_msgs::msg::BoundingBox bbox0 = makeBbox(3, 3, 3);
+  geometry_msgs::msg::Pose pose1 = makePose(0, 5);
+  traffic_simulator_msgs::msg::BoundingBox bbox1 = makeBbox(1, 1, 1);
   EXPECT_TRUE(math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1));
   EXPECT_DOUBLE_EQ(math::geometry::getPolygonDistance(pose0, bbox0, pose1, bbox1).value(), 3.0);
 }
