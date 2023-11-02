@@ -72,7 +72,7 @@ try {
     
     // Turn segment (or straight if angle == 0)
     angle == 0 ? static_cast<ParametricCurve::Ptr>(std::make_shared<Straight>(length))
-      : static_cast<ParametricCurve::Ptr>(std::make_shared<Arc>(length / abs(angle), angle)),
+      : static_cast<ParametricCurve::Ptr>(std::make_shared<Arc>(length / std::abs(angle), angle)),
     
     // Straight segment after the turn
     std::make_shared<Straight>(after_length)

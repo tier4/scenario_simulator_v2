@@ -62,7 +62,7 @@ try {
   }
   else
   {
-    auto radius = abs(1 / curvature);
+    auto radius = std::abs(1 / curvature);
     auto angle = length * curvature;
     guide_curve = std::make_shared<Arc>(radius, angle);
   }

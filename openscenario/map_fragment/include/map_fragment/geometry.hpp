@@ -204,7 +204,7 @@ public:
       );
     }
 
-    if (!(0 < abs(angle) && abs(angle) < 2 * M_PI))
+    if (!(0 < std::abs(angle) && std::abs(angle) < 2 * M_PI))
     {
       throw std::invalid_argument(
         "Expected angle to be in range (0, 2 * PI) or (-2 * PI, 0). Actual value: "
