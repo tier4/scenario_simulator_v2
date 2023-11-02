@@ -22,13 +22,21 @@
 
 namespace map_fragment
 {
-template <typename Node>
-auto loadPrinter(const Node & node)
+inline auto print_datum = [](auto && x) -> std::ostream & {
+  return std::cout << std::forward<decltype(x)>(x) << std::endl;
+};
+
+inline auto print_lanelet_id = [](auto && lanelet) -> std::ostream & {
+  return std::cout << lanelet.id() << std::endl;
+};
+
+template <typename Node, typename Receiver = decltype(print_lanelet_id)>
+auto loadBasicSelector(const Node & node, Receiver receive = print_lanelet_id)
 {
   const auto select =
     node.has_parameter("select") ? node.get_parameter("select").as_string() : "any";
 
-  return [select](auto && results) -> decltype(auto) {
+  return [select, receive](auto && results) -> decltype(auto) {
     if (1 < results.size()) {
       auto sort = [&]() {
         std::sort(results.begin(), results.end(), [](const auto & a, const auto & b) {
@@ -44,11 +52,11 @@ auto loadPrinter(const Node & node)
 
       auto all = [&]() {
         for (const auto & result : results) {
-          std::cout << result.id() << std::endl;
+          receive(result);
         }
       };
 
-      auto first = [&]() { std::cout << results.front().id() << std::endl; };
+      auto first = [&]() { receive(results.front()); };
 
       if (select == "all") {
         sort();
@@ -65,7 +73,7 @@ auto loadPrinter(const Node & node)
         throw std::runtime_error(what.str());
       }
     } else if (0 < results.size()) {
-      std::cout << results.front().id() << std::endl;
+      receive(results.front());
     } else {
       throw std::runtime_error("There is no candidate that satisfies the constraints.");
     }

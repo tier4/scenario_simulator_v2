@@ -27,6 +27,8 @@
 
 #define DEBUG(...) std::cerr << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
 
+#define LINE() std::cerr << __FILE__ << ":" << __LINE__ << std::endl
+
 namespace map_fragment
 {
 namespace default_value

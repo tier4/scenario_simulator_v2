@@ -57,9 +57,9 @@ try {
 
   node.declare_parameter("select", "any");
 
-  const auto print = loadPrinter(node);
+  const auto select = loadBasicSelector(node);
 
-  filter(satisfy, lanelet_map->laneletLayer, print);
+  filter(satisfy, lanelet_map->laneletLayer, select);
 
   return EXIT_SUCCESS;
 } catch (const std::exception & exception) {

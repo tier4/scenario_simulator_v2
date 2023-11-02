@@ -21,24 +21,73 @@
 
 namespace map_fragment
 {
-template <typename Predicate, typename Iterable, typename Continuation>
-auto filter(Predicate && satisfy, Iterable && iterable, Continuation && current_continuation)
+inline auto identity = [](auto && x) constexpr {
+  return std::forward<decltype(x)>(x);
+};
+
+template <typename Predicate, typename Iterable, typename Continuation = decltype(identity)>
+auto filter_(Predicate satisfy, Iterable && iterable, Continuation continuation = identity)
   -> decltype(auto)
 {
-  std::vector<typename std::decay_t<Iterable>::iterator::value_type> values;
+  auto values = std::vector<typename std::decay_t<Iterable>::iterator::value_type>();
 
-  auto filter =
-    [&](auto filter, auto begin, auto end) -> std::invoke_result_t<Continuation, decltype(values)> {
+  auto filter = [&](
+                  const auto filter, const auto begin,
+                  const auto end) -> std::invoke_result_t<Continuation, decltype(values)> {
     if (auto first = std::find_if(begin, end, satisfy); first != end) {
       values.push_back(*first);
       return filter(filter, std::next(first), end);
     } else {
-      return current_continuation(values);
+      return std::invoke(continuation, values);
     }
   };
 
   return filter(filter, iterable.begin(), iterable.end());
 };
+
+inline auto filter = [](auto &&... xs) -> decltype(auto) {
+  return filter_(std::forward<decltype(xs)>(xs)...);
+};
+
+inline auto append_back_insertable = [](auto && v1, auto && v2) {
+  v1.insert(v1.end(), v2.begin(), v2.end());
+};
+
+template <
+  typename Function, typename Iterable, typename Continuation = decltype(identity),
+  typename Appender = decltype(append_back_insertable)>
+auto append_map_(
+  Function function, Iterable && iterable, Continuation continuation = identity,
+  Appender append = append_back_insertable) -> decltype(auto)
+{
+  auto values =
+    std::invoke_result_t<Function, typename std::decay_t<Iterable>::iterator::reference>();
+
+  for (auto && each : iterable) {
+    append(values, std::invoke(function, std::forward<decltype(each)>(each)));
+  }
+
+  return std::invoke(continuation, values);
+}
+
+inline auto append_map = [](auto &&... xs) -> decltype(auto) {
+  return append_map_(std::forward<decltype(xs)>(xs)...);
+};
+
+template <typename Invocable>
+constexpr auto curry(Invocable invocable) -> decltype(auto)
+{
+  return [invocable](auto &&... xs) {
+    return [invocable, xs = std::forward_as_tuple(xs...)](auto &&... ys) {
+      return std::apply(
+        [&](auto &&... xs) {
+          return std::invoke(
+            invocable, std::forward<decltype(xs)>(xs)..., std::forward<decltype(ys)>(ys)...);
+        },
+        xs);
+    };
+  };
+}
 }  // namespace map_fragment
 
 #endif  // MAP_FRAGMENT__FILTER_HPP__
