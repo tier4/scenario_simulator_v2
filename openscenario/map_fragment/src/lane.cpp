@@ -67,7 +67,7 @@ try {
     guide_curve = std::make_shared<Arc>(radius, angle);
   }
 
-  RoadCrossSectionDescription cross_section_description = {number_of_lanes, width};
+  RoadCrossSectionDescription cross_section_description(number_of_lanes, width);
   RoadSegment segment(guide_curve, cross_section_description);
 
   const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));

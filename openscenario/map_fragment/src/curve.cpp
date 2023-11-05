@@ -80,7 +80,7 @@ try {
 
   auto guide_curve = std::make_shared<CombinedCurve>(guide_curve_segments);
 
-  RoadCrossSectionDescription cross_section_description = {number_of_lanes, width};
+  RoadCrossSectionDescription cross_section_description(number_of_lanes, width);
   RoadSegment segment(guide_curve, cross_section_description);
 
   const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
