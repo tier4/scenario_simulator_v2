@@ -234,7 +234,7 @@ public:
   auto setConventionalTrafficLightConfidence(lanelet::Id id, double confidence) -> void
   {
     for (auto & traffic_light : conventional_traffic_light_manager_ptr_->getTrafficLights(id)) {
-      traffic_light.get().setConfidence(confidence);
+      traffic_light.get().confidence = confidence;
     }
   }
 
