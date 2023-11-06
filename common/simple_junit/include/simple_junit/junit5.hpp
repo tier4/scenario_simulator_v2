@@ -123,7 +123,7 @@ struct Error
 
 struct Properties
 {
-  // TODO
+  /// @todo implement `properties` in junit.
 };
 
 /*
@@ -137,7 +137,7 @@ struct Properties
 
 struct Property
 {
-  // TODO
+  /// @todo implement `property` in junit.
 };
 
 /*
@@ -225,7 +225,7 @@ struct SimpleTestCase
       current_node.append_attribute("status") = testcase.status.c_str();
     }
 
-    // TODO skipped
+    /// @todo implement `skipped` element in junit.
 
     for (const auto & each : testcase.error) {
       current_node.append_child("error") << each;
@@ -235,9 +235,9 @@ struct SimpleTestCase
       current_node.append_child("failure") << each;
     }
 
-    // TODO system-out
+    /// @todo implement `system-out` element in junit.
 
-    // TODO system-err
+    /// @todo implement `system-err` element in junit.
 
     return node;
   }

@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class RequestSpeedChangeScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -77,12 +79,13 @@ private:
       true);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<RequestSpeedChangeScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::RequestSpeedChangeScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
