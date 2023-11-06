@@ -37,6 +37,7 @@ try {
 
   node.declare_parameter("start_lanelet_type", "lanelet");
   node.declare_parameter("start_lanelet_subtype", "road");
+  node.declare_parameter("start_lanelet_id", lanelet::Id());
   node.declare_parameter("start_lanelet_id_is_greater_than", lanelet::Id());
   node.declare_parameter("start_lanelet_id_is_less_than", std::numeric_limits<lanelet::Id>::max());
   node.declare_parameter("start_lanelet_is_left_of", lanelet::Id());

@@ -68,6 +68,14 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
     });
   }
 
+  if (const auto name = prefix + "id"; node.has_parameter(name)) {
+    if (const auto id = node.get_parameter(name).as_int(); id) {
+      constraints.emplace(name, [id](auto && lanelet, auto &&...) {  //
+        return lanelet.id() == id;
+      });
+    }
+  }
+
   if (const auto name = prefix + "id_greater_than"; node.has_parameter(name)) {
     const auto lower_bound = node.get_parameter(name).as_int();
     constraints.emplace(name, [lower_bound](auto && lanelet, auto &&...) {  //
