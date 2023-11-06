@@ -1,0 +1,165 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 1
+    date: '2023-09-04T09:13:15.021Z'
+    description: ''
+    author: Tatsuya Yamasaki
+  ParameterDeclarations:
+    ParameterDeclaration:
+      - name: __ego_dimensions_length__
+        parameterType: double
+        value: '0'
+      - name: __ego_dimensions_width__
+        parameterType: double
+        value: '0'
+      - name: __ego_dimensions_height__
+        parameterType: double
+        value: '0'
+      - name: __ego_center_x__
+        parameterType: double
+        value: '0'
+      - name: __ego_center_y__
+        parameterType: double
+        value: '0'
+      - name: __ego_center_z__
+        parameterType: double
+        value: '0'
+      - name: map_path
+        parameterType: string
+        value: $(ros2 pkg prefix --share kashiwanoha_map)/map
+      - name: ego_start_lanelet_id
+        parameterType: string
+        value: $(ros2 run map_fragment find --ros-args
+          -p input_directory:=$(var map_path)
+          -p is_leftmost:=true
+          -p route_length_greater_than:=100.0
+          -p select:=any
+          )
+      - name: ego_goal_lanelet_id
+        parameterType: string
+        value: $(ros2 run map_fragment path --ros-args
+          -p input_directory:=$(var map_path)
+          -p start_lanelet_id:=$(var ego_start_lanelet_id)
+          -p select_lanelet:=last
+          )
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $map_path
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property:
+                - name: isEgo
+                  value: 'true'
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: $ego_start_lanelet_id
+                      s: 1
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position: &DESTINATION
+                      LanePosition:
+                        roadId: ''
+                        laneId: $ego_goal_lanelet_id
+                        s: 0
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+    Story:
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: *DESTINATION
+                                        tolerance: 1
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 180
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
