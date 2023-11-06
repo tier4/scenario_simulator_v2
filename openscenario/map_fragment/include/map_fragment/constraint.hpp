@@ -18,6 +18,8 @@
 #include <lanelet2_core/geometry/LaneletMap.h>
 #include <lanelet2_routing/RoutingGraph.h>
 
+#include <algorithm>
+
 namespace map_fragment
 {
 inline namespace constraint
@@ -147,6 +149,39 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
     constraints.emplace(name, [lower_bound](auto && lanelet, auto &&, auto && graph) {
       return 0 < graph.possiblePaths(lanelet, lower_bound).size();
     });
+  }
+
+  return constraints;
+}
+
+template <typename Node>
+auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = "")
+{
+  std::unordered_map<
+    std::string, std::function<bool(
+                   const lanelet::routing::LaneletPath &, const lanelet::LaneletMap &,
+                   const lanelet::routing::RoutingGraph &)>>
+    constraints;
+
+  if (const auto name = prefix + "includes_id"; node.has_parameter(name)) {
+    if (const auto id = node.get_parameter(name).as_int(); id) {
+      constraints.emplace(name, [id](auto && path, auto &&...) {  //
+        return std::any_of(
+          path.begin(), path.end(), [id](auto && lanelet) { return lanelet.id() == id; });
+      });
+    }
+  }
+
+  if (const auto name = prefix + "is_allowed_to_contain_duplicate_lanelet_ids";
+      node.has_parameter(name)) {
+    if (not node.get_parameter(name).as_bool()) {
+      constraints.emplace(name, [](auto path, auto &&...) {  //
+        std::sort(path.begin(), path.end(), [](auto && a, auto && b) { return a.id() < b.id(); });
+        return std::adjacent_find(path.begin(), path.end(), [](auto && a, auto && b) {
+                 return a.id() == b.id();
+               }) == path.end();
+      });
+    }
   }
 
   return constraints;

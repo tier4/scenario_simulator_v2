@@ -60,19 +60,33 @@ try {
 
   const auto start_lanelets = filter(satisfy_start_lanelet_constraints, lanelet_map->laneletLayer);
 
-  DEBUG(start_lanelets.size());
+  node.declare_parameter("path_is_allowed_to_include_lane_changes", false);
+  node.declare_parameter("path_length_greater_than", 100.0);
 
   auto possible_paths = [&](auto && lanelet) {
     auto parameters = lanelet::routing::PossiblePathsParams();
-    parameters.includeLaneChanges = true;
-    parameters.routingCostLimit = 100.0;
+    parameters.includeLaneChanges =
+      node.get_parameter("path_is_allowed_to_include_lane_changes").as_bool();
+    parameters.routingCostLimit = node.get_parameter("path_length_greater_than").as_double();
     auto result = routing_graph->possiblePaths(lanelet, parameters);
     return result;
   };
 
   auto paths = append_map(possible_paths, start_lanelets);
 
-  DEBUG(paths.size());
+  node.declare_parameter("path_includes_id", lanelet::Id());
+  node.declare_parameter("path_is_allowed_to_contain_duplicate_lanelet_ids", false);
+
+  auto path_constraints = loadLaneletPathConstraints(node, "path_");
+
+  auto satisfy_path_constraints = [&](const auto & path) {
+    return std::all_of(
+      path_constraints.begin(), path_constraints.end(), [&](const auto & constraint) {
+        return constraint.second(path, *lanelet_map, *routing_graph);
+      });
+  };
+
+  auto filtered_paths = filter(satisfy_path_constraints, paths);
 
   node.declare_parameter("select_path", "any");
   node.declare_parameter("select_lanelet", "last");
@@ -80,7 +94,7 @@ try {
   auto select =
     loadLaneletPathSelector(node, "", "_path", loadLaneletSelector(node, "", "_lanelet"));
 
-  select(paths);
+  select(filtered_paths);
 
   return EXIT_SUCCESS;
 } catch (const std::exception & exception) {
