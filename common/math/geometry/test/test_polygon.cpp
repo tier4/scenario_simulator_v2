@@ -15,6 +15,7 @@
 #include <gtest/gtest.h>
 
 #include <geometry/polygon/polygon.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
 
@@ -74,10 +75,12 @@ TEST(Polygon, getMaxValue)
 TEST(Polygon, getMaxValueEmptyVector)
 {
   std::vector<geometry_msgs::msg::Point> points;
-  // FIXME: std::runtime_error is temporary and should be replaced with the one used in getMaxValue()
-  EXPECT_THROW(math::geometry::getMaxValue(points, math::geometry::Axis::X), std::runtime_error);
-  EXPECT_THROW(math::geometry::getMaxValue(points, math::geometry::Axis::Y), std::runtime_error);
-  EXPECT_THROW(math::geometry::getMaxValue(points, math::geometry::Axis::Z), std::runtime_error);
+  EXPECT_THROW(
+    math::geometry::getMaxValue(points, math::geometry::Axis::X), common::SimulationError);
+  EXPECT_THROW(
+    math::geometry::getMaxValue(points, math::geometry::Axis::Y), common::SimulationError);
+  EXPECT_THROW(
+    math::geometry::getMaxValue(points, math::geometry::Axis::Z), common::SimulationError);
 }
 
 TEST(Polygon, getMinValue)
@@ -92,10 +95,12 @@ TEST(Polygon, getMinValue)
 TEST(Polygon, getMinValueEmptyVector)
 {
   std::vector<geometry_msgs::msg::Point> points;
-  // FIXME: std::runtime_error is temporary and should be replaced with the one used in getMinValue()
-  EXPECT_THROW(math::geometry::getMinValue(points, math::geometry::Axis::X), std::runtime_error);
-  EXPECT_THROW(math::geometry::getMinValue(points, math::geometry::Axis::Y), std::runtime_error);
-  EXPECT_THROW(math::geometry::getMinValue(points, math::geometry::Axis::Z), std::runtime_error);
+  EXPECT_THROW(
+    math::geometry::getMinValue(points, math::geometry::Axis::X), common::SimulationError);
+  EXPECT_THROW(
+    math::geometry::getMinValue(points, math::geometry::Axis::Y), common::SimulationError);
+  EXPECT_THROW(
+    math::geometry::getMinValue(points, math::geometry::Axis::Z), common::SimulationError);
 }
 
 TEST(Polygon, get2DConvexHull)
