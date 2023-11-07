@@ -16,6 +16,7 @@
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
 
@@ -70,10 +71,8 @@ TEST(LineSegment, initializeVectorZero)
 {
   geometry_msgs::msg::Point point = makePoint(0, 0);
   geometry_msgs::msg::Vector3 vec = makeVector(0, 0);
-  EXPECT_NO_THROW(const math::geometry::LineSegment line_segment(point, vec, 1));
-  const math::geometry::LineSegment line_segment(point, vec, 1);
-  EXPECT_POINT_EQ(line_segment.start_point, point);
-  EXPECT_POINT_EQ(line_segment.end_point, point);
+  EXPECT_THROW(
+    const math::geometry::LineSegment line_segment(point, vec, 1), common::SimulationError);
 }
 
 TEST(LineSegment, initializeVectorZeroLength)
