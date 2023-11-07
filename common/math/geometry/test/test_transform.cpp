@@ -21,121 +21,100 @@
 
 constexpr double EPS = 1e-3;
 
-geometry_msgs::msg::Pose filled_pose()
+geometry_msgs::msg::Point makePoint(double x, double y, double z = 0.0)
+{
+  geometry_msgs::msg::Point p;
+  p.x = x;
+  p.y = y;
+  p.z = z;
+  return p;
+}
+
+geometry_msgs::msg::Pose makePose(
+  double x, double y, double z = 0.0,
+  geometry_msgs::msg::Quaternion q = geometry_msgs::msg::Quaternion())
+{
+  geometry_msgs::msg::Pose p;
+  p.position.x = x;
+  p.position.y = y;
+  p.position.z = z;
+  p.orientation = q;
+  return p;
+}
+
+geometry_msgs::msg::Pose getFilledPose()
 {
   geometry_msgs::msg::Pose pose;
-  pose.position.x = 1.0;
-  pose.position.y = 2.0;
-  pose.position.z = 3.0;
-  pose.orientation = quaternion_operation::convertEulerAngleToQuaternion([]() {
-    geometry_msgs::msg::Vector3 v;
-    v.x = 90 * M_PI / 180.0;
-    v.y = 0.0;
-    v.z = 0.0;
-    return v;
-  }());
+  pose.position = makePoint(1, 2, 3);
+  pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    geometry_msgs::build<geometry_msgs::msg::Vector3>().x(90.0 * M_PI / 180.0).y(0.0).z(0.0));
   return pose;
 }
 
 TEST(Transform, getRelativePoseDifferent)
 {
-  auto pose0 = filled_pose();
-  auto pose1 = geometry_msgs::msg::Pose();
-  pose1.position.x = 3;
+  geometry_msgs::msg::Pose pose0 = getFilledPose();
+  geometry_msgs::msg::Pose pose1 = makePose(3, 0);
 
-  auto ans = filled_pose();
-  ans.position.x = 2.0;
-  ans.position.y = -3.0;
-  ans.position.z = 2.0;
-  ans.orientation.x = -0.707;
-
+  geometry_msgs::msg::Pose ans = makePose(
+    2, -3, 2,
+    quaternion_operation::convertEulerAngleToQuaternion(
+      geometry_msgs::build<geometry_msgs::msg::Vector3>().x(-90.0 * M_PI / 180.0).y(0.0).z(0.0)));
   EXPECT_POSE_NEAR(math::geometry::getRelativePose(pose0, pose1), ans, EPS);
 }
 
 TEST(Transform, getRelativePoseIdentical)
 {
-  auto pose = filled_pose();
+  geometry_msgs::msg::Pose pose = getFilledPose();
   EXPECT_POSE_EQ(math::geometry::getRelativePose(pose, pose), geometry_msgs::msg::Pose());
 }
 
 TEST(Transform, transformPointRealPose)
 {
-  auto pose = filled_pose();
-  auto point = geometry_msgs::msg::Point();
-  point.x = 1.0;
-  point.y = 2.0;
-  point.z = 3.0;
+  geometry_msgs::msg::Pose pose = getFilledPose();
+  geometry_msgs::msg::Point point = makePoint(1, 2, 3);
 
-  auto ans = geometry_msgs::msg::Point();
-  ans.x = 2.0;
-  ans.y = -1.0;
-  ans.z = 5.0;
+  geometry_msgs::msg::Point ans = makePoint(2, -1, 5);
   EXPECT_POINT_EQ(math::geometry::transformPoint(pose, point), ans);
 }
 
 TEST(Transform, transformPointNoPose)
 {
-  auto pose = geometry_msgs::msg::Pose();
-  auto point = geometry_msgs::msg::Point();
-  point.x = 1.0;
-  point.y = 2.0;
-  point.z = 3.0;
-
+  geometry_msgs::msg::Pose pose;
+  geometry_msgs::msg::Point point = makePoint(1, 2, 3);
   EXPECT_POINT_EQ(math::geometry::transformPoint(pose, point), point);
 }
 
 TEST(Transform, transformPointRealSensorPose)
 {
-  auto pose = filled_pose();
-  auto sensor_pose = filled_pose();
+  geometry_msgs::msg::Pose pose = getFilledPose();
+  geometry_msgs::msg::Pose sensor_pose = getFilledPose();
   sensor_pose.orientation = geometry_msgs::msg::Quaternion();
-  auto point = geometry_msgs::msg::Point();
-  point.x = 1.0;
-  point.y = 2.0;
-  point.z = 3.0;
+  geometry_msgs::msg::Point point = makePoint(1, 2, 3);
 
-  auto ans = geometry_msgs::msg::Point();
-  ans.x = 1.0;
-  ans.y = -3.0;
-  ans.z = 2.0;
+  geometry_msgs::msg::Point ans = makePoint(1, -3, 2);
   EXPECT_POINT_EQ(math::geometry::transformPoint(pose, sensor_pose, point), ans);
 }
 
 TEST(Transform, transformPointNoSensorPose)
 {
-  auto pose = filled_pose();
-  auto sensor_pose = geometry_msgs::msg::Pose();
-  auto point = geometry_msgs::msg::Point();
-  point.x = 1.0;
-  point.y = 2.0;
-  point.z = 3.0;
+  geometry_msgs::msg::Pose pose = getFilledPose();
+  geometry_msgs::msg::Pose sensor_pose;
+  geometry_msgs::msg::Point point = makePoint(1, 2, 3);
 
-  auto ans = geometry_msgs::msg::Point();
-  ans.x = 2.0;
-  ans.y = -1.0;
-  ans.z = 5.0;
+  geometry_msgs::msg::Point ans = makePoint(2, -1, 5);
   EXPECT_POINT_EQ(math::geometry::transformPoint(pose, sensor_pose, point), ans);
 }
 
 TEST(Transform, transformPointsRealPose)
 {
-  auto pose = filled_pose();
+  geometry_msgs::msg::Pose pose = getFilledPose();
   std::vector<geometry_msgs::msg::Point> points(2);
-  points[0].x = 1.0;
-  points[0].y = 2.0;
-  points[0].z = 3.0;
-  points[1].x = 1.0;
-  points[1].y = 4.0;
-  points[1].z = 3.0;
+  points[0] = makePoint(1, 2, 3);
+  points[1] = makePoint(1, 4, 3);
 
-  auto ans0 = geometry_msgs::msg::Point();
-  ans0.x = 2.0;
-  ans0.y = -1.0;
-  ans0.z = 5.0;
-  auto ans1 = geometry_msgs::msg::Point();
-  ans1.x = 2.0;
-  ans1.y = -1.0;
-  ans1.z = 7.0;
+  geometry_msgs::msg::Point ans0 = makePoint(2, -1, 5);
+  geometry_msgs::msg::Point ans1 = makePoint(2, -1, 7);
 
   std::vector<geometry_msgs::msg::Point> ans = math::geometry::transformPoints(pose, points);
   EXPECT_EQ(ans.size(), size_t(2));
@@ -145,14 +124,10 @@ TEST(Transform, transformPointsRealPose)
 
 TEST(Transform, transformPointsNoPose)
 {
-  auto pose = geometry_msgs::msg::Pose();
+  geometry_msgs::msg::Pose pose;
   std::vector<geometry_msgs::msg::Point> points(2);
-  points[0].x = 1.0;
-  points[0].y = 2.0;
-  points[0].z = 3.0;
-  points[1].x = 1.0;
-  points[1].y = 4.0;
-  points[1].z = 3.0;
+  points[0] = makePoint(1, 2, 3);
+  points[1] = makePoint(1, 4, 3);
 
   std::vector<geometry_msgs::msg::Point> ans = math::geometry::transformPoints(pose, points);
   EXPECT_EQ(ans.size(), size_t(2));
@@ -162,7 +137,7 @@ TEST(Transform, transformPointsNoPose)
 
 TEST(Transform, transformPointsEmptyVector)
 {
-  auto pose = filled_pose();
+  geometry_msgs::msg::Pose pose = getFilledPose();
   std::vector<geometry_msgs::msg::Point> points;
 
   std::vector<geometry_msgs::msg::Point> ans;
@@ -172,27 +147,17 @@ TEST(Transform, transformPointsEmptyVector)
 
 TEST(Transform, transformPointsRealSensorPose)
 {
-  auto pose = filled_pose();
-  auto sensor_pose = filled_pose();
+  geometry_msgs::msg::Pose pose = getFilledPose();
+  geometry_msgs::msg::Pose sensor_pose = getFilledPose();
   sensor_pose.orientation = geometry_msgs::msg::Quaternion();
   std::vector<geometry_msgs::msg::Point> points(2);
-  points[0].x = 1.0;
-  points[0].y = 2.0;
-  points[0].z = 3.0;
-  points[1].x = 1.0;
-  points[1].y = 4.0;
-  points[1].z = 3.0;
+  points[0] = makePoint(1, 2, 3);
+  points[1] = makePoint(1, 4, 3);
 
   std::vector<geometry_msgs::msg::Point> ans =
     math::geometry::transformPoints(pose, sensor_pose, points);
-  auto ans0 = geometry_msgs::msg::Point();
-  ans0.x = 1.0;
-  ans0.y = -3.0;
-  ans0.z = 2.0;
-  auto ans1 = geometry_msgs::msg::Point();
-  ans1.x = 1.0;
-  ans1.y = -3.0;
-  ans1.z = 4.0;
+  geometry_msgs::msg::Point ans0 = makePoint(1, -3, 2);
+  geometry_msgs::msg::Point ans1 = makePoint(1, -3, 4);
   EXPECT_EQ(ans.size(), size_t(2));
   EXPECT_POINT_NEAR(ans[0], ans0, EPS);
   EXPECT_POINT_NEAR(ans[1], ans1, EPS);
@@ -200,26 +165,16 @@ TEST(Transform, transformPointsRealSensorPose)
 
 TEST(Transform, transformPointsNoSensorPose)
 {
-  auto pose = filled_pose();
-  auto sensor_pose = geometry_msgs::msg::Pose();
+  geometry_msgs::msg::Pose pose = getFilledPose();
+  geometry_msgs::msg::Pose sensor_pose;
   std::vector<geometry_msgs::msg::Point> points(2);
-  points[0].x = 1.0;
-  points[0].y = 2.0;
-  points[0].z = 3.0;
-  points[1].x = 1.0;
-  points[1].y = 4.0;
-  points[1].z = 3.0;
+  points[0] = makePoint(1, 2, 3);
+  points[1] = makePoint(1, 4, 3);
 
   std::vector<geometry_msgs::msg::Point> ans =
     math::geometry::transformPoints(pose, sensor_pose, points);
-  auto ans0 = geometry_msgs::msg::Point();
-  ans0.x = 2.0;
-  ans0.y = -1.0;
-  ans0.z = 5.0;
-  auto ans1 = geometry_msgs::msg::Point();
-  ans1.x = 2.0;
-  ans1.y = -1.0;
-  ans1.z = 7.0;
+  geometry_msgs::msg::Point ans0 = makePoint(2, -1, 5);
+  geometry_msgs::msg::Point ans1 = makePoint(2, -1, 7);
   EXPECT_EQ(ans.size(), size_t(2));
   EXPECT_POINT_NEAR(ans[0], ans0, EPS);
   EXPECT_POINT_NEAR(ans[1], ans1, EPS);
@@ -227,8 +182,8 @@ TEST(Transform, transformPointsNoSensorPose)
 
 TEST(Transform, transformPointsEmptyVectorWithSensorPose)
 {
-  auto pose = filled_pose();
-  auto sensor_pose = filled_pose();
+  geometry_msgs::msg::Pose pose = getFilledPose();
+  geometry_msgs::msg::Pose sensor_pose = getFilledPose();
   std::vector<geometry_msgs::msg::Point> points;
 
   std::vector<geometry_msgs::msg::Point> ans;
