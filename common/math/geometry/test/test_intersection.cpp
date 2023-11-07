@@ -143,13 +143,33 @@ TEST(Intersection, getIntersection2DIdenticalVector)
   lines.emplace_back(line);
   lines.emplace_back(line);
   lines.emplace_back(line);
+
   auto ans = math::geometry::getIntersection2D(lines);
   EXPECT_EQ(ans.size(), size_t(6));
-  for (const auto point : ans) {
-    EXPECT_TRUE(std::isnan(point.x));
-    EXPECT_TRUE(std::isnan(point.y));
-    EXPECT_TRUE(std::isnan(point.z));
-  }
+  // point 0
+  EXPECT_TRUE(std::isnan(ans[0].x));
+  EXPECT_TRUE(std::isnan(ans[0].y));
+  EXPECT_TRUE(std::isnan(ans[0].z));
+  // point 1
+  EXPECT_TRUE(std::isnan(ans[1].x));
+  EXPECT_TRUE(std::isnan(ans[1].y));
+  EXPECT_TRUE(std::isnan(ans[1].z));
+  // point 2
+  EXPECT_TRUE(std::isnan(ans[2].x));
+  EXPECT_TRUE(std::isnan(ans[2].y));
+  EXPECT_TRUE(std::isnan(ans[2].z));
+  // point 3
+  EXPECT_TRUE(std::isnan(ans[3].x));
+  EXPECT_TRUE(std::isnan(ans[3].y));
+  EXPECT_TRUE(std::isnan(ans[3].z));
+  // point 4
+  EXPECT_TRUE(std::isnan(ans[4].x));
+  EXPECT_TRUE(std::isnan(ans[4].y));
+  EXPECT_TRUE(std::isnan(ans[4].z));
+  // point 5
+  EXPECT_TRUE(std::isnan(ans[5].x));
+  EXPECT_TRUE(std::isnan(ans[5].y));
+  EXPECT_TRUE(std::isnan(ans[5].z));
 }
 
 TEST(Intersection, getIntersection2DEmptyVector)
