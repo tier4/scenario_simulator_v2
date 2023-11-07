@@ -31,31 +31,35 @@ TEST(Polygon, filterByAxis)
 {
   std::vector<geometry_msgs::msg::Point> points{
     makePoint(5, 2, 3), makePoint(1, 4, 5), makePoint(-1, 2, -3)};
-  std::vector<double> values;
-  values = math::geometry::filterByAxis(points, math::geometry::Axis::X);
-  EXPECT_DOUBLE_EQ(values[0], 5);
-  EXPECT_DOUBLE_EQ(values[1], 1);
-  EXPECT_DOUBLE_EQ(values[2], -1);
-  values = math::geometry::filterByAxis(points, math::geometry::Axis::Y);
-  EXPECT_DOUBLE_EQ(values[0], 2);
-  EXPECT_DOUBLE_EQ(values[1], 4);
-  EXPECT_DOUBLE_EQ(values[2], 2);
-  values = math::geometry::filterByAxis(points, math::geometry::Axis::Z);
-  EXPECT_DOUBLE_EQ(values[0], 3);
-  EXPECT_DOUBLE_EQ(values[1], 5);
-  EXPECT_DOUBLE_EQ(values[2], -3);
+
+  std::vector<double> values_x = math::geometry::filterByAxis(points, math::geometry::Axis::X);
+  EXPECT_DOUBLE_EQ(values_x[0], 5);
+  EXPECT_DOUBLE_EQ(values_x[1], 1);
+  EXPECT_DOUBLE_EQ(values_x[2], -1);
+
+  std::vector<double> values_y = math::geometry::filterByAxis(points, math::geometry::Axis::Y);
+  EXPECT_DOUBLE_EQ(values_y[0], 2);
+  EXPECT_DOUBLE_EQ(values_y[1], 4);
+  EXPECT_DOUBLE_EQ(values_y[2], 2);
+
+  std::vector<double> values_z = math::geometry::filterByAxis(points, math::geometry::Axis::Z);
+  EXPECT_DOUBLE_EQ(values_z[0], 3);
+  EXPECT_DOUBLE_EQ(values_z[1], 5);
+  EXPECT_DOUBLE_EQ(values_z[2], -3);
 }
 
 TEST(Polygon, filterByAxisEmptyVector)
 {
   std::vector<geometry_msgs::msg::Point> points;
-  std::vector<double> values;
-  values = math::geometry::filterByAxis(points, math::geometry::Axis::X);
-  EXPECT_TRUE(values.empty());
-  values = math::geometry::filterByAxis(points, math::geometry::Axis::Y);
-  EXPECT_TRUE(values.empty());
-  values = math::geometry::filterByAxis(points, math::geometry::Axis::Z);
-  EXPECT_TRUE(values.empty());
+
+  std::vector<double> values_x = math::geometry::filterByAxis(points, math::geometry::Axis::X);
+  EXPECT_TRUE(values_x.empty());
+
+  std::vector<double> values_y = math::geometry::filterByAxis(points, math::geometry::Axis::Y);
+  EXPECT_TRUE(values_y.empty());
+
+  std::vector<double> values_z = math::geometry::filterByAxis(points, math::geometry::Axis::Z);
+  EXPECT_TRUE(values_z.empty());
 }
 
 TEST(Polygon, getMaxValue)
