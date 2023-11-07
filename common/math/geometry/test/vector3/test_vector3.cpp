@@ -22,7 +22,7 @@
 #include <geometry/vector3/operator.hpp>
 
 #include "../expect_eq_macros.hpp"
-#include "utils.hpp"
+#include "../test_utils.hpp"
 
 constexpr double EPS = 1e-6;
 

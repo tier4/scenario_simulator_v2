@@ -18,24 +18,7 @@
 #include <geometry/intersection/intersection.hpp>
 
 #include "expect_eq_macros.hpp"
-
-geometry_msgs::msg::Point makePoint(double x, double y, double z = 0)
-{
-  geometry_msgs::msg::Point p;
-  p.x = x;
-  p.y = y;
-  p.z = z;
-  return p;
-}
-
-geometry_msgs::msg::Vector3 makeVector(double x, double y, double z = 0)
-{
-  geometry_msgs::msg::Vector3 v;
-  v.x = x;
-  v.y = y;
-  v.z = z;
-  return v;
-}
+#include "test_utils.hpp"
 
 TEST(Intersection, isIntersect2DDisjoint)
 {

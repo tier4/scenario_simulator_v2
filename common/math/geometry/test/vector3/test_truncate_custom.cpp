@@ -54,9 +54,3 @@ TEST(Vector3, truncate_customVectorOverMax)
   CustomVector3<float> vec0(4, 4, 4);
   EXPECT_VECTOR3_EQ(math::geometry::truncate(vec0, std::sqrt(12)), CustomVector3(2.0, 2.0, 2.0));
 }
-
-// int main(int argc, char ** argv)
-// {
-//   testing::InitGoogleTest(&argc, argv);
-//   return RUN_ALL_TESTS();
-// }

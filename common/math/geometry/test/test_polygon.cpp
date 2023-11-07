@@ -18,15 +18,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
-
-geometry_msgs::msg::Point makePoint(double x, double y, double z = 0)
-{
-  geometry_msgs::msg::Point p;
-  p.x = x;
-  p.y = y;
-  p.z = z;
-  return p;
-}
+#include "test_utils.hpp"
 
 TEST(Polygon, filterByAxis)
 {

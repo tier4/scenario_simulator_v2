@@ -18,17 +18,9 @@
 #include <limits>
 
 #include "expect_eq_macros.hpp"
+#include "test_utils.hpp"
 
 constexpr double EPS = 1e-3;
-
-geometry_msgs::msg::Point makePoint(double x, double y, double z = 0.0)
-{
-  geometry_msgs::msg::Point p;
-  p.x = x;
-  p.y = y;
-  p.z = z;
-  return p;
-}
 
 TEST(LINEAR_ALGEBRA, GET_SIZE_ZERO)
 {
