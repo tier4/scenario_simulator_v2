@@ -18,17 +18,9 @@
 #include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
+#include "test_utils.hpp"
 
 constexpr double EPS = 1e-6;
-
-geometry_msgs::msg::Point makePoint(double x, double y, double z = 0)
-{
-  geometry_msgs::msg::Point p;
-  p.x = x;
-  p.y = y;
-  p.z = z;
-  return p;
-}
 
 /// @brief Helper function generating line: p(0,0)-> p(1,3) -> p(2,6)
 std::shared_ptr<math::geometry::CatmullRomSpline> makeLine()
