@@ -18,29 +18,9 @@
 #include <geometry/transform.hpp>
 
 #include "expect_eq_macros.hpp"
+#include "test_utils.hpp"
 
 constexpr double EPS = 1e-3;
-
-geometry_msgs::msg::Point makePoint(double x, double y, double z = 0.0)
-{
-  geometry_msgs::msg::Point p;
-  p.x = x;
-  p.y = y;
-  p.z = z;
-  return p;
-}
-
-geometry_msgs::msg::Pose makePose(
-  double x, double y, double z = 0.0,
-  geometry_msgs::msg::Quaternion q = geometry_msgs::msg::Quaternion())
-{
-  geometry_msgs::msg::Pose p;
-  p.position.x = x;
-  p.position.y = y;
-  p.position.z = z;
-  p.orientation = q;
-  return p;
-}
 
 geometry_msgs::msg::Pose getFilledPose()
 {

@@ -19,24 +19,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
-
-geometry_msgs::msg::Point makePoint(double x, double y, double z = 0)
-{
-  geometry_msgs::msg::Point v;
-  v.x = x;
-  v.y = y;
-  v.z = z;
-  return v;
-}
-
-geometry_msgs::msg::Vector3 makeVector(double x, double y, double z = 0)
-{
-  geometry_msgs::msg::Vector3 v;
-  v.x = x;
-  v.y = y;
-  v.z = z;
-  return v;
-}
+#include "test_utils.hpp"
 
 TEST(LineSegment, initializeDifferentPoints)
 {

@@ -18,26 +18,7 @@
 #include <geometry/distance.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-geometry_msgs::msg::Point makePoint(double x, double y, double z = 0.0)
-{
-  geometry_msgs::msg::Point p;
-  p.x = x;
-  p.y = y;
-  p.z = z;
-  return p;
-}
-
-geometry_msgs::msg::Pose makePose(
-  double x, double y, double z = 0.0,
-  geometry_msgs::msg::Quaternion q = geometry_msgs::msg::Quaternion())
-{
-  geometry_msgs::msg::Pose p;
-  p.position.x = x;
-  p.position.y = y;
-  p.position.z = z;
-  p.orientation = q;
-  return p;
-}
+#include "test_utils.hpp"
 
 TEST(Distance, PointToPoint)
 {

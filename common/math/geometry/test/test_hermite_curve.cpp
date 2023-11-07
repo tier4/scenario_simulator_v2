@@ -17,38 +17,9 @@
 #include <geometry/spline/hermite_curve.hpp>
 
 #include "expect_eq_macros.hpp"
+#include "test_utils.hpp"
 
 constexpr double EPS = 1e-3;
-
-geometry_msgs::msg::Point makePoint(double x, double y, double z = 0)
-{
-  geometry_msgs::msg::Point p;
-  p.x = x;
-  p.y = y;
-  p.z = z;
-  return p;
-}
-
-geometry_msgs::msg::Vector3 makeVector(double x, double y, double z = 0)
-{
-  geometry_msgs::msg::Vector3 v;
-  v.x = x;
-  v.y = y;
-  v.z = z;
-  return v;
-}
-
-geometry_msgs::msg::Pose makePose(
-  double x, double y, double z = 0,
-  geometry_msgs::msg::Quaternion q = geometry_msgs::msg::Quaternion())
-{
-  geometry_msgs::msg::Pose p;
-  p.position.x = x;
-  p.position.y = y;
-  p.position.z = z;
-  p.orientation = q;
-  return p;
-}
 
 /// @brief Helper function generating straight line: p(0,0) v(1,0)-> p(1,0) v(1,0)
 math::geometry::HermiteCurve makeLine1()

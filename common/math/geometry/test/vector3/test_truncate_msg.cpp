@@ -20,7 +20,7 @@
 #include <geometry/vector3/truncate.hpp>
 
 #include "../expect_eq_macros.hpp"
-#include "utils.hpp"
+#include "../test_utils.hpp"
 
 constexpr double EPS = 1e-6;
 
@@ -35,9 +35,3 @@ TEST(Vector3, truncate_msgVectorOverMax)
   geometry_msgs::msg::Vector3 vec0 = makeVector(4, 4, 4);
   EXPECT_VECTOR3_EQ(math::geometry::truncate(vec0, std::sqrt(12)), makeVector(2, 2, 2));
 }
-
-// int main(int argc, char ** argv)
-// {
-//   testing::InitGoogleTest(&argc, argv);
-//   return RUN_ALL_TESTS();
-// }

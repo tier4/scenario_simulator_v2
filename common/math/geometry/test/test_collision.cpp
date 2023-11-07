@@ -17,40 +17,7 @@
 #include <geometry/intersection/collision.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
-geometry_msgs::msg::Point makePoint(double x, double y, double z = 0.0)
-{
-  geometry_msgs::msg::Point p;
-  p.x = x;
-  p.y = y;
-  p.z = z;
-  return p;
-}
-
-geometry_msgs::msg::Pose makePose(
-  double x, double y, double z = 0.0,
-  geometry_msgs::msg::Quaternion q = geometry_msgs::msg::Quaternion())
-{
-  geometry_msgs::msg::Pose pose;
-  pose.position.x = x;
-  pose.position.y = y;
-  pose.position.z = z;
-  pose.orientation = q;
-  return pose;
-}
-
-traffic_simulator_msgs::msg::BoundingBox makeBbox(
-  double dim_x, double dim_y, double dim_z = 0.0, double center_x = 0.0, double center_y = 0.0,
-  double center_z = 0.0)
-{
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.dimensions.x = dim_x;
-  bbox.dimensions.y = dim_y;
-  bbox.dimensions.z = dim_z;
-  bbox.center.x = center_x;
-  bbox.center.y = center_y;
-  bbox.center.z = center_z;
-  return bbox;
-}
+#include "test_utils.hpp"
 
 TEST(Collision, DifferentHeight)
 {
