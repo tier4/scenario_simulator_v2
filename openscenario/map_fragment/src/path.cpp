@@ -76,6 +76,7 @@ try {
 
   node.declare_parameter("path_includes_id", lanelet::Id());
   node.declare_parameter("path_is_allowed_to_contain_duplicate_lanelet_ids", false);
+  node.declare_parameter("path_includes_lanelet_related_to_regulatory_element_subtyped", "");
 
   auto path_constraints = loadLaneletPathConstraints(node, "path_");
 
