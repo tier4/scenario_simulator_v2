@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
+#include <quaternion_operation/quaternion_operation.h>
 
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
@@ -95,25 +96,6 @@ TEST(LineSegment, getIntersection2DDisjoint)
   EXPECT_FALSE(line0.getIntersection2D(line1));
 }
 
-TEST(LineSegment, getIntersection2DIntersect)
-{
-  const math::geometry::LineSegment line0(makePoint(0, 0), makePoint(1, 1));
-  const math::geometry::LineSegment line1(makePoint(1, 0), makePoint(0, 1));
-  auto ans = line0.getIntersection2D(line1);
-  EXPECT_TRUE(ans);
-  EXPECT_POINT_EQ(ans.value(), makePoint(0.5, 0.5));
-}
-
-TEST(LineSegment, getIntersection2DIdentical)
-{
-  const math::geometry::LineSegment line(makePoint(0, 0), makePoint(1, 1));
-  EXPECT_THROW(line.getIntersection2D(line), common::SimulationError);
-  // auto ans = line.getIntersection2D(line);
-  // EXPECT_TRUE(ans);
-  // EXPECT_TRUE(std::isnan(ans.value().x));
-  // EXPECT_TRUE(std::isnan(ans.value().y));
-}
-
 TEST(LineSegment, getVector)
 {
   const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(2, 3, 4));
@@ -124,6 +106,18 @@ TEST(LineSegment, getVectorZeroLength)
 {
   const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(1, 2, 3));
   EXPECT_POINT_EQ(line.getVector(), makeVector(0, 0, 0));
+}
+
+TEST(LineSegment, getNormalVector)
+{
+  const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(2, 3, 4));
+  EXPECT_VECTOR3_EQ(line.getNormalVector(), makeVector(-1, 1, 0));
+}
+
+TEST(LineSegment, getNormalVector_zeroLength)
+{
+  const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(1, 2, 3));
+  EXPECT_VECTOR3_EQ(line.getNormalVector(), makeVector(0, 0, 0));
 }
 
 TEST(LineSegment, get2DVector)
@@ -174,12 +168,54 @@ TEST(LineSegment, getSlopeZeroLength)
   EXPECT_TRUE(std::isnan(line.getSlope()));
 }
 
+TEST(LineSegment, getSquaredDistanceIn2D)
+{
+  const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(3, 4, 5));
+  EXPECT_DOUBLE_EQ(line.getSquaredDistanceIn2D(makePoint(0, 1, 2), 0.5, false), 8.0);
+}
+
+TEST(LineSegment, getSquaredDistanceIn2D_denormalize)
+{
+  const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(3, 4, 5));
+  EXPECT_DOUBLE_EQ(line.getSquaredDistanceIn2D(makePoint(0, 1, 2), std::sqrt(3.0), true), 8.0);
+}
+
+TEST(LineSegment, getSquaredDistanceVector)
+{
+  const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(3, 4, 5));
+  EXPECT_VECTOR3_EQ(
+    line.getSquaredDistanceVector(makePoint(0, 1, 2), 0.5, false), makeVector(-2, -2, -2));
+}
+
+TEST(LineSegment, getSquaredDistanceVector_denormalize)
+{
+  const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(3, 4, 5));
+  EXPECT_VECTOR3_EQ(
+    line.getSquaredDistanceVector(makePoint(0, 1, 2), std::sqrt(3.0), true),
+    makeVector(-2, -2, -2));
+}
+
 TEST(LineSegment, getLineSegments)
 {
   const std::vector<geometry_msgs::msg::Point> points{
     makePoint(1, 2, 3), makePoint(2, 3, 4), makePoint(3, 4, 5), makePoint(4, 5, 6)};
   const std::vector<math::geometry::LineSegment> lines =
-    math::geometry::getLineSegments(points, true);  // close start and end
+    math::geometry::getLineSegments(points, false);
+  EXPECT_EQ(lines.size(), size_t(3));
+  EXPECT_POINT_EQ(lines[0].start_point, points[0]);
+  EXPECT_POINT_EQ(lines[0].end_point, points[1]);
+  EXPECT_POINT_EQ(lines[1].start_point, points[1]);
+  EXPECT_POINT_EQ(lines[1].end_point, points[2]);
+  EXPECT_POINT_EQ(lines[2].start_point, points[2]);
+  EXPECT_POINT_EQ(lines[2].end_point, points[3]);
+}
+
+TEST(LineSegment, getLineSegments_closeStartEnd)
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(1, 2, 3), makePoint(2, 3, 4), makePoint(3, 4, 5), makePoint(4, 5, 6)};
+  const std::vector<math::geometry::LineSegment> lines =
+    math::geometry::getLineSegments(points, true);
   EXPECT_EQ(lines.size(), size_t(4));
   EXPECT_POINT_EQ(lines[0].start_point, points[0]);
   EXPECT_POINT_EQ(lines[0].end_point, points[1]);
@@ -203,7 +239,22 @@ TEST(LineSegment, getLineSegmentsVectorIdentical)
   geometry_msgs::msg::Point point = makePoint(1, 2, 3);
   const std::vector<geometry_msgs::msg::Point> points{point, point, point, point};
   const std::vector<math::geometry::LineSegment> lines =
-    math::geometry::getLineSegments(points, true);  // close start and end
+    math::geometry::getLineSegments(points, false);
+  EXPECT_EQ(lines.size(), size_t(3));
+  EXPECT_POINT_EQ(lines[0].start_point, point);
+  EXPECT_POINT_EQ(lines[0].end_point, point);
+  EXPECT_POINT_EQ(lines[1].start_point, point);
+  EXPECT_POINT_EQ(lines[1].end_point, point);
+  EXPECT_POINT_EQ(lines[2].start_point, point);
+  EXPECT_POINT_EQ(lines[2].end_point, point);
+}
+
+TEST(LineSegment, getLineSegmentsVectorIdentical_closeStartEnd)
+{
+  geometry_msgs::msg::Point point = makePoint(1, 2, 3);
+  const std::vector<geometry_msgs::msg::Point> points{point, point, point, point};
+  const std::vector<math::geometry::LineSegment> lines =
+    math::geometry::getLineSegments(points, true);
   EXPECT_EQ(lines.size(), size_t(4));
   EXPECT_POINT_EQ(lines[0].start_point, point);
   EXPECT_POINT_EQ(lines[0].end_point, point);
@@ -215,8 +266,62 @@ TEST(LineSegment, getLineSegmentsVectorIdentical)
   EXPECT_POINT_EQ(lines[3].end_point, point);
 }
 
+TEST(LineSegment, getSValue)
+{
+  math::geometry::LineSegment line(makePoint(0, 0, 0), makePoint(3, 3, 3));
+  const auto s = line.getSValue(makePose(2, 2, 2), 1, false);
+  EXPECT_TRUE(s);
+  if (s) {
+    EXPECT_DOUBLE_EQ(s.value(), 2.0 / 3.0);
+  }
+}
+
+TEST(LineSegment, getSValue_denormalize)
+{
+  math::geometry::LineSegment line(makePoint(0, 0, 0), makePoint(3, 3, 3));
+  const auto s = line.getSValue(makePose(2, 2, 2), 1, true);
+  EXPECT_TRUE(s);
+  if (s) {
+    EXPECT_DOUBLE_EQ(s.value(), std::hypot(2.0, 2.0, 2.0));
+  }
+}
+
+TEST(LineSegment, getSValue_outOfRange)
+{
+  math::geometry::LineSegment line(makePoint(0, 0, 0), makePoint(3, 3, 3));
+  const auto s = line.getSValue(makePose(4, 4, 4), 1, false);
+  EXPECT_FALSE(s);
+}
+
+TEST(LineSegment, getSValue_outOfRangeDenormalize)
+{
+  math::geometry::LineSegment line(makePoint(0, 0, 0), makePoint(3, 3, 3));
+  const auto s = line.getSValue(makePose(4, 4, 4), 1, true);
+  EXPECT_FALSE(s);
+}
+
+TEST(LineSegment, getSValue_parallel)
+{
+  math::geometry::LineSegment line(makePoint(0, 0, 0), makePoint(3, 3, 0));
+  const auto s = line.getSValue(
+    makePose(
+      1, 0, 0, quaternion_operation::convertEulerAngleToQuaternion(makeVector(0, 0, M_PI_4 * 3.0))),
+    1000, false);
+  EXPECT_FALSE(s);
+}
+
+TEST(LineSegment, getSValue_parallelDenormalize)
+{
+  math::geometry::LineSegment line(makePoint(0, 0, 0), makePoint(3, 3, 0));
+  const auto s = line.getSValue(
+    makePose(
+      1, 0, 0, quaternion_operation::convertEulerAngleToQuaternion(makeVector(0, 0, M_PI_4 * 3.0))),
+    1000, true);
+  EXPECT_FALSE(s);
+}
+
 /// @brief In this test case, testing the `LineSegment::getPoint` function can find the point on the line segment with start point (x,y,z) = (0,0,0) and end point (x,y,z) = (1,1,1) in the cartesian coordinate system. (variable name `line`).
-TEST(LineSegmentTest, GetPoint)
+TEST(LineSegment, GetPoint)
 {
   {
     math::geometry::LineSegment line(
@@ -430,6 +535,63 @@ TEST(LineSegment, getIntersection2DSValue)
     // [Snippet_getIntersection2DSValue_with_point_1_0_0]
     /// @snippet test/test_line_segment.cpp Snippet_getIntersection2DSValue_with_point_1_0_0
 
+    {  // parallel no denormalize
+      EXPECT_THROW(
+        line.getIntersection2DSValue(
+          math::geometry::LineSegment(
+            geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
+            geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0)),
+          false),
+        common::SimulationError);
+    }
+    {  // parallel denormalize
+      EXPECT_THROW(
+        line.getIntersection2DSValue(
+          math::geometry::LineSegment(
+            geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(-1).z(0),
+            geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(1).z(0)),
+          true),
+        common::SimulationError);
+    }
+    {  // intersect no denormalize
+      const auto collision_s = line.getIntersection2DSValue(
+        math::geometry::LineSegment(
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(0.5).z(0),
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0.5).z(0)),
+        false);
+      EXPECT_TRUE(collision_s);
+      if (collision_s) {
+        EXPECT_DOUBLE_EQ(collision_s.value(), 0.75);
+      }
+    }
+    {  // intersect denormalize
+      const auto collision_s = line.getIntersection2DSValue(
+        math::geometry::LineSegment(
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(0.5).z(0),
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0.5).z(0)),
+        true);
+      EXPECT_TRUE(collision_s);
+      if (collision_s) {
+        EXPECT_DOUBLE_EQ(collision_s.value(), 1.5);
+      }
+    }
+    {  // no intersect no denormalize
+      const auto collision_s = line.getIntersection2DSValue(
+        math::geometry::LineSegment(
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(1.5).z(0),
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1.5).z(0)),
+        false);
+      EXPECT_FALSE(collision_s);
+    }
+    {  // no intersect denormalize
+      const auto collision_s = line.getIntersection2DSValue(
+        math::geometry::LineSegment(
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(1.5).z(0),
+          geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(1.5).z(0)),
+        true);
+      EXPECT_FALSE(collision_s);
+    }
+
     /**
      * @note Testing the `LineSegment::getIntersection2D` function can throw error getting intersection with exact same line segment.
      * In this case, any s value can be a intersection point, so we cannot return single value.
@@ -459,9 +621,14 @@ TEST(LineSegment, getIntersection2DSValue)
     /// @note @note Testing the `LineSegment::getIntersection2D` function can find collision with the line segment with start point (x,y,z) = (1,0,0) and end point (x,y,z) = (-1,0,0) in the cartesian coordinate system and `line`.
     // [Snippet_getIntersection2D_line_1_0_0_-1_0_0]
     {
-      EXPECT_TRUE(line.getIntersection2D(math::geometry::LineSegment(
+      const auto point = line.getIntersection2D(math::geometry::LineSegment(
         geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0),
-        geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(0).z(0))));
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(-1).y(0).z(0)));
+      EXPECT_TRUE(point);
+      if (point) {
+        EXPECT_POINT_EQ(
+          point.value(), geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0));
+      }
     }
     // [Snippet_getIntersection2D_line_1_0_0_-1_0_0]
     /// @snippet test/test_line_segment.cpp Snippet_getIntersection2D_line_1_0_0_-1_0_0
