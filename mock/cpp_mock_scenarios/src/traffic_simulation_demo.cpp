@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class TrafficSimulationDemoScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -146,12 +148,13 @@ private:
 private:
   bool lanechange_executed_;
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<TrafficSimulationDemoScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::TrafficSimulationDemoScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

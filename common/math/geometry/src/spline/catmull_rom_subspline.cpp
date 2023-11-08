@@ -23,10 +23,9 @@ namespace geometry
 double CatmullRomSubspline::getLength() const { return end_s_ - start_s_; }
 
 std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
-  bool close_start_end) const
+  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
 {
-  auto s = spline_->getCollisionPointIn2D(polygon, search_backward, close_start_end);
+  auto s = spline_->getCollisionPointIn2D(polygon, search_backward);
 
   if (!s) {
     return std::nullopt;

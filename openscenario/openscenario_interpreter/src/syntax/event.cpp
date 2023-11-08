@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/event.hpp>
 
 namespace openscenario_interpreter
@@ -52,6 +53,17 @@ auto Event::start() -> void
     assert(element.template is<Action>());
     assert(element.template is_also<StoryboardElement>());
     element.template as<StoryboardElement>().transitionTo(start_transition);
+  }
+}
+
+auto Event::evaluate() -> Object
+{
+  try {
+    return StoryboardElement::evaluate();
+  } catch (const SpecialAction<EXIT_FAILURE> & action) {
+    throw SpecialAction<EXIT_FAILURE>(
+      name, "StartTrigger.ConditionGroup", start_trigger.activeConditionGroupIndex(), "Condition",
+      start_trigger.activeConditionGroupDescription());
   }
 }
 
