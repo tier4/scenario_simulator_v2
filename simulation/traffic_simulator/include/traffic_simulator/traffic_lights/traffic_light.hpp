@@ -313,6 +313,7 @@ struct TrafficLight
       traffic_light_bulb_proto.set_status(status());
       traffic_light_bulb_proto.set_shape(shape());
       traffic_light_bulb_proto.set_color(color());
+      // NOTE: confidence will be overwritten in TrafficLight::operator simulation_api_schema::TrafficSignal()
       traffic_light_bulb_proto.set_confidence(1.0);
 
       return traffic_light_bulb_proto;
@@ -320,6 +321,8 @@ struct TrafficLight
   };
 
   const lanelet::Id way_id;
+
+  double confidence = 1.0;
 
   std::set<Bulb> bulbs;
 
@@ -388,8 +391,9 @@ struct TrafficLight
 
     traffic_signal_proto.set_id(way_id);
     for (const auto & bulb : bulbs) {
-      *traffic_signal_proto.add_traffic_light_status() =
-        static_cast<simulation_api_schema::TrafficLight>(bulb);
+      auto traffic_light_bulb_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
+      traffic_light_bulb_proto.set_confidence(confidence);
+      *traffic_signal_proto.add_traffic_light_status() = traffic_light_bulb_proto;
     }
     return traffic_signal_proto;
   }

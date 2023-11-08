@@ -232,6 +232,13 @@ public:
     v2i_traffic_light_updater_.resetUpdateRate(rate);
   }
 
+  auto setConventionalTrafficLightConfidence(lanelet::Id id, double confidence) -> void
+  {
+    for (auto & traffic_light : conventional_traffic_light_manager_ptr_->getTrafficLights(id)) {
+      traffic_light.get().confidence = confidence;
+    }
+  }
+
 // clang-format off
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   /*!                                                                 \
