@@ -107,10 +107,11 @@ TEST(LineSegment, getIntersection2DIntersect)
 TEST(LineSegment, getIntersection2DIdentical)
 {
   const math::geometry::LineSegment line(makePoint(0, 0), makePoint(1, 1));
-  auto ans = line.getIntersection2D(line);
-  EXPECT_TRUE(ans);
-  EXPECT_TRUE(std::isnan(ans.value().x));
-  EXPECT_TRUE(std::isnan(ans.value().y));
+  EXPECT_THROW(line.getIntersection2D(line), common::SimulationError);
+  // auto ans = line.getIntersection2D(line);
+  // EXPECT_TRUE(ans);
+  // EXPECT_TRUE(std::isnan(ans.value().x));
+  // EXPECT_TRUE(std::isnan(ans.value().y));
 }
 
 TEST(LineSegment, getVector)
@@ -173,23 +174,12 @@ TEST(LineSegment, getSlopeZeroLength)
   EXPECT_TRUE(std::isnan(line.getSlope()));
 }
 
-TEST(LineSegment, getIntercept)
-{
-  const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(3, 1, 4));
-  EXPECT_DOUBLE_EQ(line.getIntercept(), 2.5);
-}
-
-TEST(LineSegment, getInterceptZeroLength)
-{
-  const math::geometry::LineSegment line(makePoint(1, 2, 3), makePoint(1, 2, 3));
-  EXPECT_TRUE(std::isnan(line.getSlope()));
-}
-
 TEST(LineSegment, getLineSegments)
 {
   const std::vector<geometry_msgs::msg::Point> points{
     makePoint(1, 2, 3), makePoint(2, 3, 4), makePoint(3, 4, 5), makePoint(4, 5, 6)};
-  const std::vector<math::geometry::LineSegment> lines = math::geometry::getLineSegments(points);
+  const std::vector<math::geometry::LineSegment> lines =
+    math::geometry::getLineSegments(points, true);  // close start and end
   EXPECT_EQ(lines.size(), size_t(4));
   EXPECT_POINT_EQ(lines[0].start_point, points[0]);
   EXPECT_POINT_EQ(lines[0].end_point, points[1]);
@@ -212,7 +202,8 @@ TEST(LineSegment, getLineSegmentsVectorIdentical)
 {
   geometry_msgs::msg::Point point = makePoint(1, 2, 3);
   const std::vector<geometry_msgs::msg::Point> points{point, point, point, point};
-  const std::vector<math::geometry::LineSegment> lines = math::geometry::getLineSegments(points);
+  const std::vector<math::geometry::LineSegment> lines =
+    math::geometry::getLineSegments(points, true);  // close start and end
   EXPECT_EQ(lines.size(), size_t(4));
   EXPECT_POINT_EQ(lines[0].start_point, point);
   EXPECT_POINT_EQ(lines[0].end_point, point);
