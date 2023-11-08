@@ -313,7 +313,7 @@ struct TrafficLight
       traffic_light_bulb_proto.set_status(status());
       traffic_light_bulb_proto.set_shape(shape());
       traffic_light_bulb_proto.set_color(color());
-      // NOTE: confidence will be overwritten in TrafficLight::operator() for simulation_api_schema::TrafficSignal
+      // NOTE: confidence will be overwritten in TrafficLight::operator simulation_api_schema::TrafficSignal()
       traffic_light_bulb_proto.set_confidence(1.0);
 
       return traffic_light_bulb_proto;
