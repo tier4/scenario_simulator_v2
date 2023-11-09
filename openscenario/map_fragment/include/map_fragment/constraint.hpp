@@ -184,7 +184,7 @@ auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = 
     }
   }
 
-  if (const auto name = prefix + "path_includes_lanelet_related_to_regulatory_element_subtyped";
+  if (const auto name = prefix + "includes_lanelet_related_to_regulatory_element_subtyped";
       node.has_parameter(name)) {
     if (const auto subtype = node.get_parameter(name).as_string(); not subtype.empty()) {
       constraints.emplace(name, [subtype](auto && path, auto &&...) {

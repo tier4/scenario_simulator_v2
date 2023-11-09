@@ -45,7 +45,7 @@ OpenSCENARIO:
           -p start_lanelet_id:=$(var ego_start_lanelet_id)
           -p select_path:=any
           -p select_lanelet:=last
-          -p path_length_greater_than:=200.0
+          -p path_length_greater_than:=150.0
           -p path_includes_lanelet_related_to_regulatory_element_subtyped:=traffic_light
           )
   CatalogLocations:
@@ -94,7 +94,7 @@ OpenSCENARIO:
                       LanePosition:
                         roadId: ''
                         laneId: $ego_goal_lanelet_id
-                        s: 0
+                        s: 10
                         offset: 0
                         Orientation:
                           type: relative
