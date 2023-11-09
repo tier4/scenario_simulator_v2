@@ -6,6 +6,7 @@
 
 # log file
 *.log
+log
 
 # files too large
 *.pcd
@@ -20,3 +21,4 @@ latex
 scenario_simulator.tar
 site
 *.pyc
+build
