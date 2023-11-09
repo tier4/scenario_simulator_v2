@@ -45,8 +45,8 @@ OpenSCENARIO:
           -p start_lanelet_id:=$(var ego_start_lanelet_id)
           -p select_path:=any
           -p select_lanelet:=last
-          -p path_length_greater_than:=150.0
-          -p path_includes_lanelet_related_to_regulatory_element_subtyped:=traffic_light
+          -p path_length_greater_than:=200.0
+          -p path_excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped:=traffic_light
           )
   CatalogLocations:
     VehicleCatalog:

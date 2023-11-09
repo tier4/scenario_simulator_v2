@@ -74,9 +74,12 @@ try {
 
   auto paths = append_map(possible_paths, start_lanelets);
 
+  // clang-format off
   node.declare_parameter("path_includes_id", lanelet::Id());
   node.declare_parameter("path_is_allowed_to_contain_duplicate_lanelet_ids", false);
   node.declare_parameter("path_includes_lanelet_related_to_regulatory_element_subtyped", "");
+  node.declare_parameter("path_excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped", "");
+  // clang-format on
 
   auto path_constraints = loadLaneletPathConstraints(node, "path_");
 

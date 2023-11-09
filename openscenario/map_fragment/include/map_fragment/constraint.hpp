@@ -201,6 +201,25 @@ auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = 
     }
   }
 
+  if (const auto name =
+        prefix + "excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped";
+      node.has_parameter(name)) {
+    if (const auto subtype = node.get_parameter(name).as_string(); not subtype.empty()) {
+      constraints.emplace(name, [subtype](auto && path, auto &&...) {
+        return 2 < path.size() and
+               std::any_of(std::next(path.begin()), std::prev(path.end()), [&](auto && lanelet) {
+                 return [&](auto && regulatory_elements) {
+                   return std::any_of(
+                     regulatory_elements.begin(), regulatory_elements.end(),
+                     [&](auto && regulatory_element) {
+                       return regulatory_element->attribute("subtype") == subtype;
+                     });
+                 }(lanelet.regulatoryElements());
+               });
+      });
+    }
+  }
+
   return constraints;
 }
 }  // namespace constraint
