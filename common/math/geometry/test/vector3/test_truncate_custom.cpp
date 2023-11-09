@@ -28,7 +28,7 @@ constexpr double EPS = 1e-6;
 template <typename T>
 struct CustomVector3
 {
-  T x = 0, y = 0, z = 0;
+  T x, y, z;
   CustomVector3() = default;
   CustomVector3(T x, T y, T z) : x(x), y(y), z(z) {}
   template <typename U>
@@ -45,12 +45,12 @@ struct CustomVector3
 
 TEST(Vector3, truncate_customVectorBelowMax)
 {
-  CustomVector3<float> vec0(4, 4, 4);
+  CustomVector3<float> vec0(4.0, 4.0, 4.0);
   EXPECT_VECTOR3_EQ(math::geometry::truncate(vec0, 16), vec0)
 }
 
 TEST(Vector3, truncate_customVectorOverMax)
 {
-  CustomVector3<float> vec0(4, 4, 4);
-  EXPECT_VECTOR3_EQ(math::geometry::truncate(vec0, std::sqrt(12)), CustomVector3(2.0, 2.0, 2.0));
+  CustomVector3<float> vec0(4.0, 4.0, 4.0);
+  EXPECT_VECTOR3_EQ(math::geometry::truncate(vec0, std::sqrt(12.0)), CustomVector3(2.0, 2.0, 2.0));
 }

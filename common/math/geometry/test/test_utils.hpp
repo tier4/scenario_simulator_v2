@@ -29,7 +29,7 @@
  *
  * @return The created `geometry_msgs::msg::Point` object with the specified coordinates.
  */
-inline geometry_msgs::msg::Point makePoint(double x, double y, double z = 0)
+inline geometry_msgs::msg::Point makePoint(double x, double y, double z = 0.0)
 {
   geometry_msgs::msg::Point p;
   p.x = x;
@@ -47,7 +47,7 @@ inline geometry_msgs::msg::Point makePoint(double x, double y, double z = 0)
  *
  * @return A `geometry_msgs::msg::Vector3` object with the specified values for `x`, `y`, and `z` coordinates.
  */
-inline geometry_msgs::msg::Vector3 makeVector(double x, double y, double z = 0)
+inline geometry_msgs::msg::Vector3 makeVector(double x, double y, double z = 0.0)
 {
   geometry_msgs::msg::Vector3 v;
   v.x = x;
@@ -67,7 +67,7 @@ inline geometry_msgs::msg::Vector3 makeVector(double x, double y, double z = 0)
  * @return A `Pose` message with the specified coordinates and orientation.
  */
 inline geometry_msgs::msg::Pose makePose(
-  double x, double y, double z = 0,
+  double x, double y, double z = 0.0,
   geometry_msgs::msg::Quaternion q = geometry_msgs::msg::Quaternion())
 {
   geometry_msgs::msg::Pose p;

@@ -26,12 +26,12 @@ constexpr double EPS = 1e-6;
 
 TEST(Vector3, truncate_msgVectorBelowMax)
 {
-  geometry_msgs::msg::Vector3 vec0 = makeVector(4, 4, 4);
+  geometry_msgs::msg::Vector3 vec0 = makeVector(4.0, 4.0, 4.0);
   EXPECT_VECTOR3_EQ(math::geometry::truncate(vec0, 16), vec0)
 }
 
 TEST(Vector3, truncate_msgVectorOverMax)
 {
-  geometry_msgs::msg::Vector3 vec0 = makeVector(4, 4, 4);
-  EXPECT_VECTOR3_EQ(math::geometry::truncate(vec0, std::sqrt(12)), makeVector(2, 2, 2));
+  geometry_msgs::msg::Vector3 vec0 = makeVector(4.0, 4.0, 4.0);
+  EXPECT_VECTOR3_EQ(math::geometry::truncate(vec0, std::sqrt(12.0)), makeVector(2.0, 2.0, 2.0));
 }

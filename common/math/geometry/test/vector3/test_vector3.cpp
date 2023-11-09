@@ -32,44 +32,44 @@ constexpr double EPS = 1e-6;
 template <typename T>
 struct CustomVector3
 {
-  T x = 0, y = 0, z = 0;
+  T x, y, z;
   CustomVector3() = default;
   CustomVector3(T x, T y, T z) : x(x), y(y), z(z) {}
 };
 
 TEST(Vector3, hypot_msgVector)
 {
-  geometry_msgs::msg::Vector3 vec0 = makeVector(1, 2, 3);
-  geometry_msgs::msg::Vector3 vec1 = makeVector(-1, -2, -1);
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 2.0, 3.0);
+  geometry_msgs::msg::Vector3 vec1 = makeVector(-1.0, -2.0, -1.0);
 
   EXPECT_DOUBLE_EQ(math::geometry::hypot(vec0, vec1), 6.0);
 }
 
 TEST(Vector3, hypot_customVector)
 {
-  CustomVector3<size_t> vec0(1, 2, 3);
-  geometry_msgs::msg::Vector3 vec1 = makeVector(-1, -2, -1);
+  CustomVector3<size_t> vec0(1.0, 2.0, 3.0);
+  geometry_msgs::msg::Vector3 vec1 = makeVector(-1.0, -2.0, -1.0);
 
   EXPECT_DOUBLE_EQ(math::geometry::hypot(vec0, vec1), 6.0);
 }
 
 TEST(Vector3, norm_msgVector)
 {
-  geometry_msgs::msg::Vector3 vec0 = makeVector(1, 2, 3);
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 2.0, 3.0);
 
   EXPECT_DOUBLE_EQ(math::geometry::norm(vec0), std::sqrt(14.0));
 }
 
 TEST(Vector3, norm_customVector)
 {
-  CustomVector3<size_t> vec0(1, 2, 3);
+  CustomVector3<size_t> vec0(1u, 2u, 3u);
 
   EXPECT_DOUBLE_EQ(math::geometry::norm(vec0), std::sqrt(14.0));
 }
 
 TEST(Vector3, normalize_msgVector)
 {
-  geometry_msgs::msg::Vector3 vec0 = makeVector(1, 2, 3);
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 2.0, 3.0);
 
   const double norm = std::sqrt(14.0);
   EXPECT_VECTOR3_EQ(
@@ -78,7 +78,7 @@ TEST(Vector3, normalize_msgVector)
 
 TEST(Vector3, normalize_customVector)
 {
-  CustomVector3<float> vec0(1, 2, 3);
+  CustomVector3<float> vec0(1.0, 2.0, 3.0);
 
   const double norm = std::sqrt(14.0);
   EXPECT_VECTOR3_NEAR(
@@ -89,98 +89,98 @@ TEST(Vector3, addition_msgVector)
 {
   using math::geometry::operator+;
 
-  geometry_msgs::msg::Vector3 vec0 = makeVector(1, 2, 3);
-  geometry_msgs::msg::Vector3 vec1 = makeVector(-1, -2, -1);
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 2.0, 3.0);
+  geometry_msgs::msg::Vector3 vec1 = makeVector(-1.0, -2.0, -1.0);
 
-  EXPECT_VECTOR3_EQ((vec0 + vec1), makeVector(0, 0, 2));
+  EXPECT_VECTOR3_EQ((vec0 + vec1), makeVector(0.0, 0.0, 2.0));
 }
 
 TEST(Vector3, addition_customVector)
 {
   using math::geometry::operator+;
 
-  CustomVector3<size_t> vec0(1, 2, 3);
-  geometry_msgs::msg::Vector3 vec1 = makeVector(-1, -2, -1);
+  CustomVector3<size_t> vec0(1u, 2u, 3u);
+  geometry_msgs::msg::Vector3 vec1 = makeVector(-1.0, -2.0, -1.0);
 
-  EXPECT_VECTOR3_EQ((vec0 + vec1), makeVector(0, 0, 2));
+  EXPECT_VECTOR3_EQ((vec0 + vec1), makeVector(0.0, 0.0, 2.0));
 }
 
 TEST(Vector3, subtraction_msgVector)
 {
   using math::geometry::operator-;
 
-  geometry_msgs::msg::Vector3 vec0 = makeVector(1, 2, 3);
-  geometry_msgs::msg::Vector3 vec1 = makeVector(-1, -2, -1);
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 2.0, 3.0);
+  geometry_msgs::msg::Vector3 vec1 = makeVector(-1.0, -2.0, -1.0);
 
-  EXPECT_VECTOR3_EQ((vec0 - vec1), makeVector(2, 4, 4));
+  EXPECT_VECTOR3_EQ((vec0 - vec1), makeVector(2.0, 4.0, 4.0));
 }
 
 TEST(Vector3, subtraction_CustomVector)
 {
   using math::geometry::operator-;
 
-  CustomVector3<size_t> vec0(1, 2, 3);
-  geometry_msgs::msg::Vector3 vec1 = makeVector(-1, -2, -1);
+  CustomVector3<size_t> vec0(1u, 2u, 3u);
+  geometry_msgs::msg::Vector3 vec1 = makeVector(-1.0, -2.0, -1.0);
 
-  EXPECT_VECTOR3_EQ((vec0 - vec1), makeVector(2, 4, 4));
+  EXPECT_VECTOR3_EQ((vec0 - vec1), makeVector(2.0, 4.0, 4.0));
 }
 
 TEST(Vector3, multiplication_msgVector)
 {
   using math::geometry::operator*;
 
-  geometry_msgs::msg::Vector3 vec0 = makeVector(1, 2, 3);
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 2.0, 3.0);
 
-  EXPECT_VECTOR3_EQ((vec0 * 3), makeVector(3, 6, 9));
+  EXPECT_VECTOR3_EQ((vec0 * 3.0), makeVector(3.0, 6.0, 9.0));
 }
 
 TEST(Vector3, multiplication_CustomVector)
 {
   using math::geometry::operator*;
 
-  CustomVector3<size_t> vec0(1, 2, 3);
+  CustomVector3<size_t> vec0(1u, 2u, 3u);
 
-  EXPECT_VECTOR3_EQ((vec0 * 3), makeVector(3, 6, 9));
+  EXPECT_VECTOR3_EQ((vec0 * 3.0), makeVector(3.0, 6.0, 9.0));
 }
 
 TEST(Vector3, division_msgVector)
 {
   using math::geometry::operator/;
 
-  geometry_msgs::msg::Vector3 vec0 = makeVector(2, 14, 6);
+  geometry_msgs::msg::Vector3 vec0 = makeVector(2.0, 14.0, 6.0);
 
-  EXPECT_VECTOR3_EQ((vec0 / 2), makeVector(1, 7, 3));
+  EXPECT_VECTOR3_EQ((vec0 / 2.0), makeVector(1.0, 7.0, 3.0));
 }
 
 TEST(Vector3, division_CustomVector)
 {
   using math::geometry::operator/;
 
-  CustomVector3<size_t> vec0(2, 14, 6);
+  CustomVector3<size_t> vec0(2u, 14u, 6u);
 
-  EXPECT_VECTOR3_EQ((vec0 / 2), makeVector(1, 7, 3));
+  EXPECT_VECTOR3_EQ((vec0 / 2.0), makeVector(1.0, 7.0, 3.0));
 }
 
 TEST(Vector3, additionAssignment_msgVector)
 {
   using math::geometry::operator+=;
 
-  geometry_msgs::msg::Vector3 vec0 = makeVector(1, 2, 3);
-  geometry_msgs::msg::Vector3 vec1 = makeVector(-1, -2, -1);
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 2.0, 3.0);
+  geometry_msgs::msg::Vector3 vec1 = makeVector(-1.0, -2.0, -1.0);
   vec0 += vec1;
 
-  EXPECT_VECTOR3_EQ(vec0, makeVector(0, 0, 2));
+  EXPECT_VECTOR3_EQ(vec0, makeVector(0.0, 0.0, 2.0));
 }
 
 TEST(Vector3, additionAssignment_customVector)
 {
   using math::geometry::operator+=;
 
-  CustomVector3<size_t> vec0(1, 2, 3);
-  geometry_msgs::msg::Vector3 vec1 = makeVector(-1, -2, -1);
+  CustomVector3<size_t> vec0(1u, 2u, 3u);
+  geometry_msgs::msg::Vector3 vec1 = makeVector(-1.0, -2.0, -1.0);
   vec0 += vec1;
 
-  EXPECT_VECTOR3_EQ(vec0, makeVector(0, 0, 2));
+  EXPECT_VECTOR3_EQ(vec0, makeVector(0.0, 0.0, 2.0));
 }
 
 int main(int argc, char ** argv)

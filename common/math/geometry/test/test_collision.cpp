@@ -22,7 +22,7 @@
 TEST(Collision, DifferentHeight)
 {
   geometry_msgs::msg::Pose pose0;
-  geometry_msgs::msg::Pose pose1 = makePose(0, 0, 30.0);
+  geometry_msgs::msg::Pose pose1 = makePose(0.0, 0.0, 30.0);
   traffic_simulator_msgs::msg::BoundingBox box = makeBbox(1.0, 1.0, 1.0);
   EXPECT_FALSE(math::geometry::checkCollision2D(pose0, box, pose1, box));
 }
@@ -37,7 +37,7 @@ TEST(Collision, SamePosition)
 
 TEST(Collision, SameHeightNoCollision)
 {
-  geometry_msgs::msg::Pose pose0 = makePose(0, 0, 30.0);
+  geometry_msgs::msg::Pose pose0 = makePose(0.0, 0.0, 30.0);
   geometry_msgs::msg::Pose pose1;
   traffic_simulator_msgs::msg::BoundingBox box = makeBbox(1.0, 1.0, 1.0);
   EXPECT_FALSE(math::geometry::checkCollision2D(pose0, box, pose1, box));
