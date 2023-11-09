@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class LaneChangeRightScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -62,12 +64,13 @@ private:
     // api_.requestLaneChange("ego", 34462);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<LaneChangeRightScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::LaneChangeRightScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
