@@ -16,8 +16,9 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <geometry/bounding_box.hpp>
-#include <geometry/test/test_utils.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+
+#include "test_utils.hpp"
 
 TEST(BoundingBox, getPointsFromBboxDefault)
 {

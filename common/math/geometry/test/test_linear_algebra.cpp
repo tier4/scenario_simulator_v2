@@ -15,9 +15,10 @@
 #include <gtest/gtest.h>
 
 #include <geometry/linear_algebra.hpp>
-#include <geometry/test/expect_eq_macros.hpp>
-#include <geometry/test/test_utils.hpp>
 #include <limits>
+
+#include "expect_eq_macros.hpp"
+#include "test_utils.hpp"
 
 constexpr double EPS = 1e-3;
 

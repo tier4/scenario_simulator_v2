@@ -16,8 +16,9 @@
 
 #include <cmath>
 #include <geometry/intersection/intersection.hpp>
-#include <geometry/test/expect_eq_macros.hpp>
-#include <geometry/test/test_utils.hpp>
+
+#include "expect_eq_macros.hpp"
+#include "test_utils.hpp"
 
 TEST(Intersection, isIntersect2DDisjoint)
 {

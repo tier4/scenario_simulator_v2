@@ -16,12 +16,13 @@
 
 #include <cmath>
 #include <geometry/linear_algebra.hpp>
-#include <geometry/test/expect_eq_macros.hpp>
-#include <geometry/test/test_utils.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
+
+#include "../expect_eq_macros.hpp"
+#include "../test_utils.hpp"
 
 constexpr double EPS = 1e-6;
 
