@@ -174,6 +174,11 @@ def launch_setup(context, *args, **kwargs):
             parameters=[{"port": port}]+make_vehicle_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
+        # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
+        # For LifecycleNode the `name` parameter is required
+        # For Node the `name` parameter is optional
+        # The LifecycleNode class inherits from Node class with some additions not used in this launch file
+        # In this case, `openscenario_interpreter_node` can be changed from Lifecycle to Node
         Node(
             package="openscenario_interpreter",
             executable="openscenario_interpreter_node",
