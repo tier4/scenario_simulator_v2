@@ -3,4 +3,7 @@ ament_add_gtest(test_truncate
     test_vector3.cpp
     test_truncate_msg.cpp
     test_truncate_custom.cpp)
+
 target_link_libraries(test_truncate geometry)
+
+target_include_directories(test_truncate PUBLIC ${CMAKE_SOURCE_DIR}/test/include)

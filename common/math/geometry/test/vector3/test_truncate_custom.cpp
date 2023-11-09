@@ -15,10 +15,10 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
+#include <geometry/test/expect_eq_macros.hpp>
+#include <geometry/test/test_utils.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/truncate.hpp>
-
-#include "../expect_eq_macros.hpp"
 
 constexpr double EPS = 1e-6;
 

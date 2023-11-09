@@ -15,10 +15,9 @@
 #include <gtest/gtest.h>
 
 #include <geometry/polygon/polygon.hpp>
+#include <geometry/test/expect_eq_macros.hpp>
+#include <geometry/test/test_utils.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-
-#include "expect_eq_macros.hpp"
-#include "test_utils.hpp"
 
 TEST(Polygon, filterByAxis)
 {
