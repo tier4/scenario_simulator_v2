@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
+#include <functional>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/functional/curry.hpp>
 #include <openscenario_interpreter/regex/function_call_expression.hpp>
@@ -131,8 +132,13 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     using tier4_simulation_msgs::msg::UserDefinedValue;
     using tier4_simulation_msgs::msg::UserDefinedValueType;
 
+    std::stringstream ss;
+    ss << name << rule << value;
+    std::stringstream node_name;
+    node_name << result.str(1) << "_subscription_" << std::hex
+              << std::hash<std::string>{}(ss.str());
     evaluate_value = [&, current_message = std::make_shared<MagicSubscription<UserDefinedValue>>(
-                           result.str(1) + "_subscription", result.str(0))]() {
+                           node_name.str(), result.str(0))]() {
       auto evaluate = [](const auto & user_defined_value) {
         switch (user_defined_value.type.data) {
           case UserDefinedValueType::BOOLEAN:
