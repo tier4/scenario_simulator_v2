@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <boost/lexical_cast.hpp>
-#include <functional>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/functional/curry.hpp>
 #include <openscenario_interpreter/regex/function_call_expression.hpp>
