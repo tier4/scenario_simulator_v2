@@ -70,7 +70,7 @@ struct PredictedState
 class FollowWaypointController
 {
   const double step_time;
-  const double with_breaking;
+  const bool with_breaking;
   // constraints
   double max_speed;
   double max_acceleration;
@@ -112,8 +112,8 @@ public:
   FollowWaypointController(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time,
     bool with_breaking)
-  : with_breaking{with_breaking},
-    step_time{step_time},
+  : step_time{step_time},
+    with_breaking{with_breaking},
     max_speed{behavior_parameter.dynamic_constraints.max_speed},
     max_acceleration{behavior_parameter.dynamic_constraints.max_acceleration},
     max_acceleration_rate{behavior_parameter.dynamic_constraints.max_acceleration_rate},
