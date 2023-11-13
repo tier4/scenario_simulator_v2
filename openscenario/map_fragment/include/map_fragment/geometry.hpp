@@ -36,18 +36,14 @@ struct Vector2d
   double y = 0;
 };
 
-Point2d operator+(Point2d a, Vector2d const& b)
+Point2d operator+(Point2d const& a, Vector2d const& b)
 {
-  a.x += b.x;
-  a.y += b.y;
-  return a;
+  return {a.x + b.x, a.y + b.y};
 }
 
-Vector2d operator*(Vector2d v, double const& multiplier)
+Vector2d operator*(Vector2d const& v, double multiplier)
 {
-  v.x *= multiplier;
-  v.y *= multiplier;
-  return v;
+  return {v.x * multiplier, v.y * multiplier};
 }
 
 Vector2d operator-(Point2d const& a, Point2d const& b)
@@ -60,20 +56,20 @@ Vector2d operator+(Vector2d const& a, Vector2d const& b)
   return {a.x + b.x, a.y + b.y};
 }
 
-Vector2d rotate(Vector2d v, double angle) {
+Vector2d rotate(Vector2d const& v, double angle) {
   return {
     v.x * std::cos(angle) - v.y * std::sin(angle),
     v.x * std::sin(angle) + v.y * std::cos(angle)
   };
 }
 
-Point2d rotate(Point2d p, double angle)
+Point2d rotate(Point2d const& p, double angle)
 {
   Point2d p0 = {0, 0};
   return p0 + rotate(p - p0, angle);
 }
 
-double calculateAngle(Vector2d v)
+double calculateAngle(Vector2d const& v)
 {
   return std::atan2(v.y, v.x);
 }
@@ -84,17 +80,18 @@ struct Transformation2d
   double rotation;
 };  // struct Transformation2d
 
-Point2d applyTransformation(Point2d p, Transformation2d t)
+Point2d applyTransformation(Point2d const& p, Transformation2d const& t)
 {
   return rotate(p, t.rotation) + t.translation;
 }
 
-Vector2d applyTransformation(Vector2d v, Transformation2d t)
+Vector2d applyTransformation(Vector2d const& v, Transformation2d const & t)
 {
   return rotate(v, t.rotation);
 }
 
-Transformation2d chainTransformations(Transformation2d first, Transformation2d second)
+Transformation2d chainTransformations(Transformation2d const& first,
+                                      Transformation2d const& second)
 {
   Transformation2d t;
   t.translation = first.translation + rotate(second.translation, first.rotation);
@@ -240,7 +237,7 @@ class CombinedCurve : public ParametricCurve
   std::vector<Transformation2d> transformations_;
 
 public:
-  explicit CombinedCurve(std::vector<ParametricCurve::Ptr> curves)
+  explicit CombinedCurve(std::vector<ParametricCurve::Ptr> const& curves)
     : curves_(curves)
   {
     if (curves.size() < 2)

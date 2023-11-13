@@ -54,9 +54,9 @@ class RoadCrossSection
   lanelet::Points3d points_;
 
 public:
-  explicit RoadCrossSection(RoadCrossSectionDescription description, // TODO: name for the origin coordinate system'
-                            Point2d origin,
-                            Vector2d tangent_vector)
+  explicit RoadCrossSection(RoadCrossSectionDescription const& description,
+                            Point2d const& origin,
+                            Vector2d const& tangent_vector)
   {
     auto n = description.number_of_lanes;
     auto w = description.lane_width;
@@ -84,7 +84,7 @@ class RoadSegment
 
 public:
   explicit RoadSegment(ParametricCurve::Ptr guide_curve,
-                       RoadCrossSectionDescription cross_section_description)
+                       RoadCrossSectionDescription const& cross_section_description)
     : guide_curve_(guide_curve)
     , cross_section_description_(cross_section_description)
   {
