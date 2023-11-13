@@ -74,8 +74,8 @@ class FollowWaypointController
   // constraints
   double max_speed;
   double max_acceleration;
-  double max_deceleration;
   double max_acceleration_rate;
+  double max_deceleration;
   double max_deceleration_rate;
   // accuracy
   const double local_epsilon{1e-12};
