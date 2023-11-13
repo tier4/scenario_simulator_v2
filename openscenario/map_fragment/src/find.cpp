@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <map_fragment/constraint.hpp>
+#include <map_fragment/filter.hpp>
+#include <map_fragment/load_lanelet_map.hpp>
 #include <map_fragment/map_fragment.hpp>
+#include <map_fragment/selector.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
@@ -23,76 +27,42 @@ try {
 
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
 
-  const auto input_directory = [&]() {
-    node.declare_parameter("input_directory", default_value::directory());
-    return std::filesystem::path(node.get_parameter("input_directory").as_string());
-  }();
+  node.declare_parameter("input_directory", default_value::directory());
+  node.declare_parameter("input_filename", default_value::filename);
 
-  const auto lanelet2_map = [&]() {
-    node.declare_parameter("lanelet2_map", input_directory / "lanelet2_map.osm");
-    return node.get_parameter("lanelet2_map").as_string();
-  }();
+  const auto lanelet_map = loadLaneletMap(node);
 
-  const auto map = lanelet::load(lanelet2_map, map_fragment::projector());
+  const auto routing_graph =
+    lanelet::routing::RoutingGraph::build(*lanelet_map, vehicleTrafficRules());
 
-  auto routing_graph = lanelet::routing::RoutingGraph::build(*map, vehicleTrafficRules());
+  node.declare_parameter("type", "lanelet");
+  node.declare_parameter("subtype", "road");
+  node.declare_parameter("id", lanelet::Id());
+  node.declare_parameter("id_is_greater_than", lanelet::Id());
+  node.declare_parameter("id_is_less_than", std::numeric_limits<lanelet::Id>::max());
+  node.declare_parameter("is_left_of", lanelet::Id());
+  node.declare_parameter("is_right_of", lanelet::Id());
+  node.declare_parameter("is_leftmost", false);
+  node.declare_parameter("is_rightmost", false);
+  node.declare_parameter("is_not_leftmost", false);
+  node.declare_parameter("is_not_rightmost", false);
+  node.declare_parameter("route_length_greater_than", 0.0);  // DEPRECATED
 
-  std::list<std::function<bool(const lanelet::Lanelet &)>> constraints{
-    [&]() {
-      node.declare_parameter("type", "lanelet");
-      const auto type = node.get_parameter("type").as_string();
-      return [type](const auto & lanelet) {
-        auto iterator = lanelet.attributes().find("type");
-        return iterator != lanelet.attributes().end() and iterator->second == type;
-      };
-    }(),
-
-    [&]() {
-      node.declare_parameter("subtype", "road");
-      const auto subtype = node.get_parameter("subtype").as_string();
-      return [subtype](const auto & lanelet) {
-        auto iterator = lanelet.attributes().find("subtype");
-        return iterator != lanelet.attributes().end() and iterator->second == subtype;
-      };
-    }(),
-
-    [&]() {
-      node.declare_parameter("lane_id_greater_than", lanelet::Id());
-      const auto lower_bound = node.get_parameter("lane_id_greater_than").as_int();
-      return [lower_bound](const auto & lanelet) { return lower_bound < lanelet.id(); };
-    }(),
-
-    [&]() {
-      node.declare_parameter("lane_id_less_than", std::numeric_limits<lanelet::Id>::max());
-      const auto upper_bound = node.get_parameter("lane_id_less_than").as_int();
-      return [upper_bound](const auto & lanelet) { return lanelet.id() < upper_bound; };
-    }(),
-
-    [&]() {
-      node.declare_parameter("route_length_greater_than", 0.0);
-      const auto lower_bound = node.get_parameter("route_length_greater_than").as_double();
-      return [&, lower_bound](const auto & lanelet) {
-        return 0 < routing_graph->possiblePaths(lanelet, lower_bound).size();
-      };
-    }(),
-  };
+  const auto constraints = loadLaneletIDConstraints(node);
 
   auto satisfy = [&](const auto & lanelet) {
-    return std::all_of(
-      constraints.begin(), constraints.end(), [&](const auto satisfy) { return satisfy(lanelet); });
+    return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
+      return constraint.second(lanelet, *lanelet_map, *routing_graph);
+    });
   };
 
-  const auto count = std::count_if(map->laneletLayer.begin(), map->laneletLayer.end(), satisfy);
+  node.declare_parameter("select", "any");
 
-  DEBUG(count);
+  const auto select = loadLaneletSelector(node);
 
-  if (auto iterator = std::find_if(map->laneletLayer.begin(), map->laneletLayer.end(), satisfy);
-      iterator != map->laneletLayer.end()) {
-    std::cout << iterator->id() << std::endl;
-    return EXIT_SUCCESS;
-  } else {
-    throw std::runtime_error("not found");
-  }
+  filter(satisfy, lanelet_map->laneletLayer, select);
+
+  return EXIT_SUCCESS;
 } catch (const std::exception & exception) {
   std::cerr << exception.what() << std::endl;
   return EXIT_FAILURE;

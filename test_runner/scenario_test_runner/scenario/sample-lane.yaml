@@ -27,40 +27,28 @@ OpenSCENARIO:
       - name: __ego_center_z__
         parameterType: double
         value: '0'
-      - name: before_length
-        parameterType: double
-        value: '50.0'
       - name: length
         parameterType: double
-        value: '100.0'
-      - name: after_length
+        value: 1000.0
+      - name: curvature
         parameterType: double
-        value: '50.0'
-      - name: angle
-        parameterType: double
-        value: 90 #$(ros2 run openscenario_interpreter_example uniform_distribution -90 90)
+        value: $(ros2 run openscenario_interpreter_example uniform_distribution -0.005 0.005)
       - name: number_of_lanes
         parameterType: unsignedInt
-        value: 3
+        value: 2
       - name: map_path
         parameterType: string
-        value: $(ros2 run map_fragment curve --ros-args
-          -p after_length:=$(var after_length)
-          -p angle:=$(var angle)
-          -p before_length:=$(var before_length)
+        value: $(ros2 run map_fragment lane --ros-args
+          -p curvature:=$(var curvature)
           -p length:=$(var length)
           -p number_of_lanes:=$(var number_of_lanes)
           )
-      - name: route_length
-        parameterType: double
-        value: '200.0'
       - name: ego_lane_id
         parameterType: string
-        value: $(ros2 run map_fragment find --ros-args
-          -p is_not_leftmost:=true
-          -p is_not_rightmost:=true
-          -p route_length_greater_than:=$(var route_length)
-          )
+        value: $(ros2 run map_fragment find --ros-args -p is_leftmost:=true)
+      - name: ego_lane_length
+        parameterType: double
+        value: $(ros2 run map_fragment length --ros-args -p id:=$(var ego_lane_id))
   CatalogLocations:
     VehicleCatalog:
       Directory:
@@ -107,7 +95,7 @@ OpenSCENARIO:
                       LanePosition:
                         roadId: ''
                         laneId: $ego_lane_id
-                        s: $route_length
+                        s: ${ $ego_lane_length - 10 }
                         offset: 0
                         Orientation:
                           type: relative

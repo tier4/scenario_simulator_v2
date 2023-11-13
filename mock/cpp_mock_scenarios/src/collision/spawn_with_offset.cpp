@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class SpawnWithOffsetScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -64,12 +66,13 @@ private:
     api_.requestSpeedChange("bob", 0, true);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<SpawnWithOffsetScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::SpawnWithOffsetScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+namespace cpp_mock_scenarios
+{
 class CrashingNpcScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
@@ -69,12 +71,13 @@ private:
     api_.requestSpeedChange("npc", 5, true);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<CrashingNpcScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::CrashingNpcScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

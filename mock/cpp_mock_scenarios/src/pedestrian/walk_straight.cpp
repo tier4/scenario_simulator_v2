@@ -26,10 +26,12 @@
 #include <string>
 #include <vector>
 
-class StopAtCrosswalkScenario : public cpp_mock_scenarios::CppScenarioNode
+namespace cpp_mock_scenarios
+{
+class WalkStraightScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit StopAtCrosswalkScenario(const rclcpp::NodeOptions & option)
+  explicit WalkStraightScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
@@ -96,12 +98,13 @@ private:
 private:
   bool lanechange_executed_;
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<StopAtCrosswalkScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::WalkStraightScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

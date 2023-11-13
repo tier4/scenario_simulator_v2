@@ -27,24 +27,27 @@ OpenSCENARIO:
       - name: __ego_center_z__
         parameterType: double
         value: '0'
-      - name: length
-        parameterType: double
-        value: 1000.0
-      - name: curvature
-        parameterType: double
-        value: $(ros2 run openscenario_interpreter_example uniform_distribution -0.005 0.005)
-      - name: number_of_lanes
-        parameterType: unsignedInt
-        value: 2
       - name: map_path
         parameterType: string
-        value: $(ros2 run map_fragment lane --ros-args -p length:=$(var length) -p curvature:=$(var curvature) -p number_of_lanes:=$(var number_of_lanes))
-      - name: ego_lane_id
+        value: $(ros2 pkg prefix --share kashiwanoha_map)/map
+      - name: ego_start_lanelet_id
         parameterType: string
-        value: $(ros2 run map_fragment find --ros-args -p type:=lanelet -p subtype:=road)
-      - name: ego_lane_length
-        parameterType: double
-        value: $(ros2 run map_fragment length --ros-args -p id:=$(var ego_lane_id))
+        value: $(ros2 run map_fragment find --ros-args
+          -p input_directory:=$(var map_path)
+          -p is_leftmost:=true
+          -p route_length_greater_than:=100.0
+          -p select:=any
+          )
+      - name: ego_goal_lanelet_id
+        parameterType: string
+        value: $(ros2 run map_fragment path --ros-args
+          -p input_directory:=$(var map_path)
+          -p start_lanelet_id:=$(var ego_start_lanelet_id)
+          -p select_path:=any
+          -p select_lanelet:=last
+          -p path_length_greater_than:=200.0
+          -p path_excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped:=traffic_light
+          )
   CatalogLocations:
     VehicleCatalog:
       Directory:
@@ -77,7 +80,7 @@ OpenSCENARIO:
                   Position:
                     LanePosition:
                       roadId: ''
-                      laneId: $ego_lane_id
+                      laneId: $ego_start_lanelet_id
                       s: 1
                       offset: 0
                       Orientation:
@@ -90,8 +93,8 @@ OpenSCENARIO:
                     Position: &DESTINATION
                       LanePosition:
                         roadId: ''
-                        laneId: $ego_lane_id
-                        s: ${ $ego_lane_length - 10 }
+                        laneId: $ego_goal_lanelet_id
+                        s: 10
                         offset: 0
                         Orientation:
                           type: relative

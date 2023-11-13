@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef MAP_FRAGMENT__MAP_FRAGMENT_HPP_
+#define MAP_FRAGMENT__MAP_FRAGMENT_HPP_
+
 #include <lanelet2_core/geometry/LaneletMap.h>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_projection/UTM.h>
@@ -23,6 +26,8 @@
 #include <limits>
 
 #define DEBUG(...) std::cerr << #__VA_ARGS__ " = " << std::boolalpha << (__VA_ARGS__) << std::endl
+
+#define LINE() std::cerr << __FILE__ << ":" << __LINE__ << std::endl
 
 namespace map_fragment
 {
@@ -39,6 +44,8 @@ auto directory() -> const auto &
   static const auto directory = std::filesystem::path("/tmp/map_fragment");
   return directory;
 }
+
+constexpr auto filename = "lanelet2_map.osm";
 
 constexpr auto length = 100.0;
 
@@ -344,3 +351,5 @@ auto makeCurvature(double arc_length, double degree)
   return degree_to_radian(degree) / arc_length;
 }
 }  // namespace map_fragment
+
+#endif  // MAP_FRAGMENT__MAP_FRAGMENT_HPP_
