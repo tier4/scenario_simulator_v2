@@ -32,9 +32,30 @@ auto getVehicleParameters(const uint8_t subtype = traffic_simulator_msgs::msg::E
   parameters.bounding_box.center.x = 1.5;
   parameters.bounding_box.center.y = 0.0;
   parameters.bounding_box.center.z = 0.9;
-  parameters.bounding_box.dimensions.x = 4.5;
-  parameters.bounding_box.dimensions.y = 2.1;
-  parameters.bounding_box.dimensions.z = 1.8;
+
+  auto & d = parameters.bounding_box.dimensions;
+  if (subtype == traffic_simulator_msgs::msg::EntitySubtype::TRUCK) {
+    d.x = 9.5;
+    d.y = 2.5;
+    d.z = 1.8;
+  } else if (subtype == traffic_simulator_msgs::msg::EntitySubtype::BUS) {
+    d.x = 12.5;
+    d.y = 3.0;
+    d.z = 1.8;
+  } else if (subtype == traffic_simulator_msgs::msg::EntitySubtype::TRAILER) {
+    d.x = 9.5;
+    d.y = 2.5;
+    d.z = 1.8;
+  } else if (subtype == traffic_simulator_msgs::msg::EntitySubtype::MOTORCYCLE) {
+    d.x = 2.5;
+    d.y = 1.1;
+    d.z = 1.5;
+  } else {
+    d.x = 4.5;
+    d.y = 2.1;
+    d.z = 1.8;
+  }
+
   parameters.axles.front_axle.max_steering = 0.5;
   parameters.axles.front_axle.wheel_diameter = 0.6;
   parameters.axles.front_axle.track_width = 1.8;

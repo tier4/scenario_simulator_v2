@@ -97,6 +97,12 @@ void CppScenarioNode::spawnEgoEntity(
 
   api_.attachDetectionSensor("ego", 200.0, true, 0.0, 0, 0.0, 0.0);
 
+  {
+    simulation_api_schema::PseudoTrafficLightDetectorConfiguration config;
+    config.set_architecture_type("awf/universe/20230906");
+    api_.attachPseudoTrafficLightDetector(config);
+  }
+
   api_.attachOccupancyGridSensor([this] {
     simulation_api_schema::OccupancyGridSensorConfiguration configuration;
     // clang-format off

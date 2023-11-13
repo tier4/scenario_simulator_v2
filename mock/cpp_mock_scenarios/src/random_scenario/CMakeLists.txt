@@ -4,7 +4,8 @@ generate_parameter_library(
 )
 
 ament_auto_add_executable(random001
-  random001.cpp
+  # random001.cpp
+  random002-odaiba.cpp
 )
 target_link_libraries(random001
   cpp_scenario_node

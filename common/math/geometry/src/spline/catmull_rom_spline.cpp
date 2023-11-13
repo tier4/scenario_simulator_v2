@@ -286,11 +286,12 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
   -> std::set<double>
 {
   if (polygon.size() <= 1) {
-    THROW_SIMULATION_ERROR(
-      "Number of points in polygon are invalid, it requires more than 2 points but only ",
-      static_cast<int>(polygon.size()), " exists.",
-      " This message is not originally intended to be displayed, if you see it, please contact the "
-      "developer of traffic_simulator.");
+    // THROW_SIMULATION_ERROR(
+    //   "Number of points in polygon are invalid, it requires more than 2 points but only ",
+    //   static_cast<int>(polygon.size()), " exists.",
+    //   " This message is not originally intended to be displayed, if you see it, please contact the "
+    //   "developer of traffic_simulator.");
+    return {};
   }
   /// @note If the spline has three or more control points.
   const auto get_collision_point_2d_with_curve =
