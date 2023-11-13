@@ -67,12 +67,11 @@ public:
       auto lateral_position = (i - n / 2) * w;
       auto p = origin + normal_vector * lateral_position;
       points_.push_back(makePoint3d(p.x, p.y, 0.));
-
     }
   }
 
-  const lanelet::Points3d getPoints()
-  { // TODO: return as smart pointer?
+  const lanelet::Points3d& getPoints()
+  {
     return points_;
   }
 }; // class RoadCrossSection

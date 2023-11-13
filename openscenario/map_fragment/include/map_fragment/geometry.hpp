@@ -154,11 +154,11 @@ protected:
  */
 class Straight : public ParametricCurve
 {
-  double length_;
-
 public:
+  const double length;
+
   explicit Straight(double length)
-    : length_(length)
+    : length(length)
   {
     if (length <= 0.0) {
       throw std::invalid_argument(
@@ -171,7 +171,7 @@ public:
 private:
   virtual Point2d getPosition_(double t) override
   {
-    return {t * length_, 0};
+    return {t * length, 0};
   }
   
   virtual Vector2d getTangentVector_(double) override
@@ -185,13 +185,14 @@ private:
  */
 class Arc : public ParametricCurve
 {
-  double radius_;
-  double angle_;
   Point2d center_;
 
 public:
+  const double radius;
+  const double angle;
+
   explicit Arc(double radius, double angle)
-    : radius_(radius), angle_(angle)
+    : radius(radius), angle(angle)
   {
     if (radius <= 0.0)
     {
@@ -215,14 +216,14 @@ public:
 private:
   virtual Point2d getPosition_(double t) override
   {
-    auto theta = t * angle_;
+    auto theta = t * angle;
     Point2d origin = {0, 0};
     return center_ + rotate(origin - center_, theta);
   }
   
   virtual Vector2d getTangentVector_(double t) override
   {
-    auto theta = t * angle_;
+    auto theta = t * angle;
     Vector2d v = {1, 0};
     return rotate(v, theta);
   }
@@ -233,12 +234,13 @@ private:
  */
 class CombinedCurve : public ParametricCurve
 {
-  std::vector<ParametricCurve::Ptr> curves_;
   std::vector<Transformation2d> transformations_;
 
 public:
+  const std::vector<ParametricCurve::Ptr> curves;
+
   explicit CombinedCurve(std::vector<ParametricCurve::Ptr> const& curves)
-    : curves_(curves)
+    : curves(curves)
   {
     if (curves.size() < 2)
     {
@@ -269,7 +271,7 @@ private:
   virtual Point2d getPosition_(double t) override
   {
     auto [curve_id, curve_t] = getCurveIdAndParameter(t);
-    auto curve = curves_[curve_id];
+    auto curve = curves[curve_id];
     auto transformation = transformations_[curve_id];
 
     return applyTransformation(curve->getPosition(curve_t), transformation);
@@ -278,7 +280,7 @@ private:
   virtual Vector2d getTangentVector_(double t) override
   {
     auto [curve_id, curve_t] = getCurveIdAndParameter(t);
-    auto curve = curves_[curve_id];
+    auto curve = curves[curve_id];
     auto transformation = transformations_[curve_id];
 
     return applyTransformation(curve->getTangentVector(curve_t), transformation);
@@ -287,10 +289,10 @@ private:
   std::pair<unsigned long, double> getCurveIdAndParameter(double t) {
     validateCurveParameterOrThrow(t);
     
-    auto range_width_per_curve = 1. / curves_.size();
+    auto range_width_per_curve = 1. / curves.size();
     auto curve_id = std::min(
       static_cast<unsigned long>(t / range_width_per_curve),
-      curves_.size() - 1);
+      curves.size() - 1);
     auto curve_t = t / range_width_per_curve - curve_id;
 
     return std::make_pair(curve_id, curve_t);
