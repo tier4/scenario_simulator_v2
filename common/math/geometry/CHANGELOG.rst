@@ -2,6 +2,150 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/master' into fix/rtc_command_action/continuous_execution
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge pull request `#1102 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1102>`_ from tier4/fix/wrong_distance
+  Change possibly wrong subtraction of distance calculation to assignment
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge remote-tracking branch 'origin/master' into fix/port_document
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* Change subtraction to assignment
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+  # Conflicts:
+  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
+* Merge pull request `#1019 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1019>`_ from tier4/feature/fallback_spline_to_line_segments
+  Feature/fallback spline to line segments
+* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge branch 'master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge pull request `#1095 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1095>`_ from tier4/feature/freespace-distance-condition
+  Feature/freespace distance condition
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge branch 'master' into feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* code refactor
+* code refactor
+* implement freespace for relative distance condition
+* Init working version of DistanceCondition freespace
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
+* fix case
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge pull request `#1087 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
+  Feature/drop galactic support
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* fix format
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* remove workbound for galactic
+* fix typo
+* add torelance
+* fix getSValue function in line segment class
+* add getSValue function
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* use auto
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* add member initializer
+* add test case
+* fix problem in total_length in CatmullRomSpline class
+* use push_back
+* add comment
+* update comment
+* add comment
+* fix comment
+* fix typo
+* add white line
+* add white line
+* fix typo
+* fix typo
+* remove plot
+* add comment
+* udpate comment
+* add comment
+* add comment
+* apply reformat
+* update comment
+* add gnupolot files
+* update comment
+* fix comment
+* update if
+* add comment
+* add comment
+* add auto scale
+* add test case
+* fix denormalize
+* add comment
+* add comment
+* add comment
+* use auto and ->
+* use &
+* use auto ->
+* remove unused header
+* use auto and ->
+* add const
+* update comment
+* add description
+* care edge case
+* simplify code
+* update comment
+* update comment
+* update comment
+* fix typo
+* add error message
+* add comment
+* add test case
+* add comment
+* add comment
+* add comment
+* add test case
+* update test case
+* remove unused function
+* add autoscale to the line segment
+* update description
+* add description
+* fix autoscale feature
+* add comment
+* fix typo
+* enable fallback for each functions
+* fix some of member function
+* add white line for visibility
+* add message
+* add comment
+* remove unused line
+* add comment
+* add comments
+* add comment
+* add comment
+* add comment
+* add test case
+* add test case
+* add docs
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* add test case
+* add test case
+* add test case
+* fix calculate s value
+* fix getLineSegments function
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* enable check collision to the point
+* add functions
+* simplify code
+* add const
+* use lambda
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Shota Minami, Tatsuya Yamasaki, yamacir-kit
+
 0.8.0 (2023-09-05)
 ------------------
 * Merge pull request `#1058 <https://github.com/tier4/scenario_simulator_v2/issues/1058>`_ from tier4/ref/RJD-553_restore_repeated_update_entity_status
