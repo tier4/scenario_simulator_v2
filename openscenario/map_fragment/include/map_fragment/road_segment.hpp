@@ -70,7 +70,7 @@ public:
     }
   }
 
-  const lanelet::Points3d& getPoints()
+  auto getPoints() -> const lanelet::Points3d&
   {
     return points_;
   }
@@ -89,7 +89,7 @@ public:
   {
   }
 
-  const lanelet::Lanelets getLanelets(double resolution)
+  auto getLanelets(double resolution) -> const lanelet::Lanelets
   {
     lanelet::Lanelets lanelets;
     auto n = cross_section_description_.number_of_lanes + 1;

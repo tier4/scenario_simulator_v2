@@ -36,40 +36,41 @@ struct Vector2d
   double y = 0;
 };
 
-Point2d operator+(Point2d const& a, Vector2d const& b)
+auto operator+(Point2d const& a, Vector2d const& b) -> Point2d
 {
   return {a.x + b.x, a.y + b.y};
 }
 
-Vector2d operator*(Vector2d const& v, double multiplier)
+auto operator*(Vector2d const& v, double multiplier) -> Vector2d
 {
   return {v.x * multiplier, v.y * multiplier};
 }
 
-Vector2d operator-(Point2d const& a, Point2d const& b)
+auto operator-(Point2d const& a, Point2d const& b) -> Vector2d
 {
   return {a.x - b.x, a.y - b.y};
 }
 
-Vector2d operator+(Vector2d const& a, Vector2d const& b)
+auto operator+(Vector2d const& a, Vector2d const& b) -> Vector2d
 {
   return {a.x + b.x, a.y + b.y};
 }
 
-Vector2d rotate(Vector2d const& v, double angle) {
+auto rotate(Vector2d const& v, double angle) -> Vector2d
+{
   return {
     v.x * std::cos(angle) - v.y * std::sin(angle),
     v.x * std::sin(angle) + v.y * std::cos(angle)
   };
 }
 
-Point2d rotate(Point2d const& p, double angle)
+auto rotate(Point2d const& p, double angle) -> Point2d
 {
   Point2d p0 = {0, 0};
   return p0 + rotate(p - p0, angle);
 }
 
-double calculateAngle(Vector2d const& v)
+auto calculateAngle(Vector2d const& v) -> double
 {
   return std::atan2(v.y, v.x);
 }
@@ -80,18 +81,18 @@ struct Transformation2d
   double rotation;
 };  // struct Transformation2d
 
-Point2d applyTransformation(Point2d const& p, Transformation2d const& t)
+auto applyTransformation(Point2d const& p, Transformation2d const& t) -> Point2d
 {
   return rotate(p, t.rotation) + t.translation;
 }
 
-Vector2d applyTransformation(Vector2d const& v, Transformation2d const & t)
+auto applyTransformation(Vector2d const& v, Transformation2d const& t) -> Vector2d
 {
   return rotate(v, t.rotation);
 }
 
-Transformation2d chainTransformations(Transformation2d const& first,
-                                      Transformation2d const& second)
+auto chainTransformations(Transformation2d const& first,
+                          Transformation2d const& second) -> Transformation2d
 {
   Transformation2d t;
   t.translation = first.translation + rotate(second.translation, first.rotation);
@@ -116,7 +117,7 @@ public:
   /**
    * Calculate curve point for given parameter t ∈ [0, 1]
    */
-  Point2d getPosition(double t)
+  auto getPosition(double t) -> Point2d
   {
     validateCurveParameterOrThrow(t);
     return getPosition_(t);
@@ -125,7 +126,7 @@ public:
   /**
    * Calculate curve tangent vector for given parameter t ∈ [0, 1]
    */
-  Vector2d getTangentVector(double t)
+  auto getTangentVector(double t) -> Vector2d
   {
     validateCurveParameterOrThrow(t);
 
@@ -134,11 +135,11 @@ public:
   }
 
 private:
-  virtual Point2d getPosition_(double t) = 0;
-  virtual Vector2d getTangentVector_(double t) = 0;
+  virtual auto getPosition_(double t) -> Point2d = 0;
+  virtual auto getTangentVector_(double t) -> Vector2d = 0;
 
 protected:
-  void validateCurveParameterOrThrow(double t)
+  auto validateCurveParameterOrThrow(double t) -> void
   {
     if (!(0 <= t && t <= 1)) {
       throw std::invalid_argument(
@@ -169,12 +170,12 @@ public:
   }
 
 private:
-  virtual Point2d getPosition_(double t) override
+  auto getPosition_(double t) -> Point2d override
   {
     return {t * length, 0};
   }
   
-  virtual Vector2d getTangentVector_(double) override
+  auto getTangentVector_(double) -> Vector2d override
   {
     return {1, 0};
   }
@@ -214,14 +215,14 @@ public:
   }
   
 private:
-  virtual Point2d getPosition_(double t) override
+  auto getPosition_(double t) -> Point2d override
   {
     auto theta = t * angle;
     Point2d origin = {0, 0};
     return center_ + rotate(origin - center_, theta);
   }
   
-  virtual Vector2d getTangentVector_(double t) override
+  auto getTangentVector_(double t) -> Vector2d override
   {
     auto theta = t * angle;
     Vector2d v = {1, 0};
@@ -268,7 +269,7 @@ public:
   }
 
 private:
-  virtual Point2d getPosition_(double t) override
+  auto getPosition_(double t) -> Point2d override
   {
     auto [curve_id, curve_t] = getCurveIdAndParameter(t);
     auto curve = curves[curve_id];
@@ -277,7 +278,7 @@ private:
     return applyTransformation(curve->getPosition(curve_t), transformation);
   }
 
-  virtual Vector2d getTangentVector_(double t) override
+  auto getTangentVector_(double t) -> Vector2d override
   {
     auto [curve_id, curve_t] = getCurveIdAndParameter(t);
     auto curve = curves[curve_id];
@@ -286,7 +287,7 @@ private:
     return applyTransformation(curve->getTangentVector(curve_t), transformation);
   }
 
-  std::pair<unsigned long, double> getCurveIdAndParameter(double t) {
+  auto getCurveIdAndParameter(double t) -> std::pair<unsigned long, double> {
     validateCurveParameterOrThrow(t);
     
     auto range_width_per_curve = 1. / curves.size();
