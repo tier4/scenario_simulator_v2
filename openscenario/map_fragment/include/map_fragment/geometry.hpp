@@ -287,12 +287,12 @@ private:
     return applyTransformation(curve->getTangentVector(curve_t), transformation);
   }
 
-  auto getCurveIdAndParameter(double t) -> std::pair<unsigned long, double> {
+  auto getCurveIdAndParameter(double t) -> std::pair<std::size_t, double> {
     validateCurveParameterOrThrow(t);
     
     auto range_width_per_curve = 1. / curves.size();
     auto curve_id = std::min(
-      static_cast<unsigned long>(t / range_width_per_curve),
+      static_cast<std::size_t>(t / range_width_per_curve),
       curves.size() - 1);
     auto curve_t = t / range_width_per_curve - curve_id;
 
