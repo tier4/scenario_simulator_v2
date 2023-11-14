@@ -112,7 +112,7 @@ class ParametricCurve
 {
 
 public:
-  using Ptr = std::shared_ptr<ParametricCurve>;
+  using Pointer = std::shared_ptr<ParametricCurve>;
   
   /**
    * Calculate curve point for given parameter t ∈ [0, 1]
@@ -238,9 +238,9 @@ class CombinedCurve : public ParametricCurve
   std::vector<Transformation2d> transformations_;
 
 public:
-  const std::vector<ParametricCurve::Ptr> curves;
+  const std::vector<ParametricCurve::Pointer> curves;
 
-  explicit CombinedCurve(std::vector<ParametricCurve::Ptr> const& curves)
+  explicit CombinedCurve(std::vector<ParametricCurve::Pointer> const& curves)
     : curves(curves)
   {
     if (curves.size() < 2)

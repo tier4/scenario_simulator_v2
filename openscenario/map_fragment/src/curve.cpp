@@ -65,14 +65,17 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  std::vector<ParametricCurve::Ptr> guide_curve_segments = {
+  std::vector<ParametricCurve::Pointer> guide_curve_segments = {
 
     // Straight segment before the turn
     std::make_shared<Straight>(before_length),
     
     // Turn segment (or straight if angle == 0)
-    angle == 0 ? static_cast<ParametricCurve::Ptr>(std::make_shared<Straight>(length))
-      : static_cast<ParametricCurve::Ptr>(std::make_shared<Arc>(length / std::abs(angle), angle)),
+    angle == 0
+      ? static_cast<ParametricCurve::Pointer>(
+        std::make_shared<Straight>(length))
+      : static_cast<ParametricCurve::Pointer>(
+        std::make_shared<Arc>(length / std::abs(angle), angle)),
     
     // Straight segment after the turn
     std::make_shared<Straight>(after_length)

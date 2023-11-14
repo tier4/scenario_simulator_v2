@@ -78,11 +78,11 @@ public:
 
 class RoadSegment
 {
-  ParametricCurve::Ptr guide_curve_;
+  ParametricCurve::Pointer guide_curve_;
   RoadCrossSectionDescription cross_section_description_;
 
 public:
-  explicit RoadSegment(ParametricCurve::Ptr guide_curve,
+  explicit RoadSegment(ParametricCurve::Pointer guide_curve,
                        RoadCrossSectionDescription const& cross_section_description)
     : guide_curve_(guide_curve)
     , cross_section_description_(cross_section_description)
@@ -132,7 +132,7 @@ auto makeCurvedRoadSegment(double curvature,
                            int number_of_lanes,
                            double lane_width) -> RoadSegment
 {
-  ParametricCurve::Ptr guide_curve;
+  ParametricCurve::Pointer guide_curve;
 
   if (curvature == 0.0)
   {
