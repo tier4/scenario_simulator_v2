@@ -77,7 +77,7 @@ inline auto append_map = [](auto &&... xs) -> decltype(auto) {
 };
 
 template <typename Invocable>
-constexpr auto curry(Invocable invocable) -> decltype(auto)
+constexpr auto curry2(Invocable invocable) -> decltype(auto)
 {
   return [invocable](auto &&... xs) {
     return [invocable, xs = std::forward_as_tuple(xs...)](auto &&... ys) {
@@ -89,6 +89,12 @@ constexpr auto curry(Invocable invocable) -> decltype(auto)
         xs);
     };
   };
+}
+
+template <typename T, typename F, typename = std::enable_if_t<std::is_invocable_v<F, T>>>
+auto operator|(T && x, F f) -> decltype(auto)
+{
+  return f(std::forward<decltype(x)>(x));
 }
 }  // namespace map_fragment
 

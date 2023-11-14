@@ -42,7 +42,7 @@ OpenSCENARIO:
         parameterType: string
         value: $(ros2 run map_fragment path --ros-args
           -p input_directory:=$(var map_path)
-          -p start_lanelet_id:=$(var ego_start_lanelet_id)
+          -p first_lanelet_id:=$(var ego_start_lanelet_id)
           -p select_path:=any
           -p select_lanelet:=last
           -p path_length_greater_than:=200.0

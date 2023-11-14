@@ -35,49 +35,37 @@ try {
   const auto routing_graph =
     lanelet::routing::RoutingGraph::build(*lanelet_map, vehicleTrafficRules());
 
-  const auto start_lanelet_constraints = loadAllLaneletIDConstraints(node, "start_lanelet_");
-
-  auto satisfy_start_lanelet_constraints = [&](const auto & lanelet) {
-    return std::all_of(
-      start_lanelet_constraints.begin(), start_lanelet_constraints.end(),
-      [&](const auto & constraint) {
+  auto satisfy_first_lanelet_constraints =
+    [&, constraints = loadAllLaneletIDConstraints(node, "first_lanelet_")](const auto & lanelet) {
+      return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
         return constraint.second(lanelet, *lanelet_map, *routing_graph);
       });
-  };
-
-  const auto start_lanelets = filter(satisfy_start_lanelet_constraints, lanelet_map->laneletLayer);
+    };
 
   node.declare_parameter("path_is_allowed_to_include_lane_changes", false);
   node.declare_parameter("path_length_greater_than", 100.0);
 
-  auto possible_paths = [&](auto && lanelet) {
+  auto search_possible_paths = [&](auto && lanelet) {
     auto parameters = lanelet::routing::PossiblePathsParams();
     parameters.includeLaneChanges =
       node.get_parameter("path_is_allowed_to_include_lane_changes").as_bool();
     parameters.routingCostLimit = node.get_parameter("path_length_greater_than").as_double();
-    auto result = routing_graph->possiblePaths(lanelet, parameters);
-    return result;
+    return routing_graph->possiblePaths(lanelet, parameters);
   };
 
-  auto paths = append_map(possible_paths, start_lanelets);
-
-  // clang-format off
-  node.declare_parameter("path_includes_id", lanelet::Id());
-  node.declare_parameter("path_is_allowed_to_contain_duplicate_lanelet_ids", false);
-  node.declare_parameter("path_includes_lanelet_related_to_regulatory_element_subtyped", "");
-  node.declare_parameter("path_excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped", "");
-  // clang-format on
-
-  auto path_constraints = loadLaneletPathConstraints(node, "path_");
-
-  auto satisfy_path_constraints = [&](const auto & path) {
-    return std::all_of(
-      path_constraints.begin(), path_constraints.end(), [&](const auto & constraint) {
+  auto satisfy_path_constraints =
+    [&, constraints = loadAllLaneletPathConstraints(node, "path_")](const auto & path) {
+      return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
         return constraint.second(path, *lanelet_map, *routing_graph);
       });
-  };
+    };
 
-  auto filtered_paths = filter(satisfy_path_constraints, paths);
+  auto satisfy_last_lanelet_constraints =
+    [&, constraints = loadAllLaneletIDConstraints(node, "last_lanelet_")](const auto & path) {
+      return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
+        return constraint.second(path.back(), *lanelet_map, *routing_graph);
+      });
+    };
 
   node.declare_parameter("select_path", "any");
   node.declare_parameter("select_lanelet", "last");
@@ -85,7 +73,13 @@ try {
   auto select =
     loadLaneletPathSelector(node, "", "_path", loadLaneletSelector(node, "", "_lanelet"));
 
-  select(filtered_paths);
+  // clang-format off
+  lanelet_map->laneletLayer | curry2(filter)(satisfy_first_lanelet_constraints)
+                            | curry2(append_map)(search_possible_paths)
+                            | curry2(filter)(satisfy_last_lanelet_constraints)
+                            | curry2(filter)(satisfy_path_constraints)
+                            | select;
+  // clang-format on
 
   return EXIT_SUCCESS;
 } catch (const std::exception & exception) {

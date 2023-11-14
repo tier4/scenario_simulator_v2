@@ -25,14 +25,14 @@ namespace map_fragment
 {
 inline namespace constraint
 {
-auto isLeftmost(const lanelet::routing::RoutingGraph & graph, const lanelet::Lanelet & lanelet)
+auto isLeftmost(const lanelet::routing::RoutingGraph & graph, const lanelet::ConstLanelet & lanelet)
 {
   return graph.leftRelations(lanelet).empty();
 }
 
 auto isRightmost(
   const lanelet::LaneletMap & map, const lanelet::routing::RoutingGraph & graph,
-  const lanelet::Lanelet & lanelet)
+  const lanelet::ConstLanelet & lanelet)
 {
   auto relations = graph.rightRelations(lanelet);
 
@@ -53,7 +53,7 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
 {
   std::unordered_map<
     std::string, std::function<bool(
-                   const lanelet::Lanelet &, const lanelet::LaneletMap &,
+                   const lanelet::ConstLanelet &, const lanelet::LaneletMap &,
                    const lanelet::routing::RoutingGraph &)>>
     constraints;
 
@@ -276,6 +276,32 @@ auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = 
   }
 
   return constraints;
+}
+
+template <typename Node>
+auto loadAllLaneletPathConstraints(Node & node, const std::string & prefix = "")
+{
+  if (const auto name = prefix + "includes_id"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "is_allowed_to_contain_duplicate_lanelet_ids";
+      not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "includes_lanelet_related_to_regulatory_element_subtyped";
+      not node.has_parameter(name)) {
+    node.declare_parameter(name, "");
+  }
+
+  if (const auto name =
+        prefix + "excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped";
+      not node.has_parameter(name)) {
+    node.declare_parameter(name, "");
+  }
+
+  return loadLaneletPathConstraints(node, prefix);
 }
 }  // namespace constraint
 }  // namespace map_fragment
