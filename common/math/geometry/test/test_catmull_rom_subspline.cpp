@@ -25,9 +25,8 @@ constexpr double EPS = 1e-6;
 /// @brief Helper function generating line: p(0,0)-> p(1,3) -> p(2,6)
 std::shared_ptr<math::geometry::CatmullRomSpline> makeLine()
 {
-  std::vector<geometry_msgs::msg::Point> points(3);
-  points[1] = makePoint(1, 3);
-  points[2] = makePoint(2, 6);
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(1.0, 3.0), makePoint(2.0, 6.0)};
   return std::make_shared<math::geometry::CatmullRomSpline>(points);
 }
 
@@ -67,11 +66,8 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D)
     spline_ptr, std::hypot(0.0, 0.0), std::hypot(1.5, 4.5));
 
   /// @brief Collision at the beginning of the spline
-  std::vector<geometry_msgs::msg::Point> polygon0(4);
-  polygon0[0] = makePoint(1.0, 1.0);
-  polygon0[1] = makePoint(1.0, -1.0);
-  polygon0[2] = makePoint(-1.0, -1.0);
-  polygon0[3] = makePoint(-1.0, 1.0);
+  std::vector<geometry_msgs::msg::Point> polygon0{
+    makePoint(1.0, 1.0), makePoint(1.0, -1.0), makePoint(-1.0, -1.0), makePoint(-1.0, 1.0)};
 
   const auto ans00 = spline.getCollisionPointIn2D(polygon0);
   EXPECT_TRUE(ans00);
@@ -81,10 +77,8 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D)
   EXPECT_NEAR(ans01.value(), std::hypot(1.0 / 3.0, 1.0), EPS);
 
   /// @brief Collision at the end of the spline
-  std::vector<geometry_msgs::msg::Point> polygon1(3);
-  polygon1[0] = makePoint(0.0, 5.0);
-  polygon1[1] = makePoint(2.0, 5.0);
-  polygon1[2] = makePoint(2.0, 3.0);
+  std::vector<geometry_msgs::msg::Point> polygon1{
+    makePoint(0.0, 5.0), makePoint(2.0, 5.0), makePoint(2.0, 3.0)};
 
   const auto ans10 = spline.getCollisionPointIn2D(polygon1);
   EXPECT_TRUE(ans10);
@@ -115,10 +109,8 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_shiftedBeginning)
     spline_ptr, std::hypot(0.5, 1.5), std::hypot(1.0, 3.0));
 
   /// @brief Collision at the beginning of the spline
-  std::vector<geometry_msgs::msg::Point> polygon0(3);
-  polygon0[0] = makePoint(0.0, 3.0);
-  polygon0[1] = makePoint(0.0, 0.0);
-  polygon0[2] = makePoint(3.0, 0.0);
+  std::vector<geometry_msgs::msg::Point> polygon0{
+    makePoint(0.0, 3.0), makePoint(0.0, 0.0), makePoint(3.0, 0.0)};
 
   const auto ans00 = spline.getCollisionPointIn2D(polygon0);
   EXPECT_TRUE(ans00);
@@ -128,10 +120,8 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_shiftedBeginning)
   EXPECT_NEAR(ans01.value(), std::hypot(0.75 - 0.5, 2.25 - 1.5), EPS);
 
   /// @brief Collision at the end of the spline
-  std::vector<geometry_msgs::msg::Point> polygon1(3);
-  polygon1[0] = makePoint(2.0, 1.0);
-  polygon1[1] = makePoint(2.0, 4.0);
-  polygon1[2] = makePoint(-1.0, 4.0);
+  std::vector<geometry_msgs::msg::Point> polygon1{
+    makePoint(2.0, 1.0), makePoint(2.0, 4.0), makePoint(-1.0, 4.0)};
 
   const auto ans10 = spline.getCollisionPointIn2D(polygon1);
   EXPECT_TRUE(ans10);
@@ -148,11 +138,8 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_edge)
   math::geometry::CatmullRomSubspline spline(
     spline_ptr, std::hypot(0.5, 1.5), std::hypot(1.5, 4.5));
 
-  std::vector<geometry_msgs::msg::Point> polygon(4);
-  polygon[0] = makePoint(-2, -2);
-  polygon[1] = makePoint(-2, -1);
-  polygon[2] = makePoint(-1, -1);
-  polygon[3] = makePoint(-1, -2);
+  std::vector<geometry_msgs::msg::Point> polygon{
+    makePoint(-2.0, -2.0), makePoint(-2.0, -1.0), makePoint(-1.0, -1.0), makePoint(-1.0, -2.0)};
 
   const auto ans0 = spline.getCollisionPointIn2D(polygon);
   EXPECT_FALSE(ans0);
@@ -167,11 +154,8 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_base)
   math::geometry::CatmullRomSubspline spline(
     spline_ptr, std::hypot(0.5, 1.5), std::hypot(1.5, 4.5));
 
-  std::vector<geometry_msgs::msg::Point> polygon(4);
-  polygon[0] = makePoint(0, 0);
-  polygon[1] = makePoint(0, 1);
-  polygon[2] = makePoint(1, 1);
-  polygon[3] = makePoint(1, 0);
+  std::vector<geometry_msgs::msg::Point> polygon{
+    makePoint(0.0, 0.0), makePoint(0.0, 1.0), makePoint(1.0, 1.0), makePoint(1.0, 0.0)};
 
   const auto ans0 = spline.getCollisionPointIn2D(polygon);
   EXPECT_FALSE(ans0);
