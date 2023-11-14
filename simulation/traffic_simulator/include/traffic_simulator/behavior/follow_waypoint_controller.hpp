@@ -81,7 +81,7 @@ class FollowWaypointController
   const double local_epsilon{1e-12};
   const double step_time_tolerance{1e-6};
   const double finish_distance_tolerance{1e-3};
-  const double predicted_distance_tolerance{0.5};
+  const double predicted_distance_tolerance{1.0};
   const int number_of_acceleration_candidates{20};
 
   template <typename StreamType>
@@ -124,8 +124,7 @@ public:
 
   auto distanceMeetsAccuracyRestrictions(const double distance) const -> double
   {
-    return with_breaking ? distance < finish_distance_tolerance
-                         : distance < predicted_distance_tolerance;
+    return distance < finish_distance_tolerance;
   }
   auto getPredictedWaypointArrivalState(
     const double step_acc, const double remaining_time, const double left_distance,

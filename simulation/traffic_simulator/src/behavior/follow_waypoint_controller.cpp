@@ -282,9 +282,9 @@ auto FollowWaypointController::getAcceleration(
       ", left_distance: ", left_distance, ". FollowWaypointController: ", *this);
   }
 
-  if (min_time_diff < -step_time) {
+  if (min_time_diff <= -step_time + step_time_tolerance) {
     return local_max_acc;
-  } else if (min_time_diff > step_time) {
+  } else if (min_time_diff >= step_time - step_time_tolerance) {
     return local_min_acc;
   } else if (
     std::abs(min_time_diff) < step_time && min_distance_diff > predicted_distance_tolerance) {

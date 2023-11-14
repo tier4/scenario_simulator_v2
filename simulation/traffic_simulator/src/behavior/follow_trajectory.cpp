@@ -283,8 +283,19 @@ auto makeUpdatedStatus(
        In addition, the controller ensures a smooth stop at the last waypoint of the trajectory,
        with linear speed equal to zero and acceleration equal to zero.
     */
-    const auto desired_acceleration =
-      follow_waypoint_controller.getAcceleration(remaining_time, distance, acceleration, speed);
+    const auto desired_acceleration = [&]() -> double {
+      try {
+        return follow_waypoint_controller.getAcceleration(
+          remaining_time, distance, acceleration, speed);
+      } catch (const ControllerError & e) {
+        throw common::Error(
+          "Vehicle ", std::quoted(entity_status.name), " during following waypoint [",
+          first_waypoint_with_arrival_time_specified->position.position.x, ", ",
+          first_waypoint_with_arrival_time_specified->position.position.y,
+          "] with specified time equal to ", first_waypoint_with_arrival_time_specified->time, ": ",
+          e.what());
+      }
+    }();
     std::isinf(desired_acceleration) or std::isnan(desired_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
