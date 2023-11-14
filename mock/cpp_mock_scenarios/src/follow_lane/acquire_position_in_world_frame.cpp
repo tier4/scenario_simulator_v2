@@ -26,10 +26,12 @@
 #include <string>
 #include <vector>
 
-class AcquirePositionInWorldFrame : public cpp_mock_scenarios::CppScenarioNode
+namespace cpp_mock_scenarios
+{
+class AcquirePositionInWorldFrameScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit AcquirePositionInWorldFrame(const rclcpp::NodeOptions & option)
+  explicit AcquirePositionInWorldFrameScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "acquire_position_in_world_frame",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
@@ -61,12 +63,14 @@ private:
     api_.requestAcquirePosition("ego", goal_pose);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<AcquirePositionInWorldFrame>(options);
+  auto component =
+    std::make_shared<cpp_mock_scenarios::AcquirePositionInWorldFrameScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

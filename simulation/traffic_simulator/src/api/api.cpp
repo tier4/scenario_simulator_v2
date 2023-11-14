@@ -215,7 +215,7 @@ bool API::updateTrafficLightsInSim()
     auto req = entity_manager_ptr_->generateUpdateRequestForConventionalTrafficLights();
     return zeromq_client_.call(req).result().success();
   }
-  // TODO handle response
+  /// @todo handle response
   return simulation_api_schema::UpdateTrafficLightsResponse().result().success();
 }
 
