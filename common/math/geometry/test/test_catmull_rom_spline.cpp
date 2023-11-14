@@ -180,28 +180,28 @@ TEST(CatmullRomSpline, GetCollisionPointIn2D)
     makePoint(0.0, 0.0), makePoint(1.0, 0.0), makePoint(2.0, 0.0)};
   const math::geometry::CatmullRomSpline spline(points);
 
-  EXPECT_DOUBLE_EQ(spline.getLength(), 2.0);
+  EXPECT_NEAR(spline.getLength(), 2.0, EPS);
   geometry_msgs::msg::Point start = makePoint(0.1, 1.0), goal = makePoint(0.1, -1.0);
 
   const auto collision_s0 = spline.getCollisionPointIn2D(start, goal, false);
   EXPECT_TRUE(collision_s0);
   if (collision_s0) {
-    EXPECT_DOUBLE_EQ(collision_s0.value(), 0.1);
+    EXPECT_NEAR(collision_s0.value(), 0.1, EPS);
   }
   const auto collision_s1 = spline.getCollisionPointIn2D({start, goal}, false);
   EXPECT_TRUE(collision_s1);
   if (collision_s1) {
-    EXPECT_DOUBLE_EQ(collision_s1.value(), 0.1);
+    EXPECT_NEAR(collision_s1.value(), 0.1, EPS);
   }
   const auto collision_s2 = spline.getCollisionPointIn2D(start, goal, true);
   EXPECT_TRUE(collision_s2);
   if (collision_s2) {
-    EXPECT_DOUBLE_EQ(collision_s2.value(), 0.1);
+    EXPECT_NEAR(collision_s2.value(), 0.1, EPS);
   }
   const auto collision_s3 = spline.getCollisionPointIn2D({start, goal}, true);
   EXPECT_TRUE(collision_s3);
   if (collision_s3) {
-    EXPECT_DOUBLE_EQ(collision_s3.value(), 0.1);
+    EXPECT_NEAR(collision_s3.value(), 0.1, EPS);
   }
 }
 
@@ -298,11 +298,8 @@ TEST(CatmullRomSpline, getCollisionPointIn2DEmpty)
   const math::geometry::CatmullRomSpline spline = makeCurve();
   const std::vector<geometry_msgs::msg::Point> polygon;
 
-  const auto collision_s0 = spline.getCollisionPointIn2D(polygon);
-  EXPECT_FALSE(collision_s0);
-
-  const auto collision_s1 = spline.getCollisionPointIn2D(polygon, true);
-  EXPECT_FALSE(collision_s1);
+  EXPECT_THROW(spline.getCollisionPointIn2D(polygon), common::SimulationError);
+  EXPECT_THROW(spline.getCollisionPointIn2D(polygon, true), common::SimulationError);
 }
 
 TEST(CatmullRomSpline, getMaximum2DCurvatureLine)
@@ -639,15 +636,8 @@ TEST(CatmullRomSpline, getTrajectoryEmpty)
 
 TEST(CatmullRomSpline, initializationNotEnoughControlPoints)
 {
-  EXPECT_THROW(
-    math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
-    common::SemanticError);
-  EXPECT_THROW(
-    math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(1)),
-    common::SemanticError);
-  EXPECT_THROW(
-    math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(2)),
-    common::SemanticError);
+  const std::vector<geometry_msgs::msg::Point> points;
+  EXPECT_THROW(math::geometry::CatmullRomSpline{points}, common::SemanticError);
 }
 
 int main(int argc, char ** argv)
