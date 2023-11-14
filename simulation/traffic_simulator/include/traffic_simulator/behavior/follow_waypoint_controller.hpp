@@ -124,7 +124,8 @@ public:
 
   auto distanceMeetsAccuracyRestrictions(const double distance) const -> double
   {
-    return distance < finish_distance_tolerance;
+    return with_breaking ? distance < finish_distance_tolerance
+                         : distance < predicted_distance_tolerance;
   }
   auto getPredictedWaypointArrivalState(
     const double step_acc, const double remaining_time, const double left_distance,
