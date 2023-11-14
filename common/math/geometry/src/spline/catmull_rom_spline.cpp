@@ -301,7 +301,8 @@ auto CatmullRomSpline::getCollisionPointIn2D(
     size_t n = curves_.size();
     if (search_backward) {
       for (size_t i = 0; i < n; i++) {
-        auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward);
+        /// @note The polygon is assumed to be closed
+        auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward, true, true);
         if (s) {
           return getSInSplineCurve(n - 1 - i, s.value());
         }
@@ -309,7 +310,8 @@ auto CatmullRomSpline::getCollisionPointIn2D(
       return std::optional<double>();
     } else {
       for (size_t i = 0; i < n; i++) {
-        auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward);
+        /// @note The polygon is assumed to be closed
+        auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward, true, true);
         if (s) {
           return std::optional<double>(getSInSplineCurve(i, s.value()));
         }
@@ -380,7 +382,7 @@ auto CatmullRomSpline::getCollisionPointIn2D(
   size_t n = curves_.size();
   if (search_backward) {
     for (size_t i = 0; i < n; i++) {
-      auto s = curves_[n - 1 - i].getCollisionPointIn2D(point0, point1, search_backward);
+      auto s = curves_[n - 1 - i].getCollisionPointIn2D(point0, point1, search_backward, true);
       if (s) {
         return getSInSplineCurve(n - 1 - i, s.value());
       }
@@ -388,7 +390,7 @@ auto CatmullRomSpline::getCollisionPointIn2D(
     return std::nullopt;
   } else {
     for (size_t i = 0; i < n; i++) {
-      auto s = curves_[i].getCollisionPointIn2D(point0, point1, search_backward);
+      auto s = curves_[i].getCollisionPointIn2D(point0, point1, search_backward, true);
       if (s) {
         return getSInSplineCurve(i, s.value());
       }
