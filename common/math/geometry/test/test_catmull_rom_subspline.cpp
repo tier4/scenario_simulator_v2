@@ -79,10 +79,6 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D)
   const auto ans01 = spline.getCollisionPointIn2D(polygon0, true);
   EXPECT_TRUE(ans01);
   EXPECT_NEAR(ans01.value(), std::hypot(1.0 / 3.0, 1.0), EPS);
-  const auto ans02 = spline.getCollisionPointIn2D(polygon0, false, false);
-  EXPECT_FALSE(ans02);
-  const auto ans03 = spline.getCollisionPointIn2D(polygon0, true, false);
-  EXPECT_FALSE(ans03);
 
   /// @brief Collision at the end of the spline
   std::vector<geometry_msgs::msg::Point> polygon1(3);
@@ -96,10 +92,6 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D)
   const auto ans11 = spline.getCollisionPointIn2D(polygon1, true);
   EXPECT_TRUE(ans11);
   EXPECT_NEAR(ans11.value(), std::hypot(1.25, 3.75), EPS);
-  const auto ans12 = spline.getCollisionPointIn2D(polygon1, false, false);
-  EXPECT_FALSE(ans12);
-  const auto ans13 = spline.getCollisionPointIn2D(polygon1, true, false);
-  EXPECT_FALSE(ans13);
 }
 
 /**
@@ -134,10 +126,6 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_shiftedBeginning)
   const auto ans01 = spline.getCollisionPointIn2D(polygon0, true);
   EXPECT_TRUE(ans01);
   EXPECT_NEAR(ans01.value(), std::hypot(0.75 - 0.5, 2.25 - 1.5), EPS);
-  const auto ans02 = spline.getCollisionPointIn2D(polygon0, false, false);
-  EXPECT_FALSE(ans02);
-  const auto ans03 = spline.getCollisionPointIn2D(polygon0, true, false);
-  EXPECT_FALSE(ans03);
 
   /// @brief Collision at the end of the spline
   std::vector<geometry_msgs::msg::Point> polygon1(3);
@@ -151,10 +139,6 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_shiftedBeginning)
   const auto ans11 = spline.getCollisionPointIn2D(polygon1, true);
   EXPECT_TRUE(ans11);
   EXPECT_NEAR(ans11.value(), std::hypot(0.75 - 0.5, 2.25 - 1.5), EPS);
-  const auto ans12 = spline.getCollisionPointIn2D(polygon1, false, false);
-  EXPECT_FALSE(ans12);
-  const auto ans13 = spline.getCollisionPointIn2D(polygon1, true, false);
-  EXPECT_FALSE(ans13);
 }
 
 TEST(CatmullRomSubspline, getCollisionPointIn2D_edge)
@@ -174,10 +158,6 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_edge)
   EXPECT_FALSE(ans0);
   const auto ans1 = spline.getCollisionPointIn2D(polygon, true);
   EXPECT_FALSE(ans1);
-  const auto ans2 = spline.getCollisionPointIn2D(polygon, false, false);
-  EXPECT_FALSE(ans2);
-  const auto ans3 = spline.getCollisionPointIn2D(polygon, true, false);
-  EXPECT_FALSE(ans3);
 }
 
 TEST(CatmullRomSubspline, getCollisionPointIn2D_base)
@@ -197,10 +177,6 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_base)
   EXPECT_FALSE(ans0);
   const auto ans1 = spline.getCollisionPointIn2D(polygon, true);
   EXPECT_FALSE(ans1);
-  const auto ans2 = spline.getCollisionPointIn2D(polygon, false, false);
-  EXPECT_FALSE(ans2);
-  const auto ans3 = spline.getCollisionPointIn2D(polygon, true, false);
-  EXPECT_FALSE(ans3);
 }
 
 TEST(CatmullRomSubspline, getCollisionPointIn2D_wrongPolygon)
@@ -216,10 +192,6 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_wrongPolygon)
   EXPECT_FALSE(ans00);
   const auto ans01 = spline.getCollisionPointIn2D(polygon0, true);
   EXPECT_FALSE(ans01);
-  const auto ans02 = spline.getCollisionPointIn2D(polygon0, false, false);
-  EXPECT_FALSE(ans02);
-  const auto ans03 = spline.getCollisionPointIn2D(polygon0, true, false);
-  EXPECT_FALSE(ans03);
 
   std::vector<geometry_msgs::msg::Point> polygon1(1);
 
@@ -227,10 +199,6 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_wrongPolygon)
   EXPECT_FALSE(ans10);
   const auto ans11 = spline.getCollisionPointIn2D(polygon1, true);
   EXPECT_FALSE(ans11);
-  const auto ans12 = spline.getCollisionPointIn2D(polygon1, false, false);
-  EXPECT_FALSE(ans12);
-  const auto ans13 = spline.getCollisionPointIn2D(polygon1, true, false);
-  EXPECT_FALSE(ans13);
 }
 
 int main(int argc, char ** argv)

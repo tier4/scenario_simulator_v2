@@ -57,7 +57,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DistanceCondition : private Scope, private SimulatorCore::CoordinateSystemConversion
+struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity". If set, "alongRoute" is ignored.
   const CoordinateSystem coordinate_system;
@@ -101,10 +101,15 @@ struct DistanceCondition : private Scope, private SimulatorCore::CoordinateSyste
 
 // clang-format off
 template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, true >(const EntityRef &) const -> double;
 template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::lateral,           true >(const EntityRef &) const -> double;
 template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::entity, RelativeDistanceType::longitudinal,      true >(const EntityRef &) const -> double;
 template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           true >(const EntityRef &) const -> double;
 template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      false>(const EntityRef &) const -> double;
+template <> auto DistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      true >(const EntityRef &) const -> double;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter

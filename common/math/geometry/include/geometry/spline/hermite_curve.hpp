@@ -47,22 +47,22 @@ public:
     double az, double bz, double cz, double dz);
   std::vector<geometry_msgs::msg::Point> getTrajectory(size_t num_points = 30) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
-    double start_s, double end_s, double resolution, bool autoscale = false) const;
-  const geometry_msgs::msg::Pose getPose(double s, bool autoscale = false) const;
-  const geometry_msgs::msg::Point getPoint(double s, bool autoscale = false) const;
-  const geometry_msgs::msg::Vector3 getTangentVector(double s, bool autoscale = false) const;
-  const geometry_msgs::msg::Vector3 getNormalVector(double s, bool autoscale = false) const;
-  double get2DCurvature(double s, bool autoscale = false) const;
+    double start_s, double end_s, double resolution, bool denormalize_s = false) const;
+  const geometry_msgs::msg::Pose getPose(double s, bool denormalize_s = false) const;
+  const geometry_msgs::msg::Point getPoint(double s, bool denormalize_s = false) const;
+  const geometry_msgs::msg::Vector3 getTangentVector(double s, bool denormalize_s = false) const;
+  const geometry_msgs::msg::Vector3 getNormalVector(double s, bool denormalize_s = false) const;
+  double get2DCurvature(double s, bool denormalize_s = false) const;
   double getMaximum2DCurvature() const;
   double getLength(size_t num_points) const;
   double getLength() const { return length_; }
   std::optional<double> getSValue(
     const geometry_msgs::msg::Pose & pose, double threshold_distance = 3.0,
-    bool autoscale = false) const;
+    bool denormalize_s = false) const;
   double getSquaredDistanceIn2D(
-    const geometry_msgs::msg::Point & point, double s, bool autoscale = false) const;
+    const geometry_msgs::msg::Point & point, double s, bool denormalize_s = false) const;
   geometry_msgs::msg::Vector3 getSquaredDistanceVector(
-    const geometry_msgs::msg::Point & point, double s, bool autoscale = false) const;
+    const geometry_msgs::msg::Point & point, double s, bool denormalize_s = false) const;
   std::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     bool search_backward = false) const;

@@ -22,47 +22,45 @@
 
 TEST(Intersection, isIntersect2DDisjoint)
 {
-  math::geometry::LineSegment line0(makePoint(0, 0), makePoint(1, 1));
-  math::geometry::LineSegment line1(makePoint(1, 0), makePoint(2, 1));
+  math::geometry::LineSegment line0(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
+  math::geometry::LineSegment line1(makePoint(1.0, 0.0), makePoint(2.0, 1.0));
   EXPECT_FALSE(math::geometry::isIntersect2D(line0, line1));
 }
 
 TEST(Intersection, isIntersect2DDisjointVector)
 {
-  std::vector<math::geometry::LineSegment> lines;
-  lines.emplace_back(makePoint(0, 0), makePoint(1, 1));
-  lines.emplace_back(makePoint(1, 0), makePoint(2, 1));
+  std::vector<math::geometry::LineSegment> lines{
+    {makePoint(0.0, 0.0), makePoint(1.0, 1.0)}, {makePoint(1.0, 0.0), makePoint(2.0, 1.0)}};
   EXPECT_FALSE(math::geometry::isIntersect2D(lines));
 }
 
 TEST(Intersection, isIntersect2DIntersect)
 {
-  math::geometry::LineSegment line0(makePoint(0, 0), makePoint(1, 1));
-  math::geometry::LineSegment line1(makePoint(1, 0), makePoint(0, 1));
+  math::geometry::LineSegment line0(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
+  math::geometry::LineSegment line1(makePoint(1.0, 0.0), makePoint(0.0, 1.0));
   EXPECT_TRUE(math::geometry::isIntersect2D(line0, line1));
 }
 
 TEST(Intersection, isIntersect2DIntersectVector)
 {
-  std::vector<math::geometry::LineSegment> lines;
-  lines.emplace_back(makePoint(0, 0), makePoint(1, 1));
-  lines.emplace_back(makePoint(1, 0), makePoint(0, 1));
+  std::vector<math::geometry::LineSegment> lines{
+    {makePoint(1.0, 0.0), makePoint(0.0, 1.0)}, {makePoint(0.0, 0.0), makePoint(1.0, 1.0)}};
   EXPECT_TRUE(math::geometry::isIntersect2D(lines));
 }
 
 TEST(Intersection, isIntersect2DIdentical)
 {
-  math::geometry::LineSegment line(makePoint(0, 0), makePoint(1, 1));
+  math::geometry::LineSegment line(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
   EXPECT_TRUE(math::geometry::isIntersect2D(line, line));
 }
 
 TEST(Intersection, isIntersect2DIdenticalVector)
 {
-  math::geometry::LineSegment line(makePoint(0, 0), makePoint(1, 1));
+  math::geometry::LineSegment line(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
   std::vector<math::geometry::LineSegment> lines;
-  lines.emplace_back(line);
-  lines.emplace_back(line);
-  lines.emplace_back(line);
+  lines.push_back(line);
+  lines.push_back(line);
+  lines.push_back(line);
   EXPECT_TRUE(math::geometry::isIntersect2D(lines));
 }
 
@@ -76,23 +74,22 @@ TEST(Intersection, isIntersect2DEmptyVector)
 
 TEST(Intersection, getIntersection2DDisjoint)
 {
-  math::geometry::LineSegment line0(makePoint(0, 0), makePoint(1, 1));
-  math::geometry::LineSegment line1(makePoint(1, 0), makePoint(2, 1));
+  math::geometry::LineSegment line0(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
+  math::geometry::LineSegment line1(makePoint(1.0, 0.0), makePoint(2.0, 1.0));
   EXPECT_FALSE(math::geometry::getIntersection2D(line0, line1));
 }
 
 TEST(Intersection, getIntersection2DDisjointVector)
 {
-  std::vector<math::geometry::LineSegment> lines;
-  lines.emplace_back(makePoint(0, 0), makePoint(1, 1));
-  lines.emplace_back(makePoint(1, 0), makePoint(2, 1));
-  EXPECT_TRUE(math::geometry::getIntersection2D(lines).empty());
+  std::vector<math::geometry::LineSegment> lines{
+    {makePoint(0.0, 0.0), makePoint(1.0, 1.0)}, {makePoint(1.0, 0.0), makePoint(2.0, 1.0)}};
+  EXPECT_EQ(math::geometry::getIntersection2D(lines).size(), size_t(0));
 }
 
 TEST(Intersection, getIntersection2DIntersect)
 {
-  math::geometry::LineSegment line0(makePoint(0, 0), makePoint(1, 1));
-  math::geometry::LineSegment line1(makePoint(1, 0), makePoint(0, 1));
+  math::geometry::LineSegment line0(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
+  math::geometry::LineSegment line1(makePoint(1.0, 0.0), makePoint(0.0, 1.0));
   auto ans = math::geometry::getIntersection2D(line0, line1);
   EXPECT_TRUE(ans);
   EXPECT_POINT_EQ(ans.value(), makePoint(0.5, 0.5));
@@ -100,9 +97,8 @@ TEST(Intersection, getIntersection2DIntersect)
 
 TEST(Intersection, getIntersection2DIntersectVector)
 {
-  std::vector<math::geometry::LineSegment> lines;
-  lines.emplace_back(makePoint(0, 0), makePoint(1, 1));
-  lines.emplace_back(makePoint(1, 0), makePoint(0, 1));
+  std::vector<math::geometry::LineSegment> lines{
+    {makePoint(0.0, 0.0), makePoint(1.0, 1.0)}, {makePoint(1.0, 0.0), makePoint(0.0, 1.0)}};
   auto ans = math::geometry::getIntersection2D(lines);
   EXPECT_EQ(ans.size(), size_t(2));
   EXPECT_POINT_EQ(ans[0], makePoint(0.5, 0.5));
@@ -111,48 +107,28 @@ TEST(Intersection, getIntersection2DIntersectVector)
 
 TEST(Intersection, getIntersection2DIdentical)
 {
-  math::geometry::LineSegment line(makePoint(0, 0), makePoint(1, 1));
+  math::geometry::LineSegment line(makePoint(0.0, 0.0), makePoint(1.0, 1.0));
   auto ans = math::geometry::getIntersection2D(line, line);
   EXPECT_TRUE(ans);
-  EXPECT_TRUE(std::isnan(ans.value().x));
-  EXPECT_TRUE(std::isnan(ans.value().y));
-  EXPECT_TRUE(std::isnan(ans.value().z));
+  EXPECT_POINT_NAN(ans.value());
 }
 
 TEST(Intersection, getIntersection2DIdenticalVector)
 {
   math::geometry::LineSegment line(makePoint(0, 0), makePoint(1, 1));
   std::vector<math::geometry::LineSegment> lines;
-  lines.emplace_back(line);
-  lines.emplace_back(line);
-  lines.emplace_back(line);
+  lines.push_back(line);
+  lines.push_back(line);
+  lines.push_back(line);
 
   auto ans = math::geometry::getIntersection2D(lines);
   EXPECT_EQ(ans.size(), size_t(6));
-  // point 0
-  EXPECT_TRUE(std::isnan(ans[0].x));
-  EXPECT_TRUE(std::isnan(ans[0].y));
-  EXPECT_TRUE(std::isnan(ans[0].z));
-  // point 1
-  EXPECT_TRUE(std::isnan(ans[1].x));
-  EXPECT_TRUE(std::isnan(ans[1].y));
-  EXPECT_TRUE(std::isnan(ans[1].z));
-  // point 2
-  EXPECT_TRUE(std::isnan(ans[2].x));
-  EXPECT_TRUE(std::isnan(ans[2].y));
-  EXPECT_TRUE(std::isnan(ans[2].z));
-  // point 3
-  EXPECT_TRUE(std::isnan(ans[3].x));
-  EXPECT_TRUE(std::isnan(ans[3].y));
-  EXPECT_TRUE(std::isnan(ans[3].z));
-  // point 4
-  EXPECT_TRUE(std::isnan(ans[4].x));
-  EXPECT_TRUE(std::isnan(ans[4].y));
-  EXPECT_TRUE(std::isnan(ans[4].z));
-  // point 5
-  EXPECT_TRUE(std::isnan(ans[5].x));
-  EXPECT_TRUE(std::isnan(ans[5].y));
-  EXPECT_TRUE(std::isnan(ans[5].z));
+  EXPECT_POINT_NAN(ans[0]);
+  EXPECT_POINT_NAN(ans[1]);
+  EXPECT_POINT_NAN(ans[2]);
+  EXPECT_POINT_NAN(ans[3]);
+  EXPECT_POINT_NAN(ans[4]);
+  EXPECT_POINT_NAN(ans[5]);
 }
 
 TEST(Intersection, getIntersection2DEmptyVector)
@@ -160,7 +136,7 @@ TEST(Intersection, getIntersection2DEmptyVector)
   std::vector<math::geometry::LineSegment> lines;
   std::vector<geometry_msgs::msg::Point> ans;
   EXPECT_NO_THROW(ans = math::geometry::getIntersection2D(lines));
-  EXPECT_TRUE(ans.empty());
+  EXPECT_EQ(ans.size(), size_t(0));
 }
 
 int main(int argc, char ** argv)
