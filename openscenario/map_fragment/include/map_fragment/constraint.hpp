@@ -19,6 +19,7 @@
 #include <lanelet2_routing/RoutingGraph.h>
 
 #include <algorithm>
+#include <limits>
 
 namespace map_fragment
 {
@@ -152,6 +153,60 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
   }
 
   return constraints;
+}
+
+template <typename Node>
+auto loadAllLaneletIDConstraints(Node & node, const std::string & prefix = "")
+{
+  if (const auto name = prefix + "lanelet_type"; not node.has_parameter(name)) {
+    node.declare_parameter(name, "lanelet");
+  }
+
+  if (const auto name = prefix + "subtype"; not node.has_parameter(name)) {
+    node.declare_parameter(name, "road");
+  }
+
+  if (const auto name = prefix + "id"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "id_greater_than"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "id_is_less_than"; not node.has_parameter(name)) {
+    node.declare_parameter(name, std::numeric_limits<lanelet::Id>::max());
+  }
+
+  if (const auto name = prefix + "is_left_of"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "is_right_of"; node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "is_leftmost"; not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "is_rightmost"; not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "is_not_leftmost"; not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "is_not_rightmost"; not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "route_length_greater_than"; not node.has_parameter(name)) {
+    node.declare_parameter(name, 0.0);
+  }
+
+  return loadLaneletIDConstraints(node, prefix);
 }
 
 template <typename Node>

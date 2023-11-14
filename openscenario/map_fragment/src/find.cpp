@@ -35,20 +35,7 @@ try {
   const auto routing_graph =
     lanelet::routing::RoutingGraph::build(*lanelet_map, vehicleTrafficRules());
 
-  node.declare_parameter("type", "lanelet");
-  node.declare_parameter("subtype", "road");
-  node.declare_parameter("id", lanelet::Id());
-  node.declare_parameter("id_is_greater_than", lanelet::Id());
-  node.declare_parameter("id_is_less_than", std::numeric_limits<lanelet::Id>::max());
-  node.declare_parameter("is_left_of", lanelet::Id());
-  node.declare_parameter("is_right_of", lanelet::Id());
-  node.declare_parameter("is_leftmost", false);
-  node.declare_parameter("is_rightmost", false);
-  node.declare_parameter("is_not_leftmost", false);
-  node.declare_parameter("is_not_rightmost", false);
-  node.declare_parameter("route_length_greater_than", 0.0);  // DEPRECATED
-
-  const auto constraints = loadLaneletIDConstraints(node);
+  const auto constraints = loadAllLaneletIDConstraints(node);
 
   auto satisfy = [&](const auto & lanelet) {
     return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
