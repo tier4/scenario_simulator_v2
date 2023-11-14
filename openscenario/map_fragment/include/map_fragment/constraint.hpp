@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <map_fragment/map_fragment.hpp>
 
 namespace map_fragment
 {
@@ -145,6 +146,20 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
     });
   }
 
+  if (const auto name = prefix + "centerline_curvature_less_than"; node.has_parameter(name)) {
+    const auto curvature = node.get_parameter(name).as_double();
+    constraints.emplace(name, [curvature](auto && lanelet, auto &&...) {
+      return curvature2d(lanelet.centerline()) < curvature;
+    });
+  }
+
+  if (const auto name = prefix + "centerline_curvature_greater_than"; node.has_parameter(name)) {
+    const auto curvature = node.get_parameter(name).as_double();
+    constraints.emplace(name, [curvature](auto && lanelet, auto &&...) {
+      return curvature < curvature2d(lanelet.centerline());
+    });
+  }
+
   if (const auto name = prefix + "route_length_greater_than"; node.has_parameter(name)) {
     const auto lower_bound = node.get_parameter(name).as_double();
     constraints.emplace(name, [lower_bound](auto && lanelet, auto &&, auto && graph) {
@@ -200,6 +215,15 @@ auto loadAllLaneletIDConstraints(Node & node, const std::string & prefix = "")
 
   if (const auto name = prefix + "is_not_rightmost"; not node.has_parameter(name)) {
     node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "centerline_curvature_less_than"; not node.has_parameter(name)) {
+    node.declare_parameter(name, std::numeric_limits<double>::max());
+  }
+
+  if (const auto name = prefix + "centerline_curvature_greater_than";
+      not node.has_parameter(name)) {
+    node.declare_parameter(name, 0.0);
   }
 
   if (const auto name = prefix + "route_length_greater_than"; not node.has_parameter(name)) {

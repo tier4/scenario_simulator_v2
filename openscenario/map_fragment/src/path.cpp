@@ -43,13 +43,15 @@ try {
     };
 
   node.declare_parameter("path_is_allowed_to_include_lane_changes", false);
-  node.declare_parameter("path_length_greater_than", 100.0);
+  node.declare_parameter("path_element_limit", 5);
 
   auto search_possible_paths = [&](auto && lanelet) {
     auto parameters = lanelet::routing::PossiblePathsParams();
-    parameters.includeLaneChanges =
-      node.get_parameter("path_is_allowed_to_include_lane_changes").as_bool();
-    parameters.routingCostLimit = node.get_parameter("path_length_greater_than").as_double();
+    // clang-format off
+    parameters.includeLaneChanges = node.get_parameter("path_is_allowed_to_include_lane_changes").as_bool();
+    parameters.includeShorterPaths = true;
+    parameters.elementLimit = node.get_parameter("path_element_limit").as_int();
+    // clang-format on
     return routing_graph->possiblePaths(lanelet, parameters);
   };
 
@@ -70,8 +72,13 @@ try {
   node.declare_parameter("select_path", "any");
   node.declare_parameter("select_lanelet", "last");
 
-  auto select =
-    loadLaneletPathSelector(node, "", "_path", loadLaneletSelector(node, "", "_lanelet"));
+  auto select = loadLaneletPathSelector(node, "", "_path", [&](auto && path) {
+    std::cerr << "select lanelet from path [";
+    for (auto && lanelet : path) {
+      std::cerr << lanelet.id() << (&lanelet != &path.back() ? " " : "] => ");
+    }
+    return std::invoke(loadLaneletSelector(node, "", "_lanelet"), path);
+  });
 
   // clang-format off
   lanelet_map->laneletLayer | curry2(filter)(satisfy_first_lanelet_constraints)

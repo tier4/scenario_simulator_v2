@@ -237,7 +237,7 @@ auto makeLanelet(double width, double length, double curvature, double resolutio
   return makeLanelet(makePoint3d(0.0, 0.0, 0.0), width, length, curvature, resolution);
 }
 
-auto length(const lanelet::LineString3d & linestring) -> double
+auto length(const lanelet::ConstLineString3d & linestring) -> double
 {
   return lanelet::geometry::length(linestring);
 }
@@ -261,7 +261,7 @@ auto angle2d(const Point & p0, const Point & p1, const Point & p2)
     angle2d(p1.basicPoint(), p2.basicPoint()) - angle2d(p0.basicPoint(), p1.basicPoint()));
 }
 
-auto curvature2d(const lanelet::LineString3d & points)
+auto curvature2d(const lanelet::ConstLineString3d & points)
 {
   if (points.size() < 3) {
     return 0.0;
