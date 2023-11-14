@@ -2,9 +2,9 @@ OpenSCENARIO:
   FileHeader:
     revMajor: 0
     revMinor: 0
-    date: "1970-01-01T09:00:00+09:00"
-    description: ""
-    author: "Tatsuya Yamasaki"
+    date: '1970-01-01T09:00:00+09:00'
+    description: ''
+    author: 'Tatsuya Yamasaki'
   ParameterDeclarations:
     ParameterDeclaration: []
   CatalogLocations:
@@ -22,7 +22,7 @@ OpenSCENARIO:
           entryName: sample_vehicle
         ObjectController:
           Controller:
-            name: ""
+            name: ''
             Properties:
               Property: []
   Storyboard:
@@ -34,8 +34,8 @@ OpenSCENARIO:
               - TeleportAction:
                   Position:
                     LanePosition:
-                      roadId: ""
-                      laneId: "34513"
+                      roadId: ''
+                      laneId: '34513'
                       s: 1
                       offset: 0
                       Orientation: &ORIENTATION
@@ -44,25 +44,25 @@ OpenSCENARIO:
                         p: 0
                         r: 0
     Story:
-      - name: ""
+      - name: ''
         Act:
-          - name: ""
+          - name: ''
             ManeuverGroup:
               - maximumExecutionCount: 1
-                name: ""
+                name: ''
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
                     - entityRef: ego
                 Maneuver:
-                  - name: ""
+                  - name: ''
                     Event:
-                      - name: ""
+                      - name: ''
                         priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ""
+                                - name: ''
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
@@ -70,7 +70,7 @@ OpenSCENARIO:
                                       value: 0
                                       rule: greaterThan
                         Action:
-                          - name: "follow_trajectory"
+                          - name: 'follow_trajectory'
                             PrivateAction:
                               - RoutingAction:
                                   FollowTrajectoryAction:
@@ -91,23 +91,23 @@ OpenSCENARIO:
                                             Vertex:
                                               - Position:
                                                   LanePosition:
-                                                    roadId: ""
-                                                    laneId: "34513"
+                                                    roadId: ''
+                                                    laneId: '34513'
                                                     s: 10
                                                     offset: 0
                                                     Orientation: *ORIENTATION
                                               - time: 12
                                                 Position: &ego_destination
                                                   LanePosition:
-                                                    roadId: ""
-                                                    laneId: "34507"
+                                                    roadId: ''
+                                                    laneId: '34507'
                                                     s: 50
                                                     offset: 0
                                                     Orientation: *ORIENTATION
             StartTrigger:
               ConditionGroup:
                 - Condition:
-                    - name: ""
+                    - name: ''
                       delay: 0
                       conditionEdge: none
                       ByValueCondition:
@@ -117,20 +117,20 @@ OpenSCENARIO:
           - name: _EndCondition
             ManeuverGroup:
               - maximumExecutionCount: 1
-                name: ""
+                name: ''
                 Actors:
                   selectTriggeringEntities: false
                   EntityRef:
                     - entityRef: ego
                 Maneuver:
-                  - name: ""
+                  - name: ''
                     Event:
-                      - name: ""
+                      - name: ''
                         priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ""
+                                - name: ''
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
@@ -138,7 +138,7 @@ OpenSCENARIO:
                                       storyboardElementRef: follow_trajectory
                                       storyboardElementType: action
                                       state: completeState
-                                - name: ""
+                                - name: ''
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -151,16 +151,16 @@ OpenSCENARIO:
                                         Position: *ego_destination
                                         tolerance: 1.1
                         Action:
-                          - name: ""
+                          - name: ''
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: exitSuccess
-                      - name: ""
+                      - name: ''
                         priority: parallel
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ""
+                                - name: ''
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
@@ -168,14 +168,14 @@ OpenSCENARIO:
                                       value: 30
                                       rule: greaterThan
                         Action:
-                          - name: ""
+                          - name: ''
                             UserDefinedAction:
                               CustomCommandAction:
                                 type: exitFailure
             StartTrigger:
               ConditionGroup:
                 - Condition:
-                    - name: ""
+                    - name: ''
                       delay: 0
                       conditionEdge: none
                       ByValueCondition:

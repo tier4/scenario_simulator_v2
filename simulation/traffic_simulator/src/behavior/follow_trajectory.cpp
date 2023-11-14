@@ -64,7 +64,6 @@ auto makeUpdatedStatus(
   if (polyline_trajectory.shape.vertices.empty()) {
     return std::nullopt;
   }
-  std::cout << std::setprecision(16) << std::fixed;
   const auto & vertices = polyline_trajectory.shape.vertices;
   const auto first_waypoint_with_arrival_time_specified = std::find_if(
     vertices.begin(), vertices.end(), [](auto && vertex) { return not std::isnan(vertex.time); });
@@ -151,11 +150,6 @@ auto makeUpdatedStatus(
        miraculously becomes zero.
     */
     isDefinitelyLessThan(distance_to_front_waypoint, std::numeric_limits<double>::epsilon())) {
-    std::cout << entity_status.time
-              << "] Reached waypoint2: v: " << entity_status.action_status.twist.linear.x
-              << " acc: " << entity_status.action_status.accel.linear.x
-              << " d: " << distance_to_front_waypoint << std::endl;
-    // throw std::runtime_error("Finished - 1");
     return discard_the_front_waypoint_and_recurse();
   } else if (
     const auto [distance, remaining_time] =
@@ -228,11 +222,6 @@ auto makeUpdatedStatus(
         }
       }();
     isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
-    std::cout << entity_status.time
-              << "] Reached waypoint3: v: " << entity_status.action_status.twist.linear.x
-              << " acc: " << entity_status.action_status.accel.linear.x
-              << " d: " << distance_to_front_waypoint << std::endl;
-    // throw std::runtime_error("Finished - 2");
     return discard_the_front_waypoint_and_recurse();
   } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
              isinf(acceleration) or isnan(acceleration)) {
@@ -441,11 +430,6 @@ auto makeUpdatedStatus(
       */
       auto this_step_distance = (speed + desired_acceleration * step_time) * step_time;
       if (this_step_distance > distance_to_front_waypoint) {
-        std::cout << "[" << entity_status.time << "] Reached waypoint with NaN time: speed: "
-                  << entity_status.action_status.twist.linear.x
-                  << ", acceleration: " << entity_status.action_status.accel.linear.x
-                  << ", distance: " << hypot(entity_status.pose.position, target_position) << "."
-                  << std::endl;
         return discard_the_front_waypoint_and_recurse();
       }
       /*
@@ -459,13 +443,6 @@ auto makeUpdatedStatus(
     } else if (isDefinitelyLessThan(remaining_time_to_front_waypoint, step_time / 2.0)) {
       if (follow_waypoint_controller.distanceMeetsAccuracyRestrictions(
             distance_to_front_waypoint)) {
-        std::cout << "[" << entity_status.time
-                  << "] Reached waypoint with specified time: remaining_time: "
-                  << remaining_time_to_front_waypoint
-                  << ", speed: " << entity_status.action_status.twist.linear.x
-                  << ", acceleration: " << entity_status.action_status.accel.linear.x
-                  << ", distance: " << hypot(entity_status.pose.position, target_position) << "."
-                  << std::endl;
         return discard_the_front_waypoint_and_recurse();
       } else {
         throw common::SimulationError(
