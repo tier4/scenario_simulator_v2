@@ -80,7 +80,7 @@ class FollowWaypointController
   // accuracy
   const double local_epsilon{1e-12};
   const double step_time_tolerance{1e-6};
-  const double finish_distance_tolerance{1e-5};
+  const double finish_distance_tolerance{1e-3};
   const double predicted_distance_tolerance{0.5};
   const int number_of_acceleration_candidates{20};
 
