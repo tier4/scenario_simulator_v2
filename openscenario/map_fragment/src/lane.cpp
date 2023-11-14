@@ -55,21 +55,7 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  ParametricCurve::Ptr guide_curve;
-  if (curvature == 0.0)
-  {
-    guide_curve = std::make_shared<Straight>(length);
-  }
-  else
-  {
-    auto radius = std::abs(1 / curvature);
-    auto angle = length * curvature;
-    guide_curve = std::make_shared<Arc>(radius, angle);
-  }
-
-  RoadCrossSectionDescription cross_section_description(number_of_lanes, width);
-  RoadSegment segment(guide_curve, cross_section_description);
-
+  auto segment = makeCurvedRoadSegment(curvature, length, number_of_lanes, width);
   const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
 
   map_fragment::write(*map, output_directory);

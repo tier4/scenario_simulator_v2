@@ -127,6 +127,29 @@ public:
   }
 }; // class RoadSegment
 
+auto makeCurvedRoadSegment(double curvature,
+                           double length,
+                           int number_of_lanes,
+                           double lane_width) -> RoadSegment
+{
+  ParametricCurve::Ptr guide_curve;
+
+  if (curvature == 0.0)
+  {
+    guide_curve = std::make_shared<Straight>(length);
+  }
+  else
+  {
+    auto radius = std::abs(1 / curvature);
+    auto angle = length * curvature;
+    guide_curve = std::make_shared<Arc>(radius, angle);
+  }
+
+  RoadCrossSectionDescription cross_section_description(number_of_lanes, lane_width);
+
+  return RoadSegment(guide_curve, cross_section_description);
+}
+
 } // namespace map_fragment
 
 #endif // MAP_FRAGMENT__ROAD_SEGMENT__HPP_
