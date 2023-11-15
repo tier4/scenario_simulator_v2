@@ -149,14 +149,14 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
   if (const auto name = prefix + "centerline_curvature_less_than"; node.has_parameter(name)) {
     const auto curvature = node.get_parameter(name).as_double();
     constraints.emplace(name, [curvature](auto && lanelet, auto &&...) {
-      return curvature2d(lanelet.centerline()) < curvature;
+      return std::abs(curvature2d(lanelet.centerline())) < curvature;
     });
   }
 
   if (const auto name = prefix + "centerline_curvature_greater_than"; node.has_parameter(name)) {
     const auto curvature = node.get_parameter(name).as_double();
     constraints.emplace(name, [curvature](auto && lanelet, auto &&...) {
-      return curvature < curvature2d(lanelet.centerline());
+      return curvature < std::abs(curvature2d(lanelet.centerline()));
     });
   }
 
@@ -223,7 +223,7 @@ auto loadAllLaneletIDConstraints(Node & node, const std::string & prefix = "")
 
   if (const auto name = prefix + "centerline_curvature_greater_than";
       not node.has_parameter(name)) {
-    node.declare_parameter(name, 0.0);
+    node.declare_parameter(name, std::numeric_limits<double>::lowest());
   }
 
   if (const auto name = prefix + "route_length_greater_than"; not node.has_parameter(name)) {
