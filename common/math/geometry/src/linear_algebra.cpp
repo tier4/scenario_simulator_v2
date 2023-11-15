@@ -149,21 +149,3 @@ geometry_msgs::msg::Point operator-(
   ret.z = v0.z - v1.z;
   return ret;
 }
-
-bool operator==(const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1)
-{
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if (std::fabs(v0.x - v1.x) <= e && std::fabs(v0.y - v1.y) <= e && std::fabs(v0.z - v1.z) <= e) {
-    return true;
-  }
-  return false;
-}
-
-bool operator==(const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1)
-{
-  constexpr double e = std::numeric_limits<double>::epsilon();
-  if (std::fabs(v0.x - v1.x) <= e && std::fabs(v0.y - v1.y) <= e && std::fabs(v0.z - v1.z) <= e) {
-    return true;
-  }
-  return false;
-}
