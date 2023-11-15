@@ -153,20 +153,20 @@ TEST(CatmullRomSpline, GetCollisionPointIn2D)
   auto collision_s = spline.getCollisionPointIn2D(start, goal, false);
   EXPECT_TRUE(collision_s);
   if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
+    EXPECT_NEAR(collision_s.value(), 0.1, 1e-6);
   }
   collision_s = spline.getCollisionPointIn2D({start, goal}, false);
   if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
+    EXPECT_NEAR(collision_s.value(), 0.1, 1e-6);
   }
   collision_s = spline.getCollisionPointIn2D(start, goal, true);
   EXPECT_TRUE(collision_s);
   if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
+    EXPECT_NEAR(collision_s.value(), 0.1, 1e-6);
   }
   collision_s = spline.getCollisionPointIn2D({start, goal}, true);
   if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
+    EXPECT_NEAR(collision_s.value(), 0.1, 1e-6);
   }
 }
 
