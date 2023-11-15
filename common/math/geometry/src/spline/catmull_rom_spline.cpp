@@ -278,15 +278,8 @@ auto CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double 
   THROW_SEMANTIC_ERROR("curve index does not match");  // LCOV_EXCL_LINE
 }
 
-/**
- * @brief Get collision point in 2D (x and y)
- * @param polygon points of polygons.
- * @param search_backward If true, return collision points with maximum s value. If false, return collision points with minimum s value.
- * @return std::optional<double> Denormalized s values along the frenet coordinate of the spline curve.
- */
-auto CatmullRomSpline::getCollisionPointIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
-  -> std::optional<double>
+auto CatmullRomSpline::getCollisionPointsIn2D(
+  const std::vector<geometry_msgs::msg::Point> & polygon) const -> std::set<double>
 {
   if (polygon.size() <= 1) {
     THROW_SIMULATION_ERROR(
@@ -296,35 +289,19 @@ auto CatmullRomSpline::getCollisionPointIn2D(
       "developer of traffic_simulator.");
   }
   /// @note If the spline has three or more control points.
-  const auto get_collision_point_2d_with_curve =
-    [this](const auto & polygon, const auto search_backward) -> std::optional<double> {
-    size_t n = curves_.size();
-    if (search_backward) {
-      for (size_t i = 0; i < n; i++) {
-        /// @note The polygon is assumed to be closed
-        auto s = curves_[n - 1 - i].getCollisionPointIn2D(polygon, search_backward, true, true);
-        if (s) {
-          return getSInSplineCurve(n - 1 - i, s.value());
-        }
+  const auto get_collision_point_2d_with_curve = [this](const auto & polygon) -> std::set<double> {
+    std::set<double> s_value_candidates;
+    for (size_t i = 0; i < curves_.size(); ++i) {
+      /// @note The polygon is assumed to be closed
+      if (const auto s = curves_[i].getCollisionPointIn2D(polygon, false, true, true)) {
+        s_value_candidates.insert(getSInSplineCurve(i, s.value()));
       }
-      return std::optional<double>();
-    } else {
-      for (size_t i = 0; i < n; i++) {
-        /// @note The polygon is assumed to be closed
-        auto s = curves_[i].getCollisionPointIn2D(polygon, search_backward, true, true);
-        if (s) {
-          return std::optional<double>(getSInSplineCurve(i, s.value()));
-        }
-      }
-      return std::optional<double>();
     }
-    return std::optional<double>();
+    return s_value_candidates;
   };
   /// @note If the spline has two control points. (Same as single line segment.)
-  const auto get_collision_point_2d_with_line =
-    [this](const auto & polygon, const auto search_backward) -> std::optional<double> {
-    const auto polygon_lines = getLineSegments(polygon);
-    std::vector<double> s_value_candidates = {};
+  const auto get_collision_point_2d_with_line = [this](const auto & polygon) -> std::set<double> {
+    std::set<double> s_value_candidates;
     for (const auto & line : getLineSegments(polygon)) {
       if (static_cast<int>(line_segments_.size()) != 1) {
         THROW_SIMULATION_ERROR(
@@ -334,26 +311,21 @@ auto CatmullRomSpline::getCollisionPointIn2D(
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
-      if (const auto s_value = line_segments_[0].getIntersection2DSValue(line)) {
-        s_value_candidates.push_back(s_value.value());
+      if (const auto s = line_segments_[0].getIntersection2DSValue(line, true)) {
+        s_value_candidates.insert(s.value());
       }
     }
-    if (s_value_candidates.empty()) {
-      return std::optional<double>();
-    }
-    return search_backward
-             ? *std::max_element(s_value_candidates.begin(), s_value_candidates.end())
-             : *std::min_element(s_value_candidates.begin(), s_value_candidates.end());
+    return s_value_candidates;
   };
   /// @note If the spline has one control point. (Same as point.)
-  const auto get_collision_point_2d_with_point = [this](const auto & polygon) {
-    const auto polygon_lines = getLineSegments(polygon);
-    for (const auto & line : polygon_lines) {
+  const auto get_collision_point_2d_with_point = [this](const auto & polygon) -> std::set<double> {
+    std::set<double> s_value_candidates;
+    for (const auto & line : getLineSegments(polygon)) {
       if (line.isIntersect2D(control_points[0])) {
-        return std::optional<double>(0);
+        s_value_candidates.insert(0.0);
       }
     }
-    return std::optional<double>();
+    return s_value_candidates;
   };
 
   switch (control_points.size()) {
@@ -368,11 +340,31 @@ auto CatmullRomSpline::getCollisionPointIn2D(
       return get_collision_point_2d_with_point(polygon);
     /// @note In this case, spline is interpreted as line segment.
     case 2:
-      return get_collision_point_2d_with_line(polygon, search_backward);
+      return get_collision_point_2d_with_line(polygon);
     /// @note In this case, spline is interpreted as curve.
     default:
-      return get_collision_point_2d_with_curve(polygon, search_backward);
+      return get_collision_point_2d_with_curve(polygon);
   }
+}
+
+/**
+ * @brief Get collision point in 2D (x and y)
+ * @param polygon points of polygons.
+ * @param search_backward If true, return collision points with maximum s value. If false, return collision points with minimum s value.
+ * @return std::optional<double> Denormalized s values along the frenet coordinate of the spline curve.
+ */
+auto CatmullRomSpline::getCollisionPointIn2D(
+  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
+  -> std::optional<double>
+{
+  std::set<double> s_value_candidates = getCollisionPointsIn2D(polygon);
+  if (s_value_candidates.empty()) {
+    return std::nullopt;
+  }
+  if (search_backward) {
+    return *(s_value_candidates.rbegin());
+  }
+  return *(s_value_candidates.begin());
 }
 
 auto CatmullRomSpline::getCollisionPointIn2D(

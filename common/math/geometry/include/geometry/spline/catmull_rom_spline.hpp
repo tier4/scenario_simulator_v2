@@ -49,6 +49,8 @@ public:
     -> double;
   auto getSquaredDistanceVector(const geometry_msgs::msg::Point & point, const double s) const
     -> geometry_msgs::msg::Vector3;
+  auto getCollisionPointsIn2D(const std::vector<geometry_msgs::msg::Point> & polygon) const
+    -> std::set<double>;
   auto getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     const bool search_backward = false) const -> std::optional<double>;
