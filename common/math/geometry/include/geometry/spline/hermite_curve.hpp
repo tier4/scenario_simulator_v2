@@ -63,9 +63,15 @@ public:
     const geometry_msgs::msg::Point & point, double s, bool denormalize_s = false) const;
   geometry_msgs::msg::Vector3 getSquaredDistanceVector(
     const geometry_msgs::msg::Point & point, double s, bool denormalize_s = false) const;
+  std::set<double> getCollisionPointsIn2D(
+    const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
+    bool search_backward = false, bool denormalize_s = false) const;
   std::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     bool search_backward = false, bool denormalize_s = false) const;
+  std::set<double> getCollisionPointsIn2D(
+    const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
+    bool close_start_end = true, bool denormalize_s = false) const;
   std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
     bool close_start_end = true, bool denormalize_s = false) const;

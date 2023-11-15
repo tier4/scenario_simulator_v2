@@ -279,7 +279,8 @@ auto CatmullRomSpline::getSInSplineCurve(const size_t curve_index, const double 
 }
 
 auto CatmullRomSpline::getCollisionPointsIn2D(
-  const std::vector<geometry_msgs::msg::Point> & polygon) const -> std::set<double>
+  const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
+  -> std::set<double>
 {
   if (polygon.size() <= 1) {
     THROW_SIMULATION_ERROR(
@@ -293,9 +294,10 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
     std::set<double> s_value_candidates;
     for (size_t i = 0; i < curves_.size(); ++i) {
       /// @note The polygon is assumed to be closed
-      if (const auto s = curves_[i].getCollisionPointIn2D(polygon, false, true, true)) {
-        s_value_candidates.insert(getSInSplineCurve(i, s.value()));
-      }
+      const auto s = curves_[i].getCollisionPointsIn2D(polygon, search_backward, true, true);
+      std::for_each(s.begin(), s.end(), [&s_value_candidates, i, this](const auto & s) {
+        s_value_candidates.insert(getSInSplineCurve(i, s));
+      });
     }
     return s_value_candidates;
   };
@@ -357,7 +359,7 @@ auto CatmullRomSpline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
   -> std::optional<double>
 {
-  std::set<double> s_value_candidates = getCollisionPointsIn2D(polygon);
+  std::set<double> s_value_candidates = getCollisionPointsIn2D(polygon, search_backward);
   if (s_value_candidates.empty()) {
     return std::nullopt;
   }
