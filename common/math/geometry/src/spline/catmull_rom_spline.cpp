@@ -290,7 +290,8 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
       "developer of traffic_simulator.");
   }
   /// @note If the spline has three or more control points.
-  const auto get_collision_point_2d_with_curve = [this](const auto & polygon) -> std::set<double> {
+  const auto get_collision_point_2d_with_curve =
+    [this](const auto & polygon, const auto search_backward) -> std::set<double> {
     std::set<double> s_value_candidates;
     for (size_t i = 0; i < curves_.size(); ++i) {
       /// @note The polygon is assumed to be closed
@@ -345,7 +346,7 @@ auto CatmullRomSpline::getCollisionPointsIn2D(
       return get_collision_point_2d_with_line(polygon);
     /// @note In this case, spline is interpreted as curve.
     default:
-      return get_collision_point_2d_with_curve(polygon);
+      return get_collision_point_2d_with_curve(polygon, search_backward);
   }
 }
 
