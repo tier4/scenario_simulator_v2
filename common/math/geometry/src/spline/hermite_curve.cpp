@@ -87,7 +87,7 @@ geometry_msgs::msg::Vector3 HermiteCurve::getSquaredDistanceVector(
 
 std::optional<double> HermiteCurve::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
-  bool close_start_end) const
+  bool close_start_end, bool denormalize_s) const
 {
   size_t n = polygon.size();
   if (n <= 1) {
@@ -97,7 +97,7 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
   for (size_t i = 0; i < (n - 1); i++) {
     const auto p0 = polygon[i];
     const auto p1 = polygon[i + 1];
-    auto s = getCollisionPointIn2D(p0, p1, search_backward);
+    auto s = getCollisionPointIn2D(p0, p1, search_backward, denormalize_s);
     if (s) {
       s_values.push_back(s.value());
     }
@@ -105,7 +105,7 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
   if (close_start_end) {
     const auto p0 = polygon[n - 1];
     const auto p1 = polygon[0];
-    auto s = getCollisionPointIn2D(p0, p1, search_backward);
+    auto s = getCollisionPointIn2D(p0, p1, search_backward, denormalize_s);
     if (s) {
       s_values.push_back(s.value());
     }
@@ -121,7 +121,7 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
 
 std::optional<double> HermiteCurve::getCollisionPointIn2D(
   const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
-  bool search_backward) const
+  bool search_backward, bool denormalize_s) const
 {
   std::vector<double> s_values;
   double fx = point0.x;
@@ -151,6 +151,16 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
     }
   };
 
+  /**
+   * @note Denormalize given S value as necessary
+   */
+  const auto denormalize = [denormalize_s, this](double s) -> double {
+    if (denormalize_s) {
+      return s * getLength();
+    }
+    return s;
+  };
+
   for (const auto solution : get_solutions()) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
     double x = solver_.cubic(ax_, bx_, cx_, dx_, solution);
@@ -163,11 +173,11 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
        * tx, ty, will be in the range [0, 1] while the other will be out of that range because of division by zero.
        */
       if ((0 <= tx && tx <= 1) || (0 <= ty && ty <= 1)) {
-        s_values.push_back(solution);
+        s_values.push_back(denormalize(solution));
       }
     } else {
       if ((0 <= tx && tx <= 1) && (0 <= ty && ty <= 1)) {
-        s_values.push_back(solution);
+        s_values.push_back(denormalize(solution));
       }
     }
   }
