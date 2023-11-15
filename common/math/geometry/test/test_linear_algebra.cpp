@@ -96,7 +96,9 @@ TEST(LINEAR_ALGEBRA, DIVIDE_ZERO)
 {
   geometry_msgs::msg::Vector3 vec = makeVector(0.0, 3.0, 1.0);
   vec = vec / 0.0;
-  EXPECT_POINT_NAN(vec);
+  EXPECT_TRUE(std::isnan(vec.x));
+  EXPECT_TRUE(std::isinf(vec.y));
+  EXPECT_TRUE(std::isinf(vec.z));
 }
 
 TEST(LINEAR_ALGEBRA, MULTIPLY_FIRST)

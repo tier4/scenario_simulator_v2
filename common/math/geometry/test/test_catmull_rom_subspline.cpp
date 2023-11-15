@@ -172,17 +172,13 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D_wrongPolygon)
 
   std::vector<geometry_msgs::msg::Point> polygon0;
 
-  const auto ans00 = spline.getCollisionPointIn2D(polygon0);
-  EXPECT_FALSE(ans00);
-  const auto ans01 = spline.getCollisionPointIn2D(polygon0, true);
-  EXPECT_FALSE(ans01);
+  EXPECT_THROW(spline.getCollisionPointIn2D(polygon0), common::SimulationError);
+  EXPECT_THROW(spline.getCollisionPointIn2D(polygon0, true), common::SimulationError);
 
   std::vector<geometry_msgs::msg::Point> polygon1(1);
 
-  const auto ans10 = spline.getCollisionPointIn2D(polygon1);
-  EXPECT_FALSE(ans10);
-  const auto ans11 = spline.getCollisionPointIn2D(polygon1, true);
-  EXPECT_FALSE(ans11);
+  EXPECT_THROW(spline.getCollisionPointIn2D(polygon1), common::SimulationError);
+  EXPECT_THROW(spline.getCollisionPointIn2D(polygon1, true), common::SimulationError);
 }
 
 int main(int argc, char ** argv)
