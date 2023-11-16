@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <map_fragment/map_fragment.hpp>
 #include <map_fragment/road_segment.hpp>
-// TODO: Add header guards so there is no redefinition
-// #include <map_fragment/map_fragment.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
