@@ -105,7 +105,7 @@ public:
   /**
    * Calculate curve point for given parameter t ∈ [0, 1]
    */
-  auto getPosition(double t) -> Point2d
+  auto getPosition(double t) const -> Point2d
   {
     validateCurveParameterOrThrow(t);
     return getPosition_(t);
@@ -114,7 +114,7 @@ public:
   /**
    * Calculate curve tangent vector for given parameter t ∈ [0, 1]
    */
-  auto getTangentVector(double t) -> Vector2d
+  auto getTangentVector(double t) const -> Vector2d
   {
     validateCurveParameterOrThrow(t);
 
@@ -123,11 +123,11 @@ public:
   }
 
 private:
-  virtual auto getPosition_(double t) -> Point2d = 0;
-  virtual auto getTangentVector_(double t) -> Vector2d = 0;
+  virtual auto getPosition_(double t) const -> Point2d = 0;
+  virtual auto getTangentVector_(double t) const -> Vector2d = 0;
 
 protected:
-  auto validateCurveParameterOrThrow(double t) -> void
+  auto validateCurveParameterOrThrow(double t) const -> void
   {
     if (!(0 <= t && t <= 1)) {
       throw std::invalid_argument(
@@ -153,9 +153,9 @@ public:
   }
 
 private:
-  auto getPosition_(double t) -> Point2d override { return {t * length, 0}; }
+  auto getPosition_(double t) const -> Point2d override { return {t * length, 0}; }
 
-  auto getTangentVector_(double) -> Vector2d override { return {1, 0}; }
+  auto getTangentVector_(double) const -> Vector2d override { return {1, 0}; }
 };  // class Straight
 
 /**
@@ -186,14 +186,14 @@ public:
   }
 
 private:
-  auto getPosition_(double t) -> Point2d override
+  auto getPosition_(double t) const -> Point2d override
   {
     auto theta = t * angle;
     Point2d origin = {0, 0};
     return center_ + rotate(origin - center_, theta);
   }
 
-  auto getTangentVector_(double t) -> Vector2d override
+  auto getTangentVector_(double t) const -> Vector2d override
   {
     auto theta = t * angle;
     Vector2d v = {1, 0};
@@ -233,7 +233,7 @@ public:
   }
 
 private:
-  auto getPosition_(double t) -> Point2d override
+  auto getPosition_(double t) const -> Point2d override
   {
     auto [curve_id, curve_t] = getCurveIdAndParameter(t);
     auto curve = curves[curve_id];
@@ -242,7 +242,7 @@ private:
     return applyTransformation(curve->getPosition(curve_t), transformation);
   }
 
-  auto getTangentVector_(double t) -> Vector2d override
+  auto getTangentVector_(double t) const -> Vector2d override
   {
     auto [curve_id, curve_t] = getCurveIdAndParameter(t);
     auto curve = curves[curve_id];
@@ -251,7 +251,7 @@ private:
     return applyTransformation(curve->getTangentVector(curve_t), transformation);
   }
 
-  auto getCurveIdAndParameter(double t) -> std::pair<std::size_t, double>
+  auto getCurveIdAndParameter(double t) const -> std::pair<std::size_t, double>
   {
     validateCurveParameterOrThrow(t);
 
