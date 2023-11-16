@@ -1,0 +1,107 @@
+PROJECT_NAME = scenario_simulator_v2 C++ API
+
+DOXYFILE_ENCODING = UTF-8
+
+ENABLE_PREPROCESSING   = YES
+EXPAND_ONLY_PREDEF     = YES
+EXTRACT_ALL            = YES
+EXTRACT_ANON_NSPACES   = YES
+EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_METHODS  = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+GENERATE_XML           = NO
+
+INPUT                  += README.md
+
+INPUT                  += common/math/geometry
+INPUT                  += common/math/arithmetic
+INPUT                  += common/scenario_simulator_exception
+INPUT                  += common/simple_junit
+INPUT                  += common/status_monitor
+INPUT                  += external/concealer
+INPUT                  += mock/cpp_mock_scenarios
+INPUT                  += simulation/behavior_tree_plugin
+INPUT                  += simulation/do_nothing_plugin
+INPUT                  += simulation/simple_sensor_simulator
+INPUT                  += simulation/simulation_interface
+INPUT                  += simulation/traffic_simulator
+INPUT                  += openscenario/openscenario_interpreter
+INPUT                  += openscenario/openscenario_interpreter_example
+INPUT                  += openscenario/openscenario_preprocessor
+INPUT                  += openscenario/openscenario_visualization
+
+IMAGE_PATH             += common/math/geometry
+IMAGE_PATH             += common/math/arithmetic
+IMAGE_PATH             += common/scenario_simulator_exception
+IMAGE_PATH             += common/simple_junit
+IMAGE_PATH             += common/status_monitor
+IMAGE_PATH             += external/concealer
+IMAGE_PATH             += mock/cpp_mock_scenarios
+IMAGE_PATH             += simulation/behavior_tree_plugin
+IMAGE_PATH             += simulation/do_nothing_plugin
+IMAGE_PATH             += simulation/simple_sensor_simulator
+IMAGE_PATH             += simulation/simulation_interface
+IMAGE_PATH             += simulation/traffic_simulator
+IMAGE_PATH             += openscenario/openscenario_interpreter
+IMAGE_PATH             += openscenario/openscenario_interpreter_example
+IMAGE_PATH             += openscenario/openscenario_preprocessor
+IMAGE_PATH             += openscenario/openscenario_visualization
+
+EXAMPLE_PATH           += common/math/geometry
+EXAMPLE_PATH           += common/scenario_simulator_exception
+EXAMPLE_PATH           += common/math/arithmetic
+EXAMPLE_PATH           += common/simple_junit
+EXAMPLE_PATH           += common/status_monitor
+EXAMPLE_PATH           += external/concealer
+EXAMPLE_PATH           += mock/cpp_mock_scenarios
+EXAMPLE_PATH           += simulation/behavior_tree_plugin
+EXAMPLE_PATH           += simulation/do_nothing_plugin
+EXAMPLE_PATH           += simulation/simple_sensor_simulator
+EXAMPLE_PATH           += simulation/simulation_interface
+EXAMPLE_PATH           += simulation/traffic_simulator
+EXAMPLE_PATH           += openscenario/openscenario_interpreter
+EXAMPLE_PATH           += openscenario/openscenario_interpreter_example
+EXAMPLE_PATH           += openscenario/openscenario_preprocessor
+EXAMPLE_PATH           += openscenario/openscenario_visualization
+
+INPUT_ENCODING         = UTF-8
+MACRO_EXPANSION        = YES
+OUTPUT_DIRECTORY       = 
+OUTPUT_LANGUAGE        = English
+RECURSIVE              = YES
+SKIP_FUNCTION_MACROS   = NO
+XML_OUTPUT             = build
+
+FILE_PATTERNS += *.hpp
+FILE_PATTERNS += *.cpp
+FILE_PATTERNS += *.md
+
+EXPAND_AS_DEFINED += BOILERPLATE
+EXPAND_AS_DEFINED += CASE
+EXPAND_AS_DEFINED += DEFINE_CHECK_FUNCTION
+EXPAND_AS_DEFINED += DEFINE_ERROR_CATEGORY
+EXPAND_AS_DEFINED += DEFINE_GETTER
+EXPAND_AS_DEFINED += DEFINE_GETTER_SETTER
+EXPAND_AS_DEFINED += DEFINE_LAZY_VISITOR
+EXPAND_AS_DEFINED += DEFINE_STATIC_DATA_MEMBER_DETECTOR
+EXPAND_AS_DEFINED += EMPLACE
+EXPAND_AS_DEFINED += EXPECT_ACCEL_EQ
+EXPAND_AS_DEFINED += EXPECT_ACTION_STATUS_EQ
+EXPAND_AS_DEFINED += EXPECT_DECIMAL_EQ
+EXPAND_AS_DEFINED += EXPECT_DETECTION_SENSOR_CONFIGURATION_EQ
+EXPAND_AS_DEFINED += EXPECT_LANELET_POSE_EQ
+EXPAND_AS_DEFINED += EXPECT_POINT_EQ
+EXPAND_AS_DEFINED += EXPECT_POSE_EQ
+EXPAND_AS_DEFINED += EXPECT_QUATERNION_EQ
+EXPAND_AS_DEFINED += EXPECT_TWIST_EQ
+EXPAND_AS_DEFINED += EXPECT_VECTOR3_EQ
+EXPAND_AS_DEFINED += FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
+EXPAND_AS_DEFINED += FORWARD_TO_ENTITY
+EXPAND_AS_DEFINED += FORWARD_TO_ENTITY_MANAGER
+EXPAND_AS_DEFINED += FORWARD_TO_HDMAP_UTILS
+EXPAND_AS_DEFINED += TEST
+EXPAND_AS_DEFINED += THROW_ERROR
+EXPAND_AS_DEFINED += THROW_SEMANTIC_ERROR
+EXPAND_AS_DEFINED += THROW_SIMULATION_ERROR
+EXPAND_AS_DEFINED += THROW_SYNTAX_ERROR

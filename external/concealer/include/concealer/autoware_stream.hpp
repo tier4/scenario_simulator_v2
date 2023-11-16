@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef CONCEALER__UTILITY__AUTOWARE_STREAM_HPP_
-#define CONCEALER__UTILITY__AUTOWARE_STREAM_HPP_
+#ifndef CONCEALER__AUTOWARE_STREAM_HPP_
+#define CONCEALER__AUTOWARE_STREAM_HPP_
 
 #define AUTOWARE_INFO_STREAM(...) \
   RCLCPP_INFO_STREAM(get_logger(), "\x1b[32m" << __VA_ARGS__ << "\x1b[0m")
@@ -28,4 +28,4 @@
   AUTOWARE_ERROR_STREAM(            \
     "Error on calling " FROM ": " << std::system_error(errno, std::system_category()).what())
 
-#endif  // CONCEALER__UTILITY__AUTOWARE_STREAM_HPP_
+#endif  // CONCEALER__AUTOWARE_STREAM_HPP_
