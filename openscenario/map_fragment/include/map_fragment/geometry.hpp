@@ -103,35 +103,35 @@ public:
   using Pointer = std::shared_ptr<ParametricCurve>;
 
   /**
-   * Calculate curve point for given parameter t ∈ [0, 1]
+   * Calculate curve point for given parameter tangent ∈ [0, 1]
    */
-  auto getPosition(double t) const -> Point2d
+  auto getPosition(double tangent) const -> Point2d
   {
-    validateCurveParameterOrThrow(t);
-    return getPosition_(t);
+    validateCurveParameterOrThrow(tangent);
+    return getPosition_(tangent);
   }
 
   /**
-   * Calculate curve tangent vector for given parameter t ∈ [0, 1]
+   * Calculate curve tangent vector for given parameter tangent ∈ [0, 1]
    */
-  auto getTangentVector(double t) const -> Vector2d
+  auto getTangentVector(double tangent) const -> Vector2d
   {
-    validateCurveParameterOrThrow(t);
+    validateCurveParameterOrThrow(tangent);
 
     // TODO Throw error if the vector is not unit?
-    return getTangentVector_(t);
+    return getTangentVector_(tangent);
   }
 
 private:
-  virtual auto getPosition_(double t) const -> Point2d = 0;
-  virtual auto getTangentVector_(double t) const -> Vector2d = 0;
+  virtual auto getPosition_(double tangent) const -> Point2d = 0;
+  virtual auto getTangentVector_(double tangent) const -> Vector2d = 0;
 
 protected:
-  auto validateCurveParameterOrThrow(double t) const -> void
+  auto validateCurveParameterOrThrow(double tangent) const -> void
   {
-    if (!(0 <= t && t <= 1)) {
+    if (!(0 <= tangent && tangent <= 1)) {
       throw std::invalid_argument(
-        "Expected t to be in range [0, 1]. Actual value: " + std::to_string(t));
+        "Expected tangent to be in range [0, 1]. Actual value: " + std::to_string(tangent));
     }
   }
 };  // class ParametricCurve
@@ -153,7 +153,7 @@ public:
   }
 
 private:
-  auto getPosition_(double t) const -> Point2d override { return {t * length, 0}; }
+  auto getPosition_(double tangent) const -> Point2d override { return {tangent * length, 0}; }
 
   auto getTangentVector_(double) const -> Vector2d override { return {1, 0}; }
 };  // class Straight
@@ -186,16 +186,16 @@ public:
   }
 
 private:
-  auto getPosition_(double t) const -> Point2d override
+  auto getPosition_(double tangent) const -> Point2d override
   {
-    auto theta = t * angle;
+    auto theta = tangent * angle;
     Point2d origin = {0, 0};
     return center_ + rotate(origin - center_, theta);
   }
 
-  auto getTangentVector_(double t) const -> Vector2d override
+  auto getTangentVector_(double tangent) const -> Vector2d override
   {
-    auto theta = t * angle;
+    auto theta = tangent * angle;
     Vector2d v = {1, 0};
     return rotate(v, theta);
   }
@@ -233,34 +233,34 @@ public:
   }
 
 private:
-  auto getPosition_(double t) const -> Point2d override
+  auto getPosition_(double tangent) const -> Point2d override
   {
-    auto [curve_id, curve_t] = getCurveIdAndParameter(t);
+    auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
     auto curve = curves[curve_id];
     auto transformation = transformations_[curve_id];
 
-    return applyTransformation(curve->getPosition(curve_t), transformation);
+    return applyTransformation(curve->getPosition(curve_tangent), transformation);
   }
 
-  auto getTangentVector_(double t) const -> Vector2d override
+  auto getTangentVector_(double tangent) const -> Vector2d override
   {
-    auto [curve_id, curve_t] = getCurveIdAndParameter(t);
+    auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
     auto curve = curves[curve_id];
     auto transformation = transformations_[curve_id];
 
-    return applyTransformation(curve->getTangentVector(curve_t), transformation);
+    return applyTransformation(curve->getTangentVector(curve_tangent), transformation);
   }
 
-  auto getCurveIdAndParameter(double t) const -> std::pair<std::size_t, double>
+  auto getCurveIdAndParameter(double tangent) const -> std::pair<std::size_t, double>
   {
-    validateCurveParameterOrThrow(t);
+    validateCurveParameterOrThrow(tangent);
 
     auto range_width_per_curve = 1. / curves.size();
     auto curve_id =
-      std::min(static_cast<std::size_t>(t / range_width_per_curve), curves.size() - 1);
-    auto curve_t = t / range_width_per_curve - curve_id;
+      std::min(static_cast<std::size_t>(tangent / range_width_per_curve), curves.size() - 1);
+    auto curve_tangent = tangent / range_width_per_curve - curve_id;
 
-    return std::make_pair(curve_id, curve_t);
+    return std::make_pair(curve_id, curve_tangent);
   }
 };  // class CombinedCurve
 
