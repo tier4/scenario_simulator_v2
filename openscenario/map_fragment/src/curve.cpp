@@ -69,17 +69,14 @@ try {
 
     // Straight segment before the turn
     std::make_shared<Straight>(before_length),
-    
+
     // Turn segment (or straight if angle == 0)
-    angle == 0
-      ? static_cast<ParametricCurve::Pointer>(
-        std::make_shared<Straight>(length))
-      : static_cast<ParametricCurve::Pointer>(
-        std::make_shared<Arc>(length / std::abs(angle), angle)),
-    
+    angle == 0 ? static_cast<ParametricCurve::Pointer>(std::make_shared<Straight>(length))
+               : static_cast<ParametricCurve::Pointer>(
+                   std::make_shared<Arc>(length / std::abs(angle), angle)),
+
     // Straight segment after the turn
-    std::make_shared<Straight>(after_length)
-  };
+    std::make_shared<Straight>(after_length)};
 
   auto guide_curve = std::make_shared<CombinedCurve>(guide_curve_segments);
 
