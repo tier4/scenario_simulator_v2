@@ -81,7 +81,7 @@ public:
   {
   }
 
-  auto getLanelets(double resolution) const -> const lanelet::Lanelets
+  auto getLanelets(double resolution) const -> lanelet::Lanelets
   {
     lanelet::Lanelets lanelets;
     auto n = cross_section_description_.number_of_lanes + 1;
