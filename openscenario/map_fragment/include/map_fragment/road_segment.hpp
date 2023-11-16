@@ -25,6 +25,7 @@ namespace map_fragment
 struct RoadCrossSectionDescription
 {
   const int number_of_lanes;
+
   const double lane_width;
 
   explicit RoadCrossSectionDescription(int number_of_lanes, double lane_width)
@@ -54,7 +55,7 @@ public:
   {
     auto n = description.number_of_lanes;
     auto w = description.lane_width;
-    auto normal_vector = rotate(tangent_vector, M_PI / 2);
+    auto normal_vector = rotate(tangent_vector, M_PI_2);
 
     for (auto i = 0; i < description.number_of_lanes + 1; i++) {
       auto lateral_position = (i - n / 2) * w;
@@ -69,6 +70,7 @@ public:
 class RoadSegment
 {
   ParametricCurve::Pointer guide_curve_;
+
   RoadCrossSectionDescription cross_section_description_;
 
 public:

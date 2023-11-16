@@ -58,7 +58,7 @@ auto rotate(Vector2d const & v, double angle) -> Vector2d
 
 auto rotate(Point2d const & p, double angle) -> Point2d
 {
-  Point2d p0 = {0, 0};
+  const Point2d p0 = {0, 0};
   return p0 + rotate(p - p0, angle);
 }
 
