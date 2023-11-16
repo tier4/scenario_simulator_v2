@@ -18,13 +18,29 @@
 #include <lanelet2_core/geometry/LaneletMap.h>
 
 #include <map_fragment/map_fragment.hpp>
+#include <map_fragment/parameter_setup.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 namespace map_fragment
 {
-template <typename Node>
-auto loadLaneletMap(const Node & node)
+template <typename T = void, typename Node>
+auto loadLaneletMap(Node & node)
 {
+  if constexpr (std::is_same_v<T, ParameterSetup::Automatic>) {
+    if (const auto name = "ignore_errors_ocurred_while_parsing_lanelet_map";
+        not node.has_parameter(name)) {
+      node.declare_parameter(name, false);
+    }
+
+    if (const auto name = "input_directory"; not node.has_parameter(name)) {
+      node.declare_parameter(name, default_value::directory());
+    }
+
+    if (const auto name = "input_filename"; not node.has_parameter(name)) {
+      node.declare_parameter(name, default_value::filename);
+    }
+  }
+
   const auto input_directory = [&]() {
     if (const auto name = "input_directory"; node.has_parameter(name)) {
       return std::filesystem::path(node.get_parameter("input_directory").as_string());

@@ -27,10 +27,7 @@ try {
 
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
 
-  node.declare_parameter("input_directory", default_value::directory());
-  node.declare_parameter("input_filename", default_value::filename);
-
-  const auto lanelet_map = loadLaneletMap(node);
+  const auto lanelet_map = loadLaneletMap<ParameterSetup::Automatic>(node);
 
   const auto routing_graph =
     lanelet::routing::RoutingGraph::build(*lanelet_map, vehicleTrafficRules());
