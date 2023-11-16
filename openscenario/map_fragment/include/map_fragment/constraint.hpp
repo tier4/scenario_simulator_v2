@@ -61,14 +61,14 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
   if (const auto name = prefix + "type"; node.has_parameter(name)) {
     const auto type = node.get_parameter(name).as_string();
     constraints.emplace(name, [type](auto && lanelet, auto &&...) {  //
-      return lanelet.attribute("type") == type;
+      return lanelet.attributeOr("type", "") == type;
     });
   }
 
   if (const auto name = prefix + "subtype"; node.has_parameter(name)) {
     const auto subtype = node.get_parameter(name).as_string();
     constraints.emplace(name, [subtype](auto && lanelet, auto &&...) {
-      return lanelet.attribute("subtype") == subtype;
+      return lanelet.attributeOr("subtype", "") == subtype;
     });
   }
 
@@ -272,7 +272,7 @@ auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = 
             return std::any_of(
               regulatory_elements.begin(), regulatory_elements.end(),
               [&](auto && regulatory_element) {
-                return regulatory_element->attribute("subtype") == subtype;
+                return regulatory_element->attributeOr("subtype", "") == subtype;
               });
           }(lanelet.regulatoryElements());
         });
@@ -291,7 +291,7 @@ auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = 
                    return std::any_of(
                      regulatory_elements.begin(), regulatory_elements.end(),
                      [&](auto && regulatory_element) {
-                       return regulatory_element->attribute("subtype") == subtype;
+                       return regulatory_element->attributeOr("subtype", "") == subtype;
                      });
                  }(lanelet.regulatoryElements());
                });

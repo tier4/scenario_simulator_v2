@@ -27,6 +27,7 @@ try {
 
   auto node = rclcpp::Node(std::filesystem::path(argv[0]).stem());
 
+  node.declare_parameter("ignore_errors_ocurred_while_parsing_lanelet_map", false);
   node.declare_parameter("input_directory", default_value::directory());
   node.declare_parameter("input_filename", default_value::filename);
 

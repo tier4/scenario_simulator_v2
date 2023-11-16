@@ -25,16 +25,29 @@ namespace map_fragment
 template <typename Node>
 auto loadLaneletMap(const Node & node)
 {
-  const auto input_directory =
-    node.has_parameter("input_directory")
-      ? std::filesystem::path(node.get_parameter("input_directory").as_string())
-      : default_value::directory();
+  const auto input_directory = [&]() {
+    if (const auto name = "input_directory"; node.has_parameter(name)) {
+      return std::filesystem::path(node.get_parameter("input_directory").as_string());
+    } else {
+      return default_value::directory();
+    }
+  }();
 
-  const auto input_filename = node.has_parameter("input_filename")
-                                ? node.get_parameter("input_filename").as_string()
-                                : default_value::filename;
+  const auto input_filename = [&]() -> std::string {
+    if (const auto name = "input_filename"; node.has_parameter(name)) {
+      return node.get_parameter("input_filename").as_string();
+    } else {
+      return default_value::filename;
+    }
+  }();
 
-  return lanelet::load(input_directory / input_filename, projector());
+  if (const auto name = "ignore_errors_ocurred_while_parsing_lanelet_map";
+      node.has_parameter(name) and node.get_parameter(name).as_bool()) {
+    auto error_messages = lanelet::ErrorMessages();
+    return lanelet::load(input_directory / input_filename, projector(), &error_messages);
+  } else {
+    return lanelet::load(input_directory / input_filename, projector());
+  }
 }
 }  // namespace map_fragment
 
