@@ -35,20 +35,20 @@ constexpr auto COORDINATE_Z = 2;
 
 using Transformation = Eigen::Transform<double, 3, Eigen::TransformTraits::AffineCompact>;
 
-auto rotateInZAxis(Eigen::Vector3d const & point_or_vector, double angle) -> Eigen::Vector3d
+auto rotateInZAxis(const Eigen::Vector3d & point_or_vector, double angle) -> Eigen::Vector3d
 {
   const auto rotation = Eigen::AngleAxis(angle, Eigen::Vector3d::UnitZ());
   const auto transformation = Transformation(rotation);
   return transformation * point_or_vector;
 }
 
-auto vectorToTranslation(Vector const & vector) -> Transformation
+auto vectorToTranslation(const Vector & vector) -> Transformation
 {
   const auto translation = Eigen::Translation<Vector::Scalar, 3>(vector);
   return Transformation(translation);
 }
 
-auto vectorToRotationWithZeroRoll(Vector const & vector) -> Transformation
+auto vectorToRotationWithZeroRoll(const Vector & vector) -> Transformation
 {
   const auto magnitude = vector.norm();
 
@@ -70,18 +70,18 @@ auto vectorToRotationWithZeroRoll(Vector const & vector) -> Transformation
   return Transformation(rotation);
 }
 
-auto chainTransformations(Transformation const & first, Transformation const & second)
+auto chainTransformations(const Transformation & first, const Transformation & second)
   -> Transformation
 {
   return second * first;
 }
 
-auto applyTransformationToPoint(Point const & point, Transformation const & transformation) -> Point
+auto applyTransformationToPoint(const Point & point, const Transformation & transformation) -> Point
 {
   return transformation * point;
 }
 
-auto applyTransformationToVector(Vector const & vector, Transformation const & transformation)
+auto applyTransformationToVector(const Vector & vector, const Transformation & transformation)
   -> Vector
 {
   return transformation.rotation() * vector;
@@ -211,7 +211,7 @@ class CombinedCurve : public ParametricCurve
 public:
   const std::vector<ParametricCurve::Pointer> curves;
 
-  explicit CombinedCurve(std::vector<ParametricCurve::Pointer> const & curves) : curves(curves)
+  explicit CombinedCurve(const std::vector<ParametricCurve::Pointer> & curves) : curves(curves)
   {
     if (curves.size() < 2) {
       throw std::invalid_argument(

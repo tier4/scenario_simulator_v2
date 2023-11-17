@@ -50,8 +50,8 @@ class RoadCrossSection
 
 public:
   explicit RoadCrossSection(
-    RoadCrossSectionDescription const & description, Point const & origin,
-    Vector const & tangent_vector)
+    const RoadCrossSectionDescription & description, const Point & origin,
+    const Vector & tangent_vector)
   {
     auto n = description.number_of_lanes;
     auto w = description.lane_width;
@@ -78,7 +78,7 @@ class RoadSegment
 public:
   explicit RoadSegment(
     ParametricCurve::Pointer guide_curve,
-    RoadCrossSectionDescription const & cross_section_description)
+    const RoadCrossSectionDescription & cross_section_description)
   : guide_curve_(guide_curve), cross_section_description_(cross_section_description)
   {
   }
