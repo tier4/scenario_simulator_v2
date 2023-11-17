@@ -35,7 +35,7 @@ constexpr auto COORDINATE_Z = 2;
 
 using Transformation = Eigen::Transform<double, 3, Eigen::TransformTraits::AffineCompact>;
 
-auto rotateInZAxis(const Eigen::Vector3d & point_or_vector, double angle) -> Eigen::Vector3d
+auto rotateInZAxis(const Eigen::Vector3d & point_or_vector, const double angle) -> Eigen::Vector3d
 {
   const auto rotation = Eigen::AngleAxis(angle, Eigen::Vector3d::UnitZ());
   const auto transformation = Transformation(rotation);
@@ -98,12 +98,12 @@ auto applyTransformationToVector(const Vector & vector, const Transformation & t
 class ParametricCurve
 {
 public:
-  using Pointer = std::shared_ptr<ParametricCurve>;
+  using ConstPointer = std::shared_ptr<const ParametricCurve>;
 
   /**
    * Calculate curve point for given parameter tangent ∈ [0, 1]
    */
-  auto getPosition(double tangent) const -> Point
+  auto getPosition(const double tangent) const -> Point
   {
     validateCurveParameterOrThrow(tangent);
     return getPosition_(tangent);
@@ -112,7 +112,7 @@ public:
   /**
    * Calculate curve tangent vector for given parameter tangent ∈ [0, 1]
    */
-  auto getTangentVector(double tangent) const -> Vector
+  auto getTangentVector(const double tangent) const -> Vector
   {
     validateCurveParameterOrThrow(tangent);
 
@@ -121,11 +121,11 @@ public:
   }
 
 private:
-  virtual auto getPosition_(double tangent) const -> Point = 0;
-  virtual auto getTangentVector_(double tangent) const -> Vector = 0;
+  virtual auto getPosition_(const double tangent) const -> Point = 0;
+  virtual auto getTangentVector_(const double tangent) const -> Vector = 0;
 
 protected:
-  auto validateCurveParameterOrThrow(double tangent) const -> void
+  auto validateCurveParameterOrThrow(const double tangent) const -> void
   {
     if (!(0 <= tangent && tangent <= 1)) {
       throw std::invalid_argument(
@@ -142,7 +142,7 @@ class Straight : public ParametricCurve
 public:
   const double length;
 
-  explicit Straight(double length) : length(length)
+  explicit Straight(const double length) : length(length)
   {
     if (length <= 0.0) {
       throw std::invalid_argument(
@@ -151,9 +151,12 @@ public:
   }
 
 private:
-  auto getPosition_(double tangent) const -> Point override { return {tangent * length, 0, 0}; }
+  auto getPosition_(const double tangent) const -> Point override
+  {
+    return {tangent * length, 0, 0};
+  }
 
-  auto getTangentVector_(double) const -> Vector override { return {1, 0, 0}; }
+  auto getTangentVector_(const double) const -> Vector override { return {1, 0, 0}; }
 };  // class Straight
 
 /**
@@ -167,7 +170,7 @@ public:
   const double radius;
   const double angle;
 
-  explicit Arc(double radius, double angle) : radius(radius), angle(angle)
+  explicit Arc(const double radius, const double angle) : radius(radius), angle(angle)
   {
     if (radius <= 0.0) {
       throw std::invalid_argument(
@@ -186,17 +189,17 @@ public:
   }
 
 private:
-  auto getPosition_(double tangent) const -> Point override
+  auto getPosition_(const double tangent) const -> Point override
   {
-    auto theta = tangent * angle;
-    Point origin = {0, 0, 0};
+    const auto theta = tangent * angle;
+    const Point origin = {0, 0, 0};
     return center_ + rotateInZAxis(origin - center_, theta);
   }
 
-  auto getTangentVector_(double tangent) const -> Vector override
+  auto getTangentVector_(const double tangent) const -> Vector override
   {
-    auto theta = tangent * angle;
-    Vector v = {1, 0, 0};
+    const auto theta = tangent * angle;
+    const Vector v = {1, 0, 0};
     return rotateInZAxis(v, theta);
   }
 };  // class Arc
@@ -209,9 +212,9 @@ class CombinedCurve : public ParametricCurve
   std::vector<Transformation> transformations_;
 
 public:
-  const std::vector<ParametricCurve::Pointer> curves;
+  const std::vector<ParametricCurve::ConstPointer> curves;
 
-  explicit CombinedCurve(const std::vector<ParametricCurve::Pointer> & curves) : curves(curves)
+  explicit CombinedCurve(const std::vector<ParametricCurve::ConstPointer> & curves) : curves(curves)
   {
     if (curves.size() < 2) {
       throw std::invalid_argument(
@@ -234,32 +237,32 @@ public:
   }
 
 private:
-  auto getPosition_(double tangent) const -> Point override
+  auto getPosition_(const double tangent) const -> Point override
   {
-    auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
-    auto curve = curves[curve_id];
-    auto transformation = transformations_[curve_id];
+    const auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
+    const auto curve = curves[curve_id];
+    const auto transformation = transformations_[curve_id];
 
     return applyTransformationToPoint(curve->getPosition(curve_tangent), transformation);
   }
 
-  auto getTangentVector_(double tangent) const -> Vector override
+  auto getTangentVector_(const double tangent) const -> Vector override
   {
-    auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
-    auto curve = curves[curve_id];
-    auto transformation = transformations_[curve_id];
+    const auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
+    const auto curve = curves[curve_id];
+    const auto transformation = transformations_[curve_id];
 
     return applyTransformationToVector(curve->getTangentVector(curve_tangent), transformation);
   }
 
-  auto getCurveIdAndParameter(double tangent) const -> std::pair<std::size_t, double>
+  auto getCurveIdAndParameter(const double tangent) const -> std::pair<std::size_t, double>
   {
     validateCurveParameterOrThrow(tangent);
 
-    auto range_width_per_curve = 1. / curves.size();
-    auto curve_id =
+    const auto range_width_per_curve = 1. / curves.size();
+    const auto curve_id =
       std::min(static_cast<std::size_t>(tangent / range_width_per_curve), curves.size() - 1);
-    auto curve_tangent = tangent / range_width_per_curve - curve_id;
+    const auto curve_tangent = tangent / range_width_per_curve - curve_id;
 
     return std::make_pair(curve_id, curve_tangent);
   }

@@ -54,7 +54,7 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  auto segment = makeCurvedRoadSegment(curvature, length, number_of_lanes, width);
+  const auto segment = makeCurvedRoadSegment(curvature, length, number_of_lanes, width);
   const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
 
   map_fragment::write(*map, output_directory);

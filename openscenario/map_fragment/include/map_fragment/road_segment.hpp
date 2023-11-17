@@ -28,7 +28,7 @@ struct RoadCrossSectionDescription
 
   const double lane_width;
 
-  explicit RoadCrossSectionDescription(int number_of_lanes, double lane_width)
+  explicit RoadCrossSectionDescription(const int number_of_lanes, const double lane_width)
   : number_of_lanes(number_of_lanes), lane_width(lane_width)
   {
     if (number_of_lanes <= 0) {
@@ -53,14 +53,14 @@ public:
     const RoadCrossSectionDescription & description, const Point & origin,
     const Vector & tangent_vector)
   {
-    auto n = description.number_of_lanes;
-    auto w = description.lane_width;
-    auto normal_vector =
+    const auto n = description.number_of_lanes;
+    const auto w = description.lane_width;
+    const auto normal_vector =
       rotateInZAxis(tangent_vector, M_PI_2);  // TODO: this will not work for inclined roads
 
     for (auto i = 0; i < description.number_of_lanes + 1; i++) {
-      auto lateral_position = (i - n / 2) * w;
-      auto p = origin + normal_vector * lateral_position;
+      const auto lateral_position = (i - n / 2) * w;
+      const auto p = origin + normal_vector * lateral_position;
 
       points_.push_back(makePoint3d(p));
     }
@@ -71,13 +71,13 @@ public:
 
 class RoadSegment
 {
-  ParametricCurve::Pointer guide_curve_;
+  const ParametricCurve::ConstPointer guide_curve_;
 
-  RoadCrossSectionDescription cross_section_description_;
+  const RoadCrossSectionDescription cross_section_description_;
 
 public:
   explicit RoadSegment(
-    ParametricCurve::Pointer guide_curve,
+    const ParametricCurve::ConstPointer guide_curve,
     const RoadCrossSectionDescription & cross_section_description)
   : guide_curve_(guide_curve), cross_section_description_(cross_section_description)
   {
@@ -86,7 +86,7 @@ public:
   auto getLanelets(double resolution) const -> lanelet::Lanelets
   {
     lanelet::Lanelets lanelets;
-    auto n = cross_section_description_.number_of_lanes + 1;
+    const auto n = cross_section_description_.number_of_lanes + 1;
 
     // TODO Find a cleaner way to do this
     std::vector<lanelet::LineString3d> lane_boundaries(n);
@@ -95,12 +95,12 @@ public:
     }
 
     for (auto i = 0; i < resolution; i++) {
-      auto tangent = i / (resolution - 1);
-      auto position = guide_curve_->getPosition(tangent);
-      auto tangent_vector = guide_curve_->getTangentVector(tangent);
+      const auto tangent = i / (resolution - 1);
+      const auto position = guide_curve_->getPosition(tangent);
+      const auto tangent_vector = guide_curve_->getTangentVector(tangent);
 
-      RoadCrossSection cross_section(cross_section_description_, position, tangent_vector);
-      auto cross_section_points = cross_section.getPoints();
+      const RoadCrossSection cross_section(cross_section_description_, position, tangent_vector);
+      const auto cross_section_points = cross_section.getPoints();
 
       for (auto j = 0; j < cross_section_description_.number_of_lanes + 1; j++) {
         lane_boundaries[j].push_back(cross_section_points[j]);
@@ -115,20 +115,17 @@ public:
   }
 };  // class RoadSegment
 
-auto makeCurvedRoadSegment(double curvature, double length, int number_of_lanes, double lane_width)
+auto makeCurvedRoadSegment(
+  const double curvature, const double length, const int number_of_lanes, const double lane_width)
   -> RoadSegment
 {
-  ParametricCurve::Pointer guide_curve;
+  const auto guide_curve = curvature == 0.0
+                             ? static_cast<ParametricCurve::ConstPointer>(  //
+                                 std::make_shared<Straight>(length))
+                             : static_cast<ParametricCurve::ConstPointer>(std::make_shared<Arc>(
+                                 std::abs(1 / curvature), length * curvature));
 
-  if (curvature == 0.0) {
-    guide_curve = std::make_shared<Straight>(length);
-  } else {
-    auto radius = std::abs(1 / curvature);
-    auto angle = length * curvature;
-    guide_curve = std::make_shared<Arc>(radius, angle);
-  }
-
-  RoadCrossSectionDescription cross_section_description(number_of_lanes, lane_width);
+  const RoadCrossSectionDescription cross_section_description(number_of_lanes, lane_width);
 
   return RoadSegment(guide_curve, cross_section_description);
 }

@@ -64,23 +64,23 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  std::vector<ParametricCurve::Pointer> guide_curve_segments = {
+  const std::vector<ParametricCurve::ConstPointer> guide_curve_segments = {
 
     // Straight segment before the turn
     std::make_shared<Straight>(before_length),
 
     // Turn segment (or straight if angle == 0)
-    angle == 0 ? static_cast<ParametricCurve::Pointer>(std::make_shared<Straight>(length))
-               : static_cast<ParametricCurve::Pointer>(
+    angle == 0 ? static_cast<ParametricCurve::ConstPointer>(std::make_shared<Straight>(length))
+               : static_cast<ParametricCurve::ConstPointer>(
                    std::make_shared<Arc>(length / std::abs(angle), angle)),
 
     // Straight segment after the turn
     std::make_shared<Straight>(after_length)};
 
-  auto guide_curve = std::make_shared<CombinedCurve>(guide_curve_segments);
+  const auto guide_curve = std::make_shared<CombinedCurve>(guide_curve_segments);
 
-  RoadCrossSectionDescription cross_section_description(number_of_lanes, width);
-  RoadSegment segment(guide_curve, cross_section_description);
+  const RoadCrossSectionDescription cross_section_description(number_of_lanes, width);
+  const RoadSegment segment(guide_curve, cross_section_description);
 
   const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
 
