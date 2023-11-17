@@ -160,13 +160,14 @@ private:
  */
 class Arc : public ParametricCurve
 {
-  Point center_;
+  const Point center_;
 
 public:
   const double radius;
   const double angle;
 
-  explicit Arc(const double radius, const double angle) : radius(radius), angle(angle)
+  explicit Arc(const double radius, const double angle)
+  : center_(0, angle > 0 ? radius : -radius, 0), radius(radius), angle(angle)
   {
     if (radius <= 0.0) {
       throw std::invalid_argument(
@@ -178,8 +179,6 @@ public:
         "Expected angle to be in range (0, 2 * PI) or (-2 * PI, 0). Actual value: " +
         std::to_string(angle));
     }
-
-    center_ = {0, angle > 0 ? radius : -radius, 0};
   }
 
 private:
