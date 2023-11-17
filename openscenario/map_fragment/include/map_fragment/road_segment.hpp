@@ -95,9 +95,9 @@ public:
     }
 
     for (auto i = 0; i < resolution; i++) {
-      auto t = i / (resolution - 1);
-      auto position = guide_curve_->getPosition(t);
-      auto tangent_vector = guide_curve_->getTangentVector(t);
+      auto tangent = i / (resolution - 1);
+      auto position = guide_curve_->getPosition(tangent);
+      auto tangent_vector = guide_curve_->getTangentVector(tangent);
 
       RoadCrossSection cross_section(cross_section_description_, position, tangent_vector);
       auto cross_section_points = cross_section.getPoints();
