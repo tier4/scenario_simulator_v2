@@ -15,6 +15,8 @@
 #ifndef MAP_FRAGMENT__GEOMETRY__HPP_
 #define MAP_FRAGMENT__GEOMETRY__HPP_
 
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
 #include <algorithm>
 #include <cmath>
 #include <memory>
@@ -24,69 +26,59 @@
 namespace map_fragment
 {
 
-struct Point2d
-{
-  double x = 0;
-  double y = 0;
-};
+using Point = Eigen::Vector3d;
+using Vector = Eigen::Vector3d;
 
-struct Vector2d
-{
-  double x = 0;
-  double y = 0;
-};
+constexpr auto COORDINATE_X = 0;
+constexpr auto COORDINATE_Y = 1;
+constexpr auto COORDINATE_Z = 2;
 
-auto operator+(Point2d const & a, Vector2d const & b) -> Point2d { return {a.x + b.x, a.y + b.y}; }
+using Transformation = Eigen::Transform<double, 3, Eigen::TransformTraits::AffineCompact>;
 
-auto operator*(Vector2d const & v, double multiplier) -> Vector2d
+auto rotateInZAxis(Eigen::Vector3d const & point_or_vector, double angle) -> Eigen::Vector3d
 {
-  return {v.x * multiplier, v.y * multiplier};
+  const auto rotation = Eigen::AngleAxis(angle, Eigen::Vector3d::UnitZ());
+  const auto transformation = Transformation(rotation);
+  return transformation * point_or_vector;
 }
 
-auto operator-(Point2d const & a, Point2d const & b) -> Vector2d { return {a.x - b.x, a.y - b.y}; }
-
-auto operator+(Vector2d const & a, Vector2d const & b) -> Vector2d
+auto vectorToTranslation(Vector const & vector) -> Transformation
 {
-  return {a.x + b.x, a.y + b.y};
+  const auto translation = Eigen::Translation<Vector::Scalar, 3>(vector);
+  return Transformation(translation);
 }
 
-auto rotate(Vector2d const & v, double angle) -> Vector2d
+auto vectorToRotationWithZeroRoll(Vector const & vector) -> Transformation
 {
-  return {
-    v.x * std::cos(angle) - v.y * std::sin(angle), v.x * std::sin(angle) + v.y * std::cos(angle)};
+  const auto magnitude = vector.norm();
+
+  if (magnitude == 0) {
+    throw std::invalid_argument("The input vector needs to have non-zero magnitude.");
+  }
+
+  if (vector(COORDINATE_X) == 0 && vector(COORDINATE_Y) == 0) {
+    throw std::invalid_argument(
+      "The input vector must not be parallel to the z axis. "
+      "Expected x or y coordinate to be non-zero.");
+  }
+
+  const auto yaw = std::atan2(vector(COORDINATE_Y), vector(COORDINATE_X));
+  const auto pitch = std::asin(vector(COORDINATE_Z) / magnitude);
+
+  const auto rotation =
+    Eigen::AngleAxis(yaw, Vector::UnitZ()) * Eigen::AngleAxis(pitch, Vector::UnitY());
+  return Transformation(rotation);
 }
 
-auto rotate(Point2d const & p, double angle) -> Point2d
+auto chainTransformations(Transformation const & first, Transformation const & second)
+  -> Transformation
 {
-  const Point2d p0 = {0, 0};
-  return p0 + rotate(p - p0, angle);
+  return second * first;
 }
 
-auto calculateAngle(Vector2d const & v) -> double { return std::atan2(v.y, v.x); }
-
-struct Transformation2d
+auto applyTransformation(Point const & point, Transformation const & transformation) -> Point
 {
-  Vector2d translation;
-  double rotation;
-};  // struct Transformation2d
-
-auto applyTransformation(Point2d const & p, Transformation2d const & t) -> Point2d
-{
-  return rotate(p, t.rotation) + t.translation;
-}
-
-auto applyTransformation(Vector2d const & v, Transformation2d const & t) -> Vector2d
-{
-  return rotate(v, t.rotation);
-}
-
-auto chainTransformations(Transformation2d const & first, Transformation2d const & second)
-  -> Transformation2d
-{
-  Transformation2d t;
-  t.translation = first.translation + rotate(second.translation, first.rotation);
-  t.rotation = first.rotation + second.rotation;
-  return t;
+  return transformation * point;
 }
 
 /**
@@ -105,7 +97,7 @@ public:
   /**
    * Calculate curve point for given parameter tangent ∈ [0, 1]
    */
-  auto getPosition(double tangent) const -> Point2d
+  auto getPosition(double tangent) const -> Point
   {
     validateCurveParameterOrThrow(tangent);
     return getPosition_(tangent);
@@ -114,7 +106,7 @@ public:
   /**
    * Calculate curve tangent vector for given parameter tangent ∈ [0, 1]
    */
-  auto getTangentVector(double tangent) const -> Vector2d
+  auto getTangentVector(double tangent) const -> Vector
   {
     validateCurveParameterOrThrow(tangent);
 
@@ -123,8 +115,8 @@ public:
   }
 
 private:
-  virtual auto getPosition_(double tangent) const -> Point2d = 0;
-  virtual auto getTangentVector_(double tangent) const -> Vector2d = 0;
+  virtual auto getPosition_(double tangent) const -> Point = 0;
+  virtual auto getTangentVector_(double tangent) const -> Vector = 0;
 
 protected:
   auto validateCurveParameterOrThrow(double tangent) const -> void
@@ -153,9 +145,9 @@ public:
   }
 
 private:
-  auto getPosition_(double tangent) const -> Point2d override { return {tangent * length, 0}; }
+  auto getPosition_(double tangent) const -> Point override { return {tangent * length, 0, 0}; }
 
-  auto getTangentVector_(double) const -> Vector2d override { return {1, 0}; }
+  auto getTangentVector_(double) const -> Vector override { return {1, 0, 0}; }
 };  // class Straight
 
 /**
@@ -163,7 +155,7 @@ private:
  */
 class Arc : public ParametricCurve
 {
-  Point2d center_;
+  Point center_;
 
 public:
   const double radius;
@@ -182,22 +174,24 @@ public:
         std::to_string(angle));
     }
 
-    center_.y = angle > 0 ? radius : -radius;
+    center_(COORDINATE_X) = 0;
+    center_(COORDINATE_Y) = 0;
+    center_(COORDINATE_Y) = angle > 0 ? radius : -radius;
   }
 
 private:
-  auto getPosition_(double tangent) const -> Point2d override
+  auto getPosition_(double tangent) const -> Point override
   {
     auto theta = tangent * angle;
-    Point2d origin = {0, 0};
-    return center_ + rotate(origin - center_, theta);
+    Point origin = {0, 0, 0};
+    return center_ + rotateInZAxis(origin - center_, theta);
   }
 
-  auto getTangentVector_(double tangent) const -> Vector2d override
+  auto getTangentVector_(double tangent) const -> Vector override
   {
     auto theta = tangent * angle;
-    Vector2d v = {1, 0};
-    return rotate(v, theta);
+    Vector v = {1, 0, 0};
+    return rotateInZAxis(v, theta);
   }
 };  // class Arc
 
@@ -206,7 +200,7 @@ private:
  */
 class CombinedCurve : public ParametricCurve
 {
-  std::vector<Transformation2d> transformations_;
+  std::vector<Transformation> transformations_;
 
 public:
   const std::vector<ParametricCurve::Pointer> curves;
@@ -219,21 +213,22 @@ public:
         std::to_string(curves.size()));
     }
 
-    Transformation2d current_transformation;
+    Transformation current_transformation;
 
     for (const auto & curve : curves) {
       transformations_.push_back(current_transformation);
 
-      Point2d origin = {0, 0};
-      Transformation2d local_transformation = {
-        curve->getPosition(1.0) - origin, calculateAngle(curve->getTangentVector(1.0))};
+      const auto origin = Point::Zero();
+      const auto translation = vectorToTranslation(curve->getPosition(1.0) - origin);
+      const auto rotation = vectorToRotationWithZeroRoll(curve->getTangentVector(1.0));
+      const auto local_transformation = chainTransformations(rotation, translation);
 
       current_transformation = chainTransformations(current_transformation, local_transformation);
     }
   }
 
 private:
-  auto getPosition_(double tangent) const -> Point2d override
+  auto getPosition_(double tangent) const -> Point override
   {
     auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
     auto curve = curves[curve_id];
@@ -242,7 +237,7 @@ private:
     return applyTransformation(curve->getPosition(curve_tangent), transformation);
   }
 
-  auto getTangentVector_(double tangent) const -> Vector2d override
+  auto getTangentVector_(double tangent) const -> Vector override
   {
     auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
     auto curve = curves[curve_id];

@@ -50,17 +50,19 @@ class RoadCrossSection
 
 public:
   explicit RoadCrossSection(
-    RoadCrossSectionDescription const & description, Point2d const & origin,
-    Vector2d const & tangent_vector)
+    RoadCrossSectionDescription const & description, Point const & origin,
+    Vector const & tangent_vector)
   {
     auto n = description.number_of_lanes;
     auto w = description.lane_width;
-    auto normal_vector = rotate(tangent_vector, M_PI_2);
+    auto normal_vector =
+      rotateInZAxis(tangent_vector, M_PI_2);  // TODO: this will not work for inclined roads
 
     for (auto i = 0; i < description.number_of_lanes + 1; i++) {
       auto lateral_position = (i - n / 2) * w;
       auto p = origin + normal_vector * lateral_position;
-      points_.push_back(makePoint3d(p.x, p.y, 0.));
+
+      points_.push_back(makePoint3d(p));
     }
   }
 
