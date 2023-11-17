@@ -76,9 +76,15 @@ auto chainTransformations(Transformation const & first, Transformation const & s
   return second * first;
 }
 
-auto applyTransformation(Point const & point, Transformation const & transformation) -> Point
+auto applyTransformationToPoint(Point const & point, Transformation const & transformation) -> Point
 {
   return transformation * point;
+}
+
+auto applyTransformationToVector(Vector const & vector, Transformation const & transformation)
+  -> Vector
+{
+  return transformation.rotation() * vector;
 }
 
 /**
@@ -213,7 +219,7 @@ public:
         std::to_string(curves.size()));
     }
 
-    Transformation current_transformation;
+    auto current_transformation = Transformation::Identity();
 
     for (const auto & curve : curves) {
       transformations_.push_back(current_transformation);
@@ -223,7 +229,7 @@ public:
       const auto rotation = vectorToRotationWithZeroRoll(curve->getTangentVector(1.0));
       const auto local_transformation = chainTransformations(rotation, translation);
 
-      current_transformation = chainTransformations(current_transformation, local_transformation);
+      current_transformation = chainTransformations(local_transformation, current_transformation);
     }
   }
 
@@ -234,7 +240,7 @@ private:
     auto curve = curves[curve_id];
     auto transformation = transformations_[curve_id];
 
-    return applyTransformation(curve->getPosition(curve_tangent), transformation);
+    return applyTransformationToPoint(curve->getPosition(curve_tangent), transformation);
   }
 
   auto getTangentVector_(double tangent) const -> Vector override
@@ -243,7 +249,7 @@ private:
     auto curve = curves[curve_id];
     auto transformation = transformations_[curve_id];
 
-    return applyTransformation(curve->getTangentVector(curve_tangent), transformation);
+    return applyTransformationToVector(curve->getTangentVector(curve_tangent), transformation);
   }
 
   auto getCurveIdAndParameter(double tangent) const -> std::pair<std::size_t, double>
