@@ -29,10 +29,6 @@ namespace map_fragment
 using Point = Eigen::Vector3d;
 using Vector = Eigen::Vector3d;
 
-constexpr auto COORDINATE_X = 0;
-constexpr auto COORDINATE_Y = 1;
-constexpr auto COORDINATE_Z = 2;
-
 using Transformation = Eigen::Transform<double, 3, Eigen::TransformTraits::AffineCompact>;
 
 auto rotateInZAxis(const Eigen::Vector3d & point_or_vector, const double angle) -> Eigen::Vector3d
@@ -56,14 +52,14 @@ auto vectorToRotationWithZeroRoll(const Vector & vector) -> Transformation
     throw std::invalid_argument("The input vector needs to have non-zero magnitude.");
   }
 
-  if (vector(COORDINATE_X) == 0 && vector(COORDINATE_Y) == 0) {
+  if (vector.x() == 0 && vector.y() == 0) {
     throw std::invalid_argument(
       "The input vector must not be parallel to the z axis. "
       "Expected x or y coordinate to be non-zero.");
   }
 
-  const auto yaw = std::atan2(vector(COORDINATE_Y), vector(COORDINATE_X));
-  const auto pitch = std::asin(vector(COORDINATE_Z) / magnitude);
+  const auto yaw = std::atan2(vector.y(), vector.x());
+  const auto pitch = std::asin(vector.z() / magnitude);
 
   const auto rotation =
     Eigen::AngleAxis(yaw, Vector::UnitZ()) * Eigen::AngleAxis(pitch, Vector::UnitY());
@@ -183,9 +179,7 @@ public:
         std::to_string(angle));
     }
 
-    center_(COORDINATE_X) = 0;
-    center_(COORDINATE_Y) = 0;
-    center_(COORDINATE_Y) = angle > 0 ? radius : -radius;
+    center_ = {0, angle > 0 ? radius : -radius, 0};
   }
 
 private:
