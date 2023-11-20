@@ -17,8 +17,8 @@
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
-#include <map_fragment/geometry.hpp>
 #include <map_fragment/map_fragment.hpp>
+#include <map_fragment/parametric_curve.hpp>
 
 namespace map_fragment
 {
