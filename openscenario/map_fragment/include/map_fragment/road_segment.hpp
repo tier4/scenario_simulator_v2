@@ -112,7 +112,7 @@ public:
     for (auto i = 0; i < resolution; i++) {
       const auto tangent = i / (resolution - 1);
       const auto position = guide_curve_->getPosition(tangent);
-      const auto tangent_vector = guide_curve_->getTangentVector(tangent);
+      const auto tangent_vector = guide_curve_->getUnitTangentVector(tangent);
 
       const RoadCrossSection cross_section(cross_section_description_, position, tangent_vector);
       const auto cross_section_points = cross_section.getPoints();

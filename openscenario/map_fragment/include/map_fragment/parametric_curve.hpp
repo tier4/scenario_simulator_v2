@@ -41,18 +41,18 @@ public:
   auto getPosition(const double tangent) const -> Point
   {
     validateCurveParameterOrThrow(tangent);
-    return getPosition_(tangent);
+    return getPositionWithParameterValidated(tangent);
   }
 
   /**
-   * Calculate curve tangent vector for given parameter tangent ∈ [0, 1]
+   * Calculate curve unit tangent vector for given parameter tangent ∈ [0, 1]
    */
-  auto getTangentVector(const double tangent) const -> Vector
+  auto getUnitTangentVector(const double tangent) const -> Vector
   {
     validateCurveParameterOrThrow(tangent);
 
     // TODO Throw error if the vector is not unit?
-    return getTangentVector_(tangent);
+    return getUnitTangentVectorWithParameterValidated(tangent);
   }
 
 private:
@@ -61,14 +61,14 @@ private:
    * 
    * **All derived classes need to implement this method.**
    */
-  virtual auto getPosition_(const double tangent) const -> Point = 0;
+  virtual auto getPositionWithParameterValidated(const double tangent) const -> Point = 0;
 
   /**
-   * Calculate curve tangent vector for given range-validated parameter tangent ∈ [0, 1]
+   * Calculate curve unit tangent vector for given range-validated parameter tangent ∈ [0, 1]
    * 
    * **All derived classes need to implement this method.**
    */
-  virtual auto getTangentVector_(const double tangent) const -> Vector = 0;
+  virtual auto getUnitTangentVectorWithParameterValidated(const double tangent) const -> Vector = 0;
 
 protected:
   auto validateCurveParameterOrThrow(const double tangent) const -> void
@@ -97,12 +97,15 @@ public:
   }
 
 private:
-  auto getPosition_(const double tangent) const -> Point override
+  auto getPositionWithParameterValidated(const double tangent) const -> Point override
   {
     return {tangent * length, 0, 0};
   }
 
-  auto getTangentVector_(const double) const -> Vector override { return {1, 0, 0}; }
+  auto getUnitTangentVectorWithParameterValidated(const double) const -> Vector override
+  {
+    return {1, 0, 0};
+  }
 };  // class Straight
 
 /**
@@ -132,14 +135,14 @@ public:
   }
 
 private:
-  auto getPosition_(const double tangent) const -> Point override
+  auto getPositionWithParameterValidated(const double tangent) const -> Point override
   {
     const auto theta = tangent * angle;
     const Point origin = {0, 0, 0};
     return center_ + rotateInZAxis(origin - center_, theta);
   }
 
-  auto getTangentVector_(const double tangent) const -> Vector override
+  auto getUnitTangentVectorWithParameterValidated(const double tangent) const -> Vector override
   {
     const auto theta = tangent * angle;
     const Vector v = {1, 0, 0};
@@ -172,7 +175,7 @@ public:
 
       const auto origin = Point::Zero();
       const auto translation = vectorToTranslation(curve->getPosition(1.0) - origin);
-      const auto rotation = vectorToRotationWithZeroRoll(curve->getTangentVector(1.0));
+      const auto rotation = vectorToRotationWithZeroRoll(curve->getUnitTangentVector(1.0));
       const auto local_transformation = chainTransformations(rotation, translation);
 
       current_transformation = chainTransformations(local_transformation, current_transformation);
@@ -180,7 +183,7 @@ public:
   }
 
 private:
-  auto getPosition_(const double tangent) const -> Point override
+  auto getPositionWithParameterValidated(const double tangent) const -> Point override
   {
     const auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
     const auto curve = curves[curve_id];
@@ -189,13 +192,13 @@ private:
     return applyTransformationToPoint(curve->getPosition(curve_tangent), transformation);
   }
 
-  auto getTangentVector_(const double tangent) const -> Vector override
+  auto getUnitTangentVectorWithParameterValidated(const double tangent) const -> Vector override
   {
     const auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
     const auto curve = curves[curve_id];
     const auto transformation = transformations_[curve_id];
 
-    return applyTransformationToVector(curve->getTangentVector(curve_tangent), transformation);
+    return applyTransformationToVector(curve->getUnitTangentVector(curve_tangent), transformation);
   }
 
   auto getCurveIdAndParameter(const double tangent) const -> std::pair<std::size_t, double>
