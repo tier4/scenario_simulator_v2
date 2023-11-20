@@ -19,6 +19,7 @@
 
 #include <map_fragment/map_fragment.hpp>
 #include <map_fragment/parametric_curve.hpp>
+#include <rcpputils/asserts.hpp>
 
 namespace map_fragment
 {
@@ -35,16 +36,13 @@ struct RoadCrossSectionDescription
   explicit RoadCrossSectionDescription(const int number_of_lanes, const double lane_width)
   : number_of_lanes(number_of_lanes), lane_width(lane_width)
   {
-    if (number_of_lanes <= 0) {
-      throw std::invalid_argument(
-        "Expected number_of_lanes to be positive. Actual value: " +
-        std::to_string(number_of_lanes));
-    }
+    rcpputils::require_true(
+      number_of_lanes > 0,
+      "Expected number_of_lanes to be positive. Actual value: " + std::to_string(number_of_lanes));
 
-    if (lane_width <= 0.0) {
-      throw std::invalid_argument(
-        "Expected lane_width to be positive. Actual value: " + std::to_string(lane_width));
-    }
+    rcpputils::require_true(
+      lane_width > 0.0,
+      "Expected lane_width to be positive. Actual value: " + std::to_string(lane_width));
   }
 };  // struct RoadCrossSectionDescription
 

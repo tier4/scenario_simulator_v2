@@ -17,6 +17,7 @@
 
 #include <map_fragment/geometry_utilities.hpp>
 #include <memory>
+#include <rcpputils/asserts.hpp>
 #include <utility>
 
 namespace map_fragment
@@ -51,8 +52,12 @@ public:
   {
     validateCurveParameterOrThrow(tangent);
 
-    // TODO Throw error if the vector is not unit?
-    return getUnitTangentVectorWithParameterValidated(tangent);
+    const auto tangent_vector = getUnitTangentVectorWithParameterValidated(tangent);
+
+    rcpputils::assert_true(
+      std::abs(tangent_vector.norm() - 1.0) < 1e-9, "The tangent vector must be unit");
+
+    return tangent_vector;
   }
 
 private:
@@ -73,10 +78,9 @@ private:
 protected:
   auto validateCurveParameterOrThrow(const double tangent) const -> void
   {
-    if (!(0 <= tangent && tangent <= 1)) {
-      throw std::invalid_argument(
-        "Expected tangent to be in range [0, 1]. Actual value: " + std::to_string(tangent));
-    }
+    rcpputils::require_true(
+      0 <= tangent && tangent <= 1,
+      "Expected tangent to be in range [0, 1]. Actual value: " + std::to_string(tangent));
   }
 };  // class ParametricCurve
 
@@ -90,10 +94,8 @@ public:
 
   explicit Straight(const double length) : length(length)
   {
-    if (length <= 0.0) {
-      throw std::invalid_argument(
-        "Expected length to be positive. Actual value: " + std::to_string(length));
-    }
+    rcpputils::require_true(
+      length > 0.0, "Expected length to be positive. Actual value: " + std::to_string(length));
   }
 
 private:
@@ -122,16 +124,13 @@ public:
   explicit Arc(const double radius, const double angle)
   : center_(0, angle > 0 ? radius : -radius, 0), radius(radius), angle(angle)
   {
-    if (radius <= 0.0) {
-      throw std::invalid_argument(
-        "Expected radius to be positive. Actual value:" + std::to_string(radius));
-    }
+    rcpputils::require_true(
+      radius > 0.0, "Expected radius to be positive. Actual value: " + std::to_string(radius));
 
-    if (!(0 < std::abs(angle) && std::abs(angle) < 2 * M_PI)) {
-      throw std::invalid_argument(
-        "Expected angle to be in range (0, 2 * PI) or (-2 * PI, 0). Actual value: " +
+    rcpputils::require_true(
+      0 < std::abs(angle) && std::abs(angle) < 2 * M_PI,
+      "Expected angle to be in range (0, 2 * PI) or (-2 * PI, 0). Actual value: " +
         std::to_string(angle));
-    }
   }
 
 private:
@@ -162,11 +161,9 @@ public:
 
   explicit CombinedCurve(const std::vector<ParametricCurve::ConstPointer> & curves) : curves(curves)
   {
-    if (curves.size() < 2) {
-      throw std::invalid_argument(
-        "Number of curves to be combined must be two or more. Actual number: " +
-        std::to_string(curves.size()));
-    }
+    rcpputils::require_true(
+      curves.size() >= 2, "Number of curves to be combined must be two or more. Actual number: " +
+                            std::to_string(curves.size()));
 
     auto current_transformation = Transformation::Identity();
 

@@ -18,6 +18,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <cmath>
+#include <rcpputils/asserts.hpp>
 #include <stdexcept>
 #include <string>
 
@@ -64,15 +65,12 @@ auto vectorToRotationWithZeroRoll(const Vector & vector) -> Transformation
 {
   const auto magnitude = vector.norm();
 
-  if (magnitude == 0) {
-    throw std::invalid_argument("The input vector needs to have non-zero magnitude.");
-  }
+  rcpputils::require_true(magnitude != 0, "The input vector needs to have non-zero magnitude.");
 
-  if (vector.x() == 0 && vector.y() == 0) {
-    throw std::invalid_argument(
-      "The input vector must not be parallel to the z axis. "
-      "Expected x or y coordinate to be non-zero.");
-  }
+  rcpputils::require_true(
+    vector.x() != 0 || vector.y() != 0,
+    "The input vector must not be parallel to the z axis. "
+    "Expected x or y coordinate to be non-zero.");
 
   const auto yaw = std::atan2(vector.y(), vector.x());
   const auto pitch = std::asin(vector.z() / magnitude);
