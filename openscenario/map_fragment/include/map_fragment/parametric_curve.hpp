@@ -23,10 +23,10 @@ namespace map_fragment
 {
 
 /**
- * Parametric representation of a smooth curve in 2D Cartesian space
+ * Parametric representation of a smooth curve in 3D Cartesian space
  * 
- * By convention, the curve is assumed to always start at point (0, 0)
- * and have a tangent vector there of [1, 0]. Geometric trasformations
+ * By convention, the curve is assumed to always start at point (0, 0, 0)
+ * and have a tangent vector there of [1, 0, 0]. Geometric trasformations
  * can be applied afterwards if other start positions and/or
  * directions are required.
  */
@@ -56,7 +56,18 @@ public:
   }
 
 private:
+  /**
+   * Calculate curve point for given range-validated parameter tangent ∈ [0, 1]
+   * 
+   * **All derived classes need to implement this method.**
+   */
   virtual auto getPosition_(const double tangent) const -> Point = 0;
+
+  /**
+   * Calculate curve tangent vector for given range-validated parameter tangent ∈ [0, 1]
+   * 
+   * **All derived classes need to implement this method.**
+   */
   virtual auto getTangentVector_(const double tangent) const -> Vector = 0;
 
 protected:

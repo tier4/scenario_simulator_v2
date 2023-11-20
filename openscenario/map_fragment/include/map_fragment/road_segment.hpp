@@ -22,6 +22,10 @@
 
 namespace map_fragment
 {
+
+/**
+ * Description of a road cross section, defining its number of lanes and lane width
+ */
 struct RoadCrossSectionDescription
 {
   const int number_of_lanes;
@@ -44,6 +48,9 @@ struct RoadCrossSectionDescription
   }
 };  // struct RoadCrossSectionDescription
 
+/**
+ * Cross section of the road
+ */
 class RoadCrossSection
 {
   lanelet::Points3d points_;
@@ -65,9 +72,15 @@ public:
     }
   }
 
+  /**
+   * Get points belonging to lane boundaries at the cross section, left to right
+   */
   auto getPoints() const -> const lanelet::Points3d & { return points_; }
 };  // class RoadCrossSection
 
+/**
+ * Road segment, defined as the result of sliding a road cross section across a guide curve
+ */
 class RoadSegment
 {
   const ParametricCurve::ConstPointer guide_curve_;
@@ -82,6 +95,9 @@ public:
   {
   }
 
+  /**
+   * Get lanelets which compose the road segment, left to right
+   */
   auto getLanelets(double resolution) const -> lanelet::Lanelets
   {
     lanelet::Lanelets lanelets;
@@ -114,6 +130,9 @@ public:
   }
 };  // class RoadSegment
 
+/**
+ * Make a road segment with constant curvature
+ */
 auto makeCurvedRoadSegment(
   const double curvature, const double length, const int number_of_lanes, const double lane_width)
   -> RoadSegment

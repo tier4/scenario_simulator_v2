@@ -29,6 +29,9 @@ using Vector = Eigen::Vector3d;
 
 using Transformation = Eigen::Transform<double, 3, Eigen::TransformTraits::AffineCompact>;
 
+/**
+ * Rotate a point or vector in z axis by a given angle.
+ */
 auto rotateInZAxis(const Eigen::Vector3d & point_or_vector, const double angle) -> Eigen::Vector3d
 {
   const auto rotation = Eigen::AngleAxis(angle, Eigen::Vector3d::UnitZ());
@@ -36,12 +39,27 @@ auto rotateInZAxis(const Eigen::Vector3d & point_or_vector, const double angle) 
   return transformation * point_or_vector;
 }
 
+/**
+ * Convert a vector encoding displacement into a translating transformation.
+ */
 auto vectorToTranslation(const Vector & vector) -> Transformation
 {
   const auto translation = Eigen::Translation<Vector::Scalar, 3>(vector);
   return Transformation(translation);
 }
 
+/**
+ * Convert a vector encoding direction into a rotating transformation.
+ * 
+ * The resulting Transformation will represent the rotation between the x axis
+ * and the direction the vector is pointing towards. Because it is not possible
+ * to extract full 3D rotation from the vector alone, an assumption is made
+ * that the roll component of rotation is equal to zero.
+ * 
+ * To extract vector direction, its magnitude needs to be non-zero.
+ * In order to avoid ambiguity due to gimbal lock, the vector also
+ * must not be verticlal.
+ */
 auto vectorToRotationWithZeroRoll(const Vector & vector) -> Transformation
 {
   const auto magnitude = vector.norm();
@@ -64,6 +82,17 @@ auto vectorToRotationWithZeroRoll(const Vector & vector) -> Transformation
   return Transformation(rotation);
 }
 
+/**
+ * Rotate a vector in z axis (in local coordinate frame) by a given angle.
+ * 
+ * The local coordinate frame is defined by the vector's direction.
+ * Its x axis is pointing in the same direction as the vector, and the y axis
+ * is assumed to point leftwards, horizontally (with zero roll).
+ * 
+ * The vector needs to have non-zero magnitude and must not be vertical.
+ * 
+ * @sa vectorToRotationWithZeroRoll
+ */
 auto rotateInLocalZAxisAssumingZeroRoll(const Vector & vector, const double angle)
   -> Eigen::Vector3d
 {
@@ -74,17 +103,28 @@ auto rotateInLocalZAxisAssumingZeroRoll(const Vector & vector, const double angl
   return transformation * vector;
 }
 
+/**
+ * Chain two transformations together, to be applied according to the order of the arguments.
+ */
 auto chainTransformations(const Transformation & first, const Transformation & second)
   -> Transformation
 {
   return second * first;
 }
 
+/**
+ * Apply a transformation to a point.
+ */
 auto applyTransformationToPoint(const Point & point, const Transformation & transformation) -> Point
 {
   return transformation * point;
 }
 
+/**
+ * Apply a transformation to a vector.
+ * 
+ * Translation part of the transformation has no effect on a vector, so only rotation will be applied.
+ */
 auto applyTransformationToVector(const Vector & vector, const Transformation & transformation)
   -> Vector
 {
