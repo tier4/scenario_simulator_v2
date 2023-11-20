@@ -66,6 +66,16 @@ auto vectorToRotationWithZeroRoll(const Vector & vector) -> Transformation
   return Transformation(rotation);
 }
 
+auto rotateInLocalZAxisAssumingZeroRoll(const Vector & vector, const double angle)
+  -> Eigen::Vector3d
+{
+  const auto local_reference_frame_rotation = vectorToRotationWithZeroRoll(vector);
+  const auto rotation_axis = local_reference_frame_rotation * Vector::UnitZ();
+  const auto rotation = Eigen::AngleAxis(angle, rotation_axis);
+  const auto transformation = Transformation(rotation);
+  return transformation * vector;
+}
+
 auto chainTransformations(const Transformation & first, const Transformation & second)
   -> Transformation
 {

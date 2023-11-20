@@ -55,8 +55,7 @@ public:
   {
     const auto n = description.number_of_lanes;
     const auto w = description.lane_width;
-    const auto normal_vector =
-      rotateInZAxis(tangent_vector, M_PI_2);  // TODO: this will not work for inclined roads
+    const auto normal_vector = rotateInLocalZAxisAssumingZeroRoll(tangent_vector, M_PI_2);
 
     for (auto i = 0; i < description.number_of_lanes + 1; i++) {
       const auto lateral_position = (i - n / 2) * w;
