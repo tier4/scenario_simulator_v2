@@ -99,6 +99,8 @@ class RandomTestRunnerLaunch(object):
                 {"default": "/tmp",
                  "description": "Directory to which result.yaml and result.junit.xml files will be placed"},
 
+            "initialize_duration": {"default": 35, "description": "How long test runner will wait for Autoware to initialize"},
+
             # test suite arguments #
             "test_name": {"default": "random_test",
                           "description": "Test name. Used for descriptive purposes only"},
@@ -117,7 +119,7 @@ class RandomTestRunnerLaunch(object):
                                 "ego_goal_partial_randomization_distance value. If ego_goal_lanelet_id is set to -1, "
                                 "this value is ignored"},
             "ego_goal_partial_randomization_distance":
-                {"default": 20.0,
+                {"default": 25.0,
                  "description": "Distance from goal set by ego_goal_lanelet_id and ego_goal_s, within which goal "
                                 "pose will be randomized if ego_goal_partial_randomization is set to true"},
             "npc_count": {"default": 10, "description": "Generated npc count"},
