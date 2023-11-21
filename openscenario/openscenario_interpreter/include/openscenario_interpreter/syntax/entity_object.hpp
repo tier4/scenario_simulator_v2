@@ -17,7 +17,6 @@
 
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
-#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
 
@@ -40,9 +39,15 @@ inline namespace syntax
 struct EntityObject : public Group
 {
   explicit EntityObject(const pugi::xml_node &, Scope &);
-
-  auto objectType() -> ObjectType;
 };
+
+DEFINE_LAZY_VISITOR(
+  const EntityObject,
+  // CASE(CatalogReference),  //
+  CASE(Vehicle),     //
+  CASE(Pedestrian),  //
+  CASE(MiscObject),  //
+);
 
 DEFINE_LAZY_VISITOR(
   EntityObject,
