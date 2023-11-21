@@ -94,6 +94,29 @@ struct ApplyFaultInjectionAction : public CustomCommand
 };
 
 template <auto Version>
+struct ApplyPseudoTrafficSignalDetectorConfidenceSetAction
+: public CustomCommand,
+  public SimulatorCore::NonStandardOperation
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope &) -> void override
+  {
+    static_assert(0 < Version and Version <= 1);
+    if (parameters.size() == 2) {
+      setConventionalTrafficLightConfidence(
+        std::stoi(parameters.at(0)), std::stod(parameters.at(1)));
+    } else {
+      throw Error(
+        "An unexpected number of arguments were passed to "
+        "PseudoTrafficSignalDetectorConfidenceSetAction. "
+        "Expected 2 arguments, but actually passed ",
+        parameters.size(), ".");
+    }
+  }
+};
+
+template <auto Version>
 struct ApplyRequestToCorporateCommandAction : public CustomCommand,
                                               public SimulatorCore::NonStandardOperation
 {
@@ -102,7 +125,14 @@ struct ApplyRequestToCorporateCommandAction : public CustomCommand,
   auto start(const Scope &) -> void override
   {
     static_assert(0 < Version and Version <= 1);
-    sendCooperateCommand(parameters.at(0), parameters.at(1));
+    if (parameters.size() == 2) {
+      sendCooperateCommand(parameters.at(0), parameters.at(1));
+    } else {
+      throw Error(
+        "An unexpected number of arguments were passed to RequestToCooperateCommandAction. "
+        "Expected 2 arguments, but actually passed ",
+        parameters.size(), ".");
+    }
   }
 };
 
@@ -271,9 +301,11 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
   static const std::unordered_map<
     std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
     commands{
+      // clang-format off
       ELEMENT("FaultInjectionAction", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v1", ApplyFaultInjectionAction<1>),
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
+      ELEMENT("PseudoTrafficSignalDetectorConfidenceSetAction@v1", ApplyPseudoTrafficSignalDetectorConfidenceSetAction<1>),
       ELEMENT("RequestToCooperateCommandAction@v1", ApplyRequestToCorporateCommandAction<1>),
       ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
@@ -284,6 +316,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("exitSuccess", ExitSuccess),
       ELEMENT("printParameter", PrintParameter),
       ELEMENT("test", TestCommand),
+      // clang-format on
     };
 #undef ELEMENT
 

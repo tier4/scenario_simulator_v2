@@ -26,10 +26,12 @@
 #include <string>
 #include <vector>
 
-class FollowLaneWithOffset : public cpp_mock_scenarios::CppScenarioNode
+namespace cpp_mock_scenarios
+{
+class FollowLaneWithOffsetScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit FollowLaneWithOffset(const rclcpp::NodeOptions & option)
+  explicit FollowLaneWithOffsetScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "follow_lane_with_offset",
       ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
@@ -62,12 +64,13 @@ private:
     api_.requestSpeedChange("ego", 10, true);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<FollowLaneWithOffset>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::FollowLaneWithOffsetScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

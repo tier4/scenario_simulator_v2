@@ -57,9 +57,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct DistanceCondition : private Scope,
-                           private SimulatorCore::CoordinateSystemConversion,
-                           private SimulatorCore::ConditionEvaluation
+struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   // Definition of the coordinate system to be used for calculations. If not provided the value is interpreted as "entity". If set, "alongRoute" is ignored.
   const CoordinateSystem coordinate_system;
