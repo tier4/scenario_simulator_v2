@@ -126,6 +126,7 @@ Here, the colon (`:`) specified in the `CustomCommandAction.type` is the `sh` co
 | <pre>UserDefinedAction:<br/>  CustomCommandAction:<br/>    type: FaultInjectionAction(<EVENT-NAME\>, ...)</pre>                                                                                       | Same as FaultInjectionAction@v1.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | <pre>UserDefinedAction:<br/>  CustomCommandAction:<br/>    type: FaultInjectionAction@v1(<EVENT-NAME\>, ...)</pre>                                                                                    | Forward any number of event names to Autoware as `ERROR` level event. Events are forwarded by publishing to the `tier4_simulation_msgs::msg::SimulationEvents` type topic `/simulation/events`. In order to perform fault injection using this CustomCommandAction, Autoware must have a node that receives the above message types. Note that the simulator has no knowledge of the contents of the event name. In other words, what happens to Autoware by this CustomCommandAction depends on Autoware implementation. |
 | <pre>UserDefinedAction:<br/>  CustomCommandAction:<br/>    type: FaultInjectionAction@v2(<ERROR-LEVEL\>, <EVENT-NAME\>)</pre>                                                                         | Forwards a single event to Autoware with the specified error level. Same as `FaultInjectionAction@v1` except that instead of specifying an error level, only one event can be specified at a time. Available error levels are `OK`, `WARN`, `ERROR` and `STALE`.                                                                                                                                                                                                                                                          |
+| <pre>UserDefinedAction:<br/>  CustomCommandAction:<br/>    type: PseudoTrafficSignalDetectorConfidenceSetAction@v1(<LANELET-ID\>, <CONFIDENCE\>)</pre>                                                | Set a confidence value for traffic light topic. This action sets the confidence value to all traffic light bulbs of specified traffic light. If you specify the traffic light by a regulatory element ID, this action sets the confidence value to all traffic lights the regulatory element refers to.                                                                                                                                                                                                                   |
 | <pre>UserDefinedAction:<br/>  CustomCommandAction:<br/>    type: RequestToCooperateCommandAction@v1(<MODULE-NAME\>, <COMMAND\>)</pre>                                                                 | Send an `ACTIVATE` / `DEACTIVATE` command to the module publishing a valid request to cooperate. If the send fails, throw an exception to fail the scenario.                                                                                                                                                                                                                                                                                                                                                              |
 | <pre>UserDefinedAction:<br/>  CustomCommandAction:<br/>    type: V2ITrafficSignalStateAction(<LANELET-ID\>, <STATE\>,    \<br/>                                      <PUBLISH-RATE(optional)\>)</pre> | TrafficSignalStateAction for V2I traffic signal. You can optionally specify the publish rate of the traffic signal topic, but otherwise the functionality is the same as `TrafficSignalStateAction`.                                                                                                                                                                                                                                                                                                                      |
 | <pre>UserDefinedAction:<br/>  CustomCommandAction:<br/>    type: WalkStraightAction(<ENTITY-REF\>, ...)</pre>                                                                                         | Make **pedestrian** entities walk straight without a target.                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
@@ -245,7 +246,7 @@ OpenSCENARIO standards.
 | PrivateAction.ControllerAction.**OverrideControllerValueAction**                        |  Unsupported   |                                    |                      |
 | PrivateAction.**TeleportAction**                                                        |       ✔        | See [here](#teleportaction)        |                      |
 | PrivateAction.RoutingAction.**AssignRouteAction**                                       |       ✔        |                                    |                      |
-| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  |  Unsupported   |                                    |                      |
+| PrivateAction.RoutingAction.**FollowTrajectoryAction**                                  |       ✔        | See [here](#followtrajectoryaction)|                      |
 | PrivateAction.RoutingAction.**AcquirePositionAction**                                   |       ✔        | See [here](#acquirepositionaction) |                      |
 
 ### Conditions
@@ -264,7 +265,7 @@ OpenSCENARIO standards.
 | ByEntityCondition.EntityCondition.**TraveledDistanceCondition** |  Unsupported   |                                              |                      |
 | ByEntityCondition.EntityCondition.**ReachPositionCondition**    |       ✔        | See [here](#reachpositioncondition)          | deprecated from v1.2 |
 | ByEntityCondition.EntityCondition.**DistanceCondition**         |       ✔        | See [here](#distancecondition)               |                      |
-| ByEntityCondition.EntityCondition.**RelativeDistanceCondition** |       ✔        | See [here](#relativedistancecondition)       |                      |
+| ByEntityCondition.EntityCondition.**RelativeDistanceCondition** |       ✔        |                                              |                      |
 | ByValueCondition.**ParameterCondition**                         |       ✔        |                                              |                      |
 | ByValueCondition.**TimeOfDayCondition**                         |  Unsupported   |                                              |                      |
 | ByValueCondition.**SimulationTimeCondition**                    |       ✔        | No                                           |                      |
@@ -300,6 +301,22 @@ OpenSCENARIO standards.
 - Currently, **only LanePosition** can be specified for element of
   TeleportAction.
 
+### FollowTrajectoryAction
+- Currently, the action handles only "[followingMode](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/FollowingMode.html)" attribute set to  `position` mode.
+
+| followingMode |   Status    |
+|:--------------|:-----------:|
+| position      |      ✔      |
+| follow        | Unsupported |
+
+- Currently, the action only supports [Trajectory](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Trajectory.html) with a [Polyline](https://www.asam.net/static_downloads/ASAM_OpenSCENARIO_V1.2.0_Model_Documentation/modelDocumentation/content/Shape.html) shape.
+
+| Element  |   Status   |
+|:---------|:----------:|
+| Polyline |      ✔     |
+| Clothoid | Unsupported|
+| Nurbs    | Unsupported|
+
 ### AcquirePositionAction
 
 - Currently, **only LanePosition** can be specified for element of
@@ -320,12 +337,8 @@ OpenSCENARIO standards.
 
 ### DistanceCondition
 
-- Currently, the values of attribute "freespace" and "alongRoute" are ignored and always behave as if freespace="false" and alongRoute="false" were specified.
+- Currently, the values of attribute "alongRoute" is ignored and always behave as if alongRoute="false" was specified.
 - Currently, **only LanePosition and WorldPosition** can be specified for the element of Position of DistanceCondition.
-
-### RelativeDistanceCondition
-
-- Currently, the values of attribute "freespace" is ignored and always behave as if freespace="false" was specified.
 
 ### StoryboardElementStateCondition
 

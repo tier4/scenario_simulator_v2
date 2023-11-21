@@ -271,7 +271,13 @@ public:
     const lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
+// clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
+  /*!                                                                      \
+   @brief Forward to arguments to the EntityManager::NAME function.        \
+   @return return value of the EntityManager::NAME function.               \
+   @note This function was defined by FORWARD_TO_ENTITY_MANAGER macro.     \
+   */                                                                      \
   template <typename... Ts>                                                \
   decltype(auto) NAME(Ts &&... xs)                                         \
   {                                                                        \
@@ -279,6 +285,7 @@ public:
     return (*entity_manager_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
   }                                                                        \
   static_assert(true, "")
+  // clang-format on
 
   FORWARD_TO_ENTITY_MANAGER(asFieldOperatorApplication);
   FORWARD_TO_ENTITY_MANAGER(cancelRequest);
@@ -287,6 +294,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLateralDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLongitudinalDistance);
+  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
@@ -322,6 +332,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setBehaviorParameter);
+  FORWARD_TO_ENTITY_MANAGER(setConventionalTrafficLightConfidence);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);

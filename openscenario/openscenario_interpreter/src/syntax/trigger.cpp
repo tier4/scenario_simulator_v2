@@ -44,6 +44,25 @@ auto Trigger::evaluate() -> Object
       }));
 }
 
+auto Trigger::activeConditionGroupIndex() const -> iterator::difference_type
+{
+  return std::distance(begin(), std::find_if(begin(), end(), [](const auto & group) {
+                         return std::all_of(group.begin(), group.end(), [](const auto & condition) {
+                           return condition.current_value;
+                         });
+                       }));
+}
+
+auto Trigger::activeConditionGroupDescription() const
+  -> std::vector<std::pair<std::string, std::string>>
+{
+  const auto & group = *std::next(begin(), activeConditionGroupIndex());
+  std::vector<std::pair<std::string, std::string>> name_description_vec;
+  for (const auto & condition : group)
+    name_description_vec.emplace_back(condition.name, condition.description());
+  return name_description_vec;
+}
+
 auto operator<<(nlohmann::json & json, const Trigger & datum) -> nlohmann::json &
 {
   json["currentValue"] = boost::lexical_cast<std::string>(Boolean(datum.current_value));

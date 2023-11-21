@@ -73,6 +73,8 @@ public:
   }
 };
 
+uint64_t UserDefinedValueCondition::magic_subscription_counter = 0;
+
 UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node, Scope & scope)
 : name(readAttribute<String>("name", node, scope)),
   value(readAttribute<String>("value", node, scope)),
@@ -131,31 +133,33 @@ UserDefinedValueCondition::UserDefinedValueCondition(const pugi::xml_node & node
     using tier4_simulation_msgs::msg::UserDefinedValue;
     using tier4_simulation_msgs::msg::UserDefinedValueType;
 
-    evaluate_value = [&, current_message = std::make_shared<MagicSubscription<UserDefinedValue>>(
-                           result.str(1) + "_subscription", result.str(0))]() {
-      auto evaluate = [](const auto & user_defined_value) {
-        switch (user_defined_value.type.data) {
-          case UserDefinedValueType::BOOLEAN:
-            return make<Boolean>(user_defined_value.value);
-          case UserDefinedValueType::DATE_TIME:
-            return make<String>(user_defined_value.value);
-          case UserDefinedValueType::DOUBLE:
-            return make<Double>(user_defined_value.value);
-          case UserDefinedValueType::INTEGER:
-            return make<Integer>(user_defined_value.value);
-          case UserDefinedValueType::STRING:
-            return make<String>(user_defined_value.value);
-          case UserDefinedValueType::UNSIGNED_INT:
-            return make<UnsignedInt>(user_defined_value.value);
-          case UserDefinedValueType::UNSIGNED_SHORT:
-            return make<UnsignedShort>(user_defined_value.value);
-          default:
-            return unspecified;
-        }
-      };
+    evaluate_value =
+      [&, current_message = std::make_shared<MagicSubscription<UserDefinedValue>>(
+            result.str(1) + "_subscription_" + std::to_string(++magic_subscription_counter),
+            result.str(0))]() {
+        auto evaluate = [](const auto & user_defined_value) {
+          switch (user_defined_value.type.data) {
+            case UserDefinedValueType::BOOLEAN:
+              return make<Boolean>(user_defined_value.value);
+            case UserDefinedValueType::DATE_TIME:
+              return make<String>(user_defined_value.value);
+            case UserDefinedValueType::DOUBLE:
+              return make<Double>(user_defined_value.value);
+            case UserDefinedValueType::INTEGER:
+              return make<Integer>(user_defined_value.value);
+            case UserDefinedValueType::STRING:
+              return make<String>(user_defined_value.value);
+            case UserDefinedValueType::UNSIGNED_INT:
+              return make<UnsignedInt>(user_defined_value.value);
+            case UserDefinedValueType::UNSIGNED_SHORT:
+              return make<UnsignedShort>(user_defined_value.value);
+            default:
+              return unspecified;
+          }
+        };
 
-      return not current_message->value.empty() ? evaluate(*current_message) : unspecified;
-    };
+        return not current_message->value.empty() ? evaluate(*current_message) : unspecified;
+      };
 #else
     throw SyntaxError(
       "The ability to have ROS 2 topics as values for `UserDefinedValueCondition` is enabled only "

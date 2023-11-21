@@ -65,102 +65,163 @@ TestExecutor::TestExecutor(
 
 void TestExecutor::initialize()
 {
-  std::string message = fmt::format("Test description: {}", test_description_);
-  RCLCPP_INFO_STREAM(logger_, message);
-  scenario_completed_ = false;
+  executeWithErrorHandling([this]() {
+    std::string message = fmt::format("Test description: {}", test_description_);
+    RCLCPP_INFO_STREAM(logger_, message);
+    scenario_completed_ = false;
 
-  api_->updateFrame();
+    api_->updateFrame();
 
-  if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-    api_->spawn(
-      ego_name_, api_->canonicalize(test_description_.ego_start_position), getVehicleParameters(),
-      traffic_simulator::VehicleBehavior::autoware());
-    api_->setEntityStatus(
-      ego_name_, api_->canonicalize(test_description_.ego_start_position),
-      traffic_simulator::helper::constructActionStatus());
+    if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
+      api_->spawn(
+        ego_name_, api_->canonicalize(test_description_.ego_start_position), getVehicleParameters(),
+        traffic_simulator::VehicleBehavior::autoware());
+      api_->setEntityStatus(
+        ego_name_, api_->canonicalize(test_description_.ego_start_position),
+        traffic_simulator::helper::constructActionStatus());
 
-    if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
-      api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-        traffic_simulator::helper::LidarType::VLP16, ego_name_,
-        stringFromArchitectureType(architecture_type_)));
+      if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
+        api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+          traffic_simulator::helper::LidarType::VLP16, ego_name_,
+          stringFromArchitectureType(architecture_type_)));
 
-      double constexpr detection_update_duration = 0.1;
-      api_->attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
-        ego_name_, stringFromArchitectureType(architecture_type_), detection_update_duration));
+        double constexpr detection_update_duration = 0.1;
+        api_->attachDetectionSensor(
+          traffic_simulator::helper::constructDetectionSensorConfiguration(
+            ego_name_, stringFromArchitectureType(architecture_type_), detection_update_duration));
+
+        api_->attachOccupancyGridSensor([&]() {
+          simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+          configuration.set_architecture_type(stringFromArchitectureType(architecture_type_));
+          configuration.set_entity(ego_name_);
+          configuration.set_filter_by_range(true);
+          configuration.set_height(200);
+          configuration.set_range(300);
+          configuration.set_resolution(0.5);
+          configuration.set_update_duration(0.1);
+          configuration.set_width(200);
+          return configuration;
+        }());
+
+        api_->asFieldOperatorApplication(ego_name_).declare_parameter<bool>(
+          "allow_goal_modification", true);
+      }
+
+      // XXX dirty hack: wait for autoware system to launch
+      // ugly but helps for now
+      std::this_thread::sleep_for(std::chrono::milliseconds{5000});
+
+      api_->requestAssignRoute(
+        ego_name_, std::vector<traffic_simulator::CanonicalizedLaneletPose>(
+                     {api_->canonicalize(test_description_.ego_goal_position)}));
+      api_->asFieldOperatorApplication(ego_name_).engage();
+
+      goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
     }
 
-    // XXX dirty hack: wait for autoware system to launch
-    // ugly but helps for now
-    std::this_thread::sleep_for(std::chrono::milliseconds{5000});
-
-    api_->requestAssignRoute(
-      ego_name_, std::vector<traffic_simulator::CanonicalizedLaneletPose>(
-                   {api_->canonicalize(test_description_.ego_goal_position)}));
-    api_->asFieldOperatorApplication(ego_name_).engage();
-
-    goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
-  }
-
-  for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
-    const auto & npc_descr = test_description_.npcs_descriptions[i];
-    api_->spawn(
-      npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters());
-    api_->setEntityStatus(
-      npc_descr.name, api_->canonicalize(npc_descr.start_position),
-      traffic_simulator::helper::constructActionStatus(npc_descr.speed));
-    api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
-  }
+    for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
+      const auto & npc_descr = test_description_.npcs_descriptions[i];
+      api_->spawn(
+        npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters());
+      api_->setEntityStatus(
+        npc_descr.name, api_->canonicalize(npc_descr.start_position),
+        traffic_simulator::helper::constructActionStatus(npc_descr.speed));
+      api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
+    }
+  });
 }
 
-void TestExecutor::update(double current_time)
+void TestExecutor::update()
 {
-  if (!std::isnan(current_time)) {
-    bool timeout_reached = current_time >= test_timeout;
-    if (timeout_reached) {
-      if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-        if (!goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
-          RCLCPP_INFO(logger_, "Timeout reached");
-          error_reporter_.reportTimeout();
+  executeWithErrorHandling([this]() {
+    if (!api_->isEgoSpawned() && !api_->isNpcLogicStarted()) {
+      api_->startNpcLogic();
+    }
+    if (
+      api_->isEgoSpawned() && !api_->isNpcLogicStarted() &&
+      api_->asFieldOperatorApplication(api_->getEgoName()).engageable()) {
+      api_->startNpcLogic();
+    }
+
+    auto current_time = api_->getCurrentTime();
+
+    if (!std::isnan(current_time)) {
+      bool timeout_reached = current_time >= test_timeout;
+      if (timeout_reached) {
+        if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
+          if (!goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
+            RCLCPP_INFO(logger_, "Timeout reached");
+            error_reporter_.reportTimeout();
+          }
+        }
+        scenario_completed_ = true;
+        return;
+      }
+    }
+    if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
+      for (const auto & npc : test_description_.npcs_descriptions) {
+        if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
+          if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
+            std::string message =
+              fmt::format("New collision occurred between ego and {}", npc.name);
+            RCLCPP_INFO_STREAM(logger_, message);
+            error_reporter_.reportCollision(npc, current_time);
+          }
         }
       }
-      scenario_completed_ = true;
-      return;
-    }
-  }
-  if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-    for (const auto & npc : test_description_.npcs_descriptions) {
-      if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
-        if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
-          std::string message = fmt::format("New collision occurred between ego and {}", npc.name);
-          RCLCPP_INFO_STREAM(logger_, message);
-          error_reporter_.reportCollision(npc, current_time);
+
+      if (almost_standstill_metric_.isAlmostStandingStill(api_->getEntityStatus(ego_name_))) {
+        RCLCPP_INFO(logger_, "Standstill duration exceeded");
+        if (goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
+          RCLCPP_INFO(logger_, "Goal reached, standstill expected");
+        } else {
+          error_reporter_.reportStandStill();
         }
+        scenario_completed_ = true;
       }
     }
 
-    if (almost_standstill_metric_.isAlmostStandingStill(api_->getEntityStatus(ego_name_))) {
-      RCLCPP_INFO(logger_, "Standstill duration exceeded");
-      if (goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
-        RCLCPP_INFO(logger_, "Goal reached, standstill expected");
-      } else {
-        error_reporter_.reportStandStill();
-      }
-      scenario_completed_ = true;
-    }
-  }
-  api_->updateFrame();
+    api_->updateFrame();
+  });
 }
 
 void TestExecutor::deinitialize()
 {
-  std::string message = fmt::format("Deinitialize: {}", test_description_);
-  RCLCPP_INFO_STREAM(logger_, message);
+  executeWithErrorHandling([this]() {
+    std::string message = fmt::format("Deinitialize: {}", test_description_);
+    RCLCPP_INFO_STREAM(logger_, message);
 
-  if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-    api_->despawn(ego_name_);
-  }
-  for (const auto & npc : test_description_.npcs_descriptions) {
-    api_->despawn(npc.name);
+    if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
+      api_->despawn(ego_name_);
+    }
+    for (const auto & npc : test_description_.npcs_descriptions) {
+      api_->despawn(npc.name);
+    }
+  });
+}
+
+void TestExecutor::executeWithErrorHandling(std::function<void()> && func)
+{
+  try {
+    func();
+  } catch (const common::AutowareError & error) {
+    error_reporter_.reportException("autoware error", error.what());
+    std::string message = fmt::format("common::AutowareError occurred: {}", error.what());
+    RCLCPP_ERROR_STREAM(logger_, message);
+    scenario_completed_ = true;
+  } catch (const common::scenario_simulator_exception::Error & error) {
+    error_reporter_.reportException("scenario simulator error", error.what());
+    std::string message =
+      fmt::format("common::scenario_simulator_exception::Error occurred: {}", error.what());
+    RCLCPP_ERROR_STREAM(logger_, message);
+    scenario_completed_ = true;
+  } catch (const std::runtime_error & error) {
+    std::string message = fmt::format("std::runtime_error occurred: {}", error.what());
+    RCLCPP_ERROR_STREAM(logger_, message);
+    scenario_completed_ = true;
+  } catch (...) {
+    RCLCPP_ERROR(logger_, "Unknown error occurred.");
+    scenario_completed_ = true;
   }
 }
 

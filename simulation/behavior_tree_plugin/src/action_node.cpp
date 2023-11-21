@@ -113,10 +113,14 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
       const auto other_status = getOtherEntityStatus(right_of_way_id);
       if (!other_status.empty() && entity_status->laneMatchingSucceed()) {
         const auto lanelet_pose = entity_status->getLaneletPose();
-        auto distance = hdmap_utils->getLongitudinalDistance(
+        const auto distance_forward = hdmap_utils->getLongitudinalDistance(
           lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
-        if (distance) {
-          distances.insert(distance.value());
+        const auto distance_backward = hdmap_utils->getLongitudinalDistance(
+          traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
+        if (distance_forward) {
+          distances.insert(distance_forward.value());
+        } else if (distance_backward) {
+          distances.insert(-distance_backward.value());
         }
       }
     }
@@ -130,6 +134,14 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
 auto ActionNode::getRightOfWayEntities(const lanelet::Ids & following_lanelets) const
   -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
 {
+  auto is_the_same_right_of_way =
+    [&](const std::int64_t & lanelet_id, const std::int64_t & following_lanelet) {
+      const auto right_of_way_lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(lanelet_id);
+      const auto the_same_right_of_way_it = std::find(
+        right_of_way_lanelet_ids.begin(), right_of_way_lanelet_ids.end(), following_lanelet);
+      return the_same_right_of_way_it != std::end(right_of_way_lanelet_ids);
+    };
+
   std::vector<traffic_simulator::CanonicalizedEntityStatus> ret;
   const auto lanelet_ids_list = hdmap_utils->getRightOfWayLaneletIds(following_lanelets);
   for (const auto & status : other_entity_status) {
@@ -137,7 +149,8 @@ auto ActionNode::getRightOfWayEntities(const lanelet::Ids & following_lanelets) 
       for (const lanelet::Id & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
         if (
           status.second.laneMatchingSucceed() &&
-          traffic_simulator::isSameLaneletId(status.second, lanelet_id)) {
+          traffic_simulator::isSameLaneletId(status.second, lanelet_id) &&
+          not is_the_same_right_of_way(lanelet_id, following_lanelet)) {
           ret.emplace_back(status.second);
         }
       }
@@ -254,7 +267,7 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
 {
   if (status.laneMatchingSucceed()) {
     return spline.getCollisionPointIn2D(
-      hdmap_utils->getLaneletPolygon(status.getLaneletPose().lanelet_id), false, true);
+      hdmap_utils->getLaneletPolygon(status.getLaneletPose().lanelet_id), false);
   }
   return std::nullopt;
 }
@@ -293,7 +306,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
       status.getMapPose(), math::geometry::getPointsFromBbox(
                              status.getBoundingBox(), width_extension_right, width_extension_left,
                              length_extension_front, length_extension_rear));
-    return spline.getCollisionPointIn2D(polygon, false, true);
+    return spline.getCollisionPointIn2D(polygon, false);
   }
   return std::nullopt;
 }

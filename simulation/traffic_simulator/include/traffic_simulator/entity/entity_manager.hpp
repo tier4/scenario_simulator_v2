@@ -32,6 +32,7 @@
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
+#include <traffic_simulator/entity/deleted_entity.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
@@ -231,28 +232,49 @@ public:
     v2i_traffic_light_updater_.resetUpdateRate(rate);
   }
 
+  auto setConventionalTrafficLightConfidence(lanelet::Id id, double confidence) -> void
+  {
+    for (auto & traffic_light : conventional_traffic_light_manager_ptr_->getTrafficLights(id)) {
+      traffic_light.get().confidence = confidence;
+    }
+  }
+
+// clang-format off
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
+  /*!                                                                 \
+   @brief Forward to arguments to the HDMapUtils::NAME function.      \
+   @return return value of the HDMapUtils::NAME function.             \
+   @note This function was defined by FORWARD_TO_HDMAP_UTILS macro.   \
+   */                                                                 \
   template <typename... Ts>                                           \
   decltype(auto) NAME(Ts &&... xs) const                              \
   {                                                                   \
     return hdmap_utils_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
   }                                                                   \
   static_assert(true, "")
+  // clang-format on
 
   FORWARD_TO_HDMAP_UTILS(toLaneletPose);
   // FORWARD_TO_HDMAP_UTILS(toMapPose);
 
 #undef FORWARD_TO_HDMAP_UTILS
 
-#define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                     \
-  template <typename... Ts>                                                    \
-  decltype(auto) IDENTIFIER(const std::string & name, Ts &&... xs) __VA_ARGS__ \
-  try {                                                                        \
-    return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);  \
-  } catch (const std::out_of_range &) {                                        \
-    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");                 \
-  }                                                                            \
+// clang-format off
+#define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
+  /*!                                                                            \
+   @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
+   @return return value of the EntityBase::IDENTIFIER function.                  \
+   @note This function was defined by FORWARD_TO_ENTITY macro.    　  　　　　　   \
+   */                                                                            \
+  template <typename... Ts>                                                      \
+  decltype(auto) IDENTIFIER(const std::string & name, Ts &&... xs) __VA_ARGS__   \
+  try {                                                                          \
+    return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);    \
+  } catch (const std::out_of_range &) {                                          \
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");                   \
+  }                                                                              \
   static_assert(true, "")
+  // clang-format on
 
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
   FORWARD_TO_ENTITY(cancelRequest, );
@@ -347,6 +369,20 @@ public:
 
   auto getEntityTypeList() const
     -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
+
+  // clang-format off
+  auto getBoundingBoxLaneLateralDistance(const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &, const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &) const -> std::optional<double>;
+  auto getBoundingBoxLaneLateralDistance(const std::string &,              const CanonicalizedLaneletPose &)                                                                                                     const -> std::optional<double>;
+  auto getBoundingBoxLaneLateralDistance(const std::string &,              const std::string &)                                                                                                                  const -> std::optional<double>;
+
+  auto getBoundingBoxLaneLongitudinalDistance(const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &, const CanonicalizedLaneletPose &,      const traffic_simulator_msgs::msg::BoundingBox &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true) -> std::optional<double>;
+  auto getBoundingBoxLaneLongitudinalDistance(const std::string &,              const CanonicalizedLaneletPose &,                 bool include_adjacent_lanelet = false, bool include_opposite_direction = true)                                                                                          -> std::optional<double>;
+  auto getBoundingBoxLaneLongitudinalDistance(const std::string &,              const std::string &,                              bool include_adjacent_lanelet = false, bool include_opposite_direction = true)                                                                                          -> std::optional<double>;
+
+  auto getBoundingBoxRelativePose(const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &, const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &) const -> std::optional<geometry_msgs::msg::Pose>;
+  auto getBoundingBoxRelativePose(const std::string &,              const geometry_msgs::msg::Pose & )                                                                                                    const -> std::optional<geometry_msgs::msg::Pose>;
+  auto getBoundingBoxRelativePose(const std::string &,              const std::string & )                                                                                                                 const -> std::optional<geometry_msgs::msg::Pose>;
+  // clang-format on
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 

@@ -185,6 +185,61 @@ public:
       position.rpy.z = std::numeric_limits<double>::quiet_NaN();
       return position;
     }
+
+    template <typename From, typename To>
+    static auto makeNativeBoundingBoxRelativeLanePosition(const From & from, const To & to)
+    {
+      auto s = [](auto &&... xs) {
+        if (const auto result =
+              core->getBoundingBoxLaneLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
+            result) {
+          return result.value();
+        } else {
+          return std::numeric_limits<
+            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
+        }
+      };
+
+      auto t = [](auto &&... xs) {
+        if (const auto result =
+              core->getBoundingBoxLaneLateralDistance(std::forward<decltype(xs)>(xs)...);
+            result) {
+          return *result;
+        } else {
+          return std::numeric_limits<
+            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
+        }
+      };
+
+      traffic_simulator::LaneletPose position;
+      position.lanelet_id = std::numeric_limits<std::int64_t>::max();
+      position.s = s(from, to);
+      position.offset = t(from, to);
+      position.rpy.x = std::numeric_limits<double>::quiet_NaN();
+      position.rpy.y = std::numeric_limits<double>::quiet_NaN();
+      position.rpy.z = std::numeric_limits<double>::quiet_NaN();
+      return position;
+    }
+
+    template <typename... Ts>
+    static auto makeNativeBoundingBoxRelativeWorldPosition(Ts &&... xs)
+    {
+      if (const auto result =
+            SimulatorCore::core->getBoundingBoxRelativePose(std::forward<decltype(xs)>(xs)...);
+          result) {
+        return result.value();
+      } else {
+        geometry_msgs::msg::Pose result_empty{};
+        result_empty.position.x = std::numeric_limits<double>::quiet_NaN();
+        result_empty.position.y = std::numeric_limits<double>::quiet_NaN();
+        result_empty.position.z = std::numeric_limits<double>::quiet_NaN();
+        result_empty.orientation.x = 0;
+        result_empty.orientation.y = 0;
+        result_empty.orientation.z = 0;
+        result_empty.orientation.w = 1;
+        return result_empty;
+      }
+    }
   };
 
   class ActionApplication  // OpenSCENARIO 1.1.1 Section 3.1.5
@@ -295,7 +350,37 @@ public:
         }());
 
         core->asFieldOperatorApplication(entity_ref)
-          .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
+          .declare_parameter<bool>(
+            "allow_goal_modification",
+            controller.properties.template get<Boolean>("allowGoalModification"));
+
+        for (const auto & module :
+             [](std::string manual_modules_string) {
+               manual_modules_string.erase(
+                 std::remove_if(
+                   manual_modules_string.begin(), manual_modules_string.end(),
+                   [](const auto & c) { return std::isspace(c); }),
+                 manual_modules_string.end());
+
+               std::vector<std::string> modules;
+               std::string buffer;
+               std::istringstream modules_stream(manual_modules_string);
+               while (std::getline(modules_stream, buffer, ',')) {
+                 modules.push_back(buffer);
+               }
+               return modules;
+             }(controller.properties.template get<String>(
+               "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions"))) {
+          try {
+            core->asFieldOperatorApplication(entity_ref)
+              .requestAutoModeForCooperation(module, false);
+          } catch (const Error & error) {
+            throw Error(
+              "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions is not "
+              "supported in this environment: ",
+              error.what());
+          }
+        }
       }
     }
 
@@ -359,7 +444,7 @@ public:
     }
 
     template <typename... Ts>
-    static auto evaluateFreespaceEuclideanDistance(Ts &&... xs)  // for RelativeDistanceCondition
+    static auto evaluateBoundingBoxEuclideanDistance(Ts &&... xs)  // for RelativeDistanceCondition
     {
       if (const auto result = core->getBoundingBoxDistance(std::forward<decltype(xs)>(xs)...);
           result) {
@@ -485,6 +570,12 @@ public:
     {
       return asFieldOperatorApplication(core->getEgoName())
         .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
+    {
+      return core->setConventionalTrafficLightConfidence(std::forward<decltype(xs)>(xs)...);
     }
   };
 };

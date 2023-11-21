@@ -39,6 +39,8 @@ struct Story : public Scope, public StoryboardElement
 {
   explicit Story(const pugi::xml_node &, Scope &);
 
+  auto run() -> void override;
+
   friend auto operator<<(nlohmann::json &, const Story &) -> nlohmann::json &;
 };
 }  // namespace syntax

@@ -14,6 +14,9 @@
 
 #include <boost/range/adaptor/sliced.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <concealer/has_data_member_allow_goal_modification.hpp>
+#include <concealer/has_data_member_option.hpp>
+#include <concealer/is_package_exists.hpp>
 
 namespace concealer
 {
@@ -22,49 +25,6 @@ FieldOperatorApplicationFor<AutowareUniverse>::~FieldOperatorApplicationFor()
   shutdownAutoware();
   // All tasks should be complete before the services used in them will be deinitialized.
   task_queue.stopAndJoin();
-}
-
-auto FieldOperatorApplicationFor<AutowareUniverse>::approve(
-  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
-{
-  auto request = std::make_shared<tier4_rtc_msgs::srv::CooperateCommands::Request>();
-  request->stamp = cooperate_status_array.stamp;
-
-  auto approvable = [](auto && cooperate_status) {
-    return cooperate_status.safe xor
-           (cooperate_status.command_status.type == tier4_rtc_msgs::msg::Command::ACTIVATE);
-  };
-
-  auto flip = [](auto && type) {
-    using Command = tier4_rtc_msgs::msg::Command;
-    return type == Command::ACTIVATE ? Command::DEACTIVATE : Command::ACTIVATE;
-  };
-
-  for (auto && cooperate_status : cooperate_status_array.statuses) {
-    if (approvable(cooperate_status)) {
-      tier4_rtc_msgs::msg::CooperateCommand cooperate_command;
-      cooperate_command.module = cooperate_status.module;
-      cooperate_command.uuid = cooperate_status.uuid;
-      cooperate_command.command.type = flip(cooperate_status.command_status.type);
-      request->commands.push_back(cooperate_command);
-    }
-  }
-
-  if (not request->commands.empty()) {
-    task_queue.delay([this, request]() { requestCooperateCommands(request); });
-  }
-}
-
-auto FieldOperatorApplicationFor<AutowareUniverse>::cooperate(
-  const tier4_rtc_msgs::msg::CooperateStatusArray & cooperate_status_array) -> void
-{
-  switch (current_cooperator) {
-    case Cooperator::simulator:
-      return task_queue.delay([=]() { return approve(cooperate_status_array); });
-
-    default:
-      return;
-  }
 }
 
 template <auto N, typename Tuples>
@@ -228,8 +188,7 @@ bool isValidCooperateStatus(
    * NOTE2: The difference in the variable referred as a distance is the impact of the
    * message specification changes in the following URL.
    * This was also decided after consulting with a member of TIER IV planning and control team.
-   * ref:
-   * https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
+   * ref: https://github.com/tier4/tier4_autoware_msgs/commit/8b85e6e43aa48cf4a439c77bf4bf6aee2e70c3ef
    */
   if constexpr (HasDistance<CooperateStatusType>::value) {
     return cooperate_status.module.type == module_type &&
@@ -260,13 +219,33 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     }
   };
 
+  /**
+   * NOTE: Used cooperate statuses will be deleted correctly in Autoware side and provided via topic update.
+   *       But, their update rate (typ. 10Hz) is lower than the one of scenario_simulator_v2.
+   *       So, we need to check cooperate statuses if they are used or not in scenario_simulator_v2 side
+   *       to avoid sending the same cooperate command when sending multiple commands between updates of cooperate statuses.
+   */
+  static std::vector<tier4_rtc_msgs::msg::CooperateStatus> used_cooperate_statuses;
+  auto is_used_cooperate_status = [this](const auto & cooperate_status) {
+    return std::find_if(
+             used_cooperate_statuses.begin(), used_cooperate_statuses.end(),
+             [&cooperate_status](const auto & used_cooperate_status) {
+               return used_cooperate_status.module == cooperate_status.module &&
+                      used_cooperate_status.uuid == cooperate_status.uuid &&
+                      used_cooperate_status.command_status.type ==
+                        cooperate_status.command_status.type;
+             }) != used_cooperate_statuses.end();
+  };
+
   if (const auto cooperate_status = std::find_if(
         latest_cooperate_status_array.statuses.begin(),
         latest_cooperate_status_array.statuses.end(),
         [module_type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name),
-         command_type = to_command_type(command)](const auto & cooperate_status) {
+         command_type = to_command_type(command),
+         is_used_cooperate_status](const auto & cooperate_status) {
           return isValidCooperateStatus<tier4_rtc_msgs::msg::CooperateStatus>(
-            cooperate_status, command_type, module_type);
+                   cooperate_status, command_type, module_type) &&
+                 not is_used_cooperate_status(cooperate_status);
         });
       cooperate_status == latest_cooperate_status_array.statuses.end()) {
     std::stringstream what;
@@ -286,6 +265,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::sendCooperateCommand(
     request->commands.push_back(cooperate_command);
 
     task_queue.delay([this, request]() { requestCooperateCommands(request); });
+
+    used_cooperate_statuses.push_back(*cooperate_status);
   }
 }
 
@@ -295,21 +276,29 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::initialize(
   if (not std::exchange(initialize_was_called, true)) {
     task_queue.delay([this, initial_pose]() {
       waitForAutowareStateToBeWaitingForRoute([&]() {
+
+#if __has_include(<autoware_adapi_v1_msgs/msg/localization_initialization_state.hpp>)
+        if (
+          getLocalizationState().state !=
+          autoware_adapi_v1_msgs::msg::LocalizationInitializationState::UNINITIALIZED) {
+          return;
+        }
+#endif
         geometry_msgs::msg::PoseWithCovarianceStamped initial_pose_msg;
         initial_pose_msg.header.stamp = get_clock()->now();
         initial_pose_msg.header.frame_id = "map";
         initial_pose_msg.pose.pose = initial_pose;
-        return setInitialPose(initial_pose_msg);
-      });
 
-      // TODO(yamacir-kit) AFTER /api/autoware/set/initialize_pose IS SUPPORTED.
-      // waitForAutowareStateToBeWaitingForRoute([&]() {
-      //   auto request = std::make_shared<InitializePose::Request>();
-      //   request->pose.header.stamp = get_clock()->now();
-      //   request->pose.header.frame_id = "map";
-      //   request->pose.pose.pose = initial_pose;
-      //   requestInitializePose(request);
-      // });
+        auto request =
+          std::make_shared<autoware_adapi_v1_msgs::srv::InitializeLocalization::Request>();
+        request->pose.push_back(initial_pose_msg);
+        try {
+          return requestInitialPose(request);
+        } catch (const decltype(requestInitialPose)::TimeoutError &) {
+          // ignore timeout error because this service is validated by Autoware state transition.
+          return;
+        }
+      });
     });
   }
 }
@@ -321,10 +310,39 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
 
   task_queue.delay([this, route] {
     waitForAutowareStateToBeWaitingForRoute();  // NOTE: This is assertion.
-    setGoalPose(route.back());
-    for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
-      setCheckpoint(each);
+
+    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>();
+
+    request->header = route.back().header;
+
+    /*
+       NOTE: The autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type was
+       created on 2022/09/05 [1], and the autoware_adapi_v1_msgs::msg::Option
+       type data member was added to the
+       autoware_adapi_v1_msgs::srv::SetRoutePoints::Request type on 2023/04/12
+       [2]. Therefore, we cannot expect
+       autoware_adapi_v1_msgs::srv::SetRoutePoints::Request to always have a
+       data member `option`.
+
+       [1] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/805f8ebd3ca24564844df9889feeaf183101fbef
+       [2] https://github.com/autowarefoundation/autoware_adapi_msgs/commit/cf310bd038673b6cbef3ae3b61dfe607212de419
+    */
+    if constexpr (
+      has_data_member_option_v<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request> and
+      has_data_member_allow_goal_modification_v<
+        decltype(std::declval<autoware_adapi_v1_msgs::srv::SetRoutePoints::Request>().option)>) {
+      request->option.allow_goal_modification =
+        get_parameter("allow_goal_modification").get_value<bool>();
     }
+
+    request->goal = route.back().pose;
+
+    for (const auto & each : route | boost::adaptors::sliced(0, route.size() - 1)) {
+      request->waypoints.push_back(each.pose);
+    }
+
+    requestSetRoutePoints(request);
+
     waitForAutowareStateToBeWaitingForEngage();
   });
 }
@@ -335,7 +353,12 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
     waitForAutowareStateToBeDriving([this]() {
       auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
       request->engage = true;
-      requestEngage(request);
+      try {
+        return requestEngage(request);
+      } catch (const decltype(requestEngage)::TimeoutError &) {
+        // ignore timeout error because this service is validated by Autoware state transition.
+        return;
+      }
     });
   });
 }
@@ -379,26 +402,22 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double v
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
 {
-  using autoware_auto_system_msgs::msg::AutowareState;
-
-#define CASE(IDENTIFIER)          \
-  case AutowareState::IDENTIFIER: \
-    return #IDENTIFIER
-
-  switch (getAutowareState().state) {
-    CASE(INITIALIZING);
-    CASE(WAITING_FOR_ROUTE);
-    CASE(PLANNING);
-    CASE(WAITING_FOR_ENGAGE);
-    CASE(DRIVING);
-    CASE(ARRIVED_GOAL);
-    CASE(FINALIZING);
-
-    default:
-      return "";
+#define IF(IDENTIFIER, RETURN)                                                         \
+  if (getAutowareState().state == tier4_system_msgs::msg::AutowareState::IDENTIFIER) { \
+    return #RETURN;                                                                    \
   }
 
-#undef CASE
+  IF(INITIALIZING_VEHICLE, INITIALIZING)
+  IF(WAITING_FOR_ROUTE, WAITING_FOR_ROUTE)
+  IF(PLANNING, PLANNING)
+  IF(WAITING_FOR_ENGAGE, WAITING_FOR_ENGAGE)
+  IF(DRIVING, DRIVING)
+  IF(ARRIVAL_GOAL, ARRIVED_GOAL)
+  IF(EMERGENCY, EMERGENCY)
+  IF(FINALIZING, FINALIZING)
+
+  return "";
+#undef IF
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const -> std::string
@@ -434,33 +453,33 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::setVelocityLimit(double velo
   });
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::setCooperator(const std::string & cooperator)
-  -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation(
+  const std::string & module_name, bool enable) -> void
 {
-  current_cooperator = boost::lexical_cast<Cooperator>(cooperator);
+  // Note: The implementation of this function will not work properly
+  //       if the `rtc_auto_mode_manager` package is present.
+  if (not isPackageExists("rtc_auto_mode_manager")) {
+    task_queue.delay([this, module_name, enable]() {
+      auto request = std::make_shared<tier4_rtc_msgs::srv::AutoModeWithModule::Request>();
+      request->module.type = toModuleType<tier4_rtc_msgs::msg::Module>(module_name);
+      request->enable = enable;
+      // We attempt to resend the service up to 30 times, but this number of times was determined by
+      // heuristics, not for any technical reason
+      requestSetRtcAutoMode(request, 30);
+    });
+  } else {
+    throw common::Error(
+      "FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperation is not "
+      "supported in this environment, because rtc_auto_mode_manager is present.");
+  }
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
-  const autoware_auto_system_msgs::msg::EmergencyState & message) -> void
+  const tier4_external_api_msgs::msg::Emergency & message) -> void
 {
-#define CASE(IDENTIFIER)                                           \
-  case autoware_auto_system_msgs::msg::EmergencyState::IDENTIFIER: \
-    minimum_risk_maneuver_state = #IDENTIFIER;                     \
-    break
-
-  switch (message.state) {
-    CASE(MRM_FAILED);
-    CASE(MRM_OPERATING);
-    CASE(MRM_SUCCEEDED);
-    CASE(NORMAL);
-    CASE(OVERRIDE_REQUESTING);
-
-    default:
-      throw common::Error("Unsupported MrmState::state, number: ", static_cast<int>(message.state));
+  if (message.emergency) {
+    throw common::Error("Emergency state received");
   }
-
-  minimum_risk_maneuver_behavior = "";
-#undef CASE
 }
 
 template <typename T>
