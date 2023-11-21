@@ -45,17 +45,17 @@ Entity::Entity(EntityRef entity_ref, const Entities * entities)
 {
 }
 
-auto Entity::descendants() const -> std::set<EntityRef>
+auto Entity::objects() const -> std::set<EntityRef>
 {
-  auto descendants = std::set<EntityRef>{};
+  auto objects = std::set<EntityRef>{};
   auto entity = entities->ref(entity_ref);
   if (entity.is<ScenarioObject>()) {
-    descendants.emplace(entity_ref);
+    objects.emplace(entity_ref);
   } else if (entity.is<EntitySelection>()) {
     auto selection = entity.as<EntitySelection>();
     if (selection.is<SelectedEntityRefs>()) {
       for (const auto & entity : selection.as<SelectedEntityRefs>().entityRefs) {
-        descendants.merge(entity.descendants());
+        objects.merge(entity.objects());
       }
     } else if (selection.is<SelectedByTypes>()) {
       const auto & by_types = selection.as<SelectedByTypes>().byTypes;
@@ -64,14 +64,14 @@ auto Entity::descendants() const -> std::set<EntityRef>
         if (
           object.is<ScenarioObject>() and
           types.count(ObjectType::of(object.as<ScenarioObject>()))) {
-          descendants.emplace(name);
+          objects.emplace(name);
         }
       }
     }
   } else {
     throw std::runtime_error{"Unexpected entity type is detected. This is a simulator bug."};
   }
-  return descendants;
+  return objects;
 }
 
 auto Entity::types() const -> std::set<ObjectType::value_type>

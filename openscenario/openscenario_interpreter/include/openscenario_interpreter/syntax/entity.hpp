@@ -54,7 +54,7 @@ public:
 
   explicit Entity(EntityRef entity_ref, const Entities * entities);
 
-  auto descendants() const -> std::set<EntityRef>;
+  auto objects() const -> std::set<EntityRef>;
 
   auto types() const -> std::set<ObjectType::value_type>;
 
