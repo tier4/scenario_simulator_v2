@@ -1,5 +1,5 @@
 {
-  "ignorePaths": ["*.drawio", "*/**/CHANGELOG.rst", "external/lanelet2_matching/**", "*.xsd"],
+  "ignorePaths": ["*.drawio", "*/**/CHANGELOG.rst", "*.xsd"],
   "words": [
     "ARGN",
     "AUTORCC",
