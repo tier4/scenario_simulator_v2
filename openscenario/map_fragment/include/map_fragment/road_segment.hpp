@@ -81,15 +81,15 @@ public:
  */
 class RoadSegment
 {
-  const ParametricCurve::ConstPointer guide_curve_;
-
-  const RoadCrossSectionDescription cross_section_description_;
-
 public:
+  const ParametricCurve::ConstPointer guide_curve;
+
+  const RoadCrossSectionDescription cross_section_description;
+
   explicit RoadSegment(
     const ParametricCurve::ConstPointer guide_curve,
     const RoadCrossSectionDescription & cross_section_description)
-  : guide_curve_(guide_curve), cross_section_description_(cross_section_description)
+  : guide_curve(guide_curve), cross_section_description(cross_section_description)
   {
   }
 
@@ -99,7 +99,7 @@ public:
   auto getLanelets(double resolution) const -> lanelet::Lanelets
   {
     lanelet::Lanelets lanelets;
-    const auto n = cross_section_description_.number_of_lanes + 1;
+    const auto n = cross_section_description.number_of_lanes + 1;
 
     std::vector<lanelet::LineString3d> lane_boundaries(n);
     for (auto boundary : lane_boundaries) {
@@ -108,18 +108,18 @@ public:
 
     for (auto i = 0; i < resolution; i++) {
       const auto tangent = i / (resolution - 1);
-      const auto position = guide_curve_->getPosition(tangent);
-      const auto tangent_vector = guide_curve_->getUnitTangentVector(tangent);
+      const auto position = guide_curve->getPosition(tangent);
+      const auto tangent_vector = guide_curve->getUnitTangentVector(tangent);
 
-      const RoadCrossSection cross_section(cross_section_description_, position, tangent_vector);
+      const RoadCrossSection cross_section(cross_section_description, position, tangent_vector);
       const auto cross_section_points = cross_section.getPoints();
 
-      for (auto j = 0; j < cross_section_description_.number_of_lanes + 1; j++) {
+      for (auto j = 0; j < cross_section_description.number_of_lanes + 1; j++) {
         lane_boundaries[j].push_back(cross_section_points[j]);
       }
     }
 
-    for (auto i = 0; i < cross_section_description_.number_of_lanes; i++) {
+    for (auto i = 0; i < cross_section_description.number_of_lanes; i++) {
       lanelets.push_back(makeLanelet(lane_boundaries[i], lane_boundaries[i + 1]));
     }
 
