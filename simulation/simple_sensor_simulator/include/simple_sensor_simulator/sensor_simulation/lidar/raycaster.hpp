@@ -74,6 +74,7 @@ private:
   std::unordered_map<unsigned int, std::string> geometry_ids_;
   std::vector<Eigen::Matrix3d> rotation_matrices_;
 
+/*
   static void intersect(
     int thread_id, int thread_count, RTCScene scene,
     pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud, RTCRayQueryContext context,
@@ -117,6 +118,7 @@ private:
     }
   }
 };
+*/
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__LIDAR__RAYCASTER_HPP_
