@@ -53,7 +53,7 @@ ament_auto_add_library(simple_sensor_simulator_component SHARED
   src/vehicle_simulation/vehicle_model/sim_model_interface.cpp
 )
 target_link_libraries(simple_sensor_simulator_component
-  embree3
+  embree4
   pthread
   sodium
   zmq
