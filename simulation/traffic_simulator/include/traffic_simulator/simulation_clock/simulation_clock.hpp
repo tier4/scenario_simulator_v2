@@ -29,9 +29,9 @@ public:
 
   auto getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock;
 
-  auto getCurrentScenarioTime() const { return (frame_ - frame_offset_) / frame_rate; }
+  auto getCurrentScenarioTime() const { return (frame_ - frame_offset_) / frame_rate * realtime_factor; }
 
-  auto getCurrentSimulationTime() const { return frame_ / frame_rate; }
+  auto getCurrentSimulationTime() const { return frame_ / frame_rate * realtime_factor; }
 
   auto getStepTime() const { return realtime_factor / frame_rate; }
 
