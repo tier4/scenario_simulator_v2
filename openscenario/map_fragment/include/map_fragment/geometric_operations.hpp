@@ -23,13 +23,24 @@
 
 namespace map_fragment
 {
+auto makeTranslation(const double x, const double y, const double z) -> Transformation
+{
+  const auto translation = Eigen::Translation<Vector::Scalar, 3>(x, y, z);
+  return Transformation(translation);
+}
+
+auto makeRotationInZAxis(const double angle) -> Transformation
+{
+  const auto rotation = Eigen::AngleAxis(angle, Eigen::Vector3d::UnitZ());
+  return Transformation(rotation);
+}
+
 /**
  * Rotate a point or vector in z axis by a given angle.
  */
 auto rotateInZAxis(const PointOrVector & point_or_vector, const double angle) -> PointOrVector
 {
-  const auto rotation = Eigen::AngleAxis(angle, PointOrVector::UnitZ());
-  const auto transformation = Transformation(rotation);
+  const auto transformation = makeRotationInZAxis(angle);
   return transformation * point_or_vector;
 }
 
@@ -38,8 +49,7 @@ auto rotateInZAxis(const PointOrVector & point_or_vector, const double angle) ->
  */
 auto vectorToTranslation(const Vector & vector) -> Transformation
 {
-  const auto translation = Eigen::Translation<Vector::Scalar, 3>(vector);
-  return Transformation(translation);
+  return makeTranslation(vector.x(), vector.y(), vector.z());
 }
 
 /**

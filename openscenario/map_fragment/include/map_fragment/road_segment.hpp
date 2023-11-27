@@ -156,6 +156,20 @@ auto makeCurvedRoadSegment(
 
   return RoadSegment(guide_curve, cross_section_description);
 }
+
+auto generateSliceOfCrossSectionAndCalculateLateralOffset(
+  const RoadCrossSectionDescription & cross_section_description, const int & first_lane_index,
+  const int & number_of_lanes) -> std::pair<RoadCrossSectionDescription, double>
+{
+  const auto slice_description =
+    RoadCrossSectionDescription(number_of_lanes, cross_section_description.lane_width);
+
+  const auto lateral_offset =
+    -cross_section_description.lane_width *
+    (first_lane_index + 0.5 * number_of_lanes - 0.5 * cross_section_description.number_of_lanes);
+
+  return std::make_pair(slice_description, lateral_offset);
+}
 }  // namespace map_fragment
 
 #endif  // MAP_FRAGMENT__ROAD_SEGMENT__HPP_
