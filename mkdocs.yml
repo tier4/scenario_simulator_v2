@@ -70,6 +70,8 @@ nav:
           - user_guide/scenario_test_runner/ScenarioFormatConversion.md
           - user_guide/scenario_test_runner/HowToWriteWorkflowFile.md
           - user_guide/scenario_test_runner/Tips.md
+      - Random Test Runner:
+          - QuickStart: user_guide/random_test_runner/README.md
   - Developer Guide:
       - About: developer_guide/About.md
       - developer_guide/AutowareAPI.md
