@@ -111,19 +111,23 @@ auto makePerpendicularDirection(const Point1 & p1, const Point2 & p2)
   return Eigen::Quaterniond(r * p * y).matrix();
 }
 
+auto generateNextLineStringId()
+{
+  static lanelet::Id id = 0;
+  return ++id;
+}
+
 auto makeLineString3d(
   const lanelet::Point3d & origin, double length, double radius, const Eigen::Matrix3d rotation,
   std::size_t resolution)
 {
-  static lanelet::Id id = 0;
-
   if (std::isinf(radius)) {
     auto point = origin.basicPoint() + rotation * Eigen::Vector3d::UnitX() * length;
-    return lanelet::LineString3d(++id, {origin, makePoint3d(point)});
+    return lanelet::LineString3d(generateNextLineStringId(), {origin, makePoint3d(point)});
   } else if (M_PI * 2 < length / radius) {
     std::exit(EXIT_FAILURE);
   } else {
-    auto line = lanelet::LineString3d(++id);
+    auto line = lanelet::LineString3d(generateNextLineStringId());
 
     const auto radian_step = length / radius / resolution;
 

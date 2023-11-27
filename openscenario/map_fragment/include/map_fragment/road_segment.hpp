@@ -101,10 +101,9 @@ public:
     lanelet::Lanelets lanelets;
     const auto n = cross_section_description_.number_of_lanes + 1;
 
-    // TODO Find a cleaner way to do this
     std::vector<lanelet::LineString3d> lane_boundaries(n);
-    for (auto i = 0; i < n; i++) {
-      lane_boundaries[i].setId(i);
+    for (auto boundary : lane_boundaries) {
+      boundary.setId(generateNextLineStringId());
     }
 
     for (auto i = 0; i < resolution; i++) {
