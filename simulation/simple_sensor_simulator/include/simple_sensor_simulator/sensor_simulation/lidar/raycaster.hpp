@@ -76,7 +76,7 @@ private:
 
   static void intersect(
     int thread_id, int thread_count, RTCScene scene,
-    pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud, RTCIntersectContext context,
+    pcl::PointCloud<pcl::PointXYZI>::Ptr thread_cloud, RTCRayQueryContext context,
     geometry_msgs::msg::Pose origin,
     std::reference_wrapper<std::set<unsigned int>> ref_thread_detected_ids, double max_distance,
     double min_distance,
