@@ -45,10 +45,6 @@ struct Entities
   auto isAdded(const EntityRef &) const -> bool;
 
   auto ref(const EntityRef &) const -> Object;
-
-  auto objects(const std::list<EntityRef> &) const -> std::set<EntityRef>;
-
-  auto objectTypes(const std::list<EntityRef> &) const -> std::set<ObjectType::value_type>;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

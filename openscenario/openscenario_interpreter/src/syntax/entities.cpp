@@ -15,11 +15,10 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
-
-#include "openscenario_interpreter/syntax/object_type.hpp"
 
 namespace openscenario_interpreter
 {
@@ -41,7 +40,7 @@ Entities::Entities(const pugi::xml_node & node, Scope & scope)
 
 auto Entities::isAdded(const EntityRef & entity_ref) const -> bool
 {
-  auto object_list = objects({entity_ref});
+  auto object_list = Entity{entity_ref, this}.objects();
   return std::all_of(std::begin(object_list), std::end(object_list), [&](const String & object) {
     if (auto entity = ref(object); entity.is<ScenarioObject>()) {
       return entity.as<ScenarioObject>().is_added;
@@ -60,37 +59,6 @@ auto Entities::ref(const EntityRef & entity_ref) const -> Object
   } else {
     return entry->second;
   }
-}
-
-auto Entities::objects(const std::list<EntityRef> & entity_refs) const -> std::set<EntityRef>
-{
-  auto object_set = std::set<EntityRef>();
-  for (auto & entity_ref : entity_refs) {
-    if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
-      object_set.emplace(entity_ref);
-    } else if (object.is<EntitySelection>()) {
-      object_set.merge(object.as<EntitySelection>().objects());
-    } else {
-      THROW_SYNTAX_ERROR("Unsupported entity type is specified");
-    }
-  }
-  return object_set;
-}
-
-auto Entities::objectTypes(const std::list<EntityRef> & entity_refs) const
-  -> std::set<ObjectType::value_type>
-{
-  auto type_set = std::set<ObjectType::value_type>();
-  for (const auto & entity_ref : entity_refs) {
-    if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
-      type_set.emplace(object.as<ScenarioObject>().objectType());
-    } else if (object.is<EntitySelection>()) {
-      type_set.merge(object.as<EntitySelection>().objectTypes());
-    } else {
-      THROW_SYNTAX_ERROR("Unsupported entity type is specified");
-    }
-  }
-  return type_set;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
