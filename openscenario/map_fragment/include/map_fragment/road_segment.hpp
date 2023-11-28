@@ -135,9 +135,9 @@ auto makeCurvedRoadSegment(
   -> RoadSegment
 {
   const auto guide_curve = curvature == 0.0
-                             ? static_cast<ParametricCurve::ConstPointer>(  //
+                             ? std::static_pointer_cast<ParametricCurve>(  //
                                  std::make_shared<Straight>(length))
-                             : static_cast<ParametricCurve::ConstPointer>(std::make_shared<Arc>(
+                             : std::static_pointer_cast<ParametricCurve>(std::make_shared<Arc>(
                                  std::abs(1 / curvature), length * curvature));
 
   const RoadCrossSectionDescription cross_section_description(number_of_lanes, lane_width);

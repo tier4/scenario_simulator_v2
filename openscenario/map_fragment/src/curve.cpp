@@ -70,8 +70,9 @@ try {
     std::make_shared<Straight>(before_length),
 
     // Turn segment (or straight if angle == 0)
-    angle == 0 ? static_cast<ParametricCurve::ConstPointer>(std::make_shared<Straight>(length))
-               : static_cast<ParametricCurve::ConstPointer>(
+    angle == 0 ? std::static_pointer_cast<ParametricCurve>(  //
+                   std::make_shared<Straight>(length))
+               : std::static_pointer_cast<ParametricCurve>(
                    std::make_shared<Arc>(length / std::abs(angle), angle)),
 
     // Straight segment after the turn
