@@ -11,10 +11,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check required label
-        if: |
-          (github.event.label.name == 'bump patch') || 
-          (github.event.label.name == 'bump minor') || 
-          (github.event.label.name == 'bump majar')
+        if: github.event.label.name == 'bump patch'
+        run: exit 0
+      - name: Check required label
+        if: github.event.label.name == 'bump minor'
+        run: exit 0
+      - name: Check required label
+        if: github.event.label.name == 'bump majar'
         run: exit 0
       - name: Throw error
         run: exit 1
