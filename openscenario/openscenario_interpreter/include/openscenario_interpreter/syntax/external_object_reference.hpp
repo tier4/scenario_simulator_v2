@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
@@ -32,6 +33,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ExternalObjectReference
 {
+  static constexpr ObjectType object_type{ObjectType::external};
+
   const String name;
 
   explicit ExternalObjectReference(const pugi::xml_node & node, Scope & scope);
