@@ -6,7 +6,7 @@ on:
 
 jobs:
   check_label:
-    name: Release
+    name: Check Label
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
