@@ -35,61 +35,36 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Entity::Entity(EntityRef entity_ref, const Scope & scope)
-: Entity(std::move(entity_ref), scope.global().entities)
+Entity::Entity(const EntityRef & entity_ref, const Scope & scope)
+: Entity(entity_ref, scope.global().entities)
 {
 }
 
-Entity::Entity(EntityRef entity_ref, const Entities * entities)
-: entity_ref(std::move(entity_ref)), entities(entities)
+Entity::Entity(const EntityRef & entity_ref, const Entities * entities)
+: entity(entities->ref(entity_ref))
 {
 }
 
 auto Entity::objects() const -> std::set<EntityRef>
 {
   auto objects = std::set<EntityRef>{};
-  auto entity = entities->ref(entity_ref);
   if (entity.is<ScenarioObject>()) {
-    objects.emplace(entity_ref);
+    objects.emplace(entity.as<ScenarioObject>().name);
   } else if (entity.is<EntitySelection>()) {
-    auto selection = entity.as<EntitySelection>();
-    if (selection.is<SelectedEntityRefs>()) {
-      for (const auto & entity : selection.as<SelectedEntityRefs>().entityRefs) {
-        objects.merge(entity.objects());
-      }
-    } else if (selection.is<SelectedByTypes>()) {
-      const auto & by_types = selection.as<SelectedByTypes>().byTypes;
-      auto types = std::set<ObjectType::value_type>{std::begin(by_types), std::end(by_types)};
-      for (const auto & [name, object] : entities->entities) {
-        if (
-          object.is<ScenarioObject>() and
-          types.count(ObjectType::of(object.as<ScenarioObject>()))) {
-          objects.emplace(name);
-        }
-      }
-    }
+    objects.merge(entity.as<EntitySelection>().objects());
   } else {
     throw std::runtime_error{"Unexpected entity type is detected. This is a simulator bug."};
   }
   return objects;
 }
 
-auto Entity::types() const -> std::set<ObjectType::value_type>
+auto Entity::objectTypes() const -> std::set<ObjectType::value_type>
 {
   auto types = std::set<ObjectType::value_type>{};
-  auto entity = entities->ref(entity_ref);
   if (entity.is<ScenarioObject>()) {
-    types.emplace(ObjectType::of(entity.as<ScenarioObject>()));
+    types.emplace(entity.as<ScenarioObject>().objectType());
   } else if (entity.is<EntitySelection>()) {
-    auto selection = entity.as<EntitySelection>();
-    if (selection.is<SelectedEntityRefs>()) {
-      for (const auto & entity : selection.as<SelectedEntityRefs>().entityRefs) {
-        types.merge(entity.types());
-      }
-    } else if (selection.is<SelectedByTypes>()) {
-      const auto & by_types = selection.as<SelectedByTypes>().byTypes;
-      types.insert(std::begin(by_types), std::end(by_types));
-    }
+    types.merge(entity.as<EntitySelection>().objectTypes());
   } else {
     throw std::runtime_error{"Unexpected entity type is detected. This is a simulator bug."};
   }
@@ -98,11 +73,11 @@ auto Entity::types() const -> std::set<ObjectType::value_type>
 
 Entity::operator String() const
 {
-  if (not entities->ref(entity_ref).is<ScenarioObject>()) {
+  if (entity.is<ScenarioObject>()) {
     throw std::runtime_error{
       "Tried to convert non-ScenarioObject entity to String. This is a simulator bug."};
   }
-  return entity_ref;
+  return entity.as<ScenarioObject>().name;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

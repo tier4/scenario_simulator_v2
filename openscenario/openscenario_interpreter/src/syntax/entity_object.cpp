@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/syntax/entity_object.hpp>
 #include <openscenario_interpreter/syntax/external_object_reference.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/vehicle.hpp>
 
@@ -36,19 +37,9 @@ EntityObject::EntityObject(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto EntityObject::objectType() -> ObjectType
+auto EntityObject::objectType() const -> ObjectType
 {
-  if (is_also<Vehicle>()) {
-    return {ObjectType::vehicle};
-  } else if (is_also<Pedestrian>()) {
-    return {ObjectType::pedestrian};
-  } else if (is_also<MiscObject>()) {
-    return {ObjectType::miscellaneous};
-  } else if (is_also<ExternalObjectReference>()) {
-    return {ObjectType::external};
-  } else {
-    THROW_SEMANTIC_ERROR("Unexpected entity object is detected");
-  }
+  return apply<ObjectType>([](const auto & object) { return object.object_type; }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

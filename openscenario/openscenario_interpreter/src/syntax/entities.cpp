@@ -19,6 +19,8 @@
 #include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 
+#include "openscenario_interpreter/syntax/object_type.hpp"
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -67,7 +69,7 @@ auto Entities::objects(const std::list<EntityRef> & entity_refs) const -> std::s
     if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
       object_set.emplace(entity_ref);
     } else if (object.is<EntitySelection>()) {
-      object_set.merge(object.as<EntitySelection>().objects(*this));
+      object_set.merge(object.as<EntitySelection>().objects());
     } else {
       THROW_SYNTAX_ERROR("Unsupported entity type is specified");
     }
@@ -83,7 +85,7 @@ auto Entities::objectTypes(const std::list<EntityRef> & entity_refs) const
     if (auto object = ref(entity_ref); object.is<ScenarioObject>()) {
       type_set.emplace(object.as<ScenarioObject>().objectType());
     } else if (object.is<EntitySelection>()) {
-      type_set.merge(object.as<EntitySelection>().objectTypes(*this));
+      type_set.merge(object.as<EntitySelection>().objectTypes());
     } else {
       THROW_SYNTAX_ERROR("Unsupported entity type is specified");
     }

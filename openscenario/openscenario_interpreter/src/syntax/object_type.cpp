@@ -17,10 +17,7 @@
 #include <openscenario_interpreter/syntax/entity_action.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
 #include <openscenario_interpreter/syntax/external_object_reference.hpp>
-#include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
-#include <openscenario_interpreter/syntax/pedestrian.hpp>
-#include <openscenario_interpreter/syntax/vehicle.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <ostream>
 
@@ -28,17 +25,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-auto ObjectType::of(const EntityObject & object) -> ObjectType
-{
-  return ObjectType{apply<ObjectType::value_type>(
-    overload(
-      [](const Vehicle &) { return ObjectType::vehicle; },
-      [](const Pedestrian &) { return ObjectType::pedestrian; },
-      [](const MiscObject &) { return ObjectType::miscellaneous; },
-      [](const ExternalObjectReference &) { return ObjectType::external; }),
-    object)};
-}
-
 auto operator>>(std::istream & is, ObjectType & type) -> std::istream &
 {
   std::string buffer;

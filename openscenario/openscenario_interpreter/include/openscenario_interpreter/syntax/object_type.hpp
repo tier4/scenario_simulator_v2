@@ -16,7 +16,6 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_TYPE_HPP_
 
 #include <istream>
-#include <openscenario_interpreter/syntax/entity_object.hpp>
 #include <ostream>
 
 namespace openscenario_interpreter
@@ -52,8 +51,6 @@ struct ObjectType
   } value;
 
   ObjectType() = default;
-
-  static auto of(const EntityObject & object) -> ObjectType;
 
   operator value_type() const noexcept { return value; }
 };

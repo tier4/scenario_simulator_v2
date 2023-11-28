@@ -28,42 +28,13 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 SelectedEntityRefs::SelectedEntityRefs(const pugi::xml_node & tree, Scope & scope)
-: entityRefs(readElements<EntityRef, 0>("EntityRef", tree, scope, scope.entities(true)))
+: entityRefs(readElements<Entity, 0>("EntityRef", tree, scope, scope.entities(true)))
 {
-}
-
-auto SelectedEntityRefs::objects(const Entities & entities) -> std::set<EntityRef>
-{
-  return entities.objects(entityRefs);
-}
-
-auto SelectedEntityRefs::objectTypes(const Entities & entities) -> std::set<ObjectType::value_type>
-{
-  return entities.objectTypes(entityRefs);
 }
 
 SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
 : byTypes(readElements<ByType, 0>("ByType", tree, scope))
 {
-}
-
-auto SelectedByTypes::objects(const Entities & entities) -> std::set<EntityRef>
-{
-  auto selected_entities = std::set<EntityRef>();
-  auto object_types = objectTypes(entities);
-  for (const auto & [name, object] : entities.entities) {
-    if (
-      object.is<ScenarioObject>() and
-      object_types.count(object.as<ScenarioObject>().objectType())) {
-      selected_entities.emplace(name);
-    }
-  }
-  return selected_entities;
-}
-
-auto SelectedByTypes::objectTypes(const Entities &) -> std::set<ObjectType::value_type>
-{
-  return std::set<ObjectType::value_type>(std::begin(byTypes), std::end(byTypes));
 }
 
 SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
@@ -74,17 +45,6 @@ SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
       std::make_pair(   "ByType", [&](const auto & tree) { return make<   SelectedByTypes>(tree.parent(), scope); })))
 // clang-format on
 {
-}
-
-auto SelectedEntities::objects(const Entities & entities) -> std::set<EntityRef>
-{
-  return apply<std::set<EntityRef>>([&](auto & e) { return e.objects(entities); }, *this);
-}
-
-auto SelectedEntities::objectTypes(const Entities & entities) -> std::set<ObjectType::value_type>
-{
-  return apply<std::set<ObjectType::value_type>>(
-    [&](auto & e) { return e.objectTypes(entities); }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
