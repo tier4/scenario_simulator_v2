@@ -15,19 +15,19 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
       - name: update patch version
-        if: github.event.label.name == 'bump patch'
+        if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
           catkin_generate_changelog
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
       - name: update minor version
-        if: github.event.label.name == 'bump minor'
+        if: contains(github.event.pull_request.labels.*.name, 'bump minor')
         run: |
           catkin_generate_changelog
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
       - name: update majar version
-        if: github.event.label.name == 'bump majar'
+        if: contains(github.event.pull_request.labels.*.name, 'bump majar')
         run: |
           catkin_generate_changelog
           catkin_tag_changelog --bump majar
