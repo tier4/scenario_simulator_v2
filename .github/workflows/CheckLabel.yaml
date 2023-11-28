@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check required label
-        if: contains(github.event.pull_request.labels.*.name, 'bump')
+        if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: exit 0
       - name: Throw error
         run: exit 1
