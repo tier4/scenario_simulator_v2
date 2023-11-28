@@ -15,8 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_HPP_
 
+#include <cstddef>
+#include <functional>
+#include <scenario_simulator_exception/exception.hpp>
 #include <openscenario_interpreter/object.hpp>
-#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
@@ -25,15 +27,14 @@
 
 namespace openscenario_interpreter
 {
+class Scope;
+
 inline namespace syntax
 {
 struct Entities;
 
-struct Entity
+struct Entity : public Object
 {
-public:
-  Object entity;
-
   template <typename Candidates>
   explicit Entity(const pugi::xml_node & node, Scope & scope, const Candidates & candidates)
   : Entity(EntityRef{node, scope, candidates}, scope)
@@ -47,10 +48,19 @@ public:
   auto objects() const -> std::set<EntityRef>;
 
   auto objectTypes() const -> std::set<ObjectType::value_type>;
-
-  operator String() const;
 };
+
+auto operator==(const Entity & left, const Entity & right) { return left.get() == right.get(); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
+
+template <>
+struct std::hash<openscenario_interpreter::Entity>
+{
+  auto operator()(const openscenario_interpreter::Entity & entity) const -> std::size_t
+  {
+    return std::hash<void *>{}(entity.get());
+  }
+};
 
 #endif  // OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_HPP_

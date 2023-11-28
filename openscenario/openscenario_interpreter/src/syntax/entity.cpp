@@ -41,43 +41,30 @@ Entity::Entity(const EntityRef & entity_ref, const Scope & scope)
 }
 
 Entity::Entity(const EntityRef & entity_ref, const Entities * entities)
-: entity(entities->ref(entity_ref))
+: Object(entities->ref(entity_ref))
 {
 }
 
 auto Entity::objects() const -> std::set<EntityRef>
 {
-  auto objects = std::set<EntityRef>{};
-  if (entity.is<ScenarioObject>()) {
-    objects.emplace(entity.as<ScenarioObject>().name);
-  } else if (entity.is<EntitySelection>()) {
-    objects.merge(entity.as<EntitySelection>().objects());
+  if (is<ScenarioObject>()) {
+    return {as<ScenarioObject>().name};
+  } else if (is<EntitySelection>()) {
+    return as<EntitySelection>().objects();
   } else {
     throw std::runtime_error{"Unexpected entity type is detected. This is a simulator bug."};
   }
-  return objects;
 }
 
 auto Entity::objectTypes() const -> std::set<ObjectType::value_type>
 {
-  auto types = std::set<ObjectType::value_type>{};
-  if (entity.is<ScenarioObject>()) {
-    types.emplace(entity.as<ScenarioObject>().objectType());
-  } else if (entity.is<EntitySelection>()) {
-    types.merge(entity.as<EntitySelection>().objectTypes());
+  if (is<ScenarioObject>()) {
+    return {as<ScenarioObject>().objectType()};
+  } else if (is<EntitySelection>()) {
+    return as<EntitySelection>().objectTypes();
   } else {
     throw std::runtime_error{"Unexpected entity type is detected. This is a simulator bug."};
   }
-  return types;
-}
-
-Entity::operator String() const
-{
-  if (entity.is<ScenarioObject>()) {
-    throw std::runtime_error{
-      "Tried to convert non-ScenarioObject entity to String. This is a simulator bug."};
-  }
-  return entity.as<ScenarioObject>().name;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
