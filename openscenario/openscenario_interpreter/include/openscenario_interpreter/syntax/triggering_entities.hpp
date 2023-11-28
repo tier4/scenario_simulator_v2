@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities_rule.hpp>
@@ -41,7 +42,7 @@ struct TriggeringEntities : private Scope
 {
   const TriggeringEntitiesRule triggering_entities_rule;
 
-  const std::list<EntityRef> entity_refs;
+  const std::list<Entity> entity_refs;
 
   template <typename Candidates>
   explicit TriggeringEntities(
@@ -49,7 +50,7 @@ struct TriggeringEntities : private Scope
   : Scope(scope),
     triggering_entities_rule(
       readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)),
-    entity_refs(readElements<EntityRef, 1>("EntityRef", node, scope, candidates))
+    entity_refs(readElements<Entity, 1>("EntityRef", node, scope, candidates))
   {
   }
 

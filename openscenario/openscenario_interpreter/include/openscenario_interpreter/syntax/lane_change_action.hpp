@@ -52,7 +52,7 @@ struct LaneChangeAction : private Scope,
 
   explicit LaneChangeAction(const pugi::xml_node &, Scope &);
 
-  std::unordered_map<String, Boolean> accomplishments;
+  std::unordered_map<Entity, Boolean> accomplishments;
 
   /*  */ auto accomplished() -> bool;
 

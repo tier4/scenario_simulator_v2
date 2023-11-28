@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <pugixml.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 
 namespace openscenario_interpreter
 {
@@ -33,7 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct RelativeTargetLane
 {
-  const String entity_ref;
+  const Entity entity_ref;
 
   const Integer value;
 

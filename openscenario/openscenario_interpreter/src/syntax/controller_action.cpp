@@ -30,9 +30,8 @@ ControllerAction::ControllerAction(const pugi::xml_node & node, Scope & scope)
 {
   // OpenSCENARIO 1.2 Table 11
   for (const auto & actor : actors) {
-    if (auto object_types = global().entities->objectTypes({actor});
-        object_types != std::set{ObjectType::vehicle} and
-        object_types != std::set{ObjectType::pedestrian}) {
+    if (auto object_types = actor.objectTypes(); object_types != std::set{ObjectType::vehicle} and
+                                                 object_types != std::set{ObjectType::pedestrian}) {
       THROW_SEMANTIC_ERROR(
         "Actors may be either of vehicle type or a pedestrian type;"
         "See OpenSCENARIO 1.2 Table 11 for more details");
@@ -54,8 +53,10 @@ auto ControllerAction::run() noexcept -> void {}
 
 auto ControllerAction::start() const -> void
 {
-  for (const auto & object : global().entities->objects(actors)) {
-    assign_controller_action(object);
+  for (const auto & actor : actors) {
+    for (const auto & object : actor.objects()) {
+      assign_controller_action(object);
+    }
   }
 }
 }  // namespace syntax

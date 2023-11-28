@@ -43,8 +43,10 @@ auto AcquirePositionAction::start() -> void
       return applyAcquirePositionAction(object, static_cast<NativeLanePosition>(position));
     });
 
-  for (const auto & object : global().entities->objects(actors)) {
-    apply<void>(acquire_position, position, object);
+  for (const auto & actor : actors) {
+    for (const auto & object : actor.objects()) {
+      apply<void>(acquire_position, position, object);
+    }
   }
 }
 }  // namespace syntax

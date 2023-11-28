@@ -34,9 +34,8 @@ LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
 {
   // OpenSCENARIO 1.2 Table 11
   for (const auto & actor : actors) {
-    if (auto object_types = global().entities->objectTypes({actor});
-        object_types != std::set{ObjectType::vehicle} and
-        object_types != std::set{ObjectType::pedestrian}) {
+    if (auto object_types = actor.objectTypes(); object_types != std::set{ObjectType::vehicle} and
+                                                 object_types != std::set{ObjectType::pedestrian}) {
       THROW_SEMANTIC_ERROR(
         "Actors may be either of vehicle type or a pedestrian type;"
         "See OpenSCENARIO 1.2 Table 11 for more details");
@@ -48,7 +47,7 @@ auto LaneChangeAction::accomplished() -> bool
 {
   return std::all_of(
     std::begin(accomplishments), std::end(accomplishments), [&](auto & accomplishment) {
-      auto objects = global().entities->objects({accomplishment.first});
+      auto objects = accomplishment.first.objects();
       return accomplishment.second or
              (accomplishment.second = not std::all_of(
                 std::begin(objects), std::end(objects),
@@ -69,7 +68,7 @@ auto LaneChangeAction::start() -> void
   }
 
   for (const auto & accomplishment : accomplishments) {
-    for (const auto & object : global().entities->objects({accomplishment.first})) {
+    for (const auto & object : accomplishment.first.objects()) {
       if (lane_change_target.is<AbsoluteTargetLane>()) {
         applyLaneChangeAction(
           object, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),

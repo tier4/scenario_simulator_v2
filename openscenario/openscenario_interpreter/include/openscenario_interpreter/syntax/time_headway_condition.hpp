@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -45,7 +46,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct TimeHeadwayCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
-  const String entity_ref;
+  const Entity entity_ref;
 
   const Double value;
 

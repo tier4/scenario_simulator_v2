@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_action.hpp>
 
 namespace openscenario_interpreter
@@ -29,7 +30,7 @@ EntityAction::EntityAction(const pugi::xml_node & node, Scope & scope)
       std::make_pair(   "AddEntityAction", [&](auto && node) { return make<   AddEntityAction>(node, scope); }),
       std::make_pair("DeleteEntityAction", [&](auto && node) { return make<DeleteEntityAction>(node, scope); }))),
   Scope(scope),
-  entity_ref(readNameRef("entityRef", node, scope, scope.entities(true)))
+  entity_ref(readNameRef("entityRef", node, scope, scope.entities(true)), scope)
 // clang-format on
 {
 }
@@ -42,7 +43,7 @@ auto EntityAction::run() noexcept -> void {}
 
 auto EntityAction::start() const -> void
 {
-  for (const auto & entity : global().entities->objects({entity_ref})) {
+  for (const auto & entity : entity_ref.objects()) {
     apply<void>([&](auto && action) { action(entity); }, *this);
   }
 }

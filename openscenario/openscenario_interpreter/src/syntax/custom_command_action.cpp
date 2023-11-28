@@ -180,8 +180,10 @@ struct ApplyWalkStraightAction : public CustomCommand, private SimulatorCore::Ac
       applyWalkStraightAction(actor);
     }
 
-    for (const auto & object : scope.global().entities->objects(scope.actors)) {
-      applyWalkStraightAction(object);
+    for (const auto & actor : scope.actors) {
+      for (const auto & object : actor.objects()) {
+        applyWalkStraightAction(object);
+      }
     }
   };
 };

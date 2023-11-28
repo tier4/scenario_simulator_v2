@@ -36,12 +36,12 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Entity::Entity(const EntityRef & entity_ref, const Scope & scope)
-: Entity(entity_ref, scope.global().entities)
+: Entity(entity_ref, *scope.global().entities)
 {
 }
 
-Entity::Entity(const EntityRef & entity_ref, const Entities * entities)
-: Object(entities->ref(entity_ref))
+Entity::Entity(const EntityRef & entity_ref, const Entities & entities)
+: Object(entity_ref.empty() ? Object{} : entities.ref(entity_ref))
 {
 }
 

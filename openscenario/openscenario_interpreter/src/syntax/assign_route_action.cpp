@@ -36,9 +36,8 @@ AssignRouteAction::AssignRouteAction(const pugi::xml_node & node, Scope & scope)
 {
   // OpenSCENARIO 1.2 Table 11
   for (const auto & actor : actors) {
-    if (auto object_types = global().entities->objectTypes({actor});
-        object_types != std::set{ObjectType::vehicle} and
-        object_types != std::set{ObjectType::pedestrian}) {
+    if (auto object_types = actor.objectTypes(); object_types != std::set{ObjectType::vehicle} and
+                                                 object_types != std::set{ObjectType::pedestrian}) {
       THROW_SEMANTIC_ERROR(
         "Actors may be either of vehicle type or a pedestrian type;"
         "See OpenSCENARIO 1.2 Table 11 for more details");
@@ -54,9 +53,11 @@ auto AssignRouteAction::run() -> void {}
 
 auto AssignRouteAction::start() -> void
 {
-  for (const auto & object : global().entities->objects(actors)) {
-    applyAssignRouteAction(
-      object, static_cast<std::vector<NativeLanePosition>>(route.as<const Route>()));
+  for (const auto & actor : actors) {
+    for (const auto & object : actor.objects()) {
+      applyAssignRouteAction(
+        object, static_cast<std::vector<NativeLanePosition>>(route.as<const Route>()));
+    }
   }
 }
 }  // namespace syntax

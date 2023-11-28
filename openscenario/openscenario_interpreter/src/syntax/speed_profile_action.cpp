@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
@@ -33,7 +34,7 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
   // for `SpeedProfileAction.entityRef`. It seems `EntitySelection` can be used only when
   // it is the subject of any actions or conditions, so I left default allowance of entities
   // and `EntitySelection` is not allowed here.
-  entity_ref(readNameRef("entityRef", node, scope, scope.entities(), String())),
+  entity_ref(readNameRef("entityRef", node, scope, scope.entities(), String()), scope),
   following_mode(readAttribute<FollowingMode>("followingMode", node, scope)),
   dynamic_constraints(
     readElement<DynamicConstraints>("DynamicConstraints", node, scope, DynamicConstraints())),
@@ -41,9 +42,8 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
 {
   // OpenSCENARIO 1.2 Table 11
   for (const auto & actor : actors) {
-    if (auto object_types = global().entities->objectTypes({actor});
-        object_types != std::set{ObjectType::vehicle} and
-        object_types != std::set{ObjectType::pedestrian}) {
+    if (auto object_types = actor.objectTypes(); object_types != std::set{ObjectType::vehicle} and
+                                                 object_types != std::set{ObjectType::pedestrian}) {
       THROW_SEMANTIC_ERROR(
         "Actors may be either of vehicle type or a pedestrian type;"
         "See OpenSCENARIO 1.2 Table 11 for more details");
@@ -52,7 +52,7 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
 }
 
 auto SpeedProfileAction::apply(
-  const EntityRef & actor, const SpeedProfileEntry & speed_profile_entry) -> void
+  const Entity & actor, const SpeedProfileEntry & speed_profile_entry) -> void
 {
   auto absolute_target_speed = [&]() { return speed_profile_entry.speed; };
 
@@ -91,10 +91,10 @@ auto SpeedProfileAction::apply(
     }
   };
 
-  for (const auto & object : global().entities->objects({actor})) {
+  for (const auto & object : actor.objects()) {
     applyProfileAction(object, dynamic_constraints);
 
-    if (entity_ref.empty()) {
+    if (entity_ref) {
       applySpeedAction(
         object, absolute_target_speed(), transition(), constraint(),
         std::isnan(speed_profile_entry.time));
@@ -121,9 +121,9 @@ auto SpeedProfileAction::run() -> void
 {
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-      auto objects = global().entities->objects({actor});
+      auto objects = actor.objects();
       return std::all_of(std::begin(objects), std::end(objects), [&](const auto & object) {
-        if (entity_ref.empty()) {
+        if (entity_ref) {
           return equal_to<double>()(evaluateSpeed(object), speed_profile_entry.speed);
         } else {
           return equal_to<double>()(

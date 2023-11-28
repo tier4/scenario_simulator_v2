@@ -112,7 +112,9 @@ auto FollowTrajectoryAction::start() -> void
     parameter->closed = trajectory_ref.trajectory.as<Trajectory>().closed;
     parameter->shape = repack_trajectory();
 
-    applyFollowTrajectoryAction(actor, parameter);
+    for (auto & object : actor.objects()) {
+      applyFollowTrajectoryAction(object, parameter);
+    }
   }
 }
 }  // namespace syntax

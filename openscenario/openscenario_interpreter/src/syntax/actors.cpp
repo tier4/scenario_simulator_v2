@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/actors.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 
 namespace openscenario_interpreter
@@ -26,7 +27,7 @@ Actors::Actors(const pugi::xml_node & node, Scope & scope)
     readAttribute<Boolean>("selectTriggeringEntities", node, scope, Boolean()))
 {
   traverse<0, unbounded>(node, "EntityRef", [&](auto && node) {
-    scope.actors.push_back(EntityRef(node, scope, scope.entities(true)));
+    scope.actors.emplace_back(node, scope, scope.entities(true));
   });
 }
 }  // namespace syntax

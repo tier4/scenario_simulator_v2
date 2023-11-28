@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter
@@ -55,7 +56,7 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   /*
      Reference entity.
   */
-  const String entity_ref;
+  const Entity entity_ref;
 
   /*
      True: distance is measured between closest bounding box points.

@@ -35,6 +35,8 @@ struct Entities;
 
 struct Entity : public Object
 {
+  Entity() = default;
+
   template <typename Candidates>
   explicit Entity(const pugi::xml_node & node, Scope & scope, const Candidates & candidates)
   : Entity(EntityRef{node, scope, candidates}, scope)
@@ -43,7 +45,7 @@ struct Entity : public Object
 
   explicit Entity(const EntityRef & entity_ref, const Scope & scope);
 
-  explicit Entity(const EntityRef & entity_ref, const Entities * entities);
+  explicit Entity(const EntityRef & entity_ref, const Entities & entities);
 
   auto objects() const -> std::set<EntityRef>;
 
