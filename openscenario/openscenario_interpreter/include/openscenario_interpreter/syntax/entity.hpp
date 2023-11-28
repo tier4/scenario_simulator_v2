@@ -15,9 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_HPP_
 
-#include <functional>
-#include <iterator>
-#include <numeric>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
@@ -25,13 +22,9 @@
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 #include <set>
-#include <type_traits>
-#include <vector>
 
 namespace openscenario_interpreter
 {
-class Scope;
-
 inline namespace syntax
 {
 struct Entities;
