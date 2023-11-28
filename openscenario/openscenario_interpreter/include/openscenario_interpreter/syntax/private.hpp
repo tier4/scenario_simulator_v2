@@ -17,8 +17,8 @@
 
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/private_action.hpp>
 #include <openscenario_interpreter/syntax/entity.hpp>
+#include <openscenario_interpreter/syntax/private_action.hpp>
 #include <pugixml.hpp>
 
 namespace openscenario_interpreter

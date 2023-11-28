@@ -16,9 +16,9 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <pugixml.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
-#include <openscenario_interpreter/syntax/entity.hpp>
 
 namespace openscenario_interpreter
 {
