@@ -210,7 +210,6 @@ private:
     return std::make_pair(curve_id, curve_tangent);
   }
 };  // class CombinedCurve
-
 }  // namespace map_fragment
 
 #endif  // MAP_FRAGMENT__PARAMETRIC_CURVE__HPP_

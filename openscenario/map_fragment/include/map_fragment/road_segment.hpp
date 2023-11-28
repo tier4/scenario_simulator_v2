@@ -144,7 +144,6 @@ auto makeCurvedRoadSegment(
 
   return RoadSegment(guide_curve, cross_section_description);
 }
-
 }  // namespace map_fragment
 
 #endif  // MAP_FRAGMENT__ROAD_SEGMENT__HPP_

@@ -128,7 +128,6 @@ auto applyTransformationToVector(const Vector & vector, const Transformation & t
 {
   return transformation.rotation() * vector;
 }
-
 }  // namespace map_fragment
 
 #endif  // MAP_FRAGMENT__GEOMETRY_UTILITIES__HPP_
