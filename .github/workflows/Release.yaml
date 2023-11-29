@@ -3,8 +3,8 @@ on:
   pull_request:
     branches:
       - master
-    # types:
-    #   - closed
+    types:
+      - closed
 
 jobs:
   release:
@@ -45,9 +45,9 @@ jobs:
           catkin_generate_changelog -y
           catkin_tag_changelog --bump majar
           catkin_package_version --bump majar
-      # - name: commit changes
-      #   run: |
-      #     git add .
-      #     git commit -m "bump version of scenario_simulator_v2."
-      #     git push
-      #   working-directory: scenario_simulator_v2
+      - name: commit changes
+        run: |
+          git add .
+          git commit -m "bump version of scenario_simulator_v2."
+          git push
+        working-directory: scenario_simulator_v2
