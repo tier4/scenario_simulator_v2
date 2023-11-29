@@ -24,24 +24,25 @@ jobs:
         run: |
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
+          git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
       - name: update patch version
         if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
-          catkin_generate_changelog
+          catkin_generate_changelog -y --all
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
       - name: update minor version
         if: contains(github.event.pull_request.labels.*.name, 'bump minor')
         run: |
-          catkin_generate_changelog
+          ccatkin_generate_changelog -y --all
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
       - name: update majar version
         if: contains(github.event.pull_request.labels.*.name, 'bump majar')
         run: |
-          catkin_generate_changelog
+          catkin_generate_changelog -y --all
           catkin_tag_changelog --bump majar
           catkin_package_version --bump majar
       # - name: commit changes
