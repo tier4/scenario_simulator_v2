@@ -14,7 +14,7 @@ jobs:
     container: ros:humble
     steps:
       - name: install bloom
-        run: apt update && apt install python3-bloom
+        run: apt update && apt install -y python3-bloom
       - name: checkout
         uses: actions/checkout@v2
         with:
