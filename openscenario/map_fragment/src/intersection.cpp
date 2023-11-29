@@ -25,6 +25,17 @@ const uint64_t NUMBER_OF_LANES_ANY_DIRECTION = 2;
 const uint64_t NUMBER_OF_LANES_STRAIGHT_OR_RIGHT = 0;
 const uint64_t NUMBER_OF_LANES_RIGHT = 0;
 
+enum IntersectionLeg { LEFT_LEG = 0, BOTTOM_LEG = 1, RIGHT_LEG = 2, TOP_LEG = 3 };
+
+auto getLegOrientation(IntersectionLeg leg) -> double { return leg * M_PI_2; }
+
+enum ConnectionType { LEFT_TURN = -1, FORWARD = 2, RIGHT_TURN = 1 };
+
+auto getConnectedLeg(IntersectionLeg leg, ConnectionType connection_type) -> IntersectionLeg
+{
+  return static_cast<IntersectionLeg>(((leg + connection_type) + 4) % 4);
+}
+
 auto main(const int argc, char const * const * const argv) -> int
 try {
   using namespace map_fragment;
@@ -63,28 +74,40 @@ try {
     NUMBER_OF_LANES_LEFT + NUMBER_OF_LANES_LEFT_OR_STRAIGHT + NUMBER_OF_LANES_STRAIGHT +
     NUMBER_OF_LANES_ANY_DIRECTION + NUMBER_OF_LANES_STRAIGHT_OR_RIGHT + NUMBER_OF_LANES_RIGHT;
 
+  const IntersectionLeg intersection_legs[] = {LEFT_LEG, BOTTOM_LEG, RIGHT_LEG, TOP_LEG};
+
   /*
-   * For each intersection leg...
+   * Create road segments for each leg adjacent to the intersection
    */
-  for (auto i = 0; i < 4; i++) {
+  std::map<IntersectionLeg, RoadSegment::ConstSharedPointer> leg_segments;
+  for (const auto leg : intersection_legs) {
     const auto leg_cross_section_description =
       RoadCrossSectionDescription(2 * total_number_of_lanes_per_leg_per_direction, lane_width);
 
-    const auto leg_transformation =
-      chainTransformations(makeTranslation(-turn_radius, 0, 0), makeRotationInZAxis(i * M_PI_2));
+    const auto leg_transformation = chainTransformations(
+      makeTranslation(-(turn_radius + leg_length), 0, 0),
+      makeRotationInZAxis(getLegOrientation(leg)));
 
-    /*
-     * 1) Create road segment for the leg (adjacent to the intersection)
-     */
+    const auto leg_guide_curve =
+      transformCurve(std::make_shared<Straight>(leg_length), leg_transformation);
 
-    const auto leg_guide_curve = transformCurve(
-      std::make_shared<Straight>(leg_length),
-      chainTransformations(makeTranslation(-leg_length, 0, 0), leg_transformation));
+    leg_segments[leg] =
+      std::make_shared<RoadSegment>(leg_guide_curve, leg_cross_section_description);
 
     road_segments.emplace_back(leg_guide_curve, leg_cross_section_description);
+  }
+
+  /*
+   * For each intersection leg...
+   */
+  for (const auto leg : intersection_legs) {
+    const auto leg_segment = leg_segments[leg];
+
+    const auto leg_boundary_transformation = chainTransformations(
+      makeTranslation(-turn_radius, 0, 0), makeRotationInZAxis(getLegOrientation(leg)));
 
     /*
-     * 2) Create connecting road segment for left-turning lanelets
+     * 1) Create connecting road segment for left-turning lanelets
      */
 
     const auto total_number_of_lanes_turning_left =
@@ -92,16 +115,18 @@ try {
 
     const auto [left_turn_cross_section_description, left_turn_lateral_offset] =
       generateSliceOfCrossSectionAndCalculateLateralOffset(
-        leg_cross_section_description, 0, total_number_of_lanes_turning_left);
+        leg_segment->cross_section_description, 0, total_number_of_lanes_turning_left);
 
     const auto left_turn_guide_curve = transformCurve(
       shiftCurveLaterally(std::make_shared<Arc>(turn_radius, M_PI_2), left_turn_lateral_offset),
-      leg_transformation);
+      leg_boundary_transformation);
 
     road_segments.emplace_back(left_turn_guide_curve, left_turn_cross_section_description);
 
+    // TODO connections
+
     /*
-     * 3) Create connecting road segment for straight-going lanelets
+     * 2) Create connecting road segment for straight-going lanelets
      */
 
     const auto index_of_first_straight_going_lane = NUMBER_OF_LANES_LEFT;
@@ -112,17 +137,19 @@ try {
 
     const auto [straight_cross_section_description, straight_lateral_offset] =
       generateSliceOfCrossSectionAndCalculateLateralOffset(
-        leg_cross_section_description, index_of_first_straight_going_lane,
+        leg_segment->cross_section_description, index_of_first_straight_going_lane,
         total_number_of_lanes_going_straight);
 
     const auto straight_guide_curve = transformCurve(
       shiftCurveLaterally(std::make_shared<Straight>(2 * turn_radius), straight_lateral_offset),
-      leg_transformation);
+      leg_boundary_transformation);
 
     road_segments.emplace_back(straight_guide_curve, straight_cross_section_description);
 
+    // TODO connections
+
     /*
-     * 4) Create connecting road segment for right-turning lanelets
+     * 3) Create connecting road segment for right-turning lanelets
      */
 
     const auto index_of_first_right_turning_lane =  //
@@ -134,14 +161,16 @@ try {
 
     const auto [right_turn_cross_section_description, right_turn_lateral_offset] =
       generateSliceOfCrossSectionAndCalculateLateralOffset(
-        leg_cross_section_description, index_of_first_right_turning_lane,
+        leg_segment->cross_section_description, index_of_first_right_turning_lane,
         total_number_of_lanes_turning_right);
 
     const auto right_turn_guide_curve = transformCurve(
       shiftCurveLaterally(std::make_shared<Arc>(turn_radius, -M_PI_2), right_turn_lateral_offset),
-      leg_transformation);
+      leg_boundary_transformation);
 
     road_segments.emplace_back(right_turn_guide_curve, right_turn_cross_section_description);
+
+    // TODO connections
   }
 
   lanelet::Lanelets lanelets;

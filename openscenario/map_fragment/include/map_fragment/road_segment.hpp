@@ -89,6 +89,8 @@ public:
 class RoadSegment
 {
 public:
+  using ConstSharedPointer = std::shared_ptr<const RoadSegment>;
+
   const ParametricCurve::ConstSharedPointer guide_curve;
 
   const RoadCrossSectionDescription cross_section_description;
