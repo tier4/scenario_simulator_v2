@@ -30,19 +30,19 @@ jobs:
       - name: update patch version
         if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
-          catkin_generate_changelog -y --all
+          catkin_generate_changelog -y
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
       - name: update minor version
         if: contains(github.event.pull_request.labels.*.name, 'bump minor')
         run: |
-          ccatkin_generate_changelog -y --all
+          ccatkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
       - name: update majar version
         if: contains(github.event.pull_request.labels.*.name, 'bump majar')
         run: |
-          catkin_generate_changelog -y --all
+          catkin_generate_changelog -y
           catkin_tag_changelog --bump majar
           catkin_package_version --bump majar
       # - name: commit changes
