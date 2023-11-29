@@ -24,6 +24,8 @@ jobs:
         run: |
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: update patch version
         if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
@@ -36,8 +38,6 @@ jobs:
           catkin_generate_changelog
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
       - name: update majar version
         if: contains(github.event.pull_request.labels.*.name, 'bump majar')
         run: |
