@@ -22,14 +22,66 @@
 
 namespace map_fragment
 {
-inline auto print = [](auto && x) -> std::ostream & {
-  return std::cout << std::forward<decltype(x)>(x) << std::endl;
+auto print(std::ostream & os, const lanelet::ConstLanelet & lanelet) -> auto &
+{
+  return os << lanelet.id();
+}
+
+auto print(std::ostream & os, const lanelet::Lanelets & lanelets) -> auto &
+{
+  for (auto && lanelet : lanelets) {
+    print(os, lanelet) << std::endl;
+  }
+  return os;
+}
+
+auto print(std::ostream & os, const lanelet::ConstLanelets & lanelets) -> auto &
+{
+  for (auto && lanelet : lanelets) {
+    print(os, lanelet) << std::endl;
+  }
+  return os;
+}
+
+auto print(std::ostream & os, const lanelet::routing::LaneletPath & path) -> auto &
+{
+  os << "[";
+  for (auto && lanelet : path) {
+    print(os, lanelet) << (&lanelet != &path.back() ? ", " : "]");
+  }
+  return os;
+}
+
+auto print(std::ostream & os, const lanelet::routing::LaneletPaths & paths) -> auto &
+{
+  for (auto && path : paths) {
+    print(os, path) << std::endl;
+  }
+  return os;
+}
+
+inline auto default_print = [](auto && x) -> std::ostream & {
+  return print(std::cout, std::forward<decltype(x)>(x)) << std::endl;
 };
 
-template <typename Node, typename Comparator = std::less<void>, typename Receiver = decltype(print)>
+auto operator<(const lanelet::ConstLanelet & a, const lanelet::ConstLanelet & b)
+{
+  return a.id() < b.id();
+}
+
+auto operator<(const lanelet::routing::LaneletPath & a, const lanelet::routing::LaneletPath & b)
+{
+  return std::lexicographical_compare(
+    a.begin(), a.end(), b.begin(), b.end(), [](auto && a, auto && b) { return a < b; });
+}
+
+inline auto less = [](auto && x, auto && y) { return x < y; };
+
+template <
+  typename Node, typename Comparator = decltype(less), typename Receiver = decltype(default_print)>
 auto loadBasicSelector(
   const Node & node, const std::string & prefix = "", const std::string & suffix = "",
-  Receiver receive = print, Comparator compare = {})
+  Receiver receive = default_print, Comparator compare = less)
 {
   const auto select = node.has_parameter(prefix + "select" + suffix)
                         ? node.get_parameter(prefix + "select" + suffix).as_string()
@@ -45,42 +97,46 @@ auto loadBasicSelector(
 
       auto shuffle = [&](auto && value_swappables) {
         auto device = std::random_device();
-        auto engine = std::mt19937(device());
+        auto engine = std::default_random_engine(device());
         std::shuffle(value_swappables.begin(), value_swappables.end(), engine);
       };
-
-      auto receive_for_each_of = [&](auto && iterable) {
-        for (auto && each : iterable) {
-          receive(std::forward<decltype(each)>(each));
-        }
-      };
-
-      auto receive_first_of = [&](auto && sequence) { receive(sequence.front()); };
-
-      auto receive_last_of = [&](auto && sequence) { receive(sequence.back()); };
 
       if (select == "all") {
         if constexpr (std::is_const_v<decltype(results)>) {
           auto copy_of_results = results;
           sort(copy_of_results);
-          receive_for_each_of(copy_of_results);
+          receive(copy_of_results);
         } else {
-          shuffle(results);
-          receive_for_each_of(results);
+          sort(results);
+          receive(results);
         }
       } else if (select == "any") {
         if constexpr (std::is_const_v<decltype(results)>) {
           auto copy_of_results = results;
           shuffle(copy_of_results);
-          receive_first_of(copy_of_results);
+          receive(copy_of_results.front());
         } else {
           shuffle(results);
-          receive_first_of(results);
+          receive(results.front());
         }
       } else if (select == "first") {
-        receive_first_of(results);
+        if constexpr (std::is_const_v<decltype(results)>) {
+          auto copy = results;
+          sort(copy);
+          receive(copy.front());
+        } else {
+          sort(results);
+          receive(results.front());
+        }
       } else if (select == "last") {
-        receive_last_of(results);
+        if constexpr (std::is_const_v<decltype(results)>) {
+          auto copy = results;
+          sort(copy);
+          receive(copy.back());
+        } else {
+          sort(results);
+          receive(results.back());
+        }
       } else {
         std::stringstream what;
         what << "There are " << results.size() << " candidates that satisfy the constraints.";
@@ -94,39 +150,20 @@ auto loadBasicSelector(
   };
 }
 
-inline auto compare_lanelet_id = [](const auto & a, const auto & b) { return a.id() < b.id(); };
-
-inline auto print_lanelet_id = [](const auto & lanelet) -> std::ostream & {
-  return std::cout << lanelet.id() << std::endl;
-};
-
 template <
-  typename Node, typename Receiver = decltype(print_lanelet_id),
-  typename Comparator = decltype(compare_lanelet_id)>
+  typename Node, typename Receiver = decltype(default_print), typename Comparator = decltype(less)>
 auto loadLaneletSelector(
   const Node & node, const std::string & prefix = "", const std::string & suffix = "",
-  Receiver receive = print_lanelet_id, Comparator compare = compare_lanelet_id)
+  Receiver receive = default_print, Comparator compare = less)
 {
   return loadBasicSelector(node, prefix, suffix, receive, compare);
 }
 
-inline auto compare_lanelet_path = [](const auto & a, const auto & b) {
-  return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), compare_lanelet_id);
-};
-
-inline auto print_lanelet_path = [](const auto & lanelet_path) -> std::ostream & {
-  for (auto && lanelet : lanelet_path) {
-    std::cout << lanelet.id() << " ";
-  }
-  return std::cout << std::endl;
-};
-
 template <
-  typename Node, typename Receiver = decltype(print_lanelet_path),
-  typename Comparator = decltype(compare_lanelet_path)>
+  typename Node, typename Receiver = decltype(default_print), typename Comparator = decltype(less)>
 auto loadLaneletPathSelector(
   const Node & node, const std::string & prefix = "", const std::string & suffix = "",
-  Receiver receive = print_lanelet_path, Comparator compare = compare_lanelet_path)
+  Receiver receive = default_print, Comparator compare = less)
 {
   return loadBasicSelector(node, prefix, suffix, receive, compare);
 }

@@ -66,16 +66,9 @@ try {
       });
     };
 
-  node.declare_parameter("select_path", "any");
-  node.declare_parameter("select_lanelet", "last");
+  node.declare_parameter("select", "any");
 
-  auto select = loadLaneletPathSelector(node, "", "_path", [&](auto && path) {
-    std::cerr << "select lanelet from path [";
-    for (auto && lanelet : path) {
-      std::cerr << lanelet.id() << (&lanelet != &path.back() ? " " : "] => ");
-    }
-    return std::invoke(loadLaneletSelector(node, "", "_lanelet"), path);
-  });
+  auto select = loadLaneletPathSelector(node);
 
   // clang-format off
   lanelet_map->laneletLayer | curry2(filter)(satisfy_first_lanelet_constraints)

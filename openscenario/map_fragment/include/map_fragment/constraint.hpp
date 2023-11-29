@@ -35,7 +35,7 @@ auto isRightmost(
   const lanelet::LaneletMap & map, const lanelet::routing::RoutingGraph & graph,
   const lanelet::ConstLanelet & lanelet)
 {
-  auto relations = graph.rightRelations(lanelet);
+  const auto relations = graph.rightRelations(lanelet);
 
   return relations.empty() or
          std::any_of(relations.begin(), relations.end(), [&](const auto & relation) {

@@ -30,25 +30,26 @@ OpenSCENARIO:
       - name: map_path
         parameterType: string
         value: $(ros2 pkg prefix --share kashiwanoha_map)/map
-      - name: ego_start_lanelet_id
+      - name: ego_path
         parameterType: string
         value: $(ros2 run map_fragment path --ros-args
-          -p first_lanelet_centerline_curvature_less_than:=0.001
           -p ignore_errors_ocurred_while_parsing_lanelet_map:=true
           -p input_directory:=$(var map_path)
           -p path_element_limit:=3
           -p path_excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped:=traffic_light
-          -p select_lanelet:=first
+          -p select:=any
+          )
+      - name: ego_start_lanelet_id
+        parameterType: string
+        value: $(ros2 run map_fragment select_lanelet_from_path --ros-args
+          -p input:='$(var ego_path)'
+          -p index:=0
           )
       - name: ego_goal_lanelet_id
         parameterType: string
-        value: $(ros2 run map_fragment path --ros-args
-          -p first_lanelet_id:=$(var ego_start_lanelet_id)
-          -p ignore_errors_ocurred_while_parsing_lanelet_map:=true
-          -p input_directory:=$(var map_path)
-          -p path_element_limit:=3
-          -p path_excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped:=traffic_light
-          -p select_lanelet:=last
+        value: $(ros2 run map_fragment select_lanelet_from_path --ros-args
+          -p input:='$(var ego_path)'
+          -p index:=2
           )
   CatalogLocations:
     VehicleCatalog:
