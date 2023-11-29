@@ -22,8 +22,8 @@ jobs:
       - run: ls -a
       - name: Setup git user
         run: |
-          git config user.name  "Release Bot"
-          git config user.email "action@github.com"
+          git config --global user.name  "Release Bot"
+          git config --global user.email "action@github.com"
       - name: update patch version
         if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
