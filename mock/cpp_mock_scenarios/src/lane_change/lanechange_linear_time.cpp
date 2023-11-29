@@ -50,7 +50,6 @@ private:
       if (const double step_time = 50e-3, expected_time = 20.0,
           real_time = static_cast<double>(lanechange_frames) * step_time;
           expected_time - step_time <= real_time && real_time <= expected_time + step_time) {
-        // if (static_cast<double>(lanechange_frames) * 0.05 == 20.0) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
