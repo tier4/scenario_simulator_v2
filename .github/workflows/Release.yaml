@@ -11,6 +11,7 @@ jobs:
     name: Release
     runs-on: ubuntu-22.04
     timeout-minutes: 10
+    container: ros:humble
     steps:
       - name: checkout
         uses: actions/checkout@v2
