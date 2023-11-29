@@ -24,28 +24,24 @@ jobs:
         run: |
           git config user.name  "Release Bot"
           git config user.email "action@github.com"
-        working-directory: scenario_simulator_v2
       - name: update patch version
         if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
           catkin_generate_changelog
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
-        working-directory: scenario_simulator_v2
       - name: update minor version
         if: contains(github.event.pull_request.labels.*.name, 'bump minor')
         run: |
           catkin_generate_changelog
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
-        working-directory: scenario_simulator_v2
       - name: update majar version
         if: contains(github.event.pull_request.labels.*.name, 'bump majar')
         run: |
           catkin_generate_changelog
           catkin_tag_changelog --bump majar
           catkin_package_version --bump majar
-        working-directory: scenario_simulator_v2
       # - name: commit changes
       #   run: |
       #     git add .
