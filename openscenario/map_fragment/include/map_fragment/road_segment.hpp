@@ -102,6 +102,8 @@ public:
   {
   }
 
+  explicit RoadSegment(const RoadSegment &) = delete;
+
   /**
    * Get lanelets which compose the road segment, left to right
    */

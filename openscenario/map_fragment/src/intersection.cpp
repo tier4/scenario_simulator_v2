@@ -69,7 +69,7 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  std::vector<RoadSegment> road_segments;
+  std::vector<RoadSegment::ConstPointer> road_segments;
   auto total_number_of_lanes_per_leg_per_direction =
     NUMBER_OF_LANES_LEFT + NUMBER_OF_LANES_LEFT_OR_STRAIGHT + NUMBER_OF_LANES_STRAIGHT +
     NUMBER_OF_LANES_ANY_DIRECTION + NUMBER_OF_LANES_STRAIGHT_OR_RIGHT + NUMBER_OF_LANES_RIGHT;
@@ -91,10 +91,11 @@ try {
     const auto leg_guide_curve =
       transformCurve(std::make_shared<Straight>(leg_length), leg_transformation);
 
-    leg_segments[leg] =
+    const auto leg_segment =
       std::make_shared<RoadSegment>(leg_guide_curve, leg_cross_section_description);
 
-    road_segments.emplace_back(leg_guide_curve, leg_cross_section_description);
+    leg_segments[leg] = leg_segment;
+    road_segments.push_back(leg_segment);
   }
 
   /*
@@ -121,7 +122,9 @@ try {
       shiftCurveLaterally(std::make_shared<Arc>(turn_radius, M_PI_2), left_turn_lateral_offset),
       leg_boundary_transformation);
 
-    road_segments.emplace_back(left_turn_guide_curve, left_turn_cross_section_description);
+    const auto left_turn_road_segment =
+      std::make_shared<RoadSegment>(left_turn_guide_curve, left_turn_cross_section_description);
+    road_segments.push_back(left_turn_road_segment);
 
     // TODO connections
 
@@ -144,7 +147,9 @@ try {
       shiftCurveLaterally(std::make_shared<Straight>(2 * turn_radius), straight_lateral_offset),
       leg_boundary_transformation);
 
-    road_segments.emplace_back(straight_guide_curve, straight_cross_section_description);
+    const auto straight_road_segment =
+      std::make_shared<RoadSegment>(straight_guide_curve, straight_cross_section_description);
+    road_segments.push_back(straight_road_segment);
 
     // TODO connections
 
@@ -168,14 +173,16 @@ try {
       shiftCurveLaterally(std::make_shared<Arc>(turn_radius, -M_PI_2), right_turn_lateral_offset),
       leg_boundary_transformation);
 
-    road_segments.emplace_back(right_turn_guide_curve, right_turn_cross_section_description);
+    const auto right_turn_road_segment =
+      std::make_shared<RoadSegment>(right_turn_guide_curve, right_turn_cross_section_description);
+    road_segments.push_back(right_turn_road_segment);
 
     // TODO connections
   }
 
   lanelet::Lanelets lanelets;
   for (auto & road_segment : road_segments) {
-    const auto road_segment_lanelets = road_segment.getLanelets(resolution);
+    const auto road_segment_lanelets = road_segment->getLanelets(resolution);
 
     lanelets.insert(lanelets.end(), road_segment_lanelets.begin(), road_segment_lanelets.end());
   }
