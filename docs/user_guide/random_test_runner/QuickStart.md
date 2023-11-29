@@ -1,6 +1,6 @@
 # Random test runner
 
-Random test runner allows running randomly generated scenarios to test autoware autonomy implementation.
+Random test runner allows running randomly generated scenarios to test Autoware autonomy implementation.
 
 ## How to build
 
