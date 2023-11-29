@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
+        with:
+          ref: tmp/master
       - name: update patch version
         if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
@@ -32,3 +34,11 @@ jobs:
           catkin_generate_changelog
           catkin_tag_changelog --bump majar
           catkin_package_version --bump majar
+      - name: commit changes
+        run: |
+          date > generated.txt
+          git config user.name  "Release Bot"
+          git config user.email "action@github.com"
+          git add .
+          git commit -m "bump version of scenario_simulator_v2."
+          git push
