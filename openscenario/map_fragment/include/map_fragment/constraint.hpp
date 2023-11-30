@@ -275,6 +275,24 @@ auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = 
     }
   }
 
+  if (const auto name = prefix + "excluded_both_ends_conflicts_with"; node.has_parameter(name)) {
+    if (const auto id = node.get_parameter(name).as_int(); id) {
+      constraints.emplace(name, [id](auto && path, auto && map, auto && graph) {
+        if (const auto found = map.laneletLayer.find(id); found != map.laneletLayer.end()) {
+          const auto conflicting = graph.conflicting(*found);
+          return 2 < path.size() and
+                 std::any_of(
+                   std::next(path.begin()), std::prev(path.end()), [&](auto && path_element) {
+                     return std::find(conflicting.begin(), conflicting.end(), path_element) !=
+                            conflicting.end();
+                   });
+        } else {
+          return false;
+        }
+      });
+    }
+  }
+
   if (const auto name = prefix + "includes_lanelet_related_to_regulatory_element_subtyped";
       node.has_parameter(name)) {
     if (const auto subtype = node.get_parameter(name).as_string(); not subtype.empty()) {
@@ -324,6 +342,11 @@ auto loadAllLaneletPathConstraints(Node & node, const std::string & prefix = "")
   if (const auto name = prefix + "is_allowed_to_contain_duplicate_lanelet_ids";
       not node.has_parameter(name)) {
     node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "excluded_both_ends_conflicts_with";
+      not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
   }
 
   if (const auto name = prefix + "includes_lanelet_related_to_regulatory_element_subtyped";

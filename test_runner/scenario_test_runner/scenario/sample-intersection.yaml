@@ -51,6 +51,34 @@ OpenSCENARIO:
           -p input:='$(var ego_path)'
           -p index:=2
           )
+      - name: curve_id
+        parameterType: string
+        value: $(ros2 run map_fragment select_lanelet_from_path --ros-args
+          -p input:='$(var ego_path)'
+          -p index:=1
+          )
+      - name: vehicle1_path
+        parameterType: string
+        value: $(ros2 run map_fragment path --ros-args
+          -p first_lanelet_id_is_not_equal_to:=$(var ego_start_lanelet_id)
+          -p ignore_errors_ocurred_while_parsing_lanelet_map:=true
+          -p input_directory:=$(var map_path)
+          -p path_element_limit:=3
+          -p path_excluded_both_ends_conflicts_with:=$(var curve_id)
+          -p select:=any
+          )
+      - name: vehicle1_start_lanelet_id
+        parameterType: string
+        value: $(ros2 run map_fragment select_lanelet_from_path --ros-args
+          -p input:='$(var vehicle1_path)'
+          -p index:=0
+          )
+      - name: vehicle1_goal_lanelet_id
+        parameterType: string
+        value: $(ros2 run map_fragment select_lanelet_from_path --ros-args
+          -p input:='$(var vehicle1_path)'
+          -p index:=2
+          )
   CatalogLocations:
     VehicleCatalog:
       Directory:
@@ -73,6 +101,15 @@ OpenSCENARIO:
               Property:
                 - name: isEgo
                   value: 'true'
+      - name: vehicle1
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
   Storyboard:
     Init:
       Actions:
@@ -97,6 +134,33 @@ OpenSCENARIO:
                       LanePosition:
                         roadId: ''
                         laneId: $ego_goal_lanelet_id
+                        s: 10
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+          - entityRef: vehicle1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: $vehicle1_start_lanelet_id
+                      s: 1
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: $vehicle1_goal_lanelet_id
                         s: 10
                         offset: 0
                         Orientation:
