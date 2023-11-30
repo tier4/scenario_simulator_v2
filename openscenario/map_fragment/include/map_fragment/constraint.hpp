@@ -72,7 +72,7 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
     });
   }
 
-  if (const auto name = prefix + "id"; node.has_parameter(name)) {
+  if (const auto name = prefix + "id_is_equal_to"; node.has_parameter(name)) {
     if (const auto id = node.get_parameter(name).as_int(); id) {
       constraints.emplace(name, [id](auto && lanelet, auto &&...) {  //
         return lanelet.id() == id;
@@ -80,7 +80,15 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
     }
   }
 
-  if (const auto name = prefix + "id_greater_than"; node.has_parameter(name)) {
+  if (const auto name = prefix + "id_is_not_equal_to"; node.has_parameter(name)) {
+    if (const auto id = node.get_parameter(name).as_int(); id) {
+      constraints.emplace(name, [id](auto && lanelet, auto &&...) {  //
+        return lanelet.id() != id;
+      });
+    }
+  }
+
+  if (const auto name = prefix + "id_is_greater_than"; node.has_parameter(name)) {
     const auto lower_bound = node.get_parameter(name).as_int();
     constraints.emplace(name, [lower_bound](auto && lanelet, auto &&...) {  //
       return lower_bound < lanelet.id();
@@ -181,11 +189,15 @@ auto loadAllLaneletIDConstraints(Node & node, const std::string & prefix = "")
     node.declare_parameter(name, "road");
   }
 
-  if (const auto name = prefix + "id"; not node.has_parameter(name)) {
+  if (const auto name = prefix + "id_is_equal_to"; not node.has_parameter(name)) {
     node.declare_parameter(name, lanelet::Id());
   }
 
-  if (const auto name = prefix + "id_greater_than"; not node.has_parameter(name)) {
+  if (const auto name = prefix + "id_is_not_equal_to"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "id_is_greater_than"; not node.has_parameter(name)) {
     node.declare_parameter(name, lanelet::Id());
   }
 
