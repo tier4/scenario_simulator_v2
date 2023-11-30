@@ -42,7 +42,7 @@ try {
 
   node.declare_parameter("select", "any");
 
-  const auto select = loadLaneletSelector(node);
+  const auto select = loadBasicSelector(node);
 
   filter(satisfy, lanelet_map->laneletLayer, select);
 

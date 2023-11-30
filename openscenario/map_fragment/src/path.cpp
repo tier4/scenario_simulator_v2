@@ -68,7 +68,7 @@ try {
 
   node.declare_parameter("select", "any");
 
-  auto select = loadLaneletPathSelector(node);
+  auto select = loadBasicSelector(node);
 
   // clang-format off
   lanelet_map->laneletLayer | curry2(filter)(satisfy_first_lanelet_constraints)

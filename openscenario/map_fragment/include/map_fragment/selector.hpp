@@ -78,7 +78,7 @@ auto operator<(const lanelet::routing::LaneletPath & a, const lanelet::routing::
 inline auto less = [](auto && x, auto && y) { return x < y; };
 
 template <
-  typename Node, typename Comparator = decltype(less), typename Receiver = decltype(default_print)>
+  typename Node, typename Receiver = decltype(default_print), typename Comparator = decltype(less)>
 auto loadBasicSelector(
   const Node & node, const std::string & prefix = "", const std::string & suffix = "",
   Receiver receive = default_print, Comparator compare = less)
@@ -148,24 +148,6 @@ auto loadBasicSelector(
       throw std::runtime_error("There is no candidate that satisfies the constraints.");
     }
   };
-}
-
-template <
-  typename Node, typename Receiver = decltype(default_print), typename Comparator = decltype(less)>
-auto loadLaneletSelector(
-  const Node & node, const std::string & prefix = "", const std::string & suffix = "",
-  Receiver receive = default_print, Comparator compare = less)
-{
-  return loadBasicSelector(node, prefix, suffix, receive, compare);
-}
-
-template <
-  typename Node, typename Receiver = decltype(default_print), typename Comparator = decltype(less)>
-auto loadLaneletPathSelector(
-  const Node & node, const std::string & prefix = "", const std::string & suffix = "",
-  Receiver receive = default_print, Comparator compare = less)
-{
-  return loadBasicSelector(node, prefix, suffix, receive, compare);
 }
 }  // namespace map_fragment
 

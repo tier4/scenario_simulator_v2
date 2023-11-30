@@ -38,7 +38,7 @@ try {
     for (auto && integer : integers) {
       what << integer << (&integer != &integers.back() ? ", " : "");
     }
-    what << "] of size " << integers.size();
+    what << "] of size " << integers.size() << ".";
     throw std::out_of_range(what.str());
   }
 
