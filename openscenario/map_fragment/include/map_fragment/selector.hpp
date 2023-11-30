@@ -60,8 +60,13 @@ auto print(std::ostream & os, const lanelet::routing::LaneletPaths & paths) -> a
   return os;
 }
 
-inline auto default_print = [](auto && x) -> std::ostream & {
-  return print(std::cout, std::forward<decltype(x)>(x)) << std::endl;
+struct DefaultReceiver
+{
+  template <typename... Ts>
+  auto operator()(Ts &&... xs) const -> decltype(auto)
+  {
+    return print(std::cout, std::forward<decltype(xs)>(xs)...);
+  }
 };
 
 auto operator<(const lanelet::ConstLanelet & a, const lanelet::ConstLanelet & b)
@@ -75,13 +80,20 @@ auto operator<(const lanelet::routing::LaneletPath & a, const lanelet::routing::
     a.begin(), a.end(), b.begin(), b.end(), [](auto && a, auto && b) { return a < b; });
 }
 
-inline auto less = [](auto && x, auto && y) { return x < y; };
+struct DefaultComparator
+{
+  template <typename T, typename U>
+  auto operator()(T && x, U && y) const -> decltype(auto)
+  {
+    return std::forward<decltype(x)>(x) < std::forward<decltype(y)>(y);
+  }
+};
 
 template <
-  typename Node, typename Receiver = decltype(default_print), typename Comparator = decltype(less)>
+  typename Node, typename Receiver = DefaultReceiver, typename Comparator = DefaultComparator>
 auto loadBasicSelector(
   const Node & node, const std::string & prefix = "", const std::string & suffix = "",
-  Receiver receive = default_print, Comparator compare = less)
+  Receiver receive = {}, Comparator compare = {})
 {
   const auto select = node.has_parameter(prefix + "select" + suffix)
                         ? node.get_parameter(prefix + "select" + suffix).as_string()
