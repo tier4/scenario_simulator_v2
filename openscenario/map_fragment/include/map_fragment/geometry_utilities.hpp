@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #ifndef MAP_FRAGMENT__GEOMETRY_UTILITIES__HPP_
-#define MAP_FRAGMENT__GEOMETRY_UTILITIEs__HPP_
+#define MAP_FRAGMENT__GEOMETRY_UTILITIES__HPP_
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
