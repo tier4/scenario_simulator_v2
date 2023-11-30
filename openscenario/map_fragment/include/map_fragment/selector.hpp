@@ -17,49 +17,13 @@
 
 #include <algorithm>
 #include <iostream>
+#include <map_fragment/less.hpp>
+#include <map_fragment/print.hpp>
 #include <random>
 #include <rclcpp/rclcpp.hpp>
 
 namespace map_fragment
 {
-auto print(std::ostream & os, const lanelet::ConstLanelet & lanelet) -> auto &
-{
-  return os << lanelet.id();
-}
-
-auto print(std::ostream & os, const lanelet::Lanelets & lanelets) -> auto &
-{
-  for (auto && lanelet : lanelets) {
-    print(os, lanelet) << std::endl;
-  }
-  return os;
-}
-
-auto print(std::ostream & os, const lanelet::ConstLanelets & lanelets) -> auto &
-{
-  for (auto && lanelet : lanelets) {
-    print(os, lanelet) << std::endl;
-  }
-  return os;
-}
-
-auto print(std::ostream & os, const lanelet::routing::LaneletPath & path) -> auto &
-{
-  os << "[";
-  for (auto && lanelet : path) {
-    print(os, lanelet) << (&lanelet != &path.back() ? ", " : "]");
-  }
-  return os;
-}
-
-auto print(std::ostream & os, const lanelet::routing::LaneletPaths & paths) -> auto &
-{
-  for (auto && path : paths) {
-    print(os, path) << std::endl;
-  }
-  return os;
-}
-
 struct DefaultReceiver
 {
   template <typename... Ts>
@@ -68,17 +32,6 @@ struct DefaultReceiver
     return print(std::cout, std::forward<decltype(xs)>(xs)...);
   }
 };
-
-auto operator<(const lanelet::ConstLanelet & a, const lanelet::ConstLanelet & b)
-{
-  return a.id() < b.id();
-}
-
-auto operator<(const lanelet::routing::LaneletPath & a, const lanelet::routing::LaneletPath & b)
-{
-  return std::lexicographical_compare(
-    a.begin(), a.end(), b.begin(), b.end(), [](auto && a, auto && b) { return a < b; });
-}
 
 struct DefaultComparator
 {
