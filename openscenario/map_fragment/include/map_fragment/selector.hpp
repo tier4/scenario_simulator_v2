@@ -53,7 +53,7 @@ auto loadBasicSelector(
                         : "any";
 
   return [select, compare, receive](auto && results) -> decltype(auto) {
-    if (1 < results.size()) {
+    if (0 < results.size()) {
       // cspell: ignore swappables
 
       auto sort = [&](auto && value_swappables) {
@@ -107,8 +107,6 @@ auto loadBasicSelector(
         what << "There are " << results.size() << " candidates that satisfy the constraints.";
         throw std::runtime_error(what.str());
       }
-    } else if (0 < results.size()) {
-      receive(results.front());
     } else {
       throw std::runtime_error("There is no candidate that satisfies the constraints.");
     }
