@@ -72,6 +72,15 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
     });
   }
 
+  if (const auto name = prefix + "turn_direction"; node.has_parameter(name)) {
+    if (const auto turn_direction = node.get_parameter(name).as_string();
+        not turn_direction.empty()) {
+      constraints.emplace(name, [turn_direction](auto && lanelet, auto &&...) {
+        return lanelet.attributeOr("turn_direction", "") == turn_direction;
+      });
+    }
+  }
+
   if (const auto name = prefix + "id_is_equal_to"; node.has_parameter(name)) {
     if (const auto id = node.get_parameter(name).as_int(); id) {
       constraints.emplace(name, [id](auto && lanelet, auto &&...) {  //
@@ -187,6 +196,10 @@ auto loadAllLaneletIDConstraints(Node & node, const std::string & prefix = "")
 
   if (const auto name = prefix + "subtype"; not node.has_parameter(name)) {
     node.declare_parameter(name, "road");
+  }
+
+  if (const auto name = prefix + "turn_direction"; not node.has_parameter(name)) {
+    node.declare_parameter(name, "");
   }
 
   if (const auto name = prefix + "id_is_equal_to"; not node.has_parameter(name)) {
