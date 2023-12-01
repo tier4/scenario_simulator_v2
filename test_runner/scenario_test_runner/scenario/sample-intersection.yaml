@@ -33,6 +33,7 @@ OpenSCENARIO:
       - name: ego_path
         parameterType: string
         value: $(ros2 run map_fragment path --ros-args
+          -p any_middle_lanelets_turn_direction:=right
           -p ignore_errors_ocurred_while_parsing_lanelet_map:=true
           -p input_directory:=$(var map_path)
           -p path_element_limit:=3
@@ -168,6 +169,15 @@ OpenSCENARIO:
                           h: 0
                           p: 0
                           r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: ${30 * 0.278} # 30km/h
     Story:
       - name: ''
         Act:

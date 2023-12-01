@@ -66,6 +66,17 @@ try {
       });
     };
 
+  auto satisfy_any_middle_lanelets_constraints = [&, constraints = loadAllLaneletIDConstraints(
+                                                       node, "any_middle_lanelets_")](
+                                                   const auto & path) {
+    return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
+      return 2 < path.size() and
+             std::any_of(std::next(path.begin()), std::prev(path.end()), [&](const auto & lanelet) {
+               return constraint.second(lanelet, *lanelet_map, *routing_graph);
+             });
+    });
+  };
+
   node.declare_parameter("select", "any");
 
   auto select = loadBasicSelector(node);
@@ -73,6 +84,7 @@ try {
   // clang-format off
   lanelet_map->laneletLayer | curry2(filter)(satisfy_first_lanelet_constraints)
                             | curry2(append_map)(search_possible_paths)
+                            | curry2(filter)(satisfy_any_middle_lanelets_constraints)
                             | curry2(filter)(satisfy_last_lanelet_constraints)
                             | curry2(filter)(satisfy_path_constraints)
                             | select;
