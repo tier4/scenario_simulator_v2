@@ -84,19 +84,70 @@ namespace jsk_rviz_plugins
 {
 class OverlayObject;
 
+/**
+ * @class ScopedPixelBuffer
+ * @brief Manages a scoped pixel buffer for RViz overlay objects.
+ *
+ * This class is designed to manage the lifetime of an Ogre::HardwarePixelBufferSharedPtr.
+ * It locks the pixel buffer on creation and unlocks it on destruction, providing a
+ * convenient way to manipulate pixel buffers within a scoped lifetime. It also offers
+ * methods to convert the buffer into a QImage format.
+ */
 class ScopedPixelBuffer
 {
 public:
+  /**
+   * @brief Constructs a ScopedPixelBuffer object and locks the pixel buffer.
+   * @param pixel_buffer The Ogre hardware pixel buffer to be managed.
+   */
   explicit ScopedPixelBuffer(Ogre::HardwarePixelBufferSharedPtr pixel_buffer);
+
+  /**
+   * @brief Destructor that unlocks the pixel buffer.
+   */
   virtual ~ScopedPixelBuffer();
+
+  /**
+   * @brief Gets the underlying Ogre hardware pixel buffer.
+   * @return Shared pointer to the Ogre::HardwarePixelBuffer.
+   */
   virtual Ogre::HardwarePixelBufferSharedPtr getPixelBuffer();
+
+  /**
+   * @brief Converts the pixel buffer to a QImage.
+   * @param width Width of the QImage.
+   * @param height Height of the QImage.
+   * @return QImage representation of the pixel buffer.
+   */
   virtual QImage getQImage(unsigned int width, unsigned int height);
+
+  /**
+   * @brief Converts the pixel buffer of an overlay object to a QImage.
+   * @param overlay Reference to the OverlayObject.
+   * @return QImage representation of the overlay object's pixel buffer.
+   */
   virtual QImage getQImage(OverlayObject & overlay);
+
+  /**
+   * @brief Converts the pixel buffer to a QImage with a specified background color.
+   * @param width Width of the QImage.
+   * @param height Height of the QImage.
+   * @param bg_color Background color for the QImage.
+   * @return QImage representation of the pixel buffer with background color.
+   */
   virtual QImage getQImage(unsigned int width, unsigned int height, QColor & bg_color);
+
+  /**
+   * @brief Converts the pixel buffer of an overlay object to a QImage with a specified background color.
+   * @param overlay Reference to the OverlayObject.
+   * @param bg_color Background color for the QImage.
+   * @return QImage representation of the overlay object's pixel buffer with background color.
+   */
   virtual QImage getQImage(OverlayObject & overlay, QColor & bg_color);
 
 protected:
-  Ogre::HardwarePixelBufferSharedPtr pixel_buffer_;
+  Ogre::HardwarePixelBufferSharedPtr
+    pixel_buffer_;  ///< Shared pointer to the pixel buffer managed by this class.
 
 private:
 };
