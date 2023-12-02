@@ -89,7 +89,9 @@ void VisualizationConditionGroupsDisplay::onInitialize()
   rviz_common::UniformStringStream ss;
   ss << "VisualizationConditionGroupsDisplayObject" << count++;
 
-  overlay_.reset(new jsk_rviz_plugins::OverlayObject(scene_manager_, context_->getRosNodeAbstraction().lock()->get_raw_node()->get_logger(), ss.str()));
+  overlay_.reset(new jsk_rviz_plugins::OverlayObject(
+    scene_manager_, context_->getRosNodeAbstraction().lock()->get_raw_node()->get_logger(),
+    ss.str()));
   overlay_->show();
 
   overlay_->updateTextureSize(property_width_->getInt(), property_length_->getInt());
