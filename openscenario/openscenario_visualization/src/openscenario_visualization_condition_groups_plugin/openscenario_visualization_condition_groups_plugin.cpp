@@ -72,7 +72,10 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
     "Width", width, "Width of the plotter window", this, SLOT(updateVisualization()), this);
   property_width_->setMin(10);
   property_value_scale_ = new rviz_common::properties::FloatProperty(
-    "Value Scale", text_size, "Value scale", this, SLOT(updateVisualization()), this);
+    "Value Scale", text_size,
+    "This property controls the scaling factor for the text size on the panel. Setting a higher "
+    "value results in larger text, making the displayed information easier to read.",
+    this, SLOT(updateVisualization()), this);
   property_value_scale_->setMin(0.01);
 }
 
