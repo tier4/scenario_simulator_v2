@@ -1,0 +1,220 @@
+ScenarioModifiers:
+  ScenarioModifier: []
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 1
+    date: '2023-12-01T09:06:49.530Z'
+    description: 
+    author: 'Piotr Zyskowski (last modified by: Piotr Zyskowski)'
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share shinjuku_map)/map
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+    ScenarioObject:
+      - name: ego
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property:
+                - name: isEgo
+                  value: 'true'
+  Storyboard:
+    Init:
+      Actions:
+        UserDefinedAction:
+          CustomCommandAction:
+            type: >-
+              V2ITrafficSignalStateAction(1457, "red
+              solidOn circle")
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '199'
+                      s: 60
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: -0.014
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: '179'
+                        s: 18.7918
+                        offset: -0.0708
+                        Orientation:
+                          type: relative
+                          h: -0.0246
+                          p: 0
+                          r: 0
+    Story:
+      - name: ''
+        Act:
+          - name: switch_traffic_light_to_green_after_ego_stops_before_traffic_light_stop_line
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: switch_traffic_light_to_green
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: event_change_to_green
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: >-
+                                  V2ITrafficSignalStateAction(1457, "green
+                                  solidOn circle")
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ego_is_in_position_before_the_traffic_light_stop_line
+                      delay: 0
+                      conditionEdge: none
+                      ByEntityCondition:
+                        TriggeringEntities:
+                          triggeringEntitiesRule: any
+                          EntityRef:
+                            - entityRef: ego
+                        EntityCondition:
+                          ReachPositionCondition:
+                            Position:
+                              LanePosition:
+                                roadId: ''
+                                laneId: '203'
+                                s: 26.5
+                                offset: 0
+                                Orientation:
+                                  type: relative
+                                  h: -0.3695
+                                  p: 0
+                                  r: 0
+                            tolerance: 2
+                    - name: ego_stooped_for_a_moment
+                      delay: 0
+                      conditionEdge: none
+                      ByEntityCondition:
+                        TriggeringEntities:
+                          triggeringEntitiesRule: any
+                          EntityRef:
+                            - entityRef: ego
+                        EntityCondition:
+                          StandStillCondition:
+                            duration: 5 
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: ego
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ego_reached_the_goal
+                                  delay: 0
+                                  conditionEdge: sticky
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position:
+                                          LanePosition:
+                                            roadId: ''
+                                            laneId: '179'
+                                            s: 18.7918
+                                            offset: -0.0708
+                                            Orientation:
+                                              type: relative
+                                              h: -0.0246
+                                              p: 0
+                                              r: 0
+                                        tolerance: 0.5
+                                - name: ego_stopped_on_the_traffic_light
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      state: completeState
+                                      storyboardElementType: act
+                                      storyboardElementRef: switch_traffic_light_to_green_after_ego_stops_before_traffic_light_stop_line
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                  - name: timeout
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 90
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []
