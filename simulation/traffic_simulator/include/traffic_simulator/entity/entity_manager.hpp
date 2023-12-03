@@ -180,8 +180,8 @@ public:
     v2i_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
     v2i_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
-    v2i_traffic_light_publisher_ptr_(
-      makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_)),
+    v2i_traffic_light_publisher_ptr_(makeV2ITrafficLightPublisher(
+      "/perception/traffic_light_recognition/external/traffic_signals", node, hdmap_utils_ptr_)),
     v2i_traffic_light_updater_(
       node,
       [this]() {
