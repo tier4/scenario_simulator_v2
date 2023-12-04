@@ -10,7 +10,7 @@ target "base" {
 
 target "humble" {
   inherits = ["base"]
-  name = replace("humble-${cuda_version}-${cuda_distro}", ".", "_")
+  name = "humble"
   tags = ["ghcr.io/tier4/scenario_simulator_v2:humble"]
   args = {"ROS_DISTRO" : "humble"}
   group = ["humble"]
