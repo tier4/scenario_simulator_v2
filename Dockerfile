@@ -3,7 +3,6 @@ FROM ros:${ROS_DISTRO} as build-stage
 SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
-ARG ROS_DISTRO
 
 RUN sudo apt-get update && sudo apt-get -y install python3-pip python3-rospkg python3-rosdep software-properties-common
 # cspell: ignore kisak
