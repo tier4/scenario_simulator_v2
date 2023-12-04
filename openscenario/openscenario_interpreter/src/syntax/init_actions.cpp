@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/syntax/action.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/init_actions.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/syntax/user_defined_action.hpp>
@@ -40,6 +41,8 @@ InitActions::InitActions(const pugi::xml_node & node, Scope & scope)
     }
   }
 }
+
+auto InitActions::evaluate() -> Object { return StoryboardElement::evaluate(); }
 
 auto InitActions::accomplished() const -> bool
 {
@@ -87,12 +90,20 @@ auto InitActions::startInstantaneousActions() -> void
   for (auto && e : global_actions) {
     e.as<GlobalAction>().start();
   }
-  for (auto && e : user_defined_actions) {
-    auto & user_defined_action = e.as<UserDefinedAction>();
-    if (user_defined_action.endsImmediately()) {
-      user_defined_action.start();
+
+  std::size_t index{0};
+  for (auto && element : user_defined_actions) {
+    try {
+      auto & user_defined_action = element.as<UserDefinedAction>();
+      if (user_defined_action.endsImmediately()) {
+        user_defined_action.start();
+      }
+      ++index;
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>("Actions", "UserDefinedAction", index, "Action");
     }
   }
+
   for (auto && e : privates) {
     e.as<Private>().startInstantaneousActions();
   }

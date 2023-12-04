@@ -61,10 +61,15 @@ public:
 
   virtual void cancelRequest();
 
-#define DEFINE_GETTER(NAME, TYPE, RETURN_VARIABLE) \
-  /*   */ auto get##NAME() const noexcept -> TYPE { return RETURN_VARIABLE; }
+// clang-format off
+#define DEFINE_GETTER(NAME, TYPE, RETURN_VARIABLE)            \
+  /**                                                         \
+   @brief Get NAME of the entity.                             \
+   @return NAME of the entity.                                \
+   @note This function was defined by DEFINE_GETTER function. \
+   */                                                         \
+  /*   */ auto get##NAME() const noexcept->TYPE { return RETURN_VARIABLE; }
 
-  // clang-format off
   DEFINE_GETTER(BoundingBox,              traffic_simulator_msgs::msg::BoundingBox,        static_cast<EntityStatus>(getStatus()).bounding_box)
   DEFINE_GETTER(CurrentAccel,             geometry_msgs::msg::Accel,                       static_cast<EntityStatus>(getStatus()).action_status.accel)
   DEFINE_GETTER(CurrentTwist,             geometry_msgs::msg::Twist,                       static_cast<EntityStatus>(getStatus()).action_status.twist)
@@ -79,10 +84,13 @@ public:
   // clang-format on
 #undef DEFINE_GETTER
 
-#define DEFINE_CHECK_FUNCTION(FUNCTION_NAME, BOOL_VARIABLE) \
+// clang-format off
+#define DEFINE_CHECK_FUNCTION(FUNCTION_NAME, BOOL_VARIABLE)            \
+  /**                                                                  \
+   @note This function was defined by DEFINE_CHECK_FUNCTION function.  \
+   */                                                                  \
   /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
 
-  // clang-format off
   DEFINE_CHECK_FUNCTION(isNpcLogicStarted,   npc_logic_started_)
   DEFINE_CHECK_FUNCTION(laneMatchingSucceed, status_.laneMatchingSucceed())
   // clang-format on

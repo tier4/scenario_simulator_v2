@@ -23,8 +23,8 @@
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
 #include <concealer/autoware.hpp>
-#include <concealer/utility/publisher_wrapper.hpp>
-#include <concealer/utility/subscriber_wrapper.hpp>
+#include <concealer/publisher_wrapper.hpp>
+#include <concealer/subscriber_wrapper.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 

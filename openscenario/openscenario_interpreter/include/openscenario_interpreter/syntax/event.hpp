@@ -51,6 +51,8 @@ struct Event : private Scope, public StoryboardElement
 
   auto start() -> void override;
 
+  auto evaluate() -> Object override;
+
   friend auto operator<<(nlohmann::json &, const Event &) -> nlohmann::json &;
 
 private:

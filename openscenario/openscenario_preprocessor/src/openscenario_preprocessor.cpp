@@ -21,7 +21,7 @@
 namespace openscenario_preprocessor
 {
 Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
-: rclcpp::Node("preprocessor", options),
+: rclcpp::Node("openscenario_preprocessor", options),
   load_server(create_service<openscenario_preprocessor_msgs::srv::Load>(
     "~/load",
     [this](

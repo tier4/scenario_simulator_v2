@@ -350,7 +350,37 @@ public:
         }());
 
         core->asFieldOperatorApplication(entity_ref)
-          .setCooperator(controller.properties.template get<String>("cooperator", "simulator"));
+          .declare_parameter<bool>(
+            "allow_goal_modification",
+            controller.properties.template get<Boolean>("allowGoalModification"));
+
+        for (const auto & module :
+             [](std::string manual_modules_string) {
+               manual_modules_string.erase(
+                 std::remove_if(
+                   manual_modules_string.begin(), manual_modules_string.end(),
+                   [](const auto & c) { return std::isspace(c); }),
+                 manual_modules_string.end());
+
+               std::vector<std::string> modules;
+               std::string buffer;
+               std::istringstream modules_stream(manual_modules_string);
+               while (std::getline(modules_stream, buffer, ',')) {
+                 modules.push_back(buffer);
+               }
+               return modules;
+             }(controller.properties.template get<String>(
+               "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions"))) {
+          try {
+            core->asFieldOperatorApplication(entity_ref)
+              .requestAutoModeForCooperation(module, false);
+          } catch (const Error & error) {
+            throw Error(
+              "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions is not "
+              "supported in this environment: ",
+              error.what());
+          }
+        }
       }
     }
 
@@ -540,6 +570,12 @@ public:
     {
       return asFieldOperatorApplication(core->getEgoName())
         .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
+    {
+      return core->setConventionalTrafficLightConfidence(std::forward<decltype(xs)>(xs)...);
     }
   };
 };
