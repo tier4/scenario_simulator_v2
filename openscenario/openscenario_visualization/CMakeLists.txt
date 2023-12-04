@@ -11,9 +11,8 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 
-# Dirty Hack! : ignore class-memaccess warning for ARM support, this is temporal solution it should be fixed.
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  # add_compile_options(-Wall -Werror) # -Wextra #-Wpedantic
+  add_compile_options(-Wall -Werror -Wextra -Wpedantic)
 endif()
 
 # find dependencies
