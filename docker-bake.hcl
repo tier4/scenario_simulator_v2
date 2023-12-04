@@ -14,4 +14,5 @@ target "humble" {
   tags = ["ghcr.io/tier4/scenario_simulator_v2:humble"]
   args = {"ROS_DISTRO" : "humble"}
   group = ["humble"]
+  matrix = {}
 }
