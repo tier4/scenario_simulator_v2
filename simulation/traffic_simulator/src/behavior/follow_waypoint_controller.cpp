@@ -262,7 +262,7 @@ auto FollowWaypointController::getAcceleration(
 
   double min_distance_diff = std::numeric_limits<double>::max();
   std::optional<double> best_acceleration = std::nullopt;
-  for (int i = 0; i <= number_of_acceleration_candidates; ++i) {
+  for (std::size_t i = 0; i <= number_of_acceleration_candidates; ++i) {
     const double candidate_acceleration = local_min_acceleration + i * step_acceleration;
     if (auto predicted_state_opt = getPredictedStopStateWithoutConsideringTime(
           candidate_acceleration, remaining_distance, acceleration, speed);
@@ -378,7 +378,7 @@ auto FollowWaypointController::getAcceleration(
     if (const double step_acceleration =
           (local_max_acceleration - local_min_acceleration) / number_of_acceleration_candidates;
         step_acceleration > local_epsilon) {
-      for (int i = 1; i < number_of_acceleration_candidates; ++i) {
+      for (std::size_t i = 1; i < number_of_acceleration_candidates; ++i) {
         considerCandidate(local_min_acceleration + i * step_acceleration);
       }
     }
