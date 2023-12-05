@@ -3,6 +3,10 @@ on:
   pull_request:
     branches:
       - master
+  label:
+    types:
+      - created
+      - edited
 
 jobs:
   check_label:
