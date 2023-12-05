@@ -91,6 +91,7 @@ random_test:
   npc_vehicle_max_speed: 3.000000000000000000
   npc_vehicle_min_spawn_distance_from_ego: 10.000000000000000000
   npc_vehicle_max_spawn_distance_from_ego: 50.000000000000000000
+  npc_pedestrian_count: 1
   test_cases:
     - seed: 1281242544
     - seed: 3644198185
@@ -213,11 +214,12 @@ Core test parameters. It sets map name, ego goal information and npc spawning pa
 | `ego_goal_s`                              | `0.0`               | Goal lanelet's s (translation along the lanelet in meters). If `ego_goal_lanelet_id` equals `-1`, s will be chosen randomly                                               |
 | `ego_goal_partial_randomization`          | `False`             | If `true`, goal will be randomized within distance set in `ego_goal_partial_randomization_distance` value. If `ego_goal_lanelet_id` is set to `-1`, this value is ignored |
 | `ego_goal_partial_randomization_distance` | `30.0`              | Distance in meters from goal set by `ego_goal_lanelet_id` and `ego_goal_s`, within which goal pose will be randomized if `ego_goal_partial_randomization` is set to true  |
-| `npc_vehicle_count`                               | `10`                | Generated npc count                                                                                                                                                       |
-| `npc_vehicle_min_speed`                           | `0.5`               | Minimum speed of generated npcs                                                                                                                                           |
-| `npc_vehicle_max_speed`                           | `3.0`               | Maximum speed of generated npcs                                                                                                                                           |
-| `npc_vehicle_min_spawn_distance_from_ego`         | `10.0`              | Minimum distance of generated npcs from ego                                                                                                                               |
-| `npc_vehicle_max_spawn_distance_from_ego`         | `100.0`             | Maximum distance of generated npcs from ego                                                                                                                               |
+| `npc_vehicle_count`                               | `10`                | Generated vehicle npc count                                                                                                                                                       |
+| `npc_vehicle_min_speed`                           | `0.5`               | Minimum speed of generated vehicle npcs                                                                                                                                           |
+| `npc_vehicle_max_speed`                           | `3.0`               | Maximum speed of generated vehicle npcs                                                                                                                                           |
+| `npc_vehicle_min_spawn_distance_from_ego`         | `10.0`              | Minimum distance of generated vehicle npcs from ego                                                                                                                               |
+| `npc_vehicle_max_spawn_distance_from_ego`         | `100.0`             | Maximum distance of generated vehicle npcs from ego                                                                                                                               |
+| `npc_pedestrian_count`                               | `10`                | Generated pedestrian npc count                                                                                                                                                       |
 
 #### Test case parameters
 

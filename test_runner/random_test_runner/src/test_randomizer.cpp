@@ -43,6 +43,7 @@ TestRandomizer::TestRandomizer(
   }
 }
 
+//TODO(mk): add pedestrian logic
 TestDescription TestRandomizer::generate()
 {
   TestDescription ret;
@@ -58,7 +59,7 @@ TestDescription TestRandomizer::generate()
     test_suite_parameters_.npc_vehicle_max_spawn_distance_from_ego);
 
   std::vector<traffic_simulator_msgs::msg::LaneletPose> npc_poses;
-  for (int npc_id = 0; npc_id < test_suite_parameters_.npcs_count; npc_id++) {
+  for (int npc_id = 0; npc_id < test_suite_parameters_.npc_vehicle_count; npc_id++) {
     ret.npcs_descriptions.emplace_back(generateNpcFromLaneletsWithMinDistanceFromPoses(
       npc_id, npc_poses, min_npc_distance, lanelets_around_start));
     npc_poses.emplace_back(ret.npcs_descriptions.back().start_position);
@@ -169,7 +170,7 @@ traffic_simulator_msgs::msg::LaneletPose TestRandomizer::generatePoseFromLanelet
     lanelet_part.lanelet_id, getRandomS(lanelet_part));
 }
 
-NPCDescription TestRandomizer::generateNpcFromLaneletsWithMinDistanceFromPoses(
+NPCVehicleDescription TestRandomizer::generateNpcFromLaneletsWithMinDistanceFromPoses(
   int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
   double min_distance, const std::vector<LaneletPart> & lanelets)
 {

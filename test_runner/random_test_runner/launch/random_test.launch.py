@@ -122,13 +122,15 @@ class RandomTestRunnerLaunch(object):
                 {"default": 25.0,
                  "description": "Distance from goal set by ego_goal_lanelet_id and ego_goal_s, within which goal "
                                 "pose will be randomized if ego_goal_partial_randomization is set to true"},
-            "npc_vehicle_count": {"default": 10, "description": "Generated npc count"},
-            "npc_vehicle_min_speed": {"default": 0.5, "description": "Minimum speed of generated npcs"},
-            "npc_vehicle_max_speed": {"default": 3.0, "description": "Maximum speed of generated npcs"},
+            "npc_vehicle_count": {"default": 10, "description": "Generated vehicle npc count"},
+            "npc_vehicle_min_speed": {"default": 0.5, "description": "Minimum speed of generated vehicle npcs"},
+            "npc_vehicle_max_speed": {"default": 3.0, "description": "Maximum speed of generated vehicle npcs"},
             "npc_min_spawn_distance_from_ego": {"default": 10.0,
-                                        "description":  "Minimum distance of generated npcs from ego"},
+                                        "description":  "Minimum distance of generated vehicle npcs from ego"},
             "npc_vehicle_max_spawn_distance_from_ego": {"default": 110.0,
-                                        "description": "Maximum distance of generated npcs from ego"},
+                                        "description": "Maximum distance of generated vehicle npcs from ego"},
+            "npc_pedestrian_count": {"default": 1, "description": "Generated pedestrian npc count"},
+            
 
             # test case arguments #
             "seed": {"default": -1, "description": "Randomization seed. If -1, seed will be generated for each test"},

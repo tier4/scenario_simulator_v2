@@ -52,7 +52,7 @@ private:
   traffic_simulator_msgs::msg::LaneletPose generateRandomPosition();
   traffic_simulator_msgs::msg::LaneletPose generatePoseFromLanelets(
     const std::vector<LaneletPart> & lanelets);
-  NPCDescription generateNpcFromLaneletsWithMinDistanceFromPoses(
+  NPCVehicleDescription generateNpcFromLaneletsWithMinDistanceFromPoses(
     int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
     double min_distance, const std::vector<LaneletPart> & lanelets);
 
