@@ -18,13 +18,14 @@ on:
   release:
     types: [published]
 jobs:
-  job1:
+  build_docker_image:
     name: Build Docker Image
     runs-on: ubuntu-20.04
     timeout-minutes: 240
     strategy:
       matrix:
         rosdistro: [humble]
+        platform: ["linux/amd64", "linux/arm64/v8"]
     steps:
       - uses: actions/checkout@v3
 
@@ -48,3 +49,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           targets: |
             ${{ matrix.rosdistro }}
+          set: |
+            *.platform=${{ matrix.platform }}
