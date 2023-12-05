@@ -171,7 +171,8 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=[{"port": port}]+make_vehicle_parameters(),
+            parameters=[{"port": port}]+make_vehicle_parameters()+[{"use_sim_time": True}],
+            # parameters=[{"port": port}]+make_vehicle_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.

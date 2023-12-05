@@ -17,7 +17,7 @@
 namespace concealer
 {
 Autoware::Autoware()
-: rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(false)),
+: rclcpp::Node("concealer", "simulation", rclcpp::NodeOptions().use_global_arguments(true)),
   current_acceleration(geometry_msgs::msg::Accel()),
   current_twist(geometry_msgs::msg::Twist()),
   current_pose(geometry_msgs::msg::Pose())
