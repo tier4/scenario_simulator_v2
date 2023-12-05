@@ -2,7 +2,11 @@ name: CheckLabel
 on:
   pull_request:
     branches:
-      - tmp/master
+      - master
+  label:
+    types:
+      - created
+      - edited
 
 jobs:
   check_label:
