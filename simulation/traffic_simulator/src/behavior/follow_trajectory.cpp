@@ -98,7 +98,7 @@ auto makeUpdatedStatus(
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
 
-  auto first_waypoint_with_arrival_time_specified = [&]() -> auto {
+  auto first_waypoint_with_arrival_time_specified = [&]() {
     return std::find_if(
       polyline_trajectory.shape.vertices.begin(), polyline_trajectory.shape.vertices.end(),
       [](auto && vertex) { return not std::isnan(vertex.time); });
