@@ -65,7 +65,6 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 
   traffic_simulator::Configuration configuration(map_path);
   configuration.simulator_host = test_control_parameters.simulator_host;
-  api_ = std::make_shared<traffic_simulator::API>(this, configuration, 1.0, 20);
   auto lanelet_utils = std::make_shared<LaneletUtils>(configuration.lanelet2_map_path());
 
   TestSuiteParameters validated_params = validateParameters(test_suite_params, lanelet_utils);
@@ -89,7 +88,7 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
       fmt::format("Generating test {}/{}", test_id + 1, test_case_parameters_vector.size());
     RCLCPP_INFO_STREAM(get_logger(), message);
     test_executors_.emplace_back(
-      api_,
+      std::make_shared<traffic_simulator::API>(this, configuration, 1.0, 20),
       TestRandomizer(
         get_logger(), validated_params, test_case_parameters_vector[test_id], lanelet_utils)
         .generate(),
@@ -197,15 +196,8 @@ void RandomTestRunner::update()
     RCLCPP_INFO_STREAM(get_logger(), message);
     current_test_executor_->initialize();
   }
-  if (!api_->isEgoSpawned() && !api_->isNpcLogicStarted()) {
-    api_->startNpcLogic();
-  }
-  if (
-    api_->isEgoSpawned() && !api_->isNpcLogicStarted() &&
-    api_->asFieldOperatorApplication(api_->getEgoName()).engageable()) {
-    api_->startNpcLogic();
-  }
-  current_test_executor_->update(api_->getCurrentTime());
+
+  current_test_executor_->update();
 }
 
 void RandomTestRunner::start()

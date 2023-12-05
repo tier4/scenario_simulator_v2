@@ -571,6 +571,12 @@ public:
       return asFieldOperatorApplication(core->getEgoName())
         .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
     }
+
+    template <typename... Ts>
+    static auto setConventionalTrafficLightConfidence(Ts &&... xs) -> decltype(auto)
+    {
+      return core->setConventionalTrafficLightConfidence(std::forward<decltype(xs)>(xs)...);
+    }
   };
 };
 }  // namespace openscenario_interpreter

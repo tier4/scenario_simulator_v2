@@ -37,21 +37,19 @@ struct Error : public std::runtime_error
     using Error::Error;                 \
   }
 
-// Autoware encountered some problem that led to a simulation failure.
+/// @brief Autoware encountered some problem that led to a simulation failure.
 DEFINE_ERROR_CATEGORY(AutowareError);
 
-// Although there were no syntactic errors in the description of the scenario,
-// differences in meaning and inconsistencies were found.
+/// @brief Although there were no syntactic errors in the description of the scenario, differences in meaning and inconsistencies were found.
 DEFINE_ERROR_CATEGORY(SemanticError);
 
-// A problem occurred that interfered with the continuation of the simulation.
+/// @brief A problem occurred that interfered with the continuation of the simulation.
 DEFINE_ERROR_CATEGORY(SimulationError);
 
-// Metric module detects specification violation in simulation.
+/// @brief When simulator detects specification violation in simulation.
 DEFINE_ERROR_CATEGORY(SpecificationViolation);
 
-// There is a syntactic error in the description of the scenario. Or you are
-// using a feature that is not yet supported by our implementation.
+/// @brief  There is a syntactic error in the description of the scenario. Or you are using a feature that is not yet supported by our implementation.
 DEFINE_ERROR_CATEGORY(SyntaxError);
 
 #undef DEFINE_ERROR_CATEGORY
@@ -62,9 +60,6 @@ DEFINE_ERROR_CATEGORY(SyntaxError);
 #define THROW_SIMULATION_ERROR(...) /*  */ THROW_ERROR(common::SimulationError, __VA_ARGS__)
 #define THROW_SPECIFICATION_VIOLATION(...) THROW_ERROR(common::SpecificationViolation, __VA_ARGS__)
 #define THROW_SYNTAX_ERROR(...) /*      */ THROW_ERROR(common::SyntaxError, __VA_ARGS__)
-
-#define SPECIFICATION_VIOLATION(...) \
-  common::SpecificationViolation(__FILE__, ":", __LINE__, ": ", __VA_ARGS__)
 }  // namespace scenario_simulator_exception
 }  // namespace common
 
