@@ -36,15 +36,15 @@ jobs:
       - name: update minor version
         if: contains(github.event.pull_request.labels.*.name, 'bump minor')
         run: |
-          ccatkin_generate_changelog -y
+          catkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
-      - name: update majar version
-        if: contains(github.event.pull_request.labels.*.name, 'bump majar')
+      - name: update major version
+        if: contains(github.event.pull_request.labels.*.name, 'bump major')
         run: |
           catkin_generate_changelog -y
-          catkin_tag_changelog --bump majar
-          catkin_package_version --bump majar
+          catkin_tag_changelog --bump major
+          catkin_package_version --bump major
       - name: commit changes
         run: |
           git add .
