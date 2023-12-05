@@ -122,12 +122,12 @@ class RandomTestRunnerLaunch(object):
                 {"default": 25.0,
                  "description": "Distance from goal set by ego_goal_lanelet_id and ego_goal_s, within which goal "
                                 "pose will be randomized if ego_goal_partial_randomization is set to true"},
-            "npc_count": {"default": 10, "description": "Generated npc count"},
-            "npc_min_speed": {"default": 0.5, "description": "Minimum speed of generated npcs"},
-            "npc_max_speed": {"default": 3.0, "description": "Maximum speed of generated npcs"},
-            "npc_min_distance_to_ego": {"default": 10.0,
+            "npc_vehicle_count": {"default": 10, "description": "Generated npc count"},
+            "npc_vehicle_min_speed": {"default": 0.5, "description": "Minimum speed of generated npcs"},
+            "npc_vehicle_max_speed": {"default": 3.0, "description": "Maximum speed of generated npcs"},
+            "npc_min_spawn_distance_from_ego": {"default": 10.0,
                                         "description":  "Minimum distance of generated npcs from ego"},
-            "npc_max_distance_to_ego": {"default": 100.0,
+            "npc_vehicle_max_spawn_distance_from_ego": {"default": 110.0,
                                         "description": "Maximum distance of generated npcs from ego"},
 
             # test case arguments #

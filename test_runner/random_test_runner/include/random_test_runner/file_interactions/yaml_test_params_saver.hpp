@@ -40,11 +40,11 @@ struct convert<TestSuiteParameters>
     node["ego_goal_lanelet_id"] = rhs.ego_goal_lanelet_id;
     node["ego_goal_partial_randomization"] = rhs.ego_goal_partial_randomization;
     node["ego_goal_partial_randomization_distance"] = rhs.ego_goal_partial_randomization_distance;
-    node["npc_count"] = rhs.npcs_count;
-    node["npc_min_speed"] = rhs.npc_min_speed;
-    node["npc_max_speed"] = rhs.npc_max_speed;
-    node["npc_min_spawn_distance_from_ego"] = rhs.npc_min_spawn_distance_from_ego;
-    node["npc_max_spawn_distance_from_ego"] = rhs.npc_max_spawn_distance_from_ego;
+    node["npc_vehicle_count"] = rhs.npcs_count;
+    node["npc_vehicle_min_speed"] = rhs.npc_vehicle_min_speed;
+    node["npc_vehicle_max_speed"] = rhs.npc_vehicle_max_speed;
+    node["npc_vehicle_min_spawn_distance_from_ego"] = rhs.npc_vehicle_min_spawn_distance_from_ego;
+    node["npc_vehicle_max_spawn_distance_from_ego"] = rhs.npc_vehicle_max_spawn_distance_from_ego;
     return node;
   }
 
@@ -61,11 +61,11 @@ struct convert<TestSuiteParameters>
     rhs.ego_goal_partial_randomization = node["ego_goal_partial_randomization"].as<bool>();
     rhs.ego_goal_partial_randomization_distance =
       node["ego_goal_partial_randomization_distance"].as<double>();
-    rhs.npcs_count = node["npc_count"].as<int64_t>();
-    rhs.npc_min_speed = node["npc_min_speed"].as<double>();
-    rhs.npc_max_speed = node["npc_max_speed"].as<double>();
-    rhs.npc_min_spawn_distance_from_ego = node["npc_min_spawn_distance_from_ego"].as<double>();
-    rhs.npc_max_spawn_distance_from_ego = node["npc_max_spawn_distance_from_ego"].as<double>();
+    rhs.npcs_count = node["npc_vehicle_count"].as<int64_t>();
+    rhs.npc_vehicle_min_speed = node["npc_vehicle_min_speed"].as<double>();
+    rhs.npc_vehicle_max_speed = node["npc_vehicle_max_speed"].as<double>();
+    rhs.npc_vehicle_min_spawn_distance_from_ego = node["npc_vehicle_min_spawn_distance_from_ego"].as<double>();
+    rhs.npc_vehicle_max_spawn_distance_from_ego = node["npc_vehicle_max_spawn_distance_from_ego"].as<double>();
 
     return true;
   }
