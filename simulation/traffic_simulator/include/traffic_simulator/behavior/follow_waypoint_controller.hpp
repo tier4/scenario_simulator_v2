@@ -49,20 +49,26 @@ struct PredictedState
   double traveled_distance;
   double travel_time;
 
-  auto straightMove(const double acc, const double step_time) -> void
+  auto moveStraight(const double step_acceleration, const double step_time) -> void
   {
-    acceleration = acc;
+    acceleration = step_acceleration;
     speed += acceleration * step_time;
     traveled_distance += speed * step_time;
     travel_time += step_time;
+  }
+
+  auto isImmobile(const double tolerance)
+  {
+    return std::abs(speed) < tolerance && std::abs(acceleration) < tolerance;
   }
 
   template <typename StreamType>
   friend auto operator<<(StreamType & stream, const PredictedState & state) -> StreamType &
   {
     stream << std::setprecision(16) << std::fixed;
-    stream << "acceleration: " << state.acceleration << ", speed: " << state.speed
-           << ", distance: " << state.traveled_distance << ", time: " << state.travel_time;
+    stream << "FollowWaypointController: acceleration: " << state.acceleration
+           << ", speed: " << state.speed << ", distance: " << state.traveled_distance
+           << ", time: " << state.travel_time << ". ";
     return stream;
   }
 };
@@ -71,19 +77,38 @@ class FollowWaypointController
 {
   const double step_time;
   const bool with_breaking;
-  // constraints
+
+  /*
+    Constraints
+  */
   double max_speed;
   double max_acceleration;
   double max_acceleration_rate;
   double max_deceleration;
   double max_deceleration_rate;
-  // accuracy
-  const double local_epsilon{1e-12};
-  const double step_time_tolerance{1e-6};
-  const double finish_distance_tolerance{1e-3};
-  const double predicted_distance_tolerance{1.0};
-  const int number_of_acceleration_candidates{20};
 
+  /*
+    Accuracy values - there is no technical basis for these values, it was determined based on
+    Dawid Moszynski's experiments
+  */
+  // achieving official epsilon (1e-16) accuracy when using doubles is difficult for this reason the
+  // controller uses less accuracy
+  const double local_epsilon{1e-12};
+  // acceptable time step inaccuracy, allowing the time to be rounded up to the full number of steps
+  const double step_time_tolerance{1e-6};
+  // accuracy of the final arrival distance at a waypoint with a specified time
+  const double finish_distance_tolerance{1e-4};
+  // accuracy of the predicted arrival distance at the waypoint with the specified time
+  // it is only used to detect in advance that it is most likely impossible to arrive at a
+  // sufficient final accuracy
+  const double predicted_distance_tolerance{1.0};
+  // number of considered acceleration candidates
+  // this is a discretization of the current range of [min_acceleration, max_acceleration]
+  const std::size_t number_of_acceleration_candidates{20};
+
+  /*
+    This is a debugging method, it is not worth giving it much attention
+  */
   template <typename StreamType>
   friend auto operator<<(StreamType & stream, const FollowWaypointController & c) -> StreamType &
   {
@@ -96,22 +121,72 @@ class FollowWaypointController
     return stream;
   }
 
+  /*
+    This provides an analytical method for calculating the acceleration that will allow
+    the best possible accuracy in arriving at the waypoint during the last few frames.
+    It provides the calculation of acceleration for arriving at waypoint without and with
+    braking.
+
+    The method allows to calculate only the last 3 steps without braking and 4 with braking, because
+    analytical calculation of a greater number of steps is difficult - a greater number of steps is
+    processed through the prediction of the controller.
+
+    Details:
+    - acceleration at the last step equal to 0.0, therefore in the penultimate step the acceleration
+    is set to 0.0
+    - only with braking: speed at the last and penultimate step equal to 0.0, therefore when there
+    are 3 steps remain the acceleration is calculated in such a way as to set the speed to 0.0
+    (a=-v/t)
+    - only with braking: because the speed is set to 0.0 when there are 3 steps remain, in the last
+    3 steps no distance will be traveled, therefore, when there are 4 steps remain, it is necessary
+    to choose the acceleration in such a way as to travel exactly the remaining distance in this
+    step (s = at^2/2+vt -> a = 2(s-vt)/t^2)
+    - only without braking: in the penultimate step, the acceleration is set to 0, therefore, when 3
+    steps remain it is necessary to choose the acceleration in such a way as to ensure that in the
+    penultimate and last step the distance traveled is equal to the remaining distance (s = last +
+    penultimate = (v+at)t + at^2/2+vt -> a = 2/3(s-2vt)/t^2)
+  */
   auto getAnalyticalAccelerationForLastSteps(
-    const double remaining_time, const double left_distance, const double acceleration,
+    const double remaining_time, const double remaining_distance, const double acceleration,
     const double speed) const -> double;
+
+  /*
+    This allows the correct counting  of the remaining number of steps
+    without this, inaccuracy sometimes results in a decrease of more than 1 step
+    which can cause major difficulties if we want to arrive at the waypoint at the precise time
+  */
   auto roundTimeToFullStepsWithTolerance(
-    const double remaining_time_source, double time_tolerance) const -> double;
-  auto timeRequiredForNonAcceleration(const double acceleration) const -> double;
+    const double remaining_time_source, const double time_tolerance) const -> double;
+
+  /*
+    This allows to calculate how much time (rounded up to whole steps) is needed to reach
+    acceleration equal to zero - which is necessary in case of achieving the maximum speed (to not
+    exceed it) and achieving the speed equal to 0.0 (to not start moving backwards).
+  */
+  auto getTimeRequiredForNonAcceleration(const double acceleration) const -> double;
+
+  /*
+    This allows the calculation of acceleration limits that meet the constraints. The limits depend
+    on the current acceleration, the current speed and the limits on the change in acceleration
+    (rate).
+   */
   auto getAccelerationLimits(const double acceleration, const double speed) const
     -> std::pair<double, double>;
+
   auto clampAcceleration(
-    const double candidate_acc, const double acceleration, const double speed) const -> double;
-  auto straightMove(PredictedState & state, const double candidate_acc) const -> void;
+    const double candidate_acceleration, const double acceleration, const double speed) const
+    -> double;
+
+  auto moveStraight(PredictedState & state, const double candidate_acceleration) const -> void;
+
+  auto getPredictedStopStateWithoutConsideringTime(
+    const double step_acceleration, const double remaining_distance, const double acceleration,
+    const double speed) const -> std::optional<PredictedState>;
 
 public:
   FollowWaypointController(
-    const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time,
-    bool with_breaking)
+    const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+    const double step_time, const bool with_breaking)
   : step_time{step_time},
     with_breaking{with_breaking},
     max_speed{behavior_parameter.dynamic_constraints.max_speed},
@@ -122,18 +197,65 @@ public:
   {
   }
 
-  auto distanceMeetsAccuracyRestrictions(const double distance) const -> double
+  /*
+    This is a debugging method, it is not worth giving it much attention
+  */
+  auto getFollowedWaypointDetails(
+    const traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory) const
+    -> std::string
   {
-    return distance < finish_distance_tolerance;
+    if (const auto & vertices = polyline_trajectory.shape.vertices; !vertices.empty()) {
+      std::stringstream waypoint_details;
+      waypoint_details << "Currently followed waypoint: ";
+      if (const auto first_waypoint_with_arrival_time_specified = std::find_if(
+            vertices.begin(), vertices.end(),
+            [](auto && vertex) { return not std::isnan(vertex.time); });
+          first_waypoint_with_arrival_time_specified !=
+          std::end(polyline_trajectory.shape.vertices)) {
+        waypoint_details << "[" << first_waypoint_with_arrival_time_specified->position.position.x
+                         << ", " << first_waypoint_with_arrival_time_specified->position.position.y
+                         << "] with specified time equal to "
+                         << first_waypoint_with_arrival_time_specified->time << "s. ";
+      } else {
+        waypoint_details << "[" << vertices.back().position.position.x << ", "
+                         << vertices.back().position.position.y << "] without specified time. ";
+      }
+      return waypoint_details.str();
+    } else {
+      return "No followed waypoint - trajectory is empty.";
+    }
   }
-  auto getPredictedWaypointArrivalState(
-    const double step_acc, const double remaining_time, const double left_distance,
-    const double acceleration, const double speed) const -> std::optional<PredictedState>;
-  auto getAcceleration(
-    const double remaining_time_source, const double left_distance, const double acceleration,
-    const double speed) const -> double;
-};
 
+  /*
+    This allows to predict the state that will be reached if the current acceleration is changed
+    from acceleration to step_acceleration
+  */
+  auto getPredictedWaypointArrivalState(
+    const double step_acceleration, const double remaining_time, const double remaining_distance,
+    const double acceleration, const double speed) const -> std::optional<PredictedState>;
+  /*
+    This allows the best acceleration to be found for the current conditions, without taking into
+    account the arrival time - this is the case when every next point of the trajectory has no
+    specified time
+  */
+  auto getAcceleration(
+    const double remaining_distance, const double acceleration, const double speed) const -> double;
+
+  /*
+    This allows the best acceleration to be found for the current conditions, taking into account
+    the arrival time
+  */
+  auto getAcceleration(
+    const double remaining_time_source, const double remaining_distance, const double acceleration,
+    const double speed) const -> double;
+
+  auto areConditionsOfArrivalMet(
+    const double acceleration, const double speed, const double distance) const -> double
+  {
+    return (!with_breaking || std::abs(speed) < local_epsilon) &&
+           std::abs(acceleration) < local_epsilon && distance < finish_distance_tolerance;
+  }
+};
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 
