@@ -50,7 +50,7 @@ jobs:
       - name: commit changes
         run: |
           git add .
-          git commit -m "bump version of scenario_simulator_v2."
+          git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
           git push
           git tag -a $(catkin_package_version) -m "release $(catkin_package_version)"
           git push origin $(catkin_package_version)
