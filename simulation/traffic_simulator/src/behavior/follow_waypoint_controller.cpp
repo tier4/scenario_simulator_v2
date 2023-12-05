@@ -101,6 +101,8 @@ auto FollowWaypointController::getAccelerationLimits(
       return std::max(0.0, local_min_acceleration);
     } else if (time_for_non_acceleration > 0) {
       return std::max(-speed / time_for_non_acceleration, local_min_acceleration);
+    } else {
+      return std::max(-max_deceleration, local_min_acceleration);
     }
   }();
 
@@ -110,6 +112,8 @@ auto FollowWaypointController::getAccelerationLimits(
       return std::min(0.0, local_max_acceleration);
     } else if (time_for_non_acceleration > 0) {
       return std::min((max_speed - speed) / time_for_non_acceleration, local_max_acceleration);
+    } else {
+      return std::min(max_acceleration, local_max_acceleration);
     }
   }();
 
@@ -127,9 +131,7 @@ auto FollowWaypointController::getAccelerationLimits(
       "Incorrect acceleration limits [", local_min_acceleration, ", ", local_max_acceleration,
       "] for acceleration: ", acceleration, " and speed: ", speed, ". ", *this);
   }
-  return {
-    std::max(local_min_acceleration, -max_deceleration),
-    std::min(local_max_acceleration, max_acceleration)};
+  return {local_min_acceleration, local_max_acceleration};
 }
 
 auto FollowWaypointController::clampAcceleration(
