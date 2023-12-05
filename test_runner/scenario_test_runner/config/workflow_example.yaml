@@ -11,6 +11,8 @@ Scenario:
   - path: $(find-pkg-share scenario_test_runner)/scenario/Property.isBlind.yaml
   - path: $(find-pkg-share scenario_test_runner)/scenario/RoutingAction.FollowTrajectoryAction-star.yaml
   - path: $(find-pkg-share scenario_test_runner)/scenario/RoutingAction.FollowTrajectoryAction-straight.yaml
+  - path: $(find-pkg-share scenario_test_runner)/scenario/RoutingAction.FollowTrajectoryAction-straight-pedestrian.yaml
+  - path: $(find-pkg-share scenario_test_runner)/scenario/RoutingAction.FollowTrajectoryAction-straight-bicycle.yaml
   - path: $(find-pkg-share scenario_test_runner)/scenario/RoutingAction.FollowTrajectoryAction-zero-distance.yaml
   - path: $(find-pkg-share scenario_test_runner)/scenario/all-in-one.yaml
   - path: $(find-pkg-share scenario_test_runner)/scenario/minimal.yaml

@@ -44,6 +44,8 @@ struct ManeuverGroup : public Scope, public StoryboardElement
 
   explicit ManeuverGroup(const pugi::xml_node &, Scope &);
 
+  auto run() -> void override;
+
   auto start() -> void override;
 
   friend auto operator<<(nlohmann::json &, const ManeuverGroup &) -> nlohmann::json &;

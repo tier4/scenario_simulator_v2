@@ -1,0 +1,194 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 0
+    revMinor: 0
+    date: "2023-09-18T09:25:53+02:00"
+    description: "This scenario is used to test the FollowTrajectory (polyline) action performed by a Pedestrian entity."
+    author: "Moszynski Dawid"
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
+  RoadNetwork:
+    LogicFile:
+      filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
+  Entities:
+    ScenarioObject:
+      - name: Pedestrian0
+        Pedestrian:
+          name: Pedestrian
+          mass: 60
+          model: ""
+          pedestrianCategory: pedestrian
+          BoundingBox:
+            Center:
+              x: 0
+              y: 0
+              z: 1
+            Dimensions:
+              width: 0.8
+              length: 0.8
+              height: 2
+          Properties:
+            Property: []
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: Pedestrian0
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ""
+                      laneId: "34513"
+                      s: 1
+                      offset: 0
+                      Orientation: &ORIENTATION
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+    Story:
+      - name: ""
+        Act:
+          - name: ""
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: Pedestrian0
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 0
+                                      rule: greaterThan
+                        Action:
+                          - name: "follow_trajectory"
+                            PrivateAction:
+                              - RoutingAction:
+                                  FollowTrajectoryAction:
+                                    initialDistanceOffset: 1
+                                    TimeReference:
+                                      Timing:
+                                        domainAbsoluteRelative: relative
+                                        offset: 0
+                                        scale: 1
+                                    TrajectoryFollowingMode:
+                                      followingMode: position
+                                    TrajectoryRef:
+                                      Trajectory:
+                                        closed: false
+                                        name: straight
+                                        Shape:
+                                          Polyline:
+                                            Vertex:
+                                              - Position:
+                                                  LanePosition:
+                                                    roadId: ""
+                                                    laneId: "34513"
+                                                    s: 10
+                                                    offset: 0
+                                                    Orientation: *ORIENTATION
+                                              - time: 25
+                                                Position: &destination
+                                                  LanePosition:
+                                                    roadId: ""
+                                                    laneId: "34507"
+                                                    s: 50
+                                                    offset: 0
+                                                    Orientation: *ORIENTATION
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ""
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef:
+                    - entityRef: Pedestrian0
+                Maneuver:
+                  - name: ""
+                    Event:
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: follow_trajectory
+                                      storyboardElementType: action
+                                      state: completeState
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef:
+                                        - entityRef: Pedestrian0
+                                    EntityCondition:
+                                      ReachPositionCondition:
+                                        Position: *destination
+                                        tolerance: 1.1
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ""
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ""
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 30
+                                      rule: greaterThan
+                        Action:
+                          - name: ""
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ""
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

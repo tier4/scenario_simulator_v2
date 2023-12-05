@@ -40,6 +40,11 @@ public:
 
   void reportTimeout() { reportError("timeout", "Ego failed to reach goal within timeout"); }
 
+  void reportException(const std::string & type, const std::string & error_msg)
+  {
+    reportError(type, error_msg);
+  }
+
 private:
   void reportError(const std::string & error_type, const std::string & message)
   {

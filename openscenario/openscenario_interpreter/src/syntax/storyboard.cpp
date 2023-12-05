@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/custom_command_action.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/global_action.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
@@ -44,8 +45,16 @@ Storyboard::Storyboard(const pugi::xml_node & node, Scope & scope)
 
 auto Storyboard::run() -> void
 {
+  std::size_t index{0};
   for (auto && story : elements) {
-    story.evaluate();
+    try {
+      story.evaluate();
+      if (story.is<Story>()) {
+        ++index;
+      }
+    } catch (const SpecialAction<EXIT_FAILURE> & action) {
+      throw SpecialAction<EXIT_FAILURE>(name, "Story", index, action);
+    }
   }
 }
 

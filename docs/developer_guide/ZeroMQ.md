@@ -38,19 +38,28 @@ sequenceDiagram
     Simple Sensor Simulator ->-Traffic Simulator : AttachLidarSensorResponse
     Traffic Simulator ->+ Simple Sensor Simulator : AttachDetectionSensorRequest
     Simple Sensor Simulator ->-Traffic Simulator : AttachDetectionSensorResponse
+    Traffic Simulator ->+ Simple Sensor Simulator : AttachOccupancyGridSensorRequest
+    Simple Sensor Simulator ->-Traffic Simulator : AttachOccupancyGridSensorResponse
+    Traffic Simulator ->+ Simple Sensor Simulator : AttachPseudoTrafficLightDetectorRequest
+    Simple Sensor Simulator ->-Traffic Simulator : AttachPseudoTrafficLightDetectorResponse
+OccupancyGridSensor
     loop every frame
-      Traffic Simulator ->+ Simple Sensor Simulator : UpdateFrameRequest
-      Simple Sensor Simulator ->-Traffic Simulator : UpdateFrameResponse
       Traffic Simulator ->+ Simple Sensor Simulator : UpdateEntityStatusRequest
+      Simple Sensor Simulator ->-Traffic Simulator : UpdateEntityStatusResponse
+      Traffic Simulator ->+ Simple Sensor Simulator : UpdateTrafficLightsRequest
+      Simple Sensor Simulator ->-Traffic Simulator : UpdateTrafficLightsResponse
+      Traffic Simulator ->+ Simple Sensor Simulator : UpdateFrameRequest
       Simple Sensor Simulator ->> Autoware : Send Pointcloud (ROS 2 topic)
       Simple Sensor Simulator ->> Autoware : Send Detection Result (ROS 2 topic)
-      Simple Sensor Simulator ->-Traffic Simulator : UpdateEntityStatusResponse
+      Simple Sensor Simulator ->> Autoware : Send Occupance Grid Map (ROS 2 topic)
+      Simple Sensor Simulator ->> Autoware : Send Traffic Light Info (ROS 2 topic)
+      Simple Sensor Simulator ->-Traffic Simulator : UpdateFrameResponse
     end
 ```
 
 ## Schema of the message
 
-`traffic_simulator::API` sends the request to the simulator. The requests are serialized by using protobuf and use various ports in order to communicate with the simulator.
+The `traffic_simulator::API` sends a request to the simulator. The request is serialized using protobuf and uses the port specified by the ROS Parameter `port` (default is 5555) to communicate with the simulator.
 
 ### Protobuf definition
 
@@ -61,16 +70,17 @@ Protobuf documentation is [here](https://tier4.github.io/scenario_simulator_v2-d
 
 The traffic simulator and the simple sensor simulator communicate with APIs. If you want to integrate the simulators with your simulator, only you have to do is preparing the following APIs:
 
-| API                          | Request                                                                                                                                                           | Response                                                                                                                                                            |
-|------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| initialize                   | [InitializeRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.InitializeRequest)                               | [InitializeResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.InitializeResponse)                               |
-| update_frame                 | [UpdateFrameRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateFrameRequest)                             | [UpdateFrameResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateFrameResponse)                             |
-| spawn_vehicle_entity         | [SpawnVehicleEntityRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.SpawnVehicleEntityRequest)               | [SpawnVehicleEntityResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.SpawnVehicleEntityResponse)               |
-| spawn_pedestrian_entity      | [SpawnPedestrianEntityRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.SpawnPedestrianEntityRequest)         | [SpawnPedestrianEntityResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.SpawnPedestrianEntityResponse)         |
-| spawn_misc_object_entity     | [SpawnMiscObjectEntityRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.SpawnMiscObjectEntityRequest)         | [SpawnPedestrianEntityResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.SpawnMiscObjectEntityResponse)         |
-| despawn_entity               | [DespawnEntityRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.DespawnEntityRequest)                         | [DespawnEntityResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.DespawnEntityResponse)                         |
-| update_entity_status         | [UpdateEntityStatusRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateEntityStatusRequest)               | [UpdateEntityStatusResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateEntityStatusResponse)               |
-| attach_lidar_sensor          | [AttachLidarSensorRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.AttachLidarSensorRequest)                 | [AttachLidarSensorResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.AttachLidarSensorResponse)                 |
-| attach_detection_sensor      | [AttachDetectionSensorRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.AttachDetectionSensorRequest)         | [AttachDetectionSensorResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.AttachDetectionSensorResponse)         |
-| attach_occupancy_grid_sensor | [AttachOccupancyGridSensorRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.AttachOccupancyGridSensorRequest) | [AttachOccupancyGridSensorResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.AttachOccupancyGridSensorResponse) |
-| update_traffic_lights        | [UpdateTrafficLightsRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateTrafficLightsRequest)             | [UpdateTrafficLightsResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#simulation_api_schema.UpdateTrafficLightsResponse)             |
+| API                                 | Request                                                                                                                                                   | Response                                                                                                                                                    |
+|-------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| initialize                          | [InitializeRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#initializerequest)                                             | [InitializeResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#initializeresponse)                                             |
+| update_frame                        | [UpdateFrameRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#updateframerequest)                                           | [UpdateFrameResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#updateframeresponse)                                           |
+| spawn_vehicle_entity                | [SpawnVehicleEntityRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#spawnvehicleentityrequest)                             | [SpawnVehicleEntityResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#spawnvehicleentityresponse)                             |
+| spawn_pedestrian_entity             | [SpawnPedestrianEntityRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#spawnpedestrianentityrequest)                       | [SpawnPedestrianEntityResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#spawnpedestrianentityresponse)                       |
+| spawn_misc_object_entity            | [SpawnMiscObjectEntityRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#spawnmiscobjectentityrequest)                       | [SpawnMiscObjectEntityResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#spawnmiscobjectentityresponse)                       |
+| despawn_entity                      | [DespawnEntityRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#despawnentityrequest)                                       | [DespawnEntityResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#despawnentityresponse)                                       |
+| update_entity_status                | [UpdateEntityStatusRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#updateentitystatusrequest)                             | [UpdateEntityStatusResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#updateentitystatusresponse)                             |
+| attach_lidar_sensor                 | [AttachLidarSensorRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#attachlidarsensorrequest)                               | [AttachLidarSensorResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#attachlidarsensorresponse)                               |
+| attach_detection_sensor             | [AttachDetectionSensorRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#attachdetectionsensorrequest)                       | [AttachDetectionSensorResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#attachdetectionsensorresponse)                       |
+| attach_occupancy_grid_sensor        | [AttachOccupancyGridSensorRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#attachoccupancygridsensorrequest)               | [AttachOccupancyGridSensorResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#attachoccupancygridsensorresponse)               |
+| attach_pseudo_traffic_light_detector | [AttachPseudoTrafficLightDetectorRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#attachpseudotrafficlightdetectorrequest) | [AttachPseudoTrafficLightDetectorResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#attachpseudotrafficlightdetectorresponse) |
+| update_traffic_lights               | [UpdateTrafficLightsRequest](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#updatetrafficlightsrequest)                           | [UpdateTrafficLightsResponse](https://tier4.github.io/scenario_simulator_v2-docs/proto_doc/protobuf/#updatetrafficlightsresponse)                           |
