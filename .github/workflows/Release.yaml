@@ -56,3 +56,4 @@ jobs:
           git tag -a $(catkin_package_version) -m "release $(catkin_package_version)"
           git push origin $(catkin_package_version)
         working-directory: scenario_simulator_v2
+
