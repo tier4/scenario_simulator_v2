@@ -30,18 +30,21 @@ jobs:
       - name: update patch version
         if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
+          git pull --tags
           catkin_generate_changelog -y
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
       - name: update minor version
         if: contains(github.event.pull_request.labels.*.name, 'bump minor')
         run: |
+          git pull --tags
           catkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
       - name: update major version
         if: contains(github.event.pull_request.labels.*.name, 'bump major')
         run: |
+          git pull --tags
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
