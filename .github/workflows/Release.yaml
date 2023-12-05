@@ -50,4 +50,6 @@ jobs:
           git add .
           git commit -m "bump version of scenario_simulator_v2."
           git push
+          git tag -a $(catkin_package_version) -m "release $(catkin_package_version)"
+          git push origin $(catkin_package_version)
         working-directory: scenario_simulator_v2
