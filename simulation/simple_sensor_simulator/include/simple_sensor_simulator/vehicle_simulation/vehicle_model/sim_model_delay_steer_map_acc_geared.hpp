@@ -213,27 +213,27 @@ class SimModelDelaySteerMapAccGeared : public SimModelInterface
 {
 public:
   /**
-     * @brief constructor
-     * @param [in] vx_lim velocity limit [m/s]
-     * @param [in] steer_lim steering limit [rad]
-     * @param [in] vx_rate_lim acceleration limit [m/ss]
-     * @param [in] steer_rate_lim steering angular velocity limit [rad/ss]
-     * @param [in] wheelbase vehicle wheelbase length [m]
-     * @param [in] dt delta time information to set input buffer for delay
-     * @param [in] acc_delay time delay for accel command [s]
-     * @param [in] acc_time_constant time constant for 1D model of accel dynamics
-     * @param [in] steer_delay time delay for steering command [s]
-     * @param [in] steer_time_constant time constant for 1D model of steering dynamics
-     * @param [in] path path to csv file for acceleration conversion map
-     */
+   * @brief constructor
+   * @param [in] vx_lim velocity limit [m/s]
+   * @param [in] steer_lim steering limit [rad]
+   * @param [in] vx_rate_lim acceleration limit [m/ss]
+   * @param [in] steer_rate_lim steering angular velocity limit [rad/ss]
+   * @param [in] wheelbase vehicle wheelbase length [m]
+   * @param [in] dt delta time information to set input buffer for delay
+   * @param [in] acc_delay time delay for accel command [s]
+   * @param [in] acc_time_constant time constant for 1D model of accel dynamics
+   * @param [in] steer_delay time delay for steering command [s]
+   * @param [in] steer_time_constant time constant for 1D model of steering dynamics
+   * @param [in] path path to csv file for acceleration conversion map
+   */
   SimModelDelaySteerMapAccGeared(
     double vx_lim, double steer_lim, double vx_rate_lim, double steer_rate_lim, double wheelbase,
     double dt, double acc_delay, double acc_time_constant, double steer_delay,
     double steer_time_constant, std::string path);
 
   /**
-     * @brief default destructor
-     */
+   * @brief default destructor
+   */
   ~SimModelDelaySteerMapAccGeared() = default;
 
   AccelerationMap acc_map_;
@@ -270,71 +270,71 @@ private:
   const std::string path_;                //!< @brief conversion map path
 
   /**
-     * @brief set queue buffer for input command
-     * @param [in] dt delta time
-     */
+   * @brief set queue buffer for input command
+   * @param [in] dt delta time
+   */
   void initializeInputQueue(const double & dt);
 
   /**
-     * @brief get vehicle position x
-     */
+   * @brief get vehicle position x
+   */
   double getX() override;
 
   /**
-     * @brief get vehicle position y
-     */
+   * @brief get vehicle position y
+   */
   double getY() override;
 
   /**
-     * @brief get vehicle angle yaw
-     */
+   * @brief get vehicle angle yaw
+   */
   double getYaw() override;
 
   /**
-     * @brief get vehicle velocity vx
-     */
+   * @brief get vehicle velocity vx
+   */
   double getVx() override;
 
   /**
-     * @brief get vehicle lateral velocity
-     */
+   * @brief get vehicle lateral velocity
+   */
   double getVy() override;
 
   /**
-     * @brief get vehicle longitudinal acceleration
-     */
+   * @brief get vehicle longitudinal acceleration
+   */
   double getAx() override;
 
   /**
-     * @brief get vehicle angular-velocity wz
-     */
+   * @brief get vehicle angular-velocity wz
+   */
   double getWz() override;
 
   /**
-     * @brief get vehicle steering angle
-     */
+   * @brief get vehicle steering angle
+   */
   double getSteer() override;
 
   /**
-     * @brief update vehicle states
-     * @param [in] dt delta time [s]
-     */
+   * @brief update vehicle states
+   * @param [in] dt delta time [s]
+   */
   void update(const double & dt) override;
 
   /**
-     * @brief calculate derivative of states with time delay steering model
-     * @param [in] state current model state
-     * @param [in] input input vector to model
-     */
+   * @brief calculate derivative of states with time delay steering model
+   * @param [in] state current model state
+   * @param [in] input input vector to model
+   */
   Eigen::VectorXd calcModel(const Eigen::VectorXd & state, const Eigen::VectorXd & input) override;
 
   /**
-     * @brief update state considering current gear
-     * @param [in] state current state
-     * @param [in] prev_state previous state
-     * @param [in] gear current gear (defined in autoware_auto_msgs/GearCommand)
-     * @param [in] dt delta time to update state
-     */
+   * @brief update state considering current gear
+   * @param [in] state current state
+   * @param [in] prev_state previous state
+   * @param [in] gear current gear (defined in autoware_auto_msgs/GearCommand)
+   * @param [in] dt delta time to update state
+   */
   void updateStateWithGear(
     Eigen::VectorXd & state, const Eigen::VectorXd & prev_state, const uint8_t gear,
     const double dt);
