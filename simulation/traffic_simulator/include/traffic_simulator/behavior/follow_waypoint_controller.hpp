@@ -89,7 +89,7 @@ class FollowWaypointController
 
   /*
     Accuracy values - there is no technical basis for these values, it was determined based on
-    Dawid Moszynski's experiments
+    Dawid Moszynski experiments
   */
   // achieving official epsilon (1e-16) accuracy when using doubles is difficult for this reason the
   // controller uses less accuracy
