@@ -40,7 +40,7 @@ random001:
       offset_variance:
         type: double
         default_value: 1.0
-        description: "Variance of the offset of the corssing pedestrina. Distribution type is normal distribution."
+        description: "Variance of the offset of the crossing pedestrian. Distribution type is normal distribution."
         read_only: false
         validation:
           bounds<>: [0, 1.2]

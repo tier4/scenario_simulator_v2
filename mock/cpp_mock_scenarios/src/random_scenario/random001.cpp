@@ -112,7 +112,7 @@ private:
   {
     [&]() {
       if (param_listener_->is_old(params_)) {
-        /// When the parameter was updated, clear entity before re-spawing entity.
+        /// When the parameter was updated, clear entity before re-spawning entity.
         despawnRoadParkingVehicles();
         despawnCrossingPedestrians();
         param_listener_->refresh_dynamic_parameters();
