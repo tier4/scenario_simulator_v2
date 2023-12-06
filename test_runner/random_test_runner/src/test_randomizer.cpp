@@ -104,10 +104,10 @@ TestRandomizer::generateEgoRoute(
 traffic_simulator_msgs::msg::LaneletPose
 TestRandomizer::generateRandomPoseWithinMinDistanceFromPosesFromLanelets(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
-  const std::vector<LaneletPart> & lanelets)
+  const std::vector<LaneletPart> & lanelets, double offset)
 {
   for (int attempt_number = 0; attempt_number < max_randomization_attempts; attempt_number++) {
-    auto ret = generatePoseFromLanelets(lanelets);
+    auto ret = generatePoseFromLanelets(lanelets, offset);
     if (poses.empty()) {
       return ret;
     }
@@ -161,7 +161,7 @@ traffic_simulator_msgs::msg::LaneletPose TestRandomizer::generateRandomPosition(
 }
 
 traffic_simulator_msgs::msg::LaneletPose TestRandomizer::generatePoseFromLanelets(
-  const std::vector<LaneletPart> & lanelets)
+  const std::vector<LaneletPart> & lanelets, double offset)
 {
   if (lanelets.empty()) {
     throw std::runtime_error("Lanelets from which position will be randomized cannot be empty");

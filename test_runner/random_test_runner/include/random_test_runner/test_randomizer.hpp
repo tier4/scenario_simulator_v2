@@ -41,7 +41,7 @@ private:
     const traffic_simulator_msgs::msg::LaneletPose & goal);
   traffic_simulator_msgs::msg::LaneletPose generateRandomPoseWithinMinDistanceFromPosesFromLanelets(
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
-    const std::vector<LaneletPart> & lanelets);
+    const std::vector<LaneletPart> & lanelets, double offset = 0.0);
   std::pair<traffic_simulator_msgs::msg::LaneletPose, traffic_simulator_msgs::msg::LaneletPose>
   generateEgoRoute(
     int64_t goal_lanelet_id, double goal_s, bool partial_randomization,
@@ -51,8 +51,11 @@ private:
   double getRandomS(const LaneletPart & lanelet);
   traffic_simulator_msgs::msg::LaneletPose generateRandomPosition();
   traffic_simulator_msgs::msg::LaneletPose generatePoseFromLanelets(
-    const std::vector<LaneletPart> & lanelets);
-  NPCVehicleDescription generateNpcFromLaneletsWithMinDistanceFromPoses(
+    const std::vector<LaneletPart> & lanelets, double offset = 0.0);
+  NPCVehicleDescription generateVehicleNpcFromLaneletsWithMinDistanceFromPoses(
+    int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
+    double min_distance, const std::vector<LaneletPart> & lanelets);
+  NPCPedestrianDescription generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses(
     int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
     double min_distance, const std::vector<LaneletPart> & lanelets);
 
