@@ -89,6 +89,9 @@ struct TestSuiteParameters
   double npc_vehicle_max_spawn_distance_from_ego = 100.0;
 
   int64_t npc_pedestrian_count = 1;
+  double npc_pedestrian_lanelet_min_offset = 3.0;
+  double npc_pedestrian_lanelet_max_offset = 5.0;
+
 };
 
 struct TestCaseParameters
@@ -151,10 +154,12 @@ DEFINE_FMT_FORMATTER(
   "{} "
   "npc_vehicle_max_speed: {} npc_vehicle_min_spawn_distance_from_ego: {} "
   "npc_vehicle_max_spawn_distance_from_ego: {} npc_pedestrian_count {} "
+  "npc_pedestrian_lanelet_min_offset: {} npc_pedestrian_lanelet_max_offset: {}"
   "name: {} map_name: {}",
   v.ego_goal_lanelet_id, v.ego_goal_s, v.ego_goal_partial_randomization,
   v.ego_goal_partial_randomization_distance, v.npc_vehicle_count, v.npc_vehicle_min_speed, v.npc_vehicle_max_speed,
-  v.npc_vehicle_min_spawn_distance_from_ego, v.npc_vehicle_max_spawn_distance_from_ego, v.npc_pedestrian_count, v.name, v.map_name)
+  v.npc_vehicle_min_spawn_distance_from_ego, v.npc_vehicle_max_spawn_distance_from_ego, v.npc_pedestrian_count,
+  v.npc_pedestrian_lanelet_min_offset, v.npc_pedestrian_lanelet_max_offset, v.name, v.map_name)
 
 DEFINE_FMT_FORMATTER(TestCaseParameters, "seed: {}", v.seed)
 

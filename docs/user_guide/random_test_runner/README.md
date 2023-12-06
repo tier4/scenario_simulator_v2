@@ -92,6 +92,8 @@ random_test:
   npc_vehicle_min_spawn_distance_from_ego: 10.000000000000000000
   npc_vehicle_max_spawn_distance_from_ego: 50.000000000000000000
   npc_pedestrian_count: 1
+  npc_pedestrian_lanelet_min_offset: 3.0
+  npc_pedestrian_lanelet_max_offset: 5.0
   test_cases:
     - seed: 1281242544
     - seed: 3644198185
@@ -220,6 +222,8 @@ Core test parameters. It sets map name, ego goal information and npc spawning pa
 | `npc_vehicle_min_spawn_distance_from_ego`         | `10.0`              | Minimum distance of generated vehicle npcs from ego                                                                                                                               |
 | `npc_vehicle_max_spawn_distance_from_ego`         | `100.0`             | Maximum distance of generated vehicle npcs from ego                                                                                                                               |
 | `npc_pedestrian_count`                               | `10`                | Generated pedestrian npc count                                                                                                                                                       |
+| `npc_pedestrian_lanelet_min_offset`                               | `3.0`                | Pedestrian minimum spawn point offset from lanelet                                                                                                                                                       |
+| `npc_pedestrian_lanelet_max_offset`                               | `3.0`                | Pedestrian maximum spawn point offset from lanelet                                                                                                                                                       |
 
 #### Test case parameters
 

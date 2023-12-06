@@ -46,6 +46,8 @@ struct convert<TestSuiteParameters>
     node["npc_vehicle_min_spawn_distance_from_ego"] = rhs.npc_vehicle_min_spawn_distance_from_ego;
     node["npc_vehicle_max_spawn_distance_from_ego"] = rhs.npc_vehicle_max_spawn_distance_from_ego;
     node["npc_pedestrian_count"] = rhs.npc_pedestrian_count;
+    node["npc_pedestrian_lanelet_min_offset"] = rhs.npc_pedestrian_lanelet_min_offset;
+    node["npc_pedestrian_lanelet_min_offset"] = rhs.npc_pedestrian_lanelet_min_offset;
     return node;
   }
 
@@ -68,6 +70,8 @@ struct convert<TestSuiteParameters>
     rhs.npc_vehicle_min_spawn_distance_from_ego = node["npc_vehicle_min_spawn_distance_from_ego"].as<double>();
     rhs.npc_vehicle_max_spawn_distance_from_ego = node["npc_vehicle_max_spawn_distance_from_ego"].as<double>();
     rhs.npc_pedestrian_count = node["npc_pedestrian_count"].as<int64_t>();
+    rhs.npc_pedestrian_lanelet_min_offset = node["npc_pedestrian_lanelet_min_offset"].as<double>();
+    rhs.npc_pedestrian_lanelet_max_offset = node["npc_pedestrian_lanelet_max_offset"].as<double>();
 
     return true;
   }
