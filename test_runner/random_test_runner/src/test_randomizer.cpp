@@ -60,9 +60,9 @@ TestDescription TestRandomizer::generate()
 
   std::vector<traffic_simulator_msgs::msg::LaneletPose> npc_poses;
   for (int npc_id = 0; npc_id < test_suite_parameters_.npc_vehicle_count; npc_id++) {
-    ret.npcs_descriptions.emplace_back(generateNpcFromLaneletsWithMinDistanceFromPoses(
+    ret.npcs_vehicle_descriptions.emplace_back(generateNpcFromLaneletsWithMinDistanceFromPoses(
       npc_id, npc_poses, min_npc_distance, lanelets_around_start));
-    npc_poses.emplace_back(ret.npcs_descriptions.back().start_position);
+    npc_poses.emplace_back(ret.npcs_vehicle_descriptions.back().start_position);
   }
   return ret;
 }

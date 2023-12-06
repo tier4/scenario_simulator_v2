@@ -119,8 +119,8 @@ void TestExecutor::initialize()
       goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
     }
 
-    for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
-      const auto & npc_descr = test_description_.npcs_descriptions[i];
+    for (size_t i = 0; i < test_description_.npcs_vehicle_descriptions.size(); i++) {
+      const auto & npc_descr = test_description_.npcs_vehicle_descriptions[i];
       api_->spawn(
         npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters());
       api_->setEntityStatus(
@@ -159,7 +159,7 @@ void TestExecutor::update()
       }
     }
     if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-      for (const auto & npc : test_description_.npcs_descriptions) {
+      for (const auto & npc : test_description_.npcs_vehicle_descriptions) {
         if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
           if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
             std::string message =
@@ -194,7 +194,7 @@ void TestExecutor::deinitialize()
     if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
       api_->despawn(ego_name_);
     }
-    for (const auto & npc : test_description_.npcs_descriptions) {
+    for (const auto & npc : test_description_.npcs_vehicle_descriptions) {
       api_->despawn(npc.name);
     }
   });

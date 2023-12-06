@@ -20,17 +20,26 @@
 #include <numeric>
 #include <ostream>
 #include <traffic_simulator/data_type/entity_status.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 
 #include "spdlog/fmt/fmt.h"
 #include "traffic_simulator_msgs/msg/action_status.hpp"
 #include "traffic_simulator_msgs/msg/entity_status.hpp"
 #include "traffic_simulator_msgs/msg/lanelet_pose.hpp"
 
-struct NPCDescription
+struct NPCVehicleDescription
 {
   traffic_simulator_msgs::msg::LaneletPose start_position;
   double speed;
   std::string name;
+};
+
+//TODO(mk): think of enum to define type of actions (static, oneWay, closedRoute)
+struct NPCPedestrianDescription
+{
+  double speed;
+  std::string name;
+  std::vector<geometry_msgs::msg::Pose> route;
 };
 
 struct TestDescription
@@ -39,7 +48,8 @@ struct TestDescription
   geometry_msgs::msg::Pose ego_goal_pose;
   traffic_simulator_msgs::msg::LaneletPose ego_start_position;
 
-  std::vector<NPCDescription> npcs_descriptions;
+  std::vector<NPCVehicleDescription> npcs_vehicle_descriptions;
+  std::vector<NPCPedestrianDescription> npcs_pedestrian_descriptions;
 };
 
 enum RandomTestType { RANDOM_RUN, REPLAY };
@@ -149,7 +159,30 @@ DEFINE_FMT_FORMATTER(
 DEFINE_FMT_FORMATTER(TestCaseParameters, "seed: {}", v.seed)
 
 DEFINE_FMT_FORMATTER(
-  NPCDescription, "name: {}, start_position: {}, speed: {}", v.name, v.start_position, v.speed)
+  NPCVehicleDescription, "name: {}, start_position: {}, speed: {}", v.name, v.start_position, v.speed)
+
+template <>
+struct fmt::formatter<NPCPedestrianDescription>
+{
+  template <typename ParseContext>
+  constexpr auto parse(ParseContext & ctx)
+  {
+    return ctx.begin();
+  }
+
+  template <typename FormatContext>
+  auto format(const NPCPedestrianDescription & v, FormatContext & ctx)
+  {
+    fmt::format_to(
+      ctx.out(),
+      "name: {}, speed: {}\nroute: ",
+      v.name, v.speed);
+    for (size_t idx = 0; idx < v.route.size(); idx++) {
+      fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.route[idx]);
+    }
+    return ctx.out();
+  }
+};
 
 template <>
 struct fmt::formatter<TestDescription>
@@ -166,10 +199,14 @@ struct fmt::formatter<TestDescription>
     fmt::format_to(
       ctx.out(),
       "ego_start_position: {} ego_goal_position: {} "
-      "ego_goal_pose: {}\nnpc_descriptions:",
+      "ego_goal_pose: {}\nnpc_vehicle_descriptions:",
       v.ego_start_position, v.ego_goal_position, v.ego_goal_pose);
-    for (size_t idx = 0; idx < v.npcs_descriptions.size(); idx++) {
-      fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.npcs_descriptions[idx]);
+    for (size_t idx = 0; idx < v.npcs_vehicle_descriptions.size(); idx++) {
+      fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.npcs_vehicle_descriptions[idx]);
+    }
+    fmt::format_to(ctx.out(), "\nnpc_pedestrian_descriptions:");
+    for (size_t idx = 0; idx < v.npcs_pedestrian_descriptions.size(); idx++) {
+      fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.npcs_pedestrian_descriptions[idx]);
     }
     return ctx.out();
   }
