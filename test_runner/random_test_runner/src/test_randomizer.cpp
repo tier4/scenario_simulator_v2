@@ -32,6 +32,8 @@ TestRandomizer::TestRandomizer(
   lanelet_ids_(lanelet_utils_->getLaneletIds()),
   randomization_engine_(std::make_shared<RandomizationEngine>(test_case_parameters.seed)),
   lanelet_id_randomizer_(randomization_engine_, 0, static_cast<int>(lanelet_ids_.size()) - 1),
+  lanelet_offset_randomizer_(randomization_engine_,
+    test_suite_parameters.npc_pedestrian_lanelet_min_offset, test_suite_parameters.npc_pedestrian_lanelet_max_offset),
   s_value_randomizer_(randomization_engine_, 0.0, 1.0),
   speed_randomizer_(
     randomization_engine_, test_suite_parameters.npc_vehicle_min_speed,

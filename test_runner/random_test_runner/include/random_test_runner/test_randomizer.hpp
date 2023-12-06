@@ -63,6 +63,7 @@ private:
 
   RandomizationEnginePtr randomization_engine_;
   LaneletIdRandomizer lanelet_id_randomizer_;
+  LaneletOffsetRandomizer lanelet_offset_randomizer_;
   SValueRandomizer s_value_randomizer_;
   SpeedRandomizer speed_randomizer_;
 
