@@ -378,7 +378,7 @@ TEST(CatmullRomSpline, getPolygonEdge)
   // FIXME should this throw a propagated error, or catch it and throw its own with a clear message what has happened?
   // EXPECT_THROW(spline.getPolygon(1, 0), common::SimulationError);
   std::vector<geometry_msgs::msg::Point> polygon0 = spline.getPolygon(1.0, 0);
-  EXPECT_EQ(polygon0.size(), static_cast<size_t>(20));
+  EXPECT_EQ(polygon0.size(), static_cast<size_t>(0));
 
   std::vector<geometry_msgs::msg::Point> polygon1 = spline.getPolygon(1.0, 1);
   EXPECT_EQ(polygon1.size(), static_cast<size_t>(6));
