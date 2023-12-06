@@ -50,6 +50,20 @@ traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
   return parameters;
 }
 
+traffic_simulator_msgs::msg::PedestrianParameters getPedestrianParameters()
+{
+  traffic_simulator_msgs::msg::PedestrianParameters parameters;
+  parameters.name = "pedestrian";
+  parameters.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
+  parameters.bounding_box.center.x = 0.0;
+  parameters.bounding_box.center.y = 0.0;
+  parameters.bounding_box.center.z = 0.5;
+  parameters.bounding_box.dimensions.x = 1.0;
+  parameters.bounding_box.dimensions.y = 1.0;
+  parameters.bounding_box.dimensions.z = 2.0;
+  return parameters;
+}
+
 TestExecutor::TestExecutor(
   std::shared_ptr<traffic_simulator::API> api, TestDescription description,
   JunitXmlReporterTestCase test_case_reporter, SimulatorType simulator_type,
