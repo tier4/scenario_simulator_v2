@@ -44,8 +44,8 @@ auto any(F f, T && x, Ts &&... xs)
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time)
-  -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time,
+  std::optional<double> target_speed) -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
@@ -93,7 +93,8 @@ auto makeUpdatedStatus(
       polyline_trajectory.shape.vertices.pop_back();
     }
 
-    return makeUpdatedStatus(entity_status, polyline_trajectory, behavior_parameter, step_time);
+    return makeUpdatedStatus(
+      entity_status, polyline_trajectory, behavior_parameter, step_time, target_speed);
   };
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
@@ -105,9 +106,8 @@ auto makeUpdatedStatus(
   };
 
   auto is_breaking_waypoint = [&]() {
-    return polyline_trajectory.shape.vertices.size() == 1 ||
-           first_waypoint_with_arrival_time_specified() ==
-             polyline_trajectory.shape.vertices.end() - 1;
+    return first_waypoint_with_arrival_time_specified() >=
+           polyline_trajectory.shape.vertices.end() - 1;
   };
 
   /*
@@ -262,8 +262,8 @@ auto makeUpdatedStatus(
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ", speed,
       ".");
-  } else if (const auto follow_waypoint_controller =
-               FollowWaypointController(behavior_parameter, step_time, is_breaking_waypoint());
+  } else if (const auto follow_waypoint_controller = FollowWaypointController(
+               behavior_parameter, step_time, is_breaking_waypoint(), target_speed);
              false) {
   } else if (
     /*
@@ -473,7 +473,6 @@ auto makeUpdatedStatus(
           " from that waypoint which is greater than the accepted accuracy.");
       }
     }
-
     const auto current_velocity =
       quaternion_operation::convertQuaternionToEulerAngle(entity_status.pose.orientation) *
       entity_status.action_status.twist.linear.x;
@@ -492,15 +491,16 @@ auto makeUpdatedStatus(
     updated_status.pose.position += velocity * step_time;
 
     updated_status.pose.orientation = [&]() {
-      // do not change orientation if there is no velocity vector
       if (velocity.y == 0 && velocity.x == 0) {
+        // do not change orientation if there is no velocity vector
         return entity_status.pose.orientation;
+      } else {
+        geometry_msgs::msg::Vector3 direction;
+        direction.x = 0;
+        direction.y = 0;
+        direction.z = std::atan2(velocity.y, velocity.x);
+        return quaternion_operation::convertEulerAngleToQuaternion(direction);
       }
-      geometry_msgs::msg::Vector3 direction;
-      direction.x = 0;
-      direction.y = 0;
-      direction.z = std::atan2(velocity.y, velocity.x);
-      return quaternion_operation::convertEulerAngleToQuaternion(direction);
     }();
 
     updated_status.action_status.twist.linear.x = norm(velocity);

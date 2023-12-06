@@ -186,10 +186,12 @@ class FollowWaypointController
 public:
   FollowWaypointController(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-    const double step_time, const bool with_breaking)
+    const double step_time, const bool with_breaking,
+    const std::optional<double> & target_speed = std::nullopt)
   : step_time{step_time},
     with_breaking{with_breaking},
-    max_speed{behavior_parameter.dynamic_constraints.max_speed},
+    max_speed{
+      target_speed ? target_speed.value() : behavior_parameter.dynamic_constraints.max_speed},
     max_acceleration{behavior_parameter.dynamic_constraints.max_acceleration},
     max_acceleration_rate{behavior_parameter.dynamic_constraints.max_acceleration_rate},
     max_deceleration{behavior_parameter.dynamic_constraints.max_deceleration},
