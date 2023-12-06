@@ -165,7 +165,7 @@ TEST(HermiteCurveTest, getTrajectoryPast1)
   const auto curve = makeLine2();
   EXPECT_NO_THROW(auto trajectory = curve.getTrajectory(0.0, 1.0, 0.1, false));
   auto trajectory = curve.getTrajectory(0.0, 1.0, 0.1, false);
-  std::vector<geometry_msgs::msg::Point> ans(10);
+  std::vector<geometry_msgs::msg::Point> ans(11);
   generateReferenceTrajectory(0.0, 0.0, 0.2, 0.2, ans, 1u);
 
   EXPECT_EQ(trajectory.size(), ans.size());
@@ -182,6 +182,7 @@ TEST(HermiteCurveTest, getTrajectoryPast1)
   EXPECT_POINT_NEAR(trajectory[7], ans[7], eps);
   EXPECT_POINT_NEAR(trajectory[8], ans[8], eps);
   EXPECT_POINT_NEAR(trajectory[9], ans[9], eps);
+  EXPECT_POINT_NEAR(trajectory[10], ans[10], eps);
 }
 
 TEST(HermiteCurveTest, getTrajectoryPast2)
@@ -189,7 +190,7 @@ TEST(HermiteCurveTest, getTrajectoryPast2)
   const auto curve = makeLine2();
   EXPECT_NO_THROW(auto trajectory = curve.getTrajectory(0.0, std::sqrt(2.0) * 2.0, 0.1, true));
   auto trajectory = curve.getTrajectory(0, std::sqrt(2.0) * 2.0, 0.1 * std::sqrt(2.0) * 2.0, true);
-  std::vector<geometry_msgs::msg::Point> ans(10);
+  std::vector<geometry_msgs::msg::Point> ans(11);
   generateReferenceTrajectory(0.0, 0.0, 0.2, 0.2, ans, 1u);
 
   EXPECT_EQ(trajectory.size(), ans.size());
@@ -206,6 +207,7 @@ TEST(HermiteCurveTest, getTrajectoryPast2)
   EXPECT_POINT_NEAR(trajectory[7], ans[7], eps);
   EXPECT_POINT_NEAR(trajectory[8], ans[8], eps);
   EXPECT_POINT_NEAR(trajectory[9], ans[9], eps);
+  EXPECT_POINT_NEAR(trajectory[10], ans[10], eps);
 }
 
 TEST(HermiteCurveTest, getPointLine)
