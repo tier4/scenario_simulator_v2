@@ -205,16 +205,6 @@ TEST(CatmullRomSpline, GetCollisionPointIn2D)
   }
 }
 
-/**
- * This test is not passing because the getCollisionPointIn2D function calling getCollisionPointIn2D
- * on HermiteCurve, which operates on a normalized lengths. After that the accumulated collision S
- * is calculated as a sum of previous HermiteCurves lengths + this HermiteCurve collision S (which
- * is calculated relative to the total length of this HermiteCurve).
- * 
- * Possible fix:
- * - Add autoscale argument to the HermiteCurve getCollisionPointIn2D function and if it is true
- *   then multiply S value by total length (like in almost every other member function of this class)
- */
 TEST(CatmullRomSpline, getCollisionPointIn2D)
 {
   const std::vector<geometry_msgs::msg::Point> points{
@@ -286,11 +276,11 @@ TEST(CatmullRomSpline, getCollisionPointIn2DPolygon)
 
   const auto collision_s0 = spline.getCollisionPointIn2D(polygon);
   EXPECT_TRUE(collision_s0);
-  EXPECT_NEAR(collision_s0.value(), 0.56727227, EPS);  // TODO check after fix if value is OK
+  EXPECT_NEAR(collision_s0.value(), 0.56727227, EPS);
 
   const auto collision_s1 = spline.getCollisionPointIn2D(polygon, true);
   EXPECT_TRUE(collision_s1);
-  EXPECT_NEAR(collision_s1.value(), 0.56727227, EPS);  // TODO check after fix if value is OK
+  EXPECT_NEAR(collision_s1.value(), 0.56727227, EPS);
 }
 
 TEST(CatmullRomSpline, getCollisionPointIn2DEmpty)
@@ -308,10 +298,6 @@ TEST(CatmullRomSpline, getMaximum2DCurvatureLine)
   EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0.0);
 }
 
-/**
- * This test fails, because this function chooses maximum value and not the value with greatest
- * absolute value. The curvature -10 is much tighter than 2, but here 2 would be the maximum.
- */
 TEST(CatmullRomSpline, getMaximum2DCurvatureCurve)
 {
   const std::vector<geometry_msgs::msg::Point> points{
@@ -361,22 +347,9 @@ TEST(CatmullRomSpline, getPolygon)
   EXPECT_POINT_NEAR(polygon[23], makePoint(4.0, 0.5), EPS);
 }
 
-/**
- * Statement spline.getPolygon(1, 0) throws this exception:
- * /home/aorusadmin/autoware_ss2_test_implementation/src/simulator/scenario_simulator/common/math/geometry/src/spline/catmull_rom_spline.cpp:256: failed to calculate curve index
- * This happens because the num_points (= 0) is used in getLeftBounds to calculate step_size (which
- * is then equal to infinity). This leads to an infinite `s` value which propagates this way:
- * getLeftBounds -> getLeftBoundsPoint -> getNormalVector -> getCurveIndexAndS (which throws this exception)
- * 
- * Possible fix:
- * - Catch this exception and throw our own which will have a meaningful description.
- * - Add early return in getPolygon when num_points == 0 so that it does not throw.
- */
 TEST(CatmullRomSpline, getPolygonEdge)
 {
   math::geometry::CatmullRomSpline spline = makeCurve();
-  // FIXME should this throw a propagated error, or catch it and throw its own with a clear message what has happened?
-  // EXPECT_THROW(spline.getPolygon(1, 0), common::SimulationError);
   std::vector<geometry_msgs::msg::Point> polygon0 = spline.getPolygon(1.0, 0);
   EXPECT_EQ(polygon0.size(), static_cast<size_t>(0));
 

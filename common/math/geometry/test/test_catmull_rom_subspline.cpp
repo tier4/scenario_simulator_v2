@@ -54,10 +54,6 @@ TEST(CatmullRomSubspline, getLength_zero)
   EXPECT_DOUBLE_EQ(spline1.getLength(), 0.0);
 }
 
-/**
- * This test tests function that does not function properly yet. I have opened a github issue about
- * the spline collision calculation (which directly affects subspline collision calculation).
- */
 TEST(CatmullRomSubspline, getCollisionPointIn2D)
 {
   const auto spline_ptr = makeLine();
@@ -88,19 +84,6 @@ TEST(CatmullRomSubspline, getCollisionPointIn2D)
   EXPECT_NEAR(ans11.value(), std::hypot(1.25, 3.75), EPS);
 }
 
-/**
- * This test fails because the subspline logic is incorrect. It obtains the collision with
- * the polygon (either first or lst one depending on the search_backward parameter) and then - if
- * the collision point is outside of subspline - returns nothing. This leads to incorrect behavior
- * when the polygon collides with the spline in more than one point, but some of these points are 
- * not on the subspline. If the polygon collides with the spline 2 times and the first collision 
- * point is outside of the subspline, but the second collision point is inside of the subspline and
- * the search_backward parameter is set to true, the second (valid) collision is ignored and nothing
- * is returned.
- * The possible fix for this may be to add function in spline that returns all collision points, not
- * only the first one, and in subspline check all of them and choose the first one that is in the
- * subspline.
- */
 TEST(CatmullRomSubspline, getCollisionPointIn2D_shiftedBeginning)
 {
   const auto spline_ptr = makeLine();
