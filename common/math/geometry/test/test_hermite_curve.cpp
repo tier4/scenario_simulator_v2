@@ -467,8 +467,6 @@ TEST(HermiteCurveTest, getCollisionPointIn2DVectorMultipleCollisions)
   EXPECT_NEAR(s2.value(), 0.75, eps);
 }
 
-TEST(HermiteCurveTest, getNewtonMethodStepSize) {}
-
 TEST(HermiteCurveTest, getTangentVector1)
 {  //p(0,0) v(1,0)-> p(1,1) v(0,1)
   const auto curve = makeCurve1();
