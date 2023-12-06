@@ -37,8 +37,9 @@ struct NPCVehicleDescription
 //TODO(mk): think of enum to define type of actions (static, oneWay, closedRoute)
 struct NPCPedestrianDescription
 {
-  double speed;
   std::string name;
+  double speed;
+  traffic_simulator_msgs::msg::LaneletPose spawn_position;
   std::vector<geometry_msgs::msg::Pose> route;
 };
 
@@ -180,8 +181,8 @@ struct fmt::formatter<NPCPedestrianDescription>
   {
     fmt::format_to(
       ctx.out(),
-      "name: {}, speed: {}\nroute: ",
-      v.name, v.speed);
+      "name: {}, speed: {}, spawn_position: {}\nroute: ",
+      v.name, v.speed, v.spawn_position);
     for (size_t idx = 0; idx < v.route.size(); idx++) {
       fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.route[idx]);
     }
