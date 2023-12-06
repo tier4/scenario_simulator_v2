@@ -138,11 +138,11 @@ double lerp(
 
 }  // namespace interpolation
 
+using Table = std::vector<std::vector<std::string>>;
+using Map = std::vector<std::vector<double>>;
 /**
  * @note copied from https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/include/simple_planning_simulator/utils/csv_loader.hpp
  */
-using Table = std::vector<std::vector<std::string>>;
-using Map = std::vector<std::vector<double>>;
 class CSVLoader
 {
 public:
