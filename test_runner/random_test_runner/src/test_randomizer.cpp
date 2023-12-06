@@ -60,11 +60,17 @@ TestDescription TestRandomizer::generate()
     ret.ego_start_position, test_suite_parameters_.npc_vehicle_min_spawn_distance_from_ego,
     test_suite_parameters_.npc_vehicle_max_spawn_distance_from_ego);
 
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> npc_poses;
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> npc_vehicle_poses;
   for (int npc_id = 0; npc_id < test_suite_parameters_.npc_vehicle_count; npc_id++) {
-    ret.npcs_vehicle_descriptions.emplace_back(generateNpcFromLaneletsWithMinDistanceFromPoses(
-      npc_id, npc_poses, min_npc_distance, lanelets_around_start));
-    npc_poses.emplace_back(ret.npcs_vehicle_descriptions.back().start_position);
+    ret.npcs_vehicle_descriptions.emplace_back(generateVehicleNpcFromLaneletsWithMinDistanceFromPoses(
+      npc_id, npc_vehicle_poses, min_npc_distance, lanelets_around_start));
+    npc_vehicle_poses.emplace_back(ret.npcs_vehicle_descriptions.back().start_position);
+  }
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> npc_pedestrian_poses;
+  for (int npc_id = 0; npc_id < test_suite_parameters_.npc_pedestrian_count; npc_id++) {
+    ret.npcs_pedestrian_descriptions.emplace_back(generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses(
+      npc_id, npc_pedestrian_poses, min_npc_distance, lanelets_around_start));
+    npc_pedestrian_poses.emplace_back(ret.npcs_pedestrian_descriptions.back().spawn_position);
   }
   return ret;
 }
@@ -169,16 +175,32 @@ traffic_simulator_msgs::msg::LaneletPose TestRandomizer::generatePoseFromLanelet
   LaneletIdRandomizer npc_lanelet_id_randomizer(randomization_engine_, 0, lanelets.size() - 1);
   LaneletPart lanelet_part = lanelets[npc_lanelet_id_randomizer.generate()];
   return traffic_simulator::helper::constructLaneletPose(
-    lanelet_part.lanelet_id, getRandomS(lanelet_part));
+    lanelet_part.lanelet_id, getRandomS(lanelet_part), offset);
 }
 
-NPCVehicleDescription TestRandomizer::generateNpcFromLaneletsWithMinDistanceFromPoses(
+NPCVehicleDescription TestRandomizer::generateVehicleNpcFromLaneletsWithMinDistanceFromPoses(
   int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
   double min_distance, const std::vector<LaneletPart> & lanelets)
 {
   std::stringstream npc_name_ss;
-  npc_name_ss << "npc" << npc_id;
+  npc_name_ss << "vehicleNPC" << npc_id;
   return {
     generateRandomPoseWithinMinDistanceFromPosesFromLanelets(poses, min_distance, lanelets),
     speed_randomizer_.generate(), npc_name_ss.str()};
+}
+
+NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses(
+  int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
+  double min_distance, const std::vector<LaneletPart> & lanelets)
+{
+  std::stringstream npc_name_ss;
+  npc_name_ss << "pedestrianNPC" << npc_id;
+  //TODO(mk): differ speed randomizer for Vehicles and NPCS
+  //TODO(mk): add route generation
+  return {
+     npc_name_ss.str(),
+     speed_randomizer_.generate(),
+     generateRandomPoseWithinMinDistanceFromPosesFromLanelets(poses, min_distance, lanelets, lanelet_offset_randomizer_.generate()),
+     {}
+  };
 }

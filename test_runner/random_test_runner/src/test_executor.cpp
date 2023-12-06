@@ -142,6 +142,23 @@ void TestExecutor::initialize()
         traffic_simulator::helper::constructActionStatus(npc_descr.speed));
       api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
     }
+
+    for (size_t i = 0; i < test_description_.npcs_pedestrian_descriptions.size(); i++) {
+      const auto & npc_descr = test_description_.npcs_pedestrian_descriptions[i];
+      api_->spawn(
+        //TODO(mk): Add planner choice parameter
+        //TODO(mk): Add speed parameter
+        npc_descr.name, api_->canonicalize(npc_descr.spawn_position), getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
+      api_->requestSpeedChange(
+        npc_descr.name, 0.0, traffic_simulator::speed_change::Transition::LINEAR,
+        traffic_simulator::speed_change::Constraint(
+          traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+        true);
+      // api_->setEntityStatus(
+      //   npc_descr.name, api_->canonicalize(npc_descr.start_position),
+      //   traffic_simulator::helper::constructActionStatus(npc_descr.speed));
+      // api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
+    }
   });
 }
 
@@ -209,6 +226,10 @@ void TestExecutor::deinitialize()
       api_->despawn(ego_name_);
     }
     for (const auto & npc : test_description_.npcs_vehicle_descriptions) {
+      api_->despawn(npc.name);
+    }
+
+    for (const auto & npc : test_description_.npcs_pedestrian_descriptions) {
       api_->despawn(npc.name);
     }
   });
