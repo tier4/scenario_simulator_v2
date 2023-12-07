@@ -177,6 +177,16 @@ auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
     });
   }
 
+  if (const auto name = prefix + "conflicts_with"; node.has_parameter(name)) {
+    if (const auto id = node.get_parameter(name).as_int(); id) {
+      constraints.emplace(name, [id](auto && lanelet, auto &&, auto && graph) {
+        const auto suspects = graph.conflicting(lanelet);
+        return std::any_of(
+          suspects.begin(), suspects.end(), [&](auto && suspect) { return suspect.id() == id; });
+      });
+    }
+  }
+
   if (const auto name = prefix + "related_to_regulatory_element_subtyped";
       node.has_parameter(name)) {
     if (const auto subtype = node.get_parameter(name).as_string(); not subtype.empty()) {
@@ -266,6 +276,10 @@ auto loadAllLaneletConstraints(Node & node, const std::string & prefix = "")
     node.declare_parameter(name, std::numeric_limits<double>::lowest());
   }
 
+  if (const auto name = prefix + "conflicts_with"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
   if (const auto name = prefix + "related_to_regulatory_element_subtyped";
       not node.has_parameter(name)) {
     node.declare_parameter(name, "");
@@ -308,24 +322,6 @@ auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = 
     }
   }
 
-  if (const auto name = prefix + "excluded_both_ends_conflicts_with"; node.has_parameter(name)) {
-    if (const auto id = node.get_parameter(name).as_int(); id) {
-      constraints.emplace(name, [id](auto && path, auto && map, auto && graph) {
-        if (const auto found = map.laneletLayer.find(id); found != map.laneletLayer.end()) {
-          const auto conflicting = graph.conflicting(*found);
-          return 2 < path.size() and
-                 std::any_of(
-                   std::next(path.begin()), std::prev(path.end()), [&](auto && path_element) {
-                     return std::find(conflicting.begin(), conflicting.end(), path_element) !=
-                            conflicting.end();
-                   });
-        } else {
-          return false;
-        }
-      });
-    }
-  }
-
   return constraints;
 }
 
@@ -339,11 +335,6 @@ auto loadAllLaneletPathConstraints(Node & node, const std::string & prefix = "")
   if (const auto name = prefix + "is_allowed_to_contain_duplicate_lanelet_ids";
       not node.has_parameter(name)) {
     node.declare_parameter(name, false);
-  }
-
-  if (const auto name = prefix + "excluded_both_ends_conflicts_with";
-      not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
   }
 
   return loadLaneletPathConstraints(node, prefix);

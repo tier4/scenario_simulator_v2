@@ -61,11 +61,11 @@ OpenSCENARIO:
       - name: vehicle1_path
         parameterType: string
         value: $(ros2 run map_fragment path --ros-args
+          -p any_middle_lanelets_conflicts_with:=$(var curve_id)
           -p first_lanelet_id_is_not_equal_to:=$(var ego_start_lanelet_id)
           -p ignore_errors_ocurred_while_parsing_lanelet_map:=true
           -p input_directory:=$(var map_path)
           -p path_element_limit:=3
-          -p path_excluded_both_ends_conflicts_with:=$(var curve_id)
           -p select:=any
           )
       - name: vehicle1_start_lanelet_id
