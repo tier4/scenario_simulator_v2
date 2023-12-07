@@ -39,6 +39,24 @@ try {
       });
     };
 
+  auto satisfy_any_middle_lanelets_constraints = [&, constraints = loadAllLaneletIDConstraints(
+                                                       node, "any_middle_lanelets_")](
+                                                   const auto & path) {
+    return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
+      return 2 < path.size() and
+             std::any_of(std::next(path.begin()), std::prev(path.end()), [&](const auto & lanelet) {
+               return constraint.second(lanelet, *lanelet_map, *routing_graph);
+             });
+    });
+  };
+
+  auto satisfy_last_lanelet_constraints =
+    [&, constraints = loadAllLaneletIDConstraints(node, "last_lanelet_")](const auto & path) {
+      return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
+        return constraint.second(path.back(), *lanelet_map, *routing_graph);
+      });
+    };
+
   node.declare_parameter("path_is_allowed_to_include_lane_changes", false);
   node.declare_parameter("path_element_limit", 5);
 
@@ -58,24 +76,6 @@ try {
         return constraint.second(path, *lanelet_map, *routing_graph);
       });
     };
-
-  auto satisfy_last_lanelet_constraints =
-    [&, constraints = loadAllLaneletIDConstraints(node, "last_lanelet_")](const auto & path) {
-      return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
-        return constraint.second(path.back(), *lanelet_map, *routing_graph);
-      });
-    };
-
-  auto satisfy_any_middle_lanelets_constraints = [&, constraints = loadAllLaneletIDConstraints(
-                                                       node, "any_middle_lanelets_")](
-                                                   const auto & path) {
-    return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
-      return 2 < path.size() and
-             std::any_of(std::next(path.begin()), std::prev(path.end()), [&](const auto & lanelet) {
-               return constraint.second(lanelet, *lanelet_map, *routing_graph);
-             });
-    });
-  };
 
   node.declare_parameter("select", "any");
 
