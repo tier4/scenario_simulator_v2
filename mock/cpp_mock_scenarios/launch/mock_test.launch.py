@@ -78,7 +78,7 @@ def generate_launch_description():
     junit_path = LaunchConfiguration("junit_path", default="/tmp/output.xunit.xml")
     launch_rviz = LaunchConfiguration("launch_rviz", default=False)
     vehicle_model = LaunchConfiguration("vehicle_model", default="sample_vehicle")
-    sensor_model = LaunchConfiguration("sensor_model", default="aip_xx1")
+    sensor_model = LaunchConfiguration("sensor_model", default="sample_sensor_kit")
     scenario_node = Node(
         package=scenario_package,
         executable=scenario,
