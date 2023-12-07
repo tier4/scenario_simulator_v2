@@ -77,7 +77,7 @@ def generate_launch_description():
     scenario_package = LaunchConfiguration("package", default="cpp_mock_scenarios")
     junit_path = LaunchConfiguration("junit_path", default="/tmp/output.xunit.xml")
     launch_rviz = LaunchConfiguration("launch_rviz", default=False)
-    vehicle_model = LaunchConfiguration("vehicle_model", default="jpntaxi")
+    vehicle_model = LaunchConfiguration("vehicle_model", default="sample_vehicle")
     sensor_model = LaunchConfiguration("sensor_model", default="aip_xx1")
     scenario_node = Node(
         package=scenario_package,
