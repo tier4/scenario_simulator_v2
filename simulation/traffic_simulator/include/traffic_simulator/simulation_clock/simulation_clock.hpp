@@ -29,17 +29,33 @@ public:
 
   auto getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock;
 
-  auto getCurrentScenarioTime() const { return (frame_ - frame_offset_) / frame_rate * realtime_factor; }
+  auto getCurrentScenarioTime() const
+  {
+    auto nanoseconds = nanoseconds_count - nanoseconds_offset;
+    auto seconds = seconds_count - seconds_offset;
 
-  auto getCurrentSimulationTime() const { return frame_ / frame_rate * realtime_factor; }
+    if (nanoseconds < 0) {
+      seconds -= 1;
+      nanoseconds += 1000000000;
+    }
+
+    return nanoseconds / 1000000000.0 + seconds;
+  }
+
+  auto getCurrentSimulationTime() const { return nanoseconds_count / 1000000000.0 + seconds_count; }
 
   auto getStepTime() const { return realtime_factor / frame_rate; }
 
   auto start() -> void;
 
-  auto started() const { return not std::isnan(frame_offset_); }
+  auto started() const
+  {
+    return not std::isnan(nanoseconds_offset) || not std::isnan(seconds_offset);
+  }
 
   auto update() -> void;
+
+  auto setRealTimeFactor(double realtime_factor_) { realtime_factor = realtime_factor_; };
 
   const bool use_raw_clock;
 
@@ -50,9 +66,13 @@ public:
   const rclcpp::Time time_on_initialize;
 
 private:
-  double frame_ = 0;
+  double seconds_count = 0;
 
-  double frame_offset_ = std::numeric_limits<double>::quiet_NaN();
+  double nanoseconds_count = 0;
+
+  double seconds_offset = std::numeric_limits<double>::quiet_NaN();
+
+  double nanoseconds_offset = std::numeric_limits<double>::quiet_NaN();
 };
 }  // namespace traffic_simulator
 

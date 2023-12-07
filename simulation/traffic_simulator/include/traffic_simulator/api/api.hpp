@@ -27,6 +27,7 @@
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
+#include <std_msgs/msg/float64.hpp>
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
@@ -79,6 +80,10 @@ public:
       simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
     setVerbose(configuration.verbose);
+
+    real_time_factor_subscriber = rclcpp::create_subscription<std_msgs::msg::Float64>(
+      node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
+      [this](const std_msgs::msg::Float64 & message) { clock_.setRealTimeFactor(message.data); });
 
     if (not configuration.standalone_mode) {
       simulation_api_schema::InitializeRequest request;
@@ -367,6 +372,8 @@ private:
   const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
 
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr debug_marker_pub_;
+
+  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr real_time_factor_subscriber;
 
   SimulationClock clock_;
 
