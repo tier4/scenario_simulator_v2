@@ -27,13 +27,14 @@ namespace map_fragment
 
 using Point = Eigen::Vector3d;
 using Vector = Eigen::Vector3d;
+using PointOrVector = Eigen::Vector3d;
 
 using Transformation = Eigen::Transform<double, 3, Eigen::TransformTraits::AffineCompact>;
 
 /**
  * Rotate a point or vector in z axis by a given angle.
  */
-auto rotateInZAxis(const Eigen::Vector3d & point_or_vector, const double angle) -> Eigen::Vector3d
+auto rotateInZAxis(const PointOrVector & point_or_vector, const double angle) -> Eigen::Vector3d
 {
   const auto rotation = Eigen::AngleAxis(angle, Eigen::Vector3d::UnitZ());
   const auto transformation = Transformation(rotation);
