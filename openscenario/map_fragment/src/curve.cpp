@@ -64,7 +64,7 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  const std::vector<ParametricCurve::ConstPointer> guide_curve_segments = {
+  const std::vector<ParametricCurve::ConstSharedPointer> guide_curve_segments = {
 
     // Straight segment before the turn
     std::make_shared<Straight>(before_length),

@@ -34,7 +34,7 @@ namespace map_fragment
 class ParametricCurve
 {
 public:
-  using ConstPointer = std::shared_ptr<const ParametricCurve>;
+  using ConstSharedPointer = std::shared_ptr<const ParametricCurve>;
 
   /**
    * Calculate curve point for given parameter tangent ∈ [0, 1]
@@ -157,9 +157,10 @@ class CombinedCurve : public ParametricCurve
   std::vector<Transformation> transformations_;
 
 public:
-  const std::vector<ParametricCurve::ConstPointer> curves;
+  const std::vector<ParametricCurve::ConstSharedPointer> curves;
 
-  explicit CombinedCurve(const std::vector<ParametricCurve::ConstPointer> & curves) : curves(curves)
+  explicit CombinedCurve(const std::vector<ParametricCurve::ConstSharedPointer> & curves)
+  : curves(curves)
   {
     rcpputils::require_true(
       curves.size() >= 2, "Number of curves to be combined must be two or more. Actual number: " +

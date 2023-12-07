@@ -82,12 +82,12 @@ public:
 class RoadSegment
 {
 public:
-  const ParametricCurve::ConstPointer guide_curve;
+  const ParametricCurve::ConstSharedPointer guide_curve;
 
   const RoadCrossSectionDescription cross_section_description;
 
   explicit RoadSegment(
-    const ParametricCurve::ConstPointer guide_curve,
+    const ParametricCurve::ConstSharedPointer guide_curve,
     const RoadCrossSectionDescription & cross_section_description)
   : guide_curve(guide_curve), cross_section_description(cross_section_description)
   {
