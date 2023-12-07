@@ -33,25 +33,25 @@ try {
     lanelet::routing::RoutingGraph::build(*lanelet_map, vehicleTrafficRules());
 
   auto satisfy_first_lanelet_constraints =
-    [&, constraints = loadAllLaneletIDConstraints(node, "first_lanelet_")](const auto & lanelet) {
+    [&, constraints = loadAllLaneletConstraints(node, "first_lanelet_")](const auto & lanelet) {
       return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
         return constraint.second(lanelet, *lanelet_map, *routing_graph);
       });
     };
 
-  auto satisfy_any_middle_lanelets_constraints = [&, constraints = loadAllLaneletIDConstraints(
-                                                       node, "any_middle_lanelets_")](
-                                                   const auto & path) {
-    return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
-      return 2 < path.size() and
-             std::any_of(std::next(path.begin()), std::prev(path.end()), [&](const auto & lanelet) {
-               return constraint.second(lanelet, *lanelet_map, *routing_graph);
-             });
-    });
-  };
+  auto satisfy_any_middle_lanelets_constraints =
+    [&, constraints = loadAllLaneletConstraints(node, "any_middle_lanelets_")](const auto & path) {
+      return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
+        return 2 < path.size() and
+               std::any_of(
+                 std::next(path.begin()), std::prev(path.end()), [&](const auto & lanelet) {
+                   return constraint.second(lanelet, *lanelet_map, *routing_graph);
+                 });
+      });
+    };
 
   auto satisfy_last_lanelet_constraints =
-    [&, constraints = loadAllLaneletIDConstraints(node, "last_lanelet_")](const auto & path) {
+    [&, constraints = loadAllLaneletConstraints(node, "last_lanelet_")](const auto & path) {
       return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {
         return constraint.second(path.back(), *lanelet_map, *routing_graph);
       });

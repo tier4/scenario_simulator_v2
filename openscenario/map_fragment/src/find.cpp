@@ -32,7 +32,7 @@ try {
   const auto routing_graph =
     lanelet::routing::RoutingGraph::build(*lanelet_map, vehicleTrafficRules());
 
-  const auto constraints = loadAllLaneletIDConstraints(node);
+  const auto constraints = loadAllLaneletConstraints(node);
 
   auto satisfy = [&](const auto & lanelet) {
     return std::all_of(constraints.begin(), constraints.end(), [&](const auto & constraint) {

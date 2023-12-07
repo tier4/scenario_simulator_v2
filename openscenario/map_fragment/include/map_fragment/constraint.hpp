@@ -50,7 +50,7 @@ auto isRightmost(
 }
 
 template <typename Node>
-auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = "")
+auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
 {
   std::unordered_map<
     std::string, std::function<bool(
@@ -188,7 +188,7 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
 }
 
 template <typename Node>
-auto loadAllLaneletIDConstraints(Node & node, const std::string & prefix = "")
+auto loadAllLaneletConstraints(Node & node, const std::string & prefix = "")
 {
   if (const auto name = prefix + "lanelet_type"; not node.has_parameter(name)) {
     node.declare_parameter(name, "lanelet");
@@ -255,7 +255,7 @@ auto loadAllLaneletIDConstraints(Node & node, const std::string & prefix = "")
     node.declare_parameter(name, 0.0);
   }
 
-  return loadLaneletIDConstraints(node, prefix);
+  return loadLaneletConstraints(node, prefix);
 }
 
 template <typename Node>
