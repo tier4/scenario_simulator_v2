@@ -59,6 +59,7 @@ public:
     double max_distance);
 
   std::vector<int64_t> getLaneletIds();
+  lanelet::Ids filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]);
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
   std::vector<int64_t> getRoute(int64_t from_lanelet_id, int64_t to_lanelet_id);
   double getLaneletLength(int64_t lanelet_id);

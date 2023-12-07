@@ -20,7 +20,10 @@
 #include <numeric>
 #include <ostream>
 #include <traffic_simulator/data_type/entity_status.hpp>
+#include <builtin_interfaces/msg/time.hpp>
+#include <std_msgs/msg/header.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 
 #include "spdlog/fmt/fmt.h"
 #include "traffic_simulator_msgs/msg/action_status.hpp"
@@ -116,6 +119,10 @@ struct TestCaseParameters
     }                                                            \
   };
 
+DEFINE_FMT_FORMATTER(builtin_interfaces::msg::Time, " sec {}, nanosec: {}", v.sec, v.nanosec)
+
+DEFINE_FMT_FORMATTER(std_msgs::msg::Header, " stamp {}, frame_id: {}", v.stamp, v.frame_id)
+
 DEFINE_FMT_FORMATTER(geometry_msgs::msg::Vector3, "(x, y, z) : ({}, {}, {})", v.x, v.y, v.z)
 
 DEFINE_FMT_FORMATTER(
@@ -133,6 +140,9 @@ DEFINE_FMT_FORMATTER(
 
 DEFINE_FMT_FORMATTER(
   geometry_msgs::msg::Pose, "position: {}, orientation {}", v.position, v.orientation)
+
+DEFINE_FMT_FORMATTER(
+  geometry_msgs::msg::PoseStamped, "header: {}, pose {}", v.header, v.pose)
 
 DEFINE_FMT_FORMATTER(
   traffic_simulator_msgs::msg::ActionStatus, "current_action: {}, twist: {}, accel: {}",

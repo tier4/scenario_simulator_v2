@@ -48,6 +48,12 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 
 std::vector<int64_t> LaneletUtils::getLaneletIds() { return hdmap_utils_ptr_->getLaneletIds(); }
 
+
+lanelet::Ids LaneletUtils::filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[])
+{
+  return hdmap_utils_ptr_->filterLaneletIds(lanelet_ids, subtype);
+}
+
 geometry_msgs::msg::PoseStamped LaneletUtils::toMapPose(
   traffic_simulator_msgs::msg::LaneletPose lanelet_pose)
 {

@@ -148,16 +148,16 @@ void TestExecutor::initialize()
       api_->spawn(
         //TODO(mk): Add planner choice parameter
         //TODO(mk): Add speed parameter
+        // npc_descr.name, api_->canonicalize(npc_descr.spawn_position), getPedestrianParameters());
         npc_descr.name, api_->canonicalize(npc_descr.spawn_position), getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
       api_->requestSpeedChange(
-        npc_descr.name, 0.0, traffic_simulator::speed_change::Transition::LINEAR,
+        npc_descr.name, 2.0, traffic_simulator::speed_change::Transition::LINEAR,
         traffic_simulator::speed_change::Constraint(
           traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
         true);
-      // api_->setEntityStatus(
-      //   npc_descr.name, api_->canonicalize(npc_descr.start_position),
-      //   traffic_simulator::helper::constructActionStatus(npc_descr.speed));
-      // api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
+      api_->requestAssignRoute(
+        npc_descr.name, npc_descr.route
+      );
     }
   });
 }

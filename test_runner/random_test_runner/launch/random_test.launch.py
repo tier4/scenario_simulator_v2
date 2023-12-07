@@ -129,7 +129,7 @@ class RandomTestRunnerLaunch(object):
                                         "description":  "Minimum distance of generated vehicle npcs from ego"},
             "npc_vehicle_max_spawn_distance_from_ego": {"default": 110.0,
                                         "description": "Maximum distance of generated vehicle npcs from ego"},
-            "npc_pedestrian_count": {"default": 1, "description": "Generated pedestrian npc count"},
+            "npc_pedestrian_count": {"default": 10, "description": "Generated pedestrian npc count"},
             "npc_pedestrian_lanelet_min_offset": {"default": 3.0, "description": "Pedestrian minimum spawn point offset from lanelet"},
             "npc_pedestrian_lanelet_max_offset": {"default": 5.0, "description": "Pedestrian maximum spawn point offset from lanelet"},
 
