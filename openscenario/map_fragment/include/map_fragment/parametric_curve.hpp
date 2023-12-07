@@ -183,32 +183,32 @@ public:
 private:
   auto getPositionWithParameterValidated(const double tangent) const -> Point override
   {
-    const auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
-    const auto curve = curves[curve_id];
-    const auto transformation = transformations_[curve_id];
+    const auto [curve_index, curve_tangent] = getCurveIndexAndParameter(tangent);
+    const auto curve = curves[curve_index];
+    const auto transformation = transformations_[curve_index];
 
     return applyTransformationToPoint(curve->getPosition(curve_tangent), transformation);
   }
 
   auto getUnitTangentVectorWithParameterValidated(const double tangent) const -> Vector override
   {
-    const auto [curve_id, curve_tangent] = getCurveIdAndParameter(tangent);
-    const auto curve = curves[curve_id];
-    const auto transformation = transformations_[curve_id];
+    const auto [curve_index, curve_tangent] = getCurveIndexAndParameter(tangent);
+    const auto curve = curves[curve_index];
+    const auto transformation = transformations_[curve_index];
 
     return applyTransformationToVector(curve->getUnitTangentVector(curve_tangent), transformation);
   }
 
-  auto getCurveIdAndParameter(const double tangent) const -> std::pair<std::size_t, double>
+  auto getCurveIndexAndParameter(const double tangent) const -> std::pair<std::size_t, double>
   {
     validateCurveParameterOrThrow(tangent);
 
     const auto range_width_per_curve = 1. / curves.size();
-    const auto curve_id =
+    const auto curve_index =
       std::min(static_cast<std::size_t>(tangent / range_width_per_curve), curves.size() - 1);
-    const auto curve_tangent = tangent / range_width_per_curve - curve_id;
+    const auto curve_tangent = tangent / range_width_per_curve - curve_index;
 
-    return std::make_pair(curve_id, curve_tangent);
+    return std::make_pair(curve_index, curve_tangent);
   }
 };  // class CombinedCurve
 }  // namespace map_fragment
