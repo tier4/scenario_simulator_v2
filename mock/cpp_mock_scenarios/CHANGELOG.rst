@@ -2,6 +2,67 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
+  # Conflicts:
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+* Merge pull request `#1113 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
+  Feature/doxygen
+* fix compile error
+* add namespace
+* update namespace
+* add concealer
+* rename scenario class
+* add namespace
+* rename scenario classes
+* add namespace
+* add cpp_mock_scenarios
+* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
+* Merge branch 'master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge branch 'master' into feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge pull request `#1080 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1080>`_ from tier4/doc/add_comment_for_pr_1074
+  add comment about PR `#1074 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1074>`_
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge pull request `#1087 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
+  Feature/drop galactic support
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* remove workbound for galactic
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
+  #	simulation/traffic_simulator/src/api/api.cpp
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* add comment about PR `#1074 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1074>`_
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+  # Conflicts:
+  #	simulation/traffic_simulator/include/traffic_simulator/api/api.hpp
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.8.0 (2023-09-05)
 ------------------
 * Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
