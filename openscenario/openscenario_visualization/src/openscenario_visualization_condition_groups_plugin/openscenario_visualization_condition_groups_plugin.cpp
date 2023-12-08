@@ -248,8 +248,8 @@ void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_
     event_name = "ConditionGroup" + std::to_string(counter++);
   }
 
-  ConditionGroups condition_groups_msg;
-  condition_groups_msg.groups_name = event_name;
+  ConditionGroups condition_groups;
+  condition_groups.groups_name = event_name;
 
   for (const auto & condition_group_node : event_node["StartTrigger"]["ConditionGroup"]) {
     ConditionGroup condition_group_msg;
@@ -263,10 +263,10 @@ void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_
       condition_group_msg.conditions.push_back(condition_msg);
     }
 
-    condition_groups_msg.condition_groups.push_back(condition_group_msg);
+    condition_groups.condition_groups.push_back(condition_group_msg);
   }
 
-  condition_groups_collection_ptr_->push_back(condition_groups_msg);
+  condition_groups_collection_ptr_->push_back(condition_groups);
 }
 
 }  // namespace openscenario_visualization
