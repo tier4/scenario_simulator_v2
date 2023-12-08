@@ -98,9 +98,9 @@ protected:
 
 private:
   void loadConditionGroups(const Context::ConstSharedPtr msg_ptr);
-  void processStory(const YAML::Node & story, int & unnamed_event_counter);
-  void processManeuver(const YAML::Node & maneuver, int & unnamed_event_counter);
-  void processEvent(const YAML::Node & event, int & unnamed_event_counter);
+  void processStory(const YAML::Node & story);
+  void processManeuver(const YAML::Node & maneuver);
+  void processEvent(const YAML::Node & event);
   rclcpp::Subscription<Context>::SharedPtr simulation_context_sub_;
   Context::ConstSharedPtr last_msg_ptr_;
   std::shared_ptr<ConditionGroupsCollection> condition_groups_collection_ptr_;

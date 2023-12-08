@@ -206,37 +206,35 @@ void VisualizationConditionGroupsDisplay::loadConditionGroups(const Context::Con
     throw std::runtime_error(std::string("Failed to load YAML: ") + e.what());
   }
 
-  int unnamed_event_counter = 1;
   condition_groups_collection_ptr_->clear();
 
   auto stories = data["OpenSCENARIO"]["Storyboard"]["Story"];
   for (const auto & story : stories) {
-    processStory(story, unnamed_event_counter);
+    processStory(story);
   }
 }
 
-void VisualizationConditionGroupsDisplay::processStory(const YAML::Node & story_node, int & counter)
+void VisualizationConditionGroupsDisplay::processStory(const YAML::Node & story_node)
 {
   for (const auto & act : story_node["Act"]) {
     for (const auto & maneuver_group : act["ManeuverGroup"]) {
       for (const auto & maneuver : maneuver_group["Maneuver"]) {
-        processManeuver(maneuver, counter);
+        processManeuver(maneuver);
       }
     }
   }
 }
 
-void VisualizationConditionGroupsDisplay::processManeuver(
-  const YAML::Node & maneuver_node, int & counter)
+void VisualizationConditionGroupsDisplay::processManeuver(const YAML::Node & maneuver_node)
 {
   for (const auto & event : maneuver_node["Event"]) {
     if (event["StartTrigger"] && event["StartTrigger"]["ConditionGroup"]) {
-      processEvent(event, counter);
+      processEvent(event);
     }
   }
 }
 
-void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_node, int & counter)
+void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_node)
 {
   std::string event_name;
   try {
@@ -245,7 +243,7 @@ void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_
     event_name = "";
   }
   if (event_name.empty()) {
-    event_name = "ConditionGroup" + std::to_string(counter++);
+    event_name = "Anonymous (The event_name property of ConditionGroup is not defined)";
   }
 
   ConditionGroups condition_groups;
