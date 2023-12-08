@@ -1,6 +1,7 @@
 name: Release
 on:
   merge_group:
+    types: [checks_requested]
 
 jobs:
   release:
