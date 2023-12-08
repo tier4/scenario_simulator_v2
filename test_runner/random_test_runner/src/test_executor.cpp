@@ -153,13 +153,20 @@ void TestExecutor::initialize()
         switch(npc_descr.action)
         {
           case PedestrianBehavior::STATIC:
-            api_->requestSpeedChange(
-              npc_descr.name, 0.0, traffic_simulator::speed_change::Transition::LINEAR,
-              traffic_simulator::speed_change::Constraint(
-                traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
-              true);
-            break;
+            {
+              // api_->requestSpeedChange(
+              //   npc_descr.name, 0.0, traffic_simulator::speed_change::Transition::LINEAR,
+              //   traffic_simulator::speed_change::Constraint(
+              //     traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+              //   true);
+              // auto tmp_lanelet_goal = npc_descr.spawn_position;
+              // tmp_lanelet_goal.offset = npc_descr.spawn_position.offset + 10.0 ;
+              // auto tmp_pose = api_->toMapPose(api_->canonicalize(tmp_lanelet_goal));
+              // api_->requestAcquirePosition(npc_descr.name, tmp_pose);
+              break;
+            }
           case PedestrianBehavior::CROSSWALK:
+          //TODO(mk): try giving laneletPose here, test if requestAssignRoute does not ignore lanelet "obstacles" when approaching to route
             api_->requestSpeedChange(
               npc_descr.name, 2.0, traffic_simulator::speed_change::Transition::LINEAR,
               traffic_simulator::speed_change::Constraint(
