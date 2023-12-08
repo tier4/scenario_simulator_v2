@@ -40,6 +40,7 @@
     "TESTRANDOMIZER",
     "travelling",
     "xerces",
-    "xercesc"
+    "xercesc",
+    "yamacir-kit"
   ]
 }
