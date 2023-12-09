@@ -165,9 +165,9 @@ void VisualizationConditionGroupsDisplay::processMessage(const Context::ConstSha
                << "Condition Groups Name: " << condition_groups.groups_name << std::endl;
     for (const auto & condition_group : condition_groups.condition_groups) {
       for (const auto & condition : condition_group.conditions) {
-        context_ss << "  Current Evaluation: " << condition.current_evaluation << std::endl
-                   << "  Current Value: " << condition.current_value << std::endl
-                   << "  Type: " << condition.type << std::endl;
+        context_ss << "    Current Evaluation: " << condition.current_evaluation << std::endl
+                   << "    Current Value: " << condition.current_value << std::endl
+                   << "    Type: " << condition.type << std::endl;
       }
     }
     context_ss << std::endl;
@@ -243,14 +243,14 @@ void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_
     event_name = "";
   }
   if (event_name.empty()) {
-    event_name = "Anonymous (The event_name property of ConditionGroup is not defined)";
+    event_name = "name is not defined";
   }
 
   ConditionGroups condition_groups;
   condition_groups.groups_name = event_name;
 
   for (const auto & condition_group_node : event_node["StartTrigger"]["ConditionGroup"]) {
-    ConditionGroup condition_group_msg;
+    ConditionGroup condition_group;
 
     for (const auto & condition_node : condition_group_node["Condition"]) {
       Condition condition_msg;
@@ -258,10 +258,10 @@ void VisualizationConditionGroupsDisplay::processEvent(const YAML::Node & event_
       condition_msg.current_value = condition_node["currentValue"].as<std::string>();
       condition_msg.type = condition_node["type"].as<std::string>();
 
-      condition_group_msg.conditions.push_back(condition_msg);
+      condition_group.conditions.push_back(condition_msg);
     }
 
-    condition_groups.condition_groups.push_back(condition_group_msg);
+    condition_groups.condition_groups.push_back(condition_group);
   }
 
   condition_groups_collection_ptr_->push_back(condition_groups);
