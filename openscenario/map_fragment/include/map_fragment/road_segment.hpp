@@ -118,7 +118,7 @@ public:
     }
 
     for (auto i = 0; i < cross_section_description.number_of_lanes; i++) {
-      lanelets.push_back(makeLanelet(lane_boundaries[i], lane_boundaries[i + 1]));
+      lanelets.push_back(makeLanelet(lane_boundaries[i + 1], lane_boundaries[i]));
     }
 
     return lanelets;
