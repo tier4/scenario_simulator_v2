@@ -61,7 +61,7 @@ public:
     const auto normal_vector = rotateInLocalZAxisAssumingZeroRoll(tangent_vector, M_PI_2);
 
     for (auto i = 0; i < description.number_of_lanes + 1; i++) {
-      const auto lateral_position = (i - description.number_of_lanes / 2) * description.lane_width;
+      const auto lateral_position = (i - description.number_of_lanes / 2.) * description.lane_width;
       const auto p = origin + normal_vector * lateral_position;
 
       points_.push_back(makePoint3d(p));
