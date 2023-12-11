@@ -24,6 +24,18 @@
 
 namespace map_fragment
 {
+template <typename T>
+auto operator<<(std::ostream & ostream, const std::vector<T> & xs) -> std::ostream &
+{
+  ostream << '[';
+
+  for (auto && x : xs) {
+    ostream << x << (&x != &xs.back() ? ", " : "");
+  }
+
+  return ostream << ']';
+}
+
 auto print(std::ostream & ostream, const lanelet::ConstLanelet & lanelet) -> auto &
 {
   return ostream << lanelet.id();
@@ -65,6 +77,12 @@ auto print(std::ostream & ostream, const lanelet::routing::LaneletPaths & paths)
     print(ostream, path) << std::endl;
   }
   return ostream;
+}
+
+template <typename T>
+auto print(std::ostream & ostream, const T & x) -> auto &
+{
+  return ostream << x;
 }
 }  // namespace map_fragment
 

@@ -70,37 +70,37 @@ auto loadBasicSelector(
         if constexpr (std::is_const_v<decltype(results)>) {
           auto copy_of_results = results;
           sort(copy_of_results);
-          receive(copy_of_results);
+          return receive(copy_of_results);
         } else {
           sort(results);
-          receive(results);
+          return receive(results);
         }
       } else if (select == "any") {
         if constexpr (std::is_const_v<decltype(results)>) {
           auto copy_of_results = results;
           shuffle(copy_of_results);
-          receive(copy_of_results.front());
+          return receive(copy_of_results.front());
         } else {
           shuffle(results);
-          receive(results.front());
+          return receive(results.front());
         }
       } else if (select == "first") {
         if constexpr (std::is_const_v<decltype(results)>) {
           auto copy = results;
           sort(copy);
-          receive(copy.front());
+          return receive(copy.front());
         } else {
           sort(results);
-          receive(results.front());
+          return receive(results.front());
         }
       } else if (select == "last") {
         if constexpr (std::is_const_v<decltype(results)>) {
           auto copy = results;
           sort(copy);
-          receive(copy.back());
+          return receive(copy.back());
         } else {
           sort(results);
-          receive(results.back());
+          return receive(results.back());
         }
       } else {
         std::stringstream what;
