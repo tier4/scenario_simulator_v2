@@ -33,20 +33,23 @@ auto rest = [](auto && tuple) -> decltype(auto) {
     std::forward<decltype(tuple)>(tuple));
 };
 
+// cspell: ignore invocable
 template <typename F, typename... Ts>
-auto apply(const std::tuple<F> & callable, Ts &&... xs) -> decltype(auto)
+auto apply(const std::tuple<F> & invocable, Ts &&... xs) -> decltype(auto)
 {
-  return head(callable)(std::forward<decltype(xs)>(xs)...);
+  return std::invoke(head(invocable), std::forward<decltype(xs)>(xs)...);
 }
 
+// cspell: ignore invocables
 template <typename F, typename G, typename... Fs, typename... Ts>
-auto apply(const std::tuple<F, G, Fs...> & callables, Ts &&... xs) -> decltype(auto)
+auto apply(const std::tuple<F, G, Fs...> & invocables, Ts &&... xs) -> decltype(auto)
 {
-  auto thunk = [&]() -> decltype(auto) {
-    return map_fragment::apply(rest(callables), std::forward<decltype(xs)>(xs)...);
-  };
-
-  return head(callables)(thunk, xs...);
+  return std::invoke(
+    head(invocables),
+    [&]() -> decltype(auto) {
+      return map_fragment::apply(rest(invocables), std::forward<decltype(xs)>(xs)...);
+    },
+    xs...);
 }
 }  // namespace tuple
 }  // namespace map_fragment
