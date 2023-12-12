@@ -26,9 +26,9 @@ namespace map_fragment
 /**
  * Rotate a point or vector in z axis by a given angle.
  */
-auto rotateInZAxis(const PointOrVector & point_or_vector, const double angle) -> Eigen::Vector3d
+auto rotateInZAxis(const PointOrVector & point_or_vector, const double angle) -> PointOrVector
 {
-  const auto rotation = Eigen::AngleAxis(angle, Eigen::Vector3d::UnitZ());
+  const auto rotation = Eigen::AngleAxis(angle, PointOrVector::UnitZ());
   const auto transformation = Transformation(rotation);
   return transformation * point_or_vector;
 }
