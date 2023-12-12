@@ -83,7 +83,13 @@ public:
 
     real_time_factor_subscriber = rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
-      [this](const std_msgs::msg::Float64 & message) { clock_.setRealTimeFactor(message.data); });
+      [this](const std_msgs::msg::Float64 & message) {
+        clock_.setRealTimeFactor(message.data);
+
+        simulation_api_schema::UpdateStepTimeRequest request;
+        request.set_simulation_step_time(clock_.getStepTime());
+        zeromq_client_.call(request);
+      });
 
     if (not configuration.standalone_mode) {
       simulation_api_schema::InitializeRequest request;

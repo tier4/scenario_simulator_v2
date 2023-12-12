@@ -47,7 +47,8 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) {
       return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
-    })
+    },
+    [this](auto &&... xs) { return updateStepTime(std::forward<decltype(xs)>(xs)...); })
 {
 }
 
@@ -130,6 +131,15 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
     current_simulation_time_, current_ros_time_, entity_status, traffic_signals_states_);
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to update frame");
+  return res;
+}
+
+auto ScenarioSimulator::updateStepTime(const simulation_api_schema::UpdateStepTimeRequest & req)
+  -> simulation_api_schema::UpdateStepTimeResponse
+{
+  auto res = simulation_api_schema::UpdateStepTimeResponse();
+  step_time_ = req.simulation_step_time();
+  res.mutable_result()->set_success(true);
   return res;
 }
 
