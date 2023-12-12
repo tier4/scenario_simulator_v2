@@ -61,7 +61,7 @@ try {
       .allow_undeclared_parameters(true)
       .automatically_declare_parameters_from_overrides(true));
 
-  auto at = [&](auto otherwise, auto && array) -> decltype(auto) {
+  auto reference_at_index = [&](auto otherwise, auto && array) -> decltype(auto) {
     switch (const auto parameter = node.get_parameter("index"); parameter.get_type()) {
       case rclcpp::ParameterType::PARAMETER_INTEGER:
         if (const auto index = parameter.as_int();
@@ -83,10 +83,10 @@ try {
     }
   };
 
-  auto select = [&](auto otherwise, auto && array) -> decltype(auto) {
+  auto reference_element = [&](auto otherwise, auto && array) -> decltype(auto) {
     switch (const auto parameter = node.get_parameter("element"); parameter.get_type()) {
       case rclcpp::ParameterType::PARAMETER_STRING:
-        if (const auto select = parameter.as_string(); select == "first") {
+        if (const auto element = parameter.as_string(); element == "first") {
           if (not array.empty()) {
             return std::cout << array.front() << std::endl;
           } else {
@@ -96,7 +96,7 @@ try {
             what << " of size " << array.size() << ".";
             throw std::out_of_range(what.str());
           }
-        } else if (select == "last") {
+        } else if (element == "last") {
           if (not array.empty()) {
             return std::cout << array.back() << std::endl;
           } else {
@@ -108,7 +108,7 @@ try {
           }
         } else {
           std::stringstream what;
-          what << "An unknown value " << std::quoted(select) << " was given for parameter "
+          what << "An unknown value " << std::quoted(element) << " was given for parameter "
                << std::quoted(parameter.get_name()) << ".";
           throw std::out_of_range(what.str());
         }
@@ -117,7 +117,7 @@ try {
         return otherwise();
 
       default:
-        throw std::invalid_argument("select type-error!");
+        throw std::invalid_argument("element type-error!");
     }
   };
 
@@ -127,11 +127,15 @@ try {
 
   switch (const auto parameter = node.get_parameter("input"); parameter.get_type()) {
     case rclcpp::ParameterType::PARAMETER_INTEGER_ARRAY:
-      map_fragment::apply(std::make_tuple(at, select, otherwise), parameter.as_integer_array());
+      map_fragment::apply(
+        std::make_tuple(reference_at_index, reference_element, otherwise),
+        parameter.as_integer_array());
       break;
 
     case rclcpp::ParameterType::PARAMETER_STRING_ARRAY:
-      map_fragment::apply(std::make_tuple(at, select, otherwise), parameter.as_string_array());
+      map_fragment::apply(
+        std::make_tuple(reference_at_index, reference_element, otherwise),
+        parameter.as_string_array());
       break;
 
     case rclcpp::ParameterType::PARAMETER_NOT_SET:
