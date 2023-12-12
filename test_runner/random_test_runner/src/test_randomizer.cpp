@@ -79,6 +79,7 @@ TestDescription TestRandomizer::generate()
   //TODO(mk): convert to construction/function
 
   // preparing pedestrian behaviors
+  //TODO(mk): move it before generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses and use as parameter
   std::vector<PedestrianBehavior> pedestrian_behaviors;
   if (test_suite_parameters_.npc_pedestrian_behavior_static)
   {
@@ -96,8 +97,6 @@ TestDescription TestRandomizer::generate()
     throw std::runtime_error("At least one behavior has to be enabled for random pedestrian generation");
   }
 
-  
-
   // get crosswalk points (currently only valid positions for pedestrians to achieve)
   auto crosswalk_ids = lanelet_utils_->filterLaneletIds(lanelet_ids_, lanelet::AttributeValueString::Crosswalk);
   std::vector<traffic_simulator_msgs::msg::LaneletPose> crosswalk_poses;
@@ -112,6 +111,7 @@ TestDescription TestRandomizer::generate()
   UniformRandomizer<int64_t> crosswalk_id_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, (crosswalk_poses.size() / 2) - 1);
   UniformRandomizer<int64_t> direction_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, 1);
   // set one goal route on nearest crosswalk point
+
   for (auto & description : ret.npcs_pedestrian_descriptions)
   {
     PedestrianBehavior behavior = pedestrian_behaviors[pedestrian_behavior_id_randomizer.generate()];
@@ -135,6 +135,13 @@ TestDescription TestRandomizer::generate()
           break;
         }
       case PedestrianBehavior::FREEWALK:
+        auto spawn_lanelet = description.spawn_position;
+        auto positions = lanelet_utils_->getPositionsOnNextLanelets(spawn_lanelet, 5, 5.0);
+        description.route = positions;
+        for (const auto & position : positions)
+        {
+          std::cout << fmt::format("Position: {}", position) << std::endl;
+        }
         break;
     }
     // auto closest_crosswalk_position = std::min_element(crosswalk_poses.begin(), crosswalk_poses.end(),

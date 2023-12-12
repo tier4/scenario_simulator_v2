@@ -131,8 +131,8 @@ class RandomTestRunnerLaunch(object):
                                         "description": "Maximum distance of generated vehicle npcs from ego"},
             "npc_pedestrian_count": {"default": 10, "description": "Generated pedestrian npc count"},
             "npc_pedestrian_behavior_static": {"default": False, "description": "Static pedestrian spawned, no movement applied"},
-            "npc_pedestrian_behavior_crosswalk": {"default": True, "description": "Pedestrian is spawned at crosswalk and passes it"},
-            "npc_pedestrian_behavior_freewalking": {"default": False, "description": "Pedestrian is spawned outside of lanes and moves freely, without jaywalking"},
+            "npc_pedestrian_behavior_crosswalk": {"default": False, "description": "Pedestrian is spawned at crosswalk and passes it"},
+            "npc_pedestrian_behavior_freewalking": {"default": True, "description": "Pedestrian is spawned outside of lanes and moves freely, without jaywalking"},
             "npc_pedestrian_lanelet_min_offset": {"default": 3.0, "description": "Pedestrian minimum spawn point offset from lanelet"},
             "npc_pedestrian_lanelet_max_offset": {"default": 5.0, "description": "Pedestrian maximum spawn point offset from lanelet"},
 

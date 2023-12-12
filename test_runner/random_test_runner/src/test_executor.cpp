@@ -177,6 +177,17 @@ void TestExecutor::initialize()
             );
             break;
           case PedestrianBehavior::FREEWALK:
+            api_->requestSpeedChange(
+                npc_descr.name, 2.0, traffic_simulator::speed_change::Transition::LINEAR,
+                traffic_simulator::speed_change::Constraint(
+                  traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+                true);
+            //TODO(mk): requestAssignRoute will no work since route is outside lanelets
+            // using requestAcquirePosition on first point instead
+            api_->requestAcquirePosition(npc_descr.name, npc_descr.route[0]);
+            // api_->requestAssignRoute(
+            //   npc_descr.name, npc_descr.route
+            // );
             break;
         }
       
