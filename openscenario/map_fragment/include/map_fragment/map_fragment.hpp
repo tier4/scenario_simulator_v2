@@ -39,6 +39,8 @@ namespace default_value
 */
 constexpr auto curvature = 0.0;
 
+constexpr auto angle = 0.0;
+
 auto directory() -> const auto &
 {
   static const auto directory = std::filesystem::path("/tmp/map_fragment");

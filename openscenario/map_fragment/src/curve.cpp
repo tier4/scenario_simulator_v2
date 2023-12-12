@@ -44,8 +44,8 @@ try {
     return node.get_parameter("after_length").as_double();
   }();
 
-  const auto angle = [&]() {
-    node.declare_parameter("angle", default_value::curvature);
+  const auto angle_in_degrees = [&]() {
+    node.declare_parameter("angle", default_value::angle);
     return node.get_parameter("angle").as_double();
   }();
 
@@ -64,16 +64,18 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
+  const auto angle_in_radians = angle_in_degrees * M_PI / 180;
+
   const std::vector<ParametricCurve::ConstSharedPointer> guide_curve_segments = {
 
     // Straight segment before the turn
     std::make_shared<Straight>(before_length),
 
-    // Turn segment (or straight if angle == 0)
-    angle == 0 ? std::static_pointer_cast<ParametricCurve>(  //
-                   std::make_shared<Straight>(length))
-               : std::static_pointer_cast<ParametricCurve>(
-                   std::make_shared<Arc>(length / std::abs(angle), angle)),
+    // Turn segment (or straight if angle is zero)
+    angle_in_radians == 0 ? std::static_pointer_cast<ParametricCurve>(  //
+                              std::make_shared<Straight>(length))
+                          : std::static_pointer_cast<ParametricCurve>(std::make_shared<Arc>(
+                              length / std::abs(angle_in_radians), angle_in_radians)),
 
     // Straight segment after the turn
     std::make_shared<Straight>(after_length)};
