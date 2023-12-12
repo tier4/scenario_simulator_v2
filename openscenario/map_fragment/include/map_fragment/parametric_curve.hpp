@@ -15,7 +15,7 @@
 #ifndef MAP_FRAGMENT__PARAMETRIC_CURVE__HPP_
 #define MAP_FRAGMENT__PARAMETRIC_CURVE__HPP_
 
-#include <map_fragment/geometry_utilities.hpp>
+#include <map_fragment/geometric_operations.hpp>
 #include <memory>
 #include <rcpputils/asserts.hpp>
 #include <utility>

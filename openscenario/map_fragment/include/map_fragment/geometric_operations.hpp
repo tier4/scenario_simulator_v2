@@ -12,25 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__GEOMETRY_UTILITIES__HPP_
-#define MAP_FRAGMENT__GEOMETRY_UTILITIES__HPP_
+#ifndef MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
+#define MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
 
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
 #include <cmath>
+#include <map_fragment/aliases.hpp>
 #include <rcpputils/asserts.hpp>
 #include <stdexcept>
 #include <string>
 
 namespace map_fragment
 {
-
-using Point = Eigen::Vector3d;
-using Vector = Eigen::Vector3d;
-using PointOrVector = Eigen::Vector3d;
-
-using Transformation = Eigen::Transform<double, 3, Eigen::TransformTraits::AffineCompact>;
-
 /**
  * Rotate a point or vector in z axis by a given angle.
  */
@@ -131,4 +123,4 @@ auto applyTransformationToVector(const Vector & vector, const Transformation & t
 }
 }  // namespace map_fragment
 
-#endif  // MAP_FRAGMENT__GEOMETRY_UTILITIES__HPP_
+#endif  // MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
