@@ -37,22 +37,25 @@ include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
 
-ament_auto_add_executable(random_test_runner
+ament_auto_add_library(${PROJECT_NAME} SHARED
   src/data_types.cpp
   src/test_randomizer.cpp
   src/test_executor.cpp
   src/lanelet_utils.cpp
   src/random_test_runner.cpp
-  src/random_test_runner_node.cpp
 )
 
-target_link_libraries(random_test_runner
+target_link_libraries(${PROJECT_NAME}
   ${PROTOBUF_LIBRARY}
   ${YAML_CPP_LIBRARIES}
   pthread
   sodium
   zmq
   fmt
+)
+
+ament_auto_add_executable(${PROJECT_NAME}_node
+  src/${PROJECT_NAME}_node.cpp
 )
 
 install(
@@ -63,6 +66,7 @@ install(
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
+  add_subdirectory(test)
 endif()
 
 ament_auto_package()
