@@ -145,12 +145,7 @@ void PedestrianEntity::requestAcquirePosition(const CanonicalizedLaneletPose & l
 void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  if (const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), true);
-      lanelet_pose) {
-    requestAcquirePosition(CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_));
-  } else {
-    THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
-  }
+  behavior_plugin_ptr_->setGoalPoses({map_pose});
 }
 
 void PedestrianEntity::cancelRequest()
