@@ -53,7 +53,7 @@ OpenSCENARIO:
           )
       - name: route_length
         parameterType: double
-        value: '200.0'
+        value: '195.0'
       - name: ego_lane_id
         parameterType: string
         value: $(ros2 run map_fragment find --ros-args
