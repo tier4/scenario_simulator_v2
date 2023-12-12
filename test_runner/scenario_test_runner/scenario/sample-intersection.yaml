@@ -43,14 +43,14 @@ OpenSCENARIO:
       - name: ego_start_lanelet_id
         parameterType: string
         value: $(ros2 run map_fragment select_lanelet_from_path --ros-args
+          -p element:=first
           -p input:='$(var ego_path)'
-          -p index:=0
           )
       - name: ego_goal_lanelet_id
         parameterType: string
         value: $(ros2 run map_fragment select_lanelet_from_path --ros-args
+          -p element:=last
           -p input:='$(var ego_path)'
-          -p index:=2
           )
       - name: curve_id
         parameterType: string
@@ -71,14 +71,14 @@ OpenSCENARIO:
       - name: vehicle1_start_lanelet_id
         parameterType: string
         value: $(ros2 run map_fragment select_lanelet_from_path --ros-args
+          -p element:=first
           -p input:='$(var vehicle1_path)'
-          -p index:=0
           )
       - name: vehicle1_goal_lanelet_id
         parameterType: string
         value: $(ros2 run map_fragment select_lanelet_from_path --ros-args
+          -p element:=last
           -p input:='$(var vehicle1_path)'
-          -p index:=2
           )
   CatalogLocations:
     VehicleCatalog:

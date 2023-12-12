@@ -61,7 +61,7 @@ try {
       .allow_undeclared_parameters(true)
       .automatically_declare_parameters_from_overrides(true));
 
-  auto at = [&](auto thunk, auto && array) -> decltype(auto) {
+  auto at = [&](auto otherwise, auto && array) -> decltype(auto) {
     switch (const auto parameter = node.get_parameter("index"); parameter.get_type()) {
       case rclcpp::ParameterType::PARAMETER_INTEGER:
         if (const auto index = parameter.as_int();
@@ -76,20 +76,36 @@ try {
         }
 
       case rclcpp::ParameterType::PARAMETER_NOT_SET:
-        return thunk();
+        return otherwise();
 
       default:
         throw std::invalid_argument("index type-error!");
     }
   };
 
-  auto select = [&](auto thunk, auto && array) -> decltype(auto) {
-    switch (const auto parameter = node.get_parameter("select"); parameter.get_type()) {
+  auto select = [&](auto otherwise, auto && array) -> decltype(auto) {
+    switch (const auto parameter = node.get_parameter("element"); parameter.get_type()) {
       case rclcpp::ParameterType::PARAMETER_STRING:
         if (const auto select = parameter.as_string(); select == "first") {
-          return std::cout << array.front() << std::endl;
+          if (not array.empty()) {
+            return std::cout << array.front() << std::endl;
+          } else {
+            std::stringstream what;
+            what << "It is not possible to refer to first element of array ";
+            map_fragment::print(what, array);
+            what << " of size " << array.size() << ".";
+            throw std::out_of_range(what.str());
+          }
         } else if (select == "last") {
-          return std::cout << array.back() << std::endl;
+          if (not array.empty()) {
+            return std::cout << array.back() << std::endl;
+          } else {
+            std::stringstream what;
+            what << "It is not possible to refer to last element of array ";
+            map_fragment::print(what, array);
+            what << " of size " << array.size() << ".";
+            throw std::out_of_range(what.str());
+          }
         } else {
           std::stringstream what;
           what << "An unknown value " << std::quoted(select) << " was given for parameter "
@@ -98,7 +114,7 @@ try {
         }
 
       case rclcpp::ParameterType::PARAMETER_NOT_SET:
-        return thunk();
+        return otherwise();
 
       default:
         throw std::invalid_argument("select type-error!");
@@ -109,7 +125,7 @@ try {
     return map_fragment::print(std::cout, std::forward<decltype(array)>(array)) << std::endl;
   };
 
-  switch (const auto parameter = node.get_parameter("reference"); parameter.get_type()) {
+  switch (const auto parameter = node.get_parameter("input"); parameter.get_type()) {
     case rclcpp::ParameterType::PARAMETER_INTEGER_ARRAY:
       map_fragment::apply(std::make_tuple(at, select, otherwise), parameter.as_integer_array());
       break;
