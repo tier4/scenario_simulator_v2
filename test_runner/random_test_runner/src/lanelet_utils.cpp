@@ -174,18 +174,15 @@ struct LaneletPartForRouting
 
 std::vector<geometry_msgs::msg::Pose> LaneletUtils::getPositionsOnNextLanelets(
   const traffic_simulator_msgs::msg::LaneletPose & start_lanelet_pose,
-  const double & start_s, const int64_t & max_number_of_points, const double & offset)
+  const int64_t & max_number_of_points, double offset)
 {
-  // lanelet::ConstLanelet starting_lanelet =
-  //   lanelet_map_ptr_->laneletLayer.get(start_lanelet_pose.lanelet_id);
-
-  // lanelet::ConstLanelets next_lanelets =
-  //           vehicle_routing_graph_ptr_->following(starting_lanelet);
-  // std::cout << "NEXT LANELET SIZE: " << next_lanelets.size() << std::endl;
-  std::cout << "\n\n\n\nSTART LANELET ID: " << start_lanelet_pose.lanelet_id << std::endl;
-  //set end of lanelet as first point to prevent returning empty poses
   std::vector<geometry_msgs::msg::Pose> route_positions;
-  route_positions.emplace_back(hdmap_utils_ptr_->toMapPose(traffic_simulator::helper::constructLaneletPose(start_lanelet_pose.lanelet_id, 1.0, offset)).pose);
+  route_positions.emplace_back(hdmap_utils_ptr_->toMapPose(
+    traffic_simulator::helper::constructLaneletPose(
+      start_lanelet_pose.lanelet_id,
+      getLaneletLength(start_lanelet_pose.lanelet_id),
+      offset)
+    ).pose);
   auto current_lanelet_id = start_lanelet_pose.lanelet_id;
   while (route_positions.size() < max_number_of_points)
   {
@@ -219,7 +216,12 @@ std::vector<geometry_msgs::msg::Pose> LaneletUtils::getPositionsOnNextLanelets(
       return route_positions;
     }
 
-    route_positions.emplace_back(hdmap_utils_ptr_->toMapPose(traffic_simulator::helper::constructLaneletPose(validated_ids[0], 1.0, offset)).pose);
+    route_positions.emplace_back(
+      hdmap_utils_ptr_->toMapPose(
+        traffic_simulator::helper::constructLaneletPose(
+          validated_ids[0],
+          getLaneletLength(validated_ids[0]),
+          offset)).pose);
     current_lanelet_id = validated_ids[0];
   }
 

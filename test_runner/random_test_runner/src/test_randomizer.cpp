@@ -278,6 +278,7 @@ NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMi
   npc_name_ss << "pedestrianNPC" << npc_id;
   //TODO(mk): differ speed randomizer for Vehicles and NPCS
   //TODO(mk): add route generation
+  //TODO(mk): check if generated pose is inside lanelet, since we want them outside, using hdmap_utils_ptr_->toLaneletPose(global_pose, false);
   return {
      npc_name_ss.str(),
      speed_randomizer_.generate(),
