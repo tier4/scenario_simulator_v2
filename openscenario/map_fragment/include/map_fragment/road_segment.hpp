@@ -33,8 +33,13 @@ struct RoadCrossSectionDescription
 
   const double lane_width;
 
-  explicit RoadCrossSectionDescription(const int number_of_lanes, const double lane_width)
-  : number_of_lanes(number_of_lanes), lane_width(lane_width)
+  const int number_of_reversed_lanes;
+
+  explicit RoadCrossSectionDescription(
+    const int number_of_lanes, const double lane_width, const int number_of_reversed_lanes = 0)
+  : number_of_lanes(number_of_lanes),
+    lane_width(lane_width),
+    number_of_reversed_lanes(number_of_reversed_lanes)
   {
     rcpputils::require_true(
       number_of_lanes > 0,
@@ -43,6 +48,10 @@ struct RoadCrossSectionDescription
     rcpputils::require_true(
       lane_width > 0.0,
       "Expected lane_width to be positive. Actual value: " + std::to_string(lane_width));
+
+    rcpputils::require_true(
+      number_of_reversed_lanes >= 0, "Expected lane_width to be non-negative. Actual value: " +
+                                       std::to_string(number_of_reversed_lanes));
   }
 };  // struct RoadCrossSectionDescription
 
@@ -98,6 +107,8 @@ public:
   {
     lanelet::Lanelets lanelets;
     const auto n = cross_section_description.number_of_lanes + 1;
+    const auto index_of_first_reversed_lane = cross_section_description.number_of_lanes -
+                                              cross_section_description.number_of_reversed_lanes;
 
     std::vector<lanelet::LineString3d> lane_boundaries(n);
     for (auto boundary : lane_boundaries) {
@@ -118,7 +129,10 @@ public:
     }
 
     for (auto i = 0; i < cross_section_description.number_of_lanes; i++) {
-      lanelets.push_back(makeLanelet(lane_boundaries[i], lane_boundaries[i + 1]));
+      lanelets.push_back(
+        i >= index_of_first_reversed_lane
+          ? makeLanelet(lane_boundaries[i + 1], lane_boundaries[i])
+          : makeLanelet(lane_boundaries[i], lane_boundaries[i + 1]));
     }
 
     return lanelets;
