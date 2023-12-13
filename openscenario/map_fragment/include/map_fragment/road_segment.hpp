@@ -106,11 +106,11 @@ public:
   auto getLanelets(double resolution) const -> lanelet::Lanelets
   {
     lanelet::Lanelets lanelets;
-    const auto n = cross_section_description.number_of_lanes + 1;
+    const auto number_of_lane_boundaries = cross_section_description.number_of_lanes + 1;
     const auto index_of_first_reversed_lane = cross_section_description.number_of_lanes -
                                               cross_section_description.number_of_reversed_lanes;
 
-    std::vector<lanelet::LineString3d> lane_boundaries(n);
+    std::vector<lanelet::LineString3d> lane_boundaries(number_of_lane_boundaries);
     for (auto boundary : lane_boundaries) {
       boundary.setId(generateNextLineStringId());
     }
