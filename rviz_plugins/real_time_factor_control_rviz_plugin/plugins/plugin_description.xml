@@ -1,0 +1,9 @@
+<library path="real_time_factor_control_rviz_plugin">
+  <class name="real_time_factor_control_rviz_plugin/RealTimeFactorSliderPanel"
+          type="real_time_factor_control_rviz_plugin::RealTimeFactorSliderPanel"
+          base_class_type="rviz_common::Panel">
+      <description>
+        Slider controlling real time factor value.
+      </description>
+  </class>
+</library>
