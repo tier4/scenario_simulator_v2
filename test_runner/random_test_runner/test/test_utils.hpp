@@ -23,7 +23,7 @@ traffic_simulator::CanonicalizedEntityStatus getCanonicalizedEntityStatus(
   const double z = 0.0, const std::string & name = "name")
 {
   static const std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+    ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
   static const auto origin = geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
                                .latitude(35.61836750154)
                                .longitude(139.78066608243)
@@ -47,4 +47,13 @@ traffic_simulator::CanonicalizedEntityStatus getCanonicalizedEntityStatus(
   entity_status.pose.position.z = z;
   entity_status.lanelet_pose_valid = false;
   return traffic_simulator::CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr);
+}
+
+inline traffic_simulator_msgs::msg::LaneletPose makeLaneletPose(
+  const long int lane_id, const double s)
+{
+  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
+  lanelet_pose.lanelet_id = lane_id;
+  lanelet_pose.s = s;
+  return lanelet_pose;
 }

@@ -59,7 +59,7 @@ ament_auto_add_executable(${PROJECT_NAME}_node
 )
 
 install(
-  DIRECTORY launch rviz include param
+  DIRECTORY launch rviz include param test/map
   DESTINATION share/${PROJECT_NAME}
 )
 
