@@ -30,27 +30,35 @@ namespace openscenario_visualization
 VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
 : condition_groups_collection_ptr_(std::make_shared<std::vector<ConditionGroups>>())
 {
-  // Get screen info of default display
+  /// @note Get screen info of default display
   const Screen * screen_info = DefaultScreenOfDisplay(XOpenDisplay(NULL));
 
-  // Fixed height for a 4k resolution screen
+  /// @note Fixed height for a 4k resolution screen
+  /// @sa https://github.com/tier4/scenario_simulator_v2/pull/1033#discussion_r1412781103
   constexpr float hight_4k = 2160.0;
 
-  // Calculate scale based on current screen height and 4k height
+  /// @note Calculate scale based on current screen height and 4k height
   const float scale = static_cast<float>(screen_info->height) / hight_4k;
 
+  /**
+   * @note The multiplication of 35.0 is used to determine the initial text size in the panel. 
+   * This value is a base size that is then scaled according to the screen resolution.
+   * The 'Value Scale' property allows users to adjust the scaling factor of this text size later on, 
+   * but the initial value of 35.0 is set to ensure a default size that is likely suitable for most screens. 
+   * The scaling factor adjusts this size to ensure readability across various resolutions.
+   */
   const float text_size = scale * 35.0;
 
-  // Define initial value of left edge position of condition results panel
+  /// @note Define initial value of left edge position of condition results panel
   const int left = 0;
 
-  // Define initial value of top edge position of condition results panel
+  /// @note Define initial value of top edge position of condition results panel
   const int top = static_cast<int>(std::round(450 * scale));
 
-  // Define initial value of horizontal length of condition results panel
+  /// @note Define initial value of horizontal length of condition results panel
   const int length = static_cast<int>(std::round(2000 * scale));
 
-  // Define initial value of width of condition results panel
+  /// @note Define initial value of width of condition results panel
   const int width = static_cast<int>(std::round(2000 * scale));
 
   property_topic_name_ = new rviz_common::properties::StringProperty(
