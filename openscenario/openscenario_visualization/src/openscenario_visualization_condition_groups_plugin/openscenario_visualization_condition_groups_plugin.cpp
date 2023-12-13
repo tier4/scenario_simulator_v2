@@ -52,7 +52,13 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
   /// @note Define initial value of left edge position of condition results panel
   const int left = 0;
 
-  /// @note Define initial value of top edge position of condition results panel
+  /**
+   * @note Define initial value of top edge position of condition results panel
+   * The multiplication of 450 sets the initial top edge position of the condition results panel. 
+   * Like the width and length, this is a predefined base value, not necessarily linked to any value set from the Top property.
+   * The purpose of this calculation is to position the top edge of the panel at an appropriate place on the screen, 
+   * again scaling according to screen resolution to maintain a consistent look across different devices.
+   */
   const int top = static_cast<int>(std::round(450 * scale));
 
   /// @note Define initial value of horizontal length of condition results panel
