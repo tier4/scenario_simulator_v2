@@ -51,4 +51,8 @@
   EXPECT_POINT_NEAR(DATA0.position, DATA1.position, TOLERANCE); \
   EXPECT_QUATERNION_NEAR(DATA0.orientation, DATA1.orientation, TOLERANCE);
 
+#define EXPECT_IN_RANGE(VAL, MIN, MAX) \
+  EXPECT_GE((VAL), (MIN));             \
+  EXPECT_LE((VAL), (MAX))
+
 #endif  // RANDOM_TEST_RUNNER__TEST__EXPECT_EQ_MACROS_HPP_
