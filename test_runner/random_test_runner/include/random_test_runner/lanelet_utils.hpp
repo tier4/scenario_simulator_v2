@@ -68,6 +68,8 @@ public:
   std::vector<int64_t> getRoute(int64_t from_lanelet_id, int64_t to_lanelet_id);
   double getLaneletLength(int64_t lanelet_id);
   bool isInLanelet(int64_t lanelet_id, double s);
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose global_pose, bool include_crosswalk = false);
 
 private:
   lanelet::LaneletMapPtr lanelet_map_ptr_;

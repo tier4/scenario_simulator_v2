@@ -138,7 +138,13 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
   global_pose.position.y = opposite_lane_global_position.y;
   global_pose.position.z = opposite_lane_global_position.z;
 
-  return hdmap_utils_ptr_->toLaneletPose(global_pose, false);
+  return toLaneletPose(global_pose, false);
+}
+
+std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::toLaneletPose(
+  geometry_msgs::msg::Pose global_pose, bool include_crosswalk)
+{
+  return hdmap_utils_ptr_->toLaneletPose(global_pose, include_crosswalk);
 }
 
 enum SearchDirection { FORWARD, BACKWARD, INVALID };

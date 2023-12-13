@@ -67,7 +67,6 @@ TestDescription TestRandomizer::generate()
     npc_vehicle_poses.emplace_back(ret.npcs_vehicle_descriptions.back().start_position);
   }
 
-  //TODO(kielczykowski-rai): move it before generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses and use as parameter
   std::vector<PedestrianBehavior> pedestrian_behaviors = pedestrianBehaviorsFromTestSuiteParameters(test_suite_parameters_);
   std::vector<traffic_simulator_msgs::msg::LaneletPose> crosswalk_poses = generateCrosswalkStartAndEndPoses();
 
@@ -269,15 +268,24 @@ NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMi
 {
   std::stringstream npc_name_ss;
   npc_name_ss << "pedestrianNPC" << npc_id;
+  traffic_simulator_msgs::msg::LaneletPose spawn_lanelet_pose;
   //TODO(kielczykowski-rai): differ speed randomizer for Vehicles and NPCS
-  //TODO(kielczykowski-rai): add route generation
-  //TODO(kielczykowski-rai): check if generated pose is inside lanelet, since we want them outside, using hdmap_utils_ptr_->toLaneletPose(global_pose, false);
-  //TODO(kielczykowski-rai): check if generated pose is on intersection (filter by attribute)
-  return {
-     npc_name_ss.str(),
-     speed_randomizer_.generate(),
-     {},
-     generateRandomPoseWithinMinDistanceFromPosesFromLanelets(poses, min_distance, lanelets, lanelet_offset_randomizer_.generate()),
-     {}
-  };
+  for (int attempt_number = 0; attempt_number < max_randomization_attempts; attempt_number++)
+  {
+    spawn_lanelet_pose = generateRandomPoseWithinMinDistanceFromPosesFromLanelets(poses, min_distance, lanelets, lanelet_offset_randomizer_.generate());
+    auto spawn_pose = lanelet_utils_->toMapPose(spawn_lanelet_pose).pose;
+    auto map_pose = lanelet_utils_->toLaneletPose(spawn_pose, false);
+    if (!map_pose)
+    {
+      return {
+        npc_name_ss.str(),
+        speed_randomizer_.generate(),
+        {},
+        spawn_lanelet_pose,
+        {}
+      };
+    }
+  }
+
+  throw std::runtime_error("Was not able to randomize NPC pedestrian spawn position.");
 }
