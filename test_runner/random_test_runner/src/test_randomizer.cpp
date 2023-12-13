@@ -45,8 +45,7 @@ TestRandomizer::TestRandomizer(
   }
 }
 
-//TODO(mk): add pedestrian logic
-//TODO(mk): filter out turn lanelets for pedestrians
+//TODO(kielczykowski-rai): filter out turn lanelets for pedestrians
 TestDescription TestRandomizer::generate()
 {
   TestDescription ret;
@@ -74,12 +73,10 @@ TestDescription TestRandomizer::generate()
       npc_id, npc_pedestrian_poses, min_npc_distance, lanelets_around_start));
     npc_pedestrian_poses.emplace_back(ret.npcs_pedestrian_descriptions.back().spawn_position);
   }
-
-  std::cout << "\n\n\nTestRandomizer::generate()\n\n\n" << std::endl;
-  //TODO(mk): convert to construction/function
+  //TODO(kielczykowski-rai): convert to construction/function
 
   // preparing pedestrian behaviors
-  //TODO(mk): move it before generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses and use as parameter
+  //TODO(kielczykowski-rai): move it before generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses and use as parameter
   std::vector<PedestrianBehavior> pedestrian_behaviors;
   if (test_suite_parameters_.npc_pedestrian_behavior_static)
   {
@@ -103,11 +100,12 @@ TestDescription TestRandomizer::generate()
   for (const auto & crosswalk_id : crosswalk_ids)
   {
     crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(crosswalk_id, 0.0));
-    // crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(crosswalk_id, 1.0));
-    crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(crosswalk_id, lanelet_utils_->getLaneletLength(crosswalk_id)-0.00001));
+    //HACK(kielczykowski-rai): when point is set on full lanelet length, ss2 throws that LaneletPose is invalid
+    // when trying to approach goal
+    crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(
+      crosswalk_id, lanelet_utils_->getLaneletLength(crosswalk_id) - 1e-6));
   }
 
-//TODO(mk): do I need specific name for the randomizer?
   UniformRandomizer<int64_t> pedestrian_behavior_id_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, pedestrian_behaviors.size() - 1);
   UniformRandomizer<int64_t> crosswalk_id_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, (crosswalk_poses.size() / 2) - 1);
   UniformRandomizer<int64_t> direction_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, 1);
@@ -117,7 +115,7 @@ TestDescription TestRandomizer::generate()
   for (auto & description : ret.npcs_pedestrian_descriptions)
   {
     PedestrianBehavior behavior = pedestrian_behaviors[pedestrian_behavior_id_randomizer.generate()];
-    description.action = behavior;
+    description.behavior = behavior;
     switch(behavior)
     {
       case PedestrianBehavior::STATIC:
@@ -152,14 +150,6 @@ TestDescription TestRandomizer::generate()
         description.route = positions;
         break;
     }
-    // auto closest_crosswalk_position = std::min_element(crosswalk_poses.begin(), crosswalk_poses.end(),
-    // [description, this](const traffic_simulator_msgs::msg::LaneletPose v1, const traffic_simulator_msgs::msg::LaneletPose v2)
-    // {
-    //   return lanelet_utils_->computeDistance(description.spawn_position, v1) < lanelet_utils_->computeDistance(description.spawn_position, v2);
-    // });
-    // geometry_msgs::msg::PoseStamped crosswalk_pose_stamped = lanelet_utils_->toMapPose(*closest_crosswalk_position);
-    // geometry_msgs::msg::Pose crosswalk_pose = crosswalk_pose_stamped.pose;
-    // description.route.emplace_back(crosswalk_pose);
   }
   return ret;
 }
@@ -284,10 +274,10 @@ NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMi
 {
   std::stringstream npc_name_ss;
   npc_name_ss << "pedestrianNPC" << npc_id;
-  //TODO(mk): differ speed randomizer for Vehicles and NPCS
-  //TODO(mk): add route generation
-  //TODO(mk): check if generated pose is inside lanelet, since we want them outside, using hdmap_utils_ptr_->toLaneletPose(global_pose, false);
-  //TODO(mk): check if generated pose is on intersection (filter by attribute)
+  //TODO(kielczykowski-rai): differ speed randomizer for Vehicles and NPCS
+  //TODO(kielczykowski-rai): add route generation
+  //TODO(kielczykowski-rai): check if generated pose is inside lanelet, since we want them outside, using hdmap_utils_ptr_->toLaneletPose(global_pose, false);
+  //TODO(kielczykowski-rai): check if generated pose is on intersection (filter by attribute)
   return {
      npc_name_ss.str(),
      speed_randomizer_.generate(),

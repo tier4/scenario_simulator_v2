@@ -146,11 +146,11 @@ void TestExecutor::initialize()
     for (size_t i = 0; i < test_description_.npcs_pedestrian_descriptions.size(); i++) {
       const auto & npc_descr = test_description_.npcs_pedestrian_descriptions[i];
       api_->spawn(
-        //TODO(mk): Add planner choice parameter
-        //TODO(mk): Add speed parameter
+        //TODO(kielczykowski-rai): Add planner choice parameter
+        //TODO(kielczykowski-rai): Add speed for pedestrians parameter
         // npc_descr.name, api_->canonicalize(npc_descr.spawn_position), getPedestrianParameters());
         npc_descr.name, api_->canonicalize(npc_descr.spawn_position), getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
-        switch(npc_descr.action)
+        switch(npc_descr.behavior)
         {
           case PedestrianBehavior::STATIC:
             {
@@ -170,7 +170,6 @@ void TestExecutor::initialize()
               break;
             }
           case PedestrianBehavior::CROSSWALK:
-          //TODO(mk): try giving laneletPose here, test if requestAssignRoute does not ignore lanelet "obstacles" when approaching to route
             api_->requestSpeedChange(
               npc_descr.name, 0.5, traffic_simulator::speed_change::Transition::LINEAR,
               traffic_simulator::speed_change::Constraint(
@@ -186,9 +185,10 @@ void TestExecutor::initialize()
                 traffic_simulator::speed_change::Constraint(
                   traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
                 true);
-            //TODO(mk): requestAssignRoute will no work since route is outside lanelets
+            //HACK(kielczykowski-rai): requestAssignRoute will no work since route is outside lanelets
             // using requestAcquirePosition on first point instead
             api_->requestAcquirePosition(npc_descr.name, npc_descr.route[0]);
+            //TODO(kielczykowski-rai): tweak when implementation on SS2 is ready
             // api_->requestAssignRoute(
             //   npc_descr.name, npc_descr.route
             // );
