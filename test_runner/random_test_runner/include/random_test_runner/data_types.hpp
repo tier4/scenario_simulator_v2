@@ -103,6 +103,8 @@ struct TestSuiteParameters
   double npc_pedestrian_lanelet_max_offset = 5.0;
 
 };
+std::vector<PedestrianBehavior> pedestrianBehaviorsFromTestSuiteParameters(const TestSuiteParameters & parameters);
+
 
 struct TestCaseParameters
 {

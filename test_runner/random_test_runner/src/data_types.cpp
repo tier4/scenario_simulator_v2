@@ -16,6 +16,27 @@
 
 #include "random_test_runner/data_types.hpp"
 
+std::vector<PedestrianBehavior> pedestrianBehaviorsFromTestSuiteParameters(const TestSuiteParameters & parameters)
+{
+  std::vector<PedestrianBehavior> pedestrian_behaviors;
+  if (parameters.npc_pedestrian_behavior_static)
+  {
+    pedestrian_behaviors.emplace_back(PedestrianBehavior::STATIC);
+  }
+  if (parameters.npc_pedestrian_behavior_crosswalk)
+  {
+    pedestrian_behaviors.emplace_back(PedestrianBehavior::CROSSWALK);
+  }
+  if (parameters.npc_pedestrian_behavior_freewalking)
+  {
+    pedestrian_behaviors.emplace_back(PedestrianBehavior::FREEWALK);
+  }
+  if (parameters.npc_pedestrian_count > 0 && pedestrian_behaviors.empty()) {
+    throw std::runtime_error("At least one behavior has to be enabled for random pedestrian generation");
+  }
+  return pedestrian_behaviors;
+}
+
 SimulatorType simulatorTypeFromString(const std::string & simulator_type_str)
 {
   if (simulator_type_str == "simple_sensor_simulator") {

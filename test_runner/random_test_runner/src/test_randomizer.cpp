@@ -77,22 +77,7 @@ TestDescription TestRandomizer::generate()
 
   // preparing pedestrian behaviors
   //TODO(kielczykowski-rai): move it before generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses and use as parameter
-  std::vector<PedestrianBehavior> pedestrian_behaviors;
-  if (test_suite_parameters_.npc_pedestrian_behavior_static)
-  {
-    pedestrian_behaviors.emplace_back(PedestrianBehavior::STATIC);
-  }
-  if (test_suite_parameters_.npc_pedestrian_behavior_crosswalk)
-  {
-    pedestrian_behaviors.emplace_back(PedestrianBehavior::CROSSWALK);
-  }
-  if (test_suite_parameters_.npc_pedestrian_behavior_freewalking)
-  {
-    pedestrian_behaviors.emplace_back(PedestrianBehavior::FREEWALK);
-  }
-  if (test_suite_parameters_.npc_pedestrian_count > 0 && pedestrian_behaviors.empty()) {
-    throw std::runtime_error("At least one behavior has to be enabled for random pedestrian generation");
-  }
+  std::vector<PedestrianBehavior> pedestrian_behaviors = pedestrianBehaviorsFromTestSuiteParameters(test_suite_parameters_);
 
   // get crosswalk points (currently only valid positions for pedestrians to achieve)
   auto crosswalk_ids = lanelet_utils_->filterLaneletIds(lanelet_ids_, lanelet::AttributeValueString::Crosswalk);
