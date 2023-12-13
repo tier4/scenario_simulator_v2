@@ -52,6 +52,11 @@ private:
   traffic_simulator_msgs::msg::LaneletPose generateRandomPosition();
   traffic_simulator_msgs::msg::LaneletPose generatePoseFromLanelets(
     const std::vector<LaneletPart> & lanelets, double offset = 0.0);
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> generateCrosswalkStartAndEndPoses();
+  void generatePedestrianRoutes(
+  TestDescription & test_description,
+  const std::vector<PedestrianBehavior> & pedestrian_behaviors,
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses);
   NPCVehicleDescription generateVehicleNpcFromLaneletsWithMinDistanceFromPoses(
     int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
     double min_distance, const std::vector<LaneletPart> & lanelets);
