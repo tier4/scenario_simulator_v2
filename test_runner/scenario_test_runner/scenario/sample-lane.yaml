@@ -48,7 +48,7 @@ OpenSCENARIO:
         value: $(ros2 run map_fragment find --ros-args -p is_leftmost:=true)
       - name: ego_lane_length
         parameterType: double
-        value: $(ros2 run map_fragment length --ros-args -p id:=$(var ego_lane_id))
+        value: $(ros2 run map_fragment length --ros-args -p id_is_equal_to:=$(var ego_lane_id))
   CatalogLocations:
     VehicleCatalog:
       Directory:

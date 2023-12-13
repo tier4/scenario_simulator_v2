@@ -30,23 +30,55 @@ OpenSCENARIO:
       - name: map_path
         parameterType: string
         value: $(ros2 pkg prefix --share kashiwanoha_map)/map
+      - name: ego_path
+        parameterType: string
+        value: $(ros2 run map_fragment path --ros-args
+          -p any_middle_lanelets_related_to_regulatory_element_subtyped:=traffic_light
+          -p any_middle_lanelets_turn_direction:=right
+          -p ignore_errors_ocurred_while_parsing_lanelet_map:=true
+          -p input_directory:=$(var map_path)
+          -p path_element_limit:=3
+          -p select:=any
+          )
       - name: ego_start_lanelet_id
         parameterType: string
-        value: $(ros2 run map_fragment find --ros-args
-          -p input_directory:=$(var map_path)
-          -p is_leftmost:=true
-          -p route_length_greater_than:=100.0
-          -p select:=any
+        value: $(ros2 run map_fragment array --ros-args
+          -p element:=first
+          -p input:='$(var ego_path)'
           )
       - name: ego_goal_lanelet_id
         parameterType: string
+        value: $(ros2 run map_fragment array --ros-args
+          -p element:=last
+          -p input:='$(var ego_path)'
+          )
+      - name: curve_id
+        parameterType: string
+        value: $(ros2 run map_fragment array --ros-args
+          -p input:='$(var ego_path)'
+          -p index:=1
+          )
+      - name: vehicle1_path
+        parameterType: string
         value: $(ros2 run map_fragment path --ros-args
+          -p any_middle_lanelets_conflicts_with:=$(var curve_id)
+          -p first_lanelet_id_is_not_equal_to:=$(var ego_start_lanelet_id)
+          -p ignore_errors_ocurred_while_parsing_lanelet_map:=true
           -p input_directory:=$(var map_path)
-          -p start_lanelet_id:=$(var ego_start_lanelet_id)
-          -p select_path:=any
-          -p select_lanelet:=last
-          -p path_length_greater_than:=200.0
-          -p path_excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped:=traffic_light
+          -p path_element_limit:=3
+          -p select:=any
+          )
+      - name: vehicle1_start_lanelet_id
+        parameterType: string
+        value: $(ros2 run map_fragment array --ros-args
+          -p element:=first
+          -p input:='$(var vehicle1_path)'
+          )
+      - name: vehicle1_goal_lanelet_id
+        parameterType: string
+        value: $(ros2 run map_fragment array --ros-args
+          -p element:=last
+          -p input:='$(var vehicle1_path)'
           )
   CatalogLocations:
     VehicleCatalog:
@@ -70,6 +102,15 @@ OpenSCENARIO:
               Property:
                 - name: isEgo
                   value: 'true'
+      - name: vehicle1
+        CatalogReference:
+          catalogName: sample_vehicle
+          entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property: []
   Storyboard:
     Init:
       Actions:
@@ -101,6 +142,42 @@ OpenSCENARIO:
                           h: 0
                           p: 0
                           r: 0
+          - entityRef: vehicle1
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: $vehicle1_start_lanelet_id
+                      s: 1
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - RoutingAction:
+                  AcquirePositionAction:
+                    Position:
+                      LanePosition:
+                        roadId: ''
+                        laneId: $vehicle1_goal_lanelet_id
+                        s: 10
+                        offset: 0
+                        Orientation:
+                          type: relative
+                          h: 0
+                          p: 0
+                          r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: ${30 * 0.278} # 30km/h
     Story:
       - name: ''
         Act:

@@ -19,21 +19,23 @@
 #include <lanelet2_routing/RoutingGraph.h>
 
 #include <algorithm>
+#include <limits>
+#include <map_fragment/map_fragment.hpp>
 
 namespace map_fragment
 {
 inline namespace constraint
 {
-auto isLeftmost(const lanelet::routing::RoutingGraph & graph, const lanelet::Lanelet & lanelet)
+auto isLeftmost(const lanelet::routing::RoutingGraph & graph, const lanelet::ConstLanelet & lanelet)
 {
   return graph.leftRelations(lanelet).empty();
 }
 
 auto isRightmost(
   const lanelet::LaneletMap & map, const lanelet::routing::RoutingGraph & graph,
-  const lanelet::Lanelet & lanelet)
+  const lanelet::ConstLanelet & lanelet)
 {
-  auto relations = graph.rightRelations(lanelet);
+  const auto relations = graph.rightRelations(lanelet);
 
   return relations.empty() or
          std::any_of(relations.begin(), relations.end(), [&](const auto & relation) {
@@ -48,29 +50,38 @@ auto isRightmost(
 }
 
 template <typename Node>
-auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = "")
+auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
 {
   std::unordered_map<
     std::string, std::function<bool(
-                   const lanelet::Lanelet &, const lanelet::LaneletMap &,
+                   const lanelet::ConstLanelet &, const lanelet::LaneletMap &,
                    const lanelet::routing::RoutingGraph &)>>
     constraints;
 
   if (const auto name = prefix + "type"; node.has_parameter(name)) {
     const auto type = node.get_parameter(name).as_string();
     constraints.emplace(name, [type](auto && lanelet, auto &&...) {  //
-      return lanelet.attribute("type") == type;
+      return lanelet.attributeOr("type", "") == type;
     });
   }
 
   if (const auto name = prefix + "subtype"; node.has_parameter(name)) {
     const auto subtype = node.get_parameter(name).as_string();
     constraints.emplace(name, [subtype](auto && lanelet, auto &&...) {
-      return lanelet.attribute("subtype") == subtype;
+      return lanelet.attributeOr("subtype", "") == subtype;
     });
   }
 
-  if (const auto name = prefix + "id"; node.has_parameter(name)) {
+  if (const auto name = prefix + "turn_direction"; node.has_parameter(name)) {
+    if (const auto turn_direction = node.get_parameter(name).as_string();
+        not turn_direction.empty()) {
+      constraints.emplace(name, [turn_direction](auto && lanelet, auto &&...) {
+        return lanelet.attributeOr("turn_direction", "") == turn_direction;
+      });
+    }
+  }
+
+  if (const auto name = prefix + "id_is_equal_to"; node.has_parameter(name)) {
     if (const auto id = node.get_parameter(name).as_int(); id) {
       constraints.emplace(name, [id](auto && lanelet, auto &&...) {  //
         return lanelet.id() == id;
@@ -78,7 +89,15 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
     }
   }
 
-  if (const auto name = prefix + "id_greater_than"; node.has_parameter(name)) {
+  if (const auto name = prefix + "id_is_not_equal_to"; node.has_parameter(name)) {
+    if (const auto id = node.get_parameter(name).as_int(); id) {
+      constraints.emplace(name, [id](auto && lanelet, auto &&...) {  //
+        return lanelet.id() != id;
+      });
+    }
+  }
+
+  if (const auto name = prefix + "id_is_greater_than"; node.has_parameter(name)) {
     const auto lower_bound = node.get_parameter(name).as_int();
     constraints.emplace(name, [lower_bound](auto && lanelet, auto &&...) {  //
       return lower_bound < lanelet.id();
@@ -144,6 +163,45 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
     });
   }
 
+  if (const auto name = prefix + "centerline_curvature_less_than"; node.has_parameter(name)) {
+    const auto curvature = node.get_parameter(name).as_double();
+    constraints.emplace(name, [curvature](auto && lanelet, auto &&...) {
+      return std::abs(curvature2d(lanelet.centerline())) < curvature;
+    });
+  }
+
+  if (const auto name = prefix + "centerline_curvature_greater_than"; node.has_parameter(name)) {
+    const auto curvature = node.get_parameter(name).as_double();
+    constraints.emplace(name, [curvature](auto && lanelet, auto &&...) {
+      return curvature < std::abs(curvature2d(lanelet.centerline()));
+    });
+  }
+
+  if (const auto name = prefix + "conflicts_with"; node.has_parameter(name)) {
+    if (const auto id = node.get_parameter(name).as_int(); id) {
+      constraints.emplace(name, [id](auto && lanelet, auto &&, auto && graph) {
+        const auto suspects = graph.conflicting(lanelet);
+        return std::any_of(
+          suspects.begin(), suspects.end(), [&](auto && suspect) { return suspect.id() == id; });
+      });
+    }
+  }
+
+  if (const auto name = prefix + "related_to_regulatory_element_subtyped";
+      node.has_parameter(name)) {
+    if (const auto subtype = node.get_parameter(name).as_string(); not subtype.empty()) {
+      constraints.emplace(name, [subtype](auto && lanelet, auto &&...) {
+        return [&](auto && regulatory_elements) {
+          return std::any_of(
+            regulatory_elements.begin(), regulatory_elements.end(),
+            [&](auto && regulatory_element) {
+              return regulatory_element->attributeOr("subtype", "") == subtype;
+            });
+        }(lanelet.regulatoryElements());
+      });
+    }
+  }
+
   if (const auto name = prefix + "route_length_greater_than"; node.has_parameter(name)) {
     const auto lower_bound = node.get_parameter(name).as_double();
     constraints.emplace(name, [lower_bound](auto && lanelet, auto &&, auto && graph) {
@@ -152,6 +210,86 @@ auto loadLaneletIDConstraints(const Node & node, const std::string & prefix = ""
   }
 
   return constraints;
+}
+
+template <typename Node>
+auto loadAllLaneletConstraints(Node & node, const std::string & prefix = "")
+{
+  if (const auto name = prefix + "lanelet_type"; not node.has_parameter(name)) {
+    node.declare_parameter(name, "lanelet");
+  }
+
+  if (const auto name = prefix + "subtype"; not node.has_parameter(name)) {
+    node.declare_parameter(name, "road");
+  }
+
+  if (const auto name = prefix + "turn_direction"; not node.has_parameter(name)) {
+    node.declare_parameter(name, "");
+  }
+
+  if (const auto name = prefix + "id_is_equal_to"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "id_is_not_equal_to"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "id_is_greater_than"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "id_is_less_than"; not node.has_parameter(name)) {
+    node.declare_parameter(name, std::numeric_limits<lanelet::Id>::max());
+  }
+
+  if (const auto name = prefix + "is_left_of"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "is_right_of"; node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "is_leftmost"; not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "is_rightmost"; not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "is_not_leftmost"; not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "is_not_rightmost"; not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  if (const auto name = prefix + "centerline_curvature_less_than"; not node.has_parameter(name)) {
+    node.declare_parameter(name, std::numeric_limits<double>::max());
+  }
+
+  if (const auto name = prefix + "centerline_curvature_greater_than";
+      not node.has_parameter(name)) {
+    node.declare_parameter(name, std::numeric_limits<double>::lowest());
+  }
+
+  if (const auto name = prefix + "conflicts_with"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "related_to_regulatory_element_subtyped";
+      not node.has_parameter(name)) {
+    node.declare_parameter(name, "");
+  }
+
+  if (const auto name = prefix + "route_length_greater_than"; not node.has_parameter(name)) {
+    node.declare_parameter(name, 0.0);
+  }
+
+  return loadLaneletConstraints(node, prefix);
 }
 
 template <typename Node>
@@ -184,43 +322,22 @@ auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = 
     }
   }
 
-  if (const auto name = prefix + "includes_lanelet_related_to_regulatory_element_subtyped";
-      node.has_parameter(name)) {
-    if (const auto subtype = node.get_parameter(name).as_string(); not subtype.empty()) {
-      constraints.emplace(name, [subtype](auto && path, auto &&...) {
-        return std::any_of(path.begin(), path.end(), [&](auto && lanelet) {
-          return [&](auto && regulatory_elements) {
-            return std::any_of(
-              regulatory_elements.begin(), regulatory_elements.end(),
-              [&](auto && regulatory_element) {
-                return regulatory_element->attribute("subtype") == subtype;
-              });
-          }(lanelet.regulatoryElements());
-        });
-      });
-    }
-  }
-
-  if (const auto name =
-        prefix + "excluded_both_ends_includes_lanelet_related_to_regulatory_element_subtyped";
-      node.has_parameter(name)) {
-    if (const auto subtype = node.get_parameter(name).as_string(); not subtype.empty()) {
-      constraints.emplace(name, [subtype](auto && path, auto &&...) {
-        return 2 < path.size() and
-               std::any_of(std::next(path.begin()), std::prev(path.end()), [&](auto && lanelet) {
-                 return [&](auto && regulatory_elements) {
-                   return std::any_of(
-                     regulatory_elements.begin(), regulatory_elements.end(),
-                     [&](auto && regulatory_element) {
-                       return regulatory_element->attribute("subtype") == subtype;
-                     });
-                 }(lanelet.regulatoryElements());
-               });
-      });
-    }
-  }
-
   return constraints;
+}
+
+template <typename Node>
+auto loadAllLaneletPathConstraints(Node & node, const std::string & prefix = "")
+{
+  if (const auto name = prefix + "includes_id"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "is_allowed_to_contain_duplicate_lanelet_ids";
+      not node.has_parameter(name)) {
+    node.declare_parameter(name, false);
+  }
+
+  return loadLaneletPathConstraints(node, prefix);
 }
 }  // namespace constraint
 }  // namespace map_fragment
