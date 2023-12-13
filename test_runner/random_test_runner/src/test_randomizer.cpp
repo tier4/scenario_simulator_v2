@@ -103,13 +103,15 @@ TestDescription TestRandomizer::generate()
   for (const auto & crosswalk_id : crosswalk_ids)
   {
     crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(crosswalk_id, 0.0));
-    crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(crosswalk_id, 1.0));
+    // crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(crosswalk_id, 1.0));
+    crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(crosswalk_id, lanelet_utils_->getLaneletLength(crosswalk_id)-0.00001));
   }
 
 //TODO(mk): do I need specific name for the randomizer?
   UniformRandomizer<int64_t> pedestrian_behavior_id_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, pedestrian_behaviors.size() - 1);
   UniformRandomizer<int64_t> crosswalk_id_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, (crosswalk_poses.size() / 2) - 1);
   UniformRandomizer<int64_t> direction_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, 1);
+  UniformRandomizer<double> start_position_randomizer = UniformRandomizer<double>(randomization_engine_, -0.5, 0.5);
   // set one goal route on nearest crosswalk point
 
   for (auto & description : ret.npcs_pedestrian_descriptions)
@@ -118,22 +120,32 @@ TestDescription TestRandomizer::generate()
     description.action = behavior;
     switch(behavior)
     {
+      case PedestrianBehavior::STATIC:
+      {
+        description.speed = 0.0;
+        auto lanelet_id = getRandomLaneletId();
+        auto dummy_goal_pose_stamped = lanelet_utils_->toMapPose(
+          traffic_simulator::helper::constructLaneletPose(lanelet_id, lanelet_utils_->getLaneletLength(lanelet_id)));
+        description.route.emplace_back(dummy_goal_pose_stamped.pose);
+        break;
+      }
       case PedestrianBehavior::CROSSWALK:
-        {
-          int64_t index = crosswalk_id_randomizer.generate();
-          auto start_lanelet_pose = crosswalk_poses[index];
-          auto goal_lanelet_pose = crosswalk_poses[index * 2 + 1];
-          if (direction_randomizer.generate() == 1) {
-            auto tmp_pose = start_lanelet_pose;
-            start_lanelet_pose = goal_lanelet_pose;
-            goal_lanelet_pose = tmp_pose;
-          }
-          description.spawn_position = start_lanelet_pose;
-          auto goal_pose_stamped = lanelet_utils_->toMapPose(goal_lanelet_pose);
-          auto goal_pose = goal_pose_stamped.pose;
-          description.route.emplace_back(goal_pose);
-          break;
+      {
+        int64_t index = crosswalk_id_randomizer.generate();
+        auto start_lanelet_pose = crosswalk_poses[index * 2];
+        auto goal_lanelet_pose = crosswalk_poses[index * 2 + 1];
+        if (direction_randomizer.generate() == 1) {
+          auto tmp_pose = start_lanelet_pose;
+          start_lanelet_pose = goal_lanelet_pose;
+          goal_lanelet_pose = tmp_pose;
         }
+        description.spawn_position = start_lanelet_pose;
+        description.spawn_position.offset = start_position_randomizer.generate();
+        auto goal_pose_stamped = lanelet_utils_->toMapPose(goal_lanelet_pose);
+        auto goal_pose = goal_pose_stamped.pose;
+        description.route.emplace_back(goal_pose);
+        break;
+      }
       case PedestrianBehavior::FREEWALK:
         auto spawn_lanelet = description.spawn_position;
         auto positions = lanelet_utils_->getPositionsOnNextLanelets(spawn_lanelet, 5, 5.0);
