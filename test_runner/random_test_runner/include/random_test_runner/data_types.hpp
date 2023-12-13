@@ -96,6 +96,8 @@ struct TestSuiteParameters
   double npc_vehicle_max_spawn_distance_from_ego = 100.0;
 
   int64_t npc_pedestrian_count = 1;
+  int64_t npc_pedestrian_min_speed = 0.1;
+  int64_t npc_pedestrian_max_speed = 1.0;
   bool npc_pedestrian_behavior_static = true;
   bool npc_pedestrian_behavior_crosswalk = true;
   bool npc_pedestrian_behavior_freewalking = true;
@@ -173,6 +175,7 @@ DEFINE_FMT_FORMATTER(
   "{} "
   "npc_vehicle_max_speed: {} npc_vehicle_min_spawn_distance_from_ego: {} "
   "npc_vehicle_max_spawn_distance_from_ego: {} npc_pedestrian_count {} "
+  "npc_pedestrian_min_speed {} npc_pedestrian_max_speed {} "
   "npc_pedestrian_behavior_static: {} npc_pedestrian_behavior_crosswalk: {} "
   "npc_pedestrian_behavior_freewalking: {} "
   "npc_pedestrian_lanelet_min_offset: {} npc_pedestrian_lanelet_max_offset: {}"
@@ -180,7 +183,8 @@ DEFINE_FMT_FORMATTER(
   v.ego_goal_lanelet_id, v.ego_goal_s, v.ego_goal_partial_randomization,
   v.ego_goal_partial_randomization_distance, v.npc_vehicle_count, v.npc_vehicle_min_speed, v.npc_vehicle_max_speed,
   v.npc_vehicle_min_spawn_distance_from_ego, v.npc_vehicle_max_spawn_distance_from_ego, v.npc_pedestrian_count,
-  v.npc_pedestrian_behavior_static, v.npc_pedestrian_behavior_crosswalk, v.npc_pedestrian_behavior_freewalking,
+  v.npc_pedestrian_min_speed, v.npc_pedestrian_max_speed, v.npc_pedestrian_behavior_static,
+  v.npc_pedestrian_behavior_crosswalk, v.npc_pedestrian_behavior_freewalking,
   v.npc_pedestrian_lanelet_min_offset, v.npc_pedestrian_lanelet_max_offset, v.name, v.map_name)
 
 DEFINE_FMT_FORMATTER(TestCaseParameters, "seed: {}", v.seed)

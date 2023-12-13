@@ -35,9 +35,12 @@ TestRandomizer::TestRandomizer(
   lanelet_offset_randomizer_(randomization_engine_,
     test_suite_parameters.npc_pedestrian_lanelet_min_offset, test_suite_parameters.npc_pedestrian_lanelet_max_offset),
   s_value_randomizer_(randomization_engine_, 0.0, 1.0),
-  speed_randomizer_(
+  vehicle_npc_speed_randomizer_(
     randomization_engine_, test_suite_parameters.npc_vehicle_min_speed,
     test_suite_parameters.npc_vehicle_max_speed),
+  pedestrian_npc_speed_randomizer_(randomization_engine_,
+    test_suite_parameters.npc_pedestrian_min_speed,
+    test_suite_parameters.npc_pedestrian_max_speed),
   test_suite_parameters_(test_suite_parameters)
 {
   if (lanelet_ids_.empty()) {
@@ -45,7 +48,6 @@ TestRandomizer::TestRandomizer(
   }
 }
 
-//TODO(kielczykowski-rai): filter out turn lanelets for pedestrians
 TestDescription TestRandomizer::generate()
 {
   TestDescription ret;
@@ -259,7 +261,7 @@ NPCVehicleDescription TestRandomizer::generateVehicleNpcFromLaneletsWithMinDista
   npc_name_ss << "vehicleNPC" << npc_id;
   return {
     generateRandomPoseWithinMinDistanceFromPosesFromLanelets(poses, min_distance, lanelets),
-    speed_randomizer_.generate(), npc_name_ss.str()};
+    vehicle_npc_speed_randomizer_.generate(), npc_name_ss.str()};
 }
 
 NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses(
@@ -279,7 +281,7 @@ NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMi
     {
       return {
         npc_name_ss.str(),
-        speed_randomizer_.generate(),
+        pedestrian_npc_speed_randomizer_.generate(),
         {},
         spawn_lanelet_pose,
         {}
