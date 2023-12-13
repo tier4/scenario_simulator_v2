@@ -61,10 +61,18 @@ VisualizationConditionGroupsDisplay::VisualizationConditionGroupsDisplay()
    */
   const int top = static_cast<int>(std::round(450 * scale));
 
-  /// @note Define initial value of horizontal length of condition results panel
+  /**
+   * @note Define initial value of horizontal length of condition results panel.
+   * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
+   * Also, this number can be set via the rviz GUI.
+   */
   const int length = static_cast<int>(std::round(2000 * scale));
 
-  /// @note Define initial value of width of condition results panel
+  /**
+   * @note Define initial value of width of condition results panel.
+   * The reason 2000 is hard-coded here is because that number displayed most beautifully when we tested the operation on a 4K/non 4K display.
+   * Also, this number can be set via the rviz GUI.
+   */
   const int width = static_cast<int>(std::round(2000 * scale));
 
   property_topic_name_ = new rviz_common::properties::StringProperty(
