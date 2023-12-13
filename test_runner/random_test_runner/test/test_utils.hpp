@@ -66,3 +66,22 @@ LaneletUtils & getLaneletUtils()
   static LaneletUtils utils(path);
   return utils;
 }
+
+std::shared_ptr<LaneletUtils> getLaneletUtilsPtr()
+{
+  static const std::string path =
+    ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
+  static const auto utils = std::make_shared<LaneletUtils>(path);
+  return utils;
+}
+
+NPCDescription makeNPCDescription(
+  const std::string name, const double speed,
+  const traffic_simulator_msgs::msg::LaneletPose lanelet_pose)
+{
+  NPCDescription description;
+  description.name = name;
+  description.speed = speed;
+  description.start_position = lanelet_pose;
+  return description;
+}

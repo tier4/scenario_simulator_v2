@@ -55,4 +55,9 @@
   EXPECT_GE((VAL), (MIN));             \
   EXPECT_LE((VAL), (MAX))
 
+#define EXPECT_NPC_DESCRIPTION_NEAR(DATA0, DATA1, TOLERANCE) \
+  EXPECT_STREQ(DATA0.name.c_str(), DATA1.name.c_str());      \
+  EXPECT_NEAR(DATA0.speed, DATA1.speed, TOLERANCE);          \
+  EXPECT_LANELET_POSE_NEAR(DATA0.start_position, DATA1.start_position, TOLERANCE);
+
 #endif  // RANDOM_TEST_RUNNER__TEST__EXPECT_EQ_MACROS_HPP_
