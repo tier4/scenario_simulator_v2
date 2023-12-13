@@ -138,10 +138,6 @@ TestDescription TestRandomizer::generate()
         auto spawn_lanelet = description.spawn_position;
         auto positions = lanelet_utils_->getPositionsOnNextLanelets(spawn_lanelet, 5, 5.0);
         description.route = positions;
-        for (const auto & position : positions)
-        {
-          std::cout << fmt::format("Position: {}", position) << std::endl;
-        }
         break;
     }
     // auto closest_crosswalk_position = std::min_element(crosswalk_poses.begin(), crosswalk_poses.end(),
@@ -279,6 +275,7 @@ NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMi
   //TODO(mk): differ speed randomizer for Vehicles and NPCS
   //TODO(mk): add route generation
   //TODO(mk): check if generated pose is inside lanelet, since we want them outside, using hdmap_utils_ptr_->toLaneletPose(global_pose, false);
+  //TODO(mk): check if generated pose is on intersection (filter by attribute)
   return {
      npc_name_ss.str(),
      speed_randomizer_.generate(),

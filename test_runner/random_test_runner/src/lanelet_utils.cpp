@@ -203,8 +203,9 @@ std::vector<geometry_msgs::msg::Pose> LaneletUtils::getPositionsOnNextLanelets(
       for (const auto & id : next_lanelet_ids)
       {
         lanelet::ConstLanelet lanelet  =
-      lanelet_map_ptr_->laneletLayer.get(id);
-        if (lanelet.attributeOr("turn_direction", "else") == "right" || lanelet.attributeOr("turn_direction", "else") == "straight") {
+          lanelet_map_ptr_->laneletLayer.get(id);
+        const std::string turn_direction_attribute = lanelet.attributeOr("turn_direction", "else");
+        if (turn_direction_attribute == "right" || turn_direction_attribute == "straight") {
           continue;
         }
         validated_ids.push_back(lanelet.id());
