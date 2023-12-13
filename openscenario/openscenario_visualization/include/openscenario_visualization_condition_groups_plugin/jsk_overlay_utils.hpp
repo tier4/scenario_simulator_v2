@@ -152,9 +152,10 @@ protected:
 private:
 };
 
-// this is a class for put overlay object on rviz 3D panel.
-// This class suppose to be instantiated in onInitialize method
-// of rviz::Display class.
+/**
+ * @brief This is a class for put overlay object on rviz 3D panel.
+ * This class suppose to be instantiated in onInitialize method of rviz::Display class.
+ */
 class OverlayObject
 {
 public:
@@ -186,10 +187,6 @@ protected:
 
 private:
 };
-
-// Ogre::Overlay* createOverlay(std::string name);
-// Ogre::PanelOverlayElement* createOverlayPanel(Ogre::Overlay* overlay);
-// Ogre::MaterialPtr createOverlayMaterial(Ogre::Overlay* overlay);
 }  // namespace jsk_rviz_plugins
 
 #endif  // JSK_OVERLAY_UTILS_HPP_
