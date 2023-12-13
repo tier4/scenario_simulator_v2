@@ -23,14 +23,6 @@
 
 constexpr double EPS = 1e-6;
 
-LaneletUtils & getLaneletUtils()
-{
-  static const std::string path =
-    ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
-  static LaneletUtils utils(path);
-  return utils;
-}
-
 TEST(LaneletUtils, initialize)
 {
   const std::string path =

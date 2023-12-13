@@ -15,6 +15,7 @@
 // Co-developed by TIER IV, Inc. and Robotec.AI sp. z o.o.
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <random_test_runner/lanelet_utils.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 
@@ -56,4 +57,12 @@ inline traffic_simulator_msgs::msg::LaneletPose makeLaneletPose(
   lanelet_pose.lanelet_id = lane_id;
   lanelet_pose.s = s;
   return lanelet_pose;
+}
+
+LaneletUtils & getLaneletUtils()
+{
+  static const std::string path =
+    ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
+  static LaneletUtils utils(path);
+  return utils;
 }
