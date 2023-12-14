@@ -26,20 +26,16 @@ static constexpr double min_npc_distance = 5.0;
 
 const std::string & pedestrianPlannerBehaviorFromString(const std::string & input)
 {
-  if (input == "context_gamma_planner")
-  {
+  if (input == "context_gamma_planner") {
     return traffic_simulator::PedestrianBehavior::contextGamma();
   }
-  if (input == "do_nothing")
-  {
+  if (input == "do_nothing") {
     return traffic_simulator::PedestrianBehavior::doNothing();
   }
-  if (input == "default")
-  {
+  if (input == "default") {
     return traffic_simulator::PedestrianBehavior::defaultBehavior();
   }
-  if (input == "behavior_tree")
-  {
+  if (input == "behavior_tree") {
     return traffic_simulator::PedestrianBehavior::behaviorTree();
   }
 
@@ -54,14 +50,15 @@ TestRandomizer::TestRandomizer(
   lanelet_ids_(lanelet_utils_->getLaneletIds()),
   randomization_engine_(std::make_shared<RandomizationEngine>(test_case_parameters.seed)),
   lanelet_id_randomizer_(randomization_engine_, 0, static_cast<int>(lanelet_ids_.size()) - 1),
-  lanelet_offset_randomizer_(randomization_engine_,
-    test_suite_parameters.npc_pedestrian_lanelet_min_offset, test_suite_parameters.npc_pedestrian_lanelet_max_offset),
+  lanelet_offset_randomizer_(
+    randomization_engine_, test_suite_parameters.npc_pedestrian_lanelet_min_offset,
+    test_suite_parameters.npc_pedestrian_lanelet_max_offset),
   s_value_randomizer_(randomization_engine_, 0.0, 1.0),
   vehicle_npc_speed_randomizer_(
     randomization_engine_, test_suite_parameters.npc_vehicle_min_speed,
     test_suite_parameters.npc_vehicle_max_speed),
-  pedestrian_npc_speed_randomizer_(randomization_engine_,
-    test_suite_parameters.npc_pedestrian_min_speed,
+  pedestrian_npc_speed_randomizer_(
+    randomization_engine_, test_suite_parameters.npc_pedestrian_min_speed,
     test_suite_parameters.npc_pedestrian_max_speed),
   test_suite_parameters_(test_suite_parameters)
 {
@@ -86,18 +83,23 @@ TestDescription TestRandomizer::generate()
 
   std::vector<traffic_simulator_msgs::msg::LaneletPose> npc_vehicle_poses;
   for (int npc_id = 0; npc_id < test_suite_parameters_.npc_vehicle_count; npc_id++) {
-    ret.npcs_vehicle_descriptions.emplace_back(generateVehicleNpcFromLaneletsWithMinDistanceFromPoses(
-      npc_id, npc_vehicle_poses, min_npc_distance, lanelets_around_start));
+    ret.npcs_vehicle_descriptions.emplace_back(
+      generateVehicleNpcFromLaneletsWithMinDistanceFromPoses(
+        npc_id, npc_vehicle_poses, min_npc_distance, lanelets_around_start));
     npc_vehicle_poses.emplace_back(ret.npcs_vehicle_descriptions.back().start_position);
   }
 
-  std::vector<PedestrianBehavior> pedestrian_behaviors = pedestrianBehaviorsFromTestSuiteParameters(test_suite_parameters_);
-  std::vector<traffic_simulator_msgs::msg::LaneletPose> crosswalk_poses = generateCrosswalkStartAndEndPoses();
+  std::vector<PedestrianBehavior> pedestrian_behaviors =
+    pedestrianBehaviorsFromTestSuiteParameters(test_suite_parameters_);
+  std::vector<traffic_simulator_msgs::msg::LaneletPose> crosswalk_poses =
+    generateCrosswalkStartAndEndPoses();
 
   std::vector<traffic_simulator_msgs::msg::LaneletPose> npc_pedestrian_poses;
   for (int npc_id = 0; npc_id < test_suite_parameters_.npc_pedestrian_count; npc_id++) {
-    ret.npcs_pedestrian_descriptions.emplace_back(generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses(
-      npc_id, npc_pedestrian_poses, pedestrian_behaviors, min_npc_distance, lanelets_around_start, crosswalk_poses));
+    ret.npcs_pedestrian_descriptions.emplace_back(
+      generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses(
+        npc_id, npc_pedestrian_poses, pedestrian_behaviors, min_npc_distance, lanelets_around_start,
+        crosswalk_poses));
     npc_pedestrian_poses.emplace_back(ret.npcs_pedestrian_descriptions.back().spawn_position);
   }
 
@@ -195,13 +197,15 @@ traffic_simulator_msgs::msg::LaneletPose TestRandomizer::generateRandomPosition(
   return traffic_simulator::helper::constructLaneletPose(lanelet_id, getRandomS(lanelet_id));
 }
 
-std::vector<traffic_simulator_msgs::msg::LaneletPose> TestRandomizer::generateCrosswalkStartAndEndPoses()
+std::vector<traffic_simulator_msgs::msg::LaneletPose>
+TestRandomizer::generateCrosswalkStartAndEndPoses()
 {
-  auto crosswalk_ids = lanelet_utils_->filterLaneletIds(lanelet_ids_, lanelet::AttributeValueString::Crosswalk);
+  auto crosswalk_ids =
+    lanelet_utils_->filterLaneletIds(lanelet_ids_, lanelet::AttributeValueString::Crosswalk);
   std::vector<traffic_simulator_msgs::msg::LaneletPose> crosswalk_poses;
-  for (const auto & crosswalk_id : crosswalk_ids)
-  {
-    crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(crosswalk_id, 0.0));
+  for (const auto & crosswalk_id : crosswalk_ids) {
+    crosswalk_poses.emplace_back(
+      traffic_simulator::helper::constructLaneletPose(crosswalk_id, 0.0));
     //HACK(kielczykowski-rai): when point is set on full lanelet length, ss2 throws that LaneletPose is invalid
     // when trying to approach goal
     crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(
@@ -235,8 +239,8 @@ NPCVehicleDescription TestRandomizer::generateVehicleNpcFromLaneletsWithMinDista
 
 NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses(
   int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
-  const std::vector<PedestrianBehavior> & pedestrian_behaviors,
-  double min_distance, const std::vector<LaneletPart> & lanelets,
+  const std::vector<PedestrianBehavior> & pedestrian_behaviors, double min_distance,
+  const std::vector<LaneletPart> & lanelets,
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses)
 {
   std::stringstream npc_name_ss;
@@ -244,8 +248,7 @@ NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMi
   PedestrianBehavior behavior = getRandomPedestrianBehavior(pedestrian_behaviors);
 
   double speed = pedestrian_npc_speed_randomizer_.generate();
-  if (behavior == PedestrianBehavior::STATIC)
-  {
+  if (behavior == PedestrianBehavior::STATIC) {
     speed = 0.0;
   }
 
@@ -260,16 +263,19 @@ NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMi
     pedestrianPlannerBehaviorFromString(test_suite_parameters_.npc_pedestrian_planner),
     behavior,
     spawn_pose,
-    route
-  };
+    route};
 }
 
-std::pair<traffic_simulator_msgs::msg::LaneletPose, geometry_msgs::msg::Pose> TestRandomizer::getRandomCrosswalkStartAndEndPose(
+std::pair<traffic_simulator_msgs::msg::LaneletPose, geometry_msgs::msg::Pose>
+TestRandomizer::getRandomCrosswalkStartAndEndPose(
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses)
 {
-  UniformRandomizer<int64_t> crosswalk_id_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, (crosswalk_poses.size() / 2) - 1);
-  UniformRandomizer<int64_t> direction_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, 1);
-  UniformRandomizer<double> start_position_randomizer = UniformRandomizer<double>(randomization_engine_, -0.5, 0.5);
+  UniformRandomizer<int64_t> crosswalk_id_randomizer =
+    UniformRandomizer<int64_t>(randomization_engine_, 0, (crosswalk_poses.size() / 2) - 1);
+  UniformRandomizer<int64_t> direction_randomizer =
+    UniformRandomizer<int64_t>(randomization_engine_, 0, 1);
+  UniformRandomizer<double> start_position_randomizer =
+    UniformRandomizer<double>(randomization_engine_, -0.5, 0.5);
 
   int64_t index = crosswalk_id_randomizer.generate();
   auto start_lanelet_pose = crosswalk_poses[index * 2];
@@ -285,34 +291,34 @@ std::pair<traffic_simulator_msgs::msg::LaneletPose, geometry_msgs::msg::Pose> Te
   return {start_lanelet_pose, goal_pose};
 }
 
-PedestrianBehavior TestRandomizer::getRandomPedestrianBehavior(const std::vector<PedestrianBehavior> & pedestrian_behaviors)
+PedestrianBehavior TestRandomizer::getRandomPedestrianBehavior(
+  const std::vector<PedestrianBehavior> & pedestrian_behaviors)
 {
-  UniformRandomizer<int64_t> pedestrian_behavior_id_randomizer = UniformRandomizer<int64_t>(randomization_engine_, 0, pedestrian_behaviors.size() - 1);
+  UniformRandomizer<int64_t> pedestrian_behavior_id_randomizer =
+    UniformRandomizer<int64_t>(randomization_engine_, 0, pedestrian_behaviors.size() - 1);
   return pedestrian_behaviors[pedestrian_behavior_id_randomizer.generate()];
 }
 
 std::pair<traffic_simulator_msgs::msg::LaneletPose, std::vector<geometry_msgs::msg::Pose>>
-  TestRandomizer::generatePedestrianSpawnPointAndRouteFromBehavior(
-    const PedestrianBehavior & behavior,
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
-    double min_distance, const std::vector<LaneletPart> & lanelets,
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses)
+TestRandomizer::generatePedestrianSpawnPointAndRouteFromBehavior(
+  const PedestrianBehavior & behavior,
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
+  const std::vector<LaneletPart> & lanelets,
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses)
 {
   std::vector<geometry_msgs::msg::Pose> route;
   traffic_simulator_msgs::msg::LaneletPose spawn_lanelet_pose;
-  switch(behavior)
-  {
-    case PedestrianBehavior::STATIC:
-    {
+  switch (behavior) {
+    case PedestrianBehavior::STATIC: {
       spawn_lanelet_pose = getRandomPedestrianSpawnPose(poses, min_distance, lanelets);
       auto lanelet_id = getRandomLaneletId();
-      auto dummy_goal_pose_stamped = lanelet_utils_->toMapPose(
-        traffic_simulator::helper::constructLaneletPose(lanelet_id, lanelet_utils_->getLaneletLength(lanelet_id)));
+      auto dummy_goal_pose_stamped =
+        lanelet_utils_->toMapPose(traffic_simulator::helper::constructLaneletPose(
+          lanelet_id, lanelet_utils_->getLaneletLength(lanelet_id)));
       route.emplace_back(dummy_goal_pose_stamped.pose);
       break;
     }
-    case PedestrianBehavior::CROSSWALK:
-    {
+    case PedestrianBehavior::CROSSWALK: {
       geometry_msgs::msg::Pose goal_pose;
       std::tie(spawn_lanelet_pose, goal_pose) = getRandomCrosswalkStartAndEndPose(crosswalk_poses);
       route.emplace_back(goal_pose);
@@ -320,7 +326,8 @@ std::pair<traffic_simulator_msgs::msg::LaneletPose, std::vector<geometry_msgs::m
     }
     case PedestrianBehavior::WALK_ALONG_LANE:
       spawn_lanelet_pose = getRandomPedestrianSpawnPose(poses, min_distance, lanelets);
-      auto positions = lanelet_utils_->getPositionsOnNextLanelets(spawn_lanelet_pose, 5, lanelet_offset_randomizer_.generate());
+      auto positions = lanelet_utils_->getPositionsOnNextLanelets(
+        spawn_lanelet_pose, 5, lanelet_offset_randomizer_.generate());
       route = positions;
       break;
   }
@@ -328,16 +335,15 @@ std::pair<traffic_simulator_msgs::msg::LaneletPose, std::vector<geometry_msgs::m
 }
 
 traffic_simulator_msgs::msg::LaneletPose TestRandomizer::getRandomPedestrianSpawnPose(
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
-  double min_distance, const std::vector<LaneletPart> & lanelets)
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
+  const std::vector<LaneletPart> & lanelets)
 {
-  for (int attempt_number = 0; attempt_number < max_randomization_attempts; attempt_number++)
-  {
-    auto spawn_lanelet_pose = generateRandomPoseWithinMinDistanceFromPosesFromLanelets(poses, min_distance, lanelets, lanelet_offset_randomizer_.generate());
+  for (int attempt_number = 0; attempt_number < max_randomization_attempts; attempt_number++) {
+    auto spawn_lanelet_pose = generateRandomPoseWithinMinDistanceFromPosesFromLanelets(
+      poses, min_distance, lanelets, lanelet_offset_randomizer_.generate());
     auto spawn_pose = lanelet_utils_->toMapPose(spawn_lanelet_pose).pose;
     auto map_pose = lanelet_utils_->toLaneletPose(spawn_pose, false);
-    if (!map_pose)
-    {
+    if (!map_pose) {
       return spawn_lanelet_pose;
     }
   }

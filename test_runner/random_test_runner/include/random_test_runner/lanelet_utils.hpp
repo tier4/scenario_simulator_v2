@@ -19,10 +19,10 @@
 
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_routing/RoutingGraph.h>
-#include <traffic_simulator/helper/helper.hpp>
 
 #include <boost/filesystem.hpp>
 #include <optional>
+#include <traffic_simulator/helper/helper.hpp>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "random_test_runner/data_types.hpp"
@@ -60,8 +60,8 @@ public:
     double max_distance);
 
   std::vector<geometry_msgs::msg::Pose> getPositionsOnNextLanelets(
-    const traffic_simulator_msgs::msg::LaneletPose & start_lanelet, const int64_t & max_number_of_points,
-    double offset = 0.0);
+    const traffic_simulator_msgs::msg::LaneletPose & start_lanelet,
+    const int64_t & max_number_of_points, double offset = 0.0);
   std::vector<int64_t> getLaneletIds();
   lanelet::Ids filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]);
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);

@@ -121,14 +121,20 @@ TestSuiteParameters RandomTestRunner::collectTestSuiteParameters()
   tp.npc_vehicle_max_spawn_distance_from_ego =
     this->declare_parameter<double>("npc_vehicle_max_spawn_distance_from_ego", 100.0);
   tp.npc_pedestrian_count = this->declare_parameter<int64_t>("npc_pedestrian_count", 1);
-  tp.npc_pedestrian_planner = this->declare_parameter<std::string>("npc_pedestrian_planner", "context_gamma_planner");
+  tp.npc_pedestrian_planner =
+    this->declare_parameter<std::string>("npc_pedestrian_planner", "context_gamma_planner");
   tp.npc_pedestrian_min_speed = this->declare_parameter<double>("npc_pedestrian_min_speed", 0.1);
   tp.npc_pedestrian_max_speed = this->declare_parameter<double>("npc_pedestrian_max_speed", 1.0);
-  tp.npc_pedestrian_behavior_static = this->declare_parameter<bool>("npc_pedestrian_behavior_static", true);
-  tp.npc_pedestrian_behavior_crosswalk = this->declare_parameter<bool>("npc_pedestrian_behavior_crosswalk", true);
-  tp.npc_pedestrian_behavior_walk_along_lane = this->declare_parameter<bool>("npc_pedestrian_behavior_walk_along_lane", true);
-  tp.npc_pedestrian_lanelet_min_offset = this->declare_parameter<double>("npc_pedestrian_lanelet_min_offset", 3.0);
-  tp.npc_pedestrian_lanelet_max_offset = this->declare_parameter<double>("npc_pedestrian_lanelet_max_offset", 5.0);
+  tp.npc_pedestrian_behavior_static =
+    this->declare_parameter<bool>("npc_pedestrian_behavior_static", true);
+  tp.npc_pedestrian_behavior_crosswalk =
+    this->declare_parameter<bool>("npc_pedestrian_behavior_crosswalk", true);
+  tp.npc_pedestrian_behavior_walk_along_lane =
+    this->declare_parameter<bool>("npc_pedestrian_behavior_walk_along_lane", true);
+  tp.npc_pedestrian_lanelet_min_offset =
+    this->declare_parameter<double>("npc_pedestrian_lanelet_min_offset", 3.0);
+  tp.npc_pedestrian_lanelet_max_offset =
+    this->declare_parameter<double>("npc_pedestrian_lanelet_max_offset", 5.0);
   tp.name = this->declare_parameter<std::string>("test_name", "random_test");
   tp.map_name = this->declare_parameter<std::string>("map_name", "kashiwanoha_map");
   return tp;

@@ -17,13 +17,13 @@
 #ifndef RANDOM_TEST_RUNNER__DATA_TYPES_HPP
 #define RANDOM_TEST_RUNNER__DATA_TYPES_HPP
 
-#include <numeric>
-#include <ostream>
-#include <traffic_simulator/data_type/entity_status.hpp>
 #include <builtin_interfaces/msg/time.hpp>
-#include <std_msgs/msg/header.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
+#include <numeric>
+#include <ostream>
+#include <std_msgs/msg/header.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
 
 #include "spdlog/fmt/fmt.h"
 #include "traffic_simulator_msgs/msg/action_status.hpp"
@@ -104,10 +104,9 @@ struct TestSuiteParameters
   bool npc_pedestrian_behavior_walk_along_lane = true;
   double npc_pedestrian_lanelet_min_offset = 3.0;
   double npc_pedestrian_lanelet_max_offset = 5.0;
-
 };
-std::vector<PedestrianBehavior> pedestrianBehaviorsFromTestSuiteParameters(const TestSuiteParameters & parameters);
-
+std::vector<PedestrianBehavior> pedestrianBehaviorsFromTestSuiteParameters(
+  const TestSuiteParameters & parameters);
 
 struct TestCaseParameters
 {
@@ -152,8 +151,7 @@ DEFINE_FMT_FORMATTER(
 DEFINE_FMT_FORMATTER(
   geometry_msgs::msg::Pose, "position: {}, orientation {}", v.position, v.orientation)
 
-DEFINE_FMT_FORMATTER(
-  geometry_msgs::msg::PoseStamped, "header: {}, pose {}", v.header, v.pose)
+DEFINE_FMT_FORMATTER(geometry_msgs::msg::PoseStamped, "header: {}, pose {}", v.header, v.pose)
 
 DEFINE_FMT_FORMATTER(
   traffic_simulator_msgs::msg::ActionStatus, "current_action: {}, twist: {}, accel: {}",
@@ -182,16 +180,18 @@ DEFINE_FMT_FORMATTER(
   "npc_pedestrian_lanelet_min_offset: {} npc_pedestrian_lanelet_max_offset: {}"
   "name: {} map_name: {}",
   v.ego_goal_lanelet_id, v.ego_goal_s, v.ego_goal_partial_randomization,
-  v.ego_goal_partial_randomization_distance, v.npc_vehicle_count, v.npc_vehicle_min_speed, v.npc_vehicle_max_speed,
-  v.npc_vehicle_min_spawn_distance_from_ego, v.npc_vehicle_max_spawn_distance_from_ego, v.npc_pedestrian_count,
-  v.npc_pedestrian_planner, v.npc_pedestrian_min_speed, v.npc_pedestrian_max_speed, v.npc_pedestrian_behavior_static,
+  v.ego_goal_partial_randomization_distance, v.npc_vehicle_count, v.npc_vehicle_min_speed,
+  v.npc_vehicle_max_speed, v.npc_vehicle_min_spawn_distance_from_ego,
+  v.npc_vehicle_max_spawn_distance_from_ego, v.npc_pedestrian_count, v.npc_pedestrian_planner,
+  v.npc_pedestrian_min_speed, v.npc_pedestrian_max_speed, v.npc_pedestrian_behavior_static,
   v.npc_pedestrian_behavior_crosswalk, v.npc_pedestrian_behavior_walk_along_lane,
   v.npc_pedestrian_lanelet_min_offset, v.npc_pedestrian_lanelet_max_offset, v.name, v.map_name)
 
 DEFINE_FMT_FORMATTER(TestCaseParameters, "seed: {}", v.seed)
 
 DEFINE_FMT_FORMATTER(
-  NPCVehicleDescription, "name: {}, start_position: {}, speed: {}", v.name, v.start_position, v.speed)
+  NPCVehicleDescription, "name: {}, start_position: {}, speed: {}", v.name, v.start_position,
+  v.speed)
 
 template <>
 struct fmt::formatter<PedestrianBehavior>
@@ -206,19 +206,18 @@ struct fmt::formatter<PedestrianBehavior>
   auto format(const PedestrianBehavior & v, FormatContext & ctx)
   {
     std::string string_representation;
-    switch (v)
-    {
-        case STATIC:
-          string_representation = "STATIC";
-          break;
-        case CROSSWALK:
-          string_representation = "CROSSWALK";
-          break;
-        case WALK_ALONG_LANE:
-          string_representation = "WALK_ALONG_LANE";
-          break;
-        default:
-          string_representation = "Unknown Behavior";
+    switch (v) {
+      case STATIC:
+        string_representation = "STATIC";
+        break;
+      case CROSSWALK:
+        string_representation = "CROSSWALK";
+        break;
+      case WALK_ALONG_LANE:
+        string_representation = "WALK_ALONG_LANE";
+        break;
+      default:
+        string_representation = "Unknown Behavior";
     }
     fmt::format_to(ctx.out(), string_representation);
     return ctx.out();
@@ -239,8 +238,8 @@ struct fmt::formatter<NPCPedestrianDescription>
   {
     fmt::format_to(
       ctx.out(),
-      "name: {}, speed: {}, planner: {}, behavior: {}, spawn_position: {}\nroute: ",
-      v.name, v.speed, v.planner_name, v.behavior, v.spawn_position);
+      "name: {}, speed: {}, planner: {}, behavior: {}, spawn_position: {}\nroute: ", v.name,
+      v.speed, v.planner_name, v.behavior, v.spawn_position);
     for (size_t idx = 0; idx < v.route.size(); idx++) {
       fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.route[idx]);
     }

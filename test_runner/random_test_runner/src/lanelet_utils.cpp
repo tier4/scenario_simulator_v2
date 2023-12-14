@@ -48,7 +48,6 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 
 std::vector<int64_t> LaneletUtils::getLaneletIds() { return hdmap_utils_ptr_->getLaneletIds(); }
 
-
 lanelet::Ids LaneletUtils::filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[])
 {
   return hdmap_utils_ptr_->filterLaneletIds(lanelet_ids, subtype);
@@ -183,33 +182,25 @@ std::vector<geometry_msgs::msg::Pose> LaneletUtils::getPositionsOnNextLanelets(
   const int64_t & max_number_of_points, double offset)
 {
   std::vector<geometry_msgs::msg::Pose> route_positions;
-  route_positions.emplace_back(hdmap_utils_ptr_->toMapPose(
-    traffic_simulator::helper::constructLaneletPose(
-      start_lanelet_pose.lanelet_id,
-      getLaneletLength(start_lanelet_pose.lanelet_id),
-      offset)
-    ).pose);
+  route_positions.emplace_back(
+    hdmap_utils_ptr_
+      ->toMapPose(traffic_simulator::helper::constructLaneletPose(
+        start_lanelet_pose.lanelet_id, getLaneletLength(start_lanelet_pose.lanelet_id), offset))
+      .pose);
   auto current_lanelet_id = start_lanelet_pose.lanelet_id;
-  while (route_positions.size() < max_number_of_points)
-  {
+  while (route_positions.size() < max_number_of_points) {
     auto next_lanelet_ids = hdmap_utils_ptr_->getNextLaneletIds(current_lanelet_id);
 
-    if (next_lanelet_ids.empty())
-    {
+    if (next_lanelet_ids.empty()) {
       return route_positions;
     }
 
     std::vector<int64_t> validated_ids;
-    if (next_lanelet_ids.size() == 1)
-    {
+    if (next_lanelet_ids.size() == 1) {
       validated_ids = next_lanelet_ids;
-    }
-    else
-    {
-      for (const auto & id : next_lanelet_ids)
-      {
-        lanelet::ConstLanelet lanelet  =
-          lanelet_map_ptr_->laneletLayer.get(id);
+    } else {
+      for (const auto & id : next_lanelet_ids) {
+        lanelet::ConstLanelet lanelet = lanelet_map_ptr_->laneletLayer.get(id);
         const std::string turn_direction_attribute = lanelet.attributeOr("turn_direction", "else");
         if (turn_direction_attribute == "right" || turn_direction_attribute == "straight") {
           continue;
@@ -218,17 +209,15 @@ std::vector<geometry_msgs::msg::Pose> LaneletUtils::getPositionsOnNextLanelets(
       }
     }
 
-    if (validated_ids.empty()){
+    if (validated_ids.empty()) {
       //we return since we don't want the pedestrian/entity to cross valid lanelet lanes
       return route_positions;
     }
 
-    route_positions.emplace_back(
-      hdmap_utils_ptr_->toMapPose(
-        traffic_simulator::helper::constructLaneletPose(
-          validated_ids[0],
-          getLaneletLength(validated_ids[0]),
-          offset)).pose);
+    route_positions.emplace_back(hdmap_utils_ptr_
+                                   ->toMapPose(traffic_simulator::helper::constructLaneletPose(
+                                     validated_ids[0], getLaneletLength(validated_ids[0]), offset))
+                                   .pose);
     current_lanelet_id = validated_ids[0];
   }
 
