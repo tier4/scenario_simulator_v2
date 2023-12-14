@@ -64,6 +64,8 @@ private:
   NPCPedestrianDescription generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses(
     int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
     double min_distance, const std::vector<LaneletPart> & lanelets);
+  std::pair<traffic_simulator_msgs::msg::LaneletPose, geometry_msgs::msg::Pose> getRandomCrosswalkStartAndEndPose(
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses);
 
   rclcpp::Logger logger_;
 
