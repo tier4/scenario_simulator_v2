@@ -53,13 +53,12 @@ OpenSCENARIO:
           )
       - name: route_length
         parameterType: double
-        value: '200.0'
+        value: '170.0'
       - name: ego_lane_id
         parameterType: string
         value: $(ros2 run map_fragment find --ros-args
           -p is_not_leftmost:=true
           -p is_not_rightmost:=true
-          -p route_length_greater_than:=$(var route_length)
           )
   CatalogLocations:
     VehicleCatalog:

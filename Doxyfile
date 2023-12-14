@@ -30,6 +30,7 @@ INPUT                  += openscenario/openscenario_interpreter
 INPUT                  += openscenario/openscenario_interpreter_example
 INPUT                  += openscenario/openscenario_preprocessor
 INPUT                  += openscenario/openscenario_visualization
+INPUT                  += openscenario/map_fragment
 
 IMAGE_PATH             += common/math/geometry
 IMAGE_PATH             += common/math/arithmetic

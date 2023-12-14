@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <map_fragment/map_fragment.hpp>
+#include <map_fragment/road_segment.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
@@ -53,15 +54,8 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  auto lanelets = lanelet::Lanelets();
-
-  lanelets.push_back(makeLanelet(width, length, curvature, resolution));
-
-  for (auto i = 1; i < number_of_lanes; ++i) {
-    lanelets.push_back(makeLaneletRight(lanelets.back(), resolution));
-  }
-
-  const auto map = lanelet::utils::createMap(lanelets);
+  const auto segment = makeCurvedRoadSegment(curvature, length, number_of_lanes, width);
+  const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
 
   map_fragment::write(*map, output_directory);
 

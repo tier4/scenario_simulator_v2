@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <map_fragment/map_fragment.hpp>
+#include <map_fragment/road_segment.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
@@ -43,12 +44,12 @@ try {
     return node.get_parameter("after_length").as_double();
   }();
 
-  const auto curvature = [&]() {
-    node.declare_parameter("angle", default_value::curvature);
-    return makeCurvature(length, node.get_parameter("angle").as_double());
+  const auto angle_in_degrees = [&]() {
+    node.declare_parameter("angle", default_value::angle);
+    return node.get_parameter("angle").as_double();
   }();
 
-  const auto number_of_lanes = [&]() {
+  const auto number_of_lanes_per_direction = [&]() {
     node.declare_parameter("number_of_lanes", default_value::number_of_lanes);
     return node.get_parameter("number_of_lanes").as_int();
   }();
@@ -63,33 +64,29 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  auto lanelets = lanelet::Lanelets();
+  const auto angle_in_radians = angle_in_degrees * M_PI / 180;
 
-  lanelets.push_back(makeLanelet(width, before_length, 0, resolution));
-  lanelets.push_back(makeLanelet(lanelets.back(), length, curvature, resolution));
-  lanelets.push_back(makeLanelet(lanelets.back(), after_length, 0, resolution));
+  const std::vector<ParametricCurve::ConstSharedPointer> guide_curve_segments = {
 
-  for (auto i = 1; i < number_of_lanes; ++i) {
-    lanelets.push_back(makeLaneletRight(lanelets[lanelets.size() - 3], resolution));
-    lanelets.push_back(
-      makeLaneletRight(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
-    lanelets.push_back(
-      makeLaneletRight(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
-  }
+    // Straight segment before the turn
+    std::make_shared<Straight>(before_length),
 
-  lanelets.push_back(makeInvertedLaneletLeft(lanelets.back(), resolution));
-  lanelets.push_back(
-    makeInvertedLaneletLeft(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
-  lanelets.push_back(
-    makeInvertedLaneletLeft(lanelets[lanelets.size() - 5], lanelets.back(), resolution));
+    // Turn segment (or straight if angle is zero)
+    angle_in_radians == 0 ? std::static_pointer_cast<ParametricCurve>(  //
+                              std::make_shared<Straight>(length))
+                          : std::static_pointer_cast<ParametricCurve>(std::make_shared<Arc>(
+                              length / std::abs(angle_in_radians), angle_in_radians)),
 
-  for (auto i = 1; i < number_of_lanes; ++i) {
-    lanelets.push_back(makeLaneletLeft(lanelets[lanelets.size() - 3], resolution));
-    lanelets.push_back(makeLaneletLeft(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
-    lanelets.push_back(makeLaneletLeft(lanelets[lanelets.size() - 3], lanelets.back(), resolution));
-  }
+    // Straight segment after the turn
+    std::make_shared<Straight>(after_length)};
 
-  const auto map = lanelet::utils::createMap(lanelets);
+  const auto guide_curve = std::make_shared<CombinedCurve>(guide_curve_segments);
+
+  const RoadCrossSectionDescription cross_section_description(
+    2 * number_of_lanes_per_direction, width, number_of_lanes_per_direction);
+  const RoadSegment segment(guide_curve, cross_section_description);
+
+  const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
 
   map_fragment::write(*map, output_directory);
 
