@@ -54,18 +54,27 @@ private:
   traffic_simulator_msgs::msg::LaneletPose generatePoseFromLanelets(
     const std::vector<LaneletPart> & lanelets, double offset = 0.0);
   std::vector<traffic_simulator_msgs::msg::LaneletPose> generateCrosswalkStartAndEndPoses();
-  void generatePedestrianRoutes(
-  TestDescription & test_description,
-  const std::vector<PedestrianBehavior> & pedestrian_behaviors,
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses);
   NPCVehicleDescription generateVehicleNpcFromLaneletsWithMinDistanceFromPoses(
     int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
     double min_distance, const std::vector<LaneletPart> & lanelets);
   NPCPedestrianDescription generatePedestrianNpcFromLaneletsWithMinDistanceFromPoses(
     int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
-    double min_distance, const std::vector<LaneletPart> & lanelets);
+    const std::vector<PedestrianBehavior> & pedestrian_behaviors,
+    double min_distance, const std::vector<LaneletPart> & lanelets,
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses);
   std::pair<traffic_simulator_msgs::msg::LaneletPose, geometry_msgs::msg::Pose> getRandomCrosswalkStartAndEndPose(
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses);
+  PedestrianBehavior getRandomPedestrianBehavior(
+    const std::vector<PedestrianBehavior> & pedestrian_behaviors);
+  std::pair<traffic_simulator_msgs::msg::LaneletPose, std::vector<geometry_msgs::msg::Pose>>
+    generatePedestrianSpawnPointAndRouteFromBehavior(
+      const PedestrianBehavior & behavior,
+      const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
+      double min_distance, const std::vector<LaneletPart> & lanelets,
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses);
+  traffic_simulator_msgs::msg::LaneletPose getRandomPedestrianSpawnPose(
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
+    double min_distance, const std::vector<LaneletPart> & lanelets);
 
   rclcpp::Logger logger_;
 
