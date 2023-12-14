@@ -54,12 +54,12 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
       const double numerator = 2.0 * (remaining_distance - speed * step_time);
       return clampAcceleration(numerator / std::pow(step_time, 2), acceleration, speed);
     }
-  } else {
-    throw common::SemanticError(
-      "An analytical calculation of acceleration is not available for a time step greater than 4 (",
-      step_time * 4, "s) in the case of braking and greater than 3 (", step_time * 3,
-      "s) without braking.");
   }
+
+  throw common::SemanticError(
+    "An analytical calculation of acceleration is not available for a time step greater than 4 (",
+    step_time * 4, "s) in the case of braking and greater than 3 (", step_time * 3,
+    "s) without braking.");
 }
 
 auto FollowWaypointController::roundTimeToFullStepsWithTolerance(
