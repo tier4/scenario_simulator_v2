@@ -19,7 +19,7 @@
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
@@ -145,7 +145,7 @@ public:
           getParameter<std::string>("architecture_type", "awf/universe");
         architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_shared<
-        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
+        TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>>(
         std::forward<decltype(xs)>(xs)...);
     } else {
       throw common::SemanticError(
