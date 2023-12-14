@@ -37,7 +37,7 @@ struct NPCVehicleDescription
   std::string name;
 };
 
-enum PedestrianBehavior { STATIC, CROSSWALK, FREEWALK };
+enum PedestrianBehavior { STATIC, CROSSWALK, WALK_ALONG_LANE };
 
 struct NPCPedestrianDescription
 {
@@ -101,7 +101,7 @@ struct TestSuiteParameters
   int64_t npc_pedestrian_max_speed = 1.0;
   bool npc_pedestrian_behavior_static = true;
   bool npc_pedestrian_behavior_crosswalk = true;
-  bool npc_pedestrian_behavior_freewalking = true;
+  bool npc_pedestrian_behavior_walk_along_lane = true;
   double npc_pedestrian_lanelet_min_offset = 3.0;
   double npc_pedestrian_lanelet_max_offset = 5.0;
 
@@ -178,14 +178,14 @@ DEFINE_FMT_FORMATTER(
   "npc_vehicle_max_spawn_distance_from_ego: {} npc_pedestrian_count {} "
   "npc_pedestrian_planner {} npc_pedestrian_min_speed {} npc_pedestrian_max_speed {} "
   "npc_pedestrian_behavior_static: {} npc_pedestrian_behavior_crosswalk: {} "
-  "npc_pedestrian_behavior_freewalking: {} "
+  "npc_pedestrian_behavior_walk_along_lane: {} "
   "npc_pedestrian_lanelet_min_offset: {} npc_pedestrian_lanelet_max_offset: {}"
   "name: {} map_name: {}",
   v.ego_goal_lanelet_id, v.ego_goal_s, v.ego_goal_partial_randomization,
   v.ego_goal_partial_randomization_distance, v.npc_vehicle_count, v.npc_vehicle_min_speed, v.npc_vehicle_max_speed,
   v.npc_vehicle_min_spawn_distance_from_ego, v.npc_vehicle_max_spawn_distance_from_ego, v.npc_pedestrian_count,
   v.npc_pedestrian_planner, v.npc_pedestrian_min_speed, v.npc_pedestrian_max_speed, v.npc_pedestrian_behavior_static,
-  v.npc_pedestrian_behavior_crosswalk, v.npc_pedestrian_behavior_freewalking,
+  v.npc_pedestrian_behavior_crosswalk, v.npc_pedestrian_behavior_walk_along_lane,
   v.npc_pedestrian_lanelet_min_offset, v.npc_pedestrian_lanelet_max_offset, v.name, v.map_name)
 
 DEFINE_FMT_FORMATTER(TestCaseParameters, "seed: {}", v.seed)
@@ -205,22 +205,22 @@ struct fmt::formatter<PedestrianBehavior>
   template <typename FormatContext>
   auto format(const PedestrianBehavior & v, FormatContext & ctx)
   {
-    std::string str_repr;
+    std::string string_representation;
     switch (v)
     {
         case STATIC:
-          str_repr = "STATIC";
+          string_representation = "STATIC";
           break;
         case CROSSWALK:
-          str_repr = "CROSSWALK";
+          string_representation = "CROSSWALK";
           break;
-        case FREEWALK:
-          str_repr = "FREEWALK";
+        case WALK_ALONG_LANE:
+          string_representation = "WALK_ALONG_LANE";
           break;
         default:
-          str_repr = "Unknown Behavior";
+          string_representation = "Unknown Behavior";
     }
-    fmt::format_to(ctx.out(), str_repr);
+    fmt::format_to(ctx.out(), string_representation);
     return ctx.out();
   }
 };

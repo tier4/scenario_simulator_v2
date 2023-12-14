@@ -97,7 +97,7 @@ random_test:
   npc_pedestrian_max_speed: 1.0
   npc_pedestrian_behavior_static: True
   npc_pedestrian_behavior_crosswalk: True
-  npc_pedestrian_behavior_freewalking: True
+  npc_pedestrian_behavior_walk_along_lane: True
   npc_pedestrian_lanelet_min_offset: 3.0
   npc_pedestrian_lanelet_max_offset: 5.0
   test_cases:
@@ -233,7 +233,7 @@ Core test parameters. It sets map name, ego goal information and npc spawning pa
 | `npc_pedestrian_max_speed`                               | `1.0`                | Maximum speed of generated vehicle npcs                                                                                                                                                       |
 | `npc_pedestrian_behavior_static`                               | `True`                | Static pedestrian spawned, no movement applied                                                                                                                                                      |
 | `npc_pedestrian_behavior_crosswalk`                               | `True`                | Pedestrian is spawned at crosswalk and passes it                                                                                                                                                      |
-| `npc_pedestrian_behavior_freewalking`                               | `True`                | Pedestrian is spawned outside of lanes and moves freely, without jaywalking                                                                                                                                                      |
+| `npc_pedestrian_behavior_walk_along_lane`                               | `True`                | Pedestrian is spawned outside of lanes and moves along them                                                                                                                                                      |
 | `npc_pedestrian_lanelet_min_offset`                               | `3.0`                | Pedestrian minimum spawn point offset from lanelet                                                                                                                                                       |
 | `npc_pedestrian_lanelet_max_offset`                               | `3.0`                | Pedestrian maximum spawn point offset from lanelet                                                                                                                                                       |
 

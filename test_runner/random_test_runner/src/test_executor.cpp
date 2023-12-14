@@ -173,7 +173,7 @@ void TestExecutor::initialize()
               npc_descr.name, npc_descr.route
             );
             break;
-          case PedestrianBehavior::FREEWALK:
+          case PedestrianBehavior::WALK_ALONG_LANE:
             api_->requestSpeedChange(
                 npc_descr.name, 2.0, traffic_simulator::speed_change::Transition::LINEAR,
                 traffic_simulator::speed_change::Constraint(

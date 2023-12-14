@@ -265,7 +265,7 @@ void TestRandomizer::generatePedestrianRoutes(
         description.route.emplace_back(goal_pose);
         break;
       }
-      case PedestrianBehavior::FREEWALK:
+      case PedestrianBehavior::WALK_ALONG_LANE:
         auto spawn_lanelet = description.spawn_position;
         auto positions = lanelet_utils_->getPositionsOnNextLanelets(spawn_lanelet, 5, 5.0);
         description.route = positions;

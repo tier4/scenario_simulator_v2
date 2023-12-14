@@ -27,9 +27,9 @@ std::vector<PedestrianBehavior> pedestrianBehaviorsFromTestSuiteParameters(const
   {
     pedestrian_behaviors.emplace_back(PedestrianBehavior::CROSSWALK);
   }
-  if (parameters.npc_pedestrian_behavior_freewalking)
+  if (parameters.npc_pedestrian_behavior_walk_along_lane)
   {
-    pedestrian_behaviors.emplace_back(PedestrianBehavior::FREEWALK);
+    pedestrian_behaviors.emplace_back(PedestrianBehavior::WALK_ALONG_LANE);
   }
   if (parameters.npc_pedestrian_count > 0 && pedestrian_behaviors.empty()) {
     throw std::runtime_error("At least one behavior has to be enabled for random pedestrian generation");

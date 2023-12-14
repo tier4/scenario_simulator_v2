@@ -136,7 +136,7 @@ class RandomTestRunnerLaunch(object):
             "npc_pedestrian_max_speed": {"default": 1.0, "description": "Maximum speed of generated vehicle npcs"},
             "npc_pedestrian_behavior_static": {"default": True, "description": "Static pedestrian spawned, no movement applied"},
             "npc_pedestrian_behavior_crosswalk": {"default": True, "description": "Pedestrian is spawned at crosswalk and passes it"},
-            "npc_pedestrian_behavior_freewalking": {"default": True, "description": "Pedestrian is spawned outside of lanes and moves along them"},
+            "npc_pedestrian_behavior_walk_along_lane": {"default": True, "description": "Pedestrian is spawned outside of lanes and moves along them"},
             "npc_pedestrian_lanelet_min_offset": {"default": 3.0, "description": "Pedestrian minimum spawn point offset from lanelet"},
             "npc_pedestrian_lanelet_max_offset": {"default": 5.0, "description": "Pedestrian maximum spawn point offset from lanelet"},
 
