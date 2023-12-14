@@ -46,6 +46,7 @@ struct convert<TestSuiteParameters>
     node["npc_vehicle_min_spawn_distance_from_ego"] = rhs.npc_vehicle_min_spawn_distance_from_ego;
     node["npc_vehicle_max_spawn_distance_from_ego"] = rhs.npc_vehicle_max_spawn_distance_from_ego;
     node["npc_pedestrian_count"] = rhs.npc_pedestrian_count;
+    node["npc_pedestrian_planner"] = rhs.npc_pedestrian_planner;
     node["npc_pedestrian_min_speed"] = rhs.npc_pedestrian_min_speed;
     node["npc_pedestrian_max_speed"] = rhs.npc_pedestrian_max_speed;
     node["npc_pedestrian_behavior_static"] = rhs.npc_pedestrian_behavior_static;
@@ -75,6 +76,7 @@ struct convert<TestSuiteParameters>
     rhs.npc_vehicle_min_spawn_distance_from_ego = node["npc_vehicle_min_spawn_distance_from_ego"].as<double>();
     rhs.npc_vehicle_max_spawn_distance_from_ego = node["npc_vehicle_max_spawn_distance_from_ego"].as<double>();
     rhs.npc_pedestrian_count = node["npc_pedestrian_count"].as<int64_t>();
+    rhs.npc_pedestrian_planner = node["npc_pedestrian_planner"].as<std::string>();
     rhs.npc_pedestrian_min_speed = node["npc_pedestrian_min_speed"].as<double>();
     rhs.npc_pedestrian_max_speed = node["npc_pedestrian_max_speed"].as<double>();
     rhs.npc_pedestrian_behavior_static = node["npc_pedestrian_behavior_static"].as<bool>();

@@ -24,6 +24,28 @@
 static constexpr int max_randomization_attempts = 100;
 static constexpr double min_npc_distance = 5.0;
 
+const std::string & pedestrianPlannerBehaviorFromString(const std::string & input)
+{
+  if (input == "context_gamma_planner")
+  {
+    return traffic_simulator::PedestrianBehavior::contextGamma();
+  }
+  if (input == "do_nothing")
+  {
+    return traffic_simulator::PedestrianBehavior::doNothing();
+  }
+  if (input == "default")
+  {
+    return traffic_simulator::PedestrianBehavior::defaultBehavior();
+  }
+  if (input == "behavior_tree")
+  {
+    return traffic_simulator::PedestrianBehavior::behaviorTree();
+  }
+
+  throw std::runtime_error(fmt::format("Unknown pedestrian planner behavior: {}", input));
+}
+
 TestRandomizer::TestRandomizer(
   rclcpp::Logger logger, const TestSuiteParameters & test_suite_parameters,
   const TestCaseParameters & test_case_parameters, std::shared_ptr<LaneletUtils> lanelet_utils)
@@ -271,7 +293,6 @@ NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMi
   std::stringstream npc_name_ss;
   npc_name_ss << "pedestrianNPC" << npc_id;
   traffic_simulator_msgs::msg::LaneletPose spawn_lanelet_pose;
-  //TODO(kielczykowski-rai): differ speed randomizer for Vehicles and NPCS
   for (int attempt_number = 0; attempt_number < max_randomization_attempts; attempt_number++)
   {
     spawn_lanelet_pose = generateRandomPoseWithinMinDistanceFromPosesFromLanelets(poses, min_distance, lanelets, lanelet_offset_randomizer_.generate());
@@ -282,6 +303,7 @@ NPCPedestrianDescription TestRandomizer::generatePedestrianNpcFromLaneletsWithMi
       return {
         npc_name_ss.str(),
         pedestrian_npc_speed_randomizer_.generate(),
+        pedestrianPlannerBehaviorFromString(test_suite_parameters_.npc_pedestrian_planner),
         {},
         spawn_lanelet_pose,
         {}

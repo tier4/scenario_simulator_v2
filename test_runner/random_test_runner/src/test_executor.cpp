@@ -146,10 +146,7 @@ void TestExecutor::initialize()
     for (size_t i = 0; i < test_description_.npcs_pedestrian_descriptions.size(); i++) {
       const auto & npc_descr = test_description_.npcs_pedestrian_descriptions[i];
       api_->spawn(
-        //TODO(kielczykowski-rai): Add planner choice parameter
-        //TODO(kielczykowski-rai): Add speed for pedestrians parameter
-        // npc_descr.name, api_->canonicalize(npc_descr.spawn_position), getPedestrianParameters());
-        npc_descr.name, api_->canonicalize(npc_descr.spawn_position), getPedestrianParameters(), traffic_simulator::PedestrianBehavior::contextGamma());
+        npc_descr.name, api_->canonicalize(npc_descr.spawn_position), getPedestrianParameters(), npc_descr.planner_name);
         switch(npc_descr.behavior)
         {
           case PedestrianBehavior::STATIC:
@@ -159,9 +156,6 @@ void TestExecutor::initialize()
                 traffic_simulator::speed_change::Constraint(
                   traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
                 true);
-              // auto tmp_lanelet_goal = npc_descr.spawn_position;
-              // tmp_lanelet_goal.offset = npc_descr.spawn_position.offset + 10.0 ;
-              // auto tmp_pose = api_->toMapPose(api_->canonicalize(tmp_lanelet_goal));
               if (npc_descr.route.empty())
               {
                 throw std::runtime_error("Route cannot be temporarily empty. Please provide dummy goal pose to STATIC pedestrian.");
@@ -188,13 +182,12 @@ void TestExecutor::initialize()
             //HACK(kielczykowski-rai): requestAssignRoute will no work since route is outside lanelets
             // using requestAcquirePosition on first point instead
             api_->requestAcquirePosition(npc_descr.name, npc_descr.route[0]);
-            //TODO(kielczykowski-rai): tweak when implementation on SS2 is ready
+            //TODO(kielczykowski-rai): tweak when implementation in SS2 is ready
             // api_->requestAssignRoute(
             //   npc_descr.name, npc_descr.route
             // );
             break;
         }
-      
     }
   });
 }

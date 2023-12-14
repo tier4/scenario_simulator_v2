@@ -120,7 +120,10 @@ TestSuiteParameters RandomTestRunner::collectTestSuiteParameters()
     this->declare_parameter<double>("npc_vehicle_min_spawn_distance_from_ego", 10.0);
   tp.npc_vehicle_max_spawn_distance_from_ego =
     this->declare_parameter<double>("npc_vehicle_max_spawn_distance_from_ego", 100.0);
-  tp.npc_pedestrian_count = this->declare_parameter<int>("npc_pedestrian_count", 1);
+  tp.npc_pedestrian_count = this->declare_parameter<int64_t>("npc_pedestrian_count", 1);
+  tp.npc_pedestrian_planner = this->declare_parameter<std::string>("npc_pedestrian_planner", "context_gamma_planner");
+  tp.npc_pedestrian_min_speed = this->declare_parameter<double>("npc_pedestrian_min_speed", 0.1);
+  tp.npc_pedestrian_max_speed = this->declare_parameter<double>("npc_pedestrian_max_speed", 1.0);
   tp.npc_pedestrian_behavior_static = this->declare_parameter<bool>("npc_pedestrian_behavior_static", true);
   tp.npc_pedestrian_behavior_crosswalk = this->declare_parameter<bool>("npc_pedestrian_behavior_crosswalk", true);
   tp.npc_pedestrian_behavior_freewalking = this->declare_parameter<bool>("npc_pedestrian_behavior_freewalking", true);

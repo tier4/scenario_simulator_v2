@@ -23,6 +23,7 @@
 #include "random_test_runner/data_types.hpp"
 #include "random_test_runner/lanelet_utils.hpp"
 #include "random_test_runner/randomizers.hpp"
+#include "traffic_simulator/api/api.hpp"
 
 class LaneletUtils;
 
