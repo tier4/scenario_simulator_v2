@@ -62,13 +62,12 @@ struct PredictedState
     return std::abs(speed) < tolerance && std::abs(acceleration) < tolerance;
   }
 
-  template <typename Stream>
-  friend auto operator<<(Stream & stream, const PredictedState & state) -> Stream &
+  template <typename StreamType>
+  friend auto operator<<(StreamType & stream, const PredictedState & state) -> StreamType &
   {
     stream << std::setprecision(16) << std::fixed;
-    stream << "FollowWaypointController: acceleration: " << state.acceleration
-           << ", speed: " << state.speed << ", distance: " << state.traveled_distance
-           << ", time: " << state.travel_time << ". ";
+    stream << "PredictedState: acceleration: " << state.acceleration << ", speed: " << state.speed
+           << ", distance: " << state.traveled_distance << ", time: " << state.travel_time << ". ";
     return stream;
   }
 };
@@ -83,6 +82,8 @@ class FollowWaypointController
   const double max_acceleration_rate;
   const double max_deceleration;
   const double max_deceleration_rate;
+
+  const double target_speed;
 
   /*
      Achieving official epsilon (1e-16) accuracy when using doubles is
@@ -137,11 +138,13 @@ class FollowWaypointController
   friend auto operator<<(StreamType & stream, const FollowWaypointController & c) -> StreamType &
   {
     stream << std::setprecision(16) << std::fixed;
-    stream << "step_time: " << c.step_time << ", with_breaking: " << c.with_breaking
-           << ", max_speed: " << c.max_speed << ", max_acceleration: " << c.max_acceleration
+    stream << "FollowWaypointController: step_time: " << c.step_time
+           << ", with_breaking: " << c.with_breaking << ", max_speed: " << c.max_speed
+           << ", max_acceleration: " << c.max_acceleration
            << ", max_deceleration: " << c.max_deceleration
            << ", max_acceleration_rate: " << c.max_acceleration_rate
-           << ", max_deceleration_rate: " << c.max_deceleration_rate << ".";
+           << ", max_deceleration_rate: " << c.max_deceleration_rate
+           << ", target_speed: " << c.target_speed << ".";
     return stream;
   }
 
@@ -223,12 +226,12 @@ public:
     const std::optional<double> & target_speed = std::nullopt)
   : step_time{step_time},
     with_breaking{with_breaking},
-    max_speed{
-      target_speed ? target_speed.value() : behavior_parameter.dynamic_constraints.max_speed},
+    max_speed{behavior_parameter.dynamic_constraints.max_speed},
     max_acceleration{behavior_parameter.dynamic_constraints.max_acceleration},
     max_acceleration_rate{behavior_parameter.dynamic_constraints.max_acceleration_rate},
     max_deceleration{behavior_parameter.dynamic_constraints.max_deceleration},
-    max_deceleration_rate{behavior_parameter.dynamic_constraints.max_deceleration_rate}
+    max_deceleration_rate{behavior_parameter.dynamic_constraints.max_deceleration_rate},
+    target_speed{(target_speed) ? target_speed.value() : max_speed}
   {
   }
 

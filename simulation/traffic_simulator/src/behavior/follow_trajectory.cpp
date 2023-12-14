@@ -262,9 +262,28 @@ auto makeUpdatedStatus(
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ", speed,
       ".");
-  } else if (const auto follow_waypoint_controller = FollowWaypointController(
-               behavior_parameter, step_time, is_breaking_waypoint(), target_speed);
-             false) {
+  } else if (
+    /*
+       The controller provides the ability to calculate acceleration using constraints from the
+       behavior_parameter. The value is_breaking_waypoint() determines whether the calculated
+       acceleration takes braking into account - it is true if the nearest waypoint with the
+       specified time is the last waypoint or the nearest waypoint without the specified time is the
+       last waypoint.
+
+       If an arrival time was specified for any of the remaining waypoints, priority is given to
+       meeting the arrival time, and the vehicle is driven at a speed at which the arrival time can
+       be met.
+
+       However, the controller allows passing target_speed as a speed which is followed by the
+       controller. target_speed is passed only if no arrival time was specified for any of the
+       remaining waypoints. If despite no arrival time in the remaining waypoints, target_speed is
+       not set (it is std::nullopt), target_speed is assumed to be the same as max_speed from the
+       behaviour_parameter.
+    */
+    const auto follow_waypoint_controller = FollowWaypointController(
+      behavior_parameter, step_time, is_breaking_waypoint(),
+      std::isinf(remaining_time) ? target_speed : std::nullopt);
+    false) {
   } else if (
     /*
        The desired acceleration is the acceleration at which the destination
