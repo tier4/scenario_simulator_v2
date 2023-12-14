@@ -107,7 +107,7 @@ auto makeUpdatedStatus(
 
   auto is_breaking_waypoint = [&]() {
     return first_waypoint_with_arrival_time_specified() >=
-           polyline_trajectory.shape.vertices.end() - 1;
+           std::prev(polyline_trajectory.shape.vertices.end());
   };
 
   /*
@@ -159,11 +159,11 @@ auto makeUpdatedStatus(
     const auto [distance, remaining_time] =
       [&]() {
         /*
-         Note for anyone working on adding support for followingMode follow
-         to this function (FollowPolylineTrajectoryAction::tick) in the
-         future: if followingMode is follow, this distance calculation may be
-         inappropriate.
-       */
+           Note for anyone working on adding support for followingMode follow
+           to this function (FollowPolylineTrajectoryAction::tick) in the
+           future: if followingMode is follow, this distance calculation may be
+           inappropriate.
+        */
         auto total_distance_to = [&](auto last) {
           auto total_distance = 0.0;
           for (auto iter = std::begin(polyline_trajectory.shape.vertices);

@@ -24,10 +24,10 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
 {
   if (remaining_time <= step_time * 2.0) {
     if (!with_breaking || (std::abs(speed) < local_epsilon)) {
-      // step in which the acceleration is set to 0.0
+      // Step in which the acceleration is set to 0.0.
       return clampAcceleration(0.0, acceleration, speed);
     } else {
-      // if it is the penultimate step with braking, speed should be equal to 0.0
+      // If it is the penultimate step with braking, speed should be equal to 0.0.
       throw ControllerError(
         "The speed in the penultimate step for last waypoint is different from zero, speed: ",
         speed, ", acceleration: ", acceleration, ", remaining_time: ", remaining_time,
@@ -35,18 +35,22 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
     }
   } else if (remaining_time <= step_time * 3.0) {
     if (with_breaking) {
-      // step in which the speed is set to 0.0
+      // Step in which the speed is set to 0.0.
       return clampAcceleration(-speed / step_time, acceleration, speed);
     } else {
-      // step in which acceleration is set to ensure that the remaining distance is traveled in next
-      // 2 steps
+      /*
+         Step in which acceleration is set to ensure that the remaining
+         distance is traveled in next 2 steps.
+      */
       const double numerator = 2.0 / 3.0 * (remaining_distance - 2.0 * speed * step_time);
       return clampAcceleration(numerator / std::pow(step_time, 2), acceleration, speed);
     }
   } else if (remaining_time <= step_time * 4.0) {
     if (with_breaking) {
-      // step in which acceleration is set to ensure that the remaining distance is traveled in next
-      // step
+      /*
+         Step in which acceleration is set to ensure that the remaining
+         distance is traveled in next step.
+      */
       const double numerator = 2.0 * (remaining_distance - speed * step_time);
       return clampAcceleration(numerator / std::pow(step_time, 2), acceleration, speed);
     }
@@ -61,21 +65,21 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
 auto FollowWaypointController::roundTimeToFullStepsWithTolerance(
   const double remaining_time_source, const double time_tolerance) const -> double
 {
-  if (remaining_time_source >= std::numeric_limits<std::size_t>::max() * step_time)
+  if (remaining_time_source >= std::numeric_limits<std::size_t>::max() * step_time) {
     throw ControllerError(
       "Exceeded the range of the variable type <std::size_t> (", remaining_time_source, "/",
       step_time, ") - the value is too large. Probably the distance to the waypoint is extremely",
       " large and the predicted time exceeds the range.");
-
-  const std::size_t number_of_steps_source =
-    static_cast<std::size_t>(remaining_time_source / step_time);
-  const double remaining_time = number_of_steps_source * step_time;
-  if (const double time_difference =
-        (remaining_time_source / step_time) - (remaining_time / step_time);
-      time_difference > 1.0 - time_tolerance) {
-    return remaining_time + step_time + time_tolerance;
   } else {
-    return remaining_time + time_tolerance;
+    const auto number_of_steps_source = static_cast<std::size_t>(remaining_time_source / step_time);
+    const double remaining_time = number_of_steps_source * step_time;
+    if (const double time_difference =
+          (remaining_time_source / step_time) - (remaining_time / step_time);
+        time_difference > 1.0 - time_tolerance) {
+      return remaining_time + step_time + time_tolerance;
+    } else {
+      return remaining_time + time_tolerance;
+    }
   }
 }
 
@@ -118,12 +122,12 @@ auto FollowWaypointController::getAccelerationLimits(
   }();
 
   /// @todo
-  // such a case occurs, even without braking, it requires further investigation, but this solves it
+  // Such a case occurs, even without braking, it requires further investigation, but this solves it.
   if (local_max_acceleration < local_min_acceleration) {
     return {local_max_acceleration, local_max_acceleration};
   }
 
-  // check the validity of the limits
+  // Check the validity of the limits.
   const double v_min = speed + local_min_acceleration * step_time;
   const double v_max = speed + local_max_acceleration * step_time;
   if (v_max < -local_epsilon || v_max > max_speed || v_min < -local_epsilon || v_min > max_speed) {
@@ -180,26 +184,27 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
   };
 
   PredictedState state{acceleration, speed, 0.0, 0.0};
+
   if (remaining_time < step_time) {
     return state;
   } else {
-    // first step with acceleration equal to step_acceleration
+    // First step with acceleration equal to step_acceleration.
     moveStraight(state, step_acceleration);
 
     if (with_breaking) {
-      // predict the current (before acceleration zeroing) braking time required for stopping
+      // Predict the current (before acceleration zeroing) braking time required for stopping.
       PredictedState breaking_check = state;
       if (!brakeUntilImmobility(breaking_check)) {
-        // if complete immobility is not possible - ignore this candidate
+        // If complete immobility is not possible - ignore this candidate.
         return std::nullopt;
       }
       if (std::abs(breaking_check.travel_time - remaining_time) <= step_time) {
-        // if it is breaking time - consider this candidate
+        // If it is breaking time - consider this candidate.
         return breaking_check;
       }
     }
 
-    // if it is not braking time, more time left for driving with constant speed
+    // If it is not braking time, more time left for driving with constant speed.
     while (std::abs(state.acceleration) > 0.0) {
       if (state.travel_time >= remaining_time) {
         throw ControllerError(
@@ -213,25 +218,25 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
       moveStraight(state, 0.0);
     }
 
-    // if the previous steps caused the constant speed to be extremely low - ignore this candidate
+    // If the previous steps caused the constant speed to be extremely low - ignore this candidate.
     if (std::abs(state.speed) <= local_epsilon) {
       return std::nullopt;
     } else {
       const double const_speed_value = state.speed;
 
       if (with_breaking) {
-        // predict the current (after acceleration zeroing) braking time required for stopping
+        // Predict the current (after acceleration zeroing) braking time required for stopping.
         if (!brakeUntilImmobility(state)) {
-          // if complete immobility is not possible - ignore this candidate
+          // If complete immobility is not possible - ignore this candidate.
           return std::nullopt;
         }
         if (std::abs(state.travel_time - remaining_time) <= step_time) {
-          // if it is breaking time - consider this candidate
+          // If it is breaking time - consider this candidate.
           return state;
         }
       }
 
-      // count the distance and time of movement with constant speed, use this to prediction
+      // Count the distance and time of movement with constant speed, use this to prediction.
       const double const_speed_distance = remaining_distance - state.traveled_distance;
       if (const_speed_distance >= std::numeric_limits<double>::max() * const_speed_value) {
         throw ControllerError(
@@ -241,7 +246,7 @@ auto FollowWaypointController::getPredictedWaypointArrivalState(
       }
       const double const_speed_time = const_speed_distance / const_speed_value;
 
-      // round distance using a time equal to the full number of steps
+      // Round distance using a time equal to the full number of steps.
       const double rounded_const_speed_time =
         roundTimeToFullStepsWithTolerance(const_speed_time, step_time_tolerance);
       const double rounded_const_speed_distance = rounded_const_speed_time * const_speed_value;
@@ -257,13 +262,17 @@ auto FollowWaypointController::getAcceleration(
 {
   const auto [local_min_acceleration, local_max_acceleration] =
     getAccelerationLimits(acceleration, speed);
+
   const double step_acceleration =
     (local_max_acceleration - local_min_acceleration) / number_of_acceleration_candidates;
 
   double min_distance_diff = std::numeric_limits<double>::max();
+
   std::optional<double> best_acceleration = std::nullopt;
+
   for (std::size_t i = 0; i <= number_of_acceleration_candidates; ++i) {
     const double candidate_acceleration = local_min_acceleration + i * step_acceleration;
+
     if (auto predicted_state_opt = getPredictedStopStateWithoutConsideringTime(
           candidate_acceleration, remaining_distance, acceleration, speed);
         predicted_state_opt) {
@@ -294,24 +303,26 @@ auto FollowWaypointController::getAcceleration(
 
   if ((speed + local_min_acceleration * step_time) * step_time > remaining_distance) {
     /*
-      If in the current conditions, the waypoint will be reached in this step even with the lowest
-      possible acceleration set, this prevents cases in which the controller is started extremely
-      close to waypoint and nothing can be done
+       If in the current conditions, the waypoint will be reached in this step
+       even with the lowest possible acceleration set, this prevents cases in
+       which the controller is started extremely close to waypoint and nothing
+       can be done.
     */
     return local_min_acceleration;
     /*
-      If the trajectory has only waypoints with unspecified time, the last one is followed
-      using maximum speed including braking - in this case accuracy of arrival is checked
+       If the trajectory has only waypoints with unspecified time, the last one
+       is followed using maximum speed including braking - in this case
+       accuracy of arrival is checked.
     */
   } else if (std::abs(local_min_acceleration - local_max_acceleration) < local_epsilon) {
     /*
-      If the range is so tight that there is no choice
+       If the range is so tight that there is no choice.
     */
     return local_min_acceleration;
   } else if (std::isinf(remaining_time_source)) {
     /*
-      If remaining time is no specified - this is the case when every next point of the trajectory
-      has no specified time
+       If remaining time is no specified - this is the case when every next
+       point of the trajectory has no specified time.
     */
     return getAcceleration(remaining_distance, acceleration, speed);
   } else {
@@ -319,7 +330,7 @@ auto FollowWaypointController::getAcceleration(
       roundTimeToFullStepsWithTolerance(remaining_time_source, step_time_tolerance);
 
     /*
-      If last steps, increase accuracy by using analytical calculations
+       If last steps, increase accuracy by using analytical calculations.
     */
     if (with_breaking && remaining_time <= step_time * 4) {
       return getAnalyticalAccelerationForLastSteps(
@@ -368,12 +379,12 @@ auto FollowWaypointController::getAcceleration(
 
     /// @todo
     /*
-      Find the best acceleration for followed waypoint with a specified time
+       Find the best acceleration for followed waypoint with a specified time.
 
-      It is likely that this search (in the intermediate values) can be skipped
-      if condition (min_time_diff < -step_time || min_time_diff > step_time) is met
-      however, at the moment this change affects other behaviors - this requires further
-      investigation
+       It is likely that this search (in the intermediate values) can be
+       skipped if condition (min_time_diff < -step_time || min_time_diff >
+       step_time) is met however, at the moment this change affects other
+       behaviors - this requires further investigation.
     */
     if (const double step_acceleration =
           (local_max_acceleration - local_min_acceleration) / number_of_acceleration_candidates;
