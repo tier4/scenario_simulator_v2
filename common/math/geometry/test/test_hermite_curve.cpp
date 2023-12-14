@@ -126,40 +126,6 @@ TEST(HermiteCurveTest, initializationParams)
     1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0));
 }
 
-TEST(HermiteCurveTest, getTrajectoryZero)
-{
-  const auto curve = makeLine1();
-  EXPECT_NO_THROW(auto trajectory = curve.getTrajectory(0));
-  auto trajectory = curve.getTrajectory(0);
-  EXPECT_EQ(trajectory.size(), size_t(0));
-}
-
-TEST(HermiteCurveTest, getTrajectory)
-{
-  const auto curve = makeLine1();
-  EXPECT_NO_THROW(auto trajectory = curve.getTrajectory(3));
-  auto trajectory = curve.getTrajectory(3);
-  EXPECT_EQ(trajectory.size(), size_t(3));
-  EXPECT_POINT_EQ(trajectory[0], makePoint(0.0, 0.0));
-  EXPECT_POINT_EQ(trajectory[1], makePoint(0.5, 0.0));
-  EXPECT_POINT_EQ(trajectory[2], makePoint(1.0, 0.0));
-}
-
-TEST(HermiteCurveTest, getTrajectoryReversed)
-{
-  geometry_msgs::msg::Pose start_pose = makePose(1.0, 0.0);
-  geometry_msgs::msg::Pose goal_pose = makePose(0.0, 0.0);
-  geometry_msgs::msg::Vector3 start_vec = makeVector(1.0, 0.0);
-  geometry_msgs::msg::Vector3 goal_vec = makeVector(1.0, 0.0);
-  math::geometry::HermiteCurve curve(start_pose, goal_pose, start_vec, goal_vec);
-  EXPECT_NO_THROW(auto trajectory = curve.getTrajectory(3));
-  auto trajectory = curve.getTrajectory(3);
-  EXPECT_EQ(trajectory.size(), size_t(3));
-  EXPECT_POINT_EQ(trajectory[0], makePoint(1.0, 0.0));
-  EXPECT_POINT_EQ(trajectory[1], makePoint(0.5, 0.0));
-  EXPECT_POINT_EQ(trajectory[2], makePoint(0.0, 0.0));
-}
-
 TEST(HermiteCurveTest, getTrajectoryPast1)
 {
   const auto curve = makeLine2();

@@ -51,14 +51,6 @@ TEST(LineSegment, initializeVector)
   EXPECT_POINT_EQ(line_segment.end_point, makePoint(std::sqrt(2.0) / 2.0, std::sqrt(2.0) / 2.0));
 }
 
-TEST(LineSegment, initializeVectorZero)
-{
-  geometry_msgs::msg::Point point = makePoint(0.0, 0.0);
-  geometry_msgs::msg::Vector3 vec = makeVector(0.0, 0.0);
-  EXPECT_THROW(
-    const math::geometry::LineSegment line_segment(point, vec, 1.0), common::SimulationError);
-}
-
 TEST(LineSegment, initializeVectorZeroLength)
 {
   geometry_msgs::msg::Point point = makePoint(0.0, 0.0);

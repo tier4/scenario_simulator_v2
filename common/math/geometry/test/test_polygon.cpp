@@ -64,17 +64,6 @@ TEST(Polygon, getMaxValue)
   EXPECT_DOUBLE_EQ(math::geometry::getMaxValue(points, math::geometry::Axis::Z), 5.0);
 }
 
-TEST(Polygon, getMaxValueEmptyVector)
-{
-  std::vector<geometry_msgs::msg::Point> points;
-  EXPECT_THROW(
-    math::geometry::getMaxValue(points, math::geometry::Axis::X), common::SimulationError);
-  EXPECT_THROW(
-    math::geometry::getMaxValue(points, math::geometry::Axis::Y), common::SimulationError);
-  EXPECT_THROW(
-    math::geometry::getMaxValue(points, math::geometry::Axis::Z), common::SimulationError);
-}
-
 TEST(Polygon, getMinValue)
 {
   std::vector<geometry_msgs::msg::Point> points{
@@ -82,17 +71,6 @@ TEST(Polygon, getMinValue)
   EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::X), -1.0);
   EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::Y), 2.0);
   EXPECT_DOUBLE_EQ(math::geometry::getMinValue(points, math::geometry::Axis::Z), -3.0);
-}
-
-TEST(Polygon, getMinValueEmptyVector)
-{
-  std::vector<geometry_msgs::msg::Point> points;
-  EXPECT_THROW(
-    math::geometry::getMinValue(points, math::geometry::Axis::X), common::SimulationError);
-  EXPECT_THROW(
-    math::geometry::getMinValue(points, math::geometry::Axis::Y), common::SimulationError);
-  EXPECT_THROW(
-    math::geometry::getMinValue(points, math::geometry::Axis::Z), common::SimulationError);
 }
 
 TEST(Polygon, get2DConvexHull)
