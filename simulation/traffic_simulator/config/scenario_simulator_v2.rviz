@@ -2952,6 +2952,22 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /simulation/traffic_light/marker
           Value: true
+        - Class: openscenario_visualization/VisualizationConditionGroups
+          Name: Condition Group
+          Topic: /simulation/context
+          Value: true
+        - Class: rviz_default_plugins/MarkerArray
+          Enabled: true
+          Name: Debug Marker
+          Namespaces:
+            {}
+          Topic:
+            Depth: 5
+            Durability Policy: Volatile
+            History Policy: Keep Last
+            Reliability Policy: Reliable
+            Value: /simulation/debug_marker
+          Value: false
         - Class: rviz_common/Group
           Displays:
             - Alpha: 0.9990000128746033
@@ -3056,7 +3072,7 @@ Visualization Manager:
                 Value: /perception/occupancy_grid_map/map_updates
               Use Timestamp: false
               Value: false
-          Enabled: false
+          Enabled: true
           Name: Simple Sensor Simulator
       Enabled: false
       Name: Simulation
