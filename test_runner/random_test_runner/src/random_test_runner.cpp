@@ -83,6 +83,7 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 
   yaml_test_params_saver.addTestSuite(validated_params, validated_params.name);
 
+
   for (size_t test_id = 0; test_id < test_case_parameters_vector.size(); test_id++) {
     std::string message =
       fmt::format("Generating test {}/{}", test_id + 1, test_case_parameters_vector.size());

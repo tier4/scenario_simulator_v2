@@ -54,6 +54,12 @@ auto ros2_launch(const std::string & package, const std::string & file, Ts &&...
     file,
     std::forward<decltype(xs)>(xs)...};
 
+  std::cout << "<<<<<<<<<<< ";
+  for (auto s : argv) {
+    std::cout << s << " ";
+  }
+  std::cout << std::endl;
+
   if (process_id < 0) {
     throw std::system_error(errno, std::system_category());
   } else if (process_id == 0 and execute(argv) < 0) {

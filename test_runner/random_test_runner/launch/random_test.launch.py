@@ -55,7 +55,7 @@ def default_autoware_launch_file_of(architecture_type):
         )
 
     return {
-        "awf/universe": "planning_simulator.launch.xml"
+        "awf/universe": "e2e_simulator.launch.xml"
     }[architecture_type]
 
 
@@ -77,11 +77,13 @@ class RandomTestRunnerLaunch(object):
                  "description": "Yaml filename within random_test_runner/param directory containing test parameters."
                                 "If specified (not empty), other test arguments will be ignored"},
             "simulator_type": {"default": "simple_sensor_simulator", "description": "Simulation backend",
-                               "values": ["simple_sensor_simulator"]},
+                               "values": ["simple_sensor_simulator", "AWSIM"]},
             "simulator_host":
                 {"default": "localhost",
                  "description": "Simulation host. It can be either IP address "
                                 "or the host name that is resolvable in the environment"},
+
+            "port": {"default": 8080, "description": "Simulation server port"},
 
             # control arguments #
             "test_count": {"default": 5, "description": "Test count to be performed in test suite"},
@@ -237,7 +239,7 @@ class RandomTestRunnerLaunch(object):
                     namespace="simulation",
                     output="log",
                     arguments=[("__log_level:=warn")],
-                    parameters=[{"port": 5555}],
+                    parameters=[{"port": 8080}],
                 ),
             )
 

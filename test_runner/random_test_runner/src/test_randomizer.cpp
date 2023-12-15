@@ -89,7 +89,8 @@ TestRandomizer::generateEgoRoute(
       goal_pose = goal_pose_from_params;
     }
 
-    auto start_pose = generateRandomPosition();
+    auto start_pose =
+        traffic_simulator::helper::constructLaneletPose(203, 10.0);
 
     if (isFeasibleRoute(start_pose, goal_pose)) {
       return {start_pose, goal_pose};
