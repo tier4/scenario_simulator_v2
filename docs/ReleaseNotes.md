@@ -25,9 +25,9 @@ Bug Fixes:bug:
 
 Minor Tweaks :oncoming_police_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
-|         |               |          |              |             |
+| Feature                                | Brief summary                                                                                               | Category            | Pull request                                                      | Contributor                                                   |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------- |
+| Additional V2I traffic light publisher | Add V2I traffic light publisher to cover the default value of AWF Autoware's external traffic lights topic. | `traffic_simulator` | [#1149](https://github.com/tier4/scenario_simulator_v2/pull/1149) | [piotr-zyskowski-rai](https://github.com/piotr-zyskowski-rai) |
 
 ## Version 0.8.0
 
