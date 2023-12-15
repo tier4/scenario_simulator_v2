@@ -200,7 +200,7 @@ void TestExecutor::deinitialize()
   });
 }
 
-void TestExecutor::executeWithErrorHandling(std::function<void()> func)
+void TestExecutor::executeWithErrorHandling(std::function<void()> && func)
 {
   try {
     func();
