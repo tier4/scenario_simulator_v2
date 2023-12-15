@@ -40,8 +40,8 @@ TEST(DataTypes, architectureTypeFromString_correct)
 {
   EXPECT_EQ(architectureTypeFromString("awf/auto"), ArchitectureType::AWF_AUTO);
   EXPECT_EQ(architectureTypeFromString("awf/universe"), ArchitectureType::AWF_UNIVERSE);
-  EXPECT_EQ(architectureTypeFromString("aawf/universe"), ArchitectureType::AWF_UNIVERSE);
-  EXPECT_EQ(architectureTypeFromString("awf/universee"), ArchitectureType::AWF_UNIVERSE);
+  EXPECT_EQ(architectureTypeFromString("-awf/universe"), ArchitectureType::AWF_UNIVERSE);
+  EXPECT_EQ(architectureTypeFromString("awf/universe-"), ArchitectureType::AWF_UNIVERSE);
   EXPECT_EQ(architectureTypeFromString("awf/universe "), ArchitectureType::AWF_UNIVERSE);
   EXPECT_EQ(architectureTypeFromString(" awf/universe"), ArchitectureType::AWF_UNIVERSE);
   EXPECT_EQ(architectureTypeFromString(" awf/universe "), ArchitectureType::AWF_UNIVERSE);

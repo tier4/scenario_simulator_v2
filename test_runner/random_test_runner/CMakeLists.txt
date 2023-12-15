@@ -40,7 +40,6 @@ ament_auto_find_build_dependencies()
 ament_auto_add_library(${PROJECT_NAME} SHARED
   src/data_types.cpp
   src/test_randomizer.cpp
-  src/test_executor.cpp
   src/lanelet_utils.cpp
   src/random_test_runner.cpp
 )

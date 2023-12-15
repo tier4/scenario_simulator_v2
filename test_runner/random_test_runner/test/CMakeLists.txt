@@ -23,6 +23,8 @@ ament_add_gtest(test_randomizers test_randomizers.cpp)
 ament_add_gtest(test_test_randomizer test_test_randomizer.cpp)
 ament_add_gtest(test_junit_xml_reporter test_junit_xml_reporter.cpp)
 ament_add_gtest(test_yaml_test_params_saver test_yaml_test_params_saver.cpp)
+ament_add_gmock(test_test_executor test_test_executor.cpp)
+
 
 target_link_libraries(test_almost_standstill_metric ${PROJECT_NAME})
 target_link_libraries(test_ego_collision_metric ${PROJECT_NAME})
@@ -33,4 +35,5 @@ target_link_libraries(test_randomizers ${PROJECT_NAME})
 target_link_libraries(test_test_randomizer ${PROJECT_NAME})
 target_link_libraries(test_junit_xml_reporter ${PROJECT_NAME})
 target_link_libraries(test_yaml_test_params_saver ${PROJECT_NAME})
+target_link_libraries(test_test_executor ${PROJECT_NAME})
 
