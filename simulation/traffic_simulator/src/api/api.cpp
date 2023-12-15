@@ -255,38 +255,27 @@ bool API::updateEntitiesStatusInSim()
 
 bool API::updateFrame()
 {
-  std::cout << "Update " << std::endl;
   if (configuration.standalone_mode && entity_manager_ptr_->isEgoSpawned()) {
     THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
   }
 
-  std::cout << "trying to update eneities status in sim " << std::endl;
   if (!updateEntitiesStatusInSim()) {
-    std::cout << "didnt make it " << std::endl;
     return false;
   }
 
-  std::cout << "made it updately EM" << std::endl;
   entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
-  std::cout << "execute traff contrkj" << std::endl;
   traffic_controller_ptr_->execute();
 
   if (not configuration.standalone_mode) {
-    std::cout << "update traffic lights " << std::endl;
     if (!updateTrafficLightsInSim() || !updateTimeInSim()) {
       return false;
     }
   }
 
-  std::cout << "broad cast eneityt " << std::endl;
   entity_manager_ptr_->broadcastEntityTransform();
-  std::cout << "update clock " << std::endl;
   clock_.update();
-  std::cout << "publsih " << std::endl;
   clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
-  std::cout << "marker " << std::endl;
   debug_marker_pub_->publish(entity_manager_ptr_->makeDebugMarker());
-  std::cout << "done " << std::endl;
   return true;
 }
 
