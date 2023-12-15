@@ -1,3 +1,44 @@
+# Features
+
+- Full and partial randomization of the Ego goal position for multiple test cases.
+
+- NPCs customization:
+  - number of NPCs
+  - distance from the Ego
+  - velocities of NPC vehicles in the simulation.
+
+- Simulation related errors reporting:
+  - Ego being found stuck in one place for too long.
+  - Ego failing to reach the goal in a specified time.
+  - Collision between Ego and NPC.
+
+- Ego vehicle capabilities:
+  - Goal following
+  - Lane changing
+  - Stopping precisely on a designated line
+  - Yield at intersections
+
+- NPCs possible actions:
+  - Following the line.
+  - Following another entity.
+
+# Limitations
+
+- Random test runner does not support traffic lights signalization.
+
+- NPCs actions:
+  - NPCs are not stopping to avoid collision when they are not following the colliding entity (eg. on the intersections).
+  - NPCs are not able to yield at the intersection.
+
+
+# Troubleshooting
+
+There are two known issues which block random test runner from initializing the test if either initial position or goal pose exceeds the drivable area.
+
+- If the initial position exceeds the drivable are: Autoware will be launched, but the ego vehicle will not move, waiting for Autoware to change its state to WaitingForEngage. After a timeout the test will terminate, the error will be logged and the runner will continue with the next test.
+- If the generated goal pose exceeds the drivable ares: test will be immediately stopped after launching the Autoware and similarly as in the first case the error will be logged and the runner will continue with the next test.
+
+
 # Launch arguments
 
 This section describes arguments of the random test runner. All of them can be specified via command line, otherwise default value specified in the launch file is used. 
@@ -52,7 +93,7 @@ High level parameters not directly related to the test itself
 | `output_dir`      |  `"/tmp"`                     |  Directory in which result.yaml and result.junit.xml files will be placed after the test suite is executed.                                                |
 | `test_count`      |  `5`                          |  Number of test cases to be performed in the test suite.                                                                   |
 | `simulator_type`  |  `"simple_sensor_simulator"`  |  Backend simulator. Currently supported value is `simple_sensor_simulator`. It should be set only via launch argument. |
-| `initialize_duration`         | `25`                          | How long test runner will wait for Autoware to initialize.                                                                                                                                                                   |
+| `initialize_duration`         | `35`                          | How long test runner will wait for Autoware to initialize.                                                                                                                                                                   |
 
 ### Test suite parameters
 
@@ -61,16 +102,26 @@ Core test parameters. It sets map name, ego goal information and npc spawning pa
 | Parameter name                            | Default value       | Description                                                                                                                                                               |
 |-------------------------------------------|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `test_name`                               | `"random_test"`     | Test name. Used for descriptive purposes only.                                                                                                                             |
-| `map_name`                                | `"kashiwanoha_map"` | Package name containing map information (lanelet, point cloud, etc).                                                                                                       |
+| `map_name`                                | `"kashiwanoha_map"` | Name of the package containing map information (including *.osm and *.pcd file). There has to be a "map/" directory inside main package directory containing specified files. Package needs to be built in the Autoware workspace.                                                                                                      |
 | `ego_goal_lanelet_id`                     | `-1`                | Goal lanelet's id. If `-1`, goal will be chosen randomly.                                                                                                |
-| `ego_goal_s`                              | `0.0`               | Goal lanelet's s (translation along the lanelet in meters). If `ego_goal_lanelet_id` equals `-1`, s will be chosen randomly.                                               |
+| `ego_goal_s`                              | `0.0`               | Goal lanelet's translation along the lanelet in meters. If `ego_goal_lanelet_id` equals `-1`, s will be chosen randomly.                                               |
 | `ego_goal_partial_randomization`          | `False`             | If `true`, goal will be randomized within distance set in `ego_goal_partial_randomization_distance` value. If `ego_goal_lanelet_id` is set to `-1`, this value is ignored. |
-| `ego_goal_partial_randomization_distance` | `30.0`              | Distance in meters from goal set by `ego_goal_lanelet_id` and `ego_goal_s`, within which goal pose will be randomized if `ego_goal_partial_randomization` is set to true.  |
+| `ego_goal_partial_randomization_distance` | `25.0`              | Distance in meters from goal set by `ego_goal_lanelet_id` and `ego_goal_s`, within which goal pose will be randomized if `ego_goal_partial_randomization` is set to true.  |
 | `npc_count`                               | `10`                | Number of npcs which will be generated.                                                                                                                                                    |
 | `npc_min_speed`                           | `0.5`               | Minimum speed of generated npcs                                                                                                                                           |
 | `npc_max_speed`                           | `3.0`               | Maximum speed of generated npcs                                                                                                                                           |
 | `npc_min_spawn_distance_from_ego`         | `10.0`              | Minimum distance of generated npcs from ego                                                                                                                               |
 | `npc_max_spawn_distance_from_ego`         | `100.0`             | Maximum distance of generated npcs from ego                                                                                                                               |
+
+#### Lanelets positioning
+
+Lanelet position used to represent the ego goal includes two coordinate:
+  - the ID of the lanelet on which the target is located,
+  - the translation along the lanelet.
+
+On the example below two connected lanelets with IDs 101 and 100 are presented. The translation s is the distance between lanelet's beginning and the vehicle's rear axle position.
+
+![Lanelets positioning](img/lanelet.jpg)
 
 ### Test case parameters
 
@@ -136,15 +187,19 @@ There are 3 types of error reported, related directly to the simulation, which a
 2. `Timeout error` - reported when ego fails to reach the goal in a specified time.
 3. `Collision error` - reported when collision between ego and npc appears.
 
-Moreover if any `AutowareError`, `scenario_simulator_exception` or `std::runtime_error` occurs during the execution, it will also be stored inside this file with a specific description.
+More general exceptions including:
+1. `AutowareError`, 
+2. `scenario_simulator_exception`,
+3. `std::runtime_error` 
+will also be stored inside this file with a specific description if caught during the simulation.
 
-If any other error occurs during the random test runner execution, it will be stored along with the information that the unknown error has occurred.
+If any other error occurs during the random test runner execution, it will be stored along with the information that the `Unknown Error` has occurred.
 
 ### Example `result.junit.xml`:
 ```xml
 <?xml version="1.0"?>
-<testsuites failures="0" errors="6" tests="6">
-  <testsuite name="random_test" failures="0" errors="6" tests="6">
+<testsuites failures="0" errors="6" tests="5">
+  <testsuite name="random_test" failures="0" errors="6" tests="5">
     <testcase name="4">
       <error type="stand still" message="Ego seems to be stuck" />
     </testcase>
