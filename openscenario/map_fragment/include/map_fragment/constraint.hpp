@@ -58,6 +58,7 @@ auto direction(const lanelet::ConstLineString3d & points)
       << (std::next(iter)->basicPoint() - iter->basicPoint()).normalized();
   }
 
+  // cspell: ignore rowwise
   return vectors.rowwise().sum().normalized();
 };
 
@@ -247,87 +248,36 @@ auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
 template <typename Node>
 auto loadAllLaneletConstraints(Node & node, const std::string & prefix = "")
 {
-  if (const auto name = prefix + "lanelet_type"; not node.has_parameter(name)) {
-    node.declare_parameter(name, "lanelet");
-  }
+#define DECLARE_PARAMETER_IF_NOT_DECLARED(NAME, DEFAULT_VALUE)         \
+  if (const auto name = prefix + NAME; not node.has_parameter(name)) { \
+    node.declare_parameter(name, DEFAULT_VALUE);                       \
+  }                                                                    \
+  static_assert(true)
 
-  if (const auto name = prefix + "subtype"; not node.has_parameter(name)) {
-    node.declare_parameter(name, "road");
-  }
+  // clang-format off
+  DECLARE_PARAMETER_IF_NOT_DECLARED("centerline_curvature_greater_than"     , std::numeric_limits<double>::lowest()  );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("centerline_curvature_less_than"        , std::numeric_limits<double>::max()     );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("conflicts_with"                        , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("direction_is_roughly_the_opposite_of"  , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("direction_is_roughly_the_same_as"      , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_equal_to"                        , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_greater_than"                    , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_less_than"                       , std::numeric_limits<lanelet::Id>::max());
+  DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_not_equal_to"                    , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("is_leftmost"                           , false                                  );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("is_left_of"                            , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("is_not_leftmost"                       , false                                  );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("is_not_rightmost"                      , false                                  );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("is_rightmost"                          , false                                  );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("is_right_of"                           , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("lanelet_type"                          , "lanelet"                              );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("related_to_regulatory_element_subtyped", ""                                     );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("route_length_greater_than"             , 0.0                                    );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("subtype"                               , "road"                                 );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("turn_direction"                        , ""                                     );
+  // clang-format on
 
-  if (const auto name = prefix + "turn_direction"; not node.has_parameter(name)) {
-    node.declare_parameter(name, "");
-  }
-
-  if (const auto name = prefix + "id_is_equal_to"; not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
-  }
-
-  if (const auto name = prefix + "id_is_not_equal_to"; not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
-  }
-
-  if (const auto name = prefix + "id_is_greater_than"; not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
-  }
-
-  if (const auto name = prefix + "id_is_less_than"; not node.has_parameter(name)) {
-    node.declare_parameter(name, std::numeric_limits<lanelet::Id>::max());
-  }
-
-  if (const auto name = prefix + "is_left_of"; not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
-  }
-
-  if (const auto name = prefix + "is_right_of"; not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
-  }
-
-  if (const auto name = prefix + "is_leftmost"; not node.has_parameter(name)) {
-    node.declare_parameter(name, false);
-  }
-
-  if (const auto name = prefix + "is_rightmost"; not node.has_parameter(name)) {
-    node.declare_parameter(name, false);
-  }
-
-  if (const auto name = prefix + "is_not_leftmost"; not node.has_parameter(name)) {
-    node.declare_parameter(name, false);
-  }
-
-  if (const auto name = prefix + "is_not_rightmost"; not node.has_parameter(name)) {
-    node.declare_parameter(name, false);
-  }
-
-  if (const auto name = prefix + "centerline_curvature_less_than"; not node.has_parameter(name)) {
-    node.declare_parameter(name, std::numeric_limits<double>::max());
-  }
-
-  if (const auto name = prefix + "centerline_curvature_greater_than";
-      not node.has_parameter(name)) {
-    node.declare_parameter(name, std::numeric_limits<double>::lowest());
-  }
-
-  if (const auto name = prefix + "conflicts_with"; not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
-  }
-
-  if (const auto name = prefix + "direction_is_roughly_the_same_as"; not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
-  }
-
-  if (const auto name = prefix + "direction_is_roughly_the_opposite_of"; not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
-  }
-
-  if (const auto name = prefix + "related_to_regulatory_element_subtyped";
-      not node.has_parameter(name)) {
-    node.declare_parameter(name, "");
-  }
-
-  if (const auto name = prefix + "route_length_greater_than"; not node.has_parameter(name)) {
-    node.declare_parameter(name, 0.0);
-  }
+#undef DECLARE_PARAMETER_IF_NOT_DECLARED
 
   return loadLaneletConstraints(node, prefix);
 }
@@ -368,14 +318,18 @@ auto loadLaneletPathConstraints(const Node & node, const std::string & prefix = 
 template <typename Node>
 auto loadAllLaneletPathConstraints(Node & node, const std::string & prefix = "")
 {
-  if (const auto name = prefix + "includes_id"; not node.has_parameter(name)) {
-    node.declare_parameter(name, lanelet::Id());
-  }
+#define DECLARE_PARAMETER_IF_NOT_DECLARED(NAME, DEFAULT_VALUE)         \
+  if (const auto name = prefix + NAME; not node.has_parameter(name)) { \
+    node.declare_parameter(name, DEFAULT_VALUE);                       \
+  }                                                                    \
+  static_assert(true)
 
-  if (const auto name = prefix + "is_allowed_to_contain_duplicate_lanelet_ids";
-      not node.has_parameter(name)) {
-    node.declare_parameter(name, false);
-  }
+  // clang-format off
+  DECLARE_PARAMETER_IF_NOT_DECLARED("includes_id"                                , lanelet::Id());
+  DECLARE_PARAMETER_IF_NOT_DECLARED("is_allowed_to_contain_duplicate_lanelet_ids", false        );
+  // clang-format on
+
+#undef DECLARE_PARAMETER_IF_NOT_DECLARED
 
   return loadLaneletPathConstraints(node, prefix);
 }

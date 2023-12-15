@@ -48,6 +48,10 @@ try {
 
   return EXIT_SUCCESS;
 } catch (const std::exception & exception) {
-  std::cerr << exception.what() << std::endl;
+  std::cerr << exception.what() << " (";
+  for (auto i = 0; i < argc; ++i) {
+    std::cerr << argv[i] << (i + 1 < argc ? " " : ")");
+  }
+  std::cerr << std::endl;
   return EXIT_FAILURE;
 }
