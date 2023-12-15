@@ -44,15 +44,15 @@ auto vectorToTranslation(const Vector & vector) -> Transformation
 
 /**
  * Convert a vector encoding direction into a rotating transformation.
- * 
+ *
  * The resulting Transformation will represent the rotation between the x axis
  * and the direction the vector is pointing towards. Because it is not possible
  * to extract full 3D rotation from the vector alone, an assumption is made
  * that the roll component of rotation is equal to zero.
- * 
+ *
  * To extract vector direction, its magnitude needs to be non-zero.
  * In order to avoid ambiguity due to gimbal lock, the vector also
- * must not be verticlal.
+ * must not be vertical.
  */
 auto vectorToRotationWithZeroRoll(const Vector & vector) -> Transformation
 {
@@ -75,13 +75,13 @@ auto vectorToRotationWithZeroRoll(const Vector & vector) -> Transformation
 
 /**
  * Rotate a vector in z axis (in local coordinate frame) by a given angle.
- * 
+ *
  * The local coordinate frame is defined by the vector's direction.
  * Its x axis is pointing in the same direction as the vector, and the y axis
  * is assumed to point leftwards, horizontally (with zero roll).
- * 
+ *
  * The vector needs to have non-zero magnitude and must not be vertical.
- * 
+ *
  * @sa vectorToRotationWithZeroRoll
  */
 auto rotateInLocalZAxisAssumingZeroRoll(const Vector & vector, const double angle)
@@ -113,7 +113,7 @@ auto applyTransformationToPoint(const Point & point, const Transformation & tran
 
 /**
  * Apply a transformation to a vector.
- * 
+ *
  * Translation part of the transformation has no effect on a vector, so only rotation will be applied.
  */
 auto applyTransformationToVector(const Vector & vector, const Transformation & transformation)
