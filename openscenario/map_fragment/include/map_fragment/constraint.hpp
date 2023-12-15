@@ -49,6 +49,18 @@ auto isRightmost(
          });
 }
 
+auto direction(const lanelet::ConstLineString3d & points)
+{
+  auto vectors = Eigen::MatrixXd(3, points.size() - 1);
+
+  for (auto iter = points.begin(); iter != std::prev(points.end()); ++iter) {
+    vectors.col(std::distance(points.begin(), iter))
+      << (std::next(iter)->basicPoint() - iter->basicPoint()).normalized();
+  }
+
+  return vectors.rowwise().sum().normalized();
+};
+
 template <typename Node>
 auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
 {
@@ -187,6 +199,26 @@ auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
     }
   }
 
+  if (const auto name = prefix + "direction_is_roughly_the_same_as"; node.has_parameter(name)) {
+    if (const auto lanelet_id = node.get_parameter(name).as_int(); lanelet_id) {
+      constraints.emplace(name, [lanelet_id](auto && lanelet, auto && map, auto &&...) {
+        auto found = map.laneletLayer.find(lanelet_id);
+        return found != map.laneletLayer.end() and
+               0.5 < direction(lanelet.centerline3d()).dot(direction(found->centerline3d()));
+      });
+    }
+  }
+
+  if (const auto name = prefix + "direction_is_roughly_the_opposite_of"; node.has_parameter(name)) {
+    if (const auto lanelet_id = node.get_parameter(name).as_int(); lanelet_id) {
+      constraints.emplace(name, [lanelet_id](auto && lanelet, auto && map, auto &&...) {
+        auto found = map.laneletLayer.find(lanelet_id);
+        return found != map.laneletLayer.end() and
+               direction(lanelet.centerline3d()).dot(direction(found->centerline3d())) < -0.5;
+      });
+    }
+  }
+
   if (const auto name = prefix + "related_to_regulatory_element_subtyped";
       node.has_parameter(name)) {
     if (const auto subtype = node.get_parameter(name).as_string(); not subtype.empty()) {
@@ -247,7 +279,7 @@ auto loadAllLaneletConstraints(Node & node, const std::string & prefix = "")
     node.declare_parameter(name, lanelet::Id());
   }
 
-  if (const auto name = prefix + "is_right_of"; node.has_parameter(name)) {
+  if (const auto name = prefix + "is_right_of"; not node.has_parameter(name)) {
     node.declare_parameter(name, lanelet::Id());
   }
 
@@ -277,6 +309,14 @@ auto loadAllLaneletConstraints(Node & node, const std::string & prefix = "")
   }
 
   if (const auto name = prefix + "conflicts_with"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "direction_is_roughly_the_same_as"; not node.has_parameter(name)) {
+    node.declare_parameter(name, lanelet::Id());
+  }
+
+  if (const auto name = prefix + "direction_is_roughly_the_opposite_of"; not node.has_parameter(name)) {
     node.declare_parameter(name, lanelet::Id());
   }
 
