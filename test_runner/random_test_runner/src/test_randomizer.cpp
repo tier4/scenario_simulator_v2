@@ -206,7 +206,7 @@ TestRandomizer::generateCrosswalkStartAndEndPoses()
   for (const auto & crosswalk_id : crosswalk_ids) {
     crosswalk_poses.emplace_back(
       traffic_simulator::helper::constructLaneletPose(crosswalk_id, 0.0));
-    //HACK(kielczykowski-rai): when point is set on full lanelet length, ss2 throws that LaneletPose is invalid
+    //HACK: when point is set on full lanelet length, ss2 throws that LaneletPose is invalid
     // when trying to approach goal
     crosswalk_poses.emplace_back(traffic_simulator::helper::constructLaneletPose(
       crosswalk_id, lanelet_utils_->getLaneletLength(crosswalk_id) - 1e-6));

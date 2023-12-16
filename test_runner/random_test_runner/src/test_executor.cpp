@@ -177,13 +177,9 @@ void TestExecutor::initialize()
             traffic_simulator::speed_change::Constraint(
               traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
             true);
-          //HACK(kielczykowski-rai): requestAssignRoute will no work since route is outside lanelets
+          //HACK: requestAssignRoute will no work since route is outside lanelets
           // using requestAcquirePosition on first point instead
           api_->requestAcquirePosition(npc_descr.name, npc_descr.route[0]);
-          //TODO(kielczykowski-rai): tweak when implementation in SS2 is ready
-          // api_->requestAssignRoute(
-          //   npc_descr.name, npc_descr.route
-          // );
           break;
       }
     }
