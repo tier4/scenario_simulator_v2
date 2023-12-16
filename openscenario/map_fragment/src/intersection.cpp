@@ -84,8 +84,9 @@ try {
    */
   std::map<IntersectionLeg, RoadSegment::ConstSharedPointer> leg_segments;
   for (const auto leg : intersection_legs) {
-    const auto leg_cross_section_description =
-      RoadCrossSectionDescription(2 * total_number_of_lanes_per_leg_per_direction, lane_width);
+    const auto leg_cross_section_description = RoadCrossSectionDescription(
+      2 * total_number_of_lanes_per_leg_per_direction, lane_width,
+      total_number_of_lanes_per_leg_per_direction);
 
     const auto leg_transformation = chainTransformations(
       makeTranslation(-(turn_radius + leg_length), 0, 0),
