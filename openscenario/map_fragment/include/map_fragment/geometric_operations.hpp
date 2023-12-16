@@ -15,6 +15,7 @@
 #ifndef MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
 #define MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
 
+#include <boost/test/tools/floating_point_comparison.hpp>
 #include <cmath>
 #include <map_fragment/aliases.hpp>
 #include <rcpputils/asserts.hpp>
@@ -23,6 +24,10 @@
 
 namespace map_fragment
 {
+constexpr auto TOLERANCE_FOR_FLOATING_POINT_COMPARISONS = 1e-6;
+using close_at_tolerance = boost::math::fpc::close_at_tolerance<double>;
+using small_with_tolerance = boost::math::fpc::small_with_tolerance<double>;
+
 auto makeTranslation(const double x, const double y, const double z) -> Transformation
 {
   const auto translation = Eigen::Translation<Vector::Scalar, 3>(x, y, z);
@@ -130,6 +135,32 @@ auto applyTransformationToVector(const Vector & vector, const Transformation & t
   -> Vector
 {
   return transformation.rotation() * vector;
+}
+
+/**
+ * Check whether two unit vectors are in the same direction.
+ */
+auto areUnitVectorsInTheSameDirection(const Vector & first, const Vector & second) -> bool
+{
+  rcpputils::require_true(
+    close_at_tolerance(TOLERANCE_FOR_FLOATING_POINT_COMPARISONS)(first.norm(), 1.0),
+    "First vector must be unit");
+
+  rcpputils::require_true(
+    close_at_tolerance(TOLERANCE_FOR_FLOATING_POINT_COMPARISONS)(second.norm(), 1.0),
+    "Second vector must be unit");
+
+  const auto dot_product = first.dot(second);
+  return close_at_tolerance(TOLERANCE_FOR_FLOATING_POINT_COMPARISONS)(dot_product, 1.0);
+}
+
+/**
+ * Check whether two points overlap.
+ */
+auto doPointsOverlap(const Point & first, const Point & second) -> bool
+{
+  const auto euclidean_distance = (first - second).norm();
+  return small_with_tolerance(TOLERANCE_FOR_FLOATING_POINT_COMPARISONS)(euclidean_distance);
 }
 }  // namespace map_fragment
 

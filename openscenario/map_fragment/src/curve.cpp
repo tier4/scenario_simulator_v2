@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <map_fragment/lanelet_map_generation.hpp>
 #include <map_fragment/map_fragment.hpp>
 #include <map_fragment/road_segment.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -84,9 +85,9 @@ try {
 
   const RoadCrossSectionDescription cross_section_description(
     2 * number_of_lanes_per_direction, width, number_of_lanes_per_direction);
-  const RoadSegment segment(guide_curve, cross_section_description);
 
-  const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
+  const auto map = generateLaneletMap(
+    {std::make_shared<RoadSegment>(guide_curve, cross_section_description)}, resolution);
 
   map_fragment::write(*map, output_directory);
 

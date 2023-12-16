@@ -56,37 +56,9 @@ struct RoadCrossSectionDescription
 };  // struct RoadCrossSectionDescription
 
 /**
- * Cross section of the road
- */
-class RoadCrossSection
-{
-  lanelet::Points3d points_;
-
-public:
-  explicit RoadCrossSection(
-    const RoadCrossSectionDescription & description, const Point & origin,
-    const Vector & tangent_vector)
-  {
-    const auto normal_vector = rotateInLocalZAxisAssumingZeroRoll(tangent_vector, M_PI_2);
-
-    for (auto i = 0; i < description.number_of_lanes + 1; i++) {
-      const auto lateral_position = (description.number_of_lanes / 2. - i) * description.lane_width;
-      const auto p = origin + normal_vector * lateral_position;
-
-      points_.push_back(makePoint3d(p));
-    }
-  }
-
-  /**
-   * Get points belonging to lane boundaries at the cross section, left to right
-   */
-  auto getPoints() const -> const lanelet::Points3d & { return points_; }
-};  // class RoadCrossSection
-
-/**
  * Road segment, defined as the result of sliding a road cross section across a guide curve
  */
-class RoadSegment
+struct RoadSegment
 {
 public:
   using ConstSharedPointer = std::shared_ptr<const RoadSegment>;
@@ -103,44 +75,6 @@ public:
   }
 
   explicit RoadSegment(const RoadSegment &) = delete;
-
-  /**
-   * Get lanelets which compose the road segment, left to right
-   */
-  auto getLanelets(double resolution) const -> lanelet::Lanelets
-  {
-    lanelet::Lanelets lanelets;
-    const auto number_of_lane_boundaries = cross_section_description.number_of_lanes + 1;
-    const auto index_of_first_reversed_lane = cross_section_description.number_of_lanes -
-                                              cross_section_description.number_of_reversed_lanes;
-
-    std::vector<lanelet::LineString3d> lane_boundaries(number_of_lane_boundaries);
-    for (auto boundary : lane_boundaries) {
-      boundary.setId(generateNextLineStringId());
-    }
-
-    for (auto i = 0; i < resolution; i++) {
-      const auto tangent = i / (resolution - 1);
-      const auto position = guide_curve->getPosition(tangent);
-      const auto tangent_vector = guide_curve->getUnitTangentVector(tangent);
-
-      const RoadCrossSection cross_section(cross_section_description, position, tangent_vector);
-      const auto cross_section_points = cross_section.getPoints();
-
-      for (auto j = 0; j < cross_section_description.number_of_lanes + 1; j++) {
-        lane_boundaries[j].push_back(cross_section_points[j]);
-      }
-    }
-
-    for (auto i = 0; i < cross_section_description.number_of_lanes; i++) {
-      lanelets.push_back(
-        i >= index_of_first_reversed_lane
-          ? makeLanelet(lane_boundaries[i + 1], lane_boundaries[i])
-          : makeLanelet(lane_boundaries[i], lane_boundaries[i + 1]));
-    }
-
-    return lanelets;
-  }
 };  // class RoadSegment
 
 /**
@@ -148,7 +82,7 @@ public:
  */
 auto makeCurvedRoadSegment(
   const double curvature, const double length, const int number_of_lanes, const double lane_width)
-  -> RoadSegment
+  -> RoadSegment::ConstSharedPointer
 {
   const auto guide_curve = curvature == 0.0
                              ? std::static_pointer_cast<ParametricCurve>(  //
@@ -158,7 +92,7 @@ auto makeCurvedRoadSegment(
 
   const RoadCrossSectionDescription cross_section_description(number_of_lanes, lane_width);
 
-  return RoadSegment(guide_curve, cross_section_description);
+  return std::make_shared<RoadSegment>(guide_curve, cross_section_description);
 }
 
 auto generateSliceOfCrossSectionAndCalculateLateralOffset(
@@ -174,6 +108,163 @@ auto generateSliceOfCrossSectionAndCalculateLateralOffset(
 
   return std::make_pair(slice_description, lateral_offset);
 }
+
+using RoadSegments = std::vector<RoadSegment::ConstSharedPointer>;
+
+/**
+ * Sequential connection between two subsequent road segments
+ *
+ * Nominally, end of the first road segment is connected to the end of the second one.
+ * For different behavior, either of the road segments can be inverted to swap
+ * its beginning with its end.
+ *
+ * To define which lanes of the first road segment connect to which lanes
+ * of the second one, a lateral offset is specified. Without an offset,
+ * leftmost lanes of both segments are aligned. Positive offset means
+ * the second segment is shifted to the right by the specified number of lanes.
+ * Conversely, a negative offset means the first segment is shifted to the right
+ * (which is equivalent to the second one being shifted to the left).
+ */
+struct RoadSegmentConnection
+{
+  const RoadSegment::ConstSharedPointer first_segment;
+
+  const bool is_first_segment_inverted;
+
+  const RoadSegment::ConstSharedPointer second_segment;
+
+  const bool is_second_segment_inverted;
+
+  const int offset;
+
+  explicit RoadSegmentConnection(
+    const RoadSegment::ConstSharedPointer first_segment, const bool is_first_segment_inverted,
+    const RoadSegment::ConstSharedPointer second_segment, const bool is_second_segment_inverted,
+    const int offset)
+  : first_segment(first_segment),
+    is_first_segment_inverted(is_first_segment_inverted),
+    second_segment(second_segment),
+    is_second_segment_inverted(is_second_segment_inverted),
+    offset(offset)
+  {
+    rcpputils::require_true(
+      first_segment->cross_section_description.lane_width ==
+        second_segment->cross_section_description.lane_width,
+      "Connected segments must have equal lane width");
+
+    const auto lane_width = first_segment->cross_section_description.lane_width;
+
+    rcpputils::require_true(
+      getNumberOfOverlappingLanes() > 0,
+      "Connected segments must have at least one overlapping lane");
+
+    const auto first_segment_guide_curve_parameter_at_connection =
+      is_first_segment_inverted ? 0 : 1;
+    const auto second_segment_guide_curve_parameter_at_connection =
+      is_second_segment_inverted ? 1 : 0;
+
+    const auto first_segment_guide_curve_position_at_connection =
+      first_segment->guide_curve->getPosition(first_segment_guide_curve_parameter_at_connection);
+    const auto second_segment_guide_curve_position_at_connection =
+      second_segment->guide_curve->getPosition(second_segment_guide_curve_parameter_at_connection);
+
+    const auto first_segment_tangent_vector_at_connection = Vector(
+      first_segment->guide_curve->getUnitTangentVector(
+        first_segment_guide_curve_parameter_at_connection) *
+      (is_first_segment_inverted ? -1 : 1));
+    const auto second_segment_tangent_vector_at_connection = Vector(
+      second_segment->guide_curve->getUnitTangentVector(
+        second_segment_guide_curve_parameter_at_connection) *
+      (is_second_segment_inverted ? -1 : 1));
+
+    rcpputils::require_true(
+      areUnitVectorsInTheSameDirection(
+        first_segment_tangent_vector_at_connection, second_segment_tangent_vector_at_connection),
+      "At the connection point, tangent vectors of connected segments' guide curves must be in the "
+      "same direction (after accounting for inverted segments)");
+
+    const auto first_segment_normal_vector_at_connection =
+      rotateInLocalZAxisAssumingZeroRoll(first_segment_tangent_vector_at_connection, M_PI_2);
+    const auto second_segment_normal_vector_at_connection =
+      rotateInLocalZAxisAssumingZeroRoll(second_segment_tangent_vector_at_connection, M_PI_2);
+
+    const auto first_segment_leftmost_boundary_connection_point =
+      first_segment_guide_curve_position_at_connection +
+      (first_segment->cross_section_description.number_of_lanes / 2. - getFirstSegmentOffset()) *
+        lane_width * first_segment_normal_vector_at_connection;
+
+    const auto second_segment_leftmost_boundary_connection_point =
+      second_segment_guide_curve_position_at_connection +
+      (second_segment->cross_section_description.number_of_lanes / 2. - getSecondSegmentOffset()) *
+        lane_width * second_segment_normal_vector_at_connection;
+
+    rcpputils::require_true(
+      doPointsOverlap(
+        first_segment_leftmost_boundary_connection_point,
+        second_segment_leftmost_boundary_connection_point),
+      "Respective ends of connected boundaries should overlap");
+  }
+
+  /*
+   * Calculate by how many lanes should the first segment be shifted to the right
+   */
+  auto getFirstSegmentOffset() const -> int { return std::max(0, -offset); }
+
+  /*
+   * Calculate by how many lanes should the second segment be shifted to the right
+   */
+  auto getSecondSegmentOffset() const -> int { return std::max(0, offset); }
+
+  /*
+   * Calculate how many lanes overlap between the two segments
+   */
+  auto getNumberOfOverlappingLanes() const -> int
+  {
+    return std::min(
+      first_segment->cross_section_description.number_of_lanes - getSecondSegmentOffset(),
+      second_segment->cross_section_description.number_of_lanes + getFirstSegmentOffset());
+  }
+
+  /**
+   * Connection between a lane boundary of the first segment
+   * and a lane boundary of the second segment.
+   *
+   * Represented as a pair of indices, where 0 means
+   * the left-most boundary for the given road segment.
+   */
+  using BoundarywiseConnection = std::pair<int, int>;
+  using BoundarywiseConnections = std::vector<BoundarywiseConnection>;
+
+  /*
+   * Calculate lane-boundary-wise connections
+   */
+  auto getBoundarywiseConnections() const -> BoundarywiseConnections
+  {
+    BoundarywiseConnections connections;
+
+    const auto number_of_connections = getNumberOfOverlappingLanes() + 1;
+    const auto first_segment_offset = getFirstSegmentOffset();
+    const auto second_segment_offset = getSecondSegmentOffset();
+
+    for (auto i = 0; i < number_of_connections; i++) {
+      const auto first_point_index =
+        first_segment_offset + is_first_segment_inverted
+          ? first_segment->cross_section_description.number_of_lanes - i
+          : i;
+
+      const auto second_point_index =
+        second_segment_offset + is_second_segment_inverted
+          ? second_segment->cross_section_description.number_of_lanes - i
+          : i;
+
+      connections.emplace_back(first_point_index, second_point_index);
+    }
+
+    return connections;
+  }
+};  // struct RoadSegmentConnection
+
+using RoadSegmentConnections = std::vector<RoadSegmentConnection>;
 }  // namespace map_fragment
 
 #endif  // MAP_FRAGMENT__ROAD_SEGMENT__HPP_
