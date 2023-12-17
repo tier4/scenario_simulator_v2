@@ -17,15 +17,6 @@
 #include <map_fragment/road_segment.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-// Structure of the intersection
-// TODO: Make this configurable
-const uint64_t NUMBER_OF_LANES_LEFT = 1;
-const uint64_t NUMBER_OF_LANES_LEFT_OR_STRAIGHT = 1;
-const uint64_t NUMBER_OF_LANES_STRAIGHT = 1;
-const uint64_t NUMBER_OF_LANES_ANY_DIRECTION = 0;
-const uint64_t NUMBER_OF_LANES_STRAIGHT_OR_RIGHT = 1;
-const uint64_t NUMBER_OF_LANES_RIGHT = 1;
-
 enum IntersectionLeg { LEFT_LEG = 0, BOTTOM_LEG = 1, RIGHT_LEG = 2, TOP_LEG = 3 };
 
 auto getLegOrientation(IntersectionLeg leg) -> double { return leg * M_PI_2; }
@@ -65,6 +56,36 @@ try {
     return node.get_parameter("resolution").as_int();
   }();
 
+  const auto number_of_lanes_going_left = [&]() {
+    node.declare_parameter("number_of_lanes_going_left", 0);
+    return node.get_parameter("number_of_lanes_going_left").as_int();
+  }();
+
+  const auto number_of_lanes_going_left_and_straight = [&]() {
+    node.declare_parameter("number_of_lanes_going_left_and_straight", 0);
+    return node.get_parameter("number_of_lanes_going_left_and_straight").as_int();
+  }();
+
+  const auto number_of_lanes_going_straight = [&]() {
+    node.declare_parameter("number_of_lanes_going_straight", 0);
+    return node.get_parameter("number_of_lanes_going_straight").as_int();
+  }();
+
+  const auto number_of_lanes_going_in_all_directions = [&]() {
+    node.declare_parameter("number_of_lanes_going_in_all_directions", 0);
+    return node.get_parameter("number_of_lanes_going_in_all_directions").as_int();
+  }();
+
+  const auto number_of_lanes_going_straight_and_right = [&]() {
+    node.declare_parameter("number_of_lanes_going_straight_and_right", 0);
+    return node.get_parameter("number_of_lanes_going_straight_and_right").as_int();
+  }();
+
+  const auto number_of_lanes_going_right = [&]() {
+    node.declare_parameter("number_of_lanes_going_right", 0);
+    return node.get_parameter("number_of_lanes_going_right").as_int();
+  }();
+
   const auto output_directory = [&]() {
     node.declare_parameter("output_directory", default_value::directory());
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
@@ -74,8 +95,9 @@ try {
   RoadSegmentConnections road_segment_connections;
 
   auto total_number_of_lanes_per_leg_per_direction =
-    NUMBER_OF_LANES_LEFT + NUMBER_OF_LANES_LEFT_OR_STRAIGHT + NUMBER_OF_LANES_STRAIGHT +
-    NUMBER_OF_LANES_ANY_DIRECTION + NUMBER_OF_LANES_STRAIGHT_OR_RIGHT + NUMBER_OF_LANES_RIGHT;
+    number_of_lanes_going_left + number_of_lanes_going_left_and_straight +
+    number_of_lanes_going_straight + number_of_lanes_going_in_all_directions +
+    number_of_lanes_going_straight_and_right + number_of_lanes_going_right;
 
   const IntersectionLeg intersection_legs[] = {LEFT_LEG, BOTTOM_LEG, RIGHT_LEG, TOP_LEG};
 
@@ -117,8 +139,9 @@ try {
 
     const auto index_of_first_left_turning_lane = 0;
 
-    const auto total_number_of_lanes_turning_left =
-      NUMBER_OF_LANES_LEFT + NUMBER_OF_LANES_LEFT_OR_STRAIGHT + NUMBER_OF_LANES_ANY_DIRECTION;
+    const auto total_number_of_lanes_turning_left = number_of_lanes_going_left +
+                                                    number_of_lanes_going_left_and_straight +
+                                                    number_of_lanes_going_in_all_directions;
 
     const auto [left_turn_cross_section_description, left_turn_lateral_offset] =
       generateSliceOfCrossSectionAndCalculateLateralOffset(
@@ -148,11 +171,11 @@ try {
      */
 
     const auto index_of_first_straight_going_lane =
-      index_of_first_left_turning_lane + NUMBER_OF_LANES_LEFT;
+      index_of_first_left_turning_lane + number_of_lanes_going_left;
 
     const auto total_number_of_lanes_going_straight =
-      NUMBER_OF_LANES_LEFT_OR_STRAIGHT + NUMBER_OF_LANES_STRAIGHT + NUMBER_OF_LANES_ANY_DIRECTION +
-      NUMBER_OF_LANES_STRAIGHT_OR_RIGHT;
+      number_of_lanes_going_left_and_straight + number_of_lanes_going_straight +
+      number_of_lanes_going_in_all_directions + number_of_lanes_going_straight_and_right;
 
     const auto [straight_cross_section_description, straight_lateral_offset] =
       generateSliceOfCrossSectionAndCalculateLateralOffset(
@@ -182,11 +205,12 @@ try {
      */
 
     const auto index_of_first_right_turning_lane =  //
-      index_of_first_straight_going_lane + NUMBER_OF_LANES_LEFT_OR_STRAIGHT +
-      NUMBER_OF_LANES_STRAIGHT;
+      index_of_first_straight_going_lane + number_of_lanes_going_left_and_straight +
+      number_of_lanes_going_straight;
 
-    const auto total_number_of_lanes_turning_right =
-      NUMBER_OF_LANES_ANY_DIRECTION + NUMBER_OF_LANES_STRAIGHT_OR_RIGHT + NUMBER_OF_LANES_RIGHT;
+    const auto total_number_of_lanes_turning_right = number_of_lanes_going_in_all_directions +
+                                                     number_of_lanes_going_straight_and_right +
+                                                     number_of_lanes_going_right;
 
     const auto [right_turn_cross_section_description, right_turn_lateral_offset] =
       generateSliceOfCrossSectionAndCalculateLateralOffset(
