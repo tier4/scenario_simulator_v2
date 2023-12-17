@@ -34,7 +34,7 @@ from launch_ros.actions import Node
 
 
 def architecture_types():
-    return ["awf/auto", "awf/universe", "awf/universe/20230906", "tier4/proposal"]
+    return ["awf/universe"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -44,10 +44,7 @@ def default_autoware_launch_package_of(architecture_type):
         )
 
     return {
-        "awf/auto": "scenario_simulator_launch",
-        "awf/universe": "autoware_launch",
-        "awf/universe/20230906": "autoware_launch",
-        "tier4/proposal": "autoware_launch",
+        "awf/universe": "autoware_launch"
     }[architecture_type]
 
 
@@ -58,10 +55,7 @@ def default_autoware_launch_file_of(architecture_type):
         )
 
     return {
-        "awf/auto": "autoware_auto.launch.py",
-        "awf/universe": "planning_simulator.launch.xml",
-        "awf/universe/20230906": "planning_simulator.launch.xml",
-        "tier4/proposal": "planning_simulator.launch.xml",
+        "awf/universe": "planning_simulator.launch.xml"
     }[architecture_type]
 
 
@@ -72,9 +66,9 @@ class RandomTestRunnerLaunch(object):
 
         self.autoware_launch_arguments = {
             # autoware arguments #
-            "architecture_type": {"default": "awf/auto", "description": "Autoware architecture type", "values": architecture_types()},
-            "sensor_model": {"default": "aip_xx1", "description": "Ego sensor model"},
-            "vehicle_model": {"default": "lexus", "description": "Ego vehicle model"},
+            "architecture_type": {"default": "awf/universe", "description": "Autoware architecture type", "values": architecture_types()},
+            "sensor_model": {"default": "sample_sensor_kit", "description": "Ego sensor model"},
+            "vehicle_model": {"default": "sample_vehicle", "description": "Ego vehicle model"},
         }
 
         self.random_test_arguments = {
@@ -83,7 +77,7 @@ class RandomTestRunnerLaunch(object):
                  "description": "Yaml filename within random_test_runner/param directory containing test parameters."
                                 "If specified (not empty), other test arguments will be ignored"},
             "simulator_type": {"default": "simple_sensor_simulator", "description": "Simulation backend",
-                               "values": ["simple_sensor_simulator", "unity"]},
+                               "values": ["simple_sensor_simulator"]},
             "simulator_host":
                 {"default": "localhost",
                  "description": "Simulation host. It can be either IP address "
