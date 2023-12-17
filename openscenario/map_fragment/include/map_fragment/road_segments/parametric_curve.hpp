@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__PARAMETRIC_CURVE__HPP_
-#define MAP_FRAGMENT__PARAMETRIC_CURVE__HPP_
+#ifndef MAP_FRAGMENT__ROAD_SEGMENTS__PARAMETRIC_CURVE__HPP_
+#define MAP_FRAGMENT__ROAD_SEGMENTS__PARAMETRIC_CURVE__HPP_
 
-#include <map_fragment/geometric_operations.hpp>
+#include <map_fragment/road_segments/geometric_operations.hpp>
 #include <memory>
 #include <rcpputils/asserts.hpp>
 #include <utility>
 
-namespace map_fragment
+namespace map_fragment::road_segments
 {
 
 /**
@@ -283,6 +283,6 @@ auto shiftCurveLaterally(
 {
   return std::make_shared<LaterallyShiftedCurve>(curve_in, lateral_offset);
 }
-}  // namespace map_fragment
+}  // namespace map_fragment::road_segments
 
-#endif  // MAP_FRAGMENT__PARAMETRIC_CURVE__HPP_
+#endif  // MAP_FRAGMENT__ROAD_SEGMENTS__PARAMETRIC_CURVE__HPP_

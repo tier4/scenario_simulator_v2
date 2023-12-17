@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
-#define MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
+#ifndef MAP_FRAGMENT__ROAD_SGEMENTS__GEOMETRIC_OPERATIONS__HPP_
+#define MAP_FRAGMENT__ROAD_SEGMENTS__GEOMETRIC_OPERATIONS__HPP_
 
 #include <boost/test/tools/floating_point_comparison.hpp>
 #include <cmath>
-#include <map_fragment/aliases.hpp>
+#include <map_fragment/road_segments/geometry_aliases.hpp>
 #include <rcpputils/asserts.hpp>
 #include <stdexcept>
 #include <string>
 
-namespace map_fragment
+namespace map_fragment::road_segments
 {
 constexpr auto TOLERANCE_FOR_FLOATING_POINT_COMPARISONS = 1e-6;
 using close_at_tolerance = boost::math::fpc::close_at_tolerance<double>;
@@ -162,6 +162,6 @@ auto doPointsOverlap(const Point & first, const Point & second) -> bool
   const auto euclidean_distance = (first - second).norm();
   return small_with_tolerance(TOLERANCE_FOR_FLOATING_POINT_COMPARISONS)(euclidean_distance);
 }
-}  // namespace map_fragment
+}  // namespace map_fragment::road_segments
 
-#endif  // MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
+#endif  // MAP_FRAGMENT__ROAD_SEGMENTS__GEOMETRIC_OPERATIONS__HPP_

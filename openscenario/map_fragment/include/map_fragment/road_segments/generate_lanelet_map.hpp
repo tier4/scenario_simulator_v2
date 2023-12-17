@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__LANELET_MAP_GENERATION__HPP_
-#define MAP_FRAGMENT__LANELET_MAP_GENERATION__HPP_
+#ifndef MAP_FRAGMENT__RAOD_SEGMENTS__GENERATE_LANELET_MAP__HPP_
+#define MAP_FRAGMENT__ROAD_SEGMENTS__GENERATE_LANELET_MAP__HPP_
 
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
 #include <boost/graph/connected_components.hpp>
 #include <boost/graph/undirected_graph.hpp>
 #include <functional>
-#include <map_fragment/road_segment.hpp>
+#include <map_fragment/road_segments/road_segment.hpp>
+#include <map_fragment/road_segments/road_segment_connection.hpp>
 #include <rcpputils/asserts.hpp>
 
-namespace map_fragment
+namespace map_fragment::road_segments
 {
 using LineStrings3dByRoadSegment =
   std::map<RoadSegment::ConstSharedPointer, lanelet::LineStrings3d>;
@@ -281,6 +282,6 @@ auto generateLaneletMap(
 
   return lanelet::utils::createMap(lanelets);
 }
-}  // namespace map_fragment
+}  // namespace map_fragment::road_segments
 
-#endif  // MAP_FRAGMENT__LANELET_MAP_GENERATION_HPP_
+#endif  // MAP_FRAGMENT__ROAD_SEGMENTS__GENERATE_LANELET_MAP_HPP_

@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <map_fragment/lanelet_map_generation.hpp>
 #include <map_fragment/map_fragment.hpp>
-#include <map_fragment/road_segment.hpp>
+#include <map_fragment/road_segments/generate_lanelet_map.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
 try {
   using namespace map_fragment;
+  using namespace map_fragment::road_segments;
 
   rclcpp::init(argc, argv);
 

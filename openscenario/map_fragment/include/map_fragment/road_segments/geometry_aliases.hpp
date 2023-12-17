@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__ALIASES__HPP_
-#define MAP_FRAGMENT__ALIASES__HPP_
+#ifndef MAP_FRAGMENT__ROAD_SEGMENTS__GEOMETRY_ALIASES__HPP_
+#define MAP_FRAGMENT__ROAD_SEGMENTS__GEOMETRY_ALIASES__HPP_
 
 #include <Eigen/Dense>
 
-namespace map_fragment
+namespace map_fragment::road_segments
 {
 using Point = Eigen::Vector3d;
 using Vector = Eigen::Vector3d;
 using PointOrVector = Eigen::Vector3d;
 
 using Transformation = Eigen::Transform<double, 3, Eigen::TransformTraits::AffineCompact>;
-};  // namespace map_fragment
+};  // namespace map_fragment::road_segments
 
-#endif  // MAP_FRAGMENT__ALIASES__HPP_
+#endif  // MAP_FRAGMENT__ROAD_SEGMENT__GEOMETRY_ALIASES__HPP_

@@ -12,105 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__ROAD_SEGMENT__HPP_
-#define MAP_FRAGMENT__ROAD_SEGMENT__HPP_
+#ifndef MAP_FRAGMENT__ROAD_SEGMENTS__ROAD_SEGMENT_CONNECTION__HPP_
+#define MAP_FRAGMENT__ROAD_SEGMENTS__ROAD_SEGMENT_CONNECTION__HPP_
 
-#include <lanelet2_core/geometry/Lanelet.h>
+#include <map_fragment/road_segments/road_segment.hpp>
 
-#include <map_fragment/map_fragment.hpp>
-#include <map_fragment/parametric_curve.hpp>
-#include <rcpputils/asserts.hpp>
-
-namespace map_fragment
+namespace map_fragment::road_segments
 {
-
-/**
- * Description of a road cross section, defining its number of lanes and lane width
- */
-struct RoadCrossSectionDescription
-{
-  const int number_of_lanes;
-
-  const double lane_width;
-
-  const int number_of_reversed_lanes;
-
-  explicit RoadCrossSectionDescription(
-    const int number_of_lanes, const double lane_width, const int number_of_reversed_lanes = 0)
-  : number_of_lanes(number_of_lanes),
-    lane_width(lane_width),
-    number_of_reversed_lanes(number_of_reversed_lanes)
-  {
-    rcpputils::require_true(
-      number_of_lanes > 0,
-      "Expected number_of_lanes to be positive. Actual value: " + std::to_string(number_of_lanes));
-
-    rcpputils::require_true(
-      lane_width > 0.0,
-      "Expected lane_width to be positive. Actual value: " + std::to_string(lane_width));
-
-    rcpputils::require_true(
-      number_of_reversed_lanes >= 0, "Expected lane_width to be non-negative. Actual value: " +
-                                       std::to_string(number_of_reversed_lanes));
-  }
-};  // struct RoadCrossSectionDescription
-
-/**
- * Road segment, defined as the result of sliding a road cross section across a guide curve
- */
-struct RoadSegment
-{
-public:
-  using ConstSharedPointer = std::shared_ptr<const RoadSegment>;
-
-  const ParametricCurve::ConstSharedPointer guide_curve;
-
-  const RoadCrossSectionDescription cross_section_description;
-
-  explicit RoadSegment(
-    const ParametricCurve::ConstSharedPointer guide_curve,
-    const RoadCrossSectionDescription & cross_section_description)
-  : guide_curve(guide_curve), cross_section_description(cross_section_description)
-  {
-  }
-
-  explicit RoadSegment(const RoadSegment &) = delete;
-};  // class RoadSegment
-
-/**
- * Make a road segment with constant curvature
- */
-auto makeCurvedRoadSegment(
-  const double curvature, const double length, const int number_of_lanes, const double lane_width)
-  -> RoadSegment::ConstSharedPointer
-{
-  const auto guide_curve = curvature == 0.0
-                             ? std::static_pointer_cast<ParametricCurve>(  //
-                                 std::make_shared<Straight>(length))
-                             : std::static_pointer_cast<ParametricCurve>(std::make_shared<Arc>(
-                                 std::abs(1 / curvature), length * curvature));
-
-  const RoadCrossSectionDescription cross_section_description(number_of_lanes, lane_width);
-
-  return std::make_shared<RoadSegment>(guide_curve, cross_section_description);
-}
-
-auto generateSliceOfCrossSectionAndCalculateLateralOffset(
-  const RoadCrossSectionDescription & cross_section_description, const int & first_lane_index,
-  const int & number_of_lanes) -> std::pair<RoadCrossSectionDescription, double>
-{
-  const auto slice_description =
-    RoadCrossSectionDescription(number_of_lanes, cross_section_description.lane_width);
-
-  const auto lateral_offset =
-    -cross_section_description.lane_width *
-    (first_lane_index + 0.5 * number_of_lanes - 0.5 * cross_section_description.number_of_lanes);
-
-  return std::make_pair(slice_description, lateral_offset);
-}
-
-using RoadSegments = std::vector<RoadSegment::ConstSharedPointer>;
-
 /**
  * Sequential connection between two subsequent road segments
  *
@@ -265,6 +173,6 @@ struct RoadSegmentConnection
 };  // struct RoadSegmentConnection
 
 using RoadSegmentConnections = std::vector<RoadSegmentConnection>;
-}  // namespace map_fragment
+}  // namespace map_fragment::road_segments
 
-#endif  // MAP_FRAGMENT__ROAD_SEGMENT__HPP_
+#endif  // MAP_FRAGMENT__ROAD_SEGMENTS__ROAD_SEGMENT_CONNECTION__HPP_
