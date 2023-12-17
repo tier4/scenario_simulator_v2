@@ -190,12 +190,12 @@ struct RoadSegmentConnection
 
     const auto first_segment_leftmost_boundary_connection_point =
       first_segment_guide_curve_position_at_connection +
-      (first_segment->cross_section_description.number_of_lanes / 2. - getFirstSegmentOffset()) *
+      (first_segment->cross_section_description.number_of_lanes / 2. - getSecondSegmentOffset()) *
         lane_width * first_segment_normal_vector_at_connection;
 
     const auto second_segment_leftmost_boundary_connection_point =
       second_segment_guide_curve_position_at_connection +
-      (second_segment->cross_section_description.number_of_lanes / 2. - getSecondSegmentOffset()) *
+      (second_segment->cross_section_description.number_of_lanes / 2. - getFirstSegmentOffset()) *
         lane_width * second_segment_normal_vector_at_connection;
 
     rcpputils::require_true(
@@ -222,7 +222,7 @@ struct RoadSegmentConnection
   {
     return std::min(
       first_segment->cross_section_description.number_of_lanes - getSecondSegmentOffset(),
-      second_segment->cross_section_description.number_of_lanes + getFirstSegmentOffset());
+      second_segment->cross_section_description.number_of_lanes - getFirstSegmentOffset());
   }
 
   /**
@@ -248,14 +248,14 @@ struct RoadSegmentConnection
 
     for (auto i = 0; i < number_of_connections; i++) {
       const auto first_point_index =
-        first_segment_offset + is_first_segment_inverted
-          ? first_segment->cross_section_description.number_of_lanes - i
-          : i;
+        is_first_segment_inverted
+          ? first_segment->cross_section_description.number_of_lanes - i - second_segment_offset
+          : i + second_segment_offset;
 
       const auto second_point_index =
-        second_segment_offset + is_second_segment_inverted
-          ? second_segment->cross_section_description.number_of_lanes - i
-          : i;
+        is_second_segment_inverted
+          ? second_segment->cross_section_description.number_of_lanes - i - first_segment_offset
+          : i + first_segment_offset;
 
       connections.emplace_back(first_point_index, second_point_index);
     }

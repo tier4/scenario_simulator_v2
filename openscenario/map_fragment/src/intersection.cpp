@@ -19,12 +19,12 @@
 
 // Structure of the intersection
 // TODO: Make this configurable
-const uint64_t NUMBER_OF_LANES_LEFT = 0;
-const uint64_t NUMBER_OF_LANES_LEFT_OR_STRAIGHT = 0;
-const uint64_t NUMBER_OF_LANES_STRAIGHT = 0;
-const uint64_t NUMBER_OF_LANES_ANY_DIRECTION = 2;
-const uint64_t NUMBER_OF_LANES_STRAIGHT_OR_RIGHT = 0;
-const uint64_t NUMBER_OF_LANES_RIGHT = 0;
+const uint64_t NUMBER_OF_LANES_LEFT = 1;
+const uint64_t NUMBER_OF_LANES_LEFT_OR_STRAIGHT = 1;
+const uint64_t NUMBER_OF_LANES_STRAIGHT = 1;
+const uint64_t NUMBER_OF_LANES_ANY_DIRECTION = 0;
+const uint64_t NUMBER_OF_LANES_STRAIGHT_OR_RIGHT = 1;
+const uint64_t NUMBER_OF_LANES_RIGHT = 1;
 
 enum IntersectionLeg { LEFT_LEG = 0, BOTTOM_LEG = 1, RIGHT_LEG = 2, TOP_LEG = 3 };
 
@@ -141,7 +141,7 @@ try {
 
     road_segment_connections.emplace_back(
       left_turn_road_segment, false, connected_leg_segment_left, true,
-      index_of_first_left_turning_lane);
+      -index_of_first_left_turning_lane);
 
     /*
      * 2) Create connecting road segment for straight-going lanelets
@@ -175,7 +175,7 @@ try {
 
     road_segment_connections.emplace_back(
       straight_road_segment, false, connected_leg_segment_straight, true,
-      index_of_first_straight_going_lane);
+      -index_of_first_straight_going_lane);
 
     /*
      * 3) Create connecting road segment for right-turning lanelets
@@ -209,7 +209,7 @@ try {
 
     road_segment_connections.emplace_back(
       right_turn_road_segment, false, connected_leg_segment_right, true,
-      index_of_first_right_turning_lane);
+      -index_of_first_right_turning_lane);
   }
 
   const auto map = generateLaneletMap(road_segments, resolution, road_segment_connections);
