@@ -17,17 +17,17 @@
 #ifndef REAL_TIME_FACTOR_SLIDER_PANEL_HPP_
 #define REAL_TIME_FACTOR_SLIDER_PANEL_HPP_
 
-#include "QLabel"
-#include "QSlider"
+#include <qt5/QtWidgets/QLabel>
+#include <qt5/QtWidgets/QSlider>
 
 #ifndef Q_MOC_RUN
 
-#include "rclcpp/rclcpp.hpp"
-#include "rviz_common/panel.hpp"
+#include <rclcpp/rclcpp.hpp>
+#include <rviz_common/panel.hpp>
 
 #endif
 
-#include "std_msgs/msg/float64.hpp"
+#include <std_msgs/msg/float64.hpp>
 
 namespace real_time_factor_control_rviz_plugin
 {
@@ -37,7 +37,7 @@ class RealTimeFactorSliderPanel : public rviz_common::Panel
 
 public:
   explicit RealTimeFactorSliderPanel(QWidget * parent = nullptr);
-  void onInitialize() override;
+  auto onInitialize() -> void override;
 
 public Q_SLOTS:
   void onChangedRealTimeFactorValue(int real_time_factor_value);

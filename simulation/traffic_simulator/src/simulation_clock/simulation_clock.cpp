@@ -19,21 +19,14 @@ namespace traffic_simulator
 {
 SimulationClock::SimulationClock(double realtime_factor, double frame_rate)
 : rclcpp::Clock(RCL_ROS_TIME),
-  use_raw_clock(false),
-  realtime_factor(realtime_factor),
-  frame_rate(frame_rate),
-  time_on_initialize(0, 0)
+  use_raw_clock_(false),
+  realtime_factor_(realtime_factor),
+  frame_rate_(frame_rate),
+  time_on_initialize_(0, 0)
 {
 }
 
-auto SimulationClock::update() -> void
-{
-  nanoseconds_count += realtime_factor * 1000000000.0 / frame_rate;
-
-  auto full_seconds = std::floor(nanoseconds_count / 1000000000.0);
-  nanoseconds_count -= full_seconds * 1000000000.0;
-  seconds_count += full_seconds;
-}
+auto SimulationClock::update() -> void { time_ += realtime_factor_ / frame_rate_; }
 
 auto SimulationClock::getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock
 {
@@ -44,10 +37,10 @@ auto SimulationClock::getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock
 
 auto SimulationClock::getCurrentRosTime() -> rclcpp::Time
 {
-  if (use_raw_clock) {
+  if (use_raw_clock_) {
     return now();
   } else {
-    return time_on_initialize + rclcpp::Duration::from_seconds(getCurrentSimulationTime());
+    return time_on_initialize_ + rclcpp::Duration::from_seconds(getCurrentSimulationTime());
   }
 }
 
@@ -57,8 +50,7 @@ auto SimulationClock::start() -> void
     THROW_SIMULATION_ERROR(
       "npc logic is already started. Please check simulation clock instance was destroyed.");
   } else {
-    seconds_offset = seconds_count;
-    nanoseconds_offset = nanoseconds_count;
+    time_offset_ = time_;
   }
 }
 }  // namespace traffic_simulator

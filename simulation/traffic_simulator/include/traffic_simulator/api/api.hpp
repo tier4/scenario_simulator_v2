@@ -97,7 +97,7 @@ public:
       simulation_api_schema::InitializeRequest request;
       request.set_initialize_time(clock_.getCurrentSimulationTime());
       request.set_lanelet2_map_path(configuration.lanelet2_map_path().string());
-      request.set_realtime_factor(clock_.realtime_factor);
+      request.set_realtime_factor(clock_.realtime_factor_);
       request.set_step_time(clock_.getStepTime());
       simulation_interface::toProto(
         clock_.getCurrentRosTime(), *request.mutable_initialize_ros_time());

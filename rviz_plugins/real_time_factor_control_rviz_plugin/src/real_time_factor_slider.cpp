@@ -14,11 +14,11 @@
 // limitations under the License.
 //
 
-#include "./real_time_factor_slider.hpp"
+#include "real_time_factor_slider.hpp"
 
-#include "QHBoxLayout"
-#include "pluginlib/class_list_macros.hpp"
-#include "rviz_common/display_context.hpp"
+#include <pluginlib/class_list_macros.hpp>
+#include <qt5/QtWidgets/QHBoxLayout>
+#include <rviz_common/display_context.hpp>
 
 namespace real_time_factor_control_rviz_plugin
 {
