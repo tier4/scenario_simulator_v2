@@ -44,7 +44,7 @@ struct TestDescription
 
 enum RandomTestType { RANDOM_RUN, REPLAY };
 
-enum SimulatorType { SIMPLE_SENSOR_SIMULATOR, UNITY };
+enum SimulatorType { SIMPLE_SENSOR_SIMULATOR, AWSIM };
 SimulatorType simulatorTypeFromString(const std::string & simulator_type_str);
 
 enum ArchitectureType { AWF_AUTO, AWF_UNIVERSE, TIER4_PROPOSAL };

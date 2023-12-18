@@ -29,8 +29,9 @@ from launch.events import Shutdown
 from launch.event_handlers import OnProcessExit
 from launch.actions import EmitEvent, RegisterEventHandler, OpaqueFunction
 from launch.actions.declare_launch_argument import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
+from launch.conditions import IfCondition
 
 class RandomTestRunnerLaunch(object):
     def __init__(self):
@@ -52,7 +53,7 @@ class RandomTestRunnerLaunch(object):
                  "description": "Yaml filename within random_test_runner/param directory containing test parameters."
                                 "If specified (not empty), other test arguments will be ignored"},
             "simulator_type": {"default": "simple_sensor_simulator", "description": "Simulation backend",
-                               "values": ["simple_sensor_simulator", "AWSIM"]},
+                               "values": ["simple_sensor_simulator", "awsim"]},
             "simulator_host":
                 {"default": "localhost",
                  "description": "Simulation host. It can be either IP address "
@@ -200,22 +201,22 @@ class RandomTestRunnerLaunch(object):
                 name="openscenario_visualizer",
                 output="screen",
             ),
-        ]
-
-        simulation_type = self.random_test_runner_launch_configuration["simulator_type"].perform(context)
-        print("Chosen simulation type", simulation_type)
-        if simulation_type == "simple_sensor_simulator":
-            launch_description.append(
-                Node(
-                    package="simple_sensor_simulator",
-                    executable="simple_sensor_simulator_node",
-                    name="simple_sensor_simulator_node",
-                    namespace="simulation",
-                    output="log",
-                    arguments=[("__log_level:=warn")],
-                    parameters=[{"port": 8080}],
+            Node(
+                package="simple_sensor_simulator",
+                executable="simple_sensor_simulator_node",
+                name="simple_sensor_simulator_node",
+                namespace="simulation",
+                output="log",
+                arguments=[("__log_level:=warn")],
+                parameters=[{"port": 8080}],
+                condition=IfCondition(
+                    PythonExpression([
+                        "'", self.random_test_runner_launch_configuration["simulator_type"], "'",
+                        ' == "simple_sensor_simulator"'
+                    ])
                 ),
             )
+        ]
 
         return launch_description
 
