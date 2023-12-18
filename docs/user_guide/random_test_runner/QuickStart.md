@@ -114,10 +114,10 @@ autoware_launch_file:=e2e_simulator.launch.xml autoware_architecture:="awf/unive
 
 ![Random test runner launched](img/random_test_runner_awsim.png)
 
-### Known isses
-- Due to misalignment of lanalet and some parts of the AWSIM environment, Ego entity is being spawned below the terrain.
+### Known issues
+- Due to misalignment of lanelet and some parts of the AWSIM environment, Ego entity is being spawned below the terrain.
 The misalignment will be fixed in a future version of the package.
 
-- when the `npc_count` is too big the NPCs start to slide sideways and the localizaiton does not work properly.
+- when the `npc_count` is too big the NPCs start to slide sideways and the localization does not work properly.
 Reasons are yet unknown and more investigation should be conducted. It was determined that the working number of
 NPCs is 5
