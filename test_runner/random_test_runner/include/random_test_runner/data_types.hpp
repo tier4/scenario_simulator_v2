@@ -197,7 +197,7 @@ template <>
 struct fmt::formatter<PedestrianBehavior>
 {
   template <typename ParseContext>
-  constexpr auto parse(ParseContext & ctx)
+  constexpr auto parse(const ParseContext & ctx)
   {
     return ctx.begin();
   }
@@ -228,7 +228,7 @@ template <>
 struct fmt::formatter<NPCPedestrianDescription>
 {
   template <typename ParseContext>
-  constexpr auto parse(ParseContext & ctx)
+  constexpr auto parse(const ParseContext & ctx)
   {
     return ctx.begin();
   }

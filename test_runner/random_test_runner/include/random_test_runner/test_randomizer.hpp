@@ -41,8 +41,8 @@ private:
     const traffic_simulator_msgs::msg::LaneletPose & start,
     const traffic_simulator_msgs::msg::LaneletPose & goal);
   traffic_simulator_msgs::msg::LaneletPose generateRandomPoseWithinMinDistanceFromPosesFromLanelets(
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
-    const std::vector<LaneletPart> & lanelets, double offset = 0.0);
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,const double min_distance,
+    const std::vector<LaneletPart> & lanelets, const double offset = 0.0);
   std::pair<traffic_simulator_msgs::msg::LaneletPose, traffic_simulator_msgs::msg::LaneletPose>
   generateEgoRoute(
     int64_t goal_lanelet_id, double goal_s, bool partial_randomization,
@@ -52,7 +52,7 @@ private:
   double getRandomS(const LaneletPart & lanelet);
   traffic_simulator_msgs::msg::LaneletPose generateRandomPosition();
   traffic_simulator_msgs::msg::LaneletPose generatePoseFromLanelets(
-    const std::vector<LaneletPart> & lanelets, double offset = 0.0);
+    const std::vector<LaneletPart> & lanelets, const double offset = 0.0);
   std::vector<traffic_simulator_msgs::msg::LaneletPose> generateCrosswalkStartAndEndPoses();
   NPCVehicleDescription generateVehicleNpcFromLaneletsWithMinDistanceFromPoses(
     int npc_id, const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,
@@ -67,14 +67,14 @@ private:
     const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses);
   PedestrianBehavior getRandomPedestrianBehavior(
     const std::vector<PedestrianBehavior> & pedestrian_behaviors);
-  std::pair<traffic_simulator_msgs::msg::LaneletPose, std::vector<geometry_msgs::msg::Pose>>
-  generatePedestrianSpawnPointAndRouteFromBehavior(
+  auto generatePedestrianSpawnPointAndRouteFromBehavior(
     const PedestrianBehavior & behavior,
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, const double min_distance,
     const std::vector<LaneletPart> & lanelets,
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses);
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses)
+    -> std::pair<traffic_simulator_msgs::msg::LaneletPose, std::vector<geometry_msgs::msg::Pose>>;
   traffic_simulator_msgs::msg::LaneletPose getRandomPedestrianSpawnPose(
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, const double min_distance,
     const std::vector<LaneletPart> & lanelets);
 
   rclcpp::Logger logger_;

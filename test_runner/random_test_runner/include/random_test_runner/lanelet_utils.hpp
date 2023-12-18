@@ -61,7 +61,7 @@ public:
 
   std::vector<geometry_msgs::msg::Pose> getPositionsOnNextLanelets(
     const traffic_simulator_msgs::msg::LaneletPose & start_lanelet,
-    const int64_t & max_number_of_points, double offset = 0.0);
+    const int64_t & max_number_of_points, const double offset = 0.0);
   std::vector<int64_t> getLaneletIds();
   lanelet::Ids filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]);
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);

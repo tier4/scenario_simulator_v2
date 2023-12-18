@@ -140,8 +140,8 @@ TestRandomizer::generateEgoRoute(
 
 traffic_simulator_msgs::msg::LaneletPose
 TestRandomizer::generateRandomPoseWithinMinDistanceFromPosesFromLanelets(
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
-  const std::vector<LaneletPart> & lanelets, double offset)
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, const double min_distance,
+  const std::vector<LaneletPart> & lanelets, const double offset)
 {
   for (int attempt_number = 0; attempt_number < max_randomization_attempts; attempt_number++) {
     auto ret = generatePoseFromLanelets(lanelets, offset);
@@ -215,7 +215,7 @@ TestRandomizer::generateCrosswalkStartAndEndPoses()
 }
 
 traffic_simulator_msgs::msg::LaneletPose TestRandomizer::generatePoseFromLanelets(
-  const std::vector<LaneletPart> & lanelets, double offset)
+  const std::vector<LaneletPart> & lanelets, const double offset)
 {
   if (lanelets.empty()) {
     throw std::runtime_error("Lanelets from which position will be randomized cannot be empty");
@@ -299,12 +299,12 @@ PedestrianBehavior TestRandomizer::getRandomPedestrianBehavior(
   return pedestrian_behaviors[pedestrian_behavior_id_randomizer.generate()];
 }
 
-std::pair<traffic_simulator_msgs::msg::LaneletPose, std::vector<geometry_msgs::msg::Pose>>
-TestRandomizer::generatePedestrianSpawnPointAndRouteFromBehavior(
+auto TestRandomizer::generatePedestrianSpawnPointAndRouteFromBehavior(
   const PedestrianBehavior & behavior,
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, const double min_distance,
   const std::vector<LaneletPart> & lanelets,
   const std::vector<traffic_simulator_msgs::msg::LaneletPose> & crosswalk_poses)
+  -> std::pair<traffic_simulator_msgs::msg::LaneletPose, std::vector<geometry_msgs::msg::Pose>>
 {
   std::vector<geometry_msgs::msg::Pose> route;
   traffic_simulator_msgs::msg::LaneletPose spawn_lanelet_pose;
@@ -335,7 +335,7 @@ TestRandomizer::generatePedestrianSpawnPointAndRouteFromBehavior(
 }
 
 traffic_simulator_msgs::msg::LaneletPose TestRandomizer::getRandomPedestrianSpawnPose(
-  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, double min_distance,
+  const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, const double min_distance,
   const std::vector<LaneletPart> & lanelets)
 {
   for (int attempt_number = 0; attempt_number < max_randomization_attempts; attempt_number++) {

@@ -179,7 +179,7 @@ struct LaneletPartForRouting
 
 std::vector<geometry_msgs::msg::Pose> LaneletUtils::getPositionsOnNextLanelets(
   const traffic_simulator_msgs::msg::LaneletPose & start_lanelet_pose,
-  const int64_t & max_number_of_points, double offset)
+  const int64_t & max_number_of_points, const double offset)
 {
   std::vector<geometry_msgs::msg::Pose> route_positions;
   route_positions.emplace_back(
@@ -188,7 +188,7 @@ std::vector<geometry_msgs::msg::Pose> LaneletUtils::getPositionsOnNextLanelets(
         start_lanelet_pose.lanelet_id, getLaneletLength(start_lanelet_pose.lanelet_id), offset))
       .pose);
   auto current_lanelet_id = start_lanelet_pose.lanelet_id;
-  while (route_positions.size() < max_number_of_points) {
+  while (route_positions.size() < static_cast<size_t>(max_number_of_points)) {
     auto next_lanelet_ids = hdmap_utils_ptr_->getNextLaneletIds(current_lanelet_id);
 
     if (next_lanelet_ids.empty()) {
