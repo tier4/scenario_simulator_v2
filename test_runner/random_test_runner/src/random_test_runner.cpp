@@ -94,7 +94,7 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
         get_logger(), validated_params, test_case_parameters_vector[test_id], lanelet_utils)
         .generate(),
       error_reporter_.spawnTestCase(validated_params.name, std::to_string(test_id)),
-      test_control_parameters.simulator_type, test_control_parameters.architecture_type,
+      260.0, test_control_parameters.architecture_type,
       get_logger());
     yaml_test_params_saver.addTestCase(test_case_parameters_vector[test_id], validated_params.name);
   }

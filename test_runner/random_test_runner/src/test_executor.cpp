@@ -21,8 +21,6 @@
 #include "random_test_runner/file_interactions/junit_xml_reporter.hpp"
 #include "random_test_runner/file_interactions/yaml_test_params_saver.hpp"
 
-const double test_timeout = 260.0;
-
 traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
 {
   traffic_simulator_msgs::msg::VehicleParameters parameters;
@@ -52,13 +50,13 @@ traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
 
 TestExecutor::TestExecutor(
   std::shared_ptr<traffic_simulator::API> api, TestDescription description,
-  JunitXmlReporterTestCase test_case_reporter, SimulatorType simulator_type,
+  JunitXmlReporterTestCase test_case_reporter, const double test_timeout,
   ArchitectureType architecture_type, rclcpp::Logger logger)
 : api_(std::move(api)),
   test_description_(std::move(description)),
   error_reporter_(std::move(test_case_reporter)),
-  simulator_type_(simulator_type),
   architecture_type_(architecture_type),
+  test_timeout_(test_timeout),
   logger_(logger)
 {
 }
@@ -148,7 +146,7 @@ void TestExecutor::update()
         scenario_completed_ = true;
       }
 
-      bool timeout_reached = current_time >= test_timeout;
+      bool timeout_reached = current_time >= test_timeout_;
       if (timeout_reached) {
           if (!goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
             RCLCPP_INFO(logger_, "Timeout reached");

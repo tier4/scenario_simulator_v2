@@ -32,7 +32,7 @@ class TestExecutor
 public:
   TestExecutor(
     std::shared_ptr<traffic_simulator::API> api, TestDescription description,
-    JunitXmlReporterTestCase test_case_reporter, SimulatorType simulator_type,
+    JunitXmlReporterTestCase test_case_reporter, double test_timeout,
     ArchitectureType architecture_type, rclcpp::Logger logger);
 
   void initialize();
@@ -52,8 +52,8 @@ private:
   EgoCollisionMetric ego_collision_metric_;
   JunitXmlReporterTestCase error_reporter_;
 
-  SimulatorType simulator_type_;
   ArchitectureType architecture_type_;
+  double test_timeout_;
 
   bool scenario_completed_ = false;
 
