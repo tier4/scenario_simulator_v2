@@ -170,17 +170,20 @@ def launch_setup(context, *args, **kwargs):
             package="simple_sensor_simulator",
             executable="simple_sensor_simulator_node",
             namespace="simulation",
-            name="simple_sensor_simulator",
             output="screen",
             on_exit=ShutdownOnce(),
             parameters=make_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
-        LifecycleNode(
+        # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
+        # For LifecycleNode the `name` parameter is required
+        # For Node the `name` parameter is optional
+        # The LifecycleNode class inherits from Node class with some additions not used in this launch file
+        # In this case, `openscenario_interpreter_node` can be changed from Lifecycle to Node
+        Node(
             package="openscenario_interpreter",
             executable="openscenario_interpreter_node",
             namespace="simulation",
-            name="openscenario_interpreter",
             output="screen",
             parameters=make_parameters(),
             on_exit=ShutdownOnce(),
@@ -189,7 +192,6 @@ def launch_setup(context, *args, **kwargs):
             package="openscenario_preprocessor",
             executable="openscenario_preprocessor_node",
             namespace="simulation",
-            name="openscenario_preprocessor",
             output="screen",
             on_exit=ShutdownOnce(),
         ),
