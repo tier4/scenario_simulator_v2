@@ -35,9 +35,17 @@
 
 There are two known issues which block random test runner from initializing the test if either initial position or goal pose exceeds the drivable area.
 
-- If the initial position exceeds the drivable are: Autoware will be launched, but the ego vehicle will not move, waiting for Autoware to change its state to WaitingForEngage. After a timeout the test will terminate, the error will be logged and the runner will continue with the next test.
-- If the generated goal pose exceeds the drivable ares: test will be immediately stopped after launching the Autoware and similarly as in the first case the error will be logged and the runner will continue with the next test.
+- If the initial position exceeds the drivable are: 
 
+Autoware will be launched, but the ego vehicle will not move, waiting for Autoware to change its state to WaitingForEngage. After a timeout the test will terminate and the runner will continue with the next test.
+
+After the test suite is completed, the `AutowareError` connected with the failed test will be logged to the `result.junit.xml` with the message: `Simulator waited for the Autoware state to transition to WaitingForEngage, but time is up. The current Autoware state is EMERGENCY.`
+
+- If the generated goal pose exceeds the drivable ares: 
+
+The test will be immediately stopped after launching the Autoware and similarly as in the first case the error will be logged and the runner will continue with the next test.
+
+After the test suite is completed, the `scenario_simulator_error` connected with the failed test will be logged to the `result.junit.xml` with the message: `Requested the service "/api/routing/set_route_points" 1 times, but was not successful.`
 
 # Launch arguments
 
@@ -102,16 +110,28 @@ Core test parameters. It sets map name, ego goal information and npc spawning pa
 | Parameter name                            | Default value       | Description                                                                                                                                                               |
 |-------------------------------------------|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `test_name`                               | `"random_test"`     | Test name. Used for descriptive purposes only.                                                                                                                             |
-| `map_name`                                | `"kashiwanoha_map"` | Name of the package containing map information (including *.osm and *.pcd file). There has to be a "map/" directory inside main package directory containing specified files. Package needs to be built in the Autoware workspace.                                                                                                      |
+| `map_name`                                | `"kashiwanoha_map"` | Name of the package containing map information. For more information please see [map package](Usage.md#map-package).                                                                                                    |
 | `ego_goal_lanelet_id`                     | `-1`                | Goal lanelet's id. If `-1`, goal will be chosen randomly.                                                                                                |
-| `ego_goal_s`                              | `0.0`               | Goal lanelet's translation along the lanelet in meters. If `ego_goal_lanelet_id` equals `-1`, s will be chosen randomly.                                               |
-| `ego_goal_partial_randomization`          | `False`             | If `true`, goal will be randomized within distance set in `ego_goal_partial_randomization_distance` value. If `ego_goal_lanelet_id` is set to `-1`, this value is ignored. |
+| `ego_goal_s`                              | `0.0`               | Goal lanelet's translation along the lanelet in meters. For more detailed description please see [lanelets positioning](Usage.md#lanelets-positioning). If `ego_goal_lanelet_id` equals `-1`, s will be chosen randomly.                                               |
+| `ego_goal_partial_randomization`          | `False`             | If `true`, goal will be randomized within distance set in `ego_goal_partial_randomization_distance` value. For more detailed description please see [lanelets positioning](Usage.md#lanelets-positioning). If `ego_goal_lanelet_id` is set to `-1`, this value is ignored. |
 | `ego_goal_partial_randomization_distance` | `25.0`              | Distance in meters from goal set by `ego_goal_lanelet_id` and `ego_goal_s`, within which goal pose will be randomized if `ego_goal_partial_randomization` is set to true.  |
 | `npc_count`                               | `10`                | Number of npcs which will be generated.                                                                                                                                                    |
 | `npc_min_speed`                           | `0.5`               | Minimum speed of generated npcs                                                                                                                                           |
 | `npc_max_speed`                           | `3.0`               | Maximum speed of generated npcs                                                                                                                                           |
 | `npc_min_spawn_distance_from_ego`         | `10.0`              | Minimum distance of generated npcs from ego                                                                                                                               |
 | `npc_max_spawn_distance_from_ego`         | `100.0`             | Maximum distance of generated npcs from ego                                                                                                                               |
+#### Map package
+
+Package containing map information. This package needs to be built in the Autoware workspace. Package example can be found [here](https://github.com/tier4/AWSIM/releases/download/v1.2.0/shinjuku_map.zip).
+
+The structure of the package needs to be as follows:
+
+- The root package directory, which contains:
+  - `package.xml` file
+  - `CMakeList.txt` file
+  - map directory, which contains:
+    - `.osm` file
+    - `.pcd` file
 
 #### Lanelets positioning
 
@@ -185,13 +205,12 @@ If the execution of the test finished with an error the stored information conta
 There are 3 types of error reported, related directly to the simulation, which are:
 1. `Stand still error` - reported when ego is found stuck in one place for too long.
 2. `Timeout error` - reported when ego fails to reach the goal in a specified time.
-3. `Collision error` - reported when collision between ego and npc appears.
+3. `Collision error` - reported when collision between ego and npc appears,
+4. Exceptions caught during the runtime which includes:
+    - `AutowareError`, 
+    - `scenario_simulator_exception`,
+    - `std::runtime_error`.
 
-More general exceptions including:
-1. `AutowareError`, 
-2. `scenario_simulator_exception`,
-3. `std::runtime_error` 
-will also be stored inside this file with a specific description if caught during the simulation.
 
 If any other error occurs during the random test runner execution, it will be stored along with the information that the `Unknown Error` has occurred.
 
