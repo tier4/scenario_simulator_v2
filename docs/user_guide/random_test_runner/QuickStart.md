@@ -1,6 +1,6 @@
 # Random test runner
 
-Random test runner allows running randomly generated scenarios to test Autoware autonomy implementation.
+Random test runner allows running randomly generated scenarios to test Autoware autonomy implementation. For more information regarding Random test runner features and limitations please see [Usage](Usage.md#features).
 
 ## How to build
 
@@ -58,6 +58,10 @@ After test is completed see `/tmp` directory. Among others, there will be two fi
 2. `result.yaml` - yaml file that can be used to replay tests.
 
 For the more specified information about output files please see [Results](Usage.md#results).
+
+##
+
+It might happen that the random test runner will behave unexpectedly and the test will not launch correctly. For further details regarding known issues please see [Troubleshooting](Usage.md#troubleshooting).
 
 ## How to replay
 
