@@ -1,0 +1,89 @@
+random001:
+  random_parameters:
+    lane_following_vehicle:
+      min_speed:
+        type: double
+        default_value: 2.0
+        description: "Minimum speed of the pedestrian on crosswalk. Distribution type is uniform distribution."
+        read_only: false
+        validation:
+          bounds<>: [0, 10]
+      max_speed:
+        type: double
+        default_value: 5.0
+        description: "Maximum speed of the pedestrian on crosswalk. Distribution type is uniform distribution."
+        read_only: false
+        validation:
+          bounds<>: [0, 5]
+    crossing_pedestrian:
+      number_of_pedestrian:
+        type: int
+        default_value: 2
+        description: "Number of crossing pedestrian on crosswalk."
+        read_only: false
+        validation:
+          bounds<>: [0, 10]
+      min_speed:
+        type: double
+        default_value: 1.0
+        description: "Minimum speed of the pedestrian on crosswalk. Distribution type is uniform distribution."
+        read_only: false
+        validation:
+          bounds<>: [0, 10]
+      max_speed:
+        type: double
+        default_value: 2.0
+        description: "Maximum speed of the pedestrian on crosswalk. Distribution type is uniform distribution."
+        read_only: false
+        validation:
+          bounds<>: [0, 5]
+      offset_variance:
+        type: double
+        default_value: 1.0
+        description: "Variance of the offset of the crossing pedestrian. Distribution type is normal distribution."
+        read_only: false
+        validation:
+          bounds<>: [0, 1.2]
+    road_parking_vehicle:
+      number_of_vehicle:
+        type: int
+        default_value: 2
+        description: "Number of parking vehicle in road side."
+        read_only: false
+        validation: 
+          bounds<>: [0, 10]
+      max_offset:
+        type: double
+        default_value: 2.5
+        description: "Maximum offset of the road parking vehicle. Distribution type is uniform distribution."
+        read_only: false
+        validation:
+          bounds<>: [-2.5, 2.5]
+      min_offset:
+        type: double
+        default_value: 2.0
+        description: "Minimum offset of the road parking vehicle. Distribution type is uniform distribution."
+        read_only: false
+        validation: 
+          bounds<>: [-2.5, 2.5]
+      s_variance:
+        type: double
+        default_value: 1.0
+        description: "Variance of the normal distribution of the s value in the road parking vehicle. Distribution type is normal distribution."
+        validation:
+          bounds<>: [0.0, 2.5]
+      entity_type:
+        type: string
+        default_value: "car"
+        description: "Type of the road parking vehicle entity."
+        read_only: false
+        validation:
+          one_of<>:
+            [
+              [
+                "car",
+                "truck",
+                "bus",
+                "trailer",
+              ],
+            ]

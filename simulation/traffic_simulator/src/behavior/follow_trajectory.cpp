@@ -498,6 +498,10 @@ auto makeUpdatedStatus(
     updated_status.pose.position += velocity * step_time;
 
     updated_status.pose.orientation = [&]() {
+      // do not change orientation if there is no velocity vector
+      if (velocity.y == 0 && velocity.x == 0) {
+        return entity_status.pose.orientation;
+      }
       geometry_msgs::msg::Vector3 direction;
       direction.x = 0;
       direction.y = 0;

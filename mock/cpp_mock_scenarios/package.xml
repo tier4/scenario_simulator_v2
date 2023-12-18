@@ -11,10 +11,12 @@
 
   <buildtool_export_depend>ament_cmake_test</buildtool_export_depend>
 
+  <depend>generate_parameter_library</depend>
   <depend>kashiwanoha_map</depend>
-  <depend>traffic_simulator</depend>
-  <depend>simple_sensor_simulator</depend>
   <depend>simple_junit</depend>
+  <depend>simple_sensor_simulator</depend>
+  <depend>traffic_simulator</depend>
+
   <exec_depend>openscenario_visualization</exec_depend>
   <exec_depend>scenario_test_runner</exec_depend>
   <exec_depend>behavior_tree_plugin</exec_depend>
