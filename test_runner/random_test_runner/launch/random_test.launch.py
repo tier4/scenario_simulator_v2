@@ -32,33 +32,6 @@ from launch.actions.declare_launch_argument import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
-
-def architecture_types():
-    return ["awf/universe"]
-
-
-def default_autoware_launch_package_of(architecture_type):
-    if architecture_type not in architecture_types():
-        raise KeyError(
-            f"architecture_type:={architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
-        )
-
-    return {
-        "awf/universe": "autoware_launch"
-    }[architecture_type]
-
-
-def default_autoware_launch_file_of(architecture_type):
-    if architecture_type not in architecture_types():
-        raise KeyError(
-            f"architecture_type:={architecture_type.perform(context)} is not supported. Choose one of {architecture_types()}."
-        )
-
-    return {
-        "awf/universe": "e2e_simulator.launch.xml"
-    }[architecture_type]
-
-
 class RandomTestRunnerLaunch(object):
     def __init__(self):
         self.random_test_runner_launch_configuration = {}
@@ -66,9 +39,11 @@ class RandomTestRunnerLaunch(object):
 
         self.autoware_launch_arguments = {
             # autoware arguments #
-            "architecture_type": {"default": "awf/universe", "description": "Autoware architecture type", "values": architecture_types()},
+            "architecture_type": {"default": "awf/universe", "description": "Autoware architecture type", "values": "awf/universe"},
             "sensor_model": {"default": "sample_sensor_kit", "description": "Ego sensor model"},
             "vehicle_model": {"default": "sample_vehicle", "description": "Ego vehicle model"},
+            "autoware_launch_file": {"default": "planning_simulator.launch.xml", "description": "Launch file name for Autoware running"},
+            "autoware_launch_package": {"default": "autoware_launch", "description": "Launch file package name for Autoware running"},
         }
 
         self.random_test_arguments = {
@@ -175,8 +150,6 @@ class RandomTestRunnerLaunch(object):
         print("Autoware architecture '{}'".format(autoware_architecture))
 
         parameters = [self.autoware_launch_configuration,
-                      {"autoware_launch_package": default_autoware_launch_package_of(autoware_architecture),
-                       "autoware_launch_file": default_autoware_launch_file_of(autoware_architecture)},
                       self.random_test_runner_launch_configuration]
 
         if test_param_file:
