@@ -130,8 +130,9 @@ DEFINE_FMT_FORMATTER(
   v.name, v.lanelet_pose, v.pose, v.action_status, v.time, v.lanelet_pose_valid, v.type)
 
 DEFINE_FMT_FORMATTER(
-  TestControlParameters, "input dir: {} output dir: {} random test type: {} test count {} test_timeout {}",
-  v.input_dir, v.output_dir, v.random_test_type, v.test_count, v.test_timeout)
+  TestControlParameters,
+  "input dir: {} output dir: {} random test type: {} test count {} test_timeout {}", v.input_dir,
+  v.output_dir, v.random_test_type, v.test_count, v.test_timeout)
 
 DEFINE_FMT_FORMATTER(
   TestSuiteParameters,

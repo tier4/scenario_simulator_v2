@@ -83,9 +83,8 @@ void TestExecutor::initialize()
         stringFromArchitectureType(architecture_type_)));
 
       double constexpr detection_update_duration = 0.1;
-      api_->attachDetectionSensor(
-        traffic_simulator::helper::constructDetectionSensorConfiguration(
-          ego_name_, stringFromArchitectureType(architecture_type_), detection_update_duration));
+      api_->attachDetectionSensor(traffic_simulator::helper::constructDetectionSensorConfiguration(
+        ego_name_, stringFromArchitectureType(architecture_type_), detection_update_duration));
 
       api_->attachOccupancyGridSensor([&]() {
         simulation_api_schema::OccupancyGridSensorConfiguration configuration;
@@ -118,7 +117,8 @@ void TestExecutor::initialize()
     for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
       const auto & npc_descr = test_description_.npcs_descriptions[i];
       api_->spawn(
-        npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters(), traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
+        npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters(),
+        traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
       api_->setEntityStatus(
         npc_descr.name, api_->canonicalize(npc_descr.start_position),
         traffic_simulator::helper::constructActionStatus(npc_descr.speed));
@@ -148,10 +148,10 @@ void TestExecutor::update()
 
       bool timeout_reached = current_time >= test_timeout_;
       if (timeout_reached) {
-          if (!goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
-            RCLCPP_INFO(logger_, "Timeout reached");
-            error_reporter_.reportTimeout();
-          }
+        if (!goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
+          RCLCPP_INFO(logger_, "Timeout reached");
+          error_reporter_.reportTimeout();
+        }
         scenario_completed_ = true;
         return;
       }
@@ -159,8 +159,7 @@ void TestExecutor::update()
     for (const auto & npc : test_description_.npcs_descriptions) {
       if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
         if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
-          std::string message =
-            fmt::format("New collision occurred between ego and {}", npc.name);
+          std::string message = fmt::format("New collision occurred between ego and {}", npc.name);
           RCLCPP_INFO_STREAM(logger_, message);
           error_reporter_.reportCollision(npc, current_time);
         }

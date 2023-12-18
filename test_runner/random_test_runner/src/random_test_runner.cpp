@@ -83,7 +83,6 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 
   yaml_test_params_saver.addTestSuite(validated_params, validated_params.name);
 
-
   for (size_t test_id = 0; test_id < test_case_parameters_vector.size(); test_id++) {
     std::string message =
       fmt::format("Generating test {}/{}", test_id + 1, test_case_parameters_vector.size());
@@ -155,8 +154,8 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
   }
   tp.test_timeout = this->declare_parameter<double>("test_timeout", 60.0);
   if (tp.test_timeout <= 0.0) {
-    throw std::runtime_error(fmt::format(
-        "Test timeout cannot be 0.0 or negative. Currently is {}", tp.test_timeout));
+    throw std::runtime_error(
+      fmt::format("Test timeout cannot be 0.0 or negative. Currently is {}", tp.test_timeout));
   }
 
   return tp;
