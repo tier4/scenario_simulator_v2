@@ -94,7 +94,7 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
         get_logger(), validated_params, test_case_parameters_vector[test_id], lanelet_utils)
         .generate(),
       error_reporter_.spawnTestCase(validated_params.name, std::to_string(test_id)),
-      260.0, test_control_parameters.architecture_type,
+      test_control_parameters.test_timeout, test_control_parameters.architecture_type,
       get_logger());
     yaml_test_params_saver.addTestCase(test_case_parameters_vector[test_id], validated_params.name);
   }
@@ -152,6 +152,11 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
   if (tp.output_dir.empty() || !boost::filesystem::is_directory(tp.output_dir)) {
     throw std::runtime_error(fmt::format(
       "Output directory {} is empty, does not exists or is not a directory", tp.output_dir));
+  }
+  tp.test_timeout = this->declare_parameter<double>("test_timeout", 60.0);
+  if (tp.test_timeout <= 0.0) {
+    throw std::runtime_error(fmt::format(
+        "Test timeout cannot be 0.0 or negative. Currently is {}", tp.test_timeout));
   }
 
   return tp;

@@ -62,6 +62,7 @@ class RandomTestRunnerLaunch(object):
 
             # control arguments #
             "test_count": {"default": 5, "description": "Test count to be performed in test suite"},
+            "test_timeout": {"default": 60.0, "description": "Timeout of the single test"},
             "input_dir":
                 {"default": "",
                  "description": "Directory containing the result.yaml file to be replayed. "
