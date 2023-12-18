@@ -18,6 +18,46 @@
 #include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
+#include "test_utils.hpp"
+
+constexpr double EPS = 1e-6;
+
+/// @brief Helper function generating line: p(0,0)-> p(1,3) -> p(2,6)
+math::geometry::CatmullRomSpline makeLine()
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(1.0, 3.0), makePoint(2.0, 6.0)};
+  return math::geometry::CatmullRomSpline(points);
+}
+
+/// @brief Helper function generating curve: p(0,0)-> p(1,1)-> p(2,0)
+math::geometry::CatmullRomSpline makeCurve()
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(1.0, 1.0), makePoint(2.0, 0.0)};
+  return math::geometry::CatmullRomSpline(points);
+}
+
+/// @brief Helper function generating curve: p(0,0)-> p(1,1)-> p(0,2)
+math::geometry::CatmullRomSpline makeCurve2()
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(1.0, 1.0), makePoint(0.0, 2.0)};
+  return math::geometry::CatmullRomSpline(points);
+}
+
+/**
+ * Add an offset to the given point in a specified direction.
+ *
+ * @param point The point to which the offset will be added.
+ * @param offset The value of the offset.
+ * @param theta The angle in radians representing the direction.
+ */
+void addOffset(geometry_msgs::msg::Point & point, const double offset, const double theta)
+{
+  point.x += std::cos(theta) * offset;
+  point.y += std::sin(theta) * offset;
+}
 
 /// @brief Testing the `CatmullRomSpline::getCollisionPointIn2D` function works valid.
 /// In this test case, number of the control points of the catmull-rom spline (variable name `spline`) is 2, so the shape of the value `spline` is line segment.
@@ -136,220 +176,359 @@ TEST(CatmullRomSpline, GetCollisionWith1ControlPoint)
 
 TEST(CatmullRomSpline, GetCollisionPointIn2D)
 {
-  geometry_msgs::msg::Point p0;
-  geometry_msgs::msg::Point p1;
-  p1.x = 1;
-  geometry_msgs::msg::Point p2;
-  p2.x = 2;
-  auto points = {p0, p1, p2};
-  auto spline = math::geometry::CatmullRomSpline(points);
-  EXPECT_DOUBLE_EQ(spline.getLength(), 2);
-  geometry_msgs::msg::Point start;
-  start.x = 0.1;
-  start.y = 1.0;
-  geometry_msgs::msg::Point goal;
-  goal.x = 0.1;
-  goal.y = -1.0;
-  auto collision_s = spline.getCollisionPointIn2D(start, goal, false);
-  EXPECT_TRUE(collision_s);
-  if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(1.0, 0.0), makePoint(2.0, 0.0)};
+  const math::geometry::CatmullRomSpline spline(points);
+
+  EXPECT_NEAR(spline.getLength(), 2.0, EPS);
+  geometry_msgs::msg::Point start = makePoint(0.1, 1.0), goal = makePoint(0.1, -1.0);
+
+  const auto collision_s0 = spline.getCollisionPointIn2D(start, goal, false);
+  EXPECT_TRUE(collision_s0);
+  if (collision_s0) {
+    EXPECT_NEAR(collision_s0.value(), 0.1, EPS);
   }
-  collision_s = spline.getCollisionPointIn2D({start, goal}, false);
-  if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
+  const auto collision_s1 = spline.getCollisionPointIn2D({start, goal}, false);
+  EXPECT_TRUE(collision_s1);
+  if (collision_s1) {
+    EXPECT_NEAR(collision_s1.value(), 0.1, EPS);
   }
-  collision_s = spline.getCollisionPointIn2D(start, goal, true);
-  EXPECT_TRUE(collision_s);
-  if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
+  const auto collision_s2 = spline.getCollisionPointIn2D(start, goal, true);
+  EXPECT_TRUE(collision_s2);
+  if (collision_s2) {
+    EXPECT_NEAR(collision_s2.value(), 0.1, EPS);
   }
-  collision_s = spline.getCollisionPointIn2D({start, goal}, true);
-  if (collision_s) {
-    EXPECT_DOUBLE_EQ(collision_s.value(), 0.1);
+  const auto collision_s3 = spline.getCollisionPointIn2D({start, goal}, true);
+  EXPECT_TRUE(collision_s3);
+  if (collision_s3) {
+    EXPECT_NEAR(collision_s3.value(), 0.1, EPS);
   }
 }
 
-TEST(CatmullRomSpline, Maximum2DCurvature)
+TEST(CatmullRomSpline, getCollisionPointIn2DNoCollision)
 {
-  geometry_msgs::msg::Point p0;
-  geometry_msgs::msg::Point p1;
-  p1.x = 1;
-  p1.y = 3;
-  geometry_msgs::msg::Point p2;
-  p2.x = 2;
-  p2.y = 6;
-  auto points = {p0, p1, p2};
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+
+  const geometry_msgs::msg::Point start = makePoint(0.5, 0.0), goal = makePoint(1.5, 0.0);
+
+  const auto collision_s0 = spline.getCollisionPointIn2D(start, goal, false);
+  EXPECT_FALSE(collision_s0);
+
+  const auto collision_s1 = spline.getCollisionPointIn2D({start, goal}, false);
+  EXPECT_FALSE(collision_s1);
+
+  const auto collision_s2 = spline.getCollisionPointIn2D(start, goal, true);
+  EXPECT_FALSE(collision_s2);
+
+  const auto collision_s3 = spline.getCollisionPointIn2D({start, goal}, true);
+  EXPECT_FALSE(collision_s3);
+}
+
+TEST(CatmullRomSpline, getCollisionPointIn2DEmpty)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+  const std::vector<geometry_msgs::msg::Point> polygon;
+
+  EXPECT_THROW(spline.getCollisionPointIn2D(polygon), common::SimulationError);
+  EXPECT_THROW(spline.getCollisionPointIn2D(polygon, true), common::SimulationError);
+}
+
+TEST(CatmullRomSpline, getMaximum2DCurvatureLine)
+{
+  const math::geometry::CatmullRomSpline spline = makeLine();
+  EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0.0);
+}
+
+TEST(CatmullRomSpline, getPolygon)
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(1.0, 0.0), makePoint(2.0, 0.0), makePoint(3.0, 0.0),
+    makePoint(4.0, 0.0)};
+  math::geometry::CatmullRomSpline spline(points);
+  std::vector<geometry_msgs::msg::Point> polygon = spline.getPolygon(1.0, 4);
+
+  EXPECT_EQ(polygon.size(), static_cast<size_t>(24));
+  // pair of triangles
+  EXPECT_POINT_NEAR(polygon[0], makePoint(0.0, 0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[1], makePoint(0.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[2], makePoint(1.0, 0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[3], makePoint(0.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[4], makePoint(1.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[5], makePoint(1.0, 0.5), EPS);
+  // pair of triangles
+  EXPECT_POINT_NEAR(polygon[6], makePoint(1.0, 0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[7], makePoint(1.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[8], makePoint(2.0, 0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[9], makePoint(1.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[10], makePoint(2.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[11], makePoint(2.0, 0.5), EPS);
+  // pair of triangles
+  EXPECT_POINT_NEAR(polygon[12], makePoint(2.0, 0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[13], makePoint(2.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[14], makePoint(3.0, 0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[15], makePoint(2.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[16], makePoint(3.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[17], makePoint(3.0, 0.5), EPS);
+  // pair of triangles
+  EXPECT_POINT_NEAR(polygon[18], makePoint(3.0, 0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[19], makePoint(3.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[20], makePoint(4.0, 0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[21], makePoint(3.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[22], makePoint(4.0, -0.5), EPS);
+  EXPECT_POINT_NEAR(polygon[23], makePoint(4.0, 0.5), EPS);
+}
+
+TEST(CatmullRomSpline, initializationLine)
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(1.0, 3.0), makePoint(2.0, 6.0)};
+
   EXPECT_NO_THROW(auto spline = math::geometry::CatmullRomSpline(points));
   auto spline = math::geometry::CatmullRomSpline(points);
-  EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0);
+  EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0.0);
 }
 
-TEST(CatmullRomSpline, Interpolate3Points)
+TEST(CatmullRomSpline, initializationCurve)
 {
-  geometry_msgs::msg::Point p0;
-  geometry_msgs::msg::Point p1;
-  p1.x = 1;
-  p1.y = 3;
-  geometry_msgs::msg::Point p2;
-  p2.x = 2;
-  p2.y = 5;
-  geometry_msgs::msg::Point p3;
-  p3.x = 4;
-  p3.y = 6;
-  auto points = {p0, p1, p2, p3};
+  const std::vector<geometry_msgs::msg::Point> points{
+
+    makePoint(0.0, 0.0), makePoint(1.0, 3.0), makePoint(2.0, 5.0), makePoint(4.0, 6.0),
+    makePoint(4.0, 1.0)};
   EXPECT_NO_THROW(auto spline = math::geometry::CatmullRomSpline(points));
 }
 
-TEST(CatmullRomSpline, Interpolate4Points)
+TEST(CatmullRomSpline, getLengthLine)
 {
-  geometry_msgs::msg::Point p0;
-  geometry_msgs::msg::Point p1;
-  p1.x = 1;
-  p1.y = 3;
-  geometry_msgs::msg::Point p2;
-  p2.x = 2;
-  p2.y = 5;
-  geometry_msgs::msg::Point p3;
-  p3.x = 4;
-  p3.y = 6;
-  geometry_msgs::msg::Point p4;
-  p4.x = 4;
-  p4.y = 10;
-  auto points = {p0, p1, p2, p3, p4};
-  EXPECT_NO_THROW(auto spline = math::geometry::CatmullRomSpline(points));
+  const math::geometry::CatmullRomSpline spline = makeLine();
+  EXPECT_NEAR(spline.getLength(), std::hypot(2.0, 6.0), EPS);
 }
 
-TEST(CatmullRomSpline, GetPoint)
+TEST(CatmullRomSpline, getLengthCurve)
 {
-  geometry_msgs::msg::Point p0;
-  geometry_msgs::msg::Point p1;
-  p1.x = 1;
-  geometry_msgs::msg::Point p2;
-  p2.x = 2;
-  geometry_msgs::msg::Point p3;
-  p3.x = 3;
-  geometry_msgs::msg::Point p4;
-  p4.x = 4;
-  auto points = {p0, p1, p2, p3, p4};
-  auto spline = math::geometry::CatmullRomSpline(points);
-  EXPECT_DOUBLE_EQ(spline.getLength(), 4);
-  auto point = spline.getPoint(3);
-  EXPECT_DOUBLE_EQ(point.x, 3);
-  EXPECT_DOUBLE_EQ(point.y, 0);
-  EXPECT_DOUBLE_EQ(point.z, 0);
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+  constexpr double eps = 0.1;
+  EXPECT_NEAR(spline.getLength(), 3.0, eps);
 }
 
-TEST(CatmullRomSpline, GetSValue)
+TEST(CatmullRomSpline, getPointLine)
 {
-  geometry_msgs::msg::Point p0;
-  geometry_msgs::msg::Point p1;
-  p1.x = 1;
-  geometry_msgs::msg::Point p2;
-  p2.x = 2;
-  geometry_msgs::msg::Point p3;
-  p3.x = 4;
-  auto points = {p0, p1, p2, p3};
-  auto spline = math::geometry::CatmullRomSpline(points);
-  geometry_msgs::msg::Pose p;
-  p.position.x = 0.1;
-  p.position.y = 0;
-  p.position.z = 0;
-  const auto result = spline.getSValue(p);
+  const math::geometry::CatmullRomSpline spline = makeLine();
+  auto point = spline.getPoint(std::hypot(1.5, 4.5));
+  EXPECT_POINT_NEAR(point, makePoint(1.5, 4.5), EPS);
+}
+
+TEST(CatmullRomSpline, getPointCurve)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+  const auto point = spline.getPoint(1.5);
+  constexpr double eps = 0.15;
+  EXPECT_POINT_NEAR(point, makePoint(1.0, 1.0), eps);
+}
+
+TEST(CatmullRomSpline, getTangentVectorLine)
+{
+  const math::geometry::CatmullRomSpline spline = makeLine();
+  const auto vec = spline.getTangentVector(1.0);
+  const double norm_vec = std::hypot(vec.x, vec.y, vec.z);
+  const auto ans = makeVector(1.5, 4.5);
+  const double norm_ans = std::hypot(ans.x, ans.y, ans.z);
+  EXPECT_NEAR(vec.x / norm_vec, ans.x / norm_ans, EPS);
+  EXPECT_NEAR(vec.y / norm_vec, ans.y / norm_ans, EPS);
+  EXPECT_NEAR(vec.z / norm_vec, ans.z / norm_ans, EPS);
+}
+
+TEST(CatmullRomSpline, getTangentVectorCurve)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+  const auto vec = spline.getTangentVector(1.5);
+  const double norm_vec = std::hypot(vec.x, vec.y, vec.z);
+  const auto ans = makeVector(1.0, 0.0);
+  constexpr double eps = 0.15;
+  EXPECT_NEAR(vec.x / norm_vec, ans.x, eps);
+  EXPECT_NEAR(vec.y / norm_vec, ans.y, eps);
+  EXPECT_NEAR(vec.z / norm_vec, ans.z, eps);
+}
+
+TEST(CatmullRomSpline, getNormalVectorLine)
+{
+  const math::geometry::CatmullRomSpline spline = makeLine();
+  const auto vec = spline.getNormalVector(1.0);
+  const double norm_vec = std::hypot(vec.x, vec.y, vec.z);
+  const auto ans = makeVector(-4.5, 1.5);
+  const double norm_ans = std::hypot(ans.x, ans.y, ans.z);
+  EXPECT_NEAR(vec.x / norm_vec, ans.x / norm_ans, EPS);
+  EXPECT_NEAR(vec.y / norm_vec, ans.y / norm_ans, EPS);
+  EXPECT_NEAR(vec.z / norm_vec, ans.z / norm_ans, EPS);
+}
+
+TEST(CatmullRomSpline, getNormalVectorCurve)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+  const auto vec = spline.getNormalVector(1.5);
+  const double norm_vec = std::hypot(vec.x, vec.y, vec.z);
+  const auto ans = makeVector(0.0, 1.0);
+  constexpr double eps = 0.15;
+  EXPECT_NEAR(vec.x / norm_vec, ans.x, eps);
+  EXPECT_NEAR(vec.y / norm_vec, ans.y, eps);
+  EXPECT_NEAR(vec.z / norm_vec, ans.z, eps);
+}
+
+TEST(CatmullRomSpline, getPoseLine)
+{
+  const math::geometry::CatmullRomSpline spline = makeLine();
+  const auto pose = spline.getPose(std::hypot(1.5, 4.5));
+  EXPECT_POINT_NEAR(pose.position, makePoint(1.5, 4.5), EPS);
+  EXPECT_QUATERNION_NEAR(
+    pose.orientation,
+    quaternion_operation::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, std::atan(3.0))), EPS);
+}
+
+TEST(CatmullRomSpline, getPoseCurve)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+  const auto pose = spline.getPose(1.5);
+  constexpr double eps = 0.02;
+  EXPECT_POINT_NEAR(pose.position, makePoint(1.0, 1.0), eps);
+  EXPECT_QUATERNION_NEAR(pose.orientation, geometry_msgs::msg::Quaternion(), eps);
+}
+
+TEST(CatmullRomSpline, getSValue1)
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(1.0, 0.0), makePoint(2.0, 0.0), makePoint(4.0, 0.0)};
+  const auto spline = math::geometry::CatmullRomSpline(points);
+  const auto result = spline.getSValue(makePose(0.1, 0.0));
   EXPECT_TRUE(result);
-  EXPECT_TRUE(result.value() > 0.099);
-  EXPECT_TRUE(result.value() < 0.101);
-  p.position.x = 10;
-  p.position.y = 0;
-  p.position.z = 0;
-  EXPECT_FALSE(spline.getSValue(p, 3));
+  EXPECT_NEAR(result.value(), 0.1, EPS);
+  EXPECT_FALSE(spline.getSValue(makePose(10.0, 0.0), 3.0));
 }
 
-TEST(CatmullRomSpline, GetSValue2)
+TEST(CatmullRomSpline, getSValue2)
 {
-  geometry_msgs::msg::Point p0;
-  p0.x = 89122.2;
-  p0.y = 43364.1;
-  p0.z = 3.13364;
-  geometry_msgs::msg::Point p1;
-  p1.x = 89122.5;
-  p1.y = 43363.8;
-  p1.z = 3.13364;
-  geometry_msgs::msg::Point p2;
-  p2.x = 89122.8;
-  p2.y = 43363.4;
-  p2.z = 3.13364;
-  geometry_msgs::msg::Point p3;
-  p3.x = 89123.1;
-  p3.y = 43363.0;
-  p3.z = 3.13364;
-  geometry_msgs::msg::Point p4;
-  p4.x = 89123.4;
-  p4.y = 43362.6;
-  p4.z = 3.13364;
-  auto points = {p0, p1, p2, p3, p4};
+  std::vector<geometry_msgs::msg::Point> points{
+    makePoint(89122.2, 43364.1, 3.13364), makePoint(89122.5, 43363.8, 3.13364),
+    makePoint(89122.8, 43363.4, 3.13364), makePoint(89123.1, 43363.0, 3.13364),
+    makePoint(89123.4, 43362.6, 3.13364)};
   auto spline = math::geometry::CatmullRomSpline(points);
-  geometry_msgs::msg::Pose p;
-  p.position.x = 89122.8;
-  p.position.y = 43363.4;
-  p.position.z = 3.13364;
-  p.orientation.x = -0.0159808;
-  p.orientation.y = -0.00566353;
-  p.orientation.z = -0.453507;
-  p.orientation.w = 0.891092;
-  {
-    const auto result = spline.getSValue(p);
-    EXPECT_TRUE(result);
-    if (result) {
-      EXPECT_DOUBLE_EQ(result.value(), 0.92433178422155371);
-    }
-  }
-  p.position.x = 89122.5;
-  p.position.y = 43363.8;
-  p.position.z = 3.13364;
-  p.orientation.x = 0.0159365;
-  p.orientation.y = -0.00578704;
-  p.orientation.z = -0.446597;
-  p.orientation.w = 0.894575;
-  {
-    const auto result = spline.getSValue(p);
-    EXPECT_TRUE(result);
-    if (result) {
-      EXPECT_DOUBLE_EQ(result.value(), 0.42440442127906564);
-    }
-  }
+
+  geometry_msgs::msg::Pose pose0;
+  pose0.position.x = 89122.8;
+  pose0.position.y = 43363.4;
+  pose0.position.z = 3.13364;
+  pose0.orientation.x = -0.0159808;
+  pose0.orientation.y = -0.00566353;
+  pose0.orientation.z = -0.453507;
+  pose0.orientation.w = 0.891092;
+  const auto result0 = spline.getSValue(pose0);
+  EXPECT_TRUE(result0);
+  EXPECT_DOUBLE_EQ(result0.value(), 0.92433178422155371);
+
+  geometry_msgs::msg::Pose pose1;
+  pose1.position.x = 89122.5;
+  pose1.position.y = 43363.8;
+  pose1.position.z = 3.13364;
+  pose1.orientation.x = 0.0159365;
+  pose1.orientation.y = -0.00578704;
+  pose1.orientation.z = -0.446597;
+  pose1.orientation.w = 0.894575;
+  const auto result1 = spline.getSValue(pose1);
+  EXPECT_TRUE(result1);
+  EXPECT_DOUBLE_EQ(result1.value(), 0.42440442127906564);
 }
 
-TEST(CatmullRomSpline, GetTrajectory)
+TEST(CatmullRomSpline, getSValueEdge)
 {
-  geometry_msgs::msg::Point p0;
-  geometry_msgs::msg::Point p1;
-  p1.x = 1;
-  geometry_msgs::msg::Point p2;
-  p2.x = 2;
-  geometry_msgs::msg::Point p3;
-  p3.x = 3;
-  auto points = {p0, p1, p2, p3};
-  auto spline = math::geometry::CatmullRomSpline(points);
-  auto trajectory = spline.getTrajectory(0, 3, 1.0);
-  EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
-  EXPECT_DECIMAL_EQ(trajectory[0].x, 0, 0.00001);
-  EXPECT_DECIMAL_EQ(trajectory[1].x, 1, 0.00001);
-  EXPECT_DECIMAL_EQ(trajectory[2].x, 2, 0.00001);
-  EXPECT_DECIMAL_EQ(trajectory[3].x, 3, 0.00001);
-  trajectory = spline.getTrajectory(3, 0, 1.0);
-  EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
-  EXPECT_DECIMAL_EQ(trajectory[0].x, 3, 0.00001);
-  EXPECT_DECIMAL_EQ(trajectory[1].x, 2, 0.00001);
-  EXPECT_DECIMAL_EQ(trajectory[2].x, 1, 0.00001);
-  EXPECT_DECIMAL_EQ(trajectory[3].x, 0, 0.00001);
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+  const auto pose = makePose(-2.0, -2.0);
+  EXPECT_FALSE(spline.getSValue(pose, 1.0));
 }
 
-TEST(CatmullRomSpline, CheckThrowingErrorWhenTheControlPointsAreNotEnough)
+TEST(CatmullRomSpline, getSquaredDistanceIn2D)
 {
-  EXPECT_THROW(
-    math::geometry::CatmullRomSpline(std::vector<geometry_msgs::msg::Point>(0)),
-    common::SemanticError);
+  const math::geometry::CatmullRomSpline spline = makeCurve2();
+  const auto distance = spline.getSquaredDistanceIn2D(makePoint(2.0, 2.0), 1.47895776);
+  EXPECT_NEAR(distance, 2.0, 1e-2);
+}
+
+TEST(CatmullRomSpline, getSquaredDistanceIn2DSamePoint)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve2();
+  const auto distance = spline.getSquaredDistanceIn2D(makePoint(1.0, 1.0), 1.47895776);
+  EXPECT_NEAR(distance, 0.0, 1e-2);
+}
+
+TEST(CatmullRomSpline, getSquaredDistanceVector)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve2();
+  const auto vector = spline.getSquaredDistanceVector(makePoint(2.0, 2.0), 1.47895776);
+  EXPECT_POINT_NEAR(vector, makeVector(1.0, 1.0), 1e-2);
+}
+
+TEST(CatmullRomSpline, getSquaredDistanceVectorSamePoint)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve2();
+  const auto vector = spline.getSquaredDistanceVector(makePoint(1.0, 1.0), 1.47895776);
+  EXPECT_POINT_NEAR(vector, makeVector(0.0, 0.0), 1e-2);
+}
+
+TEST(CatmullRomSpline, getTrajectoryLine)
+{
+  std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(1.0, 0.0), makePoint(2.0, 0.0), makePoint(3.0, 0.0)};
+  const auto spline = math::geometry::CatmullRomSpline(points);
+
+  const auto trajectory = spline.getTrajectory(0.0, 3.0, 1.0);
+  EXPECT_EQ(trajectory.size(), static_cast<size_t>(4));
+  EXPECT_POINT_NEAR(trajectory[0], makePoint(0.0, 0.0), EPS);
+  EXPECT_POINT_NEAR(trajectory[1], makePoint(1.0, 0.0), EPS);
+  EXPECT_POINT_NEAR(trajectory[2], makePoint(2.0, 0.0), EPS);
+  EXPECT_POINT_NEAR(trajectory[3], makePoint(3.0, 0.0), EPS);
+
+  const auto trajectory_reverse = spline.getTrajectory(3.0, 0.0, 1.0);
+  EXPECT_EQ(trajectory_reverse.size(), static_cast<size_t>(4));
+  EXPECT_POINT_NEAR(trajectory_reverse[0], makePoint(3.0, 0.0), EPS);
+  EXPECT_POINT_NEAR(trajectory_reverse[1], makePoint(2.0, 0.0), EPS);
+  EXPECT_POINT_NEAR(trajectory_reverse[2], makePoint(1.0, 0.0), EPS);
+  EXPECT_POINT_NEAR(trajectory_reverse[3], makePoint(0.0, 0.0), EPS);
+}
+
+TEST(CatmullRomSpline, getTrajectoryCurve)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve2();
+
+  const auto trajectory = spline.getTrajectory(0.0, 2.957916, 0.5);
+  EXPECT_POINT_NEAR(trajectory[0], makePoint(0.0, 0.0), EPS);
+  EXPECT_POINT_NEAR(trajectory[1], makePoint(0.559992, 0.336669), EPS);
+  EXPECT_POINT_NEAR(trajectory[2], makePoint(0.893292, 0.673338), EPS);
+  EXPECT_POINT_NEAR(trajectory[3], makePoint(0.999898, 1.010091), EPS);
+  EXPECT_POINT_NEAR(trajectory[4], makePoint(0.87779, 1.349586), EPS);
+  EXPECT_POINT_NEAR(trajectory[5], makePoint(0.525168, 1.68908), EPS);
+  EXPECT_POINT_NEAR(trajectory[6], makePoint(0.0, 2.0), EPS);
+
+  const auto trajectory_offset = spline.getTrajectory(0.0, 2.957916, 0.5, -1.0);
+  EXPECT_POINT_NEAR(trajectory_offset[0], makePoint(0.447214, -0.894427), EPS);
+  EXPECT_POINT_NEAR(trajectory_offset[1], makePoint(1.161918, -0.461883), EPS);
+  EXPECT_POINT_NEAR(trajectory_offset[2], makePoint(1.730462, 0.126395), EPS);
+  EXPECT_POINT_NEAR(trajectory_offset[3], makePoint(1.999695, 1.030269), EPS);
+  EXPECT_POINT_NEAR(trajectory_offset[4], makePoint(1.697341, 1.922592), EPS);
+  EXPECT_POINT_NEAR(trajectory_offset[5], makePoint(1.112457, 2.498458), EPS);
+  EXPECT_POINT_NEAR(trajectory_offset[6], makePoint(0.447213, 2.894428), EPS);
+}
+
+TEST(CatmullRomSpline, getTrajectoryEmpty)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve2();
+  const auto trajectory = spline.getTrajectory(0.0, 1.47895776, 2.0);
+  constexpr double eps = 1e-2;
+  EXPECT_EQ(trajectory.size(), static_cast<size_t>(2));
+  EXPECT_POINT_NEAR(trajectory[0], makePoint(0.0, 0.0), eps);
+  EXPECT_POINT_NEAR(trajectory[1], makePoint(1.0, 1.0), eps);
+}
+
+TEST(CatmullRomSpline, initializationNotEnoughControlPoints)
+{
+  const std::vector<geometry_msgs::msg::Point> points;
+  EXPECT_THROW(math::geometry::CatmullRomSpline{points}, common::SemanticError);
 }
 
 int main(int argc, char ** argv)
