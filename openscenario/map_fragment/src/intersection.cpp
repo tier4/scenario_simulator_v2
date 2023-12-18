@@ -15,6 +15,7 @@
 #include <map_fragment/map_fragment.hpp>
 #include <map_fragment/road_segments/generate_lanelet_map.hpp>
 #include <rclcpp/rclcpp.hpp>
+#include <rcpputils/asserts.hpp>
 
 enum IntersectionLeg { LEFT_LEG = 0, BOTTOM_LEG = 1, RIGHT_LEG = 2, TOP_LEG = 3 };
 
@@ -91,13 +92,24 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  RoadSegments road_segments;
-  RoadSegmentConnections road_segment_connections;
-
-  auto total_number_of_lanes_per_leg_per_direction =
+  const auto total_number_of_lanes_per_leg_per_direction =
     number_of_lanes_going_left + number_of_lanes_going_left_and_straight +
     number_of_lanes_going_straight + number_of_lanes_going_in_all_directions +
     number_of_lanes_going_straight_and_right + number_of_lanes_going_right;
+
+  const auto half_leg_width = total_number_of_lanes_per_leg_per_direction * lane_width;
+
+  rcpputils::require_true(
+    turn_radius >= half_leg_width,
+    "Turn radius must not be smaller than half leg width. Actual values:\n"
+    "- Turn radius: " +
+      std::to_string(turn_radius) +
+      "\n"
+      "- Half leg width: " +
+      std::to_string(half_leg_width));
+
+  RoadSegments road_segments;
+  RoadSegmentConnections road_segment_connections;
 
   const IntersectionLeg intersection_legs[] = {LEFT_LEG, BOTTOM_LEG, RIGHT_LEG, TOP_LEG};
 
