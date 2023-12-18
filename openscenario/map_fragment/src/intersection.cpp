@@ -92,6 +92,17 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
+  rcpputils::require_true(
+    number_of_lanes_going_left >= 0 && number_of_lanes_going_left_and_straight >= 0 &&
+      number_of_lanes_going_straight >= 0 && number_of_lanes_going_in_all_directions >= 0 &&
+      number_of_lanes_going_straight_and_right >= 0 && number_of_lanes_going_right >= 0,
+    "Parameters specifying number of lanes must not be smaller than zero");
+
+  rcpputils::require_true(
+    number_of_lanes_going_straight == 0 || number_of_lanes_going_in_all_directions == 0,
+    "Parameter number_of_lanes_going_straight cannot be used in conjunction with "
+    "number_of_lanes_going_in_all_directions");
+
   const auto total_number_of_lanes_per_leg_per_direction =
     number_of_lanes_going_left + number_of_lanes_going_left_and_straight +
     number_of_lanes_going_straight + number_of_lanes_going_in_all_directions +
