@@ -108,6 +108,16 @@ Random test runner will load `result.yaml` file and rerun test.
 
 ```bash
 ros2 launch random_test_runner random_test.launch.py map_name:=shinjuku_map symulator_type:=awsim \
-initialize_duration:=260 sensor_model:=awsim_sensor_kit  vehicle_model:=sample_vehicle            \
-autoware_launch_file:=e2e_simulator.launch.xml timeout_time:=300
+initialize_duration:=260 sensor_model:=awsim_sensor_kit  vehicle_model:=sample_vehicle  \
+autoware_launch_file:=e2e_simulator.launch.xml autoware_architecture:="awf/universe/20230906"
 ```
+
+![Random test runner launched](img/random_test_runner_awsim.png)
+
+### Known isses
+- Due to misalignment of lanalet and some parts of the AWSIM environment, Ego entity is being spawned below the terrain.
+The misalignment will be fixed in a future version of the package.
+
+- when the `npc_count` is too big the NPCs start to slide sideways and the localizaiton does not work properly.
+Reasons are yet unknown and more investigation should be conducted. It was determined that the working number of
+NPCs is 5

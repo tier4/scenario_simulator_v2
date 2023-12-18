@@ -95,13 +95,14 @@ Random test runner parameters are split into three categories:
 
 High level parameters not directly related to the test itself
 
-| Parameter name    | Default value                 | Description                                                                                                               |
-|-------------------|-------------------------------|---------------------------------------------------------------------------------------------------------------------------|
-| `input_dir`       |  `""`                         |  Directory containing the result.yaml file to be replayed. If not empty, tests will be replayed from result.yaml.          |
-| `output_dir`      |  `"/tmp"`                     |  Directory in which result.yaml and result.junit.xml files will be placed after the test suite is executed.                                                |
-| `test_count`      |  `5`                          |  Number of test cases to be performed in the test suite.                                                                   |
-| `simulator_type`  |  `"simple_sensor_simulator"`  |  Backend simulator. Currently supported value is `simple_sensor_simulator`. It should be set only via launch argument. |
-| `initialize_duration`         | `35`                          | How long test runner will wait for Autoware to initialize.                                                                                                                                                                   |
+| Parameter name        | Default value               | Description                                                                                                           |
+|-----------------------|-----------------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `input_dir`           | `""`                        | Directory containing the result.yaml file to be replayed. If not empty, tests will be replayed from result.yaml.      |
+| `output_dir`          | `"/tmp"`                    | Directory in which result.yaml and result.junit.xml files will be placed after the test suite is executed.            |
+| `test_count`          | `5`                         | Number of test cases to be performed in the test suite.                                                               |
+| `test_timeout`        | `60.0`                      | Timeout of each random test.                                                                                          |
+| `simulator_type`      | `"simple_sensor_simulator"` | Backend simulator. Currently supported value is `simple_sensor_simulator`. It should be set only via launch argument. |
+| `initialize_duration` | `35`                        | How long test runner will wait for Autoware to initialize.                                                            |
 
 ### Test suite parameters
 
