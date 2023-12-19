@@ -44,7 +44,7 @@ auto AcquirePositionAction::start() -> void
     });
 
   for (const auto & actor : actors) {
-    for (const auto & object : actor.objects()) {
+    for (const auto & object : actor.objectNames()) {
       apply<void>(acquire_position, position, object);
     }
   }

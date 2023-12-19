@@ -44,9 +44,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TimeHeadwayCondition : private Scope, private SimulatorCore::ConditionEvaluation
+struct TimeHeadwayCondition : private SimulatorCore::ConditionEvaluation
 {
-  const Entity entity_ref;
+  const SingleEntity entity_ref;
 
   const Double value;
 

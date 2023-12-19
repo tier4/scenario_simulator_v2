@@ -23,8 +23,7 @@ inline namespace syntax
 {
 AccelerationCondition::AccelerationCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: Scope(scope),
-  value(readAttribute<Double>("value", node, scope)),
+: value(readAttribute<Double>("value", node, scope)),
   compare(readAttribute<Rule>("rule", node, scope)),
   triggering_entities(triggering_entities),
   results(triggering_entities.entity_refs.size(), {Double::nan()})
@@ -49,7 +48,7 @@ auto AccelerationCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    auto objects = triggering_entity.objects();
+    auto objects = triggering_entity.objectNames();
     std::transform(
       std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [&](const auto & object) { return evaluateAcceleration(object); });

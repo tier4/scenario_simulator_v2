@@ -32,7 +32,7 @@ SpeedAction::SpeedAction(const pugi::xml_node & node, Scope & scope)
 {
   // OpenSCENARIO 1.2 Table 11
   for (const auto & actor : actors) {
-    if (auto object_types = global().entities->objectTypes({actor});
+    if (auto object_types = actor.objectTypes();
         object_types != std::set{ObjectType::vehicle} and
         object_types != std::set{ObjectType::pedestrian}) {
       THROW_SEMANTIC_ERROR(
@@ -57,7 +57,7 @@ auto SpeedAction::accomplished() -> bool
   };
 
   auto check = [this](auto && actor) {
-    auto objects = global().entities->objects({actor});
+    auto objects = actor.objectNames();
     return std::all_of(std::begin(objects), std::end(objects), [&](const auto & object) {
       if (speed_action_target.is<AbsoluteTargetSpeed>()) {
         return equal_to<double>()(
@@ -111,7 +111,7 @@ auto SpeedAction::start() -> void
   }
 
   for (const auto & accomplishment : accomplishments) {
-    for (const auto & object : global().entities->objects({accomplishment.first})) {
+    for (const auto & object : accomplishment.first.objectNames()) {
       if (speed_action_target.is<AbsoluteTargetSpeed>()) {
         applySpeedAction(
           object, speed_action_target.as<AbsoluteTargetSpeed>().value,

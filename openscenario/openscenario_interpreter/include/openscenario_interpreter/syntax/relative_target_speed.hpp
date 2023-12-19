@@ -40,7 +40,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct RelativeTargetSpeed
 {
-  const Entity entity_ref;
+  const SingleEntity entity_ref;
 
   const Double value;
 

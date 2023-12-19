@@ -54,7 +54,7 @@ auto AssignRouteAction::run() -> void {}
 auto AssignRouteAction::start() -> void
 {
   for (const auto & actor : actors) {
-    for (const auto & object : actor.objects()) {
+    for (const auto & object : actor.objectNames()) {
       applyAssignRouteAction(
         object, static_cast<std::vector<NativeLanePosition>>(route.as<const Route>()));
     }

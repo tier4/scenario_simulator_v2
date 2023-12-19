@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/follow_trajectory_action.hpp>
 #include <openscenario_interpreter/syntax/polyline.hpp>
@@ -53,10 +54,12 @@ auto FollowTrajectoryAction::accomplished() -> bool
   } else {
     return std::all_of(
       std::begin(accomplishments), std::end(accomplishments), [this](auto && accomplishment) {
-        auto is_running = [this](auto &&... xs) {
+        auto is_running = [this](auto & actor) {
           if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>()) {
-            return evaluateCurrentState(std::forward<decltype(xs)>(xs)...) ==
-                   "follow_polyline_trajectory";
+            auto objects = actor.objectNames();
+            return std::all_of(std::begin(objects), std::end(objects), [&](auto & object) {
+              return evaluateCurrentState(object) == "follow_polyline_trajectory";
+            });
           } else {
             return false;
           }
@@ -112,7 +115,7 @@ auto FollowTrajectoryAction::start() -> void
     parameter->closed = trajectory_ref.trajectory.as<Trajectory>().closed;
     parameter->shape = repack_trajectory();
 
-    for (auto & object : actor.objects()) {
+    for (auto & object : actor.objectNames()) {
       applyFollowTrajectoryAction(object, parameter);
     }
   }

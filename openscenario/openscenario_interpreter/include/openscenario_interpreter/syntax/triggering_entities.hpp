@@ -38,21 +38,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct TriggeringEntities : private Scope
+struct TriggeringEntities
 {
   const TriggeringEntitiesRule triggering_entities_rule;
 
-  const std::list<Entity> entity_refs;
+  const std::list<GroupedEntity> entity_refs;
 
-  template <typename Candidates>
-  explicit TriggeringEntities(
-    const pugi::xml_node & node, Scope & scope, const Candidates & candidates)
-  : Scope(scope),
-    triggering_entities_rule(
-      readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)),
-    entity_refs(readElements<Entity, 1>("EntityRef", node, scope, candidates))
-  {
-  }
+  explicit TriggeringEntities(const pugi::xml_node & node, Scope & scope);
 
   template <typename Predicate>
   auto apply(Predicate && predicate) const -> decltype(auto)

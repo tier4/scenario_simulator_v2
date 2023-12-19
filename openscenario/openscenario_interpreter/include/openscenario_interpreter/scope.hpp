@@ -190,7 +190,7 @@ class Scope
 public:
   const std::string name;
 
-  std::list<Entity> actors;
+  std::list<GroupedEntity> actors;
 
   double seed;  // NOTE: `seed` is used only for sharing randomSeed in Stochastic now
 
@@ -227,11 +227,6 @@ public:
   auto local() noexcept -> Scope &;
 
   auto insert(const Name &, const Object &) -> void;
-
-  // OpenScenario 1.2 Annex B
-  auto entities(
-    bool entity_selection_allowed = false,
-    bool misc_object_and_external_object_reference_allowed = true) -> std::list<std::string>;
 };
 }  // namespace openscenario_interpreter
 

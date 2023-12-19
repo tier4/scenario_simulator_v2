@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
@@ -31,7 +30,7 @@ RelativeDistanceCondition::RelativeDistanceCondition(
 : Scope(scope),
   coordinate_system(
     readAttribute<CoordinateSystem>("coordinateSystem", node, scope, CoordinateSystem::entity)),
-  entity_ref(readNameRef("entityRef", node, scope, scope.entities())),
+  entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   relative_distance_type(readAttribute<RelativeDistanceType>("relativeDistanceType", node, scope)),
   rule(readAttribute<Rule>("rule", node, scope)),
@@ -304,7 +303,7 @@ auto RelativeDistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    auto objects = global().entities->objects({triggering_entity});
+    auto objects = triggering_entity.objectNames();
     std::transform(
       std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [&](const auto & object) { return distance(object); });

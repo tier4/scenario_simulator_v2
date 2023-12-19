@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iterator>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
@@ -28,24 +27,62 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <stdexcept>
-#include <utility>
-#include <vector>
+
+#include "openscenario_interpreter/reader/attribute.hpp"
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Entity::Entity(const EntityRef & entity_ref, const Scope & scope)
-: Entity(entity_ref, *scope.global().entities)
+EntityBase::EntityBase(const String & name, const Entities & entities) : Object(entities.ref(name))
 {
 }
 
-Entity::Entity(const EntityRef & entity_ref, const Entities & entities)
-: Object(entity_ref.empty() ? Object{} : entities.ref(entity_ref))
+EntityBase::EntityBase(const String & name, Scope & scope)
+: EntityBase(name, *scope.global().entities)
 {
 }
 
-auto Entity::objects() const -> std::set<EntityRef>
+EntityBase::EntityBase(const pugi::xml_node & node, Scope & scope)
+: EntityBase(readAttribute<String>("entityRef", node, scope), scope)
+{
+}
+
+auto operator==(const EntityBase & left, const EntityBase & right) -> bool
+{
+  return left.get() == right.get();
+}
+
+auto EntityBase::name() const -> String { return this->as<Scope>().name; }
+
+auto throwIfNotSingle(const Object & entity) -> void
+{
+  if (not entity.is<ScenarioObject>()) {
+    THROW_SEMANTIC_ERROR("Tried to reference `EntitySelection` where it is forbidden.");
+  }
+}
+
+SingleEntity::SingleEntity(const String & name, const Entities & entities)
+: EntityBase(name, entities)
+{
+  throwIfNotSingle(*this);
+}
+
+SingleEntity::SingleEntity(const String & name, Scope & scope) : EntityBase(name, scope)
+{
+  throwIfNotSingle(*this);
+}
+
+SingleEntity::SingleEntity(const pugi::xml_node & node, Scope & scope) : EntityBase(node, scope)
+{
+  throwIfNotSingle(*this);
+}
+
+SingleEntity::operator String() const { return this->name(); }
+
+SingleEntity::operator EntityRef() const { return this->name(); }
+
+auto GroupedEntity::objectNames() const -> std::set<EntityRef>
 {
   if (is<ScenarioObject>()) {
     return {as<ScenarioObject>().name};
@@ -56,7 +93,7 @@ auto Entity::objects() const -> std::set<EntityRef>
   }
 }
 
-auto Entity::objectTypes() const -> std::set<ObjectType::value_type>
+auto GroupedEntity::objectTypes() const -> std::set<ObjectType::value_type>
 {
   if (is<ScenarioObject>()) {
     return {as<ScenarioObject>().objectType()};

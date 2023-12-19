@@ -17,6 +17,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/by_type.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
@@ -28,7 +29,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 SelectedEntityRefs::SelectedEntityRefs(const pugi::xml_node & tree, Scope & scope)
-: entityRefs(readElements<Entity, 0>("EntityRef", tree, scope, scope.entities(true)))
+: entityRefs(readElements<GroupedEntity, 0>("EntityRef", tree, scope))
 {
 }
 

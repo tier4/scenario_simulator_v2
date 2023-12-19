@@ -17,12 +17,12 @@
 
 #include <cstddef>
 #include <functional>
-#include <scenario_simulator_exception/exception.hpp>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <set>
 
 namespace openscenario_interpreter
@@ -33,33 +33,60 @@ inline namespace syntax
 {
 struct Entities;
 
-struct Entity : public Object
+struct EntityBase : public Object
 {
-  Entity() = default;
+  EntityBase() = default;
 
-  template <typename Candidates>
-  explicit Entity(const pugi::xml_node & node, Scope & scope, const Candidates & candidates)
-  : Entity(EntityRef{node, scope, candidates}, scope)
-  {
-  }
+  EntityBase(const String & name, const Entities & entities);
 
-  explicit Entity(const EntityRef & entity_ref, const Scope & scope);
+  EntityBase(const String & name, Scope & scope);
 
-  explicit Entity(const EntityRef & entity_ref, const Entities & entities);
+  EntityBase(const pugi::xml_node & node, Scope & scope);
 
-  auto objects() const -> std::set<EntityRef>;
+  auto name() const -> String;
+};
+
+auto operator==(const EntityBase & left, const EntityBase & right) -> bool;
+
+struct SingleEntity : public EntityBase
+{
+  SingleEntity() = default;
+
+  SingleEntity(const String & name, const Entities & entities);
+
+  SingleEntity(const String & name, Scope & scope);
+
+  SingleEntity(const pugi::xml_node & node, Scope & scope);
+
+  operator String() const;
+
+  operator EntityRef() const;
+};
+
+struct GroupedEntity : public EntityBase
+{
+  using EntityBase::EntityBase;
+
+  auto objectNames() const -> std::set<EntityRef>;
 
   auto objectTypes() const -> std::set<ObjectType::value_type>;
 };
-
-auto operator==(const Entity & left, const Entity & right) { return left.get() == right.get(); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
 template <>
-struct std::hash<openscenario_interpreter::Entity>
+struct std::hash<openscenario_interpreter::SingleEntity>
 {
-  auto operator()(const openscenario_interpreter::Entity & entity) const -> std::size_t
+  auto operator()(const openscenario_interpreter::SingleEntity & entity) const -> std::size_t
+  {
+    return std::hash<void *>{}(entity.get());
+  }
+};
+
+template <>
+struct std::hash<openscenario_interpreter::GroupedEntity>
+{
+  auto operator()(const openscenario_interpreter::GroupedEntity & entity) const -> std::size_t
   {
     return std::hash<void *>{}(entity.get());
   }

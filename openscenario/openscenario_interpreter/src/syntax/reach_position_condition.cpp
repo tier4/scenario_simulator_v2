@@ -27,8 +27,7 @@ inline namespace syntax
 {
 ReachPositionCondition::ReachPositionCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: Scope(scope),
-  tolerance(readAttribute<Double>("tolerance", node, scope)),
+: tolerance(readAttribute<Double>("tolerance", node, scope)),
   position(readElement<Position>("Position", node, scope)),
   compare(Rule::lessThan),
   triggering_entities(triggering_entities),
@@ -77,7 +76,7 @@ auto ReachPositionCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    auto objects = global().entities->objects({triggering_entity});
+    auto objects = triggering_entity.objectNames();
     std::transform(
       std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [&](const auto & object) { return apply<Double>(distance, position, object); });

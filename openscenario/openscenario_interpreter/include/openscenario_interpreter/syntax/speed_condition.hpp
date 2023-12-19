@@ -37,7 +37,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluation
+struct SpeedCondition : private SimulatorCore::ConditionEvaluation
 {
   const Double value;
 

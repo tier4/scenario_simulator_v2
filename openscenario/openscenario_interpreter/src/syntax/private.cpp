@@ -14,7 +14,6 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/syntax/private.hpp>
 #include <openscenario_interpreter/utility/demangle.hpp>
 
@@ -23,7 +22,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 Private::Private(const pugi::xml_node & node, Scope & scope)
-: Scope(scope), entity_ref(readNameRef("entityRef", node, local(), scope.entities(true)))
+: Scope(scope), entity_ref(readAttribute<String>("entityRef", node, local()), scope)
 {
   actors.emplace_back(entity_ref);
 
@@ -88,7 +87,7 @@ auto Private::startNonInstantaneousActions() -> void
 
 auto operator<<(nlohmann::json & json, const Private & datum) -> nlohmann::json &
 {
-  json["entityRef"] = datum.entity_ref;
+  json["entityRef"] = datum.entity_ref.name();
 
   json["PrivateAction"] = nlohmann::json::array();
 

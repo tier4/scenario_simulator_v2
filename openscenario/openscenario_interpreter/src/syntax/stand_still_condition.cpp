@@ -23,8 +23,7 @@ inline namespace syntax
 {
 StandStillCondition::StandStillCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: Scope(scope),
-  duration(readAttribute<Double>("duration", node, scope)),
+: duration(readAttribute<Double>("duration", node, scope)),
   compare(Rule::greaterThan),
   triggering_entities(triggering_entities),
   results(triggering_entities.entity_refs.size(), {Double::nan()})
@@ -49,7 +48,7 @@ auto StandStillCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    auto objects = global().entities->objects({triggering_entity});
+    auto objects = triggering_entity.objectNames();
     std::transform(
       std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [](const auto & object) { return evaluateStandStill(object); });

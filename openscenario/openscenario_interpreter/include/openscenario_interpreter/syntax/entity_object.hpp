@@ -41,7 +41,7 @@ struct EntityObject : public Group
 {
   explicit EntityObject(const pugi::xml_node &, Scope &);
 
-  auto objectType() const -> ObjectType;
+  auto objectType() const -> ObjectType::value_type;
 };
 
 DEFINE_LAZY_VISITOR(

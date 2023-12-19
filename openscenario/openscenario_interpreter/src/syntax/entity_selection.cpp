@@ -42,7 +42,7 @@ auto EntitySelection::objects() const -> std::set<EntityRef>
       [&](const SelectedEntityRefs & entity_refs) {
         auto result = std::set<EntityRef>{};
         for (const auto & entity_ref : entity_refs.entityRefs) {
-          result.merge(entity_ref.objects());
+          result.merge(entity_ref.objectNames());
         }
         return result;
       },

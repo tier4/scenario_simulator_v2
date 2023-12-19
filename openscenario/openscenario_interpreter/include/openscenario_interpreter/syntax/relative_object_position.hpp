@@ -44,7 +44,7 @@ struct RelativeObjectPosition : private SimulatorCore::CoordinateSystemConversio
 {
   const Orientation orientation;
 
-  const Entity entity_ref;
+  const SingleEntity entity_ref;
 
   const Double dx, dy, dz;
 

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
@@ -24,8 +23,7 @@ inline namespace syntax
 {
 TimeHeadwayCondition::TimeHeadwayCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: Scope(scope),
-  entity_ref(readNameRef("entityRef", node, scope, scope.entities())),
+: entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   value(readAttribute<Double>("value", node, scope)),
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   along_route(readAttribute<Boolean>("alongRoute", node, scope)),
@@ -54,7 +52,7 @@ auto TimeHeadwayCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    auto objects = global().entities->objects({triggering_entity});
+    auto objects = triggering_entity.objectNames();
     std::transform(
       std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
       [&](const auto & object) { return evaluateTimeHeadway(entity_ref, object); });

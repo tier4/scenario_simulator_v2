@@ -54,7 +54,7 @@ auto ControllerAction::run() noexcept -> void {}
 auto ControllerAction::start() const -> void
 {
   for (const auto & actor : actors) {
-    for (const auto & object : actor.objects()) {
+    for (const auto & object : actor.objectNames()) {
       assign_controller_action(object);
     }
   }

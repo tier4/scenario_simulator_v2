@@ -37,9 +37,9 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct EntityAction : public ComplexType, private Scope
+struct EntityAction : public ComplexType
 {
-  const Entity entity_ref;
+  const GroupedEntity entity_ref;
 
   explicit EntityAction(const pugi::xml_node &, Scope &);
 

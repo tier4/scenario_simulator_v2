@@ -24,7 +24,7 @@ ByEntityCondition::ByEntityCondition(const pugi::xml_node & node, Scope & scope)
 : Scope(scope),
   EntityCondition(readElement<EntityCondition>(
     "EntityCondition", node, local(),
-    readElement<TriggeringEntities>("TriggeringEntities", node, local(), scope.entities(true))))
+    readElement<TriggeringEntities>("TriggeringEntities", node, local())))
 {
 }
 }  // namespace syntax

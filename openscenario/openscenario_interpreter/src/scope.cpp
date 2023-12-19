@@ -134,20 +134,4 @@ auto Scope::insert(const Name & identifier, const Object & object) -> void
 {
   return frame->define(identifier, object);
 }
-
-auto Scope::entities(
-  bool entity_selection_allowed, bool misc_object_and_external_object_reference_allowed)
-  -> std::list<std::string>
-{
-  auto entity_list = std::list<std::string>();
-  for (const auto & [entity, object] : scenario_definition->entities->entities) {
-    if (
-      (entity_selection_allowed or not object.is<EntitySelection>()) and
-      (misc_object_and_external_object_reference_allowed or
-       not(object.is<MiscObject>() or object.is<ExternalObjectReference>()))) {
-      entity_list.push_back(entity);
-    }
-  }
-  return entity_list;
-}
 }  // namespace openscenario_interpreter

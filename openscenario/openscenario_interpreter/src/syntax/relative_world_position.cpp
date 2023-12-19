@@ -14,7 +14,6 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/syntax/relative_world_position.hpp>
 
 namespace openscenario_interpreter
@@ -23,7 +22,7 @@ inline namespace syntax
 {
 RelativeWorldPosition::RelativeWorldPosition(const pugi::xml_node & node, Scope & scope)
 : orientation(readElement<Orientation>("Orientation", node, scope)),
-  entity_ref(readNameRef("entityRef", node, scope, scope.entities())),
+  entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   dx(readAttribute<Double>("dx", node, scope)),
   dy(readAttribute<Double>("dy", node, scope)),
   dz(readAttribute<Double>("dz", node, scope, Double()))

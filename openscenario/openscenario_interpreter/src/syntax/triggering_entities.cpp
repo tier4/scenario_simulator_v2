@@ -19,6 +19,13 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+TriggeringEntities::TriggeringEntities(const pugi::xml_node & node, Scope & scope)
+: triggering_entities_rule(
+    readAttribute<TriggeringEntitiesRule>("triggeringEntitiesRule", node, scope)),
+  entity_refs(readElements<GroupedEntity, 1>("EntityRef", node, scope))
+{
+}
+
 auto TriggeringEntities::description() const -> String
 {
   std::stringstream description;

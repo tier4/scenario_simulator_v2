@@ -15,8 +15,8 @@
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/reader/name_ref.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>
@@ -34,7 +34,7 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
   // for `SpeedProfileAction.entityRef`. It seems `EntitySelection` can be used only when
   // it is the subject of any actions or conditions, so I left default allowance of entities
   // and `EntitySelection` is not allowed here.
-  entity_ref(readNameRef("entityRef", node, scope, scope.entities(), String()), scope),
+  entity_ref(readAttribute<String>("entityRef", node, scope, String()), scope),
   following_mode(readAttribute<FollowingMode>("followingMode", node, scope)),
   dynamic_constraints(
     readElement<DynamicConstraints>("DynamicConstraints", node, scope, DynamicConstraints())),
@@ -51,8 +51,8 @@ SpeedProfileAction::SpeedProfileAction(const pugi::xml_node & node, Scope & scop
   }
 }
 
-auto SpeedProfileAction::apply(const Entity & actor, const SpeedProfileEntry & speed_profile_entry)
-  -> void
+auto SpeedProfileAction::apply(
+  const GroupedEntity & actor, const SpeedProfileEntry & speed_profile_entry) -> void
 {
   auto absolute_target_speed = [&]() { return speed_profile_entry.speed; };
 
@@ -91,7 +91,7 @@ auto SpeedProfileAction::apply(const Entity & actor, const SpeedProfileEntry & s
     }
   };
 
-  for (const auto & object : actor.objects()) {
+  for (const auto & object : actor.objectNames()) {
     applyProfileAction(object, dynamic_constraints);
 
     if (entity_ref) {
@@ -121,7 +121,7 @@ auto SpeedProfileAction::run() -> void
 {
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-      auto objects = actor.objects();
+      auto objects = actor.objectNames();
       return std::all_of(std::begin(objects), std::end(objects), [&](const auto & object) {
         if (entity_ref) {
           return equal_to<double>()(evaluateSpeed(object), speed_profile_entry.speed);

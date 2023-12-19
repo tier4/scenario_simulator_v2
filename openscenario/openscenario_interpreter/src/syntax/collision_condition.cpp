@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/collision_condition.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 
 namespace openscenario_interpreter
@@ -28,7 +29,7 @@ CollisionCondition::CollisionCondition(
 : Scope(scope),
   another_given_entity(
     choice(node,
-      std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope, scope.entities()); }),
+      std::make_pair("EntityRef", [&](auto && node) { return make<SingleEntity>(node, scope); }),
       std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
   triggering_entities(triggering_entities)
 // clang-format on
@@ -54,7 +55,7 @@ auto CollisionCondition::evaluate() const -> Object
     another_given_entity.is<EntityRef>() and
     global().entities->isAdded(another_given_entity.as<EntityRef>())) {
     return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-      auto objects = triggering_entity.objects();
+      auto objects = triggering_entity.objectNames();
       return std::any_of(std::begin(objects), std::end(objects), [&](const auto & object) {
         return evaluateCollisionCondition(object, another_given_entity.as<EntityRef>());
       });

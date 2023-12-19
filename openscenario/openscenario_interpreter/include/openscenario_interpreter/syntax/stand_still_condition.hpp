@@ -33,7 +33,7 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct StandStillCondition : private Scope, private SimulatorCore::ConditionEvaluation
+struct StandStillCondition : private SimulatorCore::ConditionEvaluation
 {
   const Double duration;
 

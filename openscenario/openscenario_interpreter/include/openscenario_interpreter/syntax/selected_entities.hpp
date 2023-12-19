@@ -26,7 +26,7 @@ inline namespace syntax
 {
 struct SelectedEntityRefs : public Object
 {
-  const std::list<Entity> entityRefs;
+  const std::list<GroupedEntity> entityRefs;
 
   explicit SelectedEntityRefs(const pugi::xml_node &, Scope &);
 };

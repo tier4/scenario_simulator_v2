@@ -47,7 +47,7 @@ auto LaneChangeAction::accomplished() -> bool
 {
   return std::all_of(
     std::begin(accomplishments), std::end(accomplishments), [&](auto & accomplishment) {
-      auto objects = accomplishment.first.objects();
+      auto objects = accomplishment.first.objectNames();
       return accomplishment.second or
              (accomplishment.second = not std::all_of(
                 std::begin(objects), std::end(objects),
@@ -68,7 +68,7 @@ auto LaneChangeAction::start() -> void
   }
 
   for (const auto & accomplishment : accomplishments) {
-    for (const auto & object : accomplishment.first.objects()) {
+    for (const auto & object : accomplishment.first.objectNames()) {
       if (lane_change_target.is<AbsoluteTargetLane>()) {
         applyLaneChangeAction(
           object, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),

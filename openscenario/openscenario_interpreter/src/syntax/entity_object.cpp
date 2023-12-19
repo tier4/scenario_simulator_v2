@@ -37,9 +37,10 @@ EntityObject::EntityObject(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto EntityObject::objectType() const -> ObjectType
+auto EntityObject::objectType() const -> ObjectType::value_type
 {
-  return apply<ObjectType>([](const auto & object) { return object.object_type; }, *this);
+  return apply<ObjectType::value_type>(
+    [](const auto & object) { return object.object_type; }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

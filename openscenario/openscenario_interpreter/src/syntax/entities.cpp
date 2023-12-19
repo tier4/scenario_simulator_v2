@@ -40,7 +40,7 @@ Entities::Entities(const pugi::xml_node & node, Scope & scope)
 
 auto Entities::isAdded(const EntityRef & entity_ref) const -> bool
 {
-  auto object_list = Entity{entity_ref, *this}.objects();
+  auto object_list = GroupedEntity{entity_ref, *this}.objectNames();
   return std::all_of(std::begin(object_list), std::end(object_list), [&](const String & object) {
     if (auto entity = ref(object); entity.is<ScenarioObject>()) {
       return entity.as<ScenarioObject>().is_added;

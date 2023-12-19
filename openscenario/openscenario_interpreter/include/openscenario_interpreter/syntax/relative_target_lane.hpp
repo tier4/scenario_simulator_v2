@@ -34,7 +34,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct RelativeTargetLane
 {
-  const Entity entity_ref;
+  const SingleEntity entity_ref;
 
   const Integer value;
 
