@@ -27,11 +27,11 @@ Entities::Entities(const pugi::xml_node & node, Scope & scope)
   scope.global().entities = this;
 
   traverse<0, unbounded>(node, "ScenarioObject", [&](auto && node) {
-    entities.emplace(readAttribute<String>("name", node, scope), make<ScenarioObject>(node, scope));
+    emplace(readAttribute<String>("name", node, scope), make<ScenarioObject>(node, scope));
   });
 
   traverse<0, unbounded>(node, "EntitySelection", [&](auto && node) {
-    entities.emplace(
+    emplace(
       readAttribute<String>("name", node, scope), make<EntitySelection>(node, scope));
   });
 }
@@ -52,10 +52,10 @@ auto Entities::isAdded(const EntityRef & entity_ref) const -> bool
 
 auto Entities::ref(const EntityRef & entity_ref) const -> Object
 {
-  if (auto entry = entities.find(entity_ref); entry == std::end(entities)) {
+  try {
+    return at(entity_ref);
+  } catch (const std::out_of_range &) {
     throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");
-  } else {
-    return entry->second;
   }
 }
 }  // namespace syntax
