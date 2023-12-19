@@ -55,6 +55,8 @@ constexpr auto number_of_lanes = 1;
 
 constexpr auto resolution = 100;
 
+constexpr auto turn_radius = 50.0;
+
 constexpr auto width = 10.0;
 }  // namespace default_value
 

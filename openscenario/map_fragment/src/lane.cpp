@@ -13,12 +13,13 @@
 // limitations under the License.
 
 #include <map_fragment/map_fragment.hpp>
-#include <map_fragment/road_segment.hpp>
+#include <map_fragment/road_segments/generate_lanelet_map.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
 try {
   using namespace map_fragment;
+  using namespace map_fragment::road_segments;
 
   rclcpp::init(argc, argv);
 
@@ -54,9 +55,8 @@ try {
     return std::filesystem::path(node.get_parameter("output_directory").as_string());
   }();
 
-  const auto segment = makeCurvedRoadSegment(curvature, length, number_of_lanes, width);
-  const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
-
+  const auto map = generateLaneletMap(
+    {makeCurvedRoadSegment(curvature, length, number_of_lanes, width)}, resolution);
   map_fragment::write(*map, output_directory);
 
   std::cout << output_directory.c_str() << std::endl;

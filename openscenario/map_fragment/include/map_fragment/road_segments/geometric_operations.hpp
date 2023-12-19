@@ -12,24 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
-#define MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
+#ifndef MAP_FRAGMENT__ROAD_SGEMENTS__GEOMETRIC_OPERATIONS__HPP_
+#define MAP_FRAGMENT__ROAD_SEGMENTS__GEOMETRIC_OPERATIONS__HPP_
 
+#include <boost/test/tools/floating_point_comparison.hpp>
 #include <cmath>
-#include <map_fragment/aliases.hpp>
+#include <map_fragment/road_segments/geometry_aliases.hpp>
 #include <rcpputils/asserts.hpp>
 #include <stdexcept>
 #include <string>
 
-namespace map_fragment
+namespace map_fragment::road_segments
 {
+constexpr auto TOLERANCE_FOR_FLOATING_POINT_COMPARISONS = 1e-6;
+using close_at_tolerance = boost::math::fpc::close_at_tolerance<double>;
+using small_with_tolerance = boost::math::fpc::small_with_tolerance<double>;
+
+auto makeTranslation(const double x, const double y, const double z) -> Transformation
+{
+  const auto translation = Eigen::Translation<Vector::Scalar, 3>(x, y, z);
+  return Transformation(translation);
+}
+
+auto makeRotationInZAxis(const double angle) -> Transformation
+{
+  const auto rotation = Eigen::AngleAxis(angle, Eigen::Vector3d::UnitZ());
+  return Transformation(rotation);
+}
+
 /**
  * Rotate a point or vector in z axis by a given angle.
  */
 auto rotateInZAxis(const PointOrVector & point_or_vector, const double angle) -> PointOrVector
 {
-  const auto rotation = Eigen::AngleAxis(angle, PointOrVector::UnitZ());
-  const auto transformation = Transformation(rotation);
+  const auto transformation = makeRotationInZAxis(angle);
   return transformation * point_or_vector;
 }
 
@@ -38,8 +54,7 @@ auto rotateInZAxis(const PointOrVector & point_or_vector, const double angle) ->
  */
 auto vectorToTranslation(const Vector & vector) -> Transformation
 {
-  const auto translation = Eigen::Translation<Vector::Scalar, 3>(vector);
-  return Transformation(translation);
+  return makeTranslation(vector.x(), vector.y(), vector.z());
 }
 
 /**
@@ -121,6 +136,32 @@ auto applyTransformationToVector(const Vector & vector, const Transformation & t
 {
   return transformation.rotation() * vector;
 }
-}  // namespace map_fragment
 
-#endif  // MAP_FRAGMENT__GEOMETRIC_OPERATIONS__HPP_
+/**
+ * Check whether two unit vectors are in the same direction.
+ */
+auto areUnitVectorsInTheSameDirection(const Vector & first, const Vector & second) -> bool
+{
+  rcpputils::require_true(
+    close_at_tolerance(TOLERANCE_FOR_FLOATING_POINT_COMPARISONS)(first.norm(), 1.0),
+    "First vector must be unit");
+
+  rcpputils::require_true(
+    close_at_tolerance(TOLERANCE_FOR_FLOATING_POINT_COMPARISONS)(second.norm(), 1.0),
+    "Second vector must be unit");
+
+  const auto dot_product = first.dot(second);
+  return close_at_tolerance(TOLERANCE_FOR_FLOATING_POINT_COMPARISONS)(dot_product, 1.0);
+}
+
+/**
+ * Check whether two points overlap.
+ */
+auto doPointsOverlap(const Point & first, const Point & second) -> bool
+{
+  const auto euclidean_distance = (first - second).norm();
+  return small_with_tolerance(TOLERANCE_FOR_FLOATING_POINT_COMPARISONS)(euclidean_distance);
+}
+}  // namespace map_fragment::road_segments
+
+#endif  // MAP_FRAGMENT__ROAD_SEGMENTS__GEOMETRIC_OPERATIONS__HPP_

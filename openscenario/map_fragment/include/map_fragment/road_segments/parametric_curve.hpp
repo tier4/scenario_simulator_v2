@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__PARAMETRIC_CURVE__HPP_
-#define MAP_FRAGMENT__PARAMETRIC_CURVE__HPP_
+#ifndef MAP_FRAGMENT__ROAD_SEGMENTS__PARAMETRIC_CURVE__HPP_
+#define MAP_FRAGMENT__ROAD_SEGMENTS__PARAMETRIC_CURVE__HPP_
 
-#include <map_fragment/geometric_operations.hpp>
+#include <map_fragment/road_segments/geometric_operations.hpp>
 #include <memory>
 #include <rcpputils/asserts.hpp>
 #include <utility>
 
-namespace map_fragment
+namespace map_fragment::road_segments
 {
 
 /**
@@ -211,6 +211,78 @@ private:
     return std::make_pair(curve_index, curve_tangent);
   }
 };  // class CombinedCurve
-}  // namespace map_fragment
 
-#endif  // MAP_FRAGMENT__PARAMETRIC_CURVE__HPP_
+/**
+ * Geometric transformation applied to a base curve.
+ */
+class TransformedCurve : public ParametricCurve
+{
+public:
+  const ParametricCurve::ConstSharedPointer base_curve_;
+  const Transformation transformation_;
+
+  explicit TransformedCurve(
+    const ParametricCurve::ConstSharedPointer base_curve, const Transformation & transformation)
+  : base_curve_(base_curve), transformation_(transformation)
+  {
+  }
+
+private:
+  auto getPositionWithParameterValidated(const double tangent) const -> Point override
+  {
+    return applyTransformationToPoint(base_curve_->getPosition(tangent), transformation_);
+  }
+
+  auto getUnitTangentVectorWithParameterValidated(const double tangent) const -> Vector override
+  {
+    return applyTransformationToVector(base_curve_->getUnitTangentVector(tangent), transformation_);
+  }
+};  // class TransformedCurve
+
+auto transformCurve(
+  const ParametricCurve::ConstSharedPointer & curve_in, const Transformation & transformation)
+  -> ParametricCurve::ConstSharedPointer
+{
+  return std::make_shared<TransformedCurve>(curve_in, transformation);
+}
+
+/**
+ * Lateral shift applied to a base curve.
+ */
+class LaterallyShiftedCurve : public ParametricCurve
+{
+public:
+  const ParametricCurve::ConstSharedPointer base_curve_;
+  const double lateral_shift_;
+
+  explicit LaterallyShiftedCurve(
+    const ParametricCurve::ConstSharedPointer base_curve, const double lateral_shift)
+  : base_curve_(base_curve), lateral_shift_(lateral_shift)
+  {
+  }
+
+private:
+  auto getPositionWithParameterValidated(const double tangent) const -> Point override
+  {
+    auto base_position = base_curve_->getPosition(tangent);
+    auto normal_vector =
+      rotateInLocalZAxisAssumingZeroRoll(base_curve_->getUnitTangentVector(tangent), M_PI_2);
+
+    return base_position + normal_vector * lateral_shift_;
+  }
+
+  auto getUnitTangentVectorWithParameterValidated(const double tangent) const -> Vector override
+  {
+    return base_curve_->getUnitTangentVector(tangent);
+  }
+};  // class LaterallyShiftedCurve
+
+auto shiftCurveLaterally(
+  const ParametricCurve::ConstSharedPointer & curve_in, const double & lateral_offset)
+  -> ParametricCurve::ConstSharedPointer
+{
+  return std::make_shared<LaterallyShiftedCurve>(curve_in, lateral_offset);
+}
+}  // namespace map_fragment::road_segments
+
+#endif  // MAP_FRAGMENT__ROAD_SEGMENTS__PARAMETRIC_CURVE__HPP_

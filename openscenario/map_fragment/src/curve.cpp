@@ -13,12 +13,13 @@
 // limitations under the License.
 
 #include <map_fragment/map_fragment.hpp>
-#include <map_fragment/road_segment.hpp>
+#include <map_fragment/road_segments/generate_lanelet_map.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 auto main(const int argc, char const * const * const argv) -> int
 try {
   using namespace map_fragment;
+  using namespace map_fragment::road_segments;
 
   rclcpp::init(argc, argv);
 
@@ -84,9 +85,9 @@ try {
 
   const RoadCrossSectionDescription cross_section_description(
     2 * number_of_lanes_per_direction, width, number_of_lanes_per_direction);
-  const RoadSegment segment(guide_curve, cross_section_description);
 
-  const auto map = lanelet::utils::createMap(segment.getLanelets(resolution));
+  const auto map = generateLaneletMap(
+    {std::make_shared<RoadSegment>(guide_curve, cross_section_description)}, resolution);
 
   map_fragment::write(*map, output_directory);
 
