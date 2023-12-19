@@ -178,8 +178,8 @@ auto RelativeDistanceCondition::distance<
   -> double
 {
   if (
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
     /*
        For historical reasons, signed distances are returned when
        coordinateSystem == lane and relativeDistanceType ==
@@ -206,8 +206,8 @@ auto RelativeDistanceCondition::distance<
   const EntityRef & triggering_entity) -> double
 {
   if (
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added) {
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     /*
        For historical reasons, signed distances are returned when
        coordinateSystem == lane and relativeDistanceType ==
@@ -234,8 +234,8 @@ auto RelativeDistanceCondition::distance<
   const EntityRef & triggering_entity) -> double
 {
   if (
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added) {
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     /*
        For historical reasons, signed distances are returned when
        coordinateSystem == lane and relativeDistanceType ==
