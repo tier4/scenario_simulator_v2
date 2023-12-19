@@ -30,8 +30,7 @@ TeleportAction::TeleportAction(const pugi::xml_node & node, Scope & scope)
 {
   // OpenSCENARIO 1.2 Table 11
   for (const auto & actor : actors) {
-    if (auto object_types = actor.objectTypes();
-        object_types.count(ObjectType::external)) {
+    if (auto object_types = actor.objectTypes(); object_types.count(ObjectType::external)) {
       THROW_SEMANTIC_ERROR(
         "Actors cannot be ExternalObjectReference; See OpenSCENARIO 1.2 Table 11 for more details");
     }
