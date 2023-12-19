@@ -31,7 +31,8 @@
 
 RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 : Node("random_test_runner", option), error_reporter_(get_logger())
-{}
+{
+}
 
 void RandomTestRunner::initialize()
 {
@@ -100,7 +101,8 @@ void RandomTestRunner::initialize()
       error_reporter_.spawnTestCase(validated_params.test_name, std::to_string(test_id)),
       test_control_parameters.simulator_type, test_control_parameters.architecture_type,
       get_logger());
-    yaml_test_params_saver.addTestCase(test_case_parameters_vector[test_id], validated_params.test_name);
+    yaml_test_params_saver.addTestCase(
+      test_case_parameters_vector[test_id], validated_params.test_name);
   }
 
   current_test_executor_ = test_executors_.begin();
@@ -141,7 +143,8 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
 }
 
 random_test_runner::Params::TestSuite RandomTestRunner::validateParameters(
-  const random_test_runner::Params::TestSuite & parameters, std::shared_ptr<LaneletUtils> lanelet_utils)
+  const random_test_runner::Params::TestSuite & parameters,
+  std::shared_ptr<LaneletUtils> lanelet_utils)
 {
   auto tp = parameters;
 

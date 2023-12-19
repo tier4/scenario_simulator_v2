@@ -23,8 +23,8 @@
 #include "random_test_runner/data_types.hpp"
 #include "random_test_runner/lanelet_utils.hpp"
 #include "random_test_runner/randomizers.hpp"
-#include "traffic_simulator/api/api.hpp"
 #include "test_suite_parameters.hpp"
+#include "traffic_simulator/api/api.hpp"
 
 class LaneletUtils;
 
@@ -42,7 +42,7 @@ private:
     const traffic_simulator_msgs::msg::LaneletPose & start,
     const traffic_simulator_msgs::msg::LaneletPose & goal);
   traffic_simulator_msgs::msg::LaneletPose generateRandomPoseWithinMinDistanceFromPosesFromLanelets(
-    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses,const double min_distance,
+    const std::vector<traffic_simulator_msgs::msg::LaneletPose> & poses, const double min_distance,
     const std::vector<LaneletPart> & lanelets, const double offset = 0.0);
   std::pair<traffic_simulator_msgs::msg::LaneletPose, traffic_simulator_msgs::msg::LaneletPose>
   generateEgoRoute(

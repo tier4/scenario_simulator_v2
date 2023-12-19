@@ -43,7 +43,8 @@ private:
   TestCaseParameters collectTestCaseParameters();
 
   static random_test_runner::Params::TestSuite validateParameters(
-    const random_test_runner::Params::TestSuite & parameters, std::shared_ptr<LaneletUtils> hdmap_utils);
+    const random_test_runner::Params::TestSuite & parameters,
+    std::shared_ptr<LaneletUtils> hdmap_utils);
 
   void update();
   void start();

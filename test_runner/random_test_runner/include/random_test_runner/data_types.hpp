@@ -26,11 +26,10 @@
 #include <traffic_simulator/data_type/entity_status.hpp>
 
 #include "spdlog/fmt/fmt.h"
+#include "test_suite_parameters.hpp"
 #include "traffic_simulator_msgs/msg/action_status.hpp"
 #include "traffic_simulator_msgs/msg/entity_status.hpp"
 #include "traffic_simulator_msgs/msg/lanelet_pose.hpp"
-#include "test_suite_parameters.hpp"
-
 
 struct NPCVehicleDescription
 {

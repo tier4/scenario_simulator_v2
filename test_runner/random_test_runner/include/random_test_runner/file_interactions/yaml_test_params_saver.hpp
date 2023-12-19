@@ -24,8 +24,8 @@
 #include <rclcpp/logger.hpp>
 
 #include "random_test_runner/data_types.hpp"
-#include "test_suite_parameters.hpp"
 #include "spdlog/fmt/fmt.h"
+#include "test_suite_parameters.hpp"
 
 namespace YAML
 {
@@ -122,7 +122,8 @@ public:
   {
   }
 
-  void addTestSuite(const random_test_runner::Params::TestSuite & test_parameters, const std::string & description)
+  void addTestSuite(
+    const random_test_runner::Params::TestSuite & test_parameters, const std::string & description)
   {
     yaml_[description] = test_parameters;
   }
@@ -154,7 +155,8 @@ public:
         "suites (currently only one is supported)");
     }
 
-    random_test_runner::Params::TestSuite test_suite_parameters = yaml_.begin()->second.as<random_test_runner::Params::TestSuite>();
+    random_test_runner::Params::TestSuite test_suite_parameters =
+      yaml_.begin()->second.as<random_test_runner::Params::TestSuite>();
     std::vector<TestCaseParameters> test_cases_parameters;
     auto test_cases_yaml = yaml_.begin()->second["test_cases"];
     for (YAML::iterator test_case_it = test_cases_yaml.begin();
