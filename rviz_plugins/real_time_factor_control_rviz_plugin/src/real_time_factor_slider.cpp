@@ -48,7 +48,7 @@ void RealTimeFactorSliderPanel::onChangedRealTimeFactorValue(int real_time_facto
   value_label_->setText(QString("x ") + QString::number(msg.data, 'f', 2));
 }
 
-void RealTimeFactorSliderPanel::onInitialize()
+auto RealTimeFactorSliderPanel::onInitialize() -> void
 {
   rclcpp::Node::SharedPtr raw_node =
     this->getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();

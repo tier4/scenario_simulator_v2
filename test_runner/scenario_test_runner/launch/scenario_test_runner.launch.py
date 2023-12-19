@@ -171,8 +171,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=[{"port": port}]+make_vehicle_parameters()+[{"use_sim_time": True}],
-            # parameters=[{"port": port}]+make_vehicle_parameters(),
+            parameters=[{"port": port}, {"use_sim_time": True}]+make_vehicle_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
@@ -185,7 +184,7 @@ def launch_setup(context, *args, **kwargs):
             executable="openscenario_interpreter_node",
             namespace="simulation",
             output="screen",
-            parameters=make_parameters(),
+            parameters=[{"use_sim_time": True}]+make_parameters(),
             on_exit=ShutdownOnce(),
         ),
         Node(
