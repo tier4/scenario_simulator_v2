@@ -95,45 +95,6 @@ class RandomTestRunnerLaunch(object):
 
             "initialize_duration": {"default": 35, "description": "How long test runner will wait for Autoware to initialize"},
 
-            # test suite arguments #
-            "test_name": {"default": "random_test",
-                          "description": "Test name. Used for descriptive purposes only"},
-            "map_name": {"default": "kashiwanoha_map",
-                         "description": "Package name containing map information (lanelet, point cloud, etc)"},
-            "ego_goal_lanelet_id":
-                {"default": -1,
-                 "description": "Goal lanelet id. If -1, goal will be chosen randomly"},
-            "ego_goal_s":
-                {"default": 0.0,
-                 "description": "Goal lanelet s (translation along the lanelet in meters). "
-                                "If ego_goal_lanelet_id equals -1, s will be chosen randomly"},
-            "ego_goal_partial_randomization":
-                {"default": False,
-                 "description": "If true, goal will be randomized with distance set in "
-                                "ego_goal_partial_randomization_distance value. If ego_goal_lanelet_id is set to -1, "
-                                "this value is ignored"},
-            "ego_goal_partial_randomization_distance":
-                {"default": 25.0,
-                 "description": "Distance from goal set by ego_goal_lanelet_id and ego_goal_s, within which goal "
-                                "pose will be randomized if ego_goal_partial_randomization is set to true"},
-            "npc_vehicle_count": {"default": 10, "description": "Generated vehicle npc count"},
-            "npc_vehicle_min_speed": {"default": 0.5, "description": "Minimum speed of generated vehicle npcs"},
-            "npc_vehicle_max_speed": {"default": 3.0, "description": "Maximum speed of generated vehicle npcs"},
-            "npc_min_spawn_distance_from_ego": {"default": 10.0,
-                                        "description":  "Minimum distance of generated vehicle npcs from ego"},
-            "npc_vehicle_max_spawn_distance_from_ego": {"default": 110.0,
-                                        "description": "Maximum distance of generated vehicle npcs from ego"},
-            "npc_pedestrian_count": {"default": 10, "description": "Generated pedestrian npc count"},
-            "npc_pedestrian_planner": {"default": "context_gamma_planner", "description": "Pedestrian NPCs planner",
-                               "values": ["context_gamma_planner", "behavior_tree", "default", "do_nothing"]},
-            "npc_pedestrian_min_speed": {"default": 0.1, "description": "Minimum speed of generated pedestrian npcs"},
-            "npc_pedestrian_max_speed": {"default": 1.0, "description": "Maximum speed of generated vehicle npcs"},
-            "npc_pedestrian_behavior_static": {"default": True, "description": "Static pedestrian spawned, no movement applied"},
-            "npc_pedestrian_behavior_crosswalk": {"default": True, "description": "Pedestrian is spawned at crosswalk and passes it"},
-            "npc_pedestrian_behavior_walk_along_lane": {"default": True, "description": "Pedestrian is spawned outside of lanes and moves along them"},
-            "npc_pedestrian_lanelet_min_offset": {"default": 3.0, "description": "Pedestrian minimum spawn point offset from lanelet"},
-            "npc_pedestrian_lanelet_max_offset": {"default": 5.0, "description": "Pedestrian maximum spawn point offset from lanelet"},
-
             # test case arguments #
             "seed": {"default": -1, "description": "Randomization seed. If -1, seed will be generated for each test"},
         }
