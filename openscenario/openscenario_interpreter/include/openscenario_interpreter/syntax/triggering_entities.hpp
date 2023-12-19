@@ -15,8 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGERING_ENTITIES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__TRIGGERING_ENTITIES_HPP_
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
@@ -44,7 +42,7 @@ struct TriggeringEntities
 
   const std::list<GroupedEntity> entity_refs;
 
-  explicit TriggeringEntities(const pugi::xml_node & node, Scope & scope);
+  explicit TriggeringEntities(const pugi::xml_node &, Scope &);
 
   template <typename Predicate>
   auto apply(Predicate && predicate) const -> decltype(auto)

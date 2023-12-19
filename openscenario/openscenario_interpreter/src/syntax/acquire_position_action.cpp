@@ -15,7 +15,6 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/acquire_position_action.hpp>
-#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 
 namespace openscenario_interpreter

@@ -15,11 +15,8 @@
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
-#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
-#include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
-#include <openscenario_interpreter/syntax/vehicle.hpp>
 
 namespace openscenario_interpreter
 {

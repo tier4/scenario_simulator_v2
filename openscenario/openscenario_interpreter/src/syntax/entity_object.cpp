@@ -15,11 +15,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
-#include <openscenario_interpreter/syntax/external_object_reference.hpp>
-#include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
-#include <openscenario_interpreter/syntax/pedestrian.hpp>
-#include <openscenario_interpreter/syntax/vehicle.hpp>
 
 namespace openscenario_interpreter
 {

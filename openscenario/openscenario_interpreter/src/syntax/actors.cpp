@@ -12,11 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/actors.hpp>
-#include <openscenario_interpreter/syntax/entity.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
 
 namespace openscenario_interpreter
 {

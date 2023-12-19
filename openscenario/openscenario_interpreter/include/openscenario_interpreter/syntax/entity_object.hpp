@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_OBJECT_HPP_
 
-#include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/misc_object.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/pedestrian.hpp>

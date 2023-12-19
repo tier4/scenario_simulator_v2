@@ -16,7 +16,6 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/teleport_action.hpp>

@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CATALOG_REFERENCE_HPP_
 
 #include <boost/filesystem.hpp>
+#include <openscenario_interpreter/functional/fold.hpp>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>

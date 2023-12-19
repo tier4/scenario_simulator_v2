@@ -20,8 +20,6 @@
 
 namespace openscenario_interpreter
 {
-class Scope;
-
 inline namespace syntax
 {
 /* ---- EntityRef --------------------------------------------------------------

@@ -14,8 +14,6 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/longitudinal_action.hpp>
-#include <openscenario_interpreter/syntax/pedestrian.hpp>
-#include <openscenario_interpreter/syntax/vehicle.hpp>
 
 namespace openscenario_interpreter
 {

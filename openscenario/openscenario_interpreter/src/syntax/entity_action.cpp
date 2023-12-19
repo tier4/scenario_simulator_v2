@@ -14,8 +14,6 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/entities.hpp>
-#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_action.hpp>
 
 namespace openscenario_interpreter
