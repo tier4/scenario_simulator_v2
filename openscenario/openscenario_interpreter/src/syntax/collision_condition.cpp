@@ -52,12 +52,12 @@ auto CollisionCondition::description() const -> std::string
 auto CollisionCondition::evaluate() const -> Object
 {
   if (
-    another_given_entity.is<EntityRef>() and
-    global().entities->isAdded(another_given_entity.as<EntityRef>())) {
+    another_given_entity.is<SingleEntity>() and
+    global().entities->isAdded(another_given_entity.as<SingleEntity>())) {
     return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
       auto objects = triggering_entity.objectNames();
       return std::any_of(std::begin(objects), std::end(objects), [&](const auto & object) {
-        return evaluateCollisionCondition(object, another_given_entity.as<EntityRef>());
+        return evaluateCollisionCondition(object, another_given_entity.as<SingleEntity>());
       });
     }));
   } else {
