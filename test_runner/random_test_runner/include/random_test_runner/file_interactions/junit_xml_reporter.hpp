@@ -31,7 +31,7 @@ class JunitXmlReporterTestCase
 public:
   explicit JunitXmlReporterTestCase(common::SimpleTestCase & testcase) : testcase_(testcase) {}
 
-  void reportCollision(const NPCDescription & npc, double time)
+  void reportCollision(const NPCVehicleDescription & npc, double time)
   {
     reportError("collision", fmt::format("{} and ego collided at {}s", npc.name, time).c_str());
   }

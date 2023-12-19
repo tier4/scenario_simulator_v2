@@ -58,6 +58,7 @@ private:
 };
 
 using LaneletIdRandomizer = UniformRandomizer<int64_t>;
+using LaneletOffsetRandomizer = UniformRandomizer<double>;
 using SValueRandomizer = UniformRandomizer<double>;
 using SpeedRandomizer = UniformRandomizer<double>;
 

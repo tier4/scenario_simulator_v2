@@ -34,7 +34,7 @@ from launch_ros.actions import Node
 
 
 def architecture_types():
-    return ["awf/auto", "awf/universe", "awf/universe/20230906", "tier4/proposal"]
+    return ["awf/universe"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -44,10 +44,7 @@ def default_autoware_launch_package_of(architecture_type):
         )
 
     return {
-        "awf/auto": "scenario_simulator_launch",
-        "awf/universe": "autoware_launch",
-        "awf/universe/20230906": "autoware_launch",
-        "tier4/proposal": "autoware_launch",
+        "awf/universe": "autoware_launch"
     }[architecture_type]
 
 
@@ -58,10 +55,7 @@ def default_autoware_launch_file_of(architecture_type):
         )
 
     return {
-        "awf/auto": "autoware_auto.launch.py",
-        "awf/universe": "planning_simulator.launch.xml",
-        "awf/universe/20230906": "planning_simulator.launch.xml",
-        "tier4/proposal": "planning_simulator.launch.xml",
+        "awf/universe": "planning_simulator.launch.xml"
     }[architecture_type]
 
 
@@ -72,9 +66,9 @@ class RandomTestRunnerLaunch(object):
 
         self.autoware_launch_arguments = {
             # autoware arguments #
-            "architecture_type": {"default": "awf/auto", "description": "Autoware architecture type", "values": architecture_types()},
-            "sensor_model": {"default": "aip_xx1", "description": "Ego sensor model"},
-            "vehicle_model": {"default": "lexus", "description": "Ego vehicle model"},
+            "architecture_type": {"default": "awf/universe", "description": "Autoware architecture type", "values": architecture_types()},
+            "sensor_model": {"default": "sample_sensor_kit", "description": "Ego sensor model"},
+            "vehicle_model": {"default": "sample_vehicle", "description": "Ego vehicle model"},
         }
 
         self.random_test_arguments = {
@@ -83,7 +77,7 @@ class RandomTestRunnerLaunch(object):
                  "description": "Yaml filename within random_test_runner/param directory containing test parameters."
                                 "If specified (not empty), other test arguments will be ignored"},
             "simulator_type": {"default": "simple_sensor_simulator", "description": "Simulation backend",
-                               "values": ["simple_sensor_simulator", "unity"]},
+                               "values": ["simple_sensor_simulator"]},
             "simulator_host":
                 {"default": "localhost",
                  "description": "Simulation host. It can be either IP address "
@@ -100,35 +94,6 @@ class RandomTestRunnerLaunch(object):
                  "description": "Directory to which result.yaml and result.junit.xml files will be placed"},
 
             "initialize_duration": {"default": 35, "description": "How long test runner will wait for Autoware to initialize"},
-
-            # test suite arguments #
-            "test_name": {"default": "random_test",
-                          "description": "Test name. Used for descriptive purposes only"},
-            "map_name": {"default": "kashiwanoha_map",
-                         "description": "Package name containing map information (lanelet, point cloud, etc)"},
-            "ego_goal_lanelet_id":
-                {"default": -1,
-                 "description": "Goal lanelet id. If -1, goal will be chosen randomly"},
-            "ego_goal_s":
-                {"default": 0.0,
-                 "description": "Goal lanelet s (translation along the lanelet in meters). "
-                                "If ego_goal_lanelet_id equals -1, s will be chosen randomly"},
-            "ego_goal_partial_randomization":
-                {"default": False,
-                 "description": "If true, goal will be randomized with distance set in "
-                                "ego_goal_partial_randomization_distance value. If ego_goal_lanelet_id is set to -1, "
-                                "this value is ignored"},
-            "ego_goal_partial_randomization_distance":
-                {"default": 25.0,
-                 "description": "Distance from goal set by ego_goal_lanelet_id and ego_goal_s, within which goal "
-                                "pose will be randomized if ego_goal_partial_randomization is set to true"},
-            "npc_count": {"default": 10, "description": "Generated npc count"},
-            "npc_min_speed": {"default": 0.5, "description": "Minimum speed of generated npcs"},
-            "npc_max_speed": {"default": 3.0, "description": "Maximum speed of generated npcs"},
-            "npc_min_distance_to_ego": {"default": 10.0,
-                                        "description":  "Minimum distance of generated npcs from ego"},
-            "npc_max_distance_to_ego": {"default": 100.0,
-                                        "description": "Maximum distance of generated npcs from ego"},
 
             # test case arguments #
             "seed": {"default": -1, "description": "Randomization seed. If -1, seed will be generated for each test"},

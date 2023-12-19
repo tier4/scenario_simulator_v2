@@ -25,47 +25,69 @@
 
 #include "random_test_runner/data_types.hpp"
 #include "spdlog/fmt/fmt.h"
+#include "test_suite_parameters.hpp"
 
 namespace YAML
 {
 template <>
-struct convert<TestSuiteParameters>
+struct convert<random_test_runner::Params::TestSuite>
 {
-  static Node encode(const TestSuiteParameters & rhs)
+  static Node encode(const random_test_runner::Params::TestSuite & rhs)
   {
     Node node;
-    node["test_name"] = rhs.name;
+    node["test_name"] = rhs.test_name;
     node["map_name"] = rhs.map_name;
     node["ego_goal_s"] = rhs.ego_goal_s;
     node["ego_goal_lanelet_id"] = rhs.ego_goal_lanelet_id;
     node["ego_goal_partial_randomization"] = rhs.ego_goal_partial_randomization;
     node["ego_goal_partial_randomization_distance"] = rhs.ego_goal_partial_randomization_distance;
-    node["npc_count"] = rhs.npcs_count;
-    node["npc_min_speed"] = rhs.npc_min_speed;
-    node["npc_max_speed"] = rhs.npc_max_speed;
-    node["npc_min_spawn_distance_from_ego"] = rhs.npc_min_spawn_distance_from_ego;
-    node["npc_max_spawn_distance_from_ego"] = rhs.npc_max_spawn_distance_from_ego;
+    node["npc_vehicle_count"] = rhs.npc_vehicle_count;
+    node["npc_vehicle_min_speed"] = rhs.npc_vehicle_min_speed;
+    node["npc_vehicle_max_speed"] = rhs.npc_vehicle_max_speed;
+    node["npc_vehicle_min_spawn_distance_from_ego"] = rhs.npc_vehicle_min_spawn_distance_from_ego;
+    node["npc_vehicle_max_spawn_distance_from_ego"] = rhs.npc_vehicle_max_spawn_distance_from_ego;
+    node["npc_pedestrian_count"] = rhs.npc_pedestrian_count;
+    node["npc_pedestrian_planner"] = rhs.npc_pedestrian_planner;
+    node["npc_pedestrian_min_speed"] = rhs.npc_pedestrian_min_speed;
+    node["npc_pedestrian_max_speed"] = rhs.npc_pedestrian_max_speed;
+    node["npc_pedestrian_behavior_static"] = rhs.npc_pedestrian_behavior_static;
+    node["npc_pedestrian_behavior_crosswalk"] = rhs.npc_pedestrian_behavior_crosswalk;
+    node["npc_pedestrian_behavior_walk_along_lane"] = rhs.npc_pedestrian_behavior_walk_along_lane;
+    node["npc_pedestrian_lanelet_min_offset"] = rhs.npc_pedestrian_lanelet_min_offset;
+    node["npc_pedestrian_lanelet_min_offset"] = rhs.npc_pedestrian_lanelet_min_offset;
     return node;
   }
 
-  static bool decode(const Node & node, TestSuiteParameters & rhs)
+  static bool decode(const Node & node, random_test_runner::Params::TestSuite & rhs)
   {
     if (!node.IsMap()) {
       return false;
     }
 
-    rhs.name = node["test_name"].as<std::string>();
+    rhs.test_name = node["test_name"].as<std::string>();
     rhs.map_name = node["map_name"].as<std::string>();
     rhs.ego_goal_s = node["ego_goal_s"].as<double>();
     rhs.ego_goal_lanelet_id = node["ego_goal_lanelet_id"].as<int64_t>();
     rhs.ego_goal_partial_randomization = node["ego_goal_partial_randomization"].as<bool>();
     rhs.ego_goal_partial_randomization_distance =
       node["ego_goal_partial_randomization_distance"].as<double>();
-    rhs.npcs_count = node["npc_count"].as<int64_t>();
-    rhs.npc_min_speed = node["npc_min_speed"].as<double>();
-    rhs.npc_max_speed = node["npc_max_speed"].as<double>();
-    rhs.npc_min_spawn_distance_from_ego = node["npc_min_spawn_distance_from_ego"].as<double>();
-    rhs.npc_max_spawn_distance_from_ego = node["npc_max_spawn_distance_from_ego"].as<double>();
+    rhs.npc_vehicle_count = node["npc_vehicle_count"].as<int64_t>();
+    rhs.npc_vehicle_min_speed = node["npc_vehicle_min_speed"].as<double>();
+    rhs.npc_vehicle_max_speed = node["npc_vehicle_max_speed"].as<double>();
+    rhs.npc_vehicle_min_spawn_distance_from_ego =
+      node["npc_vehicle_min_spawn_distance_from_ego"].as<double>();
+    rhs.npc_vehicle_max_spawn_distance_from_ego =
+      node["npc_vehicle_max_spawn_distance_from_ego"].as<double>();
+    rhs.npc_pedestrian_count = node["npc_pedestrian_count"].as<int64_t>();
+    rhs.npc_pedestrian_planner = node["npc_pedestrian_planner"].as<std::string>();
+    rhs.npc_pedestrian_min_speed = node["npc_pedestrian_min_speed"].as<double>();
+    rhs.npc_pedestrian_max_speed = node["npc_pedestrian_max_speed"].as<double>();
+    rhs.npc_pedestrian_behavior_static = node["npc_pedestrian_behavior_static"].as<bool>();
+    rhs.npc_pedestrian_behavior_crosswalk = node["npc_pedestrian_behavior_crosswalk"].as<bool>();
+    rhs.npc_pedestrian_behavior_walk_along_lane =
+      node["npc_pedestrian_behavior_walk_along_lane"].as<bool>();
+    rhs.npc_pedestrian_lanelet_min_offset = node["npc_pedestrian_lanelet_min_offset"].as<double>();
+    rhs.npc_pedestrian_lanelet_max_offset = node["npc_pedestrian_lanelet_max_offset"].as<double>();
 
     return true;
   }
@@ -100,7 +122,8 @@ public:
   {
   }
 
-  void addTestSuite(const TestSuiteParameters & test_parameters, const std::string & description)
+  void addTestSuite(
+    const random_test_runner::Params::TestSuite & test_parameters, const std::string & description)
   {
     yaml_[description] = test_parameters;
   }
@@ -119,7 +142,7 @@ public:
     result_file << yaml_;
   }
 
-  std::pair<TestSuiteParameters, std::vector<TestCaseParameters>> read()
+  std::pair<random_test_runner::Params::TestSuite, std::vector<TestCaseParameters>> read()
   {
     std::string filepath = data_directory_ + "/result.yaml";
     std::string message = fmt::format("Reading yaml: {}", filepath);
@@ -132,7 +155,8 @@ public:
         "suites (currently only one is supported)");
     }
 
-    TestSuiteParameters test_suite_parameters = yaml_.begin()->second.as<TestSuiteParameters>();
+    random_test_runner::Params::TestSuite test_suite_parameters =
+      yaml_.begin()->second.as<random_test_runner::Params::TestSuite>();
     std::vector<TestCaseParameters> test_cases_parameters;
     auto test_cases_yaml = yaml_.begin()->second["test_cases"];
     for (YAML::iterator test_case_it = test_cases_yaml.begin();

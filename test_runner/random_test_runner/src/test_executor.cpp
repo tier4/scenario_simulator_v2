@@ -50,6 +50,20 @@ traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
   return parameters;
 }
 
+traffic_simulator_msgs::msg::PedestrianParameters getPedestrianParameters()
+{
+  traffic_simulator_msgs::msg::PedestrianParameters parameters;
+  parameters.name = "pedestrian";
+  parameters.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::PEDESTRIAN;
+  parameters.bounding_box.center.x = 0.0;
+  parameters.bounding_box.center.y = 0.0;
+  parameters.bounding_box.center.z = 0.5;
+  parameters.bounding_box.dimensions.x = 1.0;
+  parameters.bounding_box.dimensions.y = 1.0;
+  parameters.bounding_box.dimensions.z = 2.0;
+  return parameters;
+}
+
 TestExecutor::TestExecutor(
   std::shared_ptr<traffic_simulator::API> api, TestDescription description,
   JunitXmlReporterTestCase test_case_reporter, SimulatorType simulator_type,
@@ -119,14 +133,55 @@ void TestExecutor::initialize()
       goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
     }
 
-    for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
-      const auto & npc_descr = test_description_.npcs_descriptions[i];
+    for (size_t i = 0; i < test_description_.npcs_vehicle_descriptions.size(); i++) {
+      const auto & npc_descr = test_description_.npcs_vehicle_descriptions[i];
       api_->spawn(
         npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters());
       api_->setEntityStatus(
         npc_descr.name, api_->canonicalize(npc_descr.start_position),
         traffic_simulator::helper::constructActionStatus(npc_descr.speed));
       api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
+    }
+
+    for (size_t i = 0; i < test_description_.npcs_pedestrian_descriptions.size(); i++) {
+      const auto & npc_descr = test_description_.npcs_pedestrian_descriptions[i];
+      api_->spawn(
+        npc_descr.name, api_->canonicalize(npc_descr.spawn_position), getPedestrianParameters(),
+        npc_descr.planner_name);
+      switch (npc_descr.behavior) {
+        case PedestrianBehavior::STATIC: {
+          api_->requestSpeedChange(
+            npc_descr.name, 0.0, traffic_simulator::speed_change::Transition::LINEAR,
+            traffic_simulator::speed_change::Constraint(
+              traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+            true);
+          if (npc_descr.route.empty()) {
+            throw std::runtime_error(
+              "Route cannot be temporarily empty. Please provide dummy goal pose to STATIC "
+              "pedestrian.");
+          }
+          api_->requestAcquirePosition(npc_descr.name, npc_descr.route[0]);
+          break;
+        }
+        case PedestrianBehavior::CROSSWALK:
+          api_->requestSpeedChange(
+            npc_descr.name, 0.5, traffic_simulator::speed_change::Transition::LINEAR,
+            traffic_simulator::speed_change::Constraint(
+              traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+            true);
+          api_->requestAssignRoute(npc_descr.name, npc_descr.route);
+          break;
+        case PedestrianBehavior::WALK_ALONG_LANE:
+          api_->requestSpeedChange(
+            npc_descr.name, 2.0, traffic_simulator::speed_change::Transition::LINEAR,
+            traffic_simulator::speed_change::Constraint(
+              traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
+            true);
+          //HACK: requestAssignRoute will no work since route is outside lanelets
+          // using requestAcquirePosition on first point instead
+          api_->requestAcquirePosition(npc_descr.name, npc_descr.route[0]);
+          break;
+      }
     }
   });
 }
@@ -159,7 +214,7 @@ void TestExecutor::update()
       }
     }
     if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-      for (const auto & npc : test_description_.npcs_descriptions) {
+      for (const auto & npc : test_description_.npcs_vehicle_descriptions) {
         if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
           if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
             std::string message =
@@ -194,7 +249,11 @@ void TestExecutor::deinitialize()
     if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
       api_->despawn(ego_name_);
     }
-    for (const auto & npc : test_description_.npcs_descriptions) {
+    for (const auto & npc : test_description_.npcs_vehicle_descriptions) {
+      api_->despawn(npc.name);
+    }
+
+    for (const auto & npc : test_description_.npcs_pedestrian_descriptions) {
       api_->despawn(npc.name);
     }
   });

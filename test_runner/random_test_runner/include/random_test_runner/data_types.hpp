@@ -17,20 +17,37 @@
 #ifndef RANDOM_TEST_RUNNER__DATA_TYPES_HPP
 #define RANDOM_TEST_RUNNER__DATA_TYPES_HPP
 
+#include <builtin_interfaces/msg/time.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <numeric>
 #include <ostream>
+#include <std_msgs/msg/header.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 
 #include "spdlog/fmt/fmt.h"
+#include "test_suite_parameters.hpp"
 #include "traffic_simulator_msgs/msg/action_status.hpp"
 #include "traffic_simulator_msgs/msg/entity_status.hpp"
 #include "traffic_simulator_msgs/msg/lanelet_pose.hpp"
 
-struct NPCDescription
+struct NPCVehicleDescription
 {
   traffic_simulator_msgs::msg::LaneletPose start_position;
   double speed;
   std::string name;
+};
+
+enum PedestrianBehavior { STATIC, CROSSWALK, WALK_ALONG_LANE };
+
+struct NPCPedestrianDescription
+{
+  std::string name;
+  double speed;
+  std::string planner_name;
+  PedestrianBehavior behavior;
+  traffic_simulator_msgs::msg::LaneletPose spawn_position;
+  std::vector<geometry_msgs::msg::Pose> route;
 };
 
 struct TestDescription
@@ -39,7 +56,8 @@ struct TestDescription
   geometry_msgs::msg::Pose ego_goal_pose;
   traffic_simulator_msgs::msg::LaneletPose ego_start_position;
 
-  std::vector<NPCDescription> npcs_descriptions;
+  std::vector<NPCVehicleDescription> npcs_vehicle_descriptions;
+  std::vector<NPCPedestrianDescription> npcs_pedestrian_descriptions;
 };
 
 enum RandomTestType { RANDOM_RUN, REPLAY };
@@ -62,22 +80,8 @@ struct TestControlParameters
   std::string simulator_host = "localhost";
 };
 
-struct TestSuiteParameters
-{
-  std::string name = "random_test";
-  std::string map_name = "kashiwanoha_map";
-
-  int64_t ego_goal_lanelet_id = -1;
-  double ego_goal_s = 0.0;
-  bool ego_goal_partial_randomization = false;
-  double ego_goal_partial_randomization_distance = 30.0;
-
-  int64_t npcs_count = 10;
-  double npc_min_speed = 0.5;
-  double npc_max_speed = 3.0;
-  double npc_min_spawn_distance_from_ego = 10.0;
-  double npc_max_spawn_distance_from_ego = 100.0;
-};
+std::vector<PedestrianBehavior> pedestrianBehaviorsFromTestSuiteParameters(
+  const random_test_runner::Params::TestSuite & parameters);
 
 struct TestCaseParameters
 {
@@ -100,6 +104,10 @@ struct TestCaseParameters
     }                                                            \
   };
 
+DEFINE_FMT_FORMATTER(builtin_interfaces::msg::Time, " sec {}, nanosec: {}", v.sec, v.nanosec)
+
+DEFINE_FMT_FORMATTER(std_msgs::msg::Header, " stamp {}, frame_id: {}", v.stamp, v.frame_id)
+
 DEFINE_FMT_FORMATTER(geometry_msgs::msg::Vector3, "(x, y, z) : ({}, {}, {})", v.x, v.y, v.z)
 
 DEFINE_FMT_FORMATTER(
@@ -118,6 +126,8 @@ DEFINE_FMT_FORMATTER(
 DEFINE_FMT_FORMATTER(
   geometry_msgs::msg::Pose, "position: {}, orientation {}", v.position, v.orientation)
 
+DEFINE_FMT_FORMATTER(geometry_msgs::msg::PoseStamped, "header: {}, pose {}", v.header, v.pose)
+
 DEFINE_FMT_FORMATTER(
   traffic_simulator_msgs::msg::ActionStatus, "current_action: {}, twist: {}, accel: {}",
   v.current_action, v.twist, v.accel)
@@ -133,21 +143,84 @@ DEFINE_FMT_FORMATTER(
   v.input_dir, v.output_dir, v.random_test_type, v.test_count)
 
 DEFINE_FMT_FORMATTER(
-  TestSuiteParameters,
+  random_test_runner::Params::TestSuite,
   "ego_goal_lanelet_id: {} ego_goal_s: {} ego_goal_partial_randomization: {} "
-  "ego_goal_partial_randomization_distance: {} npcs_count: {} npc_min_speed: "
+  "ego_goal_partial_randomization_distance: {} npc_vehicle_count: {} npc_vehicle_min_speed: "
   "{} "
-  "npc_max_speed: {} npc_min_spawn_distance_from_ego: {} "
-  "npc_max_spawn_distance_from_ego: {} "
+  "npc_vehicle_max_speed: {} npc_vehicle_min_spawn_distance_from_ego: {} "
+  "npc_vehicle_max_spawn_distance_from_ego: {} npc_pedestrian_count {} "
+  "npc_pedestrian_planner {} npc_pedestrian_min_speed {} npc_pedestrian_max_speed {} "
+  "npc_pedestrian_behavior_static: {} npc_pedestrian_behavior_crosswalk: {} "
+  "npc_pedestrian_behavior_walk_along_lane: {} "
+  "npc_pedestrian_lanelet_min_offset: {} npc_pedestrian_lanelet_max_offset: {}"
   "name: {} map_name: {}",
   v.ego_goal_lanelet_id, v.ego_goal_s, v.ego_goal_partial_randomization,
-  v.ego_goal_partial_randomization_distance, v.npcs_count, v.npc_min_speed, v.npc_max_speed,
-  v.npc_min_spawn_distance_from_ego, v.npc_max_spawn_distance_from_ego, v.name, v.map_name)
+  v.ego_goal_partial_randomization_distance, v.npc_vehicle_count, v.npc_vehicle_min_speed,
+  v.npc_vehicle_max_speed, v.npc_vehicle_min_spawn_distance_from_ego,
+  v.npc_vehicle_max_spawn_distance_from_ego, v.npc_pedestrian_count, v.npc_pedestrian_planner,
+  v.npc_pedestrian_min_speed, v.npc_pedestrian_max_speed, v.npc_pedestrian_behavior_static,
+  v.npc_pedestrian_behavior_crosswalk, v.npc_pedestrian_behavior_walk_along_lane,
+  v.npc_pedestrian_lanelet_min_offset, v.npc_pedestrian_lanelet_max_offset, v.test_name, v.map_name)
 
 DEFINE_FMT_FORMATTER(TestCaseParameters, "seed: {}", v.seed)
 
 DEFINE_FMT_FORMATTER(
-  NPCDescription, "name: {}, start_position: {}, speed: {}", v.name, v.start_position, v.speed)
+  NPCVehicleDescription, "name: {}, start_position: {}, speed: {}", v.name, v.start_position,
+  v.speed)
+
+template <>
+struct fmt::formatter<PedestrianBehavior>
+{
+  template <typename ParseContext>
+  constexpr auto parse(const ParseContext & ctx)
+  {
+    return ctx.begin();
+  }
+
+  template <typename FormatContext>
+  auto format(const PedestrianBehavior & v, FormatContext & ctx)
+  {
+    std::string string_representation;
+    switch (v) {
+      case STATIC:
+        string_representation = "STATIC";
+        break;
+      case CROSSWALK:
+        string_representation = "CROSSWALK";
+        break;
+      case WALK_ALONG_LANE:
+        string_representation = "WALK_ALONG_LANE";
+        break;
+      default:
+        string_representation = "Unknown Behavior";
+    }
+    fmt::format_to(ctx.out(), string_representation);
+    return ctx.out();
+  }
+};
+
+template <>
+struct fmt::formatter<NPCPedestrianDescription>
+{
+  template <typename ParseContext>
+  constexpr auto parse(const ParseContext & ctx)
+  {
+    return ctx.begin();
+  }
+
+  template <typename FormatContext>
+  auto format(const NPCPedestrianDescription & v, FormatContext & ctx)
+  {
+    fmt::format_to(
+      ctx.out(),
+      "name: {}, speed: {}, planner: {}, behavior: {}, spawn_position: {}\nroute: ", v.name,
+      v.speed, v.planner_name, v.behavior, v.spawn_position);
+    for (size_t idx = 0; idx < v.route.size(); idx++) {
+      fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.route[idx]);
+    }
+    return ctx.out();
+  }
+};
 
 template <>
 struct fmt::formatter<TestDescription>
@@ -164,10 +237,14 @@ struct fmt::formatter<TestDescription>
     fmt::format_to(
       ctx.out(),
       "ego_start_position: {} ego_goal_position: {} "
-      "ego_goal_pose: {}\nnpc_descriptions:",
+      "ego_goal_pose: {}\nnpc_vehicle_descriptions:",
       v.ego_start_position, v.ego_goal_position, v.ego_goal_pose);
-    for (size_t idx = 0; idx < v.npcs_descriptions.size(); idx++) {
-      fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.npcs_descriptions[idx]);
+    for (size_t idx = 0; idx < v.npcs_vehicle_descriptions.size(); idx++) {
+      fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.npcs_vehicle_descriptions[idx]);
+    }
+    fmt::format_to(ctx.out(), "\nnpc_pedestrian_descriptions:");
+    for (size_t idx = 0; idx < v.npcs_pedestrian_descriptions.size(); idx++) {
+      fmt::format_to(ctx.out(), "[{}]: {}\n", idx, v.npcs_pedestrian_descriptions[idx]);
     }
     return ctx.out();
   }

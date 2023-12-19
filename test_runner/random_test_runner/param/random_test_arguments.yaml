@@ -1,0 +1,149 @@
+random_test_runner:
+  test_suite:
+    "test_name": {
+      "type": string,
+      "default_value": "random_test",
+      "description": "Test name. Used for descriptive purposes only",
+      "validation": {
+        "not_empty<>": []
+      }
+    }
+    "map_name": {
+      "type": string,
+      "default_value": "kashiwanoha_map",
+      "description": "Package name containing map information (lanelet, point cloud, etc)",
+      "validation": {
+        "not_empty<>": []
+      }
+    }
+    "ego_goal_lanelet_id": {
+      "type": int,
+      "default_value": -1,
+      "description": "Goal lanelet id. If -1, goal will be chosen randomly"
+    }
+    "ego_goal_s": {
+      "type": double,
+      "default_value": 0.0,
+      "description": "Goal lanelet s (translation along the lanelet in meters). \
+          If ego_goal_lanelet_id equals -1, s will be chosen randomly"
+    }
+    "ego_goal_partial_randomization": {
+      "type": bool,
+      "default_value": false,
+      "description": "If true, goal will be randomized with distance set in \
+        ego_goal_partial_randomization_distance value. If ego_goal_lanelet_id is set to -1, \
+        this value is ignored"
+    }
+    "ego_goal_partial_randomization_distance": {
+      "type": int,
+      "type": double,
+      "default_value": 25.0,
+      "description": "Distance from goal set by ego_goal_lanelet_id and ego_goal_s, within which goal \
+        pose will be randomized if ego_goal_partial_randomization is set to true",
+      "validation": {
+        "gt<>": [0.0]
+      }
+    }
+    "npc_vehicle_count": {
+      "type": int,
+      "default_value": 10,
+      "description": "Generated vehicle npc count",
+      "validation": {
+        "gt_eq<>": [0]
+      }
+    }
+    "npc_vehicle_min_speed": {
+      "type": double,
+      "default_value": 0.5,
+      "description": "Minimum speed of generated vehicle npcs",
+      "validation": {
+        "gt_eq<>": [0.0]
+      }
+    }
+    "npc_vehicle_max_speed": {
+      "type": double,
+      "default_value": 3.0,
+      "description": "Maximum speed of generated vehicle npcs",
+      "validation": {
+        "gt_eq<>": [0.0]
+      }
+    }
+    "npc_vehicle_min_spawn_distance_from_ego": {
+      "type": double,
+    "default_value": 10.0,
+      "description":  "Minimum distance of generated vehicle npcs from ego",
+      "validation": {
+        "gt_eq<>": [0.0]
+      }
+    }
+    "npc_vehicle_max_spawn_distance_from_ego": {
+      "type": double,
+      "default_value": 110.0,
+      "description": "Maximum distance of generated vehicle npcs from ego",
+      "validation": {
+        "gt_eq<>": [0.0]
+      }
+    }
+    "npc_pedestrian_count": {
+      "type": int,
+      "default_value": 10,
+      "description": "Generated pedestrian npc count",
+      "validation": {
+        "gt_eq<>": [0]
+      }
+    }
+    "npc_pedestrian_planner": {
+      "type": string,
+      "default_value": "context_gamma_planner",
+      "description": "Pedestrian NPCs planner",
+      "validation": {
+        "one_of<>": [["context_gamma_planner", "behavior_tree", "default_value", "do_nothing"]]
+      }
+    }
+    "npc_pedestrian_min_speed": {
+      "type": double,
+      "default_value": 0.1,
+      "description": "Minimum speed of generated pedestrian npcs",
+      "validation": {
+        "gt_eq<>": [0.0]
+      }
+    }
+    "npc_pedestrian_max_speed": {
+      "type": double,
+      "default_value": 1.0,
+      "description": "Maximum speed of generated vehicle npcs",
+      "validation": {
+        "gt_eq<>": [0.0]
+      }
+    }
+    "npc_pedestrian_behavior_static": {
+      "type": bool,
+      "default_value": true,
+      "description": "Static pedestrian spawned, no movement applied"
+    }
+    "npc_pedestrian_behavior_crosswalk": {
+      "type": bool,
+      "default_value": true,
+      "description": "Pedestrian is spawned at crosswalk and passes it"
+    }
+    "npc_pedestrian_behavior_walk_along_lane": {
+      "type": bool,
+      "default_value": true,
+      "description": "Pedestrian is spawned outside of lanes and moves along them"
+    }
+    "npc_pedestrian_lanelet_min_offset": {
+      "type": double,
+      "default_value": 3.0,
+      "description": "Pedestrian minimum spawn point offset from lanelet",
+      "validation": {
+        "gt_eq<>": [0.0]
+      }
+    }
+    "npc_pedestrian_lanelet_max_offset": {
+      "type": double,
+      "default_value": 5.0,
+      "description": "Pedestrian maximum spawn point offset from lanelet",
+      "validation": {
+        "gt_eq<>": [0.0]
+      }
+    }

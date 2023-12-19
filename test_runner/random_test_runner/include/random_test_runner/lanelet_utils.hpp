@@ -22,6 +22,7 @@
 
 #include <boost/filesystem.hpp>
 #include <optional>
+#include <traffic_simulator/helper/helper.hpp>
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "random_test_runner/data_types.hpp"
@@ -58,11 +59,17 @@ public:
     const traffic_simulator_msgs::msg::LaneletPose & pose, double min_distance,
     double max_distance);
 
+  std::vector<geometry_msgs::msg::Pose> getPositionsOnNextLanelets(
+    const traffic_simulator_msgs::msg::LaneletPose & start_lanelet,
+    const int64_t & max_number_of_points, const double offset = 0.0);
   std::vector<int64_t> getLaneletIds();
+  lanelet::Ids filterLaneletIds(const lanelet::Ids & lanelet_ids, const char subtype[]);
   geometry_msgs::msg::PoseStamped toMapPose(traffic_simulator_msgs::msg::LaneletPose lanelet_pose);
   std::vector<int64_t> getRoute(int64_t from_lanelet_id, int64_t to_lanelet_id);
   double getLaneletLength(int64_t lanelet_id);
   bool isInLanelet(int64_t lanelet_id, double s);
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> toLaneletPose(
+    geometry_msgs::msg::Pose global_pose, bool include_crosswalk = false);
 
 private:
   lanelet::LaneletMapPtr lanelet_map_ptr_;
