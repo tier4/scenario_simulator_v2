@@ -31,6 +31,9 @@ auto CatmullRomSpline::getPolygon(
   const double width, const size_t num_points, const double z_offset)
   -> std::vector<geometry_msgs::msg::Point>
 {
+  if (num_points == 0) {
+    return {};
+  }
   std::vector<geometry_msgs::msg::Point> points;
   std::vector<geometry_msgs::msg::Point> left_bounds = getLeftBounds(width, num_points, z_offset);
   std::vector<geometry_msgs::msg::Point> right_bounds = getRightBounds(width, num_points, z_offset);
