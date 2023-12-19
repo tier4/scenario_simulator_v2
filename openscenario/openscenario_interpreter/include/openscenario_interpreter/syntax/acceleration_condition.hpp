@@ -42,7 +42,7 @@ struct AccelerationCondition : private SimulatorCore::ConditionEvaluation
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<std::vector<Double>> results;  // for description
+  std::vector<std::vector<double>> results;  // for description
 
   explicit AccelerationCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
