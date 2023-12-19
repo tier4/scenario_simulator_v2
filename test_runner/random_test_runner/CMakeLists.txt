@@ -33,6 +33,7 @@ endif()
 
 # find dependencies
 find_package(ament_cmake_auto REQUIRED)
+find_package(generate_parameter_library REQUIRED)
 include(FindProtobuf REQUIRED)
 
 ament_auto_find_build_dependencies()
@@ -46,6 +47,11 @@ ament_auto_add_executable(random_test_runner
   src/random_test_runner_node.cpp
 )
 
+generate_parameter_library(
+  test_suite_parameters
+  param/random_test_arguments.yaml
+)
+
 target_link_libraries(random_test_runner
   ${PROTOBUF_LIBRARY}
   ${YAML_CPP_LIBRARIES}
@@ -53,6 +59,7 @@ target_link_libraries(random_test_runner
   sodium
   zmq
   fmt
+  test_suite_parameters
 )
 
 install(

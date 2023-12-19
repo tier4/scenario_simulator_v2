@@ -24,6 +24,7 @@
 #include "random_test_runner/data_types.hpp"
 #include "random_test_runner/file_interactions/junit_xml_reporter.hpp"
 #include "random_test_runner/test_executor.hpp"
+#include "test_suite_parameters.hpp"
 
 namespace traffic_simulator
 {
@@ -35,14 +36,14 @@ class RandomTestRunner : public rclcpp::Node
 {
 public:
   explicit RandomTestRunner(const rclcpp::NodeOptions & option);
+  void initialize();
 
 private:
   TestControlParameters collectAndValidateTestControlParameters();
-  TestSuiteParameters collectTestSuiteParameters();
   TestCaseParameters collectTestCaseParameters();
 
-  static TestSuiteParameters validateParameters(
-    const TestSuiteParameters & test_parameters, std::shared_ptr<LaneletUtils> hdmap_utils);
+  static random_test_runner::Params::TestSuite validateParameters(
+    const random_test_runner::Params::TestSuite & parameters, std::shared_ptr<LaneletUtils> hdmap_utils);
 
   void update();
   void start();

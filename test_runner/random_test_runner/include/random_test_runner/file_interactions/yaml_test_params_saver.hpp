@@ -24,17 +24,18 @@
 #include <rclcpp/logger.hpp>
 
 #include "random_test_runner/data_types.hpp"
+#include "test_suite_parameters.hpp"
 #include "spdlog/fmt/fmt.h"
 
 namespace YAML
 {
 template <>
-struct convert<TestSuiteParameters>
+struct convert<random_test_runner::Params::TestSuite>
 {
-  static Node encode(const TestSuiteParameters & rhs)
+  static Node encode(const random_test_runner::Params::TestSuite & rhs)
   {
     Node node;
-    node["test_name"] = rhs.name;
+    node["test_name"] = rhs.test_name;
     node["map_name"] = rhs.map_name;
     node["ego_goal_s"] = rhs.ego_goal_s;
     node["ego_goal_lanelet_id"] = rhs.ego_goal_lanelet_id;
@@ -57,13 +58,13 @@ struct convert<TestSuiteParameters>
     return node;
   }
 
-  static bool decode(const Node & node, TestSuiteParameters & rhs)
+  static bool decode(const Node & node, random_test_runner::Params::TestSuite & rhs)
   {
     if (!node.IsMap()) {
       return false;
     }
 
-    rhs.name = node["test_name"].as<std::string>();
+    rhs.test_name = node["test_name"].as<std::string>();
     rhs.map_name = node["map_name"].as<std::string>();
     rhs.ego_goal_s = node["ego_goal_s"].as<double>();
     rhs.ego_goal_lanelet_id = node["ego_goal_lanelet_id"].as<int64_t>();
@@ -121,7 +122,7 @@ public:
   {
   }
 
-  void addTestSuite(const TestSuiteParameters & test_parameters, const std::string & description)
+  void addTestSuite(const random_test_runner::Params::TestSuite & test_parameters, const std::string & description)
   {
     yaml_[description] = test_parameters;
   }
@@ -140,7 +141,7 @@ public:
     result_file << yaml_;
   }
 
-  std::pair<TestSuiteParameters, std::vector<TestCaseParameters>> read()
+  std::pair<random_test_runner::Params::TestSuite, std::vector<TestCaseParameters>> read()
   {
     std::string filepath = data_directory_ + "/result.yaml";
     std::string message = fmt::format("Reading yaml: {}", filepath);
@@ -153,7 +154,7 @@ public:
         "suites (currently only one is supported)");
     }
 
-    TestSuiteParameters test_suite_parameters = yaml_.begin()->second.as<TestSuiteParameters>();
+    random_test_runner::Params::TestSuite test_suite_parameters = yaml_.begin()->second.as<random_test_runner::Params::TestSuite>();
     std::vector<TestCaseParameters> test_cases_parameters;
     auto test_cases_yaml = yaml_.begin()->second["test_cases"];
     for (YAML::iterator test_case_it = test_cases_yaml.begin();

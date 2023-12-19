@@ -24,6 +24,7 @@
 #include "random_test_runner/lanelet_utils.hpp"
 #include "random_test_runner/randomizers.hpp"
 #include "traffic_simulator/api/api.hpp"
+#include "test_suite_parameters.hpp"
 
 class LaneletUtils;
 
@@ -31,7 +32,7 @@ class TestRandomizer
 {
 public:
   TestRandomizer(
-    rclcpp::Logger logger, const TestSuiteParameters & test_suite_parameters,
+    rclcpp::Logger logger, const random_test_runner::Params::TestSuite & test_suite_params,
     const TestCaseParameters & test_case_parameters, std::shared_ptr<LaneletUtils> lanelet_utils);
 
   TestDescription generate();
@@ -89,7 +90,7 @@ private:
   SpeedRandomizer vehicle_npc_speed_randomizer_;
   SpeedRandomizer pedestrian_npc_speed_randomizer_;
 
-  TestSuiteParameters test_suite_parameters_;
+  random_test_runner::Params::TestSuite test_suite_parameters_;
 };
 
 #endif  // RANDOM_TEST_RUNNER__TESTRANDOMIZER_HPP

@@ -17,7 +17,7 @@
 #include "random_test_runner/data_types.hpp"
 
 std::vector<PedestrianBehavior> pedestrianBehaviorsFromTestSuiteParameters(
-  const TestSuiteParameters & parameters)
+  const random_test_runner::Params::TestSuite & parameters)
 {
   std::vector<PedestrianBehavior> pedestrian_behaviors;
   if (parameters.npc_pedestrian_behavior_static) {

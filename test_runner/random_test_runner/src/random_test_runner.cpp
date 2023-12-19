@@ -31,16 +31,21 @@
 
 RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 : Node("random_test_runner", option), error_reporter_(get_logger())
+{}
+
+void RandomTestRunner::initialize()
 {
   TestControlParameters test_control_parameters = collectAndValidateTestControlParameters();
   std::string message = fmt::format("test control parameters: {}", test_control_parameters);
   RCLCPP_INFO_STREAM(get_logger(), message);
 
-  TestSuiteParameters test_suite_params;
+  random_test_runner::Params::TestSuite test_suite_params;
   std::vector<TestCaseParameters> test_case_parameters_vector;
   switch (test_control_parameters.random_test_type) {
     case RANDOM_RUN: {
-      test_suite_params = collectTestSuiteParameters();
+      auto param_listener = std::make_shared<random_test_runner::ParamListener>(shared_from_this());
+      auto random_test_runner_params = param_listener->get_params();
+      test_suite_params = random_test_runner_params.test_suite;
       TestCaseParameters test_case_parameters = collectTestCaseParameters();
 
       for (int test_id = 0; test_id < test_control_parameters.test_count; test_id++) {
@@ -67,9 +72,9 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
   configuration.simulator_host = test_control_parameters.simulator_host;
   auto lanelet_utils = std::make_shared<LaneletUtils>(configuration.lanelet2_map_path());
 
-  TestSuiteParameters validated_params = validateParameters(test_suite_params, lanelet_utils);
+  auto validated_params = validateParameters(test_suite_params, lanelet_utils);
 
-  message = fmt::format("Test suite parameters {}", test_suite_params);
+  message = fmt::format("Test suite parameters {}", validated_params);
   RCLCPP_INFO_STREAM(get_logger(), message);
   for (size_t test_id = 0; test_id < test_case_parameters_vector.size(); test_id++) {
     std::string message =
@@ -81,7 +86,7 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 
   YamlTestParamsIO yaml_test_params_saver(get_logger(), test_control_parameters.output_dir);
 
-  yaml_test_params_saver.addTestSuite(validated_params, validated_params.name);
+  yaml_test_params_saver.addTestSuite(validated_params, validated_params.test_name);
 
   for (size_t test_id = 0; test_id < test_case_parameters_vector.size(); test_id++) {
     std::string message =
@@ -92,52 +97,16 @@ RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
       TestRandomizer(
         get_logger(), validated_params, test_case_parameters_vector[test_id], lanelet_utils)
         .generate(),
-      error_reporter_.spawnTestCase(validated_params.name, std::to_string(test_id)),
+      error_reporter_.spawnTestCase(validated_params.test_name, std::to_string(test_id)),
       test_control_parameters.simulator_type, test_control_parameters.architecture_type,
       get_logger());
-    yaml_test_params_saver.addTestCase(test_case_parameters_vector[test_id], validated_params.name);
+    yaml_test_params_saver.addTestCase(test_case_parameters_vector[test_id], validated_params.test_name);
   }
 
   current_test_executor_ = test_executors_.begin();
   yaml_test_params_saver.write();
 
   start();
-}
-
-TestSuiteParameters RandomTestRunner::collectTestSuiteParameters()
-{
-  TestSuiteParameters tp;
-  tp.ego_goal_lanelet_id = this->declare_parameter<int64_t>("ego_goal_lanelet_id", -1);
-  tp.ego_goal_s = this->declare_parameter<double>("ego_goal_s", 0.0);
-  tp.ego_goal_partial_randomization =
-    this->declare_parameter<bool>("ego_goal_partial_randomization", false);
-  tp.ego_goal_partial_randomization_distance =
-    this->declare_parameter<double>("ego_goal_partial_randomization_distance", 30.0);
-  tp.npc_vehicle_count = this->declare_parameter<int>("npc_vehicle_count", 10);
-  tp.npc_vehicle_min_speed = this->declare_parameter<double>("npc_vehicle_min_speed", 0.5);
-  tp.npc_vehicle_max_speed = this->declare_parameter<double>("npc_vehicle_max_speed", 3.0);
-  tp.npc_vehicle_min_spawn_distance_from_ego =
-    this->declare_parameter<double>("npc_vehicle_min_spawn_distance_from_ego", 10.0);
-  tp.npc_vehicle_max_spawn_distance_from_ego =
-    this->declare_parameter<double>("npc_vehicle_max_spawn_distance_from_ego", 100.0);
-  tp.npc_pedestrian_count = this->declare_parameter<int64_t>("npc_pedestrian_count", 1);
-  tp.npc_pedestrian_planner =
-    this->declare_parameter<std::string>("npc_pedestrian_planner", "context_gamma_planner");
-  tp.npc_pedestrian_min_speed = this->declare_parameter<double>("npc_pedestrian_min_speed", 0.1);
-  tp.npc_pedestrian_max_speed = this->declare_parameter<double>("npc_pedestrian_max_speed", 1.0);
-  tp.npc_pedestrian_behavior_static =
-    this->declare_parameter<bool>("npc_pedestrian_behavior_static", true);
-  tp.npc_pedestrian_behavior_crosswalk =
-    this->declare_parameter<bool>("npc_pedestrian_behavior_crosswalk", true);
-  tp.npc_pedestrian_behavior_walk_along_lane =
-    this->declare_parameter<bool>("npc_pedestrian_behavior_walk_along_lane", true);
-  tp.npc_pedestrian_lanelet_min_offset =
-    this->declare_parameter<double>("npc_pedestrian_lanelet_min_offset", 3.0);
-  tp.npc_pedestrian_lanelet_max_offset =
-    this->declare_parameter<double>("npc_pedestrian_lanelet_max_offset", 5.0);
-  tp.name = this->declare_parameter<std::string>("test_name", "random_test");
-  tp.map_name = this->declare_parameter<std::string>("map_name", "kashiwanoha_map");
-  return tp;
 }
 
 TestCaseParameters RandomTestRunner::collectTestCaseParameters()
@@ -171,10 +140,10 @@ TestControlParameters RandomTestRunner::collectAndValidateTestControlParameters(
   return tp;
 }
 
-TestSuiteParameters RandomTestRunner::validateParameters(
-  const TestSuiteParameters & test_parameters, std::shared_ptr<LaneletUtils> lanelet_utils)
+random_test_runner::Params::TestSuite RandomTestRunner::validateParameters(
+  const random_test_runner::Params::TestSuite & parameters, std::shared_ptr<LaneletUtils> lanelet_utils)
 {
-  TestSuiteParameters tp = test_parameters;
+  auto tp = parameters;
 
   if (tp.ego_goal_lanelet_id == -1) {
     return tp;

@@ -43,7 +43,7 @@ const std::string & pedestrianPlannerBehaviorFromString(const std::string & inpu
 }
 
 TestRandomizer::TestRandomizer(
-  rclcpp::Logger logger, const TestSuiteParameters & test_suite_parameters,
+  rclcpp::Logger logger, const random_test_runner::Params::TestSuite & test_suite_parameters,
   const TestCaseParameters & test_case_parameters, std::shared_ptr<LaneletUtils> lanelet_utils)
 : logger_(logger),
   lanelet_utils_(std::move(lanelet_utils)),

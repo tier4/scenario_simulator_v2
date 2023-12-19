@@ -29,6 +29,8 @@
 #include "traffic_simulator_msgs/msg/action_status.hpp"
 #include "traffic_simulator_msgs/msg/entity_status.hpp"
 #include "traffic_simulator_msgs/msg/lanelet_pose.hpp"
+#include "test_suite_parameters.hpp"
+
 
 struct NPCVehicleDescription
 {
@@ -79,34 +81,8 @@ struct TestControlParameters
   std::string simulator_host = "localhost";
 };
 
-struct TestSuiteParameters
-{
-  std::string name = "random_test";
-  std::string map_name = "kashiwanoha_map";
-
-  int64_t ego_goal_lanelet_id = -1;
-  double ego_goal_s = 0.0;
-  bool ego_goal_partial_randomization = false;
-  double ego_goal_partial_randomization_distance = 30.0;
-
-  int64_t npc_vehicle_count = 10;
-  double npc_vehicle_min_speed = 0.5;
-  double npc_vehicle_max_speed = 3.0;
-  double npc_vehicle_min_spawn_distance_from_ego = 10.0;
-  double npc_vehicle_max_spawn_distance_from_ego = 100.0;
-
-  int64_t npc_pedestrian_count = 1;
-  std::string npc_pedestrian_planner = "context_gamma_planner";
-  int64_t npc_pedestrian_min_speed = 0.1;
-  int64_t npc_pedestrian_max_speed = 1.0;
-  bool npc_pedestrian_behavior_static = true;
-  bool npc_pedestrian_behavior_crosswalk = true;
-  bool npc_pedestrian_behavior_walk_along_lane = true;
-  double npc_pedestrian_lanelet_min_offset = 3.0;
-  double npc_pedestrian_lanelet_max_offset = 5.0;
-};
 std::vector<PedestrianBehavior> pedestrianBehaviorsFromTestSuiteParameters(
-  const TestSuiteParameters & parameters);
+  const random_test_runner::Params::TestSuite & parameters);
 
 struct TestCaseParameters
 {
@@ -168,7 +144,7 @@ DEFINE_FMT_FORMATTER(
   v.input_dir, v.output_dir, v.random_test_type, v.test_count)
 
 DEFINE_FMT_FORMATTER(
-  TestSuiteParameters,
+  random_test_runner::Params::TestSuite,
   "ego_goal_lanelet_id: {} ego_goal_s: {} ego_goal_partial_randomization: {} "
   "ego_goal_partial_randomization_distance: {} npc_vehicle_count: {} npc_vehicle_min_speed: "
   "{} "
@@ -185,7 +161,7 @@ DEFINE_FMT_FORMATTER(
   v.npc_vehicle_max_spawn_distance_from_ego, v.npc_pedestrian_count, v.npc_pedestrian_planner,
   v.npc_pedestrian_min_speed, v.npc_pedestrian_max_speed, v.npc_pedestrian_behavior_static,
   v.npc_pedestrian_behavior_crosswalk, v.npc_pedestrian_behavior_walk_along_lane,
-  v.npc_pedestrian_lanelet_min_offset, v.npc_pedestrian_lanelet_max_offset, v.name, v.map_name)
+  v.npc_pedestrian_lanelet_min_offset, v.npc_pedestrian_lanelet_max_offset, v.test_name, v.map_name)
 
 DEFINE_FMT_FORMATTER(TestCaseParameters, "seed: {}", v.seed)
 
