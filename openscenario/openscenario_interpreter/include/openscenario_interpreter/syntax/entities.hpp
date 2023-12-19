@@ -33,10 +33,8 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Entities
+struct Entities : public std::unordered_map<std::string, Object>  // TODO to be data member
 {
-  std::unordered_map<std::string, Object> entities;
-
   explicit Entities(const pugi::xml_node &, Scope &);
 
   auto isAdded(const EntityRef &) const -> bool;

@@ -123,7 +123,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
 auto Interpreter::engage() const -> void
 {
-  for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities.entities) {
+  for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
     if (
       scenario_object.template is<ScenarioObject>() and
       scenario_object.template as<ScenarioObject>().is_added and
@@ -136,8 +136,8 @@ auto Interpreter::engage() const -> void
 auto Interpreter::engageable() const -> bool
 {
   return std::all_of(
-    std::cbegin(currentScenarioDefinition()->entities.entities),
-    std::cend(currentScenarioDefinition()->entities.entities), [](const auto & each) {
+    std::cbegin(currentScenarioDefinition()->entities),
+    std::cend(currentScenarioDefinition()->entities), [](const auto & each) {
       const auto & [name, scenario_object] = each;
       return not scenario_object.template is<ScenarioObject>() or
              not scenario_object.template as<ScenarioObject>().is_added or
@@ -150,8 +150,8 @@ auto Interpreter::engageable() const -> bool
 auto Interpreter::engaged() const -> bool
 {
   return std::all_of(
-    std::cbegin(currentScenarioDefinition()->entities.entities),
-    std::cend(currentScenarioDefinition()->entities.entities), [](const auto & each) {
+    std::cbegin(currentScenarioDefinition()->entities),
+    std::cend(currentScenarioDefinition()->entities), [](const auto & each) {
       const auto & [name, scenario_object] = each;
       return not scenario_object.template is<ScenarioObject>() or
              not scenario_object.template as<ScenarioObject>().is_added or

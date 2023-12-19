@@ -49,7 +49,7 @@ auto EntitySelection::objects() const -> std::set<EntityRef>
       [&](const SelectedByTypes &) {
         auto result = std::set<EntityRef>{};
         auto types = objectTypes();
-        for (const auto & [name, object] : global().entities->entities) {
+        for (const auto & [name, object] : *global().entities) {
           if (
             object.is<ScenarioObject>() and types.count(object.as<ScenarioObject>().objectType())) {
             result.emplace(name);

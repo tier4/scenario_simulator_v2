@@ -60,8 +60,8 @@ auto RelativeDistanceCondition::distance<
   const EntityRef & triggering_entity) -> double
 {
   if (
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added) {
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
   } else {
     return Double::nan();
@@ -74,8 +74,8 @@ auto RelativeDistanceCondition::distance<
   const EntityRef & triggering_entity) -> double
 {
   if (
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added) {
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return std::abs(
       makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x);
   } else {
@@ -89,8 +89,8 @@ auto RelativeDistanceCondition::distance<
   const EntityRef & triggering_entity) -> double
 {
   if (
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added) {
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
   } else {
     return Double::nan();
@@ -103,8 +103,8 @@ auto RelativeDistanceCondition::distance<
   const EntityRef & triggering_entity) -> double
 {
   if (
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added) {
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return std::abs(
       makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
   } else {
@@ -118,8 +118,8 @@ auto RelativeDistanceCondition::distance<
   const EntityRef & triggering_entity) -> double
 {
   if (
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added) {
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return std::hypot(
       makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x,
       makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
@@ -134,8 +134,8 @@ auto RelativeDistanceCondition::distance<
   const EntityRef & triggering_entity) -> double
 {
   if (
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added and
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added) {
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return std::hypot(
       makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
       makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
@@ -150,8 +150,8 @@ auto RelativeDistanceCondition::distance<
   -> double
 {
   if (
-    global().entities->ref(entity_ref).as<ScenarioObject>().is_added and
-    global().entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
     /*
        For historical reasons, signed distances are returned when
        coordinateSystem == lane and relativeDistanceType ==
