@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__RAOD_SEGMENTS__GENERATE_LANELET_MAP__HPP_
+#ifndef MAP_FRAGMENT__ROAD_SEGMENTS__GENERATE_LANELET_MAP__HPP_
 #define MAP_FRAGMENT__ROAD_SEGMENTS__GENERATE_LANELET_MAP__HPP_
 
 #include <boost/bimap.hpp>
@@ -28,6 +28,7 @@ namespace map_fragment::road_segments
 {
 using LineStrings3dByRoadSegment =
   std::map<RoadSegment::ConstSharedPointer, lanelet::LineStrings3d>;
+
 using GroupsOfPoints3d = std::vector<lanelet::Points3d>;
 
 /**
@@ -39,13 +40,20 @@ using GroupsOfPoints3d = std::vector<lanelet::Points3d>;
  */
 class PointEquivalenceGraph
 {
+  // cspell: ignore Bimap
+  // cspell: ignore bimap
+
   using UndirectedGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS>;
+
   using PointIdentifierToVertexBimap =
     boost::bimap<lanelet::Id, UndirectedGraph::vertex_descriptor>;
+
   using PointLookupTableByIdentifier = std::map<lanelet::Id, lanelet::Point3d>;
 
   UndirectedGraph graph;
+
   PointIdentifierToVertexBimap mappings;
+
   PointLookupTableByIdentifier point_lookup_table;
 
 public:
@@ -182,7 +190,7 @@ auto createPointEquivalenceGraph(
     const auto first_segment = road_segment_connection.first_segment;
     const auto second_segment = road_segment_connection.second_segment;
 
-    for (const auto & boundary_indices : road_segment_connection.getBoundarywiseConnections()) {
+    for (const auto & boundary_indices : road_segment_connection.getBoundaryWiseConnections()) {
       auto & first_boundary =
         lanelet_boundaries_by_road_segment.at(first_segment)[boundary_indices.first];
 

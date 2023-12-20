@@ -94,6 +94,30 @@ auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
     }
   }
 
+  if (const auto name = prefix + "any_successor_turn_direction"; node.has_parameter(name)) {
+    if (const auto turn_direction = node.get_parameter(name).as_string();
+        not turn_direction.empty()) {
+      constraints.emplace(name, [turn_direction](auto && lanelet, auto &&, auto && graph) {
+        const auto successors = graph.following(lanelet);
+        return std::any_of(successors.begin(), successors.end(), [&](auto && successor) {
+          return successor.attributeOr("turn_direction", "") == turn_direction;
+        });
+      });
+    }
+  }
+
+  if (const auto name = prefix + "any_predecessor_turn_direction"; node.has_parameter(name)) {
+    if (const auto turn_direction = node.get_parameter(name).as_string();
+        not turn_direction.empty()) {
+      constraints.emplace(name, [turn_direction](auto && lanelet, auto &&, auto && graph) {
+        const auto predecessors = graph.previous(lanelet);
+        return std::any_of(predecessors.begin(), predecessors.end(), [&](auto && predecessor) {
+          return predecessor.attributeOr("turn_direction", "") == turn_direction;
+        });
+      });
+    }
+  }
+
   if (const auto name = prefix + "id_is_equal_to"; node.has_parameter(name)) {
     if (const auto id = node.get_parameter(name).as_int(); id) {
       constraints.emplace(name, [id](auto && lanelet, auto &&...) {  //
@@ -255,6 +279,8 @@ auto loadAllLaneletConstraints(Node & node, const std::string & prefix = "")
   static_assert(true)
 
   // clang-format off
+  DECLARE_PARAMETER_IF_NOT_DECLARED("any_predecessor_turn_direction"        , ""                                     );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("any_successor_turn_direction"          , ""                                     );
   DECLARE_PARAMETER_IF_NOT_DECLARED("centerline_curvature_greater_than"     , std::numeric_limits<double>::lowest()  );
   DECLARE_PARAMETER_IF_NOT_DECLARED("centerline_curvature_less_than"        , std::numeric_limits<double>::max()     );
   DECLARE_PARAMETER_IF_NOT_DECLARED("conflicts_with"                        , lanelet::Id()                          );

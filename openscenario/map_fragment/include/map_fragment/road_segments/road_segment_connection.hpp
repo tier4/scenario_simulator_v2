@@ -140,15 +140,15 @@ struct RoadSegmentConnection
    * Represented as a pair of indices, where 0 means
    * the left-most boundary for the given road segment.
    */
-  using BoundarywiseConnection = std::pair<int, int>;
-  using BoundarywiseConnections = std::vector<BoundarywiseConnection>;
+  using BoundaryWiseConnection = std::pair<int, int>;
+  using BoundaryWiseConnections = std::vector<BoundaryWiseConnection>;
 
   /*
    * Calculate lane-boundary-wise connections
    */
-  auto getBoundarywiseConnections() const -> BoundarywiseConnections
+  auto getBoundaryWiseConnections() const -> BoundaryWiseConnections
   {
-    BoundarywiseConnections connections;
+    BoundaryWiseConnections connections;
 
     const auto number_of_connections = getNumberOfOverlappingLanes() + 1;
     const auto first_segment_offset = getFirstSegmentOffset();
