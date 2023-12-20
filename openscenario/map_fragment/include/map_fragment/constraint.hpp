@@ -224,7 +224,7 @@ auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
     }
   }
 
-  if (const auto name = prefix + "direction_is_roughly_the_same_as"; node.has_parameter(name)) {
+  if (const auto name = prefix + "direction_is_roughly_parallel_to"; node.has_parameter(name)) {
     if (const auto lanelet_id = node.get_parameter(name).as_int(); lanelet_id) {
       constraints.emplace(name, [lanelet_id](auto && lanelet, auto && map, auto &&...) {
         auto found = map.laneletLayer.find(lanelet_id);
@@ -234,12 +234,24 @@ auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
     }
   }
 
-  if (const auto name = prefix + "direction_is_roughly_the_opposite_of"; node.has_parameter(name)) {
+  if (const auto name = prefix + "direction_is_roughly_antiparallel_to"; node.has_parameter(name)) {
     if (const auto lanelet_id = node.get_parameter(name).as_int(); lanelet_id) {
       constraints.emplace(name, [lanelet_id](auto && lanelet, auto && map, auto &&...) {
         auto found = map.laneletLayer.find(lanelet_id);
         return found != map.laneletLayer.end() and
                direction(lanelet.centerline3d()).dot(direction(found->centerline3d())) < -0.5;
+      });
+    }
+  }
+
+  if (const auto name = prefix + "direction_is_roughly_perpendicular_to";
+      node.has_parameter(name)) {
+    if (const auto lanelet_id = node.get_parameter(name).as_int(); lanelet_id) {
+      constraints.emplace(name, [lanelet_id](auto && lanelet, auto && map, auto &&...) {
+        auto found = map.laneletLayer.find(lanelet_id);
+        return found != map.laneletLayer.end() and
+               std::abs(direction(lanelet.centerline3d()).dot(direction(found->centerline3d()))) <=
+                 0.5;
       });
     }
   }
@@ -284,8 +296,9 @@ auto loadAllLaneletConstraints(Node & node, const std::string & prefix = "")
   DECLARE_PARAMETER_IF_NOT_DECLARED("centerline_curvature_greater_than"     , std::numeric_limits<double>::lowest()  );
   DECLARE_PARAMETER_IF_NOT_DECLARED("centerline_curvature_less_than"        , std::numeric_limits<double>::max()     );
   DECLARE_PARAMETER_IF_NOT_DECLARED("conflicts_with"                        , lanelet::Id()                          );
-  DECLARE_PARAMETER_IF_NOT_DECLARED("direction_is_roughly_the_opposite_of"  , lanelet::Id()                          );
-  DECLARE_PARAMETER_IF_NOT_DECLARED("direction_is_roughly_the_same_as"      , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("direction_is_roughly_antiparallel_to"  , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("direction_is_roughly_parallel_to"      , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("direction_is_roughly_perpendicular_to" , lanelet::Id()                          );
   DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_equal_to"                        , lanelet::Id()                          );
   DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_greater_than"                    , lanelet::Id()                          );
   DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_less_than"                       , std::numeric_limits<lanelet::Id>::max());

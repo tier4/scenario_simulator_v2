@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef MAP_FRAGMENT__ROAD_SGEMENTS__GEOMETRIC_OPERATIONS__HPP_
+#ifndef MAP_FRAGMENT__ROAD_SEGMENTS__GEOMETRIC_OPERATIONS__HPP_
 #define MAP_FRAGMENT__ROAD_SEGMENTS__GEOMETRIC_OPERATIONS__HPP_
 
 #include <boost/test/tools/floating_point_comparison.hpp>
