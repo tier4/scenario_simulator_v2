@@ -218,7 +218,7 @@ auto HdMapUtils::getLaneletIds() const -> lanelet::Ids
   return ids;
 }
 
-auto HdMapUtils::getLaneletPolygon(const lanelet::Id & lanelet_id) const
+auto HdMapUtils::getLaneletPolygon(const lanelet::Id lanelet_id) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
@@ -310,7 +310,7 @@ auto HdMapUtils::getHeight(const traffic_simulator_msgs::msg::LaneletPose & lane
 }
 
 auto HdMapUtils::getCollisionPointInLaneCoordinate(
-  const lanelet::Id & lanelet_id, const lanelet::Id & crossing_lanelet_id) const
+  const lanelet::Id lanelet_id, const lanelet::Id crossing_lanelet_id) const
   -> std::optional<double>
 {
   namespace bg = boost::geometry;
@@ -393,7 +393,7 @@ auto HdMapUtils::getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) co
 }
 
 auto HdMapUtils::clipTrajectoryFromLaneletIds(
-  const lanelet::Id & lanelet_id, const double s, const lanelet::Ids & lanelet_ids,
+  const lanelet::Id lanelet_id, const double s, const lanelet::Ids & lanelet_ids,
   const double forward_distance) const -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> ret;
@@ -555,7 +555,7 @@ auto HdMapUtils::toLaneletPose(
 }
 
 auto HdMapUtils::toLaneletPose(
-  const geometry_msgs::msg::Pose & pose, const lanelet::Id & lanelet_id,
+  const geometry_msgs::msg::Pose & pose, const lanelet::Id lanelet_id,
   const double matching_distance) const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
   const auto spline = getCenterPointsSpline(lanelet_id);
@@ -630,7 +630,7 @@ auto HdMapUtils::toLaneletPose(
 }
 
 auto HdMapUtils::toLaneletPoses(
-  const geometry_msgs::msg::Pose & pose, const lanelet::Id & lanelet_id,
+  const geometry_msgs::msg::Pose & pose, const lanelet::Id lanelet_id,
   const double matching_distance, const bool include_opposite_direction) const
   -> std::vector<traffic_simulator_msgs::msg::LaneletPose>
 {
@@ -697,7 +697,7 @@ auto HdMapUtils::getSpeedLimit(const lanelet::Ids & lanelet_ids) const -> double
 }
 
 auto HdMapUtils::getLaneChangeableLaneletId(
-  const lanelet::Id & lanelet_id, const traffic_simulator::lane_change::Direction direction,
+  const lanelet::Id lanelet_id, const traffic_simulator::lane_change::Direction direction,
   const std::uint8_t shift) const -> std::optional<lanelet::Id>
 {
   if (shift == 0) {
@@ -721,7 +721,7 @@ auto HdMapUtils::getLaneChangeableLaneletId(
 }
 
 auto HdMapUtils::getLaneChangeableLaneletId(
-  const lanelet::Id & lanelet_id, const traffic_simulator::lane_change::Direction direction) const
+  const lanelet::Id lanelet_id, const traffic_simulator::lane_change::Direction direction) const
   -> std::optional<lanelet::Id>
 {
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -744,7 +744,7 @@ auto HdMapUtils::getLaneChangeableLaneletId(
   return target;
 }
 
-auto HdMapUtils::getPreviousLanelets(const lanelet::Id & lanelet_id, const double distance) const
+auto HdMapUtils::getPreviousLanelets(const lanelet::Id lanelet_id, const double distance) const
   -> lanelet::Ids
 {
   lanelet::Ids ret;
@@ -770,7 +770,7 @@ auto HdMapUtils::getPreviousLanelets(const lanelet::Id & lanelet_id, const doubl
   return ret;
 }
 
-auto HdMapUtils::isInRoute(const lanelet::Id & lanelet_id, const lanelet::Ids & route) const -> bool
+auto HdMapUtils::isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) const -> bool
 {
   return std::find_if(route.begin(), route.end(), [lanelet_id](const auto id) {
            return lanelet_id == id;
@@ -778,7 +778,7 @@ auto HdMapUtils::isInRoute(const lanelet::Id & lanelet_id, const lanelet::Ids & 
 }
 
 auto HdMapUtils::getFollowingLanelets(
-  const lanelet::Id & lanelet_id, const lanelet::Ids & candidate_lanelet_ids, const double distance,
+  const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids, const double distance,
   const bool include_self) const -> lanelet::Ids
 {
   if (candidate_lanelet_ids.empty()) {
@@ -816,7 +816,7 @@ auto HdMapUtils::getFollowingLanelets(
 }
 
 auto HdMapUtils::getFollowingLanelets(
-  const lanelet::Id & lanelet_id, const double distance, const bool include_self) const
+  const lanelet::Id lanelet_id, const double distance, const bool include_self) const
   -> lanelet::Ids
 {
   lanelet::Ids ret;
@@ -841,8 +841,8 @@ auto HdMapUtils::getFollowingLanelets(
   return ret;
 }
 
-auto HdMapUtils::getRoute(
-  const lanelet::Id & from_lanelet_id, const lanelet::Id & to_lanelet_id) const -> lanelet::Ids
+auto HdMapUtils::getRoute(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) const
+  -> lanelet::Ids
 {
   if (route_cache_.exists(from_lanelet_id, to_lanelet_id)) {
     return route_cache_.getRoute(from_lanelet_id, to_lanelet_id);
@@ -868,7 +868,7 @@ auto HdMapUtils::getRoute(
   return ids;
 }
 
-auto HdMapUtils::getCenterPointsSpline(const lanelet::Id & lanelet_id) const
+auto HdMapUtils::getCenterPointsSpline(const lanelet::Id lanelet_id) const
   -> std::shared_ptr<math::geometry::CatmullRomSpline>
 {
   getCenterPoints(lanelet_id);
@@ -889,7 +889,7 @@ auto HdMapUtils::getCenterPoints(const lanelet::Ids & lanelet_ids) const
   return ret;
 }
 
-auto HdMapUtils::getCenterPoints(const lanelet::Id & lanelet_id) const
+auto HdMapUtils::getCenterPoints(const lanelet::Id lanelet_id) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> ret;
@@ -928,7 +928,7 @@ auto HdMapUtils::getCenterPoints(const lanelet::Id & lanelet_id) const
   return ret;
 }
 
-auto HdMapUtils::getLaneletLength(const lanelet::Id & lanelet_id) const -> double
+auto HdMapUtils::getLaneletLength(const lanelet::Id lanelet_id) const -> double
 {
   if (lanelet_length_cache_.exists(lanelet_id)) {
     return lanelet_length_cache_.getLength(lanelet_id);
@@ -938,8 +938,7 @@ auto HdMapUtils::getLaneletLength(const lanelet::Id & lanelet_id) const -> doubl
   return ret;
 }
 
-auto HdMapUtils::getPreviousRoadShoulderLanelet(const lanelet::Id & lanelet_id) const
-  -> lanelet::Ids
+auto HdMapUtils::getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -951,7 +950,7 @@ auto HdMapUtils::getPreviousRoadShoulderLanelet(const lanelet::Id & lanelet_id) 
   return ids;
 }
 
-auto HdMapUtils::getPreviousLaneletIds(const lanelet::Id & lanelet_id) const -> lanelet::Ids
+auto HdMapUtils::getPreviousLaneletIds(const lanelet::Id lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -974,7 +973,7 @@ auto HdMapUtils::getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) const -
 }
 
 auto HdMapUtils::getPreviousLaneletIds(
-  const lanelet::Id & lanelet_id, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Id lanelet_id, const std::string & turn_direction) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -996,7 +995,7 @@ auto HdMapUtils::getPreviousLaneletIds(
   return sortAndUnique(ids);
 }
 
-auto HdMapUtils::getNextRoadShoulderLanelet(const lanelet::Id & lanelet_id) const -> lanelet::Ids
+auto HdMapUtils::getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -1008,7 +1007,7 @@ auto HdMapUtils::getNextRoadShoulderLanelet(const lanelet::Id & lanelet_id) cons
   return ids;
 }
 
-auto HdMapUtils::getNextLaneletIds(const lanelet::Id & lanelet_id) const -> lanelet::Ids
+auto HdMapUtils::getNextLaneletIds(const lanelet::Id lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -1031,7 +1030,7 @@ auto HdMapUtils::getNextLaneletIds(const lanelet::Ids & lanelet_ids) const -> la
 }
 
 auto HdMapUtils::getNextLaneletIds(
-  const lanelet::Id & lanelet_id, const std::string & turn_direction) const -> lanelet::Ids
+  const lanelet::Id lanelet_id, const std::string & turn_direction) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
@@ -1073,7 +1072,7 @@ auto HdMapUtils::getTrafficLightIds() const -> lanelet::Ids
 }
 
 auto HdMapUtils::getTrafficLightBulbPosition(
-  const lanelet::Id & traffic_light_id, const std::string & color_name) const
+  const lanelet::Id traffic_light_id, const std::string & color_name) const
   -> std::optional<geometry_msgs::msg::Point>
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(lanelet_map_ptr_);
@@ -1146,20 +1145,20 @@ auto HdMapUtils::getAlongLaneletPose(
   return along_pose;
 }
 
-auto HdMapUtils::getLeftBound(const lanelet::Id & lanelet_id) const
+auto HdMapUtils::getLeftBound(const lanelet::Id lanelet_id) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).leftBound());
 }
 
-auto HdMapUtils::getRightBound(const lanelet::Id & lanelet_id) const
+auto HdMapUtils::getRightBound(const lanelet::Id lanelet_id) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   return toPolygon(lanelet_map_ptr_->laneletLayer.get(lanelet_id).rightBound());
 }
 
 auto HdMapUtils::getLeftLaneletIds(
-  const lanelet::Id & lanelet_id, const traffic_simulator_msgs::msg::EntityType & type,
+  const lanelet::Id lanelet_id, const traffic_simulator_msgs::msg::EntityType & type,
   const bool include_opposite_direction) const -> lanelet::Ids
 {
   switch (type.type) {
@@ -1375,12 +1374,12 @@ auto HdMapUtils::getVectorFromPose(const geometry_msgs::msg::Pose & pose, const 
   return vector;
 }
 
-auto HdMapUtils::isInLanelet(const lanelet::Id & lanelet_id, const double s) const -> bool
+auto HdMapUtils::isInLanelet(const lanelet::Id lanelet_id, const double s) const -> bool
 {
   return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
 }
 
-auto HdMapUtils::toMapPoints(const lanelet::Id & lanelet_id, const std::vector<double> & s) const
+auto HdMapUtils::toMapPoints(const lanelet::Id lanelet_id, const std::vector<double> & s) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> ret;
@@ -1420,14 +1419,14 @@ auto HdMapUtils::toMapPose(const traffic_simulator_msgs::msg::LaneletPose & lane
   }
 }
 
-auto HdMapUtils::getTangentVector(const lanelet::Id & lanelet_id, const double s) const
+auto HdMapUtils::getTangentVector(const lanelet::Id lanelet_id, const double s) const
   -> std::optional<geometry_msgs::msg::Vector3>
 {
   return getCenterPointsSpline(lanelet_id)->getTangentVector(s);
 }
 
 auto HdMapUtils::canChangeLane(
-  const lanelet::Id & from_lanelet_id, const lanelet::Id & to_lanelet_id) const -> bool
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) const -> bool
 {
   const auto from_lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
@@ -1604,7 +1603,7 @@ auto HdMapUtils::getRightOfWayLaneletIds(const lanelet::Ids & lanelet_ids) const
   return ret;
 }
 
-auto HdMapUtils::getRightOfWayLaneletIds(const lanelet::Id & lanelet_id) const -> lanelet::Ids
+auto HdMapUtils::getRightOfWayLaneletIds(const lanelet::Id lanelet_id) const -> lanelet::Ids
 {
   lanelet::Ids ids;
   for (const auto & right_of_way :
@@ -1672,7 +1671,7 @@ auto HdMapUtils::getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const
   return stop_line_ids;
 }
 
-auto HdMapUtils::getTrafficLights(const lanelet::Id & traffic_light_id) const
+auto HdMapUtils::getTrafficLights(const lanelet::Id traffic_light_id) const
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>
 {
   std::vector<lanelet::AutowareTrafficLightConstPtr> ret;
@@ -1694,7 +1693,7 @@ auto HdMapUtils::getTrafficLights(const lanelet::Id & traffic_light_id) const
   return ret;
 }
 
-auto HdMapUtils::getTrafficLightStopLineIds(const lanelet::Id & traffic_light_id) const
+auto HdMapUtils::getTrafficLightStopLineIds(const lanelet::Id traffic_light_id) const
   -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -1706,7 +1705,7 @@ auto HdMapUtils::getTrafficLightStopLineIds(const lanelet::Id & traffic_light_id
   return ids;
 }
 
-auto HdMapUtils::getTrafficLightStopLinesPoints(const lanelet::Id & traffic_light_id) const
+auto HdMapUtils::getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_id) const
   -> std::vector<std::vector<geometry_msgs::msg::Point>>
 {
   std::vector<std::vector<geometry_msgs::msg::Point>> ret;
@@ -1728,7 +1727,7 @@ auto HdMapUtils::getTrafficLightStopLinesPoints(const lanelet::Id & traffic_ligh
   return ret;
 }
 
-auto HdMapUtils::getStopLinePolygon(const lanelet::Id & lanelet_id) const
+auto HdMapUtils::getStopLinePolygon(const lanelet::Id lanelet_id) const
   -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
@@ -1802,7 +1801,7 @@ auto HdMapUtils::getDistanceToTrafficLightStopLine(
 
 auto HdMapUtils::getDistanceToTrafficLightStopLine(
   const std::vector<geometry_msgs::msg::Point> & waypoints,
-  const lanelet::Id & traffic_light_id) const -> std::optional<double>
+  const lanelet::Id traffic_light_id) const -> std::optional<double>
 {
   if (waypoints.empty()) {
     return std::nullopt;
@@ -1820,7 +1819,7 @@ auto HdMapUtils::getDistanceToTrafficLightStopLine(
 
 auto HdMapUtils::getDistanceToTrafficLightStopLine(
   const math::geometry::CatmullRomSplineInterface & spline,
-  const lanelet::Id & traffic_light_id) const -> std::optional<double>
+  const lanelet::Id traffic_light_id) const -> std::optional<double>
 {
   if (spline.getLength() <= 0) {
     return std::nullopt;
@@ -2011,7 +2010,7 @@ auto HdMapUtils::getLanelets(const lanelet::Ids & lanelet_ids) const -> lanelet:
   return lanelets;
 }
 
-auto HdMapUtils::isTrafficLight(const lanelet::Id & lanelet_id) const -> bool
+auto HdMapUtils::isTrafficLight(const lanelet::Id lanelet_id) const -> bool
 {
   using namespace lanelet;
 
@@ -2025,7 +2024,7 @@ auto HdMapUtils::isTrafficLight(const lanelet::Id & lanelet_id) const -> bool
   return false;
 }
 
-auto HdMapUtils::isTrafficLightRegulatoryElement(const lanelet::Id & lanelet_id) const -> bool
+auto HdMapUtils::isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) const -> bool
 {
   return lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
