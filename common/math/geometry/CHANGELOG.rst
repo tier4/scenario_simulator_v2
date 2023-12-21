@@ -2,8 +2,8 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2023-12-21)
+------------------
 * Merge pull request `#1139 <https://github.com/tier4/scenario_simulator_v2/issues/1139>`_ from tier4/fix/geometry-bug-fixes
 * Revert "Remove tests that do not pass"
 * Merge branch 'fix/get-polygon-0-points' into fix/geometry-bug-fixes

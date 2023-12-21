@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2023-12-21)
+------------------
 * Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
 * Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
 * Merge remote-tracking branch 'origin/master' into feature/random_scenario

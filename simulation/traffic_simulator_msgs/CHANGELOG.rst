@@ -2,8 +2,8 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2023-12-21)
+------------------
 * feat: remove DELETED entity type by using internal id
 * feat: add deleted entity to traffic simulator
 * Merge branch 'master' into feature/freespace-distance-condition

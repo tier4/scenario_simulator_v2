@@ -2,8 +2,8 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2023-12-21)
+------------------
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge branch 'master' into feature/freespace-distance-condition
 * Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection

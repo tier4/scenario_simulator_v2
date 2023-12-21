@@ -2,8 +2,8 @@
 Changelog for package openscenario_interpreter_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2023-12-21)
+------------------
 * Merge branch 'master' into feature/freespace-distance-condition
 * Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
 * Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased

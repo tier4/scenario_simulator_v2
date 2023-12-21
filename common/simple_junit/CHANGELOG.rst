@@ -2,8 +2,8 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2023-12-21)
+------------------
 * Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
 * Merge remote-tracking branch 'origin/master' into feature/random_scenario
 * Merge branch 'experimental/merge-master' into feature/test-geometry-spline-subspline

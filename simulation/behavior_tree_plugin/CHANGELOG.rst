@@ -2,8 +2,8 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2023-12-21)
+------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into prepare/release-0.9.0
 * Merge pull request `#1129 <https://github.com/tier4/scenario_simulator_v2/issues/1129>`_ from tier4/feature/RJD-716_add_follow_waypoint_controller
 * feat(follow_trajectory): add target_speed into consideration

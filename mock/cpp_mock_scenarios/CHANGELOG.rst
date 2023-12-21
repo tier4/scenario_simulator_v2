@@ -2,8 +2,8 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2023-12-21)
+------------------
 * Merge pull request `#1139 <https://github.com/tier4/scenario_simulator_v2/issues/1139>`_ from tier4/fix/geometry-bug-fixes
 * Merge remote-tracking branch 'tier4/master' into fix/geometry-bug-fixes
 * Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller

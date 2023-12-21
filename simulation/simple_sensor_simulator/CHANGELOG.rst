@@ -2,8 +2,8 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.9.0 (2023-12-21)
+------------------
 * Merge remote-tracking branch 'tier4/master' into fix/geometry-bug-fixes
 * Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
 * Merge remote-tracking branch 'origin/master' into feature/traffic-lights-awsim-support
