@@ -79,7 +79,7 @@ def launch_setup(context, *args, **kwargs):
     sigterm_timeout                 = LaunchConfiguration("sigterm_timeout",                default=8)
     vehicle_model                   = LaunchConfiguration("vehicle_model",                  default="")
     workflow                        = LaunchConfiguration("workflow",                       default=Path("/dev/null"))
-    use_simulation_time             = LaunchConfiguration("use_simulation_time",            default=False)
+    use_simulation_time             = LaunchConfiguration("use_simulation_time",            default=True)
     # fmt: on
 
     print(f"architecture_type       := {architecture_type.perform(context)}")
