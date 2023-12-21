@@ -79,6 +79,7 @@ def launch_setup(context, *args, **kwargs):
     sigterm_timeout                 = LaunchConfiguration("sigterm_timeout",                default=8)
     vehicle_model                   = LaunchConfiguration("vehicle_model",                  default="")
     workflow                        = LaunchConfiguration("workflow",                       default=Path("/dev/null"))
+    use_simulation_time             = LaunchConfiguration("use_simulation_time",            default=False)
     # fmt: on
 
     print(f"architecture_type       := {architecture_type.perform(context)}")
@@ -99,6 +100,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"sigterm_timeout         := {sigterm_timeout.perform(context)}")
     print(f"vehicle_model           := {vehicle_model.perform(context)}")
     print(f"workflow                := {workflow.perform(context)}")
+    print(f"use_simulation_time     := {use_simulation_time.perform(context)}")
 
     def make_parameters():
         parameters = [
@@ -146,6 +148,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("sigterm_timeout",         default_value=sigterm_timeout        ),
         DeclareLaunchArgument("vehicle_model",           default_value=vehicle_model          ),
         DeclareLaunchArgument("workflow",                default_value=workflow               ),
+        DeclareLaunchArgument("use_simulation_time",     default_value=use_simulation_time    ),
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -184,7 +187,7 @@ def launch_setup(context, *args, **kwargs):
             executable="openscenario_interpreter_node",
             namespace="simulation",
             output="screen",
-            parameters=[{"use_sim_time": True}]+make_parameters(),
+            parameters=[{"use_sim_time": use_simulation_time}]+make_parameters(),
             on_exit=ShutdownOnce(),
         ),
         Node(
