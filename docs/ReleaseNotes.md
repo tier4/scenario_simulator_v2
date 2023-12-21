@@ -4,6 +4,23 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+
+Bug Fixes:bug:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+
+Minor Tweaks :oncoming_police_car:
+
+| Feature | Brief summary | Category | Pull request | Contributor |
+| ------- | ------------- | -------- | ------------ | ----------- |
+
+## Version 0.9.0
+
+Major Changes :race_car: :red_car: :blue_car:
+
 | Feature                                                               | Brief summary                                                                                                                                                                                               | Category                                                                   | Pull request                                                      | Contributor                                             |
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------- |
 | Traffic Light Simulation                                              | Start supporting to traffic light messages in `autoware_perception_msgs`.                                                                                                                                   | `openscenario_interpreter`, `traffic_simulator`, `simple_sensor_simulator` | [#1027](https://github.com/tier4/scenario_simulator_v2/pull/1027) | [HansRobo](https://github.com/HansRobo)                 |
