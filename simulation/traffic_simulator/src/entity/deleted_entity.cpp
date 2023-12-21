@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <limits>
 #include <traffic_simulator/entity/deleted_entity.hpp>
 
 namespace traffic_simulator
@@ -32,10 +31,6 @@ DeletedEntity::DeletedEntity(
   status.bounding_box.dimensions.x = 0;
   status.bounding_box.dimensions.y = 0;
   status.bounding_box.dimensions.z = 0;
-  status.pose.position.x = std::numeric_limits<double>::infinity();
-  status.pose.position.y = std::numeric_limits<double>::infinity();
-  status.pose.position.z = std::numeric_limits<double>::infinity();
-  status.lanelet_pose_valid = false;
   status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
   status_before_update_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
 }
