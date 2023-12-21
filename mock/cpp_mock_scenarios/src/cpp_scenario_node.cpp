@@ -85,6 +85,59 @@ void CppScenarioNode::stop(Result result, const std::string & description)
   std::exit(0);
 }
 
+void CppScenarioNode::spawnEgoEntity(
+  const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
+  const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_poses,
+  const traffic_simulator_msgs::msg::VehicleParameters & parameters)
+{
+  api_.updateFrame();
+  std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
+  api_.spawn("ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware());
+  api_.attachLidarSensor("ego", 0.0);
+
+  api_.attachDetectionSensor("ego", 200.0, true, 0.0, 0, 0.0, 0.0);
+
+  api_.attachOccupancyGridSensor([this] {
+    simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+    // clang-format off
+      configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
+      configuration.set_entity("ego");
+      configuration.set_filter_by_range(true);
+      configuration.set_height(200);
+      configuration.set_range(300);
+      configuration.set_resolution(0.5);
+      configuration.set_update_duration(0.1);
+      configuration.set_width(200);
+    // clang-format on
+    return configuration;
+  }());
+  api_.requestAssignRoute("ego", goal_lanelet_poses);
+  using namespace std::chrono_literals;
+  std::atomic<bool> initialized(false);
+  auto initialize_thread = std::thread([&]() {
+    while (!api_.asFieldOperatorApplication("ego").engaged()) {
+      api_.updateFrame();
+      std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
+    }
+    initialized.store(true);
+  });
+  std::atomic<bool> engaged(false);
+  auto engage_thread = std::thread([&]() {
+    while (!api_.asFieldOperatorApplication("ego").engaged()) {
+      api_.asFieldOperatorApplication("ego").engage();
+      std::this_thread::sleep_for(1000ms);
+    }
+    engaged.store(true);
+  });
+  while (!api_.asFieldOperatorApplication("ego").engaged() &&
+         !(initialized.load() && engaged.load())) {
+    // RCLCPP_INFO_STREAM(get_logger(), "Waiting for Autoware initialization...");
+    std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
+  }
+  initialize_thread.join();
+  engage_thread.join();
+}
+
 void CppScenarioNode::checkConfiguration(const traffic_simulator::Configuration & configuration)
 {
   try {

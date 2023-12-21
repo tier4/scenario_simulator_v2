@@ -27,7 +27,8 @@ namespace follow_trajectory
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus &,
   traffic_simulator_msgs::msg::PolylineTrajectory &,
-  const traffic_simulator_msgs::msg::BehaviorParameter &, double step_time)
+  const traffic_simulator_msgs::msg::BehaviorParameter &, double step_time,
+  std::optional<double> target_speed = std::nullopt)
   -> std::optional<traffic_simulator_msgs::msg::EntityStatus>;
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
