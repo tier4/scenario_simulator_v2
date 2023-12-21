@@ -2,6 +2,34 @@
 Changelog for package junit_exporter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
+* Merge remote-tracking branch 'origin/master' into feature/random_scenario
+* Merge branch 'experimental/merge-master' into feature/test-geometry-spline-subspline
+* Merge remote-tracking branch 'tier4/master' into experimental/merge-master
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
+* Merge pull request `#1113 <https://github.com/tier4/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
+* fix typo
+* update Doxyfile
+* Merge branch 'master' into feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Mateusz Palczuk, Michał Kiełczykowski, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.8.0 (2023-09-05)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth

@@ -2,6 +2,127 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into prepare/release-0.9.0
+* Merge pull request `#1129 <https://github.com/tier4/scenario_simulator_v2/issues/1129>`_ from tier4/feature/RJD-716_add_follow_waypoint_controller
+* Merge remote-tracking branch 'tier4/master' into fix/geometry-bug-fixes
+* Merge pull request `#1149 <https://github.com/tier4/scenario_simulator_v2/issues/1149>`_ from tier4/feature/traffic-lights-awsim-support
+* Merge remote-tracking branch 'origin/master' into feature/traffic-lights-awsim-support
+* fixed typo in scenario name
+* Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
+* Merge pull request `#1033 <https://github.com/tier4/scenario_simulator_v2/issues/1033>`_ from tier4/feat/condition_groups_visualization
+* add scenario file for varification
+* Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
+* Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
+* Merge remote-tracking branch 'origin/master' into feature/random_scenario
+* v2i and conventional traffic lights AWSIM scenario samples
+* Merge branch 'experimental/merge-master' into feature/test-geometry-spline-subspline
+* ref(follow_trajectory): remove unecessary changes
+* Merge pull request `#1126 <https://github.com/tier4/scenario_simulator_v2/issues/1126>`_ from tier4/fix/duplicated_nodes
+* feat(follow_trajectory): add follow waypoint controller
+* fix(launch): add comment about the change from LifecycleNode to Node
+* Merge branch 'master' into fix/duplicated_nodes
+* Merge pull request `#1111 <https://github.com/tier4/scenario_simulator_v2/issues/1111>`_ from tier4/feature/traffic_light_confidence
+* Merge remote-tracking branch 'tier4/master' into experimental/merge-master
+* fix(launch): remove name keyword from openscenario_interpreter, openscenario_prepreocessor and simples_sensor_simulator nodes
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
+* Merge pull request `#1121 <https://github.com/tier4/scenario_simulator_v2/issues/1121>`_ from tier4/fix/sign-of-relative-distance
+* Merge remote-tracking branch 'origin/master' into fix/sign-of-relative-distance
+* Merge pull request `#1096 <https://github.com/tier4/scenario_simulator_v2/issues/1096>`_ from tier4/feature/deleted-entity
+* Update test scenario to not expect negative distance for `RelativeDistanceCondition` in non-lane coordinate systems
+* feat: update CustomCommandAction.PseudoTrafficSignalDetectorConfidenceSetAction@v1.yaml
+* chore: update author of sample scenario
+* chore: add example scenario of DeleteEntityAction
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into fix/rtc_command_action/continuous_execution
+* Merge pull request `#1092 <https://github.com/tier4/scenario_simulator_v2/issues/1092>`_ from tier4/feature/control_rtc_auto_mode
+* Merge pull request `#1099 <https://github.com/tier4/scenario_simulator_v2/issues/1099>`_ from tier4/pzyskowski/660/ss2-awsim-connection
+* Merge pull request `#1098 <https://github.com/tier4/scenario_simulator_v2/issues/1098>`_ from tier4/fix/port_document
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* fix: destination of CustomCommandAction.RequestToCooperateCommandAction@v1.yaml
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+* Merge pull request `#1093 <https://github.com/tier4/scenario_simulator_v2/issues/1093>`_ from tier4/feature/RJD-614_follow_trajectory_action_pedestrian_cyclist_support
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* feat: add continuous rtc action execution in CustomCommandAction.RequestToCooperateCommandAction@v1.yaml
+* refactor: delete cooperator property from CustomCommandAction.RequestToCooperateCommandAction@v1.yaml
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* change default port to 5555
+* Merge remote-tracking branch 'origin/master' into fix/port_document
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* refactor(simulator_core): use featureIdentifiersRequiringExternalPermissionForAutonomousDecisions instead of manualModules
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+* Merge pull request `#1075 <https://github.com/tier4/scenario_simulator_v2/issues/1075>`_ from tier4/feature/RJD-96_detail_message_scenario_failure
+* change default port to 8080
+* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
+* change port
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge branch 'master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge pull request `#1095 <https://github.com/tier4/scenario_simulator_v2/issues/1095>`_ from tier4/feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge branch 'master' into feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* code refactor
+* implement freespace for relative distance condition
+* Init working version of DistanceCondition freespace
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+* feat: update scenario for new RTC feature
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* feat(test_runner): add FollowTrajectoryAction for bicycle and pedestrian
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* fix(test_runner): fix scenarios directory
+* feat(scenario_test_runner): add workflow for simulation failure - detailed message
+* Merge pull request `#1069 <https://github.com/tier4/scenario_simulator_v2/issues/1069>`_ from tier4/feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/drop_galactic_support
+* Merge pull request `#1027 <https://github.com/tier4/scenario_simulator_v2/issues/1027>`_ from tier4/feature/new_traffic_light
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Initial version of freespace distance condition
+* chore: change architecture_type to awf/universe/20230906
+* misc object updated in sample awsim
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* updated npc in awsim_sample scenario
+* Update `update` to use `updateStatus` instead of `setStatus`
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* added MiscObject to awsim_sample scenario
+* fixed map path
+* added modifier to awsim sample scenario
+* sample awsim scenario added, model3d added to sample vehicle catalogue
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Add new test scenario `RoutingAction.FollowTrajectoryAction-autoware`
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* refactor: update architecture_type format
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* feat: add new architecture_type awf/universe/2023.08
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Mateusz Palczuk, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, f0reachARR, kyoichi-sugahara, yamacir-kit
+
 0.8.0 (2023-09-05)
 ------------------
 * Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status
