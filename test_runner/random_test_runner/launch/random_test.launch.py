@@ -202,9 +202,9 @@ class RandomTestRunnerLaunch(object):
 
         scenario_node = Node(
             package="random_test_runner",
-            executable="random_test_runner",
+            executable="random_test_runner_node",
             namespace="simulation",
-            name="random_test_runner",
+            name="random_test_runner_node",
             output="screen",
             arguments=[("__log_level:=info")],
             parameters=parameters
