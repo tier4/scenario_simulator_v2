@@ -92,10 +92,10 @@ try {
 
   return EXIT_SUCCESS;
 } catch (const std::exception & exception) {
-  std::cerr << exception.what() << " (";
-  for (auto i = 0; i < argc; ++i) {
-    std::cerr << argv[i] << (i + 1 < argc ? " " : ")");
-  }
-  std::cerr << std::endl;
+  std::cerr << exception.what() << " ("
+            << std::accumulate(
+                 argv + 1, argv + argc, std::string(argv[0]),
+                 [](auto && a, auto && b) { return a + ' ' + b; })
+            << std::endl;
   return EXIT_FAILURE;
 }

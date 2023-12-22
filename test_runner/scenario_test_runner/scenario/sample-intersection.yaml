@@ -34,30 +34,26 @@ OpenSCENARIO:
         parameterType: string
         value: $(ros2 run map_fragment path --ros-args
           -p any_middle_lanelets_related_to_regulatory_element_subtyped:=traffic_light
-          -p any_middle_lanelets_turn_direction:=right
+          -p any_middle_lanelets_is_intersection:='[right, straight]'
           -p ignore_errors_ocurred_while_parsing_lanelet_map:=true
           -p input_directory:=$(var map_path)
           -p path_element_limit:=3
-          -p select:=any
-          )
+          -p select:=any)
       - name: ego_start_lanelet_id
         parameterType: string
         value: $(ros2 run map_fragment array --ros-args
           -p element:=first
-          -p input:='$(var ego_path)'
-          )
+          -p input:='$(var ego_path)')
       - name: ego_goal_lanelet_id
         parameterType: string
         value: $(ros2 run map_fragment array --ros-args
           -p element:=last
-          -p input:='$(var ego_path)'
-          )
+          -p input:='$(var ego_path)')
       - name: curve_id
         parameterType: string
         value: $(ros2 run map_fragment array --ros-args
           -p input:='$(var ego_path)'
-          -p index:=1
-          )
+          -p index:=1)
       - name: vehicle1_path
         parameterType: string
         value: $(ros2 run map_fragment path --ros-args
@@ -68,20 +64,17 @@ OpenSCENARIO:
           -p ignore_errors_ocurred_while_parsing_lanelet_map:=true
           -p input_directory:=$(var map_path)
           -p path_element_limit:=3
-          -p select:=any
-          )
+          -p select:=any)
       - name: vehicle1_start_lanelet_id
         parameterType: string
         value: $(ros2 run map_fragment array --ros-args
           -p element:=first
-          -p input:='$(var vehicle1_path)'
-          )
+          -p input:='$(var vehicle1_path)')
       - name: vehicle1_goal_lanelet_id
         parameterType: string
         value: $(ros2 run map_fragment array --ros-args
           -p element:=last
-          -p input:='$(var vehicle1_path)'
-          )
+          -p input:='$(var vehicle1_path)')
   CatalogLocations:
     VehicleCatalog:
       Directory:

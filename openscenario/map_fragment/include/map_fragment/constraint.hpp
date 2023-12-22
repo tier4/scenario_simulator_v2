@@ -19,8 +19,10 @@
 #include <lanelet2_routing/RoutingGraph.h>
 
 #include <algorithm>
+#include <iterator>
 #include <limits>
 #include <map_fragment/map_fragment.hpp>
+#include <stdexcept>
 
 namespace map_fragment
 {
@@ -49,18 +51,41 @@ auto isRightmost(
          });
 }
 
-auto direction(const lanelet::ConstLineString3d & points)
+auto direction(
+  const lanelet::ConstLineString3d & points,
+  typename std::iterator_traits<lanelet::ConstLineString3d::iterator>::difference_type from,
+  typename std::iterator_traits<lanelet::ConstLineString3d::iterator>::difference_type to)
 {
-  auto vectors = Eigen::MatrixXd(3, points.size() - 1);
+  if (from < to) {
+    auto vectors = Eigen::MatrixXd(3, to - from);
 
-  for (auto iter = points.begin(); iter != std::prev(points.end()); ++iter) {
-    vectors.col(std::distance(points.begin(), iter))
-      << (std::next(iter)->basicPoint() - iter->basicPoint()).normalized();
+    for (auto i = from; i < to; ++i) {
+      vectors.col(i - from) << (points[i + 1].basicPoint() - points[i].basicPoint()).normalized();
+    }
+
+    // cspell: ignore rowwise
+    return vectors.rowwise().sum().normalized();
+  } else {
+    std::stringstream what;
+    what << "function map_fragment::direction was given an invalid index pair. The values are "
+         << from << " and " << to
+         << ", the latter must be greater than the former. There is a very high possibility that "
+            "this is a bug rather than incorrect user input. Please let the developer know this "
+            "error message along with the command you ran.";
+    throw std::logic_error(what.str());
   }
+}
 
-  // cspell: ignore rowwise
-  return vectors.rowwise().sum().normalized();
+auto direction(const lanelet::ConstLineString3d & points) -> decltype(auto)
+{
+  return direction(points, 0, points.size() - 1);
 };
+
+template <typename... Ts>
+auto direction(const lanelet::ConstLanelet & lanelet, Ts &&... xs) -> decltype(auto)
+{
+  return direction(lanelet.centerline3d(), std::forward<decltype(xs)>(xs)...);
+}
 
 template <typename Node>
 auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
@@ -224,6 +249,23 @@ auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
     }
   }
 
+  if (const auto name = prefix + "is_intersection"; node.has_parameter(name)) {
+    if (const auto turn_directions = node.get_parameter(name).as_string_array();
+        1 < turn_directions.size()) {
+      constraints.emplace(name, [turn_directions](auto && lanelet, auto &&, auto && graph) {
+        const auto conflictings = graph.conflicting(lanelet);
+        return lanelet.attributeOr("turn_direction", "") == turn_directions[0] and
+               std::any_of(conflictings.begin(), conflictings.end(), [&](auto && conflicting) {
+                 return conflicting.lanelet() and
+                        conflicting.lanelet()->attributeOr("turn_direction", "") ==
+                          turn_directions[1] and
+                        direction(lanelet, 0, 1).dot(direction(conflicting.lanelet().get(), 0, 1)) <
+                          -0.5;
+               });
+      });
+    }
+  }
+
   if (const auto name = prefix + "direction_is_roughly_parallel_to"; node.has_parameter(name)) {
     if (const auto lanelet_id = node.get_parameter(name).as_int(); lanelet_id) {
       constraints.emplace(name, [lanelet_id](auto && lanelet, auto && map, auto &&...) {
@@ -303,6 +345,7 @@ auto loadAllLaneletConstraints(Node & node, const std::string & prefix = "")
   DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_greater_than"                    , lanelet::Id()                          );
   DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_less_than"                       , std::numeric_limits<lanelet::Id>::max());
   DECLARE_PARAMETER_IF_NOT_DECLARED("id_is_not_equal_to"                    , lanelet::Id()                          );
+  DECLARE_PARAMETER_IF_NOT_DECLARED("is_intersection"                       , std::vector<std::string>()             );
   DECLARE_PARAMETER_IF_NOT_DECLARED("is_leftmost"                           , false                                  );
   DECLARE_PARAMETER_IF_NOT_DECLARED("is_left_of"                            , lanelet::Id()                          );
   DECLARE_PARAMETER_IF_NOT_DECLARED("is_not_leftmost"                       , false                                  );
