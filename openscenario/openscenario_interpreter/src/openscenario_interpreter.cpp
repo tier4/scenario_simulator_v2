@@ -137,7 +137,7 @@ auto Interpreter::engageable() const -> bool
 {
   return std::all_of(
     std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [](const auto & each) {
+    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
       const auto & [name, scenario_object] = each;
       return not scenario_object.template is<ScenarioObject>() or
              not scenario_object.template as<ScenarioObject>().is_added or
@@ -151,7 +151,7 @@ auto Interpreter::engaged() const -> bool
 {
   return std::all_of(
     std::cbegin(currentScenarioDefinition()->entities),
-    std::cend(currentScenarioDefinition()->entities), [](const auto & each) {
+    std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
       const auto & [name, scenario_object] = each;
       return not scenario_object.template is<ScenarioObject>() or
              not scenario_object.template as<ScenarioObject>().is_added or
