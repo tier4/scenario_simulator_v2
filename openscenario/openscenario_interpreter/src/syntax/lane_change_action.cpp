@@ -45,11 +45,12 @@ LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
 auto LaneChangeAction::accomplished() -> bool
 {
   return std::all_of(std::begin(accomplishments), std::end(accomplishments), [&](auto & each) {
-    auto objects = each.first.objects();
-    return each.second or (each.second = not std::all_of(
-                             std::begin(objects), std::end(objects), [](const auto & object) {
-                               return evaluateCurrentState(object) == "lane_change";
-                             }));
+    const auto is_lane_changing = [&](const auto & actor) {
+      auto evaluation =
+        actor.apply([&](const auto & object) { evaluateCurrentState(object) == "lane_change"; });
+      return not evaluation.size() or evaluation.min();
+    };
+    return each.second or (each.second = not is_lane_changing(each.first));
   });
 }
 
