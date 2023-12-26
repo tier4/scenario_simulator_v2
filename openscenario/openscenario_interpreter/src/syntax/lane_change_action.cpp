@@ -44,14 +44,13 @@ LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
 
 auto LaneChangeAction::accomplished() -> bool
 {
-  return std::all_of(
-    std::begin(accomplishments), std::end(accomplishments), [&](auto & accomplishment) {
-      auto objects = accomplishment.first.objectNames();
-      return accomplishment.second or
-             (accomplishment.second = not std::all_of(
-                std::begin(objects), std::end(objects),
-                [](const auto & object) { return evaluateCurrentState(object) == "lane_change"; }));
-    });
+  return std::all_of(std::begin(accomplishments), std::end(accomplishments), [&](auto & each) {
+    auto objects = each.first.objectNames();
+    return each.second or (each.second = not std::all_of(
+                             std::begin(objects), std::end(objects), [](const auto & object) {
+                               return evaluateCurrentState(object) == "lane_change";
+                             }));
+  });
 }
 
 auto LaneChangeAction::endsImmediately() noexcept -> bool { return false; }
