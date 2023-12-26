@@ -111,7 +111,7 @@ auto SpeedAction::start() -> void
     accomplishments.emplace(actor, false);
   }
 
-  for (const auto & each : accomplishments) {
+  for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       each.first.evaluate([&](const auto & object) {
         applySpeedAction(
