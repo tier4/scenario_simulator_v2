@@ -1662,6 +1662,11 @@ auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
   return ret;
 }
 
+auto getStopLineIdsOnPath() const -> lanelet::Ids
+{
+  lanelet::Ids stop_line_ids;
+}
+
 auto HdMapUtils::getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids
 {
   lanelet::Ids stop_line_ids;

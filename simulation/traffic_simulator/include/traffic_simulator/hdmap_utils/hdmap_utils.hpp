@@ -227,6 +227,8 @@ public:
 
   auto getSpeedLimit(const lanelet::Ids &) const -> double;
 
+  auto getStopLineIds() const -> lanelet::Ids;
+
   auto getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids;
 
   auto getStopLinePolygon(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
