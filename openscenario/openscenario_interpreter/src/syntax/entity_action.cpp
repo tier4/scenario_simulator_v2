@@ -39,9 +39,8 @@ auto EntityAction::run() noexcept -> void {}
 
 auto EntityAction::start() const -> void
 {
-  for (const auto & entity : entity_ref.objects()) {
-    apply<void>([&](auto && action) { action(entity); }, *this);
-  }
+  entity_ref.apply(
+    [&](const auto & object) { apply<void>([&](auto && action) { action(object); }, *this); });
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
