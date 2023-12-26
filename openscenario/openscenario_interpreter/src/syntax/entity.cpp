@@ -28,22 +28,20 @@
 #include <set>
 #include <stdexcept>
 
-#include "openscenario_interpreter/reader/attribute.hpp"
-
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-EntityBase::EntityBase(const String & name, const Entities & entities) : Object(entities.ref(name))
+EntityBase::EntityBase(const ScenarioObject & object) : Object(make(object)) {}
+
+EntityBase::EntityBase(const EntitySelection & object) : Object(make(object)) {}
+
+EntityBase::EntityBase(const String & name, const Scope & scope)
+: Object(scope.global().entities->ref(name))
 {
 }
 
-EntityBase::EntityBase(const String & name, Scope & scope)
-: EntityBase(name, *scope.global().entities)
-{
-}
-
-EntityBase::EntityBase(const pugi::xml_node & node, Scope & scope)
+EntityBase::EntityBase(const pugi::xml_node & node, const Scope & scope)
 : EntityBase(readAttribute<String>("entityRef", node, scope), scope)
 {
 }
@@ -62,18 +60,15 @@ auto throwIfNotSingle(const Object & entity) -> void
   }
 }
 
-SingleEntity::SingleEntity(const String & name, const Entities & entities)
-: EntityBase(name, entities)
+SingleEntity::SingleEntity(const ScenarioObject & object) : EntityBase(object) {}
+
+SingleEntity::SingleEntity(const String & name, const Scope & scope) : EntityBase(name, scope)
 {
   throwIfNotSingle(*this);
 }
 
-SingleEntity::SingleEntity(const String & name, Scope & scope) : EntityBase(name, scope)
-{
-  throwIfNotSingle(*this);
-}
-
-SingleEntity::SingleEntity(const pugi::xml_node & node, Scope & scope) : EntityBase(node, scope)
+SingleEntity::SingleEntity(const pugi::xml_node & node, const Scope & scope)
+: EntityBase(node, scope)
 {
   throwIfNotSingle(*this);
 }
@@ -82,10 +77,12 @@ SingleEntity::operator String() const { return this->name(); }
 
 SingleEntity::operator EntityRef() const { return this->name(); }
 
-auto GroupedEntity::objectNames() const -> std::set<EntityRef>
+GroupedEntity::GroupedEntity(const SingleEntity & single) : EntityBase(single) {}
+
+auto GroupedEntity::objects() const -> std::set<SingleEntity>
 {
   if (is<ScenarioObject>()) {
-    return {as<ScenarioObject>().name};
+    return {as<ScenarioObject>()};
   } else if (is<EntitySelection>()) {
     return as<EntitySelection>().objects();
   } else {

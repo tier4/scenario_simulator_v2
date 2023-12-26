@@ -38,15 +38,21 @@ inline namespace syntax
 {
 struct Entities;
 
+struct ScenarioObject;
+
+struct EntitySelection;
+
 struct EntityBase : public Object
 {
   EntityBase() = default;
 
-  EntityBase(const String & name, const Entities & entities);
+  EntityBase(const ScenarioObject & object);
 
-  EntityBase(const String & name, Scope & scope);
+  EntityBase(const EntitySelection & object);
 
-  EntityBase(const pugi::xml_node & node, Scope & scope);
+  EntityBase(const String & name, const Scope & scope);
+
+  EntityBase(const pugi::xml_node & node, const Scope & scope);
 
   auto name() const -> String;
 };
@@ -57,11 +63,11 @@ struct SingleEntity : public EntityBase
 {
   SingleEntity() = default;
 
-  SingleEntity(const String & name, const Entities & entities);
+  SingleEntity(const ScenarioObject & object);
 
-  SingleEntity(const String & name, Scope & scope);
+  SingleEntity(const String & name, const Scope & scope);
 
-  SingleEntity(const pugi::xml_node & node, Scope & scope);
+  SingleEntity(const pugi::xml_node & node, const Scope & scope);
 
   operator String() const;
 
@@ -72,15 +78,17 @@ struct GroupedEntity : public EntityBase
 {
   using EntityBase::EntityBase;
 
-  auto objectNames() const -> std::set<EntityRef>;
+  GroupedEntity(const SingleEntity & single);
+
+  auto objects() const -> std::set<SingleEntity>;
 
   auto objectTypes() const -> std::set<ObjectType::value_type>;
 
   template <typename Function>
   auto apply(const Function & function) const
   {
-    using Result = std::invoke_result_t<Function, String>;
-    auto objects = this->objectNames();
+    using Result = std::invoke_result_t<Function, SingleEntity>;
+    auto objects = this->objects();
     if constexpr (std::is_same_v<Result, void>) {
       std::for_each(std::begin(objects), std::end(objects), function);
     } else {

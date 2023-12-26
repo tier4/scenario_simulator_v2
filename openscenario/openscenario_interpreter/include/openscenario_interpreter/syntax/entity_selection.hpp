@@ -16,6 +16,7 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_SELECTION_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/selected_entities.hpp>
@@ -39,7 +40,7 @@ struct EntitySelection : public Scope, public SelectedEntities
 {
   explicit EntitySelection(const pugi::xml_node & node, Scope & scope);
 
-  auto objects() const -> std::set<EntityRef>;
+  auto objects() const -> std::set<SingleEntity>;
 
   auto objectTypes() const -> std::set<ObjectType::value_type>;
 };

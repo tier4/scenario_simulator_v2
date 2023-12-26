@@ -25,6 +25,8 @@
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <set>
 
+#include "openscenario_interpreter/syntax/entity.hpp"
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
@@ -35,24 +37,24 @@ EntitySelection::EntitySelection(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto EntitySelection::objects() const -> std::set<EntityRef>
+auto EntitySelection::objects() const -> std::set<SingleEntity>
 {
-  return apply<std::set<EntityRef>>(
+  return apply<std::set<SingleEntity>>(
     overload(
       [&](const SelectedEntityRefs & entity_refs) {
-        auto result = std::set<EntityRef>{};
+        auto result = std::set<SingleEntity>{};
         for (const auto & entity_ref : entity_refs.entityRefs) {
-          result.merge(entity_ref.objectNames());
+          result.merge(entity_ref.objects());
         }
         return result;
       },
       [&](const SelectedByTypes &) {
-        auto result = std::set<EntityRef>{};
+        auto result = std::set<SingleEntity>{};
         auto types = objectTypes();
         for (const auto & [name, object] : *global().entities) {
           if (
             object.is<ScenarioObject>() and types.count(object.as<ScenarioObject>().objectType())) {
-            result.emplace(name);
+            result.emplace(name, *this);
           }
         }
         return result;

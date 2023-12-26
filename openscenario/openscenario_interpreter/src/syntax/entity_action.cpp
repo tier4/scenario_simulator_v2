@@ -39,7 +39,7 @@ auto EntityAction::run() noexcept -> void {}
 
 auto EntityAction::start() const -> void
 {
-  for (const auto & entity : entity_ref.objectNames()) {
+  for (const auto & entity : entity_ref.objects()) {
     apply<void>([&](auto && action) { action(entity); }, *this);
   }
 }
