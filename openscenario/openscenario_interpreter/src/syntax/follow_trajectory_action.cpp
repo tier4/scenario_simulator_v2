@@ -53,11 +53,11 @@ auto FollowTrajectoryAction::accomplished() -> bool
   } else {
     return std::all_of(
       std::begin(accomplishments), std::end(accomplishments), [this](auto && accomplishment) {
-        auto is_running = [this](auto & actor) {
+        auto is_running = [this](auto &&... xs) {
           if (trajectory_ref.trajectory.as<Trajectory>().shape.is<Polyline>()) {
             auto objects = actor.objectNames();
             return std::all_of(std::begin(objects), std::end(objects), [&](auto & object) {
-              return evaluateCurrentState(object) == "follow_polyline_trajectory";
+              return evaluateCurrentState(std::forward<decltype(xs)>(xs)...) == "follow_polyline_trajectory";
             });
           } else {
             return false;
