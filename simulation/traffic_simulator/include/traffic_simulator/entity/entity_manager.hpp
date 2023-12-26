@@ -244,7 +244,7 @@ public:
     }
   }
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   /*!                                                                 \
    @brief Forward to arguments to the HDMapUtils::NAME function.      \
@@ -265,7 +265,7 @@ public:
 
 #undef FORWARD_TO_HDMAP_UTILS
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
   /*!                                                                            \
    @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \

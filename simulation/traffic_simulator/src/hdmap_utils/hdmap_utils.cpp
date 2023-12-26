@@ -1631,6 +1631,20 @@ auto HdMapUtils::getTrafficSignRegElementsOnPath(const lanelet::Ids & lanelet_id
   return ret;
 }
 
+auto HdMapUtils::getTrafficSignRegElements() const
+  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
+{
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
+  for (const auto & lanelet_id : getLaneletIds()) {
+    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+    const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
+    for (const auto & traffic_sign : traffic_signs) {
+      ret.push_back(traffic_sign);
+    }
+  }
+  return ret;
+}
+
 auto HdMapUtils::getTrafficLightRegElementsOnPath(const lanelet::Ids & lanelet_ids) const
   -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
 {
@@ -1646,12 +1660,10 @@ auto HdMapUtils::getTrafficLightRegElementsOnPath(const lanelet::Ids & lanelet_i
   return ret;
 }
 
-auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
-  -> lanelet::ConstLineStrings3d
+auto HdMapUtils::getStopLines() const -> lanelet::ConstLineStrings3d
 {
   lanelet::ConstLineStrings3d ret;
-  const auto traffic_signs = getTrafficSignRegElementsOnPath(lanelet_ids);
-  for (const auto & traffic_sign : traffic_signs) {
+  for (const auto & traffic_sign : getTrafficSignRegElements()) {
     if (traffic_sign->type() != "stop_sign") {
       continue;
     }
@@ -1662,9 +1674,28 @@ auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
   return ret;
 }
 
-auto getStopLineIdsOnPath() const -> lanelet::Ids
+auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
+  -> lanelet::ConstLineStrings3d
+{
+  lanelet::ConstLineStrings3d ret;
+  for (const auto & traffic_sign : getTrafficSignRegElementsOnPath(lanelet_ids)) {
+    if (traffic_sign->type() != "stop_sign") {
+      continue;
+    }
+    for (const auto & stop_line : traffic_sign->refLines()) {
+      ret.push_back(stop_line);
+    }
+  }
+  return ret;
+}
+
+auto HdMapUtils::getStopLineIds() const -> lanelet::Ids
 {
   lanelet::Ids stop_line_ids;
+  for (const auto & ret : getStopLines()) {
+    stop_line_ids.push_back(ret.id());
+  }
+  return stop_line_ids;
 }
 
 auto HdMapUtils::getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids

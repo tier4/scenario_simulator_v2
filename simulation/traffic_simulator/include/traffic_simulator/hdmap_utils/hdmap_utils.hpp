@@ -364,6 +364,8 @@ private:
 
   auto getPreviousRoadShoulderLanelet(const lanelet::Id) const -> lanelet::Ids;
 
+  auto getStopLines() const -> lanelet::ConstLineStrings3d;
+
   auto getStopLinesOnPath(const lanelet::Ids &) const -> lanelet::ConstLineStrings3d;
 
   auto getTrafficLightRegElementsOnPath(const lanelet::Ids &) const
@@ -373,6 +375,9 @@ private:
     -> std::vector<lanelet::AutowareTrafficLightConstPtr>;
 
   auto getTrafficSignRegElementsOnPath(const lanelet::Ids &) const
+    -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
+
+  auto getTrafficSignRegElements() const
     -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
 
   auto getVectorFromPose(const geometry_msgs::msg::Pose &, const double magnitude) const

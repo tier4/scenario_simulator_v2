@@ -271,7 +271,7 @@ public:
     const lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
    @brief Forward to arguments to the EntityManager::NAME function.        \
