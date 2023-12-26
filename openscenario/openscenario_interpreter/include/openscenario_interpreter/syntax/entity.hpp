@@ -15,8 +15,10 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__ENTITY_HPP_
 
+#include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <iterator>
 #include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
@@ -24,6 +26,9 @@
 #include <pugixml.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
+#include <type_traits>
+#include <valarray>
+#include <vector>
 
 namespace openscenario_interpreter
 {
@@ -70,6 +75,20 @@ struct GroupedEntity : public EntityBase
   auto objectNames() const -> std::set<EntityRef>;
 
   auto objectTypes() const -> std::set<ObjectType::value_type>;
+
+  template <typename Function>
+  auto evaluate(const Function & function) const
+  {
+    using Result = std::invoke_result_t<Function, String>;
+    auto objects = this->objectNames();
+    if constexpr (std::is_same_v<Result, void>) {
+      std::for_each(std::begin(objects), std::end(objects), function);
+    } else {
+      auto results = std::valarray<Result>(objects.size());
+      std::transform(std::begin(objects), std::end(objects), std::begin(results), function);
+      return results;
+    }
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
