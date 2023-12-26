@@ -54,7 +54,7 @@ auto SpeedAction::accomplished() -> bool
   };
 
   auto check = [this](auto && actor) {
-    auto evaluation = actor.evaluate([](const auto & object) { return evaluateSpeed(object); });
+    auto evaluation = actor.apply([](const auto & object) { return evaluateSpeed(object); });
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       return not evaluation.size() or
              equal_to<std::valarray<double>>()(
@@ -113,7 +113,7 @@ auto SpeedAction::start() -> void
 
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      each.first.evaluate([&](const auto & object) {
+      each.first.apply([&](const auto & object) {
         applySpeedAction(
           object, speed_action_target.as<AbsoluteTargetSpeed>().value,
           static_cast<traffic_simulator::speed_change::Transition>(
@@ -121,7 +121,7 @@ auto SpeedAction::start() -> void
           static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics), true);
       });
     } else {
-      each.first.evaluate([&](const auto & object) {
+      each.first.apply([&](const auto & object) {
         applySpeedAction(
           object,
           static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(

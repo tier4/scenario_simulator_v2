@@ -25,6 +25,7 @@
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <pugixml.hpp>
+#include <valarray>
 
 namespace openscenario_interpreter
 {
@@ -79,7 +80,7 @@ struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvalua
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<std::vector<Double>> results;  // for description
+  std::vector<std::valarray<double>> results;  // for description
 
   explicit DistanceCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 

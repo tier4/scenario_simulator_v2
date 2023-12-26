@@ -75,14 +75,9 @@ auto ReachPositionCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    auto objects = triggering_entity.objectNames();
-    std::transform(
-      std::begin(objects), std::end(objects), std::begin(results.emplace_back(objects.size())),
-      [&](const auto & object) { return apply<Double>(distance, position, object); });
-
-    return std::all_of(std::begin(results.back()), std::end(results.back()), [&](auto distance) {
-      return compare(distance, tolerance);
-    });
+    results.push_back(triggering_entity.apply(
+      [&](const auto & object) { return apply<double>(distance, position, object); }));
+    return not results.back().size() or compare(results.back(), tolerance).min();
   }));
 }
 }  // namespace syntax

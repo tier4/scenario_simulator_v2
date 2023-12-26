@@ -55,10 +55,10 @@ auto CollisionCondition::evaluate() const -> Object
     another_given_entity.is<SingleEntity>() and
     global().entities->isAdded(another_given_entity.as<SingleEntity>())) {
     return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-      auto objects = triggering_entity.objectNames();
-      return std::any_of(std::begin(objects), std::end(objects), [&](const auto & object) {
+      auto evaluation = triggering_entity.apply([&](const auto & object) {
         return evaluateCollisionCondition(object, another_given_entity.as<SingleEntity>());
       });
+      return not evaluation.size() or evaluation.min();
     }));
   } else {
     // TODO ByType

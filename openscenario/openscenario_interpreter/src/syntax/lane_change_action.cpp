@@ -45,7 +45,7 @@ LaneChangeAction::LaneChangeAction(const pugi::xml_node & node, Scope & scope)
 auto LaneChangeAction::accomplished() -> bool
 {
   return std::all_of(std::begin(accomplishments), std::end(accomplishments), [&](auto & each) {
-    auto objects = each.first.objectNames();
+    auto objects = each.first.objects();
     return each.second or (each.second = not std::all_of(
                              std::begin(objects), std::end(objects), [](const auto & object) {
                                return evaluateCurrentState(object) == "lane_change";
@@ -66,20 +66,22 @@ auto LaneChangeAction::start() -> void
   }
 
   for (const auto & accomplishment : accomplishments) {
-    for (const auto & object : accomplishment.first.objectNames()) {
-      if (lane_change_target.is<AbsoluteTargetLane>()) {
+    if (lane_change_target.is<AbsoluteTargetLane>()) {
+      accomplishment.first.apply([&](const auto & object) {
         applyLaneChangeAction(
           object, static_cast<traffic_simulator::lane_change::AbsoluteTarget>(*this),
           static_cast<traffic_simulator::lane_change::TrajectoryShape>(
             lane_change_action_dynamics.dynamics_shape),
           static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
-      } else {
+      });
+    } else {
+      accomplishment.first.apply([&](const auto & object) {
         applyLaneChangeAction(
           object, static_cast<traffic_simulator::lane_change::RelativeTarget>(*this),
           static_cast<traffic_simulator::lane_change::TrajectoryShape>(
             lane_change_action_dynamics.dynamics_shape),
           static_cast<traffic_simulator::lane_change::Constraint>(lane_change_action_dynamics));
-      }
+      });
     }
   }
 }

@@ -86,18 +86,20 @@ auto SpeedProfileAction::apply(
     }
   };
 
-  for (const auto & object : actor.objectNames()) {
-    applyProfileAction(object, dynamic_constraints);
+  actor.apply([&](const auto & object) { applyProfileAction(object, dynamic_constraints); });
 
-    if (entity_ref) {
+  if (entity_ref) {
+    actor.apply([&](const auto & object) {
       applySpeedAction(
         object, absolute_target_speed(), transition(), constraint(),
         std::isnan(speed_profile_entry.time));
-    } else {
+    });
+  } else {
+    actor.apply([&](const auto & object) {
       applySpeedAction(
         object, relative_target_speed(), transition(), constraint(),
         std::isnan(speed_profile_entry.time));
-    }
+    });
   }
 }
 
@@ -116,7 +118,7 @@ auto SpeedProfileAction::run() -> void
 {
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-      auto objects = actor.objectNames();
+      auto objects = actor.objects();
       return std::all_of(std::begin(objects), std::end(objects), [&](const auto & object) {
         if (entity_ref) {
           return equal_to<double>()(evaluateSpeed(object), speed_profile_entry.speed);

@@ -53,10 +53,10 @@ auto AssignRouteAction::run() -> void {}
 auto AssignRouteAction::start() -> void
 {
   for (const auto & actor : actors) {
-    for (const auto & object : actor.objectNames()) {
+    actor.apply([&](const auto & object) {
       applyAssignRouteAction(
         object, static_cast<std::vector<NativeLanePosition>>(route.as<const Route>()));
-    }
+    });
   }
 }
 }  // namespace syntax

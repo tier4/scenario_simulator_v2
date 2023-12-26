@@ -52,12 +52,10 @@ auto TeleportAction::run() noexcept -> void {}
 auto TeleportAction::start() const -> void
 {
   for (const auto & actor : actors) {
-    for (const auto & object : actor.objectNames()) {
-      if (not global().entities->isAdded(object)) {
-        AddEntityAction(local(), position)(object);  // NOTE: TIER IV extension
-      } else {
-        teleport(object, position);
-      }
+    if (not global().entities->isAdded(actor)) {
+      actor.apply(AddEntityAction(local(), position));  // NOTE: TIER IV extension
+    } else {
+      actor.apply([&](const auto & object) { teleport(object, position); });
     }
   }
 }

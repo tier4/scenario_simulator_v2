@@ -53,9 +53,7 @@ auto ControllerAction::run() noexcept -> void {}
 auto ControllerAction::start() const -> void
 {
   for (const auto & actor : actors) {
-    for (const auto & object : actor.objectNames()) {
-      assign_controller_action(object);
-    }
+    actor.apply(assign_controller_action);
   }
 }
 }  // namespace syntax
