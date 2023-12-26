@@ -77,7 +77,7 @@ struct GroupedEntity : public EntityBase
   auto objectTypes() const -> std::set<ObjectType::value_type>;
 
   template <typename Function>
-  auto evaluate(const Function & function) const
+  auto apply(const Function & function) const
   {
     using Result = std::invoke_result_t<Function, String>;
     auto objects = this->objectNames();
