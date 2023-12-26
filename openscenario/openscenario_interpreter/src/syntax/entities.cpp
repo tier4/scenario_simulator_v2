@@ -31,8 +31,7 @@ Entities::Entities(const pugi::xml_node & node, Scope & scope)
   });
 
   traverse<0, unbounded>(node, "EntitySelection", [&](auto && node) {
-    emplace(
-      readAttribute<String>("name", node, scope), make<EntitySelection>(node, scope));
+    emplace(readAttribute<String>("name", node, scope), make<EntitySelection>(node, scope));
   });
 }
 
