@@ -29,17 +29,17 @@ AcquirePositionAction::AcquirePositionAction(const pugi::xml_node & node, Scope 
 auto AcquirePositionAction::start() -> void
 {
   const auto acquire_position = overload(
-    [](const WorldPosition & position, auto && object) {
-      return applyAcquirePositionAction(object, static_cast<geometry_msgs::msg::Pose>(position));
+    [](const WorldPosition & position, auto && actor) {
+      return applyAcquirePositionAction(actor, static_cast<geometry_msgs::msg::Pose>(position));
     },
-    [](const RelativeWorldPosition & position, auto && object) {
-      return applyAcquirePositionAction(object, static_cast<NativeLanePosition>(position));
+    [](const RelativeWorldPosition & position, auto && actor) {
+      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position));
     },
-    [](const RelativeObjectPosition & position, auto && object) {
-      return applyAcquirePositionAction(object, static_cast<NativeLanePosition>(position));
+    [](const RelativeObjectPosition & position, auto && actor) {
+      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position));
     },
-    [](const LanePosition & position, auto && object) {
-      return applyAcquirePositionAction(object, static_cast<NativeLanePosition>(position));
+    [](const LanePosition & position, auto && actor) {
+      return applyAcquirePositionAction(actor, static_cast<NativeLanePosition>(position));
     });
 
   for (const auto & actor : actors) {
