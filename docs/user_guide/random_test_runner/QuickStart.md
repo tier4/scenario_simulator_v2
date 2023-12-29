@@ -107,7 +107,7 @@ Random test runner will load `result.yaml` file and rerun test.
 3. Launch `random_test_runner`.
 
 ```bash
-ros2 launch random_test_runner random_test.launch.py map_name:=shinjuku_map symulator_type:=awsim \
+ros2 launch random_test_runner random_test.launch.py map_name:=shinjuku_map simulator_type:=awsim \
 initialize_duration:=260 sensor_model:=awsim_sensor_kit  vehicle_model:=sample_vehicle  \
 autoware_launch_file:=e2e_simulator.launch.xml autoware_architecture:="awf/universe/20230906"
 ```
