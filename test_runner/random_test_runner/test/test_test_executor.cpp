@@ -117,9 +117,8 @@ TEST(TestExecutor, InitializeWithNoNPCs)
 
   auto test_case = common::junit::SimpleTestCase("test_case");
   auto test_executor = TestExecutor<MockTrafficSimulatorAPI>(
-    MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case),
-    SimulatorType::SIMPLE_SENSOR_SIMULATOR, ArchitectureType::AWF_UNIVERSE,
-    rclcpp::get_logger("test_executor_test"));
+    MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
+    ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
 
   EXPECT_CALL(*MockAPI, updateFrame).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, canonicalize).Times(1).InSequence(sequence);
@@ -154,9 +153,8 @@ TEST(TestExecutor, UpdateNoNPCs)
 
   auto test_case = common::junit::SimpleTestCase("test_case");
   auto test_executor = TestExecutor<MockTrafficSimulatorAPI>(
-    MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case),
-    SimulatorType::SIMPLE_SENSOR_SIMULATOR, ArchitectureType::AWF_UNIVERSE,
-    rclcpp::get_logger("test_executor_test"));
+    MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
+    ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
 
   EXPECT_CALL(*MockAPI, isEgoSpawned)
     .Times(1)
@@ -175,7 +173,7 @@ TEST(TestExecutor, UpdateNoNPCs)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(1.0));
-  EXPECT_CALL(*MockAPI, getEntityStatusMock).Times(1).InSequence(sequence);
+  EXPECT_CALL(*MockAPI, getEntityStatusMock).Times(2).InSequence(sequence);
   EXPECT_CALL(*MockAPI, updateFrame).Times(1).InSequence(sequence);
 
   test_executor.update();
@@ -186,9 +184,8 @@ TEST(TestExecutor, DeinitializeWithNoNPCs)
   auto MockAPI = std::make_shared<::testing::StrictMock<MockTrafficSimulatorAPI>>();
   auto test_case = common::junit::SimpleTestCase("test_case");
   auto test_executor = TestExecutor<MockTrafficSimulatorAPI>(
-    MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case),
-    SimulatorType::SIMPLE_SENSOR_SIMULATOR, ArchitectureType::AWF_UNIVERSE,
-    rclcpp::get_logger("test_executor_test"));
+    MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
+    ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
 
   EXPECT_CALL(*MockAPI, despawn("ego")).Times(1);
 
