@@ -28,6 +28,7 @@ namespace vehicle_simulation
 enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
+  DELAY_STEER_MAP_ACC_GEARED,
   DELAY_STEER_VEL,
   IDEAL_STEER_ACC,
   IDEAL_STEER_ACC_GEARED,
