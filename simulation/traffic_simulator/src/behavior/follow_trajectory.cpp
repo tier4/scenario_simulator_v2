@@ -57,6 +57,7 @@ auto makeUpdatedStatus(
   using math::geometry::operator+=;
 
   using math::geometry::hypot;
+  using math::geometry::innerProduct;
   using math::geometry::norm;
   using math::geometry::normalize;
   using math::geometry::truncate;
@@ -351,6 +352,20 @@ auto makeUpdatedStatus(
       std::quoted(entity_status.name),
       "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
       desired_velocity.y, ", ", desired_velocity.z, "].");
+  } else if (const auto current_velocity =
+               [&]() {
+                 const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(
+                                    entity_status.pose.orientation)
+                                    .z;
+                 geometry_msgs::msg::Vector3 direction;
+                 direction.x = std::cos(yaw) * speed;
+                 direction.y = std::sin(yaw) * speed;
+                 direction.z = 0.0;
+                 return direction;
+               }();
+             (speed * step_time) > distance_to_front_waypoint &&
+             innerProduct(desired_velocity, current_velocity) < 0.0) {
+    return discard_the_front_waypoint_and_recurse();
   } else if (auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
                desired_acceleration, remaining_time_to_front_waypoint, distance, acceleration,
                speed);
@@ -492,9 +507,6 @@ auto makeUpdatedStatus(
           " from that waypoint which is greater than the accepted accuracy.");
       }
     }
-    const auto current_velocity =
-      quaternion_operation::convertQuaternionToEulerAngle(entity_status.pose.orientation) *
-      entity_status.action_status.twist.linear.x;
 
     /*
        Note: If obstacle avoidance is to be implemented, the steering behavior
