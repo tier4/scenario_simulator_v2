@@ -63,9 +63,23 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       not polyline_trajectory) {
     return BT::NodeStatus::FAILURE;
   } else if (
-    const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
+    auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
       static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
-      behavior_parameter, step_time, target_speed)) {
+      behavior_parameter, step_time,
+      target_speed ? target_speed.value()
+                   : std::min(
+                       hdmap_utils->getSpeedLimit(route_lanelets),
+                       behavior_parameter.dynamic_constraints.max_speed))) {
+    // matching distance has been set to 3.0 due to matching problems during lane changes
+    if (const auto lanelet_pose = hdmap_utils->toLaneletPose(
+          updated_status->pose, entity_status->getBoundingBox(), false, 3.0);
+        lanelet_pose) {
+      updated_status->lanelet_pose = lanelet_pose.value();
+      updated_status->lanelet_pose_valid = true;
+    } else {
+      updated_status->lanelet_pose_valid = false;
+    }
+
     setOutput(
       "updated_status",
       std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
