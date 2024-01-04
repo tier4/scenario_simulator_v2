@@ -23,6 +23,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <simulation_interface/zmq_multi_client.hpp>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
@@ -35,6 +36,8 @@ namespace entity
 class EgoEntity : public VehicleEntity
 {
   const std::unique_ptr<concealer::FieldOperatorApplication> field_operator_application;
+
+  zeromq::MultiClient zeromq_client;
 
   static auto makeFieldOperatorApplication(const Configuration &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
@@ -91,6 +94,10 @@ public:
   void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
+
+  auto requestFollowTrajectory(
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter)
+    -> void override;
 
   void requestLaneChange(const lanelet::Id) override;
 

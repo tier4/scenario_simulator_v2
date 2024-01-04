@@ -83,6 +83,8 @@ EgoEntity::EgoEntity(
   const Configuration & configuration)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
   field_operator_application(makeFieldOperatorApplication(configuration)),
+  zeromq_client(
+    simulation_interface::protocol, configuration.simulator_host, getParameter<int>("port")),
   externally_updated_status_(entity_status)
 {
 }
@@ -211,6 +213,19 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 }
 
+auto EgoEntity::requestFollowTrajectory(
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
+{
+  VehicleEntity::requestFollowTrajectory(parameter);
+  auto request = simulation_api_schema::FollowPolylineTrajectoryRequest();
+  *request.mutable_name() = name;
+  *request.mutable_trajectory() = simulation_interface::toProtobufMessage(*parameter);
+  if (!zeromq_client.call(request).result().success()) {
+    THROW_SEMANTIC_ERROR(
+      "Zeromq request failure - failed to set up FollowPolylineTrajectory in EgoVehicleSimulation");
+  }
+}
+
 void EgoEntity::requestLaneChange(const lanelet::Id)
 {
   THROW_SEMANTIC_ERROR(
@@ -261,6 +276,14 @@ auto EgoEntity::setStatusExternally(const CanonicalizedEntityStatus & status) ->
 void EgoEntity::requestSpeedChange(double value, bool)
 {
   field_operator_application->restrictTargetSpeed(value);
+
+  auto request = simulation_api_schema::SetTargetSpeedRequest();
+  *request.mutable_name() = name;
+  request.set_target_speed(value);
+  if (!zeromq_client.call(request).result().success()) {
+    THROW_SEMANTIC_ERROR(
+      "Zeromq request failure - failed to set target_speed in EgoVehicleSimulation");
+  }
 }
 
 void EgoEntity::requestSpeedChange(
@@ -271,6 +294,14 @@ void EgoEntity::requestSpeedChange(
 auto EgoEntity::setVelocityLimit(double value) -> void  //
 {
   field_operator_application->setVelocityLimit(value);
+
+  auto request = simulation_api_schema::SetVelocityLimitRequest();
+  *request.mutable_name() = name;
+  request.set_max_speed(value);
+  if (!zeromq_client.call(request).result().success()) {
+    THROW_SEMANTIC_ERROR(
+      "Zeromq request failure - failed to set max_speed in EgoVehicleSimulation");
+  }
 }
 
 auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
