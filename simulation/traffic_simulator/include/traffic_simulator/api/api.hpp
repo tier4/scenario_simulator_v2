@@ -251,9 +251,6 @@ public:
 
   void startNpcLogic();
 
-  auto requestFollowTrajectory(
-    const std::string &, const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &)
-    -> bool;
 
   void requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id);
 
@@ -330,6 +327,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
+  FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
