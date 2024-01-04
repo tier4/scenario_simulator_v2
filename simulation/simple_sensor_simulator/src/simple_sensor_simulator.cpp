@@ -23,8 +23,8 @@
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <string>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <utility>
 #include <vector>
 

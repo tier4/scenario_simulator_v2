@@ -251,7 +251,6 @@ public:
 
   void startNpcLogic();
 
-
   void requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id);
 
   void requestLaneChange(const std::string & name, const lane_change::Direction & direction);

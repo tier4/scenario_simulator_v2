@@ -22,8 +22,8 @@
 #include <concealer/field_operator_application.hpp>
 #include <memory>
 #include <optional>
-#include <string>
 #include <simulation_interface/zmq_multi_client.hpp>
+#include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
