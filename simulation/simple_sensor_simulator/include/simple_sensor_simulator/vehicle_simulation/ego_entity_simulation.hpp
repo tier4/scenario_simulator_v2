@@ -19,6 +19,7 @@
 #include <memory>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
@@ -40,8 +41,6 @@ class EgoEntitySimulation
 public:
   const std::unique_ptr<concealer::Autoware> autoware;
 
-  traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory;
-
 private:
   const VehicleModelType vehicle_model_type_;
 
@@ -59,6 +58,12 @@ private:
     -> const std::shared_ptr<SimModelInterface>;
 
   traffic_simulator_msgs::msg::EntityStatus status_;
+
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
+
+  traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory_;
+
+  std::optional<double> target_speed_;
 
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
@@ -90,6 +95,16 @@ public:
   auto setInitialStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
+
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
+
+  auto setBehaviorParameter(
+    const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) -> void;
+
+  auto setPolylineTrajectory(const traffic_simulator_msgs::msg::PolylineTrajectory & trajectory)
+    -> void;
+
+  auto setTargetSpeed(const double target_speed) -> void;
 
   auto updateStatus(double time, double step_time) -> void;
 

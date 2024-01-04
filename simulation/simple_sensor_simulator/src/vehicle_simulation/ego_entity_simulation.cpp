@@ -204,10 +204,21 @@ void EgoEntitySimulation::update(
 {
   autoware->rethrow();
 
+  auto target_speed = [&]() -> double {
+    if (target_speed_.has_value()) {
+      return target_speed_.value();
+    } else if (status_.lanelet_pose_valid) {
+      return std::min(
+        hdmap_utils_ptr_->getSpeedLimit(
+          hdmap_utils_ptr_->getFollowingLanelets(status_.lanelet_pose.lanelet_id)),
+        behavior_parameter_.dynamic_constraints.max_speed);
+    } else {
+      THROW_SEMANTIC_ERROR("EgoEntity has a invalid lanelet position.");
+    }
+  }();
   if (npc_logic_started) {
     if (auto status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-          status_, polyline_trajectory, traffic_simulator_msgs::msg::BehaviorParameter(),
-          step_time);
+          status_, polyline_trajectory_, behavior_parameter_, step_time, target_speed);
         status) {
       using quaternion_operation::convertQuaternionToEulerAngle;
       using quaternion_operation::getRotationMatrix;
@@ -365,6 +376,29 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
   setAutowareStatus();
 }
 
+auto EgoEntitySimulation::getBehaviorParameter() const
+  -> traffic_simulator_msgs::msg::BehaviorParameter
+{
+  return behavior_parameter_;
+}
+
+auto EgoEntitySimulation::setBehaviorParameter(
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) -> void
+{
+  behavior_parameter_ = behavior_parameter;
+}
+
+auto EgoEntitySimulation::setPolylineTrajectory(
+  const traffic_simulator_msgs::msg::PolylineTrajectory & trajectory) -> void
+{
+  polyline_trajectory_ = trajectory;
+}
+
+auto EgoEntitySimulation::setTargetSpeed(const double target_speed) -> void
+{
+  target_speed_ = target_speed;
+}
+
 auto EgoEntitySimulation::setInitialStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
   -> void
 {
@@ -396,11 +430,11 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
   if (unique_route_lanelets.empty()) {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 3.0);
   } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 3.0);
     if (!lanelet_pose) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 3.0);
     }
   }
   if (lanelet_pose) {

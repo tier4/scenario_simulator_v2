@@ -23,6 +23,7 @@
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -45,6 +46,8 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return setVelocityLimit(std::forward<decltype(xs)>(xs)...); },
+    [this](auto &&... xs) { return setTargetSpeed(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) {
       return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
     })
@@ -317,12 +320,34 @@ auto ScenarioSimulator::followPolylineTrajectory(
 {
   auto response = simulation_api_schema::FollowPolylineTrajectoryResponse();
   if (ego_entity_simulation_ and isEgo(request.name())) {
-    ego_entity_simulation_->polyline_trajectory =
-      simulation_interface::toROS2Message(request.trajectory());
+    ego_entity_simulation_->setPolylineTrajectory(
+      simulation_interface::toROS2Message(request.trajectory()));
     response.mutable_result()->set_success(true);
   } else {
     response.mutable_result()->set_success(false);
   }
+  return response;
+}
+
+auto ScenarioSimulator::setVelocityLimit(
+  const simulation_api_schema::SetVelocityLimitRequest & request)
+  -> simulation_api_schema::SetVelocityLimitResponse
+{
+  auto behavior_parameter = ego_entity_simulation_->getBehaviorParameter();
+  behavior_parameter.dynamic_constraints.max_speed = request.max_speed();
+  ego_entity_simulation_->setBehaviorParameter(behavior_parameter);
+  auto response = simulation_api_schema::SetVelocityLimitResponse();
+  response.mutable_result()->set_success(true);
+  return response;
+}
+
+auto ScenarioSimulator::setTargetSpeed(const simulation_api_schema::SetTargetSpeedRequest & request)
+  -> simulation_api_schema::SetTargetSpeedResponse
+{
+  auto behavior_parameter = ego_entity_simulation_->getBehaviorParameter();
+  ego_entity_simulation_->setTargetSpeed(request.target_speed());
+  auto response = simulation_api_schema::SetTargetSpeedResponse();
+  response.mutable_result()->set_success(true);
   return response;
 }
 

@@ -77,6 +77,14 @@ void MultiServer::poll()
         *sim_response.mutable_follow_polyline_trajectory() =
           std::get<FollowPolylineTrajectory>(functions_)(proto.follow_polyline_trajectory());
         break;
+      case simulation_api_schema::SimulationRequest::RequestCase::kSetVelocityLimit:
+        *sim_response.mutable_set_velocity_limit() =
+          std::get<SetVelocityLimit>(functions_)(proto.set_velocity_limit());
+        break;
+      case simulation_api_schema::SimulationRequest::RequestCase::kSetTargetSpeed:
+        *sim_response.mutable_set_target_speed() =
+          std::get<SetTargetSpeed>(functions_)(proto.set_target_speed());
+        break;
       case simulation_api_schema::SimulationRequest::RequestCase::kAttachPseudoTrafficLightDetector:
         *sim_response.mutable_attach_pseudo_traffic_light_detector() =
           std::get<AttachPseudoTrafficLightDetector>(functions_)(

@@ -194,6 +194,30 @@ auto MultiClient::call(const simulation_api_schema::FollowPolylineTrajectoryRequ
   }
 }
 
+auto MultiClient::call(const simulation_api_schema::SetVelocityLimitRequest & request)
+  -> simulation_api_schema::SetVelocityLimitResponse
+{
+  if (is_running) {
+    auto simulation_request = simulation_api_schema::SimulationRequest();
+    *simulation_request.mutable_set_velocity_limit() = request;
+    return call(simulation_request).set_velocity_limit();
+  } else {
+    return {};
+  }
+}
+
+auto MultiClient::call(const simulation_api_schema::SetTargetSpeedRequest & request)
+  -> simulation_api_schema::SetTargetSpeedResponse
+{
+  if (is_running) {
+    auto simulation_request = simulation_api_schema::SimulationRequest();
+    *simulation_request.mutable_set_target_speed() = request;
+    return call(simulation_request).set_target_speed();
+  } else {
+    return {};
+  }
+}
+
 auto MultiClient::call(
   const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest & request)
   -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse

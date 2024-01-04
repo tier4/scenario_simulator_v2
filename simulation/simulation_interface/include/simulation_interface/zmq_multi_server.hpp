@@ -72,6 +72,8 @@ private:
   DEFINE_FUNCTION_TYPE(AttachOccupancyGridSensor);
   DEFINE_FUNCTION_TYPE(UpdateTrafficLights);
   DEFINE_FUNCTION_TYPE(FollowPolylineTrajectory);
+  DEFINE_FUNCTION_TYPE(SetVelocityLimit);
+  DEFINE_FUNCTION_TYPE(SetTargetSpeed);
   DEFINE_FUNCTION_TYPE(AttachPseudoTrafficLightDetector);
 
 #undef DEFINE_FUNCTION_TYPE
@@ -79,8 +81,8 @@ private:
   std::tuple<
     Initialize, UpdateFrame, SpawnVehicleEntity, SpawnPedestrianEntity, SpawnMiscObjectEntity,
     DespawnEntity, UpdateEntityStatus, AttachLidarSensor, AttachDetectionSensor,
-    AttachOccupancyGridSensor, UpdateTrafficLights, FollowPolylineTrajectory,
-    AttachPseudoTrafficLightDetector>
+    AttachOccupancyGridSensor, UpdateTrafficLights, FollowPolylineTrajectory, SetVelocityLimit,
+    SetTargetSpeed, AttachPseudoTrafficLightDetector>
     functions_;
 };
 }  // namespace zeromq

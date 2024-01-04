@@ -79,6 +79,12 @@ public:
   auto call(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
     -> simulation_api_schema::FollowPolylineTrajectoryResponse;
 
+  auto call(const simulation_api_schema::SetVelocityLimitRequest &)
+    -> simulation_api_schema::SetVelocityLimitResponse;
+
+  auto call(const simulation_api_schema::SetTargetSpeedRequest &)
+    -> simulation_api_schema::SetTargetSpeedResponse;
+
   auto call(const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest &)
     -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse;
 
