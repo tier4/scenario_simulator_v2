@@ -824,15 +824,18 @@ auto HdMapUtils::getFollowingLanelets(
   if (include_self) {
     ret.push_back(lanelet_id);
   }
+  lanelet::Id end_lanelet_id = lanelet_id;
   while (total_distance < distance) {
-    if (const auto straight_ids = getNextLaneletIds(lanelet_id, "straight");
+    if (const auto straight_ids = getNextLaneletIds(end_lanelet_id , "straight");
         !straight_ids.empty()) {
       total_distance = total_distance + getLaneletLength(straight_ids[0]);
       ret.push_back(straight_ids[0]);
+      end_lanelet_id = straight_ids[0];
       continue;
-    } else if (const auto ids = getNextLaneletIds(lanelet_id); ids.size() != 0) {
+    } else if (const auto ids = getNextLaneletIds(end_lanelet_id); ids.size() != 0) {
       total_distance = total_distance + getLaneletLength(ids[0]);
       ret.push_back(ids[0]);
+      end_lanelet_id = ids[0];
       continue;
     } else {
       break;
