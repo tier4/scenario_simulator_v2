@@ -213,7 +213,7 @@ void EgoEntitySimulation::update(
           hdmap_utils_ptr_->getFollowingLanelets(status_.lanelet_pose.lanelet_id)),
         behavior_parameter_.dynamic_constraints.max_speed);
     } else {
-      THROW_SEMANTIC_ERROR("EgoEntity has a invalid lanelet position.");
+      behavior_parameter_.dynamic_constraints.max_speed
     }
   }();
   if (npc_logic_started) {
