@@ -141,7 +141,7 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 
   setTurnIndicatorsReport([this]() {
-    autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport message;
+    autoware_vehicle_msgs::msg::TurnIndicatorsReport message;
     message.stamp = get_clock()->now();
     message.report = getTurnIndicatorsCommand().command;
     return message;

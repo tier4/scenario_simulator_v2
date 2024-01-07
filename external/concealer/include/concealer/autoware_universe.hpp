@@ -20,7 +20,7 @@
 #include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
+#include <autoware_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_vehicle_msgs/msg/velocity_report.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/publisher_wrapper.hpp>
@@ -48,7 +48,7 @@ class AutowareUniverse : public Autoware
   PublisherWrapper<autoware_auto_vehicle_msgs::msg::GearReport>           setGearReport;
   PublisherWrapper<autoware_auto_vehicle_msgs::msg::ControlModeReport>    setControlModeReport;
   PublisherWrapper<autoware_vehicle_msgs::msg::VelocityReport>       setVelocityReport;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsReport> setTurnIndicatorsReport;
+  PublisherWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsReport> setTurnIndicatorsReport;
   // clang-format on
 
   const rclcpp::TimerBase::SharedPtr localization_update_timer;
