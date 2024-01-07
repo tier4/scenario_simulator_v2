@@ -131,7 +131,7 @@ auto AutowareUniverse::updateVehicleState() -> void
 
   setVelocityReport([this]() {
     const auto twist = current_twist.load();
-    autoware_auto_vehicle_msgs::msg::VelocityReport message;
+    autoware_vehicle_msgs::msg::VelocityReport message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "base_link";
     message.longitudinal_velocity = twist.linear.x;
