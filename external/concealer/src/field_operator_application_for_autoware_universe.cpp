@@ -388,7 +388,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getWaypoints() const
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getTurnIndicatorsCommand() const
-  -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand
+  -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   return getTurnIndicatorsCommandImpl();
 }

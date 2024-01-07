@@ -62,7 +62,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
 #endif
   SubscriberWrapper<autoware_adapi_v1_msgs::msg::MrmState>                        getMrmState;
   SubscriberWrapper<tier4_planning_msgs::msg::Trajectory>                         getTrajectory;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand>       getTurnIndicatorsCommandImpl;
+  SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand>       getTurnIndicatorsCommandImpl;
 
   ServiceWithValidation<tier4_rtc_msgs::srv::CooperateCommands>                   requestCooperateCommands;
   ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                     requestEngage;
@@ -147,7 +147,7 @@ public:
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto getTurnIndicatorsCommand() const
-    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
+    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand override;
 
   auto getEmergencyStateName() const -> std::string override;
 

@@ -39,7 +39,7 @@ class AutowareUniverse : public Autoware
   // clang-format off
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand, ThreadSafety::safe> getAckermannControlCommand;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
+  SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
   SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
 
   PublisherWrapper<geometry_msgs::msg::AccelWithCovarianceStamped>        setAcceleration;

@@ -23,7 +23,7 @@
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
+#include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <chrono>
 #include <concealer/autoware_stream.hpp>
 #include <concealer/launch.hpp>
@@ -145,7 +145,7 @@ public:
   virtual auto restrictTargetSpeed(double) const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
+    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto rethrow() const noexcept(false) -> void;
 
@@ -155,11 +155,11 @@ public:
 };
 }  // namespace concealer
 
-namespace autoware_auto_vehicle_msgs::msg
+namespace autoware_vehicle_msgs::msg
 {
 auto operator<<(std::ostream &, const TurnIndicatorsCommand &) -> std::ostream &;
 
 auto operator>>(std::istream &, TurnIndicatorsCommand &) -> std::istream &;
-}  // namespace autoware_auto_vehicle_msgs::msg
+}  // namespace autoware_vehicle_msgs::msg
 
 #endif  // CONCEALER__AUTOWARE_USER_HPP_

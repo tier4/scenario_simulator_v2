@@ -18,7 +18,7 @@
 #include <atomic>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
+#include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
 #include <concealer/visibility.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -58,7 +58,7 @@ public:
   virtual auto getGearSign() const -> double = 0;
 
   virtual auto getTurnIndicatorsCommand() const
-    -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand;
+    -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
   virtual auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
