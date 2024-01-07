@@ -204,7 +204,7 @@ void EgoEntitySimulation::update(
 {
   autoware->rethrow();
 
-  auto target_speed = [&]() -> double {
+  auto getTargetSpeed = [&]() -> double {
     if (target_speed_.has_value()) {
       return target_speed_.value();
     } else if (status_.lanelet_pose_valid) {
@@ -215,10 +215,10 @@ void EgoEntitySimulation::update(
     } else {
       return behavior_parameter_.dynamic_constraints.max_speed;
     }
-  }();
+  };
   if (npc_logic_started) {
     if (auto status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-          status_, polyline_trajectory_, behavior_parameter_, step_time, target_speed);
+          status_, polyline_trajectory_, behavior_parameter_, step_time, getTargetSpeed());
         status) {
       using quaternion_operation::convertQuaternionToEulerAngle;
       using quaternion_operation::getRotationMatrix;
