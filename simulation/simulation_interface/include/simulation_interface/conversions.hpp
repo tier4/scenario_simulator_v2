@@ -23,7 +23,7 @@
 #include <traffic_simulator_msgs.pb.h>
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <builtin_interfaces/msg/duration.hpp>
 #include <builtin_interfaces/msg/time.hpp>
 #include <geometry_msgs/msg/accel.hpp>
@@ -175,14 +175,14 @@ void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header);
 DEFINE_CONVERSION(autoware_auto_control_msgs, AckermannLateralCommand);
 DEFINE_CONVERSION(autoware_auto_control_msgs, LongitudinalCommand);
 DEFINE_CONVERSION(autoware_auto_control_msgs, AckermannControlCommand);
-DEFINE_CONVERSION(autoware_auto_vehicle_msgs, GearCommand);
+DEFINE_CONVERSION(autoware_vehicle_msgs, GearCommand);
 
 #undef DEFINE_CONVERSION
 
 auto toProto(
   const std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> &,
+    autoware_vehicle_msgs::msg::GearCommand> &,
   traffic_simulator_msgs::VehicleCommand &) -> void;
 
 template <typename TrafficLightBulbMessageType>

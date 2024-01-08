@@ -26,7 +26,7 @@
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
-#include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
+#include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application.hpp>
 #include <concealer/publisher_wrapper.hpp>

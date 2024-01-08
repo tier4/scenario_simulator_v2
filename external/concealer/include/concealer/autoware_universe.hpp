@@ -38,7 +38,7 @@ class AutowareUniverse : public Autoware
 {
   // clang-format off
   SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand, ThreadSafety::safe> getAckermannControlCommand;
-  SubscriberWrapper<autoware_auto_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
+  SubscriberWrapper<autoware_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
   SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
   SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
 
@@ -82,13 +82,13 @@ public:
 
   auto updateVehicleState() -> void;
 
-  auto getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand override;
+  auto getGearCommand() const -> autoware_vehicle_msgs::msg::GearCommand override;
 
   auto getGearSign() const -> double override;
 
   auto getVehicleCommand() const -> std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> override;
+    autoware_vehicle_msgs::msg::GearCommand> override;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 };

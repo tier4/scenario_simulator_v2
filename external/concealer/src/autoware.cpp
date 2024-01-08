@@ -24,11 +24,11 @@ Autoware::Autoware()
 {
 }
 
-auto Autoware::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
+auto Autoware::getGearCommand() const -> autoware_vehicle_msgs::msg::GearCommand
 {
   static auto gear_command = []() {
-    autoware_auto_vehicle_msgs::msg::GearCommand gear_command;
-    gear_command.command = autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE;
+    autoware_vehicle_msgs::msg::GearCommand gear_command;
+    gear_command.command = autoware_vehicle_msgs::msg::GearCommand::DRIVE;
     return gear_command;
   }();
   gear_command.stamp = now();

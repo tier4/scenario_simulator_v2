@@ -546,14 +546,14 @@ void toMsg(
 }
 
 auto toProto(
-  const autoware_auto_vehicle_msgs::msg::GearCommand & message,
-  autoware_auto_vehicle_msgs::GearCommand & proto) -> void
+  const autoware_vehicle_msgs::msg::GearCommand & message,
+  autoware_vehicle_msgs::GearCommand & proto) -> void
 {
   toProto(message.stamp, *proto.mutable_stamp());
 
 #define CASE(NAME)                                                              \
-  case autoware_auto_vehicle_msgs::msg::GearCommand::NAME:                      \
-    proto.set_command(autoware_auto_vehicle_msgs::GearCommand_Constants::NAME); \
+  case autoware_vehicle_msgs::msg::GearCommand::NAME:                      \
+    proto.set_command(autoware_vehicle_msgs::GearCommand_Constants::NAME); \
     break
 
   switch (message.command) {
@@ -586,8 +586,8 @@ auto toProto(
 }
 
 auto toMsg(
-  const autoware_auto_vehicle_msgs::GearCommand & proto,
-  autoware_auto_vehicle_msgs::msg::GearCommand & message) -> void
+  const autoware_vehicle_msgs::GearCommand & proto,
+  autoware_vehicle_msgs::msg::GearCommand & message) -> void
 {
   toMsg(proto.stamp(), message.stamp);
   message.command = proto.command();
@@ -596,7 +596,7 @@ auto toMsg(
 auto toProto(
   const std::tuple<
     autoware_auto_control_msgs::msg::AckermannControlCommand,
-    autoware_auto_vehicle_msgs::msg::GearCommand> & message,
+    autoware_vehicle_msgs::msg::GearCommand> & message,
   traffic_simulator_msgs::VehicleCommand & proto) -> void
 {
   toProto(std::get<0>(message), *proto.mutable_ackermann_control_command());

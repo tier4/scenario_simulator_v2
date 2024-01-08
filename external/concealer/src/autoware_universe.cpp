@@ -148,14 +148,14 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 }
 
-auto AutowareUniverse::getGearCommand() const -> autoware_auto_vehicle_msgs::msg::GearCommand
+auto AutowareUniverse::getGearCommand() const -> autoware_vehicle_msgs::msg::GearCommand
 {
   return getGearCommandImpl();
 }
 
 auto AutowareUniverse::getGearSign() const -> double
 {
-  using autoware_auto_vehicle_msgs::msg::GearCommand;
+  using autoware_vehicle_msgs::msg::GearCommand;
   // @todo Add support for GearCommand::NONE to return 0.0
   // @sa https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L475
   return getGearCommand().command == GearCommand::REVERSE or
@@ -166,7 +166,7 @@ auto AutowareUniverse::getGearSign() const -> double
 
 auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
   autoware_auto_control_msgs::msg::AckermannControlCommand,
-  autoware_auto_vehicle_msgs::msg::GearCommand>
+  autoware_vehicle_msgs::msg::GearCommand>
 {
   return std::make_tuple(getAckermannControlCommand(), getGearCommand());
 }
