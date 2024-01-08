@@ -215,4 +215,4 @@ auto operator>>(std::istream & is, autoware_vehicle_msgs::msg::TurnIndicatorsCom
 
   return is;
 }
-}  // namespace autoware_auto_vehicle_msgs::msg
+}  // namespace autoware_vehicle_msgs::msg

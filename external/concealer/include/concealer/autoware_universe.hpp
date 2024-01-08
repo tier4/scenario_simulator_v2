@@ -17,7 +17,7 @@
 
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
-#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
+#include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_vehicle_msgs/msg/steering_report.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_report.hpp>
@@ -46,7 +46,7 @@ class AutowareUniverse : public Autoware
   PublisherWrapper<nav_msgs::msg::Odometry>                               setOdometry;
   PublisherWrapper<autoware_vehicle_msgs::msg::SteeringReport>       setSteeringReport;
   PublisherWrapper<autoware_vehicle_msgs::msg::GearReport>           setGearReport;
-  PublisherWrapper<autoware_auto_vehicle_msgs::msg::ControlModeReport>    setControlModeReport;
+  PublisherWrapper<autoware_vehicle_msgs::msg::ControlModeReport>    setControlModeReport;
   PublisherWrapper<autoware_vehicle_msgs::msg::VelocityReport>       setVelocityReport;
   PublisherWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsReport> setTurnIndicatorsReport;
   // clang-format on
