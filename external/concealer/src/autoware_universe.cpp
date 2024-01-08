@@ -123,7 +123,7 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 
   setSteeringReport([this]() {
-    autoware_auto_vehicle_msgs::msg::SteeringReport message;
+    autoware_vehicle_msgs::msg::SteeringReport message;
     message.stamp = get_clock()->now();
     message.steering_tire_angle = getSteeringAngle();
     return message;
