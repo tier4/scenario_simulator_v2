@@ -24,7 +24,7 @@
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
-#include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
+#include <autoware_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
@@ -105,7 +105,7 @@ protected:
   auto sendSIGINT() -> void override;
 
 public:
-  SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;
+  SubscriberWrapper<autoware_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;
 
 public:
   template <typename... Ts>
