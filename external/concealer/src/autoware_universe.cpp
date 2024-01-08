@@ -116,7 +116,7 @@ auto AutowareUniverse::updateVehicleState() -> void
   }());
 
   setGearReport([this]() {
-    autoware_auto_vehicle_msgs::msg::GearReport message;
+    autoware_vehicle_msgs::msg::GearReport message;
     message.stamp = get_clock()->now();
     message.report = getGearCommand().command;
     return message;
