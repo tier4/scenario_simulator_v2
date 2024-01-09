@@ -4,31 +4,27 @@ Random test runner allows running randomly generated scenarios to test Autoware 
 
 ## How to build
 
-1. Clone the Autoware Core/Universe repository:
+1. Clone the Autoware Core/Universe repository and move to the directory:
    ```bash
    git clone git@github.com:autowarefoundation/autoware.git
-   ```
-2. Navigate to the source directory:
-   ```bash
    cd autoware 
-   mkdir src 
    ```
-3. Import Autoware and Simulator dependencies:
+2. Import Autoware and Simulator dependencies:
    ```bash
+   mkdir src
    vcs import src < autoware.repos  
    vcs import src < simulator.repos
    ```
-4. Install dependencies for Autoware Core/Universe
+3. Install dependencies for Autoware Core/Universe
    ```bash
    ./setup-dev-env.sh
    ``` 
-
-5. Install dependent ROS packages.
+4. Install dependent ROS packages.
    ```bash
    source /opt/ros/humble/setup.bash
    rosdep install -iry --from-paths src --rosdistro $ROS_DISTRO
    ```
-6. Build the workspace.
+5. Build the workspace.
    ```bash
    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
    ```
@@ -83,15 +79,35 @@ Random test runner will load `result.yaml` file and rerun test.
 
 ### Autoware build update
 
-1. Follow the [How to build](#how-to-build) steps
-2. Download and extract [shinjuku_map.zip](https://github.com/tier4/AWSIM/releases/download/v1.2.0/shinjuku_map.zip) archive
-
+1. Clone RobotecAI's Autoware and move to the directory
+   ```bash
+   git clone git@github.com:RobotecAI/autoware-1.git
+   cd autoware-1
+   ```
+2. Checkout the `awsim-ss2-stable` branch
+   ```bash
+   git checkout awsim-ss2-stable
+   ```
+3. Import Autoware and Simulator dependencies:
+   ```bash
+   mkdir src
+   vcs import src < autoware.repos  
+   vcs import src < simulator.repos
+   ```
+4. Install dependencies for Autoware Core/Universe
+   ```bash
+   ./setup-dev-env.sh
+   ``` 
+5. Install dependent ROS packages.
+   ```bash
+   source /opt/ros/humble/setup.bash
+   rosdep install -iry --from-paths src --rosdistro $ROS_DISTRO
+   ```
+6. Download and extract [shinjuku_map.zip](https://github.com/tier4/AWSIM/releases/download/v1.2.0/shinjuku_map.zip) archive
    ```bash
    unzip <Download directory>/shinjuku_map.zip -d src/simulator
    ```
-
-3. Build the solution
- 
+7. Build the solution
    ```bash
    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
    ```
