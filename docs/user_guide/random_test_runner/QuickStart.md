@@ -88,14 +88,26 @@ Random test runner will load `result.yaml` file and rerun test.
    ```bash
    git checkout awsim-ss2-stable
    ```
-3. Follow 2-5 steps from [How to build](#how-to-build) section **without building the Autoware yet**.
-4. Download and extract [shinjuku_map.zip](https://github.com/tier4/AWSIM/releases/download/v1.2.0/shinjuku_map.zip) archive
-
+3. Import Autoware and Simulator dependencies:
+   ```bash
+   mkdir src
+   vcs import src < autoware.repos  
+   vcs import src < simulator.repos
+   ```
+4. Install dependencies for Autoware Core/Universe
+   ```bash
+   ./setup-dev-env.sh
+   ``` 
+5. Install dependent ROS packages.
+   ```bash
+   source /opt/ros/humble/setup.bash
+   rosdep install -iry --from-paths src --rosdistro $ROS_DISTRO
+   ```
+6. Download and extract [shinjuku_map.zip](https://github.com/tier4/AWSIM/releases/download/v1.2.0/shinjuku_map.zip) archive
    ```bash
    unzip <Download directory>/shinjuku_map.zip -d src/simulator
    ```
-5. Build the solution
- 
+7. Build the solution
    ```bash
    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
    ```
