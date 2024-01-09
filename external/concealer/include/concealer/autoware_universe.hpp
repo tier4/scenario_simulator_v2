@@ -15,7 +15,7 @@
 #ifndef CONCEALER__AUTOWARE_UNIVERSE_HPP_
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_vehicle_msgs/msg/gear_report.hpp>
@@ -37,7 +37,7 @@ namespace concealer
 class AutowareUniverse : public Autoware
 {
   // clang-format off
-  SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand, ThreadSafety::safe> getAckermannControlCommand;
+  SubscriberWrapper<autoware_control_msgs::msg::Control, ThreadSafety::safe> getCommand;
   SubscriberWrapper<autoware_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
   SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
   SubscriberWrapper<autoware_planning_msgs::msg::PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
@@ -87,7 +87,7 @@ public:
   auto getGearSign() const -> double override;
 
   auto getVehicleCommand() const -> std::tuple<
-    autoware_auto_control_msgs::msg::AckermannControlCommand,
+    autoware_control_msgs::msg::Control,
     autoware_vehicle_msgs::msg::GearCommand> override;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;

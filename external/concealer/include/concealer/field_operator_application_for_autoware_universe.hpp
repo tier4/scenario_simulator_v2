@@ -22,7 +22,7 @@
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
-#include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
@@ -53,7 +53,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   friend class TransitionAssertion<FieldOperatorApplicationFor<AutowareUniverse>>;
 
   // clang-format off
-  SubscriberWrapper<autoware_auto_control_msgs::msg::AckermannControlCommand>     getAckermannControlCommand;
+  SubscriberWrapper<autoware_control_msgs::msg::Control>     getCommand;
   SubscriberWrapper<tier4_system_msgs::msg::AutowareState, ThreadSafety::safe>    getAutowareState;
   SubscriberWrapper<tier4_rtc_msgs::msg::CooperateStatusArray>                    getCooperateStatusArray;
   SubscriberWrapper<tier4_external_api_msgs::msg::Emergency>                      getEmergencyState;
@@ -112,7 +112,7 @@ public:
   CONCEALER_PUBLIC explicit FieldOperatorApplicationFor(Ts &&... xs)
   : FieldOperatorApplication(std::forward<decltype(xs)>(xs)...),
     // clang-format off
-    getAckermannControlCommand("/control/command/control_cmd", *this),
+    getCommand("/control/command/control_cmd", *this),
     getAutowareState("/api/iv_msgs/autoware/state", *this),
     getCooperateStatusArray("/api/external/get/rtc_status", *this, [this](const auto & v) { latest_cooperate_status_array = v; }),
     getEmergencyState("/api/external/get/emergency", *this, [this](const auto & v) { receiveEmergencyState(v); }),
