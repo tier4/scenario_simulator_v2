@@ -135,8 +135,8 @@ struct ApplyRequestToCorporateCommandAction : public CustomCommand,
   }
 };
 
-struct ApplyV2ITrafficSignalControllerAction : public CustomCommand,
-                                          public SimulatorCore::NonStandardOperation
+struct ApplyV2ITrafficSignalControllerAction :  public CustomCommand,
+                                                public SimulatorCore::NonStandardOperation
 {
   using CustomCommand::CustomCommand;
 
@@ -324,6 +324,7 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
       ELEMENT("PseudoTrafficSignalDetectorConfidenceSetAction@v1", ApplyPseudoTrafficSignalDetectorConfidenceSetAction<1>),
       ELEMENT("RequestToCooperateCommandAction@v1", ApplyRequestToCorporateCommandAction<1>),
+      ELEMENT("V2ITrafficSignalControllerAction@v1", ApplyV2ITrafficSignalControllerAction),
       ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
