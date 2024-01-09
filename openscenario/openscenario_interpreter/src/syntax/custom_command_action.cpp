@@ -135,6 +135,24 @@ struct ApplyRequestToCorporateCommandAction : public CustomCommand,
   }
 };
 
+struct ApplyV2ITrafficSignalControllerAction : public CustomCommand,
+                                          public SimulatorCore::NonStandardOperation
+{
+  using CustomCommand::CustomCommand;
+
+  auto start(const Scope & scope) -> void override
+  {
+    if (parameters.size() == 2) {
+      // TODO
+    } else {
+      throw Error(
+        "An unexpected number of arguments were passed to V2ITrafficSignalControllerAction. "
+        "Expected 2 arguments, but actually passed ",
+        parameters.size(), ".");
+    }
+  }
+};
+
 struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
                                           public SimulatorCore::NonStandardOperation
 {
