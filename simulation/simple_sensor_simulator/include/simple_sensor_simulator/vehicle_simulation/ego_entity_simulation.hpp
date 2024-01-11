@@ -96,7 +96,7 @@ public:
 
   auto setStatus(const traffic_simulator_msgs::msg::EntityStatus & status) -> void;
 
-  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
+  auto getBehaviorParameter() const -> const traffic_simulator_msgs::msg::BehaviorParameter &;
 
   auto setBehaviorParameter(
     const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) -> void;

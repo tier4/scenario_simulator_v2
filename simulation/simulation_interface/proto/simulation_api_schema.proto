@@ -373,9 +373,9 @@ message SimulationRequest {
     AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsRequest update_traffic_lights = 11;
     FollowPolylineTrajectoryRequest follow_polyline_trajectory = 12;
-    SetVelocityLimitRequest set_velocity_limit = 13;
-    SetTargetSpeedRequest set_target_speed = 14;
-    AttachPseudoTrafficLightDetectorRequest attach_pseudo_traffic_light_detector = 15;
+    AttachPseudoTrafficLightDetectorRequest attach_pseudo_traffic_light_detector = 13;
+    SetVelocityLimitRequest set_velocity_limit = 14;
+    SetTargetSpeedRequest set_target_speed = 15;
   }
 }
 
@@ -397,8 +397,8 @@ message SimulationResponse {
     AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsResponse update_traffic_lights = 11;
     FollowPolylineTrajectoryResponse follow_polyline_trajectory = 12;
-    SetVelocityLimitResponse set_velocity_limit = 13;
-    SetTargetSpeedResponse set_target_speed = 14;
-    AttachPseudoTrafficLightDetectorResponse attach_pseudo_traffic_light_detector = 15;
+    AttachPseudoTrafficLightDetectorResponse attach_pseudo_traffic_light_detector = 13;
+    SetVelocityLimitResponse set_velocity_limit = 14;
+    SetTargetSpeedResponse set_target_speed = 15;
   }
 }
