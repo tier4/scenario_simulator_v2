@@ -253,6 +253,7 @@ auto loadLaneletConstraints(const Node & node, const std::string & prefix = "")
     if (const auto turn_directions = node.get_parameter(name).as_string_array();
         1 < turn_directions.size()) {
       constraints.emplace(name, [turn_directions](auto && lanelet, auto &&, auto && graph) {
+        // cspell: ignore conflictings
         const auto conflictings = graph.conflicting(lanelet);
         return lanelet.attributeOr("turn_direction", "") == turn_directions[0] and
                std::any_of(conflictings.begin(), conflictings.end(), [&](auto && conflicting) {

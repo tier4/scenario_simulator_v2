@@ -41,8 +41,8 @@ bool isIntersect2D(const LineSegment & line0, const LineSegment & line1)
 
 bool isIntersect2D(const std::vector<LineSegment> & lines)
 {
-  for (size_t i = 0; i <= lines.size(); i++) {
-    for (size_t m = 0; m <= lines.size(); m++) {
+  for (size_t i = 0; i < lines.size(); ++i) {
+    for (size_t m = 0; m < lines.size(); ++m) {
       if (i != m && isIntersect2D(lines[i], lines[m])) {
         return true;
       }
@@ -74,8 +74,8 @@ std::optional<geometry_msgs::msg::Point> getIntersection2D(
 std::vector<geometry_msgs::msg::Point> getIntersection2D(const std::vector<LineSegment> & lines)
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  for (size_t i = 0; i <= lines.size(); i++) {
-    for (size_t m = 0; m <= lines.size(); m++) {
+  for (size_t i = 0; i < lines.size(); ++i) {
+    for (size_t m = 0; m < lines.size(); ++m) {
       if (i != m) {
         const auto point = getIntersection2D(lines[i], lines[m]);
         if (point) {
