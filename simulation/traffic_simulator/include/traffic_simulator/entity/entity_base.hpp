@@ -61,7 +61,7 @@ public:
 
   virtual void cancelRequest();
 
-  // clang-format off
+// clang-format off
 #define DEFINE_GETTER(NAME, TYPE, RETURN_VARIABLE)            \
   /**                                                         \
    @brief Get NAME of the entity.                             \
@@ -84,7 +84,7 @@ public:
   // clang-format on
 #undef DEFINE_GETTER
 
-  // clang-format off
+// clang-format off
 #define DEFINE_CHECK_FUNCTION(FUNCTION_NAME, BOOL_VARIABLE)            \
   /**                                                                  \
    @note This function was defined by DEFINE_CHECK_FUNCTION function.  \
