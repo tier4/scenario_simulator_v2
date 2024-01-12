@@ -961,7 +961,7 @@ auto HdMapUtils::getPreviousLaneletIds(const lanelet::Id lanelet_id) const -> la
     ids.push_back(llt.id());
   }
   for (const auto & id : getPreviousRoadShoulderLanelet(lanelet_id)) {
-    ids.emplace_back(id);
+    ids.push_back(id);
   }
   return ids;
 }
