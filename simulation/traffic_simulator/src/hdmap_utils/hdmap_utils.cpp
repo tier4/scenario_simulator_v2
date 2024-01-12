@@ -1686,7 +1686,7 @@ auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
       continue;
     }
     for (const auto & stop_line : traffic_sign->refLines()) {
-      ret.push_back(stop_line);
+      ret.emplace_back(stop_line);
     }
   }
   return ret;
