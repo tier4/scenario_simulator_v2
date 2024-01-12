@@ -108,4 +108,3 @@ TBD
 [//]: # (|  NOTE: Kashiwanoha project is only supported on ROS 2 `galactic` but simulation interfaces are distribution-independent and random tests can be executed safely on `foxy` |)
 
 [//]: # (|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|)
-

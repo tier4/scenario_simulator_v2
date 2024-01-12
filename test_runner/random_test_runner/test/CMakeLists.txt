@@ -36,4 +36,3 @@ target_link_libraries(test_test_randomizer ${PROJECT_NAME})
 target_link_libraries(test_junit_xml_reporter ${PROJECT_NAME})
 target_link_libraries(test_yaml_test_params_saver ${PROJECT_NAME})
 target_link_libraries(test_test_executor ${PROJECT_NAME})
-
