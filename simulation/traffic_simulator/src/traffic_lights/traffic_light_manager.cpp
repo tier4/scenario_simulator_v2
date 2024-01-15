@@ -51,9 +51,9 @@ auto TrafficLightManager::getTrafficLight(const lanelet::Id traffic_light_id) ->
 
 auto TrafficLightManager::getTrafficLightIds() const -> const lanelet::Ids
 {
-  std::vector<lanelet::Id> traffic_light_ids;
+  lanelet::Ids traffic_light_ids;
   for (const auto & traffic_light_ : getTrafficLights()) {
-    traffic_light_ids.emplace_back(traffic_light_.first);
+    traffic_light_ids.push_back(traffic_light_.first);
   }
   return traffic_light_ids;
 }
