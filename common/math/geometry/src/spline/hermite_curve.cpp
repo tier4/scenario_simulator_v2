@@ -85,45 +85,47 @@ geometry_msgs::msg::Vector3 HermiteCurve::getSquaredDistanceVector(
   return ret;
 }
 
-std::optional<double> HermiteCurve::getCollisionPointIn2D(
+std::set<double> HermiteCurve::getCollisionPointsIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
-  bool close_start_end) const
+  bool close_start_end, bool denormalize_s) const
 {
   size_t n = polygon.size();
   if (n <= 1) {
-    return std::nullopt;
+    return {};
   }
-  std::vector<double> s_values;
+  std::set<double> s_values;
   for (size_t i = 0; i < (n - 1); i++) {
     const auto p0 = polygon[i];
     const auto p1 = polygon[i + 1];
-    auto s = getCollisionPointIn2D(p0, p1, search_backward);
-    if (s) {
-      s_values.push_back(s.value());
-    }
+    s_values.merge(getCollisionPointsIn2D(p0, p1, search_backward, denormalize_s));
   }
   if (close_start_end) {
     const auto p0 = polygon[n - 1];
     const auto p1 = polygon[0];
-    auto s = getCollisionPointIn2D(p0, p1, search_backward);
-    if (s) {
-      s_values.push_back(s.value());
-    }
+    s_values.merge(getCollisionPointsIn2D(p0, p1, search_backward, denormalize_s));
   }
+  return s_values;
+}
+
+std::optional<double> HermiteCurve::getCollisionPointIn2D(
+  const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward,
+  bool close_start_end, bool denormalize_s) const
+{
+  auto s_values = getCollisionPointsIn2D(polygon, search_backward, close_start_end, denormalize_s);
   if (s_values.empty()) {
     return std::nullopt;
   }
   if (search_backward) {
-    return *std::max_element(s_values.begin(), s_values.end());
+    return *s_values.rbegin();
   }
-  return *std::min_element(s_values.begin(), s_values.end());
+  return *s_values.begin();
 }
 
-std::optional<double> HermiteCurve::getCollisionPointIn2D(
+std::set<double> HermiteCurve::getCollisionPointsIn2D(
   const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
-  bool search_backward) const
+  bool search_backward, bool denormalize_s) const
 {
-  std::vector<double> s_values;
+  std::set<double> s_values;
   double fx = point0.x;
   double ex = (point1.x - point0.x);
   double fy = point0.y;
@@ -151,6 +153,16 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
     }
   };
 
+  /**
+   * @note Denormalize given S value as necessary
+   */
+  const auto denormalize = [denormalize_s, this](double s) -> double {
+    if (denormalize_s) {
+      return s * getLength();
+    }
+    return s;
+  };
+
   for (const auto solution : get_solutions()) {
     constexpr double epsilon = std::numeric_limits<double>::epsilon();
     double x = solver_.cubic(ax_, bx_, cx_, dx_, solution);
@@ -163,21 +175,29 @@ std::optional<double> HermiteCurve::getCollisionPointIn2D(
        * tx, ty, will be in the range [0, 1] while the other will be out of that range because of division by zero.
        */
       if ((0 <= tx && tx <= 1) || (0 <= ty && ty <= 1)) {
-        s_values.push_back(solution);
+        s_values.insert(denormalize(solution));
       }
     } else {
       if ((0 <= tx && tx <= 1) && (0 <= ty && ty <= 1)) {
-        s_values.push_back(solution);
+        s_values.insert(denormalize(solution));
       }
     }
   }
+  return s_values;
+}
+
+std::optional<double> HermiteCurve::getCollisionPointIn2D(
+  const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
+  bool search_backward, bool denormalize_s) const
+{
+  auto s_values = getCollisionPointsIn2D(point0, point1, search_backward, denormalize_s);
   if (s_values.empty()) {
     return std::nullopt;
   }
   if (search_backward) {
-    return *std::max_element(s_values.begin(), s_values.end());
+    return *s_values.rbegin();
   }
-  return *std::min_element(s_values.begin(), s_values.end());
+  return *s_values.begin();
 }
 
 std::optional<double> HermiteCurve::getSValue(
@@ -223,8 +243,12 @@ const std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(
 std::vector<geometry_msgs::msg::Point> HermiteCurve::getTrajectory(size_t num_points) const
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  for (size_t i = 0; i <= num_points; i++) {
-    double t = static_cast<double>(i) / static_cast<double>(num_points);
+  if (num_points == 1) {  // safe check to not divide by zero in the loop
+    ret.emplace_back(getPoint(0.0, false));
+    return ret;
+  }
+  for (size_t i = 0; i < num_points; ++i) {
+    double t = static_cast<double>(i) / static_cast<double>(num_points - 1);
     ret.emplace_back(getPoint(t, false));
   }
   return ret;

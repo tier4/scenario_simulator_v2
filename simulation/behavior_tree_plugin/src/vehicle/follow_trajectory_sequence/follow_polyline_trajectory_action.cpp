@@ -65,7 +65,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   } else if (
     const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
       static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
-      behavior_parameter, step_time)) {
+      behavior_parameter, step_time, target_speed)) {
     setOutput(
       "updated_status",
       std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
