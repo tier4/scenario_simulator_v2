@@ -33,6 +33,11 @@ auto TrafficSignalState::evaluate() const -> Object
     traffic_light.set(state);
   };
 
+  for (traffic_simulator::TrafficLight & traffic_light : getV2ITrafficLights(id())) {
+    traffic_light.clear();
+    traffic_light.set(state);
+  };
+
   return unspecified;
 }
 
