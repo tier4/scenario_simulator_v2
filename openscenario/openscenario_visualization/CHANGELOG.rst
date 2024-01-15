@@ -2,6 +2,50 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.9.0 (2023-12-21)
+------------------
+* Merge remote-tracking branch 'tier4/master' into fix/geometry-bug-fixes
+* Merge remote-tracking branch 'origin/master' into feature/traffic-lights-awsim-support
+* Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
+* Merge pull request `#1033 <https://github.com/tier4/scenario_simulator_v2/issues/1033>`_ from tier4/feat/condition_groups_visualization
+* modify comment
+* add doxygen comment
+* add doxygen comment
+* add comment
+* Refactor condition group display and event processing
+* remove unnamed_event_counter
+* rename condition_groups_msg to condition_groups
+* added explanation for value scale
+* Added the doxygen comment for ScopedPixelBuffer class
+* Reformatted for better readability.
+* Update openscenario/openscenario_visualization/src/openscenario_visualization_condition_groups_plugin/openscenario_visualization_condition_groups_plugin.cpp
+* Update openscenario/openscenario_visualization/src/openscenario_visualization_condition_groups_plugin/openscenario_visualization_condition_groups_plugin.cpp
+* Update openscenario/openscenario_visualization/src/openscenario_visualization_condition_groups_plugin/jsk_overlay_utils.cpp
+* Update openscenario/openscenario_visualization/include/openscenario_visualization_condition_groups_plugin/jsk_overlay_utils.hpp
+* Update openscenario/openscenario_visualization/include/openscenario_visualization_condition_groups_plugin/jsk_overlay_utils.hpp
+* Update openscenario/openscenario_visualization/plugins.xml
+* fix code style
+* add plugin for visualize the condition results
+* add jsk_overlay_utils
+* update plugins.xml
+* update package.xml
+* update CMakeLists
+* Merge branch 'master' into feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Mateusz Palczuk, Michał Kiełczykowski, Piotr Zyskowski, kyoichi-sugahara, yamacir-kit
+
 0.8.0 (2023-09-05)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth

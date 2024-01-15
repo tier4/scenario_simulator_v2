@@ -205,6 +205,49 @@ TEST(CatmullRomSpline, GetCollisionPointIn2D)
   }
 }
 
+TEST(CatmullRomSpline, getCollisionPointIn2D)
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(2.0, 0.0), makePoint(4.0, 0.0)};
+  const math::geometry::CatmullRomSpline spline(points);
+
+  const geometry_msgs::msg::Point start0 = makePoint(0.1, 1.0), goal0 = makePoint(0.1, -1.0);
+
+  const auto collision_s00 = spline.getCollisionPointIn2D(start0, goal0, false);
+  EXPECT_TRUE(collision_s00);
+  EXPECT_NEAR(collision_s00.value(), 0.1, EPS);
+
+  const auto collision_s01 = spline.getCollisionPointIn2D({start0, goal0}, false);
+  EXPECT_TRUE(collision_s01);
+  EXPECT_NEAR(collision_s01.value(), 0.1, EPS);
+
+  const auto collision_s02 = spline.getCollisionPointIn2D(start0, goal0, true);
+  EXPECT_TRUE(collision_s02);
+  EXPECT_NEAR(collision_s02.value(), 0.1, EPS);
+
+  const auto collision_s03 = spline.getCollisionPointIn2D({start0, goal0}, true);
+  EXPECT_TRUE(collision_s03);
+  EXPECT_NEAR(collision_s03.value(), 0.1, EPS);
+
+  const geometry_msgs::msg::Point start1 = makePoint(3.5, 1.0), goal1 = makePoint(3.5, -1.0);
+
+  const auto collision_s10 = spline.getCollisionPointIn2D(start1, goal1, false);
+  EXPECT_TRUE(collision_s10);
+  EXPECT_NEAR(collision_s10.value(), 3.5, EPS);
+
+  const auto collision_s11 = spline.getCollisionPointIn2D({start1, goal1}, false);
+  EXPECT_TRUE(collision_s11);
+  EXPECT_NEAR(collision_s11.value(), 3.5, EPS);
+
+  const auto collision_s12 = spline.getCollisionPointIn2D(start1, goal1, true);
+  EXPECT_TRUE(collision_s12);
+  EXPECT_NEAR(collision_s12.value(), 3.5, EPS);
+
+  const auto collision_s13 = spline.getCollisionPointIn2D({start1, goal1}, true);
+  EXPECT_TRUE(collision_s13);
+  EXPECT_NEAR(collision_s13.value(), 3.5, EPS);
+}
+
 TEST(CatmullRomSpline, getCollisionPointIn2DNoCollision)
 {
   const math::geometry::CatmullRomSpline spline = makeCurve();
@@ -224,6 +267,22 @@ TEST(CatmullRomSpline, getCollisionPointIn2DNoCollision)
   EXPECT_FALSE(collision_s3);
 }
 
+TEST(CatmullRomSpline, getCollisionPointIn2DPolygon)
+{
+  const math::geometry::CatmullRomSpline spline = makeCurve();
+
+  const std::vector<geometry_msgs::msg::Point> polygon{
+    makePoint(0.0, 1.0), makePoint(-1.0, 0.0), makePoint(0.0, -1.0), makePoint(1.0, 0.0)};
+
+  const auto collision_s0 = spline.getCollisionPointIn2D(polygon);
+  EXPECT_TRUE(collision_s0);
+  EXPECT_NEAR(collision_s0.value(), 0.56727227, EPS);
+
+  const auto collision_s1 = spline.getCollisionPointIn2D(polygon, true);
+  EXPECT_TRUE(collision_s1);
+  EXPECT_NEAR(collision_s1.value(), 0.56727227, EPS);
+}
+
 TEST(CatmullRomSpline, getCollisionPointIn2DEmpty)
 {
   const math::geometry::CatmullRomSpline spline = makeCurve();
@@ -237,6 +296,16 @@ TEST(CatmullRomSpline, getMaximum2DCurvatureLine)
 {
   const math::geometry::CatmullRomSpline spline = makeLine();
   EXPECT_DOUBLE_EQ(spline.getMaximum2DCurvature(), 0.0);
+}
+
+TEST(CatmullRomSpline, getMaximum2DCurvatureCurve)
+{
+  const std::vector<geometry_msgs::msg::Point> points{
+    makePoint(0.0, 0.0), makePoint(0.5, 0.5), makePoint(1.0, 0.0), makePoint(2.0, -1.0),
+    makePoint(3.0, 0.0)};
+  const math::geometry::CatmullRomSpline spline(points);
+  constexpr double eps = 0.1;
+  EXPECT_NEAR(spline.getMaximum2DCurvature(), -6.0, eps);
 }
 
 TEST(CatmullRomSpline, getPolygon)
@@ -276,6 +345,19 @@ TEST(CatmullRomSpline, getPolygon)
   EXPECT_POINT_NEAR(polygon[21], makePoint(3.0, -0.5), EPS);
   EXPECT_POINT_NEAR(polygon[22], makePoint(4.0, -0.5), EPS);
   EXPECT_POINT_NEAR(polygon[23], makePoint(4.0, 0.5), EPS);
+}
+
+TEST(CatmullRomSpline, getPolygonEdge)
+{
+  math::geometry::CatmullRomSpline spline = makeCurve();
+  std::vector<geometry_msgs::msg::Point> polygon0 = spline.getPolygon(1.0, 0);
+  EXPECT_EQ(polygon0.size(), static_cast<size_t>(0));
+
+  std::vector<geometry_msgs::msg::Point> polygon1 = spline.getPolygon(1.0, 1);
+  EXPECT_EQ(polygon1.size(), static_cast<size_t>(6));
+
+  std::vector<geometry_msgs::msg::Point> polygon2 = spline.getPolygon(1.0, 2);
+  EXPECT_EQ(polygon2.size(), static_cast<size_t>(12));
 }
 
 TEST(CatmullRomSpline, initializationLine)
