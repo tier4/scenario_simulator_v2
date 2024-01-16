@@ -368,16 +368,16 @@ private:
 
   auto getStopLinesOnPath(const lanelet::Ids &) const -> lanelet::ConstLineStrings3d;
 
-  auto getTrafficLightRegElementsOnPath(const lanelet::Ids &) const
+  auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids &) const
     -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>;
 
   auto getTrafficLights(const lanelet::Id traffic_light_id) const
     -> std::vector<lanelet::AutowareTrafficLightConstPtr>;
 
-  auto getTrafficSignRegElementsOnPath(const lanelet::Ids &) const
+  auto getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids &) const
     -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
 
-  auto getTrafficSignRegElements() const
+  auto getTrafficSignRegulatoryElements() const
     -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
 
   auto getVectorFromPose(const geometry_msgs::msg::Pose &, const double magnitude) const

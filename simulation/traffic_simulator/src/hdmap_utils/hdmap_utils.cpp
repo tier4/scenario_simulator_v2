@@ -1620,7 +1620,7 @@ auto HdMapUtils::getRightOfWayLaneletIds(const lanelet::Id lanelet_id) const -> 
   return ids;
 }
 
-auto HdMapUtils::getTrafficSignRegElementsOnPath(const lanelet::Ids & lanelet_ids) const
+auto HdMapUtils::getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids) const
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
@@ -1634,7 +1634,7 @@ auto HdMapUtils::getTrafficSignRegElementsOnPath(const lanelet::Ids & lanelet_id
   return ret;
 }
 
-auto HdMapUtils::getTrafficSignRegElements() const
+auto HdMapUtils::getTrafficSignRegulatoryElements() const
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
@@ -1648,7 +1648,7 @@ auto HdMapUtils::getTrafficSignRegElements() const
   return ret;
 }
 
-auto HdMapUtils::getTrafficLightRegElementsOnPath(const lanelet::Ids & lanelet_ids) const
+auto HdMapUtils::getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids) const
   -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
 {
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
@@ -1666,7 +1666,7 @@ auto HdMapUtils::getTrafficLightRegElementsOnPath(const lanelet::Ids & lanelet_i
 auto HdMapUtils::getStopLines() const -> lanelet::ConstLineStrings3d
 {
   lanelet::ConstLineStrings3d ret;
-  for (const auto & traffic_sign : getTrafficSignRegElements()) {
+  for (const auto & traffic_sign : getTrafficSignRegulatoryElements()) {
     if (traffic_sign->type() != "stop_sign") {
       continue;
     }
@@ -1681,7 +1681,7 @@ auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
   -> lanelet::ConstLineStrings3d
 {
   lanelet::ConstLineStrings3d ret;
-  for (const auto & traffic_sign : getTrafficSignRegElementsOnPath(lanelet_ids)) {
+  for (const auto & traffic_sign : getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
     if (traffic_sign->type() != "stop_sign") {
       continue;
     }
@@ -1784,7 +1784,7 @@ auto HdMapUtils::getStopLinePolygon(const lanelet::Id lanelet_id) const
 auto HdMapUtils::getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids
 {
   lanelet::Ids ids;
-  for (const auto & traffic_light : getTrafficLightRegElementsOnPath(route_lanelets)) {
+  for (const auto & traffic_light : getTrafficLightRegulatoryElementsOnPath(route_lanelets)) {
     for (auto light_string : traffic_light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         if (auto id = light_string.attribute("traffic_light_id").asId(); id) {
