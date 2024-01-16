@@ -9,8 +9,9 @@ Major Changes :race_car: :red_car: :blue_car:
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
+| Feature                        | Brief summary                                                  | Category            | Pull request                                                      | Contributor                                   |
+| ------------------------------ | -------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| Fix problems in route planning | Fixed a bug in a function related to Entity's route selection. | `traffic_simulator` | [#1126](https://github.com/tier4/scenario_simulator_v2/pull/1168) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 
