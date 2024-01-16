@@ -1667,11 +1667,10 @@ auto HdMapUtils::getStopLines() const -> lanelet::ConstLineStrings3d
 {
   lanelet::ConstLineStrings3d ret;
   for (const auto & traffic_sign : getTrafficSignRegulatoryElements()) {
-    if (traffic_sign->type() != "stop_sign") {
-      continue;
-    }
-    for (const auto & stop_line : traffic_sign->refLines()) {
-      ret.emplace_back(stop_line);
+    if (traffic_sign->type() == "stop_sign") {
+      for (const auto & stop_line : traffic_sign->refLines()) {
+        ret.emplace_back(stop_line);
+      }
     }
   }
   return ret;
@@ -1682,11 +1681,10 @@ auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
 {
   lanelet::ConstLineStrings3d ret;
   for (const auto & traffic_sign : getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
-    if (traffic_sign->type() != "stop_sign") {
-      continue;
-    }
-    for (const auto & stop_line : traffic_sign->refLines()) {
-      ret.emplace_back(stop_line);
+    if (traffic_sign->type() == "stop_sign") {
+      for (const auto & stop_line : traffic_sign->refLines()) {
+        ret.emplace_back(stop_line);
+      }
     }
   }
   return ret;
