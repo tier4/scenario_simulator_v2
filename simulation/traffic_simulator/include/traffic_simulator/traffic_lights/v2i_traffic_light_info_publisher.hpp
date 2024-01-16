@@ -19,14 +19,14 @@
 #include <simulation_interface/conversions.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
-#include <jpn_signal_v2i_msgs/msg/external_traffic_signal.hpp>
+#include <jpn_signal_v2i_msgs/msg/extra_traffic_signal.hpp>
 
 #include <memory>
 #include <string>
 
 namespace traffic_simulator
 {
-using Message = jpn_signal_v2i_msgs::msg::ExternalTrafficSignal;
+using Message = jpn_signal_v2i_msgs::msg::ExtraTrafficSignal;
 class V2ITrafficLightInfoPublisher
 {
   const typename rclcpp::Publisher<Message>::SharedPtr publisher_;
