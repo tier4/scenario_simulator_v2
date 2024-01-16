@@ -818,31 +818,25 @@ auto EntityBase::updateTraveledDistance(const double step_time) -> double
   return traveled_distance_;
 }
 
-auto EntityBase::getDistanceToSyncronizationPosition(
-  const lanelet::Id &
-    intersection_id           // dont know about this, maybe i can get the other infomation?
+auto EntityBase::getDistanceToTargetLaneletPose(
+  const CanonicalizedLaneletPose intersection_id        // dont know about this, maybe i can get the other infomation?
   const double stop_position  // may be if the info givven is only the intersection, perhaps needs
                               // info about how far the stop position is from the intersection
   ) -> double
 {
   // return distance to the nearest intersection on the route from ego
-  return entity_distance_to_syncronization_position_;
+  return entity_distance_to_target_position_;
 }
 
-auto EntityBase::adjustElementVelocityByIntersection(
-  const double ego_distance_to_intersection, const double max_acceleration, const double max_jerk, )
+void EntityBase::requestSynchronize()
 {
-  double calculated_velocity = 0.0;
-  // get ego info inside the function
-  // adjusting velocity of the element by the distance to the intersection
-  requestSpeedChange(calculated_velocity, false);
-}
-
-void EntityBase::setSynchronizedAction()
-{
-  // appending synchronized action to job list
   // job_list_.append(
-  // adjustElemetVelocityByIntersection(getDistanceToSyncronizationPosition(hoge,fuga), hoge, piyo),
+  //   [this]() {
+  // auto entity_distance = getDistanceToTargetLaneletPose(hoge,piyo);
+  // calculating all things and may also set speed
+  // requestSpeedChange(entity_speed, false);
+  // },
+  // [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
 }
 
 }  // namespace entity
