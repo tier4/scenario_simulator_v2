@@ -96,7 +96,7 @@ OpenSCENARIO:
                                                     s: 10
                                                     offset: 0
                                                     Orientation: *ORIENTATION
-                                              - time: 10
+                                              - time: 12
                                                 Position: &ego_destination
                                                   LanePosition:
                                                     roadId: ''
