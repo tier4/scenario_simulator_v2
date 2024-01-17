@@ -14,50 +14,50 @@
 // limitations under the License.
 //
 
-#include "real_time_factor_slider.hpp"
-
 #include <pluginlib/class_list_macros.hpp>
 #include <qt5/QtWidgets/QHBoxLayout>
+#include <real_time_factor_slider.hpp>
 #include <rviz_common/display_context.hpp>
 
 namespace real_time_factor_control_rviz_plugin
 {
-RealTimeFactorSliderPanel::RealTimeFactorSliderPanel(QWidget * parent) : rviz_common::Panel(parent)
+RealTimeFactorSliderPanel::RealTimeFactorSliderPanel(QWidget * parent)
+: rviz_common::Panel(parent),
+  value_label_(new QLabel("x 1.00")),
+  slider_(new QSlider(Qt::Horizontal))
 {
-  value_label_ = new QLabel("x 1.00");
   value_label_->setAlignment(Qt::AlignCenter);
 
-  slider_ = new QSlider(Qt::Horizontal);
   slider_->setMinimum(1);
   slider_->setMaximum(200);
   slider_->setTickInterval(1);
   slider_->setValue(100);
 
-  auto * layout = new QHBoxLayout();
+  auto layout = new QHBoxLayout(this);
   layout->addWidget(value_label_);
   layout->addWidget(slider_);
 
   setLayout(layout);
 }
 
-void RealTimeFactorSliderPanel::onChangedRealTimeFactorValue(int real_time_factor_value)
+auto RealTimeFactorSliderPanel::onChangedRealTimeFactorValue(int percentage) -> void
 {
-  std_msgs::msg::Float64 msg;
-  msg.data = real_time_factor_value / 100.0;
-  update_real_time_factor_publisher->publish(msg);
-  value_label_->setText(QString("x ") + QString::number(msg.data, 'f', 2));
+  std_msgs::msg::Float64 real_time_factor;
+  real_time_factor.data = percentage / 100.0;
+  real_time_factor_publisher->publish(real_time_factor);
+  value_label_->setText(QString("x ") + QString::number(real_time_factor.data, 'f', 2));
 }
 
 auto RealTimeFactorSliderPanel::onInitialize() -> void
 {
-  rclcpp::Node::SharedPtr raw_node =
-    this->getDisplayContext()->getRosNodeAbstraction().lock()->get_raw_node();
-  update_real_time_factor_publisher =
-    raw_node->create_publisher<std_msgs::msg::Float64>("/real_time_factor", 1);
+  real_time_factor_publisher = getDisplayContext()
+                                 ->getRosNodeAbstraction()
+                                 .lock()
+                                 ->get_raw_node()
+                                 ->create_publisher<std_msgs::msg::Float64>("/real_time_factor", 1);
 
   connect(slider_, SIGNAL(valueChanged(int)), SLOT(onChangedRealTimeFactorValue(int)));
 }
-
 }  // namespace real_time_factor_control_rviz_plugin
 
 PLUGINLIB_EXPORT_CLASS(

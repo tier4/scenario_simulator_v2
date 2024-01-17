@@ -75,29 +75,31 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
+    real_time_factor_subscriber(rclcpp::create_subscription<std_msgs::msg::Float64>(
+      node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
+      [this](const std_msgs::msg::Float64 & message) {
+        /*
+          Pausing the simulation by setting the realtime_factor_ value to 0 is not supported and causes the simulation crash.
+          For that reason, before performing the action, it needs to be ensured that the incoming request data is a positive number.
+        */
+        if (message.data >= 0.001) {
+          clock_.realtime_factor = message.data;
+          simulation_api_schema::UpdateStepTimeRequest request;
+          request.set_simulation_step_time(clock_.getStepTime());
+          zeromq_client_.call(request);
+        }
+      })),
     clock_(node->get_parameter("use_sim_time").as_bool(), std::forward<decltype(xs)>(xs)...),
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
     setVerbose(configuration.verbose);
 
-    real_time_factor_subscriber = rclcpp::create_subscription<std_msgs::msg::Float64>(
-      node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
-      [this](const std_msgs::msg::Float64 & message) {
-        if (message.data < 0.001) {
-          return;
-        }
-        clock_.setRealTimeFactor(message.data);
-        simulation_api_schema::UpdateStepTimeRequest request;
-        request.set_simulation_step_time(clock_.getStepTime());
-        zeromq_client_.call(request);
-      });
-
     if (not configuration.standalone_mode) {
       simulation_api_schema::InitializeRequest request;
       request.set_initialize_time(clock_.getCurrentSimulationTime());
       request.set_lanelet2_map_path(configuration.lanelet2_map_path().string());
-      request.set_realtime_factor(clock_.realtime_factor_);
+      request.set_realtime_factor(clock_.realtime_factor);
       request.set_step_time(clock_.getStepTime());
       simulation_interface::toProto(
         clock_.getCurrentRosTime(), *request.mutable_initialize_ros_time());
@@ -383,7 +385,7 @@ private:
 
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr debug_marker_pub_;
 
-  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr real_time_factor_subscriber;
+  const rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr real_time_factor_subscriber;
 
   SimulationClock clock_;
 

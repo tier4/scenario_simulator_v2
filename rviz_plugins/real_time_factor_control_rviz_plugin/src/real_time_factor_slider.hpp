@@ -19,15 +19,12 @@
 
 #include <qt5/QtWidgets/QLabel>
 #include <qt5/QtWidgets/QSlider>
+#include <std_msgs/msg/float64.hpp>
 
 #ifndef Q_MOC_RUN
-
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/panel.hpp>
-
 #endif
-
-#include <std_msgs/msg/float64.hpp>
 
 namespace real_time_factor_control_rviz_plugin
 {
@@ -37,18 +34,23 @@ class RealTimeFactorSliderPanel : public rviz_common::Panel
 
 public:
   explicit RealTimeFactorSliderPanel(QWidget * parent = nullptr);
+
   auto onInitialize() -> void override;
 
 public Q_SLOTS:
+  /*
+     Declaring this function by trailing return type causes Qt AutoMoc
+     subprocess error.
+  */
   void onChangedRealTimeFactorValue(int real_time_factor_value);
 
 protected:
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr update_real_time_factor_publisher;
+  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr real_time_factor_publisher;
 
-  QLabel * value_label_;
-  QSlider * slider_;
+  QLabel * const value_label_;
+
+  QSlider * const slider_;
 };
-
-}  // end namespace real_time_factor_control_rviz_plugin
+}  // namespace real_time_factor_control_rviz_plugin
 
 #endif  // REAL_TIME_FACTOR_SLIDER_PANEL_HPP_
