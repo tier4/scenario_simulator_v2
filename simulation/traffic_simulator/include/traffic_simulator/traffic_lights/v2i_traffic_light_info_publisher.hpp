@@ -15,16 +15,13 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_INFO_PUBLISHER_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_INFO_PUBLISHER_HPP_
 
+#include <jpn_signal_v2i_msgs/msg/traffic_light_info.hpp>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_interface/conversions.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-
-#include <jpn_signal_v2i_msgs/msg/traffic_light_info.hpp>
-
-#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-
-#include <memory>
 #include <string>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 
 namespace traffic_simulator
 {
@@ -53,74 +50,77 @@ class V2ITrafficLightInfoPublisher
 
 public:
   template <typename NodePointer>
-  explicit V2ITrafficLightInfoPublisher(const std::string & topic_name, const NodePointer & node, const std::shared_ptr<TrafficLightManager> & traffic_light_manager, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
+  explicit V2ITrafficLightInfoPublisher(
+    const std::string & topic_name, const NodePointer & node,
+    const std::shared_ptr<TrafficLightManager> & traffic_light_manager,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
   : publisher_(
       rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
-      traffic_light_manager_(traffic_light_manager),
-      hdmap_utils_(hdmap_utils)
+    traffic_light_manager_(traffic_light_manager),
+    hdmap_utils_(hdmap_utils)
   {
     // TODO: get vehicle ID from ros parameter and set
   }
 
-  auto publish() -> void {
+  auto publish() -> void
+  {
     Message msg;
     msg.header.stamp = rclcpp::Clock().now();
     msg.header.frame_id = "map";
 
-    for(const auto & extra_info : traffic_light_extra_info_) {
-        auto traffic_light = traffic_light_manager_->getTrafficLight(extra_info.way_id);
+    for (const auto & extra_info : traffic_light_extra_info_) {
+      auto traffic_light = traffic_light_manager_->getTrafficLight(extra_info.way_id);
 
-        jpn_signal_v2i_msgs::msg::ExtraTrafficSignal extra_traffic_signal;
-        extra_traffic_signal.header = msg.header;
-        extra_traffic_signal.has_min_rest_time = true;
-        extra_traffic_signal.min_rest_time = extra_info.min_rest_time;
-        extra_traffic_signal.has_max_rest_time = true;
-        extra_traffic_signal.max_rest_time = extra_info.max_rest_time;
-        extra_traffic_signal.min_rest_time_to_red = extra_info.rest_time_to_red;
+      jpn_signal_v2i_msgs::msg::ExtraTrafficSignal extra_traffic_signal;
+      extra_traffic_signal.header = msg.header;
+      extra_traffic_signal.has_min_rest_time = true;
+      extra_traffic_signal.min_rest_time = extra_info.min_rest_time;
+      extra_traffic_signal.has_max_rest_time = true;
+      extra_traffic_signal.max_rest_time = extra_info.max_rest_time;
+      extra_traffic_signal.min_rest_time_to_red = extra_info.rest_time_to_red;
 
-        auto relation_ids =
-          hdmap_utils_->getTrafficLightRegulatoryElementIDsFromTrafficLight(extra_info.way_id);
-        autoware_perception_msgs::msg::TrafficSignal traffic_signal_msg;
-        {
-          auto traffic_light_proto =
-            static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
-          for (auto bulb_status : traffic_light_proto.traffic_light_status()) {
-            using TrafficLightBulbType =
-              autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
-            TrafficLightBulbType light_bulb_message;
-            simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
-            traffic_signal_msg.elements.push_back(light_bulb_message);
-          }
+      auto relation_ids =
+        hdmap_utils_->getTrafficLightRegulatoryElementIDsFromTrafficLight(extra_info.way_id);
+      autoware_perception_msgs::msg::TrafficSignal traffic_signal_msg;
+      {
+        auto traffic_light_proto = static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
+        for (auto bulb_status : traffic_light_proto.traffic_light_status()) {
+          using TrafficLightBulbType =
+            autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
+          TrafficLightBulbType light_bulb_message;
+          simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
+          traffic_signal_msg.elements.push_back(light_bulb_message);
         }
+      }
 
-        for(const auto & relation_id: relation_ids) {
-          traffic_signal_msg.traffic_signal_id = relation_id;
-          extra_traffic_signal.states.push_back(traffic_signal_msg);
-        }
-        msg.car_lights.push_back(extra_traffic_signal);
+      for (const auto & relation_id : relation_ids) {
+        traffic_signal_msg.traffic_signal_id = relation_id;
+        extra_traffic_signal.states.push_back(traffic_signal_msg);
+      }
+      msg.car_lights.push_back(extra_traffic_signal);
     }
 
     publisher_->publish(msg);
   }
 
-
   // TODO: double min_rest_time; double max_rest_time;
-  void setTrafficLightExtraInfo(lanelet::Id id, double current_phase_rest_time, double rest_time_to_red) {
+  void setTrafficLightExtraInfo(
+    lanelet::Id id, double current_phase_rest_time, double rest_time_to_red)
+  {
     TrafficLightExtraInfo info;
     info.current_phase_rest_time = current_phase_rest_time;
     info.rest_time_to_red = rest_time_to_red;
 
-    if(hdmap_utils_->isTrafficLightRegulatoryElement(id)){
-      for(const auto & traffic_light: traffic_light_manager_->getTrafficLights(id)){
+    if (hdmap_utils_->isTrafficLightRegulatoryElement(id)) {
+      for (const auto & traffic_light : traffic_light_manager_->getTrafficLights(id)) {
         info.way_id = traffic_light.get().way_id;
         traffic_light_extra_info_.push_back(info);
       }
-    }else{
+    } else {
       info.way_id = id;
       traffic_light_extra_info_.push_back(info);
     }
   }
-
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__V2I_TRAFFIC_LIGHT_INFO_PUBLISHER_HPP_
