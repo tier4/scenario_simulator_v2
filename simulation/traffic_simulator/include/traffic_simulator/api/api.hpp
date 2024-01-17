@@ -341,6 +341,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
+  FORWARD_TO_ENTITY_MANAGER(setV2ITrafficLightExtraInfo);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 #undef FORWARD_TO_ENTITY_MANAGER

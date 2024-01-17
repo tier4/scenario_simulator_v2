@@ -187,8 +187,8 @@ public:
       makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_)),
     v2i_traffic_light_publisher_ptr_(makeV2ITrafficLightPublisher(
       "/perception/traffic_light_recognition/external/traffic_signals", node, hdmap_utils_ptr_)),
-    v2i_traffic_light_info_publisher_ptr_(
-      std::make_shared<V2ITrafficLightInfoPublisher>("/v2i/external/v2i_traffic_light_info", node)),
+    v2i_traffic_light_info_publisher_ptr_(std::make_shared<V2ITrafficLightInfoPublisher>(
+      "/v2i/external/v2i_traffic_light_info", node, hdmap_utils_ptr_)),
     v2i_traffic_light_updater_(
       node,
       [this]() {
@@ -246,6 +246,13 @@ public:
     for (auto & traffic_light : conventional_traffic_light_manager_ptr_->getTrafficLights(id)) {
       traffic_light.get().confidence = confidence;
     }
+  }
+
+  auto setV2ITrafficLightExtraInfo(
+    lanelet::Id id, double current_phase_rest_time, double rest_time_to_red) -> void
+  {
+    v2i_traffic_light_info_publisher_ptr_->setTrafficLightExtraInfo(
+      id, current_phase_rest_time, rest_time_to_red);
   }
 
 // clang-format off
