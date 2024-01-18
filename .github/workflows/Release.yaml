@@ -36,13 +36,13 @@ jobs:
       #   id: get_restore_key
       - name: Debug
         if: ${{ github.event_name != 'pull_request' }}
-        run: echo '${{ toJSON(github) }}'
+        run: echo '${{ toJSON(github.event.merge_group) }}'
 
       - uses: KyoriPowered/action-regex-match@v3
         if: ${{ github.event_name != 'pull_request' }}
         id: regex-match
         with:
-          text: ${{ github.event.merge_group.ref }}
+          text: ${{ github.event.merge_group.head_ref }}
           regex: 'master/pr-([0-9]+)'
 
       - name: Restore labels from cache
