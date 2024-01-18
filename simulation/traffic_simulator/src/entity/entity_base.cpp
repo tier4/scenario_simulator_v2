@@ -830,8 +830,8 @@ auto EntityBase::getDistanceToTargetLaneletPose(
   if(entity_lanelet_pose_){
     const auto entity_distance_to_intersection =
         hdmap_utils_ptr_->getLongitudinalDistance(
-            entity_lanelet_pose_.value().operator traffic_simulator::LaneletPose().lanelet_id,
-            target_lanelet_pose_.operator traffic_simulator::LaneletPose().lanelet_id);
+            static_cast<LaneletPose>(entity_lanelet_pose_.value()),
+            static_cast<LaneletPose>(target_lanelet_pose_));
   }
 
   // may be give error here too?
