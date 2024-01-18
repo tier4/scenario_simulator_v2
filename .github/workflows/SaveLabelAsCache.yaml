@@ -16,6 +16,11 @@ jobs:
         with:
           text: ${{ github.event.pull_request._links.self.href }}
           regex: 'pulls/([0-9]+)'
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          fetch-tags: true
       - name: Clear cache
         run: gh cache delete label-pr-${{ steps.key.outputs.group1 }}
         env:
