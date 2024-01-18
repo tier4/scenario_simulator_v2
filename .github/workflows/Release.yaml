@@ -31,12 +31,12 @@ jobs:
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
 
       - name: debug
-        run: echo '${{ toJSON(github.event.pull_request._links.self) }}'
+        run: echo '${{ toJSON(github.event.pull_request._links.self.href) }}'
 
       - uses: KyoriPowered/action-regex-match@v3
         id: key
         with:
-          text: ${{ github.event.merge_group.head_ref }}
+          text: ${{ github.event.pull_request._links.self.href }}
           regex: 'pulls/([0-9]+)'
 
       - name: debug
