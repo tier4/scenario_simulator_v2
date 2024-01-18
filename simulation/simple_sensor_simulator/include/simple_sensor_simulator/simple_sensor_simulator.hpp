@@ -131,12 +131,6 @@ private:
   auto followPolylineTrajectory(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
     -> simulation_api_schema::FollowPolylineTrajectoryResponse;
 
-  auto setVelocityLimit(const simulation_api_schema::SetVelocityLimitRequest & request)
-    -> simulation_api_schema::SetVelocityLimitResponse;
-
-  auto setTargetSpeed(const simulation_api_schema::SetTargetSpeedRequest & request)
-    -> simulation_api_schema::SetTargetSpeedResponse;
-
   auto attachPseudoTrafficLightDetector(
     const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest &)
     -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse;

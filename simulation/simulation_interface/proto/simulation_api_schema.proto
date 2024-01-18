@@ -325,38 +325,6 @@ message FollowPolylineTrajectoryResponse {
 }
 
 /**
- * Request to set velocity limit.
- **/
- message SetVelocityLimitRequest {
-  string name = 1;
-  double max_speed = 2;
-}
-
-/**
- * Response to set velocity limit.
- **/
-message SetVelocityLimitResponse {
-  Result result = 1;
-}
-
-/**
- * Request to set target speed.
- **/
- message SetTargetSpeedRequest {
-  string name = 1;
-  double target_speed = 2;
-}
-
-/**
- * Response to set target speed.
- **/
-message SetTargetSpeedResponse {
-  Result result = 1;
-}
-
-
-
-/**
  * Universal message for Request
  **/
 message SimulationRequest {
@@ -374,8 +342,6 @@ message SimulationRequest {
     UpdateTrafficLightsRequest update_traffic_lights = 11;
     FollowPolylineTrajectoryRequest follow_polyline_trajectory = 12;
     AttachPseudoTrafficLightDetectorRequest attach_pseudo_traffic_light_detector = 13;
-    SetVelocityLimitRequest set_velocity_limit = 14;
-    SetTargetSpeedRequest set_target_speed = 15;
   }
 }
 
@@ -398,7 +364,5 @@ message SimulationResponse {
     UpdateTrafficLightsResponse update_traffic_lights = 11;
     FollowPolylineTrajectoryResponse follow_polyline_trajectory = 12;
     AttachPseudoTrafficLightDetectorResponse attach_pseudo_traffic_light_detector = 13;
-    SetVelocityLimitResponse set_velocity_limit = 14;
-    SetTargetSpeedResponse set_target_speed = 15;
   }
 }
