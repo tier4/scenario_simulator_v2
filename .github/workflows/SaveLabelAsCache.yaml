@@ -24,7 +24,7 @@ jobs:
       - name: Clear cache
         run: gh cache delete label-pr-${{ steps.key.outputs.group1 }}
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.BLOOM_GITHUB_TOKEN }}
         continue-on-error: true
       - name: Cache label
         uses: actions/cache@v4
