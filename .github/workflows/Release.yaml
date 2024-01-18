@@ -30,12 +30,19 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
 
+      - name: Get restore key
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+            label='label-$(git show --format='%H' --no-patch)'
+            echo "::set-output name=restore_key::${label}"
+        id: get_restore_key
+
       - name: Restore labels from cache
         if: ${{ github.event_name != 'pull_request' }}
         uses: actions/cache@v4
         with:
           path: semantic_version_bump.txt
-          key: label-$(git show --format='%H' --no-patch)
+          key: ${{ steps.get_restore_key.outputs.restore_key }}
           fail-on-cache-miss: true
       
       - name: bump version
