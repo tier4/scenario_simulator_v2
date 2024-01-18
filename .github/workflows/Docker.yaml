@@ -21,7 +21,7 @@ jobs:
   build_docker_image:
     name: Build Docker Image
     runs-on: ubuntu-20.04
-    timeout-minutes: 240
+    timeout-minutes: 720
     strategy:
       matrix:
         rosdistro: [humble]
