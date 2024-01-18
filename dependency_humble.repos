@@ -19,10 +19,6 @@ repositories:
     type: git
     url: https://github.com/OUXT-Polaris/color_names.git
     version: master
-  scenario_simulator_v2_scenarios:
-    type: git
-    url: https://github.com/RobotecAI/scenario_simulator_v2_scenarios.git
-    version: main
   tier4_msgs:
     type: git
     url: https://github.com/tier4/tier4_autoware_msgs.git
