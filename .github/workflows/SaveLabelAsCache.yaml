@@ -23,8 +23,13 @@ jobs:
         if: contains(github.event.pull_request.labels.*.name, 'bump major')
         run: |
           echo major > semantic_version_bump.txt
+      - uses: KyoriPowered/action-regex-match@v3
+        id: key
+        with:
+          text: ${{ github.event.pull_request._links.self.href }}
+          regex: 'pulls/([0-9]+)'
       - name: Cache label
         uses: actions/cache@v4
         with:
           path: semantic_version_bump.txt
-          key: label-${{ github.event.pull_request.head.sha }}
+          key: label-pr-${{ steps.key.outputs.group1 }}

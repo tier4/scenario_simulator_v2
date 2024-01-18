@@ -30,18 +30,6 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
 
-      - name: debug
-        run: echo '${{ toJSON(github.event.pull_request._links.self.href) }}'
-
-      - uses: KyoriPowered/action-regex-match@v3
-        id: key
-        with:
-          text: ${{ github.event.pull_request._links.self.href }}
-          regex: 'pulls/([0-9]+)'
-
-      - name: debug
-        run: echo label-pr-${{ steps.key.outputs.group1 }}
-
       - uses: KyoriPowered/action-regex-match@v3
         if: ${{ github.event_name != 'pull_request' }}
         id: get_restore_key
