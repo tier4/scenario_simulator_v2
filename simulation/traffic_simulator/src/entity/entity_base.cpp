@@ -823,7 +823,7 @@ auto EntityBase::getDistanceToTargetLaneletPose(
 {
   // what does lanelet look like in the target, is it point?
   // check if the argument lanelet is point
-  if (/* hoge */) {
+  if () {
     // give error
   }
   // get the lanelet pose of the entity
