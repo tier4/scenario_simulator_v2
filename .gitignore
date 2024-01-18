@@ -1,6 +1,9 @@
 # other settings
 .vscode
 
+# version control
+semantic_version_bump.txt
+
 # backup file
 *.bak
 

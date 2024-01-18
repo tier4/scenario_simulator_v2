@@ -24,26 +24,20 @@ jobs:
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-      # - name: Setup tmate session
-      #   uses: mxschmitt/action-tmate@v3
-      - name: update patch version
-        if: contains(github.event.pull_request.labels.*.name, 'bump patch')
+
+      - name: Restore labels from cache
+        uses: actions/cache@v4
+        with:
+          path: semantic_version_bump.txt
+          key: label-${{ github.event.merge_group.head_ref }}
+          fail-on-cache-miss: true
+      
+      - name: bump version
         run: |
           catkin_generate_changelog -y
-          catkin_tag_changelog --bump patch
-          catkin_package_version --bump patch
-      - name: update minor version
-        if: contains(github.event.pull_request.labels.*.name, 'bump minor')
-        run: |
-          catkin_generate_changelog -y
-          catkin_tag_changelog --bump minor
-          catkin_package_version --bump minor
-      - name: update major version
-        if: contains(github.event.pull_request.labels.*.name, 'bump major')
-        run: |
-          catkin_generate_changelog -y
-          catkin_tag_changelog --bump major
-          catkin_package_version --bump major
+          catkin_tag_changelog --bump $(cat semantic_version_bump.txt)
+          catkin_package_version --bump $(cat semantic_version_bump.txt)
+
       - name: commit changes
         run: |
           git add .
