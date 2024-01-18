@@ -21,6 +21,7 @@ jobs:
         with:
           path: semantic_version_bump.txt
           key: label-pr-${{ steps.key.outputs.group1 }}
+          save-always: true
       - name: is_bump_patch
         if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
