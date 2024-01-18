@@ -833,6 +833,8 @@ auto EntityBase::getDistanceToTargetLaneletPose(
     const auto entity_distance_to_intersection = hdmap_utils_ptr_->getLongitudinalDistance(
       entity_lanelet_pose.value().lanelet_id, LaneletPose(target_lanelet_pose).value().lanelet_id,
       false, false);
+
+    return entity_distance_to_intersection;
   }
 
   // may be give error here too?
@@ -840,7 +842,7 @@ auto EntityBase::getDistanceToTargetLaneletPose(
 }
 
 void EntityBase::requestSynchronize(
-  const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target, )
+  const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target)
 {
   job_list_.append(
     [this]() {
