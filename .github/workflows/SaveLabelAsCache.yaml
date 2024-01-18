@@ -4,8 +4,6 @@ on:
   pull_request:
     branches:
       - master
-    types:
-      - closed
 
 jobs:
   save_label_as_cache:
