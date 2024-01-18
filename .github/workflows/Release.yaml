@@ -30,13 +30,8 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
 
-      # - name: Get restore key
-      #   if: ${{ github.event_name != 'pull_request' }}
-      #   run: echo "restore_key=label-$(git show --format='%H' --no-patch)" >> $GITHUB_OUTPUT
-      #   id: get_restore_key
-      - name: Debug
-        if: ${{ github.event_name != 'pull_request' }}
-        run: echo '${{ toJSON(github.event.merge_group) }}'
+      - name: debug
+        run: echo '${{ toJSON(github.event.pull_request) }}'
 
       - uses: KyoriPowered/action-regex-match@v3
         if: ${{ github.event_name != 'pull_request' }}
@@ -50,8 +45,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: semantic_version_bump.txt
-          key: ${{ steps.regex-match.outputs.group1 }}
-          # key: ${{ steps.get_restore_key.outputs.restore_key }}
+          key: label-pr-${{ steps.regex-match.outputs.group1 }}
           fail-on-cache-miss: true
       
       - name: bump version
