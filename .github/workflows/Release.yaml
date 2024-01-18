@@ -31,11 +31,20 @@ jobs:
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
 
       - name: debug
-        run: echo '${{ toJSON(github.event.pull_request) }}'
+        run: echo '${{ toJSON(github.event.pull_request._links.self) }}'
+
+      - uses: KyoriPowered/action-regex-match@v3
+        id: key
+        with:
+          text: ${{ github.event.merge_group.head_ref }}
+          regex: 'pulls/([0-9]+)'
+
+      - name: debug
+        run: echo label-pr-${{ steps.key.outputs.group1 }}
 
       - uses: KyoriPowered/action-regex-match@v3
         if: ${{ github.event_name != 'pull_request' }}
-        id: regex-match
+        id: get_restore_key
         with:
           text: ${{ github.event.merge_group.head_ref }}
           regex: 'master/pr-([0-9]+)'
@@ -45,7 +54,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: semantic_version_bump.txt
-          key: label-pr-${{ steps.regex-match.outputs.group1 }}
+          key: label-pr-${{ steps.get_restore_key.outputs.group1 }}
           fail-on-cache-miss: true
       
       - name: bump version
