@@ -23,6 +23,8 @@ jobs:
         if: contains(github.event.pull_request.labels.*.name, 'bump major')
         run: |
           echo major > semantic_version_bump.txt
+      - name: debug
+        run: cat semantic_version_bump.txt
       - uses: KyoriPowered/action-regex-match@v3
         id: key
         with:
