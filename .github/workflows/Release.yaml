@@ -79,6 +79,8 @@ jobs:
         with:
           text: ${{ github.event.merge_group.head_ref }}
           regex: 'master/pr-([0-9]+)'
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
       - name: Merge branch
         if: ${{ github.event_name != 'pull_request' }}
         run: git merge ${{ github.event.merge_group.head_ref }}
