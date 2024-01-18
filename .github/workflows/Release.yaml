@@ -35,7 +35,7 @@ jobs:
       #   run: echo "restore_key=label-$(git show --format='%H' --no-patch)" >> $GITHUB_OUTPUT
       #   id: get_restore_key
       - name: Debug
-        run: echo ${{ github.event.merge_group.head_commit }}
+        run: echo '${{ toJSON(github) }}'
 
       - name: Restore labels from cache
         if: ${{ github.event_name != 'pull_request' }}
