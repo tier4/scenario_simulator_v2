@@ -81,7 +81,7 @@ jobs:
           regex: 'master/pr-([0-9]+)'
       - name: Merge branch
         if: ${{ github.event_name != 'pull_request' }}
-        run: git merge origin ${{ github.event.merge_group.head_ref }}
+        run: git merge ${{ github.event.merge_group.head_ref }}
       - uses: actions/download-artifact@v4
         if: ${{ github.event_name != 'pull_request' }}
         with:
