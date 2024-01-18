@@ -1,5 +1,6 @@
 name: Release
 on:
+  pull_request:
   merge_group:
     types: [checks_requested]
     
@@ -11,21 +12,26 @@ jobs:
     container: ros:humble
     steps:
       - name: install bloom
+        if: ${{ github.event_name != 'pull_request' }}
         run: apt update && apt install -y python3-bloom git
+
       - name: checkout
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/checkout@v2
         with:
           ref: master
           fetch-depth: 0
           fetch-tags: true
-      - run: ls -a
+
       - name: Setup git user
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
 
       - name: Restore labels from cache
+        if: ${{ github.event_name != 'pull_request' }}
         uses: actions/cache@v4
         with:
           path: semantic_version_bump.txt
@@ -33,12 +39,14 @@ jobs:
           fail-on-cache-miss: true
       
       - name: bump version
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump $(cat semantic_version_bump.txt)
           catkin_package_version --bump $(cat semantic_version_bump.txt)
 
       - name: commit changes
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
