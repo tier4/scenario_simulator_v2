@@ -32,9 +32,7 @@ jobs:
 
       - name: Get restore key
         if: ${{ github.event_name != 'pull_request' }}
-        run: |
-            label='label-$(git show --format='%H' --no-patch)'
-            echo "::set-output name=restore_key::${label}"
+        run: echo "restore_key=label-$(git show --format='%H' --no-patch)" >> $GITHUB_OUTPUT
         id: get_restore_key
 
       - name: Restore labels from cache
