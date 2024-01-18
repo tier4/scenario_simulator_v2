@@ -823,20 +823,15 @@ auto EntityBase::getDistanceToTargetLaneletPose(
 {
   constexpr double matching_distance = 100.0; // may be better to use a parameter
 
-  // check if the argument lanelet is point
-  if(true){
-    // give error
-  }
+  const auto entity_lanelet_pose_ = getLaneletPose(matching_distance);
+  const auto target_lanelet_pose_ = target_lanelet_pose;
 
-  const auto entity_lanelet_pose_ = getLaneletPose(matching_distance).LaneletPose(matching_distance);
-  const auto target_lanelet_pose_ = target_lanelet_pose.LaneletPose(matching_distance);
   // check if the entity is on the lanelet
-  if(entity_lanelet_pose){
-    const auto entity_distance_to_intersection = hdmap_utils_ptr_->getLongitudinalDistance(
-      entity_lanelet_pose_.
-      target_lanelet_pose_.value().lanelet_id,
-      false,
-      false);
+  if(entity_lanelet_pose_){
+    const auto entity_distance_to_intersection =
+        hdmap_utils_ptr_->getLongitudinalDistance(
+            entity_lanelet_pose_.value().operator traffic_simulator::LaneletPose().lanelet_id,
+            target_lanelet_pose_.operator traffic_simulator::LaneletPose().lanelet_id);
   }
 
   // may be give error here too?
