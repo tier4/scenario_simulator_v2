@@ -229,8 +229,14 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
-    -> void final;
+  /*   */ auto EntityBase::getDistanceToTargetLaneletPose(
+    const CanonicalizedLaneletPose target_lanelet_pose) -> std::optional<double>;
+
+  /*   */ void EntityBase::requestSynchronize(
+    const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target);
+
+    virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
+      -> void final;
 
   const std::string name;
 

@@ -819,7 +819,7 @@ auto EntityBase::updateTraveledDistance(const double step_time) -> double
 }
 
 auto EntityBase::getDistanceToTargetLaneletPose(
-  const CanonicalizedLaneletPose target_lanelet_pose, ) -> std::optional<double>
+  const CanonicalizedLaneletPose target_lanelet_pose) -> std::optional<double>
 {
   // what does lanelet look like in the target, is it point?
   // check if the argument lanelet is point
