@@ -84,7 +84,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
       - name: Merge branch
         if: ${{ github.event_name != 'pull_request' }}
-        run: git merge ${{ github.event.merge_group.head_ref }}
+        run: git pull origin ${{ github.event.merge_group.head_ref }}
       - uses: actions/download-artifact@v4
         if: ${{ github.event_name != 'pull_request' }}
         with:
