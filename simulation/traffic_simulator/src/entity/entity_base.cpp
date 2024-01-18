@@ -819,22 +819,20 @@ auto EntityBase::updateTraveledDistance(const double step_time) -> double
 }
 
 auto EntityBase::getDistanceToTargetLaneletPose(
-  const CanonicalizedLaneletPose target_lanelet_pose,
-  const double stop_position  // may be if the info givven is only the intersection, perhaps needs
-                              // info about how far the stop position is from the intersection
-  ) -> std::optional<double>
+  const CanonicalizedLaneletPose target_lanelet_pose, ) -> std::optional<double>
 {
   // what does lanelet look like in the target, is it point?
-  // check if the argument lanelt is point
-  if(hoge){
+  // check if the argument lanelet is point
+  if (/* hoge */) {
     // give error
   }
   // get the lanelet pose of the entity
   const auto entity_lanelet_pose = getLaneletPose();
   // check if the entity is on the lanelet
-  if(entity_lanelet_pose){
+  if (entity_lanelet_pose) {
     const auto entity_distance_to_intersection = hdmap_utils_ptr_->getLongitudinalDistance(
-      entity_lanelet_pose.value().lanelet_id, LaneletPose(target_lanelet_pose).value().lanelet_id,false,false);
+      entity_lanelet_pose.value().lanelet_id, LaneletPose(target_lanelet_pose).value().lanelet_id,
+      false, false);
   }
 
   // may be give error here too?
@@ -842,16 +840,12 @@ auto EntityBase::getDistanceToTargetLaneletPose(
 }
 
 void EntityBase::requestSynchronize(
-  const CanonicalizedLaneletPose ego_target,
-  const CanonicalizedLaneletPose entity_target,
-  const double ego_target_lanelet_stop_position, //may be any data type?
-  const double entity_target_lanelet_stop_position //may be any data type?
-)
+  const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target, )
 {
   job_list_.append(
     [this]() {
-      const auto entity_distance = getDistanceToTargetLaneletPose(entity_target, entity_target_lanelet_stop_position);
-      const auto ego_distance = getDistanceToTargetLaneletPose(ego_target, ego_target_lanelet_stop_position);
+      const auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
+      const auto ego_distance = getDistanceToTargetLaneletPose(ego_target);
       const auto entity_velocity = getCurrentTwist().linear.x;
       const auto ego_velocity = other_status_.at("ego").getCurrentTwist().linear.x;
       // be better to use acceleration,jerk to estimate the arrival time
@@ -861,7 +855,7 @@ void EntityBase::requestSynchronize(
       const auto ego_arrival_time = ego_distance / ego_velocity;
 
       // calculate the speed of entity to synchronize with ego
-      // realy just a simple example, kind of like a joke
+      // really just a simple example, kind of like a joke
       const auto entity_velocity_to_synchronize = entity_distance / ego_arrival_time;
 
       this.requestSpeedChange(entity_velocity_to_synchronize, false);
