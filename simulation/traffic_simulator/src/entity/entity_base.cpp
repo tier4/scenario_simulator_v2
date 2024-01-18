@@ -849,7 +849,7 @@ void EntityBase::requestSynchronize(
       const auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
       const auto ego_distance = getDistanceToTargetLaneletPose(ego_target);
       const auto entity_velocity = getCurrentTwist().linear.x;
-      const auto ego_velocity = other_status_.at("ego").getCurrentTwist().linear.x;
+      const auto ego_velocity = other_status_.find("ego").getCurrentTwist().linear.x;
       // be better to use acceleration,jerk to estimate the arrival time
 
       // estimate ego's arrival time to the target point
