@@ -35,7 +35,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: semantic_version_bump.txt
-          key: label-${{ github.event.merge_group.head_ref }}
+          key: label-${{ github.event.merge_group.head_commit.id }}
           fail-on-cache-miss: true
       
       - name: bump version

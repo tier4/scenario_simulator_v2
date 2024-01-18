@@ -27,4 +27,4 @@ jobs:
         uses: actions/cache@v4
         with:
           path: semantic_version_bump.txt
-          key: label-${{ github.ref }}
+          key: label-${{ github.event.pull_request.head.sha }}
