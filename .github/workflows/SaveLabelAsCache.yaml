@@ -1,0 +1,32 @@
+name: SaveLabelAsCache
+
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - closed
+
+jobs:
+  save_label_as_cache:
+    name: SaveLabelAsCache
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: is_bump_patch
+        if: contains(github.event.pull_request.labels.*.name, 'bump patch')
+        run: |
+          echo patch > semantic_version_bump.txt
+      - name: is_bump_minor
+        if: contains(github.event.pull_request.labels.*.name, 'bump minor')
+        run: |
+          echo minor > semantic_version_bump.txt
+      - name: is_bump_major
+        if: contains(github.event.pull_request.labels.*.name, 'bump major')
+        run: |
+          echo major > semantic_version_bump.txt
+      - name: Cache label
+        uses: actions/cache@v4
+        with:
+          path: semantic_version_bump.txt
+          key: label-${{ github.ref }}
