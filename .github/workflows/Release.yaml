@@ -64,21 +64,21 @@ jobs:
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
-      - name: commit changes and push
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: dsayling/commit-branch-check-action@v0.1.6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
-          dest-branch: ${{github.event.pull_request.head.ref}}
-          verify-checks: true
-          delete-after-checks: true
-      # - name: commit changes
+      # - name: commit changes and push
       #   if: ${{ github.event_name != 'pull_request' }}
-      #   run: |
-      #     git add .
-      #     git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
-      #     git push
-      #     git tag -a $(catkin_package_version) -m "release $(catkin_package_version)"
-      #     git push origin $(catkin_package_version)
-      #   working-directory: scenario_simulator_v2
+      #   uses: dsayling/commit-branch-check-action@v0.1.6
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     commit-message: "Bump version of scenario_simulator_v2"
+      #     dest-branch: ${{github.event.pull_request.head.ref}}
+      #     verify-checks: true
+      #     delete-after-checks: true
+      - name: commit changes
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          git add .
+          git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
+          git checkout ${{ github.event.merge_group.head_ref }}
+          git merge master
+          git push
+        working-directory: scenario_simulator_v2
