@@ -47,23 +47,26 @@ jobs:
           owner: merge-queue-testing
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: bump patch version
-        if: github.event_name != 'pull_request' && (!contains(steps.get_label.output.labels, 'bump patch'))
+        if: github.event_name != 'pull_request' && (contains(steps.get_label.output.labels, 'bump patch'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
       - name: bump minor version
-        if: github.event_name != 'pull_request' && (!contains(steps.get_label.output.labels, 'bump minor'))
+        if: github.event_name != 'pull_request' && (contains(steps.get_label.output.labels, 'bump minor'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
       - name: bump major version
-        if: github.event_name != 'pull_request' && (!contains(steps.get_label.output.labels, 'bump major'))
+        if: github.event_name != 'pull_request' && (contains(steps.get_label.output.labels, 'bump major'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
+      - name: print number
+        run: echo ${{ steps.get_label.output.labels }}
+      - uses: mxschmitt/action-tmate@v3
       - name: commit changes
         if: ${{ github.event_name != 'pull_request' }}
         run: |
