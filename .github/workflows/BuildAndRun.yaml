@@ -56,12 +56,12 @@ jobs:
         shell: bash
 
       - name: Install dependencies
-        working-directory: ~/ros2_ws
+        working-directory: ros2_ws
         run: |
           vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
 
       - name: Resolve rosdep
-        working-directory: ~/ros2_ws
+        working-directory: ros2_ws
         run: |
           apt update
           apt install -y python3-pip
@@ -70,14 +70,14 @@ jobs:
         shell: bash
 
       - name: Build packages
-        working-directory: ~/ros2_ws
+        working-directory: ros2_ws
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON --packages-up-to ${{ steps.list_packages.outputs.package_list }}
         shell: bash
 
       - name: Colcon test
-        working-directory: ~/ros2_ws
+        working-directory: ros2_ws
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
@@ -86,7 +86,7 @@ jobs:
 
       - name: Show test result
         if: always()
-        working-directory: ~/ros2_ws
+        working-directory: ros2_ws
         run: |
           source /opt/ros/${{ matrix.rosdistro }}/setup.bash
           source install/local_setup.bash
