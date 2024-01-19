@@ -77,7 +77,7 @@ jobs:
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
       - name: Get branch name based on PR ID
-        uses: andrevalentin/get-branch-name-by-pr@1.0.0
+        uses: andrevalentin/get-branch-name-by-pr@v1
         id: pr_data
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
