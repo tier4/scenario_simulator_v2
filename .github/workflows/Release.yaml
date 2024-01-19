@@ -10,6 +10,17 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-22.04
+    permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
+      issues: write
+      packages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
     timeout-minutes: 10
     container: ros:humble
     steps:
@@ -29,7 +40,7 @@ jobs:
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-          git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
+          git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
       - uses: KyoriPowered/action-regex-match@v3
         if: ${{ github.event_name != 'pull_request' }}
         id: get_pull_request_number
@@ -65,19 +76,10 @@ jobs:
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
-      - name: commit changes and push
+      - name: commit changes
         if: ${{ github.event_name != 'pull_request' }}
-        uses: dsayling/commit-branch-check-action@v0.1.6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Bump version of scenario_simulator_v2"
-          dest-branch: ${{github.event.pull_request.head.ref}}
-          verify-checks: true
-          delete-after-checks: true
-      # - name: commit changes
-      #   if: ${{ github.event_name != 'pull_request' }}
-      #   run: |
-      #     git add .
-      #     git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
-      #     git push
-      #   working-directory: scenario_simulator_v2
+        run: |
+          git add .
+          git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
+          git push
+        working-directory: scenario_simulator_v2
