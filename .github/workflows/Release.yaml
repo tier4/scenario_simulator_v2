@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
         if: ${{ github.event_name != 'pull_request' }}
         with:
-          ref: master
+          # ref: master
           fetch-depth: 0
           fetch-tags: true
       - name: Setup git user
@@ -78,7 +78,5 @@ jobs:
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
-          git checkout ${{ github.event.merge_group.head_ref }}
-          git merge master
           git push
         working-directory: scenario_simulator_v2
