@@ -2,8 +2,8 @@
 Changelog for package scenario_simulator_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.8.1 (2023-12-05)
-------------------
+Forthcoming
+-----------
 * Merge pull request `#10 <https://github.com/hakuturu583/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
   update CHANGELOG
 * update CHANGELOG
