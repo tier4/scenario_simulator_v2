@@ -51,6 +51,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         run: git pull origin ${{ github.event.merge_group.head_ref }}
       - name: Get labels of the pull request
+        if: ${{ github.event_name != 'pull_request' }}
         id: get_label
         uses: fml09/get-label@v0.1.1
         with:
@@ -77,6 +78,7 @@ jobs:
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
       - name: Get branch name based on PR ID
+        if: ${{ github.event_name != 'pull_request' }}
         uses: andrevalentin/get-branch-name-by-pr@v1
         id: pr_data
         with:
