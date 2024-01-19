@@ -41,7 +41,7 @@ jobs:
       - name: Get labels of the pull request
         id: get_label
         uses: fml09/get-label@v0.1.1
-        wieh:
+        with:
           pull_number: ${{ steps.get_pull_request_number.outputs.group1 }}
           repo: scenario_simulator_v2
           owner: merge-queue-testing
