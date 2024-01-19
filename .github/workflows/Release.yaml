@@ -23,17 +23,17 @@ jobs:
         with:
           fetch-depth: 0
           fetch-tags: true
-      # - name: Clear cache
-      #   run: gh cache delete label-pr-${{ steps.key.outputs.group1 }}
-      #   env:
-      #     GH_TOKEN: ${{ secrets.BLOOM_GITHUB_TOKEN }}
-      #   continue-on-error: true
-      # - name: Cache label
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: semantic_version_bump.txt
-      #     key: label-pr-${{ steps.key.outputs.group1 }}
-      #     save-always: true
+      - name: Clear cache
+        run: gh cache delete label-pr-${{ steps.key.outputs.group1 }}
+        env:
+          GH_TOKEN: ${{ secrets.BLOOM_GITHUB_TOKEN }}
+        continue-on-error: true
+      - name: Cache label
+        uses: actions/cache@v4
+        with:
+          path: semantic_version_bump.txt
+          key: label-pr-${{ steps.key.outputs.group1 }}
+          save-always: true
       - name: is_bump_patch
         if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
@@ -46,10 +46,12 @@ jobs:
         if: contains(github.event.pull_request.labels.*.name, 'bump major')
         run: |
           echo major > semantic_version_bump.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          name: label-pr-${{ steps.key.outputs.group1 }}
-          path: semantic_version_bump.txt
+      - name: checkout
+        run: git checkout master
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: label-pr-${{ steps.key.outputs.group1 }}
+      #     path: semantic_version_bump.txt
 
   release:
     name: Release
@@ -85,17 +87,17 @@ jobs:
       - name: Merge branch
         if: ${{ github.event_name != 'pull_request' }}
         run: git pull origin ${{ github.event.merge_group.head_ref }}
-      - uses: actions/download-artifact@v4
-        if: ${{ github.event_name != 'pull_request' }}
-        with:
-          name: label-pr-${{ steps.get_restore_key.outputs.group1 }}
-      # - name: Restore labels from cache
+      # - uses: actions/download-artifact@v4
       #   if: ${{ github.event_name != 'pull_request' }}
-      #   uses: actions/cache@v4
       #   with:
-      #     path: semantic_version_bump.txt
-      #     key: label-pr-${{ steps.get_restore_key.outputs.group1 }}
-      #     fail-on-cache-miss: true
+      #     name: label-pr-${{ steps.get_restore_key.outputs.group1 }}
+      - name: Restore labels from cache
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/cache@v4
+        with:
+          path: semantic_version_bump.txt
+          key: label-pr-${{ steps.get_restore_key.outputs.group1 }}
+          fail-on-cache-miss: true
       - name: bump version
         if: ${{ github.event_name != 'pull_request' }}
         run: |
