@@ -76,10 +76,18 @@ jobs:
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
+      - name: Get branch name based on PR ID
+        uses: andrevalentin/get-branch-name-by-pr@1.0.0
+        id: pr_data
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-id: ${{ steps.get_pull_request_number.outputs.group1 }}
       - name: commit changes
         if: ${{ github.event_name != 'pull_request' }}
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
-          git push
+          git checkout ${{ steps.pr_data.outputs.branch }}
+          git merge ${{ github.event.merge_group.head_ref }}
+          git push ${{ steps.pr_data.outputs.branch }}
         working-directory: scenario_simulator_v2
