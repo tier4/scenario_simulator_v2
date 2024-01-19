@@ -15,6 +15,7 @@
 #include <rclcpp/utilities.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
+
 #include <string>
 namespace zeromq
 {
@@ -38,7 +39,10 @@ void MultiClient::closeConnection()
   }
 }
 
-MultiClient::~MultiClient() { closeConnection(); }
+MultiClient::~MultiClient()
+{
+  closeConnection();
+}
 
 auto MultiClient::call(const simulation_api_schema::SimulationRequest & req)
   -> simulation_api_schema::SimulationResponse
@@ -177,18 +181,6 @@ auto MultiClient::call(const simulation_api_schema::UpdateTrafficLightsRequest &
     simulation_api_schema::SimulationRequest sim_request;
     *sim_request.mutable_update_traffic_lights() = request;
     return call(sim_request).update_traffic_lights();
-  } else {
-    return {};
-  }
-}
-
-auto MultiClient::call(const simulation_api_schema::FollowPolylineTrajectoryRequest & request)
-  -> simulation_api_schema::FollowPolylineTrajectoryResponse
-{
-  if (is_running) {
-    auto simulation_request = simulation_api_schema::SimulationRequest();
-    *simulation_request.mutable_follow_polyline_trajectory() = request;
-    return call(simulation_request).follow_polyline_trajectory();
   } else {
     return {};
   }

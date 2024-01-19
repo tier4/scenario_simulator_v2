@@ -310,21 +310,6 @@ message UpdateTrafficLightsResponse {
 }
 
 /**
- * Request to make an entity follow a trajectory.
- **/
-message FollowPolylineTrajectoryRequest {
-  string name = 1;
-  traffic_simulator_msgs.PolylineTrajectory trajectory = 2;
-}
-
-/**
- * Response whether the entity's trajectory following request has been accepted.
- **/
-message FollowPolylineTrajectoryResponse {
-  Result result = 1;
-}
-
-/**
  * Universal message for Request
  **/
 message SimulationRequest {
@@ -340,7 +325,6 @@ message SimulationRequest {
     AttachDetectionSensorRequest attach_detection_sensor = 9;
     AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsRequest update_traffic_lights = 11;
-    FollowPolylineTrajectoryRequest follow_polyline_trajectory = 12;
     AttachPseudoTrafficLightDetectorRequest attach_pseudo_traffic_light_detector = 13;
   }
 }
@@ -362,7 +346,6 @@ message SimulationResponse {
     AttachDetectionSensorResponse attach_detection_sensor = 9;
     AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsResponse update_traffic_lights = 11;
-    FollowPolylineTrajectoryResponse follow_polyline_trajectory = 12;
     AttachPseudoTrafficLightDetectorResponse attach_pseudo_traffic_light_detector = 13;
   }
 }

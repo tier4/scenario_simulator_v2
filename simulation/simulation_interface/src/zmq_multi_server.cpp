@@ -18,7 +18,10 @@
 
 namespace zeromq
 {
-MultiServer::~MultiServer() { thread_.join(); }
+MultiServer::~MultiServer()
+{
+  thread_.join();
+}
 
 void MultiServer::poll()
 {
@@ -72,10 +75,6 @@ void MultiServer::poll()
       case simulation_api_schema::SimulationRequest::RequestCase::kUpdateTrafficLights:
         *sim_response.mutable_update_traffic_lights() =
           std::get<UpdateTrafficLights>(functions_)(proto.update_traffic_lights());
-        break;
-      case simulation_api_schema::SimulationRequest::RequestCase::kFollowPolylineTrajectory:
-        *sim_response.mutable_follow_polyline_trajectory() =
-          std::get<FollowPolylineTrajectory>(functions_)(proto.follow_polyline_trajectory());
         break;
       case simulation_api_schema::SimulationRequest::RequestCase::kAttachPseudoTrafficLightDetector:
         *sim_response.mutable_attach_pseudo_traffic_light_detector() =

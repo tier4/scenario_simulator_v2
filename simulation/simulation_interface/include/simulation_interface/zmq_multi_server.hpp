@@ -15,16 +15,17 @@
 #ifndef SIMULATION_INTERFACE__ZMQ_MULTI_SERVER_HPP_
 #define SIMULATION_INTERFACE__ZMQ_MULTI_SERVER_HPP_
 
-#include <simulation_api_schema.pb.h>
-
-#include <functional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <simulation_interface/constants.hpp>
+#include <zmqpp/zmqpp.hpp>
+
+#include <simulation_api_schema.pb.h>
+
+#include <functional>
 #include <string>
 #include <thread>
 #include <tuple>
-#include <zmqpp/zmqpp.hpp>
 
 namespace zeromq
 {
@@ -71,7 +72,6 @@ private:
   DEFINE_FUNCTION_TYPE(AttachDetectionSensor);
   DEFINE_FUNCTION_TYPE(AttachOccupancyGridSensor);
   DEFINE_FUNCTION_TYPE(UpdateTrafficLights);
-  DEFINE_FUNCTION_TYPE(FollowPolylineTrajectory);
   DEFINE_FUNCTION_TYPE(AttachPseudoTrafficLightDetector);
 
 #undef DEFINE_FUNCTION_TYPE
@@ -79,8 +79,7 @@ private:
   std::tuple<
     Initialize, UpdateFrame, SpawnVehicleEntity, SpawnPedestrianEntity, SpawnMiscObjectEntity,
     DespawnEntity, UpdateEntityStatus, AttachLidarSensor, AttachDetectionSensor,
-    AttachOccupancyGridSensor, UpdateTrafficLights, FollowPolylineTrajectory,
-    AttachPseudoTrafficLightDetector>
+    AttachOccupancyGridSensor, UpdateTrafficLights, AttachPseudoTrafficLightDetector>
     functions_;
 };
 }  // namespace zeromq

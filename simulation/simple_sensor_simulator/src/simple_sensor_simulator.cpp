@@ -12,19 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <algorithm>
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <limits>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
-#include <string>
+
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <algorithm>
+#include <limits>
+#include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -45,7 +47,6 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); },
-    [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) {
       return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
     })
@@ -69,7 +70,9 @@ geographic_msgs::msg::GeoPoint ScenarioSimulator::getOrigin()
   return origin;
 }
 
-ScenarioSimulator::~ScenarioSimulator() {}
+ScenarioSimulator::~ScenarioSimulator()
+{
+}
 
 int ScenarioSimulator::getSocketPort()
 {
@@ -310,21 +313,6 @@ auto ScenarioSimulator::updateTrafficLights(
   auto res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
   return res;
-}
-
-auto ScenarioSimulator::followPolylineTrajectory(
-  const simulation_api_schema::FollowPolylineTrajectoryRequest & request)
-  -> simulation_api_schema::FollowPolylineTrajectoryResponse
-{
-  auto response = simulation_api_schema::FollowPolylineTrajectoryResponse();
-  if (ego_entity_simulation_ and isEgo(request.name())) {
-    ego_entity_simulation_->polyline_trajectory =
-      simulation_interface::toROS2Message(request.trajectory());
-    response.mutable_result()->set_success(true);
-  } else {
-    response.mutable_result()->set_success(false);
-  }
-  return response;
 }
 
 auto ScenarioSimulator::attachPseudoTrafficLightDetector(
