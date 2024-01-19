@@ -7,52 +7,6 @@ on:
     types: [checks_requested]
     
 jobs:
-  save_label_as_cache:
-    name: SaveLabelAsCache
-    runs-on: ubuntu-22.04
-    if: ${{ github.event_name == 'pull_request' }}
-    timeout-minutes: 10
-    steps:
-      - uses: KyoriPowered/action-regex-match@v3
-        id: key
-        with:
-          text: ${{ github.event.pull_request._links.self.href }}
-          regex: 'pulls/([0-9]+)'
-      - name: checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          fetch-tags: true
-      - name: Clear cache
-        run: gh cache delete label-pr-${{ steps.key.outputs.group1 }}
-        env:
-          GH_TOKEN: ${{ secrets.BLOOM_GITHUB_TOKEN }}
-        continue-on-error: true
-      - name: Cache label
-        uses: actions/cache@v4
-        with:
-          path: semantic_version_bump.txt
-          key: label-pr-${{ steps.key.outputs.group1 }}
-          save-always: true
-      - name: is_bump_patch
-        if: contains(github.event.pull_request.labels.*.name, 'bump patch')
-        run: |
-          echo patch > semantic_version_bump.txt
-      - name: is_bump_minor
-        if: contains(github.event.pull_request.labels.*.name, 'bump minor')
-        run: |
-          echo minor > semantic_version_bump.txt
-      - name: is_bump_major
-        if: contains(github.event.pull_request.labels.*.name, 'bump major')
-        run: |
-          echo major > semantic_version_bump.txt
-      - name: checkout
-        run: git checkout master
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: label-pr-${{ steps.key.outputs.group1 }}
-      #     path: semantic_version_bump.txt
-
   release:
     name: Release
     runs-on: ubuntu-22.04
@@ -77,33 +31,39 @@ jobs:
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
       - uses: KyoriPowered/action-regex-match@v3
         if: ${{ github.event_name != 'pull_request' }}
-        id: get_restore_key
+        id: get_pull_request_number
         with:
           text: ${{ github.event.merge_group.head_ref }}
           regex: 'master/pr-([0-9]+)'
-      # - name: Setup tmate session
-      #   if: ${{ github.event_name != 'pull_request' }}
-      #   uses: mxschmitt/action-tmate@v3
       - name: Merge branch
         if: ${{ github.event_name != 'pull_request' }}
         run: git pull origin ${{ github.event.merge_group.head_ref }}
-      # - uses: actions/download-artifact@v4
-      #   if: ${{ github.event_name != 'pull_request' }}
-      #   with:
-      #     name: label-pr-${{ steps.get_restore_key.outputs.group1 }}
-      - name: Restore labels from cache
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: actions/cache@v4
-        with:
-          path: semantic_version_bump.txt
-          key: label-pr-${{ steps.get_restore_key.outputs.group1 }}
-          fail-on-cache-miss: true
-      - name: bump version
-        if: ${{ github.event_name != 'pull_request' }}
+      - name: Get labels of the pull request
+        id: get_label
+        uses: fml09/get-label
+        wieh:
+          pull_number: ${{ steps.get_pull_request_number.outputs.group1 }}
+          repo: scenario_simulator_v2
+          owner: merge-queue-testing
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: bump patch version
+        if: github.event_name != 'pull_request' && (!contains(steps.get_label.output.labels, 'bump patch'))
         run: |
           catkin_generate_changelog -y
-          catkin_tag_changelog --bump $(cat semantic_version_bump.txt)
-          catkin_package_version --bump $(cat semantic_version_bump.txt)
+          catkin_tag_changelog --bump patch
+          catkin_package_version --bump patch
+      - name: bump minor version
+        if: github.event_name != 'pull_request' && (!contains(steps.get_label.output.labels, 'bump minor'))
+        run: |
+          catkin_generate_changelog -y
+          catkin_tag_changelog --bump minor
+          catkin_package_version --bump minor
+      - name: bump major version
+        if: github.event_name != 'pull_request' && (!contains(steps.get_label.output.labels, 'bump major'))
+        run: |
+          catkin_generate_changelog -y
+          catkin_tag_changelog --bump major
+          catkin_package_version --bump major
       - name: commit changes
         if: ${{ github.event_name != 'pull_request' }}
         run: |
