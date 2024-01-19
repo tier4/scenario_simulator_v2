@@ -64,9 +64,11 @@ jobs:
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
-      - name: print number
+      - name: print labels
+        if: ${{ github.event_name != 'pull_request' }}
         run: echo ${{ steps.get_label.output.labels }}
       - uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name != 'pull_request' }}
       - name: commit changes
         if: ${{ github.event_name != 'pull_request' }}
         run: |
