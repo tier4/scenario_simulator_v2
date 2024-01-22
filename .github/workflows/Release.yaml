@@ -60,5 +60,5 @@ jobs:
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
-          git push
+          git push -f
         working-directory: scenario_simulator_v2
