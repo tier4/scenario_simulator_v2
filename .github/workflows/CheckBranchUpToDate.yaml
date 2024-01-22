@@ -12,17 +12,13 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-22.04
     steps:
-      # For pull requet check
-      - name: Check pull-request up to date
-        if: github.event_name == 'pull_request'
-        uses: Automattic/action-pr-is-up-to-date@v2
-        with:
-          branc: master
-          tags: ${{ github.head_ref }}
-      # For merge queue check
-      - name: Check pull-request up to date
-        if: github.event_name != 'pull_request'
-        uses: Automattic/action-pr-is-up-to-date@v2
-        with:
-          branc: master
-          tags: ${{ github.event.merge_group.head_ref }}
+      - name: Check if branches are up to date
+        shell: bash
+        run: |
+          BASE=$(git merge-base origin/master HEAD)
+          if [ $BASE = $(git rev-parse origin/master) ]; then
+            echo "Branches are up to date, skipping merge."
+          else
+            echo "Branches are not up to date, merge is required."
+            exit 1
+          fi
