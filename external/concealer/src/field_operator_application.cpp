@@ -71,13 +71,7 @@ auto FieldOperatorApplication::checkAutowareProcess() -> void
 
 auto FieldOperatorApplication::shutdownAutoware() -> void
 {
-  stopRequest();
-
-  if (process_id != 0 && not is_autoware_exited) {
-    is_autoware_exited = true;
-
-    sendSIGINT();
-
+  if (stopRequest(); process_id != 0 && not std::exchange(is_autoware_exited, true)) {
     const auto sigset = [this]() {
       if (auto signal_set = sigset_t();
           sigemptyset(&signal_set) or sigaddset(&signal_set, SIGCHLD)) {
@@ -104,7 +98,7 @@ auto FieldOperatorApplication::shutdownAutoware() -> void
       return timeout;
     }();
 
-    if (sigtimedwait(&sigset, nullptr, &timeout) < 0) {
+    if (sendSIGINT(); sigtimedwait(&sigset, nullptr, &timeout) < 0) {
       switch (errno) {
         case EINTR:
           /*
