@@ -96,4 +96,4 @@ jobs:
         uses: CasperWA/push-protected@v2
         with:
           token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
-          branch: ${{ github.event.merge_group.head_ref }}
+          branch: ${{ steps.pr_data.outputs.branch }}
