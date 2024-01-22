@@ -368,8 +368,7 @@ auto makeUpdatedStatus(
              innerProduct(desired_velocity, current_velocity) < 0.0) {
     return discard_the_front_waypoint_and_recurse();
   } else if (auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
-               desired_acceleration, remaining_time_to_front_waypoint, distance, acceleration,
-               speed);
+               desired_acceleration, remaining_time, distance, acceleration, speed);
              !std::isinf(remaining_time) && !predicted_state_opt.has_value()) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -377,7 +376,8 @@ auto makeUpdatedStatus(
       std::quoted(entity_status.name),
       " calculated invalid acceleration:", " desired_acceleration: ", desired_acceleration,
       ", remaining_time_to_front_waypoint: ", remaining_time_to_front_waypoint,
-      ", distance: ", distance, ", acceleration: ", acceleration, ", speed: ", speed, ".");
+      ", distance: ", distance, ", acceleration: ", acceleration, ", speed: ", speed, ".",
+      follow_waypoint_controller);
   } else {
     auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
     if constexpr (false) {
