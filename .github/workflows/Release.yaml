@@ -46,10 +46,10 @@ jobs:
           fetch-tags: true
       - name: Setup git user
         run: |
-          git config --global user.name  "Release Bot"
-          git config --global user.email "action@github.com"
+          git config --global user.name  "Masaya Kataoka"
+          git config --global user.email "ms.kataoka@gmail.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-          git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
+          git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
       - name: Merge branch
         run: git pull origin ${{ github.event.merge_group.head_ref }}
       - name: Get labels of the pull request
@@ -61,19 +61,19 @@ jobs:
           owner: merge-queue-testing
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: bump patch version
-        if: github.event_name != 'pull_request' && (contains(steps.get_label.outputs.labels, 'bump patch'))
+        if: contains(steps.get_label.outputs.labels, 'bump patch')
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
       - name: bump minor version
-        if: github.event_name != 'pull_request' && (contains(steps.get_label.outputs.labels, 'bump minor'))
+        if: contains(steps.get_label.outputs.labels, 'bump minor')
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
       - name: bump major version
-        if: github.event_name != 'pull_request' && (contains(steps.get_label.outputs.labels, 'bump major'))
+        if: contains(steps.get_label.outputs.labels, 'bump major')
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major

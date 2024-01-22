@@ -1,0 +1,23 @@
+name: Release
+on:
+  pull_request:
+    branches:
+      - master
+  merge_group:
+    types: [checks_requested]
+
+jobs:
+  check_branch_up_to_date:
+    name: CheckBranchUpToDate
+    timeout-minutes: 10
+    container: ros:humble
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Check pull-request up to date
+        uses: Automattic/action-pr-is-up-to-date@v2
+        with:
+          branc: master
