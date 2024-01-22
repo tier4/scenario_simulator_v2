@@ -2,8 +2,8 @@
 Changelog for package scenario_simulator_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.8.1 (2024-01-22)
-------------------
+Forthcoming
+-----------
 * Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from merge-queue-testing/feature/bump_version_action
   add trigger
 * fix changelog
