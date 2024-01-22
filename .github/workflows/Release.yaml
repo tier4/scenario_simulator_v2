@@ -1,12 +1,26 @@
 name: Release
 on:
-  merge_group:
-    types: [checks_requested]
+  pull_request:
+    branches:
+      - master
+    types: [closed]
     
 jobs:
   release:
+    if: github.event.pull_request.merged == true
     name: Release
     runs-on: ubuntu-22.04
+    permissions:
+      actions: write
+      checks: write
+      contents: write
+      deployments: write
+      issues: write
+      packages: write
+      pull-requests: write
+      repository-projects: write
+      security-events: write
+      statuses: write
     timeout-minutes: 10
     container: ros:humble
     steps:
@@ -18,31 +32,33 @@ jobs:
           ref: master
           fetch-depth: 0
           fetch-tags: true
-      - run: ls -a
       - name: Setup git user
         run: |
-          git config --global user.name  "Release Bot"
-          git config --global user.email "action@github.com"
+          git config --global user.name  "Masaya Kataoka"
+          git config --global user.email "ms.kataoka@gmail.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-
-      - name: Restore labels from cache
-        uses: actions/cache@v4
-        with:
-          path: semantic_version_bump.txt
-          key: label-${{ github.event.merge_group.head_ref }}
-          fail-on-cache-miss: true
-      
-      - name: bump version
+          git config --global credential.helper ${{ secrets.BLOOM_GITHUB_TOKEN }}
+      - name: bump patch version
+        if: contains(github.event.pull_request.labels.*.name, 'bump patch')
         run: |
           catkin_generate_changelog -y
-          catkin_tag_changelog --bump $(cat semantic_version_bump.txt)
-          catkin_package_version --bump $(cat semantic_version_bump.txt)
-
+          catkin_tag_changelog --bump patch
+          catkin_package_version --bump patch
+      - name: bump minor version
+        if: contains(github.event.pull_request.labels.*.name, 'bump minor')
+        run: |
+          catkin_generate_changelog -y
+          catkin_tag_changelog --bump minor
+          catkin_package_version --bump minor
+      - name: bump major version
+        if: contains(github.event.pull_request.labels.*.name, 'bump major')
+        run: |
+          catkin_generate_changelog -y
+          catkin_tag_changelog --bump major
+          catkin_package_version --bump major
       - name: commit changes
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
           git push
-          git tag -a $(catkin_package_version) -m "release $(catkin_package_version)"
-          git push origin $(catkin_package_version)
         working-directory: scenario_simulator_v2
