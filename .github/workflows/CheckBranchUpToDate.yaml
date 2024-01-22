@@ -12,12 +12,17 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          fetch-tags: true
+      # For pull requet check
       - name: Check pull-request up to date
+        if: github.event_name == 'pull_request'
         uses: Automattic/action-pr-is-up-to-date@v2
         with:
           branc: master
+          tags: ${{ github.head_ref }}
+      # For merge queue check
+      - name: Check pull-request up to date
+        if: github.event_name != 'pull_request'
+        uses: Automattic/action-pr-is-up-to-date@v2
+        with:
+          branc: master
+          tags: ${{ github.event.merge_group.head_ref }}
