@@ -1,4 +1,4 @@
-name: Release
+name: CheckBranchUpToDate
 on:
   pull_request:
     branches:
@@ -10,7 +10,7 @@ jobs:
   check_branch_up_to_date:
     name: CheckBranchUpToDate
     timeout-minutes: 10
-    container: ros:humble
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
