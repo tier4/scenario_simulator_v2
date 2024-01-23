@@ -7,9 +7,80 @@ on:
     types: [checks_requested]
     
 jobs:
+  try_release:
+    name: Try Release
+    runs-on: ubuntu-22.04
+    if: ${{ github.event_name != 'pull_request' }}
+    timeout-minutes: 10
+    container: ros:humble
+    steps:
+      - name: install bloom
+        run: apt update && apt install -y python3-bloom git
+      - name: checkout
+        uses: actions/checkout@v2
+        with:
+          ref: master
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Setup git user
+        run: |
+          git config --global user.name  "Release Bot"
+          git config --global user.email "action@github.com"
+          git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
+          git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
+      - name: Merge branch
+        run: git pull origin ${{ github.event.merge_group.head_ref }}
+      # Get infomration of the pull request.
+      - name: Get pull request number
+        uses: KyoriPowered/action-regex-match@v3
+        id: get_pull_request_number
+        with:
+          text: ${{ github.event.merge_group.head_ref }}
+          regex: 'master/pr-([0-9]+)'
+      - name: Get branch name based on pull request ID
+        uses: andrevalentin/get-branch-name-by-pr@v1
+        id: pr_data
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-id: ${{ steps.get_pull_request_number.outputs.group1 }}
+      - name: Get labels of the pull request
+        id: get_label
+        uses: fml09/get-label@v0.1.1
+        with:
+          pull_number: ${{ steps.get_pull_request_number.outputs.group1 }}
+          repo: scenario_simulator_v2
+          owner: merge-queue-testing
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get labels of the pull request
+        id: get_label
+        uses: fml09/get-label@v0.1.1
+        with:
+          pull_number: ${{ steps.get_pull_request_number.outputs.group1 }}
+          repo: scenario_simulator_v2
+          owner: merge-queue-testing
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: bump patch version
+        if: (contains(steps.get_label.outputs.labels, 'bump patch'))
+        run: |
+          catkin_generate_changelog -y
+          catkin_tag_changelog --bump patch
+          catkin_package_version --bump patch
+      - name: bump minor version
+        if: (contains(steps.get_label.outputs.labels, 'bump minor'))
+        run: |
+          catkin_generate_changelog -y
+          catkin_tag_changelog --bump minor
+          catkin_package_version --bump minor
+      - name: bump major version
+        if: (contains(steps.get_label.outputs.labels, 'bump major'))
+        run: |
+          catkin_generate_changelog -y
+          catkin_tag_changelog --bump major
+          catkin_package_version --bump major
   release:
     name: Release
     runs-on: ubuntu-22.04
+    if: github.event.pull_request.merged == true
     permissions:
       actions: write
       checks: write
@@ -24,42 +95,23 @@ jobs:
     timeout-minutes: 10
     container: ros:humble
     steps:
-      - name: Get pull request number
-        uses: KyoriPowered/action-regex-match@v3
-        if: ${{ github.event_name != 'pull_request' }}
-        id: get_pull_request_number
-        with:
-          text: ${{ github.event.merge_group.head_ref }}
-          regex: 'master/pr-([0-9]+)'
-      - name: Get branch name based on pull request ID
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: andrevalentin/get-branch-name-by-pr@v1
-        id: pr_data
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          pr-id: ${{ steps.get_pull_request_number.outputs.group1 }}
       - name: install bloom
-        if: ${{ github.event_name != 'pull_request' }}
         run: apt update && apt install -y python3-bloom git
       - name: checkout
         uses: actions/checkout@v2
-        if: ${{ github.event_name != 'pull_request' }}
         with:
-          ref: ${{ steps.pr_data.outputs.branch }}
+          ref: master
           fetch-depth: 0
           fetch-tags: true
       - name: Setup git user
-        if: ${{ github.event_name != 'pull_request' }}
         run: |
           git config --global user.name  "Release Bot"
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
           git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
       - name: Merge branch
-        if: ${{ github.event_name != 'pull_request' }}
-        run: git pull origin ${{ github.event.merge_group.head_ref }}
+        run: git pull origin ${{ github.head_ref }}
       - name: Get labels of the pull request
-        if: ${{ github.event_name != 'pull_request' }}
         id: get_label
         uses: fml09/get-label@v0.1.1
         with:
@@ -68,32 +120,30 @@ jobs:
           owner: merge-queue-testing
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: bump patch version
-        if: github.event_name != 'pull_request' && (contains(steps.get_label.outputs.labels, 'bump patch'))
+        if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
       - name: bump minor version
-        if: github.event_name != 'pull_request' && (contains(steps.get_label.outputs.labels, 'bump minor'))
+        if: (contains(github.event.pull_request.labels.*.name, 'bump minor'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
       - name: bump major version
-        if: github.event_name != 'pull_request' && (contains(steps.get_label.outputs.labels, 'bump major'))
+        if: (contains(github.event.pull_request.labels.*.name, 'bump major'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
       - name: commit changes
-        if: ${{ github.event_name != 'pull_request' }}
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
         working-directory: scenario_simulator_v2
-      - name: Pushing to the protected branch 'protected'
-        if: ${{ github.event_name != 'pull_request' }}
+      - name: Pushing to the protected branch 'master'
         uses: CasperWA/push-protected@v2
         with:
           token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
-          branch: ${{ steps.pr_data.outputs.branch }}
+          branch: master
