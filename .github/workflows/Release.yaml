@@ -84,7 +84,6 @@ jobs:
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 from version ${{ steps.old_version.outputs.old_version }} to version $(catkin_package_version)"
-        working-directory: scenario_simulator_v2
       - name: Pushing to the protected branch 'master'
         if: github.event.pull_request.merged == true
         uses: CasperWA/push-protected@v2
