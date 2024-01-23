@@ -90,3 +90,4 @@ jobs:
         with:
           token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
           branch: master
+          force: true
