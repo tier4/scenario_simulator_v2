@@ -3,14 +3,11 @@ on:
   pull_request:
     branches:
       - master
-  merge_group:
-    types: [checks_requested]
     
 jobs:
   try_release:
     name: Try Release
     runs-on: ubuntu-22.04
-    if: ${{ github.event_name != 'pull_request' }}
     timeout-minutes: 10
     container: ros:humble
     steps:
@@ -29,28 +26,7 @@ jobs:
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
           git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
       - name: Merge branch
-        run: git pull origin ${{ github.event.merge_group.head_ref }}
-      # Get infomration of the pull request.
-      - name: Get pull request number
-        uses: KyoriPowered/action-regex-match@v3
-        id: get_pull_request_number
-        with:
-          text: ${{ github.event.merge_group.head_ref }}
-          regex: 'master/pr-([0-9]+)'
-      - name: Get branch name based on pull request ID
-        uses: andrevalentin/get-branch-name-by-pr@v1
-        id: pr_data
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          pr-id: ${{ steps.get_pull_request_number.outputs.group1 }}
-      - name: Get labels of the pull request
-        id: get_label
-        uses: fml09/get-label@v0.1.1
-        with:
-          pull_number: ${{ steps.get_pull_request_number.outputs.group1 }}
-          repo: scenario_simulator_v2
-          owner: merge-queue-testing
-          token: ${{ secrets.GITHUB_TOKEN }}
+        run: git pull origin ${{ github.head_ref }}
       - name: Get labels of the pull request
         id: get_label
         uses: fml09/get-label@v0.1.1
@@ -60,19 +36,19 @@ jobs:
           owner: merge-queue-testing
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: bump patch version
-        if: (contains(steps.get_label.outputs.labels, 'bump patch'))
+        if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
       - name: bump minor version
-        if: (contains(steps.get_label.outputs.labels, 'bump minor'))
+        if: (contains(github.event.pull_request.labels.*.name, 'bump minor'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
       - name: bump major version
-        if: (contains(steps.get_label.outputs.labels, 'bump major'))
+        if: (contains(github.event.pull_request.labels.*.name, 'bump major'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
