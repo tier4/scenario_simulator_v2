@@ -4,6 +4,7 @@ on:
     branches:
       - master
     types: [closed, edited]
+concurrency: release
     
 jobs:
   try_release:
@@ -86,6 +87,10 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
           git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
+      - name: Get old version
+        id: old_version
+        run: |
+          echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
       - name: Merge branch
         run: git pull origin ${{ github.head_ref }}
       - name: Get labels of the pull request
@@ -117,7 +122,7 @@ jobs:
       - name: commit changes
         run: |
           git add .
-          git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
+          git commit -m "Bump version of scenario_simulator_v2 from version ${{ steps.old_version.outputs.old_version }} to version $(catkin_package_version)"
         working-directory: scenario_simulator_v2
       - name: Pushing to the protected branch 'master'
         uses: CasperWA/push-protected@v2
