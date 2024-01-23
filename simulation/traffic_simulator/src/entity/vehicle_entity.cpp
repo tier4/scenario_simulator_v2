@@ -135,7 +135,6 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(std::make_unique<CanonicalizedEntityStatus>(status_));
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
-
     auto route_lanelets = getRouteLanelets();
     behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
 
