@@ -3,7 +3,7 @@ on:
   pull_request:
     branches:
       - master
-    types: [closed, edited]
+    types: [closed, edited, opened, synchronize, reopened]
 concurrency: release
     
 jobs:
