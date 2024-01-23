@@ -51,6 +51,8 @@ jobs:
         id: old_version
         run: |
           echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
+      - name: Restore branch
+        uses: levonet/action-restore-branch@master
       - name: Merge branch
         run: git pull origin ${{ github.head_ref }}
       - name: Get labels of the pull request
@@ -88,7 +90,7 @@ jobs:
         if: github.event.pull_request.merged == true
         uses: CasperWA/push-protected@v2
         with:
-          token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
           force: true
       - name: Delete branch
