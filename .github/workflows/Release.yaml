@@ -3,7 +3,15 @@ on:
   pull_request:
     branches:
       - master
-    types: [closed, edited, opened, synchronize, reopened]
+    types:
+      - closed
+      - created
+      - edited
+      - labeled
+      - opened
+      - reopened
+      - synchronize
+      - unlabeled
 concurrency: release
     
 jobs:
