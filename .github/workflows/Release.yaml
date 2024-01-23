@@ -92,3 +92,4 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
+          force: true
