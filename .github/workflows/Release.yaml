@@ -6,58 +6,9 @@ on:
     types: [closed, edited]
     
 jobs:
-  try_release:
-    name: Try Release
-    runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    container: ros:humble
-    steps:
-      - name: install bloom
-        run: apt update && apt install -y python3-bloom git
-      - name: checkout
-        uses: actions/checkout@v2
-        with:
-          ref: master
-          fetch-depth: 0
-          fetch-tags: true
-      - name: Setup git user
-        run: |
-          git config --global user.name  "Release Bot"
-          git config --global user.email "action@github.com"
-          git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
-          git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
-      - name: Merge branch
-        run: git pull origin ${{ github.head_ref }}
-      - name: Get labels of the pull request
-        id: get_label
-        uses: fml09/get-label@v0.1.1
-        with:
-          pull_number: ${{ steps.get_pull_request_number.outputs.group1 }}
-          repo: scenario_simulator_v2
-          owner: merge-queue-testing
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: bump patch version
-        if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))
-        run: |
-          catkin_generate_changelog -y
-          catkin_tag_changelog --bump patch
-          catkin_package_version --bump patch
-      - name: bump minor version
-        if: (contains(github.event.pull_request.labels.*.name, 'bump minor'))
-        run: |
-          catkin_generate_changelog -y
-          catkin_tag_changelog --bump minor
-          catkin_package_version --bump minor
-      - name: bump major version
-        if: (contains(github.event.pull_request.labels.*.name, 'bump major'))
-        run: |
-          catkin_generate_changelog -y
-          catkin_tag_changelog --bump major
-          catkin_package_version --bump major
   release:
     name: Release
     runs-on: ubuntu-22.04
-    if: github.event.pull_request.merged == true
     permissions:
       actions: write
       checks: write
@@ -115,11 +66,13 @@ jobs:
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
       - name: commit changes
+        if: github.event.pull_request.merged == true
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 to version $(catkin_package_version)"
         working-directory: scenario_simulator_v2
       - name: Pushing to the protected branch 'master'
+        if: github.event.pull_request.merged == true
         uses: CasperWA/push-protected@v2
         with:
           token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
