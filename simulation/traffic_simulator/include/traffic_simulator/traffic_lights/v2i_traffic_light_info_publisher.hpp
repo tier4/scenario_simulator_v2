@@ -40,7 +40,7 @@ class V2ITrafficLightInfoPublisher
     double rest_time_to_red;
   };
 
-  std::vector<TrafficLightExtraInfo> traffic_light_extra_info_;
+  std::unordered_map<lanelet::Id, TrafficLightExtraInfo> traffic_light_extra_info_;
 
   const std::shared_ptr<TrafficLightManager> traffic_light_manager_;
 
@@ -67,18 +67,18 @@ public:
     msg.header.frame_id = "map";
 
     for (const auto & extra_info : traffic_light_extra_info_) {
-      auto traffic_light = traffic_light_manager_->getTrafficLight(extra_info.way_id);
+      auto traffic_light = traffic_light_manager_->getTrafficLight(extra_info.second.way_id);
 
       jpn_signal_v2i_msgs::msg::ExtraTrafficSignal extra_traffic_signal;
       extra_traffic_signal.header = msg.header;
-      extra_traffic_signal.has_min_rest_time = (extra_info.current_phase_rest_time > 0.0);
-      extra_traffic_signal.min_rest_time = extra_info.current_phase_rest_time;
-      extra_traffic_signal.has_max_rest_time = (extra_info.current_phase_rest_time > 0.0);
-      extra_traffic_signal.max_rest_time = extra_info.current_phase_rest_time;
-      extra_traffic_signal.min_rest_time_to_red = extra_info.rest_time_to_red;
+      extra_traffic_signal.has_min_rest_time = (extra_info.second.current_phase_rest_time > 0.0);
+      extra_traffic_signal.min_rest_time = extra_info.second.current_phase_rest_time;
+      extra_traffic_signal.has_max_rest_time = (extra_info.second.current_phase_rest_time > 0.0);
+      extra_traffic_signal.max_rest_time = extra_info.second.current_phase_rest_time;
+      extra_traffic_signal.min_rest_time_to_red = extra_info.second.rest_time_to_red;
 
       auto relation_ids =
-        hdmap_utils_->getTrafficLightRegulatoryElementIDsFromTrafficLight(extra_info.way_id);
+        hdmap_utils_->getTrafficLightRegulatoryElementIDsFromTrafficLight(extra_info.second.way_id);
       autoware_perception_msgs::msg::TrafficSignal traffic_signal_msg;
       {
         auto traffic_light_proto = static_cast<simulation_api_schema::TrafficSignal>(traffic_light);
@@ -111,11 +111,11 @@ public:
     if (hdmap_utils_->isTrafficLightRegulatoryElement(id)) {
       for (const auto & traffic_light : traffic_light_manager_->getTrafficLights(id)) {
         info.way_id = traffic_light.get().way_id;
-        traffic_light_extra_info_.push_back(info);
+        traffic_light_extra_info_.insert_or_assign(info.way_id, info);
       }
     } else {
       info.way_id = id;
-      traffic_light_extra_info_.push_back(info);
+      traffic_light_extra_info_.insert_or_assign(info.way_id, info);
     }
   }
 };
