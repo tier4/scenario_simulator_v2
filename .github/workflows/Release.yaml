@@ -32,9 +32,11 @@ jobs:
     timeout-minutes: 10
     container: ros:humble
     steps:
-      - name: install bloom
+      - name: Restore branch
+        uses: levonet/action-restore-branch@master
+      - name: Install bloom
         run: apt update && apt install -y python3-bloom git
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v2
         with:
           ref: master
