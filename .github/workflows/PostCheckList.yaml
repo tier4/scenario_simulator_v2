@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-22.04
     steps:
-      - uses: zt4ff/auto-commmenter@v2
+      - uses: zt4ff/auto-commenter@v2
         with:
           type: custom
           body: |
