@@ -291,6 +291,157 @@ Changelog for package concealer
 * Add the property `allowGoalModification` to switch destination topics
 * Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
 
+0.8.2 (2024-01-24)
+------------------
+* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into feature/restore_barnch
+* Bump version of scenario_simulator_v2 from version 0.8.0 to version 0.8.1
+* Merge pull request `#1 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
+  Feature/new release
+* Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
+  update CHANGELOG
+* Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
+* Merge remote-tracking branch 'origin/master' into feature/random_scenario
+* update CHANGELOG
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
+  # Conflicts:
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+* Merge pull request `#1113 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
+  Feature/doxygen
+* update Doxyfile
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
+* Merge pull request `#1106 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1106>`_ from tier4/fix/rtc_command_action/continuous_execution
+  Fix/rtc command action/continuous execution
+* Merge pull request `#997 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/997>`_ from tier4/feature/allow-goal-modification
+  Feature/allow goal modification
+* doc(concealer): add notes for RTC used status filter
+* refactor: service_with_validation.hpp
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into fix/rtc_command_action/continuous_execution
+* Merge pull request `#1092 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1092>`_ from tier4/feature/control_rtc_auto_mode
+  Feature/control rtc auto mode
+* refactor(concealer): delete debug print
+* chore(concealer): delete unnecessary line break
+* chore(concealer): delete unnecessary line break
+* Merge pull request `#1099 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1099>`_ from tier4/pzyskowski/660/ss2-awsim-connection
+  feat(concealer, scenario_test_runner): ss2/AWSIM connection: initial pose sending upgrade, sample scenario
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* unnecesary check removed
+* fix(concealer): fix capture
+* refactor(concealer): add const to requestAutoModeForCooperation
+* refactor(concealer): mark isPackageExists as noexcept
+* chore(concealer): roll back the number of retries for setVelocityLimit
+* chore: update comments
+* Move some metafunctions into new header files
+* Update `plan` to check that `SetRoutePoints::Requst` has the data member `option`
+* removed leftover include
+* Cleanup
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* fix(concealer): ignore timeout with engage service
+* fix(concealer): set long validation interval for /api/routing/set_route_points
+* feat(concealer): support modifying validation interval of ServiceWithValidation
+* fix(concealer): allow timeout for requestInitialPose
+* feat(concealer): add timeout exception class for ServiceWithValidation
+* feat(concealer): enable timeout validation switching for ServiceWithValidation
+* feat(concealer): add support for autoware_adapi_v1_msgs::msg::ResponseStatus for service response validation in ServiceWithValidation
+* fix(concealer): revive ServiceWithValidation::validateAvailability and fix logic
+* added has_include condition for localization state related code
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* chore(concealer): modify maximum number of retry for set velocity limit service
+* refactor: service_with_validation.hpp
+* refactor(concealer): organize order of class member variable
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* refactor(concealer): organize order of class member variable
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* chore: apply linter
+* refactor(concealer): add is_package_exists.hpp
+* refactor(concealer): stop using utility directory
+* fix(concealer): fix the history filter of cooperate statuses
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* fix(concealer): fix build errors
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge remote-tracking branch 'origin/master' into fix/port_document
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+  # Conflicts:
+  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
+* Merge pull request `#1060 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1060>`_ from tier4/AJD-805/baseline_update_rebased
+  feat: Update topics and services to be compatible with the latest AD API
+* fix(concealer): fix failure handling for service response
+* clang format
+* sending initial pose only when localizaiton is uninitialized
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge branch 'master' into feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* fix(concealer): add history filter for rtc command
+* chore: apply linter
+* feat(concealer): use task_queue to send RTC service request
+* feat(concealer): import latest ServiceWithValidation class from RobotecAI's work
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Apply review changes
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* refactor: delete cooperator
+* fix(concealer): fix compile errors
+* feat(concealer): update interface for rtc auto mode
+* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
+* feat(concealer): add empty implementation of requestAutoModeForCooperation
+* refactor(concealer): delete concealer::cooperate, approve
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge pull request `#1087 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
+  Feature/drop galactic support
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* fix clang format error
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* remove workbound for galactic
+* sending initial pose rate limited
+* checkpoints reintroduced
+* brought back velocity limit and cooperate commands
+* commented clock and parts of concealer
+* Run clang format
+* Delete comments and new lines
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Regression: revert change operation mode to engage due to engage request after stopping
+* Regression: fix autoware state naming
+* Regression: stop overriding mrm state and behavior
+* Update /autoware/state to /api/iv_msgs/autoware/state OLD AD API
+* Implement /api/routing/set_route_points AD API
+* Update getTrajectory topic type
+* Revert "WIP: get and sets for vehicle status"
+  This reverts commit bf9d0d2f86fcf729f015ba9312fdc830279a4124.
+* WIP: get and sets for vehicle status
+* Implement /api/external/get/emergency topic from tier4 external api
+* Revert "WIP: add ADAPI support in service with validation"
+  This reverts commit 944a04fa30e786e79a8517dce88d0bb8b81f207e.
+* Implement /api/localization/initialize service for position initialization
+* Implement /api/operation_mode/change_to_autonomous to engage
+* WIP: add ADAPI support in service with validation
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+  # Conflicts:
+  #	simulation/traffic_simulator/CMakeLists.txt
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/conventional_traffic_light_manager.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/traffic_light_manager_base.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp
+  #	simulation/traffic_simulator/src/entity/entity_manager.cpp
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_manager_base.cpp
+  #	simulation/traffic_simulator/src/traffic_lights/v2i_traffic_light_publisher.cpp
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Cleanup
+* Update `concealer` to use service SetRoutePoints
+* Add the property `allowGoalModification` to switch destination topics
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, yamacir-kit
+
 0.8.0 (2023-09-05)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/perception_ground_truth
