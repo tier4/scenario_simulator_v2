@@ -135,24 +135,6 @@ struct ApplyRequestToCorporateCommandAction : public CustomCommand,
   }
 };
 
-struct ApplyV2ITrafficSignalControllerAction :  public CustomCommand,
-                                                public SimulatorCore::NonStandardOperation
-{
-  using CustomCommand::CustomCommand;
-
-  auto start(const Scope & scope) -> void override
-  {
-    if (parameters.size() == 2) {
-      // TODO
-    } else {
-      throw Error(
-        "An unexpected number of arguments were passed to V2ITrafficSignalControllerAction. "
-        "Expected 2 arguments, but actually passed ",
-        parameters.size(), ".");
-    }
-  }
-};
-
 struct ApplyV2ITrafficSignalStateAction : public CustomCommand,
                                           public SimulatorCore::NonStandardOperation
 {
@@ -324,7 +306,6 @@ auto makeCustomCommand(const std::string & type, const std::string & content)
       ELEMENT("FaultInjectionAction@v2", ApplyFaultInjectionAction<2>),
       ELEMENT("PseudoTrafficSignalDetectorConfidenceSetAction@v1", ApplyPseudoTrafficSignalDetectorConfidenceSetAction<1>),
       ELEMENT("RequestToCooperateCommandAction@v1", ApplyRequestToCorporateCommandAction<1>),
-      ELEMENT("V2ITrafficSignalControllerAction@v1", ApplyV2ITrafficSignalControllerAction),
       ELEMENT("V2ITrafficSignalStateAction", ApplyV2ITrafficSignalStateAction),
       ELEMENT("WalkStraightAction", ApplyWalkStraightAction),
       ELEMENT("debugError", DebugError),
