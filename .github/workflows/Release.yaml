@@ -109,8 +109,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build description
+        id: build_description
         run: |
-          ${{ format('{0}  {1}', github.event.pull_request.body, '## Pull request number  #30') }}
+          echo description=${{ format('{0}  {1}', github.event.pull_request.body, '## Pull request number  #30') }} >> $GITHUB_OUTPUT
+      - name: Print description
+        run: echo ${{ steps.build_description.outputs.description }}
       - name: Combine strings
         uses: michpohl/action-concatenate-strings@v1.0.1
         with:
