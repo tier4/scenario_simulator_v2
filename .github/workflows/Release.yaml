@@ -89,11 +89,6 @@ jobs:
           token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
           branch: master
           force: true
-      - name: Delete branch
-        if: github.event.pull_request.merged == true
-        uses: SvanBoxel/delete-merged-branch@main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Get linked issues
         # if: github.event.pull_request.merged == true
         id: linked_issues
@@ -123,3 +118,8 @@ jobs:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
           body: ${{ steps.get_release_description.outputs.stdout }}
+      - name: Delete branch
+        if: github.event.pull_request.merged == true
+        uses: SvanBoxel/delete-merged-branch@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
