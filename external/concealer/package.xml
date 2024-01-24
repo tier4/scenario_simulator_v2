@@ -27,6 +27,7 @@
   <!-- Common -->
   <depend>ament_index_cpp</depend>
   <depend>geometry_msgs</depend>
+  <depend>libboost-dev</depend>
   <depend>nav_msgs</depend>
   <depend>rclcpp</depend>
   <depend>scenario_simulator_exception</depend>
@@ -34,7 +35,6 @@
   <depend>tf2_geometry_msgs</depend>
   <depend>tf2_ros</depend>
   <depend>traffic_simulator_msgs</depend>
-  <depend>libboost-dev</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>
