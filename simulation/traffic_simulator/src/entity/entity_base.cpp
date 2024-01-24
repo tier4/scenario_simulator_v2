@@ -846,10 +846,10 @@ void EntityBase::requestSynchronize(
 )
 {
   job_list_.append(
-    [this,ego_target,entity_target](double) {
+    [this,ego_target,entity_target](double)->bool {
       const auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
       const auto ego_distance = getDistanceToTargetLaneletPose(ego_target);
-      const auto entity_velocity = getCurrentTwist().linear.x;
+      // const auto entity_velocity = getCurrentTwist().linear.x;
       const auto ego_velocity = other_status_.find("ego")->second.getTwist().linear.x;
       // be better to use acceleration,jerk to estimate the arrival time
 
@@ -862,6 +862,8 @@ void EntityBase::requestSynchronize(
       const auto entity_velocity_to_synchronize = entity_distance.value() / ego_arrival_time;
 
       this->requestSpeedChange(entity_velocity_to_synchronize, false);
+
+      return false;
     },
     // after this im not sure it is correct, just an draft
     [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
