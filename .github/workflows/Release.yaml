@@ -102,10 +102,31 @@ jobs:
         uses: SvanBoxel/delete-merged-branch@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get linked issues
+        # if: github.event.pull_request.merged == true
+        id: linked_issues
+        uses: mondeja/pr-linked-issues-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Combine strings
+        uses: michpohl/action-concatenate-strings@v1.0.1
+        with:
+          first: ${{ github.event.pull_request.body }}
+          second: |
+            
+            ## Linked Issues
+            
+            ${{ steps.linked_issues.outputs.issues }}
+          output-var-name: 'RELEASE_DESCRIPTION'
+      # - name: debug
+      #   run: |
+      #     echo ${{ steps.linked_issues.outputs.RELEASE_DESCRIPTION }}
+      - name: debug
+        run: echo ${{ steps.linked_issues.outputs.issues }}
       - name: Create a gitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
-          body: Release version ${{ steps.new_version.outputs.new_version }}
+          body: $RELEASE_DESCRIPTION
