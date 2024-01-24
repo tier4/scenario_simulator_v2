@@ -828,10 +828,12 @@ auto EntityBase::getDistanceToTargetLaneletPose(
 
   // check if the entity is on the lanelet
   if(entity_lanelet_pose_){
-    const auto entity_distance_to_intersection =
+    const auto entity_distance_to_target =
         hdmap_utils_ptr_->getLongitudinalDistance(
             static_cast<LaneletPose>(entity_lanelet_pose_.value()),
             static_cast<LaneletPose>(target_lanelet_pose_));
+
+    return entity_distance_to_target;
   }
 
   // may be give error here too?
@@ -844,22 +846,22 @@ void EntityBase::requestSynchronize(
 )
 {
   job_list_.append(
-    [this,ego_target,entitiy_target]() {
+    [this,ego_target,entity_target](double) {
       const auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
       const auto ego_distance = getDistanceToTargetLaneletPose(ego_target);
       const auto entity_velocity = getCurrentTwist().linear.x;
-      const auto ego_velocity = other_status_.find("ego").getCurrentTwist().linear.x;
+      const auto ego_velocity = other_status_.find("ego")->second.getTwist().linear.x;
       // be better to use acceleration,jerk to estimate the arrival time
 
       // estimate ego's arrival time to the target point
       // can estimate it more precisely by using accel,jerk
-      const auto ego_arrival_time = ego_distance / ego_velocity;
+      const auto ego_arrival_time = (ego_velocity != 0) ? ego_distance.value() / ego_velocity : 0;
 
       // calculate the speed of entity to synchronize with ego
       // really just a simple example, kind of like a joke
-      const auto entity_velocity_to_synchronize = entity_distance / ego_arrival_time;
+      const auto entity_velocity_to_synchronize = entity_distance.value() / ego_arrival_time;
 
-      this.requestSpeedChange(entity_velocity_to_synchronize, false);
+      this->requestSpeedChange(entity_velocity_to_synchronize, false);
     },
     // after this im not sure it is correct, just an draft
     [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
