@@ -55,14 +55,6 @@ jobs:
           echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
       - name: Merge branch
         run: git pull origin ${{ github.head_ref }}
-      - name: Get labels of the pull request
-        id: get_label
-        uses: fml09/get-label@v0.1.1
-        with:
-          pull_number: ${{ steps.get_pull_request_number.outputs.group1 }}
-          repo: scenario_simulator_v2
-          owner: merge-queue-testing
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: bump patch version
         if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))
         run: |
@@ -108,22 +100,13 @@ jobs:
         uses: mondeja/pr-linked-issues-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Combine strings
+      - name: Update release description
         # if: github.event.pull_request.merged == true
-        id: release_description
-        uses: greguintow/concat-string-action@v1
-        env:
-          linked_issue_section: |
-            #26
-          # ${{ steps.linked_issues.outputs.issues }}
-        with:
-          string: |
-            ${{ github.event.pull_request.body }}  
-            ## Linked Issues  
-            {linked_issue_section}
-      - name: Print release description
-        # if: github.event.pull_request.merged == true
-        run: echo "${{ steps.release_description.outputs.replaced }}"
+        run: |
+          echo "${{ github.event.pull_request.body }}" >> pull_request_description.txt
+          echo "## Related Issues  " >> pull_request_description.txt
+          echo "${{ steps.linked_issues.outputs.issues }}"
+          cat pull_request_description.txt
       - name: Create a gitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
