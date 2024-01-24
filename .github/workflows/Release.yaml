@@ -55,14 +55,6 @@ jobs:
           echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
       - name: Merge branch
         run: git pull origin ${{ github.head_ref }}
-      - name: Get labels of the pull request
-        id: get_label
-        uses: fml09/get-label@v0.1.1
-        with:
-          pull_number: ${{ steps.get_pull_request_number.outputs.group1 }}
-          repo: scenario_simulator_v2
-          owner: merge-queue-testing
-          token: ${{ secrets.GITHUB_TOKEN }}
       - name: bump patch version
         if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))
         run: |
@@ -97,35 +89,35 @@ jobs:
           token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
           branch: master
           force: true
-      - name: Delete branch
-        if: github.event.pull_request.merged == true
-        uses: SvanBoxel/delete-merged-branch@main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Get linked issues
-        # if: github.event.pull_request.merged == true
         id: linked_issues
-        uses: mondeja/pr-linked-issues-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Combine strings
-        uses: michpohl/action-concatenate-strings@v1.0.1
+        uses: hossainemruz/linked-issues@main
         with:
-          first: ${{ github.event.pull_request.body }}
-          second: |
-            ## Linked Issues  
-            ${{ steps.linked_issues.outputs.issues }}
-          output-var-name: 'RELEASE_DESCRIPTION'
-          separator: '  '
-      # - name: debug
-      #   run: |
-      #     echo ${{ steps.linked_issues.outputs.RELEASE_DESCRIPTION }}
-      - name: debug
-        run: echo ${{ steps.linked_issues.outputs.issues }}
+          pr_url: ${{github.event.pull_request.html_url}}
+          format: ExternalIssueRef
+      - name: Update release description
+        run: |
+          echo "${{ github.event.pull_request.body }}" >> release_description.txt
+          echo "" >> release_description.txt
+          echo "## Pull Request  " >> release_description.txt
+          echo "#${{ github.event.pull_request.number }}" >> release_description.txt
+          echo "" >> release_description.txt
+          echo "## Related Issues  " >> release_description.txt
+          echo "${{ steps.linked_issues.outputs.issues }}" >> release_description.txt
+      - name: Get release description
+        id: get_release_description
+        uses: mathiasvr/command-output@v2.0.0
+        with:
+          run: cat release_description.txt
       - name: Create a gitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
-          body: ${{ env.RELEASE_DESCRIPTION }}
+          body: ${{ steps.get_release_description.outputs.stdout }}
+      - name: Delete branch
+        if: github.event.pull_request.merged == true
+        uses: SvanBoxel/delete-merged-branch@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
