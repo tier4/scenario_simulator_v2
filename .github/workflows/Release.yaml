@@ -110,7 +110,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build description
         run: |
-          ${{ format('{0}  {1}', ${{ github.event.pull_request.body }}, '## Pull request number  #30') }}
+          ${{ format('{0}  {1}', github.event.pull_request.body, '## Pull request number  #30') }}
       - name: Combine strings
         uses: michpohl/action-concatenate-strings@v1.0.1
         with:
