@@ -577,6 +577,12 @@ public:
     {
       return core->setConventionalTrafficLightConfidence(std::forward<decltype(xs)>(xs)...);
     }
+
+    template <typename... Ts>
+    static auto setV2ITrafficLightExtraInfo(Ts &&... xs) -> decltype(auto)
+    {
+      return core->setV2ITrafficLightExtraInfo(std::forward<decltype(xs)>(xs)...);
+    }
   };
 };
 }  // namespace openscenario_interpreter
