@@ -2,8 +2,29 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.8.1 (2024-01-24)
+------------------
+* Merge pull request `#1 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
+  Feature/new release
+* Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
+  update CHANGELOG
+* update CHANGELOG
+* Merge branch 'master' into feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Piotr Zyskowski, yamacir-kit
+
 * Merge branch 'master' into feature/freespace-distance-condition
 * Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
 * Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased

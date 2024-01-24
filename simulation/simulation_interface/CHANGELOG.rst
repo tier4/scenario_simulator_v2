@@ -2,8 +2,94 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.8.1 (2024-01-24)
+------------------
+* Merge pull request `#1 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
+  Feature/new release
+* Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
+  update CHANGELOG
+* update CHANGELOG
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge branch 'master' into feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/drop_galactic_support
+* Merge pull request `#1027 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1027>`_ from tier4/feature/new_traffic_light
+  Feature/new traffic light
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* refactor(simulation_interface)
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* refactor(simulation_interface)
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Update simulation/simulation_interface/include/simulation_interface/conversions.hpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* chore: apply formatter
+* refactor: TrafficLightDetectorEmulator => PseudoTrafficLightDetector
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
+  #	simulation/traffic_simulator/src/api/api.cpp
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+  # Conflicts:
+  #	docs/ReleaseNotes.md
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* refactor: apply formatter
+* fix: build errors
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/simple_sensor_simulator.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simulation_interface/include/simulation_interface/conversions.hpp
+  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_client.hpp
+  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_server.hpp
+  #	simulation/simulation_interface/proto/simulation_api_schema.proto
+  #	simulation/simulation_interface/src/conversions.cpp
+  #	simulation/simulation_interface/src/zmq_multi_client.cpp
+  #	simulation/simulation_interface/src/zmq_multi_server.cpp
+  #	simulation/traffic_simulator/src/api/api.cpp
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* refactor: delete unused code / dependencies
+* refactor(simulation_interface): delete unused conversion
+* refactor(traffic_simulator): refactor data flow with simulation_api_schema::TrafficSignal
+* refactor(simulation_interface/zmq_client): remove duplicated traffic light detector emulator call
+* feat(simulator_interface): add support for autoware_msgs
+* feat(simulator_interface): add AttachTrafficLightDetectorEmulatorRequest to ZMQ client/server
+* chore(traffic_simulator): reformat
+* feat(simlation_interface): add call function for AttachTrafficLightDetectorEmulatorRequest
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* feat(simulation_interface): attachTrafficLightDetectorEmulatorRequest/Response
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+  # Conflicts:
+  #	simulation/traffic_simulator/CMakeLists.txt
+  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/conventional_traffic_light_manager.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/traffic_light_manager_base.hpp
+  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp
+  #	simulation/traffic_simulator/src/entity/entity_manager.cpp
+  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_manager_base.cpp
+  #	simulation/traffic_simulator/src/traffic_lights/v2i_traffic_light_publisher.cpp
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Piotr Zyskowski, yamacir-kit
+
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge branch 'master' into feature/freespace-distance-condition
 * Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
