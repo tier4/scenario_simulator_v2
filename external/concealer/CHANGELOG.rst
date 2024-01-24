@@ -442,6 +442,9 @@ Changelog for package concealer
 * Add the property `allowGoalModification` to switch destination topics
 * Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, yamacir-kit
 
+0.8.5 (2024-01-24)
+------------------
+
 0.8.4 (2024-01-24)
 ------------------
 
