@@ -111,7 +111,7 @@ jobs:
       - name: Combine strings
         uses: michpohl/action-concatenate-strings@v1.0.1
         with:
-          first: github.event.pull_request.body
+          first: ${{ github.event.pull_request.body }}
           second: |
             ## Linked Issues\n${{ steps.linked_issues.outputs.issues }}
           separator: '\n'
