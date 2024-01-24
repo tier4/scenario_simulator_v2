@@ -10,7 +10,9 @@ OpenSCENARIO:
   ParameterDeclarations:
     ParameterDeclaration: []
   CatalogLocations:
-    CatalogLocation: []
+    VehicleCatalog:
+      Directory:
+        path: $(ros2 pkg prefix --share openscenario_experimental_catalog)/vehicle
   RoadNetwork:
     LogicFile:
       filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
@@ -19,15 +21,15 @@ OpenSCENARIO:
         - name: controller-1
           Phase:
             - name: phase-1
-              duration: 10
+              duration: 3
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'green' }
             - name: phase-2
-              duration: 10
+              duration: 3
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'yellow' }
             - name: phase-3
-              duration: 10
+              duration: 3
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'red' }
   Entities:
@@ -36,6 +38,17 @@ OpenSCENARIO:
         CatalogReference:
           catalogName: sample_vehicle
           entryName: sample_vehicle
+        ObjectController:
+          Controller:
+            name: ''
+            Properties:
+              Property:
+                - name: isEgo
+                  value: "true"
+                - name: maxJerk
+                  value: "1.5"
+                - name: minJerk
+                  value: "-1.5"
   Storyboard:
     Init:
       Actions:
@@ -90,33 +103,16 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 5
-                                      rule: greaterThan
-                        Action:
-                          - name: ''
-                            UserDefinedAction:
-                              CustomCommandAction:
-                                type: V2ITrafficSignalControllerAction(controller-1, phase-3)
-                      - name: ''
-                        priority: overwrite
-                        StartTrigger:
-                          ConditionGroup:
-                            - Condition:
-                                - name: ''
-                                  delay: 0
-                                  conditionEdge: none
-                                  ByValueCondition:
-                                    SimulationTimeCondition:
-                                      value: 20
+                                      value: 15
                                       rule: greaterThan
                         Action:
                           - name: ''
                             GlobalAction:
                               InfrastructureAction:
                                 TrafficSignalAction:
-                                  TrafficSignalStateAction:
-                                    name: '34802'
-                                    state: 'green'
+                                  TrafficSignalControllerAction:
+                                    trafficSignalControllerRef: controller-1
+                                    phase: phase-3
             StartTrigger:
               ConditionGroup:
                 - Condition:
