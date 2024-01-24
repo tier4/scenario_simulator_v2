@@ -38,8 +38,6 @@ class V2ITrafficLightInfoPublisher
     lanelet::Id way_id;
     double current_phase_rest_time;
     double rest_time_to_red;
-    double min_rest_time;
-    double max_rest_time;
   };
 
   std::vector<TrafficLightExtraInfo> traffic_light_extra_info_;
@@ -73,10 +71,10 @@ public:
 
       jpn_signal_v2i_msgs::msg::ExtraTrafficSignal extra_traffic_signal;
       extra_traffic_signal.header = msg.header;
-      extra_traffic_signal.has_min_rest_time = true;
-      extra_traffic_signal.min_rest_time = extra_info.min_rest_time;
-      extra_traffic_signal.has_max_rest_time = true;
-      extra_traffic_signal.max_rest_time = extra_info.max_rest_time;
+      extra_traffic_signal.has_min_rest_time = (extra_info.current_phase_rest_time > 0.0);
+      extra_traffic_signal.min_rest_time = extra_info.current_phase_rest_time;
+      extra_traffic_signal.has_max_rest_time = (extra_info.current_phase_rest_time > 0.0);
+      extra_traffic_signal.max_rest_time = extra_info.current_phase_rest_time;
       extra_traffic_signal.min_rest_time_to_red = extra_info.rest_time_to_red;
 
       auto relation_ids =
@@ -103,7 +101,6 @@ public:
     publisher_->publish(msg);
   }
 
-  // TODO: double min_rest_time; double max_rest_time;
   void setTrafficLightExtraInfo(
     lanelet::Id id, double current_phase_rest_time, double rest_time_to_red)
   {

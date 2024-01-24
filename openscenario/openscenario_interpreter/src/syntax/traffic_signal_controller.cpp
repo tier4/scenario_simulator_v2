@@ -123,6 +123,7 @@ auto TrafficSignalController::evaluate() -> Object
       boost::lexical_cast<std::int64_t>(traffic_signal_state.traffic_signal_id),
       current_phase_rest_time, rest_time_to_red);
   }
+  return updated;
 }
 
 auto TrafficSignalController::notifyBegin() -> void

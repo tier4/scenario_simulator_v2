@@ -102,6 +102,8 @@ public:
 
   auto notifyBegin() -> void;
 
+  auto restTimeToRed() const -> double;
+
   auto shouldChangePhaseToBegin() -> bool;
 };
 }  // namespace syntax
