@@ -99,12 +99,29 @@ auto TrafficSignalController::cycleTime() const -> double
 
 auto TrafficSignalController::evaluate() -> Object
 {
-  if (shouldChangePhaseToBegin()) {
-    return changePhaseTo(std::begin(phases));
-  } else if (currentPhaseExceeded()) {
-    return changePhaseTo(std::next(current_phase));
-  } else {
-    return unspecified;
+  auto updated = [&]() {
+    if (shouldChangePhaseToBegin()) {
+      return changePhaseTo(std::begin(phases));
+    } else if (currentPhaseExceeded()) {
+      return changePhaseTo(std::next(current_phase));
+    } else {
+      return unspecified;
+    }
+  }();
+
+  auto rest_time_to_red = restTimeToRed();
+  double current_phase_rest_time = [this]() {
+    if ((*current_phase).duration == Double::infinity()) {
+      return -1.0;
+    } else {
+      return (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
+    }
+  }();
+
+  for (const auto traffic_signal_state : (*current_phase).traffic_signal_states) {
+    setV2ITrafficLightExtraInfo(
+      boost::lexical_cast<std::int64_t>(traffic_signal_state.traffic_signal_id),
+      current_phase_rest_time, rest_time_to_red);
   }
 }
 
