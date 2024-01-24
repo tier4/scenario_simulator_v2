@@ -88,7 +88,7 @@ jobs:
         if: github.event.pull_request.merged == true
         uses: CasperWA/push-protected@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
           branch: master
           force: true
       - name: Delete branch
