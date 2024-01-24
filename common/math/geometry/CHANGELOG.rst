@@ -448,6 +448,9 @@ Changelog for package geometry
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Release Bot, Shota Minami, Tatsuya Yamasaki, yamacir-kit
 
+0.8.4 (2024-01-24)
+------------------
+
 0.8.3 (2024-01-24)
 ------------------
 * Bump version of scenario_simulator_v2 from version 0.8.1 to version 0.8.2
