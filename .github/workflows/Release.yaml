@@ -114,21 +114,16 @@ jobs:
         uses: greguintow/concat-string-action@v1
         env:
           linked_issue_section: |
-            ${{ steps.linked_issues.outputs.issues }}
+            #26
+          # ${{ steps.linked_issues.outputs.issues }}
         with:
           string: |
             ${{ github.event.pull_request.body }}  
             ## Linked Issues  
             {linked_issue_section}
-      - name: debug
+      - name: Print release description
         # if: github.event.pull_request.merged == true
-        run: echo "${{ steps.release_description.outputs.replaced }}" >> release_description.txt
-      - name: Upload artifact
-        # if: github.event.pull_request.merged == true
-        uses: actions/upload-artifact@v4
-        with:
-          name: release_description
-          path: release_description.txt
+        run: echo "${{ steps.release_description.outputs.replaced }}"
       - name: Create a gitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
