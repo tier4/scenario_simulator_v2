@@ -129,4 +129,4 @@ jobs:
         with:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
-          body: github.event.pull_request.body
+          body: $RELEASE_DESCRIPTION

@@ -29,9 +29,3 @@
 > If there are any limitations on the features or fixes added by this pull request, Please delete this sentence and please clearly describe them.
 
 > If there are no limitations on the features or modifications added by the pull request, remove the "known limitations" section.
-
-## Link to the issue
-
-> If a corresponding Issue exists, please delete this sentence and describe its number.
-
-> If it does not exist, please delete the "Link to the issue" section.
