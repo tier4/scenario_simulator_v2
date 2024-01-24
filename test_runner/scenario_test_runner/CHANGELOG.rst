@@ -415,6 +415,11 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, f0reachARR, yamacir-kit
 
+0.8.6 (2024-01-24)
+------------------
+* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into fix/release_text
+* Contributors: Masaya Kataoka
+
 0.8.5 (2024-01-24)
 ------------------
 
