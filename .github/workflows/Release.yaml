@@ -109,3 +109,5 @@ jobs:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
           body: Release version ${{ steps.new_version.outputs.new_version }}
+      - name: debug
+        run: echo '${{ toJSON(github.event.pull_request) }}'
