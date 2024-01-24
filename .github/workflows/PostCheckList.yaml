@@ -22,10 +22,9 @@ jobs:
       security-events: write
       statuses: write
     steps:
-      - uses: zt4ff/auto-commenter@v2
+      - uses: alawiii521/current-pr-comment@v1.0
         with:
-          type: custom
-          body: |
+          comment: |
             # Checklist for reviewers ☑️
             All references to "You" in the following text refer to the code reviewer.
             - [ ] Is this pull request written in a way that is easy to read from a third-party perspective?
@@ -34,4 +33,4 @@ jobs:
             - [ ] Labels of this pull request are valid?
             - [ ] All unit tests/integration tests are included in this pull request? If you think adding test cases is unnecessary, please describe why and cross out this line.
             - [ ] The documentation is enough? If you think adding documents for this pull request, is unnecessary, please describe why and cross out this line.
-          token: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
