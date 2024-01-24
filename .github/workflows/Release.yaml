@@ -102,6 +102,16 @@ jobs:
         uses: SvanBoxel/delete-merged-branch@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get linked issues
+        # if: github.event.pull_request.merged == true
+        id: linked_issues
+        uses: hossainemruz/linked-issues@main
+        with:
+          pr_url: ${{github.event.pull_request.html_url}}
+          format: IssueURL
+      - name: debug
+        run: |
+          echo ${{ format('result: {0} {1}', github.event.pull_request.body, '\n## Linked Issues\n${{ steps.linked_issues.outputs.issues }}') }}
       - name: Create a gitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
@@ -109,5 +119,3 @@ jobs:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
           body: github.event.pull_request.body
-      - name: debug
-        run: echo '${{ toJSON(github.event.pull_request) }}'
