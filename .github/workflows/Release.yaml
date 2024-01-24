@@ -108,9 +108,17 @@ jobs:
         uses: mondeja/pr-linked-issues-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Combine strings
+        uses: michpohl/action-concatenate-strings@v1
+        with:
+          first: github.event.pull_request.body
+          second: |
+            ## Linked Issues\n${{ steps.linked_issues.outputs.issues }}
+          separator: ', '
+          output-var-name: 'release_description'
       - name: debug
         run: |
-          echo ${{ format('result: {0} {1}', github.event.pull_request.body, '\n## Linked Issues\n${{ steps.linked_issues.outputs.issues }}') }}
+          echo ${{ steps.linked_issues.outputs.release_description }}
       - name: Create a gitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
