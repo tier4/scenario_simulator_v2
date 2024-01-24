@@ -66,6 +66,9 @@ Changelog for package kashiwanoha_map
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Piotr Zyskowski, Release Bot, yamacir-kit
 
+0.8.5 (2024-01-24)
+------------------
+
 0.8.4 (2024-01-24)
 ------------------
 
