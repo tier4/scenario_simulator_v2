@@ -106,8 +106,9 @@ jobs:
         run: |
           echo "${{ github.event.pull_request.body }}" >> release_description.txt
           echo "## Pull Request  " >> release_description.txt
+          echo "${{ github.event.pull_request.number }}" >> release_description.txt
+          echo "## Related Issues  " >> release_description.txt
           echo "${{ steps.linked_issues.outputs.issues }}" >> release_description.txt
-          cat release_description.txt
           echo "description=$(cat release_description.txt)" >> $GITHUB_OUTPUT
       - name: Create a gitHub release
         if: github.event.pull_request.merged == true
