@@ -10,6 +10,8 @@ jobs:
     name: PostCheckList
     timeout-minutes: 10
     runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
     steps:
       - uses: zt4ff/auto-commenter@v2
         with:
@@ -23,3 +25,4 @@ jobs:
             - [ ] Labels of this pull request are valid?
             - [ ] All unit tests/integration tests are included in this pull request? If you think adding test cases is unnecessary, please describe why and cross out this line.
             - [ ] The documentation is enough? If you think adding documents for this pull request, is unnecessary, please describe why and cross out this line.
+          token: ${{ secrets.GITHUB_TOKEN }}
