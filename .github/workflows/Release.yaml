@@ -108,30 +108,25 @@ jobs:
         uses: mondeja/pr-linked-issues-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build description
-        id: build_description
-        run: |
-          echo description=${{ format('{0}  {1}', github.event.pull_request.body, '## Pull request number  #30') }} >> $GITHUB_OUTPUT
-      - name: Print description
-        run: echo ${{ steps.build_description.outputs.description }}
       - name: Combine strings
-        uses: michpohl/action-concatenate-strings@v1.0.1
-        with:
-          first: ${{ github.event.pull_request.body }}
-          second: |
+        # if: github.event.pull_request.merged == true
+        id: release_description
+        uses: greguintow/concat-string-action@v1
+        env:
+          linked_issue_section: |
             ## Linked Issues  
             ${{ steps.linked_issues.outputs.issues }}
-          output-var-name: 'RELEASE_DESCRIPTION'
-          separator: '  '
-      # - name: debug
-      #   run: |
-      #     echo ${{ steps.linked_issues.outputs.RELEASE_DESCRIPTION }}
+        with:
+          string: |
+            ${{ github.event.pull_request.body }}
+            {linked_issue_section}
       - name: debug
-        run: echo ${{ steps.linked_issues.outputs.issues }}
+        # if: github.event.pull_request.merged == true
+        run: echo ${{ steps.release_description.outputs.replaced }}
       - name: Create a gitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
-          body: ${{ env.RELEASE_DESCRIPTION }}
+          body: ${{ steps.release_description.outputs.replaced }}
