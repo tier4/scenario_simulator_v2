@@ -116,9 +116,11 @@ jobs:
             ## Linked Issues\n${{ steps.linked_issues.outputs.issues }}
           separator: '\n'
           output-var-name: 'RELEASE_DESCRIPTION'
+      # - name: debug
+      #   run: |
+      #     echo ${{ steps.linked_issues.outputs.RELEASE_DESCRIPTION }}
       - name: debug
-        run: |
-          echo ${{ steps.linked_issues.outputs.RELEASE_DESCRIPTION }}
+        run: echo ${{ steps.linked_issues.outputs.issues }}
       - name: Create a gitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
