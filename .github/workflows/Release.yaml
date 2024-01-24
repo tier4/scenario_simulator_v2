@@ -92,9 +92,10 @@ jobs:
       - name: Get linked issues
         # if: github.event.pull_request.merged == true
         id: linked_issues
-        uses: mondeja/pr-linked-issues-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: hossainemruz/linked-issues@main
+        with:
+          pr_url: ${{github.event.pull_request.html_url}}
+          format: ExternalIssueRef
       - name: Update release description
         # if: github.event.pull_request.merged == true
         run: |
