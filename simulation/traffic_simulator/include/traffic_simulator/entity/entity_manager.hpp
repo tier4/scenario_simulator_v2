@@ -311,6 +311,7 @@ public:
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
+  FORWARD_TO_ENTITY(requestSynchronize, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
   FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );

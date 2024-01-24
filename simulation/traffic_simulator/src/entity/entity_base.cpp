@@ -860,7 +860,7 @@ void EntityBase::requestSynchronize(
 
       this->requestSpeedChange(entity_velocity_to_synchronize, false);
 
-      return false;
+      return true;
     },
     // after this im not sure it is correct, just an draft
     [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
