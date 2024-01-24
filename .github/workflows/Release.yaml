@@ -114,7 +114,7 @@ jobs:
           first: github.event.pull_request.body
           second: |
             ## Linked Issues\n${{ steps.linked_issues.outputs.issues }}
-          separator: ', '
+          separator: '\n'
           output-var-name: 'release_description'
       - name: debug
         run: |
