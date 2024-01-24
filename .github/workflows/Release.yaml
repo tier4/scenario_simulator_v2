@@ -116,7 +116,7 @@ jobs:
             ## Linked Issues  
             ${{ steps.linked_issues.outputs.issues }}
           output-var-name: 'RELEASE_DESCRIPTION'
-          separator: '\n'
+          separator: '  '
       # - name: debug
       #   run: |
       #     echo ${{ steps.linked_issues.outputs.RELEASE_DESCRIPTION }}
