@@ -38,7 +38,7 @@ ament_auto_add_executable(traffic_simulation_demo
 )
 target_link_libraries(traffic_simulation_demo cpp_scenario_node)
 
-option(BUILD_CPP_MOCK_SCENARIOS "Building the C++ scenarios" OFF)
+option(BUILD_CPP_MOCK_SCENARIOS "Building the C++ scenarios" ON)
 if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/behavior_plugin)
   add_subdirectory(src/collision)
@@ -53,6 +53,7 @@ if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/pedestrian)
   add_subdirectory(src/random_scenario)
   add_subdirectory(src/speed_planning)
+  add_subdirectory(src/synchronized_action)
 endif()
 
 install(
