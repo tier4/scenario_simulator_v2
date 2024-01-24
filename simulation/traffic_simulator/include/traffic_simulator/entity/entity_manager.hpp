@@ -199,8 +199,10 @@ public:
         v2i_traffic_light_legacy_topic_publisher_ptr_->publish(
           clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
       }),
-    conventional_traffic_light_updater_(
-      node, [this]() { conventional_traffic_light_marker_publisher_ptr_->publish(); })
+    conventional_traffic_light_updater_(node, [this]() {
+      conventional_traffic_light_marker_publisher_ptr_->publish();
+      v2i_traffic_light_info_publisher_ptr_->publish();
+    })
   {
     updateHdmapMarker();
   }
