@@ -90,14 +90,12 @@ jobs:
           branch: master
           force: true
       - name: Get linked issues
-        # if: github.event.pull_request.merged == true
         id: linked_issues
         uses: hossainemruz/linked-issues@main
         with:
           pr_url: ${{github.event.pull_request.html_url}}
           format: ExternalIssueRef
       - name: Update release description
-        # if: github.event.pull_request.merged == true
         run: |
           echo "${{ github.event.pull_request.body }}" >> release_description.txt
           echo "" >> release_description.txt
@@ -107,7 +105,6 @@ jobs:
           echo "## Related Issues  " >> release_description.txt
           echo "${{ steps.linked_issues.outputs.issues }}" >> release_description.txt
       - name: Get release description
-        # if: github.event.pull_request.merged == true
         id: get_release_description
         uses: mathiasvr/command-output@v2.0.0
         with:
