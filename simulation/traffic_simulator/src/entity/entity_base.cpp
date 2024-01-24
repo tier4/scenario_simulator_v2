@@ -818,20 +818,19 @@ auto EntityBase::updateTraveledDistance(const double step_time) -> double
   return traveled_distance_;
 }
 
-auto EntityBase::getDistanceToTargetLaneletPose(
-  const CanonicalizedLaneletPose target_lanelet_pose)-> std::optional<double>
+auto EntityBase::getDistanceToTargetLaneletPose(const CanonicalizedLaneletPose target_lanelet_pose)
+  -> std::optional<double>
 {
-  constexpr double matching_distance = 100.0; // may be better to use a parameter
+  constexpr double matching_distance = 100.0;  // may be better to use a parameter
 
   const auto entity_lanelet_pose_ = getLaneletPose(matching_distance);
   const auto target_lanelet_pose_ = target_lanelet_pose;
 
   // check if the entity is on the lanelet
-  if(entity_lanelet_pose_){
-    const auto entity_distance_to_target =
-        hdmap_utils_ptr_->getLongitudinalDistance(
-            static_cast<LaneletPose>(entity_lanelet_pose_.value()),
-            static_cast<LaneletPose>(target_lanelet_pose_));
+  if (entity_lanelet_pose_) {
+    const auto entity_distance_to_target = hdmap_utils_ptr_->getLongitudinalDistance(
+      static_cast<LaneletPose>(entity_lanelet_pose_.value()),
+      static_cast<LaneletPose>(target_lanelet_pose_));
 
     return entity_distance_to_target;
   }
@@ -841,12 +840,10 @@ auto EntityBase::getDistanceToTargetLaneletPose(
 }
 
 void EntityBase::requestSynchronize(
-  const CanonicalizedLaneletPose ego_target,
-  const CanonicalizedLaneletPose entity_target
-)
+  const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target)
 {
   job_list_.append(
-    [this,ego_target,entity_target](double)->bool {
+    [this, ego_target, entity_target](double) -> bool {
       const auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
       const auto ego_distance = getDistanceToTargetLaneletPose(ego_target);
       // const auto entity_velocity = getCurrentTwist().linear.x;
