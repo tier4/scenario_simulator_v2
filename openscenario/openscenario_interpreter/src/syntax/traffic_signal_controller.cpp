@@ -113,6 +113,47 @@ auto TrafficSignalController::notifyBegin() -> void
   change_to_begin_time = evaluateSimulationTime() + delay;
 }
 
+auto TrafficSignalController::restTimeToRed() const -> double
+{
+  auto is_red = [](const auto & phase) {
+    for (const auto & traffic_signal_state : phase.traffic_signal_states) {
+      for (traffic_simulator::TrafficLight & traffic_light :
+           getConventionalTrafficLights(traffic_signal_state.id())) {
+        for (auto & bulb : traffic_light.bulbs) {
+          if (bulb.is(traffic_simulator::TrafficLight::Color::Value::red)) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  if (current_phase == std::end(phases)) {
+    return 0;
+  } else if (is_red(*current_phase)) {
+    return 0;
+  } else {
+    double rest_time_to_red =
+      (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
+    auto iterator = current_phase;
+    auto move_next_phase = [&]() {
+      ++iterator;
+      return iterator;
+    };
+    move_next_phase();
+    while (not is_red(*iterator)) {
+      if (rest_time_to_red > cycleTime()) {
+        // no red phase
+        return 0;
+      }
+      rest_time_to_red += (*iterator).duration;
+      move_next_phase();
+    }
+    return rest_time_to_red;
+  }
+}
+
 auto TrafficSignalController::shouldChangePhaseToBegin() -> bool
 {
   if (reference.empty()) {
