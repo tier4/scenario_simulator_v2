@@ -129,4 +129,4 @@ jobs:
         with:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
-          body: $RELEASE_DESCRIPTION
+          body: ${{ env.RELEASE_DESCRIPTION }}
