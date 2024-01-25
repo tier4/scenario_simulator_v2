@@ -18,20 +18,20 @@ OpenSCENARIO:
       filepath: $(ros2 pkg prefix --share kashiwanoha_map)/map
     TrafficSignals:
       TrafficSignalController:
-        - name: controller-1
+        - name: controller-34802
           Phase:
-            - name: phase-1
-              duration: 3
+            - name: normal-green
+              duration: 10
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'green' }
-            - name: phase-2
-              duration: 3
-              TrafficSignalState:
-                - { trafficSignalId: '34802', state: 'yellow' }
-            - name: phase-3
+            - name: normal-red
               duration: 3
               TrafficSignalState:
                 - { trafficSignalId: '34802', state: 'red' }
+            - name: strange-green
+              duration: INF
+              TrafficSignalState:
+                - { trafficSignalId: '34802', state: 'green' }
   Entities:
     ScenarioObject:
       - name: ego
@@ -103,7 +103,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 15
+                                      value: 3
                                       rule: greaterThan
                         Action:
                           - name: ''
@@ -111,8 +111,28 @@ OpenSCENARIO:
                               InfrastructureAction:
                                 TrafficSignalAction:
                                   TrafficSignalControllerAction:
-                                    trafficSignalControllerRef: controller-1
-                                    phase: phase-3
+                                    trafficSignalControllerRef: controller-34802
+                                    phase: strange-green
+                      - name: ''
+                        priority: overwrite
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 6
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            GlobalAction:
+                              InfrastructureAction:
+                                TrafficSignalAction:
+                                  TrafficSignalControllerAction:
+                                    trafficSignalControllerRef: controller-34802
+                                    phase: normal-green
             StartTrigger:
               ConditionGroup:
                 - Condition:
