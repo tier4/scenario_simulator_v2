@@ -277,7 +277,7 @@ auto EgoEntity::setStatusExternally(const CanonicalizedEntityStatus & status) ->
   externally_updated_status_ = status;
 }
 
-void EgoEntity::requestSpeedChange(double value, bool continuous)
+void EgoEntity::requestSpeedChange(double value, bool /*continuous*/)
 {
   target_speed_ = value;
   field_operator_application->restrictTargetSpeed(value);
