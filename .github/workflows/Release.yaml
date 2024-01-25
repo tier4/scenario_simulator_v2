@@ -95,6 +95,7 @@ jobs:
         with:
           pr_url: ${{github.event.pull_request.html_url}}
           format: ExternalIssueRef
+        continue-on-error: true
       - name: Update release description
         run: |
           echo "${{ github.event.pull_request.body }}" >> release_description.txt
