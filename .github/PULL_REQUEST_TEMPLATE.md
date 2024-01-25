@@ -1,13 +1,24 @@
 # Description
 
+> Minimal example is [here](pull_request_samples/example_simple.md)
+
+> Detailed example is [here](pull_request_samples/example_detail.md)
+
 ## Abstract
+
+> [Required]
 
 > Delete this sentence and explain this pull request shortly.
 
 ## Background
 
+> [Optional]
+
 > Delete this sentence and explain the circumstances that led to this pull request being sent.
+
 ## Details
+
+> [Optional]
 
 > Delete this sentence and describe this pull request.
 
@@ -15,15 +26,21 @@
 
 ## References
 
+> [Optional]
+
 > Describe any standards, algorithms, books, articles, etc. that you referenced when creating the pull request. If there is any novelty, mention it.
 
 # Destructive Changes
+
+> [Optional]
 
 > Include a description of the changes and a migration guide and send the pull request with a bump major label. (Example : https://github.com/tier4/scenario_simulator_v2/pull/1139)
 
 > Otherwise, remove the "Destructive Changes" section and make sure this pull request is labeled `bump minor` or `bump patch`.)
 
 # Known Limitations
+
+> [Optional]
 
 > If there are any limitations on the features or fixes added by this pull request, delete this sentence and clearly describe them.
 
