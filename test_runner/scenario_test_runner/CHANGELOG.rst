@@ -415,6 +415,9 @@ Changelog for package scenario_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, f0reachARR, yamacir-kit
 
+0.8.10 (2024-01-25)
+-------------------
+
 0.8.9 (2024-01-25)
 ------------------
 

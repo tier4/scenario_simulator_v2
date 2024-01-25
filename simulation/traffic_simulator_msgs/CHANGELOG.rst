@@ -84,6 +84,9 @@ Changelog for package openscenario_msgs
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Piotr Zyskowski, Release Bot, f0reachARR, yamacir-kit
 
+0.8.10 (2024-01-25)
+-------------------
+
 0.8.9 (2024-01-25)
 ------------------
 
