@@ -99,10 +99,10 @@ jobs:
         run: |
           echo "${{ github.event.pull_request.body }}" >> release_description.txt
           echo "" >> release_description.txt
-          echo "## Pull Request  " >> release_description.txt
+          echo "# Pull Request  " >> release_description.txt
           echo "#${{ github.event.pull_request.number }}" >> release_description.txt
           echo "" >> release_description.txt
-          echo "## Related Issues  " >> release_description.txt
+          echo "# Related Issues  " >> release_description.txt
           echo "${{ steps.linked_issues.outputs.issues }}" >> release_description.txt
       - name: Get release description
         id: get_release_description
