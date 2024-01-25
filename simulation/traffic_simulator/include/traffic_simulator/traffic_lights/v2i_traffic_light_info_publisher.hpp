@@ -71,10 +71,13 @@ public:
 
       jpn_signal_v2i_msgs::msg::ExtraTrafficSignal extra_traffic_signal;
       extra_traffic_signal.header = msg.header;
-      extra_traffic_signal.has_min_rest_time = (extra_info.second.current_phase_rest_time > 0.0);
-      extra_traffic_signal.min_rest_time = extra_info.second.current_phase_rest_time;
-      extra_traffic_signal.has_max_rest_time = (extra_info.second.current_phase_rest_time > 0.0);
-      extra_traffic_signal.max_rest_time = extra_info.second.current_phase_rest_time;
+      extra_traffic_signal.has_min_rest_time =
+        (not std::isinf(static_cast<float>(extra_info.second.current_phase_rest_time)));
+      extra_traffic_signal.min_rest_time =
+        extra_traffic_signal.has_min_rest_time ? extra_info.second.current_phase_rest_time : 0.0;
+      extra_traffic_signal.has_max_rest_time = extra_traffic_signal.has_min_rest_time;
+      // copy min_rest_time to max_rest_time
+      extra_traffic_signal.max_rest_time = extra_traffic_signal.min_rest_time;
       extra_traffic_signal.min_rest_time_to_red = extra_info.second.rest_time_to_red;
 
       auto relation_ids =

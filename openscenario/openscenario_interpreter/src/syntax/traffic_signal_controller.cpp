@@ -110,13 +110,8 @@ auto TrafficSignalController::evaluate() -> Object
   }();
 
   auto rest_time_to_red = restTimeToRed();
-  double current_phase_rest_time = [this]() {
-    if ((*current_phase).duration == Double::infinity()) {
-      return -1.0;
-    } else {
-      return (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
-    }
-  }();
+  double current_phase_rest_time =
+    (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
 
   for (const auto traffic_signal_state : (*current_phase).traffic_signal_states) {
     setV2ITrafficLightExtraInfo(
