@@ -229,7 +229,7 @@ auto makeUpdatedStatus(
     isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
     return discard_the_front_waypoint_and_recurse();
   } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
-             isinf(acceleration) or isnan(acceleration)) {
+             std::isinf(acceleration) or std::isnan(acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -240,7 +240,7 @@ auto makeUpdatedStatus(
                  behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
                    step_time /* [s] */,
                +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
-             isinf(max_acceleration) or isnan(max_acceleration)) {
+             std::isinf(max_acceleration) or std::isnan(max_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
@@ -251,14 +251,14 @@ auto makeUpdatedStatus(
                  behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
                    step_time /* [s] */,
                -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */);
-             isinf(min_acceleration) or isnan(min_acceleration)) {
+             std::isinf(min_acceleration) or std::isnan(min_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
       "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ".");
   } else if (const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
-             isinf(speed) or isnan(speed)) {
+             std::isinf(speed) or std::isnan(speed)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",

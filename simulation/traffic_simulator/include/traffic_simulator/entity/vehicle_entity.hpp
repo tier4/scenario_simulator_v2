@@ -100,8 +100,6 @@ public:
 
   void requestAssignRoute(const std::vector<CanonicalizedLaneletPose> &) override;
 
-  auto isFollowTrajectoryActionRun() const -> bool override;
-
   auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
 

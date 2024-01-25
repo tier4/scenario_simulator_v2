@@ -158,8 +158,8 @@ auto FollowWaypointController::getAccelerationLimits(
     const double speed_min = speed + local_min_acceleration * step_time;
     const double speed_max = speed + local_max_acceleration * step_time;
     if (
-      speed_max < -local_epsilon || speed_max > max_speed + local_epsilon ||
-      speed_min < -local_epsilon || speed_min > max_speed + local_epsilon) {
+      speed_max < -local_epsilon || speed_max > std::max(max_speed, target_speed) + local_epsilon ||
+      speed_min < -local_epsilon || speed_min > std::max(max_speed, target_speed) + local_epsilon) {
       throw ControllerError(
         "Incorrect acceleration limits [", local_min_acceleration, ", ", local_max_acceleration,
         "] for acceleration: ", acceleration, " and speed: ", speed, " -> speed_min: ", speed_min,

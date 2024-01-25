@@ -400,13 +400,12 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
-  // matching distance has been set to 2.5 due to matching problems during lane changes
   if (unique_route_lanelets.empty()) {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 2.5);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
   } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 2.5);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
     if (!lanelet_pose) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 2.5);
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
     }
   }
   if (lanelet_pose) {

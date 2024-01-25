@@ -41,6 +41,11 @@ class EgoEntity : public VehicleEntity
 
   CanonicalizedEntityStatus externally_updated_status_;
 
+  bool is_controlled_by_simulator_{false};
+  std::optional<double> target_speed_;
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
+  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_;
+
 public:
   explicit EgoEntity() = delete;
 
@@ -92,6 +97,9 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
+  auto requestFollowTrajectory(
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
+
   void requestLaneChange(const lanelet::Id) override;
 
   auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
@@ -103,6 +111,8 @@ public:
   auto requestSpeedChange(
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool continuous) -> void override;
+
+  auto isControlledBySimulator() const -> bool override;
 
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;

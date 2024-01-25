@@ -77,11 +77,6 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   requestAssignRoute(route);
 }
 
-auto PedestrianEntity::isFollowTrajectoryActionRun() const -> bool
-{
-  return behavior_plugin_ptr_->getCurrentAction() == "follow_polyline_trajectory";
-}
-
 auto PedestrianEntity::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
 {
