@@ -18,10 +18,7 @@
 
 namespace zeromq
 {
-MultiServer::~MultiServer()
-{
-  thread_.join();
-}
+MultiServer::~MultiServer() { thread_.join(); }
 
 void MultiServer::poll()
 {

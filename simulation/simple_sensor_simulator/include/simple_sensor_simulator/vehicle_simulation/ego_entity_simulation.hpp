@@ -16,14 +16,12 @@
 #define TRAFFIC_SIMULATOR__VEHICLE_SIMULATION__EGO_ENTITY_SIMULATION_HPP_
 
 #include <concealer/autoware.hpp>
+#include <memory>
 #include <simple_sensor_simulator/vehicle_simulation/vehicle_model/sim_model.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-
-#include <memory>
 
 namespace vehicle_simulation
 {

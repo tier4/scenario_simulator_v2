@@ -13,10 +13,9 @@
 // limitations under the License.
 
 #include <concealer/autoware_universe.hpp>
+#include <filesystem>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-
-#include <filesystem>
 
 namespace vehicle_simulation
 {

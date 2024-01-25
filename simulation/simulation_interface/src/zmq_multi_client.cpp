@@ -15,7 +15,6 @@
 #include <rclcpp/utilities.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
-
 #include <string>
 namespace zeromq
 {
@@ -39,10 +38,7 @@ void MultiClient::closeConnection()
   }
 }
 
-MultiClient::~MultiClient()
-{
-  closeConnection();
-}
+MultiClient::~MultiClient() { closeConnection(); }
 
 auto MultiClient::call(const simulation_api_schema::SimulationRequest & req)
   -> simulation_api_schema::SimulationResponse

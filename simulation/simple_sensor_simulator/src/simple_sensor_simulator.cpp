@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <algorithm>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <limits>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
-
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <algorithm>
-#include <limits>
-#include <memory>
 #include <string>
+#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <utility>
 #include <vector>
 
@@ -70,9 +68,7 @@ geographic_msgs::msg::GeoPoint ScenarioSimulator::getOrigin()
   return origin;
 }
 
-ScenarioSimulator::~ScenarioSimulator()
-{
-}
+ScenarioSimulator::~ScenarioSimulator() {}
 
 int ScenarioSimulator::getSocketPort()
 {
