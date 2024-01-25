@@ -135,13 +135,8 @@ auto TrafficSignalController::restTimeToRed() const -> double
 {
   auto is_red = [](const auto & phase) {
     for (const auto & traffic_signal_state : phase.traffic_signal_states) {
-      for (traffic_simulator::TrafficLight & traffic_light :
-           getConventionalTrafficLights(traffic_signal_state.id())) {
-        for (auto & bulb : traffic_light.bulbs) {
-          if (bulb.is(traffic_simulator::TrafficLight::Color::Value::red)) {
-            return true;
-          }
-        }
+      if (traffic_signal_state.state.find("red") != std::string::npos) {
+        return true;
       }
     }
     return false;
@@ -155,18 +150,15 @@ auto TrafficSignalController::restTimeToRed() const -> double
     double rest_time_to_red =
       (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
     auto iterator = current_phase;
-    auto move_next_phase = [&]() {
-      ++iterator;
-      return iterator;
-    };
-    move_next_phase();
+    iterator++;
     while (not is_red(*iterator)) {
-      if (rest_time_to_red > cycleTime()) {
-        // no red phase
+      // if there is INF phase to red phase, "rest_time_to_red == cycleTime()" is true (INF == INF) and return 0
+      if (rest_time_to_red >= cycleTime()) {
+        // no red phase or some INF phases to red phase
         return 0;
       }
       rest_time_to_red += (*iterator).duration;
-      move_next_phase();
+      iterator++;
     }
     return rest_time_to_red;
   }
