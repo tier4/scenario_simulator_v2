@@ -10,11 +10,15 @@
 
 > Delete this sentence and explain this pull request shortly.
 
+> This section is required, keep it short, clear and to the point.
+
 ## Background
 
 > [Optional]
 
 > Delete this sentence and explain the circumstances that led to this pull request being sent.
+
+> If there is no background information that needs explanation (e.g., just a typo correction, etc.), then delete this section.
 
 ## Details
 
@@ -24,11 +28,15 @@
 
 > For example, it is desirable to describe the specifications of added functions, and detailed explanations of bugs that have been fixed.
 
+> If there is no code or change that is not immediately obvious without explanation, then this section can be deleted.
+
 ## References
 
 > [Optional]
 
 > Describe any standards, algorithms, books, articles, etc. that you referenced when creating the pull request. If there is any novelty, mention it.
+
+> If the referenced material does not exist, delete this section.
 
 # Destructive Changes
 
@@ -51,3 +59,5 @@
 > If the developer is aware of the existence of such problems or limitations, describe them in detail.
 
 > The problems or limitation should be listed as an Issue on Github and a link to it should be provided in this section.
+
+> If there are no known limitations that you can think of, delete this section.
