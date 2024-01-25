@@ -14,7 +14,6 @@
 
 #include <concealer/autoware_universe.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
-#include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
 #include <filesystem>
@@ -200,97 +199,102 @@ void EgoEntitySimulation::requestSpeedChange(double value)
   vehicle_model_ptr_->setState(v);
 }
 
+void EgoEntitySimulation::overwrite(
+  const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
+  double step_time, bool npc_logic_started)
+{
+  autoware->rethrow();
+
+  if (npc_logic_started) {
+    using quaternion_operation::convertQuaternionToEulerAngle;
+    using quaternion_operation::getRotationMatrix;
+
+    auto world_relative_position = [&]() -> Eigen::VectorXd {
+      auto v = Eigen::VectorXd(3);
+      v(0) = status.pose.position.x - initial_pose_.position.x;
+      v(1) = status.pose.position.y - initial_pose_.position.y;
+      v(2) = status.pose.position.z - initial_pose_.position.z;
+      return getRotationMatrix(initial_pose_.orientation).transpose() * v;
+    }();
+
+    const auto yaw = [&]() {
+      const auto q = Eigen::Quaterniond(
+        getRotationMatrix(initial_pose_.orientation).transpose() *
+        getRotationMatrix(status.pose.orientation));
+      geometry_msgs::msg::Quaternion relative_orientation;
+      relative_orientation.x = q.x();
+      relative_orientation.y = q.y();
+      relative_orientation.z = q.z();
+      relative_orientation.w = q.w();
+      return convertQuaternionToEulerAngle(relative_orientation).z -
+             (previous_linear_velocity_ ? *previous_angular_velocity_ : 0) * step_time;
+    }();
+
+    switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
+      case VehicleModelType::DELAY_STEER_ACC:
+      case VehicleModelType::DELAY_STEER_ACC_GEARED:
+      case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
+        state(5) = status.action_status.accel.linear.x;
+        [[fallthrough]];
+
+      case VehicleModelType::DELAY_STEER_VEL:
+        state(4) = 0;
+        [[fallthrough]];
+
+      case VehicleModelType::IDEAL_STEER_ACC:
+      case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+        state(3) = status.action_status.twist.linear.x;
+        [[fallthrough]];
+
+      case VehicleModelType::IDEAL_STEER_VEL:
+        state(0) = world_relative_position(0);
+        state(1) = world_relative_position(1);
+        state(2) = yaw;
+        vehicle_model_ptr_->setState(state);
+        break;
+
+      default:
+        THROW_SEMANTIC_ERROR(
+          "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
+    }
+  }
+  updateStatus(current_scenario_time, step_time);
+  updatePreviousValues();
+}
+
 void EgoEntitySimulation::update(
   double current_scenario_time, double step_time, bool npc_logic_started)
 {
   autoware->rethrow();
 
   if (npc_logic_started) {
-    if (auto status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-          status_, polyline_trajectory, traffic_simulator_msgs::msg::BehaviorParameter(),
-          step_time);
-        status) {
-      using quaternion_operation::convertQuaternionToEulerAngle;
-      using quaternion_operation::getRotationMatrix;
+    auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
-      auto world_relative_position = [&]() -> Eigen::VectorXd {
-        auto v = Eigen::VectorXd(3);
-        v(0) = status->pose.position.x - initial_pose_.position.x;
-        v(1) = status->pose.position.y - initial_pose_.position.y;
-        v(2) = status->pose.position.z - initial_pose_.position.z;
-        return getRotationMatrix(initial_pose_.orientation).transpose() * v;
-      }();
+    switch (vehicle_model_type_) {
+      case VehicleModelType::DELAY_STEER_ACC:
+      case VehicleModelType::DELAY_STEER_ACC_GEARED:
+      case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
+      case VehicleModelType::IDEAL_STEER_ACC:
+      case VehicleModelType::IDEAL_STEER_ACC_GEARED:
+        input(0) = autoware->getGearSign() * autoware->getAcceleration();
+        input(1) = autoware->getSteeringAngle();
+        break;
 
-      const auto yaw = [&]() {
-        const auto q = Eigen::Quaterniond(
-          getRotationMatrix(initial_pose_.orientation).transpose() *
-          getRotationMatrix(status->pose.orientation));
-        geometry_msgs::msg::Quaternion relative_orientation;
-        relative_orientation.x = q.x();
-        relative_orientation.y = q.y();
-        relative_orientation.z = q.z();
-        relative_orientation.w = q.w();
-        return convertQuaternionToEulerAngle(relative_orientation).z -
-               (previous_linear_velocity_ ? *previous_angular_velocity_ : 0) * step_time;
-      }();
+      case VehicleModelType::DELAY_STEER_VEL:
+      case VehicleModelType::IDEAL_STEER_VEL:
+        input(0) = autoware->getVelocity();
+        input(1) = autoware->getSteeringAngle();
+        break;
 
-      switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
-        case VehicleModelType::DELAY_STEER_ACC:
-        case VehicleModelType::DELAY_STEER_ACC_GEARED:
-        case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
-          state(5) = status->action_status.accel.linear.x;
-          [[fallthrough]];
-
-        case VehicleModelType::DELAY_STEER_VEL:
-          state(4) = 0;
-          [[fallthrough]];
-
-        case VehicleModelType::IDEAL_STEER_ACC:
-        case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-          state(3) = status->action_status.twist.linear.x;
-          [[fallthrough]];
-
-        case VehicleModelType::IDEAL_STEER_VEL:
-          state(0) = world_relative_position(0);
-          state(1) = world_relative_position(1);
-          state(2) = yaw;
-          vehicle_model_ptr_->setState(state);
-          break;
-
-        default:
-          THROW_SEMANTIC_ERROR(
-            "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
-      }
-    } else {
-      auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
-
-      switch (vehicle_model_type_) {
-        case VehicleModelType::DELAY_STEER_ACC:
-        case VehicleModelType::DELAY_STEER_ACC_GEARED:
-        case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
-        case VehicleModelType::IDEAL_STEER_ACC:
-        case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-          input(0) = autoware->getGearSign() * autoware->getAcceleration();
-          input(1) = autoware->getSteeringAngle();
-          break;
-
-        case VehicleModelType::DELAY_STEER_VEL:
-        case VehicleModelType::IDEAL_STEER_VEL:
-          input(0) = autoware->getVelocity();
-          input(1) = autoware->getSteeringAngle();
-          break;
-
-        default:
-          THROW_SEMANTIC_ERROR(
-            "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
-      }
-
-      vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
-      vehicle_model_ptr_->setInput(input);
-      vehicle_model_ptr_->update(step_time);
+      default:
+        THROW_SEMANTIC_ERROR(
+          "Unsupported vehicle_model_type ", toString(vehicle_model_type_), "specified");
     }
-  }
 
+    vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
+    vehicle_model_ptr_->setInput(input);
+    vehicle_model_ptr_->update(step_time);
+  }
   updateStatus(current_scenario_time, step_time);
   updatePreviousValues();
 }
@@ -396,13 +400,13 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
-  // matching distance has been set to 3.0 due to matching problems during lane changes
+  // matching distance has been set to 2.5 due to matching problems during lane changes
   if (unique_route_lanelets.empty()) {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 2.5);
   } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 2.5);
     if (!lanelet_pose) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 2.5);
     }
   }
   if (lanelet_pose) {

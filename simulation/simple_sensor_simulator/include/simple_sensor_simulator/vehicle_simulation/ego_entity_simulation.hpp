@@ -42,8 +42,6 @@ class EgoEntitySimulation
 public:
   const std::unique_ptr<concealer::Autoware> autoware;
 
-  traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory;
-
 private:
   const VehicleModelType vehicle_model_type_;
 
@@ -82,6 +80,10 @@ public:
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+
+  auto overwrite(
+    const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
+    double step_time, bool npc_logic_started) -> void;
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 
