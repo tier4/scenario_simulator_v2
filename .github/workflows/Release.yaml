@@ -91,7 +91,7 @@ jobs:
           force: true
       - name: Get linked issues
         id: linked_issues
-        uses: hossainemruz/linked-issues@main
+        uses: hossainemruz/linked-issues@v0.1.0
         with:
           pr_url: ${{github.event.pull_request.html_url}}
           format: ExternalIssueRef
@@ -100,9 +100,9 @@ jobs:
         run: |
           echo "${{ github.event.pull_request.body }}" >> release_description.txt
           echo "" >> release_description.txt
-          echo "# Pull Request  " >> release_description.txt
-          echo "#${{ github.event.pull_request.number }}" >> release_description.txt
-          echo "" >> release_description.txt
+      - name: Update related issues
+        if: ${{ steps.links.outputs.issues }} != ""
+        run: |
           echo "# Related Issues  " >> release_description.txt
           echo "${{ steps.linked_issues.outputs.issues }}" >> release_description.txt
       - name: Get release description
@@ -120,6 +120,6 @@ jobs:
           generateReleaseNotes: true
       - name: Delete branch
         if: github.event.pull_request.merged == true
-        uses: SvanBoxel/delete-merged-branch@main
+        uses: SvanBoxel/delete-merged-branch@1.4.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
