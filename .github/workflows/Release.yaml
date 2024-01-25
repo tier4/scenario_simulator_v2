@@ -117,6 +117,7 @@ jobs:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
           body: ${{ steps.get_release_description.outputs.stdout }}
+          generateReleaseNotes: true
       - name: Delete branch
         if: github.event.pull_request.merged == true
         uses: SvanBoxel/delete-merged-branch@main
