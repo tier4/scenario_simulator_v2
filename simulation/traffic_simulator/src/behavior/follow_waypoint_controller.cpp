@@ -65,7 +65,11 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
 auto FollowWaypointController::roundTimeToFullStepsWithTolerance(
   const double remaining_time_source, const double time_tolerance) const -> double
 {
-  if (remaining_time_source >= std::numeric_limits<std::size_t>::max() * step_time) {
+  if (std::isnan(remaining_time_source) || std::isinf(remaining_time_source)) {
+    throw ControllerError(
+      "Value remaining_time_source (", remaining_time_source,
+      ") is NaN or inf - it cannot be rounded.");
+  } else if (remaining_time_source >= std::numeric_limits<std::size_t>::max() * step_time) {
     throw ControllerError(
       "Exceeded the range of the variable type <std::size_t> (", remaining_time_source, "/",
       step_time, ") - the value is too large. Probably the distance to the waypoint is extremely",
