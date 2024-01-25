@@ -2,30 +2,30 @@
 
 ## Abstract
 
-> Please delete this sentence and explain this pull request shortly.
+> Delete this sentence and explain this pull request shortly.
 
 ## Background
 
-> Please delete this sentence and explain the circumstances that led to this pull request being sent.
+> Delete this sentence and explain the circumstances that led to this pull request being sent.
 ## Details
 
-> Please delete this sentence and describe this pull request.
+> Delete this sentence and describe this pull request.
 
 > For example, it is desirable to describe the specifications of added functions, and detailed explanations of bugs that have been fixed.
 
 ## References
 
-> Please describe any standards, algorithms, books, articles, etc. that you referenced when creating the pull request. If there is any novelty, please mention it.
+> Describe any standards, algorithms, books, articles, etc. that you referenced when creating the pull request. If there is any novelty, mention it.
 
 # Destructive Changes
 
-> Please include a description of the changes and a migration guide and send the pull request with a bump major label. (Example : https://github.com/tier4/scenario_simulator_v2/pull/1139)
+> Include a description of the changes and a migration guide and send the pull request with a bump major label. (Example : https://github.com/tier4/scenario_simulator_v2/pull/1139)
 
-> Otherwise, please remove the "Destructive Changes" section and make sure this pull request is labeled `bump minor` or `bump patch`.)
+> Otherwise, remove the "Destructive Changes" section and make sure this pull request is labeled `bump minor` or `bump patch`.)
 
 # Known Limitations
 
-> If there are any limitations on the features or fixes added by this pull request, Please delete this sentence and please clearly describe them.
+> If there are any limitations on the features or fixes added by this pull request, delete this sentence and clearly describe them.
 
 > If there are no limitations on the features or modifications added by the pull request, remove the "known limitations" section.
 
