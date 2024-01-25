@@ -109,6 +109,9 @@ Changelog for package scenario_simulator_exception
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, yamacir-kit
 
+0.8.11 (2024-01-25)
+-------------------
+
 0.8.10 (2024-01-25)
 -------------------
 
