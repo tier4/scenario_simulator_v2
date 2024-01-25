@@ -468,6 +468,9 @@ Changelog for package openscenario_interpreter
 * Remove debug prints that were left unintentionally
 * Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, yamacir-kit
 
+0.8.9 (2024-01-25)
+------------------
+
 0.8.8 (2024-01-24)
 ------------------
 
