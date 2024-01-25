@@ -96,7 +96,8 @@ auto EgoEntity::asFieldOperatorApplication() const -> concealer::FieldOperatorAp
 auto EgoEntity::getCurrentAction() const -> std::string
 {
   const auto state = field_operator_application->getAutowareStateName();
-  return state.empty() ? "Launching" : state;
+  return (state.empty() ? "Launching" : state) +
+         (isFollowTrajectoryActionRun() ? " (" + VehicleEntity::getCurrentAction() + ")" : "");
 }
 
 auto EgoEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
@@ -154,16 +155,10 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  EntityBase::onUpdate(current_time, step_time);
   setStatus(externally_updated_status_);
-
-  updateStandStillDuration(step_time);
-  updateTraveledDistance(step_time);
-
+  VehicleEntity::onUpdate(current_time, step_time);
   field_operator_application->rethrow();
   field_operator_application->spinSome();
-
-  EntityBase::onPostUpdate(current_time, step_time);
 }
 
 void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
@@ -258,8 +253,9 @@ auto EgoEntity::setStatusExternally(const CanonicalizedEntityStatus & status) ->
   externally_updated_status_ = status;
 }
 
-void EgoEntity::requestSpeedChange(double value, bool)
+void EgoEntity::requestSpeedChange(double value, bool continuous)
 {
+  VehicleEntity::requestSpeedChange(value, continuous);
   field_operator_application->restrictTargetSpeed(value);
 }
 

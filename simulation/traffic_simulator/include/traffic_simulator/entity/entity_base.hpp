@@ -182,6 +182,8 @@ public:
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
+  virtual auto isFollowTrajectoryActionRun() const -> bool;
+
   virtual auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void;
 

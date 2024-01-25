@@ -188,6 +188,7 @@ message DespawnEntityResponse {
 message UpdateEntityStatusRequest {
   repeated EntityStatus status = 1;        // List of updated entity status in traffic simulator.
   bool npc_logic_started = 2;              // Npc logic started flag
+  bool overwrite_ego_status = 3;
 }
 
 /**

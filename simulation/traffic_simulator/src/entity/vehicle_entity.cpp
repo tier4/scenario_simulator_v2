@@ -222,6 +222,11 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   requestAssignRoute(route);
 }
 
+auto VehicleEntity::isFollowTrajectoryActionRun() const -> bool
+{
+  return behavior_plugin_ptr_->getCurrentAction() == "follow_polyline_trajectory";
+}
+
 auto VehicleEntity::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
 {

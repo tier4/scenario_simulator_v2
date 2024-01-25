@@ -226,6 +226,9 @@ bool API::updateEntitiesStatusInSim()
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
     auto entity_status = entity_manager_ptr_->getEntityStatus(entity_name);
     simulation_interface::toProto(static_cast<EntityStatus>(entity_status), *req.add_status());
+    if (entity_manager_ptr_->isEgo(entity_name)) {
+      req.set_overwrite_ego_status(entity_manager_ptr_->isFollowTrajectoryActionRun(entity_name));
+    }
   }
 
   simulation_api_schema::UpdateEntityStatusResponse res;
