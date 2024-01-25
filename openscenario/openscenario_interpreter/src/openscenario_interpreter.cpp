@@ -294,7 +294,9 @@ auto Interpreter::reset() -> void
     publisher_of_context->on_deactivate();
   }
 
-  declare_parameter<int>("initialize_duration", 30);
+  if (not has_parameter("initialize_duration")) {
+    declare_parameter<int>("initialize_duration", 30);
+  }
 
   /*
      Although we have not analyzed the details yet, the process of deactivating
