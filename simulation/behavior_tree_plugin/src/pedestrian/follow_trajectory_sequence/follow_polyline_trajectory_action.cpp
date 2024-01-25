@@ -56,17 +56,13 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
-  auto target_speed_value = [&]() -> double {
+  auto getTargetSpeed = [&]() -> double {
     if (target_speed.has_value()) {
       return target_speed.value();
-    } else if (!route_lanelets.empty()) {
-      return std::min(
-        hdmap_utils->getSpeedLimit(route_lanelets),
-        behavior_parameter.dynamic_constraints.max_speed);
     } else {
-      return behavior_parameter.dynamic_constraints.max_speed;
+      return entity_status->getTwist().linear.x;
     }
-  }();
+  };
 
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
@@ -77,7 +73,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   } else if (
     auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
       static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
-      behavior_parameter, step_time, target_speed_value)) {
+      behavior_parameter, step_time, getTargetSpeed())) {
     // matching distance has been set to 3.0 due to matching problems during lane changes
     if (const auto lanelet_pose = hdmap_utils->toLaneletPose(
           updated_status->pose, entity_status->getBoundingBox(), false, 3.0);
