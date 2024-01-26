@@ -2096,9 +2096,7 @@ Visualization Manager:
                             Reliability Policy: Reliable
                             Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/virtual_wall/no_drivable_lane
                           Value: true
-                      Enabled: true
-                      Name: VirtualWall
-                      - Class: rviz_default_plugins/MarkerArray
+                        - Class: rviz_default_plugins/MarkerArray
                           Enabled: true
                           Name: VirtualWall (DynamicObstacleStop)
                           Namespaces:
@@ -2110,6 +2108,8 @@ Visualization Manager:
                             Reliability Policy: Reliable
                             Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/virtual_wall/dynamic_obstacle_stop
                           Value: true
+                      Enabled: true
+                      Name: VirtualWall
                     - Class: rviz_common/Group
                       Displays:
                         - Class: rviz_default_plugins/MarkerArray
@@ -2390,8 +2390,6 @@ Visualization Manager:
                             Reliability Policy: Reliable
                             Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/no_drivable_lane
                           Value: false
-                      Enabled: false
-                      Name: DebugMarker
                         - Class: rviz_default_plugins/MarkerArray
                           Enabled: false
                           Name: DynamicObstacleStop
@@ -2404,6 +2402,8 @@ Visualization Manager:
                             Reliability Policy: Reliable
                             Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/dynamic_obstacle_stop
                           Value: false
+                      Enabled: false
+                      Name: DebugMarker
                     - Class: rviz_common/Group
                       Displays:
                         - Class: rviz_default_plugins/MarkerArray
