@@ -2098,6 +2098,18 @@ Visualization Manager:
                           Value: true
                       Enabled: true
                       Name: VirtualWall
+                      - Class: rviz_default_plugins/MarkerArray
+                          Enabled: true
+                          Name: VirtualWall (DynamicObstacleStop)
+                          Namespaces:
+                            {}
+                          Topic:
+                            Depth: 5
+                            Durability Policy: Volatile
+                            History Policy: Keep Last
+                            Reliability Policy: Reliable
+                            Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/virtual_wall/dynamic_obstacle_stop
+                          Value: true
                     - Class: rviz_common/Group
                       Displays:
                         - Class: rviz_default_plugins/MarkerArray
@@ -2380,6 +2392,18 @@ Visualization Manager:
                           Value: false
                       Enabled: false
                       Name: DebugMarker
+                        - Class: rviz_default_plugins/MarkerArray
+                          Enabled: false
+                          Name: DynamicObstacleStop
+                          Namespaces:
+                            {}
+                          Topic:
+                            Depth: 5
+                            Durability Policy: Volatile
+                            History Policy: Keep Last
+                            Reliability Policy: Reliable
+                            Value: /planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/dynamic_obstacle_stop
+                          Value: false
                     - Class: rviz_common/Group
                       Displays:
                         - Class: rviz_default_plugins/MarkerArray
