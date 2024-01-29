@@ -232,8 +232,8 @@ public:
   /*   */ auto getDistanceToTargetLaneletPose(const CanonicalizedLaneletPose target_lanelet_pose)
     -> std::optional<double>;
 
-  /*   */ void requestSynchronize(
-    const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target);
+  /*   */ auto requestSynchronize(
+    const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target) -> bool;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
     -> void final;

@@ -839,8 +839,8 @@ auto EntityBase::getDistanceToTargetLaneletPose(const CanonicalizedLaneletPose t
   return false;
 }
 
-void EntityBase::requestSynchronize(
-  const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target)
+auto EntityBase::requestSynchronize(
+  const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target)->bool
 {
   job_list_.append(
     [this, ego_target, entity_target](double) -> bool {
@@ -864,6 +864,7 @@ void EntityBase::requestSynchronize(
     },
     // after this im not sure it is correct, just an draft
     [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
+  return true;
 }
 
 }  // namespace entity

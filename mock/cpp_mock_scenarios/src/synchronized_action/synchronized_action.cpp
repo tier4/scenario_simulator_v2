@@ -44,7 +44,12 @@ private:
   bool requested = false;
   void onUpdate() override
   {
-    if (api_.requestSynchronize()) {
+    const traffic_simulator::CanonicalizedLaneletPose ego_target =
+      getSampleLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0));
+    const traffic_simulator::CanonicalizedLaneletPose npc_target =
+      getSampleLaneletPose(traffic_simulator::helper::constructLaneletPose(34462, 15, 0, 0, 0, 0));
+
+    if (api_.requestSynchronize("npc", ego_target, npc_target)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_START
@@ -70,6 +75,12 @@ private:
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("npc", 10);
+  }
+
+  auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)
+    -> traffic_simulator::CanonicalizedLaneletPose
+  {
+    return api_.canonicalize(lanelet_pose);
   }
 };
 }  // namespace cpp_mock_scenarios
