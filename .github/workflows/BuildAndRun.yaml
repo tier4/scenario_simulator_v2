@@ -20,7 +20,7 @@ on:
 jobs:
   job1:
     name: BuildAndRun
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.runs_on }}
     timeout-minutes: 180
     container: ros:${{ matrix.rosdistro }}
     env:
@@ -29,6 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         rosdistro: [humble]
+        runs_on: [ubuntu-22.04, macos-14] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
     steps:
       - name: suppress warnings
         run: |
