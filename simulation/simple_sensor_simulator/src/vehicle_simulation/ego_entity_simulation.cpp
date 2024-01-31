@@ -263,13 +263,22 @@ void EgoEntitySimulation::update(
     } else {
       auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
+      auto acceleration_by_slope = not consider_road_slope_ ? 0.0 : [this]() {
+        // calculate longitudinal acceleration by slope
+        constexpr double gravity_acceleration = -9.81;
+        const double ego_pitch_angle = calculateEgoPitch();
+        const double slope_angle = -ego_pitch_angle;
+        return gravity_acceleration * std::sin(slope_angle);
+      }();
+
       switch (vehicle_model_type_) {
         case VehicleModelType::DELAY_STEER_ACC:
         case VehicleModelType::DELAY_STEER_ACC_GEARED:
         case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
         case VehicleModelType::IDEAL_STEER_ACC:
         case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-          input(0) = autoware->getGearSign() * autoware->getAcceleration();
+          input(0) =
+            autoware->getGearSign() * (autoware->getAcceleration() + acceleration_by_slope);
           input(1) = autoware->getSteeringAngle();
           break;
 
@@ -294,6 +303,69 @@ void EgoEntitySimulation::update(
   updatePreviousValues();
 }
 
+auto EgoEntitySimulation::calculateEgoPitch() const -> double
+{
+  const double ego_x = vehicle_model_ptr_->getX();
+  const double ego_y = vehicle_model_ptr_->getY();
+  const double ego_yaw = vehicle_model_ptr_->getYaw();
+
+  geometry_msgs::msg::Pose ego_pose;
+  ego_pose.position.x = ego_x;
+  ego_pose.position.y = ego_y;
+  ego_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    traffic_simulator::helper::constructRPY(0., 0., ego_yaw));
+
+  // calculate prev/next point of lanelet centerline nearest to ego pose.
+  auto ego_lanelet_id = hdmap_utils_ptr_->getClosestLaneletId(ego_pose, 2.0);
+  if (not ego_lanelet_id) {
+    return 0.0;
+  }
+
+  auto centerline_points = hdmap_utils_ptr_->getCenterPoints(ego_lanelet_id.value());
+
+  // copied from motion_util::findNearestSegmentIndex
+  auto find_nearest_segment_index = [](
+                                      const std::vector<geometry_msgs::msg::Point> & points,
+                                      const geometry_msgs::msg::Point & point) {
+    assert(not points.empty());
+
+    double min_dist = std::numeric_limits<double>::max();
+    size_t min_idx = 0;
+
+    for (size_t i = 0; i < points.size(); ++i) {
+      const auto dist = [](const auto point1, const auto point2) {
+        const auto dx = point1.x - point2.x;
+        const auto dy = point1.y - point2.y;
+        return dx * dx + dy * dy;
+      }(points.at(i), point);
+
+      if (dist < min_dist) {
+        min_dist = dist;
+        min_idx = i;
+      }
+    }
+    return min_idx;
+  };
+
+  const size_t ego_seg_idx = find_nearest_segment_index(centerline_points, ego_pose.position);
+
+  const auto & prev_point = centerline_points.at(ego_seg_idx);
+  const auto & next_point = centerline_points.at(ego_seg_idx + 1);
+
+  // calculate ego yaw angle on lanelet coordinates
+  const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
+  const double ego_yaw_against_lanelet = ego_yaw - lanelet_yaw;
+
+  // calculate ego pitch angle considering ego yaw.
+  const double diff_z = next_point.z - prev_point.z;
+  const double diff_xy = std::hypot(next_point.x - prev_point.x, next_point.y - prev_point.y) /
+                         std::cos(ego_yaw_against_lanelet);
+  const bool reverse_sign = std::cos(ego_yaw_against_lanelet) < 0.0;
+  const double ego_pitch_angle =
+    reverse_sign ? -std::atan2(-diff_z, -diff_xy) : -std::atan2(diff_z, diff_xy);
+  return ego_pitch_angle;
+}
+
 auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
 {
   geometry_msgs::msg::Twist current_twist;
@@ -302,7 +374,8 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
   return current_twist;
 }
 
-auto EgoEntitySimulation::getCurrentPose() const -> geometry_msgs::msg::Pose
+auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
+  -> geometry_msgs::msg::Pose
 {
   Eigen::VectorXd relative_position(3);
   relative_position(0) = vehicle_model_ptr_->getX();
@@ -315,10 +388,10 @@ auto EgoEntitySimulation::getCurrentPose() const -> geometry_msgs::msg::Pose
   current_pose.position.x = initial_pose_.position.x + relative_position(0);
   current_pose.position.y = initial_pose_.position.y + relative_position(1);
   current_pose.position.z = initial_pose_.position.z + relative_position(2);
-  current_pose.orientation = [this]() {
+  current_pose.orientation = [&]() {
     geometry_msgs::msg::Vector3 rpy;
     rpy.x = 0;
-    rpy.y = 0;
+    rpy.y = pitch_angle;
     rpy.z = vehicle_model_ptr_->getYaw();
     return initial_pose_.orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
   }();

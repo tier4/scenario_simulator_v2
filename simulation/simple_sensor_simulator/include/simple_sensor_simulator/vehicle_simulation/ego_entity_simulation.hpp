@@ -64,7 +64,9 @@ public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
 private:
-  auto getCurrentPose() const -> geometry_msgs::msg::Pose;
+  auto calculateEgoPitch() const -> double;
+
+  auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
