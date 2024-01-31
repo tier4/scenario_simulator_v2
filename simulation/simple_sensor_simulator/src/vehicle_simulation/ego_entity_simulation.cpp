@@ -105,8 +105,8 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto steer_time_delay           = getParameter<double>("steer_time_delay",            0.24);
   const auto vel_lim                    = getParameter<double>("vel_lim",                     parameters.performance.max_speed);  // 50.0
   const auto vel_rate_lim               = getParameter<double>("vel_rate_lim",                parameters.performance.max_acceleration);  // 7.0
-  const auto vel_time_constant          = getParameter<double>("vel_time_constant",           0.1);
-  const auto vel_time_delay             = getParameter<double>("vel_time_delay",              0.1);
+  const auto vel_time_constant          = getParameter<double>("vel_time_constant",           0.1);  // 0.5 is default value on simple_planning_simulator
+  const auto vel_time_delay             = getParameter<double>("vel_time_delay",              0.1);  // 0.25 is default value on simple_planning_simulator
   const auto wheel_base                 = getParameter<double>("wheel_base",                  parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
   // clang-format on
 
