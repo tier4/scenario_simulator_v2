@@ -29,7 +29,8 @@ RUN --mount=type=cache,target=/ccache source /opt/ros/${ROS_DISTRO}/setup.bash &
         --cmake-args \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DBUILD_CPP_MOCK_SCENARIOS=ON
 COPY ./docker-entrypoint.sh /
 RUN chmod a+x /docker-entrypoint.sh
 
