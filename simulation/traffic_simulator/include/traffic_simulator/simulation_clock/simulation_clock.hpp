@@ -23,36 +23,39 @@ namespace traffic_simulator
 class SimulationClock : rclcpp::Clock
 {
 public:
-  explicit SimulationClock(double realtime_factor, double frame_rate);
+  explicit SimulationClock(bool use_sim_time, double realtime_factor, double frame_rate);
 
   auto getCurrentRosTime() -> rclcpp::Time;
 
   auto getCurrentRosTimeAsMsg() -> rosgraph_msgs::msg::Clock;
 
-  auto getCurrentScenarioTime() const { return (frame_ - frame_offset_) / frame_rate; }
+  auto getCurrentScenarioTime() const { return time_ - time_offset_; }
 
-  auto getCurrentSimulationTime() const { return frame_ / frame_rate; }
+  auto getCurrentSimulationTime() const { return time_; }
 
-  auto getStepTime() const { return realtime_factor / frame_rate; }
+  auto getStepTime() const { return realtime_factor_ / frame_rate_; }
 
   auto start() -> void;
 
-  auto started() const { return not std::isnan(frame_offset_); }
+  auto started() const { return not std::isnan(time_offset_); }
 
   auto update() -> void;
 
-  const bool use_raw_clock;
+  auto setRealTimeFactor(double realtime_factor) { realtime_factor_ = realtime_factor; };
 
-  double realtime_factor;
+  const bool use_raw_clock_;
 
-  double frame_rate;
+  double realtime_factor_;
 
-  const rclcpp::Time time_on_initialize;
+  double frame_rate_;
+
+  const rclcpp::Time time_on_initialize_;
 
 private:
-  double frame_ = 0;
+  // time in seconds
+  double time_ = 0.0;
 
-  double frame_offset_ = std::numeric_limits<double>::quiet_NaN();
+  double time_offset_ = std::numeric_limits<double>::quiet_NaN();
 };
 }  // namespace traffic_simulator
 

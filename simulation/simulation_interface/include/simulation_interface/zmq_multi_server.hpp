@@ -73,6 +73,7 @@ private:
   DEFINE_FUNCTION_TYPE(UpdateTrafficLights);
   DEFINE_FUNCTION_TYPE(FollowPolylineTrajectory);
   DEFINE_FUNCTION_TYPE(AttachPseudoTrafficLightDetector);
+  DEFINE_FUNCTION_TYPE(UpdateStepTime);
 
 #undef DEFINE_FUNCTION_TYPE
 
@@ -80,7 +81,7 @@ private:
     Initialize, UpdateFrame, SpawnVehicleEntity, SpawnPedestrianEntity, SpawnMiscObjectEntity,
     DespawnEntity, UpdateEntityStatus, AttachLidarSensor, AttachDetectionSensor,
     AttachOccupancyGridSensor, UpdateTrafficLights, FollowPolylineTrajectory,
-    AttachPseudoTrafficLightDetector>
+    AttachPseudoTrafficLightDetector, UpdateStepTime>
     functions_;
 };
 }  // namespace zeromq

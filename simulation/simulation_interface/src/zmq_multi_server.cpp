@@ -82,6 +82,10 @@ void MultiServer::poll()
           std::get<AttachPseudoTrafficLightDetector>(functions_)(
             proto.attach_pseudo_traffic_light_detector());
         break;
+      case simulation_api_schema::SimulationRequest::RequestCase::kUpdateStepTime:
+        *sim_response.mutable_update_step_time() =
+          std::get<UpdateStepTime>(functions_)(proto.update_step_time());
+        break;
       case simulation_api_schema::SimulationRequest::RequestCase::REQUEST_NOT_SET: {
         THROW_SIMULATION_ERROR("No case defined for oneof in SimulationRequest message");
       }

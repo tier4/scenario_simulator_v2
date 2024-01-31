@@ -74,6 +74,18 @@ auto MultiClient::call(const simulation_api_schema::UpdateFrameRequest & request
   }
 }
 
+auto MultiClient::call(const simulation_api_schema::UpdateStepTimeRequest & request)
+  -> simulation_api_schema::UpdateStepTimeResponse
+{
+  if (is_running) {
+    simulation_api_schema::SimulationRequest sim_request;
+    *sim_request.mutable_update_step_time() = request;
+    return call(sim_request).update_step_time();
+  } else {
+    return {};
+  }
+}
+
 auto MultiClient::call(const simulation_api_schema::SpawnVehicleEntityRequest & request)
   -> simulation_api_schema::SpawnVehicleEntityResponse
 {

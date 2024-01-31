@@ -34,12 +34,14 @@ static auto getParameter(const std::string & name, T value = {})
 
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+  const rclcpp::Parameter & use_sim_time)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   hdmap_utils_ptr_(hdmap_utils)
 {
+  autoware->set_parameter(use_sim_time);
 }
 
 auto toString(const VehicleModelType datum) -> std::string
