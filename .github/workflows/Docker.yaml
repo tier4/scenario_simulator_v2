@@ -27,8 +27,9 @@ jobs:
         rosdistro: [humble]
         runs_on: [ubuntu-22.04, macos-14] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
     steps:
-      - name: Setup docker
-        uses: docker-practice/actions-setup-docker@v1
+      - name: Install docker for mac runner
+        if: ${{ matrix.runs_on == 'macos-14'}}
+        run: brew install --cask docker
 
       - name: Setup docker buildx
         uses: docker/setup-buildx-action@v2
