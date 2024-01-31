@@ -4,8 +4,9 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
+| Feature                 | Brief summary                                                        | Category            | Pull request                                                      | Contributor                                   |
+| ----------------------- | -------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| Extend matching length. | Enable consider tread when calculating matching length of EgoEntity. | `traffic_simulator` | [#1181](https://github.com/tier4/scenario_simulator_v2/pull/1181) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
 
