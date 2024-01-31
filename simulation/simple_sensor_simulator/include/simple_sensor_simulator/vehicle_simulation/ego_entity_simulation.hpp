@@ -62,6 +62,7 @@ private:
 
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+  const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
 private:
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
