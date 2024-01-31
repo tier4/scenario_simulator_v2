@@ -35,78 +35,78 @@ jobs:
         run: |
           git config --global --add safe.directory '*'
 
-      # - uses: actions/checkout@v2-beta
-      #   with:
-      #     fetch-depth: 0
-      #     token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v2-beta
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - run: git clone https://github.com/RobotecAI/scenario_simulator_v2_scenarios.git
+      - run: git clone https://github.com/RobotecAI/scenario_simulator_v2_scenarios.git
 
-      # - name: Search packages in this repository
-      #   id: list_packages
-      #   run: |
-      #     echo package_list=$(colcon list --names-only | tr '\n' ' ') >> $GITHUB_OUTPUT
+      - name: Search packages in this repository
+        id: list_packages
+        run: |
+          echo package_list=$(colcon list --names-only | tr '\n' ' ') >> $GITHUB_OUTPUT
 
-      # - name: Show target packages
-      #   run: |
-      #     echo "Target packages: ${{ steps.list_packages.outputs.package_list }}"
+      - name: Show target packages
+        run: |
+          echo "Target packages: ${{ steps.list_packages.outputs.package_list }}"
 
-      # - name: Copy repository
-      #   run: |
-      #     mkdir -p ~/ros2_ws/src/scenario_simulator_v2
-      #     cp -rf . ~/ros2_ws/src/scenario_simulator_v2
-      #   shell: bash
+      - name: Copy repository
+        run: |
+          mkdir -p ~/ros2_ws/src/scenario_simulator_v2
+          cp -rf . ~/ros2_ws/src/scenario_simulator_v2
+        shell: bash
 
-      # - name: Install dependencies
-      #   run: |
-      #     cd ~/ros2_ws
-      #     vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
+      - name: Install dependencies
+        run: |
+          cd ~/ros2_ws
+          vcs import src < src/scenario_simulator_v2/dependency_${{ matrix.rosdistro }}.repos
 
-      # - name: Resolve rosdep
-      #   run: |
-      #     cd ~/ros2_ws
-      #     apt update
-      #     apt install -y python3-pip
-      #     rosdep update --include-eol-distros
-      #     rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
-      #   shell: bash
+      - name: Resolve rosdep
+        run: |
+          cd ~/ros2_ws
+          apt update
+          apt install -y python3-pip
+          rosdep update --include-eol-distros
+          rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
+        shell: bash
 
-      # - name: Build packages
-      #   run: |
-      #     source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-      #     cd ~/ros2_ws
-      #     colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON --packages-up-to ${{ steps.list_packages.outputs.package_list }}
-      #   shell: bash
+      - name: Build packages
+        run: |
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
+          cd ~/ros2_ws
+          colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release -DBUILD_CPP_MOCK_SCENARIOS=ON --packages-up-to ${{ steps.list_packages.outputs.package_list }}
+        shell: bash
 
-      # - name: Colcon test
-      #   run: |
-      #     source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-      #     cd ~/ros2_ws
-      #     source install/local_setup.bash
-      #     colcon test --packages-select ${{ steps.list_packages.outputs.package_list }}
-      #   shell: bash
+      - name: Colcon test
+        run: |
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
+          cd ~/ros2_ws
+          source install/local_setup.bash
+          colcon test --packages-select ${{ steps.list_packages.outputs.package_list }}
+        shell: bash
 
-      # - name: Show test result
-      #   if: always()
-      #   run: |
-      #     source /opt/ros/${{ matrix.rosdistro }}/setup.bash
-      #     cd ~/ros2_ws
-      #     source install/local_setup.bash
-      #     colcon test-result --verbose
-      #   shell: bash
+      - name: Show test result
+        if: always()
+        run: |
+          source /opt/ros/${{ matrix.rosdistro }}/setup.bash
+          cd ~/ros2_ws
+          source install/local_setup.bash
+          colcon test-result --verbose
+        shell: bash
 
-      # - name: Scenario test
-      #   run: |
-      #     source ~/ros2_ws/install/setup.bash
-      #     source ~/ros2_ws/install/local_setup.bash
-      #     ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' global_frame_rate:=20
-      #     ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
-      #   shell: bash
+      - name: Scenario test
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          source ~/ros2_ws/install/local_setup.bash
+          ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' global_frame_rate:=20
+          ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
+        shell: bash
 
-      # - name: Basic test
-      #   run: |
-      #     source ~/ros2_ws/install/setup.bash
-      #     source ~/ros2_ws/install/local_setup.bash
-      #     ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_simulator_v2_scenarios)/workflow/basic.yaml'
-      #     ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
-      #   shell: bash
+      - name: Basic test
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          source ~/ros2_ws/install/local_setup.bash
+          ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_simulator_v2_scenarios)/workflow/basic.yaml'
+          ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
+        shell: bash
