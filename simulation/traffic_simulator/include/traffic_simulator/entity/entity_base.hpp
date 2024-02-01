@@ -229,11 +229,15 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
-  /*   */ auto getDistanceToTargetLaneletPose(const CanonicalizedLaneletPose target_lanelet_pose)
+  /*   */ auto getDistanceToTargetLaneletPose(const CanonicalizedLaneletPose & target_lanelet_pose)
     -> std::optional<double>;
 
+  /*   */ auto getIfArrivedToTargetLaneletPose(
+    const CanonicalizedLaneletPose & target_lanelet_pose, const double threshold) -> bool;
+
   /*   */ auto requestSynchronize(
-    const CanonicalizedLaneletPose ego_target, const CanonicalizedLaneletPose entity_target) -> bool;
+    const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,
+    const double threshold) -> bool;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
     -> void final;
