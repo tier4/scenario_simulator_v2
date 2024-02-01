@@ -1,6 +1,6 @@
 # Description
 
-> Example is here, please check example and comment out this sentense. Minimal example is [here](pull_request_samples/example_simple.md) and etailed example is [here](pull_request_samples/example_detail.md)
+> Example is here, please check example and comment out this sentence. Minimal example is [here](pull_request_samples/example_simple.md) and detailed example is [here](pull_request_samples/example_detail.md)
 
 ## Abstract
 
