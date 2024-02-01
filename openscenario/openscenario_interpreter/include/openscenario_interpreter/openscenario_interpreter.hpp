@@ -202,23 +202,11 @@ public:
 
   auto defaultTimeoutHandler() const
   {
-    /*
-       Ideally, the scenario should be terminated with an error if the total
-       time for the ScenarioDefinition evaluation and the traffic_simulator's
-       updateFrame exceeds the time allowed for a single frame. However, we
-       have found that many users are in environments where it is not possible
-       to run the simulator stably at 30 FPS (the default setting) while
-       running Autoware. In order to prioritize comfortable daily use, we
-       decided to give up full reproducibility of the scenario and only provide
-       warnings.
-    */
-
     return [this](const auto & statistics) {
-      RCLCPP_WARN_STREAM(
-        get_logger(),
-        "Your machine is not powerful enough to run the scenario at the specified frame rate ("
-          << local_frame_rate << " Hz). We recommend that you reduce the frame rate to "
-          << 1000.0 / statistics.template max<std::chrono::milliseconds>().count() << " or less.");
+      THROW_SIMULATION_ERROR(
+        "Your machine is not powerful enough to run the scenario at the specified frame rate (",
+        local_frame_rate, " Hz). We recommend that you reduce the frame rate to ",
+        1000.0 / statistics.template max<std::chrono::milliseconds>().count(), " or less.");
     };
   }
 };
