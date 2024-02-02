@@ -340,6 +340,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
+  FORWARD_TO_ENTITY_MANAGER(setMapPose);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 

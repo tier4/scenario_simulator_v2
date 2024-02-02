@@ -738,6 +738,12 @@ void EntityBase::setTrafficLightManager(
   traffic_light_manager_ = traffic_light_manager;
 }
 
+auto EntityBase::setMapPose(const geometry_msgs::msg::Pose &) -> void
+{
+  THROW_SEMANTIC_ERROR(
+    "You cannot set map pose to the vehicle other than ego named ", std::quoted(name), ".");
+}
+
 void EntityBase::activateOutOfRangeJob(
   double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
   double min_jerk, double max_jerk)

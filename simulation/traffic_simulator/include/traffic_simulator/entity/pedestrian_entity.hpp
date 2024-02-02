@@ -119,6 +119,8 @@ public:
 
   const std::string plugin_name;
 
+  const traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
+
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
   const std::shared_ptr<entity_behavior::BehaviorPluginBase> behavior_plugin_ptr_;

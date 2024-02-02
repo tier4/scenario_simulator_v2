@@ -219,6 +219,8 @@ public:
 
   virtual auto setVelocityLimit(double) -> void;
 
+  virtual auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void;
+
   virtual void startNpcLogic();
 
   /*   */ void stopAtCurrentPosition();
