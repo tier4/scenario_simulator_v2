@@ -39,8 +39,6 @@ class EgoEntity : public VehicleEntity
   static auto makeFieldOperatorApplication(const Configuration &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
-  CanonicalizedEntityStatus externally_updated_status_;
-
 public:
   explicit EgoEntity() = delete;
 

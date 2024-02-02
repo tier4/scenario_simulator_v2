@@ -82,8 +82,7 @@ EgoEntity::EgoEntity(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
-  field_operator_application(makeFieldOperatorApplication(configuration)),
-  externally_updated_status_(entity_status)
+  field_operator_application(makeFieldOperatorApplication(configuration))
 {
 }
 
@@ -155,7 +154,6 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
-  setStatus(externally_updated_status_);
 
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
