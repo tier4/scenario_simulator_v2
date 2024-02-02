@@ -738,6 +738,20 @@ void EntityBase::setTrafficLightManager(
   traffic_light_manager_ = traffic_light_manager;
 }
 
+auto EntityBase::setTwist(const geometry_msgs::msg::Twist & twist) -> void
+{
+  auto new_status = static_cast<EntityStatus>(getStatus());
+  new_status.action_status.twist = twist;
+  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
+}
+
+auto EntityBase::setAcceleration(const geometry_msgs::msg::Accel & accel) -> void
+{
+  auto new_status = static_cast<EntityStatus>(getStatus());
+  new_status.action_status.accel = accel;
+  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
+}
+
 auto EntityBase::setMapPose(const geometry_msgs::msg::Pose &) -> void
 {
   THROW_SEMANTIC_ERROR(

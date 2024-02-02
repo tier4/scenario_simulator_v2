@@ -238,6 +238,8 @@ bool API::updateEntitiesStatusInSim()
 
       if (entity_manager_ptr_->isEgo(name)) {
         setMapPose(name, entity_status.pose);
+        setTwist(name, entity_status.action_status.twist);
+        setAcceleration(name, entity_status.action_status.accel);
       } else {
         setEntityStatus(name, canonicalize(entity_status));
       }
