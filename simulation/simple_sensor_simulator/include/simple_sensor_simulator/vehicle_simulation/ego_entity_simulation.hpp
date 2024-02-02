@@ -60,7 +60,7 @@ private:
 
   traffic_simulator_msgs::msg::EntityStatus status_;
 
-  bool consider_road_slope_ = false;
+  const bool consider_acceleration_by_road_slope_;
 
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;

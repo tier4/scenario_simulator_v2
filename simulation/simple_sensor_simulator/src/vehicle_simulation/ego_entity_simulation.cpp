@@ -39,7 +39,8 @@ EgoEntitySimulation::EgoEntitySimulation(
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   hdmap_utils_ptr_(hdmap_utils),
-  consider_road_slope_(getParameter<bool>("consider_road_slope", false))
+  consider_acceleration_by_road_slope_(
+    getParameter<bool>("consider_acceleration_by_road_slope", false))
 {
 }
 
@@ -264,7 +265,7 @@ void EgoEntitySimulation::update(
     } else {
       auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
-      auto acceleration_by_slope = not consider_road_slope_ ? 0.0 : [this]() {
+      auto acceleration_by_slope = not consider_acceleration_by_road_slope_ ? 0.0 : [this]() {
         // calculate longitudinal acceleration by slope
         constexpr double gravity_acceleration = -9.81;
         const double ego_pitch_angle = calculateEgoPitch();
