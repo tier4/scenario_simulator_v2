@@ -49,6 +49,15 @@ auto TrafficLightManager::getTrafficLight(const lanelet::Id traffic_light_id) ->
   }
 }
 
+auto TrafficLightManager::getTrafficLightIds() const -> const lanelet::Ids
+{
+  lanelet::Ids traffic_light_ids;
+  for (const auto & traffic_light_ : getTrafficLights()) {
+    traffic_light_ids.push_back(traffic_light_.first);
+  }
+  return traffic_light_ids;
+}
+
 auto TrafficLightManager::getTrafficLights() const -> const TrafficLightMap &
 {
   return traffic_lights_;

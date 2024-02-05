@@ -2,6 +2,129 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.9.0 (2023-12-21)
+------------------
+* Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
+* Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
+* Merge remote-tracking branch 'origin/master' into feature/random_scenario
+* Merge branch 'experimental/merge-master' into feature/test-geometry-spline-subspline
+* Merge pull request `#1126 <https://github.com/tier4/scenario_simulator_v2/issues/1126>`_ from tier4/fix/duplicated_nodes
+* feat(user_defined_value): remove unused functional header
+* feat(user_defined_value): add magic subscription counter
+* feat(user_defined_value): add hash value based on name, rule, value to the subscription node name
+* Merge branch 'master' into fix/duplicated_nodes
+* Merge pull request `#1111 <https://github.com/tier4/scenario_simulator_v2/issues/1111>`_ from tier4/feature/traffic_light_confidence
+* Merge remote-tracking branch 'tier4/master' into experimental/merge-master
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
+* Merge pull request `#1121 <https://github.com/tier4/scenario_simulator_v2/issues/1121>`_ from tier4/fix/sign-of-relative-distance
+* Add comments about the historical background of `RelativeDistanceCondition`'s behavior
+* Fix some `RelativeDistanceCondition` mode to return non-negative value
+* chore: apply linter
+* refactor: renamed 'setTrafficLightConfidence' to 'setConventionalTrafficLightConfidence'
+* feat(openscenario_interpreter): add PseudoTrafficSignalDetectorConfidenceSetAction@v1
+* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
+* Merge pull request `#997 <https://github.com/tier4/scenario_simulator_v2/issues/997>`_ from tier4/feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into fix/rtc_command_action/continuous_execution
+* Merge pull request `#1092 <https://github.com/tier4/scenario_simulator_v2/issues/1092>`_ from tier4/feature/control_rtc_auto_mode
+* Merge pull request `#1098 <https://github.com/tier4/scenario_simulator_v2/issues/1098>`_ from tier4/fix/port_document
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* feat: add error message for featureIdentifiersRequiringExternalPermissionForAutonomousDecisions
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* change default port to 5555
+* Merge remote-tracking branch 'origin/master' into fix/port_document
+* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
+* refactor(simulator_core): use featureIdentifiersRequiringExternalPermissionForAutonomousDecisions instead of manualModules
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+* Merge pull request `#1075 <https://github.com/tier4/scenario_simulator_v2/issues/1075>`_ from tier4/feature/RJD-96_detail_message_scenario_failure
+* change default port to 8080
+* ref(openscenario_interpreter): apply clang format
+* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
+* ref(openscenario_interpreter):  ref SpecialAction
+* change port
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge branch 'master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge pull request `#1095 <https://github.com/tier4/scenario_simulator_v2/issues/1095>`_ from tier4/feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* code refactor
+* Merge branch 'master' into feature/freespace-distance-condition
+* Implement getBoundingBox* functions
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* code refactor
+* code refactor
+* implement freespace for relative distance condition
+* Init working version of DistanceCondition freespace
+* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
+* Merge pull request `#1090 <https://github.com/tier4/scenario_simulator_v2/issues/1090>`_ from tier4/refactor/lanelet-id
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* feat(openscenario_interpreter): parse manualModules
+* refactor: delete cooperator
+* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge pull request `#1087 <https://github.com/tier4/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge pull request `#1083 <https://github.com/tier4/scenario_simulator_v2/issues/1083>`_ from tier4/fix/distance-condition
+* Replace `LaneletId` with `lanelet::Id`
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/drop_galactic_support
+* Merge pull request `#1027 <https://github.com/tier4/scenario_simulator_v2/issues/1027>`_ from tier4/feature/new_traffic_light
+* ref(openscenario_interpreter): detailed result msg - last improve
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* ref(openscenario_interpreter): revert missing comment
+* ref(openscenario_interpreter): revert comments format
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* ref(openscenario_interpreter): detailed result msg - improvements after feedback - third step
+* Initial version of freespace distance condition
+* remove workbound for galactic
+* ref(openscenario_interpreter): detailed result msg - improvements after feedback - second step
+* ref(openscenario_interpreter): detailed result msg - improvements after feedback - first step
+* refactor: TrafficLightDetectorEmulator => PseudoTrafficLightDetector
+* fix: cast result to double in order to correctly compare equals values
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* ref(scenario_failure): remove blank lines
+* ref(scenario_failure): remove blank lines
+* ref(openscenario_interpreter): improve ScenarioFailure
+* feat(openscenario_interpreter): inherit ScenarioFailure and tidy up
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* ref(openscenario_interpreter): improve detailed failure message
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* ref(openscenario_interpreter): improve ScenarioFailure
+* feat(openscenario_interpreter): mv ScenarioError, add catch InitActions
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* feat(openscenario_interpreter): attach traffic light detector emulator in applyAssignControllerAction
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* feat(openscenario_interpreter): improve exception for detail result msg
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* feat(openscenario_interpreter): first step detail result msg
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Add the property `allowGoalModification` to switch destination topics
+* Remove debug prints that were left unintentionally
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Mateusz Palczuk, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
+
 0.8.0 (2023-09-05)
 ------------------
 * Merge remote-tracking branch 'origin/master' into ref/RJD-553_restore_repeated_update_entity_status

@@ -50,8 +50,8 @@ private:
 
   std::random_device seed_randomization_device_;
 
-  std::vector<TestExecutor> test_executors_;
-  std::vector<TestExecutor>::iterator current_test_executor_;
+  std::vector<TestExecutor<traffic_simulator::API>> test_executors_;
+  std::vector<TestExecutor<traffic_simulator::API>>::iterator current_test_executor_;
 
   JunitXmlReporter error_reporter_;
 
