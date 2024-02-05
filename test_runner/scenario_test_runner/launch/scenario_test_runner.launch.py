@@ -63,7 +63,7 @@ def launch_setup(context, *args, **kwargs):
     architecture_type               = LaunchConfiguration("architecture_type",              default="awf/universe")
     autoware_launch_file            = LaunchConfiguration("autoware_launch_file",           default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package         = LaunchConfiguration("autoware_launch_package",        default=default_autoware_launch_package_of(architecture_type.perform(context)))
-    consider_lanelet_slope          = LaunchConfiguration("consider_lanelet_slope",         default=True)
+    consider_pose_by_road_slope     = LaunchConfiguration("consider_pose_by_road_slope",    default=True)
     global_frame_rate               = LaunchConfiguration("global_frame_rate",              default=30.0)
     global_real_time_factor         = LaunchConfiguration("global_real_time_factor",        default=1.0)
     global_timeout                  = LaunchConfiguration("global_timeout",                 default=180)
@@ -82,25 +82,25 @@ def launch_setup(context, *args, **kwargs):
     workflow                        = LaunchConfiguration("workflow",                       default=Path("/dev/null"))
     # fmt: on
 
-    print(f"architecture_type       := {architecture_type.perform(context)}")
-    print(f"autoware_launch_file    := {autoware_launch_file.perform(context)}")
-    print(f"autoware_launch_package := {autoware_launch_package.perform(context)}")
-    print(f"consider_lanelet_slope  := {consider_lanelet_slope.perform(context)}")
-    print(f"global_frame_rate       := {global_frame_rate.perform(context)}")
-    print(f"global_real_time_factor := {global_real_time_factor.perform(context)}")
-    print(f"global_timeout          := {global_timeout.perform(context)}")
-    print(f"initialize_duration     := {initialize_duration.perform(context)}")
-    print(f"launch_autoware         := {launch_autoware.perform(context)}")
-    print(f"launch_rviz             := {launch_rviz.perform(context)}")
-    print(f"output_directory        := {output_directory.perform(context)}")
-    print(f"port                    := {port.perform(context)}")
-    print(f"record                  := {record.perform(context)}")
-    print(f"rviz_config             := {rviz_config.perform(context)}")
-    print(f"scenario                := {scenario.perform(context)}")
-    print(f"sensor_model            := {sensor_model.perform(context)}")
-    print(f"sigterm_timeout         := {sigterm_timeout.perform(context)}")
-    print(f"vehicle_model           := {vehicle_model.perform(context)}")
-    print(f"workflow                := {workflow.perform(context)}")
+    print(f"architecture_type           := {architecture_type.perform(context)}")
+    print(f"autoware_launch_file        := {autoware_launch_file.perform(context)}")
+    print(f"autoware_launch_package     := {autoware_launch_package.perform(context)}")
+    print(f"consider_pose_by_road_slope := {consider_pose_by_road_slope.perform(context)}")
+    print(f"global_frame_rate           := {global_frame_rate.perform(context)}")
+    print(f"global_real_time_factor     := {global_real_time_factor.perform(context)}")
+    print(f"global_timeout              := {global_timeout.perform(context)}")
+    print(f"initialize_duration         := {initialize_duration.perform(context)}")
+    print(f"launch_autoware             := {launch_autoware.perform(context)}")
+    print(f"launch_rviz                 := {launch_rviz.perform(context)}")
+    print(f"output_directory            := {output_directory.perform(context)}")
+    print(f"port                        := {port.perform(context)}")
+    print(f"record                      := {record.perform(context)}")
+    print(f"rviz_config                 := {rviz_config.perform(context)}")
+    print(f"scenario                    := {scenario.perform(context)}")
+    print(f"sensor_model                := {sensor_model.perform(context)}")
+    print(f"sigterm_timeout             := {sigterm_timeout.perform(context)}")
+    print(f"vehicle_model               := {vehicle_model.perform(context)}")
+    print(f"workflow                    := {workflow.perform(context)}")
 
     def make_parameters():
         parameters = [
@@ -133,22 +133,22 @@ def launch_setup(context, *args, **kwargs):
 
     return [
         # fmt: off
-        DeclareLaunchArgument("architecture_type",       default_value=architecture_type      ),
-        DeclareLaunchArgument("autoware_launch_file",    default_value=autoware_launch_file   ),
-        DeclareLaunchArgument("autoware_launch_package", default_value=autoware_launch_package),
-        DeclareLaunchArgument("consider_lanelet_slope",  default_value=consider_lanelet_slope ),
-        DeclareLaunchArgument("global_frame_rate",       default_value=global_frame_rate      ),
-        DeclareLaunchArgument("global_real_time_factor", default_value=global_real_time_factor),
-        DeclareLaunchArgument("global_timeout",          default_value=global_timeout         ),
-        DeclareLaunchArgument("launch_autoware",         default_value=launch_autoware        ),
-        DeclareLaunchArgument("launch_rviz",             default_value=launch_rviz            ),
-        DeclareLaunchArgument("output_directory",        default_value=output_directory       ),
-        DeclareLaunchArgument("rviz_config",             default_value=rviz_config            ),
-        DeclareLaunchArgument("scenario",                default_value=scenario               ),
-        DeclareLaunchArgument("sensor_model",            default_value=sensor_model           ),
-        DeclareLaunchArgument("sigterm_timeout",         default_value=sigterm_timeout        ),
-        DeclareLaunchArgument("vehicle_model",           default_value=vehicle_model          ),
-        DeclareLaunchArgument("workflow",                default_value=workflow               ),
+        DeclareLaunchArgument("architecture_type",          default_value=architecture_type         ),
+        DeclareLaunchArgument("autoware_launch_file",       default_value=autoware_launch_file      ),
+        DeclareLaunchArgument("autoware_launch_package",    default_value=autoware_launch_package       ),
+        DeclareLaunchArgument("consider_pose_by_road_slope",default_value=consider_pose_by_road_slope   ),
+        DeclareLaunchArgument("global_frame_rate",          default_value=global_frame_rate         ),
+        DeclareLaunchArgument("global_real_time_factor",    default_value=global_real_time_factor   ),
+        DeclareLaunchArgument("global_timeout",             default_value=global_timeout            ),
+        DeclareLaunchArgument("launch_autoware",            default_value=launch_autoware           ),
+        DeclareLaunchArgument("launch_rviz",                default_value=launch_rviz               ),
+        DeclareLaunchArgument("output_directory",           default_value=output_directory          ),
+        DeclareLaunchArgument("rviz_config",                default_value=rviz_config               ),
+        DeclareLaunchArgument("scenario",                   default_value=scenario                  ),
+        DeclareLaunchArgument("sensor_model",               default_value=sensor_model              ),
+        DeclareLaunchArgument("sigterm_timeout",            default_value=sigterm_timeout           ),
+        DeclareLaunchArgument("vehicle_model",              default_value=vehicle_model             ),
+        DeclareLaunchArgument("workflow",                   default_value=workflow                  ),
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -175,7 +175,7 @@ def launch_setup(context, *args, **kwargs):
             output="screen",
             on_exit=ShutdownOnce(),
             parameters=[
-                {"port": port, "consider_lanelet_slope": consider_lanelet_slope}
+                {"port": port, "consider_pose_by_road_slope": consider_pose_by_road_slope}
             ] + make_vehicle_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),

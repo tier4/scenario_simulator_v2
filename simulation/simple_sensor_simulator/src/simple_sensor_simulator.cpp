@@ -48,11 +48,11 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) {
       return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
     }),
-  consider_lanelet_slope_([&]() {
-    if (!has_parameter("consider_lanelet_slope")) {
-      declare_parameter("consider_lanelet_slope", false);
+  consider_pose_by_road_slope_([&]() {
+    if (!has_parameter("consider_pose_by_road_slope")) {
+      declare_parameter("consider_pose_by_road_slope", false);
     }
-    return get_parameter("consider_lanelet_slope").as_bool();
+    return get_parameter("consider_pose_by_road_slope").as_bool();
   }())
 {
 }
@@ -204,7 +204,7 @@ auto ScenarioSimulator::spawnVehicleEntity(
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
-      parameters, step_time_, hdmap_utils_, consider_lanelet_slope_);
+      parameters, step_time_, hdmap_utils_, consider_pose_by_road_slope_);
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
     simulation_interface::toMsg(req.pose(), initial_status.pose);
