@@ -128,7 +128,8 @@ auto RelativeDistanceCondition::distance<
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return std::hypot(
       makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y,
+      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.z);
   } else {
     return Double::nan();
   }
@@ -144,7 +145,8 @@ auto RelativeDistanceCondition::distance<
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     return std::hypot(
       makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y,
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.z);
   } else {
     return Double::nan();
   }
