@@ -78,10 +78,10 @@ public:
     real_time_factor_subscriber(rclcpp::create_subscription<std_msgs::msg::Float64>(
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {
-        /*
-          Pausing the simulation by setting the realtime_factor_ value to 0 is not supported and causes the simulation crash.
-          For that reason, before performing the action, it needs to be ensured that the incoming request data is a positive number.
-        */
+        /**
+         * @note Pausing the simulation by setting the realtime_factor_ value to 0 is not supported and causes the simulation crash.
+         * For that reason, before performing the action, it needs to be ensured that the incoming request data is a positive number.
+         */
         if (message.data >= 0.001) {
           clock_.realtime_factor = message.data;
           simulation_api_schema::UpdateStepTimeRequest request;
