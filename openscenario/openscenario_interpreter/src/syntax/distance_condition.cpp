@@ -111,22 +111,26 @@ auto DistanceCondition::distance<
       [&](const WorldPosition & position) {
         const auto relative_world = makeNativeRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
-        return std::hypot(relative_world.position.x, relative_world.position.y);
+        return std::hypot(
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const RelativeWorldPosition & position) {
         const auto relative_world = makeNativeRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
-        return std::hypot(relative_world.position.x, relative_world.position.y);
+        return std::hypot(
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const RelativeObjectPosition & position) {
         const auto relative_world = makeNativeRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
-        return std::hypot(relative_world.position.x, relative_world.position.y);
+        return std::hypot(
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const LanePosition & position) {
         const auto relative_world = makeNativeRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
-        return std::hypot(relative_world.position.x, relative_world.position.y);
+        return std::hypot(
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       }),
     position);
 }
@@ -141,22 +145,26 @@ auto DistanceCondition::distance<
       [&](const WorldPosition & position) {
         const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
-        return std::hypot(relative_world.position.x, relative_world.position.y);
+        return std::hypot(
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const RelativeWorldPosition & position) {
         const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
-        return std::hypot(relative_world.position.x, relative_world.position.y);
+        return std::hypot(
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const RelativeObjectPosition & position) {
         const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
-        return std::hypot(relative_world.position.x, relative_world.position.y);
+        return std::hypot(
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       },
       [&](const LanePosition & position) {
         const auto relative_world = makeNativeBoundingBoxRelativeWorldPosition(
           triggering_entity, static_cast<NativeWorldPosition>(position));
-        return std::hypot(relative_world.position.x, relative_world.position.y);
+        return std::hypot(
+          relative_world.position.x, relative_world.position.y, relative_world.position.z);
       }),
     position);
 }
