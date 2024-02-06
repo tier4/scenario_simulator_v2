@@ -68,6 +68,9 @@ auto RelativeDistanceCondition::distance<
   }
 }
 
+/**
+ * @note This implementation differs from the OpenSCENARIO standard. See the section "6.4. Distances" in the OpenSCENARIO User Guide.
+ */
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, true>(
@@ -97,6 +100,9 @@ auto RelativeDistanceCondition::distance<
   }
 }
 
+/**
+ * @note This implementation differs from the OpenSCENARIO standard. See the section "6.4. Distances" in the OpenSCENARIO User Guide.
+ */
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, true>(
