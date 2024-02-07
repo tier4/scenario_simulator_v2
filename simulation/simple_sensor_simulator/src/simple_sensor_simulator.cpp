@@ -47,7 +47,8 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) {
       return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
-    }),
+    },
+    [this](auto &&... xs) { return updateStepTime(std::forward<decltype(xs)>(xs)...); }),
   consider_pose_by_road_slope_([&]() {
     if (!has_parameter("consider_pose_by_road_slope")) {
       declare_parameter("consider_pose_by_road_slope", false);
@@ -139,6 +140,15 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
   return res;
 }
 
+auto ScenarioSimulator::updateStepTime(const simulation_api_schema::UpdateStepTimeRequest & req)
+  -> simulation_api_schema::UpdateStepTimeResponse
+{
+  auto res = simulation_api_schema::UpdateStepTimeResponse();
+  step_time_ = req.simulation_step_time();
+  res.mutable_result()->set_success(true);
+  return res;
+}
+
 auto ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req)
   -> simulation_api_schema::UpdateEntityStatusResponse
@@ -204,7 +214,8 @@ auto ScenarioSimulator::spawnVehicleEntity(
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
-      parameters, step_time_, hdmap_utils_, consider_pose_by_road_slope_);
+      parameters, step_time_, hdmap_utils_,
+      get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)), consider_pose_by_road_slope_);
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
     simulation_interface::toMsg(req.pose(), initial_status.pose);

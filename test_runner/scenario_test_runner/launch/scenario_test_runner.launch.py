@@ -78,6 +78,7 @@ def launch_setup(context, *args, **kwargs):
     scenario                        = LaunchConfiguration("scenario",                       default=Path("/dev/null"))
     sensor_model                    = LaunchConfiguration("sensor_model",                   default="")
     sigterm_timeout                 = LaunchConfiguration("sigterm_timeout",                default=8)
+    use_sim_time                    = LaunchConfiguration("use_sim_time",                   default=False)
     vehicle_model                   = LaunchConfiguration("vehicle_model",                  default="")
     workflow                        = LaunchConfiguration("workflow",                       default=Path("/dev/null"))
     # fmt: on
@@ -99,6 +100,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"scenario                    := {scenario.perform(context)}")
     print(f"sensor_model                := {sensor_model.perform(context)}")
     print(f"sigterm_timeout             := {sigterm_timeout.perform(context)}")
+    print(f"use_sim_time                := {use_sim_time.perform(context)}")
     print(f"vehicle_model               := {vehicle_model.perform(context)}")
     print(f"workflow                    := {workflow.perform(context)}")
 
@@ -133,22 +135,23 @@ def launch_setup(context, *args, **kwargs):
 
     return [
         # fmt: off
-        DeclareLaunchArgument("architecture_type",          default_value=architecture_type         ),
-        DeclareLaunchArgument("autoware_launch_file",       default_value=autoware_launch_file      ),
+        DeclareLaunchArgument("architecture_type",          default_value=architecture_type             ),
+        DeclareLaunchArgument("autoware_launch_file",       default_value=autoware_launch_file          ),
         DeclareLaunchArgument("autoware_launch_package",    default_value=autoware_launch_package       ),
         DeclareLaunchArgument("consider_pose_by_road_slope",default_value=consider_pose_by_road_slope   ),
-        DeclareLaunchArgument("global_frame_rate",          default_value=global_frame_rate         ),
-        DeclareLaunchArgument("global_real_time_factor",    default_value=global_real_time_factor   ),
-        DeclareLaunchArgument("global_timeout",             default_value=global_timeout            ),
-        DeclareLaunchArgument("launch_autoware",            default_value=launch_autoware           ),
-        DeclareLaunchArgument("launch_rviz",                default_value=launch_rviz               ),
-        DeclareLaunchArgument("output_directory",           default_value=output_directory          ),
-        DeclareLaunchArgument("rviz_config",                default_value=rviz_config               ),
-        DeclareLaunchArgument("scenario",                   default_value=scenario                  ),
-        DeclareLaunchArgument("sensor_model",               default_value=sensor_model              ),
-        DeclareLaunchArgument("sigterm_timeout",            default_value=sigterm_timeout           ),
-        DeclareLaunchArgument("vehicle_model",              default_value=vehicle_model             ),
-        DeclareLaunchArgument("workflow",                   default_value=workflow                  ),
+        DeclareLaunchArgument("global_frame_rate",          default_value=global_frame_rate             ),
+        DeclareLaunchArgument("global_real_time_factor",    default_value=global_real_time_factor       ),
+        DeclareLaunchArgument("global_timeout",             default_value=global_timeout                ),
+        DeclareLaunchArgument("launch_autoware",            default_value=launch_autoware               ),
+        DeclareLaunchArgument("launch_rviz",                default_value=launch_rviz                   ),
+        DeclareLaunchArgument("output_directory",           default_value=output_directory              ),
+        DeclareLaunchArgument("rviz_config",                default_value=rviz_config                   ),
+        DeclareLaunchArgument("scenario",                   default_value=scenario                      ),
+        DeclareLaunchArgument("sensor_model",               default_value=sensor_model                  ),
+        DeclareLaunchArgument("sigterm_timeout",            default_value=sigterm_timeout               ),
+        DeclareLaunchArgument("use_sim_time",               default_value=use_sim_time                  ),
+        DeclareLaunchArgument("vehicle_model",              default_value=vehicle_model                 ),
+        DeclareLaunchArgument("workflow",                   default_value=workflow                      ),
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -174,9 +177,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=[
-                {"port": port, "consider_pose_by_road_slope": consider_pose_by_road_slope}
-            ] + make_vehicle_parameters(),
+            parameters=[{"port": port}, {"use_sim_time": True}, {"consider_pose_by_road_slope": consider_pose_by_road_slope}]+make_vehicle_parameters(),
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
@@ -189,7 +190,7 @@ def launch_setup(context, *args, **kwargs):
             executable="openscenario_interpreter_node",
             namespace="simulation",
             output="screen",
-            parameters=make_parameters(),
+            parameters=[{"use_sim_time": use_sim_time}]+make_parameters(),
             on_exit=ShutdownOnce(),
         ),
         Node(
