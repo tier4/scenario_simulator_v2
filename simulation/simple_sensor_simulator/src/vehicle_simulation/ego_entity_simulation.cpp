@@ -411,7 +411,7 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
       hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
     if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.value()).z;
-      if (consider_lanelet_slope) {
+      if (consider_pose_by_road_slope) {
         const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
           spline.getPose(s_value.value()).orientation);
         const auto original_rpy =
