@@ -64,7 +64,6 @@ nav:
       - Scenario Writing Tips: user_guide/ScenarioTips.md
       - Scenario Editor:
           - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
-          - Place an entity to relative position: user_guide/scenario_editor/RelativePosition.md
       - Scenario Test Runner:
           - Overview: user_guide/scenario_test_runner/ScenarioTestRunner.md
           - user_guide/scenario_test_runner/ScenarioFormatConversion.md

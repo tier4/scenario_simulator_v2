@@ -80,7 +80,7 @@ public:
 
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time);
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 
