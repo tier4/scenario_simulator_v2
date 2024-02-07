@@ -96,6 +96,9 @@ private:
   auto updateFrame(const simulation_api_schema::UpdateFrameRequest &)
     -> simulation_api_schema::UpdateFrameResponse;
 
+  auto updateStepTime(const simulation_api_schema::UpdateStepTimeRequest &)
+    -> simulation_api_schema::UpdateStepTimeResponse;
+
   auto updateEntityStatus(const simulation_api_schema::UpdateEntityStatusRequest &)
     -> simulation_api_schema::UpdateEntityStatusResponse;
 
