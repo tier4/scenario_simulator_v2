@@ -649,12 +649,7 @@ void EntityBase::requestSpeedChange(
   }
 }
 
-auto EntityBase::isControlledBySimulator() const -> bool
-{
-  THROW_SEMANTIC_ERROR(
-    getEntityTypename(),
-    " type entities do not support switching control - to be controlled by simulator or not.");
-}
+auto EntityBase::isControlledBySimulator() const -> bool { return true; }
 
 auto EntityBase::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void

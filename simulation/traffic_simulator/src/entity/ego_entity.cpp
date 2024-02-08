@@ -153,12 +153,11 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   EntityBase::onUpdate(current_time, step_time);
   setStatus(externally_updated_status_);
   if (is_controlled_by_simulator_ && npc_logic_started_) {
-    const auto target_speed_value =
-      target_speed_ ? target_speed_.value() : status_.getTwist().linear.x;
     if (
       const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
         static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
-        behavior_parameter_, step_time, target_speed_value)) {
+        behavior_parameter_, hdmap_utils_ptr_, step_time,
+        target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       setStatus(CanonicalizedEntityStatus(*updated_status, hdmap_utils_ptr_));
     } else {
       is_controlled_by_simulator_ = false;

@@ -45,7 +45,8 @@ auto any(F f, T && x, Ts &&... xs)
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time,
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, double step_time,
   std::optional<double> target_speed) -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
@@ -96,7 +97,7 @@ auto makeUpdatedStatus(
     }
 
     return makeUpdatedStatus(
-      entity_status, polyline_trajectory, behavior_parameter, step_time, target_speed);
+      entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time, target_speed);
   };
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
@@ -234,7 +235,7 @@ auto makeUpdatedStatus(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s acceleration value is NaN or infinity. The value is ",
-      acceleration, ".");
+      acceleration, ". ");
   } else if (const auto max_acceleration = std::min(
                acceleration /* [m/s^2] */ +
                  behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
@@ -245,7 +246,7 @@ auto makeUpdatedStatus(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
-      "'s maximum acceleration value is NaN or infinity. The value is ", max_acceleration, ".");
+      "'s maximum acceleration value is NaN or infinity. The value is ", max_acceleration, ". ");
   } else if (const auto min_acceleration = std::max(
                acceleration /* [m/s^2] */ -
                  behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
@@ -256,14 +257,14 @@ auto makeUpdatedStatus(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
-      "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ".");
+      "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ". ");
   } else if (const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
              std::isinf(speed) or std::isnan(speed)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ", speed,
-      ".");
+      ". ");
   } else if (
     /*
        The controller provides the ability to calculate acceleration using constraints from the
@@ -316,14 +317,14 @@ auto makeUpdatedStatus(
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
       "'s desired acceleration value contains NaN or infinity. The value is ", desired_acceleration,
-      ".");
+      ". ");
   } else if (const auto desired_speed = speed + desired_acceleration * step_time;
              std::isinf(desired_speed) or std::isnan(desired_speed)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s desired speed value is NaN or infinity. The value is ",
-      desired_speed, ".");
+      desired_speed, ". ");
   } else if (const auto desired_velocity =
                [&]() {
                  /*
@@ -376,7 +377,7 @@ auto makeUpdatedStatus(
       std::quoted(entity_status.name),
       " calculated invalid acceleration:", " desired_acceleration: ", desired_acceleration,
       ", remaining_time_to_front_waypoint: ", remaining_time_to_front_waypoint,
-      ", distance: ", distance, ", acceleration: ", acceleration, ", speed: ", speed, ".",
+      ", distance: ", distance, ", acceleration: ", acceleration, ", speed: ", speed, ". ",
       follow_waypoint_controller);
   } else {
     auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
@@ -556,7 +557,15 @@ auto makeUpdatedStatus(
 
     updated_status.time = entity_status.time + step_time;
 
-    updated_status.lanelet_pose_valid = false;
+    // matching distance has been set to 3.0 due to matching problems during lane changes
+    if (const auto lanelet_pose =
+          hdmap_utils->toLaneletPose(updated_status.pose, entity_status.bounding_box, false, 3.0);
+        lanelet_pose) {
+      updated_status.lanelet_pose = lanelet_pose.value();
+      updated_status.lanelet_pose_valid = true;
+    } else {
+      updated_status.lanelet_pose_valid = false;
+    }
 
     return updated_status;
   }

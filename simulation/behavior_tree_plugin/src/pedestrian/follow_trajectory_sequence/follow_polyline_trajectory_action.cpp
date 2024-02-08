@@ -70,20 +70,13 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       not getInput<decltype(target_speed)>("target_speed", target_speed) or
       not polyline_trajectory) {
     return BT::NodeStatus::FAILURE;
+  } else if (std::isnan(entity_status->getTime())) {
+    THROW_SIMULATION_ERROR(
+      "Time in entity_status is NaN - FollowTrajectoryAction does not support such case.");
   } else if (
-    auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
+    const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
       static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
-      behavior_parameter, step_time, getTargetSpeed())) {
-    // matching distance has been set to 3.0 due to matching problems during lane changes
-    if (const auto lanelet_pose = hdmap_utils->toLaneletPose(
-          updated_status->pose, entity_status->getBoundingBox(), false, 3.0);
-        lanelet_pose) {
-      updated_status->lanelet_pose = lanelet_pose.value();
-      updated_status->lanelet_pose_valid = true;
-    } else {
-      updated_status->lanelet_pose_valid = false;
-    }
-
+      behavior_parameter, hdmap_utils, step_time, getTargetSpeed())) {
     setOutput(
       "updated_status",
       std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
