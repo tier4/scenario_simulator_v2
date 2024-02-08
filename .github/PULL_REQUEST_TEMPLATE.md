@@ -32,8 +32,6 @@
 # Known Limitations
 
 > [Optional] If there are no known limitations that you can think of, delete this section.  
-> If there are any limitations on the features or fixes added by this pull request, delete this sentence and clearly describe them.  
-> If there are no limitations on the features or modifications added by the pull request, remove the "known limitations" section.  
+> If there are any limitations on the features or fixes added by this pull request, delete this sentence and clearly describe them. If there are no limitations on the features or modifications added by the pull request, remove the "known limitations" section.  
 > For example, the lane matching algorithm currently (1/25/2024) employed is unable to match Entity that is heavily tilted with respect to the lane, and it is difficult to throw an exception.  
-> If the developer is aware of the existence of such problems or limitations, describe them in detail.  
-> The problems or limitation should be listed as an Issue on GitHub and a link to it should be provided in this section.  
+> If the developer is aware of the existence of such problems or limitations, describe them in detail. The problems or limitation should be listed as an Issue on GitHub and a link to it should be provided in this section.  
