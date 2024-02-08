@@ -77,7 +77,7 @@ public:
 
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time);
 
   auto overwrite(
     const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,

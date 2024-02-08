@@ -311,6 +311,20 @@ message UpdateTrafficLightsResponse {
 }
 
 /**
+ * Requests updating simulation step time.
+ **/
+message UpdateStepTimeRequest {
+  double simulation_step_time = 1;
+}
+
+/**
+ * Response of updating simulation step time.
+ **/
+message UpdateStepTimeResponse {
+  Result result = 1; // Result of [UpdateStepTimeRequest](#UpdateStepTimeRequest)
+}
+
+/**
  * Universal message for Request
  **/
 message SimulationRequest {
@@ -327,6 +341,7 @@ message SimulationRequest {
     AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsRequest update_traffic_lights = 11;
     AttachPseudoTrafficLightDetectorRequest attach_pseudo_traffic_light_detector = 13;
+    UpdateStepTimeRequest update_step_time = 14;
   }
 }
 
@@ -348,5 +363,6 @@ message SimulationResponse {
     AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsResponse update_traffic_lights = 11;
     AttachPseudoTrafficLightDetectorResponse attach_pseudo_traffic_light_detector = 13;
+    UpdateStepTimeResponse update_step_time = 14;
   }
 }

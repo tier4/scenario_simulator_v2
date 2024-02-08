@@ -49,6 +49,9 @@ public:
   auto call(const simulation_api_schema::UpdateFrameRequest &)
     -> simulation_api_schema::UpdateFrameResponse;
 
+  auto call(const simulation_api_schema::UpdateStepTimeRequest &)
+    -> simulation_api_schema::UpdateStepTimeResponse;
+
   auto call(const simulation_api_schema::SpawnVehicleEntityRequest &)
     -> simulation_api_schema::SpawnVehicleEntityResponse;
 
