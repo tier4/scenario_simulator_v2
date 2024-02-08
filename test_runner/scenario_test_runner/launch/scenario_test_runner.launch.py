@@ -115,11 +115,12 @@ def launch_setup(context, *args, **kwargs):
             {"record": record},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
+            {"sigterm_timeout": sigterm_timeout},
             {"vehicle_model": vehicle_model},
         ]
         parameters += make_vehicle_parameters()
         return parameters
-    
+
     def make_vehicle_parameters():
         parameters = []
 
@@ -177,7 +178,7 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             on_exit=ShutdownOnce(),
-            parameters=[{"port": port}, {"use_sim_time": True}, {"consider_pose_by_road_slope": consider_pose_by_road_slope}]+make_vehicle_parameters(),
+            parameters=make_parameters() + [{"use_sim_time": True}, {"consider_pose_by_road_slope": consider_pose_by_road_slope}],
             condition=IfCondition(launch_simple_sensor_simulator),
         ),
         # The `name` keyword overrides the name for all created nodes, so duplicated nodes appear.
