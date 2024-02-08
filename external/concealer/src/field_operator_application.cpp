@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <exception>
 #include <scenario_simulator_exception/exception.hpp>
+#include <system_error>
 
 namespace concealer
 {
@@ -70,71 +71,76 @@ auto FieldOperatorApplication::checkAutowareProcess() -> void
 
 auto FieldOperatorApplication::shutdownAutoware() -> void
 {
-  AUTOWARE_INFO_STREAM("Shutting down Autoware: (1/3) Stop publishing/subscribing.");
-  {
-    stopRequest();
-  }
+  if (stopRequest(); process_id != 0 && not std::exchange(is_autoware_exited, true)) {
+    const auto sigset = [this]() {
+      if (auto signal_set = sigset_t();
+          sigemptyset(&signal_set) or sigaddset(&signal_set, SIGCHLD)) {
+        RCLCPP_ERROR_STREAM(get_logger(), std::system_error(errno, std::system_category()).what());
+        std::exit(EXIT_FAILURE);
+      } else if (auto error = pthread_sigmask(SIG_BLOCK, &signal_set, nullptr)) {
+        RCLCPP_ERROR_STREAM(get_logger(), std::system_error(error, std::system_category()).what());
+        std::exit(EXIT_FAILURE);
+      } else {
+        return signal_set;
+      }
+    }();
 
-  if (process_id != 0 && not is_autoware_exited) {
-    is_autoware_exited = true;
+    const auto timeout = [this]() {
+      auto sigterm_timeout = [this](auto value) {
+        auto node = rclcpp::Node("get_parameter_sigterm_timeout", "simulation");
+        node.declare_parameter<int>("sigterm_timeout", value);
+        node.get_parameter<int>("sigterm_timeout", value);
+        return value;
+      };
+      auto timeout = timespec();
+      timeout.tv_sec = sigterm_timeout(5);
+      timeout.tv_nsec = 0;
+      return timeout;
+    }();
 
-    AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Send SIGINT to Autoware launch process.");
-    {
-      sendSIGINT();
+    if (sendSIGINT(); sigtimedwait(&sigset, nullptr, &timeout) < 0) {
+      switch (errno) {
+        case EINTR:
+          /*
+             The wait was interrupted by an unblocked, caught signal. It shall
+             be documented in system documentation whether this error causes
+             these functions to fail.
+          */
+          RCLCPP_ERROR_STREAM(
+            get_logger(),
+            "The wait for Autoware launch process termination was interrupted by an unblocked, "
+            "caught signal.");
+          break;
+
+        case EAGAIN:
+          /*
+             No signal specified by set was generated within the specified
+             timeout period.
+          */
+          RCLCPP_ERROR_STREAM(get_logger(), "Autoware launch process does not respond. Kill it.");
+          killpg(process_id, SIGKILL);
+          break;
+
+        default:
+        case EINVAL:
+          /*
+             The timeout argument specified a tv_nsec value less than zero or
+             greater than or equal to 1000 million.
+          */
+          RCLCPP_ERROR_STREAM(
+            get_logger(),
+            "The parameter sigterm_timeout specified a value less than zero or greater than or "
+            "equal to 1000 million.");
+          break;
+      }
     }
 
-    AUTOWARE_INFO_STREAM("Shutting down Autoware: (2/3) Terminating Autoware.");
-    {
-      sigset_t mask{};
-      {
-        sigset_t orig_mask{};
-
-        sigemptyset(&mask);
-        sigaddset(&mask, SIGCHLD);
-
-        if (sigprocmask(SIG_BLOCK, &mask, &orig_mask) < 0) {
-          AUTOWARE_SYSTEM_ERROR("sigprocmask");
-          std::exit(EXIT_FAILURE);
-        }
-      }
-
-      timespec timeout{};
-      {
-        timeout.tv_sec = 5;
-        timeout.tv_nsec = 0;
-      }
-
-      while (sigtimedwait(&mask, NULL, &timeout) < 0) {
-        switch (errno) {
-          case EINTR:  // Interrupted by a signal other than SIGCHLD.
-            break;
-
-          case EAGAIN:
-            AUTOWARE_ERROR_STREAM(
-              "Shutting down Autoware: (2/3) Autoware launch process does not respond. Kill it.");
-            kill(process_id, SIGKILL);
-            break;
-
-          default:
-            AUTOWARE_SYSTEM_ERROR("sigtimedwait");
-            std::exit(EXIT_FAILURE);
-        }
-      }
-    }
-
-    AUTOWARE_INFO_STREAM("Shutting down Autoware: (3/3) Waiting for Autoware to be exited.");
-    {
-      int status = 0;
-
-      const int waitpid_options = 0;
-
-      if (waitpid(process_id, &status, waitpid_options) < 0) {
-        if (errno == ECHILD) {
-          AUTOWARE_WARN_STREAM("Try to wait for the autoware process but it was already exited.");
-        } else {
-          AUTOWARE_SYSTEM_ERROR("waitpid");
-          std::exit(EXIT_FAILURE);
-        }
+    if (int status = 0; waitpid(process_id, &status, 0) < 0) {
+      if (errno == ECHILD) {
+        RCLCPP_ERROR_STREAM(
+          get_logger(), "Try to wait for the autoware process but it was already exited.");
+      } else {
+        RCLCPP_ERROR_STREAM(get_logger(), std::system_error(errno, std::system_category()).what());
       }
     }
   }
