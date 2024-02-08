@@ -1,4 +1,4 @@
-name: CheckLabel
+name: Check label
 on:
   pull_request:
     branches:
@@ -12,7 +12,7 @@ on:
 
 jobs:
   check_label:
-    name: Check Label
+    name: Check label
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:

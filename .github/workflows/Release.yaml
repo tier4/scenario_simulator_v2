@@ -55,19 +55,19 @@ jobs:
           echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
       - name: Merge branch
         run: git pull origin ${{ github.head_ref }}
-      - name: bump patch version
+      - name: Bump patch version
         if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
-      - name: bump minor version
+      - name: Bump minor version
         if: (contains(github.event.pull_request.labels.*.name, 'bump minor'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
-      - name: bump major version
+      - name: Bump major version
         if: (contains(github.event.pull_request.labels.*.name, 'bump major'))
         run: |
           catkin_generate_changelog -y
@@ -77,7 +77,7 @@ jobs:
         id: new_version
         run: |
           echo "new_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
-      - name: commit changes
+      - name: Commit changes
         if: github.event.pull_request.merged == true
         run: |
           git add .
@@ -107,7 +107,7 @@ jobs:
         uses: mathiasvr/command-output@v2.0.0
         with:
           run: cat release_description.txt
-      - name: Create a gitHub release
+      - name: Create a GitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
         with:

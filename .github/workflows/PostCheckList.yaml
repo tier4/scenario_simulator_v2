@@ -1,4 +1,4 @@
-name: PostCheckList
+name: Post check list
 on:
   pull_request:
     branches:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   post_check_list:
-    name: PostCheckList
+    name: Post check list
     timeout-minutes: 10
     runs-on: ubuntu-22.04
     permissions:
