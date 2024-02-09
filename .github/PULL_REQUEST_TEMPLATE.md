@@ -14,7 +14,7 @@
 
 ## Details
 
-> [Optional] If there are only differences whose effects are so obvious that no explanation is needed, or if there are no differences in the code (e.g., documentation additions), delete this section.  
+> <small>[required]</small> If there are only differences whose effects are so obvious that no explanation is needed, or if there are no differences in the code (e.g., documentation additions), delete this section.  
 > Delete this sentence and describe this pull request.  
 > For example, it is desirable to describe the specifications of added functions, and detailed explanations of bugs that have been fixed.  
 
