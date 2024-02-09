@@ -202,6 +202,7 @@ TEST(LaneletUtils, toMapPose)
 {
   const traffic_simulator_msgs::msg::LaneletPose pose = makeLaneletPose(34621, 10.0);
   EXPECT_NO_THROW(getLaneletUtils().toMapPose(pose));
+  // NOTE: orientation data is output as of #1103
   EXPECT_POSE_NEAR(
     getLaneletUtils().toMapPose(pose).pose,
     geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -210,10 +211,10 @@ TEST(LaneletUtils, toMapPose)
                   .y(73735.0699484234)
                   .z(0.3034051453))
       .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>()
-                     .x(0.0)
-                     .y(0.0)
-                     .z(-0.9719821398)
-                     .w(0.2350547166)),
+                     .x(-0.0091567745565503053)
+                     .y(-0.0022143853886961245)
+                     .z(-0.97193900717756765)
+                     .w(0.23504428583514828)),
     EPS);
 }
 

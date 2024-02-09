@@ -53,6 +53,7 @@ TEST(TestRandomizer, generate_10NPC)
     description.ego_start_position, makeLaneletPose(34705, 6.2940393113), EPS);
   EXPECT_LANELET_POSE_NEAR(
     description.ego_goal_position, makeLaneletPose(34642, 9.6945373700), EPS);
+  // NOTE: orientation data is output as of #1103
   EXPECT_POSE_NEAR(
     description.ego_goal_pose,
     geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -61,10 +62,10 @@ TEST(TestRandomizer, generate_10NPC)
                   .y(73741.1526960728)
                   .z(0.0698702227))
       .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>()
-                     .x(0.0)
-                     .y(0.0)
-                     .z(-0.9854984261)
-                     .w(0.1696845662)),
+                     .x(-0.0040560888625029243)
+                     .y(-0.00069838333685736189)
+                     .z(-0.98549007915725362)
+                     .w(0.16968312905673485)),
     EPS);
   // npc data
   EXPECT_EQ(description.npcs_descriptions.size(), size_t(10));
@@ -117,6 +118,7 @@ TEST(TestRandomizer, generate_8NPC)
     description.ego_start_position, makeLaneletPose(34648, 11.3744011441), EPS);
   EXPECT_LANELET_POSE_NEAR(
     description.ego_goal_position, makeLaneletPose(34507, 55.3754803281), EPS);
+  // NOTE: orientation data is output as of #1103
   EXPECT_POSE_NEAR(
     description.ego_goal_pose,
     geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -125,10 +127,10 @@ TEST(TestRandomizer, generate_8NPC)
                   .y(73815.1830249432)
                   .z(-2.9975350010))
       .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>()
-                     .x(0.0)
-                     .y(0.0)
-                     .z(0.2345315792)
-                     .w(0.9721085013)),
+                     .x(-0.002510549540877986)
+                     .y(0.01040596135909698)
+                     .z(0.23451814178855812)
+                     .w(0.97205280426591933)),
     EPS);
   // npc data
   EXPECT_EQ(description.npcs_descriptions.size(), size_t(8));
