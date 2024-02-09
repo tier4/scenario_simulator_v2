@@ -27,7 +27,7 @@
 
 > [Optional] If no destructive change exists, you can skip this section.  
 > Include a description of the changes and a migration guide and send the pull request with a bump major label. (Example : https://github.com/tier4/scenario_simulator_v2/pull/1139)  
-> Otherwise, remove the "Destructive Changes" section and make sure this pull request is labeled `bump minor` or `bump patch`.)  
+> Otherwise, skip the "Destructive Changes" section and make sure this pull request is labeled `bump minor` or `bump patch`.  
 
 # Known Limitations
 
