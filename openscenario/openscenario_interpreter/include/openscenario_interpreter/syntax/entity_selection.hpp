@@ -38,7 +38,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntitySelection : public Scope, public SelectedEntities
 {
-  explicit EntitySelection(const pugi::xml_node & node, Scope & scope);
+  explicit EntitySelection(const pugi::xml_node &, Scope &);
 
   auto objects() const -> std::set<SingleEntity>;
 
