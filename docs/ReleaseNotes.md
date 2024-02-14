@@ -4,14 +4,17 @@
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ---------------------------------- | ----------------------------------------------------------------------------- | -------------------------- | ----------------------------------------------------------------- | ----------------------------------- |
-| OpenSCENARIO 1.2 `EntitySelection` | Added `EntitySelection` and modified some classes to be able to cope with it. | `openscenario_interpreter` | [#1059](https://github.com/tier4/scenario_simulator_v2/pull/1059) | [shouth](https://github.com/shouth) |
+| Feature                 | Brief summary                                                        | Category            | Pull request                                                      | Contributor                                   |
+| ----------------------- | -------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| Extend matching length.            | Enable consider tread when calculating matching length of EgoEntity.          | `traffic_simulator`        | [#1181](https://github.com/tier4/scenario_simulator_v2/pull/1181) | [hakuturu583](https://github.com/hakuturu583) |
+| OpenSCENARIO 1.2 `EntitySelection` | Added `EntitySelection` and modified some classes to be able to handle it.    | `openscenario_interpreter` | [#1059](https://github.com/tier4/scenario_simulator_v2/pull/1059) | [shouth](https://github.com/shouth)           |
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
+| Feature                        | Brief summary                                                  | Category            | Pull request                                                      | Contributor                                   |
+| ------------------------------ | -------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| Revert #1096                   | Revert incomplete fix for de-spawned entity.                   | `traffic_simulator` | [#1159](https://github.com/tier4/scenario_simulator_v2/pull/1159) | [HansRobo](https://github.com/HansRobo)       |
+| Fix problems in route planning | Fixed a bug in a function related to Entity's route selection. | `traffic_simulator` | [#1126](https://github.com/tier4/scenario_simulator_v2/pull/1168) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 

@@ -120,9 +120,11 @@ auto StatusMonitor::write() const -> void
     }
   }
 
+  json["good"] = good();
+
   json["name"] = name();
 
-  json["good"] = good();
+  json["threshold"] = threshold.count();
 
   json["unix_time"] = std::chrono::duration_cast<std::chrono::seconds>(
                         std::chrono::high_resolution_clock::now().time_since_epoch())

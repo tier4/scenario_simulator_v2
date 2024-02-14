@@ -32,7 +32,6 @@
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
-#include <traffic_simulator/entity/deleted_entity.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
@@ -283,7 +282,7 @@ public:
   // clang-format on
 
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-  FORWARD_TO_ENTITY(cancelRequest, );
+  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
@@ -298,27 +297,30 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
-  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getMapPoseFromRelativePose, const);
-  FORWARD_TO_ENTITY(getRouteLanelets, );
+  FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
   FORWARD_TO_ENTITY(laneMatchingSucceed, const);
+  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
+  FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
-  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
+  FORWARD_TO_ENTITY(setAcceleration, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
   FORWARD_TO_ENTITY(setBehaviorParameter, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationRateLimit, );
   FORWARD_TO_ENTITY(setLinearVelocity, );
+  FORWARD_TO_ENTITY(setMapPose, );
+  FORWARD_TO_ENTITY(setTwist, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_ENTITY
@@ -473,9 +475,6 @@ public:
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
-
-  auto setEntityStatusExternally(const std::string & name, const CanonicalizedEntityStatus &)
-    -> void;
 
   void setVerbose(const bool verbose);
 
