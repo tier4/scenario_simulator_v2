@@ -96,7 +96,7 @@ Please follow the criteria below to determine which label to apply.
 * If the scenario or traffic_simulator API has some additional functionality but no destructive changes, label it with `bump minor`.
 * If there is no additional functionality and full backward compatibility is ensured, label it with `bump patch`.
 
-If you are in any doubt, please consult the maintainers [@hakuturu583](https://github.com/hakuturu583),[@yamacir-kit](https://github.com/yamacir-kit),[@HansRobo](https:// github.com/HansRobo).
+If you are in any doubt, please consult the maintainers [@hakuturu583](https://github.com/hakuturu583),[@yamacir-kit](https://github.com/yamacir-kit),[@HansRobo](https://github.com/HansRobo).
 
 ## Update Documentation
 
