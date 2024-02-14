@@ -85,7 +85,7 @@ As a good practice, reply to the reviewer's comment with a link to your changes 
 To keep the commit hashes consistent, **please DO NOT force-push the commit to your pull request during the code review.**
 If you want to force-push the commit during the review, please contact the maintainers for approval in advance.
 
-If more than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
+If at leaset one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
 Your contribution will be recorded in the [release note](https://tier4.github.io/scenario_simulator_v2-docs/ReleaseNotes/).
 
 Pull requests must be labeled `bump major`, `bump minor` or `bump patch`.
