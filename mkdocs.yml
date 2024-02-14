@@ -75,7 +75,7 @@ nav:
       - developer_guide/AutowareAPI.md
       - developer_guide/NPCBehavior.md
       - developer_guide/BehaviorPlugin.md
-      #      - developer_guide/ErrorCategories.md
+      # - developer_guide/ErrorCategories.md
       - developer_guide/OpenSCENARIOSupport.md
       - developer_guide/SimpleSensorSimulator.md
       - developer_guide/SystemArchitecture.md
@@ -83,7 +83,8 @@ nav:
       - developer_guide/ZeroMQ.md
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
-# cspell: ignore TIERIV
+      - developer_guide/LanePoseCalculation.md
+      # cspell: ignore TIERIV
       - developer_guide/TIERIVScenarioFormatVersion2.md
       - developer_guide/CONTRIBUTING.md
       - developer_guide/Communication.md
