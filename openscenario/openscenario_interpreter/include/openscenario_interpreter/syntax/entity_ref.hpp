@@ -31,7 +31,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntityRef : public String
 {
-  EntityRef(String string) : String(std::move(string)) {}
+  EntityRef(const String & string) : String(string) {}
 
   template <typename Node, typename Scope>
   explicit EntityRef(const Node & node, Scope & scope)
