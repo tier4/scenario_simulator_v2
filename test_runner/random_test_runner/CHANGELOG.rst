@@ -2,6 +2,41 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2024-02-14)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into revert/1096
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* fix error in linelint
+* Merge remote-tracking branch 'origin/master' into feature/real-time-factor-control
+* Merge pull request `#1162 <https://github.com/tier4/scenario_simulator_v2/issues/1162>`_ from tier4/fix/linelint
+  fix linelint error
+* fix linelint error
+* Merge pull request `#1143 <https://github.com/tier4/scenario_simulator_v2/issues/1143>`_ from RobotecAI/random-test-runner-docs-update
+  Update of Random Test Runner documentation
+* random_test_runner executable name changed
+* Merge branch 'tier4:master' into random-test-runner-docs-update
+* chore: fix linelint errors
+* Merge pull request `#1152 <https://github.com/tier4/scenario_simulator_v2/issues/1152>`_ from RobotecAI/feature/test-random-test-runner
+  Feature/test random test runner
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* TestExecutor tests
+* YamlTestParamsSaver tests
+* Add remaining JunitXmlReporter tests
+* Add some JunitXmlReporter tests
+* Add TestRandomizer tests
+* Move helper function
+* Fix and add randomizer tests
+* Add Randomizers tests
+* Add lanelet map and LaneletUtils tests
+* Add random_test_runner tests
+* Updated random test runner docs
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Mateusz Palczuk, Paweł Lech, pawellech1, yamacir-kit
+
 0.9.0 (2023-12-21)
 ------------------
 * Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
