@@ -46,28 +46,28 @@ struct EntityBase : public Object
 {
   EntityBase() = default;
 
-  EntityBase(const ScenarioObject & object);
+  EntityBase(const ScenarioObject &);
 
-  EntityBase(const EntitySelection & object);
+  EntityBase(const EntitySelection &);
 
-  EntityBase(const String & name, const Scope & scope);
+  EntityBase(const String &, const Scope &);
 
-  EntityBase(const pugi::xml_node & node, const Scope & scope);
+  EntityBase(const pugi::xml_node &, const Scope &);
 
   auto name() const -> String;
 };
 
-auto operator==(const EntityBase & left, const EntityBase & right) -> bool;
+auto operator==(const EntityBase &, const EntityBase &) -> bool;
 
 struct SingleEntity : public EntityBase
 {
   SingleEntity() = default;
 
-  SingleEntity(const ScenarioObject & object);
+  SingleEntity(const ScenarioObject &);
 
-  SingleEntity(const String & name, const Scope & scope);
+  SingleEntity(const String &, const Scope &);
 
-  SingleEntity(const pugi::xml_node & node, const Scope & scope);
+  SingleEntity(const pugi::xml_node &, const Scope &);
 
   operator String() const;
 
@@ -78,7 +78,7 @@ struct GroupedEntity : public EntityBase
 {
   using EntityBase::EntityBase;
 
-  GroupedEntity(const SingleEntity & single);
+  GroupedEntity(const SingleEntity &);
 
   auto objects() const -> std::set<SingleEntity>;
 
