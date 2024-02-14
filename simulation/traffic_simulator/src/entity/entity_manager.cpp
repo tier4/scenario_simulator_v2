@@ -711,18 +711,6 @@ auto EntityManager::setEntityStatus(
   }
 }
 
-auto EntityManager::setEntityStatusExternally(
-  const std::string & name, const CanonicalizedEntityStatus & status) -> void
-{
-  if (not isEgo(name)) {
-    THROW_SEMANTIC_ERROR(
-      "You cannot set entity status externally to the vehicle other than ego named ",
-      std::quoted(name), ".");
-  } else {
-    dynamic_cast<EgoEntity *>(entities_[name].get())->setStatusExternally(status);
-  }
-}
-
 void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;
