@@ -482,7 +482,7 @@ auto DistanceCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     results.push_back(
-      triggering_entity.apply([&](const auto & object) { return this->distance(object); }));
+      triggering_entity.apply([&](const auto & object) { return distance(object); }));
     return not results.back().size() or rule(results.back(), value).min();
   }));
 }
