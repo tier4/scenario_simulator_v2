@@ -82,19 +82,19 @@ struct Rule
       case equalTo:
         return equal_to<T>()(std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case greaterThan:
-        return std::greater<void>()(
+        return std::greater()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case lessThan:
-        return std::less<void>()(
+        return std::less()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case greaterOrEqual:
-        return std::greater_equal<void>()(
+        return std::greater_equal()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case lessOrEqual:
-        return std::less_equal<void>()(
+        return std::less_equal()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       case notEqualTo:
-        return std::not_equal_to<void>()(
+        return std::not_equal_to()(
           std::forward<decltype(lhs)>(lhs), std::forward<decltype(rhs)>(rhs));
       default:
         return {};
