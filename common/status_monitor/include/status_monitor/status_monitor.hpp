@@ -105,6 +105,38 @@ public:
     }
   }
 
+  template <typename T>
+  class ScopedExchanger
+  {
+    std::reference_wrapper<T> target;
+
+    T value;
+
+  public:
+    template <typename... Ts>
+    static auto locked_exchange(Ts &&... xs) -> decltype(auto)
+    {
+      auto lock = std::scoped_lock<std::mutex>(mutex);
+      return std::exchange(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename U>
+    explicit ScopedExchanger(T & x, U && y)
+    : target(x), value(locked_exchange(target.get(), std::forward<decltype(y)>(y)))
+    {
+    }
+
+    ~ScopedExchanger() { locked_exchange(target.get(), value); }
+  };
+
+  template <typename Thunk>
+  auto overrideThreshold(const std::chrono::seconds & t, Thunk thunk) -> decltype(auto)
+  {
+    auto exchanger = ScopedExchanger(threshold, t);
+
+    return thunk();
+  }
+
   auto write() const -> void;
 } static status_monitor;
 }  // namespace common

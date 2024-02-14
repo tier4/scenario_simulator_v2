@@ -34,14 +34,17 @@ static auto getParameter(const std::string & name, T value = {})
 
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+  const rclcpp::Parameter & use_sim_time)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   hdmap_utils_ptr_(hdmap_utils),
+  vehicle_parameters(parameters),
   consider_acceleration_by_road_slope_(
-    getParameter<bool>("consider_acceleration_by_road_slope", false))
+          getParameter<bool>("consider_acceleration_by_road_slope", false))
 {
+  autoware->set_parameter(use_sim_time);
 }
 
 auto toString(const VehicleModelType datum) -> std::string
@@ -470,12 +473,23 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
+  const auto get_matching_length = [&] {
+    return std::max(
+             vehicle_parameters.axles.front_axle.track_width,
+             vehicle_parameters.axles.rear_axle.track_width) *
+             0.5 +
+           1.0;
+  };
+
   if (unique_route_lanelets.empty()) {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+      status.pose, status.bounding_box, false, get_matching_length());
   } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, 1.0);
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, get_matching_length());
     if (!lanelet_pose) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, 1.0);
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+        status.pose, status.bounding_box, false, get_matching_length());
     }
   }
   if (lanelet_pose) {
