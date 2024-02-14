@@ -30,11 +30,12 @@ SpeedAction::SpeedAction(const pugi::xml_node & node, Scope & scope)
 {
   // OpenSCENARIO 1.2 Table 11
   for (const auto & actor : actors) {
-    if (auto object_types = actor.objectTypes(); object_types != std::set{ObjectType::vehicle} and
-                                                 object_types != std::set{ObjectType::pedestrian}) {
-      THROW_SEMANTIC_ERROR(
-        "Actors may be either of vehicle type or a pedestrian type;"
-        "See OpenSCENARIO 1.2 Table 11 for more details");
+    for (const auto & object_type : actor.objectTypes()) {
+      if (object_type != ObjectType::vehicle and object_type != ObjectType::pedestrian) {
+        THROW_SEMANTIC_ERROR(
+          "Actors may be either of vehicle type or a pedestrian type;"
+          "See OpenSCENARIO 1.2 Table 11 for more details");
+      }
     }
   }
 }
