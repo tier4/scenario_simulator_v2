@@ -2,6 +2,43 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.1 (2024-02-15)
+------------------
+
+1.0.0 (2024-02-14)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/new_release_flow
+* Merge pull request `#1077 <https://github.com/tier4/scenario_simulator_v2/issues/1077>`_ from tier4/fix/autoware-shutdown
+  Fix/autoware shutdown
+* Merge branch 'master' into fix/autoware-shutdown
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/consider_tread_in_ego_entity
+* Merge pull request `#1150 <https://github.com/tier4/scenario_simulator_v2/issues/1150>`_ from tier4/feature/real-time-factor-control
+  Feature/real time factor control
+* Merge remote-tracking branch 'tier/master' into feature/real-time-factor-control
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge pull request `#1159 <https://github.com/tier4/scenario_simulator_v2/issues/1159>`_ from tier4/revert/1096
+  Revert/1096
+* Changes after review
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into feature/real-time-factor-control
+* use_sim_time for openscenario_interpreter is parameterized and False by default
+* Merge branch 'tier4:master' into random-test-runner-docs-update
+* Revert "chore: add example scenario of DeleteEntityAction"
+  This reverts commit 8c6f8a498a226c2c35a9bedc18c90a95b5888f2b.
+* Revert "chore: update author of sample scenario"
+  This reverts commit 604127d61e0a3014e36f8b05af2c52ab44cd99ea.
+* Setting concealer use_sim_time manually instead of using global arguments.
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Global real time factor set with launch argument fix
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Update `shutdownAutoware` to respect the parameter `sigterm_timeout`
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, pawellech1, yamacir-kit
+
 0.9.0 (2023-12-21)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into prepare/release-0.9.0
