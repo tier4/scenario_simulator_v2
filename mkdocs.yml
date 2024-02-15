@@ -56,7 +56,9 @@ extra_javascript:
 
 nav:
   - Home: README.md
-  - Release Note: ReleaseNotes.md
+  - Release Note: 
+    - Since version 1.0.0: https://github.com/tier4/scenario_simulator_v2/releases
+    - Prior to version 1.0.0: ReleaseNotes.md
   - User Guide:
       - Quick Start: user_guide/QuickStart.md
       - Build Instructions: user_guide/BuildInstructions.md
@@ -64,7 +66,6 @@ nav:
       - Scenario Writing Tips: user_guide/ScenarioTips.md
       - Scenario Editor:
           - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
-          - Place an entity to relative position: user_guide/scenario_editor/RelativePosition.md
       - Scenario Test Runner:
           - Overview: user_guide/scenario_test_runner/ScenarioTestRunner.md
           - user_guide/scenario_test_runner/ScenarioFormatConversion.md

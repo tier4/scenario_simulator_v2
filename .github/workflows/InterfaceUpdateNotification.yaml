@@ -1,4 +1,4 @@
-name: InterfaceUpdateNotification
+name: Interface update notification
 on:
   pull_request:
     branches:

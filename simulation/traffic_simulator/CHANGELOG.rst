@@ -2,6 +2,73 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2024-02-14)
+------------------
+* Merge pull request `#1184 <https://github.com/tier4/scenario_simulator_v2/issues/1184>`_ from tier4/feature/consider_tread_in_ego_entity
+  Feature/consider tread in ego entity
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/new_release_flow
+* Merge branch 'master' into fix/autoware-shutdown
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/consider_tread_in_ego_entity
+* Merge pull request `#1150 <https://github.com/tier4/scenario_simulator_v2/issues/1150>`_ from tier4/feature/real-time-factor-control
+  Feature/real time factor control
+* Doxygen note
+* modify rviz settings
+* remove externally_updated_status\_
+* add setTwist/setAcceleration function
+* add setMapPose function
+* Merge remote-tracking branch 'tier/master' into feature/real-time-factor-control
+* Merge pull request `#1180 <https://github.com/tier4/scenario_simulator_v2/issues/1180>`_ from tier4/add_dynamic_obstacle_stop_markers
+  Add debug and virtual wall markers for dynamic_obstacle_avoidance
+* fix indent
+* Add debug and virtual wall markers for dynamic_obstacle_avoidance
+* Merge remote-tracking branch 'tier/master' into feature/real-time-factor-control
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge pull request `#1159 <https://github.com/tier4/scenario_simulator_v2/issues/1159>`_ from tier4/revert/1096
+  Revert/1096
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into revert/1096
+* Changes after review
+* Merge pull request `#1168 <https://github.com/tier4/scenario_simulator_v2/issues/1168>`_ from tier4/feature/get_stop_line_ids
+  Feature/get stop line ids
+* clean up code
+* rename from "Reg Elements" to "Regulatory Elements"
+* use push_back
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* use emplace_back
+* use emplace_back
+* use emplace_back
+* reformat
+* apply reformat
+* fix getNextLaneletIds function
+* Merge remote-tracking branch 'origin/master' into feature/real-time-factor-control
+* update traffic light manager class
+* add getStopLines function
+* add function
+* Merge pull request `#1154 <https://github.com/tier4/scenario_simulator_v2/issues/1154>`_ from tier4/cleanup/add_const_to_hdmap_utils
+  Cleanup/add const to hdmap utils
+* use_sim_time for openscenario_interpreter is parameterized and False by default
+* Merge branch 'tier4:master' into random-test-runner-docs-update
+* Revert "feat: add deleted entity to traffic simulator"
+  This reverts commit ba2abf393757a53e266476fc7f4184cf495837af.
+* Revert "feat: remove DELETED entity type by using internal id"
+  This reverts commit a15268f290e4957fbcfce1e3c52c37de23852a4c.
+* Revert "feat: invalidate status in deleted entity"
+  This reverts commit b35981583909f9ddfe9587a6ea92239a7324418e.
+* remove & from function arguments with lanelet::Id type
+* Corrected time storage in Simulation Clock. Other minor changes
+* add const to all functions in hdmap utils class
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* RViz plugin controlling real time factor value
+* UpdateStepTime request for updating simple sensor simulation step_time
+* Possibility of changing SimulationClock::realtime_factor during the simulation with ROS 2 topic
+* realtime factor fix
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Maxime CLEMENT, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, pawellech1, yamacir-kit
+
 0.9.0 (2023-12-21)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into prepare/release-0.9.0
