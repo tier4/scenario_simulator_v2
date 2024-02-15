@@ -29,7 +29,12 @@ jobs:
     steps:
       - name: Install docker for mac runner
         if: ${{ matrix.runs_on == 'macos-14'}}
-        run: brew install wget && wget https://download.docker.com/mac/static/stable/aarch64/docker-25.0.3.tgz && tar -xvzf docker-25.0.3.tgz && cp docker/docker /usr/local/bin/
+        run: |
+          brew install wget
+          wget https://download.docker.com/mac/static/stable/aarch64/docker-25.0.3.tgz
+          tar -xvzf docker-25.0.3.tgz
+          cp docker/docker /usr/local/bin/
+          wget https://github.com/docker/buildx/releases/download/v0.12.1/buildx-v0.12.1.darwin-arm64 -O $HOME/.docker/cli-plugins/docker-buildx
 
       - uses: actions/checkout@v3
 
@@ -40,7 +45,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push (amd64)
         uses: docker/bake-action@v3
         if: ${{ matrix.runs_on == 'ubuntu-22.04' }}
         with:
@@ -54,7 +59,7 @@ jobs:
           set: |
             *.platform=linux/amd64
 
-      - name: Build and push
+      - name: Build and push (arm64)
         uses: docker/bake-action@v3
         if: ${{ matrix.runs_on == 'macos-14'}}
         with:
