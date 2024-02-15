@@ -32,7 +32,7 @@ jobs:
         run: brew install colima && colima start && docker ps -a
 
       - name: Setup docker buildx
-        uses: docker/setup-buildx-action@v2
+        uses: uses: crazy-max/ghaction-setup-docker@v3
 
       - uses: actions/checkout@v3
 
