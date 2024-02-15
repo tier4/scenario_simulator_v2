@@ -34,7 +34,13 @@ jobs:
           wget https://download.docker.com/mac/static/stable/aarch64/docker-25.0.3.tgz
           tar -xvzf docker-25.0.3.tgz
           cp docker/docker /usr/local/bin/
-          dockerd
+          mkdir -p $HOME/.docker/cli-plugins
+          wget https://github.com/docker/buildx/releases/download/v0.12.1/buildx-v0.12.1.darwin-arm64 -O $HOME/.docker/cli-plugins/docker-buildx
+          chmod a+x $HOME/.docker/cli-plugins/docker-buildx
+
+      - name: Install docker for ubuntu runner
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }}
+        uses: docker/setup-buildx-action@v3
 
       - uses: actions/checkout@v3
 
@@ -45,10 +51,30 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build (amd64)
-        if: ${{ matrix.runs_on == 'ubuntu-22.04'}}
-        run: docker build -t ghcr.io/tier4/scenario_simulator_v2:${{ matrix.rosdistro }}_amd64 . --build-arg ROS_DISTRO=${{ matrix.rosdistro }}
+      - name: Build and push (amd64)
+        uses: docker/bake-action@v3
+        if: ${{ matrix.runs_on == 'ubuntu-22.04' }}
+        with:
+          files: |
+            ./docker-bake.hcl
+          workdir: .
+          no-cache: true
+          push: ${{ github.event_name != 'pull_request' }}
+          targets: |
+            ${{ matrix.rosdistro }}
+          set: |
+            *.platform=linux/amd64
 
-      - name: Build (arm64)
+      - name: Build and push (arm64)
+        uses: docker/bake-action@v3
         if: ${{ matrix.runs_on == 'macos-14'}}
-        run: docker build -t ghcr.io/tier4/scenario_simulator_v2:${{ matrix.rosdistro }}_arm64 . --build-arg ROS_DISTRO=${{ matrix.rosdistro }}
+        with:
+          files: |
+            ./docker-bake.hcl
+          workdir: .
+          no-cache: true
+          push: ${{ github.event_name != 'pull_request' }}
+          targets: |
+            ${{ matrix.rosdistro }}
+          set: |
+            *.platform=linux/arm64/v8
