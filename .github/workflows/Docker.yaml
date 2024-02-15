@@ -34,6 +34,7 @@ jobs:
           wget https://download.docker.com/mac/static/stable/aarch64/docker-25.0.3.tgz
           tar -xvzf docker-25.0.3.tgz
           cp docker/docker /usr/local/bin/
+          mkdir -p $HOME/.docker/cli-plugins
           wget https://github.com/docker/buildx/releases/download/v0.12.1/buildx-v0.12.1.darwin-arm64 -O $HOME/.docker/cli-plugins/docker-buildx
 
       - uses: actions/checkout@v3
