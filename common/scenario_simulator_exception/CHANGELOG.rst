@@ -2,6 +2,9 @@
 Changelog for package scenario_simulator_exception
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.1 (2024-02-15)
+------------------
+
 1.0.0 (2024-02-14)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
