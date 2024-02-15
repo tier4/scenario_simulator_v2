@@ -27,6 +27,7 @@ jobs:
         rosdistro: [humble]
         runs_on: [ubuntu-22.04, macos-14] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
     steps:
+      - uses: mxschmitt/action-tmate@v3
       - name: Install docker for mac runner
         if: ${{ matrix.runs_on == 'macos-14'}}
         run: brew install wget && wget https://download.docker.com/mac/static/stable/aarch64/docker-25.0.3.tgz && tar -xvzf docker-25.0.3.tgz && cp docker/docker /user/local/bin/
