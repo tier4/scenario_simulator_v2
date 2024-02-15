@@ -1,4 +1,4 @@
-name: SimModelUpdateNotification
+name: Simulation Model Update Notification
 on:
   pull_request:
     paths:

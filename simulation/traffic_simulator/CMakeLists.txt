@@ -29,6 +29,7 @@ ament_auto_find_build_dependencies()
 ament_auto_add_library(traffic_simulator SHARED
   src/api/api.cpp
   src/behavior/follow_trajectory.cpp
+  src/behavior/follow_waypoint_controller.cpp
   src/behavior/longitudinal_speed_planning.cpp
   src/behavior/route_planner.cpp
   src/color_utils/color_utils.cpp
@@ -37,7 +38,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/data_type/lane_change.cpp
   src/data_type/lanelet_pose.cpp
   src/data_type/speed_change.cpp
-  src/entity/deleted_entity.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
   src/entity/entity_manager.cpp

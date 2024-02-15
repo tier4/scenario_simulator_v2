@@ -44,6 +44,8 @@ public:
 
   auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
 
+  auto getTrafficLightIds() const -> const lanelet::Ids;
+
   auto getTrafficLights() const -> const TrafficLightMap &;
 
   auto getTrafficLights() -> TrafficLightMap &;
