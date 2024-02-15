@@ -857,7 +857,8 @@ auto EntityBase::getIfArrivedToTargetLaneletPose(
   return false;
 }
 
-/** WARNING***************
+/**
+ * WARNING*****WIP*********
  * This should not be called from ego entity
  */
 auto EntityBase::requestSynchronize(
@@ -869,9 +870,17 @@ auto EntityBase::requestSynchronize(
   }
 
   job_list_.append(
-    [this, ego_target, entity_target](double) -> bool {
-      // WARNING****************
-      // not checking job_duration_ at all
+    [this, ego_target, entity_target](double) {
+      /**
+       * @brief This is a simple example of synchronization.
+       * It is not a good way to synchronize the entity with the ego.
+       * It is just a simple example.
+       * WARNING****************
+          not checking job_duration_ at all
+       */
+
+      RCLCPP_ERROR(
+        rclcpp::get_logger("traffic_simulator"), "fuck off");
       const auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
       const auto ego_distance = this->hdmap_utils_ptr_->getLongitudinalDistance(
         static_cast<LaneletPose>(other_status_.find("ego")->second.getLaneletPose()),
@@ -885,11 +894,9 @@ auto EntityBase::requestSynchronize(
         THROW_SEMANTIC_ERROR(
           "Failed to get ego's distance to target lanelet pose. Please check ego distance exists.");
       }
-
       const auto ego_velocity = other_status_.find("ego")->second.getTwist().linear.x;
       // be better to use acceleration,jerk to estimate the arrival time
 
-      RCLCPP_ERROR(rclcpp::get_logger("simulation"), "#####################");
       // estimate ego's arrival time to the target point
       // can estimate it more precisely by using accel,jerk
       const auto ego_arrival_time = (ego_velocity != 0) ? ego_distance.value() / ego_velocity : 0;
@@ -899,10 +906,11 @@ auto EntityBase::requestSynchronize(
       const auto entity_velocity_to_synchronize = entity_distance.value() / ego_arrival_time;
 
       this->requestSpeedChange(entity_velocity_to_synchronize, true);
+      RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "fuck off");
       return true;
     },
     // after this im not sure it is correct, just an draft
-    [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
+    [](){}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
   return false;
 }
 

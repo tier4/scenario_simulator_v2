@@ -756,6 +756,8 @@ auto EntityManager::updateNpcLogic(
     std::cout << "update " << name << " behavior" << std::endl;
   }
   entities_[name]->setEntityTypeList(type_list);
+  RCLCPP_ERROR_STREAM(
+    rclcpp::get_logger("EntityManager"), "updateNpcLogic: " << name << " " << current_time_);
   entities_[name]->onUpdate(current_time_, step_time_);
   return entities_[name]->getStatus();
 }
@@ -781,9 +783,11 @@ void EntityManager::update(const double current_time, const double step_time)
     entity->setOtherStatus(all_status);
   }
   all_status.clear();
+
   for (auto && [name, entity] : entities_) {
     all_status.emplace(name, updateNpcLogic(name, type_list));
   }
+
   for (auto && [name, entity] : entities_) {
     entity->setOtherStatus(all_status);
   }

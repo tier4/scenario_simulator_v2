@@ -33,10 +33,17 @@ void JobList::append(
 
 void JobList::update(const double step_time, const job::Event event)
 {
+  // show all jobs in the listｚ
   for (auto & job : list_) {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("JobList"), "job type: " << (int)job.type);
+  }
+
+  for (auto & job : list_) {
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("JobList"), "executing job type: " << (int)job.type);
     if (job.event == event) {
       job.onUpdate(step_time);
     }
+    RCLCPP_ERROR_STREAM(rclcpp::get_logger("JobList"), "job update done");
   }
 }
 }  // namespace job

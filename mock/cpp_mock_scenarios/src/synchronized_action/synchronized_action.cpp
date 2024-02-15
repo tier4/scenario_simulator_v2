@@ -66,6 +66,7 @@ private:
     if (api_.checkCollision("ego", "npc")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
+
   }
   void onInitialize() override
   {
