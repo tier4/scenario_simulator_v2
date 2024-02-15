@@ -39,6 +39,13 @@ LineSegment::LineSegment(
 : start_point(start_point), end_point([&]() -> geometry_msgs::msg::Point {
     geometry_msgs::msg::Point ret;
     double vec_size = std::hypot(vec.x, vec.y);
+    if (vec_size == 0.0) {
+      THROW_SIMULATION_ERROR(
+        "Invalid vector is specified, while constructing LineSegment. ",
+        "The vector should have a non zero length to initialize the line segment correctly. ",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    }
     ret.x = start_point.x + vec.x / vec_size * length;
     ret.y = start_point.y + vec.y / vec_size * length;
     ret.z = start_point.z + vec.z / vec_size * length;

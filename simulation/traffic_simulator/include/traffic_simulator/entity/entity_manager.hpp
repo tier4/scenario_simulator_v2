@@ -32,7 +32,6 @@
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
-#include <traffic_simulator/entity/deleted_entity.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
@@ -117,6 +116,7 @@ class EntityManager
 
   const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
   const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
+  const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_legacy_topic_publisher_ptr_;
   const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_publisher_ptr_;
   ConfigurableRateUpdater v2i_traffic_light_updater_, conventional_traffic_light_updater_;
 
@@ -180,13 +180,17 @@ public:
     v2i_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
     v2i_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
-    v2i_traffic_light_publisher_ptr_(
+    v2i_traffic_light_legacy_topic_publisher_ptr_(
       makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_)),
+    v2i_traffic_light_publisher_ptr_(makeV2ITrafficLightPublisher(
+      "/perception/traffic_light_recognition/external/traffic_signals", node, hdmap_utils_ptr_)),
     v2i_traffic_light_updater_(
       node,
       [this]() {
         v2i_traffic_light_marker_publisher_ptr_->publish();
         v2i_traffic_light_publisher_ptr_->publish(
+          clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
+        v2i_traffic_light_legacy_topic_publisher_ptr_->publish(
           clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
       }),
     conventional_traffic_light_updater_(
@@ -254,6 +258,7 @@ public:
   static_assert(true, "")
   // clang-format on
 
+  FORWARD_TO_HDMAP_UTILS(getLaneletLength);
   FORWARD_TO_HDMAP_UTILS(toLaneletPose);
   // FORWARD_TO_HDMAP_UTILS(toMapPose);
 
@@ -277,7 +282,7 @@ public:
   // clang-format on
 
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-  FORWARD_TO_ENTITY(cancelRequest, );
+  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
@@ -292,27 +297,30 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
-  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getMapPoseFromRelativePose, const);
-  FORWARD_TO_ENTITY(getRouteLanelets, );
+  FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
   FORWARD_TO_ENTITY(laneMatchingSucceed, const);
+  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
+  FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
-  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
+  FORWARD_TO_ENTITY(setAcceleration, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
   FORWARD_TO_ENTITY(setBehaviorParameter, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationRateLimit, );
   FORWARD_TO_ENTITY(setLinearVelocity, );
+  FORWARD_TO_ENTITY(setMapPose, );
+  FORWARD_TO_ENTITY(setTwist, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_ENTITY
@@ -467,9 +475,6 @@ public:
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
-
-  auto setEntityStatusExternally(const std::string & name, const CanonicalizedEntityStatus &)
-    -> void;
 
   void setVerbose(const bool verbose);
 

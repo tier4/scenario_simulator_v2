@@ -122,6 +122,8 @@ public:
 
   auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 
+  const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
+
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;
 
