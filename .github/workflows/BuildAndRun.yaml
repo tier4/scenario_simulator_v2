@@ -1,4 +1,4 @@
-name: BuildAndRun
+name: Build and run
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ on:
       - master
 jobs:
   job1:
-    name: BuildAndRun
+    name: Build and run
     runs-on: ubuntu-22.04
     timeout-minutes: 180
     container: ros:${{ matrix.rosdistro }}
@@ -30,7 +30,7 @@ jobs:
       matrix:
         rosdistro: [humble]
     steps:
-      - name: suppress warnings
+      - name: Suppress warnings
         run: |
           git config --global --add safe.directory '*'
 
@@ -39,10 +39,12 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - run: git clone https://github.com/RobotecAI/scenario_simulator_v2_scenarios.git
+
       - name: Search packages in this repository
         id: list_packages
         run: |
-          echo package_list=$(colcon list --names-only | sed -e ':loop; N; $!b loop; s/\n/ /g') >> $GITHUB_OUTPUT
+          echo package_list=$(colcon list --names-only | tr '\n' ' ') >> $GITHUB_OUTPUT
 
       - name: Show target packages
         run: |
@@ -62,7 +64,7 @@ jobs:
       - name: Resolve rosdep
         run: |
           cd ~/ros2_ws
-          apt-get update
+          apt update
           apt install -y python3-pip
           rosdep update --include-eol-distros
           rosdep install -iy --from-paths src --rosdistro ${{ matrix.rosdistro }}
@@ -95,8 +97,15 @@ jobs:
       - name: Scenario test
         run: |
           source ~/ros2_ws/install/setup.bash
-          cd ~/ros2_ws
-          source install/local_setup.bash
+          source ~/ros2_ws/install/local_setup.bash
           ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml' global_frame_rate:=20
+          ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
+        shell: bash
+
+      - name: Basic test
+        run: |
+          source ~/ros2_ws/install/setup.bash
+          source ~/ros2_ws/install/local_setup.bash
+          ros2 launch scenario_test_runner scenario_test_runner.launch.py workflow:='$(find-pkg-share scenario_simulator_v2_scenarios)/workflow/basic.yaml'
           ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
         shell: bash

@@ -2,6 +2,76 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2024-02-14)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/new_release_flow
+* Merge branch 'master' into fix/autoware-shutdown
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/consider_tread_in_ego_entity
+* Merge pull request `#1150 <https://github.com/tier4/scenario_simulator_v2/issues/1150>`_ from tier4/feature/real-time-factor-control
+  Feature/real time factor control
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into feature/real-time-factor-control
+* Merge branch 'tier4:master' into random-test-runner-docs-update
+* fix format
+* add const to all functions in hdmap utils class
+* UpdateStepTime request for updating simple sensor simulation step_time
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Paweł Lech, Tatsuya Yamasaki, pawellech1, yamacir-kit
+
+0.9.0 (2023-12-21)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge branch 'master' into feature/freespace-distance-condition
+* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/drop_galactic_support
+* Merge pull request `#1027 <https://github.com/tier4/scenario_simulator_v2/issues/1027>`_ from tier4/feature/new_traffic_light
+* Merge branch 'master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* refactor(simulation_interface)
+* refactor(simulation_interface)
+* Update simulation/simulation_interface/include/simulation_interface/conversions.hpp
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* chore: apply formatter
+* refactor: TrafficLightDetectorEmulator => PseudoTrafficLightDetector
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* refactor: apply formatter
+* fix: build errors
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* refactor: delete unused code / dependencies
+* refactor(simulation_interface): delete unused conversion
+* refactor(traffic_simulator): refactor data flow with simulation_api_schema::TrafficSignal
+* refactor(simulation_interface/zmq_client): remove duplicated traffic light detector emulator call
+* feat(simulator_interface): add support for autoware_msgs
+* feat(simulator_interface): add AttachTrafficLightDetectorEmulatorRequest to ZMQ client/server
+* chore(traffic_simulator): reformat
+* feat(simlation_interface): add call function for AttachTrafficLightDetectorEmulatorRequest
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* feat(simulation_interface): attachTrafficLightDetectorEmulatorRequest/Response
+* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
+* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
+* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Piotr Zyskowski, yamacir-kit
+
 0.8.0 (2023-09-05)
 ------------------
 * Merge pull request `#1058 <https://github.com/tier4/scenario_simulator_v2/issues/1058>`_ from tier4/ref/RJD-553_restore_repeated_update_entity_status

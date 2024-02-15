@@ -86,13 +86,7 @@ visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 
 bool EntityManager::despawnEntity(const std::string & name)
 {
-  if (!entityExists(name)) {
-    return false;
-  }
-
-  entities_[name].reset(new DeletedEntity(name, getEntityStatus(name), hdmap_utils_ptr_));
-
-  return true;
+  return entityExists(name) && entities_.erase(name);
 }
 
 bool EntityManager::entityExists(const std::string & name)
@@ -141,11 +135,7 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};
   for (const auto & each : entities_) {
-    // Add filter for DeletedEntity because this list is used on SimpleSensorSimulator which do not
-    // know DeletedEntity.
-    if (each.second->getEntityType().type != DeletedEntity::ENTITY_TYPE_ID) {
-      names.push_back(each.first);
-    }
+    names.push_back(each.first);
   }
   return names;
 }
@@ -718,18 +708,6 @@ auto EntityManager::setEntityStatus(
       " after starting scenario.");
   } else {
     entities_.at(name)->setStatus(status);
-  }
-}
-
-auto EntityManager::setEntityStatusExternally(
-  const std::string & name, const CanonicalizedEntityStatus & status) -> void
-{
-  if (not isEgo(name)) {
-    THROW_SEMANTIC_ERROR(
-      "You cannot set entity status externally to the vehicle other than ego named ",
-      std::quoted(name), ".");
-  } else {
-    dynamic_cast<EgoEntity *>(entities_[name].get())->setStatusExternally(status);
   }
 }
 

@@ -14,6 +14,7 @@
 
 #include <geometry/spline/catmull_rom_subspline.hpp>
 #include <optional>
+#include <scenario_simulator_exception/exception.hpp>
 #include <vector>
 
 namespace math
@@ -25,17 +26,40 @@ double CatmullRomSubspline::getLength() const { return end_s_ - start_s_; }
 std::optional<double> CatmullRomSubspline::getCollisionPointIn2D(
   const std::vector<geometry_msgs::msg::Point> & polygon, const bool search_backward) const
 {
-  auto s = spline_->getCollisionPointIn2D(polygon, search_backward);
+  /// @note Make sure end is greater than start, otherwise the spline is invalid
+  if (end_s_ < start_s_) {
+    THROW_SIMULATION_ERROR(
+      "The start of the subspline is greater than the end. "
+      "The start of the subspline should always be less than the end. ",
+      "Subspline start: ", start_s_, " Subspline end: ", end_s_, " ",
+      "Something completely unexpected happened. ",
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
+  }
 
-  if (!s) {
+  std::set<double> s_value_candidates = spline_->getCollisionPointsIn2D(polygon);
+
+  if (s_value_candidates.empty()) {
     return std::nullopt;
   }
 
-  if (s.value() < start_s_ || end_s_ < s.value()) {
+  /// @note Iterators for the range of this subspline
+  auto begin = s_value_candidates.lower_bound(start_s_);
+  auto end = s_value_candidates.upper_bound(end_s_);
+
+  /**
+   * @note If begin == end there is no collision in the given range, or it is past the range
+   * If begin == s_value_candidates.end() all elements are less than start_s_
+   * end == s_value_candidates.end() is valid, all elements are less than end_s_
+   */
+  if (begin == end || begin == s_value_candidates.end()) {
     return std::nullopt;
   }
 
-  return s.value() - start_s_;
+  if (search_backward) {
+    return *(--end) - start_s_;  // end is past the last element, so we need the one before
+  }
+  return *begin - start_s_;
 }
 }  // namespace geometry
 }  // namespace math
