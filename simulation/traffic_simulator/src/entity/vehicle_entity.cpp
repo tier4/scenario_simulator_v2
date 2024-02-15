@@ -31,6 +31,7 @@ VehicleEntity::VehicleEntity(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const std::string & plugin_name)
 : EntityBase(name, entity_status, hdmap_utils_ptr),
+  vehicle_parameters(parameters),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
@@ -135,7 +136,6 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(std::make_unique<CanonicalizedEntityStatus>(status_));
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
-
     auto route_lanelets = getRouteLanelets();
     behavior_plugin_ptr_->setRouteLanelets(route_lanelets);
 

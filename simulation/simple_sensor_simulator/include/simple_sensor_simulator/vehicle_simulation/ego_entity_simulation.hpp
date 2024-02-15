@@ -28,6 +28,7 @@ namespace vehicle_simulation
 enum class VehicleModelType {
   DELAY_STEER_ACC,
   DELAY_STEER_ACC_GEARED,
+  DELAY_STEER_MAP_ACC_GEARED,
   DELAY_STEER_VEL,
   IDEAL_STEER_ACC,
   IDEAL_STEER_ACC_GEARED,
@@ -61,6 +62,7 @@ private:
 
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+  const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
 private:
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
@@ -78,7 +80,7 @@ public:
 
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &);
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time);
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 

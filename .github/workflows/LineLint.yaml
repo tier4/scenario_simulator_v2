@@ -1,4 +1,4 @@
-name: LineLint
+name: Line lint
 on: 
   workflow_dispatch:
   push:
