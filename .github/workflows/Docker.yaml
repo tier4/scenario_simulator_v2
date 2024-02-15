@@ -34,7 +34,7 @@ jobs:
           wget https://download.docker.com/mac/static/stable/aarch64/docker-25.0.3.tgz
           tar -xvzf docker-25.0.3.tgz
           cp docker/docker /usr/local/bin/
-          systemctl start docker
+          dockerd
 
       - uses: actions/checkout@v3
 
