@@ -88,7 +88,10 @@ nav:
       - developer_guide/ZeroMQ.md
       - developer_guide/VehicleDynamics.md
       - developer_guide/SimulationResultFormat.md
-      - developer_guide/LanePoseCalculation.md
+      - Lane Pose Calculation:
+          Timing of lane pose calculation: developer_guide/lane_pose_calculation/LanePoseCalculation.md
+          Process of lane pose calculation when spawning entity: developer_guide/lane_pose_calculation/Spawn.md
+          Process of lane pose calculation when updating frame: developer_guide/lane_pose_calculation/UpdateFrame.md
       # cspell: ignore TIERIV
       - developer_guide/TIERIVScenarioFormatVersion2.md
       - developer_guide/CONTRIBUTING.md
