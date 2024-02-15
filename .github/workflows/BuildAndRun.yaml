@@ -19,13 +19,8 @@ on:
       - master
 jobs:
   job1:
-<<<<<<< HEAD
     name: BuildAndRun
     runs-on: ${{ matrix.runs_on }}
-=======
-    name: Build and run
-    runs-on: ubuntu-22.04
->>>>>>> upstream/master
     timeout-minutes: 180
     container: ros:${{ matrix.rosdistro }}
     env:
