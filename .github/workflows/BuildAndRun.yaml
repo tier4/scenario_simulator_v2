@@ -1,4 +1,4 @@
-name: BuildAndRun
+name: Build and run
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ on:
       - master
 jobs:
   job1:
-    name: BuildAndRun
+    name: Build and run
     runs-on: ubuntu-22.04
     timeout-minutes: 180
     container: ros:${{ matrix.rosdistro }}
@@ -30,7 +30,7 @@ jobs:
       matrix:
         rosdistro: [humble]
     steps:
-      - name: suppress warnings
+      - name: Suppress warnings
         run: |
           git config --global --add safe.directory '*'
 

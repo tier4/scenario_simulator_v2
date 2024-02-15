@@ -2,6 +2,18 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2024-02-14)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into feature/real-time-factor-control
+* Merge branch 'tier4:master' into random-test-runner-docs-update
+* Revert "feat: add deleted entity to traffic simulator"
+  This reverts commit ba2abf393757a53e266476fc7f4184cf495837af.
+* Revert "feat: remove DELETED entity type by using internal id"
+  This reverts commit a15268f290e4957fbcfce1e3c52c37de23852a4c.
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Contributors: Kotaro Yoshimoto, Paweł Lech, pawellech1, yamacir-kit
+
 0.9.0 (2023-12-21)
 ------------------
 * feat: remove DELETED entity type by using internal id

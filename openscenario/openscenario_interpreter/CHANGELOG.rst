@@ -2,6 +2,25 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.0 (2024-02-14)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/new_release_flow
+* Merge pull request `#1077 <https://github.com/tier4/scenario_simulator_v2/issues/1077>`_ from tier4/fix/autoware-shutdown
+  Fix/autoware shutdown
+* Fix to avoid redeclaring already declared parameter `initialize_duration`
+* Add new member function `StatusMonitor::overrideThreshold`
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into feature/real-time-factor-control
+* Merge branch 'tier4:master' into random-test-runner-docs-update
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Contributors: Masaya Kataoka, Paweł Lech, Tatsuya Yamasaki, pawellech1, yamacir-kit
+
 0.9.0 (2023-12-21)
 ------------------
 * Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
