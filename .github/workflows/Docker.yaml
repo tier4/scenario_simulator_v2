@@ -46,8 +46,8 @@ jobs:
 
       - name: Build (amd64)
         if: ${{ matrix.runs_on == 'ubuntu-22.04'}}
-        run: docker build -t ghcr.io/tier4/scenario_simulator_v2:${{ matrix.rosdistro }} --platform linux/amd64 . --build-arg ROS_DISTRO=${{ matrix.rosdistro }}
+        run: docker build -t ghcr.io/tier4/scenario_simulator_v2:${{ matrix.rosdistro }}_amd64 . --build-arg ROS_DISTRO=${{ matrix.rosdistro }}
 
       - name: Build (arm64)
         if: ${{ matrix.runs_on == 'macos-14'}}
-        run: docker build -t ghcr.io/tier4/scenario_simulator_v2:${{ matrix.rosdistro }} --platform linux/arm64/v8 . --build-arg ROS_DISTRO=${{ matrix.rosdistro }}
+        run: docker build -t ghcr.io/tier4/scenario_simulator_v2:${{ matrix.rosdistro }}_arm64 . --build-arg ROS_DISTRO=${{ matrix.rosdistro }}
