@@ -2,42 +2,129 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.8.1 (2024-01-24)
+1.0.0 (2024-02-14)
 ------------------
-* Merge pull request `#1 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
-  Feature/new release
-* Merge remote-tracking branch 'test/master' into feature/new_release
-* Merge pull request `#1145 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1145>`_ from tier4/feature/random_scenario
-  Feature/random scenario
-* Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
-  update CHANGELOG
+* Merge pull request `#1184 <https://github.com/tier4/scenario_simulator_v2/issues/1184>`_ from tier4/feature/consider_tread_in_ego_entity
+  Feature/consider tread in ego entity
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/new_release_flow
+* Merge branch 'master' into fix/autoware-shutdown
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/consider_tread_in_ego_entity
+* Merge pull request `#1150 <https://github.com/tier4/scenario_simulator_v2/issues/1150>`_ from tier4/feature/real-time-factor-control
+  Feature/real time factor control
+* Doxygen note
+* modify rviz settings
+* remove externally_updated_status\_
+* add setTwist/setAcceleration function
+* add setMapPose function
+* Merge remote-tracking branch 'tier/master' into feature/real-time-factor-control
+* Merge pull request `#1180 <https://github.com/tier4/scenario_simulator_v2/issues/1180>`_ from tier4/add_dynamic_obstacle_stop_markers
+  Add debug and virtual wall markers for dynamic_obstacle_avoidance
+* fix indent
+* Add debug and virtual wall markers for dynamic_obstacle_avoidance
+* Merge remote-tracking branch 'tier/master' into feature/real-time-factor-control
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge pull request `#1159 <https://github.com/tier4/scenario_simulator_v2/issues/1159>`_ from tier4/revert/1096
+  Revert/1096
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into revert/1096
+* Changes after review
+* Merge pull request `#1168 <https://github.com/tier4/scenario_simulator_v2/issues/1168>`_ from tier4/feature/get_stop_line_ids
+  Feature/get stop line ids
+* clean up code
+* rename from "Reg Elements" to "Regulatory Elements"
+* use push_back
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* use emplace_back
+* use emplace_back
+* use emplace_back
+* reformat
+* apply reformat
+* fix getNextLaneletIds function
+* Merge remote-tracking branch 'origin/master' into feature/real-time-factor-control
+* update traffic light manager class
+* add getStopLines function
+* add function
+* Merge pull request `#1154 <https://github.com/tier4/scenario_simulator_v2/issues/1154>`_ from tier4/cleanup/add_const_to_hdmap_utils
+  Cleanup/add const to hdmap utils
+* use_sim_time for openscenario_interpreter is parameterized and False by default
+* Merge branch 'tier4:master' into random-test-runner-docs-update
+* Revert "feat: add deleted entity to traffic simulator"
+  This reverts commit ba2abf393757a53e266476fc7f4184cf495837af.
+* Revert "feat: remove DELETED entity type by using internal id"
+  This reverts commit a15268f290e4957fbcfce1e3c52c37de23852a4c.
+* Revert "feat: invalidate status in deleted entity"
+  This reverts commit b35981583909f9ddfe9587a6ea92239a7324418e.
+* remove & from function arguments with lanelet::Id type
+* Corrected time storage in Simulation Clock. Other minor changes
+* add const to all functions in hdmap utils class
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* RViz plugin controlling real time factor value
+* UpdateStepTime request for updating simple sensor simulation step_time
+* Possibility of changing SimulationClock::realtime_factor during the simulation with ROS 2 topic
+* realtime factor fix
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Maxime CLEMENT, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, pawellech1, yamacir-kit
+
+0.9.0 (2023-12-21)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into prepare/release-0.9.0
+* Merge pull request `#1129 <https://github.com/tier4/scenario_simulator_v2/issues/1129>`_ from tier4/feature/RJD-716_add_follow_waypoint_controller
+* Merge remote-tracking branch 'tier4/master' into fix/geometry-bug-fixes
+* Merge pull request `#1149 <https://github.com/tier4/scenario_simulator_v2/issues/1149>`_ from tier4/feature/traffic-lights-awsim-support
+* Merge remote-tracking branch 'origin/master' into feature/traffic-lights-awsim-support
+* ref(follow_trajectory): revert change to ensure non-void return
+* Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
+* fix(follow_trajectory): fix target_speed, little refactor
+* ref(follow_trajectory): apply review changes - patch
+* Merge pull request `#1033 <https://github.com/tier4/scenario_simulator_v2/issues/1033>`_ from tier4/feat/condition_groups_visualization
+* clang format
+* two topics publishing v2i traffic lights
+* Merge remote-tracking branch 'origin/master' into feature/traffic-lights-awsim-support
+* Reformatted for better readability.
+* feat(traffic_simulator): add EntityManager::setTrafficLightConfidence
+* update config
+* update rviz config
+* update rviz config
+* Merge pull request `#1145 <https://github.com/tier4/scenario_simulator_v2/issues/1145>`_ from tier4/feature/random_scenario
+* feat(follow_trajectory): add target_speed into consideration
+* fix(follow_trajectory): remove unecessary auto
+* fix(follow_waypoint_controller): fix for value type
+* fix(follow_waypoint_controller): fix lambda return
+* fix(spell_check): fix comment
+* Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
+* feat(follow_waypoint_controller): review changes
 * Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
 * Merge remote-tracking branch 'origin/master' into feature/random_scenario
-* Merge pull request `#1137 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1137>`_ from tier4/fix/RJD-727_fix_orientation_for_inactivity
-  fix(follow_trajectory): fix orientation for zero velocity vector (inactivity)
+* cheanged default v2i traffic lights topic
+* Merge remote-tracking branch 'tier4/master' into fix/geometry-bug-fixes
+* Merge pull request `#1137 <https://github.com/tier4/scenario_simulator_v2/issues/1137>`_ from tier4/fix/RJD-727_fix_orientation_for_inactivity
 * fix(follow_trajectory): fix orientation for norm(v)==0
-* update CHANGELOG
+* Merge branch 'experimental/merge-master' into feature/test-geometry-spline-subspline
+* ref(follow_trajectory): remove unecessary changes
+* fix(follow_trajectory): fix distance precision and add exception details
+* fix(follow_waypoint_controller): fix arrival tolerance
+* fix(follow_waypoint_controller): fix finish tolerance
+* fix(follow_waypoint_controller): add copyright
+* fix(follow_waypoint_controller): fix warnings
+* fix(follow_waypoint_controller): fix warnings
+* feat(follow_trajectory): add follow waypoint controller
 * Merge branch 'master' into fix/duplicated_nodes
-* Merge pull request `#1111 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1111>`_ from tier4/feature/traffic_light_confidence
-  Add `PseudoTrafficSignalDetectorConfidenceSetAction@v1`
+* Merge pull request `#1111 <https://github.com/tier4/scenario_simulator_v2/issues/1111>`_ from tier4/feature/traffic_light_confidence
+* Merge remote-tracking branch 'tier4/master' into experimental/merge-master
 * fix: modify comment in traffic_light.hpp
 * Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
 * fix: build errors
-* Merge pull request `#1113 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
-  Feature/doxygen
+* Merge pull request `#1113 <https://github.com/tier4/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
 * Merge remote-tracking branch 'origin/master' into fix/sign-of-relative-distance
-* Merge pull request `#1096 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1096>`_ from tier4/feature/deleted-entity
-  Support for de-spawning entity
+* Merge pull request `#1096 <https://github.com/tier4/scenario_simulator_v2/issues/1096>`_ from tier4/feature/deleted-entity
 * Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
 * Update simulation/traffic_simulator/include/traffic_simulator/data_type/speed_change.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
 * Update simulation/traffic_simulator/include/traffic_simulator/data_type/speed_change.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
 * Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_base.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
 * add clang-format off
 * refactor: reflect the reviews
 * update doxyfile
@@ -57,23 +144,18 @@ Changelog for package traffic_simulator
 * feat(traffic_simulator): add confidence to Bulb class
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into fix/rtc_command_action/continuous_execution
-* Merge pull request `#1092 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1092>`_ from tier4/feature/control_rtc_auto_mode
-  Feature/control rtc auto mode
+* Merge pull request `#1092 <https://github.com/tier4/scenario_simulator_v2/issues/1092>`_ from tier4/feature/control_rtc_auto_mode
 * Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
 * chore: apply clang_format
 * feat(traffic_simualtor): set use_foa=true to use default auto_mode settings
-* Merge pull request `#1101 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1101>`_ from tier4/fix/standstill_duration
-  add updateStandStillDuration(step_time) and updateTraveledDistance(st…
+* Merge pull request `#1101 <https://github.com/tier4/scenario_simulator_v2/issues/1101>`_ from tier4/fix/standstill_duration
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
 * Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
 * Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge pull request `#1093 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1093>`_ from tier4/feature/RJD-614_follow_trajectory_action_pedestrian_cyclist_support
-  feat(behavior_tree): follow polyline action for pedestrian and bicycle
+* Merge pull request `#1093 <https://github.com/tier4/scenario_simulator_v2/issues/1093>`_ from tier4/feature/RJD-614_follow_trajectory_action_pedestrian_cyclist_support
 * Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
 * Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-  # Conflicts:
-  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
 * add updateStandStillDuration(step_time) and updateTraveledDistance(step_time) when the entity failed to match lanelet
 * remove debug lines
 * Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
@@ -81,8 +163,7 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into AJD-805/baseline_update_rebased
 * enable clean up entity
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge pull request `#1095 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1095>`_ from tier4/feature/freespace-distance-condition
-  Feature/freespace distance condition
+* Merge pull request `#1095 <https://github.com/tier4/scenario_simulator_v2/issues/1095>`_ from tier4/feature/freespace-distance-condition
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge branch 'master' into feature/freespace-distance-condition
 * Implement getBoundingBox* functions
@@ -92,20 +173,17 @@ Changelog for package traffic_simulator
 * implement freespace for relative distance condition
 * Init working version of DistanceCondition freespace
 * Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge pull request `#1090 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1090>`_ from tier4/refactor/lanelet-id
-  Refactor/lanelet ID
+* Merge pull request `#1090 <https://github.com/tier4/scenario_simulator_v2/issues/1090>`_ from tier4/refactor/lanelet-id
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
 * feat(behavior_tree): add FollowPolyline action to pedestrian
 * Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
 * Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge pull request `#1069 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1069>`_ from tier4/feature/traffic_simulator/follow-trajectory-action-3
-  Feature/traffic simulator/follow trajectory action 3
-* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
-* remove debug line
-* fix case
+* Merge pull request `#1069 <https://github.com/tier4/scenario_simulator_v2/issues/1069>`_ from tier4/feature/traffic_simulator/follow-trajectory-action-3
 * Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
 * Merge pull request `#1087 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
   Feature/drop galactic support
+=======
+* Merge pull request `#1087 <https://github.com/tier4/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
 * Rename `gelAllCanonicalizedLaneletPoses` to `get...`
 * Cleanup
@@ -114,8 +192,7 @@ Changelog for package traffic_simulator
 * Replace `LaneletId` with `lanelet::Id`
 * Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
 * Merge remote-tracking branch 'origin/master' into feature/drop_galactic_support
-* Merge pull request `#1027 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1027>`_ from tier4/feature/new_traffic_light
-  Feature/new traffic light
+* Merge pull request `#1027 <https://github.com/tier4/scenario_simulator_v2/issues/1027>`_ from tier4/feature/new_traffic_light
 * chore: apply formatter
 * refactor(HdMapUtils): rename functions related to traffic light
 * refactor(traffic_simulator): change to a comparison method that is resistant to version changes
@@ -126,13 +203,9 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
 * refactor: use better word "thunk" instead of callback
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
 * refactor(traffic_simulator): use LaneletId instead of std::int64_t
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
 * refactor(traffic_simulator)
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
 * refactor(traffic_simulator)
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
 * apply reformat
 * Initial version of freespace distance condition
@@ -142,17 +215,10 @@ Changelog for package traffic_simulator
 * chore: change architecture_type to awf/universe/20230906
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	docs/ReleaseNotes.md
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
 * apply reformat
 * refactor: apply formatter with clang-format v14
 * reintroduced clock publshing
@@ -164,17 +230,6 @@ Changelog for package traffic_simulator
 * refactor: apply formatter
 * refactor: delete debug messages
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/simple_sensor_simulator.hpp
-  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
-  #	simulation/simulation_interface/include/simulation_interface/conversions.hpp
-  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_client.hpp
-  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_server.hpp
-  #	simulation/simulation_interface/proto/simulation_api_schema.proto
-  #	simulation/simulation_interface/src/conversions.cpp
-  #	simulation/simulation_interface/src/zmq_multi_client.cpp
-  #	simulation/simulation_interface/src/zmq_multi_server.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
 * chore: apply formatter
 * fix(TrafficLight): delete relation_id in TrafficLight class and use latest getTrafficLightRelationIDFromWayID
 * fix(HDMapUtils): return all relation ids from getTrafficLightRelationIDFromWayID
@@ -187,8 +242,6 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/api/api.hpp
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
 * Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
 * Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
@@ -219,23 +272,12 @@ Changelog for package traffic_simulator
 * fix(traffic_simulator): fix V2ITrafficLightPublisher
 * feat(simulation_interface): attachTrafficLightDetectorEmulatorRequest/Response
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/CMakeLists.txt
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/conventional_traffic_light_manager.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/traffic_light_manager_base.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp
-  #	simulation/traffic_simulator/src/entity/entity_manager.cpp
-  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_manager_base.cpp
-  #	simulation/traffic_simulator/src/traffic_lights/v2i_traffic_light_publisher.cpp
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
 * chore(traffic_light): apply ament_clang_format
 * refactor(traffic_light): use new architecture_type
 * chore(traffic_light): delay creating publisher
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/CMakeLists.txt
 * chore(traffic_light): override pure virtual function
 * chore(traffic_light): delete empty files
 * chore(traffic_light): adapt to variations of traffic light bulb types
@@ -261,807 +303,7 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, f0reachARR, yamacir-kit
-
-* Merge pull request `#1111 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1111>`_ from tier4/feature/traffic_light_confidence
-  Add `PseudoTrafficSignalDetectorConfidenceSetAction@v1`
-* fix: modify comment in traffic_light.hpp
-* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-* fix: build errors
-* Merge pull request `#1113 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
-  Feature/doxygen
-* Merge remote-tracking branch 'origin/master' into fix/sign-of-relative-distance
-* Merge pull request `#1096 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1096>`_ from tier4/feature/deleted-entity
-  Support for de-spawning entity
-* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Update simulation/traffic_simulator/include/traffic_simulator/data_type/speed_change.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Update simulation/traffic_simulator/include/traffic_simulator/data_type/speed_change.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_base.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* add clang-format off
-* refactor: reflect the reviews
-* update doxyfile
-* add simulation package
-* add comment
-* refactor: renamed 'setTrafficLightConfidence' to 'setConventionalTrafficLightConfidence'
-* update Doxyfile
-* fix(traffic_simulator): update setTrafficLightConfidence function to handle multiple TrafficLights
-* fix(traffic_simulator): fix build errors
-* feat(openscenario_interpreter): add PseudoTrafficSignalDetectorConfidenceSetAction@v1
-* feat(traffic_simulator): add EntityManager::setTrafficLightConfidence
-* feat(traffic_simulator): move confidence field from Bulb class to TrafficLight class
-* feat: invalidate status in deleted entity
-* feat: remove DELETED entity type by using internal id
-* feat: add deleted entity to traffic simulator
-* feat(traffic_simulator): add confidence to Bulb class
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into fix/rtc_command_action/continuous_execution
-* Merge pull request `#1092 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1092>`_ from tier4/feature/control_rtc_auto_mode
-  Feature/control rtc auto mode
-* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
-* chore: apply clang_format
-* feat(traffic_simualtor): set use_foa=true to use default auto_mode settings
-* Merge pull request `#1101 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1101>`_ from tier4/fix/standstill_duration
-  add updateStandStillDuration(step_time) and updateTraveledDistance(st…
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge pull request `#1093 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1093>`_ from tier4/feature/RJD-614_follow_trajectory_action_pedestrian_cyclist_support
-  feat(behavior_tree): follow polyline action for pedestrian and bicycle
-* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-  # Conflicts:
-  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
-* add updateStandStillDuration(step_time) and updateTraveledDistance(step_time) when the entity failed to match lanelet
-* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* Merge branch 'master' into AJD-805/baseline_update_rebased
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge pull request `#1095 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1095>`_ from tier4/feature/freespace-distance-condition
-  Feature/freespace distance condition
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge branch 'master' into feature/freespace-distance-condition
-* Implement getBoundingBox* functions
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* code refactor
-* fix spelling
-* implement freespace for relative distance condition
-* Init working version of DistanceCondition freespace
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge pull request `#1090 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1090>`_ from tier4/refactor/lanelet-id
-  Refactor/lanelet ID
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* feat(behavior_tree): add FollowPolyline action to pedestrian
-* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge pull request `#1069 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1069>`_ from tier4/feature/traffic_simulator/follow-trajectory-action-3
-  Feature/traffic simulator/follow trajectory action 3
-* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
-* remove debug line
-* fix case
-* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
-* Merge pull request `#1087 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
-  Feature/drop galactic support
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Rename `gelAllCanonicalizedLaneletPoses` to `get...`
-* Cleanup
-* Replace `std::vector<lanelet::Id>` with `lanelet::Ids`
-* Replace `std::int64_t` with `lanelet::Id`
-* Replace `LaneletId` with `lanelet::Id`
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/drop_galactic_support
-* Merge pull request `#1027 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1027>`_ from tier4/feature/new_traffic_light
-  Feature/new traffic light
-* chore: apply formatter
-* refactor(HdMapUtils): rename functions related to traffic light
-* refactor(traffic_simulator): change to a comparison method that is resistant to version changes
-* refactor(traffic_simulator): delete unnecessary optimization
-* fix(traffic_simulator): fix build errors
-* chore(traffic_simulator): add LaneletId alias
-* Merge branch 'master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* refactor: use better word "thunk" instead of callback
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* refactor(traffic_simulator): use LaneletId instead of std::int64_t
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* refactor(traffic_simulator)
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* refactor(traffic_simulator)
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* apply reformat
-* Initial version of freespace distance condition
-* remove workbound for galactic
-* chore: apply formatter
-* refactor: TrafficLightDetectorEmulator => PseudoTrafficLightDetector
-* chore: change architecture_type to awf/universe/20230906
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	docs/ReleaseNotes.md
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-* apply reformat
-* refactor: apply formatter with clang-format v14
-* reintroduced clock publshing
-* add getSValue function
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* add white space
-* apply reformat
-* commented clock and parts of concealer
-* refactor: apply formatter
-* refactor: delete debug messages
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/simple_sensor_simulator.hpp
-  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
-  #	simulation/simulation_interface/include/simulation_interface/conversions.hpp
-  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_client.hpp
-  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_server.hpp
-  #	simulation/simulation_interface/proto/simulation_api_schema.proto
-  #	simulation/simulation_interface/src/conversions.cpp
-  #	simulation/simulation_interface/src/zmq_multi_client.cpp
-  #	simulation/simulation_interface/src/zmq_multi_server.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
-* chore: apply formatter
-* fix(TrafficLight): delete relation_id in TrafficLight class and use latest getTrafficLightRelationIDFromWayID
-* fix(HDMapUtils): return all relation ids from getTrafficLightRelationIDFromWayID
-* apply reformat
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Update `makeUpdatedStatus` to take a reference to `PolylineTrajectory` instead of a pointer
-* apply reformat
-* fix(traffic_simulator/ego): switch a parameter for new architecture_type
-* fix compile error
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/api/api.hpp
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-* refactor: delete unused code / dependencies
-* feat: add new architecture_type awf/universe/2023.08
-* chore: apply formatter
-* refactor: delete unused lines/files
-* feat(traffic_simulator): implement conversion from way_id to relation_id
-* refactor(traffic_simulator): fix initialization order of member variables in ConfigurableRateUpdater
-* chore: apply formatter
-* fix(traffic_simulator): fix compile errors
-* refactor(traffic_simulator): refactor data flow with simulation_api_schema::TrafficSignal
-* refactor(traffic_simulator): refactor ConfigurableRateUpdater
-* refactor(traffic_simulator): delete V2ITrafficLightPublisher and use TrafficLightPublisher
-* feat(traffic_simulator): use new ConfigurableRateUpdater in TrafficLightMarkerPublisher
-* feat(traffic_simulator): implement proto exporting from TrafficLightManager
-* feat(traffic_simulator): Add TrafficLightPublisher
-* refactor(traffic_simulator): refactor ConfigurableRateUpdater
-* refactor(traffic_simulator): delete unused files
-* feat(simple_sensor_simulator): add base class for TrafficLightsDetector
-* fix(traffic_simulator): fix build errors
-* chore(traffic_simulator): reformat
-* fix(traffic_simulator): use new message in V2ITrafficLightPublisher
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* fix(traffic_simulator): fix V2ITrafficLightPublisher
-* feat(simulation_interface): attachTrafficLightDetectorEmulatorRequest/Response
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/CMakeLists.txt
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/conventional_traffic_light_manager.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/traffic_light_manager_base.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp
-  #	simulation/traffic_simulator/src/entity/entity_manager.cpp
-  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_manager_base.cpp
-  #	simulation/traffic_simulator/src/traffic_lights/v2i_traffic_light_publisher.cpp
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* chore(traffic_light): apply ament_clang_format
-* refactor(traffic_light): use new architecture_type
-* chore(traffic_light): delay creating publisher
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/CMakeLists.txt
-* chore(traffic_light): override pure virtual function
-* chore(traffic_light): delete empty files
-* chore(traffic_light): adapt to variations of traffic light bulb types
-* fix(entity_manager): fix errors for traffic light tests
-* feat(entity_manager): use new traffic light managers in entity_manager
-* feat(traffic_light): add codes for new message
-* chore(traffic_light): prepare for runtime topic adaptation
-* chore(traffic_light): delete TrafficLightManager type specialization
-* chore(traffic_light): rename timers
-* chore(traffic_light): set relation_id for new message type
-* chore(traffic_light): add template for TrafficLight::Bulb conversion operator
-* chore(traffic_light): fix errors
-* fix(HDMapUtils): getTrafficLightRelationIDFromWayID
-* chore: reformat
-* feat(HDMapUtils): getTrafficLightRelationIDFromWayID
-* chore(traffic_light): add perception messages for traffic light
-* refactor(traffic_light): use TrafficLightBase
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* refactor(traffic_light): use updated function name
-* feat(traffic_light): add TrafficLightBase and parameterize msg type of TrafficLight
-* refactor(HDMapUtil): rename some functions
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, f0reachARR, yamacir-kit
-
-0.8.2 (2024-01-24)
-------------------
-* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into feature/restore_barnch
-* Bump version of scenario_simulator_v2 from version 0.8.0 to version 0.8.1
-* Merge pull request `#1 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
-  Feature/new release
-* Merge remote-tracking branch 'test/master' into feature/new_release
-* Merge pull request `#1145 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1145>`_ from tier4/feature/random_scenario
-  Feature/random scenario
-* Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
-  update CHANGELOG
-* Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
-* Merge remote-tracking branch 'origin/master' into feature/random_scenario
-* Merge pull request `#1137 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1137>`_ from tier4/fix/RJD-727_fix_orientation_for_inactivity
-  fix(follow_trajectory): fix orientation for zero velocity vector (inactivity)
-* fix(follow_trajectory): fix orientation for norm(v)==0
-* update CHANGELOG
-* Merge branch 'master' into fix/duplicated_nodes
-* Merge pull request `#1111 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1111>`_ from tier4/feature/traffic_light_confidence
-  Add `PseudoTrafficSignalDetectorConfidenceSetAction@v1`
-* fix: modify comment in traffic_light.hpp
-* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-* fix: build errors
-* Merge pull request `#1113 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
-  Feature/doxygen
-* Merge remote-tracking branch 'origin/master' into fix/sign-of-relative-distance
-* Merge pull request `#1096 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1096>`_ from tier4/feature/deleted-entity
-  Support for de-spawning entity
-* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Update simulation/traffic_simulator/include/traffic_simulator/data_type/speed_change.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Update simulation/traffic_simulator/include/traffic_simulator/data_type/speed_change.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_base.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* add clang-format off
-* refactor: reflect the reviews
-* update doxyfile
-* add simulation package
-* add comment
-* add spawn outside vehicle
-* refactor: renamed 'setTrafficLightConfidence' to 'setConventionalTrafficLightConfidence'
-* update Doxyfile
-* fix(traffic_simulator): update setTrafficLightConfidence function to handle multiple TrafficLights
-* fix(traffic_simulator): fix build errors
-* feat(openscenario_interpreter): add PseudoTrafficSignalDetectorConfidenceSetAction@v1
-* feat(traffic_simulator): add EntityManager::setTrafficLightConfidence
-* feat(traffic_simulator): move confidence field from Bulb class to TrafficLight class
-* feat: invalidate status in deleted entity
-* feat: remove DELETED entity type by using internal id
-* feat: add deleted entity to traffic simulator
-* feat(traffic_simulator): add confidence to Bulb class
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into fix/rtc_command_action/continuous_execution
-* Merge pull request `#1092 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1092>`_ from tier4/feature/control_rtc_auto_mode
-  Feature/control rtc auto mode
-* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
-* chore: apply clang_format
-* feat(traffic_simualtor): set use_foa=true to use default auto_mode settings
-* Merge pull request `#1101 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1101>`_ from tier4/fix/standstill_duration
-  add updateStandStillDuration(step_time) and updateTraveledDistance(st…
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge pull request `#1093 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1093>`_ from tier4/feature/RJD-614_follow_trajectory_action_pedestrian_cyclist_support
-  feat(behavior_tree): follow polyline action for pedestrian and bicycle
-* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-  # Conflicts:
-  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
-* add updateStandStillDuration(step_time) and updateTraveledDistance(step_time) when the entity failed to match lanelet
-* remove debug lines
-* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* Merge branch 'master' into AJD-805/baseline_update_rebased
-* enable clean up entity
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge pull request `#1095 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1095>`_ from tier4/feature/freespace-distance-condition
-  Feature/freespace distance condition
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge branch 'master' into feature/freespace-distance-condition
-* Implement getBoundingBox* functions
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* code refactor
-* fix spelling
-* implement freespace for relative distance condition
-* Init working version of DistanceCondition freespace
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge pull request `#1090 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1090>`_ from tier4/refactor/lanelet-id
-  Refactor/lanelet ID
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* feat(behavior_tree): add FollowPolyline action to pedestrian
-* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge pull request `#1069 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1069>`_ from tier4/feature/traffic_simulator/follow-trajectory-action-3
-  Feature/traffic simulator/follow trajectory action 3
-* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
-* remove debug line
-* fix case
-* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
-* Merge pull request `#1087 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
-  Feature/drop galactic support
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Rename `gelAllCanonicalizedLaneletPoses` to `get...`
-* Cleanup
-* Replace `std::vector<lanelet::Id>` with `lanelet::Ids`
-* Replace `std::int64_t` with `lanelet::Id`
-* Replace `LaneletId` with `lanelet::Id`
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/drop_galactic_support
-* Merge pull request `#1027 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1027>`_ from tier4/feature/new_traffic_light
-  Feature/new traffic light
-* chore: apply formatter
-* refactor(HdMapUtils): rename functions related to traffic light
-* refactor(traffic_simulator): change to a comparison method that is resistant to version changes
-* refactor(traffic_simulator): delete unnecessary optimization
-* fix(traffic_simulator): fix build errors
-* chore(traffic_simulator): add LaneletId alias
-* Merge branch 'master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* refactor: use better word "thunk" instead of callback
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* refactor(traffic_simulator): use LaneletId instead of std::int64_t
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* refactor(traffic_simulator)
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* refactor(traffic_simulator)
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* apply reformat
-* Initial version of freespace distance condition
-* remove workbound for galactic
-* chore: apply formatter
-* refactor: TrafficLightDetectorEmulator => PseudoTrafficLightDetector
-* chore: change architecture_type to awf/universe/20230906
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	docs/ReleaseNotes.md
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-* apply reformat
-* refactor: apply formatter with clang-format v14
-* reintroduced clock publshing
-* add getSValue function
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* add white space
-* apply reformat
-* commented clock and parts of concealer
-* refactor: apply formatter
-* refactor: delete debug messages
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/simple_sensor_simulator.hpp
-  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
-  #	simulation/simulation_interface/include/simulation_interface/conversions.hpp
-  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_client.hpp
-  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_server.hpp
-  #	simulation/simulation_interface/proto/simulation_api_schema.proto
-  #	simulation/simulation_interface/src/conversions.cpp
-  #	simulation/simulation_interface/src/zmq_multi_client.cpp
-  #	simulation/simulation_interface/src/zmq_multi_server.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
-* chore: apply formatter
-* fix(TrafficLight): delete relation_id in TrafficLight class and use latest getTrafficLightRelationIDFromWayID
-* fix(HDMapUtils): return all relation ids from getTrafficLightRelationIDFromWayID
-* apply reformat
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Update `makeUpdatedStatus` to take a reference to `PolylineTrajectory` instead of a pointer
-* apply reformat
-* fix(traffic_simulator/ego): switch a parameter for new architecture_type
-* fix compile error
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/api/api.hpp
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-* refactor: delete unused code / dependencies
-* feat: add new architecture_type awf/universe/2023.08
-* chore: apply formatter
-* refactor: delete unused lines/files
-* feat(traffic_simulator): implement conversion from way_id to relation_id
-* refactor(traffic_simulator): fix initialization order of member variables in ConfigurableRateUpdater
-* chore: apply formatter
-* fix(traffic_simulator): fix compile errors
-* refactor(traffic_simulator): refactor data flow with simulation_api_schema::TrafficSignal
-* refactor(traffic_simulator): refactor ConfigurableRateUpdater
-* refactor(traffic_simulator): delete V2ITrafficLightPublisher and use TrafficLightPublisher
-* feat(traffic_simulator): use new ConfigurableRateUpdater in TrafficLightMarkerPublisher
-* feat(traffic_simulator): implement proto exporting from TrafficLightManager
-* feat(traffic_simulator): Add TrafficLightPublisher
-* refactor(traffic_simulator): refactor ConfigurableRateUpdater
-* refactor(traffic_simulator): delete unused files
-* feat(simple_sensor_simulator): add base class for TrafficLightsDetector
-* fix(traffic_simulator): fix build errors
-* chore(traffic_simulator): reformat
-* fix(traffic_simulator): use new message in V2ITrafficLightPublisher
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* fix(traffic_simulator): fix V2ITrafficLightPublisher
-* feat(simulation_interface): attachTrafficLightDetectorEmulatorRequest/Response
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/CMakeLists.txt
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/conventional_traffic_light_manager.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/traffic_light_manager_base.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp
-  #	simulation/traffic_simulator/src/entity/entity_manager.cpp
-  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_manager_base.cpp
-  #	simulation/traffic_simulator/src/traffic_lights/v2i_traffic_light_publisher.cpp
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* chore(traffic_light): apply ament_clang_format
-* refactor(traffic_light): use new architecture_type
-* chore(traffic_light): delay creating publisher
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/CMakeLists.txt
-* chore(traffic_light): override pure virtual function
-* chore(traffic_light): delete empty files
-* chore(traffic_light): adapt to variations of traffic light bulb types
-* fix(entity_manager): fix errors for traffic light tests
-* feat(entity_manager): use new traffic light managers in entity_manager
-* feat(traffic_light): add codes for new message
-* chore(traffic_light): prepare for runtime topic adaptation
-* chore(traffic_light): delete TrafficLightManager type specialization
-* chore(traffic_light): rename timers
-* chore(traffic_light): set relation_id for new message type
-* chore(traffic_light): add template for TrafficLight::Bulb conversion operator
-* chore(traffic_light): fix errors
-* fix(HDMapUtils): getTrafficLightRelationIDFromWayID
-* chore: reformat
-* feat(HDMapUtils): getTrafficLightRelationIDFromWayID
-* chore(traffic_light): add perception messages for traffic light
-* refactor(traffic_light): use TrafficLightBase
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* refactor(traffic_light): use updated function name
-* feat(traffic_light): add TrafficLightBase and parameterize msg type of TrafficLight
-* refactor(HDMapUtil): rename some functions
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, f0reachARR, yamacir-kit
-
-0.8.12 (2024-01-25)
--------------------
-
-0.8.11 (2024-01-25)
--------------------
-
-0.8.10 (2024-01-25)
--------------------
-
-0.8.9 (2024-01-25)
-------------------
-
-0.8.8 (2024-01-24)
-------------------
-
-0.8.7 (2024-01-24)
-------------------
-* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into fix/release_text
-* Contributors: Masaya Kataoka
-
-0.8.6 (2024-01-24)
-------------------
-* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into fix/release_text
-* Contributors: Masaya Kataoka
-
-0.8.5 (2024-01-24)
-------------------
-
-0.8.4 (2024-01-24)
-------------------
-
-0.8.3 (2024-01-24)
-------------------
-* Bump version of scenario_simulator_v2 from version 0.8.1 to version 0.8.2
-* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into feature/restore_barnch
-* Bump version of scenario_simulator_v2 from version 0.8.0 to version 0.8.1
-* Merge pull request `#1 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
-  Feature/new release
-* Merge remote-tracking branch 'test/master' into feature/new_release
-* Merge pull request `#1145 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1145>`_ from tier4/feature/random_scenario
-  Feature/random scenario
-* Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
-  update CHANGELOG
-* Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
-* Merge remote-tracking branch 'origin/master' into feature/random_scenario
-* Merge pull request `#1137 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1137>`_ from tier4/fix/RJD-727_fix_orientation_for_inactivity
-  fix(follow_trajectory): fix orientation for zero velocity vector (inactivity)
-* fix(follow_trajectory): fix orientation for norm(v)==0
-* update CHANGELOG
-* Merge branch 'master' into fix/duplicated_nodes
-* Merge pull request `#1111 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1111>`_ from tier4/feature/traffic_light_confidence
-  Add `PseudoTrafficSignalDetectorConfidenceSetAction@v1`
-* fix: modify comment in traffic_light.hpp
-* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-* fix: build errors
-* Merge pull request `#1113 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
-  Feature/doxygen
-* Merge remote-tracking branch 'origin/master' into fix/sign-of-relative-distance
-* Merge pull request `#1096 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1096>`_ from tier4/feature/deleted-entity
-  Support for de-spawning entity
-* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Update simulation/traffic_simulator/include/traffic_simulator/data_type/speed_change.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Update simulation/traffic_simulator/include/traffic_simulator/data_type/speed_change.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_base.hpp
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* add clang-format off
-* refactor: reflect the reviews
-* update doxyfile
-* add simulation package
-* add comment
-* add spawn outside vehicle
-* refactor: renamed 'setTrafficLightConfidence' to 'setConventionalTrafficLightConfidence'
-* update Doxyfile
-* fix(traffic_simulator): update setTrafficLightConfidence function to handle multiple TrafficLights
-* fix(traffic_simulator): fix build errors
-* feat(openscenario_interpreter): add PseudoTrafficSignalDetectorConfidenceSetAction@v1
-* feat(traffic_simulator): add EntityManager::setTrafficLightConfidence
-* feat(traffic_simulator): move confidence field from Bulb class to TrafficLight class
-* feat: invalidate status in deleted entity
-* feat: remove DELETED entity type by using internal id
-* feat: add deleted entity to traffic simulator
-* feat(traffic_simulator): add confidence to Bulb class
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into fix/rtc_command_action/continuous_execution
-* Merge pull request `#1092 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1092>`_ from tier4/feature/control_rtc_auto_mode
-  Feature/control rtc auto mode
-* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
-* chore: apply clang_format
-* feat(traffic_simualtor): set use_foa=true to use default auto_mode settings
-* Merge pull request `#1101 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1101>`_ from tier4/fix/standstill_duration
-  add updateStandStillDuration(step_time) and updateTraveledDistance(st…
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge pull request `#1093 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1093>`_ from tier4/feature/RJD-614_follow_trajectory_action_pedestrian_cyclist_support
-  feat(behavior_tree): follow polyline action for pedestrian and bicycle
-* Merge remote-tracking branch 'origin/feature/control_rtc_auto_mode' into fix/rtc_command_action/continuous_execution
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-  # Conflicts:
-  #	external/concealer/include/concealer/field_operator_application_for_autoware_universe.hpp
-* add updateStandStillDuration(step_time) and updateTraveledDistance(step_time) when the entity failed to match lanelet
-* remove debug lines
-* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* Merge branch 'master' into AJD-805/baseline_update_rebased
-* enable clean up entity
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge pull request `#1095 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1095>`_ from tier4/feature/freespace-distance-condition
-  Feature/freespace distance condition
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge branch 'master' into feature/freespace-distance-condition
-* Implement getBoundingBox* functions
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* code refactor
-* fix spelling
-* implement freespace for relative distance condition
-* Init working version of DistanceCondition freespace
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge pull request `#1090 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1090>`_ from tier4/refactor/lanelet-id
-  Refactor/lanelet ID
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* feat(behavior_tree): add FollowPolyline action to pedestrian
-* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge pull request `#1069 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1069>`_ from tier4/feature/traffic_simulator/follow-trajectory-action-3
-  Feature/traffic simulator/follow trajectory action 3
-* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
-* remove debug line
-* fix case
-* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
-* Merge pull request `#1087 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
-  Feature/drop galactic support
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Rename `gelAllCanonicalizedLaneletPoses` to `get...`
-* Cleanup
-* Replace `std::vector<lanelet::Id>` with `lanelet::Ids`
-* Replace `std::int64_t` with `lanelet::Id`
-* Replace `LaneletId` with `lanelet::Id`
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/drop_galactic_support
-* Merge pull request `#1027 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1027>`_ from tier4/feature/new_traffic_light
-  Feature/new traffic light
-* chore: apply formatter
-* refactor(HdMapUtils): rename functions related to traffic light
-* refactor(traffic_simulator): change to a comparison method that is resistant to version changes
-* refactor(traffic_simulator): delete unnecessary optimization
-* fix(traffic_simulator): fix build errors
-* chore(traffic_simulator): add LaneletId alias
-* Merge branch 'master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* refactor: use better word "thunk" instead of callback
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* refactor(traffic_simulator): use LaneletId instead of std::int64_t
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* refactor(traffic_simulator)
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* refactor(traffic_simulator)
-  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* apply reformat
-* Initial version of freespace distance condition
-* remove workbound for galactic
-* chore: apply formatter
-* refactor: TrafficLightDetectorEmulator => PseudoTrafficLightDetector
-* chore: change architecture_type to awf/universe/20230906
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	docs/ReleaseNotes.md
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-* apply reformat
-* refactor: apply formatter with clang-format v14
-* reintroduced clock publshing
-* add getSValue function
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* add white space
-* apply reformat
-* commented clock and parts of concealer
-* refactor: apply formatter
-* refactor: delete debug messages
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/simple_sensor_simulator.hpp
-  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
-  #	simulation/simulation_interface/include/simulation_interface/conversions.hpp
-  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_client.hpp
-  #	simulation/simulation_interface/include/simulation_interface/zmq_multi_server.hpp
-  #	simulation/simulation_interface/proto/simulation_api_schema.proto
-  #	simulation/simulation_interface/src/conversions.cpp
-  #	simulation/simulation_interface/src/zmq_multi_client.cpp
-  #	simulation/simulation_interface/src/zmq_multi_server.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
-* chore: apply formatter
-* fix(TrafficLight): delete relation_id in TrafficLight class and use latest getTrafficLightRelationIDFromWayID
-* fix(HDMapUtils): return all relation ids from getTrafficLightRelationIDFromWayID
-* apply reformat
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Update `makeUpdatedStatus` to take a reference to `PolylineTrajectory` instead of a pointer
-* apply reformat
-* fix(traffic_simulator/ego): switch a parameter for new architecture_type
-* fix compile error
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/api/api.hpp
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-* refactor: delete unused code / dependencies
-* feat: add new architecture_type awf/universe/2023.08
-* chore: apply formatter
-* refactor: delete unused lines/files
-* feat(traffic_simulator): implement conversion from way_id to relation_id
-* refactor(traffic_simulator): fix initialization order of member variables in ConfigurableRateUpdater
-* chore: apply formatter
-* fix(traffic_simulator): fix compile errors
-* refactor(traffic_simulator): refactor data flow with simulation_api_schema::TrafficSignal
-* refactor(traffic_simulator): refactor ConfigurableRateUpdater
-* refactor(traffic_simulator): delete V2ITrafficLightPublisher and use TrafficLightPublisher
-* feat(traffic_simulator): use new ConfigurableRateUpdater in TrafficLightMarkerPublisher
-* feat(traffic_simulator): implement proto exporting from TrafficLightManager
-* feat(traffic_simulator): Add TrafficLightPublisher
-* refactor(traffic_simulator): refactor ConfigurableRateUpdater
-* refactor(traffic_simulator): delete unused files
-* feat(simple_sensor_simulator): add base class for TrafficLightsDetector
-* fix(traffic_simulator): fix build errors
-* chore(traffic_simulator): reformat
-* fix(traffic_simulator): use new message in V2ITrafficLightPublisher
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* fix(traffic_simulator): fix V2ITrafficLightPublisher
-* feat(simulation_interface): attachTrafficLightDetectorEmulatorRequest/Response
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/CMakeLists.txt
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/conventional_traffic_light_manager.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/traffic_light_manager_base.hpp
-  #	simulation/traffic_simulator/include/traffic_simulator/traffic_lights/v2i_traffic_light_publisher.hpp
-  #	simulation/traffic_simulator/src/entity/entity_manager.cpp
-  #	simulation/traffic_simulator/src/traffic_lights/traffic_light_manager_base.cpp
-  #	simulation/traffic_simulator/src/traffic_lights/v2i_traffic_light_publisher.cpp
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* chore(traffic_light): apply ament_clang_format
-* refactor(traffic_light): use new architecture_type
-* chore(traffic_light): delay creating publisher
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/CMakeLists.txt
-* chore(traffic_light): override pure virtual function
-* chore(traffic_light): delete empty files
-* chore(traffic_light): adapt to variations of traffic light bulb types
-* fix(entity_manager): fix errors for traffic light tests
-* feat(entity_manager): use new traffic light managers in entity_manager
-* feat(traffic_light): add codes for new message
-* chore(traffic_light): prepare for runtime topic adaptation
-* chore(traffic_light): delete TrafficLightManager type specialization
-* chore(traffic_light): rename timers
-* chore(traffic_light): set relation_id for new message type
-* chore(traffic_light): add template for TrafficLight::Bulb conversion operator
-* chore(traffic_light): fix errors
-* fix(HDMapUtils): getTrafficLightRelationIDFromWayID
-* chore: reformat
-* feat(HDMapUtils): getTrafficLightRelationIDFromWayID
-* chore(traffic_light): add perception messages for traffic light
-* refactor(traffic_light): use TrafficLightBase
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* refactor(traffic_light): use updated function name
-* feat(traffic_light): add TrafficLightBase and parameterize msg type of TrafficLight
-* refactor(HDMapUtil): rename some functions
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, f0reachARR, yamacir-kit
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Mateusz Palczuk, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, f0reachARR, kyoichi-sugahara, yamacir-kit
 
 0.8.0 (2023-09-05)
 ------------------

@@ -31,6 +31,7 @@ PedestrianEntity::PedestrianEntity(
   const std::string & plugin_name)
 : EntityBase(name, entity_status, hdmap_utils_ptr),
   plugin_name(plugin_name),
+  pedestrian_parameters(parameters),
   loader_(pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase>(
     "traffic_simulator", "entity_behavior::BehaviorPluginBase")),
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),

@@ -39,8 +39,6 @@ class EgoEntity : public VehicleEntity
   static auto makeFieldOperatorApplication(const Configuration &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
-  CanonicalizedEntityStatus externally_updated_status_;
-
 public:
   explicit EgoEntity() = delete;
 
@@ -107,14 +105,14 @@ public:
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
 
-  auto setStatusExternally(const CanonicalizedEntityStatus & status) -> void;
-
   void requestSpeedChange(double, bool continuous) override;
 
   void requestSpeedChange(
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   auto setVelocityLimit(double) -> void override;
+
+  auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
 
   auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 };

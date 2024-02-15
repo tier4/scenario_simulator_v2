@@ -1,0 +1,29 @@
+name: Interface update notification
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - openscenario/openscenario_interpreter_msgs/msg/*.msg
+      - simulation/traffic_simulator_msgs/msg/*.msg
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Add label
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "interface breaking"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add comment
+        run: |
+          gh pr comment  "$PR_NUMBER" --edit-last --body "This PR may breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364" \
+          || gh pr comment  "$PR_NUMBER" --body "This PR may breaks the interface to external services! Please see https://tier4.atlassian.net/wiki/spaces/S/pages/1984987364"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}

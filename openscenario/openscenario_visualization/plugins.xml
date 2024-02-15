@@ -4,4 +4,7 @@
       Context Panel plugin.
     </description>
   </class>
+  <class name="openscenario_visualization/VisualizationConditionGroups" type="openscenario_visualization::VisualizationConditionGroupsDisplay" base_class_type="rviz_common::Display">
+    <description>Display Condition Groups</description>
+  </class>
 </library>

@@ -1,0 +1,71 @@
+name: Documentation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 0 * * *
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  generate:
+    name: Generate documentation
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2-beta
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: run protoc-gen-doc
+        run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.5.1"
+      - name: install
+        run: poetry install --no-interaction
+      - name: Generate documentation
+        run: poetry run mkdocs build
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: site
+          path: site
+          retention-days: 1
+      - name: Publish Documentation
+        if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
+          publish_dir: site
+          keep_files: false
+          external_repository: tier4/scenario_simulator_v2-docs
+  generate_api_document: 
+    name: Generate API documentation
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2-beta
+      - name: Install doxygen
+        run: sudo apt install -y doxygen
+      - name: Build document
+        run: doxygen Doxyfile
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: api_documentation_site
+          path: html
+          retention-days: 1
+      - name: Publish Documentation
+        if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
+          publish_dir: html
+          keep_files: false
+          external_repository: tier4/scenario_simulator_v2-api-docs

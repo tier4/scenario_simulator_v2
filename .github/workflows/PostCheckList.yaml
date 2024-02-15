@@ -1,4 +1,4 @@
-name: PostCheckList
+name: Post check list
 on:
   pull_request:
     branches:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   post_check_list:
-    name: PostCheckList
+    name: Post check list
     timeout-minutes: 10
     runs-on: ubuntu-22.04
     permissions:
@@ -32,5 +32,5 @@ jobs:
             - [ ] If this pull request contains a destructive change, does this pull request contain the migration guide?
             - [ ] Labels of this pull request are valid?
             - [ ] All unit tests/integration tests are included in this pull request? If you think adding test cases is unnecessary, please describe why and cross out this line.
-            - [ ] The documentation is enough? If you think adding documents for this pull request, is unnecessary, please describe why and cross out this line.
+            - [ ] The documentation for this pull request is enough? If you think adding documents for this pull request is unnecessary, please describe why and cross out this line.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -2,30 +2,40 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.8.1 (2024-01-24)
+1.0.0 (2024-02-14)
 ------------------
-* Merge pull request `#1 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
-  Feature/new release
-* Merge remote-tracking branch 'test/master' into feature/new_release
-* Merge pull request `#1145 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1145>`_ from tier4/feature/random_scenario
-  Feature/random scenario
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into feature/real-time-factor-control
+* Merge branch 'tier4:master' into random-test-runner-docs-update
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Contributors: Paweł Lech, pawellech1, yamacir-kit
+
+0.9.0 (2023-12-21)
+------------------
+* Merge pull request `#1139 <https://github.com/tier4/scenario_simulator_v2/issues/1139>`_ from tier4/fix/geometry-bug-fixes
+* Merge remote-tracking branch 'tier4/master' into fix/geometry-bug-fixes
+* Merge branch 'master' into feature/RJD-716_add_follow_waypoint_controller
+* Merge remote-tracking branch 'origin/master' into feature/traffic-lights-awsim-support
+* Merge pull request `#1145 <https://github.com/tier4/scenario_simulator_v2/issues/1145>`_ from tier4/feature/random_scenario
 * modify default sensor model
 * change default vehicle model
 * remove unused lambda function
-* Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
-  update CHANGELOG
 * Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
 * fix typo
 * Merge remote-tracking branch 'origin/master' into feature/random_scenario
-* update CHANGELOG
+* Remove unnecessary comments
+* Fix lanechange time constraint scenarios
+* Merge branch 'experimental/merge-master' into feature/test-geometry-spline-subspline
+* Merge remote-tracking branch 'tier4/master' into experimental/merge-master
 * Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
 * remove debug line
 * remove function object
 * add spawn_nearby_ego entity
-* Merge pull request `#1113 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
-  Feature/doxygen
+* Merge pull request `#1113 <https://github.com/tier4/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
 * fix compile error
 * add namespace
 * update namespace
@@ -66,14 +76,12 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
 * Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge pull request `#1080 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1080>`_ from tier4/doc/add_comment_for_pr_1074
-  add comment about PR `#1074 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1074>`_
+* Merge pull request `#1080 <https://github.com/tier4/scenario_simulator_v2/issues/1080>`_ from tier4/doc/add_comment_for_pr_1074
 * Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
 * Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
 * Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
 * Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
-* Merge pull request `#1087 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
-  Feature/drop galactic support
+* Merge pull request `#1087 <https://github.com/tier4/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
 * Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
 * Merge branch 'master' into feature/new_traffic_light
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
@@ -82,19 +90,13 @@ Changelog for package cpp_mock_scenarios
 * remove workbound for galactic
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* add comment about PR `#1074 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1074>`_
+* add comment about PR `#1074 <https://github.com/tier4/scenario_simulator_v2/issues/1074>`_
 * Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/api/api.hpp
 * Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
 * Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
 * Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
@@ -102,306 +104,7 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
 * Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
-
-* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-* Merge pull request `#1113 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
-  Feature/doxygen
-* fix compile error
-* add namespace
-* update namespace
-* add concealer
-* rename scenario class
-* add namespace
-* rename scenario classes
-* add namespace
-* add cpp_mock_scenarios
-* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
-* Merge branch 'master' into AJD-805/baseline_update_rebased
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge branch 'master' into feature/freespace-distance-condition
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge pull request `#1080 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1080>`_ from tier4/doc/add_comment_for_pr_1074
-  add comment about PR `#1074 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1074>`_
-* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
-* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
-* Merge pull request `#1087 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
-  Feature/drop galactic support
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge branch 'master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* remove workbound for galactic
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* add comment about PR `#1074 <https://github.com/hakuturu583/scenario_simulator_v2/issues/1074>`_
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/api/api.hpp
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
-
-0.8.2 (2024-01-24)
-------------------
-* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into feature/restore_barnch
-* Bump version of scenario_simulator_v2 from version 0.8.0 to version 0.8.1
-* Merge pull request `#1 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
-  Feature/new release
-* Merge remote-tracking branch 'test/master' into feature/new_release
-* Merge pull request `#1145 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1145>`_ from tier4/feature/random_scenario
-  Feature/random scenario
-* modify default sensor model
-* change default vehicle model
-* remove unused lambda function
-* Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
-  update CHANGELOG
-* Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
-* fix typo
-* Merge remote-tracking branch 'origin/master' into feature/random_scenario
-* update CHANGELOG
-* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-* remove debug line
-* remove function object
-* add spawn_nearby_ego entity
-* Merge pull request `#1113 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
-  Feature/doxygen
-* fix compile error
-* add namespace
-* update namespace
-* add concealer
-* add spawn outside vehicle
-* overwrite label from parameter
-* enable set label
-* rename scenario class
-* add namespace
-* rename scenario classes
-* add namespace
-* add cpp_mock_scenarios
-* remove debug lines
-* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
-* remove sending route function
-* remove sending route
-* enable run scenario
-* update scenario
-* Merge branch 'master' into AJD-805/baseline_update_rebased
-* add comment
-* uncomment targets
-* fix scenario
-* randomize speed
-* despawn stopped pedestrian
-* add offset variance parameter
-* add s variance
-* enable clean up entity
-* set bounds
-* enable update parameter
-* add parameters
-* modify condition
-* update scenario
-* update scenario
-* update scenario
-* add random scenario
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge branch 'master' into feature/freespace-distance-condition
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge pull request `#1080 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1080>`_ from tier4/doc/add_comment_for_pr_1074
-  add comment about PR `#1074 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1074>`_
-* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
-* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
-* Merge pull request `#1087 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
-  Feature/drop galactic support
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge branch 'master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* remove workbound for galactic
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* add comment about PR `#1074 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1074>`_
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/api/api.hpp
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, yamacir-kit
-
-0.8.12 (2024-01-25)
--------------------
-
-0.8.11 (2024-01-25)
--------------------
-
-0.8.10 (2024-01-25)
--------------------
-
-0.8.9 (2024-01-25)
-------------------
-
-0.8.8 (2024-01-24)
-------------------
-
-0.8.7 (2024-01-24)
-------------------
-* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into fix/release_text
-* Contributors: Masaya Kataoka
-
-0.8.6 (2024-01-24)
-------------------
-* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into fix/release_text
-* Contributors: Masaya Kataoka
-
-0.8.5 (2024-01-24)
-------------------
-
-0.8.4 (2024-01-24)
-------------------
-
-0.8.3 (2024-01-24)
-------------------
-* Bump version of scenario_simulator_v2 from version 0.8.1 to version 0.8.2
-* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into feature/restore_barnch
-* Bump version of scenario_simulator_v2 from version 0.8.0 to version 0.8.1
-* Merge pull request `#1 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
-  Feature/new release
-* Merge remote-tracking branch 'test/master' into feature/new_release
-* Merge pull request `#1145 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1145>`_ from tier4/feature/random_scenario
-  Feature/random scenario
-* modify default sensor model
-* change default vehicle model
-* remove unused lambda function
-* Merge pull request `#10 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
-  update CHANGELOG
-* Merge branch 'feature/random_scenario' of https://github.com/tier4/scenario_simulator_v2 into feature/random_scenario
-* fix typo
-* Merge remote-tracking branch 'origin/master' into feature/random_scenario
-* update CHANGELOG
-* Merge remote-tracking branch 'origin/master' into feature/traffic_light_confidence
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
-* remove debug line
-* remove function object
-* add spawn_nearby_ego entity
-* Merge pull request `#1113 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1113>`_ from tier4/feature/doxygen
-  Feature/doxygen
-* fix compile error
-* add namespace
-* update namespace
-* add concealer
-* add spawn outside vehicle
-* overwrite label from parameter
-* enable set label
-* rename scenario class
-* add namespace
-* rename scenario classes
-* add namespace
-* add cpp_mock_scenarios
-* remove debug lines
-* Merge remote-tracking branch 'origin' into feature/RJD-96_detail_message_scenario_failure
-* remove sending route function
-* remove sending route
-* enable run scenario
-* update scenario
-* Merge branch 'master' into AJD-805/baseline_update_rebased
-* add comment
-* uncomment targets
-* fix scenario
-* randomize speed
-* despawn stopped pedestrian
-* add offset variance parameter
-* add s variance
-* enable clean up entity
-* set bounds
-* enable update parameter
-* add parameters
-* modify condition
-* update scenario
-* update scenario
-* update scenario
-* add random scenario
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge branch 'master' into feature/freespace-distance-condition
-* Merge remote-tracking branch 'origin/master' into pzyskowski/660/ss2-awsim-connection
-* Merge remote-tracking branch 'origin/master' into feature/control_rtc_auto_mode
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge pull request `#1080 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1080>`_ from tier4/doc/add_comment_for_pr_1074
-  add comment about PR `#1074 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1074>`_
-* Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
-* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
-* Merge pull request `#1087 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
-  Feature/drop galactic support
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge branch 'master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* remove workbound for galactic
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/sensor_simulation/sensor_simulation.hpp
-  #	simulation/simple_sensor_simulator/src/sensor_simulation/sensor_simulation.cpp
-  #	simulation/traffic_simulator/src/api/api.cpp
-* Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* add comment about PR `#1074 <https://github.com/merge-queue-testing/scenario_simulator_v2/issues/1074>`_
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-  # Conflicts:
-  #	simulation/traffic_simulator/include/traffic_simulator/api/api.hpp
-* Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
-* Merge remote-tracking branch 'origin/master' into feature/new_traffic_light
-* Merge remote-tracking branch 'origin/master' into feature/fallback_spline_to_line_segments
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Merge remote-tracking branch 'origin/master' into feature/allow-goal-modification
-* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Release Bot, Tatsuya Yamasaki, yamacir-kit
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Lukasz Chojnacki, Masaya Kataoka, Mateusz Palczuk, Michał Kiełczykowski, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki, yamacir-kit
 
 0.8.0 (2023-09-05)
 ------------------
