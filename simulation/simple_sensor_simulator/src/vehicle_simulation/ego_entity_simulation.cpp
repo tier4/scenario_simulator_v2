@@ -42,7 +42,7 @@ EgoEntitySimulation::EgoEntitySimulation(
   hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters),
   consider_acceleration_by_road_slope_(
-          getParameter<bool>("consider_acceleration_by_road_slope", false))
+    getParameter<bool>("consider_acceleration_by_road_slope", false))
 {
   autoware->set_parameter(use_sim_time);
 }
