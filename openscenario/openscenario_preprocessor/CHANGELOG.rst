@@ -2,6 +2,9 @@
 Changelog for package openscenario_preprocessor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.1 (2024-02-15)
+------------------
+
 1.0.0 (2024-02-14)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
