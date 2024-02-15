@@ -24,11 +24,6 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
-<<<<<<< HEAD
- - OS: [e.g. ubuntu 22.04]
- - Version [e.g. 22]
-=======
  - Ubuntu Version [e.g. 22.04]
->>>>>>> origin/master
  - ROS 2 version
  - DDS

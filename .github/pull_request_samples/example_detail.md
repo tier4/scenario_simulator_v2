@@ -2,11 +2,7 @@
 
 ## Abstract
 
-<<<<<<< HEAD
-Fixed bags velow.
-=======
 Fixed bags below.
->>>>>>> origin/master
 
 - Removed equal operators for geometry_msgs::msg::Point and geometry_msgs::msg::Vector3, because they were ambiguous.
 - Fixed the bug which caused the intersection functions using vector to look past the last element of the vector and return wrong results.
