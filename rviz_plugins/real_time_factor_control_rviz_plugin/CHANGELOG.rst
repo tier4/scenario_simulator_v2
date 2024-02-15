@@ -2,6 +2,9 @@
 Changelog for package real_time_factor_control_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.1 (2024-02-15)
+------------------
+
 1.0.0 (2024-02-14)
 ------------------
 * Merge pull request `#1185 <https://github.com/tier4/scenario_simulator_v2/issues/1185>`_ from tier4/feature/new_release_flow
