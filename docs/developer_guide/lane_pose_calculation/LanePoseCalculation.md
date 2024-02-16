@@ -3,8 +3,8 @@
 The calculation method of the lane coordinate system differs from Entity to Entity, and the process of determining which lane to match is complex, including fallback.  
 In this document, we will show how the pose calculation of the lane coordinate system is performed for each Entity.
 
-There are two possible times when the lane coordinate system may be computed for all Entities.  
-These are the [timing immediately after the spawn of the Entity](Spawn.md) and the [timing of the frame update](UpdateFrame.md).
+There are 3 possible timings when the lane coordinate system may be computed for all Entities.  
+These are the [timing immediately after the spawn of the Entity](Spawn.md), the [timing of the frame update](UpdateFrame.md) the [timing of the getting longitudinal distance](GetLongitudinalDistance.md)
 
 !!! Note
     If you are not a simulator developer but a scenario writer, it is sufficient to check [this document](UpdateFrame.md) and [this section](#lane-coordinate-system-calculation-algorithm-for-a-specific-lane), since the distance measurement via condition in used in the OpenSCENARIO is basically done after frame update.
@@ -13,18 +13,18 @@ These are the [timing immediately after the spawn of the Entity](Spawn.md) and t
 
 !!! summary
     - The calculation of the pose in the lane coordinate system involves two steps: first, filtering by "which lanes can be matched," and then "calculating the pose in the specific lane coordinate system.  
-    - The parameter that most affects the matching results is the length of the horizontal bar. This length depends on the type of Entity and the timing of the calculation. If you want to check the length quickly, please check [this section](#quick-guide-to-horizontal-bar-lengths).
+    - The parameter that most affects the matching results is the length of the horizontal bar. This length depends on the type of entity and the timing of the calculation. If you want to check the length quickly, please check [this section](#quick-guide-to-horizontal-bar-lengths).
 
 ### Quick guide to horizontal bar lengths 
 
 The unit of the table is meter.
 
-| EntityType \ Timing of caluculation | [Spawn](Spawn.md) | [UpdateFrame](UpdateFrame.md)                                                          |
-| ----------------------------------- | ----------------- | -------------------------------------------------------------------------------------- |
-| EgoEntity                           | 2.0               | [(tread of the entity) + 2.0](UpdateFrame.md#calculate-pose-in-lane-coordinate-system) |
-| VehicleEntity                       | 2.0               | N/A                                                                                    |
-| PedestrianEntity                    | 2.0               | [2.0 or 4.0](UpdateFrame.md#pedestrian-entity-with-behavior-tree)                      |
-| MiscObject                          | 2.0               | N/A                                                                                    |
+| EntityType \ Timing of caluculation | [Spawn](Spawn.md) | [UpdateFrame](UpdateFrame.md)                                                          | [Fetting longitudinal distance](GetLongitudinalDistance.md) |
+| ----------------------------------- | ----------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| EgoEntity                           | 2.0               | [(tread of the entity) + 2.0](UpdateFrame.md#calculate-pose-in-lane-coordinate-system) | 10                                                          |
+| VehicleEntity                       | 2.0               | N/A                                                                                    | 10                                                          |
+| PedestrianEntity                    | 2.0               | [2.0 or 4.0](UpdateFrame.md#pedestrian-entity-with-behavior-tree)                      | 10                                                          |
+| MiscObject                          | 2.0               | N/A                                                                                    | 10                                                          |
 
 ### Detail of the lane coordinate system calculation algorithm for a specific lane
 
