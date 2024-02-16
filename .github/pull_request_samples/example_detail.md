@@ -28,8 +28,8 @@ This PR fixes how the length of the curve is computed
 
 ## References
 
-- [determine-arc-length-of-a-catmull-rom-spline-to-move-at-a-constant-speed](https://gamedev.stackexchange.com/questions/14985/determine-arc-length-of-a-catmull-rom-spline-to-move-at-a-constant-speed)
-  - This link is an example and is not directly related to this sample.
+Please check [this document about spline curve.](https://people.computing.clemson.edu/~dhouse/courses/405/notes/splines.pdf)  
+This link is an example and is not directly related to this sample.
 
 # Destructive Changes
 
