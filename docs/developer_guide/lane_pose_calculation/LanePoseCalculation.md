@@ -11,6 +11,23 @@ These are the [timing immediately after the spawn of the Entity](Spawn.md) and t
 
 ## Lane coordinate system calculation algorithm for a specific lane
 
+!!! summary
+    - The calculation of the posture in the lane coordinate system involves two steps: first, filtering by "which lanes can be matched," and then "calculating the posture in the specific lane coordinate system.  
+    - The parameter that most affects the matching results is the length of the horizontal bar. This length depends on the type of Entity and the timing of the calculation. If you want to check the length quickly, please check [this section](#quick-guide-to-horizontal-bar-lengths).
+
+### Quick guide to horizontal bar lengths 
+
+The unit of the table is meter.
+
+| EntityType \ Timing of caluculation | [Spawn](Spawn.md) | [UpdateFrame](UpdateFrame.md)                                                          |
+| ----------------------------------- | ----------------- | -------------------------------------------------------------------------------------- |
+| EgoEntity                           | 2.0               | [(tread of the entity) + 2.0](UpdateFrame.md#calculate-pose-in-lane-coordinate-system) |
+| VehicleEntity                       | 2.0               | N/A                                                                                    |
+| PedestrianEntity                    | 2.0               | N/A                                                                                    |
+| MiscObject                          | 2.0               | N/A                                                                                    |
+
+### Detail of the lane coordinate system calculation algorithm for a specific lane
+
 After the lanes to be matched have been determined, the calculation of the specific lane coordinate system to be performed is always based on a per spline curve and line segment determination.
 
 ![Lane pose calculation](../../image/lane_pose_calculation.png "Lane pose calculation.")
@@ -64,7 +81,3 @@ If the $s$ and $u$ is in $[0,1]$, Catmull-Rom spline and the line segment are de
 The value of $S$ obtained in this case is the coordinate $S$ in the lane coordinate system.  
 Next, the value of $s$ is substituted into the Catmull-Rom spline equation, and the tangent direction at that point is calculated.  
 The Euler angle is calculated from the difference in orientation between the obtained tangent direction and Entity.
-
-!!! summary
-    - The calculation of the posture in the lane coordinate system involves two steps: first, filtering by "which lanes can be matched," and then "calculating the posture in the specific lane coordinate system.  
-    - The parameter that most affects the matching results is the length of the horizontal bar. This length depends on the type of Entity and the timing of the calculation.

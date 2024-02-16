@@ -29,16 +29,42 @@ $$L_m = max(t_r, t_f) + 2.0$$
 ## Non-Ego Entity
 
 For non-EgoEntity, the process diverges depending on whether planning is done in the lane coordinate system inside BehaviorPlugin.  
-If planning is done in the lane coordinate system, there is no need to convert from the map coordinate system to the lane coordinate system after onUpdate is executed.
+If planning is done in the lane coordinate system, there is no need to convert from the map coordinate system to the lane coordinate system after update frame function is executed.
 
 ### VehicleEntity (with Behavior-Tree)
 
+Only during `follow_polyline_trajectory` execution is planning performed in map coordinate system, but [lane coordinate system calculations are not performed](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/simulation/traffic_simulator/src/behavior/follow_trajectory.cpp#L546)
+
 ### Vehicle Entity (with Do-Nothing)
 
-While the do-nothing behavior plugin is running, Entity does not move, so the lane coordinate system is calculated at spawn and is not recalculated thereafter.
+While the do-nothing behavior plugin is running, Entity does not move, so the lane coordinate system is calculated when spawning entity and is not recalculated thereafter.
 
 ### Pedestrian Entity (with Behavior-Tree)
 
+Planning is done in map coordinates in the `walk_straight` and `follow_polyline_trajectory` actions. 
+
+In the `walk_straight` Action, [the pose in the lane coordinate system is calculated.](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L56)  
+The procedure for calculating the pose in the lane coordinate system at this time is as follows.  
+
+If lane matching was successful in the previous frame, do 1, otherwise do 2
+
+1.[Set the length of the horizontal bar to 2.0 and calculate the attitude in the lane coordinate system](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c 27914c12/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L72-L77)  
+2.[Calculate the posture in the lane coordinate system considering the size of the BoundingBox of the Entity](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0 c27914c12/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L79-L83)  
+
+If calculation 1 or 2 fails,  
+3.[Set the length of the horizontal bar to 4.0 and calculate the attitude in the lane coordinate system](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c 27914c12/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L86-L91)  
+If 1 or 2 are successful, then 3 is skipped.
+
+If the pose could not be calculated in the lane coordinate system by considering up to the result of 3, [the pose calculation in the lane coordinate system is a failure](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L125).
+
+[Canonicalize pose in lane coordinate system](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L94) to determine the final pose in the lane coordinate system.
+
+In the `follow_polyline_trajectory` Action, [lane coordinate system calculations are not performed](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/simulation/traffic_simulator/src/behavior/follow_trajectory.cpp#L546)
+
 ### Pedestrian Entity (with Do-Nothing)
 
-While the do-nothing behavior plugin is running, Entity does not move, so the lane coordinate system is calculated at spawn and is not recalculated thereafter.
+While the do-nothing behavior plugin is running, Entity does not move, so the lane coordinate system is calculated when spawning entity and is not recalculated thereafter.
+
+### MiscObjectEntity
+
+Misc object entity does not move, so the lane coordinate system is calculated when spawning entity and is not recalculated thereafter.
