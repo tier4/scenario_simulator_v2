@@ -1,7 +1,7 @@
 # Lane pose caluculation
 
 The calculation method of the lane coordinate system differs from Entity to Entity, and the process of determining which lane to match is complex, including fallback.  
-In this document, we will show how the posture calculation of the lane coordinate system is performed for each Entity.
+In this document, we will show how the pose calculation of the lane coordinate system is performed for each Entity.
 
 There are two possible times when the lane coordinate system may be computed for all Entities.  
 These are the [timing immediately after the spawn of the Entity](Spawn.md) and the [timing of the frame update](UpdateFrame.md).
@@ -12,7 +12,7 @@ These are the [timing immediately after the spawn of the Entity](Spawn.md) and t
 ## Lane coordinate system calculation algorithm for a specific lane
 
 !!! summary
-    - The calculation of the posture in the lane coordinate system involves two steps: first, filtering by "which lanes can be matched," and then "calculating the posture in the specific lane coordinate system.  
+    - The calculation of the pose in the lane coordinate system involves two steps: first, filtering by "which lanes can be matched," and then "calculating the pose in the specific lane coordinate system.  
     - The parameter that most affects the matching results is the length of the horizontal bar. This length depends on the type of Entity and the timing of the calculation. If you want to check the length quickly, please check [this section](#quick-guide-to-horizontal-bar-lengths).
 
 ### Quick guide to horizontal bar lengths 
