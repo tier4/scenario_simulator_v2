@@ -182,10 +182,10 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into AJD-805/baseline_update_rebased
 * Merge remote-tracking branch 'origin/master' into feature/RJD-96_detail_message_scenario_failure
 * Merge pull request `#1069 <https://github.com/tier4/scenario_simulator_v2/issues/1069>`_ from tier4/feature/traffic_simulator/follow-trajectory-action-3
-* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
 * Merge remote-tracking branch 'origin/master' into refactor/lanelet-id
 * remove debug line
 * fix case
+* Merge remote-tracking branch 'origin/master' into feature/lanelet2_matching_via_rosdep
 * Merge pull request `#1087 <https://github.com/tier4/scenario_simulator_v2/issues/1087>`_ from tier4/feature/drop_galactic_support
 * Merge remote-tracking branch 'origin/master' into feature/traffic_simulator/follow-trajectory-action-3
 * Rename `gelAllCanonicalizedLaneletPoses` to `get...`
