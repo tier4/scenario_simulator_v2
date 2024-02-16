@@ -1,4 +1,4 @@
-# Lane pose caluculation
+# Lane pose calculation
 
 The calculation method of the lane coordinate system differs from Entity to Entity, and the process of determining which lane to match is complex, including fallback.  
 In this document, we will show how the pose calculation of the lane coordinate system is performed for each Entity.
@@ -19,12 +19,12 @@ These are the [timing immediately after the spawn of the Entity](Spawn.md), the 
 
 The unit of the table is meter.
 
-| EntityType \ Timing of caluculation | [Spawn](Spawn.md) | [UpdateFrame](UpdateFrame.md)                                                          | [Fetting longitudinal distance](GetLongitudinalDistance.md) |
-| ----------------------------------- | ----------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| EgoEntity                           | 2.0               | [(tread of the entity) + 2.0](UpdateFrame.md#calculate-pose-in-lane-coordinate-system) | 10                                                          |
-| VehicleEntity                       | 2.0               | N/A                                                                                    | 10                                                          |
-| PedestrianEntity                    | 2.0               | [2.0 or 4.0](UpdateFrame.md#pedestrian-entity-with-behavior-tree)                      | 10                                                          |
-| MiscObject                          | 2.0               | N/A                                                                                    | 10                                                          |
+| EntityType \ Timing of calculation | [Spawn](Spawn.md) | [UpdateFrame](UpdateFrame.md)                                                          | [Getting longitudinal distance](GetLongitudinalDistance.md) |
+| ---------------------------------- | ----------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| EgoEntity                          | 2.0               | [(tread of the entity) + 2.0](UpdateFrame.md#calculate-pose-in-lane-coordinate-system) | 10                                                          |
+| VehicleEntity                      | 2.0               | N/A                                                                                    | 10                                                          |
+| PedestrianEntity                   | 2.0               | [2.0 or 4.0](UpdateFrame.md#pedestrian-entity-with-behavior-tree)                      | 10                                                          |
+| MiscObject                         | 2.0               | N/A                                                                                    | 10                                                          |
 
 ### Detail of the lane coordinate system calculation algorithm for a specific lane
 

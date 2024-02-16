@@ -1,4 +1,4 @@
-# Lane pose caluculation when updating frames
+# Lane pose calculation when updating frames
 
 If the entity's behavioral logic is planned in the lane coordinate system, skip this process.
 
