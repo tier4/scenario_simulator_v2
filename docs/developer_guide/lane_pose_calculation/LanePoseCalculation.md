@@ -23,7 +23,7 @@ The unit of the table is meter.
 | ----------------------------------- | ----------------- | -------------------------------------------------------------------------------------- |
 | EgoEntity                           | 2.0               | [(tread of the entity) + 2.0](UpdateFrame.md#calculate-pose-in-lane-coordinate-system) |
 | VehicleEntity                       | 2.0               | N/A                                                                                    |
-| PedestrianEntity                    | 2.0               | N/A                                                                                    |
+| PedestrianEntity                    | 2.0               | [2.0 or 4.0](UpdateFrame.md#pedestrian-entity-with-behavior-tree)                      |
 | MiscObject                          | 2.0               | N/A                                                                                    |
 
 ### Detail of the lane coordinate system calculation algorithm for a specific lane
