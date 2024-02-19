@@ -521,8 +521,11 @@ public:
       } else {
         entity_status.pose = pose;
 
+        /// @note If the entity is pedestrian or mis object, we have to consider matching to crosswalk lanelet.
         if (const auto lanelet_pose = toLaneletPose(
-              pose, parameters.bounding_box, false,
+              pose, parameters.bounding_box,
+              entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
+                entity_status.type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT,
               getDefaultMatchingDistanceForLaneletPoseCalculation(name));
             lanelet_pose) {
           entity_status.lanelet_pose = *lanelet_pose;
