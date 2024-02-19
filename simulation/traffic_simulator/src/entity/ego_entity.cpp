@@ -82,8 +82,7 @@ EgoEntity::EgoEntity(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
-  field_operator_application(makeFieldOperatorApplication(configuration)),
-  externally_updated_status_(entity_status)
+  field_operator_application(makeFieldOperatorApplication(configuration))
 {
 }
 
@@ -151,7 +150,7 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
-  setStatus(externally_updated_status_);
+
   if (is_controlled_by_simulator_ && npc_logic_started_) {
     if (
       const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
@@ -162,7 +161,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
     } else {
       is_controlled_by_simulator_ = false;
     }
-  }
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
@@ -271,12 +269,7 @@ auto EgoEntity::setBehaviorParameter(
   behavior_parameter_ = behavior_parameter;
 }
 
-auto EgoEntity::setStatusExternally(const CanonicalizedEntityStatus & status) -> void
-{
-  externally_updated_status_ = status;
-}
-
-void EgoEntity::requestSpeedChange(double value, bool /*continuous*/)
+void EgoEntity::requestSpeedChange(double value, bool)
 {
   target_speed_ = value;
   field_operator_application->restrictTargetSpeed(value);
@@ -298,5 +291,45 @@ auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
   EntityBase::fillLaneletPose(status, false);
 }
 
+auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
+{
+  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  const auto get_matching_length = [&] {
+    return std::max(
+             vehicle_parameters.axles.front_axle.track_width,
+             vehicle_parameters.axles.rear_axle.track_width) *
+             0.5 +
+           1.0;
+  };
+  if (unique_route_lanelets.empty()) {
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false, get_matching_length());
+  } else {
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(map_pose, unique_route_lanelets, get_matching_length());
+    if (!lanelet_pose) {
+      lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false, get_matching_length());
+    }
+  }
+  geometry_msgs::msg::Pose map_pose_z_fixed = map_pose;
+  auto status = static_cast<EntityStatus>(status_);
+  if (lanelet_pose) {
+    math::geometry::CatmullRomSpline spline(
+      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+    if (const auto s_value = spline.getSValue(map_pose)) {
+      map_pose_z_fixed.position.z = spline.getPoint(s_value.value()).z;
+    }
+    status.pose = map_pose_z_fixed;
+    status.lanelet_pose_valid = true;
+    status.lanelet_pose = lanelet_pose.value();
+  } else {
+    status.pose = map_pose;
+    status.lanelet_pose_valid = false;
+    status.lanelet_pose = LaneletPose();
+  }
+  status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
+}
 }  // namespace entity
 }  // namespace traffic_simulator
