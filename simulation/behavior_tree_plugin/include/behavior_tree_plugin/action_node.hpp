@@ -78,15 +78,16 @@ public:
     return {
       // clang-format off
       BT::InputPort<double>("current_time"),
+      BT::InputPort<double>("matching_distance_for_lanelet_pose_calculation"),
       BT::InputPort<double>("step_time"),
       BT::InputPort<EntityStatusDict>("other_entity_status"),
+      BT::InputPort<lanelet::Ids>("route_lanelets"),
       BT::InputPort<std::optional<double>>("target_speed"),
       BT::InputPort<std::shared_ptr<hdmap_utils::HdMapUtils>>("hdmap_utils"),
       BT::InputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("entity_status"),
-      BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>("entity_type_list"),
-      BT::InputPort<lanelet::Ids>("route_lanelets"),
-      BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>("traffic_light_manager"),
+      BT::InputPort<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>("entity_type_list"),
+      BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
       BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("updated_status"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
@@ -116,6 +117,7 @@ protected:
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> entity_status;
   double current_time;
   double step_time;
+  double default_matching_distance_for_lanelet_pose_calculation;
   std::optional<double> target_speed;
   std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> updated_status;
   EntityStatusDict other_entity_status;

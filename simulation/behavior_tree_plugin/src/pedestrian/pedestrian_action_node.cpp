@@ -73,14 +73,17 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
      * @note Hard coded parameter. 1.0 is a matching threshold for lanelet.
      * In this branch, try to matching pedestrian entity to specified lanelet_id.
     */
-    lanelet_pose =
-      hdmap_utils->toLaneletPose(pose, entity_status->getLaneletPose().lanelet_id, 1.0);
+    lanelet_pose = hdmap_utils->toLaneletPose(
+      pose, entity_status->getLaneletPose().lanelet_id,
+      default_matching_distance_for_lanelet_pose_calculation);
   } else {
     /**
      * @note In this branch, try to matching pedestrian entity considering bounding box.
      * true means considering crosswalk.
     */
-    lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status->getBoundingBox(), true);
+    lanelet_pose = hdmap_utils->toLaneletPose(
+      pose, entity_status->getBoundingBox(), true,
+      default_matching_distance_for_lanelet_pose_calculation);
   }
   if (!lanelet_pose) {
     /**

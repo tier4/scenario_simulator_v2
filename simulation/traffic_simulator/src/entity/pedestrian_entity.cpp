@@ -42,6 +42,8 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
   behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
+  behavior_plugin_ptr_->setDefaultMatchingDistanceForLaneletPoseCalculation(
+    getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 
 void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
