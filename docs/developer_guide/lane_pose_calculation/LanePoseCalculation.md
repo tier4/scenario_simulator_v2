@@ -4,7 +4,7 @@ The calculation method of the lane coordinate system differs from Entity to Enti
 In this document, we will show how the pose calculation of the lane coordinate system is performed for each Entity.
 
 There are 3 possible timings when the lane coordinate system is computed for all Entities.  
-These are the [timing immediately after the spawn of the Entity](Spawn.md), the [timing of the frame update](UpdateFrame.md) the [timing of the getting longitudinal distance](GetLongitudinalDistance.md)
+These are the [timing immediately after the spawn of the Entity](Spawn.md), the [timing of the frame update](UpdateFrame.md) and the [timing of the getting longitudinal distance](GetLongitudinalDistance.md)
 
 !!! Note
     It is sufficient to check [this document](UpdateFrame.md) and [this section](#lane-coordinate-system-calculation-algorithm-for-a-specific-lane), if you are not a simulator developer but a scenario writter. That is because the distance measurement via condition of the OpenSCENARIO is done after frame update basically.
