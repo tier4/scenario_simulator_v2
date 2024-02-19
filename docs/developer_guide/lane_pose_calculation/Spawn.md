@@ -6,8 +6,8 @@ In the OpenSCENARIO , it is to execute a TeleportAction by specifying the LanePo
 
 If you spawn by specifying the map coordinate system, [lane pose calculation](https://github.com/tier4/scenario_simulator_v2/blob/9f03394f80e5de05cf087db3d00c7be73d27e963/simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp#L521-L529) is executed.
 
-There are several internal implementations of pose calculation in the lane coordinate system implemented in the [HDmapUtils class](https://tier4.github.io/scenario_simulator_v2-api-docs/classhdmap__utils_1_1HdMapUtils.html),
-but the one used in this case is [here](https://github.com/tier4/scenario_simulator_v2/blob/9f03394f80e5de05cf087db3d00c7be73d27e963/simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp#L602-L630).
+There are several internal implementations of pose calculation in the lane coordinate system implemented in the [HDmapUtils class](https://tier4.github.io/scenario_simulator_v2-api-docs/classhdmap__utils_1_1HdMapUtils.html).
+The one used in this case is [here](https://github.com/tier4/scenario_simulator_v2/blob/9f03394f80e5de05cf087db3d00c7be73d27e963/simulation/traffic_simulator/src/hdmap_utils/hdmap_utils.cpp#L602-L630).
 
 In this function, the following procedure is used to calculate the pose in the lane coordinate system.
 
