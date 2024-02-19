@@ -58,6 +58,19 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic_lights/traffic_light_publisher.cpp
 )
 
+ament_auto_add_library(visualization_component SHARED
+  src/visualization_component.cpp
+)
+
+ament_auto_add_executable(visualization_node
+  src/visualization_node.cpp
+)
+target_link_libraries(visualization_node visualization_component)
+
+ament_export_libraries(visualization_component)
+
+rclcpp_components_register_nodes(visualization_component "traffic_simulator::VisualizationComponent")
+
 target_link_libraries(traffic_simulator
   tinyxml2
   pugixml

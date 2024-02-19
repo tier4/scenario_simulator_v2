@@ -42,7 +42,7 @@
  */
 
 #include <memory>
-#include <openscenario_visualization/openscenario_visualization_component.hpp>
+#include <traffic_simulator/visualization/visualization_component.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 int main(int argc, char * argv[])
@@ -50,7 +50,7 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
   auto component =
-    std::make_shared<openscenario_visualization::OpenscenarioVisualizationComponent>(options);
+    std::make_shared<traffic_simulator::VisualizationComponent>(options);
   rclcpp::spin(component->get_node_base_interface());
   rclcpp::shutdown();
   return 0;
