@@ -19,12 +19,12 @@ These are the [timing immediately after the spawn of the Entity](Spawn.md), the 
 
 The unit of the table is meter.
 
-| EntityType \ Timing of calculation | [Spawn](Spawn.md) | [UpdateFrame](UpdateFrame.md)                                                          | [Getting longitudinal distance](GetLongitudinalDistance.md) |
-| ---------------------------------- | ----------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| EgoEntity                          | 2.0               | [(tread of the entity) + 2.0](UpdateFrame.md#calculate-pose-in-lane-coordinate-system) | 10                                                          |
-| VehicleEntity                      | 2.0               | N/A                                                                                    | 10                                                          |
-| PedestrianEntity                   | 2.0               | [2.0 or 4.0](UpdateFrame.md#pedestrian-entity-with-behavior-tree)                      | 10                                                          |
-| MiscObject                         | 2.0               | N/A                                                                                    | 10                                                          |
+| EntityType \ Timing of calculation | [Spawn](Spawn.md)                                                                             | [UpdateFrame](UpdateFrame.md)                                                          | [Getting longitudinal distance](GetLongitudinalDistance.md) |
+| ---------------------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| EgoEntity                          | [(tread of the entity) + 2.0](Spawn.md#calculate-pose-in-lane-coordinate-system)              | [(tread of the entity) + 2.0](UpdateFrame.md#calculate-pose-in-lane-coordinate-system) | 10                                                          |
+| VehicleEntity                      | [(tread of the entity) + 2.0](Spawn.md#calculate-pose-in-lane-coordinate-system)              | N/A                                                                                    | 10                                                          |
+| PedestrianEntity                   | [(width of the entity bounding box) + 2.0](Spawn.md#calculate-pose-in-lane-coordinate-system) | [2.0 or 4.0](UpdateFrame.md#pedestrian-entity-with-behavior-tree)                      | 10                                                          |
+| MiscObject                         | [(width of the entity bounding box) + 2.0](Spawn.md#calculate-pose-in-lane-coordinate-system) | N/A                                                                                    | 10                                                          |
 
 ### Detail of the lane coordinate system calculation algorithm for a specific lane
 
