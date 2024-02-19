@@ -473,6 +473,7 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
+  // the lanelet matching algorithm should be equivalent to the one used in EgoEntity::setMapPose
   const auto get_matching_length = [&] {
     return std::max(
              vehicle_parameters.axles.front_axle.track_width,
