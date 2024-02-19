@@ -19,7 +19,7 @@ If 3 is executed and fails, fallbacks to 4.
 
 ### Calculate pose in lane coordinate system
 
-Let $L_m$ be the length of the horizontal bar used in the lane coordinate system calculation and the tread of the front wheels be  $t_f$ and the tread of the rear wheels be $t_r$.
+Let $L_m$ be the length of the horizontal bar used in the lane coordinate system calculation and the tread of the front wheels be $t_f$ and the tread of the rear wheels be $t_r$.
 See also [here.](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/simulation/traffic_simulator/src/entity/ego_entity.cpp#L278-L284)
 
 $$L_m = max(t_r, t_f) + 2.0$$

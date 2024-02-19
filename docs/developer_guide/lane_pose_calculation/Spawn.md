@@ -30,4 +30,14 @@ After narrowing down the candidate lanes by the above procedure, the pose of the
 
 ![Lane pose calculation](../../image/lane_pose_calculation.png "Lane pose calculation.")
 
-In this case, the length of the horizontal bar is `2.0`m.
+### Vehicle / Ego Entity
+
+Let $L_m$ be the length of the horizontal bar used in the lane coordinate system calculation and the tread of the front wheels be $t_f$ and the tread of the rear wheels be $t_r$.
+
+$$L_m = max(t_r, t_f) + 2.0$$
+
+### Pedestrian / MiscObject Entity
+
+Let $L_m$ be the length of the horizontal bar used in the lane coordinate system calculation and width of the bounding box be $L_w$
+
+$$L_m = L_w + 2.0$$

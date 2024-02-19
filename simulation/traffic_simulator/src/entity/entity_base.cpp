@@ -256,7 +256,7 @@ auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & rel
 
 auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
 {
-  return getBoundingBox().dimensions.y + 1.0;
+  return getBoundingBox().dimensions.y * 0.5 + 1.0;
 }
 
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
