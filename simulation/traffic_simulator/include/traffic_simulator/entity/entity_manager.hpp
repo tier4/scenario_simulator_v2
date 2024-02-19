@@ -289,6 +289,7 @@ public:
   FORWARD_TO_ENTITY(getCurrentAccel, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
+  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getDistanceToLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
   FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
@@ -520,7 +521,9 @@ public:
       } else {
         entity_status.pose = pose;
 
-        if (const auto lanelet_pose = toLaneletPose(pose, parameters.bounding_box, false);
+        if (const auto lanelet_pose = toLaneletPose(
+              pose, parameters.bounding_box, false,
+              getDefaultMatchingDistanceForLaneletPoseCalculation(name));
             lanelet_pose) {
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
