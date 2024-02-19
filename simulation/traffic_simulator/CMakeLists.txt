@@ -59,11 +59,11 @@ ament_auto_add_library(traffic_simulator SHARED
 )
 
 ament_auto_add_library(visualization_component SHARED
-  src/visualization_component.cpp
+  src/visualization/visualization_component.cpp
 )
 
 ament_auto_add_executable(visualization_node
-  src/visualization_node.cpp
+  src/visualization/visualization_node.cpp
 )
 target_link_libraries(visualization_node visualization_component)
 
