@@ -13,7 +13,7 @@ In this function, the following procedure is used to calculate the pose in the l
 
 ## Search for matching lanes
 
-This procedure falls back to 2 if 1. fails.
+This procedure falls back to 2 if 1 fails.
 If 2 also fails, fallback is performed to 3.
 If 3 also fails, fallback is performed to 4.
 
