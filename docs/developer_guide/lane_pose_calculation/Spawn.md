@@ -1,6 +1,6 @@
 # Lane pose calculation when spawning
 
-If you spawn by specifying the lane coordinate system, lane pose calculation is skipped.  
+If you spawn entities by specifying the lane coordinate system, lane pose calculation is skipped.  
 Internally, spawn by specifying the lane coordinate system means specifying LaneletPose as the argument pose of the [API::spawn function](https://tier4.github.io/scenario_simulator_v2-api-docs/classtraffic__simulator_1_1API.html)  
 In the OpenSCENARIO , it is to execute a TeleportAction by specifying the LanePosition. ([e.g](https://github.com/tier4/scenario_simulator_v2/blob/9f03394f80e5de05cf087db3d00c7be73d27e963/test_runner/scenario_test_runner/))
 
