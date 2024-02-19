@@ -3,7 +3,7 @@
 The calculation method of the lane coordinate system differs from Entity to Entity, and the process of determining which lane to match is complex, including fallback.  
 In this document, we will show how the pose calculation of the lane coordinate system is performed for each Entity.
 
-There are 3 possible timings when the lane coordinate system may be computed for all Entities.  
+There are 3 possible timings when the lane coordinate system is computed for all Entities.  
 These are the [timing immediately after the spawn of the Entity](Spawn.md), the [timing of the frame update](UpdateFrame.md) the [timing of the getting longitudinal distance](GetLongitudinalDistance.md)
 
 !!! Note
