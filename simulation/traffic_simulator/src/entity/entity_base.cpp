@@ -254,7 +254,7 @@ auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & rel
   return ret;
 }
 
-auto EntityBase::getDefaultMatchingDistance() const -> double
+auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
 {
   return getBoundingBox().dimensions.y + 1.0;
 }

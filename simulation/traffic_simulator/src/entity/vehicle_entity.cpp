@@ -72,6 +72,15 @@ auto VehicleEntity::getDefaultDynamicConstraints() const
   return default_dynamic_constraints;
 }
 
+auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
+{
+  return std::max(
+           vehicle_parameters.axles.front_axle.track_width,
+           vehicle_parameters.axles.rear_axle.track_width) *
+           0.5 +
+         1.0;
+}
+
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
 {
   return behavior_plugin_ptr_->getBehaviorParameter();
