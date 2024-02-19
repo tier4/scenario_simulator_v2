@@ -48,6 +48,7 @@
 #include <cmath>
 #include <color_names/color_names.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>
 #include <traffic_simulator/visualization/visualization_component.hpp>
