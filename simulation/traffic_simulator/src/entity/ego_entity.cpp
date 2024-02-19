@@ -162,7 +162,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       is_controlled_by_simulator_ = false;
     }
   }
-  
+
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
 
