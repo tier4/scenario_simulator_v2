@@ -27,10 +27,8 @@ extern "C" {
 // demos/composition/include/composition/visibility_control.h at https://github.com/ros2/demos
 #if defined _WIN32 || defined __CYGWIN__
 #ifdef __GNUC__
-#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_EXPORT \
-  __attribute__((dllexport))
-#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_IMPORT \
-  __attribute__((dllimport))
+#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_EXPORT __attribute__((dllexport))
+#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_IMPORT __attribute__((dllimport))
 #else
 #define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_EXPORT __declspec(dllexport)
 #define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_IMPORT __declspec(dllimport)
@@ -46,14 +44,11 @@ extern "C" {
   TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_PUBLIC
 #define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_LOCAL
 #else
-#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_EXPORT \
-  __attribute__((visibility("default")))
+#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_EXPORT __attribute__((visibility("default")))
 #define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_IMPORT
 #if __GNUC__ >= 4
-#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_PUBLIC \
-  __attribute__((visibility("default")))
-#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_LOCAL \
-  __attribute__((visibility("hidden")))
+#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_PUBLIC __attribute__((visibility("default")))
+#define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_LOCAL __attribute__((visibility("hidden")))
 #else
 #define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_PUBLIC
 #define TRAFFIC_SIMULATOR_VISUALIZATION_COMPONENT_LOCAL
