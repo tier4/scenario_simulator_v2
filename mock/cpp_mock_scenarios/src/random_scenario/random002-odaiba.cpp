@@ -12,24 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
 #include <random001_parameters.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
-
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
-#include <quaternion_operation/quaternion_operation.h>
-
 // headers in STL
+#include <cstdlib>
+#include <ctime>
 #include <memory>
 #include <random>
 #include <string>
 #include <vector>
-#include <cstdlib>
-#include <ctime>
 
 using traffic_simulator::LaneletPose;
 using traffic_simulator::helper::constructLaneletPose;
@@ -44,42 +43,47 @@ enum class DIRECTION {
   RIGHT,
 };
 
-class StateManager {
+class StateManager
+{
 private:
-    std::vector<std::chrono::milliseconds> intervals_ms_;
-    std::chrono::time_point<std::chrono::steady_clock> last_update_;
-    int current_state_ = 0;
+  std::vector<std::chrono::milliseconds> intervals_ms_;
+  std::chrono::time_point<std::chrono::steady_clock> last_update_;
+  int current_state_ = 0;
 
-    void updateState() {
-        auto now = std::chrono::steady_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_update_);
+  void updateState()
+  {
+    auto now = std::chrono::steady_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_update_);
 
-        while (elapsed > intervals_ms_[current_state_]) {
-            elapsed -= intervals_ms_[current_state_];
-            current_state_ = (current_state_ + 1) % intervals_ms_.size();
-            last_update_ = now - elapsed;
-        }
+    while (elapsed > intervals_ms_[current_state_]) {
+      elapsed -= intervals_ms_[current_state_];
+      current_state_ = (current_state_ + 1) % intervals_ms_.size();
+      last_update_ = now - elapsed;
     }
+  }
 
 public:
-    StateManager(double interval_sec, int state_num) {
-        for (int i = 0; i < state_num; ++i) {
-            intervals_ms_.push_back(std::chrono::milliseconds(static_cast<int>(interval_sec * 1000)));
-        }
-        last_update_ = std::chrono::steady_clock::now();
+  StateManager(double interval_sec, int state_num)
+  {
+    for (int i = 0; i < state_num; ++i) {
+      intervals_ms_.push_back(std::chrono::milliseconds(static_cast<int>(interval_sec * 1000)));
     }
+    last_update_ = std::chrono::steady_clock::now();
+  }
 
-    StateManager(const std::vector<double> & interval_secs) {
-        for (double interval_sec : interval_secs) {
-            intervals_ms_.push_back(std::chrono::milliseconds(static_cast<int>(interval_sec * 1000)));
-        }
-        last_update_ = std::chrono::steady_clock::now();
+  StateManager(const std::vector<double> & interval_secs)
+  {
+    for (double interval_sec : interval_secs) {
+      intervals_ms_.push_back(std::chrono::milliseconds(static_cast<int>(interval_sec * 1000)));
     }
+    last_update_ = std::chrono::steady_clock::now();
+  }
 
-    int getCurrentState() {
-        updateState();
-        return current_state_;
-    }
+  int getCurrentState()
+  {
+    updateState();
+    return current_state_;
+  }
 };
 
 namespace
@@ -129,8 +133,7 @@ public:
   explicit RandomScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", /* ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map" */
-      "/home/pawel/robotec/2024/Q1/odaiba_reference",
-      "lanelet2_map.osm", __FILE__, false, option),
+      "/home/pawel/robotec/2024/Q1/odaiba_reference", "lanelet2_map.osm", __FILE__, false, option),
     param_listener_(std::make_shared<random001::ParamListener>(get_node_parameters_interface())),
     engine_(seed_gen_())
   {
@@ -166,7 +169,7 @@ private:
     };
 
     constexpr auto untrigger_distance = 22000.0;  // must be longer than trigger_distance
-    constexpr auto trigger_distance = 20000.0;  // must be shorter than untrigger_distance
+    constexpr auto trigger_distance = 20000.0;    // must be shorter than untrigger_distance
     const auto target_lane = api_.canonicalize(constructLaneletPose(lane_id, 0.0));
 
     const bool already_exist = api_.entityExists(entity_name_prefix + "_0");
@@ -213,8 +216,8 @@ private:
   }
 
   void spawnAndChangeLane(
-    const std::string & entity_name, const LaneletPose & spawn_pose, const lanelet::Id & lane_change_id,
-    const Direction & lane_change_direction)
+    const std::string & entity_name, const LaneletPose & spawn_pose,
+    const lanelet::Id & lane_change_id, const Direction & lane_change_direction)
   {
     const auto & p = params_.random_parameters.lane_following_vehicle;
     if (!api_.entityExists(entity_name)) {
@@ -263,12 +266,13 @@ private:
 
     constexpr double reach_tolerance = 2.0;
     if (api_.reachPosition(entity_name, api_.canonicalize(goal_pose), reach_tolerance)) {
-        api_.despawn(entity_name);
+      api_.despawn(entity_name);
     }
   }
 
-
-  void spawnRoadParkingVehicles(const lanelet::Id & spawn_lanelet_id, const size_t number_of_vehicles, const DIRECTION direction)
+  void spawnRoadParkingVehicles(
+    const lanelet::Id & spawn_lanelet_id, const size_t number_of_vehicles,
+    const DIRECTION direction)
   {
     const std::string entity_name_prefix = "road_parking_" + std::to_string(spawn_lanelet_id);
     if (!removeFarNPCsAndCheckIsInTriggerDistance(entity_name_prefix, spawn_lanelet_id)) {
@@ -344,8 +348,6 @@ private:
     }
   }
 
-
-
   void onUpdate() override
   {
 #if 0    
@@ -375,7 +377,6 @@ private:
 
     spawnAndDespawnRelativeFromEgoInRange(34621, 10.0, 20.0, 10.0, -5.0);
 #endif
-
 
     // Initialize random seed
     srand(time(0));
@@ -411,7 +412,6 @@ private:
     // spawnAndMoveToGoal(75, 83, MIN_VEL, MAX_VEL);
     // spawnAndMoveToGoal(75, 178573, MIN_VEL, MAX_VEL);
 
-
     // spawnRoadParkingVehicles(1278, randomInt(1, 2), DIRECTION::LEFT);
     // spawnRoadParkingVehicles(179398, randomInt(1, 2), DIRECTION::LEFT);
     // spawnRoadParkingVehicles(190784, randomInt(0, 1), DIRECTION::LEFT);
@@ -422,12 +422,9 @@ private:
     // spawnRoadParkingVehicles(178766, randomInt(0, 1), DIRECTION::LEFT);
     // spawnRoadParkingVehicles(179473, randomInt(0, 1), DIRECTION::LEFT);
 
-
     // 特定のlane_idの200m以内になったら、横断歩道歩行者をspawn（速度は毎回ランダム、人数はspawnで抽選、数秒ごとにspawnを止める）
 
     // 特定のlane_idの200m以内になったら、交差点の奥から車両が来る。（速度は毎回ランダム、数秒ごとにspawnを止める）
-
-
   }
 
   void onInitialize() override
