@@ -307,21 +307,39 @@ void EgoEntitySimulation::update(
   updatePreviousValues();
 }
 
+auto EgoEntitySimulation::getMatchedLaneletPoseFromEntityStatus(
+  const traffic_simulator_msgs::msg::EntityStatus & status, const double entity_width) const
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  // the lanelet matching algorithm should be equivalent to the one used in EgoEntity::setMapPose
+  const auto unique_route_lanelets =
+    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  const auto matching_length = [entity_width] { return entity_width * 0.5 + 1.0; }();
+
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+
+  if (unique_route_lanelets.empty()) {
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_length);
+  } else {
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, matching_length);
+    if (!lanelet_pose) {
+      lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_length);
+    }
+  }
+  return lanelet_pose;
+}
+
 auto EgoEntitySimulation::calculateEgoPitch() const -> double
 {
-  const double ego_x = vehicle_model_ptr_->getX();
-  const double ego_y = vehicle_model_ptr_->getY();
-  const double ego_yaw = vehicle_model_ptr_->getYaw();
-
-  geometry_msgs::msg::Pose ego_pose;
-  ego_pose.position.x = ego_x;
-  ego_pose.position.y = ego_y;
-  ego_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
-    traffic_simulator::helper::constructRPY(0., 0., ego_yaw));
-
   // calculate prev/next point of lanelet centerline nearest to ego pose.
-  auto ego_lanelet_id = hdmap_utils_ptr_->getClosestLaneletId(ego_pose, 2.0);
-  if (not ego_lanelet_id) {
+  auto ego_lanelet = getMatchedLaneletPoseFromEntityStatus(
+    status_, std::max(
+               vehicle_parameters.axles.front_axle.track_width,
+               vehicle_parameters.axles.rear_axle.track_width));
+  if (not ego_lanelet) {
     return 0.0;
   }
 
@@ -351,14 +369,17 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
     return min_idx;
   };
 
-  const size_t ego_seg_idx = find_nearest_segment_index(centerline_points, ego_pose.position);
+  geometry_msgs::msg::Point ego_point;
+  ego_point.x = vehicle_model_ptr_->getX();
+  ego_point.y = vehicle_model_ptr_->getY();
+  const size_t ego_seg_idx = find_nearest_segment_index(centerline_points, ego_point);
 
   const auto & prev_point = centerline_points.at(ego_seg_idx);
   const auto & next_point = centerline_points.at(ego_seg_idx + 1);
 
   // calculate ego yaw angle on lanelet coordinates
   const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
-  const double ego_yaw_against_lanelet = ego_yaw - lanelet_yaw;
+  const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
 
   // calculate ego pitch angle considering ego yaw.
   const double diff_z = next_point.z - prev_point.z;
@@ -468,41 +489,20 @@ auto EgoEntitySimulation::updateStatus(double current_scenario_time, double step
 auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
   traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
-  const auto unique_route_lanelets =
-    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
-  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-
-  // the lanelet matching algorithm should be equivalent to the one used in EgoEntity::setMapPose
-  const auto get_matching_length = [&] {
-    return std::max(
-             vehicle_parameters.axles.front_axle.track_width,
-             vehicle_parameters.axles.rear_axle.track_width) *
-             0.5 +
-           1.0;
-  };
-
-  if (unique_route_lanelets.empty()) {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      status.pose, status.bounding_box, false, get_matching_length());
-  } else {
-    lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, get_matching_length());
-    if (!lanelet_pose) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        status.pose, status.bounding_box, false, get_matching_length());
-    }
-  }
-  if (lanelet_pose) {
+  if (
+    auto lanelet_pose = getMatchedLaneletPoseFromEntityStatus(
+      status, std::max(
+                vehicle_parameters.axles.front_axle.track_width,
+                vehicle_parameters.axles.rear_axle.track_width))) {
     math::geometry::CatmullRomSpline spline(
       hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
     if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.value()).z;
     }
-  }
-
-  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-  if (status.lanelet_pose_valid) {
+    status.lanelet_pose_valid = true;
     status.lanelet_pose = lanelet_pose.value();
+  } else {
+    status.lanelet_pose_valid = false;
   }
 }
 }  // namespace vehicle_simulation

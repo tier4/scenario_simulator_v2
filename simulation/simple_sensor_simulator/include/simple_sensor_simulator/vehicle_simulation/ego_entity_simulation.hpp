@@ -78,6 +78,8 @@ private:
 
   auto getLinearJerk(double step_time) -> double;
 
+  auto getMatchedLaneletPoseFromEntityStatus(const traffic_simulator_msgs::msg::EntityStatus & status, const double entity_width) const -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
   auto updatePreviousValues() -> void;
 
 public:
