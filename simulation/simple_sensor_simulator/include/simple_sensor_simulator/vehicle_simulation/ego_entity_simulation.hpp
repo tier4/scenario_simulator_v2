@@ -64,6 +64,7 @@ private:
 
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 
 private:
@@ -84,7 +85,8 @@ public:
 
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time);
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time,
+    const bool consider_acceleration_by_road_slope);
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 

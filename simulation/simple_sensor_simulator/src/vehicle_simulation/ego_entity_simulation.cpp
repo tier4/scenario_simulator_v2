@@ -35,14 +35,13 @@ static auto getParameter(const std::string & name, T value = {})
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const rclcpp::Parameter & use_sim_time)
+  const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters),
-  consider_acceleration_by_road_slope_(
-    getParameter<bool>("consider_acceleration_by_road_slope", false))
+  consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope)
 {
   autoware->set_parameter(use_sim_time);
 }
