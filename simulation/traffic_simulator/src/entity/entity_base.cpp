@@ -819,77 +819,91 @@ auto EntityBase::updateTraveledDistance(const double step_time) -> double
 }
 
 auto EntityBase::getDistanceToTargetLaneletPose(
-  const CanonicalizedLaneletPose & target_lanelet_pose) -> std::optional<double>
+  const CanonicalizedLaneletPose & target_lanelet_pose, const double matching_distance)
+  -> std::optional<double>
 {
-  constexpr double matching_distance = 100.0;  // may be better to use a parameter
-  const auto entity_lanelet_pose_ = getLaneletPose(matching_distance);
+  const double matching_distance_ = matching_distance;
+  const auto entity_lanelet_pose_ = getLaneletPose(matching_distance_);
   const auto target_lanelet_pose_ = target_lanelet_pose;
 
-  // check if the entity is on the lanelet
-  if (entity_lanelet_pose_) {
-    const auto entity_distance_to_target = hdmap_utils_ptr_->getLongitudinalDistance(
-      static_cast<LaneletPose>(entity_lanelet_pose_.value()),
-      static_cast<LaneletPose>(target_lanelet_pose_));
-
-    return entity_distance_to_target;
+  if (!entity_lanelet_pose_) {
+    THROW_SEMANTIC_ERROR(
+      "Failed to get entity's lanelet pose. Please check entity lanelet pose exists.");
   }
-
-  // may be give error here too?
-  return std::nullopt;
-}
-
-auto EntityBase::getIfArrivedToTargetLaneletPose(
-  const CanonicalizedLaneletPose & target_lanelet_pose, const double threshold) -> bool
-{
-  if (!getDistanceToTargetLaneletPose(target_lanelet_pose).has_value()) {
-    // error here
-  }
-  const auto entity_lanelet_pose_ = getLaneletPose();
-  const auto target_lanelet_pose_ = target_lanelet_pose;
 
   const auto entity_distance_to_target = hdmap_utils_ptr_->getLongitudinalDistance(
     static_cast<LaneletPose>(entity_lanelet_pose_.value()),
     static_cast<LaneletPose>(target_lanelet_pose_));
 
-  if (entity_distance_to_target <= threshold) {
-    return true;
+  if (!entity_distance_to_target.has_value()) {
+    /**
+    * This is not an error, means that the entity is already over the target lanelet.
+    */
+    return std::nullopt;
   }
-  return false;
+
+  return entity_distance_to_target;
 }
 
-/** WARNING***************
- * This should not be called from ego entity
- */
+auto EntityBase::getIfArrivedToTargetLaneletPose(
+  const CanonicalizedLaneletPose & target_lanelet_pose, const double threshold) -> bool
+{
+  /**
+   * WARNING*****WIP*********
+   * mesuring distance is set to 100 manually
+   */
+  const auto entity_distance_to_target = getDistanceToTargetLaneletPose(target_lanelet_pose, 100);
+
+  if (!entity_distance_to_target.has_value()) {
+    /**
+     * @brief meaning that the entity is already over the target lanelet.
+     *
+     */
+    return true;
+  }
+
+  if (entity_distance_to_target <= threshold) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 auto EntityBase::requestSynchronize(
   const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,
   const double threshold) -> bool
 {
+  if (name == "ego") {
+    /**
+     * *********************CHECK*********************
+     * is this correct to throw syntax error?
+     */
+    THROW_SYNTAX_ERROR("The entity that is requested to synchronize is the ego. Please check.");
+  }
   if (getIfArrivedToTargetLaneletPose(entity_target, threshold)) {
     return true;
   }
 
   job_list_.append(
-    [this, ego_target, entity_target](double) -> bool {
-      // WARNING****************
-      // not checking job_duration_ at all
-      const auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
+    [this, ego_target, entity_target](double) {
+      /**
+       * @brief This is draft function for synchronization.
+       * It is not a good way to synchronize the entity with the ego.
+       * WARNING****************
+       * not checking job_duration_ at all
+       */
+      const auto entity_distance = getDistanceToTargetLaneletPose(entity_target, 100);
       const auto ego_distance = this->hdmap_utils_ptr_->getLongitudinalDistance(
         static_cast<LaneletPose>(other_status_.find("ego")->second.getLaneletPose()),
         static_cast<LaneletPose>(ego_target));
 
-      if (!entity_distance.has_value() ){
+      if (!entity_distance.has_value()) {
         THROW_SEMANTIC_ERROR(
-          "Failed to get entity's distance to target lanelet pose. Please check entity distance exists.");
+          "Entity is already over the target lanelet.");
       }
-      if (!ego_distance.has_value() ){
-        THROW_SEMANTIC_ERROR(
-          "Failed to get ego's distance to target lanelet pose. Please check ego distance exists.");
-      }
-
       const auto ego_velocity = other_status_.find("ego")->second.getTwist().linear.x;
       // be better to use acceleration,jerk to estimate the arrival time
 
-      RCLCPP_ERROR(rclcpp::get_logger("simulation"), "#####################");
       // estimate ego's arrival time to the target point
       // can estimate it more precisely by using accel,jerk
       const auto ego_arrival_time = (ego_velocity != 0) ? ego_distance.value() / ego_velocity : 0;
@@ -898,11 +912,16 @@ auto EntityBase::requestSynchronize(
       // really just a simple example, kind of like a joke
       const auto entity_velocity_to_synchronize = entity_distance.value() / ego_arrival_time;
 
-      this->requestSpeedChange(entity_velocity_to_synchronize, true);
+      RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "speed change");
+      // using this->requestSpeedChange here does not work in some kind of reason.
+      // it seems that after this function is called by some reason, func_on_cleanup will be deleted and become nullptr
+      // this->requestSpeedChange(entity_velocity_to_synchronize, true);
+      target_speed_ = entity_velocity_to_synchronize;
       return true;
     },
     // after this im not sure it is correct, just an draft
-    [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
+    [this]() { RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "sync job done"); },
+    job::Type::LINEAR_VELOCITY, false, job::Event::POST_UPDATE);
   return false;
 }
 

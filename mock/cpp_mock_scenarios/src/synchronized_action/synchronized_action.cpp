@@ -43,45 +43,56 @@ public:
 private:
   bool requested = false;
   const traffic_simulator::CanonicalizedLaneletPose ego_target =
-    getSampleLaneletPose(traffic_simulator::helper::constructLaneletPose(34510, 0, 0, 0, 0, 0));
+    getSampleLaneletPose(traffic_simulator::helper::constructLaneletPose(34585, 0, 0, 0, 0, 0));
   const traffic_simulator::CanonicalizedLaneletPose npc_target =
-    getSampleLaneletPose(traffic_simulator::helper::constructLaneletPose(34495, 15, 0, 0, 0, 0));
+    getSampleLaneletPose(traffic_simulator::helper::constructLaneletPose(34570, 0, 0, 0, 0, 0));
 
   void onUpdate() override
   {
-    // SUCCESS
-    // check if npc is in the target lanelet when ego is in the target lanelet and npc is stopped
-    if (
-      api_.requestSynchronize("npc", ego_target, npc_target, 0.2) &&
-      // api_.getIfArrivedToTargetLaneletPose("ego", ego_target, 0.2) &&
-      // api_.getCurrentTwist("npc").linear.x == 0.0) {
-      true) {
+    api_.requestSynchronize("npc", ego_target, npc_target, 0.2);
+      // SUCCESS
+      // check if npc is in the target lanelet when ego is in the target lanelet and npc is stopped
+      if (
+        // api_.getIfArrivedToTargetLaneletPose("ego", ego_target, 0.2) &&
+        // api_.getIfArrivedToTargetLaneletPose("npc", npc_target, 0.2) &&
+        // api_.getCurrentTwist("npc").linear.x <= 0.1
+        false
+      )
+    {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
 
     // FAILURES
-    if (api_.getCurrentTime() >= 20.0) {
+    if (api_.getCurrentTime() >= 40.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.checkCollision("ego", "npc")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
+
   }
   void onInitialize() override
   {
     api_.spawn(
       "ego",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 15, 0, 0, 0, 0)),
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34976, 10, 0, 0, 0, 0)),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 5);
-    // api_.requestSpeedChange("ego", 5, true);
-    // api_.requestLaneChange("ego", 34513);
+    api_.setLinearVelocity("ego", 10);
+    api_.requestSpeedChange("ego", 10, true);
+
+    std::vector<geometry_msgs::msg::Pose> goal_poses;
+    goal_poses.emplace_back(api_.toMapPose(
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34579, 10, 0, 0, 0, 0))));
+    // goal_poses.emplace_back(api_.toMapPose(
+    //   api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34579, 10, 0, 0, 0, 0))));
+    api_.requestAssignRoute("ego", goal_poses);
+
 
     api_.spawn(
       "npc",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34564, 5, 0, 0, 0, 0)),
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 5, 0, 0, 0, 0)),
       getVehicleParameters());
-    api_.setLinearVelocity("npc", 5);
+    api_.setLinearVelocity("npc", 0);
   }
 
   auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)

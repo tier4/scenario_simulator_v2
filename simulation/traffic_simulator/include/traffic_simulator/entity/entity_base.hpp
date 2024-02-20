@@ -229,7 +229,8 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
-  /*   */ auto getDistanceToTargetLaneletPose(const CanonicalizedLaneletPose & target_lanelet_pose)
+  /*   */ auto getDistanceToTargetLaneletPose(
+    const CanonicalizedLaneletPose & target_lanelet_pose, const double matching_distance)
     -> std::optional<double>;
 
   /*   */ auto getIfArrivedToTargetLaneletPose(
