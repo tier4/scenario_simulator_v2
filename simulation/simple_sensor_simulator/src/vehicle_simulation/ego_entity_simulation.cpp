@@ -267,12 +267,16 @@ void EgoEntitySimulation::update(
     } else {
       auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
-      auto acceleration_by_slope = not consider_acceleration_by_road_slope_ ? 0.0 : [this]() {
-        // calculate longitudinal acceleration by slope
-        constexpr double gravity_acceleration = -9.81;
-        const double ego_pitch_angle = calculateEgoPitch();
-        const double slope_angle = -ego_pitch_angle;
-        return gravity_acceleration * std::sin(slope_angle);
+      auto acceleration_by_slope = [this]() {
+        if (consider_acceleration_by_road_slope_) {
+          // calculate longitudinal acceleration by slope
+          constexpr double gravity_acceleration = -9.81;
+          const double ego_pitch_angle = calculateEgoPitch();
+          const double slope_angle = -ego_pitch_angle;
+          return gravity_acceleration * std::sin(slope_angle);
+        } else {
+          return 0.0;
+        }
       }();
 
       switch (vehicle_model_type_) {
@@ -343,7 +347,7 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
     return 0.0;
   }
 
-  auto centerline_points = hdmap_utils_ptr_->getCenterPoints(ego_lanelet_id.value());
+  auto centerline_points = hdmap_utils_ptr_->getCenterPoints(ego_lanelet.value().lanelet_id);
 
   // copied from motion_util::findNearestSegmentIndex
   auto find_nearest_segment_index = [](
