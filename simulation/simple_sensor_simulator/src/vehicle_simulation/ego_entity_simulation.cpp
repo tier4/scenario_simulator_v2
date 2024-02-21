@@ -315,7 +315,7 @@ auto EgoEntitySimulation::getMatchedLaneletPoseFromEntityStatus(
   const traffic_simulator_msgs::msg::EntityStatus & status, const double entity_width) const
   -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  // the lanelet matching algorithm should be equivalent to the one used in EgoEntity::setMapPose
+  // @note The lanelet matching algorithm should be equivalent to the one used in EgoEntity::setMapPose
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   const auto matching_length = [entity_width] { return entity_width * 0.5 + 1.0; }();
