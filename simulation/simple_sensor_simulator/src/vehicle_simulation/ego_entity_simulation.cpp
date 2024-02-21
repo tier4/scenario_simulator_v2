@@ -349,7 +349,7 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
 
   auto centerline_points = hdmap_utils_ptr_->getCenterPoints(ego_lanelet.value().lanelet_id);
 
-  // copied from motion_util::findNearestSegmentIndex
+  // @note Copied from motion_util::findNearestSegmentIndex
   auto find_nearest_segment_index = [](
                                       const std::vector<geometry_msgs::msg::Point> & points,
                                       const geometry_msgs::msg::Point & point) {
