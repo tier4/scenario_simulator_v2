@@ -483,7 +483,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
 }
 
 template <typename T>
-auto toMinimumRiskManeuverBehaviorString(const std::uint8_t & behavior_number)
+auto toMinimumRiskManeuverBehaviorString(const std::uint8_t & behavior_number) -> std::string
 {
   static const std::unordered_map<std::uint8_t, std::string> behavior_string_map = [&]() {
     std::unordered_map<std::uint8_t, std::string> behavior_string_map;
@@ -513,26 +513,28 @@ auto toMinimumRiskManeuverBehaviorString(const std::uint8_t & behavior_number)
   }
 }
 
+auto toMinimumRiskManeuverStateString(const std::uint8_t & state_number) -> std::string
+{
+  static const std::unordered_map<std::uint8_t, std::string> state_string_map = {
+    {autoware_adapi_v1_msgs::msg::MrmState::MRM_FAILED, "MRM_FAILED"},
+    {autoware_adapi_v1_msgs::msg::MrmState::MRM_OPERATING, "MRM_OPERATING"},
+    {autoware_adapi_v1_msgs::msg::MrmState::MRM_SUCCEEDED, "MRM_SUCCEEDED"},
+    {autoware_adapi_v1_msgs::msg::MrmState::NORMAL, "NORMAL"},
+    {autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN, "UNKNOWN"},
+  };
+
+  if (const auto state = state_string_map.find(state_number); state == state_string_map.end()) {
+    throw common::Error(
+      "Unexpected autoware_adapi_v1_msgs::msg::MrmState::state, number: ", state_number);
+  } else {
+    return state->second;
+  }
+}
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
   const autoware_adapi_v1_msgs::msg::MrmState & message) -> void
 {
-  auto to_minimum_risk_maneuver_state_string = [](const std::uint8_t & state_number) {
-    std::unordered_map<std::uint8_t, std::string> state_string_map = {
-      {autoware_adapi_v1_msgs::msg::MrmState::MRM_FAILED, "MRM_FAILED"},
-      {autoware_adapi_v1_msgs::msg::MrmState::MRM_OPERATING, "MRM_OPERATING"},
-      {autoware_adapi_v1_msgs::msg::MrmState::MRM_SUCCEEDED, "MRM_SUCCEEDED"},
-      {autoware_adapi_v1_msgs::msg::MrmState::NORMAL, "NORMAL"},
-      {autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN, "UNKNOWN"},
-    };
-
-    if (const auto state = state_string_map.find(state_number); state == state_string_map.end()) {
-      throw common::Error("Unexpected MrmState::state, number: ", state_number);
-    } else {
-      return state->second;
-    }
-  };
-
-  minimum_risk_maneuver_state = to_minimum_risk_maneuver_state_string(message.state);
+  minimum_risk_maneuver_state = toMinimumRiskManeuverStateString(message.state);
 
   minimum_risk_maneuver_behavior =
     toMinimumRiskManeuverBehaviorString<autoware_adapi_v1_msgs::msg::MrmState>(message.behavior);
