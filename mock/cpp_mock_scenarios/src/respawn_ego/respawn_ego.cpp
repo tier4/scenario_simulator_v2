@@ -12,33 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-#include <iostream>
-
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
 #include <string>
+#include <traffic_simulator/api/api.hpp>
 #include <vector>
-
-
 
 namespace cpp_mock_scenarios
 {
-class TeleportActionScenario : public cpp_mock_scenarios::CppScenarioNode
+class RespawnEgoScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit TeleportActionScenario(const rclcpp::NodeOptions & option)
+  explicit RespawnEgoScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "teleport_action", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "respawn_ego", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option),
-      goal_pose{api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0))},
-      new_position_subscriber{create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>("/initialpose", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
+    goal_pose{
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0))},
+    new_position_subscriber{create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
+      "/initialpose", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const geometry_msgs::msg::PoseWithCovarianceStamped & message) {
         geometry_msgs::msg::PoseStamped goal_msg;
         goal_msg.header.frame_id = "map";
@@ -58,17 +53,17 @@ private:
   }
 
   void onInitialize() override
-  {    
+  {
     spawnEgoEntity(
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0)),
-      {goal_pose},
-      getVehicleParameters());
+      {goal_pose}, getVehicleParameters());
   }
 
 private:
-  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose goal_pose;
+  const traffic_simulator::lanelet_pose::CanonicalizedLaneletPose goal_pose;
 
-  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr new_position_subscriber;
+  const rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
+    new_position_subscriber;
 };
 }  // namespace cpp_mock_scenarios
 
@@ -76,7 +71,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<cpp_mock_scenarios::TeleportActionScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::RespawnEgoScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;
