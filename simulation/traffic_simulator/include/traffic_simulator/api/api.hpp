@@ -163,6 +163,56 @@ public:
   {
     return entity_manager_ptr_->getHdmapUtils()->toMapPose(pose).pose;
   }
+  
+  void respawnEntity([[maybe_unused]] const geometry_msgs::msg::PoseWithCovarianceStamped & message )
+  {
+    // auto pose = message.pose;
+    std::cout<<"TeleportAction"<<std::endl;
+    // setEntityStatus("ego", message.pose.pose);
+    
+    auto get_vehicle_parameters = [](){
+      traffic_simulator_msgs::msg::VehicleParameters parameters;
+      parameters.name = "vehicle.volkswagen.t";
+      parameters.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+      parameters.performance.max_speed = 69.444;
+      parameters.performance.max_acceleration = 200;
+      parameters.performance.max_deceleration = 10.0;
+      parameters.bounding_box.center.x = 1.5;
+      parameters.bounding_box.center.y = 0.0;
+      parameters.bounding_box.center.z = 0.9;
+      parameters.bounding_box.dimensions.x = 4.5;
+      parameters.bounding_box.dimensions.y = 2.1;
+      parameters.bounding_box.dimensions.z = 1.8;
+      parameters.axles.front_axle.max_steering = 0.5;
+      parameters.axles.front_axle.wheel_diameter = 0.6;
+      parameters.axles.front_axle.track_width = 1.8;
+      parameters.axles.front_axle.position_x = 3.1;
+      parameters.axles.front_axle.position_z = 0.3;
+      parameters.axles.rear_axle.max_steering = 0.0;
+      parameters.axles.rear_axle.wheel_diameter = 0.6;
+      parameters.axles.rear_axle.track_width = 1.8;
+      parameters.axles.rear_axle.position_x = 0.0;
+      parameters.axles.rear_axle.position_z = 0.3;
+      return parameters;
+    };
+
+    simulation_api_schema::DespawnEntityRequest req;
+    req.set_name("ego");
+
+    // auto res = zeromq_client_.call(req);
+
+    if (auto res = zeromq_client_.call(req); res.result().success()) {
+      simulation_api_schema::SpawnVehicleEntityRequest spawn_req;
+      spawn_req.set_is_ego(true);
+      simulation_interface::toProto(toMapPose(message.pose.pose), *spawn_req.mutable_pose());
+      spawn_req.set_initial_speed(0.0);
+      simulation_interface::toProto(get_vehicle_parameters(), *spawn_req.mutable_parameters());
+      spawn_req.mutable_parameters()->set_name("ego");
+      spawn_req.set_asset_key("");
+
+      zeromq_client_.call(spawn_req).result().success();
+    }
+  }
 
   template <typename Pose>
   auto spawn(

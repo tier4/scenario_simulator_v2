@@ -22,6 +22,7 @@
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
+#include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_auto_planning_msgs/msg/path_with_lane_id.hpp>
@@ -68,6 +69,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   ServiceWithValidation<tier4_external_api_msgs::srv::Engage>                     requestEngage;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::InitializeLocalization>      requestInitialPose;
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>              requestSetRoutePoints;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ClearRoute>                  requestClearRoute;
   ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>                  requestSetRtcAutoMode;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>           requestSetVelocityLimit;
   // clang-format on
@@ -127,6 +129,7 @@ public:
     requestInitialPose("/api/localization/initialize", *this),
     // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
     requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
+    requestClearRoute("/api/routing/clear_route", *this),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
     getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
@@ -158,6 +161,8 @@ public:
   auto initialize(const geometry_msgs::msg::Pose &) -> void override;
 
   auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void override;
+
+  auto clearRoute() -> void override;
 
   auto requestAutoModeForCooperation(const std::string &, bool) -> void override;
 

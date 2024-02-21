@@ -340,20 +340,31 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
   });
 }
 
+auto FieldOperatorApplicationFor<AutowareUniverse>::clearRoute() -> void
+{
+  task_queue.delay([this] {
+    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ClearRoute::Request>();
+
+    requestClearRoute(request);
+  });
+}
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
-  task_queue.delay([this]() {
-    waitForAutowareStateToBeDriving([this]() {
-      auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
-      request->engage = true;
-      try {
-        return requestEngage(request);
-      } catch (const decltype(requestEngage)::TimeoutError &) {
-        // ignore timeout error because this service is validated by Autoware state transition.
-        return;
-      }
+  if (!engaged() && !isDriving()) {
+    task_queue.delay([this]() {
+      waitForAutowareStateToBeDriving([this]() {
+        auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
+        request->engage = true;
+        try {
+          return requestEngage(request);
+        } catch (const decltype(requestEngage)::TimeoutError &) {
+          // ignore timeout error because this service is validated by Autoware state transition.
+          return;
+        }
+      });
     });
-  });
+  }
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool

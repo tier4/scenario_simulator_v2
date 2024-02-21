@@ -93,6 +93,7 @@ void CppScenarioNode::spawnEgoEntity(
   api_.updateFrame();
   std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   api_.spawn("ego", spawn_lanelet_pose, parameters, traffic_simulator::VehicleBehavior::autoware());
+  api_.asFieldOperatorApplication("ego").declare_parameter<bool>("allow_goal_modification", true);
   api_.attachLidarSensor("ego", 0.0);
 
   api_.attachDetectionSensor("ego", 200.0, true, 0.0, 0, 0.0, 0.0);
@@ -124,8 +125,11 @@ void CppScenarioNode::spawnEgoEntity(
   std::atomic<bool> engaged(false);
   auto engage_thread = std::thread([&]() {
     while (!api_.asFieldOperatorApplication("ego").engaged()) {
-      api_.asFieldOperatorApplication("ego").engage();
-      std::this_thread::sleep_for(1000ms);
+      if (!api_.asFieldOperatorApplication("ego").engageable()) {
+        api_.asFieldOperatorApplication("ego").engage();
+      } else {
+      }
+      std::this_thread::sleep_for(3000ms);
     }
     engaged.store(true);
   });
