@@ -385,7 +385,7 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
   const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
   const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
 
-  // calculate ego pitch angle considering ego yaw.
+  // @note calculate ego pitch angle considering ego yaw.
   const double diff_z = next_point.z - prev_point.z;
   const double diff_xy = std::hypot(next_point.x - prev_point.x, next_point.y - prev_point.y) /
                          std::cos(ego_yaw_against_lanelet);
