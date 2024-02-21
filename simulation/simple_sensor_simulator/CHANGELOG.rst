@@ -2,6 +2,31 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.1 (2024-02-15)
+------------------
+
+1.0.0 (2024-02-14)
+------------------
+* Merge pull request `#1184 <https://github.com/tier4/scenario_simulator_v2/issues/1184>`_ from tier4/feature/consider_tread_in_ego_entity
+  Feature/consider tread in ego entity
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/new_release_flow
+* Merge branch 'master' into fix/autoware-shutdown
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/consider_tread_in_ego_entity
+* Merge pull request `#1150 <https://github.com/tier4/scenario_simulator_v2/issues/1150>`_ from tier4/feature/real-time-factor-control
+  Feature/real time factor control
+* add setTwist/setAcceleration function
+* extend matching length
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into feature/real-time-factor-control
+* Merge branch 'tier4:master' into random-test-runner-docs-update
+* Setting concealer use_sim_time manually instead of using global arguments.
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* UpdateStepTime request for updating simple sensor simulation step_time
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Merge remote-tracking branch 'origin/master' into fix/autoware-shutdown
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, Paweł Lech, Tatsuya Yamasaki, pawellech1, yamacir-kit
+
 0.9.0 (2023-12-21)
 ------------------
 * Merge remote-tracking branch 'tier4/master' into fix/geometry-bug-fixes

@@ -1,5 +1,9 @@
 # Release Notes
 
+!!! Warning
+    This release note does not record any update differences since version 1.0.0.
+    If you would like to check for update differences since version 1.0.0, please refer to [this page.](https://github.com/tier4/scenario_simulator_v2/releases)
+
 ## Difference between the latest release and master
 
 Major Changes :race_car: :red_car: :blue_car:
