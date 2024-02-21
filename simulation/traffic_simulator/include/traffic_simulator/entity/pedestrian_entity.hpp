@@ -89,7 +89,7 @@ public:
 
   auto getVehicleParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters override
   {
-    THROW_SEMANTIC_ERROR("getVehicleParametrs function cannot be used in PedestrianEntity");
+    THROW_SEMANTIC_ERROR("getVehicleParameters function cannot be used in PedestrianEntity");
   }
 
   void setAccelerationLimit(double acceleration) override;

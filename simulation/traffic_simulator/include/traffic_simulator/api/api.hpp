@@ -169,7 +169,7 @@ public:
     const geometry_msgs::msg::PoseStamped goal_pose)
   {
     if (name != "ego") {
-      throw std::runtime_error("Respawning entities other than EGO is not supported");
+      throw std::runtime_error("Respawn of any entities other than EGO is not supported");
     }
 
     simulation_api_schema::DespawnEntityRequest req;
