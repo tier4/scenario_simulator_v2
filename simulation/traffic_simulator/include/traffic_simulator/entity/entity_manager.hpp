@@ -289,7 +289,6 @@ public:
   FORWARD_TO_ENTITY(getCurrentAccel, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
-  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getDistanceToLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
   FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
@@ -526,7 +525,19 @@ public:
               pose, parameters.bounding_box,
               entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
                 entity_status.type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT,
-              getDefaultMatchingDistanceForLaneletPoseCalculation(name));
+              [](const auto & parameters) {
+                if constexpr (std::is_same_v<
+                                std::decay_t<Parameters>,
+                                traffic_simulator_msgs::msg::VehicleParameters>) {
+                  return std::max(
+                           parameters.axles.front_axle.track_width,
+                           parameters.axles.rear_axle.track_width) *
+                           0.5 +
+                         1.0;
+                } else {
+                  return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
+                }
+              }(parameters));
             lanelet_pose) {
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
