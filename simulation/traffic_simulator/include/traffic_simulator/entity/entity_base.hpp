@@ -120,6 +120,9 @@ public:
 
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
+  virtual auto getVehicleParameters() const
+    -> const traffic_simulator_msgs::msg::VehicleParameters = 0;
+
   virtual auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & = 0;
 

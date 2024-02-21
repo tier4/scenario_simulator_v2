@@ -319,6 +319,7 @@ public:
   FORWARD_TO_ENTITY(setDecelerationRateLimit, );
   FORWARD_TO_ENTITY(setLinearVelocity, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
+  FORWARD_TO_ENTITY(getVehicleParameters, );
 
 #undef FORWARD_TO_ENTITY
 

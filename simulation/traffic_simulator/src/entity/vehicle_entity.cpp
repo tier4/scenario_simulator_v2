@@ -127,6 +127,12 @@ auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::Waypoin
   }
 }
 
+auto VehicleEntity::getVehicleParameters() const
+  -> const traffic_simulator_msgs::msg::VehicleParameters
+{
+  return behavior_plugin_ptr_->getVehicleParameters();
+}
+
 void VehicleEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
