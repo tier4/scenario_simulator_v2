@@ -4,11 +4,10 @@ If the entity's behavioral logic is planned in the lane coordinate system, skip 
 
 ## Ego Entity
 
-Since EgoEntity is controlled by Autoware rather than the behavior plugin, this process is performed for every frame update.  
+Since EgoEntity is controlled in map coordinates by Autoware rather than in lane coordinates using a motion plugin, this process is performed at each frame update.  
 This process is implemented [here](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/simulation/traffic_simulator/src/api/api.cpp#L240C9-L240C19) and [here](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/simulation/traffic_simulator/src/entity/ego_entity.cpp#L276-L312).
 
 ### Search for matching lanes
-
 This process branches off into 2 or 3 depending on the outcome of 1.  
 If 3 is executed and fails, fallbacks to 4.
 
