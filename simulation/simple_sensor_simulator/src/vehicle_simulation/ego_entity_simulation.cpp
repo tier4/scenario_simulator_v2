@@ -381,7 +381,7 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
   const auto & prev_point = centerline_points.at(ego_seg_idx);
   const auto & next_point = centerline_points.at(ego_seg_idx + 1);
 
-  // calculate ego yaw angle on lanelet coordinates
+  // @note Calculate ego yaw angle on lanelet coordinates
   const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
   const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
 
