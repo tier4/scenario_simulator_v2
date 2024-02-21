@@ -86,7 +86,6 @@ private:
   {
     new_position_subscriber = this->create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>("/initialpose", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const geometry_msgs::msg::PoseWithCovarianceStamped & message) {
-        api_.respawnEntity(message);
         
         geometry_msgs::msg::PoseStamped goal_msg;
         // auto time = get_clock()->now();
@@ -95,14 +94,7 @@ private:
         goal_msg.header.frame_id = "map";
         goal_msg.pose = api_.toMapPose(api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0)));
 
-        api_.asFieldOperatorApplication("ego").clearRoute();
-        api_.asFieldOperatorApplication("ego").plan(std::vector<geometry_msgs::msg::PoseStamped>{goal_msg});
-
-        while (!api_.asFieldOperatorApplication("ego").engageable()) {
-          api_.updateFrame();
-          std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
-        }
-        api_.asFieldOperatorApplication("ego").engage();
+        api_.respawn("ego", message, goal_msg);
       });
     
     spawnEgoEntity(
