@@ -33,7 +33,7 @@ After the lanes to be matched have been determined, the calculation of the speci
 ![Lane pose calculation](../../image/lane_pose_calculation.png "Lane pose calculation.")
 
 The centerline of a lane is expressed by the cubic equation [Catmull-Rom spline.](https://en.wikipedia.org/wiki/Centripetal_Catmull%E2%80%93Rom_spline)  
-Catmull-Rom spline and line perturbation are implemented by finding the multiple solution of one cubic equation.  
+Catmull-Rom spline and line segment are implemented by finding the multiple solution of one cubic equation.  
 A specific implementation can be found [here](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/common/math/geometry/src/solver/polynomial_solver.cpp#L98-L131) and [here.](https://github.com/tier4/scenario_simulator_v2/blob/5f19d39ef29243396f26225976975f0c27914c12/common/math/geometry/src/spline/hermite_curve.cpp#L124-L187)
 
 Let $a_i,b_i,c_i,d_i (i = x, y, z)$ $s = [0,1]$ is a coefficient of the spline.  
