@@ -520,7 +520,7 @@ public:
       } else {
         entity_status.pose = pose;
 
-        /// @note If the entity is pedestrian or mis object, we have to consider matching to crosswalk lanelet.
+        /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
         if (const auto lanelet_pose = toLaneletPose(
               pose, parameters.bounding_box,
               entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
