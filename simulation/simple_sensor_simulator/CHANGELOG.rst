@@ -2,6 +2,13 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.2.0 (2024-02-22)
+------------------
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge branch 'master' into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Contributors: Masaya Kataoka
+
 1.1.0 (2024-02-22)
 ------------------
 * Merge pull request `#1182 <https://github.com/tier4/scenario_simulator_v2/issues/1182>`_ from tier4/feature/slope_vehicle_model

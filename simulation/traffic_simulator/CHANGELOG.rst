@@ -2,6 +2,26 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.2.0 (2024-02-22)
+------------------
+* Merge pull request `#1194 <https://github.com/tier4/scenario_simulator_v2/issues/1194>`_ from tier4/feature/default_matching_distance
+  Feature/default matching distance
+* Merge branch 'feature/default_matching_distance' of https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  Co-authored-by: Kotaro Yoshimoto <pythagora.yoshimoto@gmail.com>
+* Merge branch 'master' into feature/default_matching_distance
+* Merge branch 'feature/default_matching_distance' of https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* fix mathing algorithum
+* simplify code
+* passing matching distance for lanelet_pose_caluculation
+* fix document
+* fix copmile error
+* add getDefaultMatchingDistanceForLaneletPoseCalculation() for vehicle entity
+* add getDefaultMatchinDistance function
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 1.1.0 (2024-02-22)
 ------------------
 * Merge pull request `#1182 <https://github.com/tier4/scenario_simulator_v2/issues/1182>`_ from tier4/feature/slope_vehicle_model

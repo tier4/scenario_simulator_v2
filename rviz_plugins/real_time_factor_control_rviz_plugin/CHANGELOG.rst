@@ -2,6 +2,13 @@
 Changelog for package real_time_factor_control_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.2.0 (2024-02-22)
+------------------
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge branch 'master' into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Contributors: Masaya Kataoka
+
 1.1.0 (2024-02-22)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model

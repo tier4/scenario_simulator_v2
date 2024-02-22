@@ -2,6 +2,16 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.2.0 (2024-02-22)
+------------------
+* Merge pull request `#1194 <https://github.com/tier4/scenario_simulator_v2/issues/1194>`_ from tier4/feature/default_matching_distance
+  Feature/default matching distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge branch 'master' into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* passing matching distance for lanelet_pose_caluculation
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 1.1.0 (2024-02-22)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
