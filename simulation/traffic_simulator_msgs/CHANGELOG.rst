@@ -2,6 +2,11 @@
 Changelog for package openscenario_msgs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.0.3 (2024-02-21)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description
+* Contributors: Masaya Kataoka
+
 1.0.2 (2024-02-21)
 ------------------
 * Merge remote-tracking branch 'origin/master' into doc/lane_pose_calculation
