@@ -6,12 +6,12 @@ on:
     - cron: 0 0 * * *
   pull_request:
     paths:
-      - '**'
-      - '!docs/**'
-      - '!README.md'
-      - '!.github/**'
-      - '.github/workflows/Docker.yaml'
-      - '!mkdocs.yml'
+      - "**"
+      - "!docs/**"
+      - "!README.md"
+      - "!.github/**"
+      - ".github/workflows/Docker.yaml"
+      - "!mkdocs.yml"
   push:
     branches:
       - master
@@ -62,19 +62,3 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           targets: |
             ${{ matrix.rosdistro }}
-          set: |
-            *.platform=linux/amd64
-
-      - name: Build and push (arm64)
-        uses: docker/bake-action@v3
-        if: ${{ matrix.runs_on == 'macos-14'}}
-        with:
-          files: |
-            ./docker-bake.hcl
-          workdir: .
-          no-cache: true
-          push: ${{ github.event_name != 'pull_request' }}
-          targets: |
-            ${{ matrix.rosdistro }}
-          set: |
-            *.platform=linux/arm64/v8
