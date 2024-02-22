@@ -47,7 +47,7 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() >= 19) {
+    if (api_.getCurrentTime() >= 30) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
