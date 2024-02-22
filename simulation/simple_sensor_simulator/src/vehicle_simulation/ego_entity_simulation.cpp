@@ -13,9 +13,10 @@
 // limitations under the License.
 
 #include <concealer/autoware_universe.hpp>
-#include <filesystem>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+
+#include <filesystem>
 
 namespace vehicle_simulation
 {
@@ -34,12 +35,13 @@ static auto getParameter(const std::string & name, T value = {})
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const rclcpp::Parameter & use_sim_time)
+  const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   hdmap_utils_ptr_(hdmap_utils),
-  vehicle_parameters(parameters)
+  vehicle_parameters(parameters),
+  consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope)
 {
   autoware->set_parameter(use_sim_time);
 }
@@ -107,8 +109,8 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto steer_time_delay           = getParameter<double>("steer_time_delay",            0.24);
   const auto vel_lim                    = getParameter<double>("vel_lim",                     parameters.performance.max_speed);  // 50.0
   const auto vel_rate_lim               = getParameter<double>("vel_rate_lim",                parameters.performance.max_acceleration);  // 7.0
-  const auto vel_time_constant          = getParameter<double>("vel_time_constant",           0.1);
-  const auto vel_time_delay             = getParameter<double>("vel_time_delay",              0.1);
+  const auto vel_time_constant          = getParameter<double>("vel_time_constant",           0.1);  // @note 0.5 is default value on simple_planning_simulator
+  const auto vel_time_delay             = getParameter<double>("vel_time_delay",              0.1);  // @note 0.25 is default value on simple_planning_simulator
   const auto wheel_base                 = getParameter<double>("wheel_base",                  parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
   // clang-format on
 
@@ -213,16 +215,16 @@ void EgoEntitySimulation::overwrite(
 
     auto world_relative_position = [&]() -> Eigen::VectorXd {
       auto v = Eigen::VectorXd(3);
-      v(0) = status.pose.position.x - initial_pose_.position.x;
-      v(1) = status.pose.position.y - initial_pose_.position.y;
-      v(2) = status.pose.position.z - initial_pose_.position.z;
+      v(0) = status->pose.position.x - initial_pose_.position.x;
+      v(1) = status->pose.position.y - initial_pose_.position.y;
+      v(2) = status->pose.position.z - initial_pose_.position.z;
       return getRotationMatrix(initial_pose_.orientation).transpose() * v;
     }();
 
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
         getRotationMatrix(initial_pose_.orientation).transpose() *
-        getRotationMatrix(status.pose.orientation));
+        getRotationMatrix(status->pose.orientation));
       geometry_msgs::msg::Quaternion relative_orientation;
       relative_orientation.x = q.x();
       relative_orientation.y = q.y();
@@ -236,7 +238,7 @@ void EgoEntitySimulation::overwrite(
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
-        state(5) = status.action_status.accel.linear.x;
+        state(5) = status->action_status.accel.linear.x;
         [[fallthrough]];
 
       case VehicleModelType::DELAY_STEER_VEL:
@@ -245,7 +247,7 @@ void EgoEntitySimulation::overwrite(
 
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        state(3) = status.action_status.twist.linear.x;
+        state(3) = status->action_status.twist.linear.x;
         [[fallthrough]];
 
       case VehicleModelType::IDEAL_STEER_VEL:
@@ -272,13 +274,25 @@ void EgoEntitySimulation::update(
   if (npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
+    auto acceleration_by_slope = [this]() {
+      if (consider_acceleration_by_road_slope_) {
+        // calculate longitudinal acceleration by slope
+        constexpr double gravity_acceleration = -9.81;
+        const double ego_pitch_angle = calculateEgoPitch();
+        const double slope_angle = -ego_pitch_angle;
+        return gravity_acceleration * std::sin(slope_angle);
+      } else {
+        return 0.0;
+      }
+    }();
+
     switch (vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        input(0) = autoware->getGearSign() * autoware->getAcceleration();
+        input(0) = autoware->getGearSign() * (autoware->getAcceleration() + acceleration_by_slope);
         input(1) = autoware->getSteeringAngle();
         break;
 
@@ -301,6 +315,91 @@ void EgoEntitySimulation::update(
   updatePreviousValues();
 }
 
+auto EgoEntitySimulation::getMatchedLaneletPoseFromEntityStatus(
+  const traffic_simulator_msgs::msg::EntityStatus & status, const double entity_width) const
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  // @note The lanelet matching algorithm should be equivalent to the one used in
+  // EgoEntity::setMapPose
+  const auto unique_route_lanelets =
+    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  const auto matching_length = [entity_width] { return entity_width * 0.5 + 1.0; }();
+
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+
+  if (unique_route_lanelets.empty()) {
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_length);
+  } else {
+    lanelet_pose =
+      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, matching_length);
+    if (!lanelet_pose) {
+      lanelet_pose =
+        hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_length);
+    }
+  }
+  return lanelet_pose;
+}
+
+auto EgoEntitySimulation::calculateEgoPitch() const -> double
+{
+  // calculate prev/next point of lanelet centerline nearest to ego pose.
+  auto ego_lanelet = getMatchedLaneletPoseFromEntityStatus(
+    status_, std::max(
+               vehicle_parameters.axles.front_axle.track_width,
+               vehicle_parameters.axles.rear_axle.track_width));
+  if (not ego_lanelet) {
+    return 0.0;
+  }
+
+  auto centerline_points = hdmap_utils_ptr_->getCenterPoints(ego_lanelet.value().lanelet_id);
+
+  // @note Copied from motion_util::findNearestSegmentIndex
+  auto find_nearest_segment_index = [](
+                                      const std::vector<geometry_msgs::msg::Point> & points,
+                                      const geometry_msgs::msg::Point & point) {
+    assert(not points.empty());
+
+    double min_dist = std::numeric_limits<double>::max();
+    size_t min_idx = 0;
+
+    for (size_t i = 0; i < points.size(); ++i) {
+      const auto dist = [](const auto point1, const auto point2) {
+        const auto dx = point1.x - point2.x;
+        const auto dy = point1.y - point2.y;
+        return dx * dx + dy * dy;
+      }(points.at(i), point);
+
+      if (dist < min_dist) {
+        min_dist = dist;
+        min_idx = i;
+      }
+    }
+    return min_idx;
+  };
+
+  geometry_msgs::msg::Point ego_point;
+  ego_point.x = vehicle_model_ptr_->getX();
+  ego_point.y = vehicle_model_ptr_->getY();
+  const size_t ego_seg_idx = find_nearest_segment_index(centerline_points, ego_point);
+
+  const auto & prev_point = centerline_points.at(ego_seg_idx);
+  const auto & next_point = centerline_points.at(ego_seg_idx + 1);
+
+  // @note Calculate ego yaw angle on lanelet coordinates
+  const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
+  const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
+
+  // @note calculate ego pitch angle considering ego yaw.
+  const double diff_z = next_point.z - prev_point.z;
+  const double diff_xy = std::hypot(next_point.x - prev_point.x, next_point.y - prev_point.y) /
+                         std::cos(ego_yaw_against_lanelet);
+  const bool reverse_sign = std::cos(ego_yaw_against_lanelet) < 0.0;
+  const double ego_pitch_angle =
+    reverse_sign ? -std::atan2(-diff_z, -diff_xy) : -std::atan2(diff_z, diff_xy);
+  return ego_pitch_angle;
+}
+
 auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
 {
   geometry_msgs::msg::Twist current_twist;
@@ -309,7 +408,8 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
   return current_twist;
 }
 
-auto EgoEntitySimulation::getCurrentPose() const -> geometry_msgs::msg::Pose
+auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
+  -> geometry_msgs::msg::Pose
 {
   Eigen::VectorXd relative_position(3);
   relative_position(0) = vehicle_model_ptr_->getX();
@@ -322,10 +422,10 @@ auto EgoEntitySimulation::getCurrentPose() const -> geometry_msgs::msg::Pose
   current_pose.position.x = initial_pose_.position.x + relative_position(0);
   current_pose.position.y = initial_pose_.position.y + relative_position(1);
   current_pose.position.z = initial_pose_.position.z + relative_position(2);
-  current_pose.orientation = [this]() {
+  current_pose.orientation = [&]() {
     geometry_msgs::msg::Vector3 rpy;
     rpy.x = 0;
-    rpy.y = 0;
+    rpy.y = pitch_angle;
     rpy.z = vehicle_model_ptr_->getYaw();
     return initial_pose_.orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
   }();
@@ -398,40 +498,20 @@ auto EgoEntitySimulation::updateStatus(double current_scenario_time, double step
 auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
   traffic_simulator_msgs::msg::EntityStatus & status) -> void
 {
-  const auto unique_route_lanelets =
-    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
-  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-
-  const auto get_matching_length = [&] {
-    return std::max(
-             vehicle_parameters.axles.front_axle.track_width,
-             vehicle_parameters.axles.rear_axle.track_width) *
-             0.5 +
-           1.0;
-  };
-
-  if (unique_route_lanelets.empty()) {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      status.pose, status.bounding_box, false, get_matching_length());
-  } else {
-    lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, get_matching_length());
-    if (!lanelet_pose) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        status.pose, status.bounding_box, false, get_matching_length());
-    }
-  }
-  if (lanelet_pose) {
+  if (
+    auto lanelet_pose = getMatchedLaneletPoseFromEntityStatus(
+      status, std::max(
+                vehicle_parameters.axles.front_axle.track_width,
+                vehicle_parameters.axles.rear_axle.track_width))) {
     math::geometry::CatmullRomSpline spline(
       hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
     if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.value()).z;
     }
-  }
-
-  status.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-  if (status.lanelet_pose_valid) {
+    status.lanelet_pose_valid = true;
     status.lanelet_pose = lanelet_pose.value();
+  } else {
+    status.lanelet_pose_valid = false;
   }
 }
 }  // namespace vehicle_simulation

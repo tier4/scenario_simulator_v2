@@ -297,22 +297,15 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-  const auto get_matching_length = [&] {
-    return std::max(
-             vehicle_parameters.axles.front_axle.track_width,
-             vehicle_parameters.axles.rear_axle.track_width) *
-             0.5 +
-           1.0;
-  };
   if (unique_route_lanelets.empty()) {
-    lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false, get_matching_length());
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+      map_pose, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation());
   } else {
-    lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(map_pose, unique_route_lanelets, get_matching_length());
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+      map_pose, unique_route_lanelets, getDefaultMatchingDistanceForLaneletPoseCalculation());
     if (!lanelet_pose) {
-      lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false, get_matching_length());
+      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+        map_pose, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation());
     }
   }
   geometry_msgs::msg::Pose map_pose_z_fixed = map_pose;

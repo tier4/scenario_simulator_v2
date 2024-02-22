@@ -42,6 +42,8 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
   behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
+  behavior_plugin_ptr_->setDefaultMatchingDistanceForLaneletPoseCalculation(
+    getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 
 void VehicleEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
@@ -70,6 +72,15 @@ auto VehicleEntity::getDefaultDynamicConstraints() const
 {
   static auto default_dynamic_constraints = traffic_simulator_msgs::msg::DynamicConstraints();
   return default_dynamic_constraints;
+}
+
+auto VehicleEntity::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
+{
+  return std::max(
+           vehicle_parameters.axles.front_axle.track_width,
+           vehicle_parameters.axles.rear_axle.track_width) *
+           0.5 +
+         1.0;
 }
 
 auto VehicleEntity::getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter
