@@ -238,7 +238,7 @@ public:
 
   /*   */ auto requestSynchronize(
     const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,
-    const double threshold) -> bool;
+    const double threshold, const double accel_limit) -> bool;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
     -> void final;

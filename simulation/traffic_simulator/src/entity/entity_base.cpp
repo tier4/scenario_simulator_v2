@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cmath>
 #include <geometry/distance.hpp>
 #include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
@@ -871,7 +872,7 @@ auto EntityBase::getIfArrivedToTargetLaneletPose(
 
 auto EntityBase::requestSynchronize(
   const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,
-  const double threshold) -> bool
+  const double threshold, const double accel_limit) -> bool
 {
   if (name == "ego") {
     /**
@@ -885,7 +886,7 @@ auto EntityBase::requestSynchronize(
   }
 
   job_list_.append(
-    [this, ego_target, entity_target](double) {
+    [this, ego_target, entity_target, accel_limit](double job_duration) {
       /**
        * @brief This is draft function for synchronization.
        * It is not a good way to synchronize the entity with the ego.
@@ -897,31 +898,62 @@ auto EntityBase::requestSynchronize(
         static_cast<LaneletPose>(other_status_.find("ego")->second.getLaneletPose()),
         static_cast<LaneletPose>(ego_target));
 
+      /**
+       * *********************CHECK*********************
+       * there might be a better way if the car had passed away
+       */
       if (!entity_distance.has_value()) {
-        THROW_SEMANTIC_ERROR(
-          "Entity is already over the target lanelet.");
+        return true;
+      }
+      if (!ego_distance.has_value()) {
+        return true;
       }
       const auto ego_velocity = other_status_.find("ego")->second.getTwist().linear.x;
-      // be better to use acceleration,jerk to estimate the arrival time
+      const auto entity_velocity = this->getStatus().getTwist().linear.x;
 
-      // estimate ego's arrival time to the target point
-      // can estimate it more precisely by using accel,jerk
+      // be better to use acceleration,jerk to estimate the arrival time
       const auto ego_arrival_time = (ego_velocity != 0) ? ego_distance.value() / ego_velocity : 0;
 
-      // calculate the speed of entity to synchronize with ego
-      // really just a simple example, kind of like a joke
-      const auto entity_velocity_to_synchronize = entity_distance.value() / ego_arrival_time;
+      // if(ego_arrival_time < std::sqrt(ego_distance.value()/accel_limit)){
+      //   THROW_SEMANTIC_ERROR(
+      //     "The entity can not stop on the destination by time.");
+      // }
+      RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "ego arrival time: %f", ego_arrival_time);
+
+      auto entity_velocity_to_synchronize = entity_velocity;
+
+      if (
+        (entity_velocity * ego_arrival_time) -
+          (entity_velocity * entity_velocity / (2 * accel_limit)) <=
+        entity_distance.value()) {
+          RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "speed up");
+        // speed up
+        entity_velocity_to_synchronize = entity_velocity + accel_limit * job_duration;
+      } else {
+        RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "keep or slow down");
+        // keep or slow down
+        auto vel_keep_time = 2*entity_distance.value()/entity_velocity - ego_arrival_time;
+        if(vel_keep_time < 0){
+          // slow down
+          entity_velocity_to_synchronize = entity_velocity - (entity_velocity / ego_arrival_time) * job_duration;
+        } else{
+          // keep
+          entity_velocity_to_synchronize = entity_velocity;
+        }
+      }
 
       RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "speed change");
-      // using this->requestSpeedChange here does not work in some kind of reason.
-      // it seems that after this function is called by some reason, func_on_cleanup will be deleted and become nullptr
+      /**
+       * using this->requestSpeedChange here does not work in some kind of reason.
+       * it seems that after this function is called by some reason, func_on_cleanup will be deleted and become nullptr
+      */
       // this->requestSpeedChange(entity_velocity_to_synchronize, true);
       target_speed_ = entity_velocity_to_synchronize;
       return true;
     },
     // after this im not sure it is correct, just an draft
     [this]() { RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "sync job done"); },
-    job::Type::LINEAR_VELOCITY, false, job::Event::POST_UPDATE);
+    job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
   return false;
 }
 

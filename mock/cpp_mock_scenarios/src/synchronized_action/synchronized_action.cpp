@@ -49,14 +49,13 @@ private:
 
   void onUpdate() override
   {
-    api_.requestSynchronize("npc", ego_target, npc_target, 0.2);
+    api_.requestSynchronize("npc", ego_target, npc_target, 0.2, 2.0);
       // SUCCESS
       // check if npc is in the target lanelet when ego is in the target lanelet and npc is stopped
       if (
-        // api_.getIfArrivedToTargetLaneletPose("ego", ego_target, 0.2) &&
-        // api_.getIfArrivedToTargetLaneletPose("npc", npc_target, 0.2) &&
-        // api_.getCurrentTwist("npc").linear.x <= 0.1
-        false
+        api_.getIfArrivedToTargetLaneletPose("ego", ego_target, 0.2) &&
+        api_.getIfArrivedToTargetLaneletPose("npc", npc_target, 0.2) &&
+        api_.getCurrentTwist("npc").linear.x <= 0.01
       )
     {
       stop(cpp_mock_scenarios::Result::SUCCESS);
@@ -92,7 +91,7 @@ private:
       "npc",
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 5, 0, 0, 0, 0)),
       getVehicleParameters());
-    api_.setLinearVelocity("npc", 0);
+    api_.setLinearVelocity("npc", 10);
   }
 
   auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)

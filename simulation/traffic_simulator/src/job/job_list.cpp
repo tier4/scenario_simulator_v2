@@ -33,6 +33,9 @@ void JobList::append(
 
 void JobList::update(const double step_time, const job::Event event)
 {
+  // show numper of jobs in the list
+  RCLCPP_ERROR_STREAM(rclcpp::get_logger("JobList"), "job list size: " << list_.size());
+
   for (auto & job : list_) {
     if (job.event == event) {
       job.onUpdate(step_time);
