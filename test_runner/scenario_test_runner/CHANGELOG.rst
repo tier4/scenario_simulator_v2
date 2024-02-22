@@ -2,6 +2,28 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.0 (2024-02-22)
+------------------
+* Merge pull request `#1182 <https://github.com/tier4/scenario_simulator_v2/issues/1182>`_ from tier4/feature/slope_vehicle_model
+  Consider road slope in ego vehicle simulation
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
+* chore: format
+* fix: pass consider_acceleration_by_road_slope to inside of EgoEntitySimulator
+* chore: format
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* feat(scenario_test_runner): add consider_acceleration_by_road_slope for simple_sensor_simulator
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+1.0.3 (2024-02-21)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description
+* Contributors: Masaya Kataoka
+
 1.0.2 (2024-02-21)
 ------------------
 * Merge remote-tracking branch 'origin/master' into doc/lane_pose_calculation
