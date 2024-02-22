@@ -2,6 +2,39 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.0 (2024-02-22)
+------------------
+* Merge pull request `#1182 <https://github.com/tier4/scenario_simulator_v2/issues/1182>`_ from tier4/feature/slope_vehicle_model
+  Consider road slope in ego vehicle simulation
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* chore: format
+* fix(EgoEntitySimulation)
+* refactor(EgoEntitySimulation): convert lane pose matching processing to getMatchedLaneletPoseFromEntityStatus function
+* fix: pass consider_acceleration_by_road_slope to inside of EgoEntitySimulator
+* doc: add notification to duplicated lane matching algorithm
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* chore: format
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* refactor(ego_entity_simulation): rename flag name for considering slope in ego entity simulation
+* feat(ego_entity_simulation): add flog for considering slope in ego entity simulation
+* feat(ego_entity_simulation): consider slope in ego entity simulation
+* doc: add memos to code
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 1.0.3 (2024-02-21)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description

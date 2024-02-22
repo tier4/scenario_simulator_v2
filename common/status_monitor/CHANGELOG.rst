@@ -2,6 +2,17 @@
 Changelog for package status_monitor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.0 (2024-02-22)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 1.0.3 (2024-02-21)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description
