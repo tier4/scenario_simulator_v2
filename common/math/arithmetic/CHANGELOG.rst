@@ -2,6 +2,18 @@
 Changelog for package arithmetic
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.0 (2024-02-22)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+1.0.3 (2024-02-21)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description
+* Contributors: Masaya Kataoka
+
 1.0.2 (2024-02-21)
 ------------------
 * Merge remote-tracking branch 'origin/master' into doc/lane_pose_calculation

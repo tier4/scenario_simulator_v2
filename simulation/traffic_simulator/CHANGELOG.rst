@@ -2,6 +2,28 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.0 (2024-02-22)
+------------------
+* Merge pull request `#1182 <https://github.com/tier4/scenario_simulator_v2/issues/1182>`_ from tier4/feature/slope_vehicle_model
+  Consider road slope in ego vehicle simulation
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
+* Update simulation/traffic_simulator/src/entity/ego_entity.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* refactor(EgoEntitySimulation): convert lane pose matching processing to getMatchedLaneletPoseFromEntityStatus function
+* doc: add notification to duplicated lane matching algorithm
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+1.0.3 (2024-02-21)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description
+* Contributors: Masaya Kataoka
+
 1.0.2 (2024-02-21)
 ------------------
 * fix CHANGELOG
