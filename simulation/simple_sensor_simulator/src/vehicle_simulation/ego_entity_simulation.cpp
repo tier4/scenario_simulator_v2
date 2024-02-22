@@ -214,16 +214,16 @@ void EgoEntitySimulation::overwrite(
 
     auto world_relative_position = [&]() -> Eigen::VectorXd {
       auto v = Eigen::VectorXd(3);
-      v(0) = status->pose.position.x - initial_pose_.position.x;
-      v(1) = status->pose.position.y - initial_pose_.position.y;
-      v(2) = status->pose.position.z - initial_pose_.position.z;
+      v(0) = status.pose.position.x - initial_pose_.position.x;
+      v(1) = status.pose.position.y - initial_pose_.position.y;
+      v(2) = status.pose.position.z - initial_pose_.position.z;
       return getRotationMatrix(initial_pose_.orientation).transpose() * v;
     }();
 
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
         getRotationMatrix(initial_pose_.orientation).transpose() *
-        getRotationMatrix(status->pose.orientation));
+        getRotationMatrix(status.pose.orientation));
       geometry_msgs::msg::Quaternion relative_orientation;
       relative_orientation.x = q.x();
       relative_orientation.y = q.y();
@@ -237,7 +237,7 @@ void EgoEntitySimulation::overwrite(
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
       case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
-        state(5) = status->action_status.accel.linear.x;
+        state(5) = status.action_status.accel.linear.x;
         [[fallthrough]];
 
       case VehicleModelType::DELAY_STEER_VEL:
@@ -246,7 +246,7 @@ void EgoEntitySimulation::overwrite(
 
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
-        state(3) = status->action_status.twist.linear.x;
+        state(3) = status.action_status.twist.linear.x;
         [[fallthrough]];
 
       case VehicleModelType::IDEAL_STEER_VEL:
