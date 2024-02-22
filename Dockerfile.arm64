@@ -27,15 +27,10 @@ RUN source /opt/ros/${ROS_DISTRO}/setup.bash && rosdep install -iy --from-paths 
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
 
-ENV CC="/usr/lib/ccache/gcc"
-ENV CXX="/usr/lib/ccache/g++"
-ENV CCACHE_DIR="/ccache"
-RUN --mount=type=cache,target=/ccache source /opt/ros/${ROS_DISTRO}/setup.bash && \
+RUN source /opt/ros/${ROS_DISTRO}/setup.bash && \
     colcon build --symlink-install \
     --cmake-args \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-    -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
     -DBUILD_CPP_MOCK_SCENARIOS=ON
 COPY ./docker-entrypoint.sh /
 RUN chmod a+x /docker-entrypoint.sh
