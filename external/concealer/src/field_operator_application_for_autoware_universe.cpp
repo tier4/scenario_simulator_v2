@@ -342,20 +342,18 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
-  if (!isDriving()) {
-    task_queue.delay([this]() {
-      waitForAutowareStateToBeDriving([this]() {
-        auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
-        request->engage = true;
-        try {
-          return requestEngage(request);
-        } catch (const decltype(requestEngage)::TimeoutError &) {
-          // ignore timeout error because this service is validated by Autoware state transition.
-          return;
-        }
-      });
+  task_queue.delay([this]() {
+    waitForAutowareStateToBeDriving([this]() {
+      auto request = std::make_shared<tier4_external_api_msgs::srv::Engage::Request>();
+      request->engage = true;
+      try {
+        return requestEngage(request);
+      } catch (const decltype(requestEngage)::TimeoutError &) {
+        // ignore timeout error because this service is validated by Autoware state transition.
+        return;
+      }
     });
-  }
+  });
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::engageable() const -> bool
