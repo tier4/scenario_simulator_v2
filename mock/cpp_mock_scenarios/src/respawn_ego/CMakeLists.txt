@@ -10,5 +10,5 @@ install(TARGETS
 
 if(BUILD_TESTING)
   include(../../cmake/add_cpp_mock_scenario_test.cmake)
-  add_cpp_mock_scenario_test(${PROJECT_NAME} "respawn_ego" "31.0")
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "respawn_ego" "40.0")
 endif()
