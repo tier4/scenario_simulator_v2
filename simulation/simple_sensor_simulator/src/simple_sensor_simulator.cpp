@@ -47,7 +47,8 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) {
       return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
-    })
+    },
+    [this](auto &&... xs) { return updateStepTime(std::forward<decltype(xs)>(xs)...); })
 {
 }
 
@@ -133,6 +134,15 @@ auto ScenarioSimulator::updateFrame(const simulation_api_schema::UpdateFrameRequ
   return res;
 }
 
+auto ScenarioSimulator::updateStepTime(const simulation_api_schema::UpdateStepTimeRequest & req)
+  -> simulation_api_schema::UpdateStepTimeResponse
+{
+  auto res = simulation_api_schema::UpdateStepTimeResponse();
+  step_time_ = req.simulation_step_time();
+  res.mutable_result()->set_success(true);
+  return res;
+}
+
 auto ScenarioSimulator::updateEntityStatus(
   const simulation_api_schema::UpdateEntityStatusRequest & req)
   -> simulation_api_schema::UpdateEntityStatusResponse
@@ -197,8 +207,16 @@ auto ScenarioSimulator::spawnVehicleEntity(
     ego_vehicles_.emplace_back(req.parameters());
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
+    auto get_consider_acceleration_by_road_slope = [&]() {
+      if (!has_parameter("consider_acceleration_by_road_slope")) {
+        declare_parameter("consider_acceleration_by_road_slope", false);
+      }
+      return get_parameter("consider_acceleration_by_road_slope").as_bool();
+    };
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
-      parameters, step_time_, hdmap_utils_);
+      parameters, step_time_, hdmap_utils_,
+      get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
+      get_consider_acceleration_by_road_slope());
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
     simulation_interface::toMsg(req.pose(), initial_status.pose);

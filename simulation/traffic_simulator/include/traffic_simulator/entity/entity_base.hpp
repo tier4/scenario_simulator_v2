@@ -137,6 +137,8 @@ public:
   /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
     -> geometry_msgs::msg::Pose;
 
+  virtual auto getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double;
+
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
@@ -218,6 +220,12 @@ public:
     double min_jerk, double max_jerk) -> void;
 
   virtual auto setVelocityLimit(double) -> void;
+
+  virtual auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void;
+
+  /*   */ auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
+
+  /*   */ auto setAcceleration(const geometry_msgs::msg::Accel & accel) -> void;
 
   virtual void startNpcLogic();
 
