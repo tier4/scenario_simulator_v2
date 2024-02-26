@@ -2,6 +2,15 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.3.1 (2024-02-26)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Contributors: Masaya Kataoka
+
 1.3.0 (2024-02-26)
 ------------------
 * Merge pull request `#1190 <https://github.com/tier4/scenario_simulator_v2/issues/1190>`_ from tier4/feature/mrm_behavior/pull_over

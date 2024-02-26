@@ -2,6 +2,18 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.3.1 (2024-02-26)
+------------------
+* Merge pull request `#1195 <https://github.com/tier4/scenario_simulator_v2/issues/1195>`_ from tier4/feature/split_rviz_packages
+  Feature/split rviz packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* move packages
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
 1.3.0 (2024-02-26)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
