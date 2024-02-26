@@ -76,6 +76,8 @@ public:
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
+  auto getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double override;
+
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;

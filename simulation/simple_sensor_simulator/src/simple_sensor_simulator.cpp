@@ -48,13 +48,7 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) {
       return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
     },
-    [this](auto &&... xs) { return updateStepTime(std::forward<decltype(xs)>(xs)...); }),
-  consider_pose_by_road_slope_([&]() {
-    if (!has_parameter("consider_pose_by_road_slope")) {
-      declare_parameter("consider_pose_by_road_slope", false);
-    }
-    return get_parameter("consider_pose_by_road_slope").as_bool();
-  }())
+    [this](auto &&... xs) { return updateStepTime(std::forward<decltype(xs)>(xs)...); })
 {
 }
 
@@ -213,10 +207,23 @@ auto ScenarioSimulator::spawnVehicleEntity(
     ego_vehicles_.emplace_back(req.parameters());
     traffic_simulator_msgs::msg::VehicleParameters parameters;
     simulation_interface::toMsg(req.parameters(), parameters);
+    auto get_consider_acceleration_by_road_slope = [&]() {
+      if (!has_parameter("consider_acceleration_by_road_slope")) {
+        declare_parameter("consider_acceleration_by_road_slope", false);
+      }
+      return get_parameter("consider_acceleration_by_road_slope").as_bool();
+    };
+    auto get_consider_pose_by_road_slope = [&]() {
+      if (!has_parameter("consider_pose_by_road_slope")) {
+        declare_parameter("consider_pose_by_road_slope", false);
+      }
+      return get_parameter("consider_pose_by_road_slope").as_bool();
+    };
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
       parameters, step_time_, hdmap_utils_,
       get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
-      consider_pose_by_road_slope_);
+      get_consider_acceleration_by_road_slope(),
+      get_consider_pose_by_road_slope());
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
     simulation_interface::toMsg(req.pose(), initial_status.pose);
