@@ -309,6 +309,7 @@ public:
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
+  FORWARD_TO_ENTITY(isControlledBySimulator, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );

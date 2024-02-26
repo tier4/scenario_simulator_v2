@@ -226,6 +226,9 @@ bool API::updateEntitiesStatusInSim()
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
     auto entity_status = entity_manager_ptr_->getEntityStatus(entity_name);
     simulation_interface::toProto(static_cast<EntityStatus>(entity_status), *req.add_status());
+    if (entity_manager_ptr_->isEgo(entity_name)) {
+      req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(entity_name));
+    }
   }
 
   simulation_api_schema::UpdateEntityStatusResponse res;
@@ -282,21 +285,6 @@ void API::startNpcLogic()
   }
   entity_manager_ptr_->startNpcLogic();
   clock_.start();
-}
-
-auto API::requestFollowTrajectory(
-  const std::string & name,
-  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory) -> bool
-{
-  if (entity_manager_ptr_->isEgo(name)) {
-    auto request = simulation_api_schema::FollowPolylineTrajectoryRequest();
-    *request.mutable_name() = name;
-    *request.mutable_trajectory() = simulation_interface::toProtobufMessage(*trajectory);
-    return zeromq_client_.call(request).result().success();
-  } else {
-    entity_manager_ptr_->requestFollowTrajectory(name, trajectory);
-    return true;
-  }
 }
 
 void API::requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id)
