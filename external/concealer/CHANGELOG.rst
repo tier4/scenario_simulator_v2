@@ -2,6 +2,22 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.3.0 (2024-02-26)
+------------------
+* Merge pull request `#1190 <https://github.com/tier4/scenario_simulator_v2/issues/1190>`_ from tier4/feature/mrm_behavior/pull_over
+  Support `PULL_OVER` as minimul risk manuever behavior in `autoware_adapi_v1_msgs/system/msg/MrmState.msg`
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/feature/mrm_behavior/pull_over' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* refactor(concealer): convert a lambda function to local function
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+  # Conflicts:
+  #	external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* feat(concealer): Add support for optional MrmState::PULL_OVER for mrm behavior
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 1.2.0 (2024-02-22)
 ------------------
 * Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
