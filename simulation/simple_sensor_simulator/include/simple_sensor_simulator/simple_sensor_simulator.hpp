@@ -157,7 +157,6 @@ private:
   geographic_msgs::msg::GeoPoint getOrigin();
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   std::shared_ptr<vehicle_simulation::EgoEntitySimulation> ego_entity_simulation_;
-  const bool consider_pose_by_road_slope_;
 
   bool isEgo(const std::string & name);
   bool isEntityExists(const std::string & name);
