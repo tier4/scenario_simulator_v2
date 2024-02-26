@@ -203,10 +203,10 @@ def launch_setup(context, *args, **kwargs):
             on_exit=ShutdownOnce(),
         ),
         Node(
-            package="openscenario_visualization",
-            executable="openscenario_visualization_node",
+            package="traffic_simulator",
+            executable="visualization_node",
             namespace="simulation",
-            name="openscenario_visualizer",
+            name="visualizer",
             output="screen",
         ),
         Node(
