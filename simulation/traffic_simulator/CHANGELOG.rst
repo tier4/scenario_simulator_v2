@@ -2,6 +2,36 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.0 (2024-02-26)
+------------------
+* Merge pull request `#1163 <https://github.com/tier4/scenario_simulator_v2/issues/1163>`_ from tier4/fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+  fix(follow_trajectory_action): fix cooperation with Autoware, fix speed limits
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* ref(ego_entity): apply clang
+* fix(ego_entity): fix after merge
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge branch 'master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* ref(follow_trajectory_action): apply review changes
+* ref(ego_entity): revert unnecessary changes
+* fix(ego_entity): remove unused arg
+* ref(sss,simulation_interface, ego_entity): apply ament_clang reformat
+* feat(ego_entity): provide FollowTrajectoryAction execution in EgoEntity, slight ref FollowTrajectoryAction
+* fear(follow_waypoint_controller): add check if remaining_time can be rounded - inf/nan
+* feat(ego_entity): update BT, overwrite only FollowTrajectoryAction
+* feat(follow_trajectory): improve invalid acc exception
+* Revert "feat(traffic_simulator): add zeromq to ego_entity, allow FTA, target_speed, max_speed to be set"
+  This reverts commit 4d150267eea2968317684dc568150283c78d0fb0.
+* ref(ego_entity_simulator, proto): review changes
+* fix(follow_trajectory): add missing header
+* ref(simulation): apply clang reformat
+* fix(traffic_simulator): remove conflicting exception
+* feat(follow_trajectory_action): waypoint passed case
+* fix(follow_waypoint_controller): fix no arrival time solution
+* fix(route_planner): provide waypoint setting in route_planner for FollowTrajectoryAction - VehicleEntity
+* feat(traffic_simulator): add zeromq to ego_entity, allow FTA, target_speed, max_speed to be set
+* ref(traffic_simulator): revert forwarding  requestFollowTrajectory
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki
+
 1.3.1 (2024-02-26)
 ------------------
 * Merge pull request `#1195 <https://github.com/tier4/scenario_simulator_v2/issues/1195>`_ from tier4/feature/split_rviz_packages

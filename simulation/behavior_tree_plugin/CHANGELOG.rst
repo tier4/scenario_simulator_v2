@@ -2,6 +2,19 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.0 (2024-02-26)
+------------------
+* Merge pull request `#1163 <https://github.com/tier4/scenario_simulator_v2/issues/1163>`_ from tier4/fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+  fix(follow_trajectory_action): fix cooperation with Autoware, fix speed limits
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* ref(follow_trajectory_action): apply review changes
+* feat(follow_trajectory_action): use current_speed if target_speed is nullopt
+* feat(follow_trajectory): add check if entity_status time is NaN
+* fix(follow_trajectory_action): fix target_speed when no route_lanelets
+* feat(follow_trajectory_action): consider lanelet2 speed limit, match position to lanelet
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki
+
 1.3.1 (2024-02-26)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages

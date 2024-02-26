@@ -2,6 +2,23 @@
 Changelog for package simulation_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.0 (2024-02-26)
+------------------
+* Merge pull request `#1163 <https://github.com/tier4/scenario_simulator_v2/issues/1163>`_ from tier4/fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+  fix(follow_trajectory_action): fix cooperation with Autoware, fix speed limits
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* ref(zmq): apply clang reformat
+* Merge branch 'master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* ref(sss,simulation_interface, ego_entity): apply ament_clang reformat
+* feat(ego_entity): update BT, overwrite only FollowTrajectoryAction
+* feat(zmq,sss): remove FollowPolylineTrajectoryRequest
+* Revert "feat(sss): allow target_speed and max_speed to be set in EgoEntitySimulation"
+  This reverts commit f8f70d2ae1b4c7c4b91ba0af8938bcadcfb71545.
+* ref(ego_entity_simulator, proto): review changes
+* feat(sss): allow target_speed and max_speed to be set in EgoEntitySimulation
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki
+
 1.3.1 (2024-02-26)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
