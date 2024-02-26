@@ -2,6 +2,17 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.3.0 (2024-02-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+  # Conflicts:
+  #	external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Contributors: Kotaro Yoshimoto
+
 1.2.0 (2024-02-22)
 ------------------
 * Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
