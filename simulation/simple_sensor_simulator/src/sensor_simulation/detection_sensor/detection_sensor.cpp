@@ -124,11 +124,10 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::apply
   return detected_object;
 }
 
-unique_identifier_msgs::msg::UUID generateUUIDMsg(const std::string & input)
+auto generateUUIDMsg(const std::string & input) -> unique_identifier_msgs::msg::UUID
 {
   static auto generate_uuid = boost::uuids::name_generator(boost::uuids::random_generator()());
   const auto uuid = generate_uuid(input);
-
   unique_identifier_msgs::msg::UUID uuid_msg;
   std::copy(uuid.begin(), uuid.end(), uuid_msg.uuid.begin());
   return uuid_msg;
@@ -266,18 +265,16 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 
     static std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
       queue_objects;
+
     static std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
       queue_ground_truth_objects;
 
-    queue_objects.push(std::make_pair(msg, current_simulation_time));
-    queue_ground_truth_objects.push(std::make_pair(ground_truth_msg, current_simulation_time));
+    queue_objects.emplace(msg, current_simulation_time);
 
-    static rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
-      ground_truth_publisher = std::dynamic_pointer_cast<
-        rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>>(
-        ground_truth_publisher_base_ptr_);
+    queue_ground_truth_objects.emplace(ground_truth_msg, current_simulation_time);
 
     autoware_auto_perception_msgs::msg::DetectedObjects delayed_msg;
+
     autoware_auto_perception_msgs::msg::TrackedObjects delayed_ground_truth_msg;
 
     if (
@@ -306,6 +303,11 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     }
 
     publisher_ptr_->publish(noised_msg);
+
+    static rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
+      ground_truth_publisher = std::dynamic_pointer_cast<
+        rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>>(
+        ground_truth_publisher_base_ptr_);
 
     ground_truth_publisher->publish(delayed_ground_truth_msg);
   }
