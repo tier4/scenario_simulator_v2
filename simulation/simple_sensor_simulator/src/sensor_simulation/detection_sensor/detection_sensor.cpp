@@ -133,12 +133,7 @@ auto generateUUIDMsg(const std::string & input) -> unique_identifier_msgs::msg::
   return uuid_msg;
 }
 
-template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
-  const double current_simulation_time,
-  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
-  const rclcpp::Time & current_ros_time, const std::vector<std::string> & lidar_detected_entities)
-  -> void
+auto makeDetectedObject(const traffic_simulator_msgs::EntityStatus & status)
 {
   auto makeObjectClassification = [](const auto & label) {
     autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
@@ -147,6 +142,84 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     return object_classification;
   };
 
+  autoware_auto_perception_msgs::msg::DetectedObject object;
+
+  switch (status.subtype().value()) {
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
+      object.classification.push_back(makeObjectClassification(
+        autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
+      object.classification.push_back(
+        makeObjectClassification(autoware_auto_perception_msgs::msg::ObjectClassification::CAR));
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
+      object.classification.push_back(
+        makeObjectClassification(autoware_auto_perception_msgs::msg::ObjectClassification::TRUCK));
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS:
+      object.classification.push_back(
+        makeObjectClassification(autoware_auto_perception_msgs::msg::ObjectClassification::BUS));
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER:
+      object.classification.push_back(makeObjectClassification(
+        autoware_auto_perception_msgs::msg::ObjectClassification::TRAILER));
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
+      object.classification.push_back(makeObjectClassification(
+        autoware_auto_perception_msgs::msg::ObjectClassification::MOTORCYCLE));
+      object.kinematics.orientation_availability =
+        autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
+      object.classification.push_back(makeObjectClassification(
+        autoware_auto_perception_msgs::msg::ObjectClassification::BICYCLE));
+      object.kinematics.orientation_availability =
+        autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
+      break;
+    case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
+      object.classification.push_back(makeObjectClassification(
+        autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
+      break;
+    default:
+      object.classification.push_back(makeObjectClassification(
+        autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
+      break;
+  }
+
+  simulation_interface::toMsg(status.bounding_box().dimensions(), object.shape.dimensions);
+
+  geometry_msgs::msg::Pose pose;
+  simulation_interface::toMsg(status.pose(), pose);
+
+  auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
+
+  geometry_msgs::msg::Point center_point;
+  simulation_interface::toMsg(status.bounding_box().center(), center_point);
+  Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
+  center = rotation * center;
+  pose.position.x = pose.position.x + center.x();
+  pose.position.y = pose.position.y + center.y();
+  pose.position.z = pose.position.z + center.z();
+  object.kinematics.pose_with_covariance.pose = pose;
+  object.kinematics.pose_with_covariance.covariance = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+                                                       0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+                                                       0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
+  simulation_interface::toMsg(
+    status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
+
+  object.shape.type = object.shape.BOUNDING_BOX;
+
+  return object;
+}
+
+template <>
+auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
+  const double current_simulation_time,
+  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
+  const rclcpp::Time & current_ros_time, const std::vector<std::string> & lidar_detected_entities)
+  -> void
+{
   if (
     current_simulation_time - previous_simulation_time_ - configuration_.update_duration() >=
     -0.002) {
@@ -170,69 +243,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         std::find(detected_objects.begin(), detected_objects.end(), status.name()) !=
           detected_objects.end() and
         status.type().type() != traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
-        autoware_auto_perception_msgs::msg::DetectedObject object;
-        switch (status.subtype().value()) {
-          case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
-            break;
-          case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::CAR));
-            break;
-          case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::TRUCK));
-            break;
-          case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::BUS));
-            break;
-          case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::TRAILER));
-            break;
-          case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::MOTORCYCLE));
-            object.kinematics.orientation_availability =
-              autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
-            break;
-          case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::BICYCLE));
-            object.kinematics.orientation_availability =
-              autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
-            break;
-          case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
-            break;
-          default:
-            object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
-            break;
-        }
-
-        simulation_interface::toMsg(status.bounding_box().dimensions(), object.shape.dimensions);
-        geometry_msgs::msg::Pose pose;
-        simulation_interface::toMsg(status.pose(), pose);
-        auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
-        geometry_msgs::msg::Point center_point;
-        simulation_interface::toMsg(status.bounding_box().center(), center_point);
-        Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);
-        center = rotation * center;
-        pose.position.x = pose.position.x + center.x();
-        pose.position.y = pose.position.y + center.y();
-        pose.position.z = pose.position.z + center.z();
-        object.kinematics.pose_with_covariance.pose = pose;
-        object.kinematics.pose_with_covariance.covariance = {1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
-                                                             0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
-                                                             0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1};
-        simulation_interface::toMsg(
-          status.action_status().twist(), object.kinematics.twist_with_covariance.twist);
-        object.shape.type = object.shape.BOUNDING_BOX;
-
+        const auto object = makeDetectedObject(status);
         msg.objects.push_back(object);
 
         // ref: https://github.com/autowarefoundation/autoware.universe/blob/main/common/perception_utils/src/conversion.cpp
@@ -242,20 +253,15 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
             const autoware_auto_perception_msgs::msg::DetectedObject & detected_object)
           -> autoware_auto_perception_msgs::msg::TrackedObject {
           autoware_auto_perception_msgs::msg::TrackedObject tracked_object;
-          tracked_object.existence_probability = detected_object.existence_probability;
-
-          tracked_object.classification = detected_object.classification;
-
-          tracked_object.kinematics.pose_with_covariance =
-            detected_object.kinematics.pose_with_covariance;
-          tracked_object.kinematics.twist_with_covariance =
-            detected_object.kinematics.twist_with_covariance;
-          tracked_object.kinematics.orientation_availability =
-            detected_object.kinematics.orientation_availability;
-
-          tracked_object.shape = detected_object.shape;
-          tracked_object.object_id = generateUUIDMsg(name);
-
+          // clang-format off
+          tracked_object.classification                      = detected_object.classification;
+          tracked_object.existence_probability               = detected_object.existence_probability;
+          tracked_object.kinematics.orientation_availability = detected_object.kinematics.orientation_availability;
+          tracked_object.kinematics.pose_with_covariance     = detected_object.kinematics.pose_with_covariance;
+          tracked_object.kinematics.twist_with_covariance    = detected_object.kinematics.twist_with_covariance;
+          tracked_object.object_id                           = generateUUIDMsg(name);
+          tracked_object.shape                               = detected_object.shape;
+          // clang-format on
           return tracked_object;
         };
 
