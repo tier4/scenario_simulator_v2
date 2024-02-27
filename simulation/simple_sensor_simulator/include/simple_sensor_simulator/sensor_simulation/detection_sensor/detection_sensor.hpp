@@ -67,12 +67,12 @@ public:
     const std::vector<std::string> & lidar_detected_entities) = 0;
 };
 
-template <typename T>
+template <typename T, typename U = autoware_auto_perception_msgs::msg::TrackedObjects>
 class DetectionSensor : public DetectionSensorBase
 {
   const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
 
-  typename rclcpp::PublisherBase::SharedPtr ground_truth_publisher_base_ptr_;
+  const typename rclcpp::Publisher<U>::SharedPtr ground_truth_publisher_;
 
   std::mt19937 random_engine_;
 
@@ -84,10 +84,10 @@ public:
     const double current_simulation_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher,
-    const typename rclcpp::PublisherBase::SharedPtr & ground_truth_publisher = nullptr)
+    const typename rclcpp::Publisher<U>::SharedPtr & ground_truth_publisher = nullptr)
   : DetectionSensorBase(current_simulation_time, configuration),
     publisher_ptr_(publisher),
-    ground_truth_publisher_base_ptr_(ground_truth_publisher),
+    ground_truth_publisher_(ground_truth_publisher),
     random_engine_(configuration.random_seed())
   {
   }

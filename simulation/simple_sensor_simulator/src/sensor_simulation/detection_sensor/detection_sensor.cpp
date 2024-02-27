@@ -145,8 +145,6 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
 
   object_classification.label = [&]() {
     switch (status.subtype().value()) {
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
-        return autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN;
       case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
         return autoware_auto_perception_msgs::msg::ObjectClassification::CAR;
       case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
@@ -359,12 +357,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 
     publisher_ptr_->publish(noised_msg);
 
-    static rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
-      ground_truth_publisher = std::dynamic_pointer_cast<
-        rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>>(
-        ground_truth_publisher_base_ptr_);
-
-    ground_truth_publisher->publish(delayed_ground_truth_msg);
+    ground_truth_publisher_->publish(delayed_ground_truth_msg);
   }
 }
 }  // namespace simple_sensor_simulator
