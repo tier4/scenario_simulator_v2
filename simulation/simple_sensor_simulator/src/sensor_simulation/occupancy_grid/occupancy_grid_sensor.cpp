@@ -83,7 +83,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
     }
     simulation_interface::toMsg(ego->pose(), ego_pose_north_up);
     /**
-     * NOTE:
+     * @note
      * There is no problem with the yaw axis being north-up, but unless the pitch and roll axes are
      * adjusted to the slope of the road surface, the grid map will not project the obstacles correctly.
      * However, the current implementation of autoware.universe does not consider the roll and pitch axes,

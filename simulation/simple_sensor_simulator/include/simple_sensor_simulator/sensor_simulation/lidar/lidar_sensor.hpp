@@ -48,8 +48,7 @@ public:
   virtual ~LidarSensorBase() = default;
 
   virtual auto update(
-    const double /*current_simulation_time*/,
-    const std::vector<traffic_simulator_msgs::EntityStatus> &,
+    const double current_simulation_time, const std::vector<traffic_simulator_msgs::EntityStatus> &,
     const rclcpp::Time & current_ros_time) -> void = 0;
 
   auto getDetectedObjects() const -> const std::vector<std::string> & { return detected_objects_; }
