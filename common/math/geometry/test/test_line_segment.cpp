@@ -387,7 +387,12 @@ TEST(LineSegment, GetPose)
     /// Orientation should be defined by the direction of the `line`, so the orientation should be parallel to the z axis.
     // [Snippet_getPose_with_s_0]
     EXPECT_POSE_EQ(
-      line.getPose(0, false),
+      line.getPose(0, false, false),
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
+        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
+    EXPECT_POSE_EQ(
+      line.getPose(0, false, true),
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
         .orientation(quaternion_operation::convertEulerAngleToQuaternion(
@@ -399,7 +404,12 @@ TEST(LineSegment, GetPose)
     /// Orientation should be defined by the direction of the `line`, so the orientation should be parallel to the z axis.
     // [Snippet_getPose_with_s_1]
     EXPECT_POSE_EQ(
-      line.getPose(1, false),
+      line.getPose(1, false, false),
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1))
+        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)));
+    EXPECT_POSE_EQ(
+      line.getPose(1, false, true),
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(1))
         .orientation(quaternion_operation::convertEulerAngleToQuaternion(
