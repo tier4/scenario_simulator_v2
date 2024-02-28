@@ -302,7 +302,6 @@ public:
 
       core->setBehaviorParameter(entity_ref, [&]() {
         auto message = core->getBehaviorParameter(entity_ref);
-        std::cout << traffic_simulator_msgs::msg::to_yaml(message.dynamic_constraints) << std::endl;
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
         /// The default values written in https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
         message.dynamic_constraints.max_acceleration =
