@@ -56,7 +56,7 @@ auto TeleportAction::teleport(const EntityRef & entity_ref, const Position & pos
 {
   auto teleport = overload(
     [&](const WorldPosition & position) {
-      return applyTeleportAction(entity_ref, static_cast<geometry_msgs::msg::Pose>(position));
+      return applyTeleportAction(entity_ref, static_cast<NativeWorldPosition>(position));
     },
     [&](const RelativeWorldPosition & position) {
       return applyTeleportAction(
