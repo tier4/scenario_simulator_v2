@@ -1,0 +1,35 @@
+name: Check msgs / srvs update
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+jobs:
+  check_message_updates:
+    name: Check message updates
+    runs-on: ubuntu-22.04
+    container: ros:humble
+    steps:
+      - name: Prepare workspace
+        run: mkdir -p ~/ros2_ws/src/scenario_simulator_v2
+
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: ~/ros2_ws/src/scenario_simulator_v2
+
+      - name: Install dependencies
+        run: |
+          cd ~/ros2_ws
+          vcs import src/scenario_simulator_v2/external < src/scenario_simulator_v2/dependency_humble.repos
+
+      - name: Check updates
+        shell: bash
+        run: |
+          cd ~/ros2_ws/src/scenario_simulator_v2
+          python3 .github/msgs_checker.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: 1203

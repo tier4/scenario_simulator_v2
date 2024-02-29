@@ -9,6 +9,9 @@ from catkin_pkg.package import Package
 from subprocess import check_output
 from pathlib import Path
 from itertools import chain
+from json import dumps
+import requests
+import os
 
 
 @dataclass
@@ -65,6 +68,8 @@ def main():
     if len(unknown_packages) > 0:
         print(f"Unknown packages: {unknown_packages}")
 
+    updated_patches = []
+
     for path, pkg in pkgs.items():
         if pkg.name not in used_packages:
             continue
@@ -91,22 +96,52 @@ def main():
             continue
 
         # Call `git log` for 7 days history
-        log = check_output(
-            [
-                "git",
-                "log",
-                "--since",
-                "365.days",
-                "-p",
-                "--minimal",
-                "--pretty=oneline",
-                "--",
-                *existing_files,
-            ],
-            cwd=base_path,
-        ).strip()
+        log = (
+            check_output(
+                [
+                    "git",
+                    "log",
+                    "--since",
+                    "7.days",
+                    "-p",
+                    "--minimal",
+                    "--pretty=oneline",
+                    "--",
+                    *existing_files,
+                ],
+                cwd=base_path,
+            )
+            .strip()
+            .decode("utf-8")
+        )
 
-        print(log.decode("utf-8"))
+        if len(log) == 0:
+            print(f"Package {pkg.name} has no recent changes")
+            continue
+
+        updated_patches.append(log)
+
+    if len(updated_patches) == 0:
+        print("No patches to notify")
+        return
+
+    patches = "\n".join(updated_patches)
+
+    # Post to GitHub issues comment
+
+    body = dumps(
+        {
+            "body": f"```diff\n{patches}\n```",
+        }
+    )
+    requests.post(
+        f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/issues/{os.environ['ISSUE_NUMBER']}/comments",
+        headers={
+            "Authorization": f"token {os.environ['GITHUB_TOKEN']}",
+            "Content-Type": "application/json",
+        },
+        data=body,
+    )
 
 
 if __name__ == "__main__":
