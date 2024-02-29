@@ -83,20 +83,6 @@ const std::string & PedestrianBehaviorTree::getCurrentAction() const
   return logging_event_ptr_->getCurrentAction();
 }
 
-auto PedestrianBehaviorTree::getBehaviorParameter()
-  -> traffic_simulator_msgs::msg::BehaviorParameter
-{
-  return tree_.rootBlackboard()->get<traffic_simulator_msgs::msg::BehaviorParameter>(
-    getBehaviorParameterKey());
-}
-
-auto PedestrianBehaviorTree::setBehaviorParameter(
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) -> void
-{
-  tree_.rootBlackboard()->set<traffic_simulator_msgs::msg::BehaviorParameter>(
-    getBehaviorParameterKey(), behavior_paramete);
-}
-
 void PedestrianBehaviorTree::update(double current_time, double step_time)
 {
   tickOnce(current_time, step_time);
