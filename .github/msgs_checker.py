@@ -14,6 +14,7 @@ import requests
 import os
 
 
+# cspell: ignore srvs
 @dataclass
 class UsedPackage:
     msgs: Set[str]
@@ -96,6 +97,7 @@ def main():
             continue
 
         # Call `git log` for 7 days history
+        # cspell: ignore oneline
         log = (
             check_output(
                 [
