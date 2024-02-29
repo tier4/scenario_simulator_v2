@@ -169,23 +169,29 @@ public:
     const geometry_msgs::msg::PoseStamped goal_pose)
   {
     if (name != "ego") {
-      throw std::runtime_error("Respawn of any entities other than EGO is not supported");
+      throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
     }
 
-    simulation_api_schema::DespawnEntityRequest req;
-    req.set_name(name);
+    simulation_api_schema::DespawnEntityRequest despawn_req;
+    despawn_req.set_name(name);
 
-    if (auto res = zeromq_client_.call(req); res.result().success()) {
-      simulation_api_schema::SpawnVehicleEntityRequest spawn_req;
-      spawn_req.set_is_ego(true);
-      simulation_interface::toProto(toMapPose(new_pose.pose.pose), *spawn_req.mutable_pose());
-      spawn_req.set_initial_speed(0.0);
-      simulation_interface::toProto(
-        entity_manager_ptr_->getVehicleParameters(name), *spawn_req.mutable_parameters());
-      spawn_req.mutable_parameters()->set_name(name);
-      spawn_req.set_asset_key("");
+    if (not zeromq_client_.call(despawn_req).result().success()) {
+      throw common::SimulationError(
+        "Despawning failed while trying to respawn the " + name + " entity");
+    }
 
-      zeromq_client_.call(spawn_req).result().success();
+    simulation_api_schema::SpawnVehicleEntityRequest spawn_req;
+    spawn_req.set_is_ego(true);
+    simulation_interface::toProto(toMapPose(new_pose.pose.pose), *spawn_req.mutable_pose());
+    spawn_req.set_initial_speed(0.0);
+    simulation_interface::toProto(
+      entity_manager_ptr_->getVehicleParameters(name), *spawn_req.mutable_parameters());
+    spawn_req.mutable_parameters()->set_name(name);
+    spawn_req.set_asset_key("");
+
+    if (not zeromq_client_.call(spawn_req).result().success()) {
+      throw common::SimulationError(
+        "Spawning failed while trying to respawn the " + name + " entity");
     }
 
     entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
