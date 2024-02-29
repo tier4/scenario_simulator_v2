@@ -24,11 +24,25 @@ jobs:
           cd ~/ros2_ws
           vcs import src/scenario_simulator_v2/external < src/scenario_simulator_v2/dependency_humble.repos
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.5.1"
+
+      - name: Install Python dependencies
+        run: |
+          cd ~/ros2_ws/src/scenario_simulator_v2
+          poetry install --no-interaction
+
       - name: Check updates
         shell: bash
         run: |
           cd ~/ros2_ws/src/scenario_simulator_v2
-          python3 .github/msgs_checker.py
+          poetry run python3 .github/msgs_checker.py
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}
