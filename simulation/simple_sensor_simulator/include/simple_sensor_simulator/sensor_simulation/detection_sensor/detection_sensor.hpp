@@ -74,7 +74,7 @@ class DetectionSensor : public DetectionSensorBase
 
   const typename rclcpp::Publisher<U>::SharedPtr ground_truth_publisher_;
 
-  std::mt19937 random_engine_;
+  std::default_random_engine random_engine_;
 
   auto applyPositionNoise(typename T::_objects_type::value_type) ->
     typename T::_objects_type::value_type;

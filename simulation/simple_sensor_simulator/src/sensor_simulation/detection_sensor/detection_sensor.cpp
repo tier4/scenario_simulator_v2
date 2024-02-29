@@ -23,6 +23,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <memory>
+#include <random>
 #include <simple_sensor_simulator/exception.hpp>
 #include <simple_sensor_simulator/sensor_simulation/detection_sensor/detection_sensor.hpp>
 #include <simulation_interface/conversions.hpp>
@@ -279,6 +280,50 @@ auto make(
   return tracked_object;
 };
 
+struct Noise
+{
+  std::default_random_engine & random_engine;
+
+  const simulation_api_schema::DetectionSensorConfiguration & detection_sensor_configuration;
+
+  explicit Noise(
+    std::default_random_engine & random_engine,
+    const simulation_api_schema::DetectionSensorConfiguration & detection_sensor_configuration)
+  : random_engine(random_engine), detection_sensor_configuration(detection_sensor_configuration)
+  {
+  }
+};
+
+struct DefaultNoise : public Noise
+{
+  using Noise::Noise;
+
+  auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_objects)
+    -> decltype(auto)
+  {
+    auto position_noise_distribution =
+      std::normal_distribution<>(0.0, detection_sensor_configuration.pos_noise_stddev());
+
+    for (auto && detected_object : detected_objects.objects) {
+      detected_object.kinematics.pose_with_covariance.pose.position.x +=
+        position_noise_distribution(random_engine);
+      detected_object.kinematics.pose_with_covariance.pose.position.y +=
+        position_noise_distribution(random_engine);
+    }
+
+    detected_objects.objects.erase(
+      std::remove_if(
+        detected_objects.objects.begin(), detected_objects.objects.end(),
+        [this](auto &&) {
+          return std::uniform_real_distribution()(random_engine) <
+                 detection_sensor_configuration.probability_of_lost();
+        }),
+      detected_objects.objects.end());
+
+    return detected_objects;
+  }
+};
+
 template <>
 auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double current_simulation_time,
@@ -289,7 +334,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
   if (
     current_simulation_time - previous_simulation_time_ - configuration_.update_duration() >=
     -0.002) {
-    const std::vector<std::string> detected_objects = filterObjectsBySensorRange(
+    const auto detected_objects = filterObjectsBySensorRange(
       statuses,
       configuration_.detect_all_objects_in_range() ? getDetectedObjects(statuses)
                                                    : lidar_detected_entities,
@@ -322,42 +367,20 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     static std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
       queue_ground_truth_objects;
 
-    queue_objects.emplace(msg, current_simulation_time);
-
-    queue_ground_truth_objects.emplace(ground_truth_msg, current_simulation_time);
-
-    autoware_auto_perception_msgs::msg::DetectedObjects delayed_msg;
-
-    autoware_auto_perception_msgs::msg::TrackedObjects delayed_ground_truth_msg;
-
-    if (
-      current_simulation_time - queue_objects.front().second >=
-      configuration_.object_recognition_delay()) {
-      delayed_msg = queue_objects.front().first;
-      delayed_ground_truth_msg = queue_ground_truth_objects.front().first;
+    if (queue_objects.emplace(msg, current_simulation_time);
+        current_simulation_time - queue_objects.front().second >=
+        configuration_.object_recognition_delay()) {
+      publisher_ptr_->publish(
+        DefaultNoise(random_engine_, configuration_)(queue_objects.front().first));
       queue_objects.pop();
     }
 
-    if (
-      current_simulation_time - queue_ground_truth_objects.front().second >=
-      configuration_.object_recognition_ground_truth_delay()) {
-      delayed_ground_truth_msg = queue_ground_truth_objects.front().first;
+    if (queue_ground_truth_objects.emplace(ground_truth_msg, current_simulation_time);
+        current_simulation_time - queue_ground_truth_objects.front().second >=
+        configuration_.object_recognition_ground_truth_delay()) {
+      ground_truth_publisher_->publish(queue_ground_truth_objects.front().first);
       queue_ground_truth_objects.pop();
     }
-
-    autoware_auto_perception_msgs::msg::DetectedObjects noised_msg;
-    noised_msg.header = delayed_msg.header;
-    noised_msg.objects.reserve(delayed_msg.objects.size());
-    for (const auto & object : delayed_msg.objects) {
-      if (auto probability_of_lost = std::uniform_real_distribution();
-          probability_of_lost(random_engine_) > configuration_.probability_of_lost()) {
-        noised_msg.objects.push_back(applyPositionNoise(object));
-      }
-    }
-
-    publisher_ptr_->publish(noised_msg);
-
-    ground_truth_publisher_->publish(delayed_ground_truth_msg);
   }
 }
 }  // namespace simple_sensor_simulator
