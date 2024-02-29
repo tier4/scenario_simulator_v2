@@ -94,7 +94,7 @@ auto PedestrianBehaviorTree::setBehaviorParameter(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter) -> void
 {
   tree_.rootBlackboard()->set<traffic_simulator_msgs::msg::BehaviorParameter>(
-    getBehaviorParameterKey(), behavior_paramete;
+    getBehaviorParameterKey(), behavior_paramete);
 }
 
 void PedestrianBehaviorTree::update(double current_time, double step_time)
