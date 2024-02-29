@@ -6,14 +6,14 @@ on:
     - cron: 0 0 * * *
   pull_request:
     paths:
-      - '**'
-      - '!docs/**'
-      - '!README.md'
-      - '!.github/**'
-      - '.github/workflows/BuildAndRun.yaml'
-      - '!mkdocs.yml'
-      - '!pyproject.toml'
-      - '!poetry.lock'
+      - "**"
+      - "!docs/**"
+      - "!README.md"
+      - "!.github/**"
+      - ".github/workflows/BuildAndRun.yaml"
+      - "!mkdocs.yml"
+      - "!pyproject.toml"
+      - "!poetry.lock"
   push:
     branches:
       - master
@@ -29,7 +29,7 @@ jobs:
       fail-fast: false
       matrix:
         rosdistro: [humble]
-        runs_on: [ubuntu-22.04, macos-14] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
+        runs_on: [ubuntu-22.04] # macos-14 is added for arm support. See also https://x.com/github/status/1752458943245189120?s=20
     steps:
       - name: Suppress warnings
         run: |
