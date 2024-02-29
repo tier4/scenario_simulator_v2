@@ -21,7 +21,6 @@
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
-#include <autoware_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_auto_system_msgs/msg/emergency_state.hpp>
 #include <autoware_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <chrono>
