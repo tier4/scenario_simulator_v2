@@ -70,11 +70,17 @@ public:
 template <typename T, typename U = autoware_auto_perception_msgs::msg::TrackedObjects>
 class DetectionSensor : public DetectionSensorBase
 {
-  const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
+  const typename rclcpp::Publisher<T>::SharedPtr detected_objects_publisher;
 
-  const typename rclcpp::Publisher<U>::SharedPtr ground_truth_publisher_;
+  const typename rclcpp::Publisher<U>::SharedPtr ground_truth_objects_publisher;
 
   std::default_random_engine random_engine_;
+
+  std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
+    detected_objects_queue;
+
+  std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
+    ground_truth_objects_queue;
 
   auto applyPositionNoise(typename T::_objects_type::value_type) ->
     typename T::_objects_type::value_type;
@@ -86,8 +92,8 @@ public:
     const typename rclcpp::Publisher<T>::SharedPtr & publisher,
     const typename rclcpp::Publisher<U>::SharedPtr & ground_truth_publisher = nullptr)
   : DetectionSensorBase(current_simulation_time, configuration),
-    publisher_ptr_(publisher),
-    ground_truth_publisher_(ground_truth_publisher),
+    detected_objects_publisher(publisher),
+    ground_truth_objects_publisher(ground_truth_publisher),
     random_engine_(configuration.random_seed())
   {
   }

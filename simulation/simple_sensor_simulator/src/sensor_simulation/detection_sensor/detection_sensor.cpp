@@ -334,52 +334,48 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
   if (
     current_simulation_time - previous_simulation_time_ - configuration_.update_duration() >=
     -0.002) {
-    const auto detected_objects = filterObjectsBySensorRange(
+    const auto detected_objects_in_range = filterObjectsBySensorRange(
       statuses,
       configuration_.detect_all_objects_in_range() ? getDetectedObjects(statuses)
                                                    : lidar_detected_entities,
       configuration_.range());
 
-    autoware_auto_perception_msgs::msg::DetectedObjects msg;
-    msg.header.stamp = current_ros_time;
-    msg.header.frame_id = "map";
+    autoware_auto_perception_msgs::msg::DetectedObjects detected_objects;
+    detected_objects.header.stamp = current_ros_time;
+    detected_objects.header.frame_id = "map";
 
-    autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_msg;
-    ground_truth_msg.header = msg.header;
+    autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_objects;
+    ground_truth_objects.header = detected_objects.header;
 
     previous_simulation_time_ = current_simulation_time;
 
     for (const auto & status : statuses) {
       if (
-        std::find(detected_objects.begin(), detected_objects.end(), status.name()) !=
-          detected_objects.end() and
+        std::find(
+          detected_objects_in_range.begin(), detected_objects_in_range.end(), status.name()) !=
+          detected_objects_in_range.end() and
         status.type().type() != traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
-        const auto object = make<autoware_auto_perception_msgs::msg::DetectedObject>(status);
-        msg.objects.push_back(object);
-        ground_truth_msg.objects.push_back(
-          make<autoware_auto_perception_msgs::msg::TrackedObject>(status, object));
+        const auto detected_object =
+          make<autoware_auto_perception_msgs::msg::DetectedObject>(status);
+        detected_objects.objects.push_back(detected_object);
+        ground_truth_objects.objects.push_back(
+          make<autoware_auto_perception_msgs::msg::TrackedObject>(status, detected_object));
       }
     }
 
-    static std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
-      queue_objects;
-
-    static std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
-      queue_ground_truth_objects;
-
-    if (queue_objects.emplace(msg, current_simulation_time);
-        current_simulation_time - queue_objects.front().second >=
+    if (detected_objects_queue.emplace(detected_objects, current_simulation_time);
+        current_simulation_time - detected_objects_queue.front().second >=
         configuration_.object_recognition_delay()) {
-      publisher_ptr_->publish(
-        DefaultNoise(random_engine_, configuration_)(queue_objects.front().first));
-      queue_objects.pop();
+      detected_objects_publisher->publish(
+        DefaultNoise(random_engine_, configuration_)(detected_objects_queue.front().first));
+      detected_objects_queue.pop();
     }
 
-    if (queue_ground_truth_objects.emplace(ground_truth_msg, current_simulation_time);
-        current_simulation_time - queue_ground_truth_objects.front().second >=
+    if (ground_truth_objects_queue.emplace(ground_truth_objects, current_simulation_time);
+        current_simulation_time - ground_truth_objects_queue.front().second >=
         configuration_.object_recognition_ground_truth_delay()) {
-      ground_truth_publisher_->publish(queue_ground_truth_objects.front().first);
-      queue_ground_truth_objects.pop();
+      ground_truth_objects_publisher->publish(ground_truth_objects_queue.front().first);
+      ground_truth_objects_queue.pop();
     }
   }
 }
