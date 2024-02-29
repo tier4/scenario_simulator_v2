@@ -40,8 +40,6 @@ class EgoEntitySimulation
 public:
   const std::unique_ptr<concealer::Autoware> autoware;
 
-  traffic_simulator_msgs::msg::PolylineTrajectory polyline_trajectory;
-
 private:
   const VehicleModelType vehicle_model_type_;
 
@@ -60,17 +58,27 @@ private:
 
   traffic_simulator_msgs::msg::EntityStatus status_;
 
+  const bool consider_acceleration_by_road_slope_;
+
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
+  const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
+
 private:
-  auto getCurrentPose() const -> geometry_msgs::msg::Pose;
+  auto calculateEgoPitch() const -> double;
+
+  auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
 
   auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
 
   auto getCurrentAccel(const double step_time) const -> geometry_msgs::msg::Accel;
 
   auto getLinearJerk(double step_time) -> double;
+
+  auto getMatchedLaneletPoseFromEntityStatus(
+    const traffic_simulator_msgs::msg::EntityStatus & status, const double entity_width) const
+    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto updatePreviousValues() -> void;
 
@@ -79,7 +87,12 @@ public:
 
   explicit EgoEntitySimulation(
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time);
+    const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time,
+    const bool consider_acceleration_by_road_slope);
+
+  auto overwrite(
+    const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
+    double step_time, bool npc_logic_started) -> void;
 
   auto update(double time, double step_time, bool npc_logic_started) -> void;
 

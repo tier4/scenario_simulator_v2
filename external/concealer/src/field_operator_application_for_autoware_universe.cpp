@@ -96,6 +96,13 @@ DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_LEFT);
 DEFINE_STATIC_DATA_MEMBER_DETECTOR(AVOIDANCE_BY_LC_RIGHT);
 DEFINE_STATIC_DATA_MEMBER_DETECTOR(NO_DRIVABLE_LANE);
 
+// For MrmState::behavior
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(COMFORTABLE_STOP);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(EMERGENCY_STOP);
+// DEFINE_STATIC_DATA_MEMBER_DETECTOR(NONE); // NOTE: This is defined above.
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(UNKNOWN);
+DEFINE_STATIC_DATA_MEMBER_DETECTOR(PULL_OVER);
+
 #undef DEFINE_STATIC_DATA_MEMBER_DETECTOR
 
 /**
@@ -484,33 +491,61 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
   }
 }
 
+template <typename T>
+auto toMinimumRiskManeuverBehaviorString(const std::uint8_t & behavior_number) -> std::string
+{
+  static const std::unordered_map<std::uint8_t, std::string> behavior_string_map = [&]() {
+    std::unordered_map<std::uint8_t, std::string> behavior_string_map;
+
+#define EMPLACE(IDENTIFIER)                                  \
+  if constexpr (HasStatic##IDENTIFIER<T>::value) {           \
+    behavior_string_map.emplace(T::IDENTIFIER, #IDENTIFIER); \
+  }                                                          \
+  static_assert(true)
+
+    EMPLACE(COMFORTABLE_STOP);
+    EMPLACE(EMERGENCY_STOP);
+    EMPLACE(NONE);
+    EMPLACE(UNKNOWN);
+    EMPLACE(PULL_OVER);
+
+#undef EMPLACE
+    return behavior_string_map;
+  }();
+
+  if (const auto behavior = behavior_string_map.find(behavior_number);
+      behavior == behavior_string_map.end()) {
+    throw common::Error(
+      "Unexpected autoware_adapi_v1_msgs::msg::MrmState::behavior, number: ", behavior_number);
+  } else {
+    return behavior->second;
+  }
+}
+
+auto toMinimumRiskManeuverStateString(const std::uint8_t & state_number) -> std::string
+{
+  static const std::unordered_map<std::uint8_t, std::string> state_string_map = {
+    {autoware_adapi_v1_msgs::msg::MrmState::MRM_FAILED, "MRM_FAILED"},
+    {autoware_adapi_v1_msgs::msg::MrmState::MRM_OPERATING, "MRM_OPERATING"},
+    {autoware_adapi_v1_msgs::msg::MrmState::MRM_SUCCEEDED, "MRM_SUCCEEDED"},
+    {autoware_adapi_v1_msgs::msg::MrmState::NORMAL, "NORMAL"},
+    {autoware_adapi_v1_msgs::msg::MrmState::UNKNOWN, "UNKNOWN"},
+  };
+
+  if (const auto state = state_string_map.find(state_number); state == state_string_map.end()) {
+    throw common::Error(
+      "Unexpected autoware_adapi_v1_msgs::msg::MrmState::state, number: ", state_number);
+  } else {
+    return state->second;
+  }
+}
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveMrmState(
   const autoware_adapi_v1_msgs::msg::MrmState & message) -> void
 {
-#define CASE(IDENTIFIER, VARIABLE)                        \
-  case autoware_adapi_v1_msgs::msg::MrmState::IDENTIFIER: \
-    VARIABLE = #IDENTIFIER;                               \
-    break
+  minimum_risk_maneuver_state = toMinimumRiskManeuverStateString(message.state);
 
-  switch (message.state) {
-    CASE(MRM_FAILED, minimum_risk_maneuver_state);
-    CASE(MRM_OPERATING, minimum_risk_maneuver_state);
-    CASE(MRM_SUCCEEDED, minimum_risk_maneuver_state);
-    CASE(NORMAL, minimum_risk_maneuver_state);
-    CASE(UNKNOWN, minimum_risk_maneuver_state);
-    default:
-      throw common::Error("Unsupported MrmState::state, number: ", static_cast<int>(message.state));
-  }
-
-  switch (message.behavior) {
-    CASE(COMFORTABLE_STOP, minimum_risk_maneuver_behavior);
-    CASE(EMERGENCY_STOP, minimum_risk_maneuver_behavior);
-    CASE(NONE, minimum_risk_maneuver_behavior);
-    CASE(UNKNOWN, minimum_risk_maneuver_behavior);
-    default:
-      throw common::Error(
-        "Unsupported MrmState::behavior, number: ", static_cast<int>(message.behavior));
-  }
-#undef CASE
+  minimum_risk_maneuver_behavior =
+    toMinimumRiskManeuverBehaviorString<autoware_adapi_v1_msgs::msg::MrmState>(message.behavior);
 }
 }  // namespace concealer
