@@ -46,6 +46,7 @@ DistanceCondition::DistanceCondition(
   results(triggering_entities.entity_refs.size(), Double::nan()),
   consider_z([]() {
     rclcpp::Node node{"get_parameter", "simulation"};
+    node.declare_parameter("consider_pose_by_road_slope", false);
     return node.get_parameter("consider_pose_by_road_slope").as_bool();
   }())
 {
@@ -106,6 +107,7 @@ auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> d
   return std::numeric_limits<double>::quiet_NaN();
 }
 
+// @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
 static double hypot(const double x, const double y, const double z, const bool consider_z)
 {
   if (consider_z) {
