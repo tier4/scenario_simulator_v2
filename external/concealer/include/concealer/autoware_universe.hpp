@@ -16,7 +16,7 @@
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
 #include <autoware_control_msgs/msg/control.hpp>
-#include <autoware_planning_msgs/msg/path_with_lane_id.hpp>
+#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_vehicle_msgs/msg/steering_report.hpp>
@@ -40,7 +40,7 @@ class AutowareUniverse : public Autoware
   SubscriberWrapper<autoware_control_msgs::msg::Control, ThreadSafety::safe> getCommand;
   SubscriberWrapper<autoware_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
   SubscriberWrapper<autoware_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
-  SubscriberWrapper<autoware_planning_msgs::msg::PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
+  SubscriberWrapper<tier4_planning_msgs::msg::PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
 
   PublisherWrapper<geometry_msgs::msg::AccelWithCovarianceStamped>        setAcceleration;
   PublisherWrapper<nav_msgs::msg::Odometry>                               setOdometry;
