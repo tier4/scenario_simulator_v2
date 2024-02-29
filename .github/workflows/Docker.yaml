@@ -47,7 +47,9 @@ jobs:
           files: |
             ./docker-bake.hcl
           workdir: .
-          no-cache: true
+          set: |
+            *.cache-to=type=gha,mode=max
+            *.cache-from=type=gha
           push: ${{ github.event_name != 'pull_request' }}
           targets: |
             ${{ matrix.rosdistro }}
