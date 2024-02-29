@@ -32,97 +32,35 @@
 
 namespace simple_sensor_simulator
 {
-auto DetectionSensorBase::isWithinRange(
-  const geometry_msgs::Point & point1, const geometry_msgs::Point & point2,
-  const double range) const -> bool
+auto distance(const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pose2)
 {
-  auto distanceX = point1.x() - point2.x();
-  auto distanceY = point1.y() - point2.y();
-  auto distanceZ = point1.z() - point2.z();
-
-  double distance = std::hypot(distanceX, distanceY, distanceZ);
-  return distance <= range;
+  return std::hypot(
+    pose1.position().x() - pose2.position().x(),  //
+    pose1.position().y() - pose2.position().y(),  //
+    pose1.position().z() - pose2.position().z());
 }
 
-auto DetectionSensorBase::getSensorPose(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> geometry_msgs::Pose
+auto DetectionSensorBase::isTheEntityStatusToWhichThisSensorIsAttached(
+  const traffic_simulator_msgs::EntityStatus & status) const -> bool
 {
-  for (const auto & status : statuses) {
-    if (
-      status.type().type() == traffic_simulator_msgs::EntityType::EGO &&
-      status.name() == configuration_.entity()) {
-      return status.pose();
-    }
-  }
-  throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
+  return status.name() == configuration_.entity() and
+         status.type().type() == traffic_simulator_msgs::EntityType::EGO;
 }
 
-auto DetectionSensorBase::getEntityPose(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & entity_statuses,
-  const std::string & entity_string) const -> geometry_msgs::Pose
-{
-  for (const auto & entity_status : entity_statuses) {
-    if (entity_status.name() == entity_string) {
-      return entity_status.pose();
-    }
-  }
-
-  throw SimulationRuntimeError(
-    configuration_.detect_all_objects_in_range()
-      ? "Filtered object is not includes in entity statuses"
-      : "Detected object by lidar sensor is not included in lidar detected entity");
-}
-
-auto DetectionSensorBase::getDetectedObjects(
+auto DetectionSensorBase::findTheEntityStatusToWhichThisSensorIsAttached(
   const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
-  -> std::vector<std::string>
+  -> std::vector<traffic_simulator_msgs::EntityStatus>::const_iterator
 {
-  std::vector<std::string> detected_objects;
-  const auto pose = getSensorPose(statuses);
-
-  for (const auto & status : statuses) {
-    if (
-      status.name() != configuration_.entity() &&
-      isWithinRange(status.pose().position(), pose.position(), 300.0)) {
-      detected_objects.emplace_back(status.name());
-    }
+  if (auto iter = std::find_if(
+        statuses.begin(), statuses.end(),
+        [this](const auto & status) {
+          return isTheEntityStatusToWhichThisSensorIsAttached(status);
+        });
+      iter != statuses.end()) {
+    return iter;
+  } else {
+    throw SimulationRuntimeError("Detection sensor can be attached only ego entity.");
   }
-
-  return detected_objects;
-}
-
-auto DetectionSensorBase::filterObjectsBySensorRange(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & entity_statuses,
-  const std::vector<std::string> & selected_entity_strings,
-  const double detection_sensor_range) const -> std::vector<std::string>
-{
-  std::vector<std::string> detected_objects;
-  const auto sensor_pose = getSensorPose(entity_statuses);
-
-  for (const auto & selected_entity_status : selected_entity_strings) {
-    const auto selected_entity_pose = getEntityPose(entity_statuses, selected_entity_status);
-    if (
-      selected_entity_status != configuration_.entity() &&
-      isWithinRange(
-        selected_entity_pose.position(), sensor_pose.position(), detection_sensor_range)) {
-      detected_objects.emplace_back(selected_entity_status);
-    }
-  }
-  return detected_objects;
-}
-
-template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
-  autoware_auto_perception_msgs::msg::DetectedObject detected_object)
-  -> autoware_auto_perception_msgs::msg::DetectedObject
-{
-  auto position_noise_distribution =
-    std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
-  detected_object.kinematics.pose_with_covariance.pose.position.x +=
-    position_noise_distribution(random_engine_);
-  detected_object.kinematics.pose_with_covariance.pose.position.y +=
-    position_noise_distribution(random_engine_);
-  return detected_object;
 }
 
 template <typename To, typename... From>
@@ -146,19 +84,19 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
 
   object_classification.label = [&]() {
     switch (status.subtype().value()) {
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
+      case traffic_simulator_msgs::EntitySubtype::CAR:
         return autoware_auto_perception_msgs::msg::ObjectClassification::CAR;
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
+      case traffic_simulator_msgs::EntitySubtype::TRUCK:
         return autoware_auto_perception_msgs::msg::ObjectClassification::TRUCK;
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS:
+      case traffic_simulator_msgs::EntitySubtype::BUS:
         return autoware_auto_perception_msgs::msg::ObjectClassification::BUS;
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER:
+      case traffic_simulator_msgs::EntitySubtype::TRAILER:
         return autoware_auto_perception_msgs::msg::ObjectClassification::TRAILER;
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
+      case traffic_simulator_msgs::EntitySubtype::MOTORCYCLE:
         return autoware_auto_perception_msgs::msg::ObjectClassification::MOTORCYCLE;
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
+      case traffic_simulator_msgs::EntitySubtype::BICYCLE:
         return autoware_auto_perception_msgs::msg::ObjectClassification::BICYCLE;
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
+      case traffic_simulator_msgs::EntitySubtype::PEDESTRIAN:
         return autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN;
       default:
         return autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN;
@@ -226,8 +164,8 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
 
   kinematics.orientation_availability = [&]() {
     switch (status.subtype().value()) {
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
-      case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
+      case traffic_simulator_msgs::EntitySubtype::BICYCLE:
+      case traffic_simulator_msgs::EntitySubtype::MOTORCYCLE:
         return autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
       default:
         return autoware_auto_perception_msgs::msg::DetectedObjectKinematics::UNAVAILABLE;
@@ -361,12 +299,6 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     -0.002) {
     previous_simulation_time_ = current_simulation_time;
 
-    const auto detected_object_names_in_range = filterObjectsBySensorRange(
-      statuses,
-      configuration_.detect_all_objects_in_range() ? getDetectedObjects(statuses)
-                                                   : lidar_detected_entities,
-      configuration_.range());
-
     autoware_auto_perception_msgs::msg::DetectedObjects detected_objects;
     detected_objects.header.stamp = current_ros_time;
     detected_objects.header.frame_id = "map";
@@ -374,12 +306,19 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_objects;
     ground_truth_objects.header = detected_objects.header;
 
+    auto is_in_range = [&, ego_entity_status = findTheEntityStatusToWhichThisSensorIsAttached(
+                             statuses)](const auto & status) {
+      return not isTheEntityStatusToWhichThisSensorIsAttached(status) and
+             distance(status.pose(), ego_entity_status->pose()) <=
+               std::min(configuration_.range(), 300.0) and
+             (configuration_.detect_all_objects_in_range() or
+              std::find(
+                lidar_detected_entities.begin(), lidar_detected_entities.end(), status.name()) !=
+                lidar_detected_entities.end());
+    };
+
     for (const auto & status : statuses) {
-      if (
-        std::find(
-          detected_object_names_in_range.begin(), detected_object_names_in_range.end(),
-          status.name()) != detected_object_names_in_range.end() and
-        status.type().type() != traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
+      if (is_in_range(status)) {
         const auto detected_object =
           make<autoware_auto_perception_msgs::msg::DetectedObject>(status);
         detected_objects.objects.push_back(detected_object);

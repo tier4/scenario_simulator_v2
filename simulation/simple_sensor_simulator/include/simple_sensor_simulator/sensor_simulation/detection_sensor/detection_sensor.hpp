@@ -41,22 +41,12 @@ protected:
   {
   }
 
-  auto isWithinRange(
-    const geometry_msgs::Point & point1, const geometry_msgs::Point & point2,
-    const double range) const -> bool;
+  auto isTheEntityStatusToWhichThisSensorIsAttached(
+    const traffic_simulator_msgs::EntityStatus &) const -> bool;
 
-  auto filterObjectsBySensorRange(
-    const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::vector<std::string> &,
-    const double) const -> std::vector<std::string>;
-
-  auto getEntityPose(const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::string &)
-    const -> geometry_msgs::Pose;
-
-  auto getDetectedObjects(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
-    -> std::vector<std::string>;
-
-  auto getSensorPose(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
-    -> geometry_msgs::Pose;
+  auto findTheEntityStatusToWhichThisSensorIsAttached(
+    const std::vector<traffic_simulator_msgs::EntityStatus> &) const
+    -> std::vector<traffic_simulator_msgs::EntityStatus>::const_iterator;
 
 public:
   virtual ~DetectionSensorBase() = default;
@@ -81,9 +71,6 @@ class DetectionSensor : public DetectionSensorBase
 
   std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
     ground_truth_objects_queue;
-
-  auto applyPositionNoise(typename T::_objects_type::value_type) ->
-    typename T::_objects_type::value_type;
 
 public:
   explicit DetectionSensor(
