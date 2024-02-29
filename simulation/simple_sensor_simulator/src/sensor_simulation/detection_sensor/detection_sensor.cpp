@@ -292,7 +292,7 @@ struct CustomNoiseApplicator : public DefaultNoiseApplicator
      This class inherits from DefaultNoiseApplicator, so you can use its data
      members, or you can explicitly call DefaultNoiseApplicator::operator().
   */
-  // auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_object)
+  // auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_objects)
   //   -> decltype(auto)
   // {
   //   return detected_objects;
