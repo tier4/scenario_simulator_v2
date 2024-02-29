@@ -280,23 +280,26 @@ auto make(
   return tracked_object;
 };
 
-struct Noise
+struct DefaultNoiseApplicator
 {
+  const double current_simulation_time;
+
+  const rclcpp::Time & current_ros_time;
+
   std::default_random_engine & random_engine;
 
   const simulation_api_schema::DetectionSensorConfiguration & detection_sensor_configuration;
 
-  explicit Noise(
+  explicit DefaultNoiseApplicator(
+    double current_simulation_time, const rclcpp::Time & current_ros_time,
     std::default_random_engine & random_engine,
     const simulation_api_schema::DetectionSensorConfiguration & detection_sensor_configuration)
-  : random_engine(random_engine), detection_sensor_configuration(detection_sensor_configuration)
+  : current_simulation_time(current_simulation_time),
+    current_ros_time(current_ros_time),
+    random_engine(random_engine),
+    detection_sensor_configuration(detection_sensor_configuration)
   {
   }
-};
-
-struct DefaultNoise : public Noise
-{
-  using Noise::Noise;
 
   auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_objects)
     -> decltype(auto)
@@ -324,6 +327,28 @@ struct DefaultNoise : public Noise
   }
 };
 
+struct CustomNoiseApplicator : public DefaultNoiseApplicator
+{
+  using DefaultNoiseApplicator::DefaultNoiseApplicator;
+
+  /*
+     NOTE: for Autoware developers
+
+     If you need to apply experimental noise to the DetectedObjects that the
+     simulator publishes, comment out the following member functions and
+     implement them.
+
+     See class DefaultNoiseApplicator for the default noise implementation.
+     This class inherits from DefaultNoiseApplicator, so you can use its data
+     members, or you can explicitly call DefaultNoiseApplicator::operator().
+  */
+  // auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_object)
+  //   -> decltype(auto)
+  // {
+  //   return detected_objects;
+  // }
+};
+
 template <>
 auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
   const double current_simulation_time,
@@ -334,7 +359,9 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
   if (
     current_simulation_time - previous_simulation_time_ - configuration_.update_duration() >=
     -0.002) {
-    const auto detected_objects_in_range = filterObjectsBySensorRange(
+    previous_simulation_time_ = current_simulation_time;
+
+    const auto detected_object_names_in_range = filterObjectsBySensorRange(
       statuses,
       configuration_.detect_all_objects_in_range() ? getDetectedObjects(statuses)
                                                    : lidar_detected_entities,
@@ -347,13 +374,11 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_objects;
     ground_truth_objects.header = detected_objects.header;
 
-    previous_simulation_time_ = current_simulation_time;
-
     for (const auto & status : statuses) {
       if (
         std::find(
-          detected_objects_in_range.begin(), detected_objects_in_range.end(), status.name()) !=
-          detected_objects_in_range.end() and
+          detected_object_names_in_range.begin(), detected_object_names_in_range.end(),
+          status.name()) != detected_object_names_in_range.end() and
         status.type().type() != traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
         const auto detected_object =
           make<autoware_auto_perception_msgs::msg::DetectedObject>(status);
@@ -366,8 +391,9 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     if (detected_objects_queue.emplace(detected_objects, current_simulation_time);
         current_simulation_time - detected_objects_queue.front().second >=
         configuration_.object_recognition_delay()) {
-      detected_objects_publisher->publish(
-        DefaultNoise(random_engine_, configuration_)(detected_objects_queue.front().first));
+      auto apply_noise = CustomNoiseApplicator(
+        current_simulation_time, current_ros_time, random_engine_, configuration_);
+      detected_objects_publisher->publish(apply_noise(detected_objects_queue.front().first));
       detected_objects_queue.pop();
     }
 
