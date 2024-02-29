@@ -40,21 +40,21 @@ auto distance(const geometry_msgs::Pose & pose1, const geometry_msgs::Pose & pos
     pose1.position().z() - pose2.position().z());
 }
 
-auto DetectionSensorBase::isTheEntityStatusToWhichThisSensorIsAttached(
+auto DetectionSensorBase::isEgoEntityStatusToWhichThisSensorIsAttached(
   const traffic_simulator_msgs::EntityStatus & status) const -> bool
 {
   return status.name() == configuration_.entity() and
          status.type().type() == traffic_simulator_msgs::EntityType::EGO;
 }
 
-auto DetectionSensorBase::findTheEntityStatusToWhichThisSensorIsAttached(
+auto DetectionSensorBase::findEgoEntityStatusToWhichThisSensorIsAttached(
   const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const
   -> std::vector<traffic_simulator_msgs::EntityStatus>::const_iterator
 {
   if (auto iter = std::find_if(
         statuses.begin(), statuses.end(),
         [this](const auto & status) {
-          return isTheEntityStatusToWhichThisSensorIsAttached(status);
+          return isEgoEntityStatusToWhichThisSensorIsAttached(status);
         });
       iter != statuses.end()) {
     return iter;
@@ -318,10 +318,10 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_objects;
     ground_truth_objects.header = detected_objects.header;
 
-    const auto ego_entity_status = findTheEntityStatusToWhichThisSensorIsAttached(statuses);
+    const auto ego_entity_status = findEgoEntityStatusToWhichThisSensorIsAttached(statuses);
 
     auto is_in_range = [&](const auto & status) {
-      return not isTheEntityStatusToWhichThisSensorIsAttached(status) and
+      return not isEgoEntityStatusToWhichThisSensorIsAttached(status) and
              distance(status.pose(), ego_entity_status->pose()) <=
                std::min(configuration_.range(), 300.0) and
              (configuration_.detect_all_objects_in_range() or

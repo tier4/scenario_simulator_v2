@@ -41,10 +41,10 @@ protected:
   {
   }
 
-  auto isTheEntityStatusToWhichThisSensorIsAttached(
+  auto isEgoEntityStatusToWhichThisSensorIsAttached(
     const traffic_simulator_msgs::EntityStatus &) const -> bool;
 
-  auto findTheEntityStatusToWhichThisSensorIsAttached(
+  auto findEgoEntityStatusToWhichThisSensorIsAttached(
     const std::vector<traffic_simulator_msgs::EntityStatus> &) const
     -> std::vector<traffic_simulator_msgs::EntityStatus>::const_iterator;
 
