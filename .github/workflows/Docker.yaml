@@ -25,7 +25,13 @@ jobs:
     strategy:
       matrix:
         rosdistro: [humble]
+        arch: [amd64, arm64]
     steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+
       - name: Install docker for ubuntu runner
         uses: docker/setup-buildx-action@v3
 
@@ -50,6 +56,6 @@ jobs:
           set: |
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
-          push: ${{ github.event_name != 'pull_request' }}
+          push: ${{ github.event_name != 'pull_request' && matrix.arch == 'amd64' }}
           targets: |
-            ${{ matrix.rosdistro }}
+            ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
