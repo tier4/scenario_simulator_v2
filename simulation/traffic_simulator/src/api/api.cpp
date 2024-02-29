@@ -78,8 +78,8 @@ auto API::setEntityStatus(
   status.action_status = action_status;
   if (
     const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
-      status.pose, getBoundingBox(reference_entity_name), false,
-      getDefaultMatchingDistanceForLaneletPoseCalculation(reference_entity_name))) {
+      status.pose, getBoundingBox(name), false,
+      getDefaultMatchingDistanceForLaneletPoseCalculation(name))) {
     status.lanelet_pose_valid = true;
     status.lanelet_pose = lanelet_pose.value();
   } else {
