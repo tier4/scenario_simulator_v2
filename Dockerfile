@@ -4,15 +4,15 @@ SHELL ["/bin/bash", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get -y install python3-pip python3-rospkg python3-rosdep software-properties-common ccache
 # cspell: ignore kisak
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
     add-apt-repository ppa:kisak/kisak-mesa -y
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install libegl-mesa0 -y
 
 RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
@@ -26,8 +26,8 @@ RUN mkdir -p /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator/e
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator
 RUN vcs import external < dependency_${ROS_DISTRO}.repos
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+RUN --mount=type=cache,id=apt-cache-amd64,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lib-amd64,target=/var/lib/apt,sharing=locked \
     source /opt/ros/${ROS_DISTRO}/setup.bash \
     && apt-get update \
     && rosdep install -iy --from-paths . --rosdistro ${ROS_DISTRO}
