@@ -23,6 +23,7 @@ WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     source /opt/ros/${ROS_DISTRO}/setup.bash \
+    && apt-get update \
     && rosdep install -iy --from-paths . --rosdistro ${ROS_DISTRO}
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws
