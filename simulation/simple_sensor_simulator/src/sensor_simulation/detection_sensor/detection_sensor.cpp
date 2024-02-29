@@ -190,11 +190,11 @@ auto make(const traffic_simulator_msgs::EntityStatus & status)
   -> autoware_auto_perception_msgs::msg::DetectedObject
 {
   auto detected_object = autoware_auto_perception_msgs::msg::DetectedObject();
-  // clang-format off
-  detected_object.classification.push_back(make<autoware_auto_perception_msgs::msg::ObjectClassification    >(status));
-  detected_object.kinematics             = make<autoware_auto_perception_msgs::msg::DetectedObjectKinematics>(status);
-  detected_object.shape                  = make<autoware_auto_perception_msgs::msg::Shape                   >(status);
-  // clang-format on
+  detected_object.classification.push_back(
+    make<autoware_auto_perception_msgs::msg::ObjectClassification>(status));
+  detected_object.kinematics =
+    make<autoware_auto_perception_msgs::msg::DetectedObjectKinematics>(status);
+  detected_object.shape = make<autoware_auto_perception_msgs::msg::Shape>(status);
   return detected_object;
 }
 
@@ -224,20 +224,32 @@ struct DefaultNoiseApplicator
 
   const rclcpp::Time & current_ros_time;
 
+  const traffic_simulator_msgs::EntityStatus & ego_entity_status;
+
   std::default_random_engine & random_engine;
 
   const simulation_api_schema::DetectionSensorConfiguration & detection_sensor_configuration;
 
   explicit DefaultNoiseApplicator(
     double current_simulation_time, const rclcpp::Time & current_ros_time,
+    const traffic_simulator_msgs::EntityStatus & ego_entity_status,
     std::default_random_engine & random_engine,
     const simulation_api_schema::DetectionSensorConfiguration & detection_sensor_configuration)
   : current_simulation_time(current_simulation_time),
     current_ros_time(current_ros_time),
+    ego_entity_status(ego_entity_status),
     random_engine(random_engine),
     detection_sensor_configuration(detection_sensor_configuration)
   {
   }
+
+  DefaultNoiseApplicator(const DefaultNoiseApplicator &) = delete;
+
+  DefaultNoiseApplicator(DefaultNoiseApplicator &&) = delete;
+
+  auto operator=(const DefaultNoiseApplicator &) = delete;
+
+  auto operator=(DefaultNoiseApplicator &&) = delete;
 
   auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_objects)
     -> decltype(auto)
@@ -306,8 +318,9 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
     autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_objects;
     ground_truth_objects.header = detected_objects.header;
 
-    auto is_in_range = [&, ego_entity_status = findTheEntityStatusToWhichThisSensorIsAttached(
-                             statuses)](const auto & status) {
+    const auto ego_entity_status = findTheEntityStatusToWhichThisSensorIsAttached(statuses);
+
+    auto is_in_range = [&](const auto & status) {
       return not isTheEntityStatusToWhichThisSensorIsAttached(status) and
              distance(status.pose(), ego_entity_status->pose()) <=
                std::min(configuration_.range(), 300.0) and
@@ -331,7 +344,8 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         current_simulation_time - detected_objects_queue.front().second >=
         configuration_.object_recognition_delay()) {
       auto apply_noise = CustomNoiseApplicator(
-        current_simulation_time, current_ros_time, random_engine_, configuration_);
+        current_simulation_time, current_ros_time, *ego_entity_status, random_engine_,
+        configuration_);
       detected_objects_publisher->publish(apply_noise(detected_objects_queue.front().first));
       detected_objects_queue.pop();
     }
