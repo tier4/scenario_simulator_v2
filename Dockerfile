@@ -9,7 +9,7 @@ RUN sudo apt-get update && sudo apt-get -y install python3-pip python3-rospkg py
 RUN add-apt-repository ppa:kisak/kisak-mesa -y
 RUN apt-get update && apt-get install libegl-mesa0 -y
 
-RUN rm -f /etc/apt/apt.conf.d/docker-clean \
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
     echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
 
 WORKDIR /home/ubuntu/Desktop/scenario_simulator_ws/src/scenario_simulator
