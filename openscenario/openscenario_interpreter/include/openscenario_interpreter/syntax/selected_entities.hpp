@@ -15,13 +15,29 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SELECTED_ENTITIES_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__SELECTED_ENTITIES_HPP_
 
+#include <openscenario_interpreter/object.hpp>
+#include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/by_type.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
+struct SelectedEntityRefs : public Object
+{
+  const std::list<GroupedEntity> entityRefs;
+
+  explicit SelectedEntityRefs(const pugi::xml_node &, Scope &);
+};
+
+struct SelectedByTypes : public Object
+{
+  const std::list<ByType> byTypes;
+
+  explicit SelectedByTypes(const pugi::xml_node &, Scope &);
+};
+
 /* ---- SelectedEntities -------------------------------------------------------
  *
  *  <xsd:complexType name="SelectedEntities">
@@ -32,9 +48,13 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct SelectedEntities
+struct SelectedEntities : public ComplexType
 {
+  explicit SelectedEntities(const pugi::xml_node &, Scope &);
 };
+
+DEFINE_LAZY_VISITOR(SelectedEntities, CASE(SelectedEntityRefs), CASE(SelectedByTypes));
+DEFINE_LAZY_VISITOR(const SelectedEntities, CASE(SelectedEntityRefs), CASE(SelectedByTypes));
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

@@ -26,7 +26,7 @@ SpeedCondition::SpeedCondition(
 : value(readAttribute<Double>("value", node, scope)),
   compare(readAttribute<Rule>("rule", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
 }
 
@@ -48,8 +48,9 @@ auto SpeedCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(evaluateSpeed(triggering_entity));
-    return compare(results.back(), value);
+    results.push_back(
+      triggering_entity.apply([&](const auto & object) { return evaluateSpeed(object); }));
+    return not results.back().size() or compare(results.back(), value).min();
   }));
 }
 }  // namespace syntax

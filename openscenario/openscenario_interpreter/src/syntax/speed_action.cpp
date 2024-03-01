@@ -15,7 +15,9 @@
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
+#include <valarray>
 
 namespace openscenario_interpreter
 {
@@ -26,6 +28,16 @@ SpeedAction::SpeedAction(const pugi::xml_node & node, Scope & scope)
   speed_action_dynamics(readElement<TransitionDynamics>("SpeedActionDynamics", node, local())),
   speed_action_target(readElement<SpeedActionTarget>("SpeedActionTarget", node, local()))
 {
+  // OpenSCENARIO 1.2 Table 11
+  for (const auto & actor : actors) {
+    for (const auto & object_type : actor.objectTypes()) {
+      if (object_type != ObjectType::vehicle and object_type != ObjectType::pedestrian) {
+        THROW_SEMANTIC_ERROR(
+          "Actors may be either of vehicle type or a pedestrian type;"
+          "See OpenSCENARIO 1.2 Table 11 for more details");
+      }
+    }
+  }
 }
 
 auto SpeedAction::accomplished() -> bool
@@ -43,21 +55,28 @@ auto SpeedAction::accomplished() -> bool
   };
 
   auto check = [this](auto && actor) {
+    auto evaluation = actor.apply([](const auto & object) { return evaluateSpeed(object); });
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      return equal_to<double>()(
-        speed_action_target.as<AbsoluteTargetSpeed>().value, evaluateSpeed(actor));
+      return not evaluation.size() or
+             equal_to<std::valarray<double>>()(
+               speed_action_target.as<AbsoluteTargetSpeed>().value, evaluation)
+               .min();
     } else {
       switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
         case SpeedTargetValueType::delta:
-          return equal_to<double>()(
-            evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
-              speed_action_target.as<RelativeTargetSpeed>().value,
-            evaluateSpeed(actor));
+          return not evaluation.size() or
+                 equal_to<std::valarray<double>>()(
+                   evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
+                     speed_action_target.as<RelativeTargetSpeed>().value,
+                   evaluation)
+                   .min();
         case SpeedTargetValueType::factor:
-          return equal_to<double>()(
-            evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
-              speed_action_target.as<RelativeTargetSpeed>().value,
-            evaluateSpeed(actor));
+          return not evaluation.size() or
+                 equal_to<std::valarray<double>>()(
+                   evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
+                     speed_action_target.as<RelativeTargetSpeed>().value,
+                   evaluation)
+                   .min();
         default:
           return false;
       }
@@ -95,20 +114,24 @@ auto SpeedAction::start() -> void
 
   for (auto && each : accomplishments) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
-      applySpeedAction(
-        std::get<0>(each), speed_action_target.as<AbsoluteTargetSpeed>().value,
-        static_cast<traffic_simulator::speed_change::Transition>(
-          speed_action_dynamics.dynamics_shape),
-        static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics), true);
+      each.first.apply([&](const auto & object) {
+        applySpeedAction(
+          object, speed_action_target.as<AbsoluteTargetSpeed>().value,
+          static_cast<traffic_simulator::speed_change::Transition>(
+            speed_action_dynamics.dynamics_shape),
+          static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics), true);
+      });
     } else {
-      applySpeedAction(
-        std::get<0>(each),
-        static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
-          speed_action_target.as<RelativeTargetSpeed>()),
-        static_cast<traffic_simulator::speed_change::Transition>(
-          speed_action_dynamics.dynamics_shape),
-        static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics),
-        speed_action_target.as<RelativeTargetSpeed>().continuous);
+      each.first.apply([&](const auto & object) {
+        applySpeedAction(
+          object,
+          static_cast<traffic_simulator::speed_change::RelativeTargetSpeed>(
+            speed_action_target.as<RelativeTargetSpeed>()),
+          static_cast<traffic_simulator::speed_change::Transition>(
+            speed_action_dynamics.dynamics_shape),
+          static_cast<traffic_simulator::speed_change::Constraint>(speed_action_dynamics),
+          speed_action_target.as<RelativeTargetSpeed>().continuous);
+      });
     }
   }
 }

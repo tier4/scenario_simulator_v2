@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/catalog_reference.hpp>
 #include <openscenario_interpreter/syntax/entity_object.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 
 namespace openscenario_interpreter
 {
@@ -30,6 +31,12 @@ EntityObject::EntityObject(const pugi::xml_node & node, Scope & scope)
       std::make_pair("MiscObject",       [&](auto && node) { return make<MiscObject>(node, scope);        })))
 // clang-format on
 {
+}
+
+auto EntityObject::objectType() const -> ObjectType::value_type
+{
+  return apply<ObjectType::value_type>(
+    [](const auto & object) { return object.object_type; }, *this);
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -18,11 +18,13 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/coordinate_system.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_type.hpp>
 #include <openscenario_interpreter/syntax/rule.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/triggering_entities.hpp>
 #include <pugixml.hpp>
+#include <valarray>
 
 namespace openscenario_interpreter
 {
@@ -55,7 +57,7 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   /*
      Reference entity.
   */
-  const String entity_ref;
+  const SingleEntity entity_ref;
 
   /*
      True: distance is measured between closest bounding box points.
@@ -81,7 +83,7 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
 
   const TriggeringEntities triggering_entities;
 
-  std::vector<Double> results;  // for description
+  std::vector<std::valarray<double>> results;  // for description
 
   explicit RelativeDistanceCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 

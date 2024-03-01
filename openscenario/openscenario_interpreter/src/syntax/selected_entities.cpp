@@ -12,43 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/object.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/by_type.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/entity.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/syntax/selected_entities.hpp>
+#include <utility>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-Entities::Entities(const pugi::xml_node & node, Scope & scope)
+SelectedEntityRefs::SelectedEntityRefs(const pugi::xml_node & tree, Scope & scope)
+: entityRefs(readElements<GroupedEntity, 0>("EntityRef", tree, scope))
 {
-  traverse<0, unbounded>(node, "ScenarioObject", [&](auto && node) {
-    emplace(readAttribute<String>("name", node, scope), make<ScenarioObject>(node, scope));
-  });
-
-  scope.global().entities = this;
-
-  traverse<0, unbounded>(node, "EntitySelection", [&](auto && node) {
-    emplace(readAttribute<String>("name", node, scope), make<EntitySelection>(node, scope));
-  });
 }
 
-auto Entities::isAdded(const GroupedEntity & entity_ref) const -> bool
+SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
+: byTypes(readElements<ByType, 0>("ByType", tree, scope))
 {
-  auto evaluation = entity_ref.apply(
-    [&](const auto & object) { return object.template as<ScenarioObject>().is_added; });
-  return not evaluation.size() or evaluation.min();
 }
 
-auto Entities::ref(const EntityRef & entity_ref) const -> Object
+SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
+// clang-format off
+: ComplexType(
+    choice(tree,
+      std::make_pair("EntityRef", [&](const auto & tree) { return make<SelectedEntityRefs>(tree.parent(), scope); }),
+      std::make_pair(   "ByType", [&](const auto & tree) { return make<   SelectedByTypes>(tree.parent(), scope); })))
+// clang-format on
 {
-  try {
-    return at(entity_ref);
-  } catch (const std::out_of_range &) {
-    throw Error("An undeclared entity ", std::quoted(entity_ref), " was specified in entityRef.");
-  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
