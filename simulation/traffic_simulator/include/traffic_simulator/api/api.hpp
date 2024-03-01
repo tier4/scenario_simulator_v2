@@ -164,47 +164,6 @@ public:
     return entity_manager_ptr_->getHdmapUtils()->toMapPose(pose).pose;
   }
 
-  void respawn(
-    const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
-    const geometry_msgs::msg::PoseStamped goal_pose)
-  {
-    if (name != "ego") {
-      throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
-    }
-
-    simulation_api_schema::DespawnEntityRequest despawn_req;
-    despawn_req.set_name(name);
-
-    if (not zeromq_client_.call(despawn_req).result().success()) {
-      throw common::SimulationError(
-        "Despawning failed while trying to respawn the " + name + " entity");
-    }
-
-    simulation_api_schema::SpawnVehicleEntityRequest spawn_req;
-    spawn_req.set_is_ego(true);
-    simulation_interface::toProto(toMapPose(new_pose.pose.pose), *spawn_req.mutable_pose());
-    spawn_req.set_initial_speed(0.0);
-    simulation_interface::toProto(
-      entity_manager_ptr_->getVehicleParameters(name), *spawn_req.mutable_parameters());
-    spawn_req.mutable_parameters()->set_name(name);
-    spawn_req.set_asset_key("");
-
-    if (not zeromq_client_.call(spawn_req).result().success()) {
-      throw common::SimulationError(
-        "Spawning failed while trying to respawn the " + name + " entity");
-    }
-
-    entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
-    entity_manager_ptr_->asFieldOperatorApplication(name).plan(
-      std::vector<geometry_msgs::msg::PoseStamped>{goal_pose});
-
-    while (!entity_manager_ptr_->asFieldOperatorApplication(name).engageable()) {
-      updateFrame();
-      std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
-    }
-    entity_manager_ptr_->asFieldOperatorApplication(name).engage();
-  }
-
   template <typename Pose>
   auto spawn(
     const std::string & name, const Pose & pose,
@@ -261,6 +220,10 @@ public:
 
   bool despawn(const std::string & name);
   bool despawnEntities();
+
+  void respawn(
+    const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
+    const geometry_msgs::msg::PoseStamped & goal_pose);
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
   auto setEntityStatus(

@@ -116,8 +116,9 @@ void CppScenarioNode::spawnEgoEntity(
 
   using namespace std::chrono_literals;
   while (!api_.asFieldOperatorApplication("ego").engaged()) {
-    if (api_.asFieldOperatorApplication("ego").engageable())
+    if (api_.asFieldOperatorApplication("ego").engageable()) {
       api_.asFieldOperatorApplication("ego").engage();
+    }
     api_.updateFrame();
     std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   }
