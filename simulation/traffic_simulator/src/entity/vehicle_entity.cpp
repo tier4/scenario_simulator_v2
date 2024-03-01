@@ -270,6 +270,7 @@ void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Para
 
 void VehicleEntity::setVelocityLimit(double linear_velocity)
 {
+  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
   if (linear_velocity <= 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
   }
@@ -280,6 +281,7 @@ void VehicleEntity::setVelocityLimit(double linear_velocity)
 
 void VehicleEntity::setAccelerationLimit(double acceleration)
 {
+  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
   if (acceleration <= 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration limit must be greater than or equal to zero.");
   }
@@ -290,6 +292,7 @@ void VehicleEntity::setAccelerationLimit(double acceleration)
 
 void VehicleEntity::setAccelerationRateLimit(double acceleration_rate)
 {
+  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
   if (acceleration_rate <= 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration rate limit must be greater than or equal to zero.");
   }
@@ -300,6 +303,7 @@ void VehicleEntity::setAccelerationRateLimit(double acceleration_rate)
 
 void VehicleEntity::setDecelerationLimit(double deceleration)
 {
+  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
   if (deceleration <= 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration limit must be greater than or equal to zero.");
   }
@@ -310,6 +314,7 @@ void VehicleEntity::setDecelerationLimit(double deceleration)
 
 void VehicleEntity::setDecelerationRateLimit(double deceleration_rate)
 {
+  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
   if (deceleration_rate <= 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration rate limit must be greater than or equal to zero.");
   }
