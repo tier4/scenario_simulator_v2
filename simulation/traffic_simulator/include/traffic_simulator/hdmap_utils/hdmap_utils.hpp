@@ -298,8 +298,8 @@ public:
   auto toMapPoints(const lanelet::Id, const std::vector<double> & s) const
     -> std::vector<geometry_msgs::msg::Point>;
 
-  auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &) const
-    -> geometry_msgs::msg::PoseStamped;
+  auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &, const bool fill_pitch = false)
+    const -> geometry_msgs::msg::PoseStamped;
 
 private:
   /** @defgroup cache

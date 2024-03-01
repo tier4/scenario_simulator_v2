@@ -51,7 +51,7 @@ TestDescription TestRandomizer::generate()
     test_suite_parameters_.ego_goal_lanelet_id, test_suite_parameters_.ego_goal_s,
     test_suite_parameters_.ego_goal_partial_randomization,
     test_suite_parameters_.ego_goal_partial_randomization_distance);
-  ret.ego_goal_pose = lanelet_utils_->toMapPose(ret.ego_goal_position).pose;
+  ret.ego_goal_pose = lanelet_utils_->toMapPose(ret.ego_goal_position, false).pose;
 
   std::vector<LaneletPart> lanelets_around_start = lanelet_utils_->getLanesWithinDistance(
     ret.ego_start_position, test_suite_parameters_.npc_min_spawn_distance_from_ego,
