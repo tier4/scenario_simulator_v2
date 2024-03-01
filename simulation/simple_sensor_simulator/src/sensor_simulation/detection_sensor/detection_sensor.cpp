@@ -322,8 +322,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
 
     auto is_in_range = [&](const auto & status) {
       return not isEgoEntityStatusToWhichThisSensorIsAttached(status) and
-             distance(status.pose(), ego_entity_status->pose()) <=
-               std::min(configuration_.range(), 300.0) and
+             distance(status.pose(), ego_entity_status->pose()) <= configuration_.range() and
              (configuration_.detect_all_objects_in_range() or
               std::find(
                 lidar_detected_entities.begin(), lidar_detected_entities.end(), status.name()) !=
