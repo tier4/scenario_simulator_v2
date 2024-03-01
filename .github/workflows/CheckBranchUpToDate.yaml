@@ -13,11 +13,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
           fetch-tags: true
-
       - name: Check if branches are up to date
         shell: bash
         run: |
