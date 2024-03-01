@@ -2,6 +2,9 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.1 (2024-02-29)
+------------------
+
 1.4.0 (2024-02-26)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
