@@ -33,7 +33,7 @@ public:
     goal_pose{
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0))},
     new_position_subscriber{create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
-      "/initialpose", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
+      "/initialpose", rclcpp::QoS(rclcpp::KeepLast(1)).reliable(),
       [this](const geometry_msgs::msg::PoseWithCovarianceStamped & message) {
         geometry_msgs::msg::PoseStamped goal_msg;
         goal_msg.header.frame_id = "map";
