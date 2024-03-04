@@ -83,7 +83,7 @@ void API::respawn(
     std::vector<geometry_msgs::msg::PoseStamped>{goal_pose});
 
   while (!entity_manager_ptr_->asFieldOperatorApplication(name).engageable()) {
-    updateFrame();
+    entity_manager_ptr_->asFieldOperatorApplication(name).spinSome();
     std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   }
   entity_manager_ptr_->asFieldOperatorApplication(name).engage();
