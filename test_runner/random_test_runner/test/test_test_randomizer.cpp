@@ -61,10 +61,10 @@ TEST(TestRandomizer, generate_10NPC)
                   .y(73741.1526960728)
                   .z(0.0698702227))
       .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>()
-                           .x(0.0)
-                           .y(0.0)
-                           .z(-0.9854984261)
-                           .w(0.1696845662)),
+                     .x(0.0)
+                     .y(0.0)
+                     .z(-0.9854984261)
+                     .w(0.1696845662)),
     EPS);
   // npc data
   EXPECT_EQ(description.npcs_descriptions.size(), size_t(10));
@@ -126,10 +126,10 @@ TEST(TestRandomizer, generate_8NPC)
                   .y(73815.1830249432)
                   .z(-2.9975350010))
       .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>()
-                           .x(0.0)
-                           .y(0.0)
-                           .z(0.2345315792)
-                           .w(0.9721085013)),
+                     .x(0.0)
+                     .y(0.0)
+                     .z(0.2345315792)
+                     .w(0.9721085013)),
     EPS);
   // npc data
   EXPECT_EQ(description.npcs_descriptions.size(), size_t(8));
