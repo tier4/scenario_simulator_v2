@@ -117,7 +117,6 @@ TEST(TestRandomizer, generate_8NPC)
     description.ego_start_position, makeLaneletPose(34648, 11.3744011441), EPS);
   EXPECT_LANELET_POSE_NEAR(
     description.ego_goal_position, makeLaneletPose(34507, 55.3754803281), EPS);
-  // NOTE: orientation data is output as of #1103
   EXPECT_POSE_NEAR(
     description.ego_goal_pose,
     geometry_msgs::build<geometry_msgs::msg::Pose>()
