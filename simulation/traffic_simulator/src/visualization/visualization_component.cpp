@@ -48,26 +48,25 @@
 #include <cmath>
 #include <color_names/color_names.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
-#include <openscenario_visualization/openscenario_visualization_component.hpp>
+#include <rclcpp/rclcpp.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 #include <string>
+#include <traffic_simulator/visualization/visualization_component.hpp>
 #include <vector>
 
-namespace openscenario_visualization
+namespace traffic_simulator
 {
-OpenscenarioVisualizationComponent::OpenscenarioVisualizationComponent(
-  const rclcpp::NodeOptions & options)
-: Node("openscenario_visualization", options)
+VisualizationComponent::VisualizationComponent(const rclcpp::NodeOptions & options)
+: Node("visualization", options)
 {
   marker_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("entity/marker", 1);
   entity_status_sub_ =
     this->create_subscription<traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray>(
       "entity/status", 1,
-      std::bind(
-        &OpenscenarioVisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
+      std::bind(&VisualizationComponent::entityStatusCallback, this, std::placeholders::_1));
 }
 
-void OpenscenarioVisualizationComponent::entityStatusCallback(
+void VisualizationComponent::entityStatusCallback(
   const traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray::ConstSharedPtr msg)
 {
   visualization_msgs::msg::MarkerArray current_marker;
@@ -100,7 +99,7 @@ void OpenscenarioVisualizationComponent::entityStatusCallback(
   marker_pub_->publish(current_marker);
 }
 
-const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateDeleteMarker(
+const visualization_msgs::msg::MarkerArray VisualizationComponent::generateDeleteMarker(
   std::string ns)
 {
   auto ret = visualization_msgs::msg::MarkerArray();
@@ -117,7 +116,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   return ret;
 }
 
-const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::generateMarker(
+const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarker(
   const traffic_simulator_msgs::msg::EntityStatus & status,
   const std::vector<geometry_msgs::msg::Pose> & goal_pose,
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints,
@@ -449,8 +448,7 @@ const visualization_msgs::msg::MarkerArray OpenscenarioVisualizationComponent::g
   return ret;
 }
 
-const visualization_msgs::msg::MarkerArray
-OpenscenarioVisualizationComponent::generateDeleteMarker() const
+const visualization_msgs::msg::MarkerArray VisualizationComponent::generateDeleteMarker() const
 {
   visualization_msgs::msg::MarkerArray ret;
   visualization_msgs::msg::Marker marker;
@@ -458,6 +456,6 @@ OpenscenarioVisualizationComponent::generateDeleteMarker() const
   ret.markers.emplace_back(marker);
   return ret;
 }
-}  // namespace openscenario_visualization
+}  // namespace traffic_simulator
 
-RCLCPP_COMPONENTS_REGISTER_NODE(openscenario_visualization::OpenscenarioVisualizationComponent)
+RCLCPP_COMPONENTS_REGISTER_NODE(traffic_simulator::VisualizationComponent)

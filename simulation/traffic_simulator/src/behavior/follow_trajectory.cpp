@@ -15,6 +15,7 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <arithmetic/floating_point/comparison.hpp>
+#include <geometry/linear_algebra.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
@@ -44,7 +45,8 @@ auto any(F f, T && x, Ts &&... xs)
 auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
-  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter, double step_time,
+  const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, double step_time,
   std::optional<double> target_speed) -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
@@ -57,6 +59,7 @@ auto makeUpdatedStatus(
   using math::geometry::operator+=;
 
   using math::geometry::hypot;
+  using math::geometry::innerProduct;
   using math::geometry::norm;
   using math::geometry::normalize;
   using math::geometry::truncate;
@@ -94,7 +97,7 @@ auto makeUpdatedStatus(
     }
 
     return makeUpdatedStatus(
-      entity_status, polyline_trajectory, behavior_parameter, step_time, target_speed);
+      entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time, target_speed);
   };
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
@@ -227,41 +230,41 @@ auto makeUpdatedStatus(
     isDefinitelyLessThan(distance, std::numeric_limits<double>::epsilon())) {
     return discard_the_front_waypoint_and_recurse();
   } else if (const auto acceleration = entity_status.action_status.accel.linear.x;  // [m/s^2]
-             isinf(acceleration) or isnan(acceleration)) {
+             std::isinf(acceleration) or std::isnan(acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s acceleration value is NaN or infinity. The value is ",
-      acceleration, ".");
+      acceleration, ". ");
   } else if (const auto max_acceleration = std::min(
                acceleration /* [m/s^2] */ +
                  behavior_parameter.dynamic_constraints.max_acceleration_rate /* [m/s^3] */ *
                    step_time /* [s] */,
                +behavior_parameter.dynamic_constraints.max_acceleration /* [m/s^2] */);
-             isinf(max_acceleration) or isnan(max_acceleration)) {
+             std::isinf(max_acceleration) or std::isnan(max_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
-      "'s maximum acceleration value is NaN or infinity. The value is ", max_acceleration, ".");
+      "'s maximum acceleration value is NaN or infinity. The value is ", max_acceleration, ". ");
   } else if (const auto min_acceleration = std::max(
                acceleration /* [m/s^2] */ -
                  behavior_parameter.dynamic_constraints.max_deceleration_rate /* [m/s^3] */ *
                    step_time /* [s] */,
                -behavior_parameter.dynamic_constraints.max_deceleration /* [m/s^2] */);
-             isinf(min_acceleration) or isnan(min_acceleration)) {
+             std::isinf(min_acceleration) or std::isnan(min_acceleration)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
-      "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ".");
+      "'s minimum acceleration value is NaN or infinity. The value is ", min_acceleration, ". ");
   } else if (const auto speed = entity_status.action_status.twist.linear.x;  // [m/s]
-             isinf(speed) or isnan(speed)) {
+             std::isinf(speed) or std::isnan(speed)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s speed value is NaN or infinity. The value is ", speed,
-      ".");
+      ". ");
   } else if (
     /*
        The controller provides the ability to calculate acceleration using constraints from the
@@ -314,14 +317,14 @@ auto makeUpdatedStatus(
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name),
       "'s desired acceleration value contains NaN or infinity. The value is ", desired_acceleration,
-      ".");
+      ". ");
   } else if (const auto desired_speed = speed + desired_acceleration * step_time;
              std::isinf(desired_speed) or std::isnan(desired_speed)) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
       "following information to the developer: Vehicle ",
       std::quoted(entity_status.name), "'s desired speed value is NaN or infinity. The value is ",
-      desired_speed, ".");
+      desired_speed, ". ");
   } else if (const auto desired_velocity =
                [&]() {
                  /*
@@ -351,9 +354,22 @@ auto makeUpdatedStatus(
       std::quoted(entity_status.name),
       "'s desired velocity contains NaN or infinity. The value is [", desired_velocity.x, ", ",
       desired_velocity.y, ", ", desired_velocity.z, "].");
+  } else if (const auto current_velocity =
+               [&]() {
+                 const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(
+                                    entity_status.pose.orientation)
+                                    .z;
+                 geometry_msgs::msg::Vector3 direction;
+                 direction.x = std::cos(yaw) * speed;
+                 direction.y = std::sin(yaw) * speed;
+                 direction.z = 0.0;
+                 return direction;
+               }();
+             (speed * step_time) > distance_to_front_waypoint &&
+             innerProduct(desired_velocity, current_velocity) < 0.0) {
+    return discard_the_front_waypoint_and_recurse();
   } else if (auto predicted_state_opt = follow_waypoint_controller.getPredictedWaypointArrivalState(
-               desired_acceleration, remaining_time_to_front_waypoint, distance, acceleration,
-               speed);
+               desired_acceleration, remaining_time, distance, acceleration, speed);
              !std::isinf(remaining_time) && !predicted_state_opt.has_value()) {
     throw common::Error(
       "An error occurred in the internal state of FollowTrajectoryAction. Please report the "
@@ -361,7 +377,8 @@ auto makeUpdatedStatus(
       std::quoted(entity_status.name),
       " calculated invalid acceleration:", " desired_acceleration: ", desired_acceleration,
       ", remaining_time_to_front_waypoint: ", remaining_time_to_front_waypoint,
-      ", distance: ", distance, ", acceleration: ", acceleration, ", speed: ", speed, ".");
+      ", distance: ", distance, ", acceleration: ", acceleration, ", speed: ", speed, ". ",
+      follow_waypoint_controller);
   } else {
     auto remaining_time_to_arrival_to_front_waypoint = predicted_state_opt->travel_time;
     if constexpr (false) {
@@ -492,9 +509,6 @@ auto makeUpdatedStatus(
           " from that waypoint which is greater than the accepted accuracy.");
       }
     }
-    const auto current_velocity =
-      quaternion_operation::convertQuaternionToEulerAngle(entity_status.pose.orientation) *
-      entity_status.action_status.twist.linear.x;
 
     /*
        Note: If obstacle avoidance is to be implemented, the steering behavior
@@ -543,7 +557,15 @@ auto makeUpdatedStatus(
 
     updated_status.time = entity_status.time + step_time;
 
-    updated_status.lanelet_pose_valid = false;
+    // matching distance has been set to 3.0 due to matching problems during lane changes
+    if (const auto lanelet_pose =
+          hdmap_utils->toLaneletPose(updated_status.pose, entity_status.bounding_box, false, 3.0);
+        lanelet_pose) {
+      updated_status.lanelet_pose = lanelet_pose.value();
+      updated_status.lanelet_pose_valid = true;
+    } else {
+      updated_status.lanelet_pose_valid = false;
+    }
 
     return updated_status;
   }

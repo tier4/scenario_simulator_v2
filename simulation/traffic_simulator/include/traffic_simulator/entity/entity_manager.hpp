@@ -243,7 +243,7 @@ public:
     }
   }
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   /*!                                                                 \
    @brief Forward to arguments to the HDMapUtils::NAME function.      \
@@ -264,7 +264,7 @@ public:
 
 #undef FORWARD_TO_HDMAP_UTILS
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
   /*!                                                                            \
    @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
@@ -309,6 +309,7 @@ public:
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
+  FORWARD_TO_ENTITY(isControlledBySimulator, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );

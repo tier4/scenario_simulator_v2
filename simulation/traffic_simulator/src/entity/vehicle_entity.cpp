@@ -227,7 +227,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
         lanelet_waypoint) {
       route.emplace_back(CanonicalizedLaneletPose(lanelet_waypoint.value(), hdmap_utils_ptr_));
     } else {
-      THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
+      THROW_SEMANTIC_ERROR("Waypoint of vehicle entity should be on lane.");
     }
   }
   requestAssignRoute(route);
@@ -238,6 +238,19 @@ auto VehicleEntity::requestFollowTrajectory(
 {
   behavior_plugin_ptr_->setPolylineTrajectory(parameter);
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
+  std::vector<CanonicalizedLaneletPose> waypoints;
+  for (const auto & vertex : parameter->shape.vertices) {
+    if (const auto lanelet_waypoint =
+          hdmap_utils_ptr_->toLaneletPose(vertex.position, getBoundingBox(), false);
+        lanelet_waypoint) {
+      waypoints.emplace_back(CanonicalizedLaneletPose(lanelet_waypoint.value(), hdmap_utils_ptr_));
+    } else {
+      /// @todo such a protection most likely makes sense, but test scenario
+      /// RoutingAction.FollowTrajectoryAction-star has waypoints outside lanelet2
+      // THROW_SEMANTIC_ERROR("FollowTrajectory waypoint should be on lane.");
+    }
+  }
+  route_planner_.setWaypoints(waypoints);
 }
 
 void VehicleEntity::requestLaneChange(const lanelet::Id to_lanelet_id)

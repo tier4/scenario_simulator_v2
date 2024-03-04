@@ -44,7 +44,6 @@ ScenarioSimulator::ScenarioSimulator(const rclcpp::NodeOptions & options)
     [this](auto &&... xs) { return attachDetectionSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return attachOccupancyGridSensor(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) { return updateTrafficLights(std::forward<decltype(xs)>(xs)...); },
-    [this](auto &&... xs) { return followPolylineTrajectory(std::forward<decltype(xs)>(xs)...); },
     [this](auto &&... xs) {
       return attachPseudoTrafficLightDetector(std::forward<decltype(xs)>(xs)...);
     },
@@ -159,8 +158,16 @@ auto ScenarioSimulator::updateEntityStatus(
     try {
       if (isEgo(status.name())) {
         assert(ego_entity_simulation_ && "Ego is spawned but ego_entity_simulation_ is nullptr!");
-        ego_entity_simulation_->update(
-          current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
+        if (req.overwrite_ego_status()) {
+          traffic_simulator_msgs::msg::EntityStatus ego_status_msg;
+          simulation_interface::toMsg(status, ego_status_msg);
+          ego_entity_simulation_->overwrite(
+            ego_status_msg, current_scenario_time_ + step_time_, step_time_,
+            req.npc_logic_started());
+        } else {
+          ego_entity_simulation_->update(
+            current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
+        }
         simulation_api_schema::EntityStatus ego_status;
         simulation_interface::toProto(ego_entity_simulation_->getStatus(), ego_status);
         entity_status_.at(status.name()) = ego_status;
@@ -333,21 +340,6 @@ auto ScenarioSimulator::updateTrafficLights(
   auto res = simulation_api_schema::UpdateTrafficLightsResponse();
   res.mutable_result()->set_success(true);
   return res;
-}
-
-auto ScenarioSimulator::followPolylineTrajectory(
-  const simulation_api_schema::FollowPolylineTrajectoryRequest & request)
-  -> simulation_api_schema::FollowPolylineTrajectoryResponse
-{
-  auto response = simulation_api_schema::FollowPolylineTrajectoryResponse();
-  if (ego_entity_simulation_ and isEgo(request.name())) {
-    ego_entity_simulation_->polyline_trajectory =
-      simulation_interface::toROS2Message(request.trajectory());
-    response.mutable_result()->set_success(true);
-  } else {
-    response.mutable_result()->set_success(false);
-  }
-  return response;
 }
 
 auto ScenarioSimulator::attachPseudoTrafficLightDetector(
