@@ -196,8 +196,7 @@ void PedestrianEntity::setBehaviorParameter(
 
 void PedestrianEntity::setVelocityLimit(double linear_velocity)
 {
-  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
-  if (linear_velocity <= 0.0) {
+  if (linear_velocity < 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -207,8 +206,7 @@ void PedestrianEntity::setVelocityLimit(double linear_velocity)
 
 void PedestrianEntity::setAccelerationLimit(double acceleration)
 {
-  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
-  if (acceleration <= 0.0) {
+  if (acceleration < 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -218,8 +216,7 @@ void PedestrianEntity::setAccelerationLimit(double acceleration)
 
 void PedestrianEntity::setAccelerationRateLimit(double acceleration_rate)
 {
-  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
-  if (acceleration_rate <= 0.0) {
+  if (acceleration_rate < 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration rate limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -229,8 +226,7 @@ void PedestrianEntity::setAccelerationRateLimit(double acceleration_rate)
 
 void PedestrianEntity::setDecelerationLimit(double deceleration)
 {
-  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
-  if (deceleration <= 0.0) {
+  if (deceleration < 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -240,8 +236,7 @@ void PedestrianEntity::setDecelerationLimit(double deceleration)
 
 void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
 {
-  /// @todo This line should be fixed from `<= 0.0` to `< 0.0`, but this line helps us to find invalid scenarios, so remain it.
-  if (deceleration_rate <= 0.0) {
+  if (deceleration_rate < 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration rate limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
