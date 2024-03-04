@@ -510,7 +510,7 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
       status.pose.position.z = spline.getPoint(s_value.value()).z;
       if (consider_pose_by_road_slope_) {
         const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
-          spline.getPose(s_value.value()).orientation);
+          spline.getPose(s_value.value(), true).orientation);
         const auto original_rpy =
           quaternion_operation::convertQuaternionToEulerAngle(status.pose.orientation);
         status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
@@ -520,7 +520,7 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
             .z(original_rpy.z));
         lanelet_pose->rpy =
           quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
-            spline.getPose(s_value.value()).orientation, status.pose.orientation));
+            spline.getPose(s_value.value(), true).orientation, status.pose.orientation));
       }
     }
     status.lanelet_pose_valid = true;
