@@ -641,7 +641,8 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
   }
 }
 
-auto CatmullRomSpline::getPose(const double s, const bool fill_pitch) const -> geometry_msgs::msg::Pose
+auto CatmullRomSpline::getPose(const double s, const bool fill_pitch) const
+  -> geometry_msgs::msg::Pose
 {
   switch (control_points.size()) {
     case 0:
