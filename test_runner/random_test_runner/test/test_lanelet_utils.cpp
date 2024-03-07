@@ -221,7 +221,7 @@ TEST(LaneletUtils, toMapPoseWithFillingPitch)
 {
   const traffic_simulator_msgs::msg::LaneletPose pose = makeLaneletPose(34621, 10.0);
   EXPECT_NO_THROW(getLaneletUtils().toMapPose(pose, true));
-  // @note orientation data is output as of #1103
+  /// @note orientation data is output as of #1103
   EXPECT_POSE_NEAR(
     getLaneletUtils().toMapPose(pose, true).pose,
     geometry_msgs::build<geometry_msgs::msg::Pose>()
