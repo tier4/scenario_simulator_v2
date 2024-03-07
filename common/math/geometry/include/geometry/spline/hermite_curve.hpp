@@ -49,7 +49,7 @@ public:
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution, bool denormalize_s = false) const;
   const geometry_msgs::msg::Pose getPose(
-    double s, bool denormalize_s = false, bool fill_pitch = false) const;
+    double s, bool denormalize_s = false, bool fill_pitch = true) const;
   const geometry_msgs::msg::Point getPoint(double s, bool denormalize_s = false) const;
   const geometry_msgs::msg::Vector3 getTangentVector(double s, bool denormalize_s = false) const;
   const geometry_msgs::msg::Vector3 getNormalVector(double s, bool denormalize_s = false) const;
