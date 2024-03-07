@@ -56,7 +56,7 @@ private:
     }
     api_.resetBehaviorPlugin(
       "vehicle_spawn_with_behavior_tree",
-      traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
+      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
     api_.resetBehaviorPlugin(
       "pedestrian_spawn_with_behavior_tree",
       traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
@@ -81,11 +81,13 @@ private:
     api_.spawn(
       "vehicle_spawn_with_behavior_tree",
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 2.0, 0)),
-      getVehicleParameters());
+      getVehicleParameters(),
+      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::behaviorTree());
     api_.spawn(
       "pedestrian_spawn_with_behavior_tree",
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 3, 0)),
-      getPedestrianParameters());
+      getPedestrianParameters(),
+      traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::behaviorTree());
   }
 };
 }  // namespace cpp_mock_scenarios
