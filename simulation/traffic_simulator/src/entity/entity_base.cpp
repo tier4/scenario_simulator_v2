@@ -259,6 +259,20 @@ auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> 
   return getBoundingBox().dimensions.y * 0.5 + 1.0;
 }
 
+auto EntityBase::getPedestrianParameters() -> traffic_simulator_msgs::msg::PedestrianParameters
+{
+  THROW_SEMANTIC_ERROR(
+    "getPedestrianParameters function only supports pedestrian entity.",
+    "Please check the type of the entity : ", name);
+}
+
+auto EntityBase::getVehicleParameters() -> traffic_simulator_msgs::msg::VehicleParameters
+{
+  THROW_SEMANTIC_ERROR(
+    "getVehicleParameters function only supports vehicle entity.",
+    "Please check the type of the entity : ", name);
+}
+
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
 {
   return speed_planner_->isTargetSpeedReached(target_speed, getCurrentTwist());

@@ -141,7 +141,11 @@ public:
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
+  virtual auto getPedestrianParameters() -> traffic_simulator_msgs::msg::PedestrianParameters;
+
   virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
+
+  virtual auto getVehicleParameters() -> traffic_simulator_msgs::msg::VehicleParameters;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
 

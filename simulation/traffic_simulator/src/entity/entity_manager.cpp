@@ -592,6 +592,27 @@ bool EntityManager::isEgoSpawned() const
   return false;
 }
 
+bool EntityManager::isVehicle(const std::string & name) const
+{
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::VEHICLE and
+         dynamic_cast<VehicleEntity const *>(entities_.at(name).get());
+}
+
+bool EntityManager::isPedestrian(const std::string & name) const
+{
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::PEDESTRIAN and
+         dynamic_cast<PedestrianEntity const *>(entities_.at(name).get());
+}
+
+bool EntityManager::isMiscObject(const std::string & name) const
+{
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::MISC_OBJECT and
+         dynamic_cast<MiscObjectEntity const *>(entities_.at(name).get());
+}
+
 bool EntityManager::isInLanelet(
   const std::string & name, const lanelet::Id lanelet_id, const double tolerance)
 {
@@ -651,6 +672,32 @@ void EntityManager::requestLaneChange(
         static_cast<LaneletPose>(lanelet_pose.value()).lanelet_id, direction)) {
       requestLaneChange(name, target.value());
     }
+  }
+}
+
+void EntityManager::resetBehaviorPlugin(
+  const std::string & name, const std::string & behavior_plugin_name)
+{
+  if (isEgo(name)) {
+    THROW_SEMANTIC_ERROR(
+      "Entity :", name, "is EgoEitity.", "You cannot reset behavior plugin of EgoEntity.");
+  } else if (isMiscObject(name)) {
+    THROW_SEMANTIC_ERROR(
+      "Entity :", name, "is MiscObjectEitity.",
+      "You cannot reset behavior plugin of MiscObjectEntity.");
+  } else if (isVehicle(name)) {
+    const auto status = getEntityStatus(name);
+    const auto parameters = getVehicleParameters(name);
+    despawnEntity(name);
+    spawnEntity<VehicleEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+  } else if (isPedestrian(name)) {
+    const auto status = getEntityStatus(name);
+    const auto parameters = getPedestrianParameters(name);
+    despawnEntity(name);
+    spawnEntity<PedestrianEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Entity :", name, "is unkown entity type.", "Please contact to developer.");
   }
 }
 

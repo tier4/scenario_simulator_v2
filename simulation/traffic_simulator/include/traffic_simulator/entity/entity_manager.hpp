@@ -301,9 +301,11 @@ public:
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getMapPoseFromRelativePose, const);
+  FORWARD_TO_ENTITY(getPedestrianParameters, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
+  FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(laneMatchingSucceed, const);
   FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(cancelRequest, );
@@ -457,6 +459,12 @@ public:
 
   bool isEgoSpawned() const;
 
+  bool isVehicle(const std::string & name) const;
+
+  bool isPedestrian(const std::string & name) const;
+
+  bool isMiscObject(const std::string & name) const;
+
   const std::string getEgoName() const;
 
   bool isInLanelet(const std::string & name, const lanelet::Id lanelet_id, const double tolerance);
@@ -474,6 +482,8 @@ public:
 
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
+
+  void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
 
