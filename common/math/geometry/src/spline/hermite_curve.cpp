@@ -279,7 +279,7 @@ const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool 
   return vec;
 }
 
-// @note fill_pitch is introduced for backward-compatibility.
+/// @note fill_pitch is introduced for backward-compatibility.
 const geometry_msgs::msg::Pose HermiteCurve::getPose(
   double s, bool denormalize_s, bool fill_pitch) const
 {
