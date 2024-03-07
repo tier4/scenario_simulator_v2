@@ -541,9 +541,7 @@ public:
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
           /// @note fix z, roll and pitch to fitting to the lanelet
-          static bool consider_pose_by_road_slope =
-            getParameter<bool>("consider_pose_by_road_slope", false);
-          if (consider_pose_by_road_slope) {
+          if (getParameter<bool>("consider_pose_by_road_slope", false)) {
             entity_status.pose = hdmap_utils_ptr_->toMapPose(*lanelet_pose).pose;
           } else {
             entity_status.pose = pose;
