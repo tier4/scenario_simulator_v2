@@ -110,11 +110,7 @@ auto DistanceCondition::distance(const EntityRef & triggering_entity) const -> d
 // @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
 static double hypot(const double x, const double y, const double z, const bool consider_z)
 {
-  if (consider_z) {
-    return std::hypot(x, y, z);
-  } else {
-    return std::hypot(x, y);
-  }
+  return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
 }
 
 template <>
