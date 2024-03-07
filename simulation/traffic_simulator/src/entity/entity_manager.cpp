@@ -682,10 +682,10 @@ void EntityManager::resetBehaviorPlugin(
   const auto behavior_parameter = getBehaviorParameter(name);
   if (isEgo(name)) {
     THROW_SEMANTIC_ERROR(
-      "Entity :", name, "is EgoEitity.", "You cannot reset behavior plugin of EgoEntity.");
+      "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
   } else if (isMiscObject(name)) {
     THROW_SEMANTIC_ERROR(
-      "Entity :", name, "is MiscObjectEitity.",
+      "Entity :", name, "is MiscObjectEntity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
   } else if (isVehicle(name)) {
     const auto parameters = getVehicleParameters(name);
