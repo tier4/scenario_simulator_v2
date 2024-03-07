@@ -49,6 +49,22 @@ private:
       api_.getCurrentAction("pedestrian") != "do_nothing") {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
+    if (
+      api_.getCurrentAction("vehicle_spawn_with_behavior_tree") == "do_nothing" ||
+      api_.getCurrentAction("pedestrian_spawn_with_behavior_tree") == "do_nothing") {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    api_.resetBehaviorPlugin(
+      "vehicle_spawn_with_behavior_tree",
+      traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
+    api_.resetBehaviorPlugin(
+      "pedestrian_spawn_with_behavior_tree",
+      traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
+    if (
+      api_.getCurrentAction("vehicle_spawn_with_behavior_tree") != "do_nothing" ||
+      api_.getCurrentAction("pedestrian_spawn_with_behavior_tree") != "do_nothing") {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
 
     stop(cpp_mock_scenarios::Result::SUCCESS);
   }
@@ -62,6 +78,14 @@ private:
       "pedestrian", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 3, 0)),
       getPedestrianParameters(),
       traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
+    api_.spawn(
+      "vehicle_spawn_with_behavior_tree",
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 2.0, 0)),
+      getVehicleParameters());
+    api_.spawn(
+      "pedestrian_spawn_with_behavior_tree",
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 3, 0)),
+      getPedestrianParameters());
   }
 };
 }  // namespace cpp_mock_scenarios

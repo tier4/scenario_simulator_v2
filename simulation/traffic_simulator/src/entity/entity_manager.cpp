@@ -678,6 +678,8 @@ void EntityManager::requestLaneChange(
 void EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name)
 {
+  const auto status = getEntityStatus(name);
+  const auto behavior_parameter = getBehaviorParameter(name);
   if (isEgo(name)) {
     THROW_SEMANTIC_ERROR(
       "Entity :", name, "is EgoEitity.", "You cannot reset behavior plugin of EgoEntity.");
@@ -686,12 +688,10 @@ void EntityManager::resetBehaviorPlugin(
       "Entity :", name, "is MiscObjectEitity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
   } else if (isVehicle(name)) {
-    const auto status = getEntityStatus(name);
     const auto parameters = getVehicleParameters(name);
     despawnEntity(name);
     spawnEntity<VehicleEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
   } else if (isPedestrian(name)) {
-    const auto status = getEntityStatus(name);
     const auto parameters = getPedestrianParameters(name);
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
@@ -699,6 +699,9 @@ void EntityManager::resetBehaviorPlugin(
     THROW_SIMULATION_ERROR(
       "Entity :", name, "is unkown entity type.", "Please contact to developer.");
   }
+  setAcceleration(name, status.getAccel());
+  setTwist(name, status.getTwist());
+  setBehaviorParameter(name, behavior_parameter);
 }
 
 bool EntityManager::trafficLightsChanged()
