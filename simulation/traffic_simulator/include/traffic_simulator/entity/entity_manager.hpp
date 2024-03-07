@@ -483,6 +483,14 @@ public:
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
+  /**
+   * @brief Reset behavior plugin of the target entity.
+   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
+   * @param name The name of the target entity.
+   * @param behavior_plugin_name The name of the behavior plugin you want to set.
+   * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
+   * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
+   */
   void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
