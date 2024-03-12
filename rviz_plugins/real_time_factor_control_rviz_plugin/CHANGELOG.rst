@@ -2,6 +2,65 @@
 Changelog for package real_time_factor_control_rviz_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.4.2 (2024-03-01)
+------------------
+
+1.4.1 (2024-02-29)
+------------------
+
+1.4.0 (2024-02-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge branch 'master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Contributors: Dawid Moszyński
+
+1.3.1 (2024-02-26)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Contributors: Masaya Kataoka
+
+1.3.0 (2024-02-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Contributors: Kotaro Yoshimoto
+
+1.2.0 (2024-02-22)
+------------------
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge branch 'master' into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Contributors: Masaya Kataoka
+
+1.1.0 (2024-02-22)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+1.0.3 (2024-02-21)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description
+* Contributors: Masaya Kataoka
+
+1.0.2 (2024-02-21)
+------------------
+* Merge remote-tracking branch 'origin/master' into doc/lane_pose_calculation
+* Merge remote-tracking branch 'origin/master' into doc/lane_pose_calculation
+* Contributors: Masaya Kataoka
+
 1.0.1 (2024-02-15)
 ------------------
 

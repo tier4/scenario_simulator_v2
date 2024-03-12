@@ -243,7 +243,7 @@ public:
     }
   }
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   /*!                                                                 \
    @brief Forward to arguments to the HDMapUtils::NAME function.      \
@@ -264,7 +264,7 @@ public:
 
 #undef FORWARD_TO_HDMAP_UTILS
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
   /*!                                                                            \
    @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
@@ -309,6 +309,7 @@ public:
   FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
+  FORWARD_TO_ENTITY(isControlledBySimulator, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
@@ -520,7 +521,24 @@ public:
       } else {
         entity_status.pose = pose;
 
-        if (const auto lanelet_pose = toLaneletPose(pose, parameters.bounding_box, false);
+        /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
+        if (const auto lanelet_pose = toLaneletPose(
+              pose, parameters.bounding_box,
+              entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
+                entity_status.type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT,
+              [](const auto & parameters) {
+                if constexpr (std::is_same_v<
+                                std::decay_t<Parameters>,
+                                traffic_simulator_msgs::msg::VehicleParameters>) {
+                  return std::max(
+                           parameters.axles.front_axle.track_width,
+                           parameters.axles.rear_axle.track_width) *
+                           0.5 +
+                         1.0;
+                } else {
+                  return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
+                }
+              }(parameters));
             lanelet_pose) {
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
