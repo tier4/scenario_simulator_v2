@@ -25,8 +25,6 @@ struct FollowPolylineTrajectoryAction : public PedestrianActionNode
 {
   std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory;
 
-  std::optional<double> target_speed;
-
   using PedestrianActionNode::PedestrianActionNode;
 
   auto calculateWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray;

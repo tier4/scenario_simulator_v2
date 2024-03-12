@@ -65,7 +65,11 @@ auto FollowWaypointController::getAnalyticalAccelerationForLastSteps(
 auto FollowWaypointController::roundTimeToFullStepsWithTolerance(
   const double remaining_time_source, const double time_tolerance) const -> double
 {
-  if (remaining_time_source >= std::numeric_limits<std::size_t>::max() * step_time) {
+  if (std::isnan(remaining_time_source) || std::isinf(remaining_time_source)) {
+    throw ControllerError(
+      "Value remaining_time_source (", remaining_time_source,
+      ") is NaN or inf - it cannot be rounded.");
+  } else if (remaining_time_source >= std::numeric_limits<std::size_t>::max() * step_time) {
     throw ControllerError(
       "Exceeded the range of the variable type <std::size_t> (", remaining_time_source, "/",
       step_time, ") - the value is too large. Probably the distance to the waypoint is extremely",
@@ -154,8 +158,8 @@ auto FollowWaypointController::getAccelerationLimits(
     const double speed_min = speed + local_min_acceleration * step_time;
     const double speed_max = speed + local_max_acceleration * step_time;
     if (
-      speed_max < -local_epsilon || speed_max > max_speed || speed_min < -local_epsilon ||
-      speed_min > max_speed) {
+      speed_max < -local_epsilon || speed_max > std::max(max_speed, target_speed) + local_epsilon ||
+      speed_min < -local_epsilon || speed_min > std::max(max_speed, target_speed) + local_epsilon) {
       throw ControllerError(
         "Incorrect acceleration limits [", local_min_acceleration, ", ", local_max_acceleration,
         "] for acceleration: ", acceleration, " and speed: ", speed, " -> speed_min: ", speed_min,
@@ -296,7 +300,7 @@ auto FollowWaypointController::getAcceleration(
   const double step_acceleration =
     (local_max_acceleration - local_min_acceleration) / number_of_acceleration_candidates;
 
-  auto min_distance_diff = std::numeric_limits<double>::max();
+  auto min_distance_diff = std::numeric_limits<double>::lowest();
 
   std::optional<double> best_acceleration = std::nullopt;
 
@@ -307,8 +311,8 @@ auto FollowWaypointController::getAcceleration(
           candidate_acceleration, remaining_distance, acceleration, speed);
         predicted_state_opt) {
       if (const auto distance_diff = remaining_distance - predicted_state_opt->traveled_distance;
-          distance_diff >= 0 &&
-          (std::abs(distance_diff) < std::abs(min_distance_diff) || min_distance_diff < 0)) {
+          (distance_diff >= 0 || min_distance_diff < 0) &&
+          (std::abs(distance_diff) < std::abs(min_distance_diff))) {
         min_distance_diff = distance_diff;
         best_acceleration = candidate_acceleration;
       }

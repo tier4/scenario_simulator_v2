@@ -254,6 +254,11 @@ auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & rel
   return ret;
 }
 
+auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
+{
+  return getBoundingBox().dimensions.y * 0.5 + 1.0;
+}
+
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
 {
   return speed_planner_->isTargetSpeedReached(target_speed, getCurrentTwist());
@@ -648,6 +653,8 @@ void EntityBase::requestSpeedChange(
       job::Event::POST_UPDATE);
   }
 }
+
+auto EntityBase::isControlledBySimulator() const -> bool { return true; }
 
 auto EntityBase::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void

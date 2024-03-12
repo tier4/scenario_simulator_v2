@@ -5,7 +5,6 @@ on:
       - master
     types:
       - closed
-      - created
       - edited
       - labeled
       - opened
@@ -13,7 +12,7 @@ on:
       - synchronize
       - unlabeled
 concurrency: release
-    
+
 jobs:
   release:
     name: Release
@@ -34,14 +33,17 @@ jobs:
     steps:
       - name: Restore branch
         uses: levonet/action-restore-branch@master
+
       - name: Install bloom
         run: apt update && apt install -y python3-bloom git
+
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: master
           fetch-depth: 0
           fetch-tags: true
+
       - name: Setup git
         run: |
           git config --global user.name  "Release Bot"
@@ -49,39 +51,47 @@ jobs:
           git config --global --add safe.directory /__w/scenario_simulator_v2/scenario_simulator_v2
           git config --global credential.helper ${{ secrets.GITHUB_TOKEN }}
           git config pull.rebase false
+
       - name: Get old version
         id: old_version
         run: |
           echo "old_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
+
       - name: Merge branch
         run: git pull origin ${{ github.head_ref }}
+
       - name: Bump patch version
         if: (contains(github.event.pull_request.labels.*.name, 'bump patch'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump patch
           catkin_package_version --bump patch
+
       - name: Bump minor version
         if: (contains(github.event.pull_request.labels.*.name, 'bump minor'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump minor
           catkin_package_version --bump minor
+
       - name: Bump major version
         if: (contains(github.event.pull_request.labels.*.name, 'bump major'))
         run: |
           catkin_generate_changelog -y
           catkin_tag_changelog --bump major
           catkin_package_version --bump major
+
       - name: Get new version
         id: new_version
         run: |
           echo "new_version=$(catkin_package_version)" >> $GITHUB_OUTPUT
+
       - name: Commit changes
         if: github.event.pull_request.merged == true
         run: |
           git add .
           git commit -m "Bump version of scenario_simulator_v2 from version ${{ steps.old_version.outputs.old_version }} to version ${{ steps.new_version.outputs.new_version }}"
+
       - name: Pushing to the protected branch 'master'
         if: github.event.pull_request.merged == true
         uses: CasperWA/push-protected@v2
@@ -89,6 +99,7 @@ jobs:
           token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
           branch: master
           force: true
+
       - name: Get linked issues
         id: linked_issues
         uses: hossainemruz/linked-issues@main
@@ -96,17 +107,22 @@ jobs:
           pr_url: ${{github.event.pull_request.html_url}}
           format: ExternalIssueRef
         continue-on-error: true
+
       - name: Update release description
+        env:
+          PULL_REQUEST_BODY: ${{ github.event.pull_request.body }}
         run: |
-          echo "${{ github.event.pull_request.body }}" >> release_description.txt
+          echo "$PULL_REQUEST_BODY" >> release_description.txt
           echo "" >> release_description.txt
           echo "# Related Issues  " >> release_description.txt
           echo "${{ steps.linked_issues.outputs.issues }}" >> release_description.txt
+
       - name: Get release description
         id: get_release_description
         uses: mathiasvr/command-output@v2.0.0
         with:
           run: cat release_description.txt
+
       - name: Create a GitHub release
         if: github.event.pull_request.merged == true
         uses: ncipollo/release-action@v1
@@ -114,6 +130,7 @@ jobs:
           tag: ${{ steps.new_version.outputs.new_version }}
           name: ${{ steps.new_version.outputs.new_version }}
           body: ${{ steps.get_release_description.outputs.stdout }}
+
       - name: Delete branch
         if: github.event.pull_request.merged == true
         uses: SvanBoxel/delete-merged-branch@main
