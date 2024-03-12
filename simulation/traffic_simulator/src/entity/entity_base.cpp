@@ -654,6 +654,8 @@ void EntityBase::requestSpeedChange(
   }
 }
 
+auto EntityBase::isControlledBySimulator() const -> bool { return true; }
+
 auto EntityBase::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void
 {
