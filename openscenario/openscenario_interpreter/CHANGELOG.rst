@@ -2,6 +2,39 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.5.0 (2024-03-12)
+------------------
+* Merge pull request `#1209 <https://github.com/tier4/scenario_simulator_v2/issues/1209>`_ from tier4/feature/ego_slope
+  Consider road slope in distance measurement and entity poses
+* chore: enable flag defaultly
+* Update openscenario/openscenario_interpreter/src/syntax/reach_position_condition.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update openscenario/openscenario_interpreter/src/syntax/relative_distance_condition.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update openscenario/openscenario_interpreter/src/syntax/distance_condition.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* fix: add parameter declaration for consider_pose_by_road_slope in conditions
+* feat(openscenario_interpreter): add flag to switch considering z in distance conditions
+* chore: use NativeWorldPosition
+* chore: Update Position for OpenSCENARIO 1.2
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge branch 'master' into feature/ego_slope
+* fix(ReachPositionCondition): consider z-axis in euclidian distance
+* fix(DistanceCondition): consider z-axis in euclidian distance
+* fix(RelativeDistanceCondition): consider z-axis
+* doc: add memo for OpenSCENARIO standard violation
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge branch 'master' into feature/ego_slope
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka
+
 1.4.2 (2024-03-01)
 ------------------
 
