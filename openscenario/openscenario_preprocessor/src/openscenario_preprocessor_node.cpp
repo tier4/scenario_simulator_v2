@@ -36,14 +36,13 @@ public:
         openscenario_preprocessor_msgs::srv::Load::Response::SharedPtr response) -> void {
         auto lock = std::lock_guard(preprocessed_scenarios_mutex);
         try {
-          preprocessScenario(
-            openscenario_preprocessor::Scenario(request->path, request->frame_rate));
+          preprocessScenario(request->path);
           response->has_succeeded = true;
           response->message = "success";
         } catch (std::exception & e) {
           response->has_succeeded = false;
           response->message = e.what();
-          std::queue<openscenario_preprocessor::Scenario>().swap(preprocessed_scenarios);
+          //          std::queue<openscenario_preprocessor::Scenario>().swap(preprocessed_scenarios);
         }
       })),
     derive_server(create_service<openscenario_preprocessor_msgs::srv::Derive>(
@@ -55,8 +54,8 @@ public:
         if (preprocessed_scenarios.empty()) {
           response->path = "no output";
         } else {
-          response->path = preprocessed_scenarios.front().path.string();
-          response->frame_rate = preprocessed_scenarios.front().frame_rate;
+          response->path = preprocessed_scenarios.front().string();
+          response->frame_rate = 30.0;
           preprocessed_scenarios.pop();
         }
       })),

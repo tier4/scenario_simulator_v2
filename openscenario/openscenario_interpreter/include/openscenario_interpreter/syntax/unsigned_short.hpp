@@ -16,16 +16,17 @@
 #define OPENSCENARIO_INTERPRETER__SYNTAX__UNSIGNED_SHORT_HPP_
 
 #include <iostream>
-#include <std_msgs/msg/u_int16.hpp>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct UnsignedShort : public std_msgs::msg::UInt16
+struct UnsignedShort
 {
-  using value_type = decltype(std_msgs::msg::UInt16::data);
+  using value_type = std::uint16_t;
+
+  value_type data = 0U;
 
   explicit UnsignedShort() = default;
 

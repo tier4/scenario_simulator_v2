@@ -17,16 +17,17 @@
 
 #include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/error.hpp>
-#include <std_msgs/msg/int64.hpp>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct Integer : public std_msgs::msg::Int64
+struct Integer
 {
-  using value_type = decltype(std_msgs::msg::Int64::data);
+  using value_type = std::int64_t;
+
+  value_type data = 0;
 
   explicit Integer() = default;
 

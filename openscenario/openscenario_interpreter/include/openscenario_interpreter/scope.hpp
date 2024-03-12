@@ -22,7 +22,11 @@
 #include <memory>
 #include <openscenario_interpreter/name.hpp>
 #include <openscenario_interpreter/syntax/catalog_locations.hpp>
+
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
+
 #include <openscenario_interpreter/utility/demangle.hpp>
 #include <random>
 #include <unordered_map>
@@ -191,7 +195,9 @@ class Scope
 public:
   const std::string name;
 
+#ifndef PARAMETER_VALUE_DISTRIBUTION_ONLY
   std::list<EntityRef> actors;
+#endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
   // NOTE: `random_engine` is used only for sharing random number generator in Stochastic now
   std::mt19937 random_engine;
