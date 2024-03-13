@@ -103,7 +103,7 @@ public:
 
   auto notifyBegin() -> void;
 
-  auto restTimeToRed() const -> double;
+  auto restTimeToRed(const lanelet::Id) const -> double;
 
   auto shouldChangePhaseToBegin() -> bool;
 };
