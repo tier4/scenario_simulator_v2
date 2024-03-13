@@ -358,6 +358,10 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
+private:
+  FORWARD_TO_ENTITY_MANAGER(getDefaultMatchingDistanceForLaneletPoseCalculation);
+
+public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
   auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
