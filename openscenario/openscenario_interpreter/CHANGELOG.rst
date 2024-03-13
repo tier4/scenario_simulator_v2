@@ -2,6 +2,13 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.5.1 (2024-03-13)
+------------------
+* Merge pull request `#1211 <https://github.com/tier4/scenario_simulator_v2/issues/1211>`_ from tier4/chore/record_all
+  chore: include all topic to rosbag
+* chore: include all topic to rosbag
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 1.5.0 (2024-03-12)
 ------------------
 * Merge pull request `#1209 <https://github.com/tier4/scenario_simulator_v2/issues/1209>`_ from tier4/feature/ego_slope

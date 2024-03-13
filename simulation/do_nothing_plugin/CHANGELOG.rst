@@ -2,6 +2,9 @@
 Changelog for package do_nothing_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.5.1 (2024-03-13)
+------------------
+
 1.5.0 (2024-03-12)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/ego_slope

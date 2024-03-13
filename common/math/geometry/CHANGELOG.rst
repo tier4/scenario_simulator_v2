@@ -2,6 +2,9 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.5.1 (2024-03-13)
+------------------
+
 1.5.0 (2024-03-12)
 ------------------
 * Merge pull request `#1209 <https://github.com/tier4/scenario_simulator_v2/issues/1209>`_ from tier4/feature/ego_slope

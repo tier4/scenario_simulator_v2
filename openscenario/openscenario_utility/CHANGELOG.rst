@@ -2,6 +2,9 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.5.1 (2024-03-13)
+------------------
+
 1.5.0 (2024-03-12)
 ------------------
 * Merge remote-tracking branch 'origin/master' into feature/ego_slope
