@@ -2,6 +2,9 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.6.0 (2024-03-14)
+------------------
+
 1.5.1 (2024-03-13)
 ------------------
 * Merge pull request `#1211 <https://github.com/tier4/scenario_simulator_v2/issues/1211>`_ from tier4/chore/record_all

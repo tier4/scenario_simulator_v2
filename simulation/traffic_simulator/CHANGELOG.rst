@@ -2,6 +2,16 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.6.0 (2024-03-14)
+------------------
+* Merge pull request `#1208 <https://github.com/tier4/scenario_simulator_v2/issues/1208>`_ from tier4/fix/lanelet-matching-distance
+  Fix/lanelet matching distance
+* make API::getDefaultMatchingDistanceForLaneletPoseCalculation to the private functions
+* Use correct entity parameters for lanelet matching
+* Simplify code
+* Use entity specific lanelet matching distance for setting entity status
+* Contributors: Masaya Kataoka, Mateusz Palczuk
+
 1.5.1 (2024-03-13)
 ------------------
 
