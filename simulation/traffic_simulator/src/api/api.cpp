@@ -324,19 +324,14 @@ void API::requestLaneChange(
 }
 
 void API::addTrafficSource(
-  const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose)
+  const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
+  const traffic_simulator_msgs::msg::VehicleParameters & params)
 {
-  static unsigned int source_id_global = 0;
-  unsigned int source_id = source_id_global++;
+  static unsigned int source_id = 0u;
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
-    radius, rate, speed, pose,
-    [this, source_id, entity_id = static_cast<unsigned int>(0)](
-      const geometry_msgs::msg::Pose & pose, const double speed) mutable -> void {
-      const std::string name =
-        "traffic_source_" + std::to_string(source_id) + "_entity_" + std::to_string(entity_id++);
-      traffic_simulator_msgs::msg::VehicleParameters params;
-      params.name = name;
-      params.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+    radius, rate, speed, pose, source_id++,
+    [this, &params](
+      const std::string & name, const geometry_msgs::msg::Pose & pose, const double speed) -> void {
       spawn(name, pose, params);
       setEntityStatus(name, pose, helper::constructActionStatus(speed));
     });

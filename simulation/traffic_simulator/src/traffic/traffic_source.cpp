@@ -31,8 +31,15 @@ namespace traffic
 {
 TrafficSource::TrafficSource(
   const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
-  const std::function<void(const geometry_msgs::msg::Pose &, const double)> & spawn_function)
-: radius(radius), rate(rate), speed(speed), pose(pose), spawn_function(spawn_function)
+  unsigned int source_id,
+  const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
+    spawn_function)
+: radius(radius),
+  rate(rate),
+  speed(speed),
+  pose(pose),
+  source_id(source_id),
+  spawn_function(spawn_function)
 {
 }
 void TrafficSource::execute(
@@ -41,8 +48,11 @@ void TrafficSource::execute(
   if (current_time - last_spawn_time < 1.0 / rate) {
     return;
   }
-  spawn_function(pose, speed);
   last_spawn_time = current_time;
+
+  const std::string name =
+    "traffic_source_" + std::to_string(source_id) + "_entity_" + std::to_string(entity_id++);
+  spawn_function(name, pose, speed);
 }
 }  // namespace traffic
 }  // namespace traffic_simulator

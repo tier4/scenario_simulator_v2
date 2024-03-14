@@ -39,8 +39,9 @@ class TrafficSource : public TrafficModuleBase
 public:
   explicit TrafficSource(
     const double radius, const double rate, const double speed,
-    const geometry_msgs::msg::Pose & pose,
-    const std::function<void(const geometry_msgs::msg::Pose &, const double)> & spawn_function);
+    const geometry_msgs::msg::Pose & pose, unsigned int source_id,
+    const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
+      spawn_function);
   const double radius;
   const double rate;
   const double speed;
@@ -48,7 +49,10 @@ public:
   void execute(const double current_time, const double step_time) override;
 
 private:
-  const std::function<void(const geometry_msgs::msg::Pose &, const double)> & spawn_function;
+  const unsigned int source_id;
+  unsigned int entity_id = 0u;
+  const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
+    spawn_function;
   double last_spawn_time = 0.0;
 };
 }  // namespace traffic
