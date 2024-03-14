@@ -27,7 +27,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- WorldPosition ----------------------------------------------------------
+/* ---- WorldPosition 1.2 ------------------------------------------------------
  *
  *  <xsd:complexType name="WorldPosition">
  *    <xsd:attribute name="x" type="Double" use="required"/>
