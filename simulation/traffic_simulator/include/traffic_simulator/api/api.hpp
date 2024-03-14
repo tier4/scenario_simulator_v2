@@ -284,8 +284,9 @@ public:
 
   void addTrafficSource(
     const double radius, const double rate, const double speed,
-    const geometry_msgs::msg::Pose & pose,
-    const traffic_simulator_msgs::msg::VehicleParameters & params);
+    const geometry_msgs::msg::Point & point,
+    const traffic_simulator_msgs::msg::VehicleParameters & params,
+    std::optional<int> random_seed = std::nullopt);
 
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \

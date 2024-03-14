@@ -28,6 +28,9 @@
 
 #include <functional>
 #include <geometry_msgs/msg/pose.hpp>
+#include <map>
+#include <random>
+#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
 
 namespace traffic_simulator
@@ -39,20 +42,32 @@ class TrafficSource : public TrafficModuleBase
 public:
   explicit TrafficSource(
     const double radius, const double rate, const double speed,
-    const geometry_msgs::msg::Pose & pose, unsigned int source_id,
+    const geometry_msgs::msg::Point & position, unsigned int source_id,
+    std::optional<int> random_seed,
     const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
-      spawn_function);
+      spawn_function,
+    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils);
   const double radius;
   const double rate;
   const double speed;
-  const geometry_msgs::msg::Pose pose;
+  const geometry_msgs::msg::Point position;
   void execute(const double current_time, const double step_time) override;
 
 private:
+  auto getValidRandomPose() -> geometry_msgs::msg::Pose;
+  auto getRandomLaneletPose() -> traffic_simulator_msgs::msg::LaneletPose;
+  auto getRandomLaneletId() -> lanelet::Id;
+  auto getRandomSValue(const lanelet::Id lanelet_id) -> double;
+
   const unsigned int source_id;
-  unsigned int entity_id = 0u;
   const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
     spawn_function;
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  lanelet::Ids spawnable_lanelets;
+  std::mt19937 engine;
+  std::uniform_int_distribution<std::size_t> id_distribution;
+  std::map<std::size_t, std::uniform_real_distribution<double>> s_distributions;
+  unsigned int entity_id = 0u;
   double last_spawn_time = 0.0;
 };
 }  // namespace traffic

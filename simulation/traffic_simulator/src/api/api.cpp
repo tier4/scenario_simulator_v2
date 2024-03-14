@@ -324,12 +324,13 @@ void API::requestLaneChange(
 }
 
 void API::addTrafficSource(
-  const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
-  const traffic_simulator_msgs::msg::VehicleParameters & params)
+  const double radius, const double rate, const double speed,
+  const geometry_msgs::msg::Point & point,
+  const traffic_simulator_msgs::msg::VehicleParameters & params, std::optional<int> random_seed)
 {
   static unsigned int source_id = 0u;
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
-    radius, rate, speed, pose, source_id++,
+    radius, rate, speed, point, source_id++, random_seed,
     [this, &params](
       const std::string & name, const geometry_msgs::msg::Pose & pose, const double speed) -> void {
       spawn(name, pose, params);
