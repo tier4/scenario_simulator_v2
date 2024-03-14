@@ -282,6 +282,10 @@ public:
     const lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
+  void addTrafficSource(
+    const double radius, const double rate, const double speed,
+    const geometry_msgs::msg::Pose & pose);
+
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \

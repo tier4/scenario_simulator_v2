@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/traffic/traffic_source.hpp>
 
 namespace traffic_simulator
 {
@@ -265,7 +266,7 @@ bool API::updateFrame()
   }
 
   entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
-  traffic_controller_ptr_->execute();
+  traffic_controller_ptr_->execute(getCurrentTime(), clock_.getStepTime());
 
   if (not configuration.standalone_mode) {
     if (!updateTrafficLightsInSim() || !updateTimeInSim()) {
@@ -320,6 +321,25 @@ void API::requestLaneChange(
   const lane_change::Constraint & constraint)
 {
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
+}
+
+void API::addTrafficSource(
+  const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose)
+{
+  static unsigned int source_id_global = 0;
+  unsigned int source_id = source_id_global++;
+  traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
+    radius, rate, speed, pose,
+    [this, source_id, entity_id = static_cast<unsigned int>(0)](
+      const geometry_msgs::msg::Pose & pose, const double speed) mutable -> void {
+      const std::string name =
+        "traffic_source_" + std::to_string(source_id) + "_entity_" + std::to_string(entity_id++);
+      traffic_simulator_msgs::msg::VehicleParameters params;
+      params.name = name;
+      params.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+      spawn(name, pose, params);
+      setEntityStatus(name, pose, helper::constructActionStatus(speed));
+    });
 }
 
 auto API::canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose) const

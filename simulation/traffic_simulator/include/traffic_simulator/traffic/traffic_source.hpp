@@ -1,9 +1,9 @@
 /**
- * @file traffic_sink.hpp
- * @author Masaya Kataoka (masaya.kataoka@tier4.jp)
- * @brief class definition of the traffic sink
+ * @file traffic_source.hpp
+ * @author Mateusz Palczuk (mateusz.palczuk@robotec.ai)
+ * @brief class definition of the traffic source
  * @version 0.1
- * @date 2021-04-01
+ * @date 2024-03-14
  *
  * @copyright Copyright(c) TIER IV.Inc {2015}
  *
@@ -23,37 +23,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_
-#define TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_
+#ifndef TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SOURCE_HPP_
+#define TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SOURCE_HPP_
 
 #include <functional>
 #include <geometry_msgs/msg/pose.hpp>
-#include <string>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
-#include <vector>
 
 namespace traffic_simulator
 {
 namespace traffic
 {
-class TrafficSink : public TrafficModuleBase
+class TrafficSource : public TrafficModuleBase
 {
 public:
-  explicit TrafficSink(
-    double radius, const geometry_msgs::msg::Point & position,
-    const std::function<std::vector<std::string>(void)> & get_entity_names_function,
-    const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
-    const std::function<void(std::string)> & despawn_function);
+  explicit TrafficSource(
+    const double radius, const double rate, const double speed,
+    const geometry_msgs::msg::Pose & pose,
+    const std::function<void(const geometry_msgs::msg::Pose &, const double)> & spawn_function);
   const double radius;
-  const geometry_msgs::msg::Point position;
+  const double rate;
+  const double speed;
+  const geometry_msgs::msg::Pose pose;
   void execute(const double current_time, const double step_time) override;
 
 private:
-  const std::function<std::vector<std::string>(void)> get_entity_names_function;
-  const std::function<geometry_msgs::msg::Pose(const std::string &)> get_entity_pose_function;
-  const std::function<void(const std::string &)> despawn_function;
+  const std::function<void(const geometry_msgs::msg::Pose &, const double)> & spawn_function;
+  double last_spawn_time = 0.0;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SINK_HPP_
+#endif  // TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_SOURCE_HPP_

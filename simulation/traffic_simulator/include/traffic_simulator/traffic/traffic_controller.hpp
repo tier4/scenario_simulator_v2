@@ -51,7 +51,7 @@ public:
     auto module_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
     modules_.emplace_back(module_ptr);
   }
-  void execute();
+  void execute(const double current_time, const double step_time);
 
 private:
   void autoSink();

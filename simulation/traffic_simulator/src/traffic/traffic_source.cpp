@@ -1,9 +1,9 @@
 /**
- * @file traffic_MODULE_base.hpp
- * @author Masaya Kataoka (masaya.kataoka@tier4.jp)
- * @brief base class for traffic module
+ * @file traffic_source.cpp
+ * @author Mateusz Palczuk (mateusz.palczuk@robotec.ai)
+ * @brief implementation of the TrafficSource class
  * @version 0.1
- * @date 2021-04-01
+ * @date 2024-03-14
  *
  * @copyright Copyright(c) TIER IV.Inc {2015}
  *
@@ -23,20 +23,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_MODULE_BASE_HPP_
-#define TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_MODULE_BASE_HPP_
+#include <traffic_simulator/traffic/traffic_source.hpp>
 
 namespace traffic_simulator
 {
 namespace traffic
 {
-class TrafficModuleBase
+TrafficSource::TrafficSource(
+  const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
+  const std::function<void(const geometry_msgs::msg::Pose &, const double)> & spawn_function)
+: radius(radius), rate(rate), speed(speed), pose(pose), spawn_function(spawn_function)
 {
-public:
-  TrafficModuleBase() {}
-  virtual void execute(const double current_time, const double step_time) = 0;
-};
+}
+void TrafficSource::execute(
+  [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time)
+{
+  if (current_time - last_spawn_time < 1.0 / rate) {
+    return;
+  }
+  spawn_function(pose, speed);
+  last_spawn_time = current_time;
+}
 }  // namespace traffic
 }  // namespace traffic_simulator
-
-#endif  // TRAFFIC_SIMULATOR__TRAFFIC__TRAFFIC_MODULE_BASE_HPP_
