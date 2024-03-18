@@ -18,10 +18,12 @@ namespace entity_behavior
 {
 void DoNothingBehavior::configure(const rclcpp::Logger &) {}
 
-void DoNothingBehavior::update(double current_time, double)
+void DoNothingBehavior::update(double current_time, double step_time)
 {
+  setCurrentTime(current_time);
+  setStepTime(step_time);
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
-    followPolylineTrajectory(current_time);
+    followPolylineTrajectory();
   }
   entity_status_->setTime(current_time);
   setUpdatedStatus(entity_status_);
@@ -48,6 +50,11 @@ void DoNothingBehavior::checkPolylineTrajectory()
         "Currentry, base_time should be 0 when following trajectory in "
         "DoNothingBehavior.");
     }
+    if (trajectory->shape.vertices.empty()) {
+      THROW_SIMULATION_ERROR(
+        "FollowPolylineTrajectory is requested, but trajectory points are empty. Please check "
+        "description of the scenario.");
+    }
   } else {
     THROW_SIMULATION_ERROR(
       "Traffic simulator send requests of FollowTrajectory, but the trajectory is empty.",
@@ -56,10 +63,15 @@ void DoNothingBehavior::checkPolylineTrajectory()
   }
 }
 
-void DoNothingBehavior::followPolylineTrajectory(double current_time)
+void DoNothingBehavior::followPolylineTrajectory()
 {
   checkPolylineTrajectory();
   if (const auto trajectory = getPolylineTrajectory()) {
+    if (
+      current_time_ <= trajectory->shape.vertices.front().time ||
+      current_time_ >= trajectory->shape.vertices.back().time) {
+      return;
+    }
   }
 }
 

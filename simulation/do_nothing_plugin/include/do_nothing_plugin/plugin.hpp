@@ -83,7 +83,7 @@ private:                                                               \
 #undef DEFINE_GETTER_SETTER
 
   void checkPolylineTrajectory();
-  void followPolylineTrajectory(double current_time);
+  void followPolylineTrajectory();
 };
 }  // namespace entity_behavior
 
