@@ -45,11 +45,6 @@ void DoNothingBehavior::checkPolylineTrajectory()
         "Currentry, initial_distance_offset should be 0 when following trajectory in "
         "DoNothingBehavior.");
     }
-    if (std::abs(trajectory->base_time) <= std::numeric_limits<double>::epsilon()) {
-      THROW_SIMULATION_ERROR(
-        "Currentry, base_time should be 0 when following trajectory in "
-        "DoNothingBehavior.");
-    }
     if (trajectory->shape.vertices.empty()) {
       THROW_SIMULATION_ERROR(
         "FollowPolylineTrajectory is requested, but trajectory points are empty. Please check "
@@ -68,8 +63,8 @@ void DoNothingBehavior::followPolylineTrajectory()
   checkPolylineTrajectory();
   if (const auto trajectory = getPolylineTrajectory()) {
     if (
-      current_time_ <= trajectory->shape.vertices.front().time ||
-      current_time_ >= trajectory->shape.vertices.back().time) {
+      trajectory->base_time + current_time_ <= trajectory->shape.vertices.front().time ||
+      trajectory->base_time + current_time_ >= trajectory->shape.vertices.back().time) {
       return;
     }
   }
