@@ -81,6 +81,9 @@ private:                                                               \
   DEFINE_GETTER_SETTER(PolylineTrajectory, std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>, polyline_trajectory)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
+
+  void checkPolylineTrajectory();
+  void followPolylineTrajectory(double current_time);
 };
 }  // namespace entity_behavior
 

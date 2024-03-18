@@ -21,34 +21,46 @@ void DoNothingBehavior::configure(const rclcpp::Logger &) {}
 void DoNothingBehavior::update(double current_time, double)
 {
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
-    if (const auto trajectory = getPolylineTrajectory()) {
-      if (trajectory->closed) {
-        THROW_SIMULATION_ERROR("Currentry, closed trajectory does not supported.");
-      }
-      if (trajectory->dynamic_constraints_ignorable) {
-        THROW_SIMULATION_ERROR(
-          "Currentry, dynamic_constraints_ignorable = true (in OpenSCENARIO, followingMode = "
-          "follow) does not support in DoNothingBehavior.");
-      }
-      if (std::abs(trajectory->initial_distance_offset) <= std::numeric_limits<double>::epsilon()) {
-        THROW_SIMULATION_ERROR(
-          "Currentry, initial_distance_offset should be 0 when following trajectory in "
-          "DoNothingBehavior.");
-      }
-      if (std::abs(trajectory->base_time) <= std::numeric_limits<double>::epsilon()) {
-        THROW_SIMULATION_ERROR(
-          "Currentry, base_time should be 0 when following trajectory in "
-          "DoNothingBehavior.");
-      }
-    } else {
-      THROW_SIMULATION_ERROR(
-        "Traffic simulator send requests of FollowTrajectory, but the trajectory is empty.",
-        "This message is not originally intended to be displayed, if you see it, please "
-        "contact the developer of traffic_simulator.");
-    }
+    followPolylineTrajectory(current_time);
   }
   entity_status_->setTime(current_time);
   setUpdatedStatus(entity_status_);
+}
+
+void DoNothingBehavior::checkPolylineTrajectory()
+{
+  if (const auto trajectory = getPolylineTrajectory()) {
+    if (trajectory->closed) {
+      THROW_SIMULATION_ERROR("Currentry, closed trajectory does not supported.");
+    }
+    if (trajectory->dynamic_constraints_ignorable) {
+      THROW_SIMULATION_ERROR(
+        "Currentry, dynamic_constraints_ignorable = true (in OpenSCENARIO, followingMode = "
+        "follow) does not support in DoNothingBehavior.");
+    }
+    if (std::abs(trajectory->initial_distance_offset) <= std::numeric_limits<double>::epsilon()) {
+      THROW_SIMULATION_ERROR(
+        "Currentry, initial_distance_offset should be 0 when following trajectory in "
+        "DoNothingBehavior.");
+    }
+    if (std::abs(trajectory->base_time) <= std::numeric_limits<double>::epsilon()) {
+      THROW_SIMULATION_ERROR(
+        "Currentry, base_time should be 0 when following trajectory in "
+        "DoNothingBehavior.");
+    }
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Traffic simulator send requests of FollowTrajectory, but the trajectory is empty.",
+      "This message is not originally intended to be displayed, if you see it, please "
+      "contact the developer of traffic_simulator.");
+  }
+}
+
+void DoNothingBehavior::followPolylineTrajectory(double current_time)
+{
+  checkPolylineTrajectory();
+  if (const auto trajectory = getPolylineTrajectory()) {
+  }
 }
 
 const std::string & DoNothingBehavior::getCurrentAction() const
