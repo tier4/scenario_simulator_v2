@@ -24,9 +24,9 @@ namespace traffic_simulator
 namespace speed_change
 {
 enum class Transition {
-  // @todo Add CUBIC transition.
+  /// @todo Add CUBIC transition.
   LINEAR,
-  // @todo Add SINUSOIDAL transition.
+  /// @todo Add SINUSOIDAL transition.
   STEP,
   AUTO
 };
@@ -34,7 +34,7 @@ enum class Transition {
 struct Constraint
 {
   enum class Type {
-    // @todo Add DISTANCE constraint type.
+    /// @todo Add DISTANCE constraint type.
     LONGITUDINAL_ACCELERATION,
     TIME,
     NONE
