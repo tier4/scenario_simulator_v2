@@ -1,0 +1,23 @@
+name: Simulation Model Update Notification
+on:
+  pull_request:
+    paths:
+      - simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/vehicle_model/**.hpp
+      - simulation/simple_sensor_simulator/src/vehicle_simulation/vehicle_model/**.cpp
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add comment
+        run: |
+          gh pr comment  "$PR_NUMBER" --edit-last --body "This PR edits vehicle model that is copied from [simple_planning_simulator](https://github.com/autowarefoundation/autoware.universe/tree/main/simulator/simple_planning_simulator). Please consider making changes to the original code to avoid confusion or consult developers (@hakuturu583, @yamacir-kit and @HansRobo )." \
+          || gh pr comment  "$PR_NUMBER" --body "This PR edits vehicle model that is copied from [simple_planning_simulator](https://github.com/autowarefoundation/autoware.universe/tree/main/simulator/simple_planning_simulator). Please consider making changes to the original code to avoid confusion or consult developers (@hakuturu583, @yamacir-kit and @HansRobo )."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}

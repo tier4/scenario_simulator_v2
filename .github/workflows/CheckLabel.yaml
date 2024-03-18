@@ -1,0 +1,20 @@
+name: Check label
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - labeled
+      - unlabeled
+
+jobs:
+  check_label:
+    name: Check label
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Check required label
+        if: (!contains(github.event.pull_request.labels.*.name, 'bump patch')) && 
+            (!contains(github.event.pull_request.labels.*.name, 'bump minor')) &&
+            (!contains(github.event.pull_request.labels.*.name, 'bump major'))
+        run: exit 1

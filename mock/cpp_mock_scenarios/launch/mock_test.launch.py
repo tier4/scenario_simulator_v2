@@ -77,13 +77,27 @@ def generate_launch_description():
     scenario_package = LaunchConfiguration("package", default="cpp_mock_scenarios")
     junit_path = LaunchConfiguration("junit_path", default="/tmp/output.xunit.xml")
     launch_rviz = LaunchConfiguration("launch_rviz", default=False)
+    vehicle_model = LaunchConfiguration("vehicle_model", default="sample_vehicle")
+    sensor_model = LaunchConfiguration("sensor_model", default="sample_sensor_kit")
     scenario_node = Node(
         package=scenario_package,
         executable=scenario,
-        name=scenario,
+        name="scenario_node",
         output="screen",
         arguments=[("__log_level:=info")],
-        parameters=[{"junit_path": junit_path, "timeout": timeout}],
+        parameters=[
+            {
+                "junit_path": junit_path,
+                "timeout": timeout,
+                "architecture_type": "awf/universe",
+                "autoware_launch_file": "planning_simulator.launch.xml",
+                "autoware_launch_package": "autoware_launch",
+                "launch_autoware": True,
+                "vehicle_model": vehicle_model,
+                "sensor_model": sensor_model,
+                "initialize_duration": 900
+            }
+        ],
     )
     io_handler = OnProcessIO(
         target_action=scenario_node,
@@ -116,6 +130,16 @@ def generate_launch_description():
                 default_value=launch_rviz,
                 description="If true, launch with rviz.",
             ),
+            DeclareLaunchArgument(
+                "vehicle_model",
+                default_value=vehicle_model,
+                description="Vehicle model of the Autoware",
+            ),
+            DeclareLaunchArgument(
+                "sensor_model",
+                default_value=sensor_model,
+                description="Sensor model of the Autoware",
+            ),
             scenario_node,
             RegisterEventHandler(event_handler=io_handler),
             RegisterEventHandler(event_handler=shutdown_handler),
@@ -127,9 +151,9 @@ def generate_launch_description():
                 arguments=[("__log_level:=warn")],
             ),
             Node(
-                package="openscenario_visualization",
-                executable="openscenario_visualization_node",
-                name="openscenario_visualization_node",
+                package="traffic_simulator",
+                executable="visualization_node",
+                name="visualizer",
                 output="screen",
             ),
             Node(

@@ -39,7 +39,7 @@ public:
   auto getPoint(const double s, const double offset) const -> geometry_msgs::msg::Point;
   auto getTangentVector(const double s) const -> geometry_msgs::msg::Vector3;
   auto getNormalVector(const double s) const -> geometry_msgs::msg::Vector3;
-  auto getPose(const double s) const -> geometry_msgs::msg::Pose;
+  auto getPose(const double s, const bool fill_pitch = true) const -> geometry_msgs::msg::Pose;
   auto getTrajectory(
     const double start_s, const double end_s, const double resolution,
     const double offset = 0.0) const -> std::vector<geometry_msgs::msg::Point>;
@@ -49,6 +49,9 @@ public:
     -> double;
   auto getSquaredDistanceVector(const geometry_msgs::msg::Point & point, const double s) const
     -> geometry_msgs::msg::Vector3;
+  auto getCollisionPointsIn2D(
+    const std::vector<geometry_msgs::msg::Point> & polygon,
+    const bool search_backward = false) const -> std::set<double>;
   auto getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
     const bool search_backward = false) const -> std::optional<double>;

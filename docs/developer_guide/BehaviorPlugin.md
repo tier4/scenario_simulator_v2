@@ -3,7 +3,7 @@
 Behavior plugin enables support multiple type of NPC behaviors.
 Default behavior plugin implementation is [here](https://github.com/tier4/scenario_simulator_v2/tree/master/simulation/behavior_tree_plugin).
 
-Behavior plugin use pluginlib and plugin class should be inherited [this base class](https://tier4.github.io/scenario_simulator_v2-docs/package/traffic_simulator/markdown/Classes/classentity__behavior_1_1BehaviorPluginBase/#typedef-entitytypedict).
+Behavior plugin use pluginlib and plugin class should be inherited [this base class](https://tier4.github.io/scenario_simulator_v2-api-docs/classentity__behavior_1_1BehaviorPluginBase.html).
 
 Example of the behavior plugin class is below.
 

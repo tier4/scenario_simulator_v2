@@ -85,7 +85,7 @@ OpenSCENARIO:
                                         freespace: true
                                         relativeDistanceType: euclidianDistance
                                         rule: equalTo
-                                        value: 6.2855887168861768 #6.28727
+                                        value: 6.239365667688271166468894080026
                                         Position: &POSITION_1
                                           LanePosition:
                                             roadId: ""
@@ -111,7 +111,7 @@ OpenSCENARIO:
                                         freespace: true
                                         relativeDistanceType: longitudinal
                                         rule: equalTo
-                                        value: 6.2583065215658280 #6.26
+                                        value: 6.211880466908041853457689285278
                                         Position: *POSITION_1
                                 - name: ""
                                   delay: 0

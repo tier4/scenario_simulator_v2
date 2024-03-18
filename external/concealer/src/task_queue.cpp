@@ -16,7 +16,7 @@
 #include <concealer/task_queue.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-// TODO: pzyskowski : use conditional variables to wait for new messages instead of sleep_for
+/// @todo: pzyskowski : use conditional variables to wait for new messages instead of sleep_for
 namespace concealer
 {
 TaskQueue::TaskQueue()

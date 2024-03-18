@@ -56,16 +56,27 @@ auto FollowPolylineTrajectoryAction::providedPorts() -> BT::PortsList
 
 auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
 {
+  auto getTargetSpeed = [&]() -> double {
+    if (target_speed.has_value()) {
+      return target_speed.value();
+    } else {
+      return entity_status->getTwist().linear.x;
+    }
+  };
+
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
       not getInput<decltype(target_speed)>("target_speed", target_speed) or
       not polyline_trajectory) {
     return BT::NodeStatus::FAILURE;
+  } else if (std::isnan(entity_status->getTime())) {
+    THROW_SIMULATION_ERROR(
+      "Time in entity_status is NaN - FollowTrajectoryAction does not support such case.");
   } else if (
     const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
       static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
-      behavior_parameter, step_time)) {
+      behavior_parameter, hdmap_utils, step_time, getTargetSpeed())) {
     setOutput(
       "updated_status",
       std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(

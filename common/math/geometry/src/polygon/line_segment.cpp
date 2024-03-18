@@ -39,6 +39,13 @@ LineSegment::LineSegment(
 : start_point(start_point), end_point([&]() -> geometry_msgs::msg::Point {
     geometry_msgs::msg::Point ret;
     double vec_size = std::hypot(vec.x, vec.y);
+    if (vec_size == 0.0) {
+      THROW_SIMULATION_ERROR(
+        "Invalid vector is specified, while constructing LineSegment. ",
+        "The vector should have a non zero length to initialize the line segment correctly. ",
+        "This message is not originally intended to be displayed, if you see it, please "
+        "contact the developer of traffic_simulator.");
+    }
     ret.x = start_point.x + vec.x / vec_size * length;
     ret.y = start_point.y + vec.y / vec_size * length;
     ret.z = start_point.z + vec.z / vec_size * length;
@@ -86,18 +93,23 @@ auto LineSegment::getPoint(const double s, const bool denormalize_s) const
  * @brief Get pose on the line segment from s value. Orientation of thee return value was calculated from the vector of the line segment.
  * @param s Normalized s value in coordinate along line segment.
  * @param denormalize_s If true, s value should be normalized in range [0,1]. If false, s value is not normalized.
+ * @param fill_pitch If true, the pitch value of the orientation is filled. If false, the pitch value of the orientation is 0.
+ *        This parameter is introduced for backward-compatibility.
  * @return geometry_msgs::msg::Pose 
  */
-auto LineSegment::getPose(const double s, const bool denormalize_s) const
+auto LineSegment::getPose(const double s, const bool denormalize_s, const bool fill_pitch) const
   -> geometry_msgs::msg::Pose
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(getPoint(s, denormalize_s))
-    .orientation([this]() -> geometry_msgs::msg::Quaternion {
+    .orientation([this, fill_pitch]() -> geometry_msgs::msg::Quaternion {
       const auto tangent_vec = getVector();
       return quaternion_operation::convertEulerAngleToQuaternion(
-        geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(
-          std::atan2(tangent_vec.y, tangent_vec.x)));
+        geometry_msgs::build<geometry_msgs::msg::Vector3>()
+          .x(0.0)
+          .y(
+            fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0)
+          .z(std::atan2(tangent_vec.y, tangent_vec.x)));
     }());
 }
 

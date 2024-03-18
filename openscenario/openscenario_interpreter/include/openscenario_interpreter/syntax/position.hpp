@@ -26,7 +26,7 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Position ---------------------------------------------------------------
+/* ---- Position 1.2 -----------------------------------------------------------
  *
  * <xsd:complexType name="Position">
  *   <xsd:choice>
@@ -38,6 +38,8 @@ inline namespace syntax
  *     <xsd:element name="LanePosition" type="LanePosition"/>
  *     <xsd:element name="RelativeLanePosition" type="RelativeLanePosition"/>
  *     <xsd:element name="RoutePosition" type="RoutePosition"/>
+ *     <xsd:element name="GeoPosition" type="GeoPosition" minOccurs="0"/>
+ *     <xsd:element name="TrajectoryPosition" type="TrajectoryPosition" minOccurs="0"/>
  *   </xsd:choice>
  * </xsd:complexType>
  *
@@ -61,6 +63,8 @@ DEFINE_LAZY_VISITOR(
   CASE(LanePosition),
   // CASE(RelativeLanePosition),
   // CASE(RoutePosition),
+  // CASE(GeoPosition),
+  // CASE(TrajectoryPosition),
 );
 
 DEFINE_LAZY_VISITOR(
@@ -73,6 +77,8 @@ DEFINE_LAZY_VISITOR(
   CASE(LanePosition),
   // CASE(RelativeLanePosition),
   // CASE(RoutePosition),
+  // CASE(GeoPosition),
+  // CASE(TrajectoryPosition),
 );
 }  // namespace syntax
 }  // namespace openscenario_interpreter

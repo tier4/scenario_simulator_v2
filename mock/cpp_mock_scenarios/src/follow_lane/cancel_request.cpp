@@ -26,10 +26,12 @@
 #include <string>
 #include <vector>
 
-class CancelRequest : public cpp_mock_scenarios::CppScenarioNode
+namespace cpp_mock_scenarios
+{
+class CancelRequestScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit CancelRequest(const rclcpp::NodeOptions & option)
+  explicit CancelRequestScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "cancel_request", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
@@ -65,12 +67,13 @@ private:
     api_.requestAcquirePosition("ego", goal_pose);
   }
 };
+}  // namespace cpp_mock_scenarios
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<CancelRequest>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::CancelRequestScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

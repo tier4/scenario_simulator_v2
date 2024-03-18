@@ -156,6 +156,8 @@ auto AutowareUniverse::getGearCommand() const -> autoware_auto_vehicle_msgs::msg
 auto AutowareUniverse::getGearSign() const -> double
 {
   using autoware_auto_vehicle_msgs::msg::GearCommand;
+  /// @todo Add support for GearCommand::NONE to return 0.0
+  /// @sa https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/src/simple_planning_simulator/simple_planning_simulator_core.cpp#L475
   return getGearCommand().command == GearCommand::REVERSE or
              getGearCommand().command == GearCommand::REVERSE_2
            ? -1.0

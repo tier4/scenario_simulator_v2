@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>cpp_mock_scenarios</name>
-  <version>0.8.0</version>
+  <version>1.6.0</version>
   <description>C++ mock scenarios</description>
   <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
   <license>Apache License 2.0</license>
@@ -11,10 +11,12 @@
 
   <buildtool_export_depend>ament_cmake_test</buildtool_export_depend>
 
+  <depend>generate_parameter_library</depend>
   <depend>kashiwanoha_map</depend>
-  <depend>traffic_simulator</depend>
-  <depend>simple_sensor_simulator</depend>
   <depend>simple_junit</depend>
+  <depend>simple_sensor_simulator</depend>
+  <depend>traffic_simulator</depend>
+
   <exec_depend>openscenario_visualization</exec_depend>
   <exec_depend>scenario_test_runner</exec_depend>
   <exec_depend>behavior_tree_plugin</exec_depend>

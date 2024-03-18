@@ -39,7 +39,10 @@ class EgoEntity : public VehicleEntity
   static auto makeFieldOperatorApplication(const Configuration &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
-  CanonicalizedEntityStatus externally_updated_status_;
+  bool is_controlled_by_simulator_{false};
+  std::optional<double> target_speed_;
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
+  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> polyline_trajectory_;
 
 public:
   explicit EgoEntity() = delete;
@@ -92,6 +95,9 @@ public:
 
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override;
 
+  auto requestFollowTrajectory(
+    const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void override;
+
   void requestLaneChange(const lanelet::Id) override;
 
   auto requestLaneChange(const traffic_simulator::lane_change::Parameter &) -> void override;
@@ -104,10 +110,10 @@ public:
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool continuous) -> void override;
 
+  auto isControlledBySimulator() const -> bool override;
+
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
-
-  auto setStatusExternally(const CanonicalizedEntityStatus & status) -> void;
 
   void requestSpeedChange(double, bool continuous) override;
 
@@ -115,6 +121,8 @@ public:
     const speed_change::RelativeTargetSpeed & target_speed, bool continuous) override;
 
   auto setVelocityLimit(double) -> void override;
+
+  auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
 
   auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 };

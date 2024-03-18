@@ -48,7 +48,8 @@ public:
   std::vector<geometry_msgs::msg::Point> getTrajectory(size_t num_points = 30) const;
   const std::vector<geometry_msgs::msg::Point> getTrajectory(
     double start_s, double end_s, double resolution, bool denormalize_s = false) const;
-  const geometry_msgs::msg::Pose getPose(double s, bool denormalize_s = false) const;
+  const geometry_msgs::msg::Pose getPose(
+    double s, bool denormalize_s = false, bool fill_pitch = true) const;
   const geometry_msgs::msg::Point getPoint(double s, bool denormalize_s = false) const;
   const geometry_msgs::msg::Vector3 getTangentVector(double s, bool denormalize_s = false) const;
   const geometry_msgs::msg::Vector3 getNormalVector(double s, bool denormalize_s = false) const;
@@ -63,12 +64,18 @@ public:
     const geometry_msgs::msg::Point & point, double s, bool denormalize_s = false) const;
   geometry_msgs::msg::Vector3 getSquaredDistanceVector(
     const geometry_msgs::msg::Point & point, double s, bool denormalize_s = false) const;
+  std::set<double> getCollisionPointsIn2D(
+    const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
+    bool search_backward = false, bool denormalize_s = false) const;
   std::optional<double> getCollisionPointIn2D(
     const geometry_msgs::msg::Point & point0, const geometry_msgs::msg::Point & point1,
-    bool search_backward = false) const;
+    bool search_backward = false, bool denormalize_s = false) const;
+  std::set<double> getCollisionPointsIn2D(
+    const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
+    bool close_start_end = true, bool denormalize_s = false) const;
   std::optional<double> getCollisionPointIn2D(
     const std::vector<geometry_msgs::msg::Point> & polygon, bool search_backward = false,
-    bool close_start_end = true) const;
+    bool close_start_end = true, bool denormalize_s = false) const;
 
 private:
   std::pair<double, double> get2DMinMaxCurvatureValue() const;

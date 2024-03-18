@@ -13,106 +13,39 @@ on:
 
 jobs:
   generate:
-    name: Generate Documentation
+    name: Generate documentation
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2-beta
+      - uses: actions/checkout@v4
+
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
+
       - name: run protoc-gen-doc
         run: docker run --rm -v $(pwd)/simulation/simulation_interface/proto/:/protos -v $(pwd)/docs/proto_doc:/out pseudomuto/protoc-gen-doc --doc_opt=markdown,protobuf.md
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
+
       - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: "1.5.1"
+
       - name: install
         run: poetry install --no-interaction
-      - name: Install doxygen/depends of doxybook
-        run: sudo apt install -y doxygen wget
-      - name: Wget package
-        run: |
-          wget https://github.com/matusnovak/doxybook2/releases/download/v1.2.3/doxybook2-linux-amd64-v1.2.3.zip
-          mkdir -p ~/doxybook2
-          cp -rf . ~/doxybook2
-          cd ~/doxybook2
-          unzip doxybook2-linux-amd64-v1.2.3.zip
-      # generating traffic_simulator package documentation
-      - name: Generate doxygen for traffic_simulator package
-        run: |
-          cd docs/package/traffic_simulator
-          doxygen Doxyfile
-      - name: Generate markdown for traffic_simulator package
-        run: |
-          export PATH="$PATH:~/doxybook2/bin"
-          cd docs/package/traffic_simulator
-          mkdir -p ./markdown/Classes
-          doxybook2 --input ./build/ --output ./markdown -c config.json
-      # generating simple_sensor_simulator package documentation
-      - name: Generate doxygen for simple_sensor_simulator package
-        run: |
-          cd docs/package/simple_sensor_simulator
-          doxygen Doxyfile
-      - name: Generate markdown for simple_sensor_simulator package
-        run: |
-          export PATH="$PATH:~/doxybook2/bin"
-          cd docs/package/simple_sensor_simulator
-          mkdir -p ./markdown/Classes
-          doxybook2 --input ./build/ --output ./markdown -c config.json
-      # generating simulation_interface package documentation
-      - name: Generate doxygen for simulation_interface package
-        run: |
-          cd docs/package/simulation_interface
-          doxygen Doxyfile
-      - name: Generate markdown for simulation_interface package
-        run: |
-          export PATH="$PATH:~/doxybook2/bin"
-          cd docs/package/simulation_interface
-          mkdir -p ./markdown/Classes
-          doxybook2 --input ./build/ --output ./markdown -c config.json
-      # generating openscenario_interpreter package documentation
-      - name: Generate doxygen for openscenario_interpreter package
-        run: |
-          cd docs/package/openscenario_interpreter
-          doxygen Doxyfile
-      - name: Generate markdown for openscenario_interpreter package
-        run: |
-          export PATH="$PATH:~/doxybook2/bin"
-          cd docs/package/openscenario_interpreter
-          mkdir -p ./markdown/Classes
-          doxybook2 --input ./build/ --output ./markdown -c config.json
-      # generating openscenario_visualization package documentation
-      - name: Generate doxygen for openscenario_visualization package
-        run: |
-          cd docs/package/openscenario_visualization
-          doxygen Doxyfile
-      - name: Generate markdown for openscenario_visualization package
-        run: |
-          export PATH="$PATH:~/doxybook2/bin"
-          cd docs/package/openscenario_visualization
-          mkdir -p ./markdown/Classes
-          doxybook2 --input ./build/ --output ./markdown -c config.json
-      # generating geometry package documentation
-      - name: Generate doxygen for geometry package
-        run: |
-          cd docs/package/geometry
-          doxygen Doxyfile
-      - name: Generate markdown for geometry package
-        run: |
-          export PATH="$PATH:~/doxybook2/bin"
-          cd docs/package/geometry
-          mkdir -p ./markdown/Classes
-          doxybook2 --input ./build/ --output ./markdown -c config.json
+
       - name: Generate documentation
         run: poetry run mkdocs build
+
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: site
           path: site
           retention-days: 1
+
       - name: Publish Documentation
         if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
         uses: peaceiris/actions-gh-pages@v3
@@ -121,3 +54,31 @@ jobs:
           publish_dir: site
           keep_files: false
           external_repository: tier4/scenario_simulator_v2-docs
+
+  generate_api_document:
+    name: Generate API documentation
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install doxygen
+        run: sudo apt-get install -y doxygen
+
+      - name: Build document
+        run: doxygen Doxyfile
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: api_documentation_site
+          path: html
+          retention-days: 1
+
+      - name: Publish Documentation
+        if: ${{ github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'}}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          personal_token: ${{ secrets.BLOOM_GITHUB_TOKEN }}
+          publish_dir: html
+          keep_files: false
+          external_repository: tier4/scenario_simulator_v2-api-docs

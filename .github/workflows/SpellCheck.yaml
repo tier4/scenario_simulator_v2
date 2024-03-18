@@ -1,4 +1,4 @@
-name: SpellCheck
+name: Spell check
 
 on:
   workflow_dispatch:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run spell-check
         uses: autowarefoundation/autoware-github-actions/spell-check@v1
@@ -20,4 +20,3 @@ jobs:
           local-cspell-json: .github/workflows/custom_spell.json
           dict-packages: |
             https://github.com/tier4/cspell-dicts
-          verbose: true

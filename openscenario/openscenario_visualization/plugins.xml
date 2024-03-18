@@ -1,7 +1,0 @@
-<library path="openscenario_visualization_rviz_plugin">
-  <class name="openscenario_visualization/ContextPanel" type="openscenario_visualization::ContextPanel" base_class_type="rviz_common::Panel">
-    <description>
-      Context Panel plugin.
-    </description>
-  </class>
-</library>
