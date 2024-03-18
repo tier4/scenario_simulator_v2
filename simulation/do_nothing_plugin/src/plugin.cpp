@@ -20,6 +20,8 @@ void DoNothingBehavior::configure(const rclcpp::Logger &) {}
 
 void DoNothingBehavior::update(double current_time, double)
 {
+  if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
+  }
   entity_status_->setTime(current_time);
   setUpdatedStatus(entity_status_);
 }

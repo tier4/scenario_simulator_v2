@@ -48,7 +48,6 @@ public:                                         \
   DEFINE_GETTER_SETTER(DebugMarker,                                      std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, double)
   DEFINE_GETTER_SETTER(EntityTypeList,                                   EntityTypeDict)
-  DEFINE_GETTER_SETTER(PolylineTrajectory,                               std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        std::vector<geometry_msgs::msg::Pose>)
   DEFINE_GETTER_SETTER(HdMapUtils,                                       std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             traffic_simulator::lane_change::Parameter)
@@ -56,7 +55,6 @@ public:                                         \
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                EntityStatusDict)
   DEFINE_GETTER_SETTER(PedestrianParameters,                             traffic_simulator_msgs::msg::PedestrianParameters)
   DEFINE_GETTER_SETTER(ReferenceTrajectory,                              std::shared_ptr<math::geometry::CatmullRomSpline>)
-  DEFINE_GETTER_SETTER(Request,                                          traffic_simulator::behavior::Request)
   DEFINE_GETTER_SETTER(RouteLanelets,                                    lanelet::Ids)
   DEFINE_GETTER_SETTER(TargetSpeed,                                      std::optional<double>)
   DEFINE_GETTER_SETTER(TrafficLightManager,                              std::shared_ptr<traffic_simulator::TrafficLightManager>)
@@ -74,11 +72,13 @@ public:                                                                \
 private:                                                               \
   TYPE FIELD_NAME;
   // clang-format off
-  DEFINE_GETTER_SETTER(CurrentTime,       double,                                                        current_time_)
-  DEFINE_GETTER_SETTER(StepTime,          double,                                                        step_time_)
-  DEFINE_GETTER_SETTER(EntityStatus,      std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>, entity_status_)
-  DEFINE_GETTER_SETTER(BehaviorParameter, traffic_simulator_msgs::msg::BehaviorParameter,                behavior_parameter_)
-  DEFINE_GETTER_SETTER(UpdatedStatus,     std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>, updated_status_)
+  DEFINE_GETTER_SETTER(CurrentTime,        double,                                                           current_time_)
+  DEFINE_GETTER_SETTER(StepTime,           double,                                                           step_time_)
+  DEFINE_GETTER_SETTER(EntityStatus,       std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>,    entity_status_)
+  DEFINE_GETTER_SETTER(BehaviorParameter,  traffic_simulator_msgs::msg::BehaviorParameter,                   behavior_parameter_)
+  DEFINE_GETTER_SETTER(UpdatedStatus,      std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>,    updated_status_)
+  DEFINE_GETTER_SETTER(Request,            traffic_simulator::behavior::Request,                             request)
+  DEFINE_GETTER_SETTER(PolylineTrajectory, std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>, polyline_trajectory)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };
