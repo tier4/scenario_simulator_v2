@@ -45,13 +45,15 @@ struct TrafficLight
       yellow,
       red,
       white,
+      unknown,
     } value;
 
     // clang-format off
-    static_assert(static_cast<std::uint8_t>(green ) == 0b0000'0000);
-    static_assert(static_cast<std::uint8_t>(yellow) == 0b0000'0001);
-    static_assert(static_cast<std::uint8_t>(red   ) == 0b0000'0010);
-    static_assert(static_cast<std::uint8_t>(white ) == 0b0000'0011);
+    static_assert(static_cast<std::uint8_t>(green  ) == 0b0000'0000);
+    static_assert(static_cast<std::uint8_t>(yellow ) == 0b0000'0001);
+    static_assert(static_cast<std::uint8_t>(red    ) == 0b0000'0010);
+    static_assert(static_cast<std::uint8_t>(white  ) == 0b0000'0011);
+    static_assert(static_cast<std::uint8_t>(unknown) == 0b0000'0100);
     // clang-format on
 
     constexpr Color(const Value value = green) : value(value) {}
@@ -64,6 +66,7 @@ struct TrafficLight
       std::make_pair("red", red),
       std::make_pair("white", white),
       std::make_pair("yellow", yellow),
+      std::make_pair("unknown", unknown),
 
       // BACKWARD COMPATIBILITY
       std::make_pair("Green", green),
@@ -262,6 +265,8 @@ struct TrafficLight
             return simulation_api_schema::TrafficLight_Color_RED;
           case Color::white:
             return simulation_api_schema::TrafficLight_Color_WHITE;
+          case Color::unknown:
+            return simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
           default:
             throw common::SyntaxError(std::get<Color>(value), " is not supported color.");
         }
