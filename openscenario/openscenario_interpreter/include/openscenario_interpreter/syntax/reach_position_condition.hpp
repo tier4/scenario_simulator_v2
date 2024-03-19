@@ -49,6 +49,8 @@ struct ReachPositionCondition : private SimulatorCore::CoordinateSystemConversio
 
   std::vector<Double> results;  // for description
 
+  const bool consider_z;
+
   explicit ReachPositionCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
   auto description() const -> String;

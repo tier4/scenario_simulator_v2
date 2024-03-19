@@ -289,6 +289,7 @@ public:
   FORWARD_TO_ENTITY(getCurrentAccel, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
+  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getDistanceToLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
   FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
@@ -537,8 +538,6 @@ public:
         entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
         entity_status.lanelet_pose_valid = true;
       } else {
-        entity_status.pose = pose;
-
         /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
         if (const auto lanelet_pose = toLaneletPose(
               pose, parameters.bounding_box,
@@ -560,8 +559,15 @@ public:
             lanelet_pose) {
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
+          /// @note fix z, roll and pitch to fitting to the lanelet
+          if (getParameter<bool>("consider_pose_by_road_slope", false)) {
+            entity_status.pose = hdmap_utils_ptr_->toMapPose(*lanelet_pose).pose;
+          } else {
+            entity_status.pose = pose;
+          }
         } else {
           entity_status.lanelet_pose_valid = false;
+          entity_status.pose = pose;
         }
       }
 
