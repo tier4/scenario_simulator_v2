@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <do_nothing_plugin/plugin.hpp>
+#include <geometry/linear_algebra.hpp>
 
 namespace entity_behavior
 {
@@ -22,11 +23,12 @@ void DoNothingBehavior::update(double current_time, double step_time)
 {
   setCurrentTime(current_time);
   setStepTime(step_time);
+  entity_status_->setTime(current_time);
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
     followPolylineTrajectory();
+  } else {
+    setUpdatedStatus(entity_status_);
   }
-  entity_status_->setTime(current_time);
-  setUpdatedStatus(entity_status_);
 }
 
 void DoNothingBehavior::checkPolylineTrajectory()
@@ -63,9 +65,23 @@ void DoNothingBehavior::followPolylineTrajectory()
   checkPolylineTrajectory();
   if (const auto trajectory = getPolylineTrajectory()) {
     if (
-      trajectory->base_time + current_time_ <= trajectory->shape.vertices.front().time ||
-      trajectory->base_time + current_time_ >= trajectory->shape.vertices.back().time) {
+      current_time_ <= trajectory->base_time + trajectory->shape.vertices.front().time ||
+      current_time_ >= trajectory->base_time + trajectory->shape.vertices.back().time) {
       return;
+    }
+    for (size_t i = 0; i < trajectory->shape.vertices.size(); i++) {
+      const auto timestamp_i = trajectory->base_time + trajectory->shape.vertices[i].time;
+      const auto timestamp_i_1 = trajectory->base_time + trajectory->shape.vertices[i + 1].time;
+      if (timestamp_i <= current_time_ && current_time_ <= timestamp_i_1) {
+        return;
+      }
+      const auto interpolation_ratio =
+        (current_time_ - trajectory->base_time + timestamp_i) / (timestamp_i_1 - timestamp_i);
+      trajectory->shape.vertices[i].position.position * interpolation_ratio +
+        trajectory->shape.vertices[i + 1].position.position *(1 - interpolation_ratio);
+      quaternion_operation::slerp(
+        trajectory->shape.vertices[i].position.orientation,
+        trajectory->shape.vertices[i + 1].position.orientation, interpolation_ratio);
     }
   }
 }
