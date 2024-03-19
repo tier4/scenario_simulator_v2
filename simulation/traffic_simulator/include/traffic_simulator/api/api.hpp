@@ -343,6 +343,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(setAcceleration);
@@ -358,6 +359,10 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
+private:
+  FORWARD_TO_ENTITY_MANAGER(getDefaultMatchingDistanceForLaneletPoseCalculation);
+
+public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
   auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const

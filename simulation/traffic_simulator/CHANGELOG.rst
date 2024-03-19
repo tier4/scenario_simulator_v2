@@ -2,6 +2,58 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.6.1 (2024-03-19)
+------------------
+
+1.6.0 (2024-03-14)
+------------------
+* Merge pull request `#1208 <https://github.com/tier4/scenario_simulator_v2/issues/1208>`_ from tier4/fix/lanelet-matching-distance
+  Fix/lanelet matching distance
+* make API::getDefaultMatchingDistanceForLaneletPoseCalculation to the private functions
+* Use correct entity parameters for lanelet matching
+* Simplify code
+* Use entity specific lanelet matching distance for setting entity status
+* Contributors: Masaya Kataoka, Mateusz Palczuk
+
+1.5.1 (2024-03-13)
+------------------
+
+1.5.0 (2024-03-12)
+------------------
+* Merge pull request `#1209 <https://github.com/tier4/scenario_simulator_v2/issues/1209>`_ from tier4/feature/ego_slope
+  Consider road slope in distance measurement and entity poses
+* doc: use 3 slashes to comment-out before doxygen command
+* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* chore: enable flag defaultly
+* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* fix: use consider_pose_by_road_slope flag in EntityManager::spawnEntity
+* feat: add fill_pitch option to HdMapUtils::toMapPose
+* fix: build error
+* fix: fit WorldPosition to lanelet in spawn function
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge branch 'master' into feature/ego_slope
+* update slop calculation logic
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka
+
 1.4.2 (2024-03-01)
 ------------------
 

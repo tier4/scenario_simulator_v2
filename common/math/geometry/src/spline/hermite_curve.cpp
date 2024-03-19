@@ -279,7 +279,9 @@ const geometry_msgs::msg::Vector3 HermiteCurve::getTangentVector(double s, bool 
   return vec;
 }
 
-const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool denormalize_s) const
+/// @note fill_pitch is introduced for backward-compatibility.
+const geometry_msgs::msg::Pose HermiteCurve::getPose(
+  double s, bool denormalize_s, bool fill_pitch) const
 {
   if (denormalize_s) {
     s = s / getLength();
@@ -288,7 +290,7 @@ const geometry_msgs::msg::Pose HermiteCurve::getPose(double s, bool denormalize_
   geometry_msgs::msg::Vector3 tangent_vec = getTangentVector(s, false);
   geometry_msgs::msg::Vector3 rpy;
   rpy.x = 0.0;
-  rpy.y = 0.0;
+  rpy.y = fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0;
   rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
   pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
   pose.position = getPoint(s);

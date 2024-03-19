@@ -289,6 +289,7 @@ public:
   FORWARD_TO_ENTITY(getCurrentAccel, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
+  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getDistanceToLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
   FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
@@ -297,6 +298,7 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
+  FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
@@ -416,6 +418,9 @@ public:
   auto getObstacle(const std::string & name)
     -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
 
+  auto getPedestrianParameters(const std::string & name) const
+    -> traffic_simulator_msgs::msg::PedestrianParameters;
+
   // clang-format off
   auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
   auto getRelativePose(const geometry_msgs::msg::Pose     & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
@@ -428,6 +433,9 @@ public:
   // clang-format on
 
   auto getStepTime() const noexcept -> double;
+
+  auto getVehicleParameters(const std::string & name) const
+    -> traffic_simulator_msgs::msg::VehicleParameters;
 
   auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
 
@@ -457,6 +465,12 @@ public:
 
   bool isEgoSpawned() const;
 
+  bool isVehicle(const std::string & name) const;
+
+  bool isPedestrian(const std::string & name) const;
+
+  bool isMiscObject(const std::string & name) const;
+
   const std::string getEgoName() const;
 
   bool isInLanelet(const std::string & name, const lanelet::Id lanelet_id, const double tolerance);
@@ -474,6 +488,16 @@ public:
 
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
+
+  /**
+   * @brief Reset behavior plugin of the target entity.
+   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
+   * @param name The name of the target entity.
+   * @param behavior_plugin_name The name of the behavior plugin you want to set.
+   * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
+   * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
+   */
+  void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
 
@@ -519,8 +543,6 @@ public:
         entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
         entity_status.lanelet_pose_valid = true;
       } else {
-        entity_status.pose = pose;
-
         /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
         if (const auto lanelet_pose = toLaneletPose(
               pose, parameters.bounding_box,
@@ -542,8 +564,15 @@ public:
             lanelet_pose) {
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
+          /// @note fix z, roll and pitch to fitting to the lanelet
+          if (getParameter<bool>("consider_pose_by_road_slope", false)) {
+            entity_status.pose = hdmap_utils_ptr_->toMapPose(*lanelet_pose).pose;
+          } else {
+            entity_status.pose = pose;
+          }
         } else {
           entity_status.lanelet_pose_valid = false;
+          entity_status.pose = pose;
         }
       }
 

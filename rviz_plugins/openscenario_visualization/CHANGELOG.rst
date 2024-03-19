@@ -2,6 +2,20 @@
 Changelog for package openscenario_visualization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.6.1 (2024-03-19)
+------------------
+
+1.6.0 (2024-03-14)
+------------------
+
+1.5.1 (2024-03-13)
+------------------
+
+1.5.0 (2024-03-12)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Contributors: Kotaro Yoshimoto
+
 1.4.2 (2024-03-01)
 ------------------
 

@@ -513,6 +513,17 @@ auto EntityManager::getObstacle(const std::string & name)
   return entities_.at(name)->getObstacle();
 }
 
+auto EntityManager::getPedestrianParameters(const std::string & name) const
+  -> traffic_simulator_msgs::msg::PedestrianParameters
+{
+  if (const auto entity = dynamic_cast<PedestrianEntity const *>(entities_.at(name).get())) {
+    return entity->pedestrian_parameters;
+  }
+  THROW_SIMULATION_ERROR(
+    "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
+    "Please check description of the scenario and entity type of the Entity: " + name);
+}
+
 auto EntityManager::getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const
   -> geometry_msgs::msg::Pose
@@ -566,6 +577,17 @@ auto EntityManager::getRelativePose(
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
+auto EntityManager::getVehicleParameters(const std::string & name) const
+  -> traffic_simulator_msgs::msg::VehicleParameters
+{
+  if (const auto vehicle = dynamic_cast<VehicleEntity const *>(entities_.at(name).get())) {
+    return vehicle->vehicle_parameters;
+  }
+  THROW_SIMULATION_ERROR(
+    "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
+    "Please check description of the scenario and entity type of the Entity: " + name);
+}
+
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
@@ -590,6 +612,27 @@ bool EntityManager::isEgoSpawned() const
     }
   }
   return false;
+}
+
+bool EntityManager::isVehicle(const std::string & name) const
+{
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::VEHICLE and
+         dynamic_cast<VehicleEntity const *>(entities_.at(name).get());
+}
+
+bool EntityManager::isPedestrian(const std::string & name) const
+{
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::PEDESTRIAN and
+         dynamic_cast<PedestrianEntity const *>(entities_.at(name).get());
+}
+
+bool EntityManager::isMiscObject(const std::string & name) const
+{
+  using traffic_simulator_msgs::msg::EntityType;
+  return getEntityType(name).type == EntityType::MISC_OBJECT and
+         dynamic_cast<MiscObjectEntity const *>(entities_.at(name).get());
 }
 
 bool EntityManager::isInLanelet(
@@ -652,6 +695,35 @@ void EntityManager::requestLaneChange(
       requestLaneChange(name, target.value());
     }
   }
+}
+
+void EntityManager::resetBehaviorPlugin(
+  const std::string & name, const std::string & behavior_plugin_name)
+{
+  const auto status = getEntityStatus(name);
+  const auto behavior_parameter = getBehaviorParameter(name);
+  if (isEgo(name)) {
+    THROW_SEMANTIC_ERROR(
+      "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
+  } else if (isMiscObject(name)) {
+    THROW_SEMANTIC_ERROR(
+      "Entity :", name, "is MiscObjectEntity.",
+      "You cannot reset behavior plugin of MiscObjectEntity.");
+  } else if (isVehicle(name)) {
+    const auto parameters = getVehicleParameters(name);
+    despawnEntity(name);
+    spawnEntity<VehicleEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+  } else if (isPedestrian(name)) {
+    const auto parameters = getPedestrianParameters(name);
+    despawnEntity(name);
+    spawnEntity<PedestrianEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Entity :", name, "is unkown entity type.", "Please contact to developer.");
+  }
+  setAcceleration(name, status.getAccel());
+  setTwist(name, status.getTwist());
+  setBehaviorParameter(name, behavior_parameter);
 }
 
 bool EntityManager::trafficLightsChanged()
