@@ -285,7 +285,9 @@ auto HdMapUtils::getNearbyLaneletIds(
       return {};
     }
     for (const auto & lanelet : nearest_lanelet) {
-      lanelet_ids.emplace_back(lanelet.second.id());
+      if (lanelet.first <= distance_thresh) {
+        lanelet_ids.emplace_back(lanelet.second.id());
+      }
     }
   } else {
     const auto nearest_road_lanelet =
@@ -297,7 +299,9 @@ auto HdMapUtils::getNearbyLaneletIds(
       return {};
     }
     for (const auto & lanelet : nearest_lanelet) {
-      lanelet_ids.emplace_back(lanelet.second.id());
+      if (lanelet.first <= distance_thresh) {
+        lanelet_ids.emplace_back(lanelet.second.id());
+      }
     }
   }
   return lanelet_ids;
