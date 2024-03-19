@@ -46,10 +46,10 @@ public:
     const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
       spawn_function,
     std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils);
-  const double radius;
-  const double rate;
-  const double speed;
-  const geometry_msgs::msg::Point position;
+  const double radius_;
+  const double rate_;
+  const double speed_;
+  const geometry_msgs::msg::Point position_;
   void execute(const double current_time, const double step_time) override;
 
 private:
@@ -64,17 +64,17 @@ private:
   auto getRandomLaneletId() -> lanelet::Id;
   auto getRandomSValue(const lanelet::Id lanelet_id) -> double;
 
-  inline static unsigned int next_source_id = 0u;
-  const unsigned int source_id;
+  inline static unsigned int next_source_id_ = 0u;
+  const unsigned int source_id_;
   const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)>
-    spawn_function;
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
-  lanelet::Ids spawnable_lanelets;
-  std::mt19937 engine;
-  std::uniform_int_distribution<std::size_t> id_distribution;
-  std::map<std::size_t, std::uniform_real_distribution<double>> s_distributions;
-  unsigned int entity_id = 0u;
-  double last_spawn_time = 0.0;
+    spawn_function_;
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+  lanelet::Ids spawnable_lanelets_;
+  std::mt19937 engine_;
+  std::uniform_int_distribution<std::size_t> id_distribution_;
+  std::map<std::size_t, std::uniform_real_distribution<double>> s_distributions_;
+  unsigned int entity_id_ = 0u;
+  double last_spawn_time_ = 0.0;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator
