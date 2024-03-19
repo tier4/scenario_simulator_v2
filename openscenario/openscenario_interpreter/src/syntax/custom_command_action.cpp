@@ -30,19 +30,30 @@ inline namespace syntax
 template <auto Version>
 struct ApplyFaultInjectionAction : public CustomCommand
 {
-  using CustomCommand::CustomCommand;
-
-  static auto node() -> rclcpp::Node &
+  static auto node() -> auto &
   {
-    static rclcpp::Node node{"custom_command_action", "simulation"};
+    static auto node = []() {
+      auto options = rclcpp::NodeOptions();
+      options.use_global_arguments(false);
+      return rclcpp::Node(
+        "custom_command_action_" + boost::lexical_cast<std::string>(std::this_thread::get_id()),
+        "simulation", options);
+    }();
     return node;
   }
 
-  static auto publisher() -> rclcpp::Publisher<tier4_simulation_msgs::msg::SimulationEvents> &
+  static auto publisher() -> auto &
   {
-    static auto publisher = node().create_publisher<tier4_simulation_msgs::msg::SimulationEvents>(
-      "/simulation/events", rclcpp::QoS(1).reliable());
+    static auto publisher =
+      node().template create_publisher<tier4_simulation_msgs::msg::SimulationEvents>(
+        "events", rclcpp::QoS(rclcpp::KeepLast(10)).reliable());
     return *publisher;
+  }
+
+  template <typename... Ts>
+  explicit ApplyFaultInjectionAction(Ts &&... xs) : CustomCommand(std::forward<decltype(xs)>(xs)...)
+  {
+    publisher();
   }
 
   auto start(const Scope &) -> void override
@@ -292,10 +303,9 @@ struct ForkExecCommand : public CustomCommand
 auto makeCustomCommand(const std::string & type, const std::string & content)
   -> std::shared_ptr<CustomCommand>
 {
-#define ELEMENT(NAME, TYPE)                                                             \
-  std::make_pair(NAME, [](auto &&... xs) {                                              \
-    return std::shared_ptr<CustomCommand>(new TYPE(std::forward<decltype(xs)>(xs)...)); \
-  })
+#define ELEMENT(NAME, TYPE) \
+  std::make_pair(           \
+    NAME, [](auto &&... xs) { return std::make_shared<TYPE>(std::forward<decltype(xs)>(xs)...); })
 
   static const std::unordered_map<
     std::string, std::function<std::shared_ptr<CustomCommand>(const std::vector<std::string> &)>>
