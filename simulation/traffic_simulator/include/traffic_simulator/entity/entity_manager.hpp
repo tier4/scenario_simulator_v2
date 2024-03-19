@@ -32,7 +32,6 @@
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
-#include <traffic_simulator/entity/deleted_entity.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
@@ -244,7 +243,7 @@ public:
     }
   }
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
   /*!                                                                 \
    @brief Forward to arguments to the HDMapUtils::NAME function.      \
@@ -265,7 +264,7 @@ public:
 
 #undef FORWARD_TO_HDMAP_UTILS
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
   /*!                                                                            \
    @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
@@ -283,7 +282,7 @@ public:
   // clang-format on
 
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-  FORWARD_TO_ENTITY(cancelRequest, );
+  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
@@ -298,27 +297,32 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
-  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getMapPoseFromRelativePose, const);
-  FORWARD_TO_ENTITY(getRouteLanelets, );
+  FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
+  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(laneMatchingSucceed, const);
+  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
+  FORWARD_TO_ENTITY(cancelRequest, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
+  FORWARD_TO_ENTITY(isControlledBySimulator, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
-  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
+  FORWARD_TO_ENTITY(setAcceleration, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
   FORWARD_TO_ENTITY(setBehaviorParameter, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationRateLimit, );
   FORWARD_TO_ENTITY(setLinearVelocity, );
+  FORWARD_TO_ENTITY(setMapPose, );
+  FORWARD_TO_ENTITY(setTwist, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_ENTITY
@@ -474,9 +478,6 @@ public:
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
 
-  auto setEntityStatusExternally(const std::string & name, const CanonicalizedEntityStatus &)
-    -> void;
-
   void setVerbose(const bool verbose);
 
   template <typename Entity, typename Pose, typename Parameters, typename... Ts>
@@ -519,14 +520,36 @@ public:
         entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
         entity_status.lanelet_pose_valid = true;
       } else {
-        entity_status.pose = pose;
-
-        if (const auto lanelet_pose = toLaneletPose(pose, parameters.bounding_box, false);
+        /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
+        if (const auto lanelet_pose = toLaneletPose(
+              pose, parameters.bounding_box,
+              entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
+                entity_status.type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT,
+              [](const auto & parameters) {
+                if constexpr (std::is_same_v<
+                                std::decay_t<Parameters>,
+                                traffic_simulator_msgs::msg::VehicleParameters>) {
+                  return std::max(
+                           parameters.axles.front_axle.track_width,
+                           parameters.axles.rear_axle.track_width) *
+                           0.5 +
+                         1.0;
+                } else {
+                  return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
+                }
+              }(parameters));
             lanelet_pose) {
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
+          /// @note fix z, roll and pitch to fitting to the lanelet
+          if (getParameter<bool>("consider_pose_by_road_slope", false)) {
+            entity_status.pose = hdmap_utils_ptr_->toMapPose(*lanelet_pose).pose;
+          } else {
+            entity_status.pose = pose;
+          }
         } else {
           entity_status.lanelet_pose_valid = false;
+          entity_status.pose = pose;
         }
       }
 

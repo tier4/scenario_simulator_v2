@@ -218,10 +218,10 @@ class RandomTestRunnerLaunch(object):
             scenario_node,
             RegisterEventHandler(event_handler=shutdown_handler),
             Node(
-                package="openscenario_visualization",
-                executable="openscenario_visualization_node",
+                package="traffic_simulator",
+                executable="visualization_node",
                 namespace="simulation",
-                name="openscenario_visualizer",
+                name="visualizer",
                 output="screen",
             ),
         ]

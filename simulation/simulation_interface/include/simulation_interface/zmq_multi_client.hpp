@@ -49,6 +49,9 @@ public:
   auto call(const simulation_api_schema::UpdateFrameRequest &)
     -> simulation_api_schema::UpdateFrameResponse;
 
+  auto call(const simulation_api_schema::UpdateStepTimeRequest &)
+    -> simulation_api_schema::UpdateStepTimeResponse;
+
   auto call(const simulation_api_schema::SpawnVehicleEntityRequest &)
     -> simulation_api_schema::SpawnVehicleEntityResponse;
 
@@ -75,9 +78,6 @@ public:
 
   auto call(const simulation_api_schema::UpdateTrafficLightsRequest &)
     -> simulation_api_schema::UpdateTrafficLightsResponse;
-
-  auto call(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
-    -> simulation_api_schema::FollowPolylineTrajectoryResponse;
 
   auto call(const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest &)
     -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse;

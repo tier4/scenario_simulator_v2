@@ -38,7 +38,12 @@ RelativeDistanceCondition::RelativeDistanceCondition(
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), Double::nan()),
+  consider_z([]() {
+    rclcpp::Node node{"get_parameter", "simulation"};
+    node.declare_parameter("consider_pose_by_road_slope", false);
+    return node.get_parameter("consider_pose_by_road_slope").as_bool();
+  }())
 {
 }
 
@@ -70,6 +75,9 @@ auto RelativeDistanceCondition::distance<
   }
 }
 
+/**
+ * @note This implementation differs from the OpenSCENARIO standard. See the section "6.4. Distances" in the OpenSCENARIO User Guide.
+ */
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
@@ -99,6 +107,9 @@ auto RelativeDistanceCondition::distance<
   }
 }
 
+/**
+ * @note This implementation differs from the OpenSCENARIO standard. See the section "6.4. Distances" in the OpenSCENARIO User Guide.
+ */
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
@@ -114,6 +125,12 @@ auto RelativeDistanceCondition::distance<
   }
 }
 
+// @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
+static double hypot(const double x, const double y, const double z, const bool consider_z)
+{
+  return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
+}
+
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
@@ -122,9 +139,11 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::hypot(
+    return hypot(
       makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y,
+      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.z,
+      consider_z);
   } else {
     return Double::nan();
   }
@@ -138,9 +157,10 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::hypot(
+    return hypot(
       makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y,
+      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.z, consider_z);
   } else {
     return Double::nan();
   }
