@@ -282,6 +282,15 @@ public:
     const lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
+  /**
+   * @brief Add a traffic source to the simulation
+   * @param radius The radius defining the area on which entities will be spawned
+   * @param rate The rate at which entities will be spawned [Hz]
+   * @param speed The speed of the spawned entities
+   * @param point The center of the area on which entities will be spawned
+   * @param params The parameters of the spawned entities
+   * @param random_seed [Optional] The seed for the random number generator
+   */
   void addTrafficSource(
     const double radius, const double rate, const double speed,
     const geometry_msgs::msg::Point & point,
