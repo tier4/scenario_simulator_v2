@@ -1,4 +1,4 @@
-name: ToolDispatch
+name: Tool dispatch
 on:
   pull_request:
     types: [labeled]

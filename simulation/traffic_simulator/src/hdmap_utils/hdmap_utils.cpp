@@ -492,7 +492,8 @@ auto HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & point) const -> lan
 
 auto HdMapUtils::matchToLane(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double reduction_ratio) const -> std::optional<lanelet::Id>
+  const bool include_crosswalk, const double matching_distance, const double reduction_ratio) const
+  -> std::optional<lanelet::Id>
 {
   std::optional<lanelet::Id> id;
   lanelet::matching::Object2d obj;
@@ -509,7 +510,8 @@ auto HdMapUtils::matchToLane(
         bbox.center.x - bbox.dimensions.x * 0.5 * reduction_ratio,
         bbox.center.y - bbox.dimensions.y * 0.5 * reduction_ratio}},
     obj.pose);
-  auto matches = lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, 3.0);
+  auto matches =
+    lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, matching_distance);
   if (!include_crosswalk) {
     matches = lanelet::matching::removeNonRuleCompliantMatches(matches, traffic_rules_vehicle_ptr_);
   }
@@ -518,23 +520,17 @@ auto HdMapUtils::matchToLane(
   }
   std::vector<std::pair<lanelet::Id, double>> id_and_distance;
   for (const auto & match : matches) {
-    /**
-     * @note Hard coded parameter. Matching threshold for lanelet.
-     */
-    if (match.distance <= 1.0) {
-      auto lanelet_pose = toLaneletPose(pose, match.lanelet.id());
-      if (lanelet_pose) {
-        id_and_distance.emplace_back(lanelet_pose->lanelet_id, lanelet_pose->offset);
-      }
+    if (const auto lanelet_pose = toLaneletPose(pose, match.lanelet.id(), matching_distance)) {
+      id_and_distance.emplace_back(lanelet_pose->lanelet_id, lanelet_pose->offset);
     }
   }
   if (id_and_distance.empty()) {
     return std::nullopt;
   }
-  std::sort(id_and_distance.begin(), id_and_distance.end(), [](auto const & lhs, auto const & rhs) {
-    return lhs.second < rhs.second;
-  });
-  return id_and_distance[0].first;
+  const auto min_id_and_distance = std::min_element(
+    id_and_distance.begin(), id_and_distance.end(),
+    [](auto const & lhs, auto const & rhs) { return lhs.second < rhs.second; });
+  return min_id_and_distance->first;
 }
 
 auto HdMapUtils::toLaneletPose(
@@ -604,7 +600,7 @@ auto HdMapUtils::toLaneletPose(
   const bool include_crosswalk, const double matching_distance) const
   -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
+  const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk, matching_distance);
   if (!lanelet_id) {
     return toLaneletPose(pose, include_crosswalk, matching_distance);
   }
@@ -824,15 +820,18 @@ auto HdMapUtils::getFollowingLanelets(
   if (include_self) {
     ret.push_back(lanelet_id);
   }
+  lanelet::Id end_lanelet_id = lanelet_id;
   while (total_distance < distance) {
-    if (const auto straight_ids = getNextLaneletIds(lanelet_id, "straight");
+    if (const auto straight_ids = getNextLaneletIds(end_lanelet_id, "straight");
         !straight_ids.empty()) {
       total_distance = total_distance + getLaneletLength(straight_ids[0]);
       ret.push_back(straight_ids[0]);
+      end_lanelet_id = straight_ids[0];
       continue;
-    } else if (const auto ids = getNextLaneletIds(lanelet_id); ids.size() != 0) {
+    } else if (const auto ids = getNextLaneletIds(end_lanelet_id); ids.size() != 0) {
       total_distance = total_distance + getLaneletLength(ids[0]);
       ret.push_back(ids[0]);
+      end_lanelet_id = ids[0];
       continue;
     } else {
       break;
@@ -958,7 +957,7 @@ auto HdMapUtils::getPreviousLaneletIds(const lanelet::Id lanelet_id) const -> la
     ids.push_back(llt.id());
   }
   for (const auto & id : getPreviousRoadShoulderLanelet(lanelet_id)) {
-    ids.emplace_back(id);
+    ids.push_back(id);
   }
   return ids;
 }
@@ -1390,7 +1389,8 @@ auto HdMapUtils::toMapPoints(const lanelet::Id lanelet_id, const std::vector<dou
   return ret;
 }
 
-auto HdMapUtils::toMapPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+auto HdMapUtils::toMapPose(
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch) const
   -> geometry_msgs::msg::PoseStamped
 {
   if (
@@ -1406,7 +1406,7 @@ auto HdMapUtils::toMapPose(const traffic_simulator_msgs::msg::LaneletPose & lane
     const auto tangent_vec = spline->getTangentVector(pose->s);
     geometry_msgs::msg::Vector3 rpy;
     rpy.x = 0.0;
-    rpy.y = 0.0;
+    rpy.y = fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0;
     rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
     ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy) *
                            quaternion_operation::convertEulerAngleToQuaternion(pose->rpy);
@@ -1617,7 +1617,7 @@ auto HdMapUtils::getRightOfWayLaneletIds(const lanelet::Id lanelet_id) const -> 
   return ids;
 }
 
-auto HdMapUtils::getTrafficSignRegElementsOnPath(const lanelet::Ids & lanelet_ids) const
+auto HdMapUtils::getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids) const
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
@@ -1625,13 +1625,27 @@ auto HdMapUtils::getTrafficSignRegElementsOnPath(const lanelet::Ids & lanelet_id
     const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
     const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
     for (const auto & traffic_sign : traffic_signs) {
-      ret.push_back(traffic_sign);
+      ret.emplace_back(traffic_sign);
     }
   }
   return ret;
 }
 
-auto HdMapUtils::getTrafficLightRegElementsOnPath(const lanelet::Ids & lanelet_ids) const
+auto HdMapUtils::getTrafficSignRegulatoryElements() const
+  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
+{
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
+  for (const auto & lanelet_id : getLaneletIds()) {
+    const auto lanelet = lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+    const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
+    for (const auto & traffic_sign : traffic_signs) {
+      ret.emplace_back(traffic_sign);
+    }
+  }
+  return ret;
+}
+
+auto HdMapUtils::getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids) const
   -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
 {
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
@@ -1640,7 +1654,20 @@ auto HdMapUtils::getTrafficLightRegElementsOnPath(const lanelet::Ids & lanelet_i
     const auto traffic_lights =
       lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
     for (const auto & traffic_light : traffic_lights) {
-      ret.push_back(traffic_light);
+      ret.emplace_back(traffic_light);
+    }
+  }
+  return ret;
+}
+
+auto HdMapUtils::getStopLines() const -> lanelet::ConstLineStrings3d
+{
+  lanelet::ConstLineStrings3d ret;
+  for (const auto & traffic_sign : getTrafficSignRegulatoryElements()) {
+    if (traffic_sign->type() == "stop_sign") {
+      for (const auto & stop_line : traffic_sign->refLines()) {
+        ret.emplace_back(stop_line);
+      }
     }
   }
   return ret;
@@ -1650,16 +1677,23 @@ auto HdMapUtils::getStopLinesOnPath(const lanelet::Ids & lanelet_ids) const
   -> lanelet::ConstLineStrings3d
 {
   lanelet::ConstLineStrings3d ret;
-  const auto traffic_signs = getTrafficSignRegElementsOnPath(lanelet_ids);
-  for (const auto & traffic_sign : traffic_signs) {
-    if (traffic_sign->type() != "stop_sign") {
-      continue;
-    }
-    for (const auto & stop_line : traffic_sign->refLines()) {
-      ret.push_back(stop_line);
+  for (const auto & traffic_sign : getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
+    if (traffic_sign->type() == "stop_sign") {
+      for (const auto & stop_line : traffic_sign->refLines()) {
+        ret.emplace_back(stop_line);
+      }
     }
   }
   return ret;
+}
+
+auto HdMapUtils::getStopLineIds() const -> lanelet::Ids
+{
+  lanelet::Ids stop_line_ids;
+  for (const auto & ret : getStopLines()) {
+    stop_line_ids.push_back(ret.id());
+  }
+  return stop_line_ids;
 }
 
 auto HdMapUtils::getStopLineIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids
@@ -1745,7 +1779,7 @@ auto HdMapUtils::getStopLinePolygon(const lanelet::Id lanelet_id) const
 auto HdMapUtils::getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) const -> lanelet::Ids
 {
   lanelet::Ids ids;
-  for (const auto & traffic_light : getTrafficLightRegElementsOnPath(route_lanelets)) {
+  for (const auto & traffic_light : getTrafficLightRegulatoryElementsOnPath(route_lanelets)) {
     for (auto light_string : traffic_light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         if (auto id = light_string.attribute("traffic_light_id").asId(); id) {

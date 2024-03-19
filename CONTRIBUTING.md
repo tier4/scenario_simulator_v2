@@ -54,19 +54,28 @@ The release branches are used only to update the release notes. An example is [h
 
 Your changes proposed in your pull request will be tested automatically by the following checks:
 
-| Checks                                                                                                                                                                                                 | Description                                                                          |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
-| [![BuildAndRun](https://github.com/tier4/scenario_simulator_v2/actions/workflows/BuildAndRun.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/BuildAndRun.yaml)         | Build each package independently, run linters, and run unit tests and scenario test. |
-| [![Docker](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)                      | Build a docker image.                                                                |
-| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml) | Build the documentation sites.                                                       |
-| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)          | Run a spell checker and add warnings to the PR.                                      |
+| Checks                                                                                                                                                                                                                            | Description                                                                          |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [![BuildAndRun](https://github.com/tier4/scenario_simulator_v2/actions/workflows/BuildAndRun.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/BuildAndRun.yaml)                                  | Build each package independently, run linters, unit tests and scenario tests.        |
+| [![CheckBranchUpToDate](https://github.com/tier4/scenario_simulator_v2/actions/workflows/CheckBranchUpToDate.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/CheckBranchUpToDate.yaml)          | Checking the branch is up to date. This workflow works on merge queue.               |
+| [![CheckLabel](https://github.com/tier4/scenario_simulator_v2/actions/workflows/CheckLabel.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/CheckLabel.yaml)                                     | Checking the label for version control is labeled.                                   |
+| [![Docker](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Docker.yaml)                                                 | Build a docker image.                                                                |
+| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml)                            | Build the documentation sites.                                                       |
+| [![DocumentationLinkCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/DocumentationLinkCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/DocumentationLinkCheck.yaml) | Checking the URLs in documentation are valid.                                        |
+| [![LineLint](https://github.com/tier4/scenario_simulator_v2/actions/workflows/LineLint.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/LineLint.yaml)                                           | Checking text files contain the blank line at the end of the files.                  |
+| [![Release](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Release.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Release.yaml)                                              | Bump new version and create a release. This workflow works on merge queue.           |
+| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)                                     | Run a spell checker and add warnings to the PR.                                      |
 
 If you contribute to the documentation, your changes should pass the checks below:
 
-| Checks                                                                                                                                                                                                 | Description                                     |
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml) | Build the documentation sites.                  |
-| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)          | Run a spell checker and add warnings to the PR. |
+| Checks                                                                                                                                                                                                                            | Description                                                              |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [![CheckBranchUpToDate](https://github.com/tier4/scenario_simulator_v2/actions/workflows/CheckBranchUpToDate.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/CheckBranchUpToDate.yaml)          | Checking the branch is up to date. This workflow works on merge queue.   |
+| [![CheckLabel](https://github.com/tier4/scenario_simulator_v2/actions/workflows/CheckLabel.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/CheckLabel.yaml)                                     | Checking the label for version control is labeled.                       |
+| [![Documentation](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Documentation.yaml)                            | Build the documentation sites.                                           |
+| [![DocumentationLinkCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/DocumentationLinkCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/DocumentationLinkCheck.yaml) | Checking the URLs in documentation are valid.                            |
+| [![Release](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Release.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/Release.yaml)                                              | Bump new version and create a release. This workflow works on merge queue. |
+| [![SpellCheck](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml/badge.svg)](https://github.com/tier4/scenario_simulator_v2/actions/workflows/SpellCheck.yaml)                                     | Run a spell checker and add warnings to the PR.                          |
 
 ## Code review
 
@@ -76,8 +85,18 @@ As a good practice, reply to the reviewer's comment with a link to your changes 
 To keep the commit hashes consistent, **please DO NOT force-push the commit to your pull request during the code review.**
 If you want to force-push the commit during the review, please contact the maintainers for approval in advance.
 
-If more than one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
+If at least one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
 Your contribution will be recorded in the [release note](https://tier4.github.io/scenario_simulator_v2-docs/ReleaseNotes/).
+
+Pull requests must be labeled `bump major`, `bump minor` or `bump patch`.
+
+Please follow the criteria below to determine which label to apply.
+
+* If there is a destructive change to the scenario or traffic_simulator API, label it label it with `bump major`.
+* If the scenario or traffic_simulator API has some additional functionality but no destructive changes, label it with `bump minor`.
+* If there is no additional functionality and full backward compatibility is ensured, label it with `bump patch`.
+
+If you are in any doubt, please consult the maintainers [@hakuturu583](https://github.com/hakuturu583),[@yamacir-kit](https://github.com/yamacir-kit),[@HansRobo](https://github.com/HansRobo).
 
 ## Update Documentation
 

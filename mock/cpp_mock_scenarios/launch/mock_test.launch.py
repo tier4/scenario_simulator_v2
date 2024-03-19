@@ -151,9 +151,9 @@ def generate_launch_description():
                 arguments=[("__log_level:=warn")],
             ),
             Node(
-                package="openscenario_visualization",
-                executable="openscenario_visualization_node",
-                name="openscenario_visualization_node",
+                package="traffic_simulator",
+                executable="visualization_node",
+                name="visualizer",
                 output="screen",
             ),
             Node(
