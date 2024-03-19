@@ -1,15 +1,4 @@
-/**
- * @file traffic_source.cpp
- * @author Mateusz Palczuk (mateusz.palczuk@robotec.ai)
- * @brief implementation of the TrafficSource class
- * @version 0.1
- * @date 2024-03-14
- *
- * @copyright Copyright(c) TIER IV.Inc {2015}
- *
- */
-
-// Copyright 2015 TIER IV.inc. All rights reserved.
+// Copyright 2015 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
