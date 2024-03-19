@@ -42,8 +42,7 @@ class TrafficSource : public TrafficModuleBase
 public:
   explicit TrafficSource(
     const double radius, const double rate, const double speed,
-    const geometry_msgs::msg::Point & position, unsigned int source_id,
-    std::optional<int> random_seed,
+    const geometry_msgs::msg::Point & position, std::optional<int> random_seed,
     const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
       spawn_function,
     std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils);
@@ -59,10 +58,11 @@ private:
   auto getRandomLaneletId() -> lanelet::Id;
   auto getRandomSValue(const lanelet::Id lanelet_id) -> double;
 
+  inline static unsigned int next_source_id = 0u;
   const unsigned int source_id;
-  const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
+  const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)>
     spawn_function;
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
   lanelet::Ids spawnable_lanelets;
   std::mt19937 engine;
   std::uniform_int_distribution<std::size_t> id_distribution;

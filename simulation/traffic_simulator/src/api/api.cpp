@@ -328,14 +328,14 @@ void API::addTrafficSource(
   const geometry_msgs::msg::Point & point,
   const traffic_simulator_msgs::msg::VehicleParameters & params, std::optional<int> random_seed)
 {
-  static unsigned int source_id = 0u;
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
-    radius, rate, speed, point, source_id++, random_seed,
-    [this, &params](
+    radius, rate, speed, point, random_seed,
+    [this, params](
       const std::string & name, const geometry_msgs::msg::Pose & pose, const double speed) -> void {
       spawn(name, pose, params);
       setEntityStatus(name, pose, helper::constructActionStatus(speed));
-    });
+    },
+    entity_manager_ptr_->getHdmapUtils());
 }
 
 auto API::canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose) const

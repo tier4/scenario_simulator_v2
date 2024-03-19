@@ -49,13 +49,8 @@ public:
   template <typename T, typename... Ts>
   void addModule(Ts &&... xs)
   {
-    if constexpr (std::is_same_v<std::decay_t<T>, traffic_simulator::traffic::TrafficSource>) {
-      auto module_ptr = std::make_shared<T>(std::forward<Ts>(xs)..., hdmap_utils_);
-      modules_.emplace_back(module_ptr);
-    } else {
-      auto module_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
-      modules_.emplace_back(module_ptr);
-    }
+    auto module_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
+    modules_.emplace_back(module_ptr);
   }
   void execute(const double current_time, const double step_time);
 

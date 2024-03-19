@@ -32,22 +32,24 @@ namespace traffic
 {
 TrafficSource::TrafficSource(
   const double radius, const double rate, const double speed,
-  const geometry_msgs::msg::Point & position, const unsigned int source_id,
-  const std::optional<int> random_seed,
+  const geometry_msgs::msg::Point & position, const std::optional<int> random_seed,
   const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
     spawn_function,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils)
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils)
 : radius(radius),
   rate(rate),
   speed(speed),
   position(position),
-  source_id(source_id),
+  source_id(next_source_id++),
   spawn_function(spawn_function),
   hdmap_utils(hdmap_utils),
-  spawnable_lanelets(hdmap_utils->getNearbyLaneletIds(
-    position, radius, false, std::numeric_limits<std::size_t>::max())),
+  spawnable_lanelets(
+    hdmap_utils->getNearbyLaneletIds(position, radius, false, static_cast<std::size_t>(100))),
   id_distribution(0, spawnable_lanelets.size() - 1)
 {
+  if (spawnable_lanelets.empty()) {
+    THROW_SIMULATION_ERROR("TrafficSource ", source_id, " has no spawnable lanelets.");
+  }
   if (random_seed) {
     engine.seed(random_seed.value());
   }
