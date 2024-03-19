@@ -2,6 +2,42 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.6.0 (2024-03-14)
+------------------
+
+1.5.1 (2024-03-13)
+------------------
+
+1.5.0 (2024-03-12)
+------------------
+* Merge pull request `#1209 <https://github.com/tier4/scenario_simulator_v2/issues/1209>`_ from tier4/feature/ego_slope
+  Consider road slope in distance measurement and entity poses
+* chore: enable flag defaultly
+* Update common/math/geometry/src/spline/hermite_curve.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* chore: apply formatter
+* feat: add fill_pitch option to CatmullRomSpline::getPose
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* chore(geometry): add some tests for LineSegment::getPose
+* refactor: rename fit_orientation_to_lanelet to fill_pitch in HermiteCurve::getPose
+* refactor: add fill_pitch option to LineSegment::getPose
+* refactor: add fit_orientation_to_lanelet option to HermiteCurve::getPose
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge branch 'master' into feature/ego_slope
+* fix test case
+* update slop calculation logic
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka
+
+1.4.2 (2024-03-01)
+------------------
+
 1.4.1 (2024-02-29)
 ------------------
 
