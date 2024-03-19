@@ -121,12 +121,6 @@ auto PedestrianEntity::getObstacle() -> std::optional<traffic_simulator_msgs::ms
   return std::nullopt;
 }
 
-auto PedestrianEntity::getPedestrianParameters()
-  -> traffic_simulator_msgs::msg::PedestrianParameters
-{
-  return pedestrian_parameters;
-}
-
 auto PedestrianEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
 {
   return route_planner_.getGoalPoses();

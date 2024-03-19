@@ -121,11 +121,6 @@ auto VehicleEntity::getRouteLanelets(double horizon) -> lanelet::Ids
   }
 }
 
-auto VehicleEntity::getVehicleParameters() -> traffic_simulator_msgs::msg::VehicleParameters
-{
-  return vehicle_parameters;
-}
-
 auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
   if (!npc_logic_started_) {

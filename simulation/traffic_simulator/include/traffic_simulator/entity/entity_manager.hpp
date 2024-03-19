@@ -298,15 +298,14 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
+  FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getMapPoseFromRelativePose, const);
-  FORWARD_TO_ENTITY(getPedestrianParameters, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
-  FORWARD_TO_ENTITY(getVehicleParameters, const);
   FORWARD_TO_ENTITY(laneMatchingSucceed, const);
   FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(cancelRequest, );
@@ -419,6 +418,9 @@ public:
   auto getObstacle(const std::string & name)
     -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
 
+  auto getPedestrianParameters(const std::string & name) const
+    -> traffic_simulator_msgs::msg::PedestrianParameters;
+
   // clang-format off
   auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
   auto getRelativePose(const geometry_msgs::msg::Pose     & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
@@ -431,6 +433,9 @@ public:
   // clang-format on
 
   auto getStepTime() const noexcept -> double;
+
+  auto getVehicleParameters(const std::string & name) const
+    -> traffic_simulator_msgs::msg::VehicleParameters;
 
   auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
 

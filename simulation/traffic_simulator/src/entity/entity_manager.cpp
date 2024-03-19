@@ -513,6 +513,17 @@ auto EntityManager::getObstacle(const std::string & name)
   return entities_.at(name)->getObstacle();
 }
 
+auto EntityManager::getPedestrianParameters(const std::string & name) const
+  -> traffic_simulator_msgs::msg::PedestrianParameters
+{
+  if (const auto entity = dynamic_cast<PedestrianEntity const *>(entities_.at(name).get())) {
+    return entity->pedestrian_parameters;
+  }
+  THROW_SIMULATION_ERROR(
+    "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
+    "Please check description of the scenario and entity type of the Entity: " + name);
+}
+
 auto EntityManager::getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const
   -> geometry_msgs::msg::Pose
@@ -565,6 +576,17 @@ auto EntityManager::getRelativePose(
 }
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
+
+auto EntityManager::getVehicleParameters(const std::string & name) const
+  -> traffic_simulator_msgs::msg::VehicleParameters
+{
+  if (const auto vehicle = dynamic_cast<VehicleEntity const *>(entities_.at(name).get())) {
+    return vehicle->vehicle_parameters;
+  }
+  THROW_SIMULATION_ERROR(
+    "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
+    "Please check description of the scenario and entity type of the Entity: " + name);
+}
 
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
