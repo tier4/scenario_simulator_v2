@@ -53,6 +53,12 @@ public:
   void execute(const double current_time, const double step_time) override;
 
 private:
+  auto getSmallestSValue(const lanelet::Id id) -> double;
+  auto getBiggestSValue(const lanelet::Id id) -> double;
+  auto convertToPoseInArea(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
+    -> std::optional<geometry_msgs::msg::Pose>;
+  auto getNewEntityName() -> std::string;
+
   auto getValidRandomPose() -> geometry_msgs::msg::Pose;
   auto getRandomLaneletPose() -> traffic_simulator_msgs::msg::LaneletPose;
   auto getRandomLaneletId() -> lanelet::Id;
