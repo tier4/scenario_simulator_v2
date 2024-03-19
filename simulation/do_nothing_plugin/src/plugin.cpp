@@ -14,6 +14,7 @@
 
 #include <do_nothing_plugin/plugin.hpp>
 #include <geometry/linear_algebra.hpp>
+#include <geometry/vector3/hypot.hpp>
 
 namespace entity_behavior
 {
@@ -89,6 +90,26 @@ void DoNothingBehavior::followPolylineTrajectory()
           .orientation(quaternion_operation::slerp(
             trajectory->shape.vertices[i].position.orientation,
             trajectory->shape.vertices[i + 1].position.orientation, interpolation_ratio));
+      const double linear_velocity = math::geometry::hypot(
+                                       trajectory->shape.vertices[i + 1].position.position,
+                                       trajectory->shape.vertices[i].position.position) /
+                                     (timestamp_i_1 - timestamp_i);
+      const auto linear_acceleration =
+        (entity_status_->getTwist().linear.x - linear_velocity) / (timestamp_i_1 - timestamp_i);
+      const auto linear_jerk =
+        (entity_status_->getAccel().linear.x - linear_acceleration) / (timestamp_i_1 - timestamp_i);
+
+      interpolated_entity_status.action_status.twist =
+        geometry_msgs::build<geometry_msgs::msg::Twist>()
+          .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
+          .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+      interpolated_entity_status.action_status.accel =
+        geometry_msgs::build<geometry_msgs::msg::Accel>()
+          .linear(
+            geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
+          .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+      interpolated_entity_status.action_status.linear_jerk = linear_jerk;
+
       setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
         traffic_simulator::CanonicalizedEntityStatus(interpolated_entity_status, getHdMapUtils())));
     }
