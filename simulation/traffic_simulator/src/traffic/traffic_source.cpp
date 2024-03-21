@@ -15,6 +15,10 @@
 #include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
+constexpr std::size_t spawnable_lanes_limit = 1e3;
+constexpr double lanelet_sampling_step = 0.1;
+constexpr int max_randomization_attempts = 1e4;
+
 namespace traffic_simulator
 {
 namespace traffic
@@ -32,9 +36,8 @@ TrafficSource::TrafficSource(
   source_id_(next_source_id_++),
   spawn_function_(spawn_function),
   hdmap_utils_(hdmap_utils),
-  spawnable_lanelets_(
-    /// @note hardcoded parameter
-    hdmap_utils->getNearbyLaneletIds(position, radius, false, static_cast<std::size_t>(1000))),
+  spawnable_lanelets_(hdmap_utils->getNearbyLaneletIds(
+    position, radius, false, static_cast<std::size_t>(spawnable_lanes_limit))),
   id_distribution_(0, spawnable_lanelets_.size() - 1)
 {
   if (spawnable_lanelets_.empty()) {
@@ -53,8 +56,7 @@ auto TrafficSource::getSmallestSValue(const lanelet::Id id) -> double
 {
   traffic_simulator_msgs::msg::LaneletPose pose;
   pose.lanelet_id = id;
-  /// @note hardcoded parameter, sampling the lanelet in 0.1m
-  for (pose.s = 0.0; pose.s < hdmap_utils_->getLaneletLength(id); pose.s += 0.1) {
+  for (pose.s = 0.0; pose.s < hdmap_utils_->getLaneletLength(id); pose.s += lanelet_sampling_step) {
     if (convertToPoseInArea(pose)) {
       return pose.s;
     }
@@ -66,8 +68,7 @@ auto TrafficSource::getBiggestSValue(const lanelet::Id id) -> double
 {
   traffic_simulator_msgs::msg::LaneletPose pose;
   pose.lanelet_id = id;
-  /// @note hardcoded parameter, sampling the lanelet in 0.1m
-  for (pose.s = hdmap_utils_->getLaneletLength(id); pose.s > 0.0; pose.s -= 0.1) {
+  for (pose.s = hdmap_utils_->getLaneletLength(id); pose.s > 0.0; pose.s -= lanelet_sampling_step) {
     if (convertToPoseInArea(pose)) {
       return pose.s;
     }
@@ -106,8 +107,7 @@ void TrafficSource::execute(
 
 auto TrafficSource::getValidRandomPose() -> geometry_msgs::msg::Pose
 {
-  /// @note hardcoded parameter
-  for (int tries = 0; tries < 1e5; ++tries) {
+  for (int tries = 0; tries < max_randomization_attempts; ++tries) {
     const auto candidate_pose = getRandomLaneletPose();
     if (const auto map_pose = convertToPoseInArea(candidate_pose)) {
       return map_pose.value();
