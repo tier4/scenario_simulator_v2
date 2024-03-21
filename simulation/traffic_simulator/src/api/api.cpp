@@ -326,16 +326,27 @@ void API::requestLaneChange(
 void API::addTrafficSource(
   const double radius, const double rate, const double speed,
   const geometry_msgs::msg::Point & point,
-  const traffic_simulator_msgs::msg::VehicleParameters & params, std::optional<int> random_seed)
+  const std::vector<std::pair<
+    std::variant<
+      traffic_simulator_msgs::msg::VehicleParameters,
+      traffic_simulator_msgs::msg::PedestrianParameters>,
+    double>> & params_with_weights,
+  std::optional<int> random_seed)
 {
+#define MAKE_SPAWN_LAMBDA(PARAMS)                                                           \
+  [this](                                                                                   \
+    const std::string & name, const geometry_msgs::msg::Pose & pose, const PARAMS & params, \
+    const double speed) -> void {                                                           \
+    spawn(name, pose, params);                                                              \
+    setEntityStatus(name, pose, helper::constructActionStatus(speed));                      \
+  }
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
-    radius, rate, speed, point, random_seed,
-    [this, params](
-      const std::string & name, const geometry_msgs::msg::Pose & pose, const double speed) -> void {
-      spawn(name, pose, params);
-      setEntityStatus(name, pose, helper::constructActionStatus(speed));
-    },
+    radius, rate, speed, point, params_with_weights, random_seed,
+    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters),
+    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters),
+    traffic_simulator::traffic::TrafficSource::Configuration(),
     entity_manager_ptr_->getHdmapUtils());
+#undef MAKE_SPAWN_LAMBDA
 }
 
 auto API::canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose) const

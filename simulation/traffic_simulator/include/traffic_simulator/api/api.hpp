@@ -294,7 +294,11 @@ public:
   void addTrafficSource(
     const double radius, const double rate, const double speed,
     const geometry_msgs::msg::Point & point,
-    const traffic_simulator_msgs::msg::VehicleParameters & params,
+    const std::vector<std::pair<
+      std::variant<
+        traffic_simulator_msgs::msg::VehicleParameters,
+        traffic_simulator_msgs::msg::PedestrianParameters>,
+      double>> & params_with_weights,
     std::optional<int> random_seed = std::nullopt);
 
   // clang-format off

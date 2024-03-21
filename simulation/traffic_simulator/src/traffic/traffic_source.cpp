@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
@@ -25,21 +26,45 @@ namespace traffic
 {
 TrafficSource::TrafficSource(
   const double radius, const double rate, const double speed,
-  const geometry_msgs::msg::Point & position, const std::optional<int> random_seed,
-  const std::function<void(const std::string &, const geometry_msgs::msg::Pose &, const double)> &
-    spawn_function,
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils)
+  const geometry_msgs::msg::Point & position,
+  const std::vector<std::pair<std::variant<VehicleParams, PedestrianParams>, double>> & params,
+  const std::optional<int> random_seed,
+  const std::function<void(
+    const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)> &
+    vehicle_spawn_function,
+  const std::function<void(
+    const std::string &, const geometry_msgs::msg::Pose &, const PedestrianParams &,
+    const double)> & pedestrian_spawn_function,
+  const Configuration & configuration, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils)
 : radius_(radius),
   rate_(rate),
   speed_(speed),
   position_(position),
   source_id_(next_source_id_++),
-  spawn_function_(spawn_function),
+  vehicle_spawn_function_(vehicle_spawn_function),
+  pedestrian_spawn_function_(pedestrian_spawn_function),
   hdmap_utils_(hdmap_utils),
   spawnable_lanelets_(hdmap_utils->getNearbyLaneletIds(
     position, radius, false, static_cast<std::size_t>(spawnable_lanes_limit))),
-  id_distribution_(0, spawnable_lanelets_.size() - 1)
+  id_distribution_(0, spawnable_lanelets_.size() - 1),
+  angle_distribution_(0.0, M_PI * 2.0),
+  radius_distribution_(0.0, radius_),
+  config_(configuration)
 {
+  std::transform(
+    params.begin(), params.end(), std::back_inserter(params_),
+    [](const std::pair<std::variant<VehicleParams, PedestrianParams>, double> & pair) {
+      return pair.first;
+    });
+
+  std::vector<double> weights;
+  std::transform(
+    params.begin(), params.end(), std::back_inserter(weights),
+    [](const std::pair<std::variant<VehicleParams, PedestrianParams>, double> & pair) {
+      return pair.second;
+    });
+  params_distribution_ = std::discrete_distribution<>(weights.begin(), weights.end());
+
   if (spawnable_lanelets_.empty()) {
     THROW_SIMULATION_ERROR("TrafficSource ", source_id_, " has no spawnable lanelets.");
   }
@@ -50,6 +75,25 @@ TrafficSource::TrafficSource(
   if (random_seed) {
     engine_.seed(random_seed.value());
   }
+}
+
+auto TrafficSource::getRandomPose(const bool random_orientation) -> geometry_msgs::msg::Pose
+{
+  const double angle = angle_distribution_(engine_);
+  const double radius = radius_distribution_(engine_);
+
+  geometry_msgs::msg::Pose pose;
+  /// @todo add orientation from TrafficSource orientation when it will have orientation
+  pose.position = position_;
+  pose.position.x += radius * std::cos(angle);
+  pose.position.y += radius * std::sin(angle);
+
+  if (random_orientation) {
+    pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+      traffic_simulator::helper::constructRPY(0.0, 0.0, angle_distribution_(engine_)));
+  }
+
+  return pose;
 }
 
 auto TrafficSource::getSmallestSValue(const lanelet::Id id) -> double
@@ -102,26 +146,53 @@ void TrafficSource::execute(
   }
   last_spawn_time_ = current_time;
 
-  spawn_function_(getNewEntityName(), getValidRandomPose(), speed_);
+  randomParams();
+  if (isPedestrian(*current_params_)) {
+    pedestrian_spawn_function_(
+      getNewEntityName(), getValidRandomPose(), std::get<PedestrianParams>(*current_params_),
+      speed_);
+  } else {
+    vehicle_spawn_function_(
+      getNewEntityName(), getValidRandomPose(), std::get<VehicleParams>(*current_params_), speed_);
+  }
+}
+
+auto TrafficSource::randomParams() -> void
+{
+  const auto current_params_idx = params_distribution_(engine_);
+  current_params_ = std::next(params_.begin(), current_params_idx);
+}
+
+auto TrafficSource::isPedestrian(const std::variant<VehicleParams, PedestrianParams> & params)
+  -> bool
+{
+  return std::holds_alternative<PedestrianParams>(params);
+}
+
+auto TrafficSource::isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool
+{
+  if (config_.allow_spawn_outside_lane) {
+    return true;
+  }
+  const auto lanelet_pose = hdmap_utils_->toLaneletPose(pose, isPedestrian(*current_params_));
+  if (lanelet_pose) {
+    if (!config_.require_footprint_fitting) {
+      return true;
+    }
+    /// @todo enable footprint fitting
+  }
+  return false;
 }
 
 auto TrafficSource::getValidRandomPose() -> geometry_msgs::msg::Pose
 {
   for (int tries = 0; tries < max_randomization_attempts; ++tries) {
-    const auto candidate_pose = getRandomLaneletPose();
-    if (const auto map_pose = convertToPoseInArea(candidate_pose)) {
-      return map_pose.value();
+    const auto candidate_pose = getRandomPose();
+    if (isPoseValid(candidate_pose)) {
+      return candidate_pose;
     }
   }
   THROW_SIMULATION_ERROR("TrafficSource failed to get valid random pose.");
-}
-
-auto TrafficSource::getRandomLaneletPose() -> traffic_simulator_msgs::msg::LaneletPose
-{
-  traffic_simulator_msgs::msg::LaneletPose pose;
-  pose.lanelet_id = getRandomLaneletId();
-  pose.s = getRandomSValue(pose.lanelet_id);
-  return pose;
 }
 
 auto TrafficSource::getRandomLaneletId() -> lanelet::Id
