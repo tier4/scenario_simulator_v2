@@ -487,7 +487,7 @@ auto EntityManager::getLongitudinalDistance(
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
-    return isEgo(each.first);
+    return is<EgoEntity>(each.first);
   });
 }
 
@@ -495,7 +495,7 @@ const std::string EntityManager::getEgoName() const
 {
   const auto names = getEntityNames();
   for (const auto & name : names) {
-    if (isEgo(name)) {
+    if (is<EgoEntity>(name)) {
       return name;
     }
   }
@@ -597,17 +597,10 @@ auto EntityManager::getWaypoints(const std::string & name)
   return entities_.at(name)->getWaypoints();
 }
 
-bool EntityManager::isEgo(const std::string & name) const
-{
-  using traffic_simulator_msgs::msg::EntityType;
-  return getEntityType(name).type == EntityType::EGO and
-         dynamic_cast<EgoEntity const *>(entities_.at(name).get());
-}
-
 bool EntityManager::isEgoSpawned() const
 {
   for (const auto & name : getEntityNames()) {
-    if (isEgo(name)) {
+    if (is<EgoEntity>(name)) {
       return true;
     }
   }
@@ -702,7 +695,7 @@ void EntityManager::resetBehaviorPlugin(
 {
   const auto status = getEntityStatus(name);
   const auto behavior_parameter = getBehaviorParameter(name);
-  if (isEgo(name)) {
+  if (is<EgoEntity>(name)) {
     THROW_SEMANTIC_ERROR(
       "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
   } else if (isMiscObject(name)) {
@@ -735,7 +728,7 @@ bool EntityManager::trafficLightsChanged()
 void EntityManager::requestSpeedChange(
   const std::string & name, double target_speed, bool continuous)
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, continuous);
@@ -745,7 +738,7 @@ void EntityManager::requestSpeedChange(
   const std::string & name, const double target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
@@ -754,7 +747,7 @@ void EntityManager::requestSpeedChange(
 void EntityManager::requestSpeedChange(
   const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, continuous);
@@ -765,7 +758,7 @@ void EntityManager::requestSpeedChange(
   const speed_change::Transition transition, const speed_change::Constraint constraint,
   const bool continuous)
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
@@ -774,7 +767,7 @@ void EntityManager::requestSpeedChange(
 auto EntityManager::setEntityStatus(
   const std::string & name, const CanonicalizedEntityStatus & status) -> void
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR(
       "You cannot set entity status to the ego vehicle name ", std::quoted(name),
       " after starting scenario.");

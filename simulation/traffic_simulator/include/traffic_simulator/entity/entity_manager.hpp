@@ -461,6 +461,12 @@ public:
     }
   }
 
+  template <typename EntityType>
+  bool is(const std::string & name) const
+  {
+    return dynamic_cast<EntityType const *>(entities_.at(name).get());
+  }
+
   bool isEgo(const std::string & name) const;
 
   bool isEgoSpawned() const;
@@ -513,7 +519,7 @@ public:
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
         if (auto iter = std::find_if(
               std::begin(entities_), std::end(entities_),
-              [this](auto && each) { return isEgo(each.first); });
+              [this](auto && each) { return is<EgoEntity>(each.first); });
             iter != std::end(entities_)) {
           THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
         } else {
@@ -586,7 +592,7 @@ public:
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
-      if (npc_logic_started_ && not isEgo(name)) {
+      if (npc_logic_started_ && not is<EgoEntity>(name)) {
         iter->second->startNpcLogic();
       }
       return success;
