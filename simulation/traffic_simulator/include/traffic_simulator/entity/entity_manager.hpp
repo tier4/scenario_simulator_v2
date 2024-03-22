@@ -467,15 +467,7 @@ public:
     return dynamic_cast<EntityType const *>(entities_.at(name).get());
   }
 
-  bool isEgo(const std::string & name) const;
-
   bool isEgoSpawned() const;
-
-  bool isVehicle(const std::string & name) const;
-
-  bool isPedestrian(const std::string & name) const;
-
-  bool isMiscObject(const std::string & name) const;
 
   const std::string getEgoName() const;
 
