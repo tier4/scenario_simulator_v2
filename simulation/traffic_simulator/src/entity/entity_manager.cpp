@@ -693,6 +693,7 @@ void EntityManager::resetBehaviorPlugin(
     THROW_SIMULATION_ERROR(
       "Entity :", name, "is unkown entity type.", "Please contact to developer.");
   }
+  setLinearJerk(name, status.getLinearJerk());
   setAcceleration(name, status.getAccel());
   setTwist(name, status.getTwist());
   setBehaviorParameter(name, behavior_parameter);
