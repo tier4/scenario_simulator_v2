@@ -38,9 +38,12 @@ public:
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option),
+    spawn_pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
+        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1))),
     trajectory_start_pose(
       geometry_msgs::build<geometry_msgs::msg::Pose>()
-        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(0).z(0))
         .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1))),
     trajectory_goal_pose(
       geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -52,6 +55,7 @@ public:
 
 private:
   bool requested = false;
+  const geometry_msgs::msg::Pose spawn_pose;
   const geometry_msgs::msg::Pose trajectory_start_pose;
   const geometry_msgs::msg::Pose trajectory_goal_pose;
 
@@ -62,6 +66,11 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
+    if (
+      equals(api_.getCurrentTime(), 0.0, 0.01) &&
+      !api_.reachPosition("ego", spawn_pose, 0.1)) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
     if (
       equals(api_.getCurrentTime(), 1.0, 0.01) &&
       !api_.reachPosition("ego", trajectory_start_pose, 0.1)) {
@@ -84,9 +93,7 @@ private:
   {
     api_.spawn(
       "ego",
-      geometry_msgs::build<geometry_msgs::msg::Pose>()
-        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
-        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)),
+      spawn_pose,
       getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
     api_.setLinearVelocity("ego", 10);
