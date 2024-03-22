@@ -5,6 +5,7 @@ target_link_libraries(follow_polyline_trajectory_with_do_nothing_plugin cpp_scen
 
 install(TARGETS
   follow_polyline_trajectory_with_do_nothing_plugin
+  DESTINATION lib/cpp_mock_scenarios
 )
 
 if(BUILD_TESTING)
