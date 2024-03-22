@@ -43,10 +43,11 @@ void DoNothingBehavior::checkPolylineTrajectory()
         "Currentry, dynamic_constraints_ignorable = true (in OpenSCENARIO, followingMode = "
         "follow) does not support in DoNothingBehavior.");
     }
-    if (std::abs(trajectory->initial_distance_offset) <= std::numeric_limits<double>::epsilon()) {
+    if (std::abs(trajectory->initial_distance_offset) > std::numeric_limits<double>::epsilon()) {
       THROW_SIMULATION_ERROR(
         "Currentry, initial_distance_offset should be 0 when following trajectory in "
-        "DoNothingBehavior.");
+        "DoNothingBehavior.",
+        "You specified : ", trajectory->initial_distance_offset);
     }
     if (trajectory->shape.vertices.empty()) {
       THROW_SIMULATION_ERROR(
@@ -63,56 +64,56 @@ void DoNothingBehavior::checkPolylineTrajectory()
 
 void DoNothingBehavior::followPolylineTrajectory()
 {
+  updated_status_ = std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>();
   checkPolylineTrajectory();
   if (const auto trajectory = getPolylineTrajectory()) {
-    if (
-      current_time_ <= trajectory->base_time + trajectory->shape.vertices.front().time ||
-      current_time_ >= trajectory->base_time + trajectory->shape.vertices.back().time) {
-      return;
-    }
     for (size_t i = 0; i < trajectory->shape.vertices.size(); i++) {
       const auto timestamp_i = trajectory->base_time + trajectory->shape.vertices[i].time;
       const auto timestamp_i_1 = trajectory->base_time + trajectory->shape.vertices[i + 1].time;
       if (timestamp_i <= current_time_ && current_time_ <= timestamp_i_1) {
-        return;
+        const auto interpolation_ratio =
+          (current_time_ - trajectory->base_time + timestamp_i) / (timestamp_i_1 - timestamp_i);
+        auto interpolated_entity_status =
+          static_cast<traffic_simulator_msgs::msg::EntityStatus>(*entity_status_);
+        interpolated_entity_status.lanelet_pose_valid = false;
+        interpolated_entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+        interpolated_entity_status.pose =
+          geometry_msgs::build<geometry_msgs::msg::Pose>()
+            .position(
+              trajectory->shape.vertices[i].position.position * interpolation_ratio +
+              trajectory->shape.vertices[i + 1].position.position * (1 - interpolation_ratio))
+            .orientation(quaternion_operation::slerp(
+              trajectory->shape.vertices[i].position.orientation,
+              trajectory->shape.vertices[i + 1].position.orientation, interpolation_ratio));
+        const double linear_velocity = math::geometry::hypot(
+                                         trajectory->shape.vertices[i + 1].position.position,
+                                         trajectory->shape.vertices[i].position.position) /
+                                       (timestamp_i_1 - timestamp_i);
+        const auto linear_acceleration =
+          (entity_status_->getTwist().linear.x - linear_velocity) / (timestamp_i_1 - timestamp_i);
+        const auto linear_jerk = (entity_status_->getAccel().linear.x - linear_acceleration) /
+                                 (timestamp_i_1 - timestamp_i);
+
+        interpolated_entity_status.action_status.twist =
+          geometry_msgs::build<geometry_msgs::msg::Twist>()
+            .linear(
+              geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
+            .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+        interpolated_entity_status.action_status.accel =
+          geometry_msgs::build<geometry_msgs::msg::Accel>()
+            .linear(
+              geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
+            .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+        interpolated_entity_status.action_status.linear_jerk = linear_jerk;
+
+        setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+          traffic_simulator::CanonicalizedEntityStatus(
+            interpolated_entity_status, getHdMapUtils())));
       }
-      const auto interpolation_ratio =
-        (current_time_ - trajectory->base_time + timestamp_i) / (timestamp_i_1 - timestamp_i);
-      auto interpolated_entity_status =
-        static_cast<traffic_simulator_msgs::msg::EntityStatus>(*entity_status_);
-      interpolated_entity_status.lanelet_pose_valid = false;
-      interpolated_entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-      interpolated_entity_status.pose =
-        geometry_msgs::build<geometry_msgs::msg::Pose>()
-          .position(
-            trajectory->shape.vertices[i].position.position * interpolation_ratio +
-            trajectory->shape.vertices[i + 1].position.position * (1 - interpolation_ratio))
-          .orientation(quaternion_operation::slerp(
-            trajectory->shape.vertices[i].position.orientation,
-            trajectory->shape.vertices[i + 1].position.orientation, interpolation_ratio));
-      const double linear_velocity = math::geometry::hypot(
-                                       trajectory->shape.vertices[i + 1].position.position,
-                                       trajectory->shape.vertices[i].position.position) /
-                                     (timestamp_i_1 - timestamp_i);
-      const auto linear_acceleration =
-        (entity_status_->getTwist().linear.x - linear_velocity) / (timestamp_i_1 - timestamp_i);
-      const auto linear_jerk =
-        (entity_status_->getAccel().linear.x - linear_acceleration) / (timestamp_i_1 - timestamp_i);
-
-      interpolated_entity_status.action_status.twist =
-        geometry_msgs::build<geometry_msgs::msg::Twist>()
-          .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
-          .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
-      interpolated_entity_status.action_status.accel =
-        geometry_msgs::build<geometry_msgs::msg::Accel>()
-          .linear(
-            geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
-          .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
-      interpolated_entity_status.action_status.linear_jerk = linear_jerk;
-
-      setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-        traffic_simulator::CanonicalizedEntityStatus(interpolated_entity_status, getHdMapUtils())));
     }
+  }
+  if (!updated_status_) {
+    setUpdatedStatus(entity_status_);
   }
 }
 
