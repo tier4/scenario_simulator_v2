@@ -37,13 +37,24 @@ public:
   explicit FollowPolylineTrajectoryWithDoNothingPluginScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
-      "lanelet2_map.osm", __FILE__, false, option)
+      "lanelet2_map.osm", __FILE__, false, option),
+    trajectory_start_pose(
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
+        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1))),
+    trajectory_goal_pose(
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(20).y(0).z(0))
+        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)))
   {
     start();
   }
 
 private:
   bool requested = false;
+  const geometry_msgs::msg::Pose trajectory_start_pose;
+  const geometry_msgs::msg::Pose trajectory_goal_pose;
+
   void onUpdate() override
   {
     // LCOV_EXCL_START
@@ -51,6 +62,23 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
+    if (
+      equals(api_.getCurrentTime(), 1.0, 0.01) &&
+      !api_.reachPosition("ego", trajectory_start_pose, 0.1)) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (
+      equals(api_.getCurrentTime(), 2.0, 0.01) &&
+      !api_.reachPosition("ego", trajectory_goal_pose, 0.1)) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (equals(api_.getCurrentTime(), 2.5, 0.01)) {
+      if (api_.reachPosition("ego", trajectory_goal_pose, 0.1)) {
+        stop(cpp_mock_scenarios::Result::SUCCESS);
+      } else {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
+    }
   }
   void onInitialize() override
   {
@@ -71,27 +99,17 @@ private:
           .dynamic_constraints_ignorable(false)
           .base_time(0.0)
           .closed(false)
-          .shape(
-            traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Polyline>().vertices([]() {
+          .shape(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Polyline>().vertices(
+            [this]() {
               std::vector<traffic_simulator_msgs::msg::Vertex> vertices;
               vertices.emplace_back(
                 traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
                   .time(1.0)
-                  .position(
-                    geometry_msgs::build<geometry_msgs::msg::Pose>()
-                      .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0))
-                      .orientation(
-                        geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(
-                          1))));
+                  .position(trajectory_start_pose));
               vertices.emplace_back(
                 traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
-                  .time(1.0)
-                  .position(
-                    geometry_msgs::build<geometry_msgs::msg::Pose>()
-                      .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(2).y(0).z(0))
-                      .orientation(
-                        geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(
-                          1))));
+                  .time(2.0)
+                  .position(trajectory_goal_pose));
               return vertices;
             }()))));
   }

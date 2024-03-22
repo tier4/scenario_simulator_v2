@@ -66,13 +66,13 @@ void DoNothingBehavior::followPolylineTrajectory()
 {
   updated_status_ = std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>();
   checkPolylineTrajectory();
+
   if (const auto trajectory = getPolylineTrajectory()) {
-    for (size_t i = 0; i < trajectory->shape.vertices.size(); i++) {
+    for (size_t i = 0; i < trajectory->shape.vertices.size() - 1; i++) {
       const auto timestamp_i = trajectory->base_time + trajectory->shape.vertices[i].time;
       const auto timestamp_i_1 = trajectory->base_time + trajectory->shape.vertices[i + 1].time;
-      if (timestamp_i <= current_time_ && current_time_ <= timestamp_i_1) {
-        const auto interpolation_ratio =
-          (current_time_ - trajectory->base_time + timestamp_i) / (timestamp_i_1 - timestamp_i);
+
+      const auto interpolate_entity_status = [&](const double interpolation_ratio) {
         auto interpolated_entity_status =
           static_cast<traffic_simulator_msgs::msg::EntityStatus>(*entity_status_);
         interpolated_entity_status.lanelet_pose_valid = false;
@@ -80,8 +80,8 @@ void DoNothingBehavior::followPolylineTrajectory()
         interpolated_entity_status.pose =
           geometry_msgs::build<geometry_msgs::msg::Pose>()
             .position(
-              trajectory->shape.vertices[i].position.position * interpolation_ratio +
-              trajectory->shape.vertices[i + 1].position.position * (1 - interpolation_ratio))
+              trajectory->shape.vertices[i].position.position * (1 - interpolation_ratio) +
+              trajectory->shape.vertices[i + 1].position.position * interpolation_ratio)
             .orientation(quaternion_operation::slerp(
               trajectory->shape.vertices[i].position.orientation,
               trajectory->shape.vertices[i + 1].position.orientation, interpolation_ratio));
@@ -105,10 +105,30 @@ void DoNothingBehavior::followPolylineTrajectory()
               geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
             .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
         interpolated_entity_status.action_status.linear_jerk = linear_jerk;
+        return interpolated_entity_status;
+      };
 
+      if (i == 0 && (current_time_ + step_time_) <= timestamp_i) {
+        break;
+      }
+      if (
+        i == (trajectory->shape.vertices.size() - 2) &&
+        timestamp_i_1 <= (current_time_ + step_time_)) {
         setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
           traffic_simulator::CanonicalizedEntityStatus(
-            interpolated_entity_status, getHdMapUtils())));
+            interpolate_entity_status(1), getHdMapUtils())));
+        break;
+      }
+      if (
+        timestamp_i <= (current_time_ + step_time_) &&
+        (current_time_ + step_time_) <= timestamp_i_1) {
+        setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+          traffic_simulator::CanonicalizedEntityStatus(
+            interpolate_entity_status(
+              (current_time_ + step_time_ - trajectory->base_time - timestamp_i) /
+              (timestamp_i_1 - timestamp_i)),
+            getHdMapUtils())));
+        break;
       }
     }
   }
