@@ -20,6 +20,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
+#include <traffic_simulator_msgs/msg/polyline.hpp>
+#include <traffic_simulator_msgs/msg/vertex.hpp>
 
 // headers in STL
 #include <memory>
@@ -62,13 +64,36 @@ private:
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 10, true);
     api_.requestFollowTrajectory(
-      "ego", std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>(
-               traffic_simulator_msgs::build<traffic_simulator_msgs::msg::PolylineTrajectory>()
-                 .initial_distance_offset(0.0)
-                 .dynamic_constraints_ignorable(false)
-                 .base_time(0.0)
-                 .closed(false)
-                 .shape({})));
+      "ego",
+      std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>(
+        traffic_simulator_msgs::build<traffic_simulator_msgs::msg::PolylineTrajectory>()
+          .initial_distance_offset(0.0)
+          .dynamic_constraints_ignorable(false)
+          .base_time(0.0)
+          .closed(false)
+          .shape(
+            traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Polyline>().vertices([]() {
+              std::vector<traffic_simulator_msgs::msg::Vertex> vertices;
+              vertices.emplace_back(
+                traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
+                  .time(1.0)
+                  .position(
+                    geometry_msgs::build<geometry_msgs::msg::Pose>()
+                      .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(1).y(0).z(0))
+                      .orientation(
+                        geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(
+                          1))));
+              vertices.emplace_back(
+                traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
+                  .time(1.0)
+                  .position(
+                    geometry_msgs::build<geometry_msgs::msg::Pose>()
+                      .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(2).y(0).z(0))
+                      .orientation(
+                        geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(
+                          1))));
+              return vertices;
+            }()))));
   }
 };
 }  // namespace cpp_mock_scenarios
