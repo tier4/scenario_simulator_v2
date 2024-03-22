@@ -759,6 +759,13 @@ auto EntityBase::setAcceleration(const geometry_msgs::msg::Accel & accel) -> voi
   status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
 }
 
+auto EntityBase::setLinearJerk(const double linear_jerk) -> void
+{
+  auto new_status = static_cast<EntityStatus>(getStatus());
+  new_status.action_status.linear_jerk = linear_jerk;
+  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
+}
+
 auto EntityBase::setMapPose(const geometry_msgs::msg::Pose &) -> void
 {
   THROW_SEMANTIC_ERROR(

@@ -607,27 +607,6 @@ bool EntityManager::isEgoSpawned() const
   return false;
 }
 
-bool EntityManager::isVehicle(const std::string & name) const
-{
-  using traffic_simulator_msgs::msg::EntityType;
-  return getEntityType(name).type == EntityType::VEHICLE and
-         dynamic_cast<VehicleEntity const *>(entities_.at(name).get());
-}
-
-bool EntityManager::isPedestrian(const std::string & name) const
-{
-  using traffic_simulator_msgs::msg::EntityType;
-  return getEntityType(name).type == EntityType::PEDESTRIAN and
-         dynamic_cast<PedestrianEntity const *>(entities_.at(name).get());
-}
-
-bool EntityManager::isMiscObject(const std::string & name) const
-{
-  using traffic_simulator_msgs::msg::EntityType;
-  return getEntityType(name).type == EntityType::MISC_OBJECT and
-         dynamic_cast<MiscObjectEntity const *>(entities_.at(name).get());
-}
-
 bool EntityManager::isInLanelet(
   const std::string & name, const lanelet::Id lanelet_id, const double tolerance)
 {
@@ -698,15 +677,15 @@ void EntityManager::resetBehaviorPlugin(
   if (is<EgoEntity>(name)) {
     THROW_SEMANTIC_ERROR(
       "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
-  } else if (isMiscObject(name)) {
+  } else if (is<MiscObjectEntity>(name)) {
     THROW_SEMANTIC_ERROR(
       "Entity :", name, "is MiscObjectEntity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
-  } else if (isVehicle(name)) {
+  } else if (is<VehicleEntity>(name)) {
     const auto parameters = getVehicleParameters(name);
     despawnEntity(name);
     spawnEntity<VehicleEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
-  } else if (isPedestrian(name)) {
+  } else if (is<PedestrianEntity>(name)) {
     const auto parameters = getPedestrianParameters(name);
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
@@ -714,6 +693,7 @@ void EntityManager::resetBehaviorPlugin(
     THROW_SIMULATION_ERROR(
       "Entity :", name, "is unkown entity type.", "Please contact to developer.");
   }
+  setLinearJerk(name, status.getLinearJerk());
   setAcceleration(name, status.getAccel());
   setTwist(name, status.getTwist());
   setBehaviorParameter(name, behavior_parameter);
