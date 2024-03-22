@@ -525,6 +525,34 @@ auto DistanceCondition::distance<
     position);
 }
 
+template <>
+auto DistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
+  const EntityRef & triggering_entity) const -> double
+{
+}
+
+template <>
+auto DistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
+  const EntityRef & triggering_entity) const -> double
+{
+}
+
+template <>
+auto DistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
+  const EntityRef & triggering_entity) const -> double
+{
+}
+
+template <>
+auto DistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
+  const EntityRef & triggering_entity) const -> double
+{
+}
+
 auto DistanceCondition::evaluate() -> Object
 {
   results.clear();

@@ -278,6 +278,34 @@ auto RelativeDistanceCondition::distance<
   }
 }
 
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
+  const EntityRef & triggering_entity) -> double
+{
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
+  const EntityRef & triggering_entity) -> double
+{
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
+  const EntityRef & triggering_entity) -> double
+{
+}
+
+template <>
+auto RelativeDistanceCondition::distance<
+  CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
+  const EntityRef & triggering_entity) -> double
+{
+}
+
 #define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)            \
   switch (coordinate_system) {                             \
     case CoordinateSystem::entity:                         \

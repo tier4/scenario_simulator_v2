@@ -123,6 +123,10 @@ template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   R
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           RoutingAlgorithm::undefined, true >(const EntityRef &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      RoutingAlgorithm::undefined, false>(const EntityRef &) -> double;
 template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      RoutingAlgorithm::undefined, true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           RoutingAlgorithm::shortest,  false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::lateral,           RoutingAlgorithm::shortest,  true >(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      RoutingAlgorithm::shortest,  false>(const EntityRef &) -> double;
+template <> auto RelativeDistanceCondition::distance<CoordinateSystem::lane,   RelativeDistanceType::longitudinal,      RoutingAlgorithm::shortest,  true >(const EntityRef &) -> double;
 // clang-format on
 }  // namespace syntax
 }  // namespace openscenario_interpreter
