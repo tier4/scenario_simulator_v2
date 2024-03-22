@@ -283,6 +283,16 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
   const EntityRef & triggering_entity) -> double
 {
+  if (
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
+    return std::abs(static_cast<traffic_simulator::LaneletPose>(
+                      makeNativeBoundingBoxRelativeLanePosition(
+                        triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+                      .offset);
+  } else {
+    return Double::nan();
+  }
 }
 
 template <>
@@ -290,6 +300,16 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
   const EntityRef & triggering_entity) -> double
 {
+  if (
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
+    return std::abs(
+      static_cast<traffic_simulator::LaneletPose>(
+        makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+        .offset);
+  } else {
+    return Double::nan();
+  }
 }
 
 template <>
@@ -297,6 +317,16 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
   const EntityRef & triggering_entity) -> double
 {
+  if (
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
+    return std::abs(static_cast<traffic_simulator::LaneletPose>(
+                      makeNativeBoundingBoxRelativeLanePosition(
+                        triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+                      .s);
+  } else {
+    return Double::nan();
+  }
 }
 
 template <>
@@ -304,6 +334,16 @@ auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
   const EntityRef & triggering_entity) -> double
 {
+  if (
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added and
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
+    return std::abs(
+      static_cast<traffic_simulator::LaneletPose>(
+        makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
+        .s);
+  } else {
+    return Double::nan();
+  }
 }
 
 #define SWITCH_COORDINATE_SYSTEM(FUNCTION, ...)            \
