@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <openscenario_interpreter/type_traits/requires.hpp>
@@ -154,7 +155,9 @@ public:
     }
 
     template <typename From, typename To>
-    static auto makeNativeRelativeLanePosition(const From & from, const To & to)
+    static auto makeNativeRelativeLanePosition(
+      const From & from, const To & to,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
       auto s = [](auto &&... xs) {
         if (const auto result = core->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
@@ -187,7 +190,9 @@ public:
     }
 
     template <typename From, typename To>
-    static auto makeNativeBoundingBoxRelativeLanePosition(const From & from, const To & to)
+    static auto makeNativeBoundingBoxRelativeLanePosition(
+      const From & from, const To & to,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
       auto s = [](auto &&... xs) {
         if (const auto result =
