@@ -840,30 +840,31 @@ auto HdMapUtils::getFollowingLanelets(
   return ret;
 }
 
-auto HdMapUtils::getRoute(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) const
+auto HdMapUtils::getRoute(
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, bool allow_lane_change) const
   -> lanelet::Ids
 {
-  if (route_cache_.exists(from_lanelet_id, to_lanelet_id)) {
-    return route_cache_.getRoute(from_lanelet_id, to_lanelet_id);
+  if (route_cache_.exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {
+    return route_cache_.getRoute(from_lanelet_id, to_lanelet_id, allow_lane_change);
   }
   lanelet::Ids ids;
   const auto lanelet = lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
   const auto to_lanelet = lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
   lanelet::Optional<lanelet::routing::Route> route =
-    vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, false);
+    vehicle_routing_graph_ptr_->getRoute(lanelet, to_lanelet, 0, allow_lane_change);
   if (!route) {
-    route_cache_.appendData(from_lanelet_id, to_lanelet_id, ids);
+    route_cache_.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
     return ids;
   }
   lanelet::routing::LaneletPath shortest_path = route->shortestPath();
   if (shortest_path.empty()) {
-    route_cache_.appendData(from_lanelet_id, to_lanelet_id, ids);
+    route_cache_.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
     return ids;
   }
   for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
     ids.push_back(lane_itr->id());
   }
-  route_cache_.appendData(from_lanelet_id, to_lanelet_id, ids);
+  route_cache_.appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
   return ids;
 }
 

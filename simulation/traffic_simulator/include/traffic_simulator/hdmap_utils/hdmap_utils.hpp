@@ -223,7 +223,8 @@ public:
 
   auto getRightOfWayLaneletIds(const lanelet::Id) const -> lanelet::Ids;
 
-  auto getRoute(const lanelet::Id from, const lanelet::Id to) const -> lanelet::Ids;
+  auto getRoute(const lanelet::Id from, const lanelet::Id to, bool allow_lane_change = false) const
+    -> lanelet::Ids;
 
   auto getSpeedLimit(const lanelet::Ids &) const -> double;
 
