@@ -807,8 +807,6 @@ void EntityBase::activateOutOfRangeJob(
     [this]() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
 }
 
-auto EntityBase::setVelocityLimit(double) -> void {}
-
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 
 void EntityBase::stopAtCurrentPosition()
