@@ -465,7 +465,7 @@ public:
   template <typename EntityType>
   bool is(const std::string & name) const
   {
-    return dynamic_cast<EntityType const *>(entities_.at(name).get());
+    return dynamic_cast<EntityType const *>(entities_.at(name).get()) != nullptr;
   }
 
   bool isEgoSpawned() const;
