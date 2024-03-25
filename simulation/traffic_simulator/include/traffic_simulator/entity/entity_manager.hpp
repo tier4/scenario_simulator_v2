@@ -420,7 +420,7 @@ public:
     -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
 
   auto getPedestrianParameters(const std::string & name) const
-    -> traffic_simulator_msgs::msg::PedestrianParameters;
+    -> const traffic_simulator_msgs::msg::PedestrianParameters &;
 
   // clang-format off
   auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
@@ -436,7 +436,7 @@ public:
   auto getStepTime() const noexcept -> double;
 
   auto getVehicleParameters(const std::string & name) const
-    -> traffic_simulator_msgs::msg::VehicleParameters;
+    -> const traffic_simulator_msgs::msg::VehicleParameters &;
 
   auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
 
