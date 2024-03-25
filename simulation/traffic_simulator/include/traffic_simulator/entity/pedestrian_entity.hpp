@@ -53,7 +53,7 @@ public:
       return name;
     }
 
-    static auto defaultBehavior() noexcept -> const std::string & { return behaviorTree(); }
+    static auto defaultBehavior() noexcept -> const std::string & { return doNothing(); }
   };
 
   explicit PedestrianEntity(

@@ -56,7 +56,7 @@ public:
       return name;
     }
 
-    static auto defaultBehavior() -> const std::string & { return behaviorTree(); }
+    static auto defaultBehavior() -> const std::string & { return doNothing(); }
   };
 
   explicit VehicleEntity(
