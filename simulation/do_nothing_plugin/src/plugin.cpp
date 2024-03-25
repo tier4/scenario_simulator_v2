@@ -38,7 +38,7 @@ void DoNothingBehavior::checkPolylineTrajectory()
     if (trajectory->closed) {
       THROW_SIMULATION_ERROR("Currentry, closed trajectory does not supported.");
     }
-    if (trajectory->dynamic_constraints_ignorable) {
+    if (!trajectory->dynamic_constraints_ignorable) {
       THROW_SIMULATION_ERROR(
         "Currentry, dynamic_constraints_ignorable = true (in OpenSCENARIO, followingMode = "
         "follow) does not support in DoNothingBehavior.");
