@@ -514,7 +514,7 @@ auto EntityManager::getObstacle(const std::string & name)
 }
 
 auto EntityManager::getPedestrianParameters(const std::string & name) const
-  -> traffic_simulator_msgs::msg::PedestrianParameters
+  -> const traffic_simulator_msgs::msg::PedestrianParameters &
 {
   if (const auto entity = dynamic_cast<PedestrianEntity const *>(entities_.at(name).get())) {
     return entity->pedestrian_parameters;
@@ -578,7 +578,7 @@ auto EntityManager::getRelativePose(
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
 auto EntityManager::getVehicleParameters(const std::string & name) const
-  -> traffic_simulator_msgs::msg::VehicleParameters
+  -> const traffic_simulator_msgs::msg::VehicleParameters &
 {
   if (const auto vehicle = dynamic_cast<VehicleEntity const *>(entities_.at(name).get())) {
     return vehicle->vehicle_parameters;
