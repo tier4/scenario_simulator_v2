@@ -2,6 +2,26 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.8.0 (2024-03-25)
+------------------
+* Merge pull request `#1201 <https://github.com/tier4/scenario_simulator_v2/issues/1201>`_ from tier4/feature/set_behavior_parameter_in_object_controller
+  Feature/set behavior parameter in object controller
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
+* remove debug line
+* fix default value
+* apply reformat
+* enable set behavior parameters
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+1.7.1 (2024-03-21)
+------------------
+
+1.7.0 (2024-03-21)
+------------------
+
+1.6.1 (2024-03-19)
+------------------
+
 1.6.0 (2024-03-14)
 ------------------
 

@@ -91,6 +91,7 @@ public:
   {
     THROW_SEMANTIC_ERROR("getVehicleParameters function cannot be used in PedestrianEntity");
   }
+  void setVelocityLimit(double linear_velocity) override;
 
   void setAccelerationLimit(double acceleration) override;
 

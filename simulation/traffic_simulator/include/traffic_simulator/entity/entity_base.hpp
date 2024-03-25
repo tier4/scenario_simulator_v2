@@ -224,7 +224,7 @@ public:
     double min_velocity, double max_velocity, double min_acceleration, double max_acceleration,
     double min_jerk, double max_jerk) -> void;
 
-  virtual auto setVelocityLimit(double) -> void;
+  virtual auto setVelocityLimit(double) -> void = 0;
 
   virtual auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void;
 

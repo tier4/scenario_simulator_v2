@@ -109,6 +109,8 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
+  void setVelocityLimit(double) override{};
+
   void setAccelerationLimit(double) override {}
 
   void setAccelerationRateLimit(double) override {}

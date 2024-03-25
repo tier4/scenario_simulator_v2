@@ -274,9 +274,19 @@ void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Para
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }
 
+void VehicleEntity::setVelocityLimit(double linear_velocity)
+{
+  if (linear_velocity < 0.0) {
+    THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
+  }
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.dynamic_constraints.max_speed = linear_velocity;
+  setBehaviorParameter(behavior_parameter);
+}
+
 void VehicleEntity::setAccelerationLimit(double acceleration)
 {
-  if (acceleration <= 0.0) {
+  if (acceleration < 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration limit must be greater than or equal to zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -286,7 +296,7 @@ void VehicleEntity::setAccelerationLimit(double acceleration)
 
 void VehicleEntity::setAccelerationRateLimit(double acceleration_rate)
 {
-  if (acceleration_rate <= 0.0) {
+  if (acceleration_rate < 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration rate limit must be greater than or equal to zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -296,7 +306,7 @@ void VehicleEntity::setAccelerationRateLimit(double acceleration_rate)
 
 void VehicleEntity::setDecelerationLimit(double deceleration)
 {
-  if (deceleration <= 0.0) {
+  if (deceleration < 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration limit must be greater than or equal to zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -306,7 +316,7 @@ void VehicleEntity::setDecelerationLimit(double deceleration)
 
 void VehicleEntity::setDecelerationRateLimit(double deceleration_rate)
 {
-  if (deceleration_rate <= 0.0) {
+  if (deceleration_rate < 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration rate limit must be greater than or equal to zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
