@@ -2,6 +2,18 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.8.0 (2024-03-25)
+------------------
+* Merge pull request `#1201 <https://github.com/tier4/scenario_simulator_v2/issues/1201>`_ from tier4/feature/set_behavior_parameter_in_object_controller
+  Feature/set behavior parameter in object controller
+* change <= to <
+* add todo comment
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
+* add setVelocityLimit function
+* fix rviz
+* add test scenario
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
 1.7.1 (2024-03-21)
 ------------------
 
