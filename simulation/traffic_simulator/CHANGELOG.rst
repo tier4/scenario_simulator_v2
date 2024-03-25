@@ -2,6 +2,15 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.7.1 (2024-03-21)
+------------------
+
+1.7.0 (2024-03-21)
+------------------
+
+1.6.1 (2024-03-19)
+------------------
+
 1.6.0 (2024-03-14)
 ------------------
 * Merge pull request `#1208 <https://github.com/tier4/scenario_simulator_v2/issues/1208>`_ from tier4/fix/lanelet-matching-distance
