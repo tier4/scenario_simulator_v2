@@ -22,7 +22,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   RoutingAlgorithm (OpenSCENARIO 1.2)
+   RoutingAlgorithm (OpenSCENARIO XML 1.3)
 
    Algorithm for path selection/calculation between two positions across roads.
    To be used for distance calculations in road/lane coordinates during runtime.

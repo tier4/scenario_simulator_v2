@@ -32,7 +32,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   DistanceCondition (OpenSCENARIO 1.2)
+   DistanceCondition (OpenSCENARIO XML 1.3)
 
    The current distance between an entity and a position is compared to a given
    distance (less, greater, equal). Several additional parameters like free

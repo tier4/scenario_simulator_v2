@@ -30,7 +30,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   RelativeDistanceCondition (OpenSCENARIO 1.2)
+   RelativeDistanceCondition (OpenSCENARIO XML 1.3)
 
    The current relative distance of a triggering entity/entities to a reference
    entity is compared to a given value. The logical operator used for comparison
