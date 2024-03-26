@@ -1447,7 +1447,8 @@ auto HdMapUtils::getLateralDistance(
 
 auto HdMapUtils::getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>
+  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change) const
+  -> std::optional<double>
 {
   if (from.lanelet_id == to.lanelet_id) {
     if (from.s > to.s) {
@@ -1456,7 +1457,7 @@ auto HdMapUtils::getLongitudinalDistance(
       return to.s - from.s;
     }
   }
-  const auto route = getRoute(from.lanelet_id, to.lanelet_id);
+  const auto route = getRoute(from.lanelet_id, to.lanelet_id, allow_lane_change);
   if (route.empty()) {
     return std::nullopt;
   }
