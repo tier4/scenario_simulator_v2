@@ -48,6 +48,72 @@ bool API::despawnEntities()
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
 
+void API::respawn(
+  const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
+  const geometry_msgs::msg::PoseStamped & goal_pose)
+{
+  if (not entity_manager_ptr_->isEgo(name)) {
+    throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
+  }
+
+  if (new_pose.header.frame_id != "map") {
+    throw std::runtime_error("Respawn request with frame id other than map not supported.");
+  }
+
+  setEntityStatus(name, new_pose.pose.pose, helper::constructActionStatus());
+
+  simulation_api_schema::UpdateEntityStatusRequest req;
+  req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
+  simulation_interface::toProto(
+    static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name)), *req.add_status());
+  req.set_overwrite_ego_status(entity_manager_ptr_->isEgo(name));
+
+  auto res = zeromq_client_.call(req);
+
+  if (not res.result().success()) {
+    throw common::SimulationError(
+      "UpdateEntityStatus request failed for " + name + " entity during respawn.");
+  }
+
+  auto res_status = res.status().begin();
+
+  if (res_status == res.status().end()) {
+    throw common::SimulationError(
+      "Failed to receive the new status of " + name + " entity after the update request.");
+  }
+
+  auto entity_name = res_status->name();
+
+  if (entity_name != name) {
+    throw common::SimulationError(
+      "Wrong entity status received during respawn. Expected: " + name +
+      ". Received: " + entity_name + ".");
+  }
+
+  auto entity_status = static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(entity_name));
+  simulation_interface::toMsg(res_status->pose(), entity_status.pose);
+  simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
+
+  if (entity_manager_ptr_->isEgo(entity_name)) {
+    setMapPose(entity_name, entity_status.pose);
+    setTwist(entity_name, entity_status.action_status.twist);
+    setAcceleration(entity_name, entity_status.action_status.accel);
+  } else {
+    setEntityStatus(entity_name, canonicalize(entity_status));
+  }
+
+  entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
+  entity_manager_ptr_->asFieldOperatorApplication(name).plan(
+    std::vector<geometry_msgs::msg::PoseStamped>{goal_pose});
+
+  while (!entity_manager_ptr_->asFieldOperatorApplication(name).engageable()) {
+    entity_manager_ptr_->asFieldOperatorApplication(name).spinSome();
+    std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
+  }
+
+  entity_manager_ptr_->asFieldOperatorApplication(name).engage();
+}
+
 auto API::setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status)
   -> void
 {

@@ -347,6 +347,15 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::plan(
   });
 }
 
+auto FieldOperatorApplicationFor<AutowareUniverse>::clearRoute() -> void
+{
+  task_queue.delay([this] {
+    auto request = std::make_shared<autoware_adapi_v1_msgs::srv::ClearRoute::Request>();
+
+    requestClearRoute(request);
+  });
+}
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::engage() -> void
 {
   task_queue.delay([this]() {
