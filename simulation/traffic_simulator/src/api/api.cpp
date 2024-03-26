@@ -331,6 +331,7 @@ void API::addTrafficSource(
       traffic_simulator_msgs::msg::VehicleParameters,
       traffic_simulator_msgs::msg::PedestrianParameters>,
     double>> & params_with_weights,
+  const bool allow_spawn_outside_lane, const bool random_orientation,
   std::optional<int> random_seed)
 {
 #define MAKE_SPAWN_LAMBDA(PARAMS)                                                           \
@@ -342,6 +343,9 @@ void API::addTrafficSource(
   }
 
   traffic_simulator::traffic::TrafficSource::Configuration config;
+  config.allow_spawn_outside_lane = allow_spawn_outside_lane;
+  config.use_random_orientation = random_orientation;
+
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
     radius, rate, speed, position, params_with_weights, random_seed,
     MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters),

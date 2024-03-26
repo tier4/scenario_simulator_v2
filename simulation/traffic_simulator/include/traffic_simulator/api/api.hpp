@@ -299,6 +299,7 @@ public:
         traffic_simulator_msgs::msg::VehicleParameters,
         traffic_simulator_msgs::msg::PedestrianParameters>,
       double>> & params_with_weights,
+    const bool allow_spawn_outside_lane = false, const bool random_orientation = false,
     std::optional<int> random_seed = std::nullopt);
 
   // clang-format off
