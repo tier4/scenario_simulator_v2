@@ -26,7 +26,7 @@ namespace traffic
 {
 TrafficSource::TrafficSource(
   const double radius, const double rate, const double speed,
-  const geometry_msgs::msg::Point & position,
+  const geometry_msgs::msg::Pose & position,
   const std::vector<std::pair<std::variant<VehicleParams, PedestrianParams>, double>> & params,
   const std::optional<int> random_seed,
   const std::function<void(
@@ -39,16 +39,17 @@ TrafficSource::TrafficSource(
 : radius_(radius),
   rate_(rate),
   speed_(speed),
-  position_(position),
+  source_pose_(position),
   source_id_(next_source_id_++),
   vehicle_spawn_function_(vehicle_spawn_function),
   pedestrian_spawn_function_(pedestrian_spawn_function),
   hdmap_utils_(hdmap_utils),
   spawnable_lanelets_(hdmap_utils->getNearbyLaneletIds(
-    position, radius, false, static_cast<std::size_t>(spawnable_lanes_limit))),
+    position.position, radius, false, static_cast<std::size_t>(spawnable_lanes_limit))),
   id_distribution_(0, spawnable_lanelets_.size() - 1),
   angle_distribution_(0.0, M_PI * 2.0),
   radius_distribution_(0.0, radius_),
+  start_execution_time_(configuration.start_time),
   config_(configuration)
 {
   std::transform(
@@ -84,7 +85,7 @@ auto TrafficSource::getRandomPose(const bool random_orientation) -> geometry_msg
 
   geometry_msgs::msg::Pose pose;
   /// @todo add orientation from TrafficSource orientation when it will have orientation
-  pose.position = position_;
+  pose = source_pose_;
   pose.position.x += radius * std::cos(angle);
   pose.position.y += radius * std::sin(angle);
 
@@ -125,8 +126,8 @@ auto TrafficSource::convertToPoseInArea(
   -> std::optional<geometry_msgs::msg::Pose>
 {
   const auto map_pose = hdmap_utils_->toMapPose(lanelet_pose).pose;
-  const double distance2D =
-    std::hypot(map_pose.position.x - position_.x, map_pose.position.y - position_.y);
+  const double distance2D = std::hypot(
+    map_pose.position.x - source_pose_.position.x, map_pose.position.y - source_pose_.position.y);
   if (distance2D <= radius_) {
     return map_pose;
   }
@@ -141,10 +142,11 @@ auto TrafficSource::getNewEntityName() -> std::string
 void TrafficSource::execute(
   [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time)
 {
-  if (current_time - last_spawn_time_ < 1.0 / rate_) {
+  /// @note For now this mechanism allows for the spawn rate to be as high as the rate at which this function is called
+  if (current_time - start_execution_time_ < 1.0 / rate_ * spawn_count_) {
     return;
   }
-  last_spawn_time_ = current_time;
+  ++spawn_count_;
 
   randomParams();
   if (isPedestrian(*current_params_)) {
@@ -180,6 +182,8 @@ auto TrafficSource::isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool
       return true;
     }
     /// @todo enable footprint fitting
+    /// idea: precalculate unified lanelet for the traffic source at the beginning
+    THROW_SPECIFICATION_VIOLATION("TrafficSource footprint validation is not supported");
   }
   return false;
 }
@@ -187,7 +191,7 @@ auto TrafficSource::isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool
 auto TrafficSource::getValidRandomPose() -> geometry_msgs::msg::Pose
 {
   for (int tries = 0; tries < max_randomization_attempts; ++tries) {
-    const auto candidate_pose = getRandomPose();
+    const auto candidate_pose = getRandomPose(config_.use_random_orientation);
     if (isPoseValid(candidate_pose)) {
       return candidate_pose;
     }

@@ -325,7 +325,7 @@ void API::requestLaneChange(
 
 void API::addTrafficSource(
   const double radius, const double rate, const double speed,
-  const geometry_msgs::msg::Point & point,
+  const geometry_msgs::msg::Pose & position,
   const std::vector<std::pair<
     std::variant<
       traffic_simulator_msgs::msg::VehicleParameters,
@@ -340,11 +340,12 @@ void API::addTrafficSource(
     spawn(name, pose, params);                                                              \
     setEntityStatus(name, pose, helper::constructActionStatus(speed));                      \
   }
+
+  traffic_simulator::traffic::TrafficSource::Configuration config;
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
-    radius, rate, speed, point, params_with_weights, random_seed,
+    radius, rate, speed, position, params_with_weights, random_seed,
     MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters),
-    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters),
-    traffic_simulator::traffic::TrafficSource::Configuration(),
+    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters), config,
     entity_manager_ptr_->getHdmapUtils());
 #undef MAKE_SPAWN_LAMBDA
 }

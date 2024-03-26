@@ -41,10 +41,12 @@ public:
       require_footprint_fitting(require_footprint_fitting){};
     bool allow_spawn_outside_lane = false;
     bool require_footprint_fitting = false;
+    bool use_random_orientation = false;
+    double start_time = 0.0;
   };
   explicit TrafficSource(
     const double radius, const double rate, const double speed,
-    const geometry_msgs::msg::Point & position,
+    const geometry_msgs::msg::Pose & position,
     const std::vector<std::pair<std::variant<VehicleParams, PedestrianParams>, double>> & params,
     const std::optional<int> random_seed,
     const std::function<void(
@@ -57,7 +59,7 @@ public:
   const double radius_;
   const double rate_;
   const double speed_;
-  const geometry_msgs::msg::Point position_;
+  const geometry_msgs::msg::Pose source_pose_;
   void execute(const double current_time, const double step_time) override;
 
 private:
@@ -93,7 +95,8 @@ private:
   std::uniform_real_distribution<double> radius_distribution_;
   std::discrete_distribution<> params_distribution_;
   unsigned int entity_id_ = 0u;
-  double last_spawn_time_ = 0.0;
+  const double start_execution_time_ = 0.0;
+  unsigned int spawn_count_ = 0u;
   const Configuration config_;
   std::vector<std::variant<VehicleParams, PedestrianParams>> params_;
   std::vector<std::variant<VehicleParams, PedestrianParams>>::iterator current_params_;

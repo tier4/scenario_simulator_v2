@@ -293,7 +293,7 @@ public:
    */
   void addTrafficSource(
     const double radius, const double rate, const double speed,
-    const geometry_msgs::msg::Point & point,
+    const geometry_msgs::msg::Pose & position,
     const std::vector<std::pair<
       std::variant<
         traffic_simulator_msgs::msg::VehicleParameters,
