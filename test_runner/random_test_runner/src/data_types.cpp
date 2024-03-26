@@ -20,8 +20,8 @@ SimulatorType simulatorTypeFromString(const std::string & simulator_type_str)
 {
   if (simulator_type_str == "simple_sensor_simulator") {
     return SimulatorType::SIMPLE_SENSOR_SIMULATOR;
-  } else if (simulator_type_str == "unity") {
-    return SimulatorType::UNITY;
+  } else if (simulator_type_str == "awsim") {
+    return SimulatorType::AWSIM;
   }
   throw std::runtime_error(
     fmt::format("Failed to convert {} to simulation type", simulator_type_str));

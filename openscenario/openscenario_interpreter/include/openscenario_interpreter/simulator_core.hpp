@@ -326,6 +326,17 @@ public:
       core->setBehaviorParameter(entity_ref, [&]() {
         auto message = core->getBehaviorParameter(entity_ref);
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
+        /// The default values written in https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
+        message.dynamic_constraints.max_acceleration =
+          controller.properties.template get<Double>("maxAcceleration", 10.0);
+        message.dynamic_constraints.max_acceleration_rate =
+          controller.properties.template get<Double>("maxAccelerationRate", 3.0);
+        message.dynamic_constraints.max_deceleration =
+          controller.properties.template get<Double>("maxDeceleration", 10.0);
+        message.dynamic_constraints.max_deceleration_rate =
+          controller.properties.template get<Double>("maxDecelerationRate", 3.0);
+        message.dynamic_constraints.max_speed =
+          controller.properties.template get<Double>("maxSpeed", 50.0);
         return message;
       }());
 

@@ -2,6 +2,11 @@
 Changelog for package openscenario_experimental_catalog
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.8.0 (2024-03-25)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
+* Contributors: Masaya Kataoka
+
 1.7.1 (2024-03-21)
 ------------------
 

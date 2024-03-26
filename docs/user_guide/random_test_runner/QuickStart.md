@@ -4,31 +4,27 @@ Random test runner allows running randomly generated scenarios to test Autoware 
 
 ## How to build
 
-1. Clone the Autoware Core/Universe repository:
+1. Clone the Autoware Core/Universe repository and move to the directory:
    ```bash
    git clone git@github.com:autowarefoundation/autoware.git
-   ```
-2. Navigate to the source directory:
-   ```bash
    cd autoware 
-   mkdir src 
    ```
-3. Import Autoware and Simulator dependencies:
+2. Import Autoware and Simulator dependencies:
    ```bash
+   mkdir src
    vcs import src < autoware.repos  
    vcs import src < simulator.repos
    ```
-4. Install dependencies for Autoware Core/Universe
+3. Install dependencies for Autoware Core/Universe
    ```bash
    ./setup-dev-env.sh
    ``` 
-
-5. Install dependent ROS packages.
+4. Install dependent ROS packages.
    ```bash
    source /opt/ros/humble/setup.bash
    rosdep install -iry --from-paths src --rosdistro $ROS_DISTRO
    ```
-6. Build the workspace.
+5. Build the workspace.
    ```bash
    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
    ```
@@ -81,30 +77,63 @@ Random test runner will load `result.yaml` file and rerun test.
 
 ## Running with unity
 
-TBD
+### Autoware build update
 
-[//]: # (Instruction is based on `kashiwanoha_map` Unity project but can be applied to any other projects supporting [`ZeroMQ` interface]&#40;https://tier4.github.io/scenario_simulator_v2-docs/design/ZeroMQ/&#41;. )
+1. Clone RobotecAI's Autoware and move to the directory
+   ```bash
+   git clone git@github.com:RobotecAI/autoware-1.git
+   cd autoware-1
+   ```
+2. Checkout the `awsim-ss2-stable` branch
+   ```bash
+   git checkout awsim-ss2-stable
+   ```
+3. Import Autoware and Simulator dependencies:
+   ```bash
+   mkdir src
+   vcs import src < autoware.repos  
+   vcs import src < simulator.repos
+   ```
+4. Install dependencies for Autoware Core/Universe
+   ```bash
+   ./setup-dev-env.sh
+   ``` 
+5. Install dependent ROS packages.
+   ```bash
+   source /opt/ros/humble/setup.bash
+   rosdep install -iry --from-paths src --rosdistro $ROS_DISTRO
+   ```
+6. Download and extract [shinjuku_map.zip](https://github.com/tier4/AWSIM/releases/download/v1.2.0/shinjuku_map.zip) archive
+   ```bash
+   unzip <Download directory>/shinjuku_map.zip -d src/simulator
+   ```
+7. Build the solution
+   ```bash
+   colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+   ```
+   
+### Preparing Unity project
 
-[//]: # ()
-[//]: # (To run `random_test_runner` with Unity Kashiwanoha project: )
+ Follow [Setup Unity Project tutorial](https://tier4.github.io/AWSIM/GettingStarted/SetupUnityProject/)
 
-[//]: # (1. Clone and run [Kashiwanoha project]&#40;https://gitlab.com/robotec.ai/tieriv/kashiwanoha&#41;.)
+### Running the demo
 
-[//]: # (2. Make sure that package name in `map_name` parameter is `kashiwanoha_map`. For projects other than Kashiwanoha, make sure to change it to correct package name.  )
+1. Open AutowareSimulationScenarioSimulator.unity scene placed under `Assets/AWSIM/Scenes/Main` directory
+2. Run the simulation by clicking `Play` button placed at the top section of Editor.
+3. Launch `random_test_runner`.
 
-[//]: # (3. Execute `random_test_runner` launch with `simulator_type` parameter:)
+```bash
+ros2 launch random_test_runner random_test.launch.py map_name:=shinjuku_map simulator_type:=awsim \
+npc_count:=5 initialize_duration:=260 sensor_model:=awsim_sensor_kit  vehicle_model:=sample_vehicle  \
+autoware_launch_file:=e2e_simulator.launch.xml autoware_architecture:="awf/universe/20230906"
+```
 
-[//]: # (```shell)
+![Random test runner launched](img/random_test_runner_awsim.png)
 
-[//]: # (ros2 launch random_test_runner random_test.launch.py simulator_type:="unity")
+### Known issues
+- Due to misalignment of lanelet and some parts of the AWSIM environment, Ego entity is being spawned below the terrain.
+The misalignment will be fixed in a future version of the package.
 
-[//]: # (```)
-
-[//]: # (|  NOTE: Since currently unity integration does not support ego vehicle, `random_test_runner` does not spawn it. |)
-
-[//]: # (|----------------------------------------------------------------------------------------------------------------|)
-
-[//]: # ()
-[//]: # (|  NOTE: Kashiwanoha project is only supported on ROS 2 `galactic` but simulation interfaces are distribution-independent and random tests can be executed safely on `foxy` |)
-
-[//]: # (|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|)
+- when the `npc_count` is too big the NPCs start to slide sideways and the localization does not work properly.
+Reasons are yet unknown and more investigation should be conducted. It was determined that the working number of
+NPCs is 5
