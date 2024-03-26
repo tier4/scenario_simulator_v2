@@ -78,11 +78,11 @@ private:
   inline static unsigned int next_source_id_ = 0u;
   const unsigned int source_id_;
   const std::function<void(
-    const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)> &
+    const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)>
     vehicle_spawn_function_;
   const std::function<void(
-    const std::string &, const geometry_msgs::msg::Pose &, const PedestrianParams &,
-    const double)> & pedestrian_spawn_function_;
+    const std::string &, const geometry_msgs::msg::Pose &, const PedestrianParams &, const double)>
+    pedestrian_spawn_function_;
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   lanelet::Ids spawnable_lanelets_;
