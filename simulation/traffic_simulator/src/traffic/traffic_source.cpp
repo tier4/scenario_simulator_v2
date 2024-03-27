@@ -159,7 +159,7 @@ void TrafficSource::execute(
   }
 }
 
-auto TrafficSource::randomParams() -> void
+auto TrafficSource::randomizeParams() -> void
 {
   const auto current_params_idx = params_distribution_(engine_);
   current_params_ = std::next(params_.begin(), current_params_idx);

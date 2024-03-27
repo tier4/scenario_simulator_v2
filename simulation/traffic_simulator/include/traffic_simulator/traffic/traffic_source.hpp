@@ -75,7 +75,7 @@ private:
   auto getValidRandomPose() -> geometry_msgs::msg::Pose;
   auto getRandomLaneletId() -> lanelet::Id;
   auto getRandomSValue(const lanelet::Id lanelet_id) -> double;
-  auto randomParams() -> void;
+  auto randomizeParams() -> void;
 
   inline static unsigned int next_source_id_ = 0u;
   const unsigned int source_id_;
