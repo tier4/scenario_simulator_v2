@@ -2,6 +2,24 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.9.0 (2024-03-27)
+------------------
+* Merge pull request `#1155 <https://github.com/tier4/scenario_simulator_v2/issues/1155>`_ from RobotecAI/random-test-runner-AWSIM
+  Random test runner AWSIM support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Test fixes
+* Merge remote-tracking branch 'origin/master' into HEAD
+* dosc update, ego position randomized again
+* clang format
+* awsim parameter; correct way to not run sss
+* test timeout as parameter
+* timeout time extracted as a test executor parameter
+* launch update
+* working
+* Merge remote-tracking branch 'origin/master' into random-test-runner-docs-update
+* Contributors: Masaya Kataoka, Paweł Lech, Piotr Zyskowski
+
 1.8.0 (2024-03-25)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
