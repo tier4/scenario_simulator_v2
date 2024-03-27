@@ -76,7 +76,7 @@ OpenSCENARIO:
                                   conditionEdge: none
                                   ByValueCondition:
                                     SimulationTimeCondition:
-                                      value: 5
+                                      value: 1
                                       rule: greaterThan
                       - name: failure
                         priority: parallel
@@ -102,8 +102,8 @@ OpenSCENARIO:
                                         freespace: false
                                         relativeDistanceType: longitudinal
                                         routingAlgorithm: shortest
-                                        rule: greaterThan
-                                        value: 100
+                                        rule: notEqualTo
+                                        value: 116.06950065051282
                                         Position: &POSITION_1
                                           LanePosition:
                                             roadId: ""
@@ -130,8 +130,8 @@ OpenSCENARIO:
                                         freespace: false
                                         relativeDistanceType: lateral
                                         routingAlgorithm: shortest
-                                        rule: lessThan
-                                        value: 3
+                                        rule: notEqualTo
+                                        value: 3.021089007161695
                                         Position: *POSITION_1
             StartTrigger:
               ConditionGroup:
