@@ -1496,13 +1496,56 @@ auto HdMapUtils::getLongitudinalDistance(
     return std::nullopt;
   }
   double distance = 0;
-  for (const auto lanelet_id : route) {
-    if (lanelet_id == from.lanelet_id) {
-      distance = getLaneletLength(from.lanelet_id) - from.s;
-    } else if (lanelet_id == to.lanelet_id) {
-      distance = distance + to.s;
+
+  auto with_lane_change = [this](
+                            const bool allow_lane_change, const lanelet::Id current_lanelet,
+                            const lanelet::Id next_lanelet) -> bool {
+    if (allow_lane_change) {
+      auto next_lanelet_ids = getNextLaneletIds(current_lanelet);
+      auto next_lanelet_itr = std::find_if(
+        next_lanelet_ids.begin(), next_lanelet_ids.end(),
+        [next_lanelet](const lanelet::Id & id) { return id == next_lanelet; });
+      return next_lanelet_itr == next_lanelet_ids.end();
     } else {
-      distance = distance + getLaneletLength(lanelet_id);
+      return false;
+    }
+  };
+  for (unsigned int i = 0; i < route.size(); i++) {
+    if (i < route.size() - 1 && with_lane_change(allow_lane_change, route[i], route[i + 1])) {
+      if (route[i] == from.lanelet_id) {
+        distance = getLaneletLength(from.lanelet_id) - from.s;
+      }
+
+      traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
+      next_lanelet_pose.lanelet_id = route[i + 1];
+      next_lanelet_pose.s = 0.0;
+      next_lanelet_pose.offset = 0.0;
+
+      if (
+        auto next_lanelet_origin_from_current_lanelet =
+          toLaneletPose(toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
+        distance +=
+          (next_lanelet_origin_from_current_lanelet->s - getLaneletLength(route[i]));
+      } else {
+        traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
+        current_lanelet_pose.lanelet_id = route[i];
+        if (
+          auto current_lanelet_origin_from_next_lanelet =
+            toLaneletPose(toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
+          distance +=
+            (-current_lanelet_origin_from_next_lanelet->s - getLaneletLength(route[i]));
+        } else {
+          return std::nullopt;
+        }
+      }
+    } else {
+      if (route[i] == from.lanelet_id) {
+        distance = getLaneletLength(from.lanelet_id) - from.s;
+      } else if (route[i] == to.lanelet_id) {
+        distance = distance + to.s;
+      } else {
+        distance = distance + getLaneletLength(route[i]);
+      }
     }
   }
   return distance;
