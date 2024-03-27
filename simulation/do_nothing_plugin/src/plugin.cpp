@@ -36,16 +36,16 @@ void DoNothingBehavior::checkPolylineTrajectory()
 {
   if (const auto trajectory = getPolylineTrajectory()) {
     if (trajectory->closed) {
-      THROW_SIMULATION_ERROR("Currentry, closed trajectory does not supported.");
+      THROW_SIMULATION_ERROR("Currently, closed trajectory does not supported.");
     }
     if (!trajectory->dynamic_constraints_ignorable) {
       THROW_SIMULATION_ERROR(
-        "Currentry, dynamic_constraints_ignorable = true (in OpenSCENARIO, followingMode = "
+        "Currently, dynamic_constraints_ignorable = true (in OpenSCENARIO, followingMode = "
         "follow) does not support in DoNothingBehavior.");
     }
     if (std::abs(trajectory->initial_distance_offset) > std::numeric_limits<double>::epsilon()) {
       THROW_SIMULATION_ERROR(
-        "Currentry, initial_distance_offset should be 0 when following trajectory in "
+        "Currently, initial_distance_offset should be 0 when following trajectory in "
         "DoNothingBehavior.",
         "You specified : ", trajectory->initial_distance_offset);
     }
