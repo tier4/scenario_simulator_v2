@@ -148,7 +148,7 @@ void TrafficSource::execute(
   }
   ++spawn_count_;
 
-  randomParams();
+  randomizeParams();
   if (isPedestrian(*current_params_)) {
     pedestrian_spawn_function_(
       getNewEntityName(), getValidRandomPose(), std::get<PedestrianParams>(*current_params_),
