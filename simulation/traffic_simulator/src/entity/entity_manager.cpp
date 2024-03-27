@@ -292,82 +292,86 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
 }
 
 auto EntityManager::getLateralDistance(
-  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to) const
-  -> std::optional<double>
+  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  bool allow_lane_change) const -> std::optional<double>
 {
   return hdmap_utils_ptr_->getLateralDistance(
-    static_cast<LaneletPose>(from), static_cast<LaneletPose>(to));
+    static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), allow_lane_change);
 }
 
 auto EntityManager::getLateralDistance(
-  const CanonicalizedLaneletPose & from, const std::string & to) const -> std::optional<double>
+  const CanonicalizedLaneletPose & from, const std::string & to, bool allow_lane_change) const
+  -> std::optional<double>
 {
   if (const auto to_pose = getLaneletPose(to)) {
-    return getLateralDistance(from, to_pose.value());
+    return getLateralDistance(from, to_pose.value(), allow_lane_change);
   }
   return std::nullopt;
 }
 
 auto EntityManager::getLateralDistance(
-  const std::string & from, const CanonicalizedLaneletPose & to) const -> std::optional<double>
+  const std::string & from, const CanonicalizedLaneletPose & to, bool allow_lane_change) const
+  -> std::optional<double>
 {
   if (const auto from_pose = getLaneletPose(from)) {
-    return getLateralDistance(from_pose.value(), to);
+    return getLateralDistance(from_pose.value(), to, allow_lane_change);
   }
   return std::nullopt;
 }
 
-auto EntityManager::getLateralDistance(const std::string & from, const std::string & to) const
+auto EntityManager::getLateralDistance(
+  const std::string & from, const std::string & to, bool allow_lane_change) const
   -> std::optional<double>
 {
   const auto from_pose = getLaneletPose(from);
   const auto to_pose = getLaneletPose(to);
   if (from_pose && to_pose) {
-    return getLateralDistance(from_pose.value(), to_pose.value());
+    return getLateralDistance(from_pose.value(), to_pose.value(), allow_lane_change);
   }
   return std::nullopt;
 }
 
 auto EntityManager::getLateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  double matching_distance) const -> std::optional<double>
+  double matching_distance, bool allow_lane_change) const -> std::optional<double>
 {
   if (
     std::abs(static_cast<LaneletPose>(from).offset) <= matching_distance &&
     std::abs(static_cast<LaneletPose>(to).offset) <= matching_distance) {
-    return getLateralDistance(from, to);
+    return getLateralDistance(from, to, allow_lane_change);
   }
   return std::nullopt;
 }
 
 auto EntityManager::getLateralDistance(
-  const CanonicalizedLaneletPose & from, const std::string & to, double matching_distance) const
-  -> std::optional<double>
+  const CanonicalizedLaneletPose & from, const std::string & to, double matching_distance,
+  bool allow_lane_change) const -> std::optional<double>
 {
   if (const auto to_pose = getLaneletPose(to, matching_distance)) {
-    return getLateralDistance(from, to_pose.value(), matching_distance);
+    return getLateralDistance(from, to_pose.value(), matching_distance, allow_lane_change);
   }
   return std::nullopt;
 }
 
 auto EntityManager::getLateralDistance(
-  const std::string & from, const CanonicalizedLaneletPose & to, double matching_distance) const
-  -> std::optional<double>
+  const std::string & from, const CanonicalizedLaneletPose & to, double matching_distance,
+  bool allow_lane_change) const -> std::optional<double>
 {
   if (const auto from_pose = getLaneletPose(from, matching_distance)) {
-    return getLateralDistance(from_pose.value(), to, matching_distance);
+    return getLateralDistance(from_pose.value(), to, matching_distance, allow_lane_change);
   }
   return std::nullopt;
 }
 
 auto EntityManager::getLateralDistance(
-  const std::string & from, const std::string & to, double matching_distance) const
-  -> std::optional<double>
+  const std::string & from, const std::string & to, double matching_distance,
+  bool allow_lane_change) const -> std::optional<double>
 {
   const auto from_pose = getLaneletPose(from, matching_distance);
   const auto to_pose = getLaneletPose(to, matching_distance);
   if (from_pose && to_pose) {
-    return getLateralDistance(from_pose.value(), to_pose.value(), matching_distance);
+    return getLateralDistance(
+      from_pose.value(), to_pose.value(), matching_distance, allow_lane_change);
   }
   return std::nullopt;
 }

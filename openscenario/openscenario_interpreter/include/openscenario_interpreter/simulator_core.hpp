@@ -185,7 +185,7 @@ public:
         traffic_simulator::LaneletPose position;
         position.lanelet_id = std::numeric_limits<std::int64_t>::max();
         bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-        position.s = s(from, to, allow_lane_change);
+        position.s = s(from, to, false, true, allow_lane_change);
         position.offset = t(from, to, allow_lane_change);
         position.rpy.x = std::numeric_limits<double>::quiet_NaN();
         position.rpy.y = std::numeric_limits<double>::quiet_NaN();

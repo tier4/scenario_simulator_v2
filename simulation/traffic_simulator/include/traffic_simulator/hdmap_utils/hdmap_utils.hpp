@@ -170,7 +170,8 @@ public:
 
   auto getLateralDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>;
+    const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false) const
+    -> std::optional<double>;
 
   auto getLeftBound(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 

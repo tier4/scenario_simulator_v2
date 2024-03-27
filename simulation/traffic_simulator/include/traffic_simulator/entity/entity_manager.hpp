@@ -397,14 +397,14 @@ public:
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   // clang-format off
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &)                           const -> std::optional<double>;
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &)                                        const -> std::optional<double>;
-  auto getLateralDistance(const std::string &,              const CanonicalizedLaneletPose &)                           const -> std::optional<double>;
-  auto getLateralDistance(const std::string &,              const std::string &)                                        const -> std::optional<double>;
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, double matching_distance) const -> std::optional<double>;
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &,              double matching_distance) const -> std::optional<double>;
-  auto getLateralDistance(const std::string &,              const CanonicalizedLaneletPose &, double matching_distance) const -> std::optional<double>;
-  auto getLateralDistance(const std::string &,              const std::string &,              double matching_distance) const -> std::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, bool allow_lane_change = false)                           const -> std::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &, bool allow_lane_change = false)                                        const -> std::optional<double>;
+  auto getLateralDistance(const std::string &,              const CanonicalizedLaneletPose &, bool allow_lane_change = false)                           const -> std::optional<double>;
+  auto getLateralDistance(const std::string &,              const std::string &, bool allow_lane_change = false)                                        const -> std::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, double matching_distance, bool allow_lane_change = false) const -> std::optional<double>;
+  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &,              double matching_distance, bool allow_lane_change = false) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &,              const CanonicalizedLaneletPose &, double matching_distance, bool allow_lane_change = false) const -> std::optional<double>;
+  auto getLateralDistance(const std::string &,              const std::string &,              double matching_distance, bool allow_lane_change = false) const -> std::optional<double>;
 
   auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true, bool allow_lane_change = false) -> std::optional<double>;
   auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const std::string &,              bool include_adjacent_lanelet = false, bool include_opposite_direction = true, bool allow_lane_change = false) -> std::optional<double>;
