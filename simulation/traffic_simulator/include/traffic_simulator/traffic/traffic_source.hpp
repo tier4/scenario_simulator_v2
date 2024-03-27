@@ -42,13 +42,13 @@ public:
     bool allow_spawn_outside_lane = false;
     bool require_footprint_fitting = false;
     bool use_random_orientation = false;
-    double start_time = 0.0;
+    double start_delay = 0.0;
   };
   explicit TrafficSource(
     const double radius, const double rate, const double speed,
     const geometry_msgs::msg::Pose & position,
     const std::vector<std::pair<std::variant<VehicleParams, PedestrianParams>, double>> & params,
-    const std::optional<int> random_seed,
+    const std::optional<int> random_seed, const double current_time,
     const std::function<void(
       const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)> &
       vehicle_spawn_function,
@@ -95,7 +95,7 @@ private:
   std::uniform_real_distribution<double> radius_distribution_;
   std::discrete_distribution<> params_distribution_;
   unsigned int entity_id_ = 0u;
-  const double start_execution_time_ = 0.0;
+  const double start_execution_time_;
   unsigned int spawn_count_ = 0u;
   const Configuration config_;
   std::vector<std::variant<VehicleParams, PedestrianParams>> params_;

@@ -347,7 +347,7 @@ void API::addTrafficSource(
   config.use_random_orientation = random_orientation;
 
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
-    radius, rate, speed, position, params_with_weights, random_seed,
+    radius, rate, speed, position, params_with_weights, random_seed, getCurrentTime(),
     MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters),
     MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters), config,
     entity_manager_ptr_->getHdmapUtils());

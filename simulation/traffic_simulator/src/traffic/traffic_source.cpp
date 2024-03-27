@@ -28,7 +28,7 @@ TrafficSource::TrafficSource(
   const double radius, const double rate, const double speed,
   const geometry_msgs::msg::Pose & position,
   const std::vector<std::pair<std::variant<VehicleParams, PedestrianParams>, double>> & params,
-  const std::optional<int> random_seed,
+  const std::optional<int> random_seed, const double current_time,
   const std::function<void(
     const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)> &
     vehicle_spawn_function,
@@ -49,7 +49,9 @@ TrafficSource::TrafficSource(
   id_distribution_(0, spawnable_lanelets_.size() - 1),
   angle_distribution_(0.0, M_PI * 2.0),
   radius_distribution_(0.0, radius_),
-  start_execution_time_(configuration.start_time),
+  start_execution_time_(
+    /// @note Failsafe for the case where TrafficSource is added before the simulation starts or delay is negative
+    (!std::isnan(current_time) ? current_time : 0.0) + std::max(configuration.start_delay, 0.0)),
   config_(configuration)
 {
   std::transform(
