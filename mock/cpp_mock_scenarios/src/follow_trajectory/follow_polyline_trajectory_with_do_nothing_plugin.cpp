@@ -100,7 +100,7 @@ private:
       std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>(
         traffic_simulator_msgs::build<traffic_simulator_msgs::msg::PolylineTrajectory>()
           .initial_distance_offset(0.0)
-          .dynamic_constraints_ignorable(false)
+          .dynamic_constraints_ignorable(true)
           .base_time(0.0)
           .closed(false)
           .shape(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Polyline>().vertices(
