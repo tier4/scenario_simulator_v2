@@ -47,7 +47,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push (amd64)
+      - name: Build and push (${{ matrix.arch }})
         uses: docker/bake-action@v3
         with:
           files: |
