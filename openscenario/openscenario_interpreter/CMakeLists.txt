@@ -29,6 +29,7 @@ ament_auto_add_library(${PROJECT_NAME} SHARED
   src/object.cpp
   src/evaluate.cpp
   src/openscenario_interpreter.cpp
+  src/parameter_distribution.cpp
   src/record.cpp
   src/scope.cpp)
 

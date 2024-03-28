@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
-#define OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/deterministic_parameter_distribution.hpp>
 #include <pugixml.hpp>
@@ -32,12 +33,14 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct Deterministic
+struct Deterministic : public ParameterDistributionContainer
 {
   const std::list<DeterministicParameterDistribution> deterministic_parameter_distributions;
 
   explicit Deterministic(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> ParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__DETERMINISTIC_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__DETERMINISTIC_HPP_

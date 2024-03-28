@@ -41,6 +41,7 @@ struct ParameterAssignment
   }
 
   const std::string parameterRef;
+
   const std::string value;
 };
 }  // namespace syntax

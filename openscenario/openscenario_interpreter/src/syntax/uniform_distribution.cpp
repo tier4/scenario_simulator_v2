@@ -22,12 +22,11 @@ inline namespace syntax
 UniformDistribution::UniformDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
-  range(readElement<Range>("range", node, scope)),
-  distribute(range.lower_limit.data, range.upper_limit.data),
-  random_engine(scope.seed)
+  range(readElement<Range>("Range", node, scope)),
+  distribute(range.lower_limit.data, range.upper_limit.data)
 {
 }
 
-auto UniformDistribution::evaluate() -> Object { return make<Double>(distribute(random_engine)); }
+auto UniformDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

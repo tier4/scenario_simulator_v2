@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_TYPE_HPP_
-#define OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_TYPE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_DISTRIBUTION_TYPE_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_DISTRIBUTION_TYPE_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/histogram.hpp>
@@ -54,8 +54,8 @@ DEFINE_LAZY_VISITOR(
   CASE(UniformDistribution),         //
   CASE(PoissonDistribution),         //
   CASE(Histogram),                   //
-  CASE(UserDefinedDistribution),     //
+  //  CASE(UserDefinedDistribution),     //
 );
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__STOCHASTIC_DISTRIBUTION_TYPE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__STOCHASTIC_DISTRIBUTION_TYPE_HPP_

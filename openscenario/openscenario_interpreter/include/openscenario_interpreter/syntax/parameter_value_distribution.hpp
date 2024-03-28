@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__PARAMETER_VALUE_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__PARAMETER_VALUE_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_VALUE_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_VALUE_DISTRIBUTION_HPP_
 
 #include <openscenario_interpreter/syntax/distribution_definition.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
@@ -32,12 +32,15 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ParameterValueDistribution : public DistributionDefinition
+struct ParameterValueDistribution : public DistributionDefinition,
+                                    public ParameterDistributionContainer
 {
   const File scenario_file;
 
   explicit ParameterValueDistribution(const pugi::xml_node &, Scope & scope);
+
+  auto derive() -> ParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__PARAMETER_VALUE_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__PARAMETER_VALUE_DISTRIBUTION_HPP_

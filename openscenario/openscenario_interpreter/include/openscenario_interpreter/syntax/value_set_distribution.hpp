@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
-#define OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_SET_DISTRIBUTION_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_SET_DISTRIBUTION_HPP_
 
+#include <openscenario_interpreter/parameter_distribution.hpp>
 #include <openscenario_interpreter/syntax/file.hpp>
 #include <openscenario_interpreter/syntax/parameter_value_set.hpp>
 
@@ -31,14 +32,14 @@ inline namespace syntax
  *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct ValueSetDistribution : public Scope
+struct ValueSetDistribution : public Scope, public MultiParameterDistributionBase
 {
   const std::list<ParameterValueSet> parameter_value_sets;
 
   explicit ValueSetDistribution(const pugi::xml_node &, Scope & scope);
 
-  // TODO: implement evaluate()
+  auto derive() -> ParameterDistribution override;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-#endif  // OPENSCENARIO_INTERPRETER__VALUE_SET_DISTRIBUTION_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__VALUE_SET_DISTRIBUTION_HPP_
