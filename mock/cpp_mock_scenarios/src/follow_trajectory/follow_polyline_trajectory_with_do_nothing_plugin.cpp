@@ -38,7 +38,8 @@ public:
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option),
-    spawn_pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
+    spawn_pose(
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
         .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1))),
     trajectory_start_pose(
@@ -66,9 +67,7 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
-    if (
-      equals(api_.getCurrentTime(), 0.0, 0.01) &&
-      !api_.reachPosition("ego", spawn_pose, 0.1)) {
+    if (equals(api_.getCurrentTime(), 0.0, 0.01) && !api_.reachPosition("ego", spawn_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
@@ -92,9 +91,7 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      spawn_pose,
-      getVehicleParameters(),
+      "ego", spawn_pose, getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 10, true);
