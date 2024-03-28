@@ -33,6 +33,7 @@ class TrafficSource : public TrafficModuleBase
 public:
   using VehicleParams = traffic_simulator_msgs::msg::VehicleParameters;
   using PedestrianParams = traffic_simulator_msgs::msg::PedestrianParameters;
+  using ParamsVariant = std::variant<VehicleParams, PedestrianParams>;
   struct Configuration
   {
     Configuration() = default;
@@ -47,7 +48,7 @@ public:
   explicit TrafficSource(
     const double radius, const double rate, const double speed,
     const geometry_msgs::msg::Pose & position,
-    const std::vector<std::pair<std::variant<VehicleParams, PedestrianParams>, double>> & params,
+    const std::vector<std::pair<ParamsVariant, double>> & params,
     const std::optional<int> random_seed, const double current_time,
     const std::function<void(
       const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)> &
@@ -63,23 +64,26 @@ public:
   void execute(const double current_time, const double step_time) override;
 
 private:
+  static auto isPedestrian(const ParamsVariant & params) -> bool;
   auto getRandomPose(const bool random_orientation = false) -> geometry_msgs::msg::Pose;
   auto getSmallestSValue(const lanelet::Id id) -> double;
   auto getBiggestSValue(const lanelet::Id id) -> double;
   auto convertToPoseInArea(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
     -> std::optional<geometry_msgs::msg::Pose>;
   auto getNewEntityName() -> std::string;
-  auto isPedestrian(const std::variant<VehicleParams, PedestrianParams> & params) -> bool;
+  auto isCurrentPedestrian() -> bool;
   auto getCurrentBoundingBox() -> traffic_simulator_msgs::msg::BoundingBox;
-
   auto isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool;
   auto getValidRandomPose() -> geometry_msgs::msg::Pose;
   auto getRandomLaneletId() -> lanelet::Id;
   auto getRandomSValue(const lanelet::Id lanelet_id) -> double;
-  auto randomizeParams() -> void;
+  auto randomizeCurrentParams() -> void;
 
+  /// @note IDs
   inline static unsigned int next_source_id_ = 0u;
   const unsigned int source_id_;
+  unsigned int entity_id_ = 0u;
+  /// @note Spawn functions
   const std::function<void(
     const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)>
     vehicle_spawn_function_;
@@ -95,12 +99,11 @@ private:
   std::uniform_real_distribution<double> angle_distribution_;
   std::uniform_real_distribution<double> radius_distribution_;
   std::discrete_distribution<> params_distribution_;
-  unsigned int entity_id_ = 0u;
   const double start_execution_time_;
   unsigned int spawn_count_ = 0u;
   const Configuration config_;
-  std::vector<std::variant<VehicleParams, PedestrianParams>> params_;
-  std::vector<std::variant<VehicleParams, PedestrianParams>>::iterator current_params_;
+  const std::vector<ParamsVariant> params_;
+  std::vector<ParamsVariant>::const_iterator current_params_;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator

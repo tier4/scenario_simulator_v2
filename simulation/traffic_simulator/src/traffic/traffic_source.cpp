@@ -29,7 +29,7 @@ namespace traffic
 TrafficSource::TrafficSource(
   const double radius, const double rate, const double speed,
   const geometry_msgs::msg::Pose & position,
-  const std::vector<std::pair<std::variant<VehicleParams, PedestrianParams>, double>> & params,
+  const std::vector<std::pair<ParamsVariant, double>> & params,
   const std::optional<int> random_seed, const double current_time,
   const std::function<void(
     const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)> &
@@ -54,20 +54,19 @@ TrafficSource::TrafficSource(
   start_execution_time_(
     /// @note Failsafe for the case where TrafficSource is added before the simulation starts or delay is negative
     (!std::isnan(current_time) ? current_time : 0.0) + std::max(configuration.start_delay, 0.0)),
-  config_(configuration)
+  config_(configuration),
+  params_([&params]() -> std::vector<ParamsVariant> {
+    std::vector<ParamsVariant> ret;
+    std::transform(
+      params.begin(), params.end(), std::back_inserter(ret),
+      [](const std::pair<ParamsVariant, double> & pair) { return pair.first; });
+    return ret;
+  }())
 {
-  std::transform(
-    params.begin(), params.end(), std::back_inserter(params_),
-    [](const std::pair<std::variant<VehicleParams, PedestrianParams>, double> & pair) {
-      return pair.first;
-    });
-
   std::vector<double> weights;
   std::transform(
     params.begin(), params.end(), std::back_inserter(weights),
-    [](const std::pair<std::variant<VehicleParams, PedestrianParams>, double> & pair) {
-      return pair.second;
-    });
+    [](const std::pair<ParamsVariant, double> & pair) { return pair.second; });
   params_distribution_ = std::discrete_distribution<>(weights.begin(), weights.end());
 
   if (spawnable_lanelets_.empty()) {
@@ -87,9 +86,7 @@ auto TrafficSource::getRandomPose(const bool random_orientation) -> geometry_msg
   const double angle = angle_distribution_(engine_);
   const double radius = radius_distribution_(engine_);
 
-  geometry_msgs::msg::Pose pose;
-  /// @todo add orientation from TrafficSource orientation when it will have orientation
-  pose = source_pose_;
+  geometry_msgs::msg::Pose pose = source_pose_;
   pose.position.x += radius * std::cos(angle);
   pose.position.y += radius * std::sin(angle);
 
@@ -152,8 +149,8 @@ void TrafficSource::execute(
   }
   ++spawn_count_;
 
-  randomizeParams();
-  if (isPedestrian(*current_params_)) {
+  randomizeCurrentParams();
+  if (isCurrentPedestrian()) {
     pedestrian_spawn_function_(
       getNewEntityName(), getValidRandomPose(), std::get<PedestrianParams>(*current_params_),
       speed_);
@@ -163,21 +160,22 @@ void TrafficSource::execute(
   }
 }
 
-auto TrafficSource::randomizeParams() -> void
+auto TrafficSource::randomizeCurrentParams() -> void
 {
   const auto current_params_idx = params_distribution_(engine_);
   current_params_ = std::next(params_.begin(), current_params_idx);
 }
 
-auto TrafficSource::isPedestrian(const std::variant<VehicleParams, PedestrianParams> & params)
-  -> bool
+auto TrafficSource::isPedestrian(const ParamsVariant & params) -> bool
 {
   return std::holds_alternative<PedestrianParams>(params);
 }
 
+auto TrafficSource::isCurrentPedestrian() -> bool { return isPedestrian(*current_params_); }
+
 auto TrafficSource::getCurrentBoundingBox() -> traffic_simulator_msgs::msg::BoundingBox
 {
-  if (isPedestrian(*current_params_)) {
+  if (isCurrentPedestrian()) {
     return std::get<PedestrianParams>(*current_params_).bounding_box;
   }
   return std::get<VehicleParams>(*current_params_).bounding_box;
@@ -217,7 +215,7 @@ auto TrafficSource::isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool
     return true;
   }
 
-  const auto lanelet_pose = hdmap_utils_->toLaneletPose(pose, isPedestrian(*current_params_));
+  const auto lanelet_pose = hdmap_utils_->toLaneletPose(pose, isCurrentPedestrian());
   if (lanelet_pose) {
     /// @note Step 3: check whether the bounding box can be outside lanelet
     if (!config_.require_footprint_fitting) {
