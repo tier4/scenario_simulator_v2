@@ -23,3 +23,7 @@ repositories:
     type: git
     url: https://github.com/tier4/tier4_autoware_msgs.git
     version: tier4/universe # for Autoware.Universe (TIER IV)
+  embree_vendor:
+    type: git
+    url: https://github.com/tier4/embree_vendor.git
+    version: master

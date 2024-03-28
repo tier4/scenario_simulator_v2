@@ -15,7 +15,7 @@
 #ifndef SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_
 #define SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__PRIMITIVES__PRIMITIVE_HPP_
 
-#include <embree3/rtcore.h>
+#include <embree4/rtcore.h>
 
 #include <algorithm>
 #include <geometry/polygon/polygon.hpp>
