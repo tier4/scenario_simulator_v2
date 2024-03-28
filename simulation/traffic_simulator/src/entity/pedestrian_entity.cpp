@@ -42,6 +42,8 @@ PedestrianEntity::PedestrianEntity(
   behavior_plugin_ptr_->setDebugMarker({});
   behavior_plugin_ptr_->setBehaviorParameter(traffic_simulator_msgs::msg::BehaviorParameter());
   behavior_plugin_ptr_->setHdMapUtils(hdmap_utils_ptr_);
+  behavior_plugin_ptr_->setDefaultMatchingDistanceForLaneletPoseCalculation(
+    getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 
 void PedestrianEntity::appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array)
@@ -192,9 +194,19 @@ void PedestrianEntity::setBehaviorParameter(
   behavior_plugin_ptr_->setBehaviorParameter(behavior_parameter);
 }
 
+void PedestrianEntity::setVelocityLimit(double linear_velocity)
+{
+  if (linear_velocity < 0.0) {
+    THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
+  }
+  auto behavior_parameter = getBehaviorParameter();
+  behavior_parameter.dynamic_constraints.max_speed = linear_velocity;
+  setBehaviorParameter(behavior_parameter);
+}
+
 void PedestrianEntity::setAccelerationLimit(double acceleration)
 {
-  if (acceleration <= 0.0) {
+  if (acceleration < 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -204,7 +216,7 @@ void PedestrianEntity::setAccelerationLimit(double acceleration)
 
 void PedestrianEntity::setAccelerationRateLimit(double acceleration_rate)
 {
-  if (acceleration_rate <= 0.0) {
+  if (acceleration_rate < 0.0) {
     THROW_SEMANTIC_ERROR("Acceleration rate limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -214,7 +226,7 @@ void PedestrianEntity::setAccelerationRateLimit(double acceleration_rate)
 
 void PedestrianEntity::setDecelerationLimit(double deceleration)
 {
-  if (deceleration <= 0.0) {
+  if (deceleration < 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();
@@ -224,7 +236,7 @@ void PedestrianEntity::setDecelerationLimit(double deceleration)
 
 void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
 {
-  if (deceleration_rate <= 0.0) {
+  if (deceleration_rate < 0.0) {
     THROW_SEMANTIC_ERROR("Deceleration rate limit should be over zero.");
   }
   auto behavior_parameter = getBehaviorParameter();

@@ -2,6 +2,148 @@
 Changelog for package concealer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.9.0 (2024-03-27)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Merge remote-tracking branch 'origin/master' into HEAD
+* cleand up a bit
+* working
+* Contributors: Masaya Kataoka, Paweł Lech, Piotr Zyskowski
+
+1.8.0 (2024-03-25)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
+* Contributors: Masaya Kataoka
+
+1.7.1 (2024-03-21)
+------------------
+
+1.7.0 (2024-03-21)
+------------------
+
+1.6.1 (2024-03-19)
+------------------
+
+1.6.0 (2024-03-14)
+------------------
+
+1.5.1 (2024-03-13)
+------------------
+
+1.5.0 (2024-03-12)
+------------------
+* Merge pull request `#1209 <https://github.com/tier4/scenario_simulator_v2/issues/1209>`_ from tier4/feature/ego_slope
+  Consider road slope in distance measurement and entity poses
+* doc: use 3 slashes to comment-out before doxygen command
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge branch 'master' into feature/ego_slope
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge branch 'master' into feature/ego_slope
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka
+
+1.4.2 (2024-03-01)
+------------------
+
+1.4.1 (2024-02-29)
+------------------
+
+1.4.0 (2024-02-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge branch 'master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Contributors: Dawid Moszyński
+
+1.3.1 (2024-02-26)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Contributors: Masaya Kataoka
+
+1.3.0 (2024-02-26)
+------------------
+* Merge pull request `#1190 <https://github.com/tier4/scenario_simulator_v2/issues/1190>`_ from tier4/feature/mrm_behavior/pull_over
+  Support `PULL_OVER` as minimul risk manuever behavior in `autoware_adapi_v1_msgs/system/msg/MrmState.msg`
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/feature/mrm_behavior/pull_over' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* refactor(concealer): convert a lambda function to local function
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+  # Conflicts:
+  #	external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* feat(concealer): Add support for optional MrmState::PULL_OVER for mrm behavior
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.2.0 (2024-02-22)
+------------------
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge branch 'master' into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Contributors: Masaya Kataoka
+
+1.1.0 (2024-02-22)
+------------------
+* Merge pull request `#1182 <https://github.com/tier4/scenario_simulator_v2/issues/1182>`_ from tier4/feature/slope_vehicle_model
+  Consider road slope in ego vehicle simulation
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
+* Update external/concealer/src/autoware_universe.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* doc: add memos to code
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+1.0.3 (2024-02-21)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description
+* Contributors: Masaya Kataoka
+
+1.0.2 (2024-02-21)
+------------------
+* Merge remote-tracking branch 'origin/master' into doc/lane_pose_calculation
+* Merge remote-tracking branch 'origin/master' into doc/lane_pose_calculation
+* Bump version of scenario_simulator_v2 from version 0.8.11 to version 0.8.12
+* Bump version of scenario_simulator_v2 from version 0.8.10 to version 0.8.11
+* Bump version of scenario_simulator_v2 from version 0.8.9 to version 0.8.10
+* Bump version of scenario_simulator_v2 from version 0.8.8 to version 0.8.9
+* Bump version of scenario_simulator_v2 from version 0.8.7 to version 0.8.8
+* Bump version of scenario_simulator_v2 from version 0.8.6 to version 0.8.7
+* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into fix/release_text
+* Bump version of scenario_simulator_v2 from version 0.8.5 to version 0.8.6
+* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into fix/release_text
+* Bump version of scenario_simulator_v2 from version 0.8.4 to version 0.8.5
+* Bump version of scenario_simulator_v2 from version 0.8.3 to version 0.8.4
+* Bump version of scenario_simulator_v2 from version 0.8.2 to version 0.8.3
+* Bump version of scenario_simulator_v2 from version 0.8.1 to version 0.8.2
+* Merge branch 'master' of https://github.com/merge-queue-testing/scenario_simulator_v2 into feature/restore_barnch
+* Bump version of scenario_simulator_v2 from version 0.8.0 to version 0.8.1
+* Merge pull request `#1 <https://github.com/tier4/scenario_simulator_v2/issues/1>`_ from merge-queue-testing/feature/new_release
+  Feature/new release
+* Merge pull request `#10 <https://github.com/tier4/scenario_simulator_v2/issues/10>`_ from hakuturu583/test/release
+  update CHANGELOG
+* update CHANGELOG
+* Contributors: Masaya Kataoka, Release Bot
+
+1.0.1 (2024-02-15)
+------------------
+
 1.0.0 (2024-02-14)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/new_release_flow

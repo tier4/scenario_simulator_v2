@@ -19,6 +19,8 @@ mkdocs-codeinclude-plugin = "^0.2.1"
 mkdocs-git-revision-date-localized-plugin = "^1.2.0"
 plantuml = "^0.3.0"
 mkdocs-redirects = "^1.2.1"
+requests = "^2.31.0"
+catkin-pkg = "^1.0.0"
 
 
 [build-system]

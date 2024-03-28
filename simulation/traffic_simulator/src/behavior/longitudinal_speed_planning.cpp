@@ -83,10 +83,8 @@ auto LongitudinalSpeedPlanner::getDynamicStates(
   const geometry_msgs::msg::Accel & current_accel) const
   -> std::tuple<geometry_msgs::msg::Twist, geometry_msgs::msg::Accel, double>
 {
-  if (std::fabs(target_speed) > constraints.max_speed) {
-    THROW_SEMANTIC_ERROR(
-      "Target speed is ", std::to_string(target_speed), " , it overs ", entity,
-      "'s max_speed:", std::to_string(constraints.max_speed));
+  if (target_speed > constraints.max_speed) {
+    target_speed = constraints.max_speed;
   }
   double linear_jerk = planLinearJerk(target_speed, constraints, current_twist, current_accel);
   auto accel = forward(linear_jerk, current_accel, constraints);
