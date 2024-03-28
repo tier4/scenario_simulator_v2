@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/intersection/collision.hpp>
+#include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -173,19 +175,56 @@ auto TrafficSource::isPedestrian(const std::variant<VehicleParams, PedestrianPar
   return std::holds_alternative<PedestrianParams>(params);
 }
 
+auto TrafficSource::getCurrentBoundingBox() -> traffic_simulator_msgs::msg::BoundingBox
+{
+  if (isPedestrian(*current_params_)) {
+    return std::get<PedestrianParams>(*current_params_).bounding_box;
+  }
+  return std::get<VehicleParams>(*current_params_).bounding_box;
+}
+
 auto TrafficSource::isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool
 {
+  /// @note transform bounding box corners to world coordinate system
+  auto bbox_corners = math::geometry::getPointsFromBbox(getCurrentBoundingBox());
+
+  tf2::Transform ref_transform;
+  tf2::fromMsg(pose, ref_transform);
+
+  std::for_each(
+    bbox_corners.begin(), bbox_corners.end(), [&](geometry_msgs::msg::Point & corner) -> void {
+      tf2::Vector3 tf2_corner(corner.x, corner.y, corner.z);
+      const tf2::Vector3 corner_transformed = ref_transform * tf2_corner;
+      corner.x = corner_transformed.x();
+      corner.y = corner_transformed.y();
+      corner.z = corner_transformed.z();
+    });
+
+  const auto is_outside_spawnable_area = [&](const geometry_msgs::msg::Point & corner) -> bool {
+    return math::geometry::hypot(corner, source_pose_.position) > radius_;
+  };
+
+  /// @note Step 1: check whether all corners are inside spawnable area
+  if (
+    std::find_if_not(bbox_corners.begin(), bbox_corners.end(), is_outside_spawnable_area) ==
+    bbox_corners.end()) {
+    return false;
+  }
+
+  /// @note Step 2: check whether can be outside lanelet
   if (config_.allow_spawn_outside_lane) {
     return true;
   }
+
   const auto lanelet_pose = hdmap_utils_->toLaneletPose(pose, isPedestrian(*current_params_));
   if (lanelet_pose) {
+    /// @note Step 3: check whether the bounding box can be outside lanelet
     if (!config_.require_footprint_fitting) {
       return true;
     }
+    /// @note Step 4: check whether the bounding box fits inside the lanelet
     /// @todo enable footprint fitting
-    /// idea: precalculate unified lanelet for the traffic source at the beginning
-    THROW_SPECIFICATION_VIOLATION("TrafficSource footprint validation is not supported");
+    THROW_SPECIFICATION_VIOLATION("TrafficSource footprint validation is not supported yet");
   }
   return false;
 }

@@ -70,6 +70,7 @@ private:
     -> std::optional<geometry_msgs::msg::Pose>;
   auto getNewEntityName() -> std::string;
   auto isPedestrian(const std::variant<VehicleParams, PedestrianParams> & params) -> bool;
+  auto getCurrentBoundingBox() -> traffic_simulator_msgs::msg::BoundingBox;
 
   auto isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool;
   auto getValidRandomPose() -> geometry_msgs::msg::Pose;
