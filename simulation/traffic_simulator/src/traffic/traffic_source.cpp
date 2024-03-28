@@ -201,7 +201,8 @@ auto TrafficSource::isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool
     });
 
   const auto is_outside_spawnable_area = [&](const geometry_msgs::msg::Point & corner) -> bool {
-    return math::geometry::hypot(corner, source_pose_.position) > radius_;
+    return std::hypot(corner.x - source_pose_.position.x, corner.y - source_pose_.position.y) >
+           radius_;
   };
 
   /// @note Step 1: check whether all corners are inside spawnable area
