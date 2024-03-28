@@ -81,8 +81,8 @@ auto CanonicalizedLaneletPose::canonicalize(
 }
 
 auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-  LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) const
-  -> std::optional<LaneletPose>
+  LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+  bool allow_lane_change) const -> std::optional<LaneletPose>
 {
   if (lanelet_poses_.empty()) {
     return std::nullopt;
@@ -91,7 +91,8 @@ auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
     hdmap_utils->getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
   LaneletPose alternative_lanelet_pose = lanelet_poses_[0];
   for (const auto & laneletPose : lanelet_poses_) {
-    const auto route = hdmap_utils->getRoute(from.lanelet_id, laneletPose.lanelet_id);
+    const auto route =
+      hdmap_utils->getRoute(from.lanelet_id, laneletPose.lanelet_id, allow_lane_change);
     if (shortest_route.size() > route.size()) {
       shortest_route = route;
       alternative_lanelet_pose = laneletPose;
