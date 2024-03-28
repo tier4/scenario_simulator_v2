@@ -273,11 +273,13 @@ void EntityBase::onUpdate(double /*current_time*/, double step_time)
   speed_planner_ =
     std::make_unique<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>(
       step_time, name);
+  RCLCPP_ERROR_STREAM(rclcpp::get_logger("JobList"), "EntityBase::onUpdate" << name);
 }
 
 void EntityBase::onPostUpdate(double /*current_time*/, double step_time)
 {
   job_list_.update(step_time, job::Event::POST_UPDATE);
+  RCLCPP_ERROR_STREAM(rclcpp::get_logger("JobList"), "EntityBase::onPostUpdate vihicle::" << name);
 }
 
 void EntityBase::resetDynamicConstraints()
@@ -831,19 +833,41 @@ auto EntityBase::getDistanceToTargetLaneletPose(
     THROW_SEMANTIC_ERROR(
       "Failed to get entity's lanelet pose. Please check entity lanelet pose exists.");
   }
+  // RCLCPP_ERROR_STREAM(
+  //   rclcpp::get_logger("traffic_simulator"),
+  //   "getLogitudinalDistance" << static_cast<LaneletPose>(entity_lanelet_pose_.value()).lanelet_id
+  //                            << " " << static_cast<LaneletPose>(target_lanelet_pose_).lanelet_id);
 
   const auto entity_distance_to_target = hdmap_utils_ptr_->getLongitudinalDistance(
     static_cast<LaneletPose>(entity_lanelet_pose_.value()),
     static_cast<LaneletPose>(target_lanelet_pose_));
 
-  if (!entity_distance_to_target.has_value()) {
-    /**
-    * This is not an error, means that the entity is already over the target lanelet.
-    */
+  // RCLCPP_ERROR_STREAM(
+  //   rclcpp::get_logger("traffic_simulator"),
+  //   "getreverted Distance" << static_cast<LaneletPose>(target_lanelet_pose_).lanelet_id << " "
+  //                          << static_cast<LaneletPose>(entity_lanelet_pose_.value()).lanelet_id);
+
+  const auto revert_entity_distance_to_target = hdmap_utils_ptr_->getLongitudinalDistance(
+    static_cast<LaneletPose>(target_lanelet_pose_),
+    static_cast<LaneletPose>(entity_lanelet_pose_.value()));
+
+  if (!revert_entity_distance_to_target.has_value() && !entity_distance_to_target.has_value()) {
     return std::nullopt;
   }
 
-  return entity_distance_to_target;
+  if (!revert_entity_distance_to_target.has_value()) {
+    return entity_distance_to_target;
+  }
+
+  if (!entity_distance_to_target.has_value()) {
+    return revert_entity_distance_to_target;
+  }
+
+  if (revert_entity_distance_to_target.value() < entity_distance_to_target.value()) {
+    return revert_entity_distance_to_target;
+  } else {
+    return entity_distance_to_target;
+  }
 }
 
 auto EntityBase::getIfArrivedToTargetLaneletPose(
@@ -886,63 +910,87 @@ auto EntityBase::requestSynchronize(
   }
 
   job_list_.append(
-    [this, ego_target, entity_target, accel_limit](double job_duration) {
+    [this, ego_target, entity_target, accel_limit](double) {
       /**
        * @brief This is draft function for synchronization.
        * It is not a good way to synchronize the entity with the ego.
-       * WARNING****************
-       * not checking job_duration_ at all
        */
-      const auto entity_distance = getDistanceToTargetLaneletPose(entity_target, 100);
-      const auto ego_distance = this->hdmap_utils_ptr_->getLongitudinalDistance(
+      auto entity_distance = getDistanceToTargetLaneletPose(entity_target, 100);
+      auto ego_distance = this->hdmap_utils_ptr_->getLongitudinalDistance(
         static_cast<LaneletPose>(other_status_.find("ego")->second.getLaneletPose()),
         static_cast<LaneletPose>(ego_target));
-
       /**
        * *********************CHECK*********************
        * there might be a better way if the car had passed away
        */
       if (!entity_distance.has_value()) {
-        return true;
+        RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "entity has already passed away");
+        entity_distance = 0;
       }
       if (!ego_distance.has_value()) {
+        RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "ego has already passed away");
         return true;
       }
       const auto ego_velocity = other_status_.find("ego")->second.getTwist().linear.x;
       const auto entity_velocity = this->getStatus().getTwist().linear.x;
 
+      // better change 0.2 to parameter
+      // check if the entity has already arrived to the target lanelet and entity is nearly stopped
+      if (getIfArrivedToTargetLaneletPose(entity_target, 0.2) && entity_velocity < 0.8) {
+        target_speed_ = 0;
+        return true;
+      }
+
       // be better to use acceleration,jerk to estimate the arrival time
+      RCLCPP_ERROR_STREAM(
+        rclcpp::get_logger("traffic_simulator"),
+        "ego velocity: " << ego_velocity << " ego distance: " << ego_distance.value());
+      RCLCPP_ERROR_STREAM(
+        rclcpp::get_logger("traffic_simulator"),
+        "entity velocity: " << entity_velocity << " entity distance: " << entity_distance.value());
       const auto ego_arrival_time = (ego_velocity != 0) ? ego_distance.value() / ego_velocity : 0;
 
-      // if(ego_arrival_time < std::sqrt(ego_distance.value()/accel_limit)){
-      //   THROW_SEMANTIC_ERROR(
-      //     "The entity can not stop on the destination by time.");
-      // }
-      RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "ego arrival time: %f", ego_arrival_time);
+      RCLCPP_ERROR(
+        rclcpp::get_logger("traffic_simulator"), "ego arrival time: %f", ego_arrival_time);
 
       auto entity_velocity_to_synchronize = entity_velocity;
 
+      if (accel_limit * ego_arrival_time < entity_velocity)
+        THROW_SEMANTIC_ERROR("The entity can not stop on the destination by time.");
+
+      if (entity_velocity * entity_velocity / (accel_limit * 2) > entity_distance.value())
+        THROW_SEMANTIC_ERROR("The entity will pass away the destination by time.");
+
       if (
-        (entity_velocity * ego_arrival_time) -
-          (entity_velocity * entity_velocity / (2 * accel_limit)) <=
-        entity_distance.value()) {
-          RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "speed up");
+        entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / accel_limit +
+          accel_limit * ego_arrival_time * ego_arrival_time / 2 <
+        entity_distance.value())
+        THROW_SEMANTIC_ERROR("The entity can not reach the destination by time.");
+
+      auto accel_limit_ = accel_limit * 1.5;  // 0.05 is a margin
+      auto const distance_mergin = 0.0;
+
+      if (
+        entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / (accel_limit * 2) <
+        entity_distance.value() - distance_mergin) {
+        RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "speed up");
         // speed up
-        entity_velocity_to_synchronize = entity_velocity + accel_limit * job_duration;
+        entity_velocity_to_synchronize = entity_velocity + accel_limit_ * 50 / 1000;
+      } else if (
+        entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / (accel_limit * 2) >
+        entity_distance.value() - distance_mergin) {
+        RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "slow down");
+        // slow down
+        entity_velocity_to_synchronize = entity_velocity - accel_limit_ * 50 / 1000;
       } else {
-        RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "keep or slow down");
-        // keep or slow down
-        auto vel_keep_time = 2*entity_distance.value()/entity_velocity - ego_arrival_time;
-        if(vel_keep_time < 0){
-          // slow down
-          entity_velocity_to_synchronize = entity_velocity - (entity_velocity / ego_arrival_time) * job_duration;
-        } else{
-          // keep
-          entity_velocity_to_synchronize = entity_velocity;
-        }
+        RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "keep speed");
+        // keep speed
+        entity_velocity_to_synchronize = entity_velocity;
       }
 
-      RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "speed change");
+      RCLCPP_ERROR(
+        rclcpp::get_logger("traffic_simulator"), "speed change: %f",
+        entity_velocity_to_synchronize);
       /**
        * using this->requestSpeedChange here does not work in some kind of reason.
        * it seems that after this function is called by some reason, func_on_cleanup will be deleted and become nullptr
@@ -951,7 +999,6 @@ auto EntityBase::requestSynchronize(
       target_speed_ = entity_velocity_to_synchronize;
       return true;
     },
-    // after this im not sure it is correct, just an draft
     [this]() { RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "sync job done"); },
     job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
   return false;
