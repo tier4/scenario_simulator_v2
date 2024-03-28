@@ -2,6 +2,9 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.9.1 (2024-03-28)
+------------------
+
 1.9.0 (2024-03-27)
 ------------------
 * Merge pull request `#1210 <https://github.com/tier4/scenario_simulator_v2/issues/1210>`_ from tier4/feature/reset_behavior_plugin

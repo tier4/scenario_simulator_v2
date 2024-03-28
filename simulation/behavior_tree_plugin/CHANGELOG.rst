@@ -2,6 +2,9 @@
 Changelog for package behavior_tree_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.9.1 (2024-03-28)
+------------------
+
 1.9.0 (2024-03-27)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
