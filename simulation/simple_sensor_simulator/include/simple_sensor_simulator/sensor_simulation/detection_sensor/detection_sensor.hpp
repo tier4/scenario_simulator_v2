@@ -41,22 +41,12 @@ protected:
   {
   }
 
-  auto isWithinRange(
-    const geometry_msgs::Point & point1, const geometry_msgs::Point & point2,
-    const double range) const -> bool;
+  auto isEgoEntityStatusToWhichThisSensorIsAttached(
+    const traffic_simulator_msgs::EntityStatus &) const -> bool;
 
-  auto filterObjectsBySensorRange(
-    const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::vector<std::string> &,
-    const double) const -> std::vector<std::string>;
-
-  auto getEntityPose(const std::vector<traffic_simulator_msgs::EntityStatus> &, const std::string &)
-    const -> geometry_msgs::Pose;
-
-  auto getDetectedObjects(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
-    -> std::vector<std::string>;
-
-  auto getSensorPose(const std::vector<traffic_simulator_msgs::EntityStatus> &) const
-    -> geometry_msgs::Pose;
+  auto findEgoEntityStatusToWhichThisSensorIsAttached(
+    const std::vector<traffic_simulator_msgs::EntityStatus> &) const
+    -> std::vector<traffic_simulator_msgs::EntityStatus>::const_iterator;
 
 public:
   virtual ~DetectionSensorBase() = default;
@@ -67,27 +57,30 @@ public:
     const std::vector<std::string> & lidar_detected_entities) = 0;
 };
 
-template <typename T>
+template <typename T, typename U = autoware_auto_perception_msgs::msg::TrackedObjects>
 class DetectionSensor : public DetectionSensorBase
 {
-  const typename rclcpp::Publisher<T>::SharedPtr publisher_ptr_;
+  const typename rclcpp::Publisher<T>::SharedPtr detected_objects_publisher;
 
-  typename rclcpp::PublisherBase::SharedPtr ground_truth_publisher_base_ptr_;
+  const typename rclcpp::Publisher<U>::SharedPtr ground_truth_objects_publisher;
 
-  std::mt19937 random_engine_;
+  std::default_random_engine random_engine_;
 
-  auto applyPositionNoise(typename T::_objects_type::value_type) ->
-    typename T::_objects_type::value_type;
+  std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
+    detected_objects_queue;
+
+  std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
+    ground_truth_objects_queue;
 
 public:
   explicit DetectionSensor(
     const double current_simulation_time,
     const simulation_api_schema::DetectionSensorConfiguration & configuration,
     const typename rclcpp::Publisher<T>::SharedPtr & publisher,
-    const typename rclcpp::PublisherBase::SharedPtr & ground_truth_publisher = nullptr)
+    const typename rclcpp::Publisher<U>::SharedPtr & ground_truth_publisher = nullptr)
   : DetectionSensorBase(current_simulation_time, configuration),
-    publisher_ptr_(publisher),
-    ground_truth_publisher_base_ptr_(ground_truth_publisher),
+    detected_objects_publisher(publisher),
+    ground_truth_objects_publisher(ground_truth_publisher),
     random_engine_(configuration.random_seed())
   {
   }
