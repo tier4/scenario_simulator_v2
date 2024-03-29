@@ -1512,9 +1512,6 @@ auto HdMapUtils::getLongitudinalDistance(
   };
   for (unsigned int i = 0; i < route.size(); i++) {
     if (i < route.size() - 1 && with_lane_change(allow_lane_change, route[i], route[i + 1])) {
-      if (route[i] == from.lanelet_id) {
-        distance = getLaneletLength(from.lanelet_id) - from.s;
-      }
 
       traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
       next_lanelet_pose.lanelet_id = route[i + 1];
@@ -1524,27 +1521,33 @@ auto HdMapUtils::getLongitudinalDistance(
       if (
         auto next_lanelet_origin_from_current_lanelet =
           toLaneletPose(toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
-        distance +=
-          (next_lanelet_origin_from_current_lanelet->s - getLaneletLength(route[i]));
+        distance += next_lanelet_origin_from_current_lanelet->s;
       } else {
         traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
         current_lanelet_pose.lanelet_id = route[i];
         if (
           auto current_lanelet_origin_from_next_lanelet =
             toLaneletPose(toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
-          distance +=
-            (-current_lanelet_origin_from_next_lanelet->s - getLaneletLength(route[i]));
+          distance -= current_lanelet_origin_from_next_lanelet->s;
         } else {
           return std::nullopt;
+        }
+      }
+
+      if (route[i] == from.lanelet_id) {
+        distance += getLaneletLength(route[i + 1]) - from.s;
+        if (route[i + 1] == to.lanelet_id) {
+          distance -= getLaneletLength(route[i + 1]) - to.s;
+          return distance;
         }
       }
     } else {
       if (route[i] == from.lanelet_id) {
         distance = getLaneletLength(from.lanelet_id) - from.s;
       } else if (route[i] == to.lanelet_id) {
-        distance = distance + to.s;
+        distance += to.s;
       } else {
-        distance = distance + getLaneletLength(route[i]);
+        distance += getLaneletLength(route[i]);
       }
     }
   }
