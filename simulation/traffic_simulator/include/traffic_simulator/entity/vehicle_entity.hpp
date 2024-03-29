@@ -76,6 +76,8 @@ public:
   auto getDefaultDynamicConstraints() const
     -> const traffic_simulator_msgs::msg::DynamicConstraints & override;
 
+  auto getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double override;
+
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
   auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
@@ -106,6 +108,8 @@ public:
   void requestLaneChange(const lanelet::Id to_lanelet_id) override;
 
   void requestLaneChange(const traffic_simulator::lane_change::Parameter &) override;
+
+  void setVelocityLimit(double linear_velocity) override;
 
   void setAccelerationLimit(double acceleration) override;
 

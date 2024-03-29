@@ -1,0 +1,45 @@
+name: Check msgs / srvs update
+on:
+  schedule:
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+jobs:
+  check_message_updates:
+    name: Check message updates
+    runs-on: ubuntu-22.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: scenario_simulator_v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.5.1"
+
+      - name: Install dependencies
+        run: |
+          pip3 install -U vcstool
+          vcs import scenario_simulator_v2/external < scenario_simulator_v2/dependency_humble.repos
+
+      - name: Install Python dependencies
+        run: |
+          cd scenario_simulator_v2
+          poetry install --no-interaction
+
+      - name: Check updates
+        shell: bash
+        run: |
+          cd scenario_simulator_v2
+          poetry run python3 .github/msgs_checker.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          ISSUE_NUMBER: 1203

@@ -27,8 +27,6 @@
 #include "random_test_runner/metrics/goal_reached_metric.hpp"
 #include "traffic_simulator/api/api.hpp"
 
-const double test_timeout = 60.0;
-
 traffic_simulator_msgs::msg::VehicleParameters getVehicleParameters()
 {
   traffic_simulator_msgs::msg::VehicleParameters parameters;
@@ -62,12 +60,12 @@ class TestExecutor
 public:
   TestExecutor(
     std::shared_ptr<traffic_simulator_api_type> api, TestDescription description,
-    JunitXmlReporterTestCase test_case_reporter, SimulatorType simulator_type,
+    JunitXmlReporterTestCase test_case_reporter, double test_timeout,
     ArchitectureType architecture_type, rclcpp::Logger logger)
   : api_(std::move(api)),
     test_description_(std::move(description)),
     error_reporter_(std::move(test_case_reporter)),
-    simulator_type_(simulator_type),
+    test_timeout_(test_timeout),
     architecture_type_(architecture_type),
     logger_(logger)
   {
@@ -82,57 +80,55 @@ public:
 
       api_->updateFrame();
 
-      if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-        api_->spawn(
-          ego_name_, api_->canonicalize(test_description_.ego_start_position),
-          getVehicleParameters(), traffic_simulator::VehicleBehavior::autoware());
-        api_->setEntityStatus(
-          ego_name_, api_->canonicalize(test_description_.ego_start_position),
-          traffic_simulator::helper::constructActionStatus());
+      api_->spawn(
+        ego_name_, api_->canonicalize(test_description_.ego_start_position), getVehicleParameters(),
+        traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
+      api_->setEntityStatus(
+        ego_name_, api_->canonicalize(test_description_.ego_start_position),
+        traffic_simulator::helper::constructActionStatus());
 
-        if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
-          api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-            traffic_simulator::helper::LidarType::VLP16, ego_name_,
-            stringFromArchitectureType(architecture_type_)));
+      if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
+        api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+          traffic_simulator::helper::LidarType::VLP16, ego_name_,
+          stringFromArchitectureType(architecture_type_)));
 
-          double constexpr detection_update_duration = 0.1;
-          api_->attachDetectionSensor(
-            traffic_simulator::helper::constructDetectionSensorConfiguration(
-              ego_name_, stringFromArchitectureType(architecture_type_),
-              detection_update_duration));
+        double constexpr detection_update_duration = 0.1;
+        api_->attachDetectionSensor(
+          traffic_simulator::helper::constructDetectionSensorConfiguration(
+            ego_name_, stringFromArchitectureType(architecture_type_), detection_update_duration));
 
-          api_->attachOccupancyGridSensor([&]() {
-            simulation_api_schema::OccupancyGridSensorConfiguration configuration;
-            configuration.set_architecture_type(stringFromArchitectureType(architecture_type_));
-            configuration.set_entity(ego_name_);
-            configuration.set_filter_by_range(true);
-            configuration.set_height(200);
-            configuration.set_range(300);
-            configuration.set_resolution(0.5);
-            configuration.set_update_duration(0.1);
-            configuration.set_width(200);
-            return configuration;
-          }());
+        api_->attachOccupancyGridSensor([&]() {
+          simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+          configuration.set_architecture_type(stringFromArchitectureType(architecture_type_));
+          configuration.set_entity(ego_name_);
+          configuration.set_filter_by_range(true);
+          configuration.set_height(200);
+          configuration.set_range(300);
+          configuration.set_resolution(0.5);
+          configuration.set_update_duration(0.1);
+          configuration.set_width(200);
+          return configuration;
+        }());
 
-          api_->asFieldOperatorApplication(ego_name_).template declare_parameter<bool>(
-            "allow_goal_modification", true);
-        }
-
-        // XXX dirty hack: wait for autoware system to launch
-        // ugly but helps for now
-        std::this_thread::sleep_for(std::chrono::milliseconds{5000});
-
-        api_->requestAssignRoute(
-          ego_name_, std::vector({api_->canonicalize(test_description_.ego_goal_position)}));
-        api_->asFieldOperatorApplication(ego_name_).engage();
-
-        goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
+        api_->asFieldOperatorApplication(ego_name_).template declare_parameter<bool>(
+          "allow_goal_modification", true);
       }
+
+      // XXX dirty hack: wait for autoware system to launch
+      // ugly but helps for now
+      std::this_thread::sleep_for(std::chrono::milliseconds{5000});
+
+      api_->requestAssignRoute(
+        ego_name_, std::vector({api_->canonicalize(test_description_.ego_goal_position)}));
+      api_->asFieldOperatorApplication(ego_name_).engage();
+
+      goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
 
       for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
         const auto & npc_descr = test_description_.npcs_descriptions[i];
         api_->spawn(
-          npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters());
+          npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters(),
+          traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
         api_->setEntityStatus(
           npc_descr.name, api_->canonicalize(npc_descr.start_position),
           traffic_simulator::helper::constructActionStatus(npc_descr.speed));
@@ -156,41 +152,40 @@ public:
       auto current_time = api_->getCurrentTime();
 
       if (!std::isnan(current_time)) {
-        bool timeout_reached = current_time >= test_timeout;
+        if (goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
+          scenario_completed_ = true;
+        }
+
+        bool timeout_reached = current_time >= test_timeout_;
         if (timeout_reached) {
-          if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-            if (!goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
-              RCLCPP_INFO(logger_, "Timeout reached");
-              error_reporter_.reportTimeout();
-            }
+          if (!goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
+            RCLCPP_INFO(logger_, "Timeout reached");
+            error_reporter_.reportTimeout();
           }
           scenario_completed_ = true;
-
           return;
         }
       }
 
-      if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-        for (const auto & npc : test_description_.npcs_descriptions) {
-          if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
-            if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
-              std::string message =
-                fmt::format("New collision occurred between ego and {}", npc.name);
-              RCLCPP_INFO_STREAM(logger_, message);
-              error_reporter_.reportCollision(npc, current_time);
-            }
+      for (const auto & npc : test_description_.npcs_descriptions) {
+        if (api_->entityExists(npc.name) && api_->checkCollision(ego_name_, npc.name)) {
+          if (ego_collision_metric_.isThereEgosCollisionWith(npc.name, current_time)) {
+            std::string message =
+              fmt::format("New collision occurred between ego and {}", npc.name);
+            RCLCPP_INFO_STREAM(logger_, message);
+            error_reporter_.reportCollision(npc, current_time);
           }
         }
+      }
 
-        if (almost_standstill_metric_.isAlmostStandingStill(api_->getEntityStatus(ego_name_))) {
-          RCLCPP_INFO(logger_, "Standstill duration exceeded");
-          if (goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
-            RCLCPP_INFO(logger_, "Goal reached, standstill expected");
-          } else {
-            error_reporter_.reportStandStill();
-          }
-          scenario_completed_ = true;
+      if (almost_standstill_metric_.isAlmostStandingStill(api_->getEntityStatus(ego_name_))) {
+        RCLCPP_INFO(logger_, "Standstill duration exceeded");
+        if (goal_reached_metric_.isGoalReached(api_->getEntityStatus(ego_name_))) {
+          RCLCPP_INFO(logger_, "Goal reached, standstill expected");
+        } else {
+          error_reporter_.reportStandStill();
         }
+        scenario_completed_ = true;
       }
 
       api_->updateFrame();
@@ -203,9 +198,8 @@ public:
       std::string message = fmt::format("Deinitialize: {}", test_description_);
       RCLCPP_INFO_STREAM(logger_, message);
 
-      if (simulator_type_ == SimulatorType::SIMPLE_SENSOR_SIMULATOR) {
-        api_->despawn(ego_name_);
-      }
+      api_->despawn(ego_name_);
+
       for (const auto & npc : test_description_.npcs_descriptions) {
         api_->despawn(npc.name);
       }
@@ -249,8 +243,8 @@ private:
   EgoCollisionMetric ego_collision_metric_;
   JunitXmlReporterTestCase error_reporter_;
 
-  SimulatorType simulator_type_;
   ArchitectureType architecture_type_;
+  double test_timeout_;
 
   bool scenario_completed_ = false;
 

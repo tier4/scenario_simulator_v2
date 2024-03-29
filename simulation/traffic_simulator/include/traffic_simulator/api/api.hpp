@@ -266,10 +266,6 @@ public:
 
   void startNpcLogic();
 
-  auto requestFollowTrajectory(
-    const std::string &, const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &)
-    -> bool;
-
   void requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id);
 
   void requestLaneChange(const std::string & name, const lane_change::Direction & direction);
@@ -286,7 +282,7 @@ public:
     const lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
    @brief Forward to arguments to the EntityManager::NAME function.        \
@@ -344,8 +340,10 @@ public:
   FORWARD_TO_ENTITY_MANAGER(reachPosition);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
+  FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(setAcceleration);
@@ -361,6 +359,10 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
+private:
+  FORWARD_TO_ENTITY_MANAGER(getDefaultMatchingDistanceForLaneletPoseCalculation);
+
+public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
   auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
