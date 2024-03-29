@@ -88,7 +88,7 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ""
+                                - name: "lateral, freespace=false, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -103,7 +103,7 @@ OpenSCENARIO:
                                         relativeDistanceType: longitudinal
                                         routingAlgorithm: shortest
                                         rule: notEqualTo
-                                        value: 56.8777144221841695
+                                        value: 56.8808259861762621767
                                         Position: &POSITION_1
                                           LanePosition:
                                             roadId: ""
@@ -116,7 +116,49 @@ OpenSCENARIO:
                                               p: 0
                                               r: 0
                             - Condition:
-                                - name: ""
+                                - name: "lateral, freespace=false, shortest to adjacent lane"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 56.8808259861762621767
+                                        Position: &POSITION_2
+                                          LanePosition:
+                                            roadId: ""
+                                            laneId: 34462
+                                            s: 50
+                                            offset: 0
+                                            Orientation: *DEFAULT_ORIENTATION
+                            - Condition:
+                                - name: "lateral, freespace=true, shortest"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: true
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 53.140825986176260187221487285569
+                                        Position: *POSITION_1
+                            - Condition:
+                                - name: "lateral, freespace=false, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -132,6 +174,24 @@ OpenSCENARIO:
                                         routingAlgorithm: shortest
                                         rule: notEqualTo
                                         value: 3.021089007161695
+                                        Position: *POSITION_1
+                            - Condition:
+                                - name: "lateral, freespace=true, shortest"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: true
+                                        relativeDistanceType: lateral
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 2.106089007161695114689337060
                                         Position: *POSITION_1
             StartTrigger:
               ConditionGroup:
