@@ -231,14 +231,14 @@ public:
 
   /*   */ auto getDistanceToTargetLaneletPose(
     const CanonicalizedLaneletPose & target_lanelet_pose, const double matching_distance)
-    -> std::optional<double>;
+    -> double;
 
   /*   */ auto getIfArrivedToTargetLaneletPose(
     const CanonicalizedLaneletPose & target_lanelet_pose, const double threshold) -> bool;
 
   /*   */ auto requestSynchronize(
     const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,
-    const double threshold, const double accel_limit) -> bool;
+    const double threshold, const double accel_limit, const double loop_period) -> bool;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
     -> void final;

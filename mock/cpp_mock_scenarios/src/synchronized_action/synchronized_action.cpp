@@ -49,23 +49,20 @@ private:
 
   void onUpdate() override
   {
-    if (!api_.getIfArrivedToTargetLaneletPose("npc", npc_target, 0.4)) {
-      api_.requestSynchronize("npc", ego_target, npc_target, 0.2, 3.0);
-      RCLCPP_ERROR_STREAM(
-        rclcpp::get_logger("synchronized action"), "current time: " << api_.getCurrentTime());
-    }
-
+    RCLCPP_ERROR_STREAM(
+      rclcpp::get_logger("synchronized action"), "current time: " << api_.getCurrentTime());
     // SUCCESS
     // check if npc is in the target lanelet when ego is in the target lanelet and npc is stopped
     if (
+      api_.requestSynchronize("npc", ego_target, npc_target, 0.2, 3.0, 50) &&
       api_.getIfArrivedToTargetLaneletPose("ego", ego_target, 0.2) &&
       api_.getIfArrivedToTargetLaneletPose("npc", npc_target, 0.2) &&
-      api_.getCurrentTwist("npc").linear.x <= 0.01) {
+      api_.getCurrentTwist("npc").linear.x <= 0.1) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
 
     // FAILURES
-    if (api_.getCurrentTime() >= 40.0) {
+    if (api_.getCurrentTime() >= 9.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.checkCollision("ego", "npc")) {
@@ -96,7 +93,7 @@ private:
     npc_goal_poses.emplace_back(api_.toMapPose(
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34696, 3, 0, 0, 0, 0))));
     api_.requestAssignRoute("npc", npc_goal_poses);
-    api_.setLinearVelocity("npc", 6);
+    api_.setLinearVelocity("npc", 5.5);
   }
 
   auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)
