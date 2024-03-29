@@ -1,0 +1,122 @@
+name: BuildTest
+
+on:
+  schedule:
+    - cron: 0 0 * * *
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 8
+      matrix:
+        rosdistro: [humble]
+        include:
+          # Galactic Geochelone (May 2021 - November 2022)
+          # - docker_image: rostooling/setup-ros-docker:ubuntu-focal-ros-galactic-ros-base-latest
+          #   rosdistro: galactic
+          # Humble Hawksbill (May 2022 - May 2027)
+          - docker_image: rostooling/setup-ros-docker:ubuntu-jammy-ros-humble-ros-base-latest
+            rosdistro: humble
+          # Rolling Ridley
+          # - docker_image: rostooling/setup-ros-docker:ubuntu-jammy-ros-rolling-ros-base-latest
+          #   rosdistro: rolling
+    env:
+      ROS_DISTRO: ${{ matrix.rosdistro }}
+    container:
+      image: ${{ matrix.docker_image }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: workaround for jammy
+        if: ${{ matrix.rosdistro == 'humble' }}
+        run: |
+          apt remove libunwind-14-dev -y
+          apt install python3-nose -y
+          pip uninstall nose -y
+      - name: install ccache
+        run: |
+          apt install -y ccache
+      - name: Make ccache dir
+        run: |
+          mkdir -p /tmp/ccache
+      - uses: actions/cache@v3
+        with:
+          path: /tmp/ccache
+          key: ccache-${{ matrix.rosdistro }}
+      - name: Search packages in this repository
+        id: list_packages
+        run: |
+          echo ::set-output name=package_list::$(colcon list --names-only | sed -e ':loop; N; $!b loop; s/\n/ /g')
+      - name: Show target packages
+        run: |
+          echo "Target packages: ${{ steps.list_packages.outputs.package_list }}"
+      - name: Check dependency-${{ matrix.rosdistro }}.repos existence
+        id: check_rosdistro_repos_files
+        uses: andstor/file-existence-action@v1
+        with:
+          files: dependency-${{ matrix.rosdistro }}.repos
+          allow_failure: false
+      - name: Check dependency.repos existence
+        id: check_repos_files
+        uses: andstor/file-existence-action@v1
+        with:
+          files: dependency.repos
+          allow_failure: false
+      - name: Run build test with dependency-${{ matrix.rosdistro }}.repos
+        uses: ros-tooling/action-ros-ci@v0.3
+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'true'
+        with:
+          package-name: ${{ steps.list_packages.outputs.package_list }}
+          target-ros2-distro: ${{ matrix.rosdistro }}
+          vcs-repo-file-url: dependency-${{ matrix.rosdistro }}.repos
+          extra-cmake-args: -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        env: 
+          CCACHE_DIR: /tmp/ccache
+          DEVELOP: true
+      - name: Run build test with dependency.repos
+        uses: ros-tooling/action-ros-ci@v0.3
+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'true'
+        with:
+          package-name: ${{ steps.list_packages.outputs.package_list }}
+          target-ros2-distro: ${{ matrix.rosdistro }}
+          vcs-repo-file-url: dependency.repos
+          extra-cmake-args: -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        env: 
+          CCACHE_DIR: /tmp/ccache
+          DEVELOP: true
+      - name: Run build test without .repos file
+        uses: ros-tooling/action-ros-ci@v0.3
+        if: steps.check_rosdistro_repos_files.outputs.files_exists == 'false' && steps.check_repos_files.outputs.files_exists == 'false'
+        with:
+          package-name: ${{ steps.list_packages.outputs.package_list }}
+          target-ros2-distro: ${{ matrix.rosdistro }}
+          extra-cmake-args: -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+        env: 
+          CCACHE_DIR: /tmp/ccache
+          DEVELOP: true
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v2
+        if: failure()
+        with:
+          status: ${{ job.status }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+  merge:
+    name: merge
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    needs: build
+    steps:
+      - name: merge PR
+        if : ${{ (github.event_name == 'pull_request') && (github.actor == 'wam-v-tan') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge ${{ github.event.pull_request.html_url }} --merge
