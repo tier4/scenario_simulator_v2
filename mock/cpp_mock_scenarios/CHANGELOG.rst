@@ -2,6 +2,20 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.10.0 (2024-03-28)
+-------------------
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.9.1 (2024-03-28)
+------------------
+
 1.9.0 (2024-03-27)
 ------------------
 * Merge pull request `#1210 <https://github.com/tier4/scenario_simulator_v2/issues/1210>`_ from tier4/feature/reset_behavior_plugin

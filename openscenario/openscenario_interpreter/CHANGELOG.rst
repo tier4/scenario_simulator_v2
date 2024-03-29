@@ -2,6 +2,19 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.10.0 (2024-03-28)
+-------------------
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.9.1 (2024-03-28)
+------------------
+
 1.9.0 (2024-03-27)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
