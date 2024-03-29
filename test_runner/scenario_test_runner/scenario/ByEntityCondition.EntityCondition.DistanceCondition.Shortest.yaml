@@ -131,7 +131,7 @@ OpenSCENARIO:
                                         relativeDistanceType: longitudinal
                                         routingAlgorithm: shortest
                                         rule: notEqualTo
-                                        value: 29
+                                        value: 28.90481959183431825977095
                                         Position: &POSITION_2
                                           LanePosition:
                                             roadId: ""
