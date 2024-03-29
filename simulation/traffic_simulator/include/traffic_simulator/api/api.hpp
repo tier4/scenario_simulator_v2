@@ -27,6 +27,7 @@
 #include <rosgraph_msgs/msg/clock.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <simulation_interface/zmq_multi_client.hpp>
+#include <std_msgs/msg/float64.hpp>
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
@@ -74,7 +75,21 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    clock_(std::forward<decltype(xs)>(xs)...),
+    real_time_factor_subscriber(rclcpp::create_subscription<std_msgs::msg::Float64>(
+      node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
+      [this](const std_msgs::msg::Float64 & message) {
+        /**
+         * @note Pausing the simulation by setting the realtime_factor_ value to 0 is not supported and causes the simulation crash.
+         * For that reason, before performing the action, it needs to be ensured that the incoming request data is a positive number.
+         */
+        if (message.data >= 0.001) {
+          clock_.realtime_factor = message.data;
+          simulation_api_schema::UpdateStepTimeRequest request;
+          request.set_simulation_step_time(clock_.getStepTime());
+          zeromq_client_.call(request);
+        }
+      })),
+    clock_(node->get_parameter("use_sim_time").as_bool(), std::forward<decltype(xs)>(xs)...),
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
@@ -251,10 +266,6 @@ public:
 
   void startNpcLogic();
 
-  auto requestFollowTrajectory(
-    const std::string &, const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &)
-    -> bool;
-
   void requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id);
 
   void requestLaneChange(const std::string & name, const lane_change::Direction & direction);
@@ -271,7 +282,7 @@ public:
     const lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
-// clang-format off
+  // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
    @brief Forward to arguments to the EntityManager::NAME function.        \
@@ -330,11 +341,14 @@ public:
   FORWARD_TO_ENTITY_MANAGER(reachPosition);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
+  FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestSynchronize);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
+  FORWARD_TO_ENTITY_MANAGER(setAcceleration);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setBehaviorParameter);
@@ -342,9 +356,15 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
+  FORWARD_TO_ENTITY_MANAGER(setMapPose);
+  FORWARD_TO_ENTITY_MANAGER(setTwist);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
+private:
+  FORWARD_TO_ENTITY_MANAGER(getDefaultMatchingDistanceForLaneletPoseCalculation);
+
+public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
   auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
@@ -371,6 +391,8 @@ private:
   const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
 
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr debug_marker_pub_;
+
+  const rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr real_time_factor_subscriber;
 
   SimulationClock clock_;
 

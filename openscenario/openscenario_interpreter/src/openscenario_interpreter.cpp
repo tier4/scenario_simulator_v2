@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/syntax/scenario_definition.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
+#include <status_monitor/status_monitor.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
@@ -200,12 +201,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          // clang-format off
           record::start(
-            "-a",
-            "-o", boost::filesystem::path(osc_path).replace_extension("").string(),
-            "-x", "/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/intersection");
-          // clang-format on
+            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
         }
 
         SimulatorCore::activate(
@@ -293,7 +290,26 @@ auto Interpreter::reset() -> void
     publisher_of_context->on_deactivate();
   }
 
-  SimulatorCore::deactivate();
+  if (not has_parameter("initialize_duration")) {
+    declare_parameter<int>("initialize_duration", 30);
+  }
+
+  /*
+     Although we have not analyzed the details yet, the process of deactivating
+     the simulator core takes quite a long time (especially the
+     traffic_simulator::API::despawnEntities function is slow). During the
+     process, the interpreter becomes unresponsive, which often resulted in the
+     status monitor thread judging the interpreter as "not good". Therefore, we
+     will increase the threshold of the judgment only during the process of
+     deactivating the simulator core.
+
+     The threshold value here is set to the value of initialize_duration, but
+     there is no rationale for this; it should be larger than the original
+     threshold value of the status monitor and long enough for the simulator
+     core to be deactivated.
+  */
+  common::status_monitor.overrideThreshold(
+    std::chrono::seconds(get_parameter("initialize_duration").as_int()), SimulatorCore::deactivate);
 
   scenarios.pop_front();
 

@@ -641,7 +641,8 @@ auto CatmullRomSpline::getTangentVector(const double s) const -> geometry_msgs::
   }
 }
 
-auto CatmullRomSpline::getPose(const double s) const -> geometry_msgs::msg::Pose
+auto CatmullRomSpline::getPose(const double s, const bool fill_pitch) const
+  -> geometry_msgs::msg::Pose
 {
   switch (control_points.size()) {
     case 0:
@@ -664,10 +665,10 @@ auto CatmullRomSpline::getPose(const double s) const -> geometry_msgs::msg::Pose
           "This message is not originally intended to be displayed, if you see it, please "
           "contact the developer of traffic_simulator.");
       }
-      return line_segments_[0].getPose(s, true);
+      return line_segments_[0].getPose(s, true, fill_pitch);
     default:
       const auto index_and_s = getCurveIndexAndS(s);
-      return curves_[index_and_s.first].getPose(index_and_s.second, true);
+      return curves_[index_and_s.first].getPose(index_and_s.second, true, fill_pitch);
   }
 }
 

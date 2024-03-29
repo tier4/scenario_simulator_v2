@@ -1,0 +1,30 @@
+name: Check branch up to date
+on:
+  pull_request:
+    branches:
+      - master
+  merge_group:
+    types: [checks_requested]
+
+jobs:
+  check_branch_up_to_date:
+    name: Check branch up to date
+    timeout-minutes: 10
+    runs-on: ubuntu-22.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Check if branches are up to date
+        shell: bash
+        run: |
+          BASE=$(git merge-base origin/master HEAD)
+          if [ $BASE = $(git rev-parse origin/master) ]; then
+            echo "Branches are up to date, skipping merge."
+          else
+            echo "Branches are not up to date, merge is required."
+            exit 1
+          fi

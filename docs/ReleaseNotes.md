@@ -1,16 +1,23 @@
 # Release Notes
 
+!!! Warning
+    This release note does not record any update differences since version 1.0.0.
+    If you would like to check for update differences since version 1.0.0, please refer to [this page.](https://github.com/tier4/scenario_simulator_v2/releases)
+
 ## Difference between the latest release and master
 
 Major Changes :race_car: :red_car: :blue_car:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
+| Feature                 | Brief summary                                                        | Category            | Pull request                                                      | Contributor                                   |
+| ----------------------- | -------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| Extend matching length. | Enable consider tread when calculating matching length of EgoEntity. | `traffic_simulator` | [#1181](https://github.com/tier4/scenario_simulator_v2/pull/1181) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
 
-| Feature | Brief summary | Category | Pull request | Contributor |
-| ------- | ------------- | -------- | ------------ | ----------- |
+| Feature                        | Brief summary                                                  | Category            | Pull request                                                      | Contributor                                   |
+| ------------------------------ | -------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
+| Revert #1096                   | Revert incomplete fix for de-spawned entity.                   | `traffic_simulator` | [#1159](https://github.com/tier4/scenario_simulator_v2/pull/1159) | [HansRobo](https://github.com/HansRobo)       |
+| Fix problems in route planning | Fixed a bug in a function related to Entity's route selection. | `traffic_simulator` | [#1126](https://github.com/tier4/scenario_simulator_v2/pull/1168) | [hakuturu583](https://github.com/hakuturu583) |
 
 Minor Tweaks :oncoming_police_car:
 

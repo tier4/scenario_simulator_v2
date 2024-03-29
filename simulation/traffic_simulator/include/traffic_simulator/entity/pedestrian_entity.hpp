@@ -87,6 +87,8 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &);
 
+  void setVelocityLimit(double linear_velocity) override;
+
   void setAccelerationLimit(double acceleration) override;
 
   void setAccelerationRateLimit(double acceleration_rate) override;
@@ -118,6 +120,8 @@ public:
   auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 
   const std::string plugin_name;
+
+  const traffic_simulator_msgs::msg::PedestrianParameters pedestrian_parameters;
 
 private:
   pluginlib::ClassLoader<entity_behavior::BehaviorPluginBase> loader_;

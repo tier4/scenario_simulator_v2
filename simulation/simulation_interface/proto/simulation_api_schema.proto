@@ -188,6 +188,7 @@ message DespawnEntityResponse {
 message UpdateEntityStatusRequest {
   repeated EntityStatus status = 1;        // List of updated entity status in traffic simulator.
   bool npc_logic_started = 2;              // Npc logic started flag
+  bool overwrite_ego_status = 3;
 }
 
 /**
@@ -310,18 +311,17 @@ message UpdateTrafficLightsResponse {
 }
 
 /**
- * Request to make an entity follow a trajectory.
+ * Requests updating simulation step time.
  **/
-message FollowPolylineTrajectoryRequest {
-  string name = 1;
-  traffic_simulator_msgs.PolylineTrajectory trajectory = 2;
+message UpdateStepTimeRequest {
+  double simulation_step_time = 1;
 }
 
 /**
- * Response whether the entity's trajectory following request has been accepted.
+ * Response of updating simulation step time.
  **/
-message FollowPolylineTrajectoryResponse {
-  Result result = 1;
+message UpdateStepTimeResponse {
+  Result result = 1; // Result of [UpdateStepTimeRequest](#UpdateStepTimeRequest)
 }
 
 /**
@@ -340,8 +340,8 @@ message SimulationRequest {
     AttachDetectionSensorRequest attach_detection_sensor = 9;
     AttachOccupancyGridSensorRequest attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsRequest update_traffic_lights = 11;
-    FollowPolylineTrajectoryRequest follow_polyline_trajectory = 12;
     AttachPseudoTrafficLightDetectorRequest attach_pseudo_traffic_light_detector = 13;
+    UpdateStepTimeRequest update_step_time = 14;
   }
 }
 
@@ -362,7 +362,7 @@ message SimulationResponse {
     AttachDetectionSensorResponse attach_detection_sensor = 9;
     AttachOccupancyGridSensorResponse attach_occupancy_grid_sensor = 10;
     UpdateTrafficLightsResponse update_traffic_lights = 11;
-    FollowPolylineTrajectoryResponse follow_polyline_trajectory = 12;
     AttachPseudoTrafficLightDetectorResponse attach_pseudo_traffic_light_detector = 13;
+    UpdateStepTimeResponse update_step_time = 14;
   }
 }

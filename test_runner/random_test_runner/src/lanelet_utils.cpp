@@ -49,9 +49,9 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 std::vector<int64_t> LaneletUtils::getLaneletIds() { return hdmap_utils_ptr_->getLaneletIds(); }
 
 geometry_msgs::msg::PoseStamped LaneletUtils::toMapPose(
-  traffic_simulator_msgs::msg::LaneletPose lanelet_pose)
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch)
 {
-  return hdmap_utils_ptr_->toMapPose(lanelet_pose);
+  return hdmap_utils_ptr_->toMapPose(lanelet_pose, fill_pitch);
 }
 
 std::vector<int64_t> LaneletUtils::getRoute(int64_t from_lanelet_id, int64_t to_lanelet_id)
@@ -118,7 +118,7 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
   perpendicular_vector.z = 0.0;
   perpendicular_vector = math::geometry::normalize(perpendicular_vector);
 
-  geometry_msgs::msg::Point global_position_p = toMapPose(pose).pose.position;
+  geometry_msgs::msg::Point global_position_p = toMapPose(pose, false).pose.position;
   geometry_msgs::msg::Vector3 global_position;
   global_position.x = global_position_p.x;
   global_position.y = global_position_p.y;

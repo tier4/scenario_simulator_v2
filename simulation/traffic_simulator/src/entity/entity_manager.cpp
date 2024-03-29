@@ -86,13 +86,7 @@ visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 
 bool EntityManager::despawnEntity(const std::string & name)
 {
-  if (!entityExists(name)) {
-    return false;
-  }
-
-  entities_[name].reset(new DeletedEntity(name, getEntityStatus(name), hdmap_utils_ptr_));
-
-  return true;
+  return entityExists(name) && entities_.erase(name);
 }
 
 bool EntityManager::entityExists(const std::string & name)
@@ -141,11 +135,7 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};
   for (const auto & each : entities_) {
-    // Add filter for DeletedEntity because this list is used on SimpleSensorSimulator which do not
-    // know DeletedEntity.
-    if (each.second->getEntityType().type != DeletedEntity::ENTITY_TYPE_ID) {
-      names.push_back(each.first);
-    }
+    names.push_back(each.first);
   }
   return names;
 }
@@ -497,7 +487,7 @@ auto EntityManager::getLongitudinalDistance(
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
-    return isEgo(each.first);
+    return is<EgoEntity>(each.first);
   });
 }
 
@@ -505,7 +495,7 @@ const std::string EntityManager::getEgoName() const
 {
   const auto names = getEntityNames();
   for (const auto & name : names) {
-    if (isEgo(name)) {
+    if (is<EgoEntity>(name)) {
       return name;
     }
   }
@@ -521,6 +511,17 @@ auto EntityManager::getObstacle(const std::string & name)
     return std::nullopt;
   }
   return entities_.at(name)->getObstacle();
+}
+
+auto EntityManager::getPedestrianParameters(const std::string & name) const
+  -> const traffic_simulator_msgs::msg::PedestrianParameters &
+{
+  if (const auto entity = dynamic_cast<PedestrianEntity const *>(entities_.at(name).get())) {
+    return entity->pedestrian_parameters;
+  }
+  THROW_SIMULATION_ERROR(
+    "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
+    "Please check description of the scenario and entity type of the Entity: " + name);
 }
 
 auto EntityManager::getRelativePose(
@@ -576,6 +577,17 @@ auto EntityManager::getRelativePose(
 
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
+auto EntityManager::getVehicleParameters(const std::string & name) const
+  -> const traffic_simulator_msgs::msg::VehicleParameters &
+{
+  if (const auto vehicle = dynamic_cast<VehicleEntity const *>(entities_.at(name).get())) {
+    return vehicle->vehicle_parameters;
+  }
+  THROW_SIMULATION_ERROR(
+    "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
+    "Please check description of the scenario and entity type of the Entity: " + name);
+}
+
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
@@ -585,17 +597,10 @@ auto EntityManager::getWaypoints(const std::string & name)
   return entities_.at(name)->getWaypoints();
 }
 
-bool EntityManager::isEgo(const std::string & name) const
-{
-  using traffic_simulator_msgs::msg::EntityType;
-  return getEntityType(name).type == EntityType::EGO and
-         dynamic_cast<EgoEntity const *>(entities_.at(name).get());
-}
-
 bool EntityManager::isEgoSpawned() const
 {
   for (const auto & name : getEntityNames()) {
-    if (isEgo(name)) {
+    if (is<EgoEntity>(name)) {
       return true;
     }
   }
@@ -664,6 +669,36 @@ void EntityManager::requestLaneChange(
   }
 }
 
+void EntityManager::resetBehaviorPlugin(
+  const std::string & name, const std::string & behavior_plugin_name)
+{
+  const auto status = getEntityStatus(name);
+  const auto behavior_parameter = getBehaviorParameter(name);
+  if (is<EgoEntity>(name)) {
+    THROW_SEMANTIC_ERROR(
+      "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
+  } else if (is<MiscObjectEntity>(name)) {
+    THROW_SEMANTIC_ERROR(
+      "Entity :", name, "is MiscObjectEntity.",
+      "You cannot reset behavior plugin of MiscObjectEntity.");
+  } else if (is<VehicleEntity>(name)) {
+    const auto parameters = getVehicleParameters(name);
+    despawnEntity(name);
+    spawnEntity<VehicleEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+  } else if (is<PedestrianEntity>(name)) {
+    const auto parameters = getPedestrianParameters(name);
+    despawnEntity(name);
+    spawnEntity<PedestrianEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Entity :", name, "is unkown entity type.", "Please contact to developer.");
+  }
+  setLinearJerk(name, status.getLinearJerk());
+  setAcceleration(name, status.getAccel());
+  setTwist(name, status.getTwist());
+  setBehaviorParameter(name, behavior_parameter);
+}
+
 bool EntityManager::trafficLightsChanged()
 {
   return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
@@ -673,7 +708,7 @@ bool EntityManager::trafficLightsChanged()
 void EntityManager::requestSpeedChange(
   const std::string & name, double target_speed, bool continuous)
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, continuous);
@@ -683,7 +718,7 @@ void EntityManager::requestSpeedChange(
   const std::string & name, const double target_speed, const speed_change::Transition transition,
   const speed_change::Constraint constraint, const bool continuous)
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
@@ -692,7 +727,7 @@ void EntityManager::requestSpeedChange(
 void EntityManager::requestSpeedChange(
   const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, continuous);
@@ -703,7 +738,7 @@ void EntityManager::requestSpeedChange(
   const speed_change::Transition transition, const speed_change::Constraint constraint,
   const bool continuous)
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
@@ -712,24 +747,12 @@ void EntityManager::requestSpeedChange(
 auto EntityManager::setEntityStatus(
   const std::string & name, const CanonicalizedEntityStatus & status) -> void
 {
-  if (isEgo(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR(
       "You cannot set entity status to the ego vehicle name ", std::quoted(name),
       " after starting scenario.");
   } else {
     entities_.at(name)->setStatus(status);
-  }
-}
-
-auto EntityManager::setEntityStatusExternally(
-  const std::string & name, const CanonicalizedEntityStatus & status) -> void
-{
-  if (not isEgo(name)) {
-    THROW_SEMANTIC_ERROR(
-      "You cannot set entity status externally to the vehicle other than ego named ",
-      std::quoted(name), ".");
-  } else {
-    dynamic_cast<EgoEntity *>(entities_[name].get())->setStatusExternally(status);
   }
 }
 

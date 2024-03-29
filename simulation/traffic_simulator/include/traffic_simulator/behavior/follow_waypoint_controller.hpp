@@ -144,7 +144,7 @@ class FollowWaypointController
            << ", max_deceleration: " << c.max_deceleration
            << ", max_acceleration_rate: " << c.max_acceleration_rate
            << ", max_deceleration_rate: " << c.max_deceleration_rate
-           << ", target_speed: " << c.target_speed << ".";
+           << ", target_speed: " << c.target_speed << ". ";
     return stream;
   }
 

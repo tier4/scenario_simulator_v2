@@ -38,7 +38,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/data_type/lane_change.cpp
   src/data_type/lanelet_pose.cpp
   src/data_type/speed_change.cpp
-  src/entity/deleted_entity.cpp
   src/entity/ego_entity.cpp
   src/entity/entity_base.cpp
   src/entity/entity_manager.cpp
@@ -58,6 +57,19 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic_lights/traffic_light_marker_publisher.cpp
   src/traffic_lights/traffic_light_publisher.cpp
 )
+
+ament_auto_add_library(visualization_component SHARED
+  src/visualization/visualization_component.cpp
+)
+
+ament_auto_add_executable(visualization_node
+  src/visualization/visualization_node.cpp
+)
+target_link_libraries(visualization_node visualization_component)
+
+ament_export_libraries(visualization_component)
+
+rclcpp_components_register_nodes(visualization_component "traffic_simulator::VisualizationComponent")
 
 target_link_libraries(traffic_simulator
   tinyxml2
