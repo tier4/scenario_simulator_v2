@@ -140,6 +140,30 @@ OpenSCENARIO:
                                             offset: 0
                                             Orientation: *DEFAULT_ORIENTATION
                             - Condition:
+                                - name: "lateral, freespace=false, shortest to adjacent lane (backward position)"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: ego
+                                    EntityCondition:
+                                      DistanceCondition:
+                                        coordinateSystem: lane
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 6.0951804081656817402290471363812
+                                        Position:
+                                          LanePosition:
+                                            roadId: ""
+                                            laneId: 34462
+                                            s: 5
+                                            offset: 0
+                                            Orientation: *DEFAULT_ORIENTATION
+                            - Condition:
                                 - name: "lateral, freespace=true, shortest"
                                   delay: 0
                                   conditionEdge: none
