@@ -25,15 +25,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- UniformDistribution 1.2 ------------------------------------------------
- *
- *  <xsd:complexType name="UniformDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="Range" type="Range"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   UniformDistribution (OpenSCENARIO XML 1.3)
+
+   Uniform distribution which can be applied to a single parameter.
+
+   <xsd:complexType name="UniformDistribution">
+     <xsd:sequence>
+       <xsd:element name="Range" type="Range"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct UniformDistribution : public ComplexType,
                              private Scope,
                              public StochasticParameterDistributionBase

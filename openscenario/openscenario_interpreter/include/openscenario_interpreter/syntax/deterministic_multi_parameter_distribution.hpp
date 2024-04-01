@@ -23,15 +23,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicMultiParameterDistribution 1.2 ----------------------------
- *
- *  <xsd:complexType name="DeterministicMultiParameterDistribution">
- *    <xsd:sequence>
- *      <xsd:group ref="DeterministicMultiParameterDistributionType"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DeterministicMultiParameterDistribution (OpenSCENARIO XML 1.3)
+
+   Container for a deterministic distribution which is applied to multiple parameters.
+
+ <xsd:complexType name="DeterministicMultiParameterDistribution">
+   <xsd:sequence>
+     <xsd:group ref="DeterministicMultiParameterDistributionType"/>
+   </xsd:sequence>
+ </xsd:complexType>
+*/
 struct DeterministicMultiParameterDistribution : public DeterministicMultiParameterDistributionType,
                                                  public ParameterDistributionContainer
 {

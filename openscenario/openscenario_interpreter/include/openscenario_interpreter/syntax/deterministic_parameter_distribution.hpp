@@ -24,18 +24,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicParameterDistribution 1.2 ---------------------------------
- *
- *  <xsd:group name="DeterministicParameterDistribution">
- *    <xsd:choice>
- *      <xsd:element name="DeterministicMultiParameterDistribution"
- *        type="DeterministicMultiParameterDistribution"/>
- *      <xsd:element name="DeterministicSingleParameterDistribution"
- *        type="DeterministicSingleParameterDistribution"/>
- *    </xsd:choice>
- *  </xsd:group>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DeterministicParameterDistribution (OpenSCENARIO XML 1.3)
+
+   Either a DeterministicMultiParameterDistribution or a DeterministicSingleParameterDistribution
+
+   <xsd:group name="DeterministicParameterDistribution">
+     <xsd:choice>
+       <xsd:element name="DeterministicMultiParameterDistribution" type="DeterministicMultiParameterDistribution"/>
+       <xsd:element name="DeterministicSingleParameterDistribution" type="DeterministicSingleParameterDistribution"/>
+     </xsd:choice>
+   </xsd:group>
+*/
 struct DeterministicParameterDistribution : public Group
 {
   explicit DeterministicParameterDistribution(const pugi::xml_node &, Scope & scope);

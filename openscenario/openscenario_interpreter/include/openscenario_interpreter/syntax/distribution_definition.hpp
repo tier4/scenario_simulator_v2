@@ -24,16 +24,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DistributionDefinition 1.2 ---------------------------------------------
- *
- *  <xsd:group name="DistributionDefinition">
- *    <xsd:choice>
- *      <xsd:element name="Deterministic" type="Deterministic"/>
- *      <xsd:element name="Stochastic" type="Stochastic"/>
- *    </xsd:choice>
- *  </xsd:group>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DistributionDefinition (OpenSCENARIO XML 1.3)
+
+   Indicates whether the content defines a deterministic or stochastic parameter distribution.
+
+   <xsd:group name="DistributionDefinition">
+     <xsd:choice>
+       <xsd:element name="Deterministic" type="Deterministic"/>
+       <xsd:element name="Stochastic" type="Stochastic"/>
+     </xsd:choice>
+   </xsd:group>
+*/
 struct DistributionDefinition : public Group
 {
   explicit DistributionDefinition(const pugi::xml_node &, Scope & scope);

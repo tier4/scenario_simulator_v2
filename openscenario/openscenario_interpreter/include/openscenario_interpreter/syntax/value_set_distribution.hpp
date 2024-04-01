@@ -23,15 +23,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ValueSetDistribution 1.2 -----------------------------------------------
- *
- *  <xsd:complexType name="ValueSetDistribution">
- *    <xsd:sequence>
- *      <xsd:element name="ParameterValueSet" type="ParameterValueSet" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   ValueSetDistribution (OpenSCENARIO XML 1.3)
+
+   Deterministic multi-parameter distribution, where one or multiple sets of parameter values can be defined.
+
+   <xsd:complexType name="ValueSetDistribution">
+     <xsd:sequence>
+       <xsd:element name="ParameterValueSet" type="ParameterValueSet" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct ValueSetDistribution : public Scope, public MultiParameterDistributionBase
 {
   const std::list<ParameterValueSet> parameter_value_sets;

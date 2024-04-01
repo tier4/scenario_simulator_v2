@@ -23,16 +23,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- DeterministicSingleParameterDistribution 1.2 ---------------------------
- *
- *  <xsd:complexType name="DeterministicSingleParameterDistribution">
- *    <xsd:sequence>
- *      <xsd:group ref="DeterministicSingleParameterDistributionType"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="parameterName" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   DeterministicSingleParameterDistribution (OpenSCENARIO XML 1.3)
+
+   Container for a deterministic distribution which is applied to a single parameter.
+
+   <xsd:complexType name="DeterministicSingleParameterDistribution">
+     <xsd:sequence>
+       <xsd:group ref="DeterministicSingleParameterDistributionType"/>
+     </xsd:sequence>
+     <xsd:attribute name="parameterName" type="String" use="required"/>
+ </xsd:complexType>
+*/
 struct DeterministicSingleParameterDistribution
 : public DeterministicSingleParameterDistributionType,
   public ParameterDistributionContainer
