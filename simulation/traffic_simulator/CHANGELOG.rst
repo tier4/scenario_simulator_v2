@@ -2,6 +2,48 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.10.0 (2024-03-28)
+-------------------
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.9.1 (2024-03-28)
+------------------
+
+1.9.0 (2024-03-27)
+------------------
+* Merge pull request `#1210 <https://github.com/tier4/scenario_simulator_v2/issues/1210>`_ from tier4/feature/reset_behavior_plugin
+  Feature/reset behavior plugin
+* return const &
+* Update simulation/traffic_simulator/src/api/api.cpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Update simulation/traffic_simulator/src/api/api.cpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* enable set jerk
+* fix compile errors
+* remvoe unused function definitions
+* remove isEgo function and add is<EntityType> function
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Use capability query in get Vehicle/Pedestrian parameters functions.
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* add doxygen comment
+* fix typo
+* enable reset behavior parameter
+* add resetBehaviorPlugin function
+* Merge remote-tracking branch 'origin/master' into HEAD
+* cleand up a bit
+* working
+* Merge remote-tracking branch 'origin/master' into random-test-runner-docs-update
+* Contributors: Masaya Kataoka, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki
+
 1.8.0 (2024-03-25)
 ------------------
 * Merge pull request `#1201 <https://github.com/tier4/scenario_simulator_v2/issues/1201>`_ from tier4/feature/set_behavior_parameter_in_object_controller

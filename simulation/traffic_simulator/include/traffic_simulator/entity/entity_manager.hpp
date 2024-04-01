@@ -289,6 +289,7 @@ public:
   FORWARD_TO_ENTITY(getCurrentAccel, const);
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
+  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getDistanceToLaneBound, );
   FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
   FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
@@ -297,6 +298,7 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
+  FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
@@ -304,13 +306,12 @@ public:
   FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
-  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(laneMatchingSucceed, const);
   FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(cancelRequest, );
+  FORWARD_TO_ENTITY(isControlledBySimulator, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
-  FORWARD_TO_ENTITY(isControlledBySimulator, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
@@ -320,6 +321,7 @@ public:
   FORWARD_TO_ENTITY(setBehaviorParameter, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationRateLimit, );
+  FORWARD_TO_ENTITY(setLinearJerk, );
   FORWARD_TO_ENTITY(setLinearVelocity, );
   FORWARD_TO_ENTITY(setMapPose, );
   FORWARD_TO_ENTITY(setTwist, );
@@ -417,6 +419,9 @@ public:
   auto getObstacle(const std::string & name)
     -> std::optional<traffic_simulator_msgs::msg::Obstacle>;
 
+  auto getPedestrianParameters(const std::string & name) const
+    -> const traffic_simulator_msgs::msg::PedestrianParameters &;
+
   // clang-format off
   auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
   auto getRelativePose(const geometry_msgs::msg::Pose     & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
@@ -429,6 +434,9 @@ public:
   // clang-format on
 
   auto getStepTime() const noexcept -> double;
+
+  auto getVehicleParameters(const std::string & name) const
+    -> const traffic_simulator_msgs::msg::VehicleParameters &;
 
   auto getWaypoints(const std::string & name) -> traffic_simulator_msgs::msg::WaypointsArray;
 
@@ -454,7 +462,11 @@ public:
     }
   }
 
-  bool isEgo(const std::string & name) const;
+  template <typename EntityType>
+  bool is(const std::string & name) const
+  {
+    return dynamic_cast<EntityType const *>(entities_.at(name).get()) != nullptr;
+  }
 
   bool isEgoSpawned() const;
 
@@ -476,6 +488,16 @@ public:
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
+  /**
+   * @brief Reset behavior plugin of the target entity.
+   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
+   * @param name The name of the target entity.
+   * @param behavior_plugin_name The name of the behavior plugin you want to set.
+   * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
+   * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
+   */
+  void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
+
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
 
   void setVerbose(const bool verbose);
@@ -490,7 +512,7 @@ public:
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
         if (auto iter = std::find_if(
               std::begin(entities_), std::end(entities_),
-              [this](auto && each) { return isEgo(each.first); });
+              [this](auto && each) { return is<EgoEntity>(each.first); });
             iter != std::end(entities_)) {
           THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
         } else {
@@ -563,7 +585,7 @@ public:
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
-      if (npc_logic_started_ && not isEgo(name)) {
+      if (npc_logic_started_ && not is<EgoEntity>(name)) {
         iter->second->startNpcLogic();
       }
       return success;

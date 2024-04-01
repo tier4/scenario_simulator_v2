@@ -2,6 +2,41 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.10.0 (2024-03-28)
+-------------------
+* Merge pull request `#1200 <https://github.com/tier4/scenario_simulator_v2/issues/1200>`_ from tier4/feature/simple_sensor_simulator/custom_noise
+  Feature/simple sensor simulator/custom noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Remove the upper limit `300.0` of the detection sensor range
+* Replace the word `TheEntity` with `EgoEntity`
+* Rename function argument `detected_object` to `detected_objects`
+* Update `DefaultNoiseApplicator` to hold reference to Ego entity's status
+* Simplify complex and inefficient function `filterObjectsBySensorRange`
+* Add new struct `CustomNoiseApplicator`
+* Rename variables to appropriate for the current class content
+* Move the process of applying noise to a new structure `DefaultNoise`
+* Add type U for ground truth to the template parameter of DetectionSensor
+* Split ROS message type object construction into some free functions
+* Move the DetectedObject construction to a new free function
+* Lipsticks
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+1.9.1 (2024-03-28)
+------------------
+
+1.9.0 (2024-03-27)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Merge remote-tracking branch 'origin/master' into HEAD
+* Merge remote-tracking branch 'origin/master' into random-test-runner-docs-update
+* Contributors: Masaya Kataoka, Paweł Lech, Piotr Zyskowski
+
 1.8.0 (2024-03-25)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
