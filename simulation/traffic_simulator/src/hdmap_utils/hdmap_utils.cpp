@@ -1512,7 +1512,6 @@ auto HdMapUtils::getLongitudinalDistance(
   };
   for (unsigned int i = 0; i < route.size(); i++) {
     if (i < route.size() - 1 && with_lane_change(allow_lane_change, route[i], route[i + 1])) {
-
       traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
       next_lanelet_pose.lanelet_id = route[i + 1];
       next_lanelet_pose.s = 0.0;
