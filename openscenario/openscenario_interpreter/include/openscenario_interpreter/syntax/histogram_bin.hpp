@@ -23,16 +23,18 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- HistogramBin 1.2 -------------------------------------------------------
- *
- *  <xsd:complexType name="HistogramBin">
- *    <xsd:sequence>
- *      <xsd:element name="Range" type="Range"/>
- *    </xsd:sequence>
- *    <xsd:attribute name="weight" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   HistogramBin (OpenSCENARIO XML 1.3)
+
+   A bin in a histogram.
+
+   <xsd:complexType name="HistogramBin">
+     <xsd:sequence>
+       <xsd:element name="Range" type="Range"/>
+     </xsd:sequence>
+     <xsd:attribute name="weight" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct HistogramBin : public ComplexType
 {
   const Range range;

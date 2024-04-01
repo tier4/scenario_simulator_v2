@@ -24,14 +24,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ParameterAssignment--------------------------------------------------
- *
- * <xsd:complexType name="ParameterAssignment">
- *   <xsd:attribute name="parameterRef" type="String" use="required"/>
- *   <xsd:attribute name="value" type="String" use="required"/>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
 struct ParameterAssignments : std::list<ParameterAssignment>
 {
   explicit ParameterAssignments() = default;

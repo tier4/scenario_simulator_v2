@@ -21,15 +21,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ParameterValueSet 1.2 --------------------------------------------------
- *
- *  <xsd:complexType name="ParameterValueSet">
- *    <xsd:sequence>
- *      <xsd:element name="ParameterAssignment" type="ParameterAssignment" maxOccurs="unbounded"/>
- *    </xsd:sequence>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   ParameterValueSet (OpenSCENARIO XML 1.3)
+
+   Set of parameter values that have to be assigned for a single concrete scenario.
+
+   <xsd:complexType name="ParameterValueSet">
+     <xsd:sequence>
+       <xsd:element name="ParameterAssignment" type="ParameterAssignment" maxOccurs="unbounded"/>
+     </xsd:sequence>
+   </xsd:complexType>
+*/
 struct ParameterValueSet : private Scope
 {
   const std::list<ParameterAssignment> parameter_assignments;

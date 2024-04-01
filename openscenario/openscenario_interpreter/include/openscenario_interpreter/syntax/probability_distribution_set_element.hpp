@@ -23,14 +23,16 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- ProbabilityDistributionSetElement 1.2 ----------------------------------
- *
- *  <xsd:complexType name="ParameterValueSet">
- *    <xsd:attribute name="value" type="String" use="required"/>
- *    <xsd:attribute name="weight" type="Double" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   ProbabilityDistributionSetElement (OpenSCENARIO XML 1.3)
+
+   Indicates a value and probability in a stochastic distribution.
+
+   <xsd:complexType name="ProbabilityDistributionSetElement">
+     <xsd:attribute name="value" type="String" use="required"/>
+     <xsd:attribute name="weight" type="Double" use="required"/>
+   </xsd:complexType>
+*/
 struct ProbabilityDistributionSetElement : public ComplexType
 {
   const String value;
