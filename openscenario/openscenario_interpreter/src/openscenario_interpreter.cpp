@@ -201,12 +201,8 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
       },
       [&]() {
         if (record) {
-          // clang-format off
           record::start(
-            "-a",
-            "-o", boost::filesystem::path(osc_path).replace_extension("").string(),
-            "-x", "/planning/scenario_planning/lane_driving/behavior_planning/behavior_velocity_planner/debug/intersection");
-          // clang-format on
+            "-a", "-o", boost::filesystem::path(osc_path).replace_extension("").string());
         }
 
         SimulatorCore::activate(

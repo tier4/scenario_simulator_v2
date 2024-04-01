@@ -44,7 +44,7 @@ struct TestDescription
 
 enum RandomTestType { RANDOM_RUN, REPLAY };
 
-enum SimulatorType { SIMPLE_SENSOR_SIMULATOR, UNITY };
+enum SimulatorType { SIMPLE_SENSOR_SIMULATOR, AWSIM };
 SimulatorType simulatorTypeFromString(const std::string & simulator_type_str);
 
 enum ArchitectureType { AWF_AUTO, AWF_UNIVERSE, TIER4_PROPOSAL };
@@ -60,6 +60,7 @@ struct TestControlParameters
   SimulatorType simulator_type = SimulatorType::SIMPLE_SENSOR_SIMULATOR;
   ArchitectureType architecture_type = ArchitectureType::AWF_UNIVERSE;
   std::string simulator_host = "localhost";
+  double test_timeout = 60.0;
 };
 
 struct TestSuiteParameters
@@ -129,8 +130,9 @@ DEFINE_FMT_FORMATTER(
   v.name, v.lanelet_pose, v.pose, v.action_status, v.time, v.lanelet_pose_valid, v.type)
 
 DEFINE_FMT_FORMATTER(
-  TestControlParameters, "input dir: {} output dir: {} random test type: {} test count {}",
-  v.input_dir, v.output_dir, v.random_test_type, v.test_count)
+  TestControlParameters,
+  "input dir: {} output dir: {} random test type: {} test count {} test_timeout {}", v.input_dir,
+  v.output_dir, v.random_test_type, v.test_count, v.test_timeout)
 
 DEFINE_FMT_FORMATTER(
   TestSuiteParameters,

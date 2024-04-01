@@ -492,7 +492,8 @@ auto HdMapUtils::toPoint2d(const geometry_msgs::msg::Point & point) const -> lan
 
 auto HdMapUtils::matchToLane(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double reduction_ratio) const -> std::optional<lanelet::Id>
+  const bool include_crosswalk, const double matching_distance, const double reduction_ratio) const
+  -> std::optional<lanelet::Id>
 {
   std::optional<lanelet::Id> id;
   lanelet::matching::Object2d obj;
@@ -509,7 +510,8 @@ auto HdMapUtils::matchToLane(
         bbox.center.x - bbox.dimensions.x * 0.5 * reduction_ratio,
         bbox.center.y - bbox.dimensions.y * 0.5 * reduction_ratio}},
     obj.pose);
-  auto matches = lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, 3.0);
+  auto matches =
+    lanelet::matching::getDeterministicMatches(*lanelet_map_ptr_, obj, matching_distance);
   if (!include_crosswalk) {
     matches = lanelet::matching::removeNonRuleCompliantMatches(matches, traffic_rules_vehicle_ptr_);
   }
@@ -518,23 +520,17 @@ auto HdMapUtils::matchToLane(
   }
   std::vector<std::pair<lanelet::Id, double>> id_and_distance;
   for (const auto & match : matches) {
-    /**
-     * @note Hard coded parameter. Matching threshold for lanelet.
-     */
-    if (match.distance <= 1.0) {
-      auto lanelet_pose = toLaneletPose(pose, match.lanelet.id());
-      if (lanelet_pose) {
-        id_and_distance.emplace_back(lanelet_pose->lanelet_id, lanelet_pose->offset);
-      }
+    if (const auto lanelet_pose = toLaneletPose(pose, match.lanelet.id(), matching_distance)) {
+      id_and_distance.emplace_back(lanelet_pose->lanelet_id, lanelet_pose->offset);
     }
   }
   if (id_and_distance.empty()) {
     return std::nullopt;
   }
-  std::sort(id_and_distance.begin(), id_and_distance.end(), [](auto const & lhs, auto const & rhs) {
-    return lhs.second < rhs.second;
-  });
-  return id_and_distance[0].first;
+  const auto min_id_and_distance = std::min_element(
+    id_and_distance.begin(), id_and_distance.end(),
+    [](auto const & lhs, auto const & rhs) { return lhs.second < rhs.second; });
+  return min_id_and_distance->first;
 }
 
 auto HdMapUtils::toLaneletPose(
@@ -604,7 +600,7 @@ auto HdMapUtils::toLaneletPose(
   const bool include_crosswalk, const double matching_distance) const
   -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk);
+  const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk, matching_distance);
   if (!lanelet_id) {
     return toLaneletPose(pose, include_crosswalk, matching_distance);
   }
@@ -1393,7 +1389,8 @@ auto HdMapUtils::toMapPoints(const lanelet::Id lanelet_id, const std::vector<dou
   return ret;
 }
 
-auto HdMapUtils::toMapPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose) const
+auto HdMapUtils::toMapPose(
+  const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch) const
   -> geometry_msgs::msg::PoseStamped
 {
   if (
@@ -1409,7 +1406,7 @@ auto HdMapUtils::toMapPose(const traffic_simulator_msgs::msg::LaneletPose & lane
     const auto tangent_vec = spline->getTangentVector(pose->s);
     geometry_msgs::msg::Vector3 rpy;
     rpy.x = 0.0;
-    rpy.y = 0.0;
+    rpy.y = fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0;
     rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
     ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy) *
                            quaternion_operation::convertEulerAngleToQuaternion(pose->rpy);
