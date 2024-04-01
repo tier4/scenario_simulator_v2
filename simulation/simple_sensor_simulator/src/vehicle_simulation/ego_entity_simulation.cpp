@@ -34,13 +34,15 @@ static auto getParameter(const std::string & name, T value = {})
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
+  const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope,
+  const bool consider_pose_by_road_slope)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters),
-  consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope)
+  consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
+  consider_pose_by_road_slope_(consider_pose_by_road_slope)
 {
   autoware->set_parameter(use_sim_time);
 }
@@ -108,8 +110,8 @@ auto EgoEntitySimulation::makeSimulationModel(
   const auto steer_time_delay           = getParameter<double>("steer_time_delay",            0.24);
   const auto vel_lim                    = getParameter<double>("vel_lim",                     parameters.performance.max_speed);  // 50.0
   const auto vel_rate_lim               = getParameter<double>("vel_rate_lim",                parameters.performance.max_acceleration);  // 7.0
-  const auto vel_time_constant          = getParameter<double>("vel_time_constant",           0.1);  // @note 0.5 is default value on simple_planning_simulator
-  const auto vel_time_delay             = getParameter<double>("vel_time_delay",              0.1);  // @note 0.25 is default value on simple_planning_simulator
+  const auto vel_time_constant          = getParameter<double>("vel_time_constant",           0.1);  /// @note 0.5 is default value on simple_planning_simulator
+  const auto vel_time_delay             = getParameter<double>("vel_time_delay",              0.1);  /// @note 0.25 is default value on simple_planning_simulator
   const auto wheel_base                 = getParameter<double>("wheel_base",                  parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
   // clang-format on
 
@@ -318,8 +320,8 @@ auto EgoEntitySimulation::getMatchedLaneletPoseFromEntityStatus(
   const traffic_simulator_msgs::msg::EntityStatus & status, const double entity_width) const
   -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
 {
-  // @note The lanelet matching algorithm should be equivalent to the one used in
-  // EgoEntity::setMapPose
+  /// @note The lanelet matching algorithm should be equivalent to the one used in
+  /// EgoEntity::setMapPose
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   const auto matching_length = [entity_width] { return entity_width * 0.5 + 1.0; }();
@@ -353,7 +355,7 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
 
   auto centerline_points = hdmap_utils_ptr_->getCenterPoints(ego_lanelet.value().lanelet_id);
 
-  // @note Copied from motion_util::findNearestSegmentIndex
+  /// @note Copied from motion_util::findNearestSegmentIndex
   auto find_nearest_segment_index = [](
                                       const std::vector<geometry_msgs::msg::Point> & points,
                                       const geometry_msgs::msg::Point & point) {
@@ -385,11 +387,11 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
   const auto & prev_point = centerline_points.at(ego_seg_idx);
   const auto & next_point = centerline_points.at(ego_seg_idx + 1);
 
-  // @note Calculate ego yaw angle on lanelet coordinates
+  /// @note Calculate ego yaw angle on lanelet coordinates
   const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
   const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
 
-  // @note calculate ego pitch angle considering ego yaw.
+  /// @note calculate ego pitch angle considering ego yaw.
   const double diff_z = next_point.z - prev_point.z;
   const double diff_xy = std::hypot(next_point.x - prev_point.x, next_point.y - prev_point.y) /
                          std::cos(ego_yaw_against_lanelet);
@@ -506,6 +508,20 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
       hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
     if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.value()).z;
+      if (consider_pose_by_road_slope_) {
+        const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
+          spline.getPose(s_value.value(), true).orientation);
+        const auto original_rpy =
+          quaternion_operation::convertQuaternionToEulerAngle(status.pose.orientation);
+        status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>()
+            .x(original_rpy.x)
+            .y(rpy.y)
+            .z(original_rpy.z));
+        lanelet_pose->rpy =
+          quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
+            spline.getPose(s_value.value(), true).orientation, status.pose.orientation));
+      }
     }
     status.lanelet_pose_valid = true;
     status.lanelet_pose = lanelet_pose.value();

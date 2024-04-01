@@ -8,17 +8,12 @@ jobs:
   check_message_updates:
     name: Check message updates
     runs-on: ubuntu-22.04
-    container: ros:humble
     steps:
       - name: checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           path: scenario_simulator_v2
-
-      - name: Install dependencies
-        run: |
-          vcs import scenario_simulator_v2/external < scenario_simulator_v2/dependency_humble.repos
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -28,6 +23,11 @@ jobs:
       - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: "1.5.1"
+
+      - name: Install dependencies
+        run: |
+          pip3 install -U vcstool
+          vcs import scenario_simulator_v2/external < scenario_simulator_v2/dependency_humble.repos
 
       - name: Install Python dependencies
         run: |

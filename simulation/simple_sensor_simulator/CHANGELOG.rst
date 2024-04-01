@@ -2,6 +2,102 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.10.0 (2024-03-28)
+-------------------
+* Merge pull request `#1200 <https://github.com/tier4/scenario_simulator_v2/issues/1200>`_ from tier4/feature/simple_sensor_simulator/custom_noise
+  Feature/simple sensor simulator/custom noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Remove the upper limit `300.0` of the detection sensor range
+* Replace the word `TheEntity` with `EgoEntity`
+* Rename function argument `detected_object` to `detected_objects`
+* Update `DefaultNoiseApplicator` to hold reference to Ego entity's status
+* Simplify complex and inefficient function `filterObjectsBySensorRange`
+* Add new struct `CustomNoiseApplicator`
+* Rename variables to appropriate for the current class content
+* Move the process of applying noise to a new structure `DefaultNoise`
+* Add type U for ground truth to the template parameter of DetectionSensor
+* Split ROS message type object construction into some free functions
+* Move the DetectedObject construction to a new free function
+* Lipsticks
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+1.9.1 (2024-03-28)
+------------------
+
+1.9.0 (2024-03-27)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Merge remote-tracking branch 'origin/master' into HEAD
+* Merge remote-tracking branch 'origin/master' into random-test-runner-docs-update
+* Contributors: Masaya Kataoka, Paweł Lech, Piotr Zyskowski
+
+1.8.0 (2024-03-25)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
+* Contributors: Masaya Kataoka
+
+1.7.1 (2024-03-21)
+------------------
+
+1.7.0 (2024-03-21)
+------------------
+
+1.6.1 (2024-03-19)
+------------------
+
+1.6.0 (2024-03-14)
+------------------
+
+1.5.1 (2024-03-13)
+------------------
+
+1.5.0 (2024-03-12)
+------------------
+* Merge pull request `#1209 <https://github.com/tier4/scenario_simulator_v2/issues/1209>`_ from tier4/feature/ego_slope
+  Consider road slope in distance measurement and entity poses
+* doc: use 3 slashes to comment-out before doxygen command
+* fix: use fill_pitch option in EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* doc:
+* chore: apply formatter
+* fix(build)
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* chore: format
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+* chore: fix conflict resolving miss
+* doc: add note for origin orientation of grid map
+* fix: build error
+* chore: format
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* refactor: use consider_pose_by_road_slope instead of consider_lanelet_pose
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* update slop calculation logic
+* enable toggle setting
+* add consider_lanelet_slope member value
+* remove warnings
+* add considerLaneletSlope() function
+* consider lanalet slope
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 1.4.2 (2024-03-01)
 ------------------
 

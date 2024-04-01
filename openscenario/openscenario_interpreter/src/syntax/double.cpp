@@ -97,7 +97,7 @@ auto operator>>(std::istream & is, Double & datum) -> std::istream &
 
 auto operator<<(std::ostream & os, const Double & datum) -> std::ostream &
 {
-  return os << std::fixed << datum.data;
+  return os << std::fixed << std::setprecision(30) << datum.data;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
