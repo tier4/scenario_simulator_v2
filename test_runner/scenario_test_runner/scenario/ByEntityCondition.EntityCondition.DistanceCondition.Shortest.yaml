@@ -17,9 +17,17 @@ OpenSCENARIO:
   Entities:
     ScenarioObject:
       - name: ego
-        CatalogReference:
+        CatalogReference: &SAMPLE_VEHICLE
           catalogName: sample_vehicle
           entryName: sample_vehicle
+      - name: car_1
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: car_2
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: car_3
+        CatalogReference: *SAMPLE_VEHICLE
+      - name: car_4
+        CatalogReference: *SAMPLE_VEHICLE
   Storyboard:
     Init:
       Actions:
@@ -38,7 +46,7 @@ OpenSCENARIO:
                         h: 0
                         p: 0
                         r: 0
-              - LongitudinalAction:
+              - LongitudinalAction: &SPEED_ACTION_ZERO
                   SpeedAction:
                     SpeedActionDynamics:
                       dynamicsDimension: time
@@ -47,6 +55,43 @@ OpenSCENARIO:
                     SpeedActionTarget:
                       AbsoluteTargetSpeed:
                         value: 0
+          - entityRef: car_1
+            PrivateAction:
+              - TeleportAction:
+                  Position: &POSITION_1
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34468
+                      s: 10
+                      offset: 0
+                      Orientation: &DEFAULT_ORIENTATION
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction: *SPEED_ACTION_ZERO
+          - entityRef: car_2
+            PrivateAction:
+              - TeleportAction:
+                  Position: &POSITION_2
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34462
+                      s: 40
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+              - LongitudinalAction: *SPEED_ACTION_ZERO
+          - entityRef: car_3
+            PrivateAction:
+              - TeleportAction:
+                  Position: &POSITION_3
+                    LanePosition:
+                      roadId: ""
+                      laneId: 34462
+                      s: 5
+                      offset: 0
+                      Orientation: *DEFAULT_ORIENTATION
+              - LongitudinalAction: *SPEED_ACTION_ZERO
     Story:
       - name: story
         Act:
@@ -88,7 +133,7 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: "lateral, freespace=false, shortest"
+                                - name: "DistanceCondition(lateral, freespace=false, shortest)"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -104,19 +149,27 @@ OpenSCENARIO:
                                         routingAlgorithm: shortest
                                         rule: notEqualTo
                                         value: 56.8808259861762621767
-                                        Position: &POSITION_1
-                                          LanePosition:
-                                            roadId: ""
-                                            laneId: 34468
-                                            s: 10
-                                            offset: 0
-                                            Orientation: &DEFAULT_ORIENTATION
-                                              type: relative
-                                              h: 0
-                                              p: 0
-                                              r: 0
+                                        Position: *POSITION_1
                             - Condition:
-                                - name: "lateral, freespace=false, shortest to adjacent lane"
+                                - name: "RelativeDistanceCondition(lateral, freespace=false, shortest)"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_1
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 56.8808259861762621767
+                            - Condition:
+                                - name: "DistanceCondition(lateral, freespace=false, shortest to adjacent lane)"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -132,15 +185,27 @@ OpenSCENARIO:
                                         routingAlgorithm: shortest
                                         rule: notEqualTo
                                         value: 28.90481959183431825977095
-                                        Position: &POSITION_2
-                                          LanePosition:
-                                            roadId: ""
-                                            laneId: 34462
-                                            s: 40
-                                            offset: 0
-                                            Orientation: *DEFAULT_ORIENTATION
+                                        Position: *POSITION_2
                             - Condition:
-                                - name: "lateral, freespace=false, shortest to adjacent lane (backward position)"
+                                - name: "RelativeDistanceCondition(lateral, freespace=false, shortest to adjacent lane)"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_2
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 28.90481959183431825977095
+                            - Condition:
+                                - name: "DistanceCondition(lateral, freespace=false, shortest to adjacent lane (backward position))"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -156,13 +221,25 @@ OpenSCENARIO:
                                         routingAlgorithm: shortest
                                         rule: notEqualTo
                                         value: 6.0951804081656817402290471363812
-                                        Position:
-                                          LanePosition:
-                                            roadId: ""
-                                            laneId: 34462
-                                            s: 5
-                                            offset: 0
-                                            Orientation: *DEFAULT_ORIENTATION
+                                        Position: *POSITION_3
+                            - Condition:
+                                - name: "RelativeDistanceCondition(lateral, freespace=false, shortest to adjacent lane (backward position))"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_3
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: false
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 6.0951804081656817402290471363812
                             - Condition:
                                 - name: "lateral, freespace=true, shortest"
                                   delay: 0
@@ -182,6 +259,24 @@ OpenSCENARIO:
                                         value: 53.140825986176260187221487285569
                                         Position: *POSITION_1
                             - Condition:
+                                - name: "lateral, freespace=true, shortest"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_1
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: true
+                                        relativeDistanceType: longitudinal
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 52.1108259861762661557
+                            - Condition:
                                 - name: "lateral, freespace=false, shortest"
                                   delay: 0
                                   conditionEdge: none
@@ -200,6 +295,24 @@ OpenSCENARIO:
                                         value: 3.021089007161695
                                         Position: *POSITION_1
                             - Condition:
+                                - name: "lateral, freespace=false, shortest"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_1
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: false
+                                        relativeDistanceType: lateral
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 3.021089007161695
+                            - Condition:
                                 - name: "lateral, freespace=true, shortest"
                                   delay: 0
                                   conditionEdge: none
@@ -217,6 +330,24 @@ OpenSCENARIO:
                                         rule: notEqualTo
                                         value: 2.106089007161695114689337060
                                         Position: *POSITION_1
+                            - Condition:
+                                - name: "lateral, freespace=true, shortest"
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef:
+                                        - entityRef: car_1
+                                    EntityCondition:
+                                      RelativeDistanceCondition:
+                                        coordinateSystem: lane
+                                        entityRef: ego
+                                        freespace: true
+                                        relativeDistanceType: lateral
+                                        routingAlgorithm: shortest
+                                        rule: notEqualTo
+                                        value: 1.191089007161695079162200
             StartTrigger:
               ConditionGroup:
                 - Condition:
