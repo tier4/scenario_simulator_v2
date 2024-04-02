@@ -116,7 +116,7 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: ""
+                                - name: "timeout"
                                   delay: 0
                                   conditionEdge: none
                                   ByValueCondition:
@@ -133,7 +133,7 @@ OpenSCENARIO:
                         StartTrigger:
                           ConditionGroup:
                             - Condition:
-                                - name: "DistanceCondition(lateral, freespace=false, shortest)"
+                                - name: "DistanceCondition, lateral, freespace=false, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -151,7 +151,7 @@ OpenSCENARIO:
                                         value: 56.8808259861762621767
                                         Position: *POSITION_1
                             - Condition:
-                                - name: "RelativeDistanceCondition(lateral, freespace=false, shortest)"
+                                - name: "RelativeDistanceCondition, lateral, freespace=false, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -169,7 +169,7 @@ OpenSCENARIO:
                                         rule: notEqualTo
                                         value: 56.8808259861762621767
                             - Condition:
-                                - name: "DistanceCondition(lateral, freespace=false, shortest to adjacent lane)"
+                                - name: "DistanceCondition, lateral, freespace=false, shortest to adjacent lane"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -187,7 +187,7 @@ OpenSCENARIO:
                                         value: 28.90481959183431825977095
                                         Position: *POSITION_2
                             - Condition:
-                                - name: "RelativeDistanceCondition(lateral, freespace=false, shortest to adjacent lane)"
+                                - name: "RelativeDistanceCondition, lateral, freespace=false, shortest to adjacent lane"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -205,7 +205,7 @@ OpenSCENARIO:
                                         rule: notEqualTo
                                         value: 28.90481959183431825977095
                             - Condition:
-                                - name: "DistanceCondition(lateral, freespace=false, shortest to adjacent lane (backward position))"
+                                - name: "DistanceCondition, lateral, freespace=false, shortest to adjacent lane (backward position)"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -223,7 +223,7 @@ OpenSCENARIO:
                                         value: 6.0951804081656817402290471363812
                                         Position: *POSITION_3
                             - Condition:
-                                - name: "RelativeDistanceCondition(lateral, freespace=false, shortest to adjacent lane (backward position))"
+                                - name: "RelativeDistanceCondition, lateral, freespace=false, shortest to adjacent lane (backward position)"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -241,7 +241,7 @@ OpenSCENARIO:
                                         rule: notEqualTo
                                         value: 6.0951804081656817402290471363812
                             - Condition:
-                                - name: "lateral, freespace=true, shortest"
+                                - name: "DistanceCondition, lateral, freespace=true, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -259,7 +259,7 @@ OpenSCENARIO:
                                         value: 53.140825986176260187221487285569
                                         Position: *POSITION_1
                             - Condition:
-                                - name: "lateral, freespace=true, shortest"
+                                - name: "RelativeDistanceCondition, lateral, freespace=true, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -277,7 +277,7 @@ OpenSCENARIO:
                                         rule: notEqualTo
                                         value: 52.1108259861762661557
                             - Condition:
-                                - name: "lateral, freespace=false, shortest"
+                                - name: "DistanceCondition, lateral, freespace=false, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -295,7 +295,7 @@ OpenSCENARIO:
                                         value: 3.021089007161695
                                         Position: *POSITION_1
                             - Condition:
-                                - name: "lateral, freespace=false, shortest"
+                                - name: "RelativeDistanceCondition, lateral, freespace=false, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -313,7 +313,7 @@ OpenSCENARIO:
                                         rule: notEqualTo
                                         value: 3.021089007161695
                             - Condition:
-                                - name: "lateral, freespace=true, shortest"
+                                - name: "DistanceCondition, lateral, freespace=true, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
@@ -331,7 +331,7 @@ OpenSCENARIO:
                                         value: 2.106089007161695114689337060
                                         Position: *POSITION_1
                             - Condition:
-                                - name: "lateral, freespace=true, shortest"
+                                - name: "RelativeDistanceCondition, lateral, freespace=true, shortest"
                                   delay: 0
                                   conditionEdge: none
                                   ByEntityCondition:
