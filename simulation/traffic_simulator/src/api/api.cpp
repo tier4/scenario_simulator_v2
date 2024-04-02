@@ -294,7 +294,7 @@ bool API::updateEntitiesStatusInSim()
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
     auto entity_status = entity_manager_ptr_->getEntityStatus(entity_name);
     simulation_interface::toProto(static_cast<EntityStatus>(entity_status), *req.add_status());
-    if (entity_manager_ptr_->isEgo(entity_name)) {
+    if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
       req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(entity_name));
     }
   }
@@ -307,7 +307,7 @@ bool API::updateEntitiesStatusInSim()
       simulation_interface::toMsg(res_status.pose(), entity_status.pose);
       simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
 
-      if (entity_manager_ptr_->isEgo(name)) {
+      if (entity_manager_ptr_->is<entity::EgoEntity>(name)) {
         setMapPose(name, entity_status.pose);
         setTwist(name, entity_status.action_status.twist);
         setAcceleration(name, entity_status.action_status.accel);
