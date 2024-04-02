@@ -5,6 +5,16 @@ Changelog for package embree_vendor
 0.0.9 (2021-07-13)
 ------------------
 
+1.11.0 (2024-04-02)
+-------------------
+* Merge pull request `#1173 <https://github.com/tier4/scenario_simulator_v2/issues/1173>`_ from tier4/feature/arm_support
+  Feature/arm_build_test
+* update version
+* remove unused files
+* remove unused .github directory
+* add embree_vendor package to the repository
+* Contributors: Masaya Kataoka
+
 0.1.0 (2021-07-14)
 ------------------
 * Merge branch 'master' of https://github.com/OUXT-Polaris/embree_vendor
