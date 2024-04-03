@@ -21,8 +21,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-int ObjectController::ego_count = 0;
-
 ObjectController::ObjectController()  //
 : ComplexType(unspecified)
 {
@@ -36,16 +34,6 @@ ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
       std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, scope);        })))
 // clang-format on
 {
-  if (isAutoware()) {
-    ego_count++;
-  }
-}
-
-ObjectController::~ObjectController()
-{
-  if (isAutoware()) {
-    ego_count--;
-  }
 }
 
 auto ObjectController::isAutoware() const & -> bool

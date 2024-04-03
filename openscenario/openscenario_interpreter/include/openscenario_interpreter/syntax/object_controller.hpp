@@ -38,14 +38,9 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ObjectController : public ComplexType
 {
-  // inline static int ego_count= 0;
-  static int ego_count;
-
   explicit ObjectController();
 
   explicit ObjectController(const pugi::xml_node &, Scope &);
-
-  ~ObjectController();
 
   [[deprecated]] auto isAutoware() const & -> bool;
 };
