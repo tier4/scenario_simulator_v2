@@ -47,7 +47,7 @@ struct ObjectController : public ComplexType
 
   ~ObjectController();
 
-  auto isAutoware() const & -> bool;
+  [[deprecated]] auto isAutoware() const & -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

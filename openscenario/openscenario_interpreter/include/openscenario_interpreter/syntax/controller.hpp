@@ -15,12 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_HPP_
 
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
+#include <openscenario_interpreter/syntax/pedestrian.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
+#include <openscenario_interpreter/syntax/vehicle.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -60,7 +60,25 @@ struct Controller : public Scope
 
   explicit Controller(const pugi::xml_node &, Scope &);
 
-  auto isAutoware() const & -> bool;
+  [[deprecated]] auto isAutoware() const & -> bool;
+
+  template <typename T>
+  auto of() const & -> const String &
+  {
+    if (properties.get<Boolean>("isEgo")) {
+      return traffic_simulator::VehicleBehavior::autoware();
+    } else if (name.empty()) {
+      if constexpr (std::is_same_v<std::decay_t<T>, Vehicle>) {
+        return traffic_simulator::VehicleBehavior::defaultBehavior();
+      } else if constexpr (std::is_same_v<std::decay_t<T>, Pedestrian>) {
+        return traffic_simulator::PedestrianBehavior::defaultBehavior();
+      } else {
+        return name;
+      }
+    } else {
+      return name;
+    }
+  }
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
