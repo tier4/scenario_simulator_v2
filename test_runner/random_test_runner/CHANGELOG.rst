@@ -2,6 +2,15 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.0 (2024-04-02)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin/master' into feature/arm_support
+* Merge remote-tracking branch 'upstream/master' into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin' into feature/arm_support
+* Contributors: Masaya Kataoka, f0reachARR
+
 1.10.0 (2024-03-28)
 -------------------
 * Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
