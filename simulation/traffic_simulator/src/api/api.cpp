@@ -54,64 +54,55 @@ void API::respawn(
 {
   if (not entity_manager_ptr_->is<entity::EgoEntity>(name)) {
     throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
-  }
-
-  if (new_pose.header.frame_id != "map") {
+  } else if (new_pose.header.frame_id != "map") {
     throw std::runtime_error("Respawn request with frame id other than map not supported.");
-  }
-
-  setEntityStatus(name, new_pose.pose.pose, helper::constructActionStatus());
-
-  simulation_api_schema::UpdateEntityStatusRequest req;
-  req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-  simulation_interface::toProto(
-    static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name)), *req.add_status());
-  req.set_overwrite_ego_status(entity_manager_ptr_->is<entity::EgoEntity>(name));
-
-  auto res = zeromq_client_.call(req);
-
-  if (not res.result().success()) {
-    throw common::SimulationError(
-      "UpdateEntityStatus request failed for " + name + " entity during respawn.");
-  }
-
-  auto res_status = res.status().begin();
-
-  if (res_status == res.status().end()) {
-    throw common::SimulationError(
-      "Failed to receive the new status of " + name + " entity after the update request.");
-  }
-
-  auto entity_name = res_status->name();
-
-  if (entity_name != name) {
-    throw common::SimulationError(
-      "Wrong entity status received during respawn. Expected: " + name +
-      ". Received: " + entity_name + ".");
-  }
-
-  auto entity_status = static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(entity_name));
-  simulation_interface::toMsg(res_status->pose(), entity_status.pose);
-  simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
-
-  if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
-    setMapPose(entity_name, entity_status.pose);
-    setTwist(entity_name, entity_status.action_status.twist);
-    setAcceleration(entity_name, entity_status.action_status.accel);
   } else {
-    setEntityStatus(entity_name, canonicalize(entity_status));
-  }
+    // set new pose and default action status in EntityManager
+    entity_manager_ptr_->setControlledBySimulator(name, true);
+    setEntityStatus(name, new_pose.pose.pose, helper::constructActionStatus());
 
-  entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
-  entity_manager_ptr_->asFieldOperatorApplication(name).plan(
-    std::vector<geometry_msgs::msg::PoseStamped>{goal_pose});
+    // read status from EntityManager, then send it to SimpleSensorSimulator
+    simulation_api_schema::UpdateEntityStatusRequest req;
+    simulation_interface::toProto(
+      static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name)), *req.add_status());
+    req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
+    req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(name));
+    entity_manager_ptr_->setControlledBySimulator(name, false);
 
-  while (!entity_manager_ptr_->asFieldOperatorApplication(name).engageable()) {
-    updateFrame();
-    entity_manager_ptr_->asFieldOperatorApplication(name).spinSome();
-    std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
+    // check response
+    if (const auto res = zeromq_client_.call(req); not res.result().success()) {
+      throw common::SimulationError(
+        "UpdateEntityStatus request failed for \"" + name + "\" entity during respawn.");
+    } else if (const auto res_status = res.status().begin(); res.status().size() != 1) {
+      throw common::SimulationError(
+        "Failed to receive the new status of \"" + name + "\" entity after the update request.");
+    } else if (const auto res_name = res_status->name(); res_name != name) {
+      throw common::SimulationError(
+        "Wrong entity status received during respawn. Expected: \"" + name + "\". Received: \"" +
+        res_name + "\".");
+    } else {
+      // if valid, set response in EntityManager, then plan path and engage
+      auto entity_status = static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name));
+      simulation_interface::toMsg(res_status->pose(), entity_status.pose);
+      simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
+      setMapPose(name, entity_status.pose);
+      setTwist(name, entity_status.action_status.twist);
+      setAcceleration(name, entity_status.action_status.accel);
+
+      entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
+      entity_manager_ptr_->asFieldOperatorApplication(name).plan({goal_pose});
+
+      // DIRTY HACK
+      // waiting for the possibility to engage, during this loop the update of the simulation is
+      // not performed, only the publication of the clock takes place - it is necessary
+      while (!entity_manager_ptr_->asFieldOperatorApplication(name).engageable()) {
+        clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
+        entity_manager_ptr_->asFieldOperatorApplication(name).spinSome();
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      }
+      entity_manager_ptr_->asFieldOperatorApplication(name).engage();
+    }
   }
-  entity_manager_ptr_->asFieldOperatorApplication(name).engage();
 }
 
 auto API::setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status)
