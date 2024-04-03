@@ -127,7 +127,7 @@ auto Interpreter::engage() const -> void
   for (const auto & [name, scenario_object] : currentScenarioDefinition()->entities) {
     if (
       scenario_object.template as<ScenarioObject>().is_added and
-      scenario_object.template as<ScenarioObject>().object_controller.isUserDefinedController()) {
+      scenario_object.template as<ScenarioObject>().object_controller.isAutoware()) {
       asFieldOperatorApplication(name).engage();
     }
   }
@@ -140,8 +140,7 @@ auto Interpreter::engageable() const -> bool
     std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
       const auto & [name, scenario_object] = each;
       return not scenario_object.template as<ScenarioObject>().is_added or
-             not scenario_object.template as<ScenarioObject>()
-                   .object_controller.isUserDefinedController() or
+             not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
              asFieldOperatorApplication(name).engageable();
     });
 }
@@ -153,8 +152,7 @@ auto Interpreter::engaged() const -> bool
     std::cend(currentScenarioDefinition()->entities), [this](const auto & each) {
       const auto & [name, scenario_object] = each;
       return not scenario_object.template as<ScenarioObject>().is_added or
-             not scenario_object.template as<ScenarioObject>()
-                   .object_controller.isUserDefinedController() or
+             not scenario_object.template as<ScenarioObject>().object_controller.isAutoware() or
              asFieldOperatorApplication(name).engaged();
     });
 }

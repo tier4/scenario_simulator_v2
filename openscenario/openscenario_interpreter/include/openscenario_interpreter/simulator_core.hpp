@@ -317,7 +317,7 @@ public:
         return message;
       }());
 
-      if (controller.isUserDefinedController()) {
+      if (controller.isAutoware()) {
         core->attachLidarSensor(
           entity_ref, controller.properties.template get<Double>("pointcloudPublishingDelay"));
 

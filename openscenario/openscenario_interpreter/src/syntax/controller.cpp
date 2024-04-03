@@ -31,9 +31,6 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto Controller::isUserDefinedController() const & -> bool
-{
-  return properties.get<Boolean>("isEgo");
-}
+auto Controller::isAutoware() const & -> bool { return properties.get<Boolean>("isEgo"); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

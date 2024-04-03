@@ -55,7 +55,7 @@ try {
         applyAddEntityAction(
           entity_ref, static_cast<NativeWorldPosition>(position.as<WorldPosition>()),
           static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
-          entity.as<ScenarioObject>().object_controller.isUserDefinedController()
+          entity.as<ScenarioObject>().object_controller.isAutoware()
             ? traffic_simulator::VehicleBehavior::autoware()
             : traffic_simulator::VehicleBehavior::defaultBehavior(),
           vehicle.model3d);
@@ -64,7 +64,7 @@ try {
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeWorldPosition>()),
           static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
-          entity.as<ScenarioObject>().object_controller.isUserDefinedController()
+          entity.as<ScenarioObject>().object_controller.isAutoware()
             ? traffic_simulator::VehicleBehavior::autoware()
             : traffic_simulator::VehicleBehavior::defaultBehavior(),
           vehicle.model3d);
@@ -73,7 +73,7 @@ try {
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeObjectPosition>()),
           static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
-          entity.as<ScenarioObject>().object_controller.isUserDefinedController()
+          entity.as<ScenarioObject>().object_controller.isAutoware()
             ? traffic_simulator::VehicleBehavior::autoware()
             : traffic_simulator::VehicleBehavior::defaultBehavior(),
           vehicle.model3d);
@@ -81,7 +81,7 @@ try {
         applyAddEntityAction(
           entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
           static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
-          entity.as<ScenarioObject>().object_controller.isUserDefinedController()
+          entity.as<ScenarioObject>().object_controller.isAutoware()
             ? traffic_simulator::VehicleBehavior::autoware()
             : traffic_simulator::VehicleBehavior::defaultBehavior(),
           vehicle.model3d);

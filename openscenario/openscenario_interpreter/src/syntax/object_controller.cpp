@@ -36,21 +36,21 @@ ObjectController::ObjectController(const pugi::xml_node & node, Scope & scope)
       std::make_pair("Controller",       [&](auto && node) { return make<Controller>(node, scope);        })))
 // clang-format on
 {
-  if (isUserDefinedController()) {
+  if (isAutoware()) {
     ego_count++;
   }
 }
 
 ObjectController::~ObjectController()
 {
-  if (isUserDefinedController()) {
+  if (isAutoware()) {
     ego_count--;
   }
 }
 
-auto ObjectController::isUserDefinedController() const & -> bool
+auto ObjectController::isAutoware() const & -> bool
 {
-  return is<Controller>() and as<Controller>().isUserDefinedController();
+  return is<Controller>() and as<Controller>().isAutoware();
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
