@@ -52,7 +52,7 @@ void API::respawn(
   const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
   const geometry_msgs::msg::PoseStamped & goal_pose)
 {
-  if (not entity_manager_ptr_->isEgo(name)) {
+  if (not entity_manager_ptr_->is<entity::EgoEntity>(name)) {
     throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
   }
 
@@ -66,7 +66,7 @@ void API::respawn(
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   simulation_interface::toProto(
     static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name)), *req.add_status());
-  req.set_overwrite_ego_status(entity_manager_ptr_->isEgo(name));
+  req.set_overwrite_ego_status(entity_manager_ptr_->is<entity::EgoEntity>(name));
 
   auto res = zeromq_client_.call(req);
 
@@ -94,7 +94,7 @@ void API::respawn(
   simulation_interface::toMsg(res_status->pose(), entity_status.pose);
   simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
 
-  if (entity_manager_ptr_->isEgo(entity_name)) {
+  if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
     setMapPose(entity_name, entity_status.pose);
     setTwist(entity_name, entity_status.action_status.twist);
     setAcceleration(entity_name, entity_status.action_status.accel);
@@ -107,10 +107,10 @@ void API::respawn(
     std::vector<geometry_msgs::msg::PoseStamped>{goal_pose});
 
   while (!entity_manager_ptr_->asFieldOperatorApplication(name).engageable()) {
+    updateFrame();
     entity_manager_ptr_->asFieldOperatorApplication(name).spinSome();
     std::this_thread::sleep_for(std::chrono::duration<double>(1.0 / 20.0));
   }
-
   entity_manager_ptr_->asFieldOperatorApplication(name).engage();
 }
 
