@@ -42,7 +42,7 @@ struct ObjectController : public ComplexType
 
   explicit ObjectController(const pugi::xml_node &, Scope &);
 
-  [[deprecated]] auto isAutoware() const & -> bool;
+  auto isAutoware() const & -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

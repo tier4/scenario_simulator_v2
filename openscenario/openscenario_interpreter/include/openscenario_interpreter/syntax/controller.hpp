@@ -60,7 +60,7 @@ struct Controller : public Scope
 
   explicit Controller(const pugi::xml_node &, Scope &);
 
-  [[deprecated]] auto isAutoware() const & -> bool;
+  auto isAutoware() const & -> bool;
 
   template <typename T>
   auto of() const & -> const String &
