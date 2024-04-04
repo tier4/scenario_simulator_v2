@@ -40,10 +40,10 @@ bool checkPolylineTrajectory(
         "DoNothingBehavior.",
         "You specified : ", trajectory->initial_distance_offset);
     }
-    if (trajectory->shape.vertices.empty()) {
+    if (trajectory->shape.vertices.size() <= 1) {
       THROW_SIMULATION_ERROR(
-        "FollowPolylineTrajectory is requested, but trajectory points are empty. Please check "
-        "description of the scenario.");
+        "FollowPolylineTrajectory is requested, but vertex points are less than 1 point.",
+        "At least 2 vertex points are required.", "Please check description of the scenario.");
     }
   } else {
     THROW_SIMULATION_ERROR(
