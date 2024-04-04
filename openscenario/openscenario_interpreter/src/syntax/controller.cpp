@@ -31,7 +31,7 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 
 auto Controller::isAutoware() const & -> bool
 {
-  return of<Vehicle>() == traffic_simulator::VehicleBehavior::autoware();
+  return properties.get<Boolean>("isEgo") or name == traffic_simulator::VehicleBehavior::autoware();
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
