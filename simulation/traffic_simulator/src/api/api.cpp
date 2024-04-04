@@ -331,8 +331,8 @@ void API::defineTrafficSource(
       traffic_simulator_msgs::msg::VehicleParameters,
       traffic_simulator_msgs::msg::PedestrianParameters>,
     double>> & params_with_weights,
-  const bool allow_spawn_outside_lane, const bool random_orientation,
-  std::optional<int> random_seed)
+  const bool allow_spawn_outside_lane, const bool require_footprint_fitting,
+  const bool random_orientation, std::optional<int> random_seed)
 {
 #define MAKE_SPAWN_LAMBDA(PARAMS)                                                           \
   [this](                                                                                   \
@@ -344,6 +344,7 @@ void API::defineTrafficSource(
 
   traffic_simulator::traffic::TrafficSource::Configuration config;
   config.allow_spawn_outside_lane = allow_spawn_outside_lane;
+  config.require_footprint_fitting = require_footprint_fitting;
   config.use_random_orientation = random_orientation;
 
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
@@ -352,7 +353,7 @@ void API::defineTrafficSource(
     MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters),
     [this](const std::string & name) -> void {
       auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(getEntityStatus(name));
-      status.lanelet_pose.rpy = geometry_msgs::msg::Vector3();
+      status.lanelet_pose.rpy.z = 0.0;
       setEntityStatus(name, canonicalize(status));
     },
     config, entity_manager_ptr_->getHdmapUtils());
