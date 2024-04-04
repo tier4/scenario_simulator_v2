@@ -143,20 +143,19 @@ auto TrafficSource::getNewEntityName() -> std::string
 void TrafficSource::execute(
   [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time)
 {
-  /// @note For now this mechanism allows for the spawn rate to be as high as the rate at which this function is called
-  if (current_time - start_execution_time_ < 1.0 / rate_ * spawn_count_) {
-    return;
-  }
-  ++spawn_count_;
+  while (current_time - start_execution_time_ > 1.0 / rate_ * spawn_count_) {
+    ++spawn_count_;
 
-  randomizeCurrentParams();
-  if (isCurrentPedestrian()) {
-    pedestrian_spawn_function_(
-      getNewEntityName(), getValidRandomPose(), std::get<PedestrianParams>(*current_params_),
-      speed_);
-  } else {
-    vehicle_spawn_function_(
-      getNewEntityName(), getValidRandomPose(), std::get<VehicleParams>(*current_params_), speed_);
+    randomizeCurrentParams();
+    if (isCurrentPedestrian()) {
+      pedestrian_spawn_function_(
+        getNewEntityName(), getValidRandomPose(), std::get<PedestrianParams>(*current_params_),
+        speed_);
+    } else {
+      vehicle_spawn_function_(
+        getNewEntityName(), getValidRandomPose(), std::get<VehicleParams>(*current_params_),
+        speed_);
+    }
   }
 }
 
