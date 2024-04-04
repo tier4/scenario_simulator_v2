@@ -70,59 +70,61 @@ auto interpolateEntityStatusFromPolylineTrajectory(
   if (!trajectory) {
     return std::nullopt;
   }
-  for (size_t i = 0; i < trajectory->shape.vertices.size() - 1; i++) {
-    const auto timestamp_i = trajectory->base_time + trajectory->shape.vertices[i].time;
-    const auto timestamp_i_1 = trajectory->base_time + trajectory->shape.vertices[i + 1].time;
 
-    const auto interpolate_entity_status = [&](
-                                             const double interpolation_ratio,
-                                             const traffic_simulator_msgs::msg::Vertex & v0,
-                                             const traffic_simulator_msgs::msg::Vertex & v1)
-      -> traffic_simulator_msgs::msg::EntityStatus {
-      auto interpolated_entity_status =
-        static_cast<traffic_simulator_msgs::msg::EntityStatus>(*entity_status);
-      interpolated_entity_status.lanelet_pose_valid = false;
-      interpolated_entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-      interpolated_entity_status.pose =
-        geometry_msgs::build<geometry_msgs::msg::Pose>()
-          .position(
-            v0.position.position * (1 - interpolation_ratio) +
-            v1.position.position * interpolation_ratio)
-          .orientation(quaternion_operation::slerp(
-            v0.position.orientation, v1.position.orientation, interpolation_ratio));
-      const double linear_velocity =
-        math::geometry::hypot(v1.position.position, v0.position.position) / (v1.time - v0.time);
-      const auto linear_acceleration =
-        (entity_status->getTwist().linear.x - linear_velocity) / (v1.time - v0.time);
-      const auto linear_jerk =
-        (entity_status->getAccel().linear.x - linear_acceleration) / (v1.time - v0.time);
+  const auto interpolate_entity_status =
+    [&](
+      const double interpolation_ratio, const traffic_simulator_msgs::msg::Vertex & v0,
+      const traffic_simulator_msgs::msg::Vertex & v1) -> traffic_simulator_msgs::msg::EntityStatus {
+    auto interpolated_entity_status =
+      static_cast<traffic_simulator_msgs::msg::EntityStatus>(*entity_status);
+    interpolated_entity_status.lanelet_pose_valid = false;
+    interpolated_entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    interpolated_entity_status.pose =
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(
+          v0.position.position * (1 - interpolation_ratio) +
+          v1.position.position * interpolation_ratio)
+        .orientation(quaternion_operation::slerp(
+          v0.position.orientation, v1.position.orientation, interpolation_ratio));
+    const double linear_velocity =
+      math::geometry::hypot(v1.position.position, v0.position.position) / (v1.time - v0.time);
+    const auto linear_acceleration =
+      (entity_status->getTwist().linear.x - linear_velocity) / (v1.time - v0.time);
+    const auto linear_jerk =
+      (entity_status->getAccel().linear.x - linear_acceleration) / (v1.time - v0.time);
 
-      interpolated_entity_status.action_status.twist =
-        geometry_msgs::build<geometry_msgs::msg::Twist>()
-          .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
-          .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
-      interpolated_entity_status.action_status.accel =
-        geometry_msgs::build<geometry_msgs::msg::Accel>()
-          .linear(
-            geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
-          .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
-      interpolated_entity_status.action_status.linear_jerk = linear_jerk;
-      return interpolated_entity_status;
-    };
+    interpolated_entity_status.action_status.twist =
+      geometry_msgs::build<geometry_msgs::msg::Twist>()
+        .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+    interpolated_entity_status.action_status.accel =
+      geometry_msgs::build<geometry_msgs::msg::Accel>()
+        .linear(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+    interpolated_entity_status.action_status.linear_jerk = linear_jerk;
+    return interpolated_entity_status;
+  };
 
-    if (i == 0 && (current_time + step_time) <= timestamp_i) {
-      return std::nullopt;
-    }
-    if (
-      i == (trajectory->shape.vertices.size() - 2) && timestamp_i_1 <= (current_time + step_time)) {
-      return interpolate_entity_status(
-        1, trajectory->shape.vertices[i], trajectory->shape.vertices[i + 1]);
-    }
+  if ((current_time + step_time) <= trajectory->shape.vertices.begin()->time) {
+    return std::nullopt;
+  }
+  if (trajectory->shape.vertices.back().time <= (current_time + step_time)) {
+    return interpolate_entity_status(
+      1, *std::prev(trajectory->shape.vertices.end(), 2),
+      *std::prev(trajectory->shape.vertices.end(), 1));
+  }
+  for (auto vertex_itr = std::adjacent_find(
+         trajectory->shape.vertices.begin(), trajectory->shape.vertices.end(),
+         [](const auto &, const auto &) { return true; });
+       vertex_itr != trajectory->shape.vertices.end(); vertex_itr++) {
+    const auto timestamp_i = trajectory->base_time + vertex_itr->time;
+    const auto timestamp_i_1 = trajectory->base_time + (vertex_itr + 1)->time;
     if (timestamp_i <= (current_time + step_time) && (current_time + step_time) <= timestamp_i_1) {
       return interpolate_entity_status(
         (current_time + step_time - trajectory->base_time - timestamp_i) /
           (timestamp_i_1 - timestamp_i),
-        trajectory->shape.vertices[i], trajectory->shape.vertices[i + 1]);
+        *vertex_itr, *std::next(vertex_itr));
     }
   }
   return std::nullopt;
