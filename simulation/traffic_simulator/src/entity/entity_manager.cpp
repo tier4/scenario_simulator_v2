@@ -848,12 +848,13 @@ void EntityManager::updateHdmapMarker()
   lanelet_marker_pub_ptr_->publish(markers);
 }
 
-void EntityManager::startNpcLogic()
+void EntityManager::startNpcLogic(const double current_time)
 {
-  npc_logic_started_ = true;
   for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    it->second->startNpcLogic();
+    it->second->startNpcLogic(current_time);
   }
+  current_time_ = current_time;
+  npc_logic_started_ = true;
 }
 
 }  // namespace entity
