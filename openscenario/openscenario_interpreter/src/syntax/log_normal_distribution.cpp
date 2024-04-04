@@ -14,23 +14,23 @@
 
 #include <cmath>
 #include <openscenario_interpreter/reader/element.hpp>
-#include <openscenario_interpreter/syntax/normal_distribution.hpp>
+#include <openscenario_interpreter/syntax/log_normal_distribution.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-NormalDistribution::NormalDistribution(
+LogNormalDistribution::LogNormalDistribution(
   const pugi::xml_node & node, openscenario_interpreter::Scope & scope)
 : Scope(scope),
   range(readElement<Range>("Range", node, scope)),
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   variance(readAttribute<Double>("variance", node, scope)),
   distribute(
-    static_cast<double>(expected_value.data), std::sqrt(static_cast<double>(variance.data)))
+    static_cast<double>(expected_value.data), sta::sqrt(static_cast<double>(variance.data)))
 {
 }
 
-auto NormalDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
+auto LogNormalDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

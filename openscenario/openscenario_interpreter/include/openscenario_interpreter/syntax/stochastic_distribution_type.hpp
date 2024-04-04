@@ -53,10 +53,10 @@ DEFINE_LAZY_VISITOR(
   StochasticDistributionType,
   CASE(ProbabilityDistributionSet),  //
   CASE(NormalDistribution),          //
-  //  CASE(LogNormalDistribution),       //
+  CASE(LogNormalDistribution),       //
   CASE(UniformDistribution),         //
   CASE(PoissonDistribution),         //
-  CASE(Histogram),                   //
+  CASE(Histogram)                    //
   //  CASE(UserDefinedDistribution),     //
 );
 }  // namespace syntax
