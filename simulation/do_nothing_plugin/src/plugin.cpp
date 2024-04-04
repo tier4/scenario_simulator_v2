@@ -54,6 +54,14 @@ bool checkPolylineTrajectory(
   return true;
 }
 
+auto getLastVertexTimestamp(
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+  -> std::optional<double>
+{
+  checkPolylineTrajectory(trajectory);
+  return trajectory->base_time + trajectory->shape.vertices.back().time;
+}
+
 auto interpolateEntityStatusFromPolylineTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory,
   const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & entity_status,
@@ -147,6 +155,11 @@ void DoNothingBehavior::followPolylineTrajectory()
       traffic_simulator::CanonicalizedEntityStatus(interpolated_status.value(), getHdMapUtils())));
   } else {
     setUpdatedStatus(entity_status_);
+  }
+  if (
+    getCurrentTime() + getStepTime() <=
+    do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
+    setRequest(traffic_simulator::behavior::Request::NONE);
   }
 }
 
