@@ -23,7 +23,6 @@
 #include <traffic_simulator_msgs/msg/polyline.hpp>
 #include <traffic_simulator_msgs/msg/vertex.hpp>
 
-// headers in STL
 #include <memory>
 #include <string>
 #include <vector>
