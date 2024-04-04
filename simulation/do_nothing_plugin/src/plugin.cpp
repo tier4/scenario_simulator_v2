@@ -136,6 +136,9 @@ void DoNothingBehavior::configure(const rclcpp::Logger &) {}
 
 void DoNothingBehavior::update(double current_time, double step_time)
 {
+  setCurrentTime(current_time);
+  setStepTime(step_time);
+
   const auto follow_polyline_trajectory = [&]() {
     do_nothing_behavior::follow_trajectory::checkPolylineTrajectory(getPolylineTrajectory());
     if (
@@ -149,14 +152,12 @@ void DoNothingBehavior::update(double current_time, double step_time)
       setUpdatedStatus(entity_status_);
     }
     if (
-      getCurrentTime() + getStepTime() <=
+      getCurrentTime() + getStepTime() >=
       do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
       setRequest(traffic_simulator::behavior::Request::NONE);
     }
   };
 
-  setCurrentTime(current_time);
-  setStepTime(step_time);
   entity_status_->setTime(current_time);
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
     follow_polyline_trajectory();
