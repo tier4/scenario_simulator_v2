@@ -349,8 +349,13 @@ void API::defineTrafficSource(
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
     radius, rate, speed, position, params_with_weights, random_seed, getCurrentTime(),
     MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters),
-    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters), config,
-    entity_manager_ptr_->getHdmapUtils());
+    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters),
+    [this](const std::string & name) -> void {
+      auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(getEntityStatus(name));
+      status.lanelet_pose.rpy = geometry_msgs::msg::Vector3();
+      setEntityStatus(name, canonicalize(status));
+    },
+    config, entity_manager_ptr_->getHdmapUtils());
 #undef MAKE_SPAWN_LAMBDA
 }
 

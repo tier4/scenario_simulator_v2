@@ -37,6 +37,7 @@ TrafficSource::TrafficSource(
   const std::function<void(
     const std::string &, const geometry_msgs::msg::Pose &, const PedestrianParams &,
     const double)> & pedestrian_spawn_function,
+  const std::function<void(const std::string &)> & align_to_lane_function,
   const Configuration & configuration, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils)
 : radius_(radius),
   rate_(rate),
@@ -45,6 +46,7 @@ TrafficSource::TrafficSource(
   source_id_(next_source_id_++),
   vehicle_spawn_function_(vehicle_spawn_function),
   pedestrian_spawn_function_(pedestrian_spawn_function),
+  align_to_lane_function_(align_to_lane_function),
   hdmap_utils_(hdmap_utils),
   spawnable_lanelets_(hdmap_utils->getNearbyLaneletIds(
     position.position, radius, false, static_cast<std::size_t>(spawnable_lanes_limit))),
@@ -147,14 +149,16 @@ void TrafficSource::execute(
     ++spawn_count_;
 
     randomizeCurrentParams();
+    const auto name = getNewEntityName();
     if (isCurrentPedestrian()) {
       pedestrian_spawn_function_(
-        getNewEntityName(), getValidRandomPose(), std::get<PedestrianParams>(*current_params_),
-        speed_);
+        name, getValidRandomPose(), std::get<PedestrianParams>(*current_params_), speed_);
     } else {
       vehicle_spawn_function_(
-        getNewEntityName(), getValidRandomPose(), std::get<VehicleParams>(*current_params_),
-        speed_);
+        name, getValidRandomPose(), std::get<VehicleParams>(*current_params_), speed_);
+    }
+    if (!config_.allow_spawn_outside_lane) {
+      align_to_lane_function_(name);
     }
   }
 }
