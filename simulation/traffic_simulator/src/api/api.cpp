@@ -91,15 +91,6 @@ void API::respawn(
 
       entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
       entity_manager_ptr_->asFieldOperatorApplication(name).plan({goal_pose});
-
-      // DIRTY HACK
-      // waiting for the possibility to engage, during this loop the update of the simulation is
-      // not performed, only the publication of the clock takes place - it is necessary
-      while (!entity_manager_ptr_->asFieldOperatorApplication(name).engageable()) {
-        clock_pub_->publish(clock_.getCurrentRosTimeAsMsg());
-        entity_manager_ptr_->asFieldOperatorApplication(name).spinSome();
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-      }
       entity_manager_ptr_->asFieldOperatorApplication(name).engage();
     }
   }
