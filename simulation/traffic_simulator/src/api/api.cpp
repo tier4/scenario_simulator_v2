@@ -323,7 +323,7 @@ void API::requestLaneChange(
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
 
-void API::addTrafficSource(
+void API::defineTrafficSource(
   const double radius, const double rate, const double speed,
   const geometry_msgs::msg::Pose & position,
   const std::vector<std::pair<

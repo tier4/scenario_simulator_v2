@@ -291,7 +291,7 @@ public:
    * @param params The parameters of the spawned entities
    * @param random_seed [Optional] The seed for the random number generator
    */
-  void addTrafficSource(
+  void defineTrafficSource(
     const double radius, const double rate, const double speed,
     const geometry_msgs::msg::Pose & position,
     const std::vector<std::pair<
