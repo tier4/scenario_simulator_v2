@@ -81,7 +81,6 @@ private:                                                               \
   DEFINE_GETTER_SETTER(UpdatedStatus,      std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>,    updated_status_)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
-  void followPolylineTrajectory();
 };
 }  // namespace entity_behavior
 

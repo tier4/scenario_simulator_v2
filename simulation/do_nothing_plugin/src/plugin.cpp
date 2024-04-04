@@ -134,32 +134,32 @@ void DoNothingBehavior::configure(const rclcpp::Logger &) {}
 
 void DoNothingBehavior::update(double current_time, double step_time)
 {
+  const auto follow_polyline_trajectory = [&]() {
+    do_nothing_behavior::follow_trajectory::checkPolylineTrajectory(getPolylineTrajectory());
+    if (
+      const auto interpolated_status =
+        do_nothing_behavior::follow_trajectory::interpolateEntityStatusFromPolylineTrajectory(
+          getPolylineTrajectory(), getEntityStatus(), getCurrentTime(), getStepTime())) {
+      setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+        traffic_simulator::CanonicalizedEntityStatus(
+          interpolated_status.value(), getHdMapUtils())));
+    } else {
+      setUpdatedStatus(entity_status_);
+    }
+    if (
+      getCurrentTime() + getStepTime() <=
+      do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
+      setRequest(traffic_simulator::behavior::Request::NONE);
+    }
+  };
+
   setCurrentTime(current_time);
   setStepTime(step_time);
   entity_status_->setTime(current_time);
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
-    followPolylineTrajectory();
+    follow_polyline_trajectory();
   } else {
     setUpdatedStatus(entity_status_);
-  }
-}
-
-void DoNothingBehavior::followPolylineTrajectory()
-{
-  do_nothing_behavior::follow_trajectory::checkPolylineTrajectory(getPolylineTrajectory());
-  if (
-    const auto interpolated_status =
-      do_nothing_behavior::follow_trajectory::interpolateEntityStatusFromPolylineTrajectory(
-        getPolylineTrajectory(), getEntityStatus(), getCurrentTime(), getStepTime())) {
-    setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-      traffic_simulator::CanonicalizedEntityStatus(interpolated_status.value(), getHdMapUtils())));
-  } else {
-    setUpdatedStatus(entity_status_);
-  }
-  if (
-    getCurrentTime() + getStepTime() <=
-    do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
-    setRequest(traffic_simulator::behavior::Request::NONE);
   }
 }
 
