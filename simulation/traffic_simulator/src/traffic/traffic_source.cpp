@@ -197,15 +197,16 @@ auto TrafficSource::isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool
       corner.z = corner_transformed.z();
     });
 
+  /// @note 2D validation - does not account for height
   const auto is_outside_spawnable_area = [&](const geometry_msgs::msg::Point & corner) -> bool {
     return std::hypot(corner.x - source_pose_.position.x, corner.y - source_pose_.position.y) >
            radius_;
   };
 
   /// @note Step 1: check whether all corners are inside spawnable area
-  if (
-    std::find_if_not(bbox_corners.begin(), bbox_corners.end(), is_outside_spawnable_area) ==
-    bbox_corners.end()) {
+  if (const auto first_corner_outside =
+        std::find_if(bbox_corners.begin(), bbox_corners.end(), is_outside_spawnable_area);
+      first_corner_outside != bbox_corners.end()) {
     return false;
   }
 
