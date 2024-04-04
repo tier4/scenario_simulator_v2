@@ -35,11 +35,9 @@ OpenSCENARIO:
           entryName: sample_vehicle
         ObjectController:
           Controller:
-            name: ''
+            name: 'Autoware'
             Properties:
               Property:
-                - name: isEgo
-                  value: "true"
                 - name: maxJerk
                   value: "1.5"
                 - name: minJerk

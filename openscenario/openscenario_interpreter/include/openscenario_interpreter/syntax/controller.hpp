@@ -15,7 +15,6 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_HPP_
 
-#include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <pugixml.hpp>
@@ -49,10 +48,11 @@ struct Controller : public Scope
 
   /*
      NOTE: The term "controller" in OpenSCENARIO is a concept equivalent to
-     "the person driving the car. Here, Autoware is considered anthropomorphic.
-     In other words, the sensor performance of Autoware in a simulation is
-     described in ScenarioObject.ObjectController.Controller.Properties as
-     "characteristics of the person driving the car.
+     "the person driving the car". Here, Autoware is considered
+     anthropomorphic. In other words, the sensor performance of Autoware in a
+     simulation is described in
+     ScenarioObject.ObjectController.Controller.Properties as "characteristics
+     of the person driving the car".
   */
   Properties properties;  // Describing properties for the controller.
 
