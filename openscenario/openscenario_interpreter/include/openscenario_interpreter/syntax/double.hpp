@@ -25,7 +25,7 @@ struct Double
 {
   using value_type = double;
 
-  value_type data = 0.0;
+  value_type data;
 
   Double() = default;
 
