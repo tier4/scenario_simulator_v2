@@ -28,7 +28,7 @@ struct UnsignedShort
 
   value_type data;
 
-  explicit UnsignedShort() = default;
+  UnsignedShort() = default;
 
   explicit UnsignedShort(value_type);
 

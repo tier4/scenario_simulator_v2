@@ -29,7 +29,7 @@ struct Integer
 
   value_type data;
 
-  explicit Integer() = default;
+  Integer() = default;
 
   explicit Integer(value_type);
 

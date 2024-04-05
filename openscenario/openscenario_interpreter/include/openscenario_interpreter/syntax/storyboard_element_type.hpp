@@ -53,7 +53,7 @@ struct StoryboardElementType
     story,
   } value;
 
-  explicit StoryboardElementType() = default;
+  StoryboardElementType() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };

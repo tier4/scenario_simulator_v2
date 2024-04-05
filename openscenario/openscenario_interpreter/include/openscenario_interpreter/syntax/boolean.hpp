@@ -28,7 +28,7 @@ struct Boolean
 
   value_type data;
 
-  explicit Boolean() = default;
+  Boolean() = default;
 
   explicit constexpr Boolean(value_type value) noexcept : data(value) {}
 
