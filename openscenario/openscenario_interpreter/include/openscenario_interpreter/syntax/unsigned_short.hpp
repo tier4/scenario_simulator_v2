@@ -26,7 +26,7 @@ struct UnsignedShort
 {
   using value_type = std::uint16_t;
 
-  value_type data = 0U;
+  value_type data;
 
   explicit UnsignedShort() = default;
 
