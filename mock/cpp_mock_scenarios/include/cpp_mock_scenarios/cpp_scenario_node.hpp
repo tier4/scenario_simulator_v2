@@ -15,14 +15,12 @@
 #ifndef CPP_MOCK_SCENARIOS__CPP_SCENARIO_NODE_HPP_
 #define CPP_MOCK_SCENARIOS__CPP_SCENARIO_NODE_HPP_
 
-#include <rclcpp/rclcpp.hpp>
-#include <simple_junit/junit5.hpp>
-#include <traffic_simulator/api/api.hpp>
-
-// headers in STL
 #include <limits>
 #include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <simple_junit/junit5.hpp>
 #include <string>
+#include <traffic_simulator/api/api.hpp>
 #include <vector>
 
 namespace cpp_mock_scenarios
