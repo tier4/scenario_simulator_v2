@@ -30,7 +30,7 @@ struct Boolean
 
   Boolean() = default;
 
-  explicit constexpr Boolean(value_type value) noexcept : data(value) {}
+  constexpr Boolean(value_type value) noexcept : data(value) {}
 
   explicit Boolean(const std::string &);
 

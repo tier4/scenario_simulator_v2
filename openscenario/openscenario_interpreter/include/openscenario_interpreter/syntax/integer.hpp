@@ -31,7 +31,7 @@ struct Integer
 
   Integer() = default;
 
-  explicit Integer(value_type);
+  Integer(value_type);
 
   explicit Integer(const std::string &);
 

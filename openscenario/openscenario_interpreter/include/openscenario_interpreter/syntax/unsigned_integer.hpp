@@ -31,7 +31,7 @@ struct UnsignedInteger
 
   UnsignedInteger() = default;
 
-  explicit UnsignedInteger(value_type);
+  UnsignedInteger(value_type);
 
   explicit UnsignedInteger(const std::string &);
 

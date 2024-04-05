@@ -29,7 +29,7 @@ struct Double
 
   Double() = default;
 
-  explicit Double(value_type);
+  Double(value_type);
 
   explicit Double(const std::string &);
 
