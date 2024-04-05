@@ -27,7 +27,7 @@ struct Integer
 {
   using value_type = std::int64_t;
 
-  value_type data = 0;
+  value_type data;
 
   explicit Integer() = default;
 
