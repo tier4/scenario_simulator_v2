@@ -139,28 +139,27 @@ void DoNothingBehavior::update(double current_time, double step_time)
   setCurrentTime(current_time);
   setStepTime(step_time);
 
-  const auto follow_polyline_trajectory = [&]() {
+  const auto interpolate_entity_status_on_polyline_trajectory = [&]() {
     do_nothing_behavior::follow_trajectory::checkPolylineTrajectory(getPolylineTrajectory());
     if (
       const auto interpolated_status =
         do_nothing_behavior::follow_trajectory::interpolateEntityStatusFromPolylineTrajectory(
           getPolylineTrajectory(), getEntityStatus(), getCurrentTime(), getStepTime())) {
-      setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-        traffic_simulator::CanonicalizedEntityStatus(
-          interpolated_status.value(), getHdMapUtils())));
+      return std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+        traffic_simulator::CanonicalizedEntityStatus(interpolated_status.value(), getHdMapUtils()));
     } else {
-      setUpdatedStatus(entity_status_);
-    }
-    if (
-      getCurrentTime() + getStepTime() >=
-      do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
-      setRequest(traffic_simulator::behavior::Request::NONE);
+      return entity_status_;
     }
   };
 
   entity_status_->setTime(current_time);
   if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
-    follow_polyline_trajectory();
+    setUpdatedStatus(interpolate_entity_status_on_polyline_trajectory());
+    if (
+      getCurrentTime() + getStepTime() >=
+      do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
+      setRequest(traffic_simulator::behavior::Request::NONE);
+    }
   } else {
     setUpdatedStatus(entity_status_);
   }
