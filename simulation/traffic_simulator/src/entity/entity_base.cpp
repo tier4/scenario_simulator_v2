@@ -219,13 +219,16 @@ auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool includ
 
   if (unique_route_lanelets.empty()) {
     lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);
+      status_non_canonicalized.pose, getBoundingBox(), include_crosswalk,
+      getDefaultMatchingDistanceForLaneletPoseCalculation());
   } else {
-    lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status_non_canonicalized.pose, unique_route_lanelets, 1.0);
+    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
+      status_non_canonicalized.pose, unique_route_lanelets,
+      getDefaultMatchingDistanceForLaneletPoseCalculation());
     if (!lanelet_pose) {
       lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);
+        status_non_canonicalized.pose, getBoundingBox(), include_crosswalk,
+        getDefaultMatchingDistanceForLaneletPoseCalculation());
     }
   }
   if (lanelet_pose) {

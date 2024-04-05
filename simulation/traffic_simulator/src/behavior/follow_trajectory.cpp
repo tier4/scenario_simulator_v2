@@ -47,7 +47,8 @@ auto makeUpdatedStatus(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, double step_time,
-  std::optional<double> target_speed) -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
+  double matching_distance, std::optional<double> target_speed)
+  -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
@@ -97,7 +98,8 @@ auto makeUpdatedStatus(
     }
 
     return makeUpdatedStatus(
-      entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time, target_speed);
+      entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time,
+      matching_distance, target_speed);
   };
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
@@ -557,9 +559,8 @@ auto makeUpdatedStatus(
 
     updated_status.time = entity_status.time + step_time;
 
-    // matching distance has been set to 3.0 due to matching problems during lane changes
-    if (const auto lanelet_pose =
-          hdmap_utils->toLaneletPose(updated_status.pose, entity_status.bounding_box, false, 3.0);
+    if (const auto lanelet_pose = hdmap_utils->toLaneletPose(
+          updated_status.pose, entity_status.bounding_box, false, matching_distance);
         lanelet_pose) {
       updated_status.lanelet_pose = lanelet_pose.value();
       updated_status.lanelet_pose_valid = true;

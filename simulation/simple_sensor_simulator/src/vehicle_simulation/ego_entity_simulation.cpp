@@ -324,19 +324,23 @@ auto EgoEntitySimulation::getMatchedLaneletPoseFromEntityStatus(
   /// EgoEntity::setMapPose
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
-  const auto matching_length = [entity_width] { return entity_width * 0.5 + 1.0; }();
+  const auto matching_distance = std::max(
+                                   vehicle_parameters.axles.front_axle.track_width,
+                                   vehicle_parameters.axles.rear_axle.track_width) *
+                                   0.5 +
+                                 1.0;
 
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
   if (unique_route_lanelets.empty()) {
     lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_length);
+      hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_distance);
   } else {
     lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, matching_length);
+      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, matching_distance);
     if (!lanelet_pose) {
       lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_length);
+        hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_distance);
     }
   }
   return lanelet_pose;
