@@ -85,7 +85,7 @@ OpenSCENARIO:
                                         freespace: true
                                         relativeDistanceType: euclidianDistance
                                         rule: equalTo
-                                        value: 6.239365667688271166468894080026
+                                        value: 7.239365667688271166468894080026
                                         Position: &POSITION_1
                                           LanePosition:
                                             roadId: ""
