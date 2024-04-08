@@ -18,6 +18,7 @@ exit_status=0
 while IFS= read -r line
 do
     $COMMAND"$line"
+    ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
     cmd_exit_status=$?
     if [ $cmd_exit_status -ne 0 ]; then
         echo "Error: caught non-zero exit code（code: $cmd_exit_status)"
