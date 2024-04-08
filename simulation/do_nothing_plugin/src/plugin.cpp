@@ -117,9 +117,9 @@ auto interpolateEntityStatusFromPolylineTrajectory(
   for (auto vertex_itr = std::adjacent_find(
          trajectory->shape.vertices.begin(), trajectory->shape.vertices.end(),
          [](const auto &, const auto &) { return true; });
-       vertex_itr != trajectory->shape.vertices.end(); vertex_itr++) {
+       vertex_itr != trajectory->shape.vertices.end(); ++vertex_itr) {
     const auto timestamp_i = trajectory->base_time + vertex_itr->time;
-    const auto timestamp_i_1 = trajectory->base_time + (vertex_itr + 1)->time;
+    const auto timestamp_i_1 = trajectory->base_time + std::next(vertex_itr)->time;
     if (timestamp_i <= (current_time + step_time) && (current_time + step_time) <= timestamp_i_1) {
       return interpolate_entity_status(
         (current_time + step_time - trajectory->base_time - timestamp_i) /
