@@ -2,6 +2,9 @@
 Changelog for package cpp_mock_scenarios
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.2 (2024-04-08)
+-------------------
+
 1.11.1 (2024-04-05)
 -------------------
 * Merge pull request `#1224 <https://github.com/tier4/scenario_simulator_v2/issues/1224>`_ from tier4/fix/remove_headers_in_stl_comment
