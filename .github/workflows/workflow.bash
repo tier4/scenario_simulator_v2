@@ -26,5 +26,4 @@ do
     fi
 done < "$FILE_PATHS"
 
-# スクリプトの終了コードを設定
 exit $exit_status
