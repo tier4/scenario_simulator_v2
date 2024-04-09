@@ -283,27 +283,23 @@ void TrafficSource::execute(
     const auto name = getNewEntityName();
     const auto [pose, lanelet_pose] = getValidRandomPose();
 
+    // clang-format off
     if (lanelet_pose) {
+      /// @note If lanelet pose is valid spawn using lanelet pose
       if (isCurrentPedestrian()) {
-        pedestrian_ll_spawn_function_(
-          name, lanelet_pose.value(), std::get<PedestrianParams>(*current_params_),
-          *current_behavior_, *current_model3d_, speed_);
+        pedestrian_ll_spawn_function_(name, lanelet_pose.value(), std::get<PedestrianParams>(*current_params_), *current_behavior_, *current_model3d_, speed_);
       } else {
-        vehicle_ll_spawn_function_(
-          name, lanelet_pose.value(), std::get<VehicleParams>(*current_params_), *current_behavior_,
-          *current_model3d_, speed_);
+        vehicle_ll_spawn_function_(   name, lanelet_pose.value(), std::get<VehicleParams>(*current_params_),    *current_behavior_, *current_model3d_, speed_);
       }
     } else {
+      /// @note If lanelet pose is not valid spawn using normal map pose
       if (isCurrentPedestrian()) {
-        pedestrian_spawn_function_(
-          name, pose, std::get<PedestrianParams>(*current_params_), *current_behavior_,
-          *current_model3d_, speed_);
+        pedestrian_spawn_function_(   name, pose,                 std::get<PedestrianParams>(*current_params_), *current_behavior_, *current_model3d_, speed_);
       } else {
-        vehicle_spawn_function_(
-          name, pose, std::get<VehicleParams>(*current_params_), *current_behavior_,
-          *current_model3d_, speed_);
+        vehicle_spawn_function_(      name, pose,                 std::get<VehicleParams>(*current_params_),    *current_behavior_, *current_model3d_, speed_);
       }
     }
+    // clang-format on
   }
 }
 
