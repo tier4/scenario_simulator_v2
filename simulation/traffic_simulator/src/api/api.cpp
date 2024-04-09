@@ -326,20 +326,20 @@ void API::requestLaneChange(
 void API::defineTrafficSource(
   const double radius, const double rate, const double speed,
   const geometry_msgs::msg::Pose & position,
-  const std::vector<std::pair<
+  const std::vector<std::tuple<
     std::variant<
       traffic_simulator_msgs::msg::VehicleParameters,
       traffic_simulator_msgs::msg::PedestrianParameters>,
-    double>> & params_with_weights,
+    std::string, std::string, double>> & params_with_weights,
   const bool allow_spawn_outside_lane, const bool require_footprint_fitting,
   const bool random_orientation, std::optional<int> random_seed)
 {
-#define MAKE_SPAWN_LAMBDA(PARAMST, POSET)                                 \
-  [this](                                                                 \
-    const std::string & name, const POSET & pose, const PARAMST & params, \
-    const double speed) -> void {                                         \
-    spawn(name, pose, params);                                            \
-    setLinearVelocity(name, speed);                                       \
+#define MAKE_SPAWN_LAMBDA(PARAMST, POSET)                                                    \
+  [this](                                                                                    \
+    const std::string & name, const POSET & pose, const PARAMST & params,                    \
+    const std::string & behavior, const std::string & model3d, const double speed) -> void { \
+    spawn(name, pose, params, behavior, model3d);                                            \
+    setLinearVelocity(name, speed);                                                          \
   }
 
   traffic_simulator::traffic::TrafficSource::Configuration config;

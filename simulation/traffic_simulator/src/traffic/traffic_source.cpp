@@ -206,10 +206,12 @@ void SpawnPoseValidator::removeRedundantAreas()
 TrafficSource::TrafficSource(
   const double radius, const double rate, const double speed,
   const geometry_msgs::msg::Pose & position,
-  const std::vector<std::pair<ParamsVariant, double>> & params,
+  const std::vector<std::tuple<ParamsVariant, std::string, std::string, double>> & params,
   const std::optional<int> random_seed, const double current_time,
-#define MAKE_FUNCTION_REF_TYPE(PARAMST, POSET) \
-  const std::function<void(const std::string &, const POSET &, const PARAMST &, const double)> &
+#define MAKE_FUNCTION_REF_TYPE(PARAMST, POSET)                                                     \
+  const std::function<void(                                                                        \
+    const std::string &, const POSET &, const PARAMST &, const std::string &, const std::string &, \
+    const double)> &
   // clang-format off
   MAKE_FUNCTION_REF_TYPE(VehicleParams,    CanonicalizedLaneletPose) vehicle_ll_spawn_function,
   MAKE_FUNCTION_REF_TYPE(PedestrianParams, CanonicalizedLaneletPose) pedestrian_ll_spawn_function,
@@ -234,21 +236,14 @@ TrafficSource::TrafficSource(
     /// @note Failsafe for the case where TrafficSource is added before the simulation starts or delay is negative
     (!std::isnan(current_time) ? current_time : 0.0) + std::max(configuration.start_delay, 0.0)),
   config_(configuration),
-  params_([&params]() -> std::vector<ParamsVariant> {
-    std::vector<ParamsVariant> ret;
-    std::transform(
-      params.begin(), params.end(), std::back_inserter(ret),
-      [](const std::pair<ParamsVariant, double> & pair) { return pair.first; });
-    return ret;
-  }()),
+  params_(obtainParams<ParamsVariant, 0>(params)),
+  behaviors_(obtainParams<std::string, 1>(params)),
+  models3d_(obtainParams<std::string, 2>(params)),
   validator_(hdmap_utils, position, radius, false),
   validator_crosswalk_(hdmap_utils, position, radius, true)
 {
   // Create a parameter distribution from the weights
-  std::vector<double> weights;
-  std::transform(
-    params.begin(), params.end(), std::back_inserter(weights),
-    [](const std::pair<ParamsVariant, double> & pair) { return pair.second; });
+  const auto weights = obtainParams<double, 3>(params);
   params_distribution_ = std::discrete_distribution<>(weights.begin(), weights.end());
 
   if (random_seed) {
@@ -291,17 +286,22 @@ void TrafficSource::execute(
     if (lanelet_pose) {
       if (isCurrentPedestrian()) {
         pedestrian_ll_spawn_function_(
-          name, lanelet_pose.value(), std::get<PedestrianParams>(*current_params_), speed_);
+          name, lanelet_pose.value(), std::get<PedestrianParams>(*current_params_),
+          *current_behavior_, *current_model3d_, speed_);
       } else {
         vehicle_ll_spawn_function_(
-          name, lanelet_pose.value(), std::get<VehicleParams>(*current_params_), speed_);
+          name, lanelet_pose.value(), std::get<VehicleParams>(*current_params_), *current_behavior_,
+          *current_model3d_, speed_);
       }
     } else {
       if (isCurrentPedestrian()) {
         pedestrian_spawn_function_(
-          name, pose, std::get<PedestrianParams>(*current_params_), speed_);
+          name, pose, std::get<PedestrianParams>(*current_params_), *current_behavior_,
+          *current_model3d_, speed_);
       } else {
-        vehicle_spawn_function_(name, pose, std::get<VehicleParams>(*current_params_), speed_);
+        vehicle_spawn_function_(
+          name, pose, std::get<VehicleParams>(*current_params_), *current_behavior_,
+          *current_model3d_, speed_);
       }
     }
   }
@@ -311,6 +311,8 @@ auto TrafficSource::randomizeCurrentParams() -> void
 {
   const auto current_params_idx = params_distribution_(engine_);
   current_params_ = std::next(params_.begin(), current_params_idx);
+  current_behavior_ = std::next(behaviors_.begin(), current_params_idx);
+  current_model3d_ = std::next(models3d_.begin(), current_params_idx);
 }
 
 auto TrafficSource::isPedestrian(const ParamsVariant & params) -> bool

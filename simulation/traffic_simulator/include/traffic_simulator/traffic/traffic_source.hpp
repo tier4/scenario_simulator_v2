@@ -126,10 +126,12 @@ public:
   explicit TrafficSource(
     const double radius, const double rate, const double speed,
     const geometry_msgs::msg::Pose & position,
-    const std::vector<std::pair<ParamsVariant, double>> & params,
+    const std::vector<std::tuple<ParamsVariant, std::string, std::string, double>> & params,
     const std::optional<int> random_seed, const double current_time,
-#define MAKE_FUNCTION_REF_TYPE(PARAMST, POSET) \
-  const std::function<void(const std::string &, const POSET &, const PARAMST &, const double)> &
+#define MAKE_FUNCTION_REF_TYPE(PARAMST, POSET)                                                     \
+  const std::function<void(                                                                        \
+    const std::string &, const POSET &, const PARAMST &, const std::string &, const std::string &, \
+    double)> &
     // clang-format off
     MAKE_FUNCTION_REF_TYPE(VehicleParams,    CanonicalizedLaneletPose) vehicle_ll_spawn_function,
     MAKE_FUNCTION_REF_TYPE(PedestrianParams, CanonicalizedLaneletPose) pedestrian_ll_spawn_function,
@@ -147,6 +149,18 @@ public:
   const geometry_msgs::msg::Pose source_pose_;
 
 private:
+  template <typename T, std::size_t N>
+  static auto obtainParams(
+    const std::vector<std::tuple<ParamsVariant, std::string, std::string, double>> & params)
+    -> std::vector<T>
+  {
+    std::vector<T> ret;
+    ret.reserve(params.size());
+    for (const auto & param : params) {
+      ret.push_back(std::get<N>(param));
+    }
+    return ret;
+  }
   static auto isPedestrian(const ParamsVariant & params) -> bool;
   auto getRandomPose(const bool random_orientation = false) -> geometry_msgs::msg::Pose;
   auto getNewEntityName() -> std::string;
@@ -166,8 +180,10 @@ private:
   unsigned int entity_id_ = 0u;
 
 /// @note Functions
-#define MAKE_FUNCTION_TYPE(PARAMST, POSET) \
-  const std::function<void(const std::string &, const POSET &, const PARAMST &, const double)>
+#define MAKE_FUNCTION_TYPE(PARAMST, POSET)                                                         \
+  const std::function<void(                                                                        \
+    const std::string &, const POSET &, const PARAMST &, const std::string &, const std::string &, \
+    const double)>
   // clang-format off
   MAKE_FUNCTION_TYPE(VehicleParams,    CanonicalizedLaneletPose) vehicle_ll_spawn_function_;
   MAKE_FUNCTION_TYPE(PedestrianParams, CanonicalizedLaneletPose) pedestrian_ll_spawn_function_;
@@ -185,7 +201,11 @@ private:
   unsigned int spawn_count_ = 0u;
   const Configuration config_;
   const std::vector<ParamsVariant> params_;
+  const std::vector<std::string> behaviors_;
+  const std::vector<std::string> models3d_;
   std::vector<ParamsVariant>::const_iterator current_params_;
+  std::vector<std::string>::const_iterator current_behavior_;
+  std::vector<std::string>::const_iterator current_model3d_;
 
   /// @note Validators, one does not allow positions on crosswalk, the other does allow positions on crosswalk
   const SpawnPoseValidator validator_;

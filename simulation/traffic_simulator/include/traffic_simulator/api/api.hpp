@@ -297,11 +297,11 @@ public:
   void defineTrafficSource(
     const double radius, const double rate, const double speed,
     const geometry_msgs::msg::Pose & position,
-    const std::vector<std::pair<
+    const std::vector<std::tuple<
       std::variant<
         traffic_simulator_msgs::msg::VehicleParameters,
         traffic_simulator_msgs::msg::PedestrianParameters>,
-      double>> & params_with_weights,
+      std::string, std::string, double>> & params_with_weights,
     const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
     const bool random_orientation = false, std::optional<int> random_seed = std::nullopt);
 
