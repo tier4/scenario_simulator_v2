@@ -2,6 +2,13 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.3 (2024-04-09)
+-------------------
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 1.11.2 (2024-04-08)
 -------------------
 * Merge pull request `#1225 <https://github.com/tier4/scenario_simulator_v2/issues/1225>`_ from tier4/fix/remove_warnings_from_random_test_runner
