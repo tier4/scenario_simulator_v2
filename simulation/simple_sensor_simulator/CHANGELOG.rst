@@ -2,6 +2,38 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.3 (2024-04-09)
+-------------------
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.11.2 (2024-04-08)
+-------------------
+
+1.11.1 (2024-04-05)
+-------------------
+
+1.11.0 (2024-04-02)
+-------------------
+* Merge pull request `#1173 <https://github.com/tier4/scenario_simulator_v2/issues/1173>`_ from tier4/feature/arm_support
+  Feature/arm_build_test
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin/master' into feature/arm_support
+* Merge remote-tracking branch 'upstream/master' into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* fix compile error
+* remove IntersectContext
+* remove unused function
+* remove unused line
+* rename to new struct name
+  https://github.com/embree/embree/blob/be0accfd0b246e2b03355b8ee7710a22c1b49240/README.md?plain=1#L1360-L1361
+* remove some warnings
+* change header
+* add arm support branch
+* Contributors: Masaya Kataoka, Ubuntu, f0reachARR
+
 1.10.0 (2024-03-28)
 -------------------
 * Merge pull request `#1200 <https://github.com/tier4/scenario_simulator_v2/issues/1200>`_ from tier4/feature/simple_sensor_simulator/custom_noise

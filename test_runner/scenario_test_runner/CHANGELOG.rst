@@ -2,6 +2,32 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.3 (2024-04-09)
+-------------------
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.11.2 (2024-04-08)
+-------------------
+
+1.11.1 (2024-04-05)
+-------------------
+
+1.11.0 (2024-04-02)
+-------------------
+* Merge pull request `#1173 <https://github.com/tier4/scenario_simulator_v2/issues/1173>`_ from tier4/feature/arm_support
+  Feature/arm_build_test
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin/master' into feature/arm_support
+* Merge remote-tracking branch 'upstream/master' into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin' into feature/arm_support
+* add scenario
+* Contributors: Masaya Kataoka, Ubuntu, f0reachARR
+
 1.10.0 (2024-03-28)
 -------------------
 * Merge branch 'master' into feature/simple_sensor_simulator/custom_noise

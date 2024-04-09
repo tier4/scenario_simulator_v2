@@ -29,7 +29,9 @@ struct UnsignedInteger
 
   value_type data;
 
-  explicit UnsignedInteger(value_type value = {});
+  UnsignedInteger() = default;
+
+  UnsignedInteger(value_type);
 
   explicit UnsignedInteger(const std::string &);
 

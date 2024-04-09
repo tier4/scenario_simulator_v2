@@ -27,7 +27,7 @@ LogNormalDistribution::LogNormalDistribution(
   expected_value(readAttribute<Double>("expectedValue", node, scope)),
   variance(readAttribute<Double>("variance", node, scope)),
   distribute(
-    static_cast<double>(expected_value.data), sta::sqrt(static_cast<double>(variance.data)))
+    static_cast<double>(expected_value.data), std::sqrt(static_cast<double>(variance.data)))
 {
 }
 

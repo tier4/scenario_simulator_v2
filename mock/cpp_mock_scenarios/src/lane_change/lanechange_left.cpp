@@ -17,13 +17,11 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <string>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-
-// headers in STL
-#include <memory>
-#include <string>
 #include <vector>
 
 namespace cpp_mock_scenarios

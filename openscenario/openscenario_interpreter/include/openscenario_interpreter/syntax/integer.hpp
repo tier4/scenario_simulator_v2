@@ -27,11 +27,11 @@ struct Integer
 {
   using value_type = std::int64_t;
 
-  value_type data = 0;
+  value_type data;
 
-  explicit Integer() = default;
+  Integer() = default;
 
-  explicit Integer(value_type);
+  Integer(value_type);
 
   explicit Integer(const std::string &);
 
