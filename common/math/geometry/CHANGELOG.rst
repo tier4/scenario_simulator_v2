@@ -2,6 +2,12 @@
 Changelog for package geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.2 (2024-04-08)
+-------------------
+
+1.11.1 (2024-04-05)
+-------------------
+
 1.11.0 (2024-04-02)
 -------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support

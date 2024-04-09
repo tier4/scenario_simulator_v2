@@ -2,6 +2,16 @@
 Changelog for package random_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.2 (2024-04-08)
+-------------------
+* Merge pull request `#1225 <https://github.com/tier4/scenario_simulator_v2/issues/1225>`_ from tier4/fix/remove_warnings_from_random_test_runner
+  fix -Wreorder warnings in test extcutor class
+* fix -Wreorder warnings in test extcutor class
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+1.11.1 (2024-04-05)
+-------------------
+
 1.11.0 (2024-04-02)
 -------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
