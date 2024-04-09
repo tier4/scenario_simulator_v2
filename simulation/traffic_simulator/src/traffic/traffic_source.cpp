@@ -296,7 +296,7 @@ void TrafficSource::execute(
     const auto [pose, lanelet_pose] = getValidRandomPose();
 
     if (lanelet_pose) {
-    if (isCurrentPedestrian()) {
+      if (isCurrentPedestrian()) {
         pedestrian_ll_spawn_function_(
           name, lanelet_pose.value(), std::get<PedestrianParams>(*current_params_), speed_);
       } else {
@@ -309,7 +309,7 @@ void TrafficSource::execute(
           name, pose, std::get<PedestrianParams>(*current_params_), speed_);
       } else {
         vehicle_spawn_function_(name, pose, std::get<VehicleParams>(*current_params_), speed_);
-    }
+      }
     }
   }
 }
