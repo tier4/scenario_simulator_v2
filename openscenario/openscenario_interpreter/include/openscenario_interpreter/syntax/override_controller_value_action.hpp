@@ -58,7 +58,7 @@ struct OverrideControllerValueAction
   // New value for gear position or unset value.
   // const OverrideGearAction overrideGear;
 
-  explicit OverrideControllerValueAction() = default;
+  OverrideControllerValueAction() = default;
 
   explicit OverrideControllerValueAction(const pugi::xml_node &, Scope &);
 };

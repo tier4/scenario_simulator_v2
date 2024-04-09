@@ -59,7 +59,7 @@ struct RelativeDistanceType
     euclidianDistance,
   } value;
 
-  explicit RelativeDistanceType() = default;
+  RelativeDistanceType() = default;
 
   constexpr RelativeDistanceType(value_type value) : value(value) {}
 

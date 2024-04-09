@@ -48,7 +48,7 @@ struct TriggeringEntitiesRule
     none,
   } value;
 
-  explicit TriggeringEntitiesRule() = default;
+  TriggeringEntitiesRule() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 
