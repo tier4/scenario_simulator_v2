@@ -58,7 +58,7 @@ class EnvironmentFrame
 
 #undef DEFINE_SYNTAX_ERROR
 
-  explicit EnvironmentFrame() = default;
+  EnvironmentFrame() = default;
 
   explicit EnvironmentFrame(EnvironmentFrame &, const std::string &);
 

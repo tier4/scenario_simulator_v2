@@ -54,7 +54,7 @@ struct DynamicsDimension
     distance,
   } value;
 
-  explicit DynamicsDimension() = default;
+  DynamicsDimension() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 
