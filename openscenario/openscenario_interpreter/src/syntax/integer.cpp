@@ -21,7 +21,7 @@ inline namespace syntax
 {
 static_assert(std::is_standard_layout<Integer>::value, "");
 
-static_assert(not std::is_trivial<Integer>::value, "");
+static_assert(std::is_trivial<Integer>::value, "");
 
 Integer::Integer(value_type value) { data = value; }
 
