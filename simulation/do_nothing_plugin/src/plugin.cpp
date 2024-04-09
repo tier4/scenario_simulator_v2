@@ -114,20 +114,20 @@ auto interpolateEntityStatusFromPolylineTrajectory(
       1, *std::prev(trajectory->shape.vertices.end(), 2),
       *std::prev(trajectory->shape.vertices.end(), 1));
   }
-  for (auto vertex_itr = std::adjacent_find(
-         trajectory->shape.vertices.begin(), trajectory->shape.vertices.end(),
-         [](const auto &, const auto &) { return true; });
-       vertex_itr != trajectory->shape.vertices.end(); ++vertex_itr) {
-    const auto timestamp_i = trajectory->base_time + vertex_itr->time;
-    const auto timestamp_i_1 = trajectory->base_time + std::next(vertex_itr)->time;
-    if (timestamp_i <= (current_time + step_time) && (current_time + step_time) <= timestamp_i_1) {
-      return interpolate_entity_status(
-        (current_time + step_time - trajectory->base_time - timestamp_i) /
-          (timestamp_i_1 - timestamp_i),
-        *vertex_itr, *std::next(vertex_itr));
-    }
+  if (const auto vertex_iter = std::adjacent_find(
+        trajectory->shape.vertices.begin(), trajectory->shape.vertices.end(),
+        [&](const auto & vertex_a, const auto & vertex_b) {
+          return (trajectory->base_time + vertex_a.time) <= (current_time + step_time) and
+                 (current_time + step_time) <= (trajectory->base_time + vertex_b.time);
+        });
+      vertex_iter != trajectory->shape.vertices.end()) {
+    return interpolate_entity_status(
+      (current_time + step_time - trajectory->base_time - vertex_iter->time) /
+        (std::next(vertex_iter)->time - vertex_iter->time),
+      *vertex_iter, *std::next(vertex_iter));
+  } else {
+    return std::nullopt;
   }
-  return std::nullopt;
 }
 }  // namespace follow_trajectory
 }  // namespace do_nothing_behavior
