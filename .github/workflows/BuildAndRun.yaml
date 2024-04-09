@@ -44,8 +44,9 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          repository: RobotecAI/scenario_simulator_v2_scenarios
+          repository: HansRobo/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
+          ref: new-workflow-file
 
       - name: Search packages in this repository
         id: list_packages
@@ -93,13 +94,12 @@ jobs:
         run: |
           source install/setup.bash
           source install/local_setup.bash
-          ./src/scenario_simulator_v2/.github/workflows/workflow.bash "ros2 launch scenario_test_runner scenario_test_runner.launch.py global_frame_rate:=20 scenario:=" $(pwd)/src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.csv
+          ./src/scenario_simulator_v2/.github/workflows/workflow.bash "ros2 launch scenario_test_runner scenario_test_runner.launch.py global_frame_rate:=20 scenario:=" ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.csv
         shell: bash
 
       - name: Basic test
         run: |
           source install/setup.bash
           source install/local_setup.bash
-          ./src/scenario_simulator_v2/.github/workflows/workflow.bash "ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:=" $(pwd)/src/scenario_simulator_v2/test_runner/scenario_test_runner/config/basic.csv
-          ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
+          ./src/scenario_simulator_v2/.github/workflows/workflow.bash "ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:=" ./src/scenario_simulator_v2_scenarios)/workflow/basic.csv
         shell: bash
