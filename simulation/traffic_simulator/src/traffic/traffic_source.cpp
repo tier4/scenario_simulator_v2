@@ -80,24 +80,24 @@ auto SpawnPoseValidator::LaneletArea::contains(const lanelet::Id & id) const -> 
   return false;
 }
 
-/**
- * @note Closes the polygon (adds first point to the end)
- */
 auto SpawnPoseValidator::LaneletArea::toBoostPolygon(
   const std::vector<geometry_msgs::msg::Point> & points) -> boost_polygon
 {
   boost_polygon poly;
   poly.outer().reserve(points.size() + 1);
+
   std::transform(
     points.begin(), points.end(), std::back_inserter(poly.outer()),
     [](const geometry_msgs::msg::Point & p) { return math::geometry::toBoostPoint(p); });
+
   poly.outer().push_back(poly.outer().front());
   return poly;
 }
 
 auto SpawnPoseValidator::LaneletArea::getBoostPolygon() const -> const boost_polygon &
 {
-  if (polygon_b.outer().empty()) {
+  // recalculate only when necessary (+1 because boost polygon is closed)
+  if (polygon_b.outer().size() != getPolygon().size() + static_cast<std::size_t>(1)) {
     polygon_b = toBoostPolygon(getPolygon());
   }
   return polygon_b;
@@ -137,11 +137,13 @@ SpawnPoseValidator::SpawnPoseValidator(
   if (ids.empty()) {
     THROW_SIMULATION_ERROR("TrafficSource has no spawnable lanelets.");
   }
+
   /// @note start recursive search from every lanelet to find all possibilities
   for (const auto & id : ids) {
     areas_.emplace_back(id, hdmap_utils_);
     findAllSpawnableAreas(id, ids);
   }
+
   removeRedundantAreas();
 }
 
@@ -149,6 +151,7 @@ auto SpawnPoseValidator::isValid(
   const std::vector<geometry_msgs::msg::Point> & polygon, const lanelet::Id & id) const -> bool
 {
   const auto boost_polygon = LaneletArea::toBoostPolygon(polygon);
+
   for (const auto & area : areas_) {
     if (area.contains(id) && boost::geometry::within(boost_polygon, area.getBoostPolygon())) {
       return true;
@@ -157,10 +160,6 @@ auto SpawnPoseValidator::isValid(
   return false;
 }
 
-/**
- * @brief recursively find all spawnable areas
- * @param in_front do not use this parameter, it is for recursion
- */
 void SpawnPoseValidator::findAllSpawnableAreas(
   const lanelet::Id id, const std::set<lanelet::Id> & ids,
   const std::optional<LaneletArea> & previous_area, const bool in_front)
@@ -173,6 +172,7 @@ void SpawnPoseValidator::findAllSpawnableAreas(
       area = area + previous_area.value();
     }
   }
+
   const auto following_ids = hdmap_utils_->getFollowingLanelets(area.last_id);
   for (const auto & following_id : following_ids) {
     if (following_id != area.last_id && ids.count(following_id) == 1) {
@@ -180,6 +180,7 @@ void SpawnPoseValidator::findAllSpawnableAreas(
       findAllSpawnableAreas(following_id, ids, area, true);
     }
   }
+
   const auto previous_ids = hdmap_utils_->getPreviousLanelets(area.first_id);
   for (const auto & previous_id : previous_ids) {
     if (previous_id != area.first_id && ids.count(previous_id) == 1) {
@@ -249,14 +250,6 @@ TrafficSource::TrafficSource(
     params.begin(), params.end(), std::back_inserter(weights),
     [](const std::pair<ParamsVariant, double> & pair) { return pair.second; });
   params_distribution_ = std::discrete_distribution<>(weights.begin(), weights.end());
-
-  // Verify there are spawnable lanes
-  if (hdmap_utils
-        ->getNearbyLaneletIds(
-          position.position, radius, false, static_cast<std::size_t>(spawnable_lanes_limit))
-        .empty()) {
-    THROW_SIMULATION_ERROR("TrafficSource ", source_id_, " has no spawnable lanelets.");
-  }
 
   if (random_seed) {
     engine_.seed(random_seed.value());
@@ -364,9 +357,7 @@ auto TrafficSource::isPoseValid(
 
   const auto lanelet_pose = hdmap_utils_->toLaneletPose(pose, isCurrentPedestrian());
   if (lanelet_pose) {
-    std::cerr << "Matched to lanelet id: " << lanelet_pose->lanelet_id << " s: " << lanelet_pose->s
-              << std::endl;
-    /// @note reset orientation
+    /// @note reset orientation - to align the entity with lane
     auto corrected_pose = lanelet_pose.value();
     corrected_pose.rpy.z = 0.0;
     out_pose.emplace(corrected_pose, hdmap_utils_);

@@ -81,14 +81,23 @@ public:
   /**
    * @brief whether the 2D polygon does fit inside the lanelet with the given id
    * @note The polygon is checked against any lanelet combinations in the Validators area
-  */
+   */
   auto isValid(const std::vector<geometry_msgs::msg::Point> & polygon, const lanelet::Id & id) const
     -> bool;
 
 private:
+  /**
+    * @brief recursively find all spawnable areas
+    * @param previous_area used for recursion, do not use this parameter
+    * @param in_front used for recursion, do not use this parameter
+    */
   void findAllSpawnableAreas(
     const lanelet::Id id, const std::set<lanelet::Id> & ids,
     const std::optional<LaneletArea> & previous_area = std::nullopt, const bool in_front = true);
+  /**
+   * @brief as after `findAllSpawnableAreas` there will be many redundant areas (meaning one will
+   * be a subset of the other), remove all subsets for faster search
+   */
   void removeRedundantAreas();
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
@@ -101,6 +110,7 @@ public:
   using VehicleParams = traffic_simulator_msgs::msg::VehicleParameters;
   using PedestrianParams = traffic_simulator_msgs::msg::PedestrianParameters;
   using ParamsVariant = std::variant<VehicleParams, PedestrianParams>;
+
   struct Configuration
   {
     Configuration() = default;
@@ -112,6 +122,7 @@ public:
     bool use_random_orientation = false;
     double start_delay = 0.0;
   };
+
   explicit TrafficSource(
     const double radius, const double rate, const double speed,
     const geometry_msgs::msg::Pose & position,
@@ -128,11 +139,12 @@ public:
 #undef MAKE_FUNCTION_REF_TYPE
     const Configuration & configuration, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils);
 
+  void execute(const double current_time, const double step_time) override;
+
   const double radius_;
   const double rate_;
   const double speed_;
   const geometry_msgs::msg::Pose source_pose_;
-  void execute(const double current_time, const double step_time) override;
 
 private:
   static auto isPedestrian(const ParamsVariant & params) -> bool;

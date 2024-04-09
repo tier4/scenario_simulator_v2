@@ -287,8 +287,11 @@ public:
    * @param radius The radius defining the area on which entities will be spawned
    * @param rate The rate at which entities will be spawned [Hz]
    * @param speed The speed of the spawned entities
-   * @param point The center of the area on which entities will be spawned
-   * @param params The parameters of the spawned entities
+   * @param position The center of the area on which entities will be spawned (includes orientation)
+   * @param params_with_weights The parameters of the spawned entities with their respective weights for random distribution
+   * @param allow_spawn_outside_lane Whether entities can be spawned outside the lane
+   * @param require_footprint_fitting Whether entities are required to fit inside lanelet polygon when spawned
+   * @param random_orientation Whether entities should have their orientation randomized before lane matching
    * @param random_seed [Optional] The seed for the random number generator
    */
   void defineTrafficSource(
