@@ -62,7 +62,7 @@ struct Priority
     parallel,
   } value;
 
-  explicit Priority() = default;
+  Priority() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };

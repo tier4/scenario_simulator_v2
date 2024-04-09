@@ -84,7 +84,7 @@ struct DynamicsShape
     step,
   } value;
 
-  explicit DynamicsShape() = default;
+  DynamicsShape() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 

@@ -17,15 +17,13 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <memory>
 #include <random001_parameters.hpp>
+#include <random>
 #include <rclcpp/rclcpp.hpp>
+#include <string>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-
-// headers in STL
-#include <memory>
-#include <random>
-#include <string>
 #include <vector>
 
 class RandomScenario : public cpp_mock_scenarios::CppScenarioNode

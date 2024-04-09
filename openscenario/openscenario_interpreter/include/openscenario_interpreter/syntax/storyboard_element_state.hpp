@@ -173,7 +173,7 @@ struct StoryboardElementState
     skipTransition,
   } value;
 
-  explicit StoryboardElementState() = default;
+  StoryboardElementState() = default;
 
   explicit StoryboardElementState(value_type value) : value(value) {}
 
