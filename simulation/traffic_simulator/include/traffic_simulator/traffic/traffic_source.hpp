@@ -28,6 +28,73 @@ namespace traffic_simulator
 {
 namespace traffic
 {
+
+typedef boost::geometry::model::d2::point_xy<double> boost_point;
+typedef boost::geometry::model::polygon<boost_point> boost_polygon;
+
+class SpawnPoseValidator
+{
+public:
+  struct LaneletArea
+  {
+    lanelet::Id first_id = -1, last_id = -1;
+    lanelet::Ids ids{};
+    std::vector<geometry_msgs::msg::Point> left_bound{}, right_bound{};
+    /**
+     * @note polygon and polygon_b are declared mutable for lazy calculation.
+     * They may be not up to date, to get the most up to date polygon, call
+     * `getPolygon()` and `getBoostPolygon()` respectively
+     */
+    mutable std::vector<geometry_msgs::msg::Point> polygon{};
+    mutable boost_polygon polygon_b;
+
+    LaneletArea() = default;
+    LaneletArea(const lanelet::Id & id, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils);
+
+    /// @brief combine two lanelet areas in the order they are passed (second is inserted after first)
+    auto operator+(const LaneletArea & other) const -> LaneletArea;
+
+    /// @brief combine two lanelet areas in the order they are passed (second is inserted after first)
+    static auto combine(const LaneletArea & before, const LaneletArea & after) -> LaneletArea;
+
+    /// @brief whether this area contains the other area
+    auto contains(const LaneletArea & other) const -> bool;
+
+    /// @brief whether this area contains the lanelet id
+    auto contains(const lanelet::Id & id) const -> bool;
+
+    /// @note Closes the polygon (adds first point to the end)
+    static auto toBoostPolygon(const std::vector<geometry_msgs::msg::Point> & points)
+      -> boost_polygon;
+
+    /// @note Returns closed polygon the polygon (first point == last point)
+    auto getBoostPolygon() const -> const boost_polygon &;
+    auto getPolygon() const -> const std::vector<geometry_msgs::msg::Point> &;
+    void createPolygon() const;
+  };
+
+  SpawnPoseValidator(
+    std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
+    const geometry_msgs::msg::Pose & source_pose, const double source_radius,
+    const bool include_crosswalk);
+
+  /**
+   * @brief whether the 2D polygon does fit inside the lanelet with the given id
+   * @note The polygon is checked against any lanelet combinations in the Validators area
+  */
+  auto isValid(const std::vector<geometry_msgs::msg::Point> & polygon, const lanelet::Id & id) const
+    -> bool;
+
+private:
+  void findAllSpawnableAreas(
+    const lanelet::Id id, const std::set<lanelet::Id> & ids,
+    const std::optional<LaneletArea> & previous_area = std::nullopt, const bool in_front = true);
+  void removeRedundantAreas();
+
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+  std::vector<LaneletArea> areas_;
+};
+
 class TrafficSource : public TrafficModuleBase
 {
 public:
@@ -50,14 +117,17 @@ public:
     const geometry_msgs::msg::Pose & position,
     const std::vector<std::pair<ParamsVariant, double>> & params,
     const std::optional<int> random_seed, const double current_time,
-    const std::function<void(
-      const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)> &
-      vehicle_spawn_function,
-    const std::function<void(
-      const std::string &, const geometry_msgs::msg::Pose &, const PedestrianParams &,
-      const double)> & pedestrian_spawn_function,
-    const std::function<void(const std::string &)> & align_to_lane_function,
+#define MAKE_FUNCTION_REF_TYPE(PARAMST, POSET) \
+  const std::function<void(const std::string &, const POSET &, const PARAMST &, const double)> &
+    // clang-format off
+    MAKE_FUNCTION_REF_TYPE(VehicleParams,    CanonicalizedLaneletPose) vehicle_ll_spawn_function,
+    MAKE_FUNCTION_REF_TYPE(PedestrianParams, CanonicalizedLaneletPose) pedestrian_ll_spawn_function,
+    MAKE_FUNCTION_REF_TYPE(VehicleParams,    geometry_msgs::msg::Pose) vehicle_spawn_function,
+    MAKE_FUNCTION_REF_TYPE(PedestrianParams, geometry_msgs::msg::Pose) pedestrian_spawn_function,
+  // clang-format on
+#undef MAKE_FUNCTION_REF_TYPE
     const Configuration & configuration, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils);
+
   const double radius_;
   const double rate_;
   const double speed_;
@@ -67,15 +137,13 @@ public:
 private:
   static auto isPedestrian(const ParamsVariant & params) -> bool;
   auto getRandomPose(const bool random_orientation = false) -> geometry_msgs::msg::Pose;
-  auto getSmallestSValue(const lanelet::Id id) -> double;
-  auto getBiggestSValue(const lanelet::Id id) -> double;
-  auto convertToPoseInArea(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
-    -> std::optional<geometry_msgs::msg::Pose>;
   auto getNewEntityName() -> std::string;
   auto isCurrentPedestrian() -> bool;
   auto getCurrentBoundingBox() -> traffic_simulator_msgs::msg::BoundingBox;
-  auto isPoseValid(const geometry_msgs::msg::Pose & pose) -> bool;
-  auto getValidRandomPose() -> geometry_msgs::msg::Pose;
+  auto isPoseValid(
+    geometry_msgs::msg::Pose & pose, std::optional<CanonicalizedLaneletPose> & out_pose) -> bool;
+  auto getValidRandomPose()
+    -> std::pair<geometry_msgs::msg::Pose, std::optional<CanonicalizedLaneletPose>>;
   auto getRandomLaneletId() -> lanelet::Id;
   auto getRandomSValue(const lanelet::Id lanelet_id) -> double;
   auto randomizeCurrentParams() -> void;
@@ -84,20 +152,20 @@ private:
   inline static unsigned int next_source_id_ = 0u;
   const unsigned int source_id_;
   unsigned int entity_id_ = 0u;
-  /// @note Functions
-  const std::function<void(
-    const std::string &, const geometry_msgs::msg::Pose &, const VehicleParams &, const double)>
-    vehicle_spawn_function_;
-  const std::function<void(
-    const std::string &, const geometry_msgs::msg::Pose &, const PedestrianParams &, const double)>
-    pedestrian_spawn_function_;
-  const std::function<void(const std::string &)> align_to_lane_function_;
+
+/// @note Functions
+#define MAKE_FUNCTION_TYPE(PARAMST, POSET) \
+  const std::function<void(const std::string &, const POSET &, const PARAMST &, const double)>
+  // clang-format off
+  MAKE_FUNCTION_TYPE(VehicleParams,    CanonicalizedLaneletPose) vehicle_ll_spawn_function_;
+  MAKE_FUNCTION_TYPE(PedestrianParams, CanonicalizedLaneletPose) pedestrian_ll_spawn_function_;
+  MAKE_FUNCTION_TYPE(VehicleParams,    geometry_msgs::msg::Pose) vehicle_spawn_function_;
+  MAKE_FUNCTION_TYPE(PedestrianParams, geometry_msgs::msg::Pose) pedestrian_spawn_function_;
+  // clang-format on
+#undef MAKE_FUNCTION_TYPE
 
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
-  lanelet::Ids spawnable_lanelets_;
   std::mt19937 engine_;
-  std::uniform_int_distribution<std::size_t> id_distribution_;
-  std::map<std::size_t, std::uniform_real_distribution<double>> s_distributions_;
   std::uniform_real_distribution<double> angle_distribution_;
   std::uniform_real_distribution<double> radius_distribution_;
   std::discrete_distribution<> params_distribution_;
@@ -106,6 +174,10 @@ private:
   const Configuration config_;
   const std::vector<ParamsVariant> params_;
   std::vector<ParamsVariant>::const_iterator current_params_;
+
+  /// @note Validators, one does not allow positions on crosswalk, the other does allow positions on crosswalk
+  const SpawnPoseValidator validator_;
+  const SpawnPoseValidator validator_crosswalk_;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator

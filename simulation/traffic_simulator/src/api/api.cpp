@@ -334,12 +334,12 @@ void API::defineTrafficSource(
   const bool allow_spawn_outside_lane, const bool require_footprint_fitting,
   const bool random_orientation, std::optional<int> random_seed)
 {
-#define MAKE_SPAWN_LAMBDA(PARAMS)                                                           \
-  [this](                                                                                   \
-    const std::string & name, const geometry_msgs::msg::Pose & pose, const PARAMS & params, \
-    const double speed) -> void {                                                           \
-    spawn(name, pose, params);                                                              \
-    setEntityStatus(name, pose, helper::constructActionStatus(speed));                      \
+#define MAKE_SPAWN_LAMBDA(PARAMST, POSET)                                 \
+  [this](                                                                 \
+    const std::string & name, const POSET & pose, const PARAMST & params, \
+    const double speed) -> void {                                         \
+    spawn(name, pose, params);                                            \
+    setLinearVelocity(name, speed);                                       \
   }
 
   traffic_simulator::traffic::TrafficSource::Configuration config;
@@ -349,13 +349,12 @@ void API::defineTrafficSource(
 
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
     radius, rate, speed, position, params_with_weights, random_seed, getCurrentTime(),
-    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters),
-    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters),
-    [this](const std::string & name) -> void {
-      auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(getEntityStatus(name));
-      status.lanelet_pose.rpy.z = 0.0;
-      setEntityStatus(name, canonicalize(status));
-    },
+    // clang-format off
+    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters,    CanonicalizedLaneletPose),
+    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters, CanonicalizedLaneletPose),
+    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters,    geometry_msgs::msg::Pose),
+    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters, geometry_msgs::msg::Pose),
+    // clang-format on
     config, entity_manager_ptr_->getHdmapUtils());
 #undef MAKE_SPAWN_LAMBDA
 }
