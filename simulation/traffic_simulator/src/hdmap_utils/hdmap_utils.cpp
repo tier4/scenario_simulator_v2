@@ -298,7 +298,7 @@ auto HdMapUtils::getNearbyLaneletIds(
     if (nearest_road_lanelet.front().first > distance_thresh) {
       return {};
     }
-    for (const auto & lanelet : nearest_lanelet) {
+    for (const auto & lanelet : nearest_road_lanelet) {
       if (lanelet.first <= distance_thresh) {
         lanelet_ids.emplace_back(lanelet.second.id());
       }
