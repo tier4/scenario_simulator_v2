@@ -51,7 +51,7 @@ struct Wetness
     highFlooded      // Road completely covered with water. Water depth > 5cm.
   } value;
 
-  explicit Wetness() = default;
+  Wetness() = default;
 
   constexpr Wetness(value_type value) : value(value) {}
 

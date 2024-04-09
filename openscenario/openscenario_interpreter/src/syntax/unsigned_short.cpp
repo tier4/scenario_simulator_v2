@@ -22,7 +22,7 @@ inline namespace syntax
 {
 static_assert(std::is_standard_layout<UnsignedShort>::value, "");
 
-static_assert(not std::is_trivial<UnsignedShort>::value, "");
+static_assert(std::is_trivial<UnsignedShort>::value, "");
 
 UnsignedShort::UnsignedShort(value_type value) { data = value; }
 

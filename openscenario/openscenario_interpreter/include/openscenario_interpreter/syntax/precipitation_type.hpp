@@ -43,7 +43,7 @@ struct PrecipitationType
 {
   enum value_type { dry, rain, snow } value;
 
-  explicit PrecipitationType() = default;
+  PrecipitationType() = default;
 
   constexpr PrecipitationType(value_type value) : value(value) {}
 

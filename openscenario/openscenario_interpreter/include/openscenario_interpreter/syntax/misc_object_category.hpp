@@ -83,7 +83,7 @@ struct MiscObjectCategory
     wind,  // NOTE: DEPRECATED (since OpenSCENARIO 1.1)
   } value;
 
-  explicit MiscObjectCategory() = default;
+  MiscObjectCategory() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 
