@@ -44,9 +44,8 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          repository: HansRobo/scenario_simulator_v2_scenarios
+          repository: RobotecAI/scenario_simulator_v2_scenarios
           path: src/scenario_simulator_v2_scenarios
-          ref: new-workflow-file
 
       - name: Search packages in this repository
         id: list_packages
