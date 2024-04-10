@@ -1510,8 +1510,12 @@ auto HdMapUtils::getLongitudinalDistance(
       return false;
     }
   };
+
+  /// @note in this for loop, some cases are marked by @note command. each case is explained in the document.
+  /// @sa https://tier4.github.io/scenario_simulator_v2-docs/developer_guide/DistanceCalculation/
   for (unsigned int i = 0; i < route.size(); i++) {
     if (i < route.size() - 1 && with_lane_change(allow_lane_change, route[i], route[i + 1])) {
+      /// @note "the lanelet before the lane change" case
       traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
       next_lanelet_pose.lanelet_id = route[i + 1];
       next_lanelet_pose.s = 0.0;
@@ -1533,6 +1537,7 @@ auto HdMapUtils::getLongitudinalDistance(
         }
       }
 
+      /// @note "first lanelet before the lane change" case
       if (route[i] == from.lanelet_id) {
         distance += getLaneletLength(route[i + 1]) - from.s;
         if (route[i + 1] == to.lanelet_id) {
@@ -1541,11 +1546,15 @@ auto HdMapUtils::getLongitudinalDistance(
         }
       }
     } else {
+
       if (route[i] == from.lanelet_id) {
+        /// @note "first lanelet" case
         distance = getLaneletLength(from.lanelet_id) - from.s;
       } else if (route[i] == to.lanelet_id) {
+        /// @note "last lanelet" case
         distance += to.s;
       } else {
+        ///@note "normal intermediate lanelet" case
         distance += getLaneletLength(route[i]);
       }
     }
