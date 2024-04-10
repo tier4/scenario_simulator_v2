@@ -20,6 +20,12 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 
+int main(int argc, char ** argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
+
 TEST(TrafficLight, Color)
 {
   using Color = traffic_simulator::TrafficLight::Color;
@@ -367,8 +373,231 @@ TEST(TrafficLight, TrafficLight)
   }
 }
 
-int main(int argc, char ** argv)
+TEST(TrafficLight, Color_make)
 {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  using Color = traffic_simulator::TrafficLight::Color;
+  {
+    const auto color = Color::make("green");
+
+    EXPECT_TRUE(color == Color::green);
+    EXPECT_TRUE(color.is(Color::green));
+    EXPECT_TRUE(boost::lexical_cast<Color>("green") == Color::green);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "green");
+  }
+
+  {
+    const auto color = Color::make("yellow");
+
+    EXPECT_TRUE(color == Color::yellow);
+    EXPECT_TRUE(color.is(Color::yellow));
+    EXPECT_TRUE(boost::lexical_cast<Color>("yellow") == Color::yellow);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
+  }
+
+  {
+    const auto color = Color::make("red");
+
+    EXPECT_TRUE(color == Color::red);
+    EXPECT_TRUE(color.is(Color::red));
+    EXPECT_TRUE(boost::lexical_cast<Color>("red") == Color::red);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "red");
+  }
+
+  {
+    const auto color = Color::make("white");
+
+    EXPECT_TRUE(color == Color::white);
+    EXPECT_TRUE(color.is(Color::white));
+    EXPECT_TRUE(boost::lexical_cast<Color>("white") == Color::white);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "white");
+  }
+
+  {
+    const auto color = Color::make("amber");
+
+    EXPECT_TRUE(color == Color::yellow);
+    EXPECT_TRUE(color.is(Color::yellow));
+    EXPECT_TRUE(boost::lexical_cast<Color>("amber") == Color::yellow);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
+  }
+}
+
+TEST(TrafficLight, Shape_make)
+{
+  using Shape = traffic_simulator::TrafficLight::Shape;
+
+  {
+    const auto shape = Shape::make("circle");
+
+    EXPECT_TRUE(shape == Shape::circle);
+    EXPECT_TRUE(shape.is(Shape::circle));
+    EXPECT_TRUE(shape.is(Shape::Category::circle));
+    EXPECT_TRUE(shape.category() == Shape::Category::circle);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("circle") == Shape::circle);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "circle");
+  }
+
+  {
+    const auto shape = Shape::make("cross");
+
+    EXPECT_TRUE(shape == Shape::cross);
+    EXPECT_TRUE(shape.is(Shape::cross));
+    EXPECT_TRUE(shape.is(Shape::Category::cross));
+    EXPECT_TRUE(shape.category() == Shape::Category::cross);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("cross") == Shape::cross);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "cross");
+  }
+
+  {
+    const auto shape = Shape::make("left");
+
+    EXPECT_TRUE(shape == Shape::left);
+    EXPECT_TRUE(shape.is(Shape::left));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("left") == Shape::left);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "left");
+  }
+
+  {
+    const auto shape = Shape::make("down");
+
+    EXPECT_TRUE(shape == Shape::down);
+    EXPECT_TRUE(shape.is(Shape::down));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("down") == Shape::down);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "down");
+  }
+
+  {
+    const auto shape = Shape::make("up");
+
+    EXPECT_TRUE(shape == Shape::up);
+    EXPECT_TRUE(shape.is(Shape::up));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("up") == Shape::up);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "up");
+  }
+
+  {
+    const auto shape = Shape::make("right");
+
+    EXPECT_TRUE(shape == Shape::right);
+    EXPECT_TRUE(shape.is(Shape::right));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("right") == Shape::right);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "right");
+  }
+
+  {
+    const auto shape = Shape::make("lowerLeft");
+
+    EXPECT_TRUE(shape == Shape::lower_left);
+    EXPECT_TRUE(shape.is(Shape::lower_left));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("lowerLeft") == Shape::lower_left);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "lowerLeft");
+  }
+
+  {
+    const auto shape = Shape::make("upperLeft");
+
+    EXPECT_TRUE(shape == Shape::upper_left);
+    EXPECT_TRUE(shape.is(Shape::upper_left));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("upperLeft") == Shape::upper_left);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "upperLeft");
+  }
+
+  {
+    const auto shape = Shape::make("lowerRight");
+
+    EXPECT_TRUE(shape == Shape::lower_right);
+    EXPECT_TRUE(shape.is(Shape::lower_right));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("lowerRight") == Shape::lower_right);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "lowerRight");
+  }
+
+  {
+    const auto shape = Shape::make("upperRight");
+
+    EXPECT_TRUE(shape == Shape::upper_right);
+    EXPECT_TRUE(shape.is(Shape::upper_right));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("upperRight") == Shape::upper_right);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "upperRight");
+  }
+}
+
+TEST(TrafficLight, Status_make)
+{
+  using Status = traffic_simulator::TrafficLight::Status;
+
+  {
+    const auto status = Status::make("solidOn");
+
+    EXPECT_TRUE(status == Status::solid_on);
+    EXPECT_TRUE(status.is(Status::solid_on));
+    EXPECT_TRUE(boost::lexical_cast<Status>("solidOn") == Status::solid_on);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "solidOn");
+  }
+
+  {
+    const auto status = Status::make("solidOff");
+
+    EXPECT_TRUE(status == Status::solid_off);
+    EXPECT_TRUE(status.is(Status::solid_off));
+    EXPECT_TRUE(boost::lexical_cast<Status>("solidOff") == Status::solid_off);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "solidOff");
+  }
+
+  {
+    const auto status = Status::make("flashing");
+
+    EXPECT_TRUE(status == Status::flashing);
+    EXPECT_TRUE(status.is(Status::flashing));
+    EXPECT_TRUE(boost::lexical_cast<Status>("flashing") == Status::flashing);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "flashing");
+  }
+
+  {
+    const auto status = Status::make("unknown");
+
+    EXPECT_TRUE(status == Status::unknown);
+    EXPECT_TRUE(status.is(Status::unknown));
+    EXPECT_TRUE(boost::lexical_cast<Status>("unknown") == Status::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "unknown");
+  }
+}
+
+TEST(TrafficLight, Color_make_wrong)
+{
+  using Color = traffic_simulator::TrafficLight::Color;
+  Color color;
+  EXPECT_THROW(color = Color::make("karmazynowy"), std::runtime_error);
+  EXPECT_FALSE(boost::lexical_cast<std::string>(color) == "karmazynowy");
+}
+
+TEST(TrafficLight, Shape_make_wrong)
+{
+  using Shape = traffic_simulator::TrafficLight::Shape;
+  Shape shape;
+  EXPECT_THROW(shape = Shape::make("dwunastoscian foremny"), std::runtime_error);
+  EXPECT_FALSE(boost::lexical_cast<std::string>(shape) == "dwunastoscian foremny");
+}
+
+TEST(TrafficLight, Status_make_wrong)
+{
+  using Status = traffic_simulator::TrafficLight::Status;
+  Status status;
+  EXPECT_THROW(status = Status::make("quo"), std::runtime_error);
+  EXPECT_FALSE(boost::lexical_cast<std::string>(status) == "quo");
 }
