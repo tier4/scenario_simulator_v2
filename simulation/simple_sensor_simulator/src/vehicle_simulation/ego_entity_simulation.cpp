@@ -234,7 +234,6 @@ void EgoEntitySimulation::overwrite(
       return convertQuaternionToEulerAngle(relative_orientation).z -
              (previous_linear_velocity_ ? *previous_angular_velocity_ : 0) * step_time;
     }();
-
     switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
@@ -249,6 +248,7 @@ void EgoEntitySimulation::overwrite(
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
         state(3) = status.action_status.twist.linear.x;
+        state(6) = world_relative_position(2);
         [[fallthrough]];
 
       case VehicleModelType::IDEAL_STEER_VEL:
@@ -419,7 +419,7 @@ auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   Eigen::VectorXd relative_position(3);
   relative_position(0) = vehicle_model_ptr_->getX();
   relative_position(1) = vehicle_model_ptr_->getY();
-  relative_position(2) = 0.0;
+  relative_position(2) = vehicle_model_ptr_->getZ();
   relative_position =
     quaternion_operation::getRotationMatrix(initial_pose_.orientation) * relative_position;
 

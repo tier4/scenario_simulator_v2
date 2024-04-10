@@ -107,6 +107,11 @@ public:
   virtual double getY() = 0;
 
   /**
+   * @brief get vehicle position z
+   */
+  virtual double getZ() { return 0; };
+
+  /**
    * @brief get vehicle angle yaw
    */
   virtual double getYaw() = 0;

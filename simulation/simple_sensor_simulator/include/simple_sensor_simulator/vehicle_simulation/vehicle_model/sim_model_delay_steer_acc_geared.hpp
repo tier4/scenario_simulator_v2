@@ -62,6 +62,7 @@ private:
     VX,
     STEER,
     ACCX,
+    Z,
   };
   enum IDX_U {
     ACCX_DES = 0,
@@ -100,6 +101,11 @@ private:
    * @brief get vehicle position y
    */
   double getY() override;
+
+  /**
+   * @brief get vehicle position z
+   */
+  double getZ() override;
 
   /**
    * @brief get vehicle angle yaw

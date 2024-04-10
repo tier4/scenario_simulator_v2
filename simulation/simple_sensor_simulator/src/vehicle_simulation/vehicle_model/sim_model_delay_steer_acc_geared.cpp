@@ -21,7 +21,7 @@ SimModelDelaySteerAccGeared::SimModelDelaySteerAccGeared(
   double dt, double acc_delay, double acc_time_constant, double steer_delay,
   double steer_time_constant, double steer_dead_band, double debug_acc_scaling_factor,
   double debug_steer_scaling_factor)
-: SimModelInterface(6 /* dim x */, 2 /* dim u */),
+: SimModelInterface(7 /* dim x */, 2 /* dim u */),
   MIN_TIME_CONSTANT(0.03),
   vx_lim_(vx_lim),
   vx_rate_lim_(vx_rate_lim),
@@ -41,6 +41,7 @@ SimModelDelaySteerAccGeared::SimModelDelaySteerAccGeared(
 
 double SimModelDelaySteerAccGeared::getX() { return state_(IDX::X); }
 double SimModelDelaySteerAccGeared::getY() { return state_(IDX::Y); }
+double SimModelDelaySteerAccGeared::getZ() { return state_(IDX::Z); }
 double SimModelDelaySteerAccGeared::getYaw() { return state_(IDX::YAW); }
 double SimModelDelaySteerAccGeared::getVx() { return state_(IDX::VX); }
 double SimModelDelaySteerAccGeared::getVy() { return 0.0; }
