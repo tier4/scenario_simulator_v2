@@ -15,12 +15,9 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__CONTROLLER_HPP_
 
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -49,18 +46,19 @@ struct Controller : public Scope
 {
   const ParameterDeclarations parameter_declarations;  // Definition of additional parameters.
 
+  /*
+     NOTE: The term "controller" in OpenSCENARIO is a concept equivalent to
+     "the person driving the car". Here, Autoware is considered
+     anthropomorphic. In other words, the sensor performance of Autoware in a
+     simulation is described in
+     ScenarioObject.ObjectController.Controller.Properties as "characteristics
+     of the person driving the car".
+  */
   Properties properties;  // Describing properties for the controller.
 
   explicit Controller(const pugi::xml_node &, Scope &);
 
-  /*
-     NOTE: The term "controller" in OpenSCENARIO is a concept equivalent to
-     "the person driving the car. Here, Autoware is considered anthropomorphic.
-     In other words, the sensor performance of Autoware in a simulation is
-     described in ScenarioObject.ObjectController.Controller.Properties as
-     "characteristics of the person driving the car.
-  */
-  auto isUserDefinedController() const & -> bool;
+  auto isAutoware() const & -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -8,11 +8,9 @@ OpenSCENARIO:
   Catalog:
     name: all-in-one-controller
     Controller:
-      - name: ego-controller
+      - name: Autoware
         Properties:
-          Property:
-            - name: isEgo
-              value: "false"
-      - name: default-object-controller
+          Property: []
+      - name: behavior_tree_plugin/VehicleBehaviorTree
         Properties:
           Property: []
