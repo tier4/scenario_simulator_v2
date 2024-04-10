@@ -5,6 +5,13 @@ Changelog for package embree_vendor
 0.0.9 (2021-07-13)
 ------------------
 
+1.12.0 (2024-04-10)
+-------------------
+* Merge branch 'master' into feature/user-defined-controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge remote-tracking branch 'origin/master' into feature/user-defined-controller
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 1.11.3 (2024-04-09)
 -------------------
 * Merge branch 'master' into refactor/basic_types
