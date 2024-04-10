@@ -79,6 +79,11 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
+      equals(api_.getCurrentTime(), 1.5, 0.01) &&
+      !api_.reachPosition("ego", trajectory_waypoint_pose, 0.1)) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (
       equals(api_.getCurrentTime(), 2.0, 0.01) &&
       !api_.reachPosition("ego", trajectory_goal_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
