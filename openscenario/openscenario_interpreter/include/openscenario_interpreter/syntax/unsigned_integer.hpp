@@ -17,18 +17,21 @@
 
 #include <boost/lexical_cast.hpp>
 #include <openscenario_interpreter/error.hpp>
-#include <std_msgs/msg/u_int64.hpp>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct UnsignedInteger : public std_msgs::msg::UInt64
+struct UnsignedInteger
 {
-  using value_type = decltype(std_msgs::msg::UInt64::data);
+  using value_type = std::uint64_t;
 
-  explicit UnsignedInteger(value_type value = {});
+  value_type data;
+
+  UnsignedInteger() = default;
+
+  UnsignedInteger(value_type);
 
   explicit UnsignedInteger(const std::string &);
 

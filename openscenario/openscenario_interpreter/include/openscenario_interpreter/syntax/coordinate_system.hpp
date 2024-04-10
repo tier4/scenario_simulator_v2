@@ -50,7 +50,7 @@ struct CoordinateSystem
     trajectory,
   } value;
 
-  explicit CoordinateSystem() = default;
+  CoordinateSystem() = default;
 
   constexpr CoordinateSystem(value_type value) : value(value) {}
 

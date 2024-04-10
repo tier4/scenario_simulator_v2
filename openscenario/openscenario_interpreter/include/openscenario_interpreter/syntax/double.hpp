@@ -15,16 +15,17 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__DOUBLE_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__DOUBLE_HPP_
 
-#include <std_msgs/msg/float64.hpp>
 #include <string>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct Double : public std_msgs::msg::Float64
+struct Double
 {
-  using value_type = decltype(std_msgs::msg::Float64::data);
+  using value_type = double;
+
+  value_type data;
 
   Double() = default;
 
