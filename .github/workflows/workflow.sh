@@ -1,12 +1,9 @@
 #!/bin/sh
 
-if [ $# -lt 2 ]; then
-    echo "usage: workflow.bash <command> <path of workflow csv file>"
-    exit 1
-fi
+FILE_PATH="$1"
 
-COMMAND="$1"
-FILE_PATH="$2"
+shift 1
+OPTIONS = "$@"
 
 if [ ! -f "$FILE_PATH" ]; then
     echo "No such file: $FILE_PATH"
@@ -17,7 +14,7 @@ exit_status=0
 
 while IFS= read -r line
 do
-    $COMMAND"$line"
+    ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:="$line" $OPTIONS
     ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
     cmd_exit_status=$?
     if [ $cmd_exit_status -ne 0 ]; then
