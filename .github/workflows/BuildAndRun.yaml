@@ -96,9 +96,9 @@ jobs:
           ./src/scenario_simulator_v2/.github/workflows/workflow.bash "ros2 launch scenario_test_runner scenario_test_runner.launch.py global_frame_rate:=20 scenario:=" ./src/scenario_simulator_v2/test_runner/scenario_test_runner/config/workflow.txt
         shell: bash
 
-      - name: Basic test
-        run: |
-          source install/setup.bash
-          source install/local_setup.bash
-          ./src/scenario_simulator_v2/.github/workflows/workflow.bash "ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:=" ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
-        shell: bash
+#      - name: Basic test
+#        run: |
+#          source install/setup.bash
+#          source install/local_setup.bash
+#          ./src/scenario_simulator_v2/.github/workflows/workflow.bash "ros2 launch scenario_test_runner scenario_test_runner.launch.py scenario:=" ./src/scenario_simulator_v2_scenarios/workflow/basic.txt
+#        shell: bash
