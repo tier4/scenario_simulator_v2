@@ -2,6 +2,57 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.11.3 (2024-04-09)
+-------------------
+* Merge pull request `#1220 <https://github.com/tier4/scenario_simulator_v2/issues/1220>`_ from tier4/refactor/basic_types
+  Stop using ROS messages as basic types in `openscenario_interpreter`
+* Merge branch 'master' into refactor/basic_types
+* chore: apply linter
+* chore: make another version of Properties::get to suite new form of basic types of openscenario_interpreter/syntax
+* chore: fixed tests for structures that became trivial
+* refactor: stop marking as const to members of Orientation
+* refactor: stop using explicit keyword to default constructors
+* refactor: stop using explicit keyword to default constructors
+* refactor: remove redundant code according to N4659 (6.1)
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* refactor: remove redundant code according to N4659 (6.1)
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* refactor: remove redundant code according to N4659 (6.1)
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* chore: apply linter
+* refactor(openscenario_interpreter): delete ros messages from basic types
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.11.2 (2024-04-08)
+-------------------
+
+1.11.1 (2024-04-05)
+-------------------
+
+1.11.0 (2024-04-02)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin/master' into feature/arm_support
+* Merge remote-tracking branch 'upstream/master' into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin' into feature/arm_support
+* Contributors: Masaya Kataoka, f0reachARR
+
+1.10.0 (2024-03-28)
+-------------------
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.9.1 (2024-03-28)
+------------------
+
 1.9.0 (2024-03-27)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin

@@ -30,7 +30,7 @@ struct Command
     print,
   } value;
 
-  explicit Command() = default;
+  Command() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 

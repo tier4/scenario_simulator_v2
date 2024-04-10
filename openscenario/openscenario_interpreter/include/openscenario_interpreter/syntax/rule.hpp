@@ -56,7 +56,7 @@ struct Rule
     notEqualTo,
   } value;
 
-  explicit Rule() = default;
+  Rule() = default;
 
   explicit Rule(value_type value) : value(value) {}
 

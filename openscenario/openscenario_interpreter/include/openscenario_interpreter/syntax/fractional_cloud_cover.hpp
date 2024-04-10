@@ -61,7 +61,7 @@ struct FractionalCloudCover
     nineOktas
   } value;
 
-  explicit FractionalCloudCover() = default;
+  FractionalCloudCover() = default;
 
   constexpr FractionalCloudCover(value_type value) : value(value) {}
 
