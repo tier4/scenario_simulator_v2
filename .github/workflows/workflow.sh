@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [ $# -lt 2 ]; then
     echo "usage: workflow.bash <command> <path of workflow csv file>"
@@ -6,10 +6,10 @@ if [ $# -lt 2 ]; then
 fi
 
 COMMAND="$1"
-FILE_PATHS="$2"
+FILE_PATH="$2"
 
-if [ ! -f "$FILE_PATHS" ]; then
-    echo "No such file: $FILE_PATHS"
+if [ ! -f "$FILE_PATH" ]; then
+    echo "No such file: $FILE_PATH"
     exit 1
 fi
 
@@ -24,6 +24,6 @@ do
         echo "Error: caught non-zero exit code（code: $cmd_exit_status)"
         exit_status=1
     fi
-done < "$FILE_PATHS"
+done < "$FILE_PATH"
 
 exit $exit_status
