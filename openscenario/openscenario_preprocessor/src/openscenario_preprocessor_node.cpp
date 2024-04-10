@@ -24,7 +24,7 @@ class PreprocessorNode : public rclcpp::Node, public openscenario_preprocessor::
 {
 public:
   explicit PreprocessorNode(const rclcpp::NodeOptions & options)
-  : rclcpp::Node("preprocessor", options),
+  : rclcpp::Node("openscenario_preprocessor", options),
     openscenario_preprocessor::Preprocessor([this] {
       declare_parameter<std::string>("output_directory", "/tmp/openscenario_preprocessor");
       return get_parameter("output_directory").as_string();
