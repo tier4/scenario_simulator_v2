@@ -1546,7 +1546,6 @@ auto HdMapUtils::getLongitudinalDistance(
         }
       }
     } else {
-
       if (route[i] == from.lanelet_id) {
         /// @note "first lanelet" case
         distance = getLaneletLength(from.lanelet_id) - from.s;
