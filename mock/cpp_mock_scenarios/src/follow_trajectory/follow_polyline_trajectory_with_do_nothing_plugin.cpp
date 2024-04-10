@@ -44,6 +44,10 @@ public:
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(0).z(0))
         .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1))),
+    trajectory_waypoint_pose(
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(15).y(0).z(0))
+        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1))),
     trajectory_goal_pose(
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(20).y(0).z(0))
@@ -56,6 +60,7 @@ private:
   bool requested = false;
   const geometry_msgs::msg::Pose spawn_pose;
   const geometry_msgs::msg::Pose trajectory_start_pose;
+  const geometry_msgs::msg::Pose trajectory_waypoint_pose;
   const geometry_msgs::msg::Pose trajectory_goal_pose;
 
   void onUpdate() override
@@ -108,6 +113,10 @@ private:
                 traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
                   .time(1.0)
                   .position(trajectory_start_pose));
+              vertices.emplace_back(
+                traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
+                  .time(1.5)
+                  .position(trajectory_waypoint_pose));
               vertices.emplace_back(
                 traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
                   .time(2.0)
