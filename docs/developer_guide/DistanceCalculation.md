@@ -7,7 +7,7 @@ This document explains the algorithm that have already implemented.
 ## `RoutingAlgorithm::undefined` in lane coordinate system
 
 The old implementation is used as-is.  
-Please see [this document](../lane_pose_calculation/GetLongitudinalDistance.md) for details.
+Please see [this document](lane_pose_calculation/GetLongitudinalDistance.md) for details.  
 This implementation has limitations such as not being able to route to locations where lane changes are required.  
 In the internal implementation, lanelet2's shortestPath is used as the algorithm.  
 
