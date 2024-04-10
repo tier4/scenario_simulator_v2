@@ -1,0 +1,2 @@
+ament_add_gtest(test_conversion src/test_conversions.cpp)
+target_link_libraries(test_conversion simulation_interface)
