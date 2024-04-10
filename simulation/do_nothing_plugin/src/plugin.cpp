@@ -18,23 +18,14 @@
 
 namespace entity_behavior
 {
-void DoNothingBehavior::configure(const rclcpp::Logger &) {}
-
-void DoNothingBehavior::update(double current_time, double step_time)
+namespace do_nothing_behavior
 {
-  setCurrentTime(current_time);
-  setStepTime(step_time);
-  entity_status_->setTime(current_time);
-  if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
-    followPolylineTrajectory();
-  } else {
-    setUpdatedStatus(entity_status_);
-  }
-}
-
-void DoNothingBehavior::checkPolylineTrajectory()
+namespace follow_trajectory
 {
-  if (const auto trajectory = getPolylineTrajectory()) {
+bool checkPolylineTrajectory(
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+{
+  if (trajectory) {
     if (trajectory->closed) {
       THROW_SIMULATION_ERROR("Currently, closed trajectory does not supported.");
     }
@@ -49,10 +40,10 @@ void DoNothingBehavior::checkPolylineTrajectory()
         "DoNothingBehavior.",
         "You specified : ", trajectory->initial_distance_offset);
     }
-    if (trajectory->shape.vertices.empty()) {
+    if (trajectory->shape.vertices.size() <= 1) {
       THROW_SIMULATION_ERROR(
-        "FollowPolylineTrajectory is requested, but trajectory points are empty. Please check "
-        "description of the scenario.");
+        "FollowPolylineTrajectory is requested, but vertex points are less than 1 point.",
+        "At least 2 vertex points are required.", "Please check description of the scenario.");
     }
   } else {
     THROW_SIMULATION_ERROR(
@@ -60,82 +51,116 @@ void DoNothingBehavior::checkPolylineTrajectory()
       "This message is not originally intended to be displayed, if you see it, please "
       "contact the developer of traffic_simulator.");
   }
+  return true;
 }
 
-void DoNothingBehavior::followPolylineTrajectory()
+auto getLastVertexTimestamp(
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory)
+  -> std::optional<double>
 {
-  updated_status_ = std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>();
-  checkPolylineTrajectory();
+  checkPolylineTrajectory(trajectory);
+  return trajectory->base_time + trajectory->shape.vertices.back().time;
+}
 
-  if (const auto trajectory = getPolylineTrajectory()) {
-    for (size_t i = 0; i < trajectory->shape.vertices.size() - 1; i++) {
-      const auto timestamp_i = trajectory->base_time + trajectory->shape.vertices[i].time;
-      const auto timestamp_i_1 = trajectory->base_time + trajectory->shape.vertices[i + 1].time;
-
-      const auto interpolate_entity_status = [this](
-                                               const double interpolation_ratio,
-                                               const traffic_simulator_msgs::msg::Vertex & v0,
-                                               const traffic_simulator_msgs::msg::Vertex & v1) {
-        auto interpolated_entity_status =
-          static_cast<traffic_simulator_msgs::msg::EntityStatus>(*entity_status_);
-        interpolated_entity_status.lanelet_pose_valid = false;
-        interpolated_entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
-        interpolated_entity_status.pose =
-          geometry_msgs::build<geometry_msgs::msg::Pose>()
-            .position(
-              v0.position.position * (1 - interpolation_ratio) +
-              v1.position.position * interpolation_ratio)
-            .orientation(quaternion_operation::slerp(
-              v0.position.orientation, v1.position.orientation, interpolation_ratio));
-        const double linear_velocity =
-          math::geometry::hypot(v1.position.position, v0.position.position) / (v1.time - v0.time);
-        const auto linear_acceleration =
-          (entity_status_->getTwist().linear.x - linear_velocity) / (v1.time - v0.time);
-        const auto linear_jerk =
-          (entity_status_->getAccel().linear.x - linear_acceleration) / (v1.time - v0.time);
-
-        interpolated_entity_status.action_status.twist =
-          geometry_msgs::build<geometry_msgs::msg::Twist>()
-            .linear(
-              geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
-            .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
-        interpolated_entity_status.action_status.accel =
-          geometry_msgs::build<geometry_msgs::msg::Accel>()
-            .linear(
-              geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
-            .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
-        interpolated_entity_status.action_status.linear_jerk = linear_jerk;
-        return interpolated_entity_status;
-      };
-
-      if (i == 0 && (current_time_ + step_time_) <= timestamp_i) {
-        break;
-      }
-      if (
-        i == (trajectory->shape.vertices.size() - 2) &&
-        timestamp_i_1 <= (current_time_ + step_time_)) {
-        setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-          traffic_simulator::CanonicalizedEntityStatus(
-            interpolate_entity_status(
-              1, trajectory->shape.vertices[i], trajectory->shape.vertices[i + 1]),
-            getHdMapUtils())));
-        break;
-      }
-      if (
-        timestamp_i <= (current_time_ + step_time_) &&
-        (current_time_ + step_time_) <= timestamp_i_1) {
-        setUpdatedStatus(std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-          traffic_simulator::CanonicalizedEntityStatus(
-            interpolate_entity_status(
-              (current_time_ + step_time_ - trajectory->base_time - timestamp_i) /
-                (timestamp_i_1 - timestamp_i),
-              trajectory->shape.vertices[i], trajectory->shape.vertices[i + 1]),
-            getHdMapUtils())));
-        break;
-      }
-    }
+auto interpolateEntityStatusFromPolylineTrajectory(
+  const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & trajectory,
+  const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & entity_status,
+  double current_time, double step_time) -> std::optional<traffic_simulator::EntityStatus>
+{
+  if (!trajectory) {
+    return std::nullopt;
   }
-  if (!updated_status_) {
+
+  const auto interpolate_entity_status =
+    [&](
+      const double interpolation_ratio, const traffic_simulator_msgs::msg::Vertex & v0,
+      const traffic_simulator_msgs::msg::Vertex & v1) -> traffic_simulator_msgs::msg::EntityStatus {
+    auto interpolated_entity_status =
+      static_cast<traffic_simulator_msgs::msg::EntityStatus>(*entity_status);
+    interpolated_entity_status.lanelet_pose_valid = false;
+    interpolated_entity_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    interpolated_entity_status.pose =
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(
+          v0.position.position * (1 - interpolation_ratio) +
+          v1.position.position * interpolation_ratio)
+        .orientation(quaternion_operation::slerp(
+          v0.position.orientation, v1.position.orientation, interpolation_ratio));
+    const double linear_velocity =
+      math::geometry::hypot(v1.position.position, v0.position.position) / (v1.time - v0.time);
+    const auto linear_acceleration =
+      (entity_status->getTwist().linear.x - linear_velocity) / (v1.time - v0.time);
+    const auto linear_jerk =
+      (entity_status->getAccel().linear.x - linear_acceleration) / (v1.time - v0.time);
+
+    interpolated_entity_status.action_status.twist =
+      geometry_msgs::build<geometry_msgs::msg::Twist>()
+        .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_velocity).y(0).z(0))
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+    interpolated_entity_status.action_status.accel =
+      geometry_msgs::build<geometry_msgs::msg::Accel>()
+        .linear(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>().x(linear_acceleration).y(0).z(0))
+        .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(0).z(0));
+    interpolated_entity_status.action_status.linear_jerk = linear_jerk;
+    return interpolated_entity_status;
+  };
+
+  if ((current_time + step_time) <= trajectory->shape.vertices.begin()->time) {
+    return std::nullopt;
+  }
+  if (trajectory->shape.vertices.back().time <= (current_time + step_time)) {
+    return interpolate_entity_status(
+      1, *std::prev(trajectory->shape.vertices.end(), 2),
+      *std::prev(trajectory->shape.vertices.end(), 1));
+  }
+  if (const auto vertex_iter = std::adjacent_find(
+        trajectory->shape.vertices.begin(), trajectory->shape.vertices.end(),
+        [&](const auto & vertex_a, const auto & vertex_b) {
+          return (trajectory->base_time + vertex_a.time) <= (current_time + step_time) and
+                 (current_time + step_time) <= (trajectory->base_time + vertex_b.time);
+        });
+      vertex_iter != trajectory->shape.vertices.end()) {
+    return interpolate_entity_status(
+      (current_time + step_time - trajectory->base_time - vertex_iter->time) /
+        (std::next(vertex_iter)->time - vertex_iter->time),
+      *vertex_iter, *std::next(vertex_iter));
+  } else {
+    return std::nullopt;
+  }
+}
+}  // namespace follow_trajectory
+}  // namespace do_nothing_behavior
+
+void DoNothingBehavior::configure(const rclcpp::Logger &) {}
+
+void DoNothingBehavior::update(double current_time, double step_time)
+{
+  setCurrentTime(current_time);
+  setStepTime(step_time);
+
+  const auto interpolate_entity_status_on_polyline_trajectory = [&]() {
+    do_nothing_behavior::follow_trajectory::checkPolylineTrajectory(getPolylineTrajectory());
+    if (
+      const auto interpolated_status =
+        do_nothing_behavior::follow_trajectory::interpolateEntityStatusFromPolylineTrajectory(
+          getPolylineTrajectory(), getEntityStatus(), getCurrentTime(), getStepTime())) {
+      return std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+        traffic_simulator::CanonicalizedEntityStatus(interpolated_status.value(), getHdMapUtils()));
+    } else {
+      return entity_status_;
+    }
+  };
+
+  entity_status_->setTime(current_time);
+  if (getRequest() == traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY) {
+    setUpdatedStatus(interpolate_entity_status_on_polyline_trajectory());
+    if (
+      getCurrentTime() + getStepTime() >=
+      do_nothing_behavior::follow_trajectory::getLastVertexTimestamp(getPolylineTrajectory())) {
+      setRequest(traffic_simulator::behavior::Request::NONE);
+    }
+  } else {
     setUpdatedStatus(entity_status_);
   }
 }

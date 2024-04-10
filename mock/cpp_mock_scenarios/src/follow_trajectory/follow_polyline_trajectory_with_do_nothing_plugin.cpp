@@ -17,15 +17,13 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <memory>
 #include <rclcpp/rclcpp.hpp>
+#include <string>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/polyline.hpp>
 #include <traffic_simulator_msgs/msg/vertex.hpp>
-
-// headers in STL
-#include <memory>
-#include <string>
 #include <vector>
 
 namespace cpp_mock_scenarios
@@ -38,12 +36,17 @@ public:
   : cpp_mock_scenarios::CppScenarioNode(
       "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option),
-    spawn_pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
+    spawn_pose(
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
         .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1))),
     trajectory_start_pose(
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(0).z(0))
+        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1))),
+    trajectory_waypoint_pose(
+      geometry_msgs::build<geometry_msgs::msg::Pose>()
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(15).y(0).z(0))
         .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1))),
     trajectory_goal_pose(
       geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -57,6 +60,7 @@ private:
   bool requested = false;
   const geometry_msgs::msg::Pose spawn_pose;
   const geometry_msgs::msg::Pose trajectory_start_pose;
+  const geometry_msgs::msg::Pose trajectory_waypoint_pose;
   const geometry_msgs::msg::Pose trajectory_goal_pose;
 
   void onUpdate() override
@@ -66,14 +70,17 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
-    if (
-      equals(api_.getCurrentTime(), 0.0, 0.01) &&
-      !api_.reachPosition("ego", spawn_pose, 0.1)) {
+    if (equals(api_.getCurrentTime(), 0.0, 0.01) && !api_.reachPosition("ego", spawn_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 1.0, 0.01) &&
       !api_.reachPosition("ego", trajectory_start_pose, 0.1)) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    if (
+      equals(api_.getCurrentTime(), 1.5, 0.01) &&
+      !api_.reachPosition("ego", trajectory_waypoint_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
@@ -92,9 +99,7 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego",
-      spawn_pose,
-      getVehicleParameters(),
+      "ego", spawn_pose, getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 10, true);
@@ -103,7 +108,7 @@ private:
       std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>(
         traffic_simulator_msgs::build<traffic_simulator_msgs::msg::PolylineTrajectory>()
           .initial_distance_offset(0.0)
-          .dynamic_constraints_ignorable(false)
+          .dynamic_constraints_ignorable(true)
           .base_time(0.0)
           .closed(false)
           .shape(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Polyline>().vertices(
@@ -113,6 +118,10 @@ private:
                 traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
                   .time(1.0)
                   .position(trajectory_start_pose));
+              vertices.emplace_back(
+                traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
+                  .time(1.5)
+                  .position(trajectory_waypoint_pose));
               vertices.emplace_back(
                 traffic_simulator_msgs::build<traffic_simulator_msgs::msg::Vertex>()
                   .time(2.0)
