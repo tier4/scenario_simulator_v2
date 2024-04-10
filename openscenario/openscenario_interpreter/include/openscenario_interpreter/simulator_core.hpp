@@ -15,19 +15,12 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <limits>
-#include <memory>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
-#include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -317,7 +310,7 @@ public:
         return message;
       }());
 
-      if (controller.isUserDefinedController()) {
+      if (controller.isAutoware()) {
         core->attachLidarSensor(
           entity_ref, controller.properties.template get<Double>("pointcloudPublishingDelay"));
 

@@ -2,6 +2,22 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.12.0 (2024-04-10)
+-------------------
+* Merge pull request `#1222 <https://github.com/tier4/scenario_simulator_v2/issues/1222>`_ from tier4/feature/user-defined-controller
+  Feature/user defined controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge remote-tracking branch 'origin/master' into feature/user-defined-controller
+* Update sample scenarios to specify controller name
+* Remove member function template `Controller::of<T>`
+* Update member function `Controller::isAutoware`
+* Remove unused static data member `ego_count`
+* Add new member function template `Controller::of<T>`
+* Rename `Controller::isUserDefinedController` to `isAutoware`
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, yamacir-kit
+
 1.11.3 (2024-04-09)
 -------------------
 * Merge pull request `#1220 <https://github.com/tier4/scenario_simulator_v2/issues/1220>`_ from tier4/refactor/basic_types
