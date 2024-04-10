@@ -166,6 +166,10 @@ void SpawnPoseValidator::findAllSpawnableAreas(
 {
   LaneletArea area(id, hdmap_utils_);
   if (previous_area) {
+    /// @note check if this ID is already in the area - prevents loops
+    if (previous_area->contains(id)) {
+      return;
+    }
     if (in_front) {
       area = previous_area.value() + area;
     } else {
