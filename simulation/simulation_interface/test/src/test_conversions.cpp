@@ -105,7 +105,7 @@ TEST(Conversion, toMsg_Pose)
   EXPECT_POSE_EQ(dst_msg, src_proto);
 }
 
-TEST(Conversion, toProto_Vector)
+TEST(Conversion, toProto_Vector3)
 {
   geometry_msgs::msg::Vector3 src_msg;
   geometry_msgs::Vector3 dst_proto;
@@ -116,7 +116,7 @@ TEST(Conversion, toProto_Vector)
   EXPECT_VECTOR3_EQ(src_msg, dst_proto);
 }
 
-TEST(Conversion, toMsg_Vector)
+TEST(Conversion, toMsg_Vector3)
 {
   geometry_msgs::msg::Vector3 init_msg;
   geometry_msgs::Vector3 src_proto;
@@ -483,7 +483,7 @@ TEST(Conversion, toMsg_ActionStatus)
   EXPECT_ACTION_STATUS_EQ(dst_msg, src_proto);
 }
 
-TEST(Conversion, toProto_EntityStatus)
+TEST(Conversion, toProto_trafficSimulatorMsgsEntityStatus)
 {
   traffic_simulator_msgs::msg::EntityStatus src_msg;
   traffic_simulator_msgs::EntityStatus dst_proto;
@@ -541,7 +541,7 @@ TEST(Conversion, toProto_EntityStatus)
   EXPECT_ENTITY_STATUS_EQ(src_msg, dst_proto);
 }
 
-TEST(Conversion, toMsg_EntityStatus)
+TEST(Conversion, toMsg_trafficSimulatorMsgsEntityStatus)
 {
   traffic_simulator_msgs::msg::EntityStatus init_msg;
   traffic_simulator_msgs::EntityStatus src_proto;
@@ -601,7 +601,7 @@ TEST(Conversion, toMsg_EntityStatus)
   EXPECT_ENTITY_STATUS_EQ(dst_msg, src_proto);
 }
 
-TEST(Conversion, toProto_SentEntityStatus)
+TEST(Conversion, toProto_simulationApiSchemaEntityStatus)
 {
   traffic_simulator_msgs::msg::EntityStatus src_msg;
   simulation_api_schema::EntityStatus dst_proto;
@@ -640,7 +640,7 @@ TEST(Conversion, toProto_SentEntityStatus)
   EXPECT_SENT_ENTITY_STATUS_EQ(src_msg, dst_proto);
 }
 
-TEST(Conversion, toMsg_SentEntityStatus)
+TEST(Conversion, toMsg_simulationApiSchemaEntityStatus)
 {
   traffic_simulator_msgs::msg::EntityStatus init_msg;
   simulation_api_schema::EntityStatus src_proto;
@@ -1501,4 +1501,104 @@ TEST(Conversion, toMsg_GearCommandDrive18)
   EXPECT_NO_THROW(simulation_interface::toProto(init_msg, src_proto));
   EXPECT_NO_THROW(simulation_interface::toMsg(src_proto, dst_msg));
   EXPECT_EQ(dst_msg.command, autoware_auto_vehicle_msgs::msg::GearCommand::DRIVE_18);
+}
+
+TEST(Conversion, toProto_GearCommandReverse)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand src_msg;
+  autoware_auto_vehicle_msgs::GearCommand dst_proto;
+  src_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE;
+  EXPECT_NO_THROW(simulation_interface::toProto(src_msg, dst_proto));
+  EXPECT_EQ(dst_proto.command(), autoware_auto_vehicle_msgs::GearCommand_Constants::REVERSE);
+}
+
+TEST(Conversion, toMsg_GearCommandReverse)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand init_msg;
+  autoware_auto_vehicle_msgs::GearCommand src_proto;
+  autoware_auto_vehicle_msgs::msg::GearCommand dst_msg;
+  init_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE;
+  EXPECT_NO_THROW(simulation_interface::toProto(init_msg, src_proto));
+  EXPECT_NO_THROW(simulation_interface::toMsg(src_proto, dst_msg));
+  EXPECT_EQ(dst_msg.command, autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE);
+}
+
+TEST(Conversion, toProto_GearCommandReverse2)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand src_msg;
+  autoware_auto_vehicle_msgs::GearCommand dst_proto;
+  src_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE_2;
+  EXPECT_NO_THROW(simulation_interface::toProto(src_msg, dst_proto));
+  EXPECT_EQ(dst_proto.command(), autoware_auto_vehicle_msgs::GearCommand_Constants::REVERSE_2);
+}
+
+TEST(Conversion, toMsg_GearCommandReverse2)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand init_msg;
+  autoware_auto_vehicle_msgs::GearCommand src_proto;
+  autoware_auto_vehicle_msgs::msg::GearCommand dst_msg;
+  init_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE_2;
+  EXPECT_NO_THROW(simulation_interface::toProto(init_msg, src_proto));
+  EXPECT_NO_THROW(simulation_interface::toMsg(src_proto, dst_msg));
+  EXPECT_EQ(dst_msg.command, autoware_auto_vehicle_msgs::msg::GearCommand::REVERSE_2);
+}
+
+TEST(Conversion, toProto_GearCommandPark)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand src_msg;
+  autoware_auto_vehicle_msgs::GearCommand dst_proto;
+  src_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::PARK;
+  EXPECT_NO_THROW(simulation_interface::toProto(src_msg, dst_proto));
+  EXPECT_EQ(dst_proto.command(), autoware_auto_vehicle_msgs::GearCommand_Constants::PARK);
+}
+
+TEST(Conversion, toMsg_GearCommandPark)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand init_msg;
+  autoware_auto_vehicle_msgs::GearCommand src_proto;
+  autoware_auto_vehicle_msgs::msg::GearCommand dst_msg;
+  init_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::PARK;
+  EXPECT_NO_THROW(simulation_interface::toProto(init_msg, src_proto));
+  EXPECT_NO_THROW(simulation_interface::toMsg(src_proto, dst_msg));
+  EXPECT_EQ(dst_msg.command, autoware_auto_vehicle_msgs::msg::GearCommand::PARK);
+}
+
+TEST(Conversion, toProto_GearCommandLow)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand src_msg;
+  autoware_auto_vehicle_msgs::GearCommand dst_proto;
+  src_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
+  EXPECT_NO_THROW(simulation_interface::toProto(src_msg, dst_proto));
+  EXPECT_EQ(dst_proto.command(), autoware_auto_vehicle_msgs::GearCommand_Constants::LOW);
+}
+
+TEST(Conversion, toMsg_GearCommandLow)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand init_msg;
+  autoware_auto_vehicle_msgs::GearCommand src_proto;
+  autoware_auto_vehicle_msgs::msg::GearCommand dst_msg;
+  init_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW;
+  EXPECT_NO_THROW(simulation_interface::toProto(init_msg, src_proto));
+  EXPECT_NO_THROW(simulation_interface::toMsg(src_proto, dst_msg));
+  EXPECT_EQ(dst_msg.command, autoware_auto_vehicle_msgs::msg::GearCommand::LOW);
+}
+
+TEST(Conversion, toProto_GearCommandLow2)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand src_msg;
+  autoware_auto_vehicle_msgs::GearCommand dst_proto;
+  src_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW_2;
+  EXPECT_NO_THROW(simulation_interface::toProto(src_msg, dst_proto));
+  EXPECT_EQ(dst_proto.command(), autoware_auto_vehicle_msgs::GearCommand_Constants::LOW_2);
+}
+
+TEST(Conversion, toMsg_GearCommandLow2)
+{
+  autoware_auto_vehicle_msgs::msg::GearCommand init_msg;
+  autoware_auto_vehicle_msgs::GearCommand src_proto;
+  autoware_auto_vehicle_msgs::msg::GearCommand dst_msg;
+  init_msg.command = autoware_auto_vehicle_msgs::msg::GearCommand::LOW_2;
+  EXPECT_NO_THROW(simulation_interface::toProto(init_msg, src_proto));
+  EXPECT_NO_THROW(simulation_interface::toMsg(src_proto, dst_msg));
+  EXPECT_EQ(dst_msg.command, autoware_auto_vehicle_msgs::msg::GearCommand::LOW_2);
 }
