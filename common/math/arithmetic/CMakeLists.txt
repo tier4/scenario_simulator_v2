@@ -18,4 +18,12 @@ install(
   DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
   DESTINATION include/)
 
+if(BUILD_TESTING)
+  include_directories(include)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+  find_package(ament_cmake_gtest REQUIRED)
+  add_subdirectory(test)
+endif()
+
 ament_auto_package()
