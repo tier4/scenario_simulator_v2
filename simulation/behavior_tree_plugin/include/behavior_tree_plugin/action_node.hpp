@@ -92,6 +92,7 @@ public:
       BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("updated_status"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
+      BT::OutputPort<std::vector<visualization_msgs::msg::Marker>>("debug_marker"),
       // clang-format on
     };
   }
