@@ -1,2 +1,5 @@
 ament_add_gtest(test_longitudinal_speed_planning test_longitudinal_speed_planning.cpp)
 target_link_libraries(test_longitudinal_speed_planning traffic_simulator)
+
+ament_add_gtest(test_behavior test_behavior.cpp)
+target_link_libraries(test_behavior traffic_simulator)
