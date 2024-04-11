@@ -90,6 +90,19 @@ geometry_msgs::msg::Vector3 operator*(double value, const geometry_msgs::msg::Ve
   return vec * value;
 }
 
+geometry_msgs::msg::Point operator*(const geometry_msgs::msg::Point & point, const double value)
+{
+  return geometry_msgs::build<geometry_msgs::msg::Point>()
+    .x(point.x * value)
+    .y(point.z * value)
+    .z(point.z * value);
+}
+
+geometry_msgs::msg::Point operator*(const double value, const geometry_msgs::msg::Point & point)
+{
+  return point * value;
+}
+
 geometry_msgs::msg::Point operator+(
   const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Vector3 & v1)
 {
