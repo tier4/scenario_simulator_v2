@@ -203,12 +203,18 @@ void SpawnPoseValidator::findAllSpawnableAreas(
 
 void SpawnPoseValidator::removeRedundantAreas()
 {
-  for (auto it = areas_.begin(); it != areas_.end(); ++it) {
-    for (auto other_it = areas_.begin(); other_it != areas_.end(); /* do not increment here! */) {
-      if (it != other_it && it->contains(*other_it)) {
-        other_it = areas_.erase(other_it);
-      } else {
-        ++other_it;
+  // sort so that the biggest areas are first
+  std::sort(areas_.begin(), areas_.end(), [](const LaneletArea & lhs, const LaneletArea & rhs) {
+    return lhs.ids.size() > rhs.ids.size();
+  });
+
+  // remove redundant areas
+  for (size_t i = 0; i < areas_.size(); ++i) {
+    for (size_t j = 0; j < i; ++j) {
+      if (areas_[j].contains(areas_[i])) {
+        areas_.erase(areas_.begin() + i);
+        --i;    // adjust the index after erasing
+        break;  // no need to check other larger areas
       }
     }
   }
