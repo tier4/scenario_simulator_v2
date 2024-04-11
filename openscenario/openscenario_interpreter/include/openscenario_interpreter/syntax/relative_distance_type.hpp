@@ -17,38 +17,40 @@
 
 #include <iostream>
 
-//ignore spell miss due to OpenSCENARIO standard
+// Ignore spell miss due to OpenSCENARIO standard.
 // cspell: ignore euclidian
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeDistanceType (OpenSCENARIO 1.1) --------------------------------
- *
- *  <xsd:simpleType name="RelativeDistanceType">
- *    <xsd:union>
- *      <xsd:simpleType>
- *        <xsd:restriction base="xsd:string">
- *          <xsd:enumeration value="lateral"/>
- *          <xsd:enumeration value="longitudinal"/>
- *          <xsd:enumeration value="cartesianDistance">
- *            <xsd:annotation>
- *              <xsd:appinfo>
- *                deprecated
- *              </xsd:appinfo>
- *            </xsd:annotation>
- *          </xsd:enumeration>
- *          <xsd:enumeration value="euclidianDistance"/>
- *        </xsd:restriction>
- *      </xsd:simpleType>
- *      <xsd:simpleType>
- *        <xsd:restriction base="parameter"/>
- *      </xsd:simpleType>
- *    </xsd:union>
- *  </xsd:simpleType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   RelativeDistanceType (OpenSCENARIO XML 1.3)
+
+   Definition of the coordinate system dimension(s) to be used for calculating distances.
+
+   <xsd:simpleType name="RelativeDistanceType">
+     <xsd:union>
+       <xsd:simpleType>
+         <xsd:restriction base="xsd:string">
+           <xsd:enumeration value="lateral"/>
+           <xsd:enumeration value="longitudinal"/>
+           <xsd:enumeration value="cartesianDistance">
+             <xsd:annotation>
+               <xsd:appinfo>
+                 deprecated
+               </xsd:appinfo>
+             </xsd:annotation>
+           </xsd:enumeration>
+           <xsd:enumeration value="euclidianDistance"/>
+         </xsd:restriction>
+       </xsd:simpleType>
+       <xsd:simpleType>
+         <xsd:restriction base="parameter"/>
+       </xsd:simpleType>
+     </xsd:union>
+   </xsd:simpleType>
+ */
 struct RelativeDistanceType
 {
   // NOTE: I understand that "euclidian" is an incorrect spelling, but the XML
