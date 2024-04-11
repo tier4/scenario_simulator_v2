@@ -84,3 +84,12 @@ TEST(Vertex, toPoints_manyVertices)
     EXPECT_EQ(points[i].z, vertices[i].z);
   }
 }
+
+TEST(Vertex, toPoints_empty)
+{
+  std::vector<simple_sensor_simulator::Vertex> vertices{};
+
+  std::vector<geometry_msgs::msg::Point> points = simple_sensor_simulator::toPoints(vertices);
+
+  EXPECT_EQ(points.size(), 0);
+}

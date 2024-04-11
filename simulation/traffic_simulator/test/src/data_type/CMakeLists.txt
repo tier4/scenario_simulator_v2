@@ -1,0 +1,2 @@
+ament_add_gtest(test_speed_change test_speed_change.cpp)
+target_link_libraries(test_speed_change traffic_simulator)
