@@ -28,6 +28,11 @@ ament_auto_add_executable(define_traffic_source_outside_lane
 )
 target_link_libraries(define_traffic_source_outside_lane cpp_scenario_node)
 
+ament_auto_add_executable(define_traffic_source_high_rate
+  define_traffic_source_high_rate.cpp
+)
+target_link_libraries(define_traffic_source_high_rate cpp_scenario_node)
+
 install(TARGETS
   define_traffic_source_vehicle
   define_traffic_source_pedestrian
@@ -35,6 +40,7 @@ install(TARGETS
   define_traffic_source_mixed
   define_traffic_source_delay
   define_traffic_source_outside_lane
+  define_traffic_source_high_rate
   DESTINATION lib/cpp_mock_scenarios
 )
 
@@ -56,4 +62,7 @@ if(BUILD_TESTING)
 
   include(../../cmake/add_cpp_mock_scenario_test.cmake)
   add_cpp_mock_scenario_test(${PROJECT_NAME} "define_traffic_source_outside_lane" "5.0")  
+
+  include(../../cmake/add_cpp_mock_scenario_test.cmake)
+  add_cpp_mock_scenario_test(${PROJECT_NAME} "define_traffic_source_high_rate" "5.0")  
 endif()
