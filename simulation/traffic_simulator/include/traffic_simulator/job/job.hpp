@@ -23,7 +23,7 @@ namespace traffic_simulator
 namespace job
 {
 enum class Type {
-  UNKOWN = 0,
+  UNKNOWN = 0,
   LINEAR_VELOCITY = 1,
   LINEAR_ACCELERATION = 2,
   STAND_STILL_DURATION = 3,
