@@ -58,10 +58,12 @@ public:
 
   /**
    * @brief List all objects in range of sensor sight
+   * @warning `status` must contain EGO object
    * @return names of objects in range of sensor sight
    */
   const std::vector<std::string> getDetectedObjects(
-    const std::vector<traffic_simulator_msgs::EntityStatus> &) const;
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status,
+    const std::vector<std::string> & lidar_detected_entities) const;
 
   /**
    * @brief Extract sensor pose from entity statuses
