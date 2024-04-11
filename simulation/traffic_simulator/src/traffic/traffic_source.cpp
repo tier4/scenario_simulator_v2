@@ -250,8 +250,9 @@ TrafficSource::TrafficSource(
   params_(obtainParams<ParamsVariant, 0>(params)),
   behaviors_(obtainParams<std::string, 1>(params)),
   models3d_(obtainParams<std::string, 2>(params)),
-  validator_(hdmap_utils, position, radius, false),
-  validator_crosswalk_(hdmap_utils, position, radius, true)
+  validator_(hdmap_utils, position, radius, !configuration.require_footprint_fitting, false),
+  validator_crosswalk_(
+    hdmap_utils, position, radius, !configuration.require_footprint_fitting, true)
 {
   // Create a parameter distribution from the weights
   const auto weights = obtainParams<double, 3>(params);
