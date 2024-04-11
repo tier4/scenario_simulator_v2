@@ -75,7 +75,7 @@ public:
 
   SpawnPoseValidator(
     std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-    const geometry_msgs::msg::Pose & source_pose, const double source_radius,
+    const geometry_msgs::msg::Pose & source_pose, const double source_radius, const bool disabled,
     const bool include_crosswalk);
 
   /**
@@ -100,6 +100,7 @@ private:
    */
   void removeRedundantAreas();
 
+  const bool disabled_;
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
   std::vector<LaneletArea> areas_;
 };

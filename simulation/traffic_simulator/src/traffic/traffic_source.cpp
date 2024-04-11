@@ -126,10 +126,14 @@ void SpawnPoseValidator::LaneletArea::createPolygon() const
 
 SpawnPoseValidator::SpawnPoseValidator(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-  const geometry_msgs::msg::Pose & source_pose, const double source_radius,
+  const geometry_msgs::msg::Pose & source_pose, const double source_radius, const bool disabled,
   const bool include_crosswalk)
-: hdmap_utils_(hdmap_utils)
+: disabled_(disabled), hdmap_utils_(hdmap_utils)
 {
+  if (disabled) {
+    return;
+  }
+
   const auto spawnable_lanelets = hdmap_utils_->getNearbyLaneletIds(
     source_pose.position, source_radius, include_crosswalk, spawnable_lanes_limit);
   std::set<lanelet::Id> ids(spawnable_lanelets.begin(), spawnable_lanelets.end());
@@ -150,6 +154,9 @@ SpawnPoseValidator::SpawnPoseValidator(
 auto SpawnPoseValidator::isValid(
   const std::vector<geometry_msgs::msg::Point> & polygon, const lanelet::Id & id) const -> bool
 {
+  if (disabled_) {
+    return true;
+  }
   const auto boost_polygon = LaneletArea::toBoostPolygon(polygon);
 
   for (const auto & area : areas_) {
