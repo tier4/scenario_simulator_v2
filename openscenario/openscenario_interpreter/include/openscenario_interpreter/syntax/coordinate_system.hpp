@@ -22,25 +22,30 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- CoordinateSystem (OpenSCENARIO 1.1) ------------------------------------
- *
- *  <xsd:simpleType name="CoordinateSystem">
- *    <xsd:union>
- *      <xsd:simpleType>
- *        <xsd:restriction base="xsd:string">
- *          <xsd:enumeration value="entity"/>
- *          <xsd:enumeration value="lane"/>
- *          <xsd:enumeration value="road"/>
- *          <xsd:enumeration value="trajectory"/>
- *        </xsd:restriction>
- *      </xsd:simpleType>
- *      <xsd:simpleType>
- *        <xsd:restriction base="parameter"/>
- *      </xsd:simpleType>
- *    </xsd:union>
- *  </xsd:simpleType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   CoordinateSystem (OpenSCENARIO XML 1.3)
+
+   Definition of the coordinate system to be used for calculations.
+   If used in a condition, then the coordinate system relates to the triggering entity.
+   If used in an action, the coordinate system relates to the actor.
+
+   <xsd:simpleType name="CoordinateSystem">
+     <xsd:union>
+       <xsd:simpleType>
+         <xsd:restriction base="xsd:string">
+           <xsd:enumeration value="entity"/>
+           <xsd:enumeration value="lane"/>
+           <xsd:enumeration value="road"/>
+           <xsd:enumeration value="trajectory"/>
+           <xsd:enumeration value="world"/>
+         </xsd:restriction>
+       </xsd:simpleType>
+       <xsd:simpleType>
+         <xsd:restriction base="parameter"/>
+       </xsd:simpleType>
+     </xsd:union>
+   </xsd:simpleType>
+*/
 struct CoordinateSystem
 {
   enum value_type {

@@ -2,6 +2,52 @@
 Changelog for package openscenario_interpreter
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.13.0 (2024-04-11)
+-------------------
+* Merge pull request `#1216 <https://github.com/tier4/scenario_simulator_v2/issues/1216>`_ from tier4/feature/routing-algorithm
+  Implement `DistanceCondition` / `RelativeDistanceCondition` for `shortest` of `RoutingAlgorithm`
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* fix: perform `std::abs` to longitudinal distance with shortest routing algorithm
+* feat: implement makeNativeBoundingBoxRelativeLanePosition for shortest routing algorithm
+* fix: perform `std::abs` to lateral distance with shortest routing algorithm
+* feat: implement getLateralDistance with lane change
+* Merge branch 'master' into feature/routing-algorithm
+* doc(openscenario_interpreter): update standard annotation
+* feat(traffic_simulator): switch allow_lane_change option for longitudinal distance by routing algorithm
+* feat(openscenario_interpreter): implement (Relative)DistanceCondition with relative lane position makeing functions for shortest routing algorithm
+* feat(openscenario_interpreter): add routing_algorithm option to relative lane position making functions
+* feat(openscenario_interpreter): add empty implementation of (Relative)DistanceCondition for shortest routing algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Add `RoutingAlgorithm::value_type` to template parameter of distance
+* Add `RoutingAlgorithm::value_type` to template parameter of `distance`
+* Update `RelativeDistanceCondition` to read attribute `routingAlgorithm`
+* Update `DistanceCondition` to read attribute `RoutingAlgorithm`
+* Add new struct `RoutingAlgorithm`
+* Lipsticks
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, yamacir-kit
+
 1.12.0 (2024-04-10)
 -------------------
 * Merge pull request `#1222 <https://github.com/tier4/scenario_simulator_v2/issues/1222>`_ from tier4/feature/user-defined-controller
