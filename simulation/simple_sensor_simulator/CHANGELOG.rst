@@ -2,6 +2,30 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.13.0 (2024-04-11)
+-------------------
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
 1.12.0 (2024-04-10)
 -------------------
 * Merge branch 'master' into feature/user-defined-controller

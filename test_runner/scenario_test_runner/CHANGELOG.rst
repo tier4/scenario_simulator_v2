@@ -2,6 +2,49 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.13.0 (2024-04-11)
+-------------------
+* Merge pull request `#1216 <https://github.com/tier4/scenario_simulator_v2/issues/1216>`_ from tier4/feature/routing-algorithm
+  Implement `DistanceCondition` / `RelativeDistanceCondition` for `shortest` of `RoutingAlgorithm`
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* chore: update ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* doc: add clear names to conditions in ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* chore: add tests for RelativeDistanceCondition with shortest routing algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* chore: update parameters in ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* chore: add test case for distance to backward point in adjacent lane
+* fix: ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* chore: update ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml for distance conditions for freespace=true
+* chore: update parameters in ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* chore: add ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml to scenario test
+* chore: update parameters in ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* Merge branch 'master' into feature/routing-algorithm
+* chore: add test scenario for shortest routing algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, yamacir-kit
+
 1.12.0 (2024-04-10)
 -------------------
 * Merge pull request `#1222 <https://github.com/tier4/scenario_simulator_v2/issues/1222>`_ from tier4/feature/user-defined-controller
