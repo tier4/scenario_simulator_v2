@@ -92,8 +92,8 @@ private:
     * @param in_front used for recursion, do not use this parameter
     */
   void findAllSpawnableAreas(
-    const lanelet::Id id, const std::set<lanelet::Id> & ids,
-    const std::optional<LaneletArea> & previous_area = std::nullopt, const bool in_front = true);
+    const lanelet::Id id, const std::set<lanelet::Id> & ids, const bool in_front,
+    const std::optional<LaneletArea> & previous_area = std::nullopt);
   /**
    * @brief as after `findAllSpawnableAreas` there will be many redundant areas (meaning one will
    * be a subset of the other), remove all subsets for faster search

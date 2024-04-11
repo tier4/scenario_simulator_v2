@@ -64,10 +64,12 @@ auto SpawnPoseValidator::LaneletArea::combine(const LaneletArea & before, const 
 
 auto SpawnPoseValidator::LaneletArea::contains(const LaneletArea & other) const -> bool
 {
-  const std::set<lanelet::Id> this_ids_set(ids.begin(), ids.end());
-  const std::set<lanelet::Id> other_ids_set(other.ids.begin(), other.ids.end());
-  return std::includes(
-    this_ids_set.begin(), this_ids_set.end(), other_ids_set.begin(), other_ids_set.end());
+  for (const auto & other_id : other.ids) {
+    if (!contains(other_id)) {
+      return false;
+    }
+  }
+  return true;
 }
 
 auto SpawnPoseValidator::LaneletArea::contains(const lanelet::Id & id) const -> bool
@@ -124,6 +126,16 @@ void SpawnPoseValidator::LaneletArea::createPolygon() const
   polygon.insert(polygon.end(), right_bound.rbegin(), right_bound.rend());
 }
 
+auto hasCommonElements(const lanelet::Ids & ids, const std::set<lanelet::Id> & other) -> bool
+{
+  for (const auto & id : ids) {
+    if (other.find(id) != other.end()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 SpawnPoseValidator::SpawnPoseValidator(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   const geometry_msgs::msg::Pose & source_pose, const double source_radius, const bool disabled,
@@ -136,16 +148,26 @@ SpawnPoseValidator::SpawnPoseValidator(
 
   const auto spawnable_lanelets = hdmap_utils_->getNearbyLaneletIds(
     source_pose.position, source_radius, include_crosswalk, spawnable_lanes_limit);
-  std::set<lanelet::Id> ids(spawnable_lanelets.begin(), spawnable_lanelets.end());
+  std::set<lanelet::Id> spawnable_ids(spawnable_lanelets.begin(), spawnable_lanelets.end());
 
-  if (ids.empty()) {
+  if (spawnable_ids.empty()) {
     THROW_SIMULATION_ERROR("TrafficSource has no spawnable lanelets.");
   }
 
-  /// @note start recursive search from every lanelet to find all possibilities
-  for (const auto & id : ids) {
+  /// @note find all "first" lanelets in the spawnable lanelets
+  std::set<lanelet::Id> start_ids;
+  for (const auto & id : spawnable_ids) {
+    auto previous = hdmap_utils_->getPreviousLaneletIds(id);
+    previous.erase(std::remove(previous.begin(), previous.end(), id), previous.end());
+
+    if (previous.empty() || !hasCommonElements(previous, spawnable_ids)) {
+      start_ids.insert(id);
+    }
+  }
+
+  for (const auto & id : start_ids) {
     areas_.emplace_back(id, hdmap_utils_);
-    findAllSpawnableAreas(id, ids);
+    findAllSpawnableAreas(id, spawnable_ids, true);
   }
 
   removeRedundantAreas();
@@ -168,8 +190,8 @@ auto SpawnPoseValidator::isValid(
 }
 
 void SpawnPoseValidator::findAllSpawnableAreas(
-  const lanelet::Id id, const std::set<lanelet::Id> & ids,
-  const std::optional<LaneletArea> & previous_area, const bool in_front)
+  const lanelet::Id id, const std::set<lanelet::Id> & valid_ids, const bool in_front,
+  const std::optional<LaneletArea> & previous_area)
 {
   LaneletArea area(id, hdmap_utils_);
   if (previous_area) {
@@ -184,19 +206,17 @@ void SpawnPoseValidator::findAllSpawnableAreas(
     }
   }
 
-  const auto following_ids = hdmap_utils_->getFollowingLanelets(area.last_id);
-  for (const auto & following_id : following_ids) {
-    if (following_id != area.last_id && ids.count(following_id) == 1) {
-      areas_.push_back(area);
-      findAllSpawnableAreas(following_id, ids, area, true);
-    }
+  lanelet::Ids ids_to_consider;
+  const lanelet::Id border_id = in_front ? area.last_id : area.first_id;
+  if (in_front) {
+    ids_to_consider = hdmap_utils_->getFollowingLanelets(border_id);
+  } else {
+    ids_to_consider = hdmap_utils_->getPreviousLaneletIds(border_id);
   }
 
-  const auto previous_ids = hdmap_utils_->getPreviousLanelets(area.first_id);
-  for (const auto & previous_id : previous_ids) {
-    if (previous_id != area.first_id && ids.count(previous_id) == 1) {
-      areas_.push_back(area);
-      findAllSpawnableAreas(previous_id, ids, area, false);
+  for (const auto & id_to_consider : ids_to_consider) {
+    if (id_to_consider != border_id && valid_ids.count(id_to_consider) > 0) {
+      findAllSpawnableAreas(id_to_consider, valid_ids, in_front, area);
     }
   }
 }
