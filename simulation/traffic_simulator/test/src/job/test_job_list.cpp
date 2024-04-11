@@ -12,10 +12,7 @@ TEST(JobList, append)
 {
   bool was_cleanup_func_called = false;
   auto update_func = [](const double) { return true; };
-  auto cleanup_func = [&was_cleanup_func_called]()
-  {
-    was_cleanup_func_called = true;
-  };
+  auto cleanup_func = [&was_cleanup_func_called]() { was_cleanup_func_called = true; };
   auto type = traffic_simulator::job::Type::UNKNOWN;
   auto event = traffic_simulator::job::Event::POST_UPDATE;
   auto is_exclusive = true;
@@ -65,7 +62,10 @@ TEST(JobList, update)
   int update_count = 0;
   int cleanup_count = 0;
 
-  auto update_func = [&update_count](const double) { update_count++; return update_count >= 2; };
+  auto update_func = [&update_count](const double) {
+    update_count++;
+    return update_count >= 2;
+  };
   auto cleanup_func = [&cleanup_count]() { cleanup_count++; };
 
   auto type = traffic_simulator::job::Type::UNKNOWN;
