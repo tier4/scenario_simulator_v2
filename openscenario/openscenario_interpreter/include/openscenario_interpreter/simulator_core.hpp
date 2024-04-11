@@ -15,19 +15,13 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
-#include <geometry_msgs/msg/point.hpp>
-#include <geometry_msgs/msg/pose.hpp>
-#include <limits>
-#include <memory>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
+#include <openscenario_interpreter/syntax/routing_algorithm.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
-#include <openscenario_interpreter/type_traits/requires.hpp>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <utility>
 
 namespace openscenario_interpreter
 {
@@ -154,71 +148,111 @@ public:
     }
 
     template <typename From, typename To>
-    static auto makeNativeRelativeLanePosition(const From & from, const To & to)
+    static auto makeNativeRelativeLanePosition(
+      const From & from, const To & to,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
-      auto s = [](auto &&... xs) {
-        if (const auto result = core->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
-            result) {
-          return result.value();
-        } else {
-          return std::numeric_limits<
-            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
-        }
-      };
+      if (
+        routing_algorithm == RoutingAlgorithm::value_type::shortest or
+        routing_algorithm == RoutingAlgorithm::value_type::undefined) {
+        auto s = [](auto &&... xs) {
+          if (const auto result = core->getLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
+              result) {
+            return result.value();
+          } else {
+            return std::numeric_limits<
+              typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
+          }
+        };
 
-      auto t = [](auto &&... xs) {
-        if (const auto result = core->getLateralDistance(std::forward<decltype(xs)>(xs)...);
-            result) {
-          return *result;
-        } else {
-          return std::numeric_limits<
-            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
-        }
-      };
+        auto t = [](auto &&... xs) {
+          if (const auto result = core->getLateralDistance(std::forward<decltype(xs)>(xs)...);
+              result) {
+            return *result;
+          } else {
+            return std::numeric_limits<
+              typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
+          }
+        };
 
-      traffic_simulator::LaneletPose position;
-      position.lanelet_id = std::numeric_limits<std::int64_t>::max();
-      position.s = s(from, to);
-      position.offset = t(from, to);
-      position.rpy.x = std::numeric_limits<double>::quiet_NaN();
-      position.rpy.y = std::numeric_limits<double>::quiet_NaN();
-      position.rpy.z = std::numeric_limits<double>::quiet_NaN();
-      return position;
+        traffic_simulator::LaneletPose position;
+        position.lanelet_id = std::numeric_limits<std::int64_t>::max();
+        bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+        position.s = s(from, to, false, true, allow_lane_change);
+        position.offset = t(from, to, allow_lane_change);
+        position.rpy.x = std::numeric_limits<double>::quiet_NaN();
+        position.rpy.y = std::numeric_limits<double>::quiet_NaN();
+        position.rpy.z = std::numeric_limits<double>::quiet_NaN();
+        return position;
+      } else {
+        std::unordered_map<RoutingAlgorithm::value_type, std::string> name_map = {
+          {RoutingAlgorithm::value_type::assigned_route, "assignedRoute"},
+          {RoutingAlgorithm::value_type::fastest, "fastest"},
+          {RoutingAlgorithm::value_type::least_intersections, "leastIntersections"},
+          {RoutingAlgorithm::value_type::shortest, "shortest"},
+          {RoutingAlgorithm::value_type::undefined, "undefined"}};
+        std::stringstream what;
+        what << "There was an operation to calculate relative lane position with RoutingAlgorithm "
+                "set to "
+             << name_map[routing_algorithm] << ", but this is currently not supported.";
+        what << "Please set RoutingAlgorithm to either 'shortest' or 'undefined'.";
+        throw common::Error(what.str());
+      }
     }
 
     template <typename From, typename To>
-    static auto makeNativeBoundingBoxRelativeLanePosition(const From & from, const To & to)
+    static auto makeNativeBoundingBoxRelativeLanePosition(
+      const From & from, const To & to,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
-      auto s = [](auto &&... xs) {
-        if (const auto result =
-              core->getBoundingBoxLaneLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
-            result) {
-          return result.value();
-        } else {
-          return std::numeric_limits<
-            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
-        }
-      };
+      if (
+        routing_algorithm == RoutingAlgorithm::value_type::shortest or
+        routing_algorithm == RoutingAlgorithm::value_type::undefined) {
+        auto s = [](auto &&... xs) {
+          if (const auto result =
+                core->getBoundingBoxLaneLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
+              result) {
+            return result.value();
+          } else {
+            return std::numeric_limits<
+              typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
+          }
+        };
 
-      auto t = [](auto &&... xs) {
-        if (const auto result =
-              core->getBoundingBoxLaneLateralDistance(std::forward<decltype(xs)>(xs)...);
-            result) {
-          return *result;
-        } else {
-          return std::numeric_limits<
-            typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
-        }
-      };
+        auto t = [](auto &&... xs) {
+          if (const auto result =
+                core->getBoundingBoxLaneLateralDistance(std::forward<decltype(xs)>(xs)...);
+              result) {
+            return *result;
+          } else {
+            return std::numeric_limits<
+              typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
+          }
+        };
 
-      traffic_simulator::LaneletPose position;
-      position.lanelet_id = std::numeric_limits<std::int64_t>::max();
-      position.s = s(from, to);
-      position.offset = t(from, to);
-      position.rpy.x = std::numeric_limits<double>::quiet_NaN();
-      position.rpy.y = std::numeric_limits<double>::quiet_NaN();
-      position.rpy.z = std::numeric_limits<double>::quiet_NaN();
-      return position;
+        traffic_simulator::LaneletPose position;
+        position.lanelet_id = std::numeric_limits<std::int64_t>::max();
+        bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+        position.s = s(from, to, false, true, allow_lane_change);
+        position.offset = t(from, to, allow_lane_change);
+        position.rpy.x = std::numeric_limits<double>::quiet_NaN();
+        position.rpy.y = std::numeric_limits<double>::quiet_NaN();
+        position.rpy.z = std::numeric_limits<double>::quiet_NaN();
+        return position;
+      } else {
+        std::unordered_map<RoutingAlgorithm::value_type, std::string> name_map = {
+          {RoutingAlgorithm::value_type::assigned_route, "assignedRoute"},
+          {RoutingAlgorithm::value_type::fastest, "fastest"},
+          {RoutingAlgorithm::value_type::least_intersections, "leastIntersections"},
+          {RoutingAlgorithm::value_type::shortest, "shortest"},
+          {RoutingAlgorithm::value_type::undefined, "undefined"}};
+        std::stringstream what;
+        what << "There was an operation to calculate relative lane position for bounding box with "
+                "RoutingAlgorithm set to "
+             << name_map[routing_algorithm] << ", but this is currently not supported.";
+        what << "Please set RoutingAlgorithm to either 'shortest' or 'undefined'.";
+        throw common::Error(what.str());
+      }
     }
 
     template <typename... Ts>
@@ -317,7 +351,7 @@ public:
         return message;
       }());
 
-      if (controller.isUserDefinedController()) {
+      if (controller.isAutoware()) {
         core->attachLidarSensor(
           entity_ref, controller.properties.template get<Double>("pointcloudPublishingDelay"));
 

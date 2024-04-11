@@ -2,6 +2,54 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.13.0 (2024-04-11)
+-------------------
+* Merge pull request `#1216 <https://github.com/tier4/scenario_simulator_v2/issues/1216>`_ from tier4/feature/routing-algorithm
+  Implement `DistanceCondition` / `RelativeDistanceCondition` for `shortest` of `RoutingAlgorithm`
+* chore: apply linter
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* doc: add comment to connect documentation
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* chore: apply linter
+* Merge branch 'master' into feature/routing-algorithm
+* fix: HdMapUtils::getLongitudinalDistance for adjacent lane
+* feat: implement makeNativeBoundingBoxRelativeLanePosition for shortest routing algorithm
+* feat: implement getLongitudinalDistance with lane change
+* feat: implement getLateralDistance with lane change
+* Merge branch 'master' into feature/routing-algorithm
+* feat(traffic_simulator): add allow_lane_change option to getLongitudinalDistance methods
+* feat(HDMapUtils): add allow_lane_change option to getRoute method
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, yamacir-kit
+
+1.12.0 (2024-04-10)
+-------------------
+* Merge branch 'master' into feature/user-defined-controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge remote-tracking branch 'origin/master' into feature/user-defined-controller
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 1.11.3 (2024-04-09)
 -------------------
 * Merge branch 'master' into refactor/basic_types

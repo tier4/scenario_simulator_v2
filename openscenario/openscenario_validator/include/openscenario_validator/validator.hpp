@@ -75,7 +75,7 @@ class OpenSCENARIOValidator
 
   ErrorHandler error_handler;
 
-  static constexpr auto schema_filepath = "/tmp/OpenSCENARIO-1.2.xsd";
+  static constexpr auto schema_filepath = "/tmp/OpenSCENARIO-1.3.xsd";
 
 public:
   explicit OpenSCENARIOValidator()

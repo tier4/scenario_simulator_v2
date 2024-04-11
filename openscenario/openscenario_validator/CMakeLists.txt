@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.16.3) # Ubuntu 20.04 default CMake version
 
-project(openscenario_validator VERSION 0.0.0)
+project(openscenario_validator)
 
 find_package(ament_cmake_auto REQUIRED)
 find_package(XercesC          REQUIRED)
 
-file(READ ${CMAKE_CURRENT_SOURCE_DIR}/configure/OpenSCENARIO-1.2.xsd ${PROJECT_NAME}_OPENSCENARIO_1_2_XSD)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/configure/OpenSCENARIO-1.3.xsd ${PROJECT_NAME}_OPENSCENARIO_1_3_XSD)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/configure/schema.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/schema.cpp)
 

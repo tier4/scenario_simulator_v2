@@ -22,6 +22,8 @@
 #include <random>
 #include <string>
 
+// cspell: ignore lognormal
+
 namespace openscenario_interpreter
 {
 inline namespace syntax
