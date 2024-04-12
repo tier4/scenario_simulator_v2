@@ -154,7 +154,11 @@ SpawnPoseValidator::SpawnPoseValidator(
     THROW_SIMULATION_ERROR("TrafficSource has no spawnable lanelets.");
   }
 
-  /// @note find all "first" lanelets in the spawnable lanelets
+  /**
+   * @note find all "starting" lanelets out of spawnable lanelets.
+   * These are the lanelets that have no previous lanelets inside the area of TrafficSource.
+   * Slightly increases computation time for small areas (~0.1ms), but reduces this time for larger areas.
+   */
   std::set<lanelet::Id> start_ids;
   for (const auto & id : spawnable_ids) {
     auto previous = hdmap_utils_->getPreviousLaneletIds(id);
@@ -166,8 +170,16 @@ SpawnPoseValidator::SpawnPoseValidator(
   }
 
   for (const auto & id : start_ids) {
-    areas_.emplace_back(id, hdmap_utils_);
     findAllSpawnableAreas(id, spawnable_ids, true);
+  }
+
+  /// @note find all lanelets that are not reachable from "starting" lanelets (detached loops within area of TrafficSource)
+  for (const auto & id : spawnable_ids) {
+    if (std::none_of(areas_.begin(), areas_.end(), [&id](const LaneletArea & area) {
+          return area.contains(id);
+        })) {
+      findAllSpawnableAreas(id, spawnable_ids, true);
+    }
   }
 
   removeRedundantAreas();
