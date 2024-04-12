@@ -13,9 +13,7 @@
   <depend>libgoogle-glog-dev</depend>
   <depend>openscenario_interpreter</depend>
   <depend>openscenario_preprocessor_msgs</depend>
-  <depend>openscenario_validator</depend>
   <depend>rclcpp</depend>
-  <depend>xerces</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>
   <test_depend>ament_cmake_copyright</test_depend>

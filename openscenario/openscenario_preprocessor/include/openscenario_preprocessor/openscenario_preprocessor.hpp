@@ -15,50 +15,60 @@
 #ifndef OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 #define OPENSCENARIO_PREPROCESSOR__OPENSCENARIO_PREPROCESSOR_HPP_
 
+#include <concealer/execute.hpp>
+#include <deque>
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_validator/validator.hpp>
-#include <queue>
+#include <openscenario_preprocessor_msgs/srv/check_derivative_remained.hpp>
+#include <openscenario_preprocessor_msgs/srv/derive.hpp>
+#include <openscenario_preprocessor_msgs/srv/load.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 namespace openscenario_preprocessor
 {
-struct Scenario
+struct ScenarioSet
 {
-  Scenario() = default;
+  ScenarioSet() = default;
 
-  explicit Scenario(const boost::filesystem::path & path, int expect, double frame_rate)
-  : path(path), expect(expect), frame_rate(frame_rate)
+  explicit ScenarioSet(openscenario_preprocessor_msgs::srv::Load::Request & load_request)
   {
+    path = load_request.path;
+    frame_rate = load_request.frame_rate;
   }
 
-  boost::filesystem::path path;
+  auto getDeriveResponse() -> openscenario_preprocessor_msgs::srv::Derive::Response
+  {
+    openscenario_preprocessor_msgs::srv::Derive::Response response;
+    response.path = path;
+    response.frame_rate = frame_rate;
+    return response;
+  }
 
-  int expect;
+  std::string path;
 
-  double frame_rate;
+  float frame_rate;
 };
 
-class Preprocessor
+class Preprocessor : public rclcpp::Node
 {
 public:
-  explicit Preprocessor(const boost::filesystem::path & output_directory)
-  : validate(), output_directory(output_directory)
-  {
-    if (not boost::filesystem::exists(output_directory)) {
-      boost::filesystem::create_directories(output_directory);
-    }
-  }
+  explicit Preprocessor(const rclcpp::NodeOptions &);
 
-protected:
-  void preprocessScenario(const Scenario &);
+private:
+  void preprocessScenario(ScenarioSet &);
 
-  std::queue<Scenario> preprocessed_scenarios;
+  [[nodiscard]] bool validateXOSC(const boost::filesystem::path &, bool);
+
+  rclcpp::Service<openscenario_preprocessor_msgs::srv::Load>::SharedPtr load_server;
+
+  rclcpp::Service<openscenario_preprocessor_msgs::srv::Derive>::SharedPtr derive_server;
+
+  rclcpp::Service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>::SharedPtr
+    check_server;
+
+  std::deque<ScenarioSet> preprocessed_scenarios;
 
   std::mutex preprocessed_scenarios_mutex;
-
-  openscenario_validator::OpenSCENARIOValidator validate;
-
-  boost::filesystem::path output_directory;
 };
 }  // namespace openscenario_preprocessor
 

@@ -13,75 +13,102 @@
 // limitations under the License.
 
 #include <algorithm>
-#include <boost/lexical_cast.hpp>
-#include <boost/range/adaptor/indexed.hpp>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
-#include <openscenario_interpreter/syntax/parameter_value_distribution_definition.hpp>
+#include <openscenario_interpreter/syntax/parameter_value_distribution.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
+#include <rclcpp_components/register_node_macro.hpp>
 
 namespace openscenario_preprocessor
 {
-void Preprocessor::preprocessScenario(const Scenario & scenario)
+Preprocessor::Preprocessor(const rclcpp::NodeOptions & options)
+: rclcpp::Node("openscenario_preprocessor", options),
+  load_server(create_service<openscenario_preprocessor_msgs::srv::Load>(
+    "~/load",
+    [this](
+      const openscenario_preprocessor_msgs::srv::Load::Request::SharedPtr request,
+      openscenario_preprocessor_msgs::srv::Load::Response::SharedPtr response) -> void {
+      auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+      try {
+        auto s = ScenarioSet(*request);
+        preprocessScenario(s);
+        response->has_succeeded = true;
+        response->message = "success";
+      } catch (std::exception & e) {
+        response->has_succeeded = false;
+        response->message = e.what();
+        preprocessed_scenarios.clear();
+      }
+    })),
+  derive_server(create_service<openscenario_preprocessor_msgs::srv::Derive>(
+    "~/derive",
+    [this](
+      const openscenario_preprocessor_msgs::srv::Derive::Request::SharedPtr,
+      openscenario_preprocessor_msgs::srv::Derive::Response::SharedPtr response) -> void {
+      auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+      if (preprocessed_scenarios.empty()) {
+        response->path = "no output";
+      } else {
+        *response = preprocessed_scenarios.front().getDeriveResponse();
+        preprocessed_scenarios.pop_front();
+      }
+    })),
+  check_server(create_service<openscenario_preprocessor_msgs::srv::CheckDerivativeRemained>(
+    "~/check",
+    [this](
+      const openscenario_preprocessor_msgs::srv::CheckDerivativeRemained::Request::SharedPtr,
+      openscenario_preprocessor_msgs::srv::CheckDerivativeRemained::Response::SharedPtr response)
+      -> void {
+      auto lock = std::lock_guard(preprocessed_scenarios_mutex);
+      response->derivative_remained = not preprocessed_scenarios.empty();
+    }))
+{
+}
+
+bool Preprocessor::validateXOSC(const boost::filesystem::path & file_name, bool verbose = false)
+{
+  auto result =
+    concealer::dollar("ros2 run openscenario_utility validation.py " + file_name.string());
+  if (verbose) {
+    std::cout << "validate : " << result << std::endl;
+  }
+  return result.find("All xosc files given are standard compliant.") != std::string::npos;
+}
+
+void Preprocessor::preprocessScenario(ScenarioSet & scenario)
 {
   using openscenario_interpreter::OpenScenario;
   using openscenario_interpreter::ParameterValueDistribution;
-  using openscenario_interpreter::ParameterValueDistributionDefinition;
 
-  validate(scenario.path);
-
-  if (OpenScenario script{scenario.path};
-      script.category.is<ParameterValueDistributionDefinition>()) {
-    auto & parameter_value_distribution = script.category.as<ParameterValueDistribution>();
-    auto scenario_file_path = parameter_value_distribution.scenario_file.filepath;
-
-    if (boost::filesystem::exists(scenario_file_path)) {
-      validate(scenario_file_path);
-
-      OpenScenario scenario_file{scenario_file_path};
-
-      auto p = parameter_value_distribution.derive();
-
-      for (const auto & parameter_list : p | boost::adaptors::indexed()) {
-        pugi::xml_document derived_script;
-
-        derived_script.reset(scenario_file.script);  // deep copy
-
-        auto parameter_declarations =
-          derived_script.document_element()
-            .select_node(pugi::xpath_query{"/OpenSCENARIO/ParameterDeclarations"})
-            .node();
-
-        // embedding parameter values
-        for (const auto & [name, value] : *parameter_list.value()) {
-          if (
-            auto parameter_node =
-              parameter_declarations.find_child_by_attribute("name", name.c_str())) {
-            parameter_node.attribute("value").set_value(
-              boost::lexical_cast<std::string>(value).c_str());
-          } else {
-            std::cerr << "Parameter " << std::quoted(name) << " is not declared in scenario "
-                      << std::quoted(scenario_file_path.string()) << ", so ignore it." << std::endl;
-          }
+  if (validateXOSC(scenario.path)) {
+    if (auto script = std::make_shared<OpenScenario>(scenario.path);
+        script->category.is<ParameterValueDistribution>()) {
+      std::cout << "ParameterValueDistribution!!" << std::endl;
+      auto base_scenario_path =
+        script->category.as<ParameterValueDistribution>().scenario_file.filepath;
+      std::cout << "base_scenario_path : " << base_scenario_path << std::endl;
+      if (boost::filesystem::exists(base_scenario_path)) {
+        if (validateXOSC(base_scenario_path, true)) {
+          // TODO : implement in feature/parameter_value_distribution branch
+          //
+          //  parameters = evaluate( parameter_value_distribution( given scenario ) )
+          //  for( auto derived_scenario : embedParameter( linked scenario, parameters)
+          //    preprocessed_scenarios.emplace_back({derived_scenario, derive_server});
+        } else {
+          throw common::Error("base scenario is not valid : " + base_scenario_path.string());
         }
-
-        const auto derived_scenario_path =
-          output_directory /
-          (scenario.path.stem().string() + "." + std::to_string(parameter_list.index()) +
-           scenario.path.extension().string());
-
-        derived_script.save_file(derived_scenario_path.c_str());
-
-        preprocessed_scenarios.emplace(derived_scenario_path, scenario.expect, scenario.frame_rate);
+      } else {
+        throw common::Error("base scenario does not exist : " + base_scenario_path.string());
       }
+      std::cout << "base scenario is valid!" << std::endl;
+
     } else {
-      std::stringstream what;
-      what << "Scenario file " << std::quoted(scenario_file_path.string())
-           << " described in ParameterDistributionDefinition file "
-           << std::quoted(scenario.path.string()) << " does not exist";
-      throw std::runtime_error(what.str());
+      // normal scenario
+      preprocessed_scenarios.emplace_back(scenario);
     }
   } else {
-    preprocessed_scenarios.push(scenario);  // normal scenario
+    throw common::Error("the scenario file is not valid. Please check your scenario");
   }
 }
 }  // namespace openscenario_preprocessor
+
+RCLCPP_COMPONENTS_REGISTER_NODE(openscenario_preprocessor::Preprocessor)
