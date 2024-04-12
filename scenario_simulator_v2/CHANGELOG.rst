@@ -2,6 +2,9 @@
 Changelog for package scenario_simulator_v2
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.14.0 (2024-04-12)
+-------------------
+
 1.13.0 (2024-04-11)
 -------------------
 * Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
