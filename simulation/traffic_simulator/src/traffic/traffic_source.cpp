@@ -205,11 +205,12 @@ void SpawnPoseValidator::findAllSpawnableAreas(
       area = area + previous_area.value();
     }
   }
+  areas_.push_back(area);
 
   lanelet::Ids ids_to_consider;
   const lanelet::Id border_id = in_front ? area.last_id : area.first_id;
   if (in_front) {
-    ids_to_consider = hdmap_utils_->getFollowingLanelets(border_id);
+    ids_to_consider = hdmap_utils_->getNextLaneletIds(border_id);
   } else {
     ids_to_consider = hdmap_utils_->getPreviousLaneletIds(border_id);
   }
