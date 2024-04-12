@@ -2,6 +2,9 @@
 Changelog for package do_nothing_plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.14.1 (2024-04-12)
+-------------------
+
 1.14.0 (2024-04-12)
 -------------------
 * Merge pull request `#1229 <https://github.com/tier4/scenario_simulator_v2/issues/1229>`_ from tier4/feature/follow_trajectory_action_in_do_nothing_plugin
