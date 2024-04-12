@@ -6,7 +6,6 @@
   <description>Validator for OpenSCENARIO 1.3</description>
   <maintainer email="kotaro.yoshimoto@tier4.jp">Kotaro Yoshimoto</maintainer>
   <license>Apache License 2.0</license>
-  <buildtool_depend>ament_cmake_auto</buildtool_depend>
   <depend>xerces</depend>
   <export>
     <build_type>ament_cmake</build_type>
