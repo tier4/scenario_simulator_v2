@@ -25,7 +25,7 @@ plugins:
   - redirects:
       redirect_maps:
 
-copyright: "Copyright &copy; 2022 TIER IV, Inc."
+copyright: "Copyright &copy; 2024 TIER IV, Inc."
 
 markdown_extensions:
   - admonition
@@ -78,6 +78,7 @@ nav:
   - Developer Guide:
       - About: developer_guide/About.md
       - developer_guide/AutowareAPI.md
+      - developer_guide/DistanceCalculation.md
       - developer_guide/NPCBehavior.md
       - developer_guide/BehaviorPlugin.md
       # - developer_guide/ErrorCategories.md

@@ -34,7 +34,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ParameterAssignments : std::list<ParameterAssignment>
 {
-  explicit ParameterAssignments() = default;
+  ParameterAssignments() = default;
+
   explicit ParameterAssignments(const pugi::xml_node & node, Scope & scope)
   : std::list<ParameterAssignment>(
       readElements<ParameterAssignment, 0>("ParameterAssignment", node, scope))

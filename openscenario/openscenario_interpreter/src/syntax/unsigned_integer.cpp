@@ -20,7 +20,7 @@ inline namespace syntax
 {
 static_assert(std::is_standard_layout<UnsignedInteger>::value, "");
 
-static_assert(not std::is_trivial<UnsignedInteger>::value, "");
+static_assert(std::is_trivial<UnsignedInteger>::value, "");
 
 UnsignedInteger::UnsignedInteger(value_type value) { data = value; }
 
