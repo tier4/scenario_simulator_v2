@@ -84,7 +84,7 @@ private:
         {getPedestrianParameters(), PedestrianBehavior::defaultBehavior(), "", 0.0},
       }  // clang-format on
       ,
-      true, false, false, 1);
+      true, false, true, 0);
 
     api_.spawn(
       "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34570, 0, 0)),

@@ -66,7 +66,7 @@ private:
           {getVehicleParameters(), VehicleBehavior::defaultBehavior(), "", 0.0},
         }  // clang-format on
         ,
-        false, true, false, 1);
+        false, true, true, 0);
     }
 
     if (api_.getCurrentTime() > 4.0) {

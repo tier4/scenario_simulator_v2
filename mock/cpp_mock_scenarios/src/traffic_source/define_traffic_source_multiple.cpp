@@ -109,7 +109,7 @@ private:
         {getVehicleParameters(), VehicleBehavior::defaultBehavior(), "", 0.0},
       }  // clang-format on
       ,
-      false, true, false, 1);
+      false, true, true, 0);
 
     api_.defineTrafficSource(
       2.0, 5.0, 3.0,
@@ -123,7 +123,7 @@ private:
         {getPedestrianParameters(), PedestrianBehavior::defaultBehavior(), "", 0.0},
       }  // clang-format on
       ,
-      false, true, false, 1);
+      false, true, true, 0);
 
     api_.spawn(
       "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34570, 0, 0)),

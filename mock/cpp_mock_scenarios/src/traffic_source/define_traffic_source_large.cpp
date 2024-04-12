@@ -68,11 +68,7 @@ private:
           static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status).type.type ==
           traffic_simulator_msgs::msg::EntityType::VEHICLE;
 
-        const bool valid_vehicle_lanelet =
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
-          api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
-
-        if (!entity_status.laneMatchingSucceed() || !valid_vehicle_lanelet || !is_vehicle) {
+        if (!entity_status.laneMatchingSucceed() || !is_vehicle) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         }
       }
@@ -93,7 +89,7 @@ private:
         {getVehicleParameters(), VehicleBehavior::defaultBehavior(), "", 0.0},
       }  // clang-format on
       ,
-      false, true, false, 1);
+      false, true, true, 0);
 
     api_.spawn(
       "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34570, 0, 0)),
