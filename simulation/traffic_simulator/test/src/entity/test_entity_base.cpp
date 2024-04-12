@@ -18,7 +18,12 @@ public:
   {
   }
 
-  void onUpdate(double, double) override {}
+  void appendToJobList(const std::function<bool(const double)> & func_on_update,
+    const std::function<void()> & func_on_cleanup, traffic_simulator::job::Type type, bool exclusive,
+    const traffic_simulator::job::Event event)
+  {
+    job_list_.append(func_on_update, func_on_cleanup, type, exclusive, event);
+  }
 
   auto getCurrentAction() const -> std::string override { return {}; }
 
@@ -226,4 +231,84 @@ TEST(EntityBase, activateOutOfRangeJob_jerk)
   double step_time = 0.0;
   EXPECT_NO_THROW(dummy.onUpdate(current_time, step_time));
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), std::runtime_error);
+}
+
+TEST(EntityBase, onUpdate)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status = traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+
+  bool first_cleanup = false;
+  bool first_update = false;
+  bool second_cleanup = false;
+  bool second_update = false;
+
+  auto first_update_func = [&first_update](const double) { return first_update = true; };
+  auto first_cleanup_func = [&first_cleanup]() { first_cleanup = true; };
+  auto second_update_func = [&second_update](const double) { return second_update = true; };
+  auto second_cleanup_func = [&second_cleanup]() { second_cleanup = true; };
+
+  auto type_first = traffic_simulator::job::Type::LINEAR_VELOCITY;
+  auto type_second = traffic_simulator::job::Type::LINEAR_ACCELERATION;
+  auto first_event = traffic_simulator::job::Event::PRE_UPDATE;
+  auto second_event = traffic_simulator::job::Event::POST_UPDATE;
+  auto is_exclusive = true;
+
+  dummy.appendToJobList(first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
+  dummy.appendToJobList(second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
+
+  double current_time = 0.0;
+  double step_time = 0.0;
+  dummy.onUpdate(current_time, step_time);
+
+  EXPECT_TRUE(first_cleanup);
+  EXPECT_TRUE(first_update);
+  EXPECT_FALSE(second_cleanup);
+  EXPECT_FALSE(second_update);
+}
+
+TEST(EntityBase, onPostUpdate)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status = traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+
+  bool first_cleanup = false;
+  bool first_update = false;
+  bool second_cleanup = false;
+  bool second_update = false;
+
+  auto first_update_func = [&first_update](const double) { return first_update = true; };
+  auto first_cleanup_func = [&first_cleanup]() { first_cleanup = true; };
+  auto second_update_func = [&second_update](const double) { return second_update = true; };
+  auto second_cleanup_func = [&second_cleanup]() { second_cleanup = true; };
+
+  auto type_first = traffic_simulator::job::Type::LINEAR_VELOCITY;
+  auto type_second = traffic_simulator::job::Type::LINEAR_ACCELERATION;
+  auto first_event = traffic_simulator::job::Event::PRE_UPDATE;
+  auto second_event = traffic_simulator::job::Event::POST_UPDATE;
+  auto is_exclusive = true;
+
+  dummy.appendToJobList(first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
+  dummy.appendToJobList(second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
+
+  double current_time = 0.0;
+  double step_time = 0.0;
+  dummy.onPostUpdate(current_time, step_time);
+
+  EXPECT_FALSE(first_cleanup);
+  EXPECT_FALSE(first_update);
+  EXPECT_TRUE(second_cleanup);
+  EXPECT_TRUE(second_update);
 }
