@@ -71,6 +71,15 @@ public:
     auto getBoostPolygon() const -> const boost_polygon &;
     auto getPolygon() const -> const std::vector<geometry_msgs::msg::Point> &;
     void createPolygon() const;
+    template <typename OSTREAM>
+    friend OSTREAM & operator<<(OSTREAM & os, const LaneletArea & area)
+    {
+      os << "first_id: " << area.first_id << ", last_id: " << area.last_id << ", ids:";
+      for (const auto & id : area.ids) {
+        os << " " << id;
+      }
+      return os;
+    }
   };
 
   SpawnPoseValidator(
