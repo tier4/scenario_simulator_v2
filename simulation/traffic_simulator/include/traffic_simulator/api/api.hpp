@@ -325,9 +325,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLaneletLength);
   FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
-  FORWARD_TO_ENTITY_MANAGER(getLateralDistance);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
-  FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getMapPoseFromRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getRelativePose);

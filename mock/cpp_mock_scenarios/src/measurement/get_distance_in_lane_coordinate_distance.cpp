@@ -21,6 +21,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/distance_utils.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
@@ -40,17 +41,62 @@ public:
 
 private:
   bool requested = false;
+
+  auto getLateralDistance(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<double>
+  {
+    const auto from_lanelet_pose_opt = api_.getEntity(from_entity_name)->getLaneletPose();
+    const auto to_lanelet_pose_opt = api_.getEntity(to_entity_name)->getLaneletPose();
+    if (from_lanelet_pose_opt && to_lanelet_pose_opt) {
+      return traffic_simulator::DistanceUtils::getLateralDistance(
+        *from_lanelet_pose_opt, *to_lanelet_pose_opt, false, api_.getHdmapUtils());
+    } else {
+      return std::nullopt;
+    }
+  };
+
+  auto getLateralDistance(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const double matching_distance) -> std::optional<double>
+  {
+    const auto from_lanelet_pose_opt =
+      api_.getEntity(from_entity_name)->getLaneletPose(matching_distance);
+    const auto to_lanelet_pose_opt =
+      api_.getEntity(to_entity_name)->getLaneletPose(matching_distance);
+    if (from_lanelet_pose_opt && to_lanelet_pose_opt) {
+      return traffic_simulator::DistanceUtils::getLateralDistance(
+        *from_lanelet_pose_opt, *to_lanelet_pose_opt, false, api_.getHdmapUtils());
+    } else {
+      return std::nullopt;
+    }
+  };
+
+  auto getLongitudinalDistance(
+    const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<double>
+  {
+    const auto from_lanelet_pose_opt = api_.getEntity(from_entity_name)->getLaneletPose();
+    const auto to_lanelet_pose_opt = api_.getEntity(to_entity_name)->getLaneletPose();
+    if (from_lanelet_pose_opt && to_lanelet_pose_opt) {
+      return traffic_simulator::DistanceUtils::getLongitudinalDistance(
+        *from_lanelet_pose_opt, *to_lanelet_pose_opt, false, true, false, api_.getHdmapUtils());
+
+    } else {
+      return std::nullopt;
+    }
+  }
+
   void onUpdate() override
   {
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    const auto distance_to_front = api_.getLongitudinalDistance("ego", "front");
-    const auto distance_to_behind = api_.getLongitudinalDistance("ego", "behind");
-    const auto lateral_none = api_.getLateralDistance("ego", "front", 0.1);
-    const auto lateral_about_one = api_.getLateralDistance("ego", "front", 1.5);
-    const auto lateral_to_front = api_.getLateralDistance("ego", "front");
-    const auto lateral_to_behind = api_.getLateralDistance("ego", "behind");
+    const auto distance_to_front = getLongitudinalDistance("ego", "front");
+    const auto distance_to_behind = getLongitudinalDistance("ego", "behind");
+    const auto lateral_none = getLateralDistance("ego", "front", 0.1);
+    const auto lateral_about_one = getLateralDistance("ego", "front", 1.5);
+    const auto lateral_to_front = getLateralDistance("ego", "front");
+    const auto lateral_to_behind = getLateralDistance("ego", "behind");
     // LCOV_EXCL_START
     if (lateral_none) {
       return stop(cpp_mock_scenarios::Result::FAILURE);
