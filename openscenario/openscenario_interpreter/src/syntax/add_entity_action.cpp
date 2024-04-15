@@ -51,40 +51,42 @@ try {
 
   const auto add_entity = overload(
     [&](const Vehicle & vehicle) {
+      auto make_behavior_name = [](const auto & object_controller) {
+        if (object_controller.template is<Controller>()) {
+          if (const auto & controller = object_controller.template as<Controller>();
+              controller.properties.template get<Boolean>("isEgo")) {
+            return traffic_simulator::VehicleBehavior::autoware();
+          } else if (controller.name.empty()) {
+            return traffic_simulator::VehicleBehavior::defaultBehavior();
+          } else {
+            return controller.name;
+          }
+        } else {
+          return traffic_simulator::VehicleBehavior::defaultBehavior();
+        }
+      };
       if (position.is<WorldPosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeWorldPosition>(position.as<WorldPosition>()),
           static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
-          entity.as<ScenarioObject>().object_controller.isUserDefinedController()
-            ? traffic_simulator::VehicleBehavior::autoware()
-            : traffic_simulator::VehicleBehavior::defaultBehavior(),
-          vehicle.model3d);
+          make_behavior_name(entity.as<ScenarioObject>().object_controller), vehicle.model3d);
       } else if (position.is<RelativeWorldPosition>()) {
         applyAddEntityAction(
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeWorldPosition>()),
           static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
-          entity.as<ScenarioObject>().object_controller.isUserDefinedController()
-            ? traffic_simulator::VehicleBehavior::autoware()
-            : traffic_simulator::VehicleBehavior::defaultBehavior(),
-          vehicle.model3d);
+          make_behavior_name(entity.as<ScenarioObject>().object_controller), vehicle.model3d);
       } else if (position.is<RelativeObjectPosition>()) {
         applyAddEntityAction(
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeObjectPosition>()),
           static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
-          entity.as<ScenarioObject>().object_controller.isUserDefinedController()
-            ? traffic_simulator::VehicleBehavior::autoware()
-            : traffic_simulator::VehicleBehavior::defaultBehavior(),
-          vehicle.model3d);
+          make_behavior_name(entity.as<ScenarioObject>().object_controller), vehicle.model3d);
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
           static_cast<traffic_simulator_msgs::msg::VehicleParameters>(vehicle),
-          entity.as<ScenarioObject>().object_controller.isUserDefinedController()
-            ? traffic_simulator::VehicleBehavior::autoware()
-            : traffic_simulator::VehicleBehavior::defaultBehavior(),
-          vehicle.model3d);
+          make_behavior_name(entity.as<ScenarioObject>().object_controller), vehicle.model3d);
       } else {
         throw common::Error(__FILE__);
       }
@@ -98,28 +100,40 @@ try {
           : Properties());
     },
     [&](const Pedestrian & pedestrian) {
+      auto make_behavior_name = [](const auto & object_controller) {
+        if (object_controller.template is<Controller>()) {
+          if (const auto & controller = object_controller.template as<Controller>();
+              controller.name.empty()) {
+            return traffic_simulator::PedestrianBehavior::defaultBehavior();
+          } else {
+            return controller.name;
+          }
+        } else {
+          return traffic_simulator::PedestrianBehavior::defaultBehavior();
+        }
+      };
       if (position.is<WorldPosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeWorldPosition>(position.as<WorldPosition>()),
           static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian),
-          traffic_simulator::PedestrianBehavior::defaultBehavior(), pedestrian.model3d);
+          make_behavior_name(entity.as<ScenarioObject>().object_controller), pedestrian.model3d);
       } else if (position.is<RelativeWorldPosition>()) {
         applyAddEntityAction(
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeWorldPosition>()),
           static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian),
-          traffic_simulator::PedestrianBehavior::defaultBehavior(), pedestrian.model3d);
+          make_behavior_name(entity.as<ScenarioObject>().object_controller), pedestrian.model3d);
       } else if (position.is<RelativeObjectPosition>()) {
         applyAddEntityAction(
           entity_ref,
           static_cast<NativeRelativeWorldPosition>(position.as<RelativeObjectPosition>()),
           static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian),
-          traffic_simulator::PedestrianBehavior::defaultBehavior(), pedestrian.model3d);
+          make_behavior_name(entity.as<ScenarioObject>().object_controller), pedestrian.model3d);
       } else if (position.is<LanePosition>()) {
         applyAddEntityAction(
           entity_ref, static_cast<NativeLanePosition>(position.as<LanePosition>()),
           static_cast<traffic_simulator_msgs::msg::PedestrianParameters>(pedestrian),
-          traffic_simulator::PedestrianBehavior::defaultBehavior(), pedestrian.model3d);
+          make_behavior_name(entity.as<ScenarioObject>().object_controller), pedestrian.model3d);
       } else {
         throw common::Error(__FILE__);
       }

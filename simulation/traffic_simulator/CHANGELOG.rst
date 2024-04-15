@@ -2,6 +2,146 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.14.1 (2024-04-12)
+-------------------
+
+1.14.0 (2024-04-12)
+-------------------
+
+1.13.0 (2024-04-11)
+-------------------
+* Merge pull request `#1216 <https://github.com/tier4/scenario_simulator_v2/issues/1216>`_ from tier4/feature/routing-algorithm
+  Implement `DistanceCondition` / `RelativeDistanceCondition` for `shortest` of `RoutingAlgorithm`
+* chore: apply linter
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* doc: add comment to connect documentation
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* chore: apply linter
+* Merge branch 'master' into feature/routing-algorithm
+* fix: HdMapUtils::getLongitudinalDistance for adjacent lane
+* feat: implement makeNativeBoundingBoxRelativeLanePosition for shortest routing algorithm
+* feat: implement getLongitudinalDistance with lane change
+* feat: implement getLateralDistance with lane change
+* Merge branch 'master' into feature/routing-algorithm
+* feat(traffic_simulator): add allow_lane_change option to getLongitudinalDistance methods
+* feat(HDMapUtils): add allow_lane_change option to getRoute method
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, yamacir-kit
+
+1.12.0 (2024-04-10)
+-------------------
+* Merge branch 'master' into feature/user-defined-controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge remote-tracking branch 'origin/master' into feature/user-defined-controller
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.11.3 (2024-04-09)
+-------------------
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.11.2 (2024-04-08)
+-------------------
+
+1.11.1 (2024-04-05)
+-------------------
+
+1.11.0 (2024-04-02)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin/master' into feature/arm_support
+* Merge remote-tracking branch 'upstream/master' into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin' into feature/arm_support
+* Contributors: Masaya Kataoka, f0reachARR
+
+1.10.0 (2024-03-28)
+-------------------
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.9.1 (2024-03-28)
+------------------
+
+1.9.0 (2024-03-27)
+------------------
+* Merge pull request `#1210 <https://github.com/tier4/scenario_simulator_v2/issues/1210>`_ from tier4/feature/reset_behavior_plugin
+  Feature/reset behavior plugin
+* return const &
+* Update simulation/traffic_simulator/src/api/api.cpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Update simulation/traffic_simulator/src/api/api.cpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* enable set jerk
+* fix compile errors
+* remvoe unused function definitions
+* remove isEgo function and add is<EntityType> function
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Use capability query in get Vehicle/Pedestrian parameters functions.
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* add doxygen comment
+* fix typo
+* enable reset behavior parameter
+* add resetBehaviorPlugin function
+* Merge remote-tracking branch 'origin/master' into HEAD
+* cleand up a bit
+* working
+* Merge remote-tracking branch 'origin/master' into random-test-runner-docs-update
+* Contributors: Masaya Kataoka, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki
+
+1.8.0 (2024-03-25)
+------------------
+* Merge pull request `#1201 <https://github.com/tier4/scenario_simulator_v2/issues/1201>`_ from tier4/feature/set_behavior_parameter_in_object_controller
+  Feature/set behavior parameter in object controller
+* change <= to <
+* add todo comment
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
+* add setVelocityLimit function
+* fix rviz
+* add test scenario
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+1.7.1 (2024-03-21)
+------------------
+
+1.7.0 (2024-03-21)
+------------------
+
+1.6.1 (2024-03-19)
+------------------
+
 1.6.0 (2024-03-14)
 ------------------
 * Merge pull request `#1208 <https://github.com/tier4/scenario_simulator_v2/issues/1208>`_ from tier4/fix/lanelet-matching-distance
