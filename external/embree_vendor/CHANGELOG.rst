@@ -5,6 +5,12 @@ Changelog for package embree_vendor
 0.0.9 (2021-07-13)
 ------------------
 
+1.14.1 (2024-04-12)
+-------------------
+
+1.14.0 (2024-04-12)
+-------------------
+
 1.13.0 (2024-04-11)
 -------------------
 * Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
