@@ -486,3 +486,24 @@ TEST(EntityBase, updateTraveledDistance_notStarted)
   dummy.setLinearVelocity(0.0);
   EXPECT_EQ(0.0, dummy.updateTraveledDistance(step_time));
 }
+
+TEST(EntityBase, stopAtCurrentPosition)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+
+  double velocity = 3.0;
+  dummy.setLinearVelocity(velocity);
+  auto curr_twist = dummy.getCurrentTwist();
+  EXPECT_TRUE(curr_twist.linear.x == velocity);
+
+  dummy.stopAtCurrentPosition();
+  curr_twist = dummy.getCurrentTwist();
+  EXPECT_TRUE(curr_twist.linear.x == 0.0);
+}
