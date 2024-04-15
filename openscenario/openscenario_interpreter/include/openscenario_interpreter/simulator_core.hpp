@@ -67,6 +67,27 @@ public:
   class CoordinateSystemConversion
   {
   protected:
+    static auto checkRoutingAlgorithm(const RoutingAlgorithm::value_type & routing_algorithm)
+    {
+      std::set<RoutingAlgorithm::value_type> supported = {
+        RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
+
+      if (supported.find(routing_algorithm) == supported.end()) {
+        std::unordered_map<RoutingAlgorithm::value_type, std::string> name_map = {
+          {RoutingAlgorithm::value_type::assigned_route, "assignedRoute"},
+          {RoutingAlgorithm::value_type::fastest, "fastest"},
+          {RoutingAlgorithm::value_type::least_intersections, "leastIntersections"},
+          {RoutingAlgorithm::value_type::shortest, "shortest"},
+          {RoutingAlgorithm::value_type::undefined, "undefined"}};
+        std::stringstream what;
+        what << "There was an operation to calculate relative lane position with RoutingAlgorithm "
+                "set to "
+             << name_map[routing_algorithm] << ", but this is currently not supported. ";
+        what << "Please set RoutingAlgorithm to either 'shortest' or 'undefined'.";
+        throw common::Error(what.str());
+      }
+    }
+
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const geometry_msgs::msg::Pose & pose)
     {
@@ -157,7 +178,7 @@ public:
         return makeNativeRelativeLanePosition(
           from_entity_name, to_lanelet_pose_opt.value(), routing_algorithm);
       } else {
-        return traffic_simulator::lanelet_pose::getQuietNaN();
+        return traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
       }
     }
 
@@ -170,7 +191,7 @@ public:
         return makeNativeRelativeLanePosition(
           from_lanelet_pose_opt.value(), to_lanelet_pose, routing_algorithm);
       } else {
-        return traffic_simulator::lanelet_pose::getQuietNaN();
+        return traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
       }
     }
 
@@ -179,101 +200,87 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      if (
-        routing_algorithm == RoutingAlgorithm::value_type::shortest or
-        routing_algorithm == RoutingAlgorithm::value_type::undefined) {
-        const bool allow_lane_change =
-          (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-        return traffic_simulator::DistanceUtils::makeNativeRelativeLanePosition(
-          from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
-      } else {
-        std::unordered_map<RoutingAlgorithm::value_type, std::string> name_map = {
-          {RoutingAlgorithm::value_type::assigned_route, "assignedRoute"},
-          {RoutingAlgorithm::value_type::fastest, "fastest"},
-          {RoutingAlgorithm::value_type::least_intersections, "leastIntersections"},
-          {RoutingAlgorithm::value_type::shortest, "shortest"},
-          {RoutingAlgorithm::value_type::undefined, "undefined"}};
-        std::stringstream what;
-        what << "There was an operation to calculate relative lane position with RoutingAlgorithm "
-                "set to "
-             << name_map[routing_algorithm] << ", but this is currently not supported.";
-        what << "Please set RoutingAlgorithm to either 'shortest' or 'undefined'.";
-        throw common::Error(what.str());
-      }
+      checkRoutingAlgorithm(routing_algorithm);
+      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      return traffic_simulator::DistanceUtils::makeNativeRelativeLanePosition(
+        from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
     }
 
-    template <typename From, typename To>
     static auto makeNativeBoundingBoxRelativeLanePosition(
-      const From & from, const To & to,
+      const std::string & from_entity_name, const std::string & to_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
-      if (
-        routing_algorithm == RoutingAlgorithm::value_type::shortest or
-        routing_algorithm == RoutingAlgorithm::value_type::undefined) {
-        auto s = [](auto &&... xs) {
-          if (const auto result =
-                core->getBoundingBoxLaneLongitudinalDistance(std::forward<decltype(xs)>(xs)...);
-              result) {
-            return result.value();
-          } else {
-            return std::numeric_limits<
-              typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
-          }
-        };
-
-        auto t = [](auto &&... xs) {
-          if (const auto result =
-                core->getBoundingBoxLaneLateralDistance(std::forward<decltype(xs)>(xs)...);
-              result) {
-            return *result;
-          } else {
-            return std::numeric_limits<
-              typename std::decay_t<decltype(result)>::value_type>::quiet_NaN();
-          }
-        };
-
-        traffic_simulator::LaneletPose position;
-        position.lanelet_id = std::numeric_limits<std::int64_t>::max();
-        bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-        position.s = s(from, to, false, true, allow_lane_change);
-        position.offset = t(from, to, allow_lane_change);
-        position.rpy.x = std::numeric_limits<double>::quiet_NaN();
-        position.rpy.y = std::numeric_limits<double>::quiet_NaN();
-        position.rpy.z = std::numeric_limits<double>::quiet_NaN();
-        return position;
+      const auto from_lanelet_pose_opt = core->getEntity(from_entity_name)->getLaneletPose();
+      const auto to_lanelet_pose_opt = core->getEntity(to_entity_name)->getLaneletPose();
+      if (to_lanelet_pose_opt && from_lanelet_pose_opt) {
+        const auto from_bbox = core->getEntity(from_entity_name)->getBoundingBox();
+        const auto to_bbox = core->getEntity(to_entity_name)->getBoundingBox();
+        return makeNativeBoundingBoxRelativeLanePosition(
+          from_lanelet_pose_opt.value(), from_bbox, to_lanelet_pose_opt.value(), to_bbox,
+          routing_algorithm);
       } else {
-        std::unordered_map<RoutingAlgorithm::value_type, std::string> name_map = {
-          {RoutingAlgorithm::value_type::assigned_route, "assignedRoute"},
-          {RoutingAlgorithm::value_type::fastest, "fastest"},
-          {RoutingAlgorithm::value_type::least_intersections, "leastIntersections"},
-          {RoutingAlgorithm::value_type::shortest, "shortest"},
-          {RoutingAlgorithm::value_type::undefined, "undefined"}};
-        std::stringstream what;
-        what << "There was an operation to calculate relative lane position for bounding box with "
-                "RoutingAlgorithm set to "
-             << name_map[routing_algorithm] << ", but this is currently not supported.";
-        what << "Please set RoutingAlgorithm to either 'shortest' or 'undefined'.";
-        throw common::Error(what.str());
+        return traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
       }
     }
 
-    template <typename... Ts>
-    static auto makeNativeBoundingBoxRelativeWorldPosition(Ts &&... xs)
+    static auto makeNativeBoundingBoxRelativeLanePosition(
+      const std::string & from_entity_name, const NativeLanePosition & to_lanelet_pose,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
-      if (const auto result =
-            SimulatorCore::core->getBoundingBoxRelativePose(std::forward<decltype(xs)>(xs)...);
-          result) {
-        return result.value();
+      const auto from_lanelet_pose_opt = core->getEntity(from_entity_name)->getLaneletPose();
+      if (from_lanelet_pose_opt) {
+        const auto from_bbox = core->getEntity(from_entity_name)->getBoundingBox();
+        const auto to_bbox = traffic_simulator_msgs::msg::BoundingBox();
+        return makeNativeBoundingBoxRelativeLanePosition(
+          from_lanelet_pose_opt.value(), from_bbox, to_lanelet_pose, to_bbox, routing_algorithm);
       } else {
-        geometry_msgs::msg::Pose result_empty{};
-        result_empty.position.x = std::numeric_limits<double>::quiet_NaN();
-        result_empty.position.y = std::numeric_limits<double>::quiet_NaN();
-        result_empty.position.z = std::numeric_limits<double>::quiet_NaN();
-        result_empty.orientation.x = 0;
-        result_empty.orientation.y = 0;
-        result_empty.orientation.z = 0;
-        result_empty.orientation.w = 1;
-        return result_empty;
+        return traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+      }
+    }
+
+    static auto makeNativeBoundingBoxRelativeLanePosition(
+      const NativeLanePosition & from_lanelet_pose,
+      const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
+      const NativeLanePosition & to_lanelet_pose,
+      const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
+      -> traffic_simulator::LaneletPose
+    {
+      checkRoutingAlgorithm(routing_algorithm);
+      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      return traffic_simulator::DistanceUtils::makeNativeBoundingBoxRelativeLanePosition(
+        from_lanelet_pose, from_bbox, to_lanelet_pose, to_bbox, allow_lane_change,
+        core->getHdmapUtils());
+    }
+
+    static auto makeNativeBoundingBoxRelativeWorldPosition(
+      const std::string & from_entity_name, const std::string & to_entity_name)
+    {
+      const auto from_map_pose = core->getEntity(from_entity_name)->getMapPose();
+      const auto from_bbox = core->getEntity(from_entity_name)->getBoundingBox();
+      const auto to_map_pose = core->getEntity(to_entity_name)->getMapPose();
+      const auto to_bbox = core->getEntity(to_entity_name)->getBoundingBox();
+      if (
+        const auto relative_pose = traffic_simulator::DistanceUtils::getBoundingBoxRelativePose(
+          from_map_pose, from_bbox, to_map_pose, to_bbox)) {
+        return relative_pose.value();
+      } else {
+        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
+      }
+    }
+
+    static auto makeNativeBoundingBoxRelativeWorldPosition(
+      const std::string & from_entity_name, const NativeWorldPosition & to_map_pose)
+    {
+      const auto from_map_pose = core->getEntity(from_entity_name)->getMapPose();
+      const auto from_bbox = core->getEntity(from_entity_name)->getBoundingBox();
+      const auto to_bbox = traffic_simulator_msgs::msg::BoundingBox();
+      if (
+        const auto relative_pose = traffic_simulator::DistanceUtils::getBoundingBoxRelativePose(
+          from_map_pose, from_bbox, to_map_pose, to_bbox)) {
+        return relative_pose.value();
+      } else {
+        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
       }
     }
   };
@@ -339,7 +346,8 @@ public:
       core->setBehaviorParameter(entity_ref, [&]() {
         auto message = core->getBehaviorParameter(entity_ref);
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
-        /// The default values written in https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
+        /// The default values written in
+        /// https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
         message.dynamic_constraints.max_acceleration =
           controller.properties.template get<Double>("maxAcceleration", 10.0);
         message.dynamic_constraints.max_acceleration_rate =
@@ -491,13 +499,20 @@ public:
     }
 
     template <typename... Ts>
-    static auto evaluateBoundingBoxEuclideanDistance(Ts &&... xs)  // for RelativeDistanceCondition
+    static auto evaluateBoundingBoxEuclideanDistance(
+      const std::string & from_entity_name,
+      const std::string & to_entity_name)  // for RelativeDistanceCondition
     {
-      if (const auto result = core->getBoundingBoxDistance(std::forward<decltype(xs)>(xs)...);
-          result) {
-        return result.value();
+      const auto from_map_pose = core->getEntity(from_entity_name)->getMapPose();
+      const auto from_bbox = core->getEntity(from_entity_name)->getBoundingBox();
+      const auto to_map_pose = core->getEntity(to_entity_name)->getMapPose();
+      const auto to_bbox = core->getEntity(to_entity_name)->getBoundingBox();
+      if (
+        const auto distance = traffic_simulator::DistanceUtils::getBoundingBoxDistance(
+          from_map_pose, from_bbox, to_map_pose, to_bbox)) {
+        return distance.value();
       } else {
-        using value_type = typename std::decay<decltype(result)>::type::value_type;
+        using value_type = typename std::decay<decltype(distance)>::type::value_type;
         return std::numeric_limits<value_type>::quiet_NaN();
       }
     }

@@ -24,16 +24,29 @@ using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 inline namespace lanelet_pose
 {
 
-inline auto getQuietNaN()
+inline auto createQuietNaNLaneletPose()
 {
-  traffic_simulator::LaneletPose position;
-  position.lanelet_id = std::numeric_limits<std::int64_t>::max();
-  position.s = std::numeric_limits<double>::quiet_NaN();
-  position.offset = std::numeric_limits<double>::quiet_NaN();
-  position.rpy.x = std::numeric_limits<double>::quiet_NaN();
-  position.rpy.y = std::numeric_limits<double>::quiet_NaN();
-  position.rpy.z = std::numeric_limits<double>::quiet_NaN();
-  return position;
+  traffic_simulator::LaneletPose pose;
+  pose.lanelet_id = std::numeric_limits<std::int64_t>::max();
+  pose.s = std::numeric_limits<double>::quiet_NaN();
+  pose.offset = std::numeric_limits<double>::quiet_NaN();
+  pose.rpy.x = std::numeric_limits<double>::quiet_NaN();
+  pose.rpy.y = std::numeric_limits<double>::quiet_NaN();
+  pose.rpy.z = std::numeric_limits<double>::quiet_NaN();
+  return pose;
+}
+
+inline auto createQuietNaNMapPose()
+{
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = std::numeric_limits<double>::quiet_NaN();
+  pose.position.y = std::numeric_limits<double>::quiet_NaN();
+  pose.position.z = std::numeric_limits<double>::quiet_NaN();
+  pose.orientation.x = 0;
+  pose.orientation.y = 0;
+  pose.orientation.z = 0;
+  pose.orientation.w = 1;
+  return pose;
 }
 
 class CanonicalizedLaneletPose

@@ -38,70 +38,6 @@ auto DistanceUtils::getLateralDistance(
     static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), allow_lane_change);
 }
 
-// auto DistanceUtils::getLateralDistance(
-//   const CanonicalizedLaneletPose & from, const std::string & to, bool allow_lane_change)
-//   -> std::optional<double>
-// {
-//   if (const auto to_pose = getLaneletPose(to)) {
-//     return getLateralDistance(from, to_pose.value(), allow_lane_change);
-//   }
-//   return std::nullopt;
-// }
-
-// auto DistanceUtils::getLateralDistance(
-//   const std::string & from, const CanonicalizedLaneletPose & to, bool allow_lane_change)
-//   -> std::optional<double>
-// {
-//   if (const auto from_pose = getLaneletPose(from)) {
-//     return getLateralDistance(from_pose.value(), to, allow_lane_change);
-//   }
-//   return std::nullopt;
-// }
-
-// auto DistanceUtils::getLateralDistance(
-//   const std::string & from, const std::string & to, bool allow_lane_change) ->
-//   std::optional<double>
-// {
-//   const auto from_pose = getLaneletPose(from);
-//   const auto to_pose = getLaneletPose(to);
-//   if (from_pose && to_pose) {
-//     return getLateralDistance(from_pose.value(), to_pose.value(), allow_lane_change);
-//   }
-//   return std::nullopt;
-// }
-
-// auto DistanceUtils::getLateralDistance(
-//   const CanonicalizedLaneletPose & from, const std::string & to, double matching_distance,
-//   bool allow_lane_change) -> std::optional<double>
-// {
-//   if (const auto to_pose = getLaneletPose(to, matching_distance)) {
-//     return getLateralDistance(from, to_pose.value(), matching_distance, allow_lane_change);
-//   }
-//   return std::nullopt;
-// }
-
-// auto DistanceUtils::getLateralDistance(
-//   const std::string & from, const CanonicalizedLaneletPose & to, double matching_distance,
-//   bool allow_lane_change) -> std::optional<double>
-// {
-//   if (const auto from_pose = getLaneletPose(from, matching_distance)) {
-//     return getLateralDistance(from_pose.value(), to, matching_distance, allow_lane_change);
-//   }
-//   return std::nullopt;
-// }
-
-// auto DistanceUtils::getLateralDistance(
-//   const std::string & from, const std::string & to, double matching_distance,
-//   bool allow_lane_change) -> std::optional<double>
-// {
-//   const auto from_pose = getLaneletPose(from, matching_distance);
-//   const auto to_pose = getLaneletPose(to, matching_distance);
-//   if (from_pose && to_pose) {
-//     return getLateralDistance(
-//       from_pose.value(), to_pose.value(), matching_distance, allow_lane_change);
-//   }
-//   return std::nullopt;
-// }
 auto DistanceUtils::getLongitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
@@ -188,7 +124,8 @@ auto DistanceUtils::makeNativeRelativeLanePosition(
   const auto lateral_distance =
     DistanceUtils::getLateralDistance(from, to, allow_lane_change, hdmap_utils_ptr);
 
-  traffic_simulator::LaneletPose position = traffic_simulator::lanelet_pose::getQuietNaN();
+  traffic_simulator::LaneletPose position =
+    traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
   if (longitudinal_distance && lateral_distance) {
     position.s = longitudinal_distance.value();
     position.offset = lateral_distance.value();
@@ -196,57 +133,20 @@ auto DistanceUtils::makeNativeRelativeLanePosition(
   return position;
 }
 
-// auto DistanceUtils::getLongitudinalDistance(
-//   const CanonicalizedLaneletPose & from, const std::string & to, bool include_adjacent_lanelet,
-//   bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>
-// {
-//   const auto to_pose = getLaneletPose(to);
-//   if (!laneMatchingSucceed(to) || !to_pose) {
-//     return std::nullopt;
-//   } else {
-//     return getLongitudinalDistance(
-//       from, to_pose.value(), include_adjacent_lanelet, include_opposite_direction,
-//       allow_lane_change);
-//   }
-// }
-
-// auto DistanceUtils::getLongitudinalDistance(
-//   const std::string & from, const CanonicalizedLaneletPose & to, bool include_adjacent_lanelet,
-//   bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>
-// {
-//   const auto from_pose = getLaneletPose(from);
-//   if (!laneMatchingSucceed(from) || !from_pose) {
-//     return std::nullopt;
-//   } else {
-//     return getLongitudinalDistance(
-//       from_pose.value(), to, include_adjacent_lanelet, include_opposite_direction,
-//       allow_lane_change);
-//   }
-// }
-
-// auto DistanceUtils::getLongitudinalDistance(
-//   const std::string & from, const std::string & to, bool include_adjacent_lanelet,
-//   bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>
-// {
-//   const auto from_lanelet_pose = getLaneletPose(from);
-//   const auto to_lanelet_pose = getLaneletPose(to);
-//   if (
-//     laneMatchingSucceed(from) and laneMatchingSucceed(to) and from_lanelet_pose and
-//     to_lanelet_pose) {
-//     return getLongitudinalDistance(
-//       from_lanelet_pose.value(), to_lanelet_pose.value(), include_adjacent_lanelet,
-//       include_opposite_direction, allow_lane_change);
-//   } else {
-//     return std::nullopt;
-//   }
-// }
-
 // auto DistanceUtils::getBoundingBoxDistance(const std::string & from, const std::string & to)
 //   -> std::optional<double>
 // {
 //   return math::geometry::getPolygonDistance(
 //     getMapPose(from), getBoundingBox(from), getMapPose(to), getBoundingBox(to));
 // }
+
+auto DistanceUtils::getBoundingBoxDistance(
+  const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
+  const geometry_msgs::msg::Pose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox)
+  -> std::optional<double>
+{
+  return math::geometry::getPolygonDistance(from, from_bbox, to, to_bbox);
+}
 
 auto DistanceUtils::getBoundingBoxLaneLateralDistance(
   const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
@@ -349,6 +249,30 @@ auto DistanceUtils::getBoundingBoxLaneLongitudinalDistance(
 //   return std::nullopt;
 // }
 
+auto DistanceUtils::makeNativeBoundingBoxRelativeLanePosition(
+  const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
+  const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
+  bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> traffic_simulator::LaneletPose
+{
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{true};
+
+  const auto longitudinal_bb_distance = DistanceUtils ::getBoundingBoxLaneLongitudinalDistance(
+    from, from_bbox, to, to_bbox, include_adjacent_lanelet, include_opposite_direction,
+    allow_lane_change, hdmap_utils_ptr);
+  const auto lateral_bb_distance = DistanceUtils::getBoundingBoxLaneLateralDistance(
+    from, from_bbox, to, to_bbox, allow_lane_change, hdmap_utils_ptr);
+
+  traffic_simulator::LaneletPose position =
+    traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+  if (longitudinal_bb_distance && include_opposite_direction) {
+    position.s = longitudinal_bb_distance.value();
+    position.offset = lateral_bb_distance.value();
+  }
+  return position;
+}
+
 auto DistanceUtils::getBoundingBoxRelativePose(
   const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
   const geometry_msgs::msg::Pose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox)
@@ -358,7 +282,9 @@ auto DistanceUtils::getBoundingBoxRelativePose(
       closest_points) {
     const auto from_pose_bbox = getRelativePose(from, closest_points.value().first);
     const auto to_pose_bbox = getRelativePose(from, closest_points.value().second);
-    return math::geometry::subtractPoses(from_pose_bbox, to_pose_bbox);
+    if (from_pose_bbox && to_pose_bbox) {
+      return math::geometry::subtractPoses(from_pose_bbox.value(), to_pose_bbox.value());
+    }
   }
   return std::nullopt;
 }

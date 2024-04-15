@@ -89,8 +89,10 @@ public:
     -> traffic_simulator::LaneletPose;
 
   // BoundingBox
-  static auto getBoundingBoxDistance(const std::string & from, const std::string & to)
-    -> std::optional<double>;
+  static auto getBoundingBoxDistance(
+    const geometry_msgs::msg::Pose & from,
+    const traffic_simulator_msgs::msg::BoundingBox & from_bbox, const geometry_msgs::msg::Pose & to,
+    const traffic_simulator_msgs::msg::BoundingBox & to_bbox) -> std::optional<double>;
 
   static auto getBoundingBoxLaneLateralDistance(
     const CanonicalizedLaneletPose & from,
@@ -113,9 +115,16 @@ public:
     bool include_opposite_direction, bool allow_lane_change,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
+  static auto makeNativeBoundingBoxRelativeLanePosition(
+    const CanonicalizedLaneletPose & from,
+    const traffic_simulator_msgs::msg::BoundingBox & from_bbox, const CanonicalizedLaneletPose & to,
+    const traffic_simulator_msgs::msg::BoundingBox & to_bbox, bool allow_lane_change,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+    -> traffic_simulator::LaneletPose;
   // static auto getBoundingBoxLaneLongitudinalDistance(
-  //   const std::string & from, const CanonicalizedLaneletPose & to, bool include_adjacent_lanelet,
-  //   bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>;
+  //   const std::string & from, const CanonicalizedLaneletPose & to, bool
+  //   include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change) ->
+  //   std::optional<double>;
 
   // static auto getBoundingBoxLaneLongitudinalDistance(
   //   const std::string & from, const std::string & to, bool include_adjacent_lanelet,
