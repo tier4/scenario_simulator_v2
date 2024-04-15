@@ -88,10 +88,19 @@ public:
       }
     }
 
-    template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
-    static auto convert(const geometry_msgs::msg::Pose & pose)
+    static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
+      -> NativeLanePosition
     {
-      if (const auto result = core->toLaneletPose(pose, false); result) {
+      return traffic_simulator::DistanceUtils::canonicalize(
+        non_canonicalized, core->getHdmapUtils());
+    }
+
+    template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
+    static auto convert(const NativeWorldPosition & pose) -> NativeLanePosition
+    {
+      if (
+        const auto result =
+          traffic_simulator::DistanceUtils::toLaneletPose(pose, false, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(
@@ -106,66 +115,50 @@ public:
       }
     }
 
-    static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
-      -> traffic_simulator::CanonicalizedLaneletPose
-    {
-      return core->canonicalize(non_canonicalized);
-    }
-
     template <
       typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
-    static auto convert(const NativeLanePosition & native_lane_position)
+    static auto convert(const NativeLanePosition & native_lane_position) -> NativeWorldPosition
     {
-      return core->toMapPose(native_lane_position);
+      return traffic_simulator::DistanceUtils::toMapPose(native_lane_position);
     }
 
-    template <typename OSCLanePosition>
-    static auto makeNativeLanePosition(const OSCLanePosition & osc_lane_position)
+    static auto makeNativeRelativeWorldPosition(
+      const std::string & from_entity_name, const std::string & to_entity_name)
     {
-      traffic_simulator::LaneletPose native_lane_position;
-      native_lane_position.lanelet_id =
-        boost::lexical_cast<std::int64_t>(osc_lane_position.lane_id);
-      native_lane_position.s = osc_lane_position.s;
-      native_lane_position.offset = osc_lane_position.offset;
-      native_lane_position.rpy.x = osc_lane_position.orientation.r;
-      native_lane_position.rpy.y = osc_lane_position.orientation.p;
-      native_lane_position.rpy.z = osc_lane_position.orientation.h;
-      return canonicalize(native_lane_position);
+      const auto from_map_pose = core->getEntity(from_entity_name)->getMapPose();
+      const auto to_map_pose = core->getEntity(to_entity_name)->getMapPose();
+      if (
+        const auto relative_pose =
+          traffic_simulator::DistanceUtils::getRelativePose(from_map_pose, to_map_pose)) {
+        return relative_pose.value();
+      } else {
+        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
+      }
     }
 
-    template <typename OSCWorldPosition>
-    static auto makeNativeWorldPosition(const OSCWorldPosition & osc_world_position)
+    static auto makeNativeRelativeWorldPosition(
+      const std::string & from_entity_name, const NativeWorldPosition & to_map_pose)
     {
-      NativeWorldPosition native_world_position;
-      native_world_position.position.x = osc_world_position.x;
-      native_world_position.position.y = osc_world_position.y;
-      native_world_position.position.z = osc_world_position.z;
-      native_world_position.orientation =
-        quaternion_operation::convertEulerAngleToQuaternion([&]() {
-          geometry_msgs::msg::Vector3 vector;
-          vector.x = osc_world_position.r;
-          vector.y = osc_world_position.p;
-          vector.z = osc_world_position.h;
-          return vector;
-        }());
-      return native_world_position;
+      const auto from_map_pose = core->getEntity(from_entity_name)->getMapPose();
+      if (
+        const auto relative_pose =
+          traffic_simulator::DistanceUtils::getRelativePose(from_map_pose, to_map_pose)) {
+        return relative_pose.value();
+      } else {
+        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
+      }
     }
 
-    template <typename... Ts>
-    static auto makeNativeRelativeWorldPosition(Ts &&... xs)
+    static auto makeNativeRelativeWorldPosition(
+      const NativeWorldPosition & from_map_pose, const std::string & to_entity_name)
     {
-      try {
-        return SimulatorCore::core->getRelativePose(std::forward<decltype(xs)>(xs)...);
-      } catch (...) {
-        geometry_msgs::msg::Pose result{};
-        result.position.x = std::numeric_limits<double>::quiet_NaN();
-        result.position.y = std::numeric_limits<double>::quiet_NaN();
-        result.position.z = std::numeric_limits<double>::quiet_NaN();
-        result.orientation.x = 0;
-        result.orientation.y = 0;
-        result.orientation.z = 0;
-        result.orientation.w = 1;
-        return result;
+      const auto to_map_pose = core->getEntity(to_entity_name)->getMapPose();
+      if (
+        const auto relative_pose =
+          traffic_simulator::DistanceUtils::getRelativePose(from_map_pose, to_map_pose)) {
+        return relative_pose.value();
+      } else {
+        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
       }
     }
 
@@ -586,10 +579,17 @@ public:
     static auto evaluateRelativeHeading(
       const EntityRef & entity_ref, const OSCLanePosition & osc_lane_position)
     {
-      return std::abs(
-        quaternion_operation::convertQuaternionToEulerAngle(
-          core->getRelativePose(entity_ref, makeNativeLanePosition(osc_lane_position)).orientation)
-          .z);
+      const auto from_map_pose = core->getEntity(entity_ref)->getMapPose();
+      const auto to_map_pose = static_cast<NativeWorldPosition>(osc_lane_position);
+      if (
+        const auto relative_pose =
+          traffic_simulator::DistanceUtils::getRelativePose(from_map_pose, to_map_pose)) {
+        return static_cast<Double>(std::abs(
+          quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
+            .z));
+      } else {
+        return Double::nan();
+      }
     }
 
     template <typename EntityRef>

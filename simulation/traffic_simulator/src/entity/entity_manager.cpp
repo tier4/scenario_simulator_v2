@@ -202,57 +202,6 @@ auto EntityManager::getPedestrianParameters(const std::string & name) const
     "Please check description of the scenario and entity type of the Entity: " + name);
 }
 
-auto EntityManager::getRelativePose(
-  const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to) const
-  -> geometry_msgs::msg::Pose
-{
-  return math::geometry::getRelativePose(from, to);
-}
-
-auto EntityManager::getRelativePose(
-  const geometry_msgs::msg::Pose & from, const std::string & to) const -> geometry_msgs::msg::Pose
-{
-  return getRelativePose(from, getMapPose(to));
-}
-
-auto EntityManager::getRelativePose(
-  const std::string & from, const geometry_msgs::msg::Pose & to) const -> geometry_msgs::msg::Pose
-{
-  return getRelativePose(getMapPose(from), to);
-}
-
-auto EntityManager::getRelativePose(const std::string & from, const std::string & to) const
-  -> geometry_msgs::msg::Pose
-{
-  return getRelativePose(getMapPose(from), getMapPose(to));
-}
-
-auto EntityManager::getRelativePose(
-  const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to) const
-  -> geometry_msgs::msg::Pose
-{
-  return getRelativePose(from, toMapPose(to));
-}
-
-auto EntityManager::getRelativePose(
-  const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to) const
-  -> geometry_msgs::msg::Pose
-{
-  return getRelativePose(toMapPose(from), to);
-}
-
-auto EntityManager::getRelativePose(
-  const std::string & from, const CanonicalizedLaneletPose & to) const -> geometry_msgs::msg::Pose
-{
-  return getRelativePose(getMapPose(from), toMapPose(to));
-}
-
-auto EntityManager::getRelativePose(
-  const CanonicalizedLaneletPose & from, const std::string & to) const -> geometry_msgs::msg::Pose
-{
-  return getRelativePose(toMapPose(from), getMapPose(to));
-}
-
 auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
 auto EntityManager::getVehicleParameters(const std::string & name) const

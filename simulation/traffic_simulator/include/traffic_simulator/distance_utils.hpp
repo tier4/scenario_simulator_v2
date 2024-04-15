@@ -31,6 +31,18 @@ class DistanceUtils
   using CanonicalizedEntityStatus = entity_status::CanonicalizedEntityStatus;
 
 public:
+  static auto canonicalize(
+    const LaneletPose & lanelet_pose,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
+
+  static auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose)
+    -> const geometry_msgs::msg::Pose;
+
+  static auto toLaneletPose(
+    const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+    -> std::optional<CanonicalizedLaneletPose>;
+
   // Lateral
   static auto getLateralDistance(
     const lanelet_pose::CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
@@ -186,7 +198,7 @@ public:
   // RelativePose
   static auto getRelativePose(
     const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
-    -> geometry_msgs::msg::Pose;
+    -> std::optional<geometry_msgs::msg::Pose>;
 
   // auto EntityManager::getRelativePose(
   //   const geometry_msgs::msg::Pose & from, const std::string & to) ->
@@ -200,11 +212,11 @@ public:
 
   static auto getRelativePose(
     const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
-    -> geometry_msgs::msg::Pose;
+    -> std::optional<geometry_msgs::msg::Pose>;
 
   static auto getRelativePose(
     const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
-    -> geometry_msgs::msg::Pose;
+    -> std::optional<geometry_msgs::msg::Pose>;
 
   // auto EntityManager::getRelativePose(
   //   const std::string & from, const CanonicalizedLaneletPose & to) ->

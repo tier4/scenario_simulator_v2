@@ -399,17 +399,6 @@ public:
   auto getPedestrianParameters(const std::string & name) const
     -> const traffic_simulator_msgs::msg::PedestrianParameters &;
 
-  // clang-format off
-  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string                  & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string                  & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const CanonicalizedLaneletPose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string                  & from, const CanonicalizedLaneletPose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const CanonicalizedLaneletPose & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
-  // clang-format on
-
   auto getStepTime() const noexcept -> double;
 
   auto getVehicleParameters(const std::string & name) const

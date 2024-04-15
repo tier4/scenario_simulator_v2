@@ -16,6 +16,30 @@
 
 namespace traffic_simulator
 {
+auto DistanceUtils::canonicalize(
+  const LaneletPose & lanelet_pose,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
+{
+  return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
+}
+
+auto DistanceUtils::toMapPose(const CanonicalizedLaneletPose & lanelet_pose)
+  -> const geometry_msgs::msg::Pose
+{
+  return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
+}
+
+auto DistanceUtils::toLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<CanonicalizedLaneletPose>
+{
+  if (const auto pose = hdmap_utils_ptr->toLaneletPose(map_pose, include_crosswalk)) {
+    return DistanceUtils::canonicalize(pose.value(), hdmap_utils_ptr);
+  }
+  return std::nullopt;
+}
+
 auto DistanceUtils::getLateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   double matching_distance, bool allow_lane_change,
@@ -428,9 +452,13 @@ auto DistanceUtils::getDistanceToRightLaneBound(
 
 auto DistanceUtils::getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
-  -> geometry_msgs::msg::Pose
+  -> std::optional<geometry_msgs::msg::Pose>
 {
-  return math::geometry::getRelativePose(from, to);
+  try {
+    return math::geometry::getRelativePose(from, to);
+  } catch (...) {
+    return std::nullopt;
+  }
 }
 
 // auto EntityManager::getRelativePose(
@@ -455,14 +483,14 @@ auto DistanceUtils::getRelativePose(
 
 auto DistanceUtils::getRelativePose(
   const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
-  -> geometry_msgs::msg::Pose
+  -> std::optional<geometry_msgs::msg::Pose>
 {
   return getRelativePose(from, static_cast<geometry_msgs::msg::Pose>(to));
 }
 
 auto DistanceUtils::getRelativePose(
   const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
-  -> geometry_msgs::msg::Pose
+  -> std::optional<geometry_msgs::msg::Pose>
 {
   return getRelativePose(static_cast<geometry_msgs::msg::Pose>(from), to);
 }

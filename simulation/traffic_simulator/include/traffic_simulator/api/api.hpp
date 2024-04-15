@@ -324,7 +324,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getMapPoseFromRelativePose);
-  FORWARD_TO_ENTITY_MANAGER(getRelativePose);
+  // FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
