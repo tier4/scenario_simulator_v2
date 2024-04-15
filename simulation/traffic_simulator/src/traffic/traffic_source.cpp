@@ -18,7 +18,7 @@
 #include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
-constexpr std::size_t spawnable_lanes_limit = 1e3;
+constexpr std::size_t spawning_lanes_limit = 1e3;
 constexpr double lanelet_sampling_step = 0.1;
 constexpr int max_randomization_attempts = 1e5;
 
@@ -146,39 +146,39 @@ SpawnPoseValidator::SpawnPoseValidator(
     return;
   }
 
-  const auto spawnable_lanelets = hdmap_utils_->getNearbyLaneletIds(
-    source_pose.position, source_radius, include_crosswalk, spawnable_lanes_limit);
-  std::set<lanelet::Id> spawnable_ids(spawnable_lanelets.begin(), spawnable_lanelets.end());
+  const auto spawning_lanelets = hdmap_utils_->getNearbyLaneletIds(
+    source_pose.position, source_radius, include_crosswalk, spawning_lanes_limit);
+  std::set<lanelet::Id> spawning_ids(spawning_lanelets.begin(), spawning_lanelets.end());
 
-  if (spawnable_ids.empty()) {
-    THROW_SIMULATION_ERROR("TrafficSource has no spawnable lanelets.");
+  if (spawning_ids.empty()) {
+    THROW_SIMULATION_ERROR("TrafficSource has no spawning lanelets.");
   }
 
   /**
-   * @note find all "starting" lanelets out of spawnable lanelets.
+   * @note find all "starting" lanelets out of spawning lanelets.
    * These are the lanelets that have no previous lanelets inside the area of TrafficSource.
    * Slightly increases computation time for small areas (~0.1ms), but reduces this time for larger areas.
    */
   std::set<lanelet::Id> start_ids;
-  for (const auto & id : spawnable_ids) {
+  for (const auto & id : spawning_ids) {
     auto previous = hdmap_utils_->getPreviousLaneletIds(id);
     previous.erase(std::remove(previous.begin(), previous.end(), id), previous.end());
 
-    if (previous.empty() || !hasCommonElements(previous, spawnable_ids)) {
+    if (previous.empty() || !hasCommonElements(previous, spawning_ids)) {
       start_ids.insert(id);
     }
   }
 
   for (const auto & id : start_ids) {
-    findAllSpawnableAreas(id, spawnable_ids, true);
+    findAllSpawningAreas(id, spawning_ids, true);
   }
 
   /// @note find all lanelets that are not reachable from "starting" lanelets (detached loops within area of TrafficSource)
-  for (const auto & id : spawnable_ids) {
+  for (const auto & id : spawning_ids) {
     if (std::none_of(areas_.begin(), areas_.end(), [&id](const LaneletArea & area) {
           return area.contains(id);
         })) {
-      findAllSpawnableAreas(id, spawnable_ids, true);
+      findAllSpawningAreas(id, spawning_ids, true);
     }
   }
 
@@ -201,7 +201,7 @@ auto SpawnPoseValidator::isValid(
   return false;
 }
 
-void SpawnPoseValidator::findAllSpawnableAreas(
+void SpawnPoseValidator::findAllSpawningAreas(
   const lanelet::Id id, const std::set<lanelet::Id> & valid_ids, const bool in_front,
   const std::optional<LaneletArea> & previous_area)
 {
@@ -229,7 +229,7 @@ void SpawnPoseValidator::findAllSpawnableAreas(
 
   for (const auto & id_to_consider : ids_to_consider) {
     if (id_to_consider != border_id && valid_ids.count(id_to_consider) > 0) {
-      findAllSpawnableAreas(id_to_consider, valid_ids, in_front, area);
+      findAllSpawningAreas(id_to_consider, valid_ids, in_front, area);
     }
   }
 }
@@ -258,9 +258,9 @@ TrafficSource::TrafficSource(
   const geometry_msgs::msg::Pose & position,
   const std::vector<std::tuple<ParamsVariant, std::string, std::string, double>> & params,
   const std::optional<int> random_seed, const double current_time,
-#define MAKE_FUNCTION_REF_TYPE(PARAMST, POSET)                                                     \
-  const std::function<void(                                                                        \
-    const std::string &, const POSET &, const PARAMST &, const std::string &, const std::string &, \
+#define MAKE_FUNCTION_REF_TYPE(PARAMS, POSE)                                                     \
+  const std::function<void(                                                                      \
+    const std::string &, const POSE &, const PARAMS &, const std::string &, const std::string &, \
     const double)> &
   // clang-format off
   MAKE_FUNCTION_REF_TYPE(VehicleParams,    CanonicalizedLaneletPose) vehicle_ll_spawn_function,
@@ -386,15 +386,14 @@ auto TrafficSource::isPoseValid(
   auto bbox_corners_transformed = math::geometry::transformPoints(pose, bbox_corners);
 
   /// @note 2D validation - does not account for height
-  const auto is_outside_spawnable_area = [&](const geometry_msgs::msg::Point & corner) -> bool {
+  const auto is_outside_spawning_area = [&](const geometry_msgs::msg::Point & corner) -> bool {
     return std::hypot(corner.x - source_pose_.position.x, corner.y - source_pose_.position.y) >
            radius_;
   };
 
-  /// @note Step 1: check whether all corners are inside spawnable area
+  /// @note Step 1: check whether all corners are inside spawning area
   if (const auto first_corner_outside = std::find_if(
-        bbox_corners_transformed.begin(), bbox_corners_transformed.end(),
-        is_outside_spawnable_area);
+        bbox_corners_transformed.begin(), bbox_corners_transformed.end(), is_outside_spawning_area);
       first_corner_outside != bbox_corners_transformed.end()) {
     return false;
   }

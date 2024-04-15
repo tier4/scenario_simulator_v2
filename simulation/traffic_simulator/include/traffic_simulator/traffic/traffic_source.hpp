@@ -96,15 +96,15 @@ public:
 
 private:
   /**
-    * @brief recursively find all spawnable areas
+    * @brief recursively find all spawning areas
     * @param previous_area used for recursion, do not use this parameter
     * @param in_front used for recursion, do not use this parameter
     */
-  void findAllSpawnableAreas(
+  void findAllSpawningAreas(
     const lanelet::Id id, const std::set<lanelet::Id> & ids, const bool in_front,
     const std::optional<LaneletArea> & previous_area = std::nullopt);
   /**
-   * @brief as after `findAllSpawnableAreas` there will be many redundant areas (meaning one will
+   * @brief as after `findAllSpawningAreas` there will be many redundant areas (meaning one will
    * be a subset of the other), remove all subsets for faster search
    */
   void removeRedundantAreas();
@@ -138,9 +138,9 @@ public:
     const geometry_msgs::msg::Pose & position,
     const std::vector<std::tuple<ParamsVariant, std::string, std::string, double>> & params,
     const std::optional<int> random_seed, const double current_time,
-#define MAKE_FUNCTION_REF_TYPE(PARAMST, POSET)                                                     \
-  const std::function<void(                                                                        \
-    const std::string &, const POSET &, const PARAMST &, const std::string &, const std::string &, \
+#define MAKE_FUNCTION_REF_TYPE(PARAMS, POSE)                                                     \
+  const std::function<void(                                                                      \
+    const std::string &, const POSE &, const PARAMS &, const std::string &, const std::string &, \
     double)> &
     // clang-format off
     MAKE_FUNCTION_REF_TYPE(VehicleParams,    CanonicalizedLaneletPose) vehicle_ll_spawn_function,
@@ -190,9 +190,9 @@ private:
   unsigned int entity_id_ = 0u;
 
 /// @note Functions
-#define MAKE_FUNCTION_TYPE(PARAMST, POSET)                                                         \
-  const std::function<void(                                                                        \
-    const std::string &, const POSET &, const PARAMST &, const std::string &, const std::string &, \
+#define MAKE_FUNCTION_TYPE(PARAMS, POSE)                                                         \
+  const std::function<void(                                                                      \
+    const std::string &, const POSE &, const PARAMS &, const std::string &, const std::string &, \
     const double)>
   // clang-format off
   MAKE_FUNCTION_TYPE(VehicleParams,    CanonicalizedLaneletPose) vehicle_ll_spawn_function_;

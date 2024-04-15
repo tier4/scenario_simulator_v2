@@ -334,9 +334,9 @@ void API::defineTrafficSource(
   const bool allow_spawn_outside_lane, const bool require_footprint_fitting,
   const bool random_orientation, std::optional<int> random_seed)
 {
-#define MAKE_SPAWN_LAMBDA(PARAMST, POSET)                                                    \
+#define MAKE_SPAWN_LAMBDA(PARAMS, POSE)                                                      \
   [this](                                                                                    \
-    const std::string & name, const POSET & pose, const PARAMST & params,                    \
+    const std::string & name, const POSE & pose, const PARAMS & params,                      \
     const std::string & behavior, const std::string & model3d, const double speed) -> void { \
     spawn(name, pose, params, behavior, model3d);                                            \
     setLinearVelocity(name, speed);                                                          \
