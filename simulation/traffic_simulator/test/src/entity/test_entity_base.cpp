@@ -18,9 +18,21 @@ public:
   {
   }
 
-  void appendToJobList(const std::function<bool(const double)> & func_on_update,
-    const std::function<void()> & func_on_cleanup, traffic_simulator::job::Type type, bool exclusive,
-    const traffic_simulator::job::Event event)
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override
+  {
+    return behavior_parameter;
+  }
+
+  void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter & params) override
+  {
+    behavior_parameter = params;
+  }
+
+  void appendToJobList(
+    const std::function<bool(const double)> & func_on_update,
+    const std::function<void()> & func_on_cleanup, traffic_simulator::job::Type type,
+    bool exclusive, const traffic_simulator::job::Event event)
   {
     job_list_.append(func_on_update, func_on_cleanup, type, exclusive, event);
   }
@@ -32,14 +44,14 @@ public:
   {
     static const auto default_dynamic_constraints = []() {
       auto dynamic_constraints = traffic_simulator_msgs::msg::DynamicConstraints();
-      dynamic_constraints.max_speed = 0.0;
-      dynamic_constraints.max_acceleration = 0.0;
-      dynamic_constraints.max_acceleration_rate = 0.0;
-      dynamic_constraints.max_deceleration = 0.0;
-      dynamic_constraints.max_deceleration_rate = 0.0;
+      dynamic_constraints.max_speed = 3.0;
+      dynamic_constraints.max_acceleration = 5.0;
+      dynamic_constraints.max_acceleration_rate = 7.0;
+      dynamic_constraints.max_deceleration = 11.0;
+      dynamic_constraints.max_deceleration_rate = 13.0;
       return dynamic_constraints;
     }();
-  
+
     return default_dynamic_constraints;
   }
 
@@ -58,7 +70,10 @@ public:
 
   ~DummyEntity() override = default;
 
-  auto getGoalPoses() -> std::vector<traffic_simulator::CanonicalizedLaneletPose> override { return {}; }
+  auto getGoalPoses() -> std::vector<traffic_simulator::CanonicalizedLaneletPose> override
+  {
+    return {};
+  }
 
   std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
   {
@@ -77,29 +92,6 @@ public:
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
 
-  void requestSpeedChange(double, bool) override {}
-
-  void requestSpeedChange(const traffic_simulator::speed_change::RelativeTargetSpeed &, bool) override {}
-
-  void requestAssignRoute(const std::vector<traffic_simulator::CanonicalizedLaneletPose> &) override {}
-
-  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override {}
-
-  void requestAcquirePosition(const traffic_simulator::CanonicalizedLaneletPose &) override {}
-
-  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override {}
-
-  void requestSpeedChange(
-    const double, const traffic_simulator::speed_change::Transition, const traffic_simulator::speed_change::Constraint,
-    const bool) override {}
-
-  auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override
-  {
-    THROW_SEMANTIC_ERROR("getBehaviorParameter function does not support in MiscObjectEntity.");
-  }
-
-  void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override {}
-
   void setVelocityLimit(double) override {}
 
   void setAccelerationLimit(double) override {}
@@ -109,6 +101,29 @@ public:
   void setDecelerationLimit(double) override {}
 
   void setDecelerationRateLimit(double) override {}
+
+  void requestSpeedChange(double, bool) override {}
+
+  void requestSpeedChange(
+    const traffic_simulator::speed_change::RelativeTargetSpeed &, bool) override
+  {
+  }
+
+  void requestAssignRoute(const std::vector<traffic_simulator::CanonicalizedLaneletPose> &) override
+  {
+  }
+
+  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override {}
+
+  void requestAcquirePosition(const traffic_simulator::CanonicalizedLaneletPose &) override {}
+
+  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override {}
+
+  void requestSpeedChange(
+    const double, const traffic_simulator::speed_change::Transition,
+    const traffic_simulator::speed_change::Constraint, const bool) override
+  {
+  }
 };
 
 int main(int argc, char ** argv)
@@ -116,14 +131,6 @@ int main(int argc, char ** argv)
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
-/*
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  auto map = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
-*/
 
 TEST(EntityBase, asFieldOperatorApplication)
 {
@@ -132,10 +139,11 @@ TEST(EntityBase, asFieldOperatorApplication)
   entity_status.name = name;
   entity_status.lanelet_pose_valid = false;
 
-  auto canonicalized_entity_status = traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
 
   auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
-  
+
   EXPECT_THROW(dummy.asFieldOperatorApplication(), std::runtime_error);
 }
 
@@ -146,10 +154,11 @@ TEST(EntityBase, startNpcLogic)
   entity_status.name = name;
   entity_status.lanelet_pose_valid = false;
 
-  auto canonicalized_entity_status = traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
 
   auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
-  
+
   EXPECT_FALSE(dummy.isNpcLogicStarted());
   dummy.startNpcLogic();
   EXPECT_TRUE(dummy.isNpcLogicStarted());
@@ -162,7 +171,8 @@ TEST(EntityBase, activateOutOfRangeJob_speed)
   entity_status.name = name;
   entity_status.lanelet_pose_valid = false;
 
-  auto canonicalized_entity_status = traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
 
   auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
 
@@ -174,7 +184,8 @@ TEST(EntityBase, activateOutOfRangeJob_speed)
   double max_jerk = 100.0;
   double velocity = 1.0;
   dummy.setLinearVelocity(velocity);
-  dummy.activateOutOfRangeJob(min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk);
+  dummy.activateOutOfRangeJob(
+    min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk);
   double current_time = 0.0;
   double step_time = 0.0;
   EXPECT_NO_THROW(dummy.onUpdate(current_time, step_time));
@@ -188,7 +199,8 @@ TEST(EntityBase, activateOutOfRangeJob_acceleration)
   entity_status.name = name;
   entity_status.lanelet_pose_valid = false;
 
-  auto canonicalized_entity_status = traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
 
   auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
 
@@ -200,7 +212,8 @@ TEST(EntityBase, activateOutOfRangeJob_acceleration)
   double max_jerk = 100.0;
   double acceleration = 1.0;
   dummy.setLinearAcceleration(acceleration);
-  dummy.activateOutOfRangeJob(min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk);
+  dummy.activateOutOfRangeJob(
+    min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk);
   double current_time = 0.0;
   double step_time = 0.0;
   EXPECT_NO_THROW(dummy.onUpdate(current_time, step_time));
@@ -214,7 +227,8 @@ TEST(EntityBase, activateOutOfRangeJob_jerk)
   entity_status.name = name;
   entity_status.lanelet_pose_valid = false;
 
-  auto canonicalized_entity_status = traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
 
   auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
 
@@ -226,7 +240,8 @@ TEST(EntityBase, activateOutOfRangeJob_jerk)
   double max_jerk = 0.0;
   double jerk = 1.0;
   dummy.setLinearJerk(jerk);
-  dummy.activateOutOfRangeJob(min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk);
+  dummy.activateOutOfRangeJob(
+    min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk);
   double current_time = 0.0;
   double step_time = 0.0;
   EXPECT_NO_THROW(dummy.onUpdate(current_time, step_time));
@@ -240,7 +255,8 @@ TEST(EntityBase, onUpdate)
   entity_status.name = name;
   entity_status.lanelet_pose_valid = false;
 
-  auto canonicalized_entity_status = traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
 
   auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
 
@@ -260,8 +276,10 @@ TEST(EntityBase, onUpdate)
   auto second_event = traffic_simulator::job::Event::POST_UPDATE;
   auto is_exclusive = true;
 
-  dummy.appendToJobList(first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
-  dummy.appendToJobList(second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
+  dummy.appendToJobList(
+    first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
+  dummy.appendToJobList(
+    second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
 
   double current_time = 0.0;
   double step_time = 0.0;
@@ -280,7 +298,8 @@ TEST(EntityBase, onPostUpdate)
   entity_status.name = name;
   entity_status.lanelet_pose_valid = false;
 
-  auto canonicalized_entity_status = traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
 
   auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
 
@@ -300,8 +319,10 @@ TEST(EntityBase, onPostUpdate)
   auto second_event = traffic_simulator::job::Event::POST_UPDATE;
   auto is_exclusive = true;
 
-  dummy.appendToJobList(first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
-  dummy.appendToJobList(second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
+  dummy.appendToJobList(
+    first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
+  dummy.appendToJobList(
+    second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
 
   double current_time = 0.0;
   double step_time = 0.0;
@@ -311,4 +332,157 @@ TEST(EntityBase, onPostUpdate)
   EXPECT_FALSE(first_update);
   EXPECT_TRUE(second_cleanup);
   EXPECT_TRUE(second_update);
+}
+
+TEST(EntityBase, resetDynamicConstraints)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+
+  auto default_constraints = dummy.getDefaultDynamicConstraints();
+  dummy.resetDynamicConstraints();
+  auto current_constraints = dummy.getDynamicConstraints();
+
+  EXPECT_EQ(default_constraints.max_speed, current_constraints.max_speed);
+  EXPECT_EQ(default_constraints.max_acceleration, current_constraints.max_acceleration);
+  EXPECT_EQ(default_constraints.max_deceleration, current_constraints.max_deceleration);
+  EXPECT_EQ(default_constraints.max_acceleration_rate, current_constraints.max_acceleration_rate);
+  EXPECT_EQ(default_constraints.max_deceleration_rate, current_constraints.max_deceleration_rate);
+}
+
+TEST(EntityBase, setDynamicConstraints)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+  traffic_simulator_msgs::msg::DynamicConstraints default_constraints{};
+
+  default_constraints.max_speed = 5.0;
+  default_constraints.max_acceleration = 7.0;
+  default_constraints.max_deceleration = 11.0;
+  default_constraints.max_acceleration_rate = 13.0;
+  default_constraints.max_deceleration_rate = 17.0;
+  dummy.setDynamicConstraints(default_constraints);
+  auto current_constraints = dummy.getDynamicConstraints();
+
+  EXPECT_EQ(default_constraints.max_speed, current_constraints.max_speed);
+  EXPECT_EQ(default_constraints.max_acceleration, current_constraints.max_acceleration);
+  EXPECT_EQ(default_constraints.max_deceleration, current_constraints.max_deceleration);
+  EXPECT_EQ(default_constraints.max_acceleration_rate, current_constraints.max_acceleration_rate);
+  EXPECT_EQ(default_constraints.max_deceleration_rate, current_constraints.max_deceleration_rate);
+}
+
+TEST(EntityBase, requestFollowTrajectory)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+
+  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> ptr = nullptr;
+  EXPECT_THROW(dummy.requestFollowTrajectory(ptr), std::runtime_error);
+}
+
+TEST(EntityBase, requestWalkStraight)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+
+  EXPECT_THROW(dummy.requestWalkStraight(), std::runtime_error);
+}
+
+TEST(EntityBase, updateStandStillDuration_startedMoving)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+  dummy.startNpcLogic();
+  dummy.setLinearVelocity(3.0);
+
+  EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
+}
+
+TEST(EntityBase, updateStandStillDuration_notStarted)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+
+  dummy.setLinearVelocity(3.0);
+  EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
+
+  dummy.setLinearVelocity(0.0);
+  EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
+}
+
+TEST(EntityBase, updateTraveledDistance_startedMoving)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+
+  double velocity = 3.0;
+  double step_time = 0.1;
+  dummy.startNpcLogic();
+  dummy.setLinearVelocity(velocity);
+
+  EXPECT_EQ(step_time * velocity, dummy.updateTraveledDistance(step_time));
+}
+
+TEST(EntityBase, updateTraveledDistance_notStarted)
+{
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.lanelet_pose_valid = false;
+
+  auto canonicalized_entity_status =
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, nullptr);
+  auto dummy = DummyEntity(name, canonicalized_entity_status, nullptr);
+
+  double velocity = 3.0;
+  double step_time = 0.1;
+  dummy.setLinearVelocity(velocity);
+  EXPECT_EQ(0.0, dummy.updateTraveledDistance(step_time));
+
+  dummy.setLinearVelocity(0.0);
+  EXPECT_EQ(0.0, dummy.updateTraveledDistance(step_time));
 }
