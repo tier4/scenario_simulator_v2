@@ -23,6 +23,19 @@ using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
 inline namespace lanelet_pose
 {
+
+inline auto getQuietNaN()
+{
+  traffic_simulator::LaneletPose position;
+  position.lanelet_id = std::numeric_limits<std::int64_t>::max();
+  position.s = std::numeric_limits<double>::quiet_NaN();
+  position.offset = std::numeric_limits<double>::quiet_NaN();
+  position.rpy.x = std::numeric_limits<double>::quiet_NaN();
+  position.rpy.y = std::numeric_limits<double>::quiet_NaN();
+  position.rpy.z = std::numeric_limits<double>::quiet_NaN();
+  return position;
+}
+
 class CanonicalizedLaneletPose
 {
 public:

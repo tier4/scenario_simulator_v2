@@ -91,7 +91,7 @@ class EntityManager
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
-  std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
+  std::unordered_map<std::string, std::shared_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
   double step_time_;
 
@@ -376,6 +376,16 @@ public:
     -> std::optional<double>;
 
   auto getEntityNames() const -> const std::vector<std::string>;
+
+  auto getEntity(const std::string & name) const
+    -> std::shared_ptr<traffic_simulator::entity::EntityBase>
+  {
+    if (auto it = entities_.find(name); it != entities_.end()) {
+      return it->second;
+    } else {
+      return std::nullptr_t;
+    }
+  };
 
   auto getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus;
 

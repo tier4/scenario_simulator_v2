@@ -318,9 +318,11 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getDistanceToLeftLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getDistanceToRightLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
+  FORWARD_TO_ENTITY_MANAGER(getEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
+  FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLaneletLength);
   FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(getLateralDistance);
