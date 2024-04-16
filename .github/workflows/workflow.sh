@@ -5,7 +5,8 @@ file_path="$1"
 # Arguments other than file path are passed to the command's arguments
 shift 1
 
-if [ ! -f "$file_path" ]; then
+if [ ! -f "$file_path" ]
+then
   echo "No such file: $file_path"
   exit 1
 fi
