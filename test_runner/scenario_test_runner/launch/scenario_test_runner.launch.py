@@ -73,7 +73,7 @@ def launch_setup(context, *args, **kwargs):
     launch_rviz                         = LaunchConfiguration("launch_rviz",                            default=False)
     launch_simple_sensor_simulator      = LaunchConfiguration("launch_simple_sensor_simulator",         default=True)
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
-    port                                = LaunchConfiguration("port",                                   default=5556)
+    port                                = LaunchConfiguration("port",                                   default=5555)
     record                              = LaunchConfiguration("record",                                 default=True)
     rviz_config                         = LaunchConfiguration("rviz_config",                            default="")
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
