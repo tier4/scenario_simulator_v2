@@ -1,12 +1,12 @@
 #!/bin/sh
 
-FILE_PATH="$1"
+file_path="$1"
 
 # Arguments other than file path are passed to the command's arguments
 shift 1
 
-if [ ! -f "$FILE_PATH" ]; then
-    echo "No such file: $FILE_PATH"
+if [ ! -f "$file_path" ]; then
+    echo "No such file: $file_path"
     exit 1
 fi
 
@@ -21,6 +21,6 @@ do
         echo "Error: caught non-zero exit status（code: $cmd_exit_status)"
         exit_status=1
     fi
-done < "$FILE_PATH"
+done < "$file_path"
 
 exit $exit_status
