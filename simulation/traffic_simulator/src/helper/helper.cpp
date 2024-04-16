@@ -49,6 +49,16 @@ LaneletPose constructLaneletPose(
   return lanelet_pose;
 }
 
+CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr, double offset = 0,
+  double roll = 0, double pitch = 0, double yaw = 0)
+{
+  return traffic_simulator::PoseUtils::canonicalize(
+    traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
+    hdmap_utils_ptr);
+}
+
 geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)
 {
   geometry_msgs::msg::Vector3 rpy;
