@@ -34,6 +34,7 @@
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator/distance_utils.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -147,7 +148,8 @@ public:
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
+        simulation_interface::toProto(
+          entity_manager_ptr_->getEntity(name)->getMapPose(), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
         /// @todo Should be filled from function API
         req.set_initial_speed(0.0);
@@ -156,13 +158,6 @@ public:
     };
 
     return register_to_entity_manager() and register_to_environment_simulator();
-  }
-
-  geometry_msgs::msg::Pose toMapPose(const geometry_msgs::msg::Pose & pose) { return pose; }
-
-  geometry_msgs::msg::Pose toMapPose(const traffic_simulator_msgs::msg::LaneletPose & pose)
-  {
-    return entity_manager_ptr_->getHdmapUtils()->toMapPose(pose).pose;
   }
 
   template <typename Pose>
@@ -185,7 +180,8 @@ public:
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
+        simulation_interface::toProto(
+          entity_manager_ptr_->getEntity(name)->getMapPose(), *req.mutable_pose());
         return zeromq_client_.call(req).result().success();
       }
     };
@@ -211,7 +207,8 @@ public:
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(toMapPose(pose), *req.mutable_pose());
+        simulation_interface::toProto(
+          entity_manager_ptr_->getEntity(name)->getMapPose(), *req.mutable_pose());
         return zeromq_client_.call(req).result().success();
       }
     };
@@ -350,7 +347,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setMapPose);
   FORWARD_TO_ENTITY_MANAGER(setTwist);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
-  FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 private:
   FORWARD_TO_ENTITY_MANAGER(getDefaultMatchingDistanceForLaneletPoseCalculation);

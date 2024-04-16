@@ -22,7 +22,6 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/distance_utils.hpp>
 
 namespace traffic_simulator
 {
@@ -114,7 +113,7 @@ auto API::setEntityStatus(
   EntityStatus status;
   status.time = getCurrentTime();
   status.bounding_box = getBoundingBox(name);
-  status.pose = entity_manager_ptr_->toMapPose(lanelet_pose);
+  status.pose = PoseUtils::toMapPose(lanelet_pose);
   status.name = name;
   status.action_status = action_status;
   status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose);

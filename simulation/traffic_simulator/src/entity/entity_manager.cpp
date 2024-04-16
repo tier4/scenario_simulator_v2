@@ -25,7 +25,6 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <traffic_simulator/distance_utils.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
@@ -389,12 +388,6 @@ void EntityManager::setVerbose(const bool verbose)
   for (auto & entity : entities_) {
     entity.second->verbose = verbose;
   }
-}
-
-auto EntityManager::toMapPose(const CanonicalizedLaneletPose & lanelet_pose) const
-  -> const geometry_msgs::msg::Pose
-{
-  return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 }
 
 auto EntityManager::updateNpcLogic(
