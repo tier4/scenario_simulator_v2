@@ -290,12 +290,6 @@ public:
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
-  FORWARD_TO_ENTITY(getDistanceToLaneBound, );
-  FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
-  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
-  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, const);
-  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
-  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);

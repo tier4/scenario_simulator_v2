@@ -79,8 +79,9 @@ public:
       node, "/real_time_factor", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
       [this](const std_msgs::msg::Float64 & message) {
         /**
-         * @note Pausing the simulation by setting the realtime_factor_ value to 0 is not supported and causes the simulation crash.
-         * For that reason, before performing the action, it needs to be ensured that the incoming request data is a positive number.
+         * @note Pausing the simulation by setting the realtime_factor_ value to 0 is not supported
+         * and causes the simulation crash. For that reason, before performing the action, it needs
+         * to be ensured that the incoming request data is a positive number.
          */
         if (message.data >= 0.001) {
           clock_.realtime_factor = message.data;
@@ -310,9 +311,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
-  FORWARD_TO_ENTITY_MANAGER(getDistanceToLaneBound);
-  FORWARD_TO_ENTITY_MANAGER(getDistanceToLeftLaneBound);
-  FORWARD_TO_ENTITY_MANAGER(getDistanceToRightLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
@@ -324,7 +322,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getMapPoseFromRelativePose);
-  // FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
