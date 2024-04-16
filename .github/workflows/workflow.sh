@@ -18,7 +18,7 @@ do
     ros2 run scenario_test_runner result_checker.py /tmp/scenario_test_runner/result.junit.xml
     cmd_exit_status=$?
     if [ $cmd_exit_status -ne 0 ]; then
-        echo "Error: caught non-zero exit code（code: $cmd_exit_status)"
+        echo "Error: caught non-zero exit status（code: $cmd_exit_status)"
         exit_status=1
     fi
 done < "$FILE_PATH"
