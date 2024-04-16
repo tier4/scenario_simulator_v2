@@ -97,34 +97,6 @@ bool EntityManager::entityExists(const std::string & name)
 
 auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
 
-auto EntityManager::getDistanceToCrosswalk(
-  const std::string & name, const lanelet::Id target_crosswalk_id) -> std::optional<double>
-{
-  if (entities_.find(name) == entities_.end()) {
-    return std::nullopt;
-  }
-  if (getWaypoints(name).waypoints.empty()) {
-    return std::nullopt;
-  }
-  math::geometry::CatmullRomSpline spline(getWaypoints(name).waypoints);
-  auto polygon = hdmap_utils_ptr_->getLaneletPolygon(target_crosswalk_id);
-  return spline.getCollisionPointIn2D(polygon);
-}
-
-auto EntityManager::getDistanceToStopLine(
-  const std::string & name, const lanelet::Id target_stop_line_id) -> std::optional<double>
-{
-  if (entities_.find(name) == entities_.end()) {
-    return std::nullopt;
-  }
-  if (getWaypoints(name).waypoints.empty()) {
-    return std::nullopt;
-  }
-  math::geometry::CatmullRomSpline spline(getWaypoints(name).waypoints);
-  auto polygon = hdmap_utils_ptr_->getStopLinePolygon(target_stop_line_id);
-  return spline.getCollisionPointIn2D(polygon);
-}
-
 auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};

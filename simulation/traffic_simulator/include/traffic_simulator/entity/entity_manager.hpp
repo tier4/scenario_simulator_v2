@@ -360,12 +360,6 @@ public:
 
   auto getCurrentTime() const noexcept -> double;
 
-  auto getDistanceToCrosswalk(const std::string & name, const lanelet::Id target_crosswalk_id)
-    -> std::optional<double>;
-
-  auto getDistanceToStopLine(const std::string & name, const lanelet::Id target_stop_line_id)
-    -> std::optional<double>;
-
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntity(const std::string & name) const

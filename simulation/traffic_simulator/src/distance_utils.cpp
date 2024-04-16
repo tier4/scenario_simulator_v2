@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <traffic_simulator/distance_utils.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
 {
@@ -422,33 +423,33 @@ auto DistanceUtils::getDistanceToRightLaneBound(
   }
 }
 
-// auto DistanceUtils::getDistanceToCrosswalk(
-//   const std::string & name, const lanelet::Id target_crosswalk_id) -> std::optional<double>
-// {
-//   if (entities_.find(name) == entities_.end()) {
-//     return std::nullopt;
-//   }
-//   if (getWaypoints(name).waypoints.empty()) {
-//     return std::nullopt;
-//   }
-//   math::geometry::CatmullRomSpline spline(getWaypoints(name).waypoints);
-//   auto polygon = hdmap_utils_ptr_->getLaneletPolygon(target_crosswalk_id);
-//   return spline.getCollisionPointIn2D(polygon);
-// }
+auto DistanceUtils::getDistanceToCrosswalk(
+  const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
+  const lanelet::Id target_crosswalk_id,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+{
+  if (waypoints_array.waypoints.empty()) {
+    return std::nullopt;
+  } else {
+    math::geometry::CatmullRomSpline spline(waypoints_array.waypoints);
+    auto polygon = hdmap_utils_ptr->getLaneletPolygon(target_crosswalk_id);
+    return spline.getCollisionPointIn2D(polygon);
+  }
+}
 
-// auto DistanceUtils::getDistanceToStopLine(
-//   const std::string & name, const lanelet::Id target_stop_line_id) -> std::optional<double>
-// {
-//   if (entities_.find(name) == entities_.end()) {
-//     return std::nullopt;
-//   }
-//   if (getWaypoints(name).waypoints.empty()) {
-//     return std::nullopt;
-//   }
-//   math::geometry::CatmullRomSpline spline(getWaypoints(name).waypoints);
-//   auto polygon = hdmap_utils_ptr_->getStopLinePolygon(target_stop_line_id);
-//   return spline.getCollisionPointIn2D(polygon);
-// }
+auto DistanceUtils::getDistanceToStopLine(
+  const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
+  const lanelet::Id target_stop_line_id,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
+{
+  if (waypoints_array.waypoints.empty()) {
+    return std::nullopt;
+  } else {
+    const math::geometry::CatmullRomSpline spline(waypoints_array.waypoints);
+    const auto polygon = hdmap_utils_ptr->getStopLinePolygon(target_stop_line_id);
+    return spline.getCollisionPointIn2D(polygon);
+  }
+}
 
 auto DistanceUtils::getRelativePose(
   const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)

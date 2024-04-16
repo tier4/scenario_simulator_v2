@@ -188,12 +188,15 @@ public:
 
   // Others
 
-  // static auto getDistanceToCrosswalk(
-  //   const std::string & name, const lanelet::Id target_crosswalk_id) -> std::optional<double>;
+  static auto getDistanceToCrosswalk(
+    const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
+    const lanelet::Id target_crosswalk_id,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
-  // static auto getDistanceToStopLine(const std::string & name, const lanelet::Id
-  // target_stop_line_id)
-  //   -> std::optional<double>;
+  static auto getDistanceToStopLine(
+    const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
+    const lanelet::Id target_stop_line_id,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
   // RelativePose
   static auto getRelativePose(
