@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator/distance_utils.hpp>
+#include <traffic_simulator/pose_utils.hpp>
 
 namespace openscenario_interpreter
 {
@@ -91,8 +92,7 @@ public:
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
-      return traffic_simulator::DistanceUtils::canonicalize(
-        non_canonicalized, core->getHdmapUtils());
+      return traffic_simulator::PoseUtils::canonicalize(non_canonicalized, core->getHdmapUtils());
     }
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
@@ -100,7 +100,7 @@ public:
     {
       if (
         const auto result =
-          traffic_simulator::DistanceUtils::toLaneletPose(pose, false, core->getHdmapUtils())) {
+          traffic_simulator::PoseUtils::toLaneletPose(pose, false, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(
@@ -119,7 +119,7 @@ public:
       typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
     static auto convert(const NativeLanePosition & native_lane_position) -> NativeWorldPosition
     {
-      return traffic_simulator::DistanceUtils::toMapPose(native_lane_position);
+      return traffic_simulator::PoseUtils::toMapPose(native_lane_position);
     }
 
     static auto makeNativeRelativeWorldPosition(
