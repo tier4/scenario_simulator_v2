@@ -49,14 +49,11 @@ private:
 
   void onUpdate() override
   {
-    RCLCPP_ERROR_STREAM(
-      rclcpp::get_logger("synchronized action"), "current time: " << api_.getCurrentTime());
     // SUCCESS
-    // check if npc is in the target lanelet when ego is in the target lanelet and npc is stopped
     if (
       api_.requestSynchronize("npc", ego_target, npc_target, 1.0, 1.0, 50) &&
-      api_.getIfArrivedToTargetLaneletPose("ego", ego_target, 1.0) &&
-      api_.getIfArrivedToTargetLaneletPose("npc", npc_target, 1.0)) {
+      api_.isArrivedToTargetLaneletPose("ego", ego_target, 1.0) &&
+      api_.isArrivedToTargetLaneletPose("npc", npc_target, 1.0)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
 
