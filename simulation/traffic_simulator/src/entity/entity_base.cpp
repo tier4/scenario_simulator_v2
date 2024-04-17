@@ -854,28 +854,28 @@ auto EntityBase::updateTraveledDistance(const double step_time) -> double
 }
 
 auto EntityBase::getDistanceToTargetLaneletPose(
-  const CanonicalizedLaneletPose & target_lanelet_pose, const double matching_distance) -> double
+  const CanonicalizedLaneletPose & target_lanelet_pose) -> double
 {
-  const auto entity_lanelet_pose_ = getLaneletPose(matching_distance);
+  const auto entity_lanelet_pose_ = getLaneletPose();
   const auto target_lanelet_pose_ = target_lanelet_pose;
 
   if (!entity_lanelet_pose_) {
     THROW_SEMANTIC_ERROR(
       "Failed to get entity's lanelet pose. Please check entity lanelet pose exists.");
   }
-  // RCLCPP_ERROR_STREAM(
-  //   rclcpp::get_logger("traffic_simulator"),
-  //   "getLogitudinalDistance" << static_cast<LaneletPose>(entity_lanelet_pose_.value()).lanelet_id
-  //                            << " " << static_cast<LaneletPose>(target_lanelet_pose_).lanelet_id);
+  RCLCPP_ERROR_STREAM(
+    rclcpp::get_logger("traffic_simulator"),
+    "getLogitudinalDistance" << static_cast<LaneletPose>(entity_lanelet_pose_.value()).lanelet_id
+                             << " " << static_cast<LaneletPose>(target_lanelet_pose_).lanelet_id);
 
   const auto entity_distance_to_target = hdmap_utils_ptr_->getLongitudinalDistance(
     static_cast<LaneletPose>(entity_lanelet_pose_.value()),
     static_cast<LaneletPose>(target_lanelet_pose_));
 
-  // RCLCPP_ERROR_STREAM(
-  //   rclcpp::get_logger("traffic_simulator"),
-  //   "getreverted Distance" << static_cast<LaneletPose>(target_lanelet_pose_).lanelet_id << " "
-  //                          << static_cast<LaneletPose>(entity_lanelet_pose_.value()).lanelet_id);
+  RCLCPP_ERROR_STREAM(
+    rclcpp::get_logger("traffic_simulator"),
+    "getreverted Distance" << static_cast<LaneletPose>(target_lanelet_pose_).lanelet_id << " "
+                           << static_cast<LaneletPose>(entity_lanelet_pose_.value()).lanelet_id);
 
   const auto revert_entity_distance_to_target = hdmap_utils_ptr_->getLongitudinalDistance(
     static_cast<LaneletPose>(target_lanelet_pose_),
@@ -915,11 +915,7 @@ auto EntityBase::getDistanceToTargetLaneletPose(
 auto EntityBase::getIfArrivedToTargetLaneletPose(
   const CanonicalizedLaneletPose & target_lanelet_pose, const double threshold) -> bool
 {
-  /**
-   * CHECK**************
-   * matching distance is set to 500 manually
-   */
-  const auto entity_distance_to_target = getDistanceToTargetLaneletPose(target_lanelet_pose, 500);
+  const auto entity_distance_to_target = getDistanceToTargetLaneletPose(target_lanelet_pose);
 
   if (entity_distance_to_target <= threshold) {
     return true;
@@ -932,12 +928,16 @@ auto EntityBase::requestSynchronize(
   const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,
   const double threshold, const double accel_limit, const double loop_period) -> bool
 {
-  if (this->
+  /**
+   * *********************CHECK*********************
+   * is this right way to check the entity?
+   */
+  if (traffic_simulator_msgs::msg::EntityType::EGO == getEntityType().type) {
     /**
      * *********************CHECK*********************
      * is this correct to throw syntax error?
      */
-    THROW_SYNTAX_ERROR("The entity that is requested to synchronize is the ego. Please check.");
+    THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
   }
 
   // check if the entity has already arrived to the target lanelet and entity is nearly stopped
@@ -954,11 +954,11 @@ auto EntityBase::requestSynchronize(
   }
 
   job_list_.append(
-    [this, ego_target, entity_target, accel_limit, loop_period](double) {
+    [this, ego_target, entity_target, accel_limit, threshold, loop_period](double) {
       /**
        * @brief This is function for synchronization.
        */
-      auto entity_distance = getDistanceToTargetLaneletPose(entity_target, 100);
+      auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
       auto ego_distance = this->hdmap_utils_ptr_->getLongitudinalDistance(
         static_cast<LaneletPose>(other_status_.find("ego")->second.getLaneletPose()),
         static_cast<LaneletPose>(ego_target));
@@ -997,9 +997,12 @@ auto EntityBase::requestSynchronize(
       //   THROW_SEMANTIC_ERROR("The entity can not reach the destination by time.");
 
       auto accel_limit_ = accel_limit * 1;
-      auto const distance_mergin = 1.0;
+      auto const distance_mergin = threshold;
 
-      if (
+      if (entity_velocity > accel_limit * ego_arrival_time) {
+        entity_velocity_to_synchronize = entity_velocity - accel_limit_ * loop_period / 1000;
+        RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "speed down");
+      } else if (
         entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / (accel_limit * 2) <
         entity_distance - distance_mergin) {
         RCLCPP_ERROR(rclcpp::get_logger("traffic_simulator"), "speed up");
