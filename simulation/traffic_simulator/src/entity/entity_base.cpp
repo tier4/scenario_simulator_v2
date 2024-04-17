@@ -958,23 +958,23 @@ auto EntityBase::requestSynchronize(
       auto entity_velocity_to_synchronize = entity_velocity;
 
       auto accel_limit_ = accel_limit * 1;
-      auto const distance_mergin = threshold;
+      auto const distance_margin = threshold;
 
       if (entity_velocity > accel_limit * ego_arrival_time) {
         /**
-         * @brief Making entity slow down sice the speed is too fast
+         * @brief Making entity slow down since the speed is too fast
          */
         entity_velocity_to_synchronize = entity_velocity - accel_limit_ * loop_period / 1000;
       } else if (
         entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / (accel_limit * 2) <
-        entity_distance - distance_mergin) {
+        entity_distance - distance_margin) {
         /**
          * @brief Making entity speed up
          */
         entity_velocity_to_synchronize = entity_velocity + accel_limit_ * loop_period / 1000;
       } else if (
         entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / (accel_limit * 2) >
-        entity_distance - distance_mergin) {
+        entity_distance - distance_margin) {
         /**
          * @brief Making entity slow down
          */
