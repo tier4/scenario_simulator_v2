@@ -182,8 +182,6 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     updateEntityStatusTimestamp(current_time);
   }
   EntityBase::onPostUpdate(current_time, step_time);
-  RCLCPP_ERROR_STREAM(
-    rclcpp::get_logger("VehicleEntity"), "##############END onUpdate###############");
 }
 
 void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)

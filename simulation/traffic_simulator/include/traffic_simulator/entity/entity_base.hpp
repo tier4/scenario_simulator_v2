@@ -241,11 +241,10 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
-  /*   */ auto getDistanceToTargetLaneletPose(
-    const CanonicalizedLaneletPose & target_lanelet_pose)
+  /*   */ auto getDistanceToTargetLaneletPose(const CanonicalizedLaneletPose & target_lanelet_pose)
     -> double;
 
-  /*   */ auto getIfArrivedToTargetLaneletPose(
+  /*   */ auto isArrivedToTargetLaneletPose(
     const CanonicalizedLaneletPose & target_lanelet_pose, const double threshold) -> bool;
 
   /*   */ auto requestSynchronize(
