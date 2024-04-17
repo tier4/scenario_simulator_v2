@@ -34,7 +34,7 @@ public:
   explicit SynchronizedAction(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "synchronized_action",
-      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
+      ament_index_cpp::get_package_share_directory("simple_cross_map") + "/map", "lanelet2_map.osm",
       __FILE__, false, option)
   {
     start();
