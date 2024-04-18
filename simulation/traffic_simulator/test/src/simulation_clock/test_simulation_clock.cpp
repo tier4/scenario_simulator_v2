@@ -69,13 +69,11 @@ TEST(SimulationClock, Initialize)
 {
   traffic_simulator::SimulationClock sim_clock(true, 1.0, 10.0);
 
-  sim_clock.started();
+  EXPECT_FALSE(sim_clock.started());
   sim_clock.update();
-
   EXPECT_NO_THROW(sim_clock.start());
 
-  sim_clock.started();
+  EXPECT_TRUE(sim_clock.started());
   sim_clock.update();
-
   EXPECT_THROW(sim_clock.start(), std::runtime_error);
 }
