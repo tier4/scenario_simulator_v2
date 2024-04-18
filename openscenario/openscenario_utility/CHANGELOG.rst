@@ -2,6 +2,20 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.15.0 (2024-04-18)
+-------------------
+* Merge pull request `#1223 <https://github.com/tier4/scenario_simulator_v2/issues/1223>`_ from tier4/refactor/drop_workflow
+  Delete workflow feature and add alternative bash script
+* Merge branch 'master' into refactor/drop_workflow
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* refactor: delete workflow.Workflow and rename workflow.py to scenario.py
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 1.14.1 (2024-04-12)
 -------------------
 
