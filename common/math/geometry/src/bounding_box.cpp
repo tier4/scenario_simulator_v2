@@ -15,6 +15,7 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <geometry/bounding_box.hpp>
+#include <geometry/polygon/polygon.hpp>
 
 // headers in Eigen
 #define EIGEN_MPL2_ONLY
@@ -149,6 +150,55 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   p3.z = distances_from_center_to_edge.up;
   points.emplace_back(p3);
   return points;
+}
+
+auto get2DPolygon(const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
+  -> std::vector<geometry_msgs::msg::Point>
+{
+  std::vector<geometry_msgs::msg::Point> points_bbox;
+  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
+
+  p0.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p0.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p0.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p0);
+
+  p1.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p1.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p1.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p1);
+
+  p2.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p2.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p2.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p2);
+
+  p3.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p3.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p3.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p3);
+
+  p4.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p4.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p4.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p4);
+
+  p5.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p5.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p5.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p5);
+
+  p6.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p6.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p6.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p6);
+
+  p7.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p7.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p7.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
+  points_bbox.emplace_back(p7);
+
+  return math::geometry::get2DConvexHull(points_bbox);
 }
 
 boost_point toBoostPoint(const geometry_msgs::msg::Point & point)

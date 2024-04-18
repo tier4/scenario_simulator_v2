@@ -22,6 +22,7 @@
 #include <iostream>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
 {
@@ -31,6 +32,8 @@ class DistanceUtils
   using CanonicalizedEntityStatus = entity_status::CanonicalizedEntityStatus;
 
 public:
+  // Pose
+  /// @todo: they will be moved to separate class for "poses"
   static auto canonicalize(
     const LaneletPose & lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
@@ -43,58 +46,38 @@ public:
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
     -> std::optional<CanonicalizedLaneletPose>;
 
+  // RelativePose
+  ///@todo: they will be moved to separate class for "poses"
+  static auto getRelativePose(
+    const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  static auto getRelativePose(
+    const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  static auto getRelativePose(
+    const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
   // Lateral
   static auto getLateralDistance(
     const lanelet_pose::CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
     bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
     -> std::optional<double>;
 
-  // static auto getLateralDistance(
-  //   const CanonicalizedLaneletPose & from, const std::string & to, bool allow_lane_change)
-  //   -> std::optional<double>;
-
-  // static auto getLateralDistance(
-  //   const std::string & from, const CanonicalizedLaneletPose & to, bool allow_lane_change)
-  //   -> std::optional<double>;
-
-  // static auto getLateralDistance(
-  //   const std::string & from, const std::string & to, bool allow_lane_change)
-  //   -> std::optional<double>;
-
   static auto getLateralDistance(
     const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
     double matching_distance, bool allow_lane_change,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
-  // static auto getLateralDistance(
-  //   const CanonicalizedLaneletPose & from, const std::string & to, double matching_distance,
-  //   bool allow_lane_change) -> std::optional<double>;
-
-  // static auto getLateralDistance(
-  //   const std::string & from, const CanonicalizedLaneletPose & to, double matching_distance,
-  //   bool allow_lane_change) -> std::optional<double>;
-
-  // static auto getLateralDistance(
-  //   const std::string & from, const std::string & to, double matching_distance,
-  //   bool allow_lane_change) -> std::optional<double>;
   // Longitudinal
   static auto getLongitudinalDistance(
     const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
     bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
-  // static auto getLongitudinalDistance(
-  //   const CanonicalizedLaneletPose & from, const std::string & to, bool include_adjacent_lanelet,
-  //   bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>;
-
-  // static auto getLongitudinalDistance(
-  //   const std::string & from, const CanonicalizedLaneletPose & to, bool include_adjacent_lanelet,
-  //   bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>;
-
-  // static auto getLongitudinalDistance(
-  //   const std::string & from, const std::string & to, bool include_adjacent_lanelet,
-  //   bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>;
-
+  ///@todo: it will be moved to separate class for "poses"
   static auto makeNativeRelativeLanePosition(
     const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
     bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
@@ -112,14 +95,6 @@ public:
     const traffic_simulator_msgs::msg::BoundingBox & to_bbox, bool allow_lane_change,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
-  // static auto getBoundingBoxLaneLateralDistance(
-  //   const std::string & from, const CanonicalizedLaneletPose & to, bool allow_lane_change)
-  //   -> std::optional<double>;
-
-  // static auto getBoundingBoxLaneLateralDistance(
-  //   const std::string & from, const std::string & to, bool allow_lane_change)
-  //   -> std::optional<double>;
-
   static auto getBoundingBoxLaneLongitudinalDistance(
     const CanonicalizedLaneletPose & from,
     const traffic_simulator_msgs::msg::BoundingBox & from_bbox, const CanonicalizedLaneletPose & to,
@@ -127,37 +102,22 @@ public:
     bool include_opposite_direction, bool allow_lane_change,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
+  ///@todo: it will be moved to separate class for "poses"
   static auto makeNativeBoundingBoxRelativeLanePosition(
     const CanonicalizedLaneletPose & from,
     const traffic_simulator_msgs::msg::BoundingBox & from_bbox, const CanonicalizedLaneletPose & to,
     const traffic_simulator_msgs::msg::BoundingBox & to_bbox, bool allow_lane_change,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
     -> traffic_simulator::LaneletPose;
-  // static auto getBoundingBoxLaneLongitudinalDistance(
-  //   const std::string & from, const CanonicalizedLaneletPose & to, bool
-  //   include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change) ->
-  //   std::optional<double>;
 
-  // static auto getBoundingBoxLaneLongitudinalDistance(
-  //   const std::string & from, const std::string & to, bool include_adjacent_lanelet,
-  //   bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>;
-
+  ///@todo: it will be moved to separate class for "poses"
   static auto getBoundingBoxRelativePose(
     const geometry_msgs::msg::Pose & from,
     const traffic_simulator_msgs::msg::BoundingBox & from_bbox, const geometry_msgs::msg::Pose & to,
     const traffic_simulator_msgs::msg::BoundingBox & to_bbox)
     -> std::optional<geometry_msgs::msg::Pose>;
 
-  // static auto getBoundingBoxRelativePose(
-  //   const std::string & from, const geometry_msgs::msg::Pose & to)
-  //   -> std::optional<geometry_msgs::msg::Pose>;
-
-  // static auto getBoundingBoxRelativePose(const std::string & from, const std::string & to)
-  //   -> std::optional<geometry_msgs::msg::Pose>;
-
   // Bounds
-  // static auto getDistanceToLaneBound() -> double;
-
   static auto getDistanceToLaneBound(
     const CanonicalizedEntityStatus & status, lanelet::Id lanelet_id,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
@@ -165,8 +125,6 @@ public:
   static auto getDistanceToLaneBound(
     const CanonicalizedEntityStatus & status, const lanelet::Ids & lanelet_ids,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
-
-  // static auto getDistanceToLeftLaneBound() -> double;
 
   static auto getDistanceToLeftLaneBound(
     const CanonicalizedEntityStatus & status, lanelet::Id lanelet_id,
@@ -176,8 +134,6 @@ public:
     const CanonicalizedEntityStatus & status, const lanelet::Ids & lanelet_ids,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
 
-  // static auto getDistanceToRightLaneBound() -> double;
-
   static auto getDistanceToRightLaneBound(
     const CanonicalizedEntityStatus & status, lanelet::Id lanelet_id,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
@@ -186,8 +142,7 @@ public:
     const CanonicalizedEntityStatus & status, const lanelet::Ids & lanelet_ids,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
 
-  // Others
-
+  // Other objects
   static auto getDistanceToCrosswalk(
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
     const lanelet::Id target_crosswalk_id,
@@ -197,40 +152,6 @@ public:
     const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
     const lanelet::Id target_stop_line_id,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
-
-  // RelativePose
-  static auto getRelativePose(
-    const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
-    -> std::optional<geometry_msgs::msg::Pose>;
-
-  // auto EntityManager::getRelativePose(
-  //   const geometry_msgs::msg::Pose & from, const std::string & to) ->
-  //   geometry_msgs::msg::Pose
-
-  // static auto getRelativePose(const std::string & from, const geometry_msgs::msg::Pose & to)
-  //   -> geometry_msgs::msg::Pose;
-
-  // auto EntityManager::getRelativePose(const std::string & from, const std::string & to)
-  //   -> geometry_msgs::msg::Pose
-
-  static auto getRelativePose(
-    const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
-    -> std::optional<geometry_msgs::msg::Pose>;
-
-  static auto getRelativePose(
-    const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
-    -> std::optional<geometry_msgs::msg::Pose>;
-
-  // auto EntityManager::getRelativePose(
-  //   const std::string & from, const CanonicalizedLaneletPose & to) ->
-  //   geometry_msgs::msg::Pose
-
-  // auto EntityManager::getRelativePose(
-  //   const CanonicalizedLaneletPose & from, const std::string & to) ->
-  //   geometry_msgs::msg::Pose
-
-  static auto get2DPolygon(const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
-    -> std::vector<geometry_msgs::msg::Point>;
 };
 
 }  // namespace traffic_simulator
