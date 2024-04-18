@@ -15,10 +15,20 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
 
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/static_transform_broadcaster.h>
+#include <tf2_ros/transform_broadcaster.h>
+
+#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <memory>
+#include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
 #include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+#include <stdexcept>
+#include <string>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
@@ -32,27 +42,15 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
-
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-#include <visualization_msgs/msg/marker_array.hpp>
-
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2_ros/static_transform_broadcaster.h>
-#include <tf2_ros/transform_broadcaster.h>
-
-#include <memory>
-#include <optional>
-#include <stdexcept>
-#include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 /// @todo find some shared space for this function
 template <typename T>
@@ -447,8 +445,7 @@ public:
 
   /**
    * @brief Reset behavior plugin of the target entity.
-   * The internal behavior is to take over the various parameters and save them, then respawn the
-   * Entity and set the parameters.
+   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
    * @param name The name of the target entity.
    * @param behavior_plugin_name The name of the behavior plugin you want to set.
    * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
@@ -500,8 +497,7 @@ public:
         entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
         entity_status.lanelet_pose_valid = true;
       } else {
-        /// @note If the entity is pedestrian or misc object, we have to consider matching to
-        /// crosswalk lanelet.
+        /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
         if (const auto lanelet_pose = toLaneletPose(
               pose, parameters.bounding_box,
               entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
