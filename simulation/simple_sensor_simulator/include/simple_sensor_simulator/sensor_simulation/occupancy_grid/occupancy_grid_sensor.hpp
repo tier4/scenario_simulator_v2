@@ -58,10 +58,12 @@ public:
 
   /**
    * @brief List all objects in range of sensor sight
+   * @warning `status` must contain EGO object
    * @return names of objects in range of sensor sight
    */
   const std::vector<std::string> getDetectedObjects(
-    const std::vector<traffic_simulator_msgs::EntityStatus> &) const;
+    const std::vector<traffic_simulator_msgs::EntityStatus> & status,
+    const std::vector<std::string> & lidar_detected_entities) const;
 
   /**
    * @brief Extract sensor pose from entity statuses
@@ -124,7 +126,7 @@ private:
 template <>
 auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp,
-  const std::vector<std::string> & lidar_detected_entity) -> nav_msgs::msg::OccupancyGrid;
+  const std::vector<std::string> & lidar_detected_entities) -> nav_msgs::msg::OccupancyGrid;
 }  // namespace simple_sensor_simulator
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__OCCUPANCY_GRID__OCCUPANCY_GRID_SENSOR_HPP_

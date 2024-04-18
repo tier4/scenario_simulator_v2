@@ -89,7 +89,7 @@ public:
 
   auto update(
     const double, const std::vector<traffic_simulator_msgs::EntityStatus> &, const rclcpp::Time &,
-    const std::vector<std::string> & lidar_detected_entity) -> void override;
+    const std::vector<std::string> & lidar_detected_entities) -> void override;
 };
 }  // namespace simple_sensor_simulator
 
