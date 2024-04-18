@@ -67,4 +67,11 @@
   EXPECT_STREQ(DATA0.architecture_type().c_str(), DATA1.architecture_type().c_str()); \
   EXPECT_DOUBLE_EQ(DATA0.update_duration(), DATA1.update_duration());
 
+#define EXPECT_DYNAMIC_CONSTRAINTS_EQ(DATA0, DATA1)                    \
+  EXPECT_EQ(DATA0.max_speed, DATA1.max_speed);                         \
+  EXPECT_EQ(DATA0.max_acceleration, DATA1.max_acceleration);           \
+  EXPECT_EQ(DATA0.max_deceleration, DATA1.max_deceleration);           \
+  EXPECT_EQ(DATA0.max_acceleration_rate, DATA1.max_acceleration_rate); \
+  EXPECT_EQ(DATA0.max_deceleration_rate, DATA1.max_deceleration_rate);
+
 #endif  // TRAFFIC_SIMULATOR__TEST__EXPECT_EQ_MACROS_HPP_

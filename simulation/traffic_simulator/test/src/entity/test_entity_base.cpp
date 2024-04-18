@@ -339,11 +339,7 @@ TEST(EntityBase, resetDynamicConstraints)
   dummy.resetDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
 
-  EXPECT_EQ(default_constraints.max_speed, current_constraints.max_speed);
-  EXPECT_EQ(default_constraints.max_acceleration, current_constraints.max_acceleration);
-  EXPECT_EQ(default_constraints.max_deceleration, current_constraints.max_deceleration);
-  EXPECT_EQ(default_constraints.max_acceleration_rate, current_constraints.max_acceleration_rate);
-  EXPECT_EQ(default_constraints.max_deceleration_rate, current_constraints.max_deceleration_rate);
+  EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
 TEST(EntityBase, setDynamicConstraints)
@@ -364,11 +360,7 @@ TEST(EntityBase, setDynamicConstraints)
   dummy.setDynamicConstraints(default_constraints);
   auto current_constraints = dummy.getDynamicConstraints();
 
-  EXPECT_EQ(default_constraints.max_speed, current_constraints.max_speed);
-  EXPECT_EQ(default_constraints.max_acceleration, current_constraints.max_acceleration);
-  EXPECT_EQ(default_constraints.max_deceleration, current_constraints.max_deceleration);
-  EXPECT_EQ(default_constraints.max_acceleration_rate, current_constraints.max_acceleration_rate);
-  EXPECT_EQ(default_constraints.max_deceleration_rate, current_constraints.max_deceleration_rate);
+  EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
 TEST(EntityBase, requestFollowTrajectory)
@@ -467,11 +459,11 @@ TEST(EntityBase, stopAtCurrentPosition)
   double velocity = 3.0;
   dummy.setLinearVelocity(velocity);
   auto curr_twist = dummy.getCurrentTwist();
-  EXPECT_TRUE(curr_twist.linear.x == velocity);
+  EXPECT_EQ(curr_twist.linear.x, velocity);
 
   dummy.stopAtCurrentPosition();
   curr_twist = dummy.getCurrentTwist();
-  EXPECT_TRUE(curr_twist.linear.x == 0.0);
+  EXPECT_EQ(curr_twist.linear.x, 0.0);
 }
 
 TEST(EntityBase, getDistanceToLeftLaneBound_one)
@@ -642,4 +634,64 @@ TEST(EntityBase, getDistanceToLaneBound_empty)
   tested variables depend on the fix which is to be implemented
   */
   throw std::runtime_error("Not implemented");
+}
+
+TEST(EntityBase, getDistanceToLeftLaneBound_many)
+{
+  const double entity_bounding_box_dims = 1.0;
+  const double entity_center_offset = -0.5;
+  lanelet::Id id_0 = 120659;
+  lanelet::Id id_1 = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
+  auto status = makeCanonicalizedEntityStatus(
+    hdmap_utils_ptr, pose, entity_bounding_box_dims, entity_center_offset);
+
+  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+
+  lanelet::Ids ids{id_0, id_1};
+  auto distance_result = dummy.getDistanceToLeftLaneBound(ids);
+  auto distance_actual = dummy.getDistanceToLeftLaneBound(id_0);
+  EXPECT_NEAR(distance_result, distance_actual, 0.1);
+}
+
+TEST(EntityBase, getDistanceToRightLaneBound_many)
+{
+  const double entity_bounding_box_dims = 1.0;
+  const double entity_center_offset = -0.5;
+  lanelet::Id id_0 = 120659;
+  lanelet::Id id_1 = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
+  auto status = makeCanonicalizedEntityStatus(
+    hdmap_utils_ptr, pose, entity_bounding_box_dims, entity_center_offset);
+
+  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+
+  lanelet::Ids ids{id_0, id_1};
+  auto distance_result = dummy.getDistanceToRightLaneBound(ids);
+  auto distance_actual = dummy.getDistanceToRightLaneBound(id_0);
+  EXPECT_NEAR(distance_result, distance_actual, 0.1);
+}
+
+TEST(EntityBase, getDistanceToLaneBound_many)
+{
+  const double entity_bounding_box_dims = 1.0;
+  const double entity_center_offset = -0.5;
+  lanelet::Id id_0 = 120659;
+  lanelet::Id id_1 = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
+  auto status = makeCanonicalizedEntityStatus(
+    hdmap_utils_ptr, pose, entity_bounding_box_dims, entity_center_offset);
+
+  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+
+  lanelet::Ids ids{id_0, id_1};
+  auto distance_result = dummy.getDistanceToLaneBound(ids);
+  auto distance_actual = dummy.getDistanceToLaneBound(id_0);
+  EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
