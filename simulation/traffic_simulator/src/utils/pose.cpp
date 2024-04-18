@@ -15,12 +15,36 @@
 #include <geometry/bounding_box.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
 
 namespace pose
 {
+
+auto getQuietNaNPose() -> geometry_msgs::msg::Pose
+{
+  return geometry_msgs::build<geometry_msgs::msg::Pose>()
+    .position(geometry_msgs::build<geometry_msgs::msg::Point>()
+                .x(std::numeric_limits<double>::quiet_NaN())
+                .y(std::numeric_limits<double>::quiet_NaN())
+                .z(std::numeric_limits<double>::quiet_NaN()))
+    .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
+}
+
+auto getQuietNaNLaneletPose() -> traffic_simulator::LaneletPose
+{
+  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
+    .lanelet_id(std::numeric_limits<std::int64_t>::max())
+    .s(std::numeric_limits<double>::quiet_NaN())
+    .offset(std::numeric_limits<double>::quiet_NaN())
+    .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+           .x(std::numeric_limits<double>::quiet_NaN())
+           .y(std::numeric_limits<double>::quiet_NaN())
+           .z(std::numeric_limits<double>::quiet_NaN()));
+}
+
 auto canonicalize(
   const LaneletPose & lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
@@ -96,8 +120,7 @@ auto makeNativeRelativeLanePosition(
   const auto lateral_distance =
     traffic_simulator::distance::getLateralDistance(from, to, allow_lane_change, hdmap_utils_ptr);
 
-  traffic_simulator::LaneletPose position =
-    traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+  traffic_simulator::LaneletPose position = traffic_simulator::pose::getQuietNaNLaneletPose();
   if (longitudinal_distance && lateral_distance) {
     position.s = longitudinal_distance.value();
     position.offset = lateral_distance.value();
@@ -121,8 +144,7 @@ auto makeNativeBoundingBoxRelativeLanePosition(
   const auto lateral_bb_distance = traffic_simulator::distance::getBoundingBoxLaneLateralDistance(
     from, from_bbox, to, to_bbox, allow_lane_change, hdmap_utils_ptr);
 
-  traffic_simulator::LaneletPose position =
-    traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+  traffic_simulator::LaneletPose position = traffic_simulator::pose::getQuietNaNLaneletPose();
   if (longitudinal_bb_distance && include_opposite_direction) {
     position.s = longitudinal_bb_distance.value();
     position.offset = lateral_bb_distance.value();

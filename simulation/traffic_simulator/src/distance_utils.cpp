@@ -149,8 +149,7 @@ auto DistanceUtils::makeNativeRelativeLanePosition(
   const auto lateral_distance =
     DistanceUtils::getLateralDistance(from, to, allow_lane_change, hdmap_utils_ptr);
 
-  traffic_simulator::LaneletPose position =
-    traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+  traffic_simulator::LaneletPose position = traffic_simulator::pose::getQuietNaNLaneletPose();
   if (longitudinal_distance && lateral_distance) {
     position.s = longitudinal_distance.value();
     position.offset = lateral_distance.value();
@@ -228,8 +227,7 @@ auto DistanceUtils::makeNativeBoundingBoxRelativeLanePosition(
   const auto lateral_bb_distance = DistanceUtils::getBoundingBoxLaneLateralDistance(
     from, from_bbox, to, to_bbox, allow_lane_change, hdmap_utils_ptr);
 
-  traffic_simulator::LaneletPose position =
-    traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+  traffic_simulator::LaneletPose position = traffic_simulator::pose::getQuietNaNLaneletPose();
   if (longitudinal_bb_distance && include_opposite_direction) {
     position.s = longitudinal_bb_distance.value();
     position.offset = lateral_bb_distance.value();

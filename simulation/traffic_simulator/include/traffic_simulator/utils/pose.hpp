@@ -24,6 +24,11 @@ namespace pose
 {
 using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;
 
+// Constructors
+auto getQuietNaNPose() -> geometry_msgs::msg::Pose;
+
+auto getQuietNaNLaneletPose() -> traffic_simulator::LaneletPose;
+
 // Conversions
 auto canonicalize(
   const LaneletPose & lanelet_pose,

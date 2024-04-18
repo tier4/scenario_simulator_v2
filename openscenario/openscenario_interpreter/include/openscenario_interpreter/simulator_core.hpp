@@ -132,7 +132,7 @@ public:
           traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
         return relative_pose.value();
       } else {
-        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
+        return traffic_simulator::pose::getQuietNaNPose();
       }
     }
 
@@ -145,7 +145,7 @@ public:
           traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
         return relative_pose.value();
       } else {
-        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
+        return traffic_simulator::pose::getQuietNaNPose();
       }
     }
 
@@ -158,7 +158,7 @@ public:
           traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
         return relative_pose.value();
       } else {
-        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
+        return traffic_simulator::pose::getQuietNaNPose();
       }
     }
 
@@ -171,7 +171,7 @@ public:
         return makeNativeRelativeLanePosition(
           from_entity_name, to_lanelet_pose_opt.value(), routing_algorithm);
       } else {
-        return traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+        return traffic_simulator::pose::getQuietNaNLaneletPose();
       }
     }
 
@@ -184,7 +184,7 @@ public:
         return makeNativeRelativeLanePosition(
           from_lanelet_pose_opt.value(), to_lanelet_pose, routing_algorithm);
       } else {
-        return traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+        return traffic_simulator::pose::getQuietNaNLaneletPose();
       }
     }
 
@@ -212,7 +212,7 @@ public:
           from_lanelet_pose_opt.value(), from_bbox, to_lanelet_pose_opt.value(), to_bbox,
           routing_algorithm);
       } else {
-        return traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+        return traffic_simulator::pose::getQuietNaNLaneletPose();
       }
     }
 
@@ -227,7 +227,7 @@ public:
         return makeNativeBoundingBoxRelativeLanePosition(
           from_lanelet_pose_opt.value(), from_bbox, to_lanelet_pose, to_bbox, routing_algorithm);
       } else {
-        return traffic_simulator::lanelet_pose::createQuietNaNLaneletPose();
+        return traffic_simulator::pose::getQuietNaNLaneletPose();
       }
     }
 
@@ -258,7 +258,7 @@ public:
           from_map_pose, from_bbox, to_map_pose, to_bbox)) {
         return relative_pose.value();
       } else {
-        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
+        return traffic_simulator::pose::getQuietNaNPose();
       }
     }
 
@@ -273,7 +273,7 @@ public:
           from_map_pose, from_bbox, to_map_pose, to_bbox)) {
         return relative_pose.value();
       } else {
-        return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
+        return traffic_simulator::pose::getQuietNaNPose();
       }
     }
   };
