@@ -2,12 +2,12 @@
 <OpenSCENARIO>
   <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
   <ParameterValueDistribution>
-    <ScenarioFile filepath="$(ros2 pkg prefix --share scenario_test_runner)/scenario/sample.xosc"/>
+    <ScenarioFile filepath="$(ros2 pkg prefix --share openscenario_interpreter)/test/parameter_value_distribution/sample.xosc"/>
     <Stochastic numberOfTestRuns="3">
       <StochasticDistribution parameterName="offset">
-        <PoissonDistribution expectedValue="1.0">
+        <UniformDistribution>
           <Range lowerLimit="-1.0" upperLimit="1.0"/>
-        </PoissonDistribution>
+        </UniformDistribution>
       </StochasticDistribution>
     </Stochastic>
   </ParameterValueDistribution>
