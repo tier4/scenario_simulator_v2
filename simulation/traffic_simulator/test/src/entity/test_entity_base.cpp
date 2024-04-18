@@ -115,36 +115,54 @@ auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
 }
 
 auto makeCanonicalizedLaneletPose(
-  std::shared_ptr<hdmap_utils::HdMapUtils> ptr, lanelet::Id id = 120659)
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils, const lanelet::Id id = 120659,
+  const double s = 0.0, const double offset = 0.0)
   -> traffic_simulator::lanelet_pose::CanonicalizedLaneletPose
 {
   return traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
-    traffic_simulator::helper::constructLaneletPose(id, 0, 0), ptr);
+    traffic_simulator::helper::constructLaneletPose(id, s, offset), hdmap_utils);
+}
+
+auto makeBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
+{
+  traffic_simulator_msgs::msg::BoundingBox bbox;
+  bbox.center.x = -1.0;
+  bbox.center.y = center_y;
+  bbox.dimensions.x = 4.0;
+  bbox.dimensions.y = 2.0;
+  bbox.dimensions.z = 1.5;
+  return bbox;
+}
+
+auto makeEntityStatus(
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose, const double speed = 0.0,
+  const double bbox_center_y = 0.0, const std::string name = "dummy_entity")
+  -> traffic_simulator::EntityStatus
+{
+  traffic_simulator::EntityStatus entity_status;
+  entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+  entity_status.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+  entity_status.time = 0.0;
+  entity_status.name = name;
+  entity_status.bounding_box = makeBoundingBox(bbox_center_y);
+  geometry_msgs::msg::Twist twist;
+  entity_status.action_status =
+    traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0);
+  entity_status.lanelet_pose_valid = true;
+  entity_status.lanelet_pose = static_cast<traffic_simulator::LaneletPose>(pose);
+  entity_status.pose = hdmap_utils->toMapPose(entity_status.lanelet_pose).pose;
+  return entity_status;
 }
 
 auto makeCanonicalizedEntityStatus(
-  std::shared_ptr<hdmap_utils::HdMapUtils> ptr,
-  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose, double bounding_box_dims = 1.0,
-  double center_offset = 0.0) -> traffic_simulator::entity_status::CanonicalizedEntityStatus
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose, const double speed = 0.0,
+  const double bbox_center_y = 0.0, const std::string name = "dummy_entity")
+  -> traffic_simulator::entity_status::CanonicalizedEntityStatus
 {
-  const std::string name("dummy_entity");
-  auto entity_status = traffic_simulator::EntityStatus();
-  entity_status.name = name;
-  entity_status.bounding_box =
-    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
-      .center(geometry_msgs::build<geometry_msgs::msg::Point>()
-                .x(center_offset)
-                .y(center_offset)
-                .z(center_offset))
-      .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                    .x(bounding_box_dims)
-                    .y(bounding_box_dims)
-                    .z(bounding_box_dims));
-  entity_status.lanelet_pose_valid = true;
-  entity_status.lanelet_pose = static_cast<traffic_simulator::LaneletPose>(pose);
-  entity_status.pose = ptr->toMapPose(entity_status.lanelet_pose).pose;
-
-  return traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, ptr);
+  return traffic_simulator::entity_status::CanonicalizedEntityStatus(
+    makeEntityStatus(hdmap_utils, pose, speed, bbox_center_y, name), hdmap_utils);
 }
 
 int main(int argc, char ** argv)
@@ -469,14 +487,13 @@ TEST(EntityBase, stopAtCurrentPosition)
 TEST(EntityBase, getDistanceToLeftLaneBound_one)
 {
   const double lane_width = 3.0;
-  const double entity_bounding_box_dims = 1.0;
+  const double entity_bounding_box_dims = 2.0;
   const double entity_center_offset = -0.5;
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto status = makeCanonicalizedEntityStatus(
-    hdmap_utils_ptr, pose, entity_bounding_box_dims, entity_center_offset);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, 0.0, entity_center_offset);
 
   auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
 
@@ -488,14 +505,13 @@ TEST(EntityBase, getDistanceToLeftLaneBound_one)
 TEST(EntityBase, getDistanceToRightLaneBound_one)
 {
   const double lane_width = 3.0;
-  const double entity_bounding_box_dims = 1.0;
+  const double entity_bounding_box_dims = 2.0;
   const double entity_center_offset = -0.5;
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto status = makeCanonicalizedEntityStatus(
-    hdmap_utils_ptr, pose, entity_bounding_box_dims, entity_center_offset);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, 0.0, entity_center_offset);
 
   auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
 
@@ -507,14 +523,13 @@ TEST(EntityBase, getDistanceToRightLaneBound_one)
 TEST(EntityBase, getDistanceToLaneBound_one)
 {
   const double lane_width = 3.0;
-  const double entity_bounding_box_dims = 1.0;
+  const double entity_bounding_box_dims = 2.0;
   const double entity_center_offset = -0.5;
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto status = makeCanonicalizedEntityStatus(
-    hdmap_utils_ptr, pose, entity_bounding_box_dims, entity_center_offset);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, 0.0, entity_center_offset);
 
   auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
 
@@ -638,15 +653,13 @@ TEST(EntityBase, getDistanceToLaneBound_empty)
 
 TEST(EntityBase, getDistanceToLeftLaneBound_many)
 {
-  const double entity_bounding_box_dims = 1.0;
   const double entity_center_offset = -0.5;
   lanelet::Id id_0 = 120659;
   lanelet::Id id_1 = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
-  auto status = makeCanonicalizedEntityStatus(
-    hdmap_utils_ptr, pose, entity_bounding_box_dims, entity_center_offset);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, 0.0, entity_center_offset);
 
   auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
 
@@ -658,15 +671,13 @@ TEST(EntityBase, getDistanceToLeftLaneBound_many)
 
 TEST(EntityBase, getDistanceToRightLaneBound_many)
 {
-  const double entity_bounding_box_dims = 1.0;
   const double entity_center_offset = -0.5;
   lanelet::Id id_0 = 120659;
   lanelet::Id id_1 = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
-  auto status = makeCanonicalizedEntityStatus(
-    hdmap_utils_ptr, pose, entity_bounding_box_dims, entity_center_offset);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, 0.0, entity_center_offset);
 
   auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
 
@@ -678,15 +689,13 @@ TEST(EntityBase, getDistanceToRightLaneBound_many)
 
 TEST(EntityBase, getDistanceToLaneBound_many)
 {
-  const double entity_bounding_box_dims = 1.0;
   const double entity_center_offset = -0.5;
   lanelet::Id id_0 = 120659;
   lanelet::Id id_1 = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
-  auto status = makeCanonicalizedEntityStatus(
-    hdmap_utils_ptr, pose, entity_bounding_box_dims, entity_center_offset);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, 0.0, entity_center_offset);
 
   auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
 
