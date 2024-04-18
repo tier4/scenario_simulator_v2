@@ -36,6 +36,7 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(entity.pose(), pose);
       ego_pose = pose;
+      ego_pose->position.z += entity.bounding_box().dimensions().z();
     } else {
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(entity.pose(), pose);
