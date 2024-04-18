@@ -15,66 +15,12 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_
 
-#include <geometry/bounding_box.hpp>
-#include <geometry/distance.hpp>
-#include <geometry/transform.hpp>
-#include <geometry_msgs/msg/point.hpp>
-#include <iostream>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
 {
-
-namespace distance
-{
-using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;
-using CanonicalizedEntityStatus = entity_status::CanonicalizedEntityStatus;
-
-// Pose
-/// @todo: they will be moved to separate class for "poses"
-auto canonicalize(
-  const LaneletPose & lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
-
-auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> const geometry_msgs::msg::Pose;
-
-auto toLaneletPose(
-  const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<CanonicalizedLaneletPose>;
-
-// RelativePose
-///@todo: they will be moved to separate class for "poses"
-auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
-  -> std::optional<geometry_msgs::msg::Pose>;
-
-auto getRelativePose(const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
-  -> std::optional<geometry_msgs::msg::Pose>;
-
-auto getRelativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
-  -> std::optional<geometry_msgs::msg::Pose>;
-
-///@todo: it will be moved to separate class for "poses"
-auto getBoundingBoxRelativePose(
-  const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const geometry_msgs::msg::Pose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox)
-  -> std::optional<geometry_msgs::msg::Pose>;
-
-///@todo: it will be moved to separate class for "poses"
-auto makeNativeRelativeLanePosition(
-  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> traffic_simulator::LaneletPose;
-
-///@todo: it will be moved to separate class for "poses"
-auto makeNativeBoundingBoxRelativeLanePosition(
-  const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
-  bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> traffic_simulator::LaneletPose;
-}  // namespace distance
 
 namespace distance
 {

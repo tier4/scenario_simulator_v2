@@ -23,6 +23,7 @@
 #include <openscenario_interpreter/syntax/unsigned_integer.hpp>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace openscenario_interpreter
 {
@@ -91,7 +92,7 @@ public:
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
-      return traffic_simulator::distance::canonicalize(non_canonicalized, core->getHdmapUtils());
+      return traffic_simulator::pose::canonicalize(non_canonicalized, core->getHdmapUtils());
     }
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
@@ -99,7 +100,7 @@ public:
     {
       if (
         const auto result =
-          traffic_simulator::distance::toLaneletPose(pose, false, core->getHdmapUtils())) {
+          traffic_simulator::pose::toLaneletPose(pose, false, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(
@@ -118,7 +119,7 @@ public:
       typename T, typename std::enable_if_t<std::is_same_v<T, NativeWorldPosition>, int> = 0>
     static auto convert(const NativeLanePosition & native_lane_position) -> NativeWorldPosition
     {
-      return traffic_simulator::distance::toMapPose(native_lane_position);
+      return traffic_simulator::pose::toMapPose(native_lane_position);
     }
 
     static auto makeNativeRelativeWorldPosition(
@@ -128,7 +129,7 @@ public:
       const auto to_map_pose = core->getEntity(to_entity_name)->getMapPose();
       if (
         const auto relative_pose =
-          traffic_simulator::distance::getRelativePose(from_map_pose, to_map_pose)) {
+          traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
         return relative_pose.value();
       } else {
         return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
@@ -141,7 +142,7 @@ public:
       const auto from_map_pose = core->getEntity(from_entity_name)->getMapPose();
       if (
         const auto relative_pose =
-          traffic_simulator::distance::getRelativePose(from_map_pose, to_map_pose)) {
+          traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
         return relative_pose.value();
       } else {
         return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
@@ -154,7 +155,7 @@ public:
       const auto to_map_pose = core->getEntity(to_entity_name)->getMapPose();
       if (
         const auto relative_pose =
-          traffic_simulator::distance::getRelativePose(from_map_pose, to_map_pose)) {
+          traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
         return relative_pose.value();
       } else {
         return traffic_simulator::lanelet_pose::createQuietNaNMapPose();
@@ -194,7 +195,7 @@ public:
     {
       checkRoutingAlgorithm(routing_algorithm);
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      return traffic_simulator::distance::makeNativeRelativeLanePosition(
+      return traffic_simulator::pose::makeNativeRelativeLanePosition(
         from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
     }
 
@@ -240,7 +241,7 @@ public:
     {
       checkRoutingAlgorithm(routing_algorithm);
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      return traffic_simulator::distance::makeNativeBoundingBoxRelativeLanePosition(
+      return traffic_simulator::pose::makeNativeBoundingBoxRelativeLanePosition(
         from_lanelet_pose, from_bbox, to_lanelet_pose, to_bbox, allow_lane_change,
         core->getHdmapUtils());
     }
@@ -253,7 +254,7 @@ public:
       const auto to_map_pose = core->getEntity(to_entity_name)->getMapPose();
       const auto to_bbox = core->getEntity(to_entity_name)->getBoundingBox();
       if (
-        const auto relative_pose = traffic_simulator::distance::getBoundingBoxRelativePose(
+        const auto relative_pose = traffic_simulator::pose::getBoundingBoxRelativePose(
           from_map_pose, from_bbox, to_map_pose, to_bbox)) {
         return relative_pose.value();
       } else {
@@ -268,7 +269,7 @@ public:
       const auto from_bbox = core->getEntity(from_entity_name)->getBoundingBox();
       const auto to_bbox = traffic_simulator_msgs::msg::BoundingBox();
       if (
-        const auto relative_pose = traffic_simulator::distance::getBoundingBoxRelativePose(
+        const auto relative_pose = traffic_simulator::pose::getBoundingBoxRelativePose(
           from_map_pose, from_bbox, to_map_pose, to_bbox)) {
         return relative_pose.value();
       } else {
@@ -582,7 +583,7 @@ public:
       const auto to_map_pose = static_cast<NativeWorldPosition>(osc_lane_position);
       if (
         const auto relative_pose =
-          traffic_simulator::distance::getRelativePose(from_map_pose, to_map_pose)) {
+          traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
         return static_cast<Double>(std::abs(
           quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
             .z));
