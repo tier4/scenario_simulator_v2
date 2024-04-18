@@ -12,20 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/utils/pose.hpp>
+
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <limits>
 #include <memory>
 #include <optional>
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
-#include <traffic_simulator/api/api.hpp>
 
 namespace traffic_simulator
 {
-void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbose); }
+void API::setVerbose(const bool verbose)
+{
+  entity_manager_ptr_->setVerbose(verbose);
+}
 
 bool API::despawn(const std::string & name)
 {
@@ -94,7 +99,7 @@ std::optional<double> API::getTimeHeadway(
 {
   const auto from_map_pose = getEntity(from_entity_name)->getMapPose();
   const auto to_map_pose = getEntity(to_entity_name)->getMapPose();
-  if (auto relative_pose_opt = DistanceUtils::getRelativePose(from_map_pose, to_map_pose);
+  if (auto relative_pose_opt = pose::getRelativePose(from_map_pose, to_map_pose);
       !relative_pose_opt || relative_pose_opt.value().position.x > 0) {
     return std::nullopt;
   } else if (const double ret = (relative_pose_opt.value().position.x * -1) /

@@ -59,6 +59,8 @@ boost_polygon toBoostPolygon(const std::vector<geometry_msgs::msg::Point> & poin
 geometry_msgs::msg::Pose toPose(const boost_point & point);
 geometry_msgs::msg::Pose subtractPoses(
   const geometry_msgs::msg::Pose & pose1, const geometry_msgs::msg::Pose & pose2);
+auto get2DPolygon(const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
+  -> std::vector<geometry_msgs::msg::Point>;
 const boost_polygon get2DPolygon(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox);
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(

@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
-#include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <memory>
+#include <string>
 #include <vector>
 
 namespace cpp_mock_scenarios
@@ -47,7 +50,7 @@ private:
     const auto from_lanelet_pose_opt = api_.getEntity(from_entity_name)->getLaneletPose();
     const auto to_lanelet_pose_opt = api_.getEntity(to_entity_name)->getLaneletPose();
     if (from_lanelet_pose_opt && to_lanelet_pose_opt) {
-      return traffic_simulator::DistanceUtils::getLateralDistance(
+      return traffic_simulator::distance::getLateralDistance(
         *from_lanelet_pose_opt, *to_lanelet_pose_opt, false, api_.getHdmapUtils());
     } else {
       return std::nullopt;
@@ -63,7 +66,7 @@ private:
     const auto to_lanelet_pose_opt =
       api_.getEntity(to_entity_name)->getLaneletPose(matching_distance);
     if (from_lanelet_pose_opt && to_lanelet_pose_opt) {
-      return traffic_simulator::DistanceUtils::getLateralDistance(
+      return traffic_simulator::distance::getLateralDistance(
         *from_lanelet_pose_opt, *to_lanelet_pose_opt, false, api_.getHdmapUtils());
     } else {
       return std::nullopt;
@@ -77,7 +80,7 @@ private:
     const auto from_lanelet_pose_opt = api_.getEntity(from_entity_name)->getLaneletPose();
     const auto to_lanelet_pose_opt = api_.getEntity(to_entity_name)->getLaneletPose();
     if (from_lanelet_pose_opt && to_lanelet_pose_opt) {
-      return traffic_simulator::DistanceUtils::getLongitudinalDistance(
+      return traffic_simulator::distance::getLongitudinalDistance(
         *from_lanelet_pose_opt, *to_lanelet_pose_opt, false, true, false, api_.getHdmapUtils());
 
     } else {

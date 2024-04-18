@@ -361,12 +361,6 @@ public:
 
   auto getCurrentTime() const noexcept -> double;
 
-  auto getDistanceToCrosswalk(const std::string & name, const lanelet::Id target_crosswalk_id)
-    -> std::optional<double>;
-
-  auto getDistanceToStopLine(const std::string & name, const lanelet::Id target_stop_line_id)
-    -> std::optional<double>;
-
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntity(const std::string & name) const
@@ -375,7 +369,8 @@ public:
     if (auto it = entities_.find(name); it != entities_.end()) {
       return it->second;
     } else {
-      return nullptr;
+      throw common::SemanticError(
+        "There was an attempt to get an entity named " + name + " - such an entity does not exist");
     }
   };
 
@@ -451,8 +446,7 @@ public:
 
   /**
    * @brief Reset behavior plugin of the target entity.
-   * The internal behavior is to take over the various parameters and save them, then respawn the
-   * Entity and set the parameters.
+   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
    * @param name The name of the target entity.
    * @param behavior_plugin_name The name of the behavior plugin you want to set.
    * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
@@ -504,8 +498,7 @@ public:
         entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
         entity_status.lanelet_pose_valid = true;
       } else {
-        /// @note If the entity is pedestrian or misc object, we have to consider matching to
-        /// crosswalk lanelet.
+        /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
         if (const auto lanelet_pose = toLaneletPose(
               pose, parameters.bounding_box,
               entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
