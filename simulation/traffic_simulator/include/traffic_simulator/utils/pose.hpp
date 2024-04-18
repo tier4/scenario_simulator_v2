@@ -19,7 +19,6 @@
 
 namespace traffic_simulator
 {
-
 namespace pose
 {
 using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;

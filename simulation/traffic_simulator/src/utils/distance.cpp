@@ -20,10 +20,8 @@
 
 namespace traffic_simulator
 {
-
 namespace distance
 {
-
 auto getLateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
@@ -280,6 +278,5 @@ auto getDistanceToStopLine(
     return spline.getCollisionPointIn2D(polygon);
   }
 }
-
 }  // namespace distance
 }  // namespace traffic_simulator

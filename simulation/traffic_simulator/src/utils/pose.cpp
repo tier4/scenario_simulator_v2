@@ -19,10 +19,8 @@
 
 namespace traffic_simulator
 {
-
 namespace pose
 {
-
 auto getQuietNaNPose() -> geometry_msgs::msg::Pose
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
@@ -151,6 +149,5 @@ auto makeNativeBoundingBoxRelativeLanePosition(
   }
   return position;
 }
-
 }  // namespace pose
 }  // namespace traffic_simulator
