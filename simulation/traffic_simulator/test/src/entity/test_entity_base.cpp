@@ -507,3 +507,56 @@ TEST(EntityBase, stopAtCurrentPosition)
   curr_twist = dummy.getCurrentTwist();
   EXPECT_TRUE(curr_twist.linear.x == 0.0);
 }
+
+auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
+{
+  std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+  geographic_msgs::msg::GeoPoint origin;
+  origin.latitude = 35.9037067912303;
+  origin.longitude = 139.9337945139059;
+  return std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
+}
+
+auto makeCanonicalizedLaneletPose(std::shared_ptr<hdmap_utils::HdMapUtils> ptr, lanelet::Id id = 120659)
+{
+  return traffic_simulator::lanelet_pose::CanonicalizedLaneletPose(
+    traffic_simulator::helper::constructLaneletPose(id, 0, 0), ptr);
+}
+
+auto makeCanonicalizedEntityStatus(std::shared_ptr<hdmap_utils::HdMapUtils> ptr, traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose)
+{
+  const double bounding_box_dims = 1.0;
+  const std::string name("test");
+  auto entity_status = traffic_simulator::EntityStatus();
+  entity_status.name = name;
+  entity_status.bounding_box =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
+      .center(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
+      .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+                    .x(bounding_box_dims)
+                    .y(bounding_box_dims)
+                    .z(bounding_box_dims));
+  entity_status.lanelet_pose_valid = true;
+  entity_status.lanelet_pose = static_cast<traffic_simulator::LaneletPose>(pose);
+  entity_status.pose = ptr->toMapPose(entity_status.lanelet_pose).pose;
+
+  return traffic_simulator::entity_status::CanonicalizedEntityStatus(entity_status, ptr);
+}
+
+TEST(EntityBase, getDistanceToLeftLaneBound)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose);
+
+  auto dummy = DummyEntity("test_name", status, hdmap_utils_ptr);
+
+  auto left = dummy.getDistanceToLeftLaneBound(id);
+  
+  const double lane_width = 3.0;
+  const double entity_bounding_box_dims = 1.0;
+  EXPECT_NEAR(left, (lane_width - entity_bounding_box_dims) / 2, 0.1);
+}
