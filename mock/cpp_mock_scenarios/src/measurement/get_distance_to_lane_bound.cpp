@@ -21,7 +21,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/distance_utils.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
@@ -47,7 +47,7 @@ private:
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     auto ego_entity = api_.getEntity("ego");
-    const auto distance = traffic_simulator::DistanceUtils::getDistanceToLaneBound(
+    const auto distance = traffic_simulator::distance::getDistanceToLaneBound(
       ego_entity->getStatus(), ego_entity->getRouteLanelets(), api_.getHdmapUtils());
     // LCOV_EXCL_START
     if (distance <= 0.4 && distance >= 0.52) {

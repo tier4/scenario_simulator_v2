@@ -22,7 +22,7 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/distance_utils.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 
 namespace traffic_simulator
 {
@@ -95,7 +95,7 @@ std::optional<double> API::getTimeHeadway(
 {
   const auto from_map_pose = getEntity(from_entity_name)->getMapPose();
   const auto to_map_pose = getEntity(to_entity_name)->getMapPose();
-  if (auto relative_pose_opt = DistanceUtils::getRelativePose(from_map_pose, to_map_pose);
+  if (auto relative_pose_opt = distance::getRelativePose(from_map_pose, to_map_pose);
       !relative_pose_opt || relative_pose_opt.value().position.x > 0) {
     return std::nullopt;
   } else if (const double ret = (relative_pose_opt.value().position.x * -1) /
