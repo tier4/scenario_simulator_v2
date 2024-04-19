@@ -87,6 +87,8 @@ public:
 
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &);
 
+  void setVelocityLimit(double linear_velocity) override;
+
   void setAccelerationLimit(double acceleration) override;
 
   void setAccelerationRateLimit(double acceleration_rate) override;

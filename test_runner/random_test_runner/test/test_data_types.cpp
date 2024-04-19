@@ -24,7 +24,7 @@ TEST(DataTypes, simulatorTypeFromString_correct)
 {
   EXPECT_EQ(
     simulatorTypeFromString("simple_sensor_simulator"), SimulatorType::SIMPLE_SENSOR_SIMULATOR);
-  EXPECT_EQ(simulatorTypeFromString("unity"), SimulatorType::UNITY);
+  EXPECT_EQ(simulatorTypeFromString("awsim"), SimulatorType::AWSIM);
 }
 
 TEST(DataTypes, simulatorTypeFromString_incorrect)
@@ -32,8 +32,8 @@ TEST(DataTypes, simulatorTypeFromString_incorrect)
   EXPECT_THROW(simulatorTypeFromString("unknown"), std::runtime_error);
   EXPECT_THROW(simulatorTypeFromString("simple_sensor_simulator "), std::runtime_error);
   EXPECT_THROW(simulatorTypeFromString(" simple_sensor_simulator"), std::runtime_error);
-  EXPECT_THROW(simulatorTypeFromString("unity "), std::runtime_error);
-  EXPECT_THROW(simulatorTypeFromString(" unity"), std::runtime_error);
+  EXPECT_THROW(simulatorTypeFromString("awsim "), std::runtime_error);
+  EXPECT_THROW(simulatorTypeFromString(" awsim"), std::runtime_error);
 }
 
 TEST(DataTypes, architectureTypeFromString_correct)

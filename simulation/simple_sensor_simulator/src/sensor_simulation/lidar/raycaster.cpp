@@ -119,12 +119,11 @@ const sensor_msgs::msg::PointCloud2 Raycaster::raycast(
   std::vector<pcl::PointCloud<pcl::PointXYZI>::Ptr> thread_cloud(thread_count);
 
   rtcCommitScene(scene_);
-  RTCIntersectContext context;
   for (unsigned int i = 0; i < threads.size(); ++i) {
     thread_cloud[i] = pcl::PointCloud<pcl::PointXYZI>::Ptr(new pcl::PointCloud<pcl::PointXYZI>());
     threads[i] = std::thread(
-      intersect, i, thread_count, scene_, thread_cloud[i], context, origin,
-      std::ref(thread_detected_ids[i]), max_distance, min_distance, std::ref(rotation_matrices_));
+      intersect, i, thread_count, scene_, thread_cloud[i], origin, std::ref(thread_detected_ids[i]),
+      max_distance, min_distance, std::ref(rotation_matrices_));
   }
   for (unsigned int i = 0; i < threads.size(); ++i) {
     threads[i].join();
