@@ -21,10 +21,8 @@
 
 namespace traffic_simulator
 {
-
 namespace distance
 {
-
 using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;
 using CanonicalizedEntityStatus = entity_status::CanonicalizedEntityStatus;
 

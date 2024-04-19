@@ -19,7 +19,6 @@
 
 namespace traffic_simulator
 {
-
 namespace pose
 {
 using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;
@@ -57,12 +56,12 @@ auto getBoundingBoxRelativePose(
   -> std::optional<geometry_msgs::msg::Pose>;
 
 // Relative LaneletPose
-auto makeNativeRelativeLanePosition(
+auto getRelativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> traffic_simulator::LaneletPose;
 
-auto makeNativeBoundingBoxRelativeLanePosition(
+auto getBoundingBoxRelativeLaneletPose(
   const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
   const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)

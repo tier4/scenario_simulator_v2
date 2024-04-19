@@ -43,13 +43,8 @@ WorldPosition::operator NativeWorldPosition() const
   native_world_position.position.x = x;
   native_world_position.position.y = y;
   native_world_position.position.z = z;
-  native_world_position.orientation = quaternion_operation::convertEulerAngleToQuaternion([&]() {
-    geometry_msgs::msg::Vector3 vector;
-    vector.x = r;
-    vector.y = p;
-    vector.z = h;
-    return vector;
-  }());
+  native_world_position.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    geometry_msgs::build<geometry_msgs::msg::Vector3>().x(r).y(p).z(h));
   return native_world_position;
 }
 }  // namespace syntax

@@ -106,6 +106,16 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
   return names;
 }
 
+auto EntityManager::getEntity(const std::string & name) const
+  -> std::shared_ptr<traffic_simulator::entity::EntityBase>
+{
+  if (auto it = entities_.find(name); it != entities_.end()) {
+    return it->second;
+  } else {
+    return nullptr;
+  }
+};
+
 auto EntityManager::getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus
 {
   if (const auto iter = entities_.find(name); iter == entities_.end()) {
