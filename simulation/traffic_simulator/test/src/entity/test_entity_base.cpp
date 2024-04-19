@@ -29,14 +29,6 @@ public:
     behavior_parameter = params;
   }
 
-  void appendToJobList(
-    const std::function<bool(const double)> & func_on_update,
-    const std::function<void()> & func_on_cleanup, traffic_simulator::job::Type type,
-    bool exclusive, const traffic_simulator::job::Event event)
-  {
-    job_list_.append(func_on_update, func_on_cleanup, type, exclusive, event);
-  }
-
   auto getCurrentAction() const -> std::string override { return {}; }
 
   auto getDefaultDynamicConstraints() const
@@ -94,14 +86,21 @@ public:
   void setAccelerationRateLimit(double) override {}
   void setDecelerationLimit(double) override {}
   void setDecelerationRateLimit(double) override {}
-  void requestSpeedChange(double, bool) override {}
-  void requestSpeedChange(const traffic_simulator::speed_change::RelativeTargetSpeed &, bool) override {}
   void requestAssignRoute(const std::vector<traffic_simulator::CanonicalizedLaneletPose> &) override {}
   void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override {}
   void requestAcquirePosition(const traffic_simulator::CanonicalizedLaneletPose &) override {}
   void requestAcquirePosition(const geometry_msgs::msg::Pose &) override {}
-  void requestSpeedChange(const double, const traffic_simulator::speed_change::Transition, const traffic_simulator::speed_change::Constraint, const bool) override {}
   // clang-format on
+
+  void appendToJobList(
+    const std::function<bool(const double)> & func_on_update,
+    const std::function<void()> & func_on_cleanup, traffic_simulator::job::Type type,
+    bool exclusive, const traffic_simulator::job::Event event)
+  {
+    job_list_.append(func_on_update, func_on_cleanup, type, exclusive, event);
+  }
+
+  std::optional<double> getTargetSpeed() { return target_speed_; }
 };
 
 auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
@@ -729,4 +728,87 @@ TEST(EntityBase, getDistanceToLaneBound_many)
   auto distance_result = dummy.getDistanceToLaneBound(ids);
   auto distance_actual = dummy.getDistanceToLaneBound(id_0);
   EXPECT_NEAR(distance_result, distance_actual, 0.1);
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteNotContinuous)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+
+  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+
+  const double target_speed = 3.0;
+  const bool continuous = false;
+
+  dummy.requestSpeedChange(target_speed, continuous);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  dummy.setLinearVelocity(target_speed);
+
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteContinuous)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+
+  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+
+  const double target_speed = 3.0;
+  const bool continuous = true;
+
+  dummy.requestSpeedChange(target_speed, continuous);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  dummy.setLinearVelocity(target_speed);
+
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteReached)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+
+  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+
+  const double target_speed = 3.0;
+  const bool continuous = false;
+
+  dummy.setLinearVelocity(target_speed);
+  dummy.requestSpeedChange(target_speed, continuous);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
 }
