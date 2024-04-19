@@ -111,9 +111,8 @@ TEST(ParameterValueDistribution, DistributionSet)
 TEST(ParameterValueDistribution, ValueSetDistribution)
 {
   using ament_index_cpp::get_package_share_directory;
-  using openscenario_interpreter::Double;
-  using openscenario_interpreter::String;
   using openscenario_interpreter::make;
+  using openscenario_interpreter::String;
 
   std::string path = get_package_share_directory("openscenario_interpreter") +
                      "/test/parameter_value_distribution/Deterministic.ValueSetDistribution.xosc";
@@ -123,6 +122,108 @@ TEST(ParameterValueDistribution, ValueSetDistribution)
   (*parameter_list)["LANE_ID"] = make<String>("34564");
   (*parameter_list)["offset"] = make<String>("1.0");
   expected_distribution.push_back(parameter_list);
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+// Histogram
+TEST(ParameterValueDistribution, Histogram)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.Histogram.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", -0.657155383483317367954157361964));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", -0.122937022973606868703200234449));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", -0.068217520040680490467366325902));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+TEST(ParameterValueDistribution, LogNormalDistribution)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.LogNormalDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+TEST(ParameterValueDistribution, NormalDistribution)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.NormalDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.793935916513793027426970638771));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.214115627062221924870044631461));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.050105047474801357731966078290));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+// PoissonDistribution
+TEST(ParameterValueDistribution, PoissonDistribution)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+  using openscenario_interpreter::make;
+  using openscenario_interpreter::String;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.PoissonDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 1.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 1.0));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+// ProbabilityDistribution
+TEST(ParameterValueDistribution, ProbabilityDistributionSet)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::String;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.ProbabilityDistributionSet.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "0.0"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1.0"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1.0"));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+// UniformDistribution
+TEST(ParameterValueDistribution, UniformDistribution)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.UniformDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.185689233033365264091685276071));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.688531488513196565648399882775));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.715891239979659754766316837049));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
