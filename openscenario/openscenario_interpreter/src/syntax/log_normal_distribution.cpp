@@ -31,6 +31,9 @@ LogNormalDistribution::LogNormalDistribution(
 {
 }
 
-auto LogNormalDistribution::derive() -> Object { return make<Double>(range.evaluate(distribute(random_engine))); }
+auto LogNormalDistribution::derive() -> Object
+{
+  return make<Double>(range.evaluate(distribute(random_engine)));
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
