@@ -2,6 +2,77 @@
 Changelog for package openscenario_utility
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.15.0 (2024-04-18)
+-------------------
+* Merge pull request `#1223 <https://github.com/tier4/scenario_simulator_v2/issues/1223>`_ from tier4/refactor/drop_workflow
+  Delete workflow feature and add alternative bash script
+* Merge branch 'master' into refactor/drop_workflow
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* refactor: delete workflow.Workflow and rename workflow.py to scenario.py
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.15.1 (2024-04-18)
+-------------------
+* Merge branch 'master' into fix/occluded-object-in-grid
+* Bump version of scenario_simulator_v2 from version 1.14.1 to version 1.15.0
+* Merge branch 'master' into fix/occluded-object-in-grid
+* Merge pull request `#1223 <https://github.com/tier4/scenario_simulator_v2/issues/1223>`_ from tier4/refactor/drop_workflow
+  Delete workflow feature and add alternative bash script
+* Merge branch 'master' into refactor/drop_workflow
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* refactor: delete workflow.Workflow and rename workflow.py to scenario.py
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, hakuturu583, ぐるぐる
+
+1.14.1 (2024-04-12)
+-------------------
+
+1.14.0 (2024-04-12)
+-------------------
+
+1.13.0 (2024-04-11)
+-------------------
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
+1.12.0 (2024-04-10)
+-------------------
+* Merge branch 'master' into feature/user-defined-controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge remote-tracking branch 'origin/master' into feature/user-defined-controller
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.11.3 (2024-04-09)
+-------------------
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.11.2 (2024-04-08)
+-------------------
+
 1.11.1 (2024-04-05)
 -------------------
 

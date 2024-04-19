@@ -58,7 +58,7 @@ OpenSCENARIO:
         ObjectController:
           CatalogReference:
             catalogName: all-in-one-controller
-            entryName: ego-controller
+            entryName: behavior_tree_plugin/VehicleBehaviorTree
       - name: vehicle-1
         CatalogReference:
           catalogName: all-in-one-vehicle
@@ -66,7 +66,7 @@ OpenSCENARIO:
         ObjectController:
           CatalogReference:
             catalogName: all-in-one-controller
-            entryName: default-object-controller
+            entryName: behavior_tree_plugin/VehicleBehaviorTree
       - name: vehicle-2
         CatalogReference:
           catalogName: all-in-one-vehicle
@@ -74,7 +74,7 @@ OpenSCENARIO:
         ObjectController:
           CatalogReference:
             catalogName: all-in-one-controller
-            entryName: default-object-controller
+            entryName: behavior_tree_plugin/VehicleBehaviorTree
       - name: barricade
         MiscObject:
           mass: 1.0
