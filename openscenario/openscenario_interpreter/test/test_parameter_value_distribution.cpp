@@ -31,64 +31,102 @@ using openscenario_interpreter::ParameterDistribution;
 using openscenario_interpreter::ParameterValueDistribution;
 using openscenario_interpreter::ParameterValueDistributionDefinition;
 
-class ParameterValueDistributionTester
+void checkParameterValueDistribution(const std::string path, const ParameterDistribution & expected)
 {
-public:
-  explicit ParameterValueDistributionTester(std::string path) : script{path}
-  {
-    OpenScenario script{path};
-  }
-  void check(const ParameterDistribution & expected)
-  {
-    auto & parameter_value_distribution = script.category.as<ParameterValueDistribution>();
-    ParameterDistribution derived_distribution = parameter_value_distribution.derive();
-    EXPECT_EQ(expected.size(), derived_distribution.size());
+  OpenScenario script{path};
+  auto actual = script.category.as<ParameterValueDistribution>().derive();
+  EXPECT_EQ(expected.size(), actual.size());
 
-    for (std::size_t i = 0; i < expected.size(); i++) {
-      const auto & expected_parameter_list = expected.at(i);
-      const auto & derived_parameter_list = derived_distribution.at(i);
-      EXPECT_EQ(expected_parameter_list->size(), derived_parameter_list->size());
-      for (const auto & expected_parameter : *expected_parameter_list) {
-        const auto & derived_parameter = derived_parameter_list->at(expected_parameter.first);
-        EXPECT_EQ(expected_parameter.second, derived_parameter);
+  for (std::size_t i = 0; i < expected.size(); i++) {
+    const auto & expected_parameter_list = expected.at(i);
+    const auto & actual_parameter_list = actual.at(i);
+    EXPECT_EQ(expected_parameter_list->size(), actual_parameter_list->size());
+    for (const auto & [expected_parameter_name, expected_parameter] : *expected_parameter_list) {
+      const auto & actual_parameter = actual_parameter_list->at(expected_parameter_name);
+      using openscenario_interpreter::Boolean;
+      using openscenario_interpreter::Double;
+      using openscenario_interpreter::Integer;
+      using openscenario_interpreter::String;
+      using openscenario_interpreter::UnsignedInt;
+      using openscenario_interpreter::UnsignedShort;
+      if (expected_parameter.is<Integer>()) {
+        EXPECT_EQ(expected_parameter.as<Integer>(), actual_parameter.as<Integer>());
+      } else if (expected_parameter.is<UnsignedInt>()) {
+        EXPECT_EQ(expected_parameter.as<UnsignedInt>(), actual_parameter.as<UnsignedInt>());
+      } else if (expected_parameter.is<UnsignedShort>()) {
+        EXPECT_EQ(expected_parameter.as<UnsignedShort>(), actual_parameter.as<UnsignedShort>());
+      } else if (expected_parameter.is<String>()) {
+        EXPECT_EQ(expected_parameter.as<String>(), actual_parameter.as<String>());
+      } else if (expected_parameter.is<Double>()) {
+        EXPECT_EQ(expected_parameter.as<Double>(), actual_parameter.as<Double>());
+      } else if (expected_parameter.is<Boolean>()) {
+        EXPECT_EQ(expected_parameter.as<Boolean>(), actual_parameter.as<Boolean>());
+      } else {
+        THROW_SYNTAX_ERROR(std::quoted(expected_parameter_name), "is unexpected type");
       }
     }
   }
+}
 
-private:
-  OpenScenario script;
-};
+template <typename T, typename U>
+auto makeParameterListSharedPtr(const std::string & name, U value)
+{
+  auto parameter_list = std::make_shared<openscenario_interpreter::ParameterList>();
+  (*parameter_list)[name] = openscenario_interpreter::make<T>(value);
+  return parameter_list;
+}
 
 TEST(ParameterValueDistribution, DistributionRange)
 {
   using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
 
   std::string path = get_package_share_directory("openscenario_interpreter") +
                      "/test/parameter_value_distribution/Deterministic.DistributionRange.xosc";
 
-  ParameterValueDistributionTester tester{path};
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", -1.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 1.0));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+TEST(ParameterValueDistribution, DistributionSet)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::String;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Deterministic.DistributionSet.xosc";
 
   ParameterDistribution expected_distribution;
-  {
-    auto parameter_list = std::make_shared<openscenario_interpreter::ParameterList>();
-    (*parameter_list)["offset"] =
-      openscenario_interpreter::make<openscenario_interpreter::Double>(-1.0);
-    expected_distribution.emplace_back(parameter_list);
-  }
-  {
-    auto parameter_list = std::make_shared<openscenario_interpreter::ParameterList>();
-    (*parameter_list)["offset"] =
-      openscenario_interpreter::make<openscenario_interpreter::Double>(0.0);
-    expected_distribution.emplace_back(parameter_list);
-  }
-  {
-    auto parameter_list = std::make_shared<openscenario_interpreter::ParameterList>();
-    (*parameter_list)["offset"] =
-      openscenario_interpreter::make<openscenario_interpreter::Double>(1.0);
-    expected_distribution.emplace_back(parameter_list);
-  }
-  tester.check(expected_distribution);
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("LANE_ID", "34510"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("LANE_ID", "34513"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("LANE_ID", "34564"));
+
+  checkParameterValueDistribution(path, expected_distribution);
 }
+
+TEST(ParameterValueDistribution, ValueSetDistribution)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+  using openscenario_interpreter::String;
+  using openscenario_interpreter::make;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Deterministic.ValueSetDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  auto parameter_list = std::make_shared<openscenario_interpreter::ParameterList>();
+  (*parameter_list)["LANE_ID"] = make<String>("34564");
+  (*parameter_list)["offset"] = make<String>("1.0");
+  expected_distribution.push_back(parameter_list);
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
 //
 // TEST(Error, Success)
 // {
