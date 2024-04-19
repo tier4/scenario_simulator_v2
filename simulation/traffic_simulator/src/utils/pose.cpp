@@ -123,8 +123,9 @@ auto getRelativeLaneletPose(
       hdmap_utils_ptr)) {
     position.s = longitudinal_distance.value();
   }
-  if (const auto lateral_distance = traffic_simulator::distance::getLateralDistance(
-        from, to, allow_lane_change, hdmap_utils_ptr);) {
+  if (
+    const auto lateral_distance = traffic_simulator::distance::getLateralDistance(
+      from, to, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_distance.value();
   }
   return position;
