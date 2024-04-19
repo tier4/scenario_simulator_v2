@@ -54,7 +54,7 @@ CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr, double offset = 0,
   double roll = 0, double pitch = 0, double yaw = 0)
 {
-  return traffic_simulator::PoseUtils::canonicalize(
+  return traffic_simulator::pose::canonicalize(
     traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
     hdmap_utils_ptr);
 }

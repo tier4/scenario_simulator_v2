@@ -55,6 +55,13 @@ auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> const geometry_
   return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 }
 
+auto toMapPose(
+  const LaneletPose & lanelet_pose,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose
+{
+  return hdmap_utils_ptr->toMapPose(lanelet_pose).pose;
+}
+
 auto toLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)

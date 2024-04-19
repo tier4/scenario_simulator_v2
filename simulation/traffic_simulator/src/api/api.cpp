@@ -12,25 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/utils/pose.hpp>
-
 #include <tf2/LinearMath/Quaternion.h>
 
 #include <limits>
 #include <memory>
 #include <optional>
+#include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <stdexcept>
 #include <string>
+#include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
-void API::setVerbose(const bool verbose)
-{
-  entity_manager_ptr_->setVerbose(verbose);
-}
+void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbose); }
 
 bool API::despawn(const std::string & name)
 {
@@ -118,7 +114,7 @@ auto API::setEntityStatus(
   EntityStatus status;
   status.time = getCurrentTime();
   status.bounding_box = getBoundingBox(name);
-  status.pose = PoseUtils::toMapPose(lanelet_pose);
+  status.pose = pose::toMapPose(lanelet_pose);
   status.name = name;
   status.action_status = action_status;
   status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose);

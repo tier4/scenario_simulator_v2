@@ -60,7 +60,7 @@ private:
       getVehicleParameters());
     api_.setLinearVelocity("ego", 7);
     api_.requestSpeedChange("ego", 7, true);
-    const geometry_msgs::msg::Pose goal_pose = traffic_simulator::PoseUtils::toMapPose(
+    const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34408, 0, 0, 0, 0, 0)));
     api_.requestAcquirePosition("ego", goal_pose);
   }

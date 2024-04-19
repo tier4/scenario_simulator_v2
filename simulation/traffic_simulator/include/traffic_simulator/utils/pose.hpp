@@ -35,6 +35,10 @@ auto canonicalize(
 
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> const geometry_msgs::msg::Pose;
 
+auto toMapPose(
+  const LaneletPose & lanelet_pose,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose;
+
 auto toLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
