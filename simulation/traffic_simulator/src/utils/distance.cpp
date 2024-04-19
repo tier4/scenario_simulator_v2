@@ -41,8 +41,9 @@ auto getLateralDistance(
     std::abs(static_cast<LaneletPose>(to).offset) <= matching_distance) {
     return traffic_simulator::distance::getLateralDistance(
       from, to, allow_lane_change, hdmap_utils_ptr);
+  } else {
+    return std::nullopt;
   }
-  return std::nullopt;
 }
 
 auto getLongitudinalDistance(
@@ -54,9 +55,9 @@ auto getLongitudinalDistance(
     auto to_canonicalized = static_cast<LaneletPose>(to);
     if (to.hasAlternativeLaneletPose()) {
       if (
-        const auto to_canonicalized_optional = to.getAlternativeLaneletPoseBaseOnShortestRouteFrom(
+        const auto to_canonicalized_opt = to.getAlternativeLaneletPoseBaseOnShortestRouteFrom(
           static_cast<LaneletPose>(from), hdmap_utils_ptr, allow_lane_change)) {
-        to_canonicalized = to_canonicalized_optional.value();
+        to_canonicalized = to_canonicalized_opt.value();
       }
     }
 
@@ -77,14 +78,16 @@ auto getLongitudinalDistance(
       return std::nullopt;
     }
   } else {
+    /// @todo here matching_distance should be passed
+    constexpr double matching_distance = 5.0;
     /**
      * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
      * A matching distance of about 1.5 lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
      */
     auto from_poses = hdmap_utils_ptr->toLaneletPoses(
-      static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPose>(from).lanelet_id, 5.0,
-      include_opposite_direction);
+      static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPose>(from).lanelet_id,
+      matching_distance, include_opposite_direction);
     from_poses.emplace_back(from);
     /**
      * @brief hard coded parameter!! 5.0 is a matching distance of the toLaneletPoses function.
@@ -92,9 +95,10 @@ auto getLongitudinalDistance(
      * Entity present on the adjacent Lanelet.
      */
     auto to_poses = hdmap_utils_ptr->toLaneletPoses(
-      static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPose>(to).lanelet_id, 5.0,
-      include_opposite_direction);
+      static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPose>(to).lanelet_id,
+      matching_distance, include_opposite_direction);
     to_poses.emplace_back(to);
+
     std::vector<double> distances = {};
     for (const auto & from_pose : from_poses) {
       for (const auto & to_pose : to_poses) {
@@ -107,13 +111,14 @@ auto getLongitudinalDistance(
         }
       }
     }
-    if (distances.empty()) {
+
+    if (!distances.empty()) {
+      return *std::min_element(distances.begin(), distances.end(), [](double a, double b) {
+        return std::abs(a) < std::abs(b);
+      });
+    } else {
       return std::nullopt;
     }
-    std::sort(distances.begin(), distances.end(), [](double a, double b) {
-      return std::abs(a) < std::abs(b);
-    });
-    return distances.front();
   }
 }
 
@@ -137,10 +142,9 @@ auto getBoundingBoxLaneLateralDistance(
     const auto from_bbox_distances = math::geometry::getDistancesFromCenterToEdge(from_bbox);
     const auto to_bbox_distances = math::geometry::getDistancesFromCenterToEdge(to_bbox);
     auto bbox_distance = 0.0;
-
-    if (lateral_distance.value() > 0) {
+    if (lateral_distance.value() > 0.0) {
       bbox_distance = -std::abs(from_bbox_distances.right) - std::abs(to_bbox_distances.left);
-    } else if (lateral_distance.value() < 0) {
+    } else if (lateral_distance.value() < 0.0) {
       bbox_distance = std::abs(from_bbox_distances.left) + std::abs(to_bbox_distances.right);
     }
     return lateral_distance.value() + bbox_distance;
@@ -161,7 +165,6 @@ auto getBoundingBoxLaneLongitudinalDistance(
     const auto from_bbox_distances = math::geometry::getDistancesFromCenterToEdge(from_bbox);
     const auto to_bbox_distances = math::geometry::getDistancesFromCenterToEdge(to_bbox);
     auto bbox_distance = 0.0;
-
     if (longitudinal_distance.value() > 0.0) {
       bbox_distance = -std::abs(from_bbox_distances.front) - std::abs(to_bbox_distances.rear);
     } else if (longitudinal_distance.value() < 0.0) {

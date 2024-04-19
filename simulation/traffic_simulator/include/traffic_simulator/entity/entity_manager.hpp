@@ -363,15 +363,7 @@ public:
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntity(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EntityBase>
-  {
-    if (auto it = entities_.find(name); it != entities_.end()) {
-      return it->second;
-    } else {
-      throw common::SemanticError(
-        "There was an attempt to get an entity named " + name + " - such an entity does not exist");
-    }
-  };
+    -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
   auto getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus;
 
