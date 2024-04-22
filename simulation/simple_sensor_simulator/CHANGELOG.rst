@@ -2,6 +2,287 @@
 Changelog for package simple_sensor_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.15.0 (2024-04-18)
+-------------------
+* Merge branch 'master' into refactor/drop_workflow
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Contributors: Kotaro Yoshimoto
+
+1.15.1 (2024-04-18)
+-------------------
+* Merge pull request `#1227 <https://github.com/tier4/scenario_simulator_v2/issues/1227>`_ from tier4/fix/occluded-object-in-grid
+  Exclude LiDAR occluded object on OccupancyGrid
+* Merge branch 'master' into fix/occluded-object-in-grid
+* Bump version of scenario_simulator_v2 from version 1.14.1 to version 1.15.0
+* Merge branch 'master' into fix/occluded-object-in-grid
+* Merge branch 'master' into refactor/drop_workflow
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* Fix spell
+* Exclude LiDAR occluded object from OccupancyGrid in simple_sensor_simulator
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, f0reachARR, hakuturu583, ぐるぐる
+
+1.14.1 (2024-04-12)
+-------------------
+
+1.14.0 (2024-04-12)
+-------------------
+
+1.13.0 (2024-04-11)
+-------------------
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Contributors: Kotaro Yoshimoto, yamacir-kit
+
+1.12.0 (2024-04-10)
+-------------------
+* Merge branch 'master' into feature/user-defined-controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge remote-tracking branch 'origin/master' into feature/user-defined-controller
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.11.3 (2024-04-09)
+-------------------
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.11.2 (2024-04-08)
+-------------------
+
+1.11.1 (2024-04-05)
+-------------------
+
+1.11.0 (2024-04-02)
+-------------------
+* Merge pull request `#1173 <https://github.com/tier4/scenario_simulator_v2/issues/1173>`_ from tier4/feature/arm_support
+  Feature/arm_build_test
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin/master' into feature/arm_support
+* Merge remote-tracking branch 'upstream/master' into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* fix compile error
+* remove IntersectContext
+* remove unused function
+* remove unused line
+* rename to new struct name
+  https://github.com/embree/embree/blob/be0accfd0b246e2b03355b8ee7710a22c1b49240/README.md?plain=1#L1360-L1361
+* remove some warnings
+* change header
+* add arm support branch
+* Contributors: Masaya Kataoka, Ubuntu, f0reachARR
+
+1.10.0 (2024-03-28)
+-------------------
+* Merge pull request `#1200 <https://github.com/tier4/scenario_simulator_v2/issues/1200>`_ from tier4/feature/simple_sensor_simulator/custom_noise
+  Feature/simple sensor simulator/custom noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Remove the upper limit `300.0` of the detection sensor range
+* Replace the word `TheEntity` with `EgoEntity`
+* Rename function argument `detected_object` to `detected_objects`
+* Update `DefaultNoiseApplicator` to hold reference to Ego entity's status
+* Simplify complex and inefficient function `filterObjectsBySensorRange`
+* Add new struct `CustomNoiseApplicator`
+* Rename variables to appropriate for the current class content
+* Move the process of applying noise to a new structure `DefaultNoise`
+* Add type U for ground truth to the template parameter of DetectionSensor
+* Split ROS message type object construction into some free functions
+* Move the DetectedObject construction to a new free function
+* Lipsticks
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+1.9.1 (2024-03-28)
+------------------
+
+1.9.0 (2024-03-27)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Merge remote-tracking branch 'origin/master' into HEAD
+* Merge remote-tracking branch 'origin/master' into random-test-runner-docs-update
+* Contributors: Masaya Kataoka, Paweł Lech, Piotr Zyskowski
+
+1.8.0 (2024-03-25)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
+* Contributors: Masaya Kataoka
+
+1.7.1 (2024-03-21)
+------------------
+
+1.7.0 (2024-03-21)
+------------------
+
+1.6.1 (2024-03-19)
+------------------
+
+1.6.0 (2024-03-14)
+------------------
+
+1.5.1 (2024-03-13)
+------------------
+
+1.5.0 (2024-03-12)
+------------------
+* Merge pull request `#1209 <https://github.com/tier4/scenario_simulator_v2/issues/1209>`_ from tier4/feature/ego_slope
+  Consider road slope in distance measurement and entity poses
+* doc: use 3 slashes to comment-out before doxygen command
+* fix: use fill_pitch option in EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* doc:
+* chore: apply formatter
+* fix(build)
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* chore: format
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+* chore: fix conflict resolving miss
+* doc: add note for origin orientation of grid map
+* fix: build error
+* chore: format
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* refactor: use consider_pose_by_road_slope instead of consider_lanelet_pose
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* update slop calculation logic
+* enable toggle setting
+* add consider_lanelet_slope member value
+* remove warnings
+* add considerLaneletSlope() function
+* consider lanalet slope
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+1.4.2 (2024-03-01)
+------------------
+
+1.4.1 (2024-02-29)
+------------------
+
+1.4.0 (2024-02-26)
+------------------
+* Merge pull request `#1163 <https://github.com/tier4/scenario_simulator_v2/issues/1163>`_ from tier4/fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+  fix(follow_trajectory_action): fix cooperation with Autoware, fix speed limits
+* fix(ego_entity_simulation): fix after merge
+* ref(ego_entity_simulation): apply clang reformat
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge branch 'master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* ref(sss): remove unused include
+* ref(sss,simulation_interface, ego_entity): apply ament_clang reformat
+* feat(ego_entity): provide FollowTrajectoryAction execution in EgoEntity, slight ref FollowTrajectoryAction
+* feat(sss): add option to overwrite Ego status
+* feat(zmq,sss): remove FollowPolylineTrajectoryRequest
+* Revert "feat(sss): allow target_speed and max_speed to be set in EgoEntitySimulation"
+  This reverts commit f8f70d2ae1b4c7c4b91ba0af8938bcadcfb71545.
+* ref(ego_entity_simulator, proto): review changes
+* ref(ego_entity_simulation): calc target_speed only for npc_logic_started
+* fx(ego_entity_simulation): fix commit 'fix ego target_speed'..
+* fix(ego_entity_simulation): fix ego target_speed without lanelet valid pose
+* ref(simulation): apply clang reformat
+* feat(sss): allow target_speed and max_speed to be set in EgoEntitySimulation
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki
+
+1.3.1 (2024-02-26)
+------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Contributors: Masaya Kataoka
+
+1.3.0 (2024-02-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Contributors: Kotaro Yoshimoto
+
+1.2.0 (2024-02-22)
+------------------
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge branch 'master' into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Contributors: Masaya Kataoka
+
+1.1.0 (2024-02-22)
+------------------
+* Merge pull request `#1182 <https://github.com/tier4/scenario_simulator_v2/issues/1182>`_ from tier4/feature/slope_vehicle_model
+  Consider road slope in ego vehicle simulation
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* chore: format
+* fix(EgoEntitySimulation)
+* refactor(EgoEntitySimulation): convert lane pose matching processing to getMatchedLaneletPoseFromEntityStatus function
+* fix: pass consider_acceleration_by_road_slope to inside of EgoEntitySimulator
+* doc: add notification to duplicated lane matching algorithm
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* chore: format
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* refactor(ego_entity_simulation): rename flag name for considering slope in ego entity simulation
+* feat(ego_entity_simulation): add flog for considering slope in ego entity simulation
+* feat(ego_entity_simulation): consider slope in ego entity simulation
+* doc: add memos to code
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 1.0.3 (2024-02-21)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description

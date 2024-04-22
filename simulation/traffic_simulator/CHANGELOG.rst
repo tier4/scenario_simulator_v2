@@ -2,6 +2,319 @@
 Changelog for package traffic_simulator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.15.0 (2024-04-18)
+-------------------
+* Merge branch 'master' into refactor/drop_workflow
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Contributors: Kotaro Yoshimoto
+
+1.15.1 (2024-04-18)
+-------------------
+* Merge branch 'master' into fix/occluded-object-in-grid
+* Bump version of scenario_simulator_v2 from version 1.14.1 to version 1.15.0
+* Merge branch 'master' into fix/occluded-object-in-grid
+* Merge branch 'master' into refactor/drop_workflow
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* Contributors: Kotaro Yoshimoto, hakuturu583, ぐるぐる
+
+1.14.1 (2024-04-12)
+-------------------
+
+1.14.0 (2024-04-12)
+-------------------
+
+1.13.0 (2024-04-11)
+-------------------
+* Merge pull request `#1216 <https://github.com/tier4/scenario_simulator_v2/issues/1216>`_ from tier4/feature/routing-algorithm
+  Implement `DistanceCondition` / `RelativeDistanceCondition` for `shortest` of `RoutingAlgorithm`
+* chore: apply linter
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* doc: add comment to connect documentation
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* chore: apply linter
+* Merge branch 'master' into feature/routing-algorithm
+* fix: HdMapUtils::getLongitudinalDistance for adjacent lane
+* feat: implement makeNativeBoundingBoxRelativeLanePosition for shortest routing algorithm
+* feat: implement getLongitudinalDistance with lane change
+* feat: implement getLateralDistance with lane change
+* Merge branch 'master' into feature/routing-algorithm
+* feat(traffic_simulator): add allow_lane_change option to getLongitudinalDistance methods
+* feat(HDMapUtils): add allow_lane_change option to getRoute method
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, yamacir-kit
+
+1.12.0 (2024-04-10)
+-------------------
+* Merge branch 'master' into feature/user-defined-controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge remote-tracking branch 'origin/master' into feature/user-defined-controller
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.11.3 (2024-04-09)
+-------------------
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.11.2 (2024-04-08)
+-------------------
+
+1.11.1 (2024-04-05)
+-------------------
+
+1.11.0 (2024-04-02)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin/master' into feature/arm_support
+* Merge remote-tracking branch 'upstream/master' into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin' into feature/arm_support
+* Contributors: Masaya Kataoka, f0reachARR
+
+1.10.0 (2024-03-28)
+-------------------
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge branch 'master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Merge remote-tracking branch 'origin/master' into feature/simple_sensor_simulator/custom_noise
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+1.9.1 (2024-03-28)
+------------------
+
+1.9.0 (2024-03-27)
+------------------
+* Merge pull request `#1210 <https://github.com/tier4/scenario_simulator_v2/issues/1210>`_ from tier4/feature/reset_behavior_plugin
+  Feature/reset behavior plugin
+* return const &
+* Update simulation/traffic_simulator/src/api/api.cpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Update simulation/traffic_simulator/src/api/api.cpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  Co-authored-by: Tatsuya Yamasaki <httperror@404-notfound.jp>
+* enable set jerk
+* fix compile errors
+* remvoe unused function definitions
+* remove isEgo function and add is<EntityType> function
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* Use capability query in get Vehicle/Pedestrian parameters functions.
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/reset_behavior_plugin
+* add doxygen comment
+* fix typo
+* enable reset behavior parameter
+* add resetBehaviorPlugin function
+* Merge remote-tracking branch 'origin/master' into HEAD
+* cleand up a bit
+* working
+* Merge remote-tracking branch 'origin/master' into random-test-runner-docs-update
+* Contributors: Masaya Kataoka, Paweł Lech, Piotr Zyskowski, Tatsuya Yamasaki
+
+1.8.0 (2024-03-25)
+------------------
+* Merge pull request `#1201 <https://github.com/tier4/scenario_simulator_v2/issues/1201>`_ from tier4/feature/set_behavior_parameter_in_object_controller
+  Feature/set behavior parameter in object controller
+* change <= to <
+* add todo comment
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/set_behavior_parameter_in_object_controller
+* add setVelocityLimit function
+* fix rviz
+* add test scenario
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+1.7.1 (2024-03-21)
+------------------
+
+1.7.0 (2024-03-21)
+------------------
+
+1.6.1 (2024-03-19)
+------------------
+
+1.6.0 (2024-03-14)
+------------------
+* Merge pull request `#1208 <https://github.com/tier4/scenario_simulator_v2/issues/1208>`_ from tier4/fix/lanelet-matching-distance
+  Fix/lanelet matching distance
+* make API::getDefaultMatchingDistanceForLaneletPoseCalculation to the private functions
+* Use correct entity parameters for lanelet matching
+* Simplify code
+* Use entity specific lanelet matching distance for setting entity status
+* Contributors: Masaya Kataoka, Mateusz Palczuk
+
+1.5.1 (2024-03-13)
+------------------
+
+1.5.0 (2024-03-12)
+------------------
+* Merge pull request `#1209 <https://github.com/tier4/scenario_simulator_v2/issues/1209>`_ from tier4/feature/ego_slope
+  Consider road slope in distance measurement and entity poses
+* doc: use 3 slashes to comment-out before doxygen command
+* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* chore: enable flag defaultly
+* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* fix: use consider_pose_by_road_slope flag in EntityManager::spawnEntity
+* feat: add fill_pitch option to HdMapUtils::toMapPose
+* fix: build error
+* fix: fit WorldPosition to lanelet in spawn function
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/include/simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp
+  #	simulation/simple_sensor_simulator/src/simple_sensor_simulator.cpp
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Merge remote-tracking branch 'origin/master' into feature/ego_slope
+* Merge branch 'master' into feature/ego_slope
+* update slop calculation logic
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Masaya Kataoka
+
+1.4.2 (2024-03-01)
+------------------
+
+1.4.1 (2024-02-29)
+------------------
+
+1.4.0 (2024-02-26)
+------------------
+* Merge pull request `#1163 <https://github.com/tier4/scenario_simulator_v2/issues/1163>`_ from tier4/fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+  fix(follow_trajectory_action): fix cooperation with Autoware, fix speed limits
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* ref(ego_entity): apply clang
+* fix(ego_entity): fix after merge
+* Merge remote-tracking branch 'origin/master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* Merge branch 'master' into fix/RJD-834_fix_follow_trajectory_action_autoware_cooperation
+* ref(follow_trajectory_action): apply review changes
+* ref(ego_entity): revert unnecessary changes
+* fix(ego_entity): remove unused arg
+* ref(sss,simulation_interface, ego_entity): apply ament_clang reformat
+* feat(ego_entity): provide FollowTrajectoryAction execution in EgoEntity, slight ref FollowTrajectoryAction
+* fear(follow_waypoint_controller): add check if remaining_time can be rounded - inf/nan
+* feat(ego_entity): update BT, overwrite only FollowTrajectoryAction
+* feat(follow_trajectory): improve invalid acc exception
+* Revert "feat(traffic_simulator): add zeromq to ego_entity, allow FTA, target_speed, max_speed to be set"
+  This reverts commit 4d150267eea2968317684dc568150283c78d0fb0.
+* ref(ego_entity_simulator, proto): review changes
+* fix(follow_trajectory): add missing header
+* ref(simulation): apply clang reformat
+* fix(traffic_simulator): remove conflicting exception
+* feat(follow_trajectory_action): waypoint passed case
+* fix(follow_waypoint_controller): fix no arrival time solution
+* fix(route_planner): provide waypoint setting in route_planner for FollowTrajectoryAction - VehicleEntity
+* feat(traffic_simulator): add zeromq to ego_entity, allow FTA, target_speed, max_speed to be set
+* ref(traffic_simulator): revert forwarding  requestFollowTrajectory
+* Contributors: Dawid Moszyński, Tatsuya Yamasaki
+
+1.3.1 (2024-02-26)
+------------------
+* Merge pull request `#1195 <https://github.com/tier4/scenario_simulator_v2/issues/1195>`_ from tier4/feature/split_rviz_packages
+  Feature/split rviz packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/split_rviz_packages
+* add include
+* apply reformat
+* fix package path
+* move packages
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+1.3.0 (2024-02-26)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+* Merge remote-tracking branch 'origin/master' into feature/mrm_behavior/pull_over
+  # Conflicts:
+  #	external/concealer/src/field_operator_application_for_autoware_universe.cpp
+* Contributors: Kotaro Yoshimoto
+
+1.2.0 (2024-02-22)
+------------------
+* Merge pull request `#1194 <https://github.com/tier4/scenario_simulator_v2/issues/1194>`_ from tier4/feature/default_matching_distance
+  Feature/default matching distance
+* Merge branch 'feature/default_matching_distance' of https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Update simulation/traffic_simulator/include/traffic_simulator/entity/entity_manager.hpp
+  Co-authored-by: Kotaro Yoshimoto <pythagora.yoshimoto@gmail.com>
+* Merge branch 'master' into feature/default_matching_distance
+* Merge branch 'feature/default_matching_distance' of https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* Merge https://github.com/tier4/scenario_simulator_v2 into feature/default_matching_distance
+* fix mathing algorithum
+* simplify code
+* passing matching distance for lanelet_pose_caluculation
+* fix document
+* fix copmile error
+* add getDefaultMatchingDistanceForLaneletPoseCalculation() for vehicle entity
+* add getDefaultMatchinDistance function
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+1.1.0 (2024-02-22)
+------------------
+* Merge pull request `#1182 <https://github.com/tier4/scenario_simulator_v2/issues/1182>`_ from tier4/feature/slope_vehicle_model
+  Consider road slope in ego vehicle simulation
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/slope_vehicle_model
+* Update simulation/traffic_simulator/src/entity/ego_entity.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* refactor(EgoEntitySimulation): convert lane pose matching processing to getMatchedLaneletPoseFromEntityStatus function
+* doc: add notification to duplicated lane matching algorithm
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+* Merge remote-tracking branch 'origin/master' into feature/slope_vehicle_model
+  # Conflicts:
+  #	simulation/simple_sensor_simulator/src/vehicle_simulation/ego_entity_simulation.cpp
+  #	test_runner/scenario_test_runner/launch/scenario_test_runner.launch.py
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 1.0.3 (2024-02-21)
 ------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/release_description

@@ -12,7 +12,7 @@ if(NOT CMAKE_CXX_STANDARD)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wpedantic -Werror) # -Wextra
+  add_compile_options(-Wall -Werror -Wextra -Wpedantic)
 endif()
 
 # find dependencies
@@ -35,15 +35,6 @@ include_directories(include
   SYSTEM
   ${OGRE_INCLUDE_DIRS})
 
-ament_auto_add_library(openscenario_visualization_component SHARED
-  src/openscenario_visualization_component.cpp
-)
-
-ament_auto_add_executable(openscenario_visualization_node
-  src/openscenario_visualization_node.cpp
-)
-target_link_libraries(openscenario_visualization_node openscenario_visualization_component)
-
 add_definitions(-DQT_NO_KEYWORDS)
 
 qt5_wrap_ui(UIC_FILES src/ui/context_panel_plugin.ui)
@@ -62,10 +53,6 @@ target_include_directories(openscenario_visualization_rviz_plugin PRIVATE "${OGR
 
 install(DIRECTORY icons DESTINATION share/openscenario_visualization)
 install(DIRECTORY include/ DESTINATION include)
-
-ament_export_libraries(openscenario_visualization_component)
-
-rclcpp_components_register_nodes(openscenario_visualization_component "openscenario_visualization::OpenscenarioVisualizationComponent")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

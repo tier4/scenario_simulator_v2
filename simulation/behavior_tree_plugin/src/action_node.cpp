@@ -65,6 +65,13 @@ auto ActionNode::getBlackBoardValues() -> void
     target_speed = std::nullopt;
   }
 
+  if (!getInput<double>(
+        "matching_distance_for_lanelet_pose_calculation",
+        default_matching_distance_for_lanelet_pose_calculation)) {
+    THROW_SIMULATION_ERROR(
+      "failed to get input matching_distance_for_lanelet_pose_calculation in ActionNode");
+  }
+
   if (!getInput<EntityStatusDict>("other_entity_status", other_entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status in ActionNode");
   }

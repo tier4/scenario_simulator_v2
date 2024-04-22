@@ -131,14 +131,12 @@ private:
   auto updateTrafficLights(const simulation_api_schema::UpdateTrafficLightsRequest &)
     -> simulation_api_schema::UpdateTrafficLightsResponse;
 
-  auto followPolylineTrajectory(const simulation_api_schema::FollowPolylineTrajectoryRequest &)
-    -> simulation_api_schema::FollowPolylineTrajectoryResponse;
-
   auto attachPseudoTrafficLightDetector(
     const simulation_api_schema::AttachPseudoTrafficLightDetectorRequest &)
     -> simulation_api_schema::AttachPseudoTrafficLightDetectorResponse;
 
   int getSocketPort();
+
   std::vector<traffic_simulator_msgs::VehicleParameters> ego_vehicles_;
   std::vector<traffic_simulator_msgs::VehicleParameters> vehicles_;
   std::vector<traffic_simulator_msgs::PedestrianParameters> pedestrians_;

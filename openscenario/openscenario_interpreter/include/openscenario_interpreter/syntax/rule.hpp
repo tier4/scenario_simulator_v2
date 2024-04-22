@@ -36,27 +36,27 @@ struct RuleResultDeduction<std::valarray<T>, U>
 {
   using type = std::valarray<bool>;
 };
-/* ---- Rule -------------------------------------------------------------------
- *
- * <xsd:simpleType name="Rule">
- *   <xsd:union>
- *     <xsd:simpleType>
- *       <xsd:restriction base="xsd:string">
- *         <xsd:enumeration value="equalTo"/>
- *         <xsd:enumeration value="greaterThan"/>
- *         <xsd:enumeration value="lessThan"/>
- *         <xsd:enumeration value="greaterOrEqual"/>
- *         <xsd:enumeration value="lessOrEqual"/>
- *         <xsd:enumeration value="notEqualTo"/>
- *       </xsd:restriction>
- *     </xsd:simpleType>
- *     <xsd:simpleType>
- *       <xsd:restriction base="parameter"/>
- *     </xsd:simpleType>
- *   </xsd:union>
- * </xsd:simpleType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Rule (OpenSCENARIO XML 1.3)
+
+   <xsd:simpleType name="Rule">
+     <xsd:union>
+       <xsd:simpleType>
+         <xsd:restriction base="xsd:string">
+           <xsd:enumeration value="equalTo"/>
+           <xsd:enumeration value="greaterThan"/>
+           <xsd:enumeration value="lessThan"/>
+           <xsd:enumeration value="greaterOrEqual"/>
+           <xsd:enumeration value="lessOrEqual"/>
+           <xsd:enumeration value="notEqualTo"/>
+         </xsd:restriction>
+       </xsd:simpleType>
+       <xsd:simpleType>
+         <xsd:restriction base="parameter"/>
+       </xsd:simpleType>
+     </xsd:union>
+   </xsd:simpleType>
+*/
 struct Rule
 {
   enum value_type {
@@ -68,7 +68,7 @@ struct Rule
     notEqualTo,
   } value;
 
-  explicit Rule() = default;
+  Rule() = default;
 
   explicit Rule(value_type value) : value(value) {}
 

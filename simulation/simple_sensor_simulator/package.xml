@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>1.0.3</version>
+  <version>1.15.1</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -39,7 +39,7 @@
   <depend>autoware_perception_msgs</depend>
   <depend>boost</depend>
   <depend>eigen</depend>
-  <depend>embree</depend>
+  <depend>embree_vendor</depend>
   <depend>libpcl-all-dev</depend>
   <depend>nav_msgs</depend>
   <depend>pcl_conversions</depend>
