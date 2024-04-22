@@ -93,13 +93,13 @@ auto SpeedProfileAction::apply(
   if (entity_ref) {
     actor.apply([&](const auto & object) {
       applySpeedAction(
-        object, absolute_target_speed(), transition(), constraint(),
+        object, relative_target_speed(), transition(), constraint(),
         std::isnan(speed_profile_entry.time));
     });
   } else {
     actor.apply([&](const auto & object) {
       applySpeedAction(
-        object, relative_target_speed(), transition(), constraint(),
+        object, absolute_target_speed(), transition(), constraint(),
         std::isnan(speed_profile_entry.time));
     });
   }
@@ -120,15 +120,15 @@ auto SpeedProfileAction::run() -> void
 {
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
-      auto evaluation = actor.apply([&](const auto & object) { return evaluateSpeed(object); });
-      if (not evaluation.size()) {
+      auto speeds = actor.apply([&](const auto & object) { return evaluateSpeed(object); });
+      if (not speeds.size()) {
         return true;
       } else if (entity_ref) {
-        return equal_to<std::valarray<double>>()(evaluation, speed_profile_entry.speed).min();
-      } else {
         return equal_to<std::valarray<double>>()(
-                 evaluation, speed_profile_entry.speed + evaluateSpeed(entity_ref))
+                 speeds, speed_profile_entry.speed + evaluateSpeed(entity_ref))
           .min();
+      } else {
+        return equal_to<std::valarray<double>>()(speeds, speed_profile_entry.speed).min();
       }
     };
 
