@@ -16,7 +16,6 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/controller.hpp>
-#include <openscenario_interpreter/syntax/double.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 
 namespace openscenario_interpreter
@@ -31,9 +30,9 @@ Controller::Controller(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto Controller::isUserDefinedController() const & -> bool
+auto Controller::isAutoware() const & -> bool
 {
-  return properties.get<Boolean>("isEgo");
+  return properties.get<Boolean>("isEgo") or name == traffic_simulator::VehicleBehavior::autoware();
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
