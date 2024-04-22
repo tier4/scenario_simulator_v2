@@ -5,7 +5,7 @@ project(openscenario_validator)
 find_package(ament_cmake REQUIRED)
 find_package(XercesC REQUIRED)
 
-file(READ configure/OpenSCENARIO-1.3.xsd ${PROJECT_NAME}_OPENSCENARIO_1_3_XSD)
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/configure/OpenSCENARIO-1.3.xsd ${PROJECT_NAME}_OPENSCENARIO_1_3_XSD)
 
 configure_file(configure/schema.cpp src/schema.cpp)
 
