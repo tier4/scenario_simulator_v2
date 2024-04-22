@@ -221,9 +221,9 @@ public:
   bool despawn(const std::string & name);
   bool despawnEntities();
 
-  void respawn(
+  auto respawn(
     const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
-    const geometry_msgs::msg::PoseStamped & goal_pose);
+    const geometry_msgs::msg::PoseStamped & goal_pose) -> void;
 
   auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
   auto setEntityStatus(

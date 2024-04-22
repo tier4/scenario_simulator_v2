@@ -102,11 +102,6 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override;
 
-  auto getVehicleParameters() const -> const traffic_simulator_msgs::msg::VehicleParameters override
-  {
-    THROW_SEMANTIC_ERROR("getVehicleParameters function cannot be used in MiscObjectEntity");
-  }
-
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) override;
 
   void setVelocityLimit(double) override{};

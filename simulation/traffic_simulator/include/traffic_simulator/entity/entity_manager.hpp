@@ -327,7 +327,6 @@ public:
   FORWARD_TO_ENTITY(setMapPose, );
   FORWARD_TO_ENTITY(setTwist, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
-  FORWARD_TO_ENTITY(getVehicleParameters, );
 
 #undef FORWARD_TO_ENTITY
 

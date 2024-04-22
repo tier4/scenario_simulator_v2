@@ -48,9 +48,9 @@ bool API::despawnEntities()
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
 
-void API::respawn(
+auto API::respawn(
   const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
-  const geometry_msgs::msg::PoseStamped & goal_pose)
+  const geometry_msgs::msg::PoseStamped & goal_pose) -> void
 {
   if (not entity_manager_ptr_->is<entity::EgoEntity>(name)) {
     throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
