@@ -18,7 +18,6 @@ public:
   {
   }
 
-  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override
   {
     return behavior_parameter;
@@ -49,9 +48,7 @@ public:
 
   auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override
   {
-    static traffic_simulator_msgs::msg::EntityType type;
-    type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
-    return type;
+    return entity_type;
   }
 
   auto getEntityTypename() const -> const std::string & override
@@ -91,6 +88,14 @@ public:
   void requestAcquirePosition(const traffic_simulator::CanonicalizedLaneletPose &) override {}
   void requestAcquirePosition(const geometry_msgs::msg::Pose &) override {}
   // clang-format on
+
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+  traffic_simulator_msgs::msg::EntityType entity_type;
+
+  void setEntityType(uint8_t value)
+  {
+    entity_type.type = value;
+  }
 
   void appendToJobList(
     const std::function<bool(const double)> & func_on_update,
@@ -811,4 +816,38 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteReached)
   dummy.setLinearVelocity(target_speed);
   dummy.requestSpeedChange(target_speed, continuous);
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarget)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+
+  auto bob_speed = 17.0;
+  auto delta_speed = 3.0;
+  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus> others;
+  others.emplace("hmmm", bob_status);
+  dummy.setOtherStatus(others);
+
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed("hmmm", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 3.0);
+  bool continuous = false;
+  dummy.requestSpeedChange(relative_taget_speed, continuous);
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(dummy.getTargetSpeed().value(), bob_speed + delta_speed);
+
+  // doesnt make any sense
+  // possible bug
+  // condition on 643 evaluates to false
+  // why 581 and 595 exist but here it doesnt?
 }
