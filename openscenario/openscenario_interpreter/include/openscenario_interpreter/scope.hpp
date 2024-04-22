@@ -194,7 +194,7 @@ public:
   std::list<EntityRef> actors;
 
   // NOTE: `random_engine` is used only for sharing random number generator in Stochastic now
-  std::mt19937 random_engine;
+  std::default_random_engine random_engine;
 
   Scope() = delete;
 
