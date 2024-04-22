@@ -37,7 +37,7 @@ EntityBase::EntityBase(const ScenarioObject & object) : Object(make(object)) {}
 EntityBase::EntityBase(const EntitySelection & object) : Object(make(object)) {}
 
 EntityBase::EntityBase(const String & name, const Scope & scope)
-: Object(scope.global().entities->ref(name))
+: Object(name.empty() ? nullptr : scope.global().entities->ref(name))
 {
 }
 
@@ -53,9 +53,9 @@ auto operator==(const EntityBase & left, const EntityBase & right) -> bool
 
 auto EntityBase::name() const -> String { return this->as<Scope>().name; }
 
-auto throwIfNotSingle(const Object & entity) -> void
+auto throwIfNotSingle(const SingleEntity & entity) -> void
 {
-  if (not entity.is<ScenarioObject>()) {
+  if (entity and not entity.is<ScenarioObject>()) {
     THROW_SEMANTIC_ERROR("Tried to reference `EntitySelection` where it is forbidden.");
   }
 }
