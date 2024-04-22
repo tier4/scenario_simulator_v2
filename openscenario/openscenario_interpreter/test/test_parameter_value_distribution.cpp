@@ -137,11 +137,11 @@ TEST(ParameterValueDistribution, Histogram)
 
   ParameterDistribution expected_distribution;
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -0.657155383483317367954157361964));
+    makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -0.122937022973606868703200234449));
+    makeParameterListSharedPtr<Double>("offset", -0.791349867976780196876518402860));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -0.068217520040680490467366325902));
+    makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
@@ -155,9 +155,12 @@ TEST(ParameterValueDistribution, LogNormalDistribution)
                      "/test/parameter_value_distribution/Stochastic.LogNormalDistribution.xosc";
 
   ParameterDistribution expected_distribution;
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.679981508546370405632330857770));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.032166799749118187012886238563));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.033371713868564217841949925969));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
@@ -172,11 +175,11 @@ TEST(ParameterValueDistribution, NormalDistribution)
 
   ParameterDistribution expected_distribution;
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", 0.793935916513793027426970638771));
+    makeParameterListSharedPtr<Double>("offset", -0.086242833039257865701543437353));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", 0.214115627062221924870044631461));
+    makeParameterListSharedPtr<Double>("offset", -0.768496409013107117935703627154));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", 0.050105047474801357731966078290));
+    makeParameterListSharedPtr<Double>("offset", 0.483866059556305461164527059736));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
@@ -194,8 +197,8 @@ TEST(ParameterValueDistribution, PoissonDistribution)
 
   ParameterDistribution expected_distribution;
   expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 1.0));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 1.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
@@ -211,9 +214,9 @@ TEST(ParameterValueDistribution, ProbabilityDistributionSet)
     "/test/parameter_value_distribution/Stochastic.ProbabilityDistributionSet.xosc";
 
   ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "-1.0"));
   expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "0.0"));
-  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1.0"));
-  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1.0"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "-1.0"));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
@@ -229,94 +232,14 @@ TEST(ParameterValueDistribution, UniformDistribution)
 
   ParameterDistribution expected_distribution;
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", 0.185689233033365264091685276071));
+    makeParameterListSharedPtr<Double>("offset", -0.736924424522478638266420603031));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", 0.688531488513196565648399882775));
+    makeParameterListSharedPtr<Double>("offset", -0.082699735953560393753036805720));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", 0.715891239979659754766316837049));
+    makeParameterListSharedPtr<Double>("offset", -0.562081627575042097610946711939));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
-
-//
-// TEST(Error, Success)
-// {
-//   using ament_index_cpp::get_package_share_directory;
-//
-//   auto node {
-//     std::make_shared<rclcpp::Node>("", rclcpp::NodeOptions())
-//   };
-//
-//   openscenario_interpreter::OpenScenario evaluate {
-//     get_package_share_directory("openscenario_interpreter") + "/test/success.xosc",
-//     node
-//   };
-//
-//   ASSERT_FALSE(evaluate.complete());
-//
-//   const auto begin {std::chrono::high_resolution_clock::now()};
-//
-//   using std::chrono_literals::operator""ms;
-//
-//   rclcpp::WallRate rate {50ms};
-//
-//   using openscenario_interpreter::complete_state;
-//
-//   for (evaluate.init(); evaluate() != complete_state; rate.sleep()) {
-//     ASSERT_LT(
-//       std::chrono::duration_cast<std::chrono::seconds>(
-//         std::chrono::high_resolution_clock::now() - begin).count(),
-//       20);
-//   }
-// }
-
-// TEST(Syntax, invalid)
-// {
-//   auto f = []()
-//   {
-//     openscenario_interpreter::OpenSCENARIO osc { XOSC("invalid-1.xosc") };
-//   };
-//
-//   EXPECT_THROW({ f(); }, openscenario_interpreter::SyntaxError);
-// }
-
-// TEST(Syntax, scenarioDefinition)
-// {
-//   using namespace openscenario_interpreter;
-//
-//   OpenSCENARIO osc { XOSC("example.xosc"), "127.0.0.1", 5555 };
-//
-//   // EXPECT_TRUE(osc.element("FileHeader"));
-//   // EXPECT_TRUE(osc.element("ParameterDeclarations"));
-//
-//   // EXPECT_EQ(osc["FileHeader"].revMajor(), 1);
-//   // EXPECT_TRUE(osc.catalog_locations);
-//   // EXPECT_TRUE(osc.entities);
-//   // EXPECT_TRUE(osc.parameter_declarations);
-//   // EXPECT_TRUE(osc.road_network);
-//   // EXPECT_TRUE(osc.storyboard);
-//
-//   EXPECT_TRUE(osc.evaluate().is<Boolean>());
-// }
-
-// TEST(Core, objectBinder)
-// {
-//   using openscenario_interpreter::make;
-//
-//   const auto foo {make<Double>(3.14)};
-//
-//   const auto result {foo.evaluate()};
-//
-//   EXPECT_TRUE(result.is<Double>());
-//   EXPECT_TRUE(result.as<Double>().data = 3.14);
-// }
-
-// TEST(Scenario, LaneChange)
-// {
-//   using namespace openscenario_interpreter;
-//
-//   OpenSCENARIO osc { XOSC("lane_change.xosc"), "127.0.0.1", 5555 };
-// }
 
 int main(int argc, char ** argv)
 {
