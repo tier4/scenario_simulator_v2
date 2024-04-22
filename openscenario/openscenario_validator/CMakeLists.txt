@@ -18,7 +18,7 @@ target_link_libraries(${PROJECT_NAME}
 
 include_directories(${XercesC_INCLUDE_DIRS} include)
 
-add_executable(validator
+add_executable(validate
   src/validator_command.cpp)
 
 target_link_libraries(validator
