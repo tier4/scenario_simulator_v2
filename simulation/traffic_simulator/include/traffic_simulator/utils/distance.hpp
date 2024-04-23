@@ -15,7 +15,6 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_
 
-#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
@@ -24,7 +23,6 @@ namespace traffic_simulator
 namespace distance
 {
 using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;
-using CanonicalizedEntityStatus = entity_status::CanonicalizedEntityStatus;
 
 // Lateral
 auto getLateralDistance(
@@ -63,27 +61,33 @@ auto getBoundingBoxLaneLongitudinalDistance(
 
 // Bounds
 auto getDistanceToLaneBound(
-  const CanonicalizedEntityStatus & status, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> double;
 
 auto getDistanceToLaneBound(
-  const CanonicalizedEntityStatus & status, const lanelet::Ids & lanelet_ids,
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
 
 auto getDistanceToLeftLaneBound(
-  const CanonicalizedEntityStatus & status, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> double;
 
 auto getDistanceToLeftLaneBound(
-  const CanonicalizedEntityStatus & status, const lanelet::Ids & lanelet_ids,
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
 
 auto getDistanceToRightLaneBound(
-  const CanonicalizedEntityStatus & status, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> double;
 
 auto getDistanceToRightLaneBound(
-  const CanonicalizedEntityStatus & status, const lanelet::Ids & lanelet_ids,
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
 
 // Other objects
