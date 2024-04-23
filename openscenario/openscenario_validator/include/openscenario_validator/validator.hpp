@@ -28,15 +28,6 @@
 
 namespace openscenario_validator
 {
-struct XMLPlatform
-{
-  XMLPlatform();
-
-  ~XMLPlatform();
-};
-
-static XMLPlatform platform{};
-
 class OpenSCENARIOValidator
 {
   struct ErrorHandler : public xercesc::HandlerBase
@@ -71,6 +62,30 @@ class OpenSCENARIOValidator
     }
   };
 
+  struct XMLPlatform
+  {
+    XMLPlatform()
+    {
+      if (not count++) {
+        xercesc::XMLPlatformUtils::Initialize();
+      }
+    }
+
+    ~XMLPlatform()
+    {
+      if (not --count) {
+        xercesc::XMLPlatformUtils::Terminate();
+      }
+    }
+    int count = 0;
+  };
+
+  static void initializeXMLPlatform()
+  {
+    // initialize XML platform once by singleton pattern
+    static XMLPlatform platform;
+  }
+
   xercesc::XercesDOMParser parser;
 
   ErrorHandler error_handler;
@@ -80,6 +95,7 @@ class OpenSCENARIOValidator
 public:
   explicit OpenSCENARIOValidator()
   {
+    initializeXMLPlatform();
     if (auto file = std::ofstream(schema_filepath, std::ios::trunc)) {
       file << schema;
     } else {

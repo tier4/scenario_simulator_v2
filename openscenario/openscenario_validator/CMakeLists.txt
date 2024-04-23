@@ -9,31 +9,21 @@ file(READ ${CMAKE_CURRENT_SOURCE_DIR}/configure/OpenSCENARIO-1.3.xsd ${PROJECT_N
 
 configure_file(configure/schema.cpp src/schema.cpp)
 
-add_library(${PROJECT_NAME} STATIC
-  src/schema.cpp
-  src/validator.cpp)
-
-target_link_libraries(${PROJECT_NAME}
-  XercesC::XercesC)
-
 include_directories(${XercesC_INCLUDE_DIRS} include)
+
+add_library(${PROJECT_NAME} STATIC src/schema.cpp)
+
+target_link_libraries(${PROJECT_NAME} ${XercesC_LIBRARIES})
 
 add_executable(validate
   src/validator_command.cpp)
 
-target_link_libraries(validator
-  ${PROJECT_NAME})
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-  CXX_EXTENSIONS OFF
-  CXX_STANDARD 17
-  CXX_STANDARD_REQUIRED ON)
+target_link_libraries(validate ${PROJECT_NAME})
 
 install(TARGETS ${PROJECT_NAME}
-  INCLUDES DESTINATION include/${PROJECT_NAME}
-  ARCHIVE DESTINATION lib/${PROJECT_NAME})
+  INCLUDES DESTINATION include/${PROJECT_NAME})
 
-install(TARGETS validator
+install(TARGETS validate
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
