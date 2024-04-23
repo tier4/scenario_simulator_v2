@@ -101,7 +101,7 @@ TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
 TEST(LongitudinalSpeedPlanner, getAccelerationDuration_zero)
 {
   // possible negative duration:
-  // longitudinal_speed_planning: 185, 199
+  // longitudinal_speed_planning.cpp: 185, 199
   auto planner = makeLongitudinalSpeedPlanner();
 
   geometry_msgs::msg::Twist current_twist{};
