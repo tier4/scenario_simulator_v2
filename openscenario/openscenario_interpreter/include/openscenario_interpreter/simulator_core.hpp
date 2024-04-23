@@ -496,18 +496,17 @@ public:
       const std::string & from_entity_name,
       const std::string & to_entity_name)  // for RelativeDistanceCondition
     {
-      const auto from_map_pose = core->getEntity(from_entity_name)->getMapPose();
-      const auto from_bbox = core->getEntity(from_entity_name)->getBoundingBox();
-      const auto to_map_pose = core->getEntity(to_entity_name)->getMapPose();
-      const auto to_bbox = core->getEntity(to_entity_name)->getBoundingBox();
-      if (
-        const auto distance = traffic_simulator::distance::getBoundingBoxDistance(
-          from_map_pose, from_bbox, to_map_pose, to_bbox)) {
-        return distance.value();
-      } else {
-        using value_type = typename std::decay<decltype(distance)>::type::value_type;
-        return std::numeric_limits<value_type>::quiet_NaN();
+      if (const auto from_entity = core->getEntity(from_entity_name)) {
+        if (const auto to_entity = core->getEntity(to_entity_name)) {
+          if (
+            const auto distance = traffic_simulator::distance::getBoundingBoxDistance(
+              from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
+              to_entity->getBoundingBox())) {
+            return distance.value();
+          }
+        }
       }
+      return std::numeric_limits<double>::quiet_NaN();
     }
 
     template <typename... Ts>
