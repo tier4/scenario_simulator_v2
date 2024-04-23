@@ -21,16 +21,16 @@ auto mergeParameterDistribution(
   -> ParameterDistribution
 {
   if (distribution.empty()) {
-    distribution.emplace_back(std::make_shared<ParameterList>());
+    distribution.emplace_back(std::make_shared<ParameterSet>());
   }
 
   ParameterDistribution merged_distribution;
   merged_distribution.reserve(distribution.size() * additional_distribution.size());
-  for (const ParameterListSharedPtr additional_parameter_list : additional_distribution) {
-    for (const ParameterListSharedPtr list : distribution) {
-      auto merged_list = ParameterList{*list};
-      merged_list.insert(additional_parameter_list->cbegin(), additional_parameter_list->cend());
-      merged_distribution.emplace_back(std::make_shared<ParameterList>(merged_list));
+  for (const ParameterSetSharedPtr additional_parameter_set : additional_distribution) {
+    for (const ParameterSetSharedPtr parameter_set : distribution) {
+      auto merged_set = ParameterSet{*parameter_set};
+      merged_set.insert(additional_parameter_set->cbegin(), additional_parameter_set->cend());
+      merged_distribution.emplace_back(std::make_shared<ParameterSet>(merged_set));
     }
   }
   return merged_distribution;

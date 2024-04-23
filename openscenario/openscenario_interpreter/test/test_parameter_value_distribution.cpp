@@ -71,9 +71,9 @@ void checkParameterValueDistribution(const std::string path, const ParameterDist
 template <typename T, typename U>
 auto makeParameterListSharedPtr(const std::string & name, U value)
 {
-  auto parameter_list = std::make_shared<openscenario_interpreter::ParameterList>();
-  (*parameter_list)[name] = openscenario_interpreter::make<T>(value);
-  return parameter_list;
+  auto parameter_set = std::make_shared<openscenario_interpreter::ParameterSet>();
+  (*parameter_set)[name] = openscenario_interpreter::make<T>(value);
+  return parameter_set;
 }
 
 TEST(ParameterValueDistribution, DistributionRange)
@@ -118,10 +118,10 @@ TEST(ParameterValueDistribution, ValueSetDistribution)
                      "/test/parameter_value_distribution/Deterministic.ValueSetDistribution.xosc";
 
   ParameterDistribution expected_distribution;
-  auto parameter_list = std::make_shared<openscenario_interpreter::ParameterList>();
-  (*parameter_list)["LANE_ID"] = make<String>("34564");
-  (*parameter_list)["offset"] = make<String>("1.0");
-  expected_distribution.push_back(parameter_list);
+  auto parameter_set = std::make_shared<openscenario_interpreter::ParameterSet>();
+  (*parameter_set)["LANE_ID"] = make<String>("34564");
+  (*parameter_set)["offset"] = make<String>("1.0");
+  expected_distribution.push_back(parameter_set);
 
   checkParameterValueDistribution(path, expected_distribution);
 }
