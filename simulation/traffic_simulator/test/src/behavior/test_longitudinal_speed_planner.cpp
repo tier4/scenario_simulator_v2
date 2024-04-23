@@ -194,7 +194,7 @@ TEST(LongitudinalSpeedPlanner, planConstraintsFromJerkAndTimeConstraint_accelera
   constraints.max_acceleration_rate = 1.0;
   constraints.max_deceleration_rate = 1.0;
 
-  const double epsilon = 1e5;
+  const double epsilon = 1e-5;
   const double acceleration_duration = 1.0;
   const double plausible_lower_bound = 0.0;
   const double plausible_upper_bound = 1e2;
@@ -234,7 +234,7 @@ TEST(LongitudinalSpeedPlanner, planConstraintsFromJerkAndTimeConstraint_decelera
   constraints.max_acceleration_rate = 1.0;
   constraints.max_deceleration_rate = 1.0;
 
-  const double epsilon = 1e5;
+  const double epsilon = 1e-5;
   const double acceleration_duration = 1.0;
   const double plausible_lower_bound = 0.0;
   const double plausible_upper_bound = 1e2;
