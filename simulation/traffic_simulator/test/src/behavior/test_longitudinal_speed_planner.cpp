@@ -95,7 +95,7 @@ TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
 
   const double result_duration =
     planner.getAccelerationDuration(target_speed, constraints, current_twist, current_accel);
-  EXPECT_TRUE(std::abs(expected_duration - result_duration) < epsilon);
+  EXPECT_NEAR(result_duration, expected_duration, epsilon);
 }
 
 TEST(LongitudinalSpeedPlanner, getAccelerationDuration_zero)
