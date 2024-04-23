@@ -1,3 +1,17 @@
+// Copyright 2015 TIER IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -832,10 +846,10 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarge
   auto delta_speed = 3.0;
   auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
   std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus> others;
-  others.emplace("hmmm", bob_status);
+  others.emplace("bob_entity", bob_status);
   dummy.setOtherStatus(others);
 
-  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed("hmmm", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 3.0);
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed("bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
   bool continuous = false;
   dummy.requestSpeedChange(relative_taget_speed, continuous);
 
