@@ -60,7 +60,7 @@ def default_autoware_launch_file_of(architecture_type):
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
-    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe")
+    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20230906")
     autoware_launch_file                = LaunchConfiguration("autoware_launch_file",                   default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
@@ -81,7 +81,6 @@ def launch_setup(context, *args, **kwargs):
     sigterm_timeout                     = LaunchConfiguration("sigterm_timeout",                        default=8)
     use_sim_time                        = LaunchConfiguration("use_sim_time",                           default=False)
     vehicle_model                       = LaunchConfiguration("vehicle_model",                          default="")
-    workflow                            = LaunchConfiguration("workflow",                               default=Path("/dev/null"))
     # fmt: on
 
     print(f"architecture_type                   := {architecture_type.perform(context)}")
@@ -104,7 +103,6 @@ def launch_setup(context, *args, **kwargs):
     print(f"sigterm_timeout                     := {sigterm_timeout.perform(context)}")
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
-    print(f"workflow                            := {workflow.perform(context)}")
 
     def make_parameters():
         parameters = [
@@ -157,7 +155,6 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("sigterm_timeout",                     default_value=sigterm_timeout                    ),
         DeclareLaunchArgument("use_sim_time",                        default_value=use_sim_time                       ),
         DeclareLaunchArgument("vehicle_model",                       default_value=vehicle_model                      ),
-        DeclareLaunchArgument("workflow",                            default_value=workflow                           ),
         # fmt: on
         Node(
             package="scenario_test_runner",
@@ -173,7 +170,6 @@ def launch_setup(context, *args, **kwargs):
                 "--global-timeout",          global_timeout,
                 "--output-directory",        output_directory,
                 "--scenario",                scenario,
-                "--workflow",                workflow,
                 # fmt: on
             ],
         ),
