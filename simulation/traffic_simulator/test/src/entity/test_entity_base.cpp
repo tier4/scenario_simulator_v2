@@ -106,10 +106,7 @@ public:
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   traffic_simulator_msgs::msg::EntityType entity_type;
 
-  void setEntityType(uint8_t value)
-  {
-    entity_type.type = value;
-  }
+  void setEntityType(uint8_t value) { entity_type.type = value; }
 
   void appendToJobList(
     const std::function<bool(const double)> & func_on_update,
@@ -197,7 +194,7 @@ TEST(EntityBase, asFieldOperatorApplication)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   EXPECT_THROW(dummy.asFieldOperatorApplication(), std::runtime_error);
 }
@@ -209,7 +206,7 @@ TEST(EntityBase, startNpcLogic)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   EXPECT_FALSE(dummy.isNpcLogicStarted());
   dummy.startNpcLogic();
@@ -223,7 +220,7 @@ TEST(EntityBase, activateOutOfRangeJob_speed)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   double min_velocity = 0.0;
   double max_velocity = 0.0;
@@ -248,7 +245,7 @@ TEST(EntityBase, activateOutOfRangeJob_acceleration)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   double min_velocity = -100.0;
   double max_velocity = 100.0;
@@ -273,7 +270,7 @@ TEST(EntityBase, activateOutOfRangeJob_jerk)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   double min_velocity = -100.0;
   double max_velocity = 100.0;
@@ -298,7 +295,7 @@ TEST(EntityBase, onUpdate)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   bool first_cleanup = false;
   bool first_update = false;
@@ -338,7 +335,7 @@ TEST(EntityBase, onPostUpdate)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   bool first_cleanup = false;
   bool first_update = false;
@@ -378,7 +375,7 @@ TEST(EntityBase, resetDynamicConstraints)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   dummy.resetDynamicConstraints();
@@ -394,7 +391,7 @@ TEST(EntityBase, setDynamicConstraints)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   traffic_simulator_msgs::msg::DynamicConstraints default_constraints{};
 
@@ -416,9 +413,9 @@ TEST(EntityBase, requestFollowTrajectory)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> ptr = nullptr;
+  auto ptr = std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>();
   EXPECT_THROW(dummy.requestFollowTrajectory(ptr), std::runtime_error);
 }
 
@@ -429,7 +426,7 @@ TEST(EntityBase, requestWalkStraight)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   EXPECT_THROW(dummy.requestWalkStraight(), std::runtime_error);
 }
@@ -441,7 +438,7 @@ TEST(EntityBase, updateStandStillDuration_startedMoving)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   dummy.startNpcLogic();
   dummy.setLinearVelocity(3.0);
@@ -456,7 +453,7 @@ TEST(EntityBase, updateStandStillDuration_notStarted)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   dummy.setLinearVelocity(3.0);
   EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
@@ -472,7 +469,7 @@ TEST(EntityBase, updateTraveledDistance_startedMoving)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   double velocity = 3.0;
   double step_time = 0.1;
@@ -489,7 +486,7 @@ TEST(EntityBase, updateTraveledDistance_notStarted)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   double velocity = 3.0;
   double step_time = 0.1;
@@ -507,7 +504,7 @@ TEST(EntityBase, stopAtCurrentPosition)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   double velocity = 3.0;
   dummy.setLinearVelocity(velocity);
@@ -530,7 +527,7 @@ TEST(EntityBase, getDistanceToLeftLaneBound_one)
   auto bbox = makeBoundingBox(entity_center_offset);
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   auto distance_result = dummy.getDistanceToLeftLaneBound(id);
   double distance_actual = (lane_width - bbox.dimensions.y) / 2 - entity_center_offset;
@@ -548,7 +545,7 @@ TEST(EntityBase, getDistanceToRightLaneBound_one)
   auto bbox = makeBoundingBox(entity_center_offset);
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   auto distance_result = dummy.getDistanceToRightLaneBound(id);
   double distance_actual = (lane_width - bbox.dimensions.y) / 2 + entity_center_offset;
@@ -566,7 +563,7 @@ TEST(EntityBase, getDistanceToLaneBound_one)
   auto bbox = makeBoundingBox(entity_center_offset);
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   auto distance_result = dummy.getDistanceToLaneBound(id);
   double distance_actual = std::min(
@@ -584,7 +581,7 @@ TEST(EntityBase, getDistanceToLeftLaneBound)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   /* 
   auto distance = dummy.getDistanceToLeftLaneBound();
@@ -603,7 +600,7 @@ TEST(EntityBase, getDistanceToRightLaneBound)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   /*
   auto distance = dummy.getDistanceToRightLaneBound();
@@ -622,7 +619,7 @@ TEST(EntityBase, getDistanceToLaneBound)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   /*
   auto distance = dummy.getDistanceToLaneBound();
@@ -641,7 +638,7 @@ TEST(EntityBase, getDistanceToLeftLaneBound_empty)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   auto ids = std::vector<lanelet::Id>{};
 
   /*
@@ -661,7 +658,7 @@ TEST(EntityBase, getDistanceToRightLaneBound_empty)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   auto ids = std::vector<lanelet::Id>{};
 
   /*
@@ -681,7 +678,7 @@ TEST(EntityBase, getDistanceToLaneBound_empty)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   auto ids = std::vector<lanelet::Id>{};
 
   /*
@@ -703,7 +700,7 @@ TEST(EntityBase, getDistanceToLeftLaneBound_many)
   auto bbox = makeBoundingBox(entity_center_offset);
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   lanelet::Ids ids{id_0, id_1};
   auto distance_result = dummy.getDistanceToLeftLaneBound(ids);
@@ -722,7 +719,7 @@ TEST(EntityBase, getDistanceToRightLaneBound_many)
   auto bbox = makeBoundingBox(entity_center_offset);
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   lanelet::Ids ids{id_0, id_1};
   auto distance_result = dummy.getDistanceToRightLaneBound(ids);
@@ -741,7 +738,7 @@ TEST(EntityBase, getDistanceToLaneBound_many)
   auto bbox = makeBoundingBox(entity_center_offset);
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   lanelet::Ids ids{id_0, id_1};
   auto distance_result = dummy.getDistanceToLaneBound(ids);
@@ -758,7 +755,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteNotContinuous)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
 
   const double target_speed = 3.0;
@@ -789,7 +786,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteContinuous)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
 
   const double target_speed = 3.0;
@@ -821,7 +818,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteReached)
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
 
   const double target_speed = 3.0;
@@ -840,16 +837,18 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarge
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
   auto bbox = makeBoundingBox();
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-  auto dummy = DummyEntity("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   auto bob_speed = 17.0;
   auto delta_speed = 3.0;
   auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
-  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus> others;
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
+    others;
   others.emplace("bob_entity", bob_status);
   dummy.setOtherStatus(others);
 
-  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed("bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
+    "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
   bool continuous = false;
   dummy.requestSpeedChange(relative_taget_speed, continuous);
 
