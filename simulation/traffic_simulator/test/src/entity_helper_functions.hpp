@@ -20,9 +20,8 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
-#include "../catalogs.hpp"
-#include "../expect_eq_macros.hpp"
-#include "dummy_entity.hpp"
+#include "catalogs.hpp"
+#include "expect_eq_macros.hpp"
 
 auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
 {

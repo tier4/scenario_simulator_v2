@@ -20,9 +20,9 @@
 #include <traffic_simulator/helper/helper.hpp>
 
 #include "../catalogs.hpp"
+#include "../entity_helper_functions.hpp"
 #include "../expect_eq_macros.hpp"
 #include "dummy_entity.hpp"
-#include "entity_helper_functions.hpp"
 
 int main(int argc, char ** argv)
 {
