@@ -28,6 +28,11 @@
   EXPECT_DOUBLE_EQ(DATA0.y, DATA1.y); \
   EXPECT_DOUBLE_EQ(DATA0.z, DATA1.z);
 
+#define EXPECT_POINT_NEAR(DATA0, DATA1, EPS) \
+  EXPECT_NEAR(DATA0.x, DATA1.x, EPS);        \
+  EXPECT_NEAR(DATA0.y, DATA1.y, EPS);        \
+  EXPECT_NEAR(DATA0.z, DATA1.z, EPS);
+
 #define EXPECT_VECTOR3_EQ(DATA0, DATA1) \
   EXPECT_DOUBLE_EQ(DATA0.x, DATA1.x);   \
   EXPECT_DOUBLE_EQ(DATA0.y, DATA1.y);   \
@@ -39,9 +44,19 @@
   EXPECT_DOUBLE_EQ(DATA0.z, DATA1.z);      \
   EXPECT_DOUBLE_EQ(DATA0.w, DATA1.w);
 
+#define EXPECT_QUATERNION_NEAR(DATA0, DATA1, EPS) \
+  EXPECT_NEAR(DATA0.x, DATA1.x, EPS);             \
+  EXPECT_NEAR(DATA0.y, DATA1.y, EPS);             \
+  EXPECT_NEAR(DATA0.z, DATA1.z, EPS);             \
+  EXPECT_NEAR(DATA0.w, DATA1.w, EPS);
+
 #define EXPECT_POSE_EQ(DATA0, DATA1)               \
   EXPECT_POINT_EQ(DATA0.position, DATA1.position); \
   EXPECT_QUATERNION_EQ(DATA0.orientation, DATA1.orientation);
+
+#define EXPECT_POSE_NEAR(DATA0, DATA1, EPS)               \
+  EXPECT_POINT_NEAR(DATA0.position, DATA1.position, EPS); \
+  EXPECT_QUATERNION_NEAR(DATA0.orientation, DATA1.orientation, EPS);
 
 #define EXPECT_LANELET_POSE_EQ(DATA0, DATA1)     \
   EXPECT_EQ(DATA0.lanelet_id, DATA1.lanelet_id); \
