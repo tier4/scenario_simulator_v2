@@ -790,6 +790,28 @@ TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
   EXPECT_FALSE(lanelet_pose);
 }
 
+TEST(EntityBase, getMapPoseFromRelativePose_relative)
+{
+  const lanelet::Id id = 120659;
+  const double s = 5.0;
+  constexpr double eps = 0.1;
+
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id, 0.0);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+
+  geometry_msgs::msg::Pose relative_pose;
+  relative_pose.position.x = s;
+
+  auto result_pose = dummy.getMapPoseFromRelativePose(relative_pose);
+
+  auto ref_pose = makeCanonicalizedLaneletPose(hdmap_utils, id, s);
+  EXPECT_POSE_NEAR(result_pose, static_cast<geometry_msgs::msg::Pose>(ref_pose), eps);
+}
+
 TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteNotContinuous)
 {
   lanelet::Id id = 120659;
