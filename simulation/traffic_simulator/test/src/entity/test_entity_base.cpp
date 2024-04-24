@@ -966,3 +966,133 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuous)
   EXPECT_TRUE(dummy.getTargetSpeed().has_value());
   EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
 }
+
+TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNoneReached)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+
+  const double bob_speed = 17.0;
+  const double delta_speed = 3.0;
+  const double target_speed = bob_speed + delta_speed;
+  dummy.setLinearVelocity(target_speed);
+
+  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
+    others;
+  others.emplace("bob_entity", bob_status);
+  dummy.setOtherStatus(others);
+
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
+    "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::NONE, 0.0);
+  auto transition = traffic_simulator::speed_change::Transition::AUTO;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous));
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNone)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+
+  const double bob_speed = 17.0;
+  const double delta_speed = 3.0;
+  const double target_speed = bob_speed + delta_speed;
+  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
+    others;
+  others.emplace("bob_entity", bob_status);
+  dummy.setOtherStatus(others);
+
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
+    "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::NONE, 0.0);
+  auto transition = traffic_simulator::speed_change::Transition::AUTO;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous));
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  dummy.setLinearVelocity(target_speed);
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTransitionStep)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+
+  const double bob_speed = 17.0;
+  const double delta_speed = 3.0;
+  const double target_speed = bob_speed + delta_speed;
+  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
+    others;
+  others.emplace("bob_entity", bob_status);
+  dummy.setOtherStatus(others);
+
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
+    "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 0.0);
+  auto transition = traffic_simulator::speed_change::Transition::STEP;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous));
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  dummy.setLinearVelocity(target_speed);
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+}
+
+/*
+182: "getDistanceToRightLaneBound" typo
+183: sigsegv on empty "distances" vector
+595, 630: why do these lines exist? The job seemingly will do nothing
+644: this line should be moved down, just like in 604, 630, 587
+385, 437, 512, 545: why is a request to change the speed being issued,
+  and then, immidiately, the speed is forcefully changed? 
+  The job assigned to change the target speed will return early anyway,
+  after checking "isTargetSpeedReached"
+551, 618: "requestSpeedChange" throws on invalid entity name if-and-only-if continuous is false.
+  Order of checking in the if statement should be swapped in my opinion.
+*/
