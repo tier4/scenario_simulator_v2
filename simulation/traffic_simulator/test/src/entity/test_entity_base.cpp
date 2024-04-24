@@ -141,7 +141,7 @@ auto makeCanonicalizedLaneletPose(
 auto makeBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
 {
   traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.center.x = -1.0;
+  bbox.center.x = 1.0;
   bbox.center.y = center_y;
   bbox.dimensions.x = 4.0;
   bbox.dimensions.y = 2.0;
@@ -170,9 +170,38 @@ auto makeEntityStatus(
   return entity_status;
 }
 
+auto makeEntityStatus(
+  std::shared_ptr<hdmap_utils::HdMapUtils> /* hdmap_utils */, geometry_msgs::msg::Pose pose,
+  traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
+  const std::string name = "dummy_entity") -> traffic_simulator::EntityStatus
+{
+  traffic_simulator::EntityStatus entity_status;
+  entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+  entity_status.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+  entity_status.time = 0.0;
+  entity_status.name = name;
+  entity_status.bounding_box = bbox;
+  geometry_msgs::msg::Twist twist;
+  entity_status.action_status =
+    traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0);
+  entity_status.lanelet_pose_valid = false;
+  entity_status.pose = pose;
+  return entity_status;
+}
+
 auto makeCanonicalizedEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose,
+  traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
+  const std::string name = "dummy_entity")
+  -> traffic_simulator::entity_status::CanonicalizedEntityStatus
+{
+  return traffic_simulator::entity_status::CanonicalizedEntityStatus(
+    makeEntityStatus(hdmap_utils, pose, bbox, speed, name), hdmap_utils);
+}
+
+auto makeCanonicalizedEntityStatus(
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils, geometry_msgs::msg::Pose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
   const std::string name = "dummy_entity")
   -> traffic_simulator::entity_status::CanonicalizedEntityStatus
@@ -185,6 +214,15 @@ int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
+}
+
+auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
+{
+  geometry_msgs::msg::Point point;
+  point.x = x;
+  point.y = y;
+  point.z = z;
+  return point;
 }
 
 TEST(EntityBase, asFieldOperatorApplication)
@@ -476,7 +514,9 @@ TEST(EntityBase, updateTraveledDistance_startedMoving)
   dummy.startNpcLogic();
   dummy.setLinearVelocity(velocity);
 
-  EXPECT_EQ(step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(1 * step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(2 * step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(3 * step_time * velocity, dummy.updateTraveledDistance(step_time));
 }
 
 TEST(EntityBase, updateTraveledDistance_notStarted)
