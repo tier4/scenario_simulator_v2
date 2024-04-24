@@ -46,6 +46,37 @@ auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
   return quaternion_operation::convertEulerAngleToQuaternion(v);
 }
 
+TEST(EntityBase, appendDebugMarker)
+{
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  visualization_msgs::msg::MarkerArray markers{};
+
+  {
+    auto markers_copy = markers;
+    dummy.appendDebugMarker(markers);
+    EXPECT_EQ(markers.markers.size(), markers_copy.markers.size());
+  }
+
+  visualization_msgs::msg::Marker marker{};
+  marker.action = visualization_msgs::msg::Marker::ADD;
+  marker.type = visualization_msgs::msg::Marker::ARROW;
+  marker.pose.position.x = 10.0;
+  marker.pose.position.y = 10.0;
+
+  markers.markers.push_back(marker);
+
+  {
+    auto markers_copy = markers;
+    dummy.appendDebugMarker(markers);
+    EXPECT_EQ(markers.markers.size(), markers_copy.markers.size());
+  }
+}
+
 TEST(EntityBase, asFieldOperatorApplication)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -56,6 +87,34 @@ TEST(EntityBase, asFieldOperatorApplication)
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   EXPECT_THROW(dummy.asFieldOperatorApplication(), std::runtime_error);
+}
+
+TEST(EntityBase, get2DPolygon)
+{
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+
+  const auto polygon = dummy.get2DPolygon();
+
+  std::vector<geometry_msgs::msg::Point> ref_poly{};
+  {
+    ref_poly.push_back(makePoint(-1.0, -1.0));
+    ref_poly.push_back(makePoint(-1.0, 1.0));
+    ref_poly.push_back(makePoint(3.0, 1.0));
+    ref_poly.push_back(makePoint(3.0, -1.0));
+    ref_poly.push_back(ref_poly.front());
+
+    EXPECT_EQ(polygon.size(), ref_poly.size());
+    EXPECT_POINT_EQ(polygon.at(0), ref_poly.at(0));
+    EXPECT_POINT_EQ(polygon.at(1), ref_poly.at(1));
+    EXPECT_POINT_EQ(polygon.at(2), ref_poly.at(2));
+    EXPECT_POINT_EQ(polygon.at(3), ref_poly.at(3));
+    EXPECT_POINT_EQ(polygon.at(4), ref_poly.at(4));
+  }
 }
 
 TEST(EntityBase, startNpcLogic)
