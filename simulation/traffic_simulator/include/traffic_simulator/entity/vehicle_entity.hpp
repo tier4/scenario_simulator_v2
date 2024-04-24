@@ -109,6 +109,8 @@ public:
 
   void requestLaneChange(const traffic_simulator::lane_change::Parameter &) override;
 
+  void setVelocityLimit(double linear_velocity) override;
+
   void setAccelerationLimit(double acceleration) override;
 
   void setAccelerationRateLimit(double acceleration_rate) override;

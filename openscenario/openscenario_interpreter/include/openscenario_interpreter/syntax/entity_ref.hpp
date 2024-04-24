@@ -22,13 +22,15 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- EntityRef --------------------------------------------------------------
- *
- *  <xsd:complexType name="EntityRef">
- *    <xsd:attribute name="entityRef" type="String" use="required"/>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   EntityRef (OpenSCENARIO XML 1.3)
+
+   Unambiguous reference to an entity represented as its name.
+
+   <xsd:complexType name="EntityRef">
+     <xsd:attribute name="entityRef" type="String" use="required"/>
+   </xsd:complexType>
+*/
 struct EntityRef : public String
 {
   template <typename... Ts>
