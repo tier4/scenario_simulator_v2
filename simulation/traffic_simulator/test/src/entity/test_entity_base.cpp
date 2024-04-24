@@ -39,6 +39,13 @@ auto makePoint(const double x, const double y, const double z = 0.0) -> geometry
   return point;
 }
 
+auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
+{
+  geometry_msgs::msg::Vector3 v;
+  v.z = yaw;
+  return quaternion_operation::convertEulerAngleToQuaternion(v);
+}
+
 TEST(EntityBase, asFieldOperatorApplication)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -598,6 +605,130 @@ TEST(EntityBase, getDistanceToLaneBound_many)
   auto distance_result = dummy.getDistanceToLaneBound(ids);
   auto distance_actual = dummy.getDistanceToLaneBound(id_0);
   EXPECT_NEAR(distance_result, distance_actual, 0.1);
+}
+
+TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkPedestrian)
+{
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto bbox = makeBoundingBox();
+
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 3810.0;
+  pose.position.y = 73745.0;
+
+  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
+  status_base.type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  dummy.setEntityType(status_base.type.type);
+
+  auto lanelet_pose = dummy.getLaneletPose(5.0);
+  EXPECT_FALSE(lanelet_pose);
+}
+
+TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkPedestrian)
+{
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto bbox = makeBoundingBox();
+
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 3766.1;
+  pose.position.y = 73738.2;
+  pose.orientation = makeQuaternionFromYaw((30.0) * M_PI / 180.0);
+
+  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
+  status_base.type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  dummy.setEntityType(status_base.type.type);
+
+  auto lanelet_pose = dummy.getLaneletPose(1.0);
+  EXPECT_TRUE(lanelet_pose);
+}
+
+TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadPedestrian)
+{
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto bbox = makeBoundingBox();
+
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 3764.5;
+  pose.position.y = 73737.5;
+  pose.orientation = makeQuaternionFromYaw((30.0) * M_PI / 180.0);
+
+  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
+  status_base.type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  dummy.setEntityType(status_base.type.type);
+
+  auto lanelet_pose = dummy.getLaneletPose(1.0);
+  EXPECT_TRUE(lanelet_pose);
+}
+
+TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
+{
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto bbox = makeBoundingBox();
+
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 3810.0;
+  pose.position.y = 73745.0;
+
+  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
+  status_base.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  dummy.setEntityType(status_base.type.type);
+
+  auto lanelet_pose = dummy.getLaneletPose(5.0);
+  EXPECT_FALSE(lanelet_pose);
+}
+
+TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
+{
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto bbox = makeBoundingBox();
+
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 3766.1;
+  pose.position.y = 73738.2;
+  pose.orientation = makeQuaternionFromYaw((120.0) * M_PI / 180.0);
+
+  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
+  status_base.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  dummy.setEntityType(status_base.type.type);
+
+  auto lanelet_pose = dummy.getLaneletPose(1.0);
+  EXPECT_TRUE(lanelet_pose);
+}
+
+TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
+{
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto bbox = makeBoundingBox();
+
+  geometry_msgs::msg::Pose pose;
+  pose.position.x = 3764.5;
+  pose.position.y = 73737.5;
+  pose.orientation = makeQuaternionFromYaw((120.0) * M_PI / 180.0);
+
+  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
+  status_base.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  dummy.setEntityType(status_base.type.type);
+
+  auto lanelet_pose = dummy.getLaneletPose(1.0);
+  EXPECT_FALSE(lanelet_pose);
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteNotContinuous)
