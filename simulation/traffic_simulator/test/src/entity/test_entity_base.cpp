@@ -839,8 +839,40 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarge
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  auto bob_speed = 17.0;
-  auto delta_speed = 3.0;
+  const double bob_speed = 17.0;
+  const double delta_speed = 3.0;
+  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
+    others;
+  others.emplace("bob_entity", bob_status);
+  dummy.setOtherStatus(others);
+
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
+    "invalid_name", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
+  bool continuous = false;
+
+  EXPECT_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous), std::runtime_error);
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuous)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+
+  const double bob_speed = 17.0;
+  const double delta_speed = 3.0;
+  const double target_speed = bob_speed + delta_speed;
   auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
   std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
     others;
@@ -850,17 +882,87 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarge
   traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
     "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
   bool continuous = false;
-  dummy.requestSpeedChange(relative_taget_speed, continuous);
-
+  EXPECT_NO_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous));
+  // the job cannot change target_speed. entity_base.cpp, 644 should be moved 2 lines down
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
 
   EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(dummy.getTargetSpeed().value(), bob_speed + delta_speed);
+  EXPECT_EQ(dummy.getTargetSpeed().value(), target_speed);
 
-  // doesnt make any sense
-  // possible bug
-  // condition on 643 evaluates to false
-  // why 581 and 595 exist but here it doesnt?
+  dummy.setLinearVelocity(target_speed);
+
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuousInvalidTarget)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+
+  const double bob_speed = 17.0;
+  const double delta_speed = 3.0;
+  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
+    others;
+  others.emplace("bob_entity", bob_status);
+  dummy.setOtherStatus(others);
+
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
+    "invalid_name", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
+  bool continuous = true;
+
+  EXPECT_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous), std::runtime_error);
+  // inconsistency: entity_base.cpp, 618 will only check and throw on "invalid_name" if continuous == false
+  // this differs form functionality tested in requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarget
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuous)
+{
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+
+  const double bob_speed = 17.0;
+  const double delta_speed = 3.0;
+  const double target_speed = bob_speed + delta_speed;
+  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
+    others;
+  others.emplace("bob_entity", bob_status);
+  dummy.setOtherStatus(others);
+
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
+    "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
+  bool continuous = true;
+
+  EXPECT_NO_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous));
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  dummy.setLinearVelocity(target_speed);
+
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
 }
