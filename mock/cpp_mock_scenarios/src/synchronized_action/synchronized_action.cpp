@@ -88,13 +88,6 @@ private:
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34564, 23, 0, 0, 0, 0)));
     api_.requestAssignRoute("npc", npc_goal_poses);
     api_.setLinearVelocity("npc", 3);
-    RCLCPP_ERROR_STREAM(
-      rclcpp::get_logger("synchronized action"),
-      "current npc pose: " << static_cast<traffic_simulator::LaneletPose>(
-                                api_.getLaneletPose("npc").value())
-                                .lanelet_id);
-    RCLCPP_ERROR_STREAM(
-      rclcpp::get_logger("synchronized action"), "initialized synchronized action");
   }
 
   auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)
