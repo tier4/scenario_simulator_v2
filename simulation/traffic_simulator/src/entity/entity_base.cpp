@@ -992,8 +992,7 @@ auto EntityBase::requestSynchronize(
       target_speed_ = entity_velocity_to_synchronize;
       return false;
     },
-    [this]() {},
-    job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
+    [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
   return false;
 }
 
