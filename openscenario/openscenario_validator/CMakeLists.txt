@@ -9,11 +9,10 @@ file(READ ${CMAKE_CURRENT_SOURCE_DIR}/configure/OpenSCENARIO-1.3.xsd ${PROJECT_N
 
 configure_file(configure/schema.cpp src/schema.cpp)
 
-include_directories(${XercesC_INCLUDE_DIRS} include)
-
 add_library(${PROJECT_NAME} STATIC src/schema.cpp)
 
 target_link_libraries(${PROJECT_NAME} ${XercesC_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${XercesC_INCLUDE_DIRS} include)
 
 add_executable(validate
   src/validator_command.cpp)
@@ -21,7 +20,10 @@ add_executable(validate
 target_link_libraries(validate ${PROJECT_NAME})
 
 install(TARGETS ${PROJECT_NAME}
-  INCLUDES DESTINATION include/${PROJECT_NAME})
+  DESTINATION lib/${PROJECT_NAME})
+
+install(DIRECTORY include/
+  DESTINATION include)
 
 install(TARGETS validate
   DESTINATION lib/${PROJECT_NAME})
