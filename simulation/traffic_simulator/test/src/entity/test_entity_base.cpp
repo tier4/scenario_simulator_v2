@@ -514,7 +514,9 @@ TEST(EntityBase, updateTraveledDistance_startedMoving)
   dummy.startNpcLogic();
   dummy.setLinearVelocity(velocity);
 
-  EXPECT_EQ(step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(1 * step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(2 * step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(3 * step_time * velocity, dummy.updateTraveledDistance(step_time));
 }
 
 TEST(EntityBase, updateTraveledDistance_notStarted)
