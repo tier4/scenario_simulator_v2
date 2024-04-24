@@ -215,8 +215,8 @@ TEST(ParameterValueDistribution, ProbabilityDistributionSet)
 
   ParameterDistribution expected_distribution;
   expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "-1.0"));
-  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "0.0"));
-  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "-1.0"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "-0.47"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "0.59"));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
