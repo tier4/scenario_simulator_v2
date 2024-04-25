@@ -1073,7 +1073,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarge
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuous)
 {
-  // "requestSpeedChange" will not change the "target_speed", explained in the 4th issue
+  // "requestSpeedChange" is unable to change the "target_speed", explained in the 4th issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -1219,7 +1219,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNoneReached)
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNone)
 {
-  // "requestSpeedChange" does nothing in this case, explained in the 4th issue
+  // "requestSpeedChange" is unable to change the "target_speed", explained in the 4th issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -1260,7 +1260,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNone)
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTransitionStep)
 {
-  // "requestSpeedChange" does nothing here, explained in the 5th issue
+  // internal call of "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -1288,15 +1288,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
   EXPECT_NO_THROW(
     dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous));
 
-  const double current_time = 5.0;
-  const double step_time = 7.0;
-  dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
-
-  dummy.setLinearVelocity(target_speed);
-  dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeContinuous)
@@ -1372,7 +1364,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeTransitionStep)
 {
-  // "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
+  // internal call of "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
   lanelet::Id id = 120659;
 
   const double initial_speed = 25.0;
@@ -1408,7 +1400,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeTransitionS
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeTransitionNotStepNoTime)
 {
-  // "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
+  // internal call of "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
   lanelet::Id id = 120659;
 
   const double initial_speed = 10.0;
@@ -1452,16 +1444,8 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintNoneReached)
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  const double bob_speed = 17.0;
-  const double delta_speed = 3.0;
-  const double target_speed = bob_speed + delta_speed;
+  const double target_speed = 20.0;
   dummy.setLinearVelocity(target_speed);
-
-  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
-  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
-    others;
-  others.emplace("bob_entity", bob_status);
-  dummy.setOtherStatus(others);
 
   traffic_simulator::speed_change::Constraint constraint(
     traffic_simulator::speed_change::Constraint::Type::NONE, 0.0);
@@ -1487,15 +1471,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintNone)
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  const double bob_speed = 17.0;
-  const double delta_speed = 3.0;
-  const double target_speed = bob_speed + delta_speed;
-  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
-  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
-    others;
-  others.emplace("bob_entity", bob_status);
-  dummy.setOtherStatus(others);
-
+  const double target_speed = 20.0;
   traffic_simulator::speed_change::Constraint constraint(
     traffic_simulator::speed_change::Constraint::Type::NONE, 0.0);
   auto transition = traffic_simulator::speed_change::Transition::AUTO;
@@ -1514,6 +1490,82 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintNone)
   dummy.onPostUpdate(current_time, step_time);
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
 }
+
+TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTransitionStep)
+{
+  // internal call of "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
+  lanelet::Id id = 120659;
+
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+
+  const double target_speed = 20.0;
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 0.0);
+  auto transition = traffic_simulator::speed_change::Transition::STEP;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintTimeTransitionStep)
+{
+  // internal call of "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
+  lanelet::Id id = 120659;
+
+  const double initial_speed = 25.0;
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setLinearVelocity(initial_speed);
+
+  const double target_speed = 20.0;
+  const double constraint_value = 10.0;
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::TIME, constraint_value);
+  auto transition = traffic_simulator::speed_change::Transition::STEP;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintTimeTransitionNotStepNoTime)
+{
+  // internal call of "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
+  lanelet::Id id = 120659;
+
+  const double initial_speed = 10.0;
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setLinearVelocity(initial_speed);
+
+  const double target_speed = 20.0;
+  const double constraint_value = 0.0;
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::TIME, constraint_value);
+  auto transition = traffic_simulator::speed_change::Transition::LINEAR;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
+}
+
 /*
 ISSUES:
 1: 182: "getDistanceToRightLaneBound" typo
