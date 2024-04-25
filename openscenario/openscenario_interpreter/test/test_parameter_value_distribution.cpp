@@ -126,6 +126,39 @@ TEST(ParameterValueDistribution, ValueSetDistribution)
   checkParameterValueDistribution(path, expected_distribution);
 }
 
+TEST(ParameterValueDistribution, Deterministic)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+  using openscenario_interpreter::make;
+  using openscenario_interpreter::String;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Deterministic.xosc";
+
+  ParameterDistribution expected_distribution;
+  auto make_parameter_set = [](double offset, std::string lane_id) {
+    auto parameter_set = std::make_shared<openscenario_interpreter::ParameterSet>();
+    (*parameter_set)["offset"] = make<Double>(offset);
+    (*parameter_set)["LANE_ID"] = make<String>(lane_id);
+    return parameter_set;
+  };
+  expected_distribution.push_back(make_parameter_set(-1.0, "34510"));
+  expected_distribution.push_back(make_parameter_set(-1.0, "34513"));
+  expected_distribution.push_back(make_parameter_set(-1.0, "34564"));
+  expected_distribution.push_back(make_parameter_set(-0.47, "34510"));
+  expected_distribution.push_back(make_parameter_set(-0.47, "34513"));
+  expected_distribution.push_back(make_parameter_set(-0.47, "34564"));
+  expected_distribution.push_back(make_parameter_set(0.06, "34510"));
+  expected_distribution.push_back(make_parameter_set(0.06, "34513"));
+  expected_distribution.push_back(make_parameter_set(0.06, "34564"));
+  expected_distribution.push_back(make_parameter_set(0.59, "34510"));
+  expected_distribution.push_back(make_parameter_set(0.59, "34513"));
+  expected_distribution.push_back(make_parameter_set(0.59, "34564"));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
 // Histogram
 TEST(ParameterValueDistribution, Histogram)
 {
