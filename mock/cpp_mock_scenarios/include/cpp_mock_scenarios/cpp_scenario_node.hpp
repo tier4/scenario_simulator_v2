@@ -21,8 +21,6 @@
 #include <simple_junit/junit5.hpp>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/distance_utils.hpp>
-#include <traffic_simulator/pose_utils.hpp>
 #include <vector>
 
 namespace cpp_mock_scenarios

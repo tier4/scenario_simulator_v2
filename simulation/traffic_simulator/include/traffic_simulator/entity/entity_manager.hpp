@@ -32,18 +32,17 @@
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/speed_change.hpp>
-#include <traffic_simulator/distance_utils.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/pose_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -261,7 +260,6 @@ public:
   // clang-format on
 
   FORWARD_TO_HDMAP_UTILS(getLaneletLength);
-  FORWARD_TO_HDMAP_UTILS(toLaneletPose);
 
 #undef FORWARD_TO_HDMAP_UTILS
 
@@ -403,7 +401,7 @@ public:
       } else {
         std::vector<geometry_msgs::msg::Pose> poses;
         for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPose>(name)) {
-          poses.push_back(PoseUtils::toMapPose(lanelet_pose));
+          poses.push_back(pose::toMapPose(lanelet_pose));
         }
         return poses;
       }
@@ -486,12 +484,12 @@ public:
       entity_status.action_status.current_action = "waiting for initialize";
 
       if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
-        entity_status.pose = PoseUtils::toMapPose(pose);
+        entity_status.pose = pose::toMapPose(pose);
         entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
         entity_status.lanelet_pose_valid = true;
       } else {
         /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
-        if (const auto lanelet_pose = toLaneletPose(
+        if (const auto lanelet_pose = pose::toLaneletPose(
               pose, parameters.bounding_box,
               entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
                 entity_status.type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT,
@@ -507,13 +505,14 @@ public:
                 } else {
                   return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
                 }
-              }(parameters));
+              }(parameters),
+              hdmap_utils_ptr_);
             lanelet_pose) {
-          entity_status.lanelet_pose = *lanelet_pose;
+          entity_status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose.value());
           entity_status.lanelet_pose_valid = true;
           /// @note fix z, roll and pitch to fitting to the lanelet
           if (getParameter<bool>("consider_pose_by_road_slope", false)) {
-            entity_status.pose = hdmap_utils_ptr_->toMapPose(*lanelet_pose).pose;
+            entity_status.pose = hdmap_utils_ptr_->toMapPose(entity_status.lanelet_pose).pose;
           } else {
             entity_status.pose = pose;
           }

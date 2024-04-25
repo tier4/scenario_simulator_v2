@@ -75,6 +75,44 @@ auto toLaneletPose(
   }
 }
 
+auto toLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const bool include_crosswalk, const double matching_distance,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<CanonicalizedLaneletPose>
+{
+  if (
+    const auto pose =
+      hdmap_utils_ptr->toLaneletPose(map_pose, bbox, include_crosswalk, matching_distance)) {
+    return canonicalize(pose.value(), hdmap_utils_ptr);
+  } else {
+    return std::nullopt;
+  }
+}
+
+auto toLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
+  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<CanonicalizedLaneletPose>
+{
+  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  if (!unique_route_lanelets.empty()) {
+    lanelet_pose =
+      hdmap_utils_ptr->toLaneletPose(map_pose, unique_route_lanelets, matching_distance);
+  }
+  if (!lanelet_pose) {
+    lanelet_pose =
+      hdmap_utils_ptr->toLaneletPose(map_pose, bbox, include_crosswalk, matching_distance);
+  }
+
+  if (lanelet_pose) {
+    return canonicalize(lanelet_pose.value(), hdmap_utils_ptr);
+  } else {
+    return std::nullopt;
+  }
+}
+
 auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>
 {

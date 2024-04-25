@@ -78,11 +78,12 @@ auto API::setEntityStatus(
     entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
   status.action_status = action_status;
   if (
-    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
+    const auto lanelet_pose = pose::toLaneletPose(
       status.pose, getBoundingBox(name), false,
-      getDefaultMatchingDistanceForLaneletPoseCalculation(name))) {
+      getDefaultMatchingDistanceForLaneletPoseCalculation(name),
+      entity_manager_ptr_->getHdmapUtils())) {
     status.lanelet_pose_valid = true;
-    status.lanelet_pose = lanelet_pose.value();
+    status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose.value());
   } else {
     status.lanelet_pose_valid = false;
     status.lanelet_pose = traffic_simulator::LaneletPose();
@@ -133,10 +134,11 @@ auto API::setEntityStatus(
   status.name = name;
   status.action_status = action_status;
   if (
-    const auto lanelet_pose = entity_manager_ptr_->toLaneletPose(
+    const auto lanelet_pose = pose::toLaneletPose(
       map_pose, getBoundingBox(name), false,
-      getDefaultMatchingDistanceForLaneletPoseCalculation(name))) {
-    status.lanelet_pose = lanelet_pose.value();
+      getDefaultMatchingDistanceForLaneletPoseCalculation(name),
+      entity_manager_ptr_->getHdmapUtils())) {
+    status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose.value());
   } else {
     status.lanelet_pose_valid = false;
   }
@@ -339,16 +341,5 @@ auto API::canonicalize(const EntityStatus & may_non_canonicalized_entity_status)
 {
   return CanonicalizedEntityStatus(
     may_non_canonicalized_entity_status, entity_manager_ptr_->getHdmapUtils());
-}
-
-auto API::toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
-  -> std::optional<CanonicalizedLaneletPose>
-{
-  if (
-    const auto pose =
-      entity_manager_ptr_->getHdmapUtils()->toLaneletPose(map_pose, include_crosswalk)) {
-    return canonicalize(pose.value());
-  }
-  return std::nullopt;
 }
 }  // namespace traffic_simulator

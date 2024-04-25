@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
 
@@ -196,9 +197,11 @@ void VehicleEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lane
 void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  if (const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), false);
-      lanelet_pose) {
-    requestAcquirePosition(CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_));
+  if (
+    const auto lanelet_pose = pose::toLaneletPose(
+      map_pose, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation(),
+      hdmap_utils_ptr_)) {
+    requestAcquirePosition(lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
   }
@@ -222,10 +225,11 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
 {
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
-    if (const auto lanelet_waypoint =
-          hdmap_utils_ptr_->toLaneletPose(waypoint, getBoundingBox(), false);
-        lanelet_waypoint) {
-      route.emplace_back(CanonicalizedLaneletPose(lanelet_waypoint.value(), hdmap_utils_ptr_));
+    if (
+      const auto lanelet_waypoint = pose::toLaneletPose(
+        waypoint, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation(),
+        hdmap_utils_ptr_)) {
+      route.emplace_back(lanelet_waypoint.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of vehicle entity should be on lane.");
     }
@@ -240,10 +244,11 @@ auto VehicleEntity::requestFollowTrajectory(
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_POLYLINE_TRAJECTORY);
   std::vector<CanonicalizedLaneletPose> waypoints;
   for (const auto & vertex : parameter->shape.vertices) {
-    if (const auto lanelet_waypoint =
-          hdmap_utils_ptr_->toLaneletPose(vertex.position, getBoundingBox(), false);
-        lanelet_waypoint) {
-      waypoints.emplace_back(CanonicalizedLaneletPose(lanelet_waypoint.value(), hdmap_utils_ptr_));
+    if (
+      const auto lanelet_waypoint = pose::toLaneletPose(
+        vertex.position, getBoundingBox(), false,
+        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+      waypoints.emplace_back(lanelet_waypoint.value());
     } else {
       /// @todo such a protection most likely makes sense, but test scenario
       /// RoutingAction.FollowTrajectoryAction-star has waypoints outside lanelet2

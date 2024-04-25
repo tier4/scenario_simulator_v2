@@ -24,6 +24,7 @@
 #include <system_error>
 #include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
@@ -296,29 +297,21 @@ auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-  if (unique_route_lanelets.empty()) {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      map_pose, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation());
-  } else {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      map_pose, unique_route_lanelets, getDefaultMatchingDistanceForLaneletPoseCalculation());
-    if (!lanelet_pose) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        map_pose, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation());
-    }
-  }
+  auto canonicalized_lanelet_pose = pose::toLaneletPose(
+    map_pose, getBoundingBox(), unique_route_lanelets, false,
+    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
   geometry_msgs::msg::Pose map_pose_z_fixed = map_pose;
   auto status = static_cast<EntityStatus>(status_);
-  if (lanelet_pose) {
+  if (canonicalized_lanelet_pose) {
+    auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
     math::geometry::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
+      hdmap_utils_ptr_->getCenterPoints(lanelet_pose.lanelet_id));
     if (const auto s_value = spline.getSValue(map_pose)) {
       map_pose_z_fixed.position.z = spline.getPoint(s_value.value()).z;
     }
     status.pose = map_pose_z_fixed;
     status.lanelet_pose_valid = true;
-    status.lanelet_pose = lanelet_pose.value();
+    status.lanelet_pose = lanelet_pose;
   } else {
     status.pose = map_pose;
     status.lanelet_pose_valid = false;

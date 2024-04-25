@@ -39,6 +39,20 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 {
 }
 
+CanonicalizedLaneletPose::CanonicalizedLaneletPose(const CanonicalizedLaneletPose & other)
+: lanelet_pose_(other.lanelet_pose_),
+  lanelet_poses_(other.lanelet_poses_),
+  map_pose_(other.map_pose_)
+{
+}
+
+CanonicalizedLaneletPose::CanonicalizedLaneletPose(CanonicalizedLaneletPose && other) noexcept
+: lanelet_pose_(std::move(other.lanelet_pose_)),
+  lanelet_poses_(std::move(other.lanelet_poses_)),
+  map_pose_(std::move(other.map_pose_))
+{
+}
+
 auto CanonicalizedLaneletPose::canonicalize(
   const LaneletPose & may_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPose

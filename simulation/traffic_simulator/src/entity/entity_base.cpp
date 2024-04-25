@@ -20,6 +20,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -76,51 +77,36 @@ auto EntityBase::getLaneletPose(double matching_distance) const
 {
   if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getEntityType().type) {
     if (
-      const auto lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), true, matching_distance)) {
-      return CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_);
+      const auto lanelet_pose_include_crosswalk = pose::toLaneletPose(
+        getMapPose(), getBoundingBox(), true, matching_distance, hdmap_utils_ptr_)) {
+      return lanelet_pose_include_crosswalk;
     }
   } else {
-    if (
-      const auto lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(getMapPose(), getBoundingBox(), false, matching_distance)) {
-      return CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_);
-    }
+    return pose::toLaneletPose(
+      getMapPose(), getBoundingBox(), false, matching_distance, hdmap_utils_ptr_);
   }
   return std::nullopt;
 }
 
 auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk) -> void
 {
+  auto non_canonicalized_status = static_cast<EntityStatus>(status);
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
+  const auto canonicalized_lanelet_pose = pose::toLaneletPose(
+    non_canonicalized_status.pose, getBoundingBox(), unique_route_lanelets, include_crosswalk,
+    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 
-  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-  auto status_non_canonicalized = static_cast<EntityStatus>(status);
-
-  if (unique_route_lanelets.empty()) {
-    lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-      status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);
-  } else {
-    lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status_non_canonicalized.pose, unique_route_lanelets, 1.0);
-    if (!lanelet_pose) {
-      lanelet_pose = hdmap_utils_ptr_->toLaneletPose(
-        status_non_canonicalized.pose, getBoundingBox(), include_crosswalk, 1.0);
-    }
-  }
-  if (lanelet_pose) {
+  non_canonicalized_status.lanelet_pose_valid = static_cast<bool>(canonicalized_lanelet_pose);
+  if (canonicalized_lanelet_pose) {
+    non_canonicalized_status.lanelet_pose =
+      static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
     math::geometry::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
-    if (const auto s_value = spline.getSValue(status_non_canonicalized.pose)) {
-      status_non_canonicalized.pose.position.z = spline.getPoint(s_value.value()).z;
+      hdmap_utils_ptr_->getCenterPoints(non_canonicalized_status.lanelet_pose.lanelet_id));
+    if (const auto s_value = spline.getSValue(non_canonicalized_status.pose)) {
+      non_canonicalized_status.pose.position.z = spline.getPoint(s_value.value()).z;
     }
   }
-
-  status_non_canonicalized.lanelet_pose_valid = static_cast<bool>(lanelet_pose);
-  if (status_non_canonicalized.lanelet_pose_valid) {
-    status_non_canonicalized.lanelet_pose = lanelet_pose.value();
-  }
-  status = CanonicalizedEntityStatus(status_non_canonicalized, hdmap_utils_ptr_);
+  status = CanonicalizedEntityStatus(non_canonicalized_status, hdmap_utils_ptr_);
 }
 
 auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const

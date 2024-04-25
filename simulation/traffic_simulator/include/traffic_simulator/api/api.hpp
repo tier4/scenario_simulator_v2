@@ -34,7 +34,6 @@
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/distance_utils.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -357,9 +356,6 @@ public:
     -> CanonicalizedLaneletPose;
   auto canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
     -> CanonicalizedEntityStatus;
-
-  auto toLaneletPose(const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk) const
-    -> std::optional<CanonicalizedLaneletPose>;
 
 private:
   bool updateTimeInSim();

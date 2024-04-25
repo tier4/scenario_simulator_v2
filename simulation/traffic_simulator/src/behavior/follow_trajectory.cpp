@@ -25,6 +25,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -558,10 +559,10 @@ auto makeUpdatedStatus(
     updated_status.time = entity_status.time + step_time;
 
     // matching distance has been set to 3.0 due to matching problems during lane changes
-    if (const auto lanelet_pose =
-          hdmap_utils->toLaneletPose(updated_status.pose, entity_status.bounding_box, false, 3.0);
+    if (const auto lanelet_pose = pose::toLaneletPose(
+          updated_status.pose, entity_status.bounding_box, false, 3.0, hdmap_utils);
         lanelet_pose) {
-      updated_status.lanelet_pose = lanelet_pose.value();
+      updated_status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose.value());
       updated_status.lanelet_pose_valid = true;
     } else {
       updated_status.lanelet_pose_valid = false;

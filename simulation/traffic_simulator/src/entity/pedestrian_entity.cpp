@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <vector>
 
 namespace traffic_simulator
@@ -70,9 +71,11 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
 {
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
-    const auto lanelet_waypoint = hdmap_utils_ptr_->toLaneletPose(waypoint, getBoundingBox(), true);
-    if (lanelet_waypoint) {
-      route.emplace_back(CanonicalizedLaneletPose(lanelet_waypoint.value(), hdmap_utils_ptr_));
+    if (
+      const auto lanelet_waypoint = pose::toLaneletPose(
+        waypoint, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation(),
+        hdmap_utils_ptr_)) {
+      route.emplace_back(lanelet_waypoint.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
     }
@@ -148,9 +151,11 @@ void PedestrianEntity::requestAcquirePosition(const CanonicalizedLaneletPose & l
 void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_pose)
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
-  if (const auto lanelet_pose = hdmap_utils_ptr_->toLaneletPose(map_pose, getBoundingBox(), true);
-      lanelet_pose) {
-    requestAcquirePosition(CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr_));
+  if (
+    const auto lanelet_pose = pose::toLaneletPose(
+      map_pose, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation(),
+      hdmap_utils_ptr_)) {
+    requestAcquirePosition(lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
   }
