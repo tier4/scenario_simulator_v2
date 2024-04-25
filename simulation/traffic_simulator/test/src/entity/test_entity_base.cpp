@@ -483,6 +483,46 @@ TEST(EntityBase, setDynamicConstraints)
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
+TEST(EntityBase, setOtherStatus)
+{
+  const lanelet::Id id = 120659;
+
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
+
+  const std::string name0 = "other_entity0", name1 = "other_entity1";
+
+  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> other_status;
+  {
+    auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id, 5.0);
+    auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox, 0.0, name0);
+    other_status.emplace(name0, status);
+  }
+  {
+    geometry_msgs::msg::Pose pose;
+    pose.position = makePoint(3810.0, 73745.0);  // outside of road
+    auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox, 0.0, name1);
+    other_status.emplace(name1, status);
+  }
+
+  dummy_base->setOtherStatus(other_status);
+
+  const auto & result_status = dummy.getOtherstatus();
+
+  EXPECT_EQ(other_status.size(), result_status.size());
+  EXPECT_EQ(
+    static_cast<traffic_simulator_msgs::msg::EntityStatus>(other_status.at(name0)),
+    static_cast<traffic_simulator_msgs::msg::EntityStatus>(result_status.at(name0)));
+  EXPECT_EQ(
+    static_cast<traffic_simulator_msgs::msg::EntityStatus>(other_status.at(name1)),
+    static_cast<traffic_simulator_msgs::msg::EntityStatus>(result_status.at(name1)));
+}
+
 TEST(EntityBase, requestFollowTrajectory)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();

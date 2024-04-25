@@ -120,9 +120,14 @@ public:
   {
     lane_change_param_TEST_ = param;
   }
-  traffic_simulator::lane_change::Parameter requestLaneChangeTEST()
+  auto requestLaneChangeTEST() const -> traffic_simulator::lane_change::Parameter
   {
     return lane_change_param_TEST_;
+  }
+  auto getOtherstatus() const
+    -> const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
+  {
+    return other_status_;
   }
 
   traffic_simulator::lane_change::Parameter lane_change_param_TEST_;
