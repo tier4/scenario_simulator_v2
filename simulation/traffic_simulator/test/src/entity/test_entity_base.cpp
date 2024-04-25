@@ -503,11 +503,8 @@ TEST(EntityBase, getDistanceToLeftLaneBound)
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  /* 
-  auto distance = dummy.getDistanceToLeftLaneBound();
-  sigsegv if invoked
-  tested variables depend on the fix which is to be implemented
-  */
+  // auto distance = dummy.getDistanceToLeftLaneBound();
+
   throw std::runtime_error("Fix not implemented");
 }
 
@@ -522,16 +519,14 @@ TEST(EntityBase, getDistanceToRightLaneBound)
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  /*
-  auto distance = dummy.getDistanceToRightLaneBound();
-  sigsegv if invoked
-  tested variables depend on the fix which is to be implemented
-  */
+  // auto distance = dummy.getDistanceToRightLaneBound();
+
   throw std::runtime_error("Fix not implemented");
 }
 
 TEST(EntityBase, getDistanceToLaneBound)
 {
+  // fix is to be implemented, 2nd issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -541,16 +536,13 @@ TEST(EntityBase, getDistanceToLaneBound)
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  /*
-  auto distance = dummy.getDistanceToLaneBound();
-  sigsegv if invoked
-  tested variables depend on the fix which is to be implemented
-  */
+  // auto distance = dummy.getDistanceToLaneBound();
   throw std::runtime_error("Fix not implemented");
 }
 
 TEST(EntityBase, getDistanceToLeftLaneBound_empty)
 {
+  // fix is to be implemented, 2nd issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -561,16 +553,14 @@ TEST(EntityBase, getDistanceToLeftLaneBound_empty)
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   auto ids = std::vector<lanelet::Id>{};
 
-  /*
-  auto left = dummy.getDistanceToLeftLaneBound(ids);
-  sigsegv if invoked
-  tested variables depend on the fix which is to be implemented
-  */
+  // auto left = dummy.getDistanceToLeftLaneBound(ids);
+
   throw std::runtime_error("Fix not implemented");
 }
 
 TEST(EntityBase, getDistanceToRightLaneBound_empty)
 {
+  // fix is to be implemented, 2nd issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -581,16 +571,13 @@ TEST(EntityBase, getDistanceToRightLaneBound_empty)
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   auto ids = std::vector<lanelet::Id>{};
 
-  /*
-  auto right = dummy.getDistanceToRightLaneBound(ids);
-  sigsegv if invoked
-  tested variables depend on the fix which is to be implemented
-  */
+  // auto right = dummy.getDistanceToRightLaneBound(ids);
   throw std::runtime_error("Fix not implemented");
 }
 
 TEST(EntityBase, getDistanceToLaneBound_empty)
 {
+  // fix is to be implemented, 2nd issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -601,11 +588,8 @@ TEST(EntityBase, getDistanceToLaneBound_empty)
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   auto ids = std::vector<lanelet::Id>{};
 
-  /*
-  auto distance = dummy.getDistanceToLaneBound(ids);
-  sigsegv if invoked
-  tested variables depend on the fix which is to be implemented
-  */
+  // auto distance = dummy.getDistanceToLaneBound(ids);
+
   throw std::runtime_error("Fix not implemented");
 }
 
@@ -630,6 +614,7 @@ TEST(EntityBase, getDistanceToLeftLaneBound_many)
 
 TEST(EntityBase, getDistanceToRightLaneBound_many)
 {
+  // typo, 1st issue
   const double entity_center_offset = -0.5;
   lanelet::Id id_0 = 120659;
   lanelet::Id id_1 = 120659;
@@ -649,6 +634,7 @@ TEST(EntityBase, getDistanceToRightLaneBound_many)
 
 TEST(EntityBase, getDistanceToLaneBound_many)
 {
+  // typo, 1st issue
   const double entity_center_offset = -0.5;
   lanelet::Id id_0 = 120659;
   lanelet::Id id_1 = 120659;
@@ -928,6 +914,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarge
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuous)
 {
+  // "requestSpeedChange" will not change the "target_speed", explained in the 4th issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -949,7 +936,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuous)
     "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
   bool continuous = false;
   EXPECT_NO_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous));
-  // the job cannot change target_speed. entity_base.cpp, 644 should be moved 2 lines down
+
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
@@ -961,11 +948,11 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuous)
 
   dummy.onPostUpdate(current_time, step_time);
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
-  // will not work because of the 4th issue
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuousInvalidTarget)
 {
+  // "requestSpeedChange" will not throw when "continuous" == true, explained in the 6th issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -987,18 +974,17 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuousInvalidTarget)
   bool continuous = true;
 
   EXPECT_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous), std::runtime_error);
-  // inconsistency: entity_base.cpp, 618 will only check and throw on "invalid_name" if continuous == false
-  // this differs form functionality tested in requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarget
+
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
 
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
-  // will not throw because of the 6th issue
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuous)
 {
+  // "requestSpeedChange" is unable to change the "target_speed", explained in the 4th issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -1033,7 +1019,6 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuous)
   dummy.onPostUpdate(current_time, step_time);
   EXPECT_TRUE(dummy.getTargetSpeed().has_value());
   EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
-  // target will not be set, because of the 4th issue
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNoneReached)
@@ -1075,6 +1060,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNoneReached)
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNone)
 {
+  // "requestSpeedChange" does nothing in this case, explained in the 4th issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -1111,11 +1097,11 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNone)
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
-  // will not work because of the 4th issue
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTransitionStep)
 {
+  // "requestSpeedChange" does nothing here, explained in the 5th issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -1152,7 +1138,6 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
-  // request speed change has nothing to do here, 5th issue
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeContinuous)
@@ -1188,6 +1173,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeContinuous)
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTransitionLinear)
 {
+  // target speed will not be set, explained in the 4th issue
   lanelet::Id id = 120659;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -1222,18 +1208,19 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
   dummy.onPostUpdate(current_time, step_time);
   EXPECT_TRUE(dummy.getTargetSpeed().has_value());
   EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
-  // target will not be set, because of the 4th issue
 }
 
 /*
-182: "getDistanceToRightLaneBound" typo
-183: sigsegv on empty "distances" vector
-595, 630: why do these lines exist? The job seemingly will do nothing
-644: this line should be moved down, just like in 604, 630, 587
-385, 437, 512, 545: why is a request to change the speed being issued,
+ISSUES:
+1: 182: "getDistanceToRightLaneBound" typo
+2: 183: sigsegv on empty "distances" vector
+3: 595, 630: removal of these lines might be considered.
+  The job will seemingly do nothing, if continuous == false and the target_speed is already set
+4: 644: this line should be moved down, just like in 604, 630, 587
+5: 385, 437, 512, 545: why is a request to change the speed being issued,
   and then, immidiately, the speed is forcefully changed? 
   The job assigned to change the target speed will return early anyway,
   after checking "isTargetSpeedReached"
-551, 618: "requestSpeedChange" throws on invalid entity name if-and-only-if continuous is false.
+6: 551, 618: "requestSpeedChange" throws on invalid entity name if-and-only-if continuous is false.
   Order of checking in the if statement should be swapped in my opinion.
 */
