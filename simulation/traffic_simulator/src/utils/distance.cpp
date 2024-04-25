@@ -176,82 +176,84 @@ auto getBoundingBoxLaneLongitudinalDistance(
 }
 
 auto getDistanceToLeftLaneBound(
-  const CanonicalizedEntityStatus & status, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> double
 {
   if (const auto bound = hdmap_utils_ptr->getLeftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
-  } else if (const auto polygon = math::geometry::transformPoints(
-               status.getMapPose(), math::geometry::get2DPolygon(status.getBoundingBox()));
+  } else if (const auto polygon =
+               math::geometry::transformPoints(map_pose, math::geometry::get2DPolygon(bbox));
              polygon.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate 2d polygon of entity: ", status.getName(), " . Please check ",
-      status.getName(), " exists and it's definition");
+    THROW_SEMANTIC_ERROR("Failed to calculate 2d polygon.");
   } else {
     return math::geometry::getDistance2D(bound, polygon);
   }
 }
 
 auto getDistanceToLeftLaneBound(
-  const CanonicalizedEntityStatus & status, const lanelet::Ids & lanelet_ids,
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances), [&](auto lanelet_id) {
-      return getDistanceToLeftLaneBound(status, lanelet_id, hdmap_utils_ptr);
+      return getDistanceToLeftLaneBound(map_pose, bbox, lanelet_id, hdmap_utils_ptr);
     });
   return *std::min_element(distances.begin(), distances.end());
 }
 
 auto getDistanceToRightLaneBound(
-  const CanonicalizedEntityStatus & status, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> double
 {
   if (const auto bound = hdmap_utils_ptr->getRightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
-  } else if (const auto polygon = math::geometry::transformPoints(
-               status.getMapPose(), math::geometry::get2DPolygon(status.getBoundingBox()));
+  } else if (const auto polygon =
+               math::geometry::transformPoints(map_pose, math::geometry::get2DPolygon(bbox));
              polygon.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate 2d polygon of entity: ", status.getName(), " . Please check ",
-      status.getName(), " exists and it's definition");
+    THROW_SEMANTIC_ERROR("Failed to calculate 2d polygon.");
   } else {
     return math::geometry::getDistance2D(bound, polygon);
   }
 }
 
 auto getDistanceToRightLaneBound(
-  const CanonicalizedEntityStatus & status, const lanelet::Ids & lanelet_ids,
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances), [&](auto lanelet_id) {
-      return getDistanceToLeftLaneBound(status, lanelet_id, hdmap_utils_ptr);
+      return getDistanceToLeftLaneBound(map_pose, bbox, lanelet_id, hdmap_utils_ptr);
     });
   return *std::min_element(distances.begin(), distances.end());
 }
 
 auto getDistanceToLaneBound(
-  const CanonicalizedEntityStatus & status, lanelet::Id lanelet_id,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> double
 {
   return std::min(
-    getDistanceToLeftLaneBound(status, lanelet_id, hdmap_utils_ptr),
-    getDistanceToRightLaneBound(status, lanelet_id, hdmap_utils_ptr));
+    getDistanceToLeftLaneBound(map_pose, bbox, lanelet_id, hdmap_utils_ptr),
+    getDistanceToRightLaneBound(map_pose, bbox, lanelet_id, hdmap_utils_ptr));
 }
 
 auto getDistanceToLaneBound(
-  const CanonicalizedEntityStatus & status, const lanelet::Ids & lanelet_ids,
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
   return std::min(
-    getDistanceToLeftLaneBound(status, lanelet_ids, hdmap_utils_ptr),
-    getDistanceToRightLaneBound(status, lanelet_ids, hdmap_utils_ptr));
+    getDistanceToLeftLaneBound(map_pose, bbox, lanelet_ids, hdmap_utils_ptr),
+    getDistanceToRightLaneBound(map_pose, bbox, lanelet_ids, hdmap_utils_ptr));
 }
 
 auto getDistanceToCrosswalk(
