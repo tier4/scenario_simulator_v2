@@ -302,6 +302,181 @@ TEST(EntityBase, resetDynamicConstraints)
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
+TEST(EntityBase, requestLaneChange_absoluteTarget)
+{
+  const lanelet::Id id = 120659;
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
+
+  traffic_simulator::lane_change::AbsoluteTarget target(id, 1.0);
+
+  traffic_simulator::lane_change::TrajectoryShape trajectory_shape =
+    traffic_simulator::lane_change::TrajectoryShape::LINEAR;
+
+  traffic_simulator::lane_change::Constraint constraint(
+    traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
+    traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
+
+  dummy_base->requestLaneChange(target, trajectory_shape, constraint);
+  auto result_param = dummy.requestLaneChangeTEST();
+
+  EXPECT_LANE_CHANGE_ABSOLUTE_TARGET_EQ(result_param.target, target);
+  EXPECT_EQ(result_param.trajectory_shape, trajectory_shape);
+  EXPECT_LANE_CHANGE_CONSTRAINT_EQ(result_param.constraint, constraint);
+}
+
+TEST(EntityBase, requestLaneChange_relativeTarget)
+{
+  const lanelet::Id id = 120659;
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
+
+  const lanelet::Id target_id = 34468;
+  const std::string target_name = "target_name";
+  auto target_pose = makeCanonicalizedLaneletPose(hdmap_utils, target_id, 5.0);
+  auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
+
+  const double target_offset = 1.0;
+  traffic_simulator::lane_change::RelativeTarget target(
+    target_name, traffic_simulator::lane_change::Direction::STRAIGHT, 3, target_offset);
+
+  traffic_simulator::lane_change::TrajectoryShape trajectory_shape =
+    traffic_simulator::lane_change::TrajectoryShape::LINEAR;
+
+  traffic_simulator::lane_change::Constraint constraint(
+    traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
+    traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
+
+  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> other_status;
+  other_status.emplace(target_name, target_status);
+
+  dummy_base->setOtherStatus(other_status);
+
+  dummy_base->requestLaneChange(target, trajectory_shape, constraint);
+  auto result_param = dummy.requestLaneChangeTEST();
+
+  traffic_simulator::lane_change::AbsoluteTarget ref_target(target_id, target_offset);
+
+  EXPECT_LANE_CHANGE_ABSOLUTE_TARGET_EQ(result_param.target, ref_target);
+  EXPECT_EQ(result_param.trajectory_shape, trajectory_shape);
+  EXPECT_LANE_CHANGE_CONSTRAINT_EQ(result_param.constraint, constraint);
+}
+
+TEST(EntityBase, requestLaneChange_relativeTargetLaneletPose)
+{
+  const lanelet::Id id = 120659;
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
+
+  const std::string target_name = "target_name";
+  geometry_msgs::msg::Pose target_pose;
+  target_pose.position = makePoint(3810.0, 73745.0);  // outside of road
+
+  auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
+
+  const double target_offset = 1.0;
+  traffic_simulator::lane_change::RelativeTarget target(
+    target_name, traffic_simulator::lane_change::Direction::STRAIGHT, 3, target_offset);
+
+  traffic_simulator::lane_change::TrajectoryShape trajectory_shape =
+    traffic_simulator::lane_change::TrajectoryShape::LINEAR;
+
+  traffic_simulator::lane_change::Constraint constraint(
+    traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
+    traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
+
+  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> other_status;
+  other_status.emplace(target_name, target_status);
+
+  dummy_base->setOtherStatus(other_status);
+
+  EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint);, common::Error);
+}
+
+TEST(EntityBase, requestLaneChange_relativeTargetnName)
+{
+  const lanelet::Id id = 120659;
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
+
+  const lanelet::Id target_id = 34468;
+  const std::string target_name = "target_name";
+  auto target_pose = makeCanonicalizedLaneletPose(hdmap_utils, target_id, 5.0);
+  auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
+
+  const double target_offset = 1.0;
+  traffic_simulator::lane_change::RelativeTarget target(
+    target_name + "_wrong", traffic_simulator::lane_change::Direction::STRAIGHT, 3, target_offset);
+
+  traffic_simulator::lane_change::TrajectoryShape trajectory_shape =
+    traffic_simulator::lane_change::TrajectoryShape::LINEAR;
+
+  traffic_simulator::lane_change::Constraint constraint(
+    traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
+    traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
+
+  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> other_status;
+  other_status.emplace(target_name, target_status);
+
+  dummy_base->setOtherStatus(other_status);
+  EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint);, common::Error);
+}
+
+TEST(EntityBase, requestLaneChange_relativeTargetInvalid)
+{
+  const lanelet::Id id = 120659;
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
+
+  const lanelet::Id target_id = 34468;
+  const std::string target_name = "target_name";
+  auto target_pose = makeCanonicalizedLaneletPose(hdmap_utils, target_id, 5.0);
+  auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
+  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
+
+  const double target_offset = 1.0;
+  traffic_simulator::lane_change::RelativeTarget target(
+    target_name, traffic_simulator::lane_change::Direction::RIGHT,
+    std::numeric_limits<std::uint8_t>::max(), target_offset);
+
+  traffic_simulator::lane_change::TrajectoryShape trajectory_shape =
+    traffic_simulator::lane_change::TrajectoryShape::LINEAR;
+
+  traffic_simulator::lane_change::Constraint constraint(
+    traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
+    traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
+
+  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> other_status;
+  other_status.emplace(target_name, target_status);
+
+  dummy_base->setOtherStatus(other_status);
+  EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint), common::Error);
+}
+
 TEST(EntityBase, setDynamicConstraints)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
