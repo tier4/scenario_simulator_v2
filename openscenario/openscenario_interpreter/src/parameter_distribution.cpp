@@ -17,7 +17,7 @@
 namespace openscenario_interpreter
 {
 auto mergeParameterDistribution(
-  ParameterDistribution & distribution, ParameterDistribution && additional_distribution)
+  const ParameterDistribution & distribution, const ParameterDistribution & additional_distribution)
   -> ParameterDistribution
 {
   if (distribution.empty()) {

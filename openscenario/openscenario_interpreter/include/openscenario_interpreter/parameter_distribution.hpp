@@ -67,7 +67,7 @@ struct ParameterDistributionContainer
 };
 
 auto mergeParameterDistribution(
-  ParameterDistribution & distribution, ParameterDistribution && additional_distribution)
+  const ParameterDistribution & distribution, const ParameterDistribution & additional_distribution)
   -> ParameterDistribution;
 
 template <typename DistributionT>
