@@ -30,22 +30,6 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
-auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
-{
-  geometry_msgs::msg::Point point;
-  point.x = x;
-  point.y = y;
-  point.z = z;
-  return point;
-}
-
-auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
-{
-  geometry_msgs::msg::Vector3 v;
-  v.z = yaw;
-  return quaternion_operation::convertEulerAngleToQuaternion(v);
-}
-
 TEST(EntityBase, appendDebugMarker)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
@@ -1341,7 +1325,8 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeContinuous)
   bool continuous = true;
 
   EXPECT_THROW(
-    dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous),  std::runtime_error);
+    dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous),
+    std::runtime_error);
 
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
 }
@@ -1385,6 +1370,78 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
   EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
 }
 
+TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeTransitionStep)
+{
+  // "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
+  lanelet::Id id = 120659;
+
+  const double initial_speed = 25.0;
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setLinearVelocity(initial_speed);
+
+  const double bob_speed = 17.0;
+  const double delta_speed = 3.0;
+  const double target_speed = bob_speed + delta_speed;
+  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
+    others;
+  others.emplace("bob_entity", bob_status);
+  dummy.setOtherStatus(others);
+
+  const double constraint_value = 10.0;
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
+    "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::TIME, constraint_value);
+  auto transition = traffic_simulator::speed_change::Transition::STEP;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous));
+
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeTransitionNotStepNoTime)
+{
+  // "requestSpeedChange" is being issued with manual and forceful speed change, 5th issue
+  lanelet::Id id = 120659;
+
+  const double initial_speed = 10.0;
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setLinearVelocity(initial_speed);
+
+  const double bob_speed = 17.0;
+  const double delta_speed = 3.0;
+  const double target_speed = bob_speed + delta_speed;
+  auto bob_status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, bob_speed, "bob");
+  std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
+    others;
+  others.emplace("bob_entity", bob_status);
+  dummy.setOtherStatus(others);
+
+  const double constraint_value = 0.0;
+  traffic_simulator::speed_change::RelativeTargetSpeed relative_taget_speed(
+    "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::TIME, constraint_value);
+  auto transition = traffic_simulator::speed_change::Transition::LINEAR;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous));
+
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
+}
+
 /*
 ISSUES:
 1: 182: "getDistanceToRightLaneBound" typo
@@ -1401,4 +1458,8 @@ ISSUES:
   after checking "isTargetSpeedReached" (if continuous == false)
 6: 551, 618: "requestSpeedChange" throws on invalid entity name if-and-only-if continuous is false.
   Order of checking in the if statement should be swapped in my opinion.
+7: 49, 59: it should be considered to make the "cancelRequest" and "appendDebugMarker" functions
+  purely virtual, or make them throw.
+8: 565: "requestSpeedChange" throws if "continuous" == true with "RelativeTargetSpeed",
+  whereas it does not when called with absolute ratget speed.
 */

@@ -114,4 +114,20 @@ auto makeCanonicalizedEntityStatus(
     makeEntityStatus(hdmap_utils, pose, bbox, speed, name), hdmap_utils);
 }
 
+auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
+{
+  geometry_msgs::msg::Point point;
+  point.x = x;
+  point.y = y;
+  point.z = z;
+  return point;
+}
+
+auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
+{
+  geometry_msgs::msg::Vector3 v;
+  v.z = yaw;
+  return quaternion_operation::convertEulerAngleToQuaternion(v);
+}
+
 #endif
