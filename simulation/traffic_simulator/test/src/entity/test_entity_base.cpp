@@ -1667,6 +1667,123 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintTimeTransitionN
   EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
 }
 
+TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTransitionLinear)
+{
+  lanelet::Id id = 120659;
+
+  const double initial_speed = 10.0;
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setLinearVelocity(initial_speed);
+
+  const double target_speed = 20.0;
+  const double constraint_value = 5.0;
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, constraint_value);
+  auto transition = traffic_simulator::speed_change::Transition::LINEAR;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, initial_speed);
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  dummy.setLinearVelocity(target_speed);
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+
+  auto default_constraints = dummy.getDefaultDynamicConstraints();
+  auto current_constraints = dummy.getDynamicConstraints();
+  EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTransitionAutoAccelerate)
+{
+  lanelet::Id id = 120659;
+
+  const double initial_speed = 10.0;
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setLinearVelocity(initial_speed);
+
+  const double target_speed = 20.0;
+  const double constraint_value = 5.0;
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, constraint_value);
+  auto transition = traffic_simulator::speed_change::Transition::AUTO;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, initial_speed);
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  dummy.setLinearVelocity(target_speed);
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+
+  auto default_constraints = dummy.getDefaultDynamicConstraints();
+  auto current_constraints = dummy.getDynamicConstraints();
+  EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
+}
+
+TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTransitionAutoDecelerate)
+{
+  lanelet::Id id = 120659;
+
+  const double initial_speed = 30.0;
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setLinearVelocity(initial_speed);
+
+  const double target_speed = 20.0;
+  const double constraint_value = 5.0;
+  traffic_simulator::speed_change::Constraint constraint(
+    traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, constraint_value);
+  auto transition = traffic_simulator::speed_change::Transition::AUTO;
+  bool continuous = false;
+
+  EXPECT_NO_THROW(
+    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, initial_speed);
+
+  const double current_time = 5.0;
+  const double step_time = 7.0;
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+
+  dummy.setLinearVelocity(target_speed);
+  dummy.onPostUpdate(current_time, step_time);
+  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+
+  auto default_constraints = dummy.getDefaultDynamicConstraints();
+  auto current_constraints = dummy.getDynamicConstraints();
+  EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
+}
+
 /*
 ISSUES:
 1: 182: "getDistanceToRightLaneBound" typo
