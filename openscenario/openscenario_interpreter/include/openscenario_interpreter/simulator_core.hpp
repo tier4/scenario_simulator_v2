@@ -100,7 +100,7 @@ public:
     {
       if (
         const auto result =
-          traffic_simulator::pose::toLaneletPose(pose, false, core->getHdmapUtils())) {
+          traffic_simulator::pose::toCanonicalizedLaneletPose(pose, false, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(

@@ -297,7 +297,7 @@ auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-  auto canonicalized_lanelet_pose = pose::toLaneletPose(
+  auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
     map_pose, getBoundingBox(), unique_route_lanelets, false,
     getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
   geometry_msgs::msg::Pose map_pose_z_fixed = map_pose;

@@ -39,18 +39,18 @@ auto toMapPose(
   const LaneletPose & lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose;
 
-auto toLaneletPose(
+auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>;
 
-auto toLaneletPose(
+auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
   const bool include_crosswalk, const double matching_distance,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>;
 
-auto toLaneletPose(
+auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)

@@ -489,7 +489,7 @@ public:
         entity_status.lanelet_pose_valid = true;
       } else {
         /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
-        if (const auto lanelet_pose = pose::toLaneletPose(
+        if (const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
               pose, parameters.bounding_box,
               entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
                 entity_status.type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT,

@@ -78,7 +78,7 @@ auto API::setEntityStatus(
     entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose);
   status.action_status = action_status;
   if (
-    const auto lanelet_pose = pose::toLaneletPose(
+    const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
       status.pose, getBoundingBox(name), false,
       getDefaultMatchingDistanceForLaneletPoseCalculation(name),
       entity_manager_ptr_->getHdmapUtils())) {
@@ -134,7 +134,7 @@ auto API::setEntityStatus(
   status.name = name;
   status.action_status = action_status;
   if (
-    const auto lanelet_pose = pose::toLaneletPose(
+    const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, getBoundingBox(name), false,
       getDefaultMatchingDistanceForLaneletPoseCalculation(name),
       entity_manager_ptr_->getHdmapUtils())) {

@@ -77,12 +77,12 @@ auto EntityBase::getLaneletPose(double matching_distance) const
 {
   if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getEntityType().type) {
     if (
-      const auto lanelet_pose_include_crosswalk = pose::toLaneletPose(
+      const auto lanelet_pose_include_crosswalk = pose::toCanonicalizedLaneletPose(
         getMapPose(), getBoundingBox(), true, matching_distance, hdmap_utils_ptr_)) {
       return lanelet_pose_include_crosswalk;
     }
   } else {
-    return pose::toLaneletPose(
+    return pose::toCanonicalizedLaneletPose(
       getMapPose(), getBoundingBox(), false, matching_distance, hdmap_utils_ptr_);
   }
   return std::nullopt;
@@ -92,7 +92,7 @@ auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool includ
 {
   auto non_canonicalized_status = static_cast<EntityStatus>(status);
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-  const auto canonicalized_lanelet_pose = pose::toLaneletPose(
+  const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
     non_canonicalized_status.pose, getBoundingBox(), unique_route_lanelets, include_crosswalk,
     getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 

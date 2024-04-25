@@ -72,7 +72,7 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
-      const auto lanelet_waypoint = pose::toLaneletPose(
+      const auto lanelet_waypoint = pose::toCanonicalizedLaneletPose(
         waypoint, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation(),
         hdmap_utils_ptr_)) {
       route.emplace_back(lanelet_waypoint.value());
@@ -152,7 +152,7 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
-    const auto lanelet_pose = pose::toLaneletPose(
+    const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation(),
       hdmap_utils_ptr_)) {
     requestAcquirePosition(lanelet_pose.value());
