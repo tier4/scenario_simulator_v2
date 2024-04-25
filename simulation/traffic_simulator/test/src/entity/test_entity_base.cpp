@@ -1215,12 +1215,15 @@ ISSUES:
 1: 182: "getDistanceToRightLaneBound" typo
 2: 183: sigsegv on empty "distances" vector
 3: 595, 581: removal of these lines might be considered.
-  The job will seemingly do nothing, if continuous == false and the target_speed is already set
-4: 644: this line should be moved down, just like in 604, 630, 587
-5: 385, 437, 512, 545: why is a request to change the speed being issued,
-  and then, immidiately, the speed is forcefully changed? 
+  It looks like a job to change the "target_speed" is added after
+  the "target_speed" is already set for the desired value.
+  The job will do nothing, if continuous == false and the target_speed is already set
+4: 644: this line should be moved down, just like in 604, 630, 587.
+  "target_speed" often will not be set because of this line.
+5: 385, 437, 512, 545: it is unclear, why is a request to change the speed being issued,
+  and then, immidiately, the speed is forcefully changed.
   The job assigned to change the target speed will return early anyway,
-  after checking "isTargetSpeedReached"
+  after checking "isTargetSpeedReached" (if continuous == false)
 6: 551, 618: "requestSpeedChange" throws on invalid entity name if-and-only-if continuous is false.
   Order of checking in the if statement should be swapped in my opinion.
 */
