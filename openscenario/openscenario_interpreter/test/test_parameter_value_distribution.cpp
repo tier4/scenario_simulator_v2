@@ -86,8 +86,9 @@ TEST(ParameterValueDistribution, DistributionRange)
 
   ParameterDistribution expected_distribution;
   expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", -1.0));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 1.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", -0.47));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.06));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.59));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
@@ -172,7 +173,7 @@ TEST(ParameterValueDistribution, Histogram)
   expected_distribution.push_back(
     makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -0.791349867976780196876518402860));
+    makeParameterListSharedPtr<Double>("offset", -0.845241258489508595630468335003));
   expected_distribution.push_back(
     makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
 
