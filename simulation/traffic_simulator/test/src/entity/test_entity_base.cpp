@@ -523,6 +523,67 @@ TEST(EntityBase, setOtherStatus)
     static_cast<traffic_simulator_msgs::msg::EntityStatus>(result_status.at(name1)));
 }
 
+TEST(EntityBase, setStatus)
+{
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
+  auto bbox = makeBoundingBox();
+  const auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+
+  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setEntityType(traffic_simulator_msgs::msg::EntityType::VEHICLE);
+  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
+
+  auto new_type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+  auto new_subtype = traffic_simulator_msgs::msg::EntitySubtype::CAR;
+  double new_time = 1.0;
+  const std::string new_name = "dummy_entity_new";
+  traffic_simulator_msgs::msg::BoundingBox new_bounding_box;
+  new_bounding_box.center.x = 2.0;
+  new_bounding_box.dimensions.x = 3.0;
+  new_bounding_box.dimensions.y = 1.5;
+  traffic_simulator_msgs::msg::ActionStatus new_action_status;
+  new_action_status.twist.linear.x = 100.0;
+  new_action_status.linear_jerk = 20.0;
+  new_action_status.current_action = "new_current_status";
+  geometry_msgs::msg::Pose new_pose;
+  new_pose.position = makePoint(3810.0, 73745.0);  // outside of road
+  bool new_lanelet_pose_valid = false;
+
+  traffic_simulator_msgs::msg::EntityStatus new_status;
+  {
+    new_status.type.type = new_type;
+    new_status.subtype.value = new_subtype;
+    new_status.time = new_time;
+    new_status.name = new_name;
+    new_status.bounding_box = new_bounding_box;
+    new_status.action_status = new_action_status;
+    new_status.pose = new_pose;
+    new_status.lanelet_pose_valid = new_lanelet_pose_valid;
+  }
+
+  auto ref_status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(dummy_base->getStatus());
+  {
+    ref_status.time = new_time;
+    ref_status.action_status = [&]() -> traffic_simulator_msgs::msg::ActionStatus {
+      auto tmp_action = ref_status.action_status.current_action;
+      auto ret_status = new_action_status;
+      ret_status.current_action = tmp_action;
+      return ret_status;
+    }();
+    ref_status.pose = new_pose;
+    ref_status.lanelet_pose = traffic_simulator_msgs::msg::LaneletPose();
+    ref_status.lanelet_pose_valid = new_lanelet_pose_valid;
+  }
+
+  dummy_base->setStatus(
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(new_status, hdmap_utils_ptr));
+
+  EXPECT_EQ(
+    static_cast<traffic_simulator_msgs::msg::EntityStatus>(dummy_base->getStatus()),
+    static_cast<traffic_simulator_msgs::msg::EntityStatus>(ref_status));
+}
+
 TEST(EntityBase, requestFollowTrajectory)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
