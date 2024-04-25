@@ -58,7 +58,7 @@ void checkParameterValueDistribution(const std::string path, const ParameterDist
       } else if (expected_parameter.is<String>()) {
         EXPECT_EQ(expected_parameter.as<String>(), actual_parameter.as<String>());
       } else if (expected_parameter.is<Double>()) {
-        EXPECT_EQ(expected_parameter.as<Double>(), actual_parameter.as<Double>());
+        EXPECT_DOUBLE_EQ(expected_parameter.as<Double>(), actual_parameter.as<Double>());
       } else if (expected_parameter.is<Boolean>()) {
         EXPECT_EQ(expected_parameter.as<Boolean>(), actual_parameter.as<Boolean>());
       } else {
