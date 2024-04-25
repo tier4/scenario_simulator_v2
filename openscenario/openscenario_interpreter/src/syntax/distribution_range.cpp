@@ -30,7 +30,7 @@ auto DistributionRange::derive() -> SingleUnnamedParameterDistribution
 {
   SingleUnnamedParameterDistribution unnamed_distribution;
   const auto number_of_parameters =
-    static_cast<std::size_t>((range.upper_limit - range.lower_limit) / step_width);
+    static_cast<std::size_t>((range.upper_limit - range.lower_limit) / step_width + 1);
   for (std::size_t i = 0; i < number_of_parameters; ++i) {
     unnamed_distribution.emplace_back(
       make<Double>(range.lower_limit + static_cast<double>(i) * step_width));
