@@ -114,6 +114,18 @@ public:
   }
 
   std::optional<double> getTargetSpeed() { return target_speed_; }
+
+public:
+  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter & param) override
+  {
+    lane_change_param_TEST_ = param;
+  }
+  traffic_simulator::lane_change::Parameter requestLaneChangeTEST()
+  {
+    return lane_change_param_TEST_;
+  }
+
+  traffic_simulator::lane_change::Parameter lane_change_param_TEST_;
 };
 
 #endif

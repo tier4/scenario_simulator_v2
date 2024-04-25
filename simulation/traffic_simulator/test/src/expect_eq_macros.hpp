@@ -89,4 +89,24 @@
   EXPECT_EQ(DATA0.max_acceleration_rate, DATA1.max_acceleration_rate); \
   EXPECT_EQ(DATA0.max_deceleration_rate, DATA1.max_deceleration_rate);
 
+#define EXPECT_LANE_CHANGE_ABSOLUTE_TARGET_EQ(DATA0, DATA1) \
+  EXPECT_EQ(DATA0.lanelet_id, DATA1.lanelet_id);            \
+  EXPECT_DOUBLE_EQ(DATA0.offset, DATA1.offset);
+
+#define EXPECT_LANE_CHANGE_RELATIVE_TARGET_EQ(DATA0, DATA1) \
+  EXPECT_EQ(DATA0.entity_name, DATA1.entity_name);          \
+  EXPECT_EQ(DATA0.direction, DATA1.direction);              \
+  EXPECT_EQ(DATA0.shift, DATA1.shift);                      \
+  EXPECT_DOUBLE_EQ(DATA0.offset, DATA1.offset);
+
+#define EXPECT_LANE_CHANGE_CONSTRAINT_EQ(DATA0, DATA1) \
+  EXPECT_EQ(DATA0.type, DATA1.type);                   \
+  EXPECT_DOUBLE_EQ(DATA0.value, DATA1.value);          \
+  EXPECT_EQ(DATA0.policy, DATA1.policy);
+
+#define EXPECT_LANE_CHANGE_PARAMETER_EQ(DATA0, DATA1)                \
+  EXPECT_LANE_CHANGE_ABSOLUTE_TARGET_EQ(DATA0.target, DATA1.target); \
+  EXPECT_EQ(DATA0.trajectory_shape, DATA1.trajectory_shape);         \
+  EXPECT_LANE_CHANGE_CONSTRAINT_EQ(DATA0.constraint, DATA1.constraint);
+
 #endif  // TRAFFIC_SIMULATOR__TEST__EXPECT_EQ_MACROS_HPP_
