@@ -248,9 +248,31 @@ TEST(ParameterValueDistribution, ProbabilityDistributionSet)
     "/test/parameter_value_distribution/Stochastic.ProbabilityDistributionSet.xosc";
 
   ParameterDistribution expected_distribution;
-  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "-1.0"));
-  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "-0.47"));
-  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "0.59"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "3"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "3"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "3"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "3"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+
+  // NOTE:
+  // 1, ideal: 5/20,  actual: 6/20
+  // 2: ideal: 10/20, actual: 10/20
+  // 3: ideal: 5/20,  actual: 4/20
 
   checkParameterValueDistribution(path, expected_distribution);
 }
