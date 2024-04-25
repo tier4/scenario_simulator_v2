@@ -84,11 +84,16 @@ TEST(ParameterValueDistribution, DistributionRange)
   std::string path = get_package_share_directory("openscenario_interpreter") +
                      "/test/parameter_value_distribution/Deterministic.DistributionRange.xosc";
 
+  double offset0 = -1.0 + 0.53 * 0;  // -1.0
+  double offset1 = -1.0 + 0.53 * 1;  // -0.47
+  double offset2 = -1.0 + 0.53 * 2;  // 0.06
+  double offset3 = -1.0 + 0.53 * 3;  // 0.59
+
   ParameterDistribution expected_distribution;
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", -1.0));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", -0.47));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.06));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.59));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", offset0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", offset1));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", offset2));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", offset3));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
@@ -144,18 +149,34 @@ TEST(ParameterValueDistribution, Deterministic)
     (*parameter_set)["LANE_ID"] = make<String>(lane_id);
     return parameter_set;
   };
-  expected_distribution.push_back(make_parameter_set(-1.0, "34510"));
-  expected_distribution.push_back(make_parameter_set(-1.0, "34513"));
-  expected_distribution.push_back(make_parameter_set(-1.0, "34564"));
-  expected_distribution.push_back(make_parameter_set(-0.47, "34510"));
-  expected_distribution.push_back(make_parameter_set(-0.47, "34513"));
-  expected_distribution.push_back(make_parameter_set(-0.47, "34564"));
-  expected_distribution.push_back(make_parameter_set(0.06, "34510"));
-  expected_distribution.push_back(make_parameter_set(0.06, "34513"));
-  expected_distribution.push_back(make_parameter_set(0.06, "34564"));
-  expected_distribution.push_back(make_parameter_set(0.59, "34510"));
-  expected_distribution.push_back(make_parameter_set(0.59, "34513"));
-  expected_distribution.push_back(make_parameter_set(0.59, "34564"));
+  double offset0 = -1.0 + 0.53 * 0;  // -1.0
+  double offset1 = -1.0 + 0.53 * 1;  // -0.47
+  double offset2 = -1.0 + 0.53 * 2;  // 0.06
+  double offset3 = -1.0 + 0.53 * 3;  // 0.59
+  std::string lane_id0 = "34510";
+  std::string lane_id1 = "34513";
+  std::string lane_id2 = "34564";
+
+  {
+    expected_distribution.push_back(make_parameter_set(offset0, lane_id0));
+    expected_distribution.push_back(make_parameter_set(offset0, lane_id1));
+    expected_distribution.push_back(make_parameter_set(offset0, lane_id2));
+  }
+  {
+    expected_distribution.push_back(make_parameter_set(offset1, lane_id0));
+    expected_distribution.push_back(make_parameter_set(offset1, lane_id1));
+    expected_distribution.push_back(make_parameter_set(offset1, lane_id2));
+  }
+  {
+    expected_distribution.push_back(make_parameter_set(offset2, lane_id0));
+    expected_distribution.push_back(make_parameter_set(offset2, lane_id1));
+    expected_distribution.push_back(make_parameter_set(offset2, lane_id2));
+  }
+  {
+    expected_distribution.push_back(make_parameter_set(offset3, lane_id0));
+    expected_distribution.push_back(make_parameter_set(offset3, lane_id1));
+    expected_distribution.push_back(make_parameter_set(offset3, lane_id2));
+  }
 
   checkParameterValueDistribution(path, expected_distribution);
 }
@@ -218,7 +239,6 @@ TEST(ParameterValueDistribution, NormalDistribution)
   checkParameterValueDistribution(path, expected_distribution);
 }
 
-// PoissonDistribution
 TEST(ParameterValueDistribution, PoissonDistribution)
 {
   using ament_index_cpp::get_package_share_directory;
@@ -237,7 +257,6 @@ TEST(ParameterValueDistribution, PoissonDistribution)
   checkParameterValueDistribution(path, expected_distribution);
 }
 
-// ProbabilityDistribution
 TEST(ParameterValueDistribution, ProbabilityDistributionSet)
 {
   using ament_index_cpp::get_package_share_directory;
@@ -277,7 +296,6 @@ TEST(ParameterValueDistribution, ProbabilityDistributionSet)
   checkParameterValueDistribution(path, expected_distribution);
 }
 
-// UniformDistribution
 TEST(ParameterValueDistribution, UniformDistribution)
 {
   using ament_index_cpp::get_package_share_directory;
