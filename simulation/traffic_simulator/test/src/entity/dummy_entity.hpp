@@ -100,9 +100,7 @@ public:
   void requestAcquirePosition(const geometry_msgs::msg::Pose &) override {}
   // clang-format on
 
-  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
-  traffic_simulator_msgs::msg::EntityType entity_type;
-
+public:
   void setEntityType(uint8_t value) { entity_type.type = value; }
 
   void appendToJobList(
@@ -115,7 +113,6 @@ public:
 
   std::optional<double> getTargetSpeed() { return target_speed_; }
 
-public:
   virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter & param) override
   {
     lane_change_param_TEST_ = param;
@@ -130,6 +127,8 @@ public:
     return other_status_;
   }
 
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
+  traffic_simulator_msgs::msg::EntityType entity_type;
   traffic_simulator::lane_change::Parameter lane_change_param_TEST_;
 };
 
