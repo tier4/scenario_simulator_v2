@@ -13,6 +13,11 @@ Changelog for package cpp_mock_scenarios
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.15.2 (2024-04-23)
+-------------------
+* Merge branch 'master' into feature/update_default_architecture_type
+* Contributors: Masaya Kataoka
+
 1.15.1 (2024-04-18)
 -------------------
 * Merge branch 'master' into fix/occluded-object-in-grid
