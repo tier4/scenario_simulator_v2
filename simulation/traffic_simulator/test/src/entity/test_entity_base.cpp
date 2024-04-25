@@ -1214,7 +1214,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
 ISSUES:
 1: 182: "getDistanceToRightLaneBound" typo
 2: 183: sigsegv on empty "distances" vector
-3: 595, 630: removal of these lines might be considered.
+3: 595, 581: removal of these lines might be considered.
   The job will seemingly do nothing, if continuous == false and the target_speed is already set
 4: 644: this line should be moved down, just like in 604, 630, 587
 5: 385, 437, 512, 545: why is a request to change the speed being issued,
