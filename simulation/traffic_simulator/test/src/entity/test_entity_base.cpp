@@ -70,7 +70,7 @@ TEST(EntityBase, asFieldOperatorApplication)
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  EXPECT_THROW(dummy.asFieldOperatorApplication(), std::runtime_error);
+  EXPECT_THROW(dummy.asFieldOperatorApplication(), common::Error);
 }
 
 TEST(EntityBase, get2DPolygon)
@@ -137,7 +137,7 @@ TEST(EntityBase, activateOutOfRangeJob_speed)
   double current_time = 0.0;
   double step_time = 0.0;
   EXPECT_NO_THROW(dummy.onUpdate(current_time, step_time));
-  EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), std::runtime_error);
+  EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
 
 TEST(EntityBase, activateOutOfRangeJob_acceleration)
@@ -162,7 +162,7 @@ TEST(EntityBase, activateOutOfRangeJob_acceleration)
   double current_time = 0.0;
   double step_time = 0.0;
   EXPECT_NO_THROW(dummy.onUpdate(current_time, step_time));
-  EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), std::runtime_error);
+  EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
 
 TEST(EntityBase, activateOutOfRangeJob_jerk)
@@ -187,7 +187,7 @@ TEST(EntityBase, activateOutOfRangeJob_jerk)
   double current_time = 0.0;
   double step_time = 0.0;
   EXPECT_NO_THROW(dummy.onUpdate(current_time, step_time));
-  EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), std::runtime_error);
+  EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
 
 TEST(EntityBase, onUpdate)
@@ -493,7 +493,7 @@ TEST(EntityBase, requestFollowTrajectory)
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   auto ptr = std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>();
-  EXPECT_THROW(dummy.requestFollowTrajectory(ptr), std::runtime_error);
+  EXPECT_THROW(dummy.requestFollowTrajectory(ptr), common::Error);
 }
 
 TEST(EntityBase, requestWalkStraight)
@@ -505,7 +505,7 @@ TEST(EntityBase, requestWalkStraight)
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  EXPECT_THROW(dummy.requestWalkStraight(), std::runtime_error);
+  EXPECT_THROW(dummy.requestWalkStraight(), common::Error);
 }
 
 TEST(EntityBase, updateStandStillDuration_startedMoving)
@@ -1062,7 +1062,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarge
     "invalid_name", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
   bool continuous = false;
 
-  EXPECT_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous), std::runtime_error);
+  EXPECT_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous), common::Error);
 
   const double current_time = 5.0;
   const double step_time = 7.0;
@@ -1132,7 +1132,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuousInvalidTarget)
     "invalid_name", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, delta_speed);
   bool continuous = true;
 
-  EXPECT_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous), std::runtime_error);
+  EXPECT_THROW(dummy.requestSpeedChange(relative_taget_speed, continuous), common::Error);
 
   const double current_time = 5.0;
   const double step_time = 7.0;
@@ -1326,7 +1326,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeContinuous)
 
   EXPECT_THROW(
     dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous),
-    std::runtime_error);
+    common::Error);
 
   EXPECT_FALSE(dummy.getTargetSpeed().has_value());
 }
@@ -1453,7 +1453,7 @@ ISSUES:
 4: 644: this line should be moved down, just like in 604, 630, 587.
   "target_speed" often will not be set because of this line.
 5: 385, 437, 512, 545: it is unclear, why is a request to change the speed being issued,
-  and then, immidiately, the speed is forcefully changed.
+  and then, immediately, the speed is forcefully changed.
   The job assigned to change the target speed will return early anyway,
   after checking "isTargetSpeedReached" (if continuous == false)
 6: 551, 618: "requestSpeedChange" throws on invalid entity name if-and-only-if continuous is false.
