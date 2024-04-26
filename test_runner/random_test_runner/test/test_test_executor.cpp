@@ -36,10 +36,6 @@ public:
   }
 };
 
-struct DummyCanonicalizedLaneletPose
-{
-};
-
 class MockTrafficSimulatorAPI
 {
 public:
@@ -51,12 +47,12 @@ public:
   MOCK_METHOD(bool, updateFrame, (), ());
   MOCK_METHOD(
     bool, spawn,
-    (const std::string &, DummyCanonicalizedLaneletPose,
+    (const std::string &, const traffic_simulator::LaneletPose &,
      const traffic_simulator_msgs::msg::VehicleParameters &, const std::string &, std::string),
     ());
   MOCK_METHOD(
     void, setEntityStatus,
-    (const std::string &, DummyCanonicalizedLaneletPose,
+    (const std::string &, const traffic_simulator::LaneletPose &,
      const traffic_simulator_msgs::msg::ActionStatus),
     ());
   MOCK_METHOD(void, attachLidarSensor, (const simulation_api_schema::LidarConfiguration &), ());
@@ -66,13 +62,10 @@ public:
     bool, attachOccupancyGridSensor, (simulation_api_schema::OccupancyGridSensorConfiguration), ());
   MOCK_METHOD(void, asFieldOperatorApplicationMock, (const std::string &), ());
   MOCK_METHOD(
-    void, requestAssignRoute, (const std::string &, std::vector<DummyCanonicalizedLaneletPose>),
-    ());
-  MOCK_METHOD(
-    DummyCanonicalizedLaneletPose, canonicalize, (const traffic_simulator::LaneletPose &), ());
+    void, requestAssignRoute, (const std::string &, std::vector<geometry_msgs::msg::Pose>), ());
   MOCK_METHOD(
     void, spawn,
-    (const std::string &, DummyCanonicalizedLaneletPose,
+    (const std::string &, const traffic_simulator::LaneletPose &,
      const traffic_simulator_msgs::msg::VehicleParameters &),
     ());
   MOCK_METHOD(void, requestSpeedChange, (const std::string &, double, bool), ());
@@ -121,15 +114,14 @@ TEST(TestExecutor, InitializeWithNoNPCs)
     ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
 
   EXPECT_CALL(*MockAPI, updateFrame).Times(1).InSequence(sequence);
-  EXPECT_CALL(*MockAPI, canonicalize).Times(1).InSequence(sequence);
   EXPECT_CALL(
-    *MockAPI, spawn(
-                ::testing::A<const std::string &>(), ::testing::A<DummyCanonicalizedLaneletPose>(),
-                ::testing::A<const traffic_simulator_msgs::msg::VehicleParameters &>(),
-                ::testing::A<const std::string &>(), ::testing::A<std::string>()))
+    *MockAPI,
+    spawn(
+      ::testing::A<const std::string &>(), ::testing::A<const traffic_simulator::LaneletPose &>(),
+      ::testing::A<const traffic_simulator_msgs::msg::VehicleParameters &>(),
+      ::testing::A<const std::string &>(), ::testing::A<std::string>()))
     .Times(1)
     .InSequence(sequence);
-  EXPECT_CALL(*MockAPI, canonicalize).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, setEntityStatus).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachLidarSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachDetectionSensor).Times(1).InSequence(sequence);
@@ -138,7 +130,6 @@ TEST(TestExecutor, InitializeWithNoNPCs)
   EXPECT_CALL(*(MockAPI->field_operator_application_mock), declare_parameter_mock)
     .Times(1)
     .InSequence(sequence);
-  EXPECT_CALL(*MockAPI, canonicalize).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, requestAssignRoute).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, asFieldOperatorApplicationMock).Times(1).InSequence(sequence);
   EXPECT_CALL(*(MockAPI->field_operator_application_mock), engage).Times(1).InSequence(sequence);

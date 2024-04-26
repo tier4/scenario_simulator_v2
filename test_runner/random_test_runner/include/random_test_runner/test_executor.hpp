@@ -81,10 +81,10 @@ public:
       api_->updateFrame();
 
       api_->spawn(
-        ego_name_, api_->canonicalize(test_description_.ego_start_position), getVehicleParameters(),
+        ego_name_, test_description_.ego_start_position, getVehicleParameters(),
         traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
       api_->setEntityStatus(
-        ego_name_, api_->canonicalize(test_description_.ego_start_position),
+        ego_name_, test_description_.ego_start_position,
         traffic_simulator::helper::constructActionStatus());
 
       if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
@@ -118,8 +118,7 @@ public:
       // ugly but helps for now
       std::this_thread::sleep_for(std::chrono::milliseconds{5000});
 
-      api_->requestAssignRoute(
-        ego_name_, std::vector({api_->canonicalize(test_description_.ego_goal_position)}));
+      api_->requestAssignRoute(ego_name_, std::vector({test_description_.ego_goal_pose}));
       api_->asFieldOperatorApplication(ego_name_).engage();
 
       goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
@@ -127,10 +126,10 @@ public:
       for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
         const auto & npc_descr = test_description_.npcs_descriptions[i];
         api_->spawn(
-          npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters(),
+          npc_descr.name, npc_descr.start_position, getVehicleParameters(),
           traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
         api_->setEntityStatus(
-          npc_descr.name, api_->canonicalize(npc_descr.start_position),
+          npc_descr.name, npc_descr.start_position,
           traffic_simulator::helper::constructActionStatus(npc_descr.speed));
         api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
       }
