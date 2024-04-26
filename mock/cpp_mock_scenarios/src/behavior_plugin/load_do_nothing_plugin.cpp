@@ -69,23 +69,23 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 0, 0)),
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0),
       getVehicleParameters(),
-      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing();
     api_.spawn(
-      "pedestrian", canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 3, 0)),
+      "pedestrian", traffic_simulator::helper::constructLaneletPose(34741, 3, 0)),
       getPedestrianParameters(),
-      traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
+      traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing();
     api_.spawn(
       "vehicle_spawn_with_behavior_tree",
-      canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 2.0, 0)),
+      traffic_simulator::helper::constructLaneletPose(34741, 2.0, 0)),
       getVehicleParameters(),
-      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::behaviorTree());
+      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::behaviorTree();
     api_.spawn(
       "pedestrian_spawn_with_behavior_tree",
-      canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 3, 0)),
+      traffic_simulator::helper::constructLaneletPose(34741, 3, 0)),
       getPedestrianParameters(),
-      traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::behaviorTree());
+      traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::behaviorTree();
   }
 };
 }  // namespace cpp_mock_scenarios

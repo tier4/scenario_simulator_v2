@@ -49,7 +49,7 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0)),
+      "ego", traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 10, true);

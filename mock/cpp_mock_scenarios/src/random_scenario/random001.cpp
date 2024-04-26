@@ -69,12 +69,12 @@ private:
         constexpr lanelet::Id spawn_lanelet_id = 34705;
         api_.spawn(
           entity_name,
-          canonicalize(traffic_simulator::helper::constructLaneletPose(
+          traffic_simulator::helper::constructLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
                 api_.getLaneletLength(spawn_lanelet_id) +
               normal_dist(engine_),
-            offset, 0, 0)),
+            offset, 0, 0),
           getVehicleParameters(
             get_entity_subtype(params_.random_parameters.road_parking_vehicle.entity_type)));
         api_.requestSpeedChange(entity_name, 0, true);
@@ -124,9 +124,8 @@ private:
       if (!api_.entityExists(entity_name)) {
         api_.spawn(
           entity_name,
-          canonicalize(
-            traffic_simulator::helper::constructLaneletPose(34513, spawn_s_value, 0, 0, 0, 0)),
-          getVehicleParameters());
+          traffic_simulator::helper::constructLaneletPose(34513, spawn_s_value, 0, 0, 0, 0)),
+          getVehicleParameters();
         std::uniform_real_distribution<> speed_distribution(
           params_.random_parameters.lane_following_vehicle.min_speed,
           params_.random_parameters.lane_following_vehicle.max_speed);
@@ -170,8 +169,8 @@ private:
           params_.random_parameters.crossing_pedestrian.max_speed);
         api_.spawn(
           entity_name,
-          canonicalize(traffic_simulator::helper::constructLaneletPose(
-            lanelet_id, 0.0, offset_distribution(engine_))),
+          traffic_simulator::helper::constructLaneletPose(
+            lanelet_id, 0.0, offset_distribution(engine_)),
           getPedestrianParameters());
         const auto speed = speed_distribution(engine_);
         api_.requestSpeedChange(entity_name, speed, true);
@@ -213,7 +212,7 @@ private:
     spawnRoadParkingVehicles();
 
     spawnEgoEntity(
-      canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0)),
+      traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0),
       {canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0))},
       getVehicleParameters());
     api_.spawn(
