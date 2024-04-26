@@ -412,6 +412,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
   geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
   geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
 
+  /// @note here is no entity_status->laneMatchingSucceed() check -> it may throw an exception
   auto lanelet_pose = entity_status->getLaneletPose();
   lanelet_pose.s =
     lanelet_pose.s + (twist_new.linear.x + entity_status->getTwist().linear.x) / 2.0 * step_time;
