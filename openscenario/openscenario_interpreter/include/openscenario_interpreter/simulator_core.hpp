@@ -168,7 +168,7 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto to_entity = core->getEntity(to_entity_name)) {
-        if (const auto to_lanelet_pose_opt = to_entity->getLaneletPose()) {
+        if (const auto to_lanelet_pose_opt = to_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_entity_name, to_lanelet_pose_opt.value(), routing_algorithm);
         }
@@ -182,7 +182,7 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose_opt = from_entity->getLaneletPose()) {
+        if (const auto from_lanelet_pose_opt = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_lanelet_pose_opt.value(), to_lanelet_pose, routing_algorithm);
         }
@@ -207,8 +207,8 @@ public:
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
-          if (const auto from_lanelet_pose_opt = from_entity->getLaneletPose()) {
-            if (const auto to_lanelet_pose_opt = to_entity->getLaneletPose()) {
+          if (const auto from_lanelet_pose_opt = from_entity->getCanonicalizedLaneletPose()) {
+            if (const auto to_lanelet_pose_opt = to_entity->getCanonicalizedLaneletPose()) {
               return makeNativeBoundingBoxRelativeLanePosition(
                 from_lanelet_pose_opt.value(), from_entity->getBoundingBox(),
                 to_lanelet_pose_opt.value(), to_entity->getBoundingBox(), routing_algorithm);
@@ -224,7 +224,7 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose_opt = from_entity->getLaneletPose()) {
+        if (const auto from_lanelet_pose_opt = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeBoundingBoxRelativeLanePosition(
             from_lanelet_pose_opt.value(), from_entity->getBoundingBox(), to_lanelet_pose,
             traffic_simulator_msgs::msg::BoundingBox(), routing_algorithm);
@@ -578,28 +578,30 @@ public:
     static auto evaluateRelativeHeading(
       const EntityRef & entity_ref, const OSCLanePosition & osc_lane_position)
     {
-      const auto from_map_pose = core->getEntity(entity_ref)->getMapPose();
-      const auto to_map_pose = static_cast<NativeWorldPosition>(osc_lane_position);
-      if (
-        const auto relative_pose =
-          traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
-        return static_cast<Double>(std::abs(
-          quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
-            .z));
-      } else {
-        return Double::nan();
+      if (const auto entity = core->getEntity(entity_ref)) {
+        const auto from_map_pose = entity->getMapPose();
+        const auto to_map_pose = static_cast<NativeWorldPosition>(osc_lane_position);
+        if (
+          const auto relative_pose =
+            traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
+          return static_cast<Double>(std::abs(
+            quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
+              .z));
+        }
       }
+      return Double::nan();
     }
 
     template <typename EntityRef>
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
-      if (auto lanelet_pose = core->getLaneletPose(entity_ref)) {
-        return static_cast<Double>(
-          std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).rpy.z));
-      } else {
-        return Double::nan();
+      if (const auto entity = core->getEntity(entity_ref)) {
+        if (auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+          return static_cast<Double>(std::abs(
+            static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()).rpy.z));
+        }
       }
+      return Double::nan();
     }
 
     template <typename... Ts>
