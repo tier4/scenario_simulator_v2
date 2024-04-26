@@ -353,15 +353,15 @@ void EntityManager::requestSpeedChange(
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 
-auto EntityManager::setEntityStatus(
-  const std::string & name, const CanonicalizedEntityStatus & status) -> void
+auto EntityManager::setEntityStatus(const std::string & name, const EntityStatus & status) -> void
 {
   if (is<EgoEntity>(name) && getCurrentTime() > 0) {
     THROW_SEMANTIC_ERROR(
       "You cannot set entity status to the ego vehicle name ", std::quoted(name),
       " after starting scenario.");
   } else {
-    entities_.at(name)->setStatus(status);
+    auto const canonicalized_entity_status = CanonicalizedEntityStatus(status, getHdmapUtils());
+    entities_.at(name)->setStatus(canonicalized_entity_status);
   }
 }
 

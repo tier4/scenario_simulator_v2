@@ -292,7 +292,7 @@ public:
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
-  FORWARD_TO_ENTITY(getLaneletPose, const);
+  // FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getMapPoseFromRelativePose, const);
@@ -444,7 +444,7 @@ public:
    */
   void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
 
-  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
+  auto setEntityStatus(const std::string & name, const EntityStatus & status) -> void;
 
   void setVerbose(const bool verbose);
 
@@ -485,6 +485,13 @@ public:
 
       if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
         entity_status.pose = pose::toMapPose(pose);
+      } else if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
+        entity_status.pose = pose::toMapPose(pose, hdmap_utils_ptr_);
+      } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
+        entity_status.pose = pose;
+      }
+
+      if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
         entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
         entity_status.lanelet_pose_valid = true;
       } else {
@@ -513,12 +520,9 @@ public:
           /// @note fix z, roll and pitch to fitting to the lanelet
           if (getParameter<bool>("consider_pose_by_road_slope", false)) {
             entity_status.pose = hdmap_utils_ptr_->toMapPose(entity_status.lanelet_pose).pose;
-          } else {
-            entity_status.pose = pose;
           }
         } else {
           entity_status.lanelet_pose_valid = false;
-          entity_status.pose = pose;
         }
       }
 

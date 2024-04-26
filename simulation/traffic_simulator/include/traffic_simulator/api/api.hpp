@@ -217,11 +217,14 @@ public:
   bool despawn(const std::string & name);
   bool despawnEntities();
 
-  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus &) -> void;
+  auto setEntityStatus(const std::string & name, const EntityStatus & status) -> void;
   auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
+  auto setEntityStatus(
+    const std::string & name, const LaneletPose & lanelet_pose,
+    const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void;
   auto setEntityStatus(
     const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
@@ -313,7 +316,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLaneletLength);
-  FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
+  // FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getMapPoseFromRelativePose);
@@ -352,10 +355,10 @@ private:
 public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
-  auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
-    -> CanonicalizedLaneletPose;
-  auto canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
-    -> CanonicalizedEntityStatus;
+  // auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
+  //   -> CanonicalizedLaneletPose;
+  // auto canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
+  //   -> CanonicalizedEntityStatus;
 
 private:
   bool updateTimeInSim();
