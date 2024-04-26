@@ -100,7 +100,9 @@ public:
   void requestAcquirePosition(const geometry_msgs::msg::Pose &) override {}
   // clang-format on
 
-public:
+  /**
+   * @brief Additional fields and functions used in tests.
+   */
   void setEntityType(uint8_t value) { entity_type.type = value; }
 
   void appendToJobList(
