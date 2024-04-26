@@ -111,9 +111,8 @@ auto PedestrianEntity::getDefaultDynamicConstraints() const
 
 auto PedestrianEntity::getRouteLanelets(double horizon) -> lanelet::Ids
 {
-  if (status_.laneMatchingSucceed()) {
-    return route_planner_.getRouteLanelets(
-      CanonicalizedLaneletPose(status_.getLaneletPose(), hdmap_utils_ptr_), horizon);
+  if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
+    return route_planner_.getRouteLanelets(canonicalized_lanelet_pose.value(), horizon);
   } else {
     return {};
   }
