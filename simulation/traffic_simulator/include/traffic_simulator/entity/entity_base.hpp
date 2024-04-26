@@ -116,6 +116,11 @@ public:
   /*   */ auto getLaneletPose(double matching_distance) const
     -> std::optional<CanonicalizedLaneletPose>;
 
+  /*   */ auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
+
+  /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
+    -> std::optional<CanonicalizedLaneletPose>;
+
   /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
     -> geometry_msgs::msg::Pose;
 

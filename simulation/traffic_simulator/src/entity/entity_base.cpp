@@ -88,6 +88,20 @@ auto EntityBase::getLaneletPose(double matching_distance) const
   return std::nullopt;
 }
 
+auto EntityBase::getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
+{
+  return status_.getCanonicalizedLaneletPose();
+}
+
+auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
+  -> std::optional<CanonicalizedLaneletPose>
+{
+  const auto include_crosswalk =
+    traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getEntityType().type;
+  return pose::toCanonicalizedLaneletPose(
+    getMapPose(), getBoundingBox(), include_crosswalk, matching_distance, hdmap_utils_ptr_);
+}
+
 auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk) -> void
 {
   auto non_canonicalized_status = static_cast<EntityStatus>(status);
@@ -169,7 +183,7 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::Constraint & constraint)
 {
   lanelet::Id reference_lanelet_id = 0;
-  const auto lanelet_pose = getLaneletPose();
+  const auto lanelet_pose = getCanonicalizedLaneletPose();
   if (lanelet_pose && target.entity_name == name) {
     if (!lanelet_pose) {
       THROW_SEMANTIC_ERROR(

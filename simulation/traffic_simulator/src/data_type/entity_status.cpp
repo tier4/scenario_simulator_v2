@@ -22,15 +22,33 @@ namespace entity_status
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-: entity_status_(canonicalize(may_non_canonicalized_entity_status, hdmap_utils))
+: canonicalized_lanelet_pose_{may_non_canonicalized_entity_status.lanelet_pose_valid?std::optional(CanonicalizedLaneletPose(
+    may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils)):std::nullopt},
+  entity_status_{may_non_canonicalized_entity_status}
 {
+  entity_status_ = may_non_canonicalized_entity_status;
+  assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());
+  if (canonicalized_lanelet_pose_) {
+    entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
+  } else {
+    entity_status_.lanelet_pose = LaneletPose();
+  }
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
-: entity_status_(canonicalize(may_non_canonicalized_entity_status, hdmap_utils, route_lanelets))
+: canonicalized_lanelet_pose_{may_non_canonicalized_entity_status.lanelet_pose_valid?std::optional(CanonicalizedLaneletPose(
+    may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils, route_lanelets)):std::nullopt},
+      entity_status_{may_non_canonicalized_entity_status}
 {
+  entity_status_ = may_non_canonicalized_entity_status;
+  assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());
+  if (canonicalized_lanelet_pose_) {
+    entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
+  } else {
+    entity_status_.lanelet_pose = LaneletPose();
+  }
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj)
@@ -38,37 +56,9 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntitySt
 {
 }
 
-auto CanonicalizedEntityStatus::canonicalize(
-  const EntityStatus & may_non_canonicalized_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> EntityStatus
+auto CanonicalizedEntityStatus::laneMatchingSucceed() const noexcept -> bool
 {
-  auto canonicalized = may_non_canonicalized_entity_status;
-  if (may_non_canonicalized_entity_status.lanelet_pose_valid) {
-    canonicalized.lanelet_pose_valid = true;
-    canonicalized.lanelet_pose = static_cast<LaneletPose>(
-      CanonicalizedLaneletPose(may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils));
-  } else {
-    canonicalized.lanelet_pose_valid = false;
-    canonicalized.lanelet_pose = LaneletPose();
-  }
-  return canonicalized;
-}
-
-auto CanonicalizedEntityStatus::canonicalize(
-  const EntityStatus & may_non_canonicalized_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
-  -> EntityStatus
-{
-  auto canonicalized = may_non_canonicalized_entity_status;
-  if (may_non_canonicalized_entity_status.lanelet_pose_valid) {
-    canonicalized.lanelet_pose_valid = true;
-    canonicalized.lanelet_pose = static_cast<LaneletPose>(CanonicalizedLaneletPose(
-      may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils, route_lanelets));
-  } else {
-    canonicalized.lanelet_pose_valid = false;
-    canonicalized.lanelet_pose = LaneletPose();
-  }
-  return canonicalized;
+  return canonicalized_lanelet_pose_.has_value();
 }
 
 auto CanonicalizedEntityStatus::getBoundingBox() const noexcept
@@ -79,10 +69,16 @@ auto CanonicalizedEntityStatus::getBoundingBox() const noexcept
 
 auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose
 {
-  if (!laneMatchingSucceed()) {
+  if (!canonicalized_lanelet_pose_.has_value()) {
     THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
   }
-  return entity_status_.lanelet_pose;
+  return static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
+}
+
+auto CanonicalizedEntityStatus::getCanonicalizedLaneletPose() const
+  -> std::optional<CanonicalizedLaneletPose>
+{
+  return canonicalized_lanelet_pose_;
 }
 
 auto CanonicalizedEntityStatus::setTwist(const geometry_msgs::msg::Twist & twist) -> void
@@ -127,11 +123,20 @@ auto CanonicalizedEntityStatus::getTime() const noexcept -> double { return enti
 
 bool isSameLaneletId(const CanonicalizedEntityStatus & s0, const CanonicalizedEntityStatus & s1)
 {
-  return s0.getLaneletPose().lanelet_id == s1.getLaneletPose().lanelet_id;
+  if (const auto s0_canonicalized_lanelet_pose = s0.getCanonicalizedLaneletPose()) {
+    if (const auto s1_canonicalized_lanelet_pose = s1.getCanonicalizedLaneletPose()) {
+      return isSameLaneletId(
+        s0_canonicalized_lanelet_pose.value(), s1_canonicalized_lanelet_pose.value());
+    }
+  }
+  THROW_SIMULATION_ERROR("There is no Lanelet pose");
 }
 
 bool isSameLaneletId(const CanonicalizedEntityStatus & s, const lanelet::Id lanelet_id)
 {
-  return s.getLaneletPose().lanelet_id == lanelet_id;
+  if (const auto s_canonicalized_lanelet_pose = s.getCanonicalizedLaneletPose()) {
+    return isSameLaneletId(s_canonicalized_lanelet_pose.value(), lanelet_id);
+  }
+  THROW_SIMULATION_ERROR("There is no Lanelet pose");
 }
 }  // namespace traffic_simulator

@@ -44,9 +44,10 @@ public:
   }
   auto getName() const noexcept -> std::string { return entity_status_.name; };
   auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
-  auto laneMatchingSucceed() const noexcept -> bool { return entity_status_.lanelet_pose_valid; }
+  auto laneMatchingSucceed() const noexcept -> bool;
   auto getMapPose() const noexcept -> geometry_msgs::msg::Pose { return entity_status_.pose; }
   auto getLaneletPose() const -> LaneletPose;
+  auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
   auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
   auto getTwist() const noexcept -> geometry_msgs::msg::Twist;
   auto setLinearVelocity(double linear_velocity) -> void;
@@ -58,13 +59,7 @@ public:
   auto getTime() const noexcept -> double;
 
 private:
-  auto canonicalize(
-    const EntityStatus & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> EntityStatus;
-  auto canonicalize(
-    const EntityStatus & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const lanelet::Ids & route_lanelets) -> EntityStatus;
+  std::optional<CanonicalizedLaneletPose> canonicalized_lanelet_pose_;
   EntityStatus entity_status_;
 };
 }  // namespace entity_status
