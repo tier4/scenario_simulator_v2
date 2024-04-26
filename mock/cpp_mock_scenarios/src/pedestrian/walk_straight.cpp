@@ -72,17 +72,17 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(120545, 0)),
+      "ego", canonicalize(traffic_simulator::helper::constructLaneletPose(120545, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 8, true);
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)),
-               api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34690, 0.0))});
+               canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)),
+               canonicalize(traffic_simulator::helper::constructLaneletPose(34690, 0.0))});
 
     api_.spawn(
-      "bob", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34378, 0.0)),
+      "bob", canonicalize(traffic_simulator::helper::constructLaneletPose(34378, 0.0)),
       getPedestrianParameters());
     api_.setLinearVelocity("bob", 0);
     api_.requestWalkStraight("bob");

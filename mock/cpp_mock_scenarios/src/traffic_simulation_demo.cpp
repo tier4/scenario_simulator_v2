@@ -49,35 +49,32 @@ private:
     }
     if (api_.getCurrentTime() >= 4 && api_.entityExists("obstacle")) {
       api_.setEntityStatus(
-        "obstacle", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(120545, 0)),
+        "obstacle", canonicalize(traffic_simulator::helper::constructLaneletPose(120545, 0)),
         traffic_simulator::helper::constructActionStatus(10));
     }
     if (api_.getCurrentTime() >= 6 && api_.entityExists("obstacle")) {
       api_.despawn("obstacle");
     }
     if (api_.reachPosition(
-          "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34615, 10.0)),
-          5)) {
+          "ego", canonicalize(traffic_simulator::helper::constructLaneletPose(34615, 10.0)), 5)) {
       api_.requestAcquirePosition(
-        "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(35026, 0.0)));
+        "ego", canonicalize(traffic_simulator::helper::constructLaneletPose(35026, 0.0)));
       if (api_.entityExists("npc2")) {
         api_.requestSpeedChange("npc2", 13, true);
       }
     }
     if (api_.reachPosition(
-          "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34579, 0.0)),
-          5)) {
+          "ego", canonicalize(traffic_simulator::helper::constructLaneletPose(34579, 0.0)), 5)) {
       api_.requestAcquirePosition(
-        "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)));
+        "ego", canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)));
       if (api_.entityExists("npc2")) {
         api_.requestSpeedChange("npc2", 3, true);
       }
     }
     if (api_.reachPosition(
-          "npc2", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0.0)),
-          5)) {
+          "npc2", canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0.0)), 5)) {
       api_.requestAcquirePosition(
-        "npc2", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34630, 0.0)));
+        "npc2", canonicalize(traffic_simulator::helper::constructLaneletPose(34630, 0.0)));
       api_.requestSpeedChange("npc2", 13, true);
     }
     if (api_.getCurrentTime() > 10.0 && api_.entityExists("bob")) {
@@ -90,14 +87,14 @@ private:
     lanechange_executed_ = false;
 
     api_.spawn(
-      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(120545, 0)),
+      "ego", canonicalize(traffic_simulator::helper::constructLaneletPose(120545, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 8, true);
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)),
-               api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34690, 0.0))});
+               canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)),
+               canonicalize(traffic_simulator::helper::constructLaneletPose(34690, 0.0))});
 
     api_.spawn(
       "tom", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
@@ -109,27 +106,27 @@ private:
     api_.requestSpeedChange("tom", 3, true);
 
     api_.spawn(
-      "bob", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34378, 0.0)),
+      "bob", canonicalize(traffic_simulator::helper::constructLaneletPose(34378, 0.0)),
       getPedestrianParameters());
     api_.setLinearVelocity("bob", 1.0);
     api_.requestSpeedChange("bob", 1, true);
 
     api_.spawn(
-      "npc1", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34579, 20.0)),
+      "npc1", canonicalize(traffic_simulator::helper::constructLaneletPose(34579, 20.0)),
       getVehicleParameters());
     api_.setLinearVelocity("npc1", 5.0);
     api_.requestSpeedChange("npc1", 5, true);
     api_.requestAcquirePosition(
-      "npc1", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)));
+      "npc1", canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)));
 
     api_.spawn(
-      "npc2", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 20.0)),
+      "npc2", canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 20.0)),
       getVehicleParameters());
     api_.setLinearVelocity("npc2", 5);
     api_.requestSpeedChange("npc2", 0, true);
 
     api_.spawn(
-      "npc3", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34468, 0)),
+      "npc3", canonicalize(traffic_simulator::helper::constructLaneletPose(34468, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("npc3", 10);
 
