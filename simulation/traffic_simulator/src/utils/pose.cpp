@@ -50,7 +50,7 @@ auto canonicalize(
   return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
 }
 
-auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> const geometry_msgs::msg::Pose
+auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
 {
   return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 }
@@ -60,6 +60,17 @@ auto toMapPose(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose
 {
   return hdmap_utils_ptr->toMapPose(lanelet_pose).pose;
+}
+
+auto toCanonicalizedLaneletPose(
+  const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const bool include_crosswalk, const double matching_distance,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<CanonicalizedLaneletPose>
+{
+  return toCanonicalizedLaneletPose(
+    toMapPose(lanelet_pose, hdmap_utils_ptr), bbox, include_crosswalk, matching_distance,
+    hdmap_utils_ptr);
 }
 
 auto toCanonicalizedLaneletPose(
