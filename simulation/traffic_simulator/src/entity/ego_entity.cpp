@@ -12,20 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <boost/lexical_cast.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
+#include <traffic_simulator/entity/ego_entity.hpp>
+#include <traffic_simulator/utils/pose.hpp>
+
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
+
+#include <boost/lexical_cast.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <functional>
 #include <memory>
 #include <optional>
 #include <string>
 #include <system_error>
 #include <thread>
-#include <traffic_simulator/entity/ego_entity.hpp>
-#include <traffic_simulator/utils/pose.hpp>
-#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -141,7 +144,10 @@ auto EgoEntity::getRouteLanelets(double /*unused horizon*/) -> lanelet::Ids
   return ids;
 }
 
-auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose { return status_.getMapPose(); }
+auto EgoEntity::getCurrentPose() const -> geometry_msgs::msg::Pose
+{
+  return status_.getMapPose();
+}
 
 auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray
 {
@@ -154,14 +160,12 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 
   if (is_controlled_by_simulator_ && npc_logic_started_) {
     if (
-      const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-        static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
-        behavior_parameter_, hdmap_utils_ptr_, step_time,
-        target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
-      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        updated_status.value().pose, getBoundingBox(), false,
-        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-      setStatus(CanonicalizedEntityStatus(*updated_status, canonicalized_lanelet_pose));
+      const auto updated_canonicalized_status =
+        traffic_simulator::follow_trajectory::makeUpdatedStatus(
+          static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
+          behavior_parameter_, hdmap_utils_ptr_, step_time,
+          target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
+      setStatus(updated_canonicalized_status.value());
     } else {
       is_controlled_by_simulator_ = false;
     }
@@ -221,7 +225,10 @@ void EgoEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &
   }
 }
 
-auto EgoEntity::isControlledBySimulator() const -> bool { return is_controlled_by_simulator_; }
+auto EgoEntity::isControlledBySimulator() const -> bool
+{
+  return is_controlled_by_simulator_;
+}
 
 auto EgoEntity::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> & parameter) -> void
@@ -316,7 +323,6 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 
   } else {
     status.pose = map_pose;
-
   }
   status_ = CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
 }

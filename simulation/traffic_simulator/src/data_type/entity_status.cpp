@@ -35,42 +35,9 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   }
 }
 
-CanonicalizedEntityStatus::CanonicalizedEntityStatus(
-  const EntityStatus & may_non_canonicalized_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-: canonicalized_lanelet_pose_{may_non_canonicalized_entity_status.lanelet_pose_valid?std::optional(CanonicalizedLaneletPose(
-    may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils)):std::nullopt},
-  entity_status_{may_non_canonicalized_entity_status}
-{
-  entity_status_ = may_non_canonicalized_entity_status;
-  assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());
-  if (canonicalized_lanelet_pose_) {
-    entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
-  } else {
-    entity_status_.lanelet_pose = LaneletPose();
-  }
-}
-
-CanonicalizedEntityStatus::CanonicalizedEntityStatus(
-  const EntityStatus & may_non_canonicalized_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
-: canonicalized_lanelet_pose_{may_non_canonicalized_entity_status.lanelet_pose_valid?std::optional(CanonicalizedLaneletPose(
-    may_non_canonicalized_entity_status.lanelet_pose, route_lanelets, hdmap_utils )):std::nullopt},
-      entity_status_{may_non_canonicalized_entity_status}
-{
-  entity_status_ = may_non_canonicalized_entity_status;
-  assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());
-  if (canonicalized_lanelet_pose_) {
-    entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
-  } else {
-    entity_status_.lanelet_pose = LaneletPose();
-  }
-}
-
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj)
 : canonicalized_lanelet_pose_(obj.canonicalized_lanelet_pose_),
   entity_status_(static_cast<EntityStatus>(obj))
-
 {
 }
 
@@ -152,9 +119,15 @@ auto CanonicalizedEntityStatus::getLinearJerk() const noexcept -> double
   return entity_status_.action_status.linear_jerk;
 }
 
-auto CanonicalizedEntityStatus::setTime(double time) -> void { entity_status_.time = time; }
+auto CanonicalizedEntityStatus::setTime(double time) -> void
+{
+  entity_status_.time = time;
+}
 
-auto CanonicalizedEntityStatus::getTime() const noexcept -> double { return entity_status_.time; }
+auto CanonicalizedEntityStatus::getTime() const noexcept -> double
+{
+  return entity_status_.time;
+}
 }  // namespace entity_status
 
 bool isSameLaneletId(const CanonicalizedEntityStatus & s0, const CanonicalizedEntityStatus & s1)

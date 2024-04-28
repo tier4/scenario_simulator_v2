@@ -132,7 +132,9 @@ auto interpolateEntityStatusFromPolylineTrajectory(
 }  // namespace follow_trajectory
 }  // namespace do_nothing_behavior
 
-void DoNothingBehavior::configure(const rclcpp::Logger &) {}
+void DoNothingBehavior::configure(const rclcpp::Logger &)
+{
+}
 
 void DoNothingBehavior::update(double current_time, double step_time)
 {
@@ -145,8 +147,9 @@ void DoNothingBehavior::update(double current_time, double step_time)
       const auto interpolated_status =
         do_nothing_behavior::follow_trajectory::interpolateEntityStatusFromPolylineTrajectory(
           getPolylineTrajectory(), getEntityStatus(), getCurrentTime(), getStepTime())) {
+      /// @note interpolated_status has invalid LaneletPose so cannot be canonicalize
       return std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-        traffic_simulator::CanonicalizedEntityStatus(interpolated_status.value(), getHdMapUtils()));
+        traffic_simulator::CanonicalizedEntityStatus(interpolated_status.value(), std::nullopt));
     } else {
       return entity_status_;
     }

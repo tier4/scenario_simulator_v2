@@ -17,6 +17,7 @@
 
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 
 namespace traffic_simulator
@@ -30,14 +31,7 @@ class CanonicalizedEntityStatus
 public:
   explicit CanonicalizedEntityStatus(
     const EntityStatus & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
-  explicit CanonicalizedEntityStatus(
-    const EntityStatus & may_non_canonicalized_entity_status,
     const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
-  explicit CanonicalizedEntityStatus(
-    const EntityStatus & may_non_canonicalized_entity_status,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const lanelet::Ids & route_lanelets);
   explicit CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
   CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj);

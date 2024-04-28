@@ -15,12 +15,13 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
-#include <limits>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
-#include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+
+#include <limits>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -47,7 +48,9 @@ EntityBase::EntityBase(
   }
 }
 
-void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
+void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &)
+{
+}
 
 auto EntityBase::asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &
 {
@@ -57,7 +60,9 @@ auto EntityBase::asFieldOperatorApplication() const -> concealer::FieldOperatorA
     " is not the entity controlled by Autoware.");
 }
 
-void EntityBase::cancelRequest() {}
+void EntityBase::cancelRequest()
+{
+}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
@@ -89,10 +94,7 @@ auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool includ
     non_canonicalized_status.pose, getBoundingBox(), unique_route_lanelets, include_crosswalk,
     getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 
-  non_canonicalized_status.lanelet_pose_valid = static_cast<bool>(canonicalized_lanelet_pose);
   if (canonicalized_lanelet_pose) {
-    non_canonicalized_status.lanelet_pose =
-      static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
     math::geometry::CatmullRomSpline spline(
       hdmap_utils_ptr_->getCenterPoints(non_canonicalized_status.lanelet_pose.lanelet_id));
     if (const auto s_value = spline.getSValue(non_canonicalized_status.pose)) {
@@ -513,7 +515,10 @@ void EntityBase::requestSpeedChange(
   }
 }
 
-auto EntityBase::isControlledBySimulator() const -> bool { return true; }
+auto EntityBase::isControlledBySimulator() const -> bool
+{
+  return true;
+}
 
 auto EntityBase::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void
@@ -565,7 +570,10 @@ void EntityBase::setOtherStatus(
   }
 }
 
-auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void { status_ = status; }
+auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
+{
+  status_ = status;
+}
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
@@ -598,7 +606,10 @@ auto EntityBase::setLinearJerk(const double linear_jerk) -> void
   status_.setLinearJerk(linear_jerk);
 }
 
-auto EntityBase::setAction(const std::string & action) -> void { status_.setAction(action); }
+auto EntityBase::setAction(const std::string & action) -> void
+{
+  status_.setAction(action);
+}
 
 auto EntityBase::setMapPose(const geometry_msgs::msg::Pose &) -> void
 {
@@ -648,7 +659,10 @@ void EntityBase::activateOutOfRangeJob(
     [this]() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
 }
 
-void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
+void EntityBase::startNpcLogic()
+{
+  npc_logic_started_ = true;
+}
 
 void EntityBase::stopAtCurrentPosition()
 {

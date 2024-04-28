@@ -17,6 +17,7 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <random_test_runner/lanelet_utils.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
+
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 
 traffic_simulator::CanonicalizedEntityStatus getCanonicalizedEntityStatus(
@@ -46,8 +47,8 @@ traffic_simulator::CanonicalizedEntityStatus getCanonicalizedEntityStatus(
   entity_status.pose.position.x = x;
   entity_status.pose.position.y = y;
   entity_status.pose.position.z = z;
-  entity_status.lanelet_pose_valid = false;
-  return traffic_simulator::CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr);
+  /// @note set invalid LaneletPose so pass std::nullopt
+  return traffic_simulator::CanonicalizedEntityStatus(entity_status, std::nullopt);
 }
 
 inline traffic_simulator_msgs::msg::LaneletPose makeLaneletPose(

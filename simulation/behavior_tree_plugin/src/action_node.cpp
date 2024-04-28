@@ -12,19 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <behavior_tree_plugin/action_node.hpp>
+#include <geometry/bounding_box.hpp>
+#include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
+#include <traffic_simulator/helper/helper.hpp>
+
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
-#include <behavior_tree_plugin/action_node.hpp>
-#include <geometry/bounding_box.hpp>
 #include <memory>
 #include <optional>
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
-#include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -36,7 +37,10 @@ ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & c
 {
 }
 
-auto ActionNode::executeTick() -> BT::NodeStatus { return BT::ActionNodeBase::executeTick(); }
+auto ActionNode::executeTick() -> BT::NodeStatus
+{
+  return BT::ActionNodeBase::executeTick();
+}
 
 auto ActionNode::getBlackBoardValues() -> void
 {
@@ -246,7 +250,8 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
       entity_status->getMapPose().orientation,
       other_entity_status.at(each.first).getMapPose().orientation);
     /**
-     * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
+     * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a
+     * candidate of front entity.
      */
     if (
       std::fabs(quaternion_operation::convertQuaternionToEulerAngle(quat).z) <=
@@ -424,13 +429,14 @@ auto ActionNode::calculateUpdatedEntityStatus(
     traffic_simulator::EntityStatus entity_status_updated;
     {
       entity_status_updated.time = current_time + step_time;
-      entity_status_updated.lanelet_pose = canonicalized_lanelet_pose.value();
       entity_status_updated.action_status.twist = twist_new;
       entity_status_updated.action_status.accel = accel_new;
       entity_status_updated.action_status.linear_jerk = linear_jerk_new;
       entity_status_updated.pose = hdmap_utils->toMapPose(canonicalized_lanelet_pose.value()).pose;
     }
-    return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
+    return traffic_simulator::CanonicalizedEntityStatus(
+      entity_status_updated,
+      traffic_simulator::pose::canonicalize(canonicalized_lanelet_pose.value(), hdmap_utils));
   } else {
     // If canonicalize failed, set end of road lanelet pose.
     if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
@@ -445,13 +451,14 @@ auto ActionNode::calculateUpdatedEntityStatus(
         traffic_simulator::EntityStatus entity_status_updated;
         {
           entity_status_updated.time = current_time + step_time;
-          entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
           entity_status_updated.action_status.twist = twist_new;
           entity_status_updated.action_status.accel = accel_new;
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
           entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
         }
-        return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
+        return traffic_simulator::CanonicalizedEntityStatus(
+          entity_status_updated,
+          traffic_simulator::pose::canonicalize(end_of_road_lanelet_pose, hdmap_utils));
       } else {
         traffic_simulator::LaneletPose end_of_road_lanelet_pose;
         {
@@ -464,13 +471,14 @@ auto ActionNode::calculateUpdatedEntityStatus(
         traffic_simulator::EntityStatus entity_status_updated;
         {
           entity_status_updated.time = current_time + step_time;
-          entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
           entity_status_updated.action_status.twist = twist_new;
           entity_status_updated.action_status.accel = accel_new;
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
           entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
         }
-        return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
+        return traffic_simulator::CanonicalizedEntityStatus(
+          entity_status_updated,
+          traffic_simulator::pose::canonicalize(end_of_road_lanelet_pose, hdmap_utils));
       }
     } else {
       THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
@@ -512,9 +520,8 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;
   entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-  entity_status_updated.lanelet_pose_valid = false;
-  entity_status_updated.lanelet_pose = traffic_simulator::LaneletPose();
-  return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
+  /// @note lanelet_pose_valid == false so cannot be canonicalized -> pass std::nullopt
+  return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, std::nullopt);
 }
 
 auto ActionNode::calculateStopDistance(

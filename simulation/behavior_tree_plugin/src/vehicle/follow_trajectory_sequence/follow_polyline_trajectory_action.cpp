@@ -74,13 +74,13 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     THROW_SIMULATION_ERROR(
       "Time in entity_status is NaN - FollowTrajectoryAction does not support such case.");
   } else if (
-    const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-      static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
-      behavior_parameter, hdmap_utils, step_time, getTargetSpeed())) {
+    const auto updated_canonicalized_status =
+      traffic_simulator::follow_trajectory::makeUpdatedStatus(
+        static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
+        behavior_parameter, hdmap_utils, step_time, getTargetSpeed())) {
     setOutput(
-      "updated_status",
-      std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-        traffic_simulator::CanonicalizedEntityStatus(*updated_status, hdmap_utils)));
+      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
+                          updated_canonicalized_status.value()));
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
     return BT::NodeStatus::RUNNING;

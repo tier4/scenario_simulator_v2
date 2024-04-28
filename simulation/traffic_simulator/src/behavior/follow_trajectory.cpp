@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <arithmetic/floating_point/comparison.hpp>
 #include <geometry/linear_algebra.hpp>
 #include <geometry/vector3/hypot.hpp>
@@ -21,11 +19,14 @@
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <geometry/vector3/truncate.hpp>
-#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <iostream>
 
 namespace traffic_simulator
 {
@@ -48,7 +49,7 @@ auto makeUpdatedStatus(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, double step_time,
-  std::optional<double> target_speed) -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
+  std::optional<double> target_speed) -> std::optional<CanonicalizedEntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
@@ -119,7 +120,8 @@ auto makeUpdatedStatus(
      "Steering Behaviors For Autonomous Characters" by Craig Reynolds for more
      information.
 
-     See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
+     See
+     https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
   if (polyline_trajectory.shape.vertices.empty()) {
     return std::nullopt;
@@ -562,13 +564,10 @@ auto makeUpdatedStatus(
     if (const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
           updated_status.pose, entity_status.bounding_box, false, 3.0, hdmap_utils);
         lanelet_pose) {
-      updated_status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose.value());
-      updated_status.lanelet_pose_valid = true;
+      return std::optional(CanonicalizedEntityStatus(updated_status, lanelet_pose));
     } else {
-      updated_status.lanelet_pose_valid = false;
+      return std::optional(CanonicalizedEntityStatus(updated_status, std::nullopt));
     }
-
-    return updated_status;
   }
 }
 }  // namespace follow_trajectory

@@ -15,11 +15,14 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_
 
-#include <optional>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
+
+#include <optional>
 
 namespace traffic_simulator
 {
@@ -30,8 +33,7 @@ auto makeUpdatedStatus(
   traffic_simulator_msgs::msg::PolylineTrajectory &,
   const traffic_simulator_msgs::msg::BehaviorParameter &,
   const std::shared_ptr<hdmap_utils::HdMapUtils> &, double,
-  std::optional<double> target_speed = std::nullopt)
-  -> std::optional<traffic_simulator_msgs::msg::EntityStatus>;
+  std::optional<double> target_speed = std::nullopt) -> std::optional<CanonicalizedEntityStatus>;
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 

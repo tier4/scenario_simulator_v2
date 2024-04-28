@@ -14,9 +14,9 @@
 //
 // Co-developed by TIER IV, Inc. and Robotec.AI sp. z o.o.
 
-#include <gmock/gmock.h>
-
 #include <random_test_runner/test_executor.hpp>
+
+#include <gmock/gmock.h>
 
 class MockFieldOperatorApplication
 {
@@ -89,9 +89,8 @@ public:
   traffic_simulator::CanonicalizedEntityStatus getEntityStatus(const std::string & name)
   {
     getEntityStatusMock(name);
-    entity_status_.lanelet_pose_valid = false;
-    std::shared_ptr<hdmap_utils::HdMapUtils> hd_map_utils_nullptr = nullptr;
-    return traffic_simulator::CanonicalizedEntityStatus(entity_status_, hd_map_utils_nullptr);
+    /// @note set invalid LaneletPose so pass std::nullopt
+    return traffic_simulator::CanonicalizedEntityStatus(entity_status_, std::nullopt);
   }
 
   void setEntityStatusNecessaryValues(

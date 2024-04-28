@@ -13,11 +13,12 @@
 // limitations under the License.
 
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
+#include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/helper/helper.hpp>
+
 #include <memory>
 #include <optional>
-#include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/helper/helper.hpp>
 
 namespace entity_behavior
 {
@@ -53,15 +54,8 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
   auto updated_status = static_cast<traffic_simulator::EntityStatus>(
     ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       target_speed, behavior_parameter.dynamic_constraints));
-  const auto lanelet_pose = estimateLaneletPose(updated_status.pose);
-  if (lanelet_pose) {
-    updated_status.lanelet_pose_valid = true;
-    updated_status.lanelet_pose = static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value());
-  } else {
-    updated_status.lanelet_pose_valid = false;
-    updated_status.lanelet_pose = traffic_simulator::LaneletPose();
-  }
-  return traffic_simulator::CanonicalizedEntityStatus(updated_status, hdmap_utils);
+  return traffic_simulator::CanonicalizedEntityStatus(
+    updated_status, estimateLaneletPose(updated_status.pose));
 }
 
 auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
@@ -71,7 +65,7 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
   if (entity_status->laneMatchingSucceed()) {
     /**
      * @note In this branch, try to matching pedestrian entity to specified lanelet_id.
-    */
+     */
     lanelet_pose = hdmap_utils->toLaneletPose(
       pose, entity_status->getLaneletPose().lanelet_id,
       default_matching_distance_for_lanelet_pose_calculation);
@@ -79,7 +73,7 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
     /**
      * @note In this branch, try to matching pedestrian entity considering bounding box.
      * true means considering crosswalk.
-    */
+     */
     lanelet_pose = hdmap_utils->toLaneletPose(
       pose, entity_status->getBoundingBox(), true,
       default_matching_distance_for_lanelet_pose_calculation);
@@ -89,7 +83,7 @@ auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & 
      * @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
      * true means considering crosswalk.
      * In this branch, the algorithm only consider entity pose.
-    */
+     */
     lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);
   }
   if (lanelet_pose) {
