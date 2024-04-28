@@ -28,13 +28,11 @@ MiscObjectEntity::MiscObjectEntity(
 
 void MiscObjectEntity::onUpdate(double, double)
 {
-  auto status = static_cast<EntityStatus>(status_);
-  status.action_status.twist = geometry_msgs::msg::Twist();
-  status.action_status.accel = geometry_msgs::msg::Accel();
-  status.action_status.linear_jerk = 0;
-  status.action_status.current_action = "static";
-  status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
-  status_before_update_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
+  setTwist(geometry_msgs::msg::Twist());
+  setAcceleration(geometry_msgs::msg::Accel());
+  setLinearJerk(0.0);
+  setAction("static");
+  status_before_update_ = status_;
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string

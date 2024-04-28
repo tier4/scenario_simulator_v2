@@ -121,11 +121,7 @@ auto EntityManager::getEntityStatus(const std::string & name) const -> Canonical
   if (const auto iter = entities_.find(name); iter == entities_.end()) {
     THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   } else {
-    auto entity_status = static_cast<EntityStatus>(iter->second->getStatus());
-    assert(entity_status.name == name && "The entity name in status is different from key!");
-    entity_status.action_status.current_action = getCurrentAction(name);
-    entity_status.time = current_time_;
-    return CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_);
+    return traffic_simulator::CanonicalizedEntityStatus(iter->second->getStatus());
   }
 }
 
