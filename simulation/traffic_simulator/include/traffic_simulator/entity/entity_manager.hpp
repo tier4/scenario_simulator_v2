@@ -444,7 +444,7 @@ public:
    */
   void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
 
-  auto setEntityStatus(const std::string & name, const EntityStatus & status) -> void;
+  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status) -> void;
 
   void setVerbose(const bool verbose);
 
@@ -473,60 +473,47 @@ public:
       }
 
       entity_status.subtype = parameters.subtype;
-
       entity_status.time = getCurrentTime();
-
       entity_status.name = name;
-
       entity_status.bounding_box = parameters.bounding_box;
-
       entity_status.action_status = traffic_simulator_msgs::msg::ActionStatus();
       entity_status.action_status.current_action = "waiting for initialize";
 
+      const auto include_crosswalk = [](const auto & entity_type) {
+        return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+               (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+      }(entity_status.type);
+
+      const auto matching_distance = [](const auto & parameters) {
+        if constexpr (std::is_same_v<
+                        std::decay_t<Parameters>, traffic_simulator_msgs::msg::VehicleParameters>) {
+          return std::max(
+                   parameters.axles.front_axle.track_width,
+                   parameters.axles.rear_axle.track_width) *
+                   0.5 +
+                 1.0;
+        } else {
+          return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
+        }
+      }(parameters);
+
       if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
         entity_status.pose = pose::toMapPose(pose);
+        return CanonicalizedEntityStatus(entity_status, pose);
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
         entity_status.pose = pose::toMapPose(pose, hdmap_utils_ptr_);
+        return CanonicalizedEntityStatus(entity_status, pose::canonicalize(pose, hdmap_utils_ptr_));
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
-        entity_status.pose = pose;
-      }
-
-      if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
-        entity_status.lanelet_pose = static_cast<LaneletPose>(pose);
-        entity_status.lanelet_pose_valid = true;
-      } else {
-        /// @note If the entity is pedestrian or misc object, we have to consider matching to crosswalk lanelet.
-        if (const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
-              pose, parameters.bounding_box,
-              entity_status.type.type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN ||
-                entity_status.type.type == traffic_simulator_msgs::msg::EntityType::MISC_OBJECT,
-              [](const auto & parameters) {
-                if constexpr (std::is_same_v<
-                                std::decay_t<Parameters>,
-                                traffic_simulator_msgs::msg::VehicleParameters>) {
-                  return std::max(
-                           parameters.axles.front_axle.track_width,
-                           parameters.axles.rear_axle.track_width) *
-                           0.5 +
-                         1.0;
-                } else {
-                  return parameters.bounding_box.dimensions.y * 0.5 + 1.0;
-                }
-              }(parameters),
-              hdmap_utils_ptr_);
-            lanelet_pose) {
-          entity_status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose.value());
-          entity_status.lanelet_pose_valid = true;
-          /// @note fix z, roll and pitch to fitting to the lanelet
-          if (getParameter<bool>("consider_pose_by_road_slope", false)) {
-            entity_status.pose = hdmap_utils_ptr_->toMapPose(entity_status.lanelet_pose).pose;
-          }
+        const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
+          pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
+        /// @note fix z, roll and pitch in msg::Pose to fitting to the lanelet
+        if (lanelet_pose && getParameter<bool>("consider_pose_by_road_slope", false)) {
+          entity_status.pose = pose::toMapPose(lanelet_pose.value());
         } else {
-          entity_status.lanelet_pose_valid = false;
+          entity_status.pose = pose;
         }
+        return CanonicalizedEntityStatus(entity_status, lanelet_pose);
       }
-
-      return CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_);
     };
 
     if (const auto [iter, success] = entities_.emplace(

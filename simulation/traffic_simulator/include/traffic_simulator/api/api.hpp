@@ -217,6 +217,8 @@ public:
   bool despawn(const std::string & name);
   bool despawnEntities();
 
+  auto setEntityStatus(
+    const std::string & name, const CanonicalizedEntityStatus & canonicalized_status) -> void;
   auto setEntityStatus(const std::string & name, const EntityStatus & status) -> void;
   auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
@@ -226,7 +228,7 @@ public:
     const std::string & name, const LaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void;
   auto setEntityStatus(
-    const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
+    const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
   auto setEntityStatus(

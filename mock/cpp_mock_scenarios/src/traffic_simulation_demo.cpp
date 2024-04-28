@@ -117,8 +117,8 @@ private:
     api_.requestAcquirePosition(
       "npc1", canonicalize(traffic_simulator::helper::constructLaneletPose(34675, 0.0)));
 
-    api_.spawn("npc2", traffic_simulator::helper::constructLaneletPose(34606, 20.0),
-      getVehicleParameters());
+    api_.spawn(
+      "npc2", traffic_simulator::helper::constructLaneletPose(34606, 20.0), getVehicleParameters());
     api_.setLinearVelocity("npc2", 5);
     api_.requestSpeedChange("npc2", 0, true);
 

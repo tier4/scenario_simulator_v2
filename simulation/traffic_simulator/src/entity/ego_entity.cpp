@@ -158,7 +158,10 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
         behavior_parameter_, hdmap_utils_ptr_, step_time,
         target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
-      setStatus(CanonicalizedEntityStatus(*updated_status, hdmap_utils_ptr_));
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        updated_status.value().pose, getBoundingBox(), false,
+        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+      setStatus(CanonicalizedEntityStatus(*updated_status, canonicalized_lanelet_pose));
     } else {
       is_controlled_by_simulator_ = false;
     }
@@ -310,14 +313,12 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
       map_pose_z_fixed.position.z = spline.getPoint(s_value.value()).z;
     }
     status.pose = map_pose_z_fixed;
-    status.lanelet_pose_valid = true;
-    status.lanelet_pose = lanelet_pose;
+
   } else {
     status.pose = map_pose;
-    status.lanelet_pose_valid = false;
-    status.lanelet_pose = LaneletPose();
+
   }
-  status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
+  status_ = CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
 }
 }  // namespace entity
 }  // namespace traffic_simulator

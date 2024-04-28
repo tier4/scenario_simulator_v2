@@ -31,11 +31,11 @@ public:
     const LaneletPose & maybe_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
   explicit CanonicalizedLaneletPose(
-    const LaneletPose & maybe_non_canonicalized_lanelet_pose,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const lanelet::Ids & route_lanelets);
+    const LaneletPose & maybe_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
   CanonicalizedLaneletPose(const CanonicalizedLaneletPose & other);
   CanonicalizedLaneletPose(CanonicalizedLaneletPose && other) noexcept;
+  CanonicalizedLaneletPose & operator=(const CanonicalizedLaneletPose & obj);
   explicit operator LaneletPose() const noexcept { return lanelet_pose_; }
   explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
   bool hasAlternativeLaneletPose() const { return lanelet_poses_.size() > 1; }
@@ -70,12 +70,11 @@ private:
     const LaneletPose & may_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPose;
   auto canonicalize(
-    const LaneletPose & may_non_canonicalized_lanelet_pose,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    const lanelet::Ids & route_lanelets) -> LaneletPose;
-  const LaneletPose lanelet_pose_;
-  const std::vector<LaneletPose> lanelet_poses_;
-  const geometry_msgs::msg::Pose map_pose_;
+    const LaneletPose & may_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPose;
+  LaneletPose lanelet_pose_;
+  std::vector<LaneletPose> lanelet_poses_;
+  geometry_msgs::msg::Pose map_pose_;
 };
 }  // namespace lanelet_pose
 

@@ -68,9 +68,53 @@ bool API::despawnEntities()
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
 
+auto API::setEntityStatus(
+  const std::string & name, const CanonicalizedEntityStatus & canonicalized_status) -> void
+{
+  if (const auto entity = getEntity(name)) {
+    entity->setStatus(canonicalized_status);
+  } else {
+    THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
+  }
+}
+
+auto API::setEntityStatus(
+  const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
+{
+  if (const auto entity = getEntity(name)) {
+    auto status = static_cast<EntityStatus>(entity->getStatus());
+    status.action_status = action_status;
+    entity->setStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
+  } else {
+    THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
+  }
+}
+
 auto API::setEntityStatus(const std::string & name, const EntityStatus & status) -> void
 {
-  entity_manager_ptr_->setEntityStatus(name, status);
+  if (const auto entity = getEntity(name)) {
+    const auto include_crosswalk = [](const auto & entity_type) {
+      return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+             (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+    }(entity->getEntityType());
+
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      status.pose, entity->getBoundingBox(), include_crosswalk,
+      entity->getDefaultMatchingDistanceForLaneletPoseCalculation(),
+      entity_manager_ptr_->getHdmapUtils());
+    entity->setStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
+  } else {
+    THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
+  }
+}
+
+auto API::setEntityStatus(
+  const std::string & name, const LaneletPose & lanelet_pose,
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
+{
+  setEntityStatus(
+    name, pose::canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
 }
 
 auto API::setEntityStatus(
@@ -79,31 +123,12 @@ auto API::setEntityStatus(
 {
   if (const auto entity = getEntity(name)) {
     EntityStatus status = static_cast<EntityStatus>(entity->getStatus());
-    status.time = getCurrentTime();
     status.pose = map_pose;
     status.action_status = action_status;
-    // lanelet_pose will be set as canonicalized in EntityManager
-    status.lanelet_pose_valid = false;
     setEntityStatus(name, status);
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
   }
-}
-
-/// @todo it should be removed
-auto API::setEntityStatus(
-  const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
-{
-  setEntityStatus(name, pose::toMapPose(lanelet_pose), action_status);
-}
-
-auto API::setEntityStatus(
-  const std::string & name, const LaneletPose & lanelet_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
-{
-  setEntityStatus(
-    name, pose::toMapPose(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
 }
 
 auto API::setEntityStatus(
@@ -313,17 +338,4 @@ void API::requestLaneChange(
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
 
-// auto API::canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose) const
-//   -> CanonicalizedLaneletPose
-// {
-//   return CanonicalizedLaneletPose(
-//     may_non_canonicalized_lanelet_pose, entity_manager_ptr_->getHdmapUtils());
-// }
-
-// auto API::canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
-//   -> CanonicalizedEntityStatus
-// {
-//   return CanonicalizedEntityStatus(
-//     may_non_canonicalized_entity_status, entity_manager_ptr_->getHdmapUtils());
-// }
 }  // namespace traffic_simulator

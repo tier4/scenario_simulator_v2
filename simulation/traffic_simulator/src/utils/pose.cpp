@@ -59,18 +59,8 @@ auto toMapPose(
   const LaneletPose & lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose
 {
-  return hdmap_utils_ptr->toMapPose(lanelet_pose).pose;
-}
-
-auto toCanonicalizedLaneletPose(
-  const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double matching_distance,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<CanonicalizedLaneletPose>
-{
-  return toCanonicalizedLaneletPose(
-    toMapPose(lanelet_pose, hdmap_utils_ptr), bbox, include_crosswalk, matching_distance,
-    hdmap_utils_ptr);
+  constexpr bool fill_pitch{true};
+  return hdmap_utils_ptr->toMapPose(lanelet_pose, fill_pitch).pose;
 }
 
 auto toCanonicalizedLaneletPose(

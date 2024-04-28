@@ -44,11 +44,10 @@ private:
     if (
       api_.reachPosition(
         "ego", traffic_simulator::helper::constructLaneletPose(34513, 30, 0, 0, 0, 0)),
-      3.0)
-      {
-        api_.cancelRequest("ego");
-        canceled = true;
-      }
+      3.0) {
+      api_.cancelRequest("ego");
+      canceled = true;
+    }
     if (api_.isInLanelet("ego", 34507, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }

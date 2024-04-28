@@ -64,30 +64,6 @@ auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
   return math::geometry::get2DPolygon(getBoundingBox());
 }
 
-auto EntityBase::getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
-{
-  if (laneMatchingSucceed()) {
-    return CanonicalizedLaneletPose(status_.getLaneletPose(), hdmap_utils_ptr_);
-  }
-  return std::nullopt;
-}
-
-auto EntityBase::getLaneletPose(double matching_distance) const
-  -> std::optional<CanonicalizedLaneletPose>
-{
-  if (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getEntityType().type) {
-    if (
-      const auto lanelet_pose_include_crosswalk = pose::toCanonicalizedLaneletPose(
-        getMapPose(), getBoundingBox(), true, matching_distance, hdmap_utils_ptr_)) {
-      return lanelet_pose_include_crosswalk;
-    }
-  } else {
-    return pose::toCanonicalizedLaneletPose(
-      getMapPose(), getBoundingBox(), false, matching_distance, hdmap_utils_ptr_);
-  }
-  return std::nullopt;
-}
-
 auto EntityBase::getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
 {
   return status_.getCanonicalizedLaneletPose();
@@ -96,8 +72,11 @@ auto EntityBase::getCanonicalizedLaneletPose() const -> std::optional<Canonicali
 auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
   -> std::optional<CanonicalizedLaneletPose>
 {
-  const auto include_crosswalk =
-    traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == getEntityType().type;
+  const auto include_crosswalk = [](const auto & entity_type) {
+    return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+           (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+  }(getEntityType());
+
   return pose::toCanonicalizedLaneletPose(
     getMapPose(), getBoundingBox(), include_crosswalk, matching_distance, hdmap_utils_ptr_);
 }
@@ -120,7 +99,7 @@ auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool includ
       non_canonicalized_status.pose.position.z = spline.getPoint(s_value.value()).z;
     }
   }
-  status = CanonicalizedEntityStatus(non_canonicalized_status, hdmap_utils_ptr_);
+  status = CanonicalizedEntityStatus(non_canonicalized_status, canonicalized_lanelet_pose);
 }
 
 auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
