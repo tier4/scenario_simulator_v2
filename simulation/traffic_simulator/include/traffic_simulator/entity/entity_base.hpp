@@ -216,6 +216,8 @@ public:
 
   /*   */ auto setAcceleration(const geometry_msgs::msg::Accel & accel) -> void;
 
+  /*   */ auto setAction(const std::string & action) -> void;
+
   /*   */ auto setLinearJerk(const double liner_jerk) -> void;
 
   virtual void startNpcLogic();

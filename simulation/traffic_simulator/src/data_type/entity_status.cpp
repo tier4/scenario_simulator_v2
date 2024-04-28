@@ -152,15 +152,9 @@ auto CanonicalizedEntityStatus::getLinearJerk() const noexcept -> double
   return entity_status_.action_status.linear_jerk;
 }
 
-auto CanonicalizedEntityStatus::setTime(double time) -> void
-{
-  entity_status_.time = time;
-}
+auto CanonicalizedEntityStatus::setTime(double time) -> void { entity_status_.time = time; }
 
-auto CanonicalizedEntityStatus::getTime() const noexcept -> double
-{
-  return entity_status_.time;
-}
+auto CanonicalizedEntityStatus::getTime() const noexcept -> double { return entity_status_.time; }
 }  // namespace entity_status
 
 bool isSameLaneletId(const CanonicalizedEntityStatus & s0, const CanonicalizedEntityStatus & s1)
