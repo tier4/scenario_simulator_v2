@@ -51,13 +51,19 @@ LaneletPose constructLaneletPose(
 }
 
 CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr, double offset = 0,
-  double roll = 0, double pitch = 0, double yaw = 0)
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
 {
   return traffic_simulator::pose::canonicalize(
     traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
     hdmap_utils_ptr);
+}
+
+CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+{
+  return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0, hdmap_utils_ptr);
 }
 
 geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)

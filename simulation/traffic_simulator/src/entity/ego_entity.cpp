@@ -316,7 +316,6 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 
   } else {
     status.pose = map_pose;
-
   }
   status_ = CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
 }
