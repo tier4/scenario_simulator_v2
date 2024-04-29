@@ -245,8 +245,7 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
       entity_status->getMapPose().orientation,
       other_entity_status.at(each.first).getMapPose().orientation);
     /**
-     * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a
-     * candidate of front entity.
+     * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
      */
     if (
       std::fabs(quaternion_operation::convertQuaternionToEulerAngle(quat).z) <=
