@@ -101,6 +101,11 @@ auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose
   return static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
 }
 
+auto CanonicalizedEntityStatus::getLaneletId() const -> lanelet::Id
+{
+  return getLaneletPose().lanelet_id;
+}
+
 auto CanonicalizedEntityStatus::getCanonicalizedLaneletPose() const
   -> std::optional<CanonicalizedLaneletPose>
 {

@@ -47,6 +47,7 @@ public:
   auto laneMatchingSucceed() const noexcept -> bool;
   auto getMapPose() const noexcept -> geometry_msgs::msg::Pose { return entity_status_.pose; }
   auto getLaneletPose() const -> LaneletPose;
+  auto getLaneletId() const -> lanelet::Id;
   auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
   auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
   auto getTwist() const noexcept -> geometry_msgs::msg::Twist;
