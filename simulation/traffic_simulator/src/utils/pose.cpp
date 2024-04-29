@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <geometry/bounding_box.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -203,5 +204,105 @@ auto getBoundingBoxRelativeLaneletPose(
   }
   return position;
 }
+
+auto estimateCanonicalizedLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
+  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
+{
+  std::optional<traffic_simulator::LaneletPose> lanelet_pose;
+  if (!unique_route_lanelets.empty()) {
+    lanelet_pose =
+      hdmap_utils_ptr->toLaneletPose(map_pose, unique_route_lanelets, matching_distance);
+  } else {
+    lanelet_pose =
+      hdmap_utils_ptr->toLaneletPose(map_pose, bbox, include_crosswalk, matching_distance);
+  }
+  if (!lanelet_pose) {
+    /**
+     * @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
+     * true means considering crosswalk.
+     * In this branch, the algorithm only consider entity pose.
+     */
+    lanelet_pose = hdmap_utils_ptr->toLaneletPose(map_pose, include_crosswalk, 2.0);
+  }
+
+  if (lanelet_pose) {
+    const auto canonicalized = hdmap_utils_ptr->canonicalizeLaneletPose(lanelet_pose.value());
+    if (
+      const auto canonicalized_lanelet_pose =
+        std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
+      /// @note If canonicalize succeed, set canonicalized pose and set other values.
+      return traffic_simulator::CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils_ptr);
+    } else {
+      /// @note If canonicalize failed, set end of road lanelet pose.
+      if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
+        if (lanelet_pose.value().s < 0) {
+          return traffic_simulator::CanonicalizedLaneletPose(
+            traffic_simulator_msgs::build<traffic_simulator::LaneletPose>()
+              .lanelet_id(end_of_road_lanelet_id.value())
+              .s(0.0)
+              .offset(lanelet_pose.value().offset)
+              .rpy(lanelet_pose.value().rpy),
+            hdmap_utils_ptr);
+        } else {
+          return traffic_simulator::CanonicalizedLaneletPose(
+            traffic_simulator_msgs::build<traffic_simulator::LaneletPose>()
+              .lanelet_id(end_of_road_lanelet_id.value())
+              .s(hdmap_utils_ptr->getLaneletLength(end_of_road_lanelet_id.value()))
+              .offset(lanelet_pose.value().offset)
+              .rpy(lanelet_pose.value().rpy),
+            hdmap_utils_ptr);
+        }
+      } else {
+        THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
+      }
+    }
+  } else {
+    return std::nullopt;
+  }
+}
+
+auto isInLanelet(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
+  const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
+{
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{false};
+  constexpr bool allow_lane_change{false};
+
+  if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
+    return true;
+  } else {
+    const auto start_edge = traffic_simulator::helper::constructCanonicalizedLaneletPose(
+      lanelet_id, 0.0, 0.0, hdmap_utils_ptr);
+    const auto end_edge = traffic_simulator::helper::constructCanonicalizedLaneletPose(
+      lanelet_id, hdmap_utils_ptr->getLaneletLength(lanelet_id), 0.0, hdmap_utils_ptr);
+    auto dist0 = distance::getLongitudinalDistance(
+      start_edge, canonicalized_lanelet_pose, include_adjacent_lanelet, include_opposite_direction,
+      allow_lane_change, hdmap_utils_ptr);
+    auto dist1 = distance::getLongitudinalDistance(
+      canonicalized_lanelet_pose, end_edge, include_adjacent_lanelet, include_opposite_direction,
+      allow_lane_change, hdmap_utils_ptr);
+    if (dist0 and dist0.value() < tolerance) {
+      return true;
+    }
+    if (dist1 and dist1.value() < tolerance) {
+      return true;
+    }
+  }
+  return false;
+}
+
+auto isAtEndOfLanelets(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
+{
+  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  return hdmap_utils_ptr->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
+         hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
+}
+
 }  // namespace pose
 }  // namespace traffic_simulator

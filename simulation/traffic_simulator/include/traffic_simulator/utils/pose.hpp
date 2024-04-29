@@ -82,6 +82,21 @@ auto getBoundingBoxRelativeLaneletPose(
   const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> traffic_simulator::LaneletPose;
+
+// Others
+auto estimateCanonicalizedLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
+  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<traffic_simulator::CanonicalizedLaneletPose>;
+
+auto isInLanelet(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
+  const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
+
+auto isAtEndOfLanelets(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
 }  // namespace pose
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__POSE_HPP_

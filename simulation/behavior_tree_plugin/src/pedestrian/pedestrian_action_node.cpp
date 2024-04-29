@@ -18,6 +18,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace entity_behavior
 {
@@ -67,64 +68,12 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
 auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
   -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
 {
-  std::optional<traffic_simulator::LaneletPose> lanelet_pose;
+  lanelet::Ids unique_route_lanelets;
   if (entity_status->laneMatchingSucceed()) {
-    /**
-     * @note In this branch, try to matching pedestrian entity to specified lanelet_id.
-    */
-    lanelet_pose = hdmap_utils->toLaneletPose(
-      pose, entity_status->getLaneletPose().lanelet_id,
-      default_matching_distance_for_lanelet_pose_calculation);
-  } else {
-    /**
-     * @note In this branch, try to matching pedestrian entity considering bounding box.
-     * true means considering crosswalk.
-    */
-    lanelet_pose = hdmap_utils->toLaneletPose(
-      pose, entity_status->getBoundingBox(), true,
-      default_matching_distance_for_lanelet_pose_calculation);
+    unique_route_lanelets.push_back(entity_status->getLaneletId());
   }
-  if (!lanelet_pose) {
-    /**
-     * @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
-     * true means considering crosswalk.
-     * In this branch, the algorithm only consider entity pose.
-    */
-    lanelet_pose = hdmap_utils->toLaneletPose(pose, true, 2.0);
-  }
-  if (lanelet_pose) {
-    const auto canonicalized = hdmap_utils->canonicalizeLaneletPose(lanelet_pose.value());
-    if (
-      const auto canonicalized_lanelet_pose =
-        std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
-      /// @note If canonicalize succeed, set canonicalized pose and set other values.
-      return traffic_simulator::CanonicalizedLaneletPose(lanelet_pose.value(), hdmap_utils);
-    } else {
-      /// @note If canonicalize failed, set end of road lanelet pose.
-      if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
-        if (lanelet_pose.value().s < 0) {
-          return traffic_simulator::CanonicalizedLaneletPose(
-            traffic_simulator_msgs::build<traffic_simulator::LaneletPose>()
-              .lanelet_id(end_of_road_lanelet_id.value())
-              .s(0.0)
-              .offset(lanelet_pose.value().offset)
-              .rpy(lanelet_pose.value().rpy),
-            hdmap_utils);
-        } else {
-          return traffic_simulator::CanonicalizedLaneletPose(
-            traffic_simulator_msgs::build<traffic_simulator::LaneletPose>()
-              .lanelet_id(end_of_road_lanelet_id.value())
-              .s(hdmap_utils->getLaneletLength(end_of_road_lanelet_id.value()))
-              .offset(lanelet_pose.value().offset)
-              .rpy(lanelet_pose.value().rpy),
-            hdmap_utils);
-        }
-      } else {
-        THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
-      }
-    }
-  } else {
-    return std::nullopt;
-  }
+  return traffic_simulator::pose::estimateCanonicalizedLaneletPose(
+    pose, entity_status->getBoundingBox(), unique_route_lanelets, true,
+    default_matching_distance_for_lanelet_pose_calculation, hdmap_utils);
 }
 }  // namespace entity_behavior

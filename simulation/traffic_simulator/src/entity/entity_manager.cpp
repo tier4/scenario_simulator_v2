@@ -219,23 +219,10 @@ bool EntityManager::isEgoSpawned() const
 bool EntityManager::isInLanelet(
   const std::string & name, const lanelet::Id lanelet_id, const double tolerance)
 {
-  const auto status = getEntityStatus(name);
-  if (not status.laneMatchingSucceed()) {
-    return false;
-  }
-  if (isSameLaneletId(status, lanelet_id)) {
-    return true;
-  } else {
-    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(
-      helper::constructLaneletPose(lanelet_id, hdmap_utils_ptr_->getLaneletLength(lanelet_id)),
-      status.getLaneletPose());
-    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(
-      status.getLaneletPose(), helper::constructLaneletPose(lanelet_id, 0));
-    if (dist0 and dist0.value() < tolerance) {
-      return true;
-    }
-    if (dist1 and dist1.value() < tolerance) {
-      return true;
+  if (const auto entity = getEntity(name)) {
+    if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+      return pose::isInLanelet(
+        canonicalized_lanelet_pose.value(), lanelet_id, tolerance, hdmap_utils_ptr_);
     }
   }
   return false;
