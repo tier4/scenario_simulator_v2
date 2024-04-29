@@ -101,6 +101,10 @@ auto isInLanelet(
 auto isAtEndOfLanelets(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
+
+auto getLaneletLength(
+  const lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> double;
 }  // namespace pose
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__POSE_HPP_

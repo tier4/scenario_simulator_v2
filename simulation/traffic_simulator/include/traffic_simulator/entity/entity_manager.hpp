@@ -245,25 +245,6 @@ public:
   }
 
   // clang-format off
-#define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
-  /*!                                                                 \
-   @brief Forward to arguments to the HDMapUtils::NAME function.      \
-   @return return value of the HDMapUtils::NAME function.             \
-   @note This function was defined by FORWARD_TO_HDMAP_UTILS macro.   \
-   */                                                                 \
-  template <typename... Ts>                                           \
-  decltype(auto) NAME(Ts &&... xs) const                              \
-  {                                                                   \
-    return hdmap_utils_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                   \
-  static_assert(true, "")
-  // clang-format on
-
-  FORWARD_TO_HDMAP_UTILS(getLaneletLength);
-
-#undef FORWARD_TO_HDMAP_UTILS
-
-  // clang-format off
 #define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
   /*!                                                                            \
    @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \

@@ -317,7 +317,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
-  FORWARD_TO_ENTITY_MANAGER(getLaneletLength);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
