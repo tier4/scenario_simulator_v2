@@ -26,14 +26,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
 : canonicalized_lanelet_pose_{canonicalized_lanelet_pose},
   entity_status_{may_non_canonicalized_entity_status}
 {
-  if (canonicalized_lanelet_pose) {
-    entity_status_.lanelet_pose_valid = true;
-    entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-    entity_status_.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
-  } else {
-    entity_status_.lanelet_pose_valid = false;
-    entity_status_.lanelet_pose = LaneletPose();
-  }
+  canonicalize();
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
@@ -43,13 +36,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
     may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils)):std::nullopt},
   entity_status_{may_non_canonicalized_entity_status}
 {
-  entity_status_ = may_non_canonicalized_entity_status;
-  assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());
-  if (canonicalized_lanelet_pose_) {
-    entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
-  } else {
-    entity_status_.lanelet_pose = LaneletPose();
-  }
+  canonicalize();
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
@@ -59,19 +46,12 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
     may_non_canonicalized_entity_status.lanelet_pose, route_lanelets, hdmap_utils )):std::nullopt},
       entity_status_{may_non_canonicalized_entity_status}
 {
-  entity_status_ = may_non_canonicalized_entity_status;
-  assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());
-  if (canonicalized_lanelet_pose_) {
-    entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
-  } else {
-    entity_status_.lanelet_pose = LaneletPose();
-  }
+  canonicalize();
 }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj)
 : canonicalized_lanelet_pose_(obj.canonicalized_lanelet_pose_),
   entity_status_(static_cast<EntityStatus>(obj))
-
 {
 }
 
@@ -81,6 +61,20 @@ CanonicalizedEntityStatus & CanonicalizedEntityStatus::operator=(
   this->canonicalized_lanelet_pose_ = obj.canonicalized_lanelet_pose_;
   this->entity_status_ = obj.entity_status_;
   return *this;
+}
+
+auto CanonicalizedEntityStatus::canonicalize() -> void
+{
+  assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());
+  if (canonicalized_lanelet_pose_) {
+    entity_status_.lanelet_pose_valid = true;
+    entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
+    entity_status_.pose =
+      static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose_.value());
+  } else {
+    entity_status_.lanelet_pose_valid = false;
+    entity_status_.lanelet_pose = LaneletPose();
+  }
 }
 
 auto CanonicalizedEntityStatus::laneMatchingSucceed() const noexcept -> bool

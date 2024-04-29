@@ -61,6 +61,7 @@ public:
   auto getTime() const noexcept -> double;
 
 private:
+  auto canonicalize() -> void;
   std::optional<CanonicalizedLaneletPose> canonicalized_lanelet_pose_;
   EntityStatus entity_status_;
 };
