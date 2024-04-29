@@ -226,16 +226,15 @@ auto ScenarioSimulator::spawnVehicleEntity(
       }
       return get_parameter("consider_pose_by_road_slope").as_bool();
     };
-    ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
-      parameters, step_time_, hdmap_utils_,
-      get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
-      get_consider_acceleration_by_road_slope(), get_consider_pose_by_road_slope());
+
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
-    simulation_interface::toMsg(req.pose(), initial_status.pose);
     initial_status.bounding_box = parameters.bounding_box;
-    ego_entity_simulation_->fillLaneletDataAndSnapZToLanelet(initial_status);
-    ego_entity_simulation_->setInitialStatus(initial_status);
+
+    ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
+      initial_status, parameters, step_time_, hdmap_utils_,
+      get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
+      get_consider_acceleration_by_road_slope(), get_consider_pose_by_road_slope());
   } else {
     vehicles_.emplace_back(req.parameters());
   }
