@@ -72,10 +72,10 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
-      const auto lanelet_waypoint = pose::toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         waypoint, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation(),
         hdmap_utils_ptr_)) {
-      route.emplace_back(lanelet_waypoint.value());
+      route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
     }
@@ -151,10 +151,10 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
-    const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation(),
       hdmap_utils_ptr_)) {
-    requestAcquirePosition(lanelet_pose.value());
+    requestAcquirePosition(canonicalized_lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
   }

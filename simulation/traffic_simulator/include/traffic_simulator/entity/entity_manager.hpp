@@ -504,15 +504,16 @@ public:
         entity_status.pose = pose::toMapPose(pose, hdmap_utils_ptr_);
         return CanonicalizedEntityStatus(entity_status, pose::canonicalize(pose, hdmap_utils_ptr_));
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
-        const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
+        const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
         /// @note fix z, roll and pitch in msg::Pose to fitting to the lanelet
-        if (lanelet_pose && getParameter<bool>("consider_pose_by_road_slope", false)) {
-          entity_status.pose = pose::toMapPose(lanelet_pose.value());
+        if (
+          canonicalized_lanelet_pose && getParameter<bool>("consider_pose_by_road_slope", false)) {
+          entity_status.pose = pose::toMapPose(canonicalized_lanelet_pose.value());
         } else {
           entity_status.pose = pose;
         }
-        return CanonicalizedEntityStatus(entity_status, lanelet_pose);
+        return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }
     };
 

@@ -559,10 +559,10 @@ auto makeUpdatedStatus(
     updated_status.time = entity_status.time + step_time;
 
     // matching distance has been set to 3.0 due to matching problems during lane changes
-    if (const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
+    if (const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
           updated_status.pose, entity_status.bounding_box, false, 3.0, hdmap_utils);
-        lanelet_pose) {
-      updated_status.lanelet_pose = static_cast<LaneletPose>(lanelet_pose.value());
+        canonicalized_lanelet_pose) {
+      updated_status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
       updated_status.lanelet_pose_valid = true;
     } else {
       updated_status.lanelet_pose_valid = false;

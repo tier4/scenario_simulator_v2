@@ -195,10 +195,10 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
-    const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       map_pose, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation(),
       hdmap_utils_ptr_)) {
-    requestAcquirePosition(lanelet_pose.value());
+    requestAcquirePosition(canonicalized_lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
   }
@@ -223,10 +223,10 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
-      const auto lanelet_waypoint = pose::toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         waypoint, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation(),
         hdmap_utils_ptr_)) {
-      route.emplace_back(lanelet_waypoint.value());
+      route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of vehicle entity should be on lane.");
     }
@@ -242,10 +242,10 @@ auto VehicleEntity::requestFollowTrajectory(
   std::vector<CanonicalizedLaneletPose> waypoints;
   for (const auto & vertex : parameter->shape.vertices) {
     if (
-      const auto lanelet_waypoint = pose::toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
         vertex.position, getBoundingBox(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
-      waypoints.emplace_back(lanelet_waypoint.value());
+      waypoints.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       /// @todo such a protection most likely makes sense, but test scenario
       /// RoutingAction.FollowTrajectoryAction-star has waypoints outside lanelet2

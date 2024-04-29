@@ -111,11 +111,6 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
 
-  /*   */ auto getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
-
-  /*   */ auto getLaneletPose(double matching_distance) const
-    -> std::optional<CanonicalizedLaneletPose>;
-
   /*   */ auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
 
   /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
