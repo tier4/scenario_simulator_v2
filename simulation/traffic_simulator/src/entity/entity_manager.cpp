@@ -256,10 +256,10 @@ bool EntityManager::reachPosition(
 void EntityManager::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
-  if (const auto canonicalized_lanelet_pose = getEntity(name)->getCanonicalizedLaneletPose()) {
+  if (const auto entity = getEntity(name); entity && entity->laneMatchingSucceed()) {
     if (
       const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-        static_cast<LaneletPose>(canonicalized_lanelet_pose.value()).lanelet_id, direction)) {
+        entity->getStatus().getLaneletId(), direction)) {
       requestLaneChange(name, target.value());
     }
   }

@@ -162,31 +162,30 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::Constraint & constraint)
 {
   lanelet::Id reference_lanelet_id = 0;
-  const auto lanelet_pose = getCanonicalizedLaneletPose();
-  if (lanelet_pose && target.entity_name == name) {
-    if (!lanelet_pose) {
+  if (target.entity_name == name) {
+    if (laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(
-        "Target entity does not assigned to lanelet. Please check Target entity name : ",
-        target.entity_name, " exists on lane.");
+        "Source entity does not assigned to lanelet. Please check source entity name : ", name,
+        " exists on lane.");
     }
-    reference_lanelet_id = static_cast<LaneletPose>(lanelet_pose.value()).lanelet_id;
+    reference_lanelet_id = getStatus().getLaneletId();
   } else {
     if (other_status_.find(target.entity_name) == other_status_.end()) {
       THROW_SEMANTIC_ERROR(
         "Target entity : ", target.entity_name, " does not exist. Please check ",
         target.entity_name, " exists.");
-    }
-    if (!other_status_.at(target.entity_name).laneMatchingSucceed()) {
+    } else if (!other_status_.at(target.entity_name).laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");
+    } else {
+      reference_lanelet_id = other_status_.at(target.entity_name).getLaneletId();
     }
-    reference_lanelet_id =
-      static_cast<EntityStatus>(other_status_.at(target.entity_name)).lanelet_pose.lanelet_id;
   }
-  const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-    reference_lanelet_id, target.direction, target.shift);
-  if (lane_change_target_id) {
+
+  if (
+    const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+      reference_lanelet_id, target.direction, target.shift)) {
     requestLaneChange(
       traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);
