@@ -248,11 +248,6 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
   setBehaviorParameter(behavior_parameter);
 }
 
-// auto PedestrianEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-// {
-//   EntityBase::fillLaneletPose(status, true);
-// }
-
 void PedestrianEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);

@@ -116,16 +116,11 @@ public:
   /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
     -> std::optional<CanonicalizedLaneletPose>;
 
-  // /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
-  //   -> geometry_msgs::msg::Pose;
-
   virtual auto getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double;
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
-
-  // virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
@@ -222,9 +217,6 @@ public:
   /*   */ auto updateStandStillDuration(const double step_time) -> double;
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
-
-  // virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
-  //   -> void final;
 
   const std::string name;
 

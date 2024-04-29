@@ -23,7 +23,6 @@ using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
 inline namespace lanelet_pose
 {
-
 class CanonicalizedLaneletPose
 {
 public:

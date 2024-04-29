@@ -81,40 +81,6 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
     getMapPose(), getBoundingBox(), include_crosswalk, matching_distance, hdmap_utils_ptr_);
 }
 
-// auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk) ->
-// void
-// {
-//   auto non_canonicalized_status = static_cast<EntityStatus>(status);
-//   const auto unique_route_lanelets =
-//   traffic_simulator::helper::getUniqueValues(getRouteLanelets()); const auto
-//   canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-//     non_canonicalized_status.pose, getBoundingBox(), unique_route_lanelets, include_crosswalk,
-//     getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-
-//   non_canonicalized_status.lanelet_pose_valid = static_cast<bool>(canonicalized_lanelet_pose);
-//   if (canonicalized_lanelet_pose) {
-//     non_canonicalized_status.lanelet_pose =
-//       static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-//     math::geometry::CatmullRomSpline spline(
-//       hdmap_utils_ptr_->getCenterPoints(non_canonicalized_status.lanelet_pose.lanelet_id));
-//     if (const auto s_value = spline.getSValue(non_canonicalized_status.pose)) {
-//       non_canonicalized_status.pose.position.z = spline.getPoint(s_value.value()).z;
-//     }
-//   }
-//   status = CanonicalizedEntityStatus(non_canonicalized_status, canonicalized_lanelet_pose);
-// }
-
-// auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
-//   -> geometry_msgs::msg::Pose
-// {
-//   tf2::Transform ref_transform, relative_transform;
-//   tf2::fromMsg(getMapPose(), ref_transform);
-//   tf2::fromMsg(relative_pose, relative_transform);
-//   geometry_msgs::msg::Pose ret;
-//   tf2::toMsg(ref_transform * relative_transform, ret);
-//   return ret;
-// }
-
 auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
 {
   return getBoundingBox().dimensions.y * 0.5 + 1.0;

@@ -292,11 +292,6 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
   field_operator_application->setVelocityLimit(value);
 }
 
-// auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-// {
-//   EntityBase::fillLaneletPose(status, false);
-// }
-
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
   auto status = static_cast<EntityStatus>(status_);

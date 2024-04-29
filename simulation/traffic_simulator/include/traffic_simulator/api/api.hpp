@@ -318,10 +318,8 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLaneletLength);
-  // FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
-  // FORWARD_TO_ENTITY_MANAGER(getMapPoseFromRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
@@ -356,11 +354,6 @@ private:
 
 public:
 #undef FORWARD_TO_ENTITY_MANAGER
-
-  // auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
-  //   -> CanonicalizedLaneletPose;
-  // auto canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
-  //   -> CanonicalizedEntityStatus;
 
 private:
   bool updateTimeInSim();
