@@ -56,6 +56,10 @@ auto toCanonicalizedLaneletPose(
   const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>;
 
+auto transformRelativePoseToGlobal(
+  const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
+  -> geometry_msgs::msg::Pose;
+
 // Relative msg::Pose
 auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>;

@@ -191,15 +191,20 @@ private:
       const auto trigger_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34621, 10, 0.0, api_.getHdmapUtils());
       const auto entity_name = "spawn_nearby_ego";
-      if (api_.reachPosition("ego", trigger_position, 20.0) && !api_.entityExists(entity_name)) {
-        api_.spawn(
-          entity_name,
-          api_.getMapPoseFromRelativePose(
-            "ego", geometry_msgs::build<geometry_msgs::msg::Pose>()
-                     .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(-5).z(0))
-                     .orientation(geometry_msgs::msg::Quaternion())),
-          getVehicleParameters(),
-          traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+      if (const auto ego = api_.getEntity("ego")) {
+        if (api_.reachPosition("ego", trigger_position, 20.0) && !api_.entityExists(entity_name)) {
+          api_.spawn(
+            entity_name,
+            traffic_simulator::pose::transformRelativePoseToGlobal(
+              ego->getMapPose(),
+              geometry_msgs::build<geometry_msgs::msg::Pose>()
+                .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(-5).z(0))
+                .orientation(geometry_msgs::msg::Quaternion())),
+            getVehicleParameters(),
+            traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+        } else {
+          stop(cpp_mock_scenarios::Result::FAILURE);
+        }
       }
       if (!api_.reachPosition("ego", trigger_position, 20.0) && api_.entityExists(entity_name)) {
         api_.despawn(entity_name);
@@ -219,14 +224,19 @@ private:
       {traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34606, 0.0, 0.0, api_.getHdmapUtils())},
       getVehicleParameters());
-    api_.spawn(
-      "parking_outside",
-      api_.getMapPoseFromRelativePose(
-        "ego", geometry_msgs::build<geometry_msgs::msg::Pose>()
-                 .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(15).z(0))
-                 .orientation(geometry_msgs::msg::Quaternion())),
-      getVehicleParameters(),
-      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+    if (const auto ego = api_.getEntity("ego")) {
+      api_.spawn(
+        "parking_outside",
+        traffic_simulator::pose::transformRelativePoseToGlobal(
+          ego->getMapPose(),
+          geometry_msgs::build<geometry_msgs::msg::Pose>()
+            .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(15).z(0))
+            .orientation(geometry_msgs::msg::Quaternion())),
+        getVehicleParameters(),
+        traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+    } else {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
   }
 };
 

@@ -102,16 +102,16 @@ auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool includ
   status = CanonicalizedEntityStatus(non_canonicalized_status, canonicalized_lanelet_pose);
 }
 
-auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
-  -> geometry_msgs::msg::Pose
-{
-  tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(getMapPose(), ref_transform);
-  tf2::fromMsg(relative_pose, relative_transform);
-  geometry_msgs::msg::Pose ret;
-  tf2::toMsg(ref_transform * relative_transform, ret);
-  return ret;
-}
+// auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
+//   -> geometry_msgs::msg::Pose
+// {
+//   tf2::Transform ref_transform, relative_transform;
+//   tf2::fromMsg(getMapPose(), ref_transform);
+//   tf2::fromMsg(relative_pose, relative_transform);
+//   geometry_msgs::msg::Pose ret;
+//   tf2::toMsg(ref_transform * relative_transform, ret);
+//   return ret;
+// }
 
 auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
 {

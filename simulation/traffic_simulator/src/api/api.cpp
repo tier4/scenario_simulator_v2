@@ -136,9 +136,14 @@ auto API::setEntityStatus(
   const geometry_msgs::msg::Pose & relative_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  setEntityStatus(
-    name, entity_manager_ptr_->getMapPoseFromRelativePose(reference_entity_name, relative_pose),
-    action_status);
+  if (const auto reference_entity = getEntity(reference_entity_name)) {
+    setEntityStatus(
+      name, pose::transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
+      action_status);
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Cannot get entity \"", reference_entity_name, "\" - such entity does not exist.");
+  }
 }
 
 auto API::setEntityStatus(

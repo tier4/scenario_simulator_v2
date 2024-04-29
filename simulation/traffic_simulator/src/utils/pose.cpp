@@ -115,6 +115,18 @@ auto toCanonicalizedLaneletPose(
   }
 }
 
+auto transformRelativePoseToGlobal(
+  const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
+  -> geometry_msgs::msg::Pose
+{
+  tf2::Transform ref_transform, relative_transform;
+  tf2::fromMsg(global_pose, ref_transform);
+  tf2::fromMsg(relative_pose, relative_transform);
+  geometry_msgs::msg::Pose ret;
+  tf2::toMsg(ref_transform * relative_transform, ret);
+  return ret;
+}
+
 auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>
 {
