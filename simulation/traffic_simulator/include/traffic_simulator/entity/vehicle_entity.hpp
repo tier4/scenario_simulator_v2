@@ -124,7 +124,7 @@ public:
   void setTrafficLightManager(
     const std::shared_ptr<traffic_simulator::TrafficLightManager> &) override;
 
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
+  // auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 

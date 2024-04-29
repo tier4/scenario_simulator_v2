@@ -65,7 +65,7 @@ public:
     THROW_SEMANTIC_ERROR("getRouteLanelets function cannot not use in MiscObjectEntity");
   }
 
-  auto fillLaneletPose(CanonicalizedEntityStatus &) -> void override;
+  // auto fillLaneletPose(CanonicalizedEntityStatus &) -> void override;
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override
   {

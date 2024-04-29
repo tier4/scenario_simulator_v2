@@ -292,31 +292,19 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
   field_operator_application->setVelocityLimit(value);
 }
 
-auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-{
-  EntityBase::fillLaneletPose(status, false);
-}
+// auto EgoEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
+// {
+//   EntityBase::fillLaneletPose(status, false);
+// }
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
+  auto status = static_cast<EntityStatus>(status_);
+  status.pose = map_pose;
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
   const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
     map_pose, getBoundingBox(), unique_route_lanelets, false,
     getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-  geometry_msgs::msg::Pose map_pose_z_fixed = map_pose;
-  auto status = static_cast<EntityStatus>(status_);
-  if (canonicalized_lanelet_pose) {
-    auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-    math::geometry::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(lanelet_pose.lanelet_id));
-    if (const auto s_value = spline.getSValue(map_pose)) {
-      map_pose_z_fixed.position.z = spline.getPoint(s_value.value()).z;
-    }
-    status.pose = map_pose_z_fixed;
-
-  } else {
-    status.pose = map_pose;
-  }
   status_ = CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
 }
 }  // namespace entity

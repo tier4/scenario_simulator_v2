@@ -281,7 +281,7 @@ public:
   // clang-format on
 
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-  FORWARD_TO_ENTITY(fillLaneletPose, const);
+  // FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
@@ -436,7 +436,8 @@ public:
 
   /**
    * @brief Reset behavior plugin of the target entity.
-   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
+   * The internal behavior is to take over the various parameters and save them, then respawn the
+   * Entity and set the parameters.
    * @param name The name of the target entity.
    * @param behavior_plugin_name The name of the behavior plugin you want to set.
    * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior

@@ -117,7 +117,7 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
+  // auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 
   const std::string plugin_name;
 

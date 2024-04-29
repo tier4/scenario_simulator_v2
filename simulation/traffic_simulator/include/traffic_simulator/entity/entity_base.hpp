@@ -125,7 +125,7 @@ public:
 
   virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
 
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
+  // virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
@@ -223,8 +223,8 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
-    -> void final;
+  // virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
+  //   -> void final;
 
   const std::string name;
 
