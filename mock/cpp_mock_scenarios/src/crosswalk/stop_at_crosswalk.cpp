@@ -82,14 +82,14 @@ private:
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
                traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34675, 0.0, 0.0, api_.getHdMapUtils()),
+                 34675, 0.0, 0.0, api_.getHdmapUtils()),
                traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34690, 0.0, 0.0, api_.getHdMapUtils())});
+                 34690, 0.0, 0.0, api_.getHdmapUtils())});
 
     api_.spawn(
       "bob",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34378, 0.0, 0.0, api_.getHdMapUtils()),
+        34378, 0.0, 0.0, api_.getHdmapUtils()),
       getPedestrianParameters());
     api_.setLinearVelocity("bob", 0);
     api_.requestSpeedChange(

@@ -56,7 +56,7 @@ private:
     api_.requestSpeedChange("ego", 10, true);
     const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34408, 1.0, 0.0, api_.getHdMapUtils()));
+        34408, 1.0, 0.0, api_.getHdmapUtils()));
     api_.requestAcquirePosition("ego", goal_pose);
   }
 };
