@@ -29,6 +29,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   if (canonicalized_lanelet_pose) {
     entity_status_.lanelet_pose_valid = true;
     entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
+    entity_status_.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
   } else {
     entity_status_.lanelet_pose_valid = false;
     entity_status_.lanelet_pose = LaneletPose();
@@ -93,12 +94,22 @@ auto CanonicalizedEntityStatus::getBoundingBox() const noexcept
   return entity_status_.bounding_box;
 }
 
+auto CanonicalizedEntityStatus::getMapPose() const noexcept -> geometry_msgs::msg::Pose
+{
+  if (canonicalized_lanelet_pose_) {
+    return static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose_.value());
+  } else {
+    return entity_status_.pose;
+  }
+}
+
 auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose
 {
-  if (!canonicalized_lanelet_pose_.has_value()) {
+  if (canonicalized_lanelet_pose_) {
+    return static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
+  } else {
     THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
   }
-  return static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
 }
 
 auto CanonicalizedEntityStatus::getLaneletId() const -> lanelet::Id

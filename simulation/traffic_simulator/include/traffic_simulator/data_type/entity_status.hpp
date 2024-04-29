@@ -45,7 +45,7 @@ public:
   auto getName() const noexcept -> std::string { return entity_status_.name; };
   auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
   auto laneMatchingSucceed() const noexcept -> bool;
-  auto getMapPose() const noexcept -> geometry_msgs::msg::Pose { return entity_status_.pose; }
+  auto getMapPose() const noexcept -> geometry_msgs::msg::Pose;
   auto getLaneletPose() const -> LaneletPose;
   auto getLaneletId() const -> lanelet::Id;
   auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;

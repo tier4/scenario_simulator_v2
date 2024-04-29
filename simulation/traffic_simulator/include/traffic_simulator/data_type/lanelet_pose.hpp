@@ -66,6 +66,8 @@ public:
 #undef DEFINE_COMPARISON_OPERATOR
 
 private:
+  auto adjustOrientationAndOzPosition(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
+    -> void;
   auto canonicalize(
     const LaneletPose & may_non_canonicalized_lanelet_pose,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPose;
