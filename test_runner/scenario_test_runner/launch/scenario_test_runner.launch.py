@@ -21,7 +21,7 @@ from launch import LaunchDescription
 
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 
 from launch.substitutions import LaunchConfiguration
 
@@ -65,6 +65,7 @@ def launch_setup(context, *args, **kwargs):
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
     consider_pose_by_road_slope         = LaunchConfiguration("consider_pose_by_road_slope",            default=True)
+    enable_perf                         = LaunchConfiguration("perf",                                   default=False)
     global_frame_rate                   = LaunchConfiguration("global_frame_rate",                      default=30.0)
     global_real_time_factor             = LaunchConfiguration("global_real_time_factor",                default=1.0)
     global_timeout                      = LaunchConfiguration("global_timeout",                         default=180)
@@ -88,6 +89,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"autoware_launch_package             := {autoware_launch_package.perform(context)}")
     print(f"consider_acceleration_by_road_slope := {consider_acceleration_by_road_slope.perform(context)}")
     print(f"consider_pose_by_road_slope         := {consider_pose_by_road_slope.perform(context)}")
+    print(f"enable_perf                         := {enable_perf.perform(context)}")
     print(f"global_frame_rate                   := {global_frame_rate.perform(context)}")
     print(f"global_real_time_factor             := {global_real_time_factor.perform(context)}")
     print(f"global_timeout                      := {global_timeout.perform(context)}")
@@ -143,6 +145,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("autoware_launch_package",             default_value=autoware_launch_package            ),
         DeclareLaunchArgument("consider_acceleration_by_road_slope", default_value=consider_acceleration_by_road_slope),
         DeclareLaunchArgument("consider_pose_by_road_slope",         default_value=consider_pose_by_road_slope        ),
+        DeclareLaunchArgument("enable_perf",                         default_value=enable_perf                        ),
         DeclareLaunchArgument("global_frame_rate",                   default_value=global_frame_rate                  ),
         DeclareLaunchArgument("global_real_time_factor",             default_value=global_real_time_factor            ),
         DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
@@ -194,6 +197,17 @@ def launch_setup(context, *args, **kwargs):
             output="screen",
             parameters=[{"use_sim_time": use_sim_time}]+make_parameters(),
             on_exit=ShutdownOnce(),
+            condition=IfCondition(enable_perf),
+        ),
+        Node(
+            package="openscenario_interpreter",
+            executable="openscenario_interpreter_node",
+            namespace="simulation",
+            output="screen",
+            parameters=[{"use_sim_time": use_sim_time}]+make_parameters(),
+            prefix="prof record -F 10000",
+            on_exit=ShutdownOnce(),
+            condition=UnlessCondition(enable_perf),
         ),
         Node(
             package="openscenario_preprocessor",
