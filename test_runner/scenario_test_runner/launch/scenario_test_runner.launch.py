@@ -60,7 +60,7 @@ def default_autoware_launch_file_of(architecture_type):
 
 def launch_setup(context, *args, **kwargs):
     # fmt: off
-    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe")
+    architecture_type                   = LaunchConfiguration("architecture_type",                      default="awf/universe/20230906")
     autoware_launch_file                = LaunchConfiguration("autoware_launch_file",                   default=default_autoware_launch_file_of(architecture_type.perform(context)))
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)

@@ -31,6 +31,18 @@ LogNormalDistribution::LogNormalDistribution(
 {
 }
 
-auto LogNormalDistribution::derive() -> Object { return make<Double>(distribute(random_engine)); }
+auto LogNormalDistribution::derive() -> Object
+{
+  return make<Double>([&]() {
+    double value;
+    auto in_range = [this](double value) {
+      return range.lower_limit.data <= value and value <= range.upper_limit.data;
+    };
+    do {
+      value = distribute(random_engine);
+    } while (not in_range(value));
+    return value;
+  }());
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter

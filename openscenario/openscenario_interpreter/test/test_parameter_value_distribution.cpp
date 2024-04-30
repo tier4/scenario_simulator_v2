@@ -58,7 +58,7 @@ void checkParameterValueDistribution(const std::string path, const ParameterDist
       } else if (expected_parameter.is<String>()) {
         EXPECT_EQ(expected_parameter.as<String>(), actual_parameter.as<String>());
       } else if (expected_parameter.is<Double>()) {
-        EXPECT_EQ(expected_parameter.as<Double>(), actual_parameter.as<Double>());
+        EXPECT_DOUBLE_EQ(expected_parameter.as<Double>(), actual_parameter.as<Double>());
       } else if (expected_parameter.is<Boolean>()) {
         EXPECT_EQ(expected_parameter.as<Boolean>(), actual_parameter.as<Boolean>());
       } else {
@@ -71,9 +71,9 @@ void checkParameterValueDistribution(const std::string path, const ParameterDist
 template <typename T, typename U>
 auto makeParameterListSharedPtr(const std::string & name, U value)
 {
-  auto parameter_list = std::make_shared<openscenario_interpreter::ParameterList>();
-  (*parameter_list)[name] = openscenario_interpreter::make<T>(value);
-  return parameter_list;
+  auto parameter_set = std::make_shared<openscenario_interpreter::ParameterSet>();
+  (*parameter_set)[name] = openscenario_interpreter::make<T>(value);
+  return parameter_set;
 }
 
 TEST(ParameterValueDistribution, DistributionRange)
@@ -84,10 +84,16 @@ TEST(ParameterValueDistribution, DistributionRange)
   std::string path = get_package_share_directory("openscenario_interpreter") +
                      "/test/parameter_value_distribution/Deterministic.DistributionRange.xosc";
 
+  double offset0 = -1.0 + 0.53 * 0;  // -1.0
+  double offset1 = -1.0 + 0.53 * 1;  // -0.47
+  double offset2 = -1.0 + 0.53 * 2;  // 0.06
+  double offset3 = -1.0 + 0.53 * 3;  // 0.59
+
   ParameterDistribution expected_distribution;
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", -1.0));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
-  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 1.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", offset0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", offset1));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", offset2));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", offset3));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
@@ -111,101 +117,203 @@ TEST(ParameterValueDistribution, DistributionSet)
 TEST(ParameterValueDistribution, ValueSetDistribution)
 {
   using ament_index_cpp::get_package_share_directory;
-  using openscenario_interpreter::Double;
-  using openscenario_interpreter::String;
   using openscenario_interpreter::make;
+  using openscenario_interpreter::String;
 
   std::string path = get_package_share_directory("openscenario_interpreter") +
                      "/test/parameter_value_distribution/Deterministic.ValueSetDistribution.xosc";
 
   ParameterDistribution expected_distribution;
-  auto parameter_list = std::make_shared<openscenario_interpreter::ParameterList>();
-  (*parameter_list)["LANE_ID"] = make<String>("34564");
-  (*parameter_list)["offset"] = make<String>("1.0");
-  expected_distribution.push_back(parameter_list);
+  auto parameter_set = std::make_shared<openscenario_interpreter::ParameterSet>();
+  (*parameter_set)["LANE_ID"] = make<String>("34564");
+  (*parameter_set)["offset"] = make<String>("1.0");
+  expected_distribution.push_back(parameter_set);
 
   checkParameterValueDistribution(path, expected_distribution);
 }
 
-//
-// TEST(Error, Success)
-// {
-//   using ament_index_cpp::get_package_share_directory;
-//
-//   auto node {
-//     std::make_shared<rclcpp::Node>("", rclcpp::NodeOptions())
-//   };
-//
-//   openscenario_interpreter::OpenScenario evaluate {
-//     get_package_share_directory("openscenario_interpreter") + "/test/success.xosc",
-//     node
-//   };
-//
-//   ASSERT_FALSE(evaluate.complete());
-//
-//   const auto begin {std::chrono::high_resolution_clock::now()};
-//
-//   using std::chrono_literals::operator""ms;
-//
-//   rclcpp::WallRate rate {50ms};
-//
-//   using openscenario_interpreter::complete_state;
-//
-//   for (evaluate.init(); evaluate() != complete_state; rate.sleep()) {
-//     ASSERT_LT(
-//       std::chrono::duration_cast<std::chrono::seconds>(
-//         std::chrono::high_resolution_clock::now() - begin).count(),
-//       20);
-//   }
-// }
+TEST(ParameterValueDistribution, Deterministic)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+  using openscenario_interpreter::make;
+  using openscenario_interpreter::String;
 
-// TEST(Syntax, invalid)
-// {
-//   auto f = []()
-//   {
-//     openscenario_interpreter::OpenSCENARIO osc { XOSC("invalid-1.xosc") };
-//   };
-//
-//   EXPECT_THROW({ f(); }, openscenario_interpreter::SyntaxError);
-// }
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Deterministic.xosc";
 
-// TEST(Syntax, scenarioDefinition)
-// {
-//   using namespace openscenario_interpreter;
-//
-//   OpenSCENARIO osc { XOSC("example.xosc"), "127.0.0.1", 5555 };
-//
-//   // EXPECT_TRUE(osc.element("FileHeader"));
-//   // EXPECT_TRUE(osc.element("ParameterDeclarations"));
-//
-//   // EXPECT_EQ(osc["FileHeader"].revMajor(), 1);
-//   // EXPECT_TRUE(osc.catalog_locations);
-//   // EXPECT_TRUE(osc.entities);
-//   // EXPECT_TRUE(osc.parameter_declarations);
-//   // EXPECT_TRUE(osc.road_network);
-//   // EXPECT_TRUE(osc.storyboard);
-//
-//   EXPECT_TRUE(osc.evaluate().is<Boolean>());
-// }
+  ParameterDistribution expected_distribution;
+  auto make_parameter_set = [](double offset, std::string lane_id) {
+    auto parameter_set = std::make_shared<openscenario_interpreter::ParameterSet>();
+    (*parameter_set)["offset"] = make<Double>(offset);
+    (*parameter_set)["LANE_ID"] = make<String>(lane_id);
+    return parameter_set;
+  };
+  double offset0 = -1.0 + 0.53 * 0;  // -1.0
+  double offset1 = -1.0 + 0.53 * 1;  // -0.47
+  double offset2 = -1.0 + 0.53 * 2;  // 0.06
+  double offset3 = -1.0 + 0.53 * 3;  // 0.59
+  std::string lane_id0 = "34510";
+  std::string lane_id1 = "34513";
+  std::string lane_id2 = "34564";
 
-// TEST(Core, objectBinder)
-// {
-//   using openscenario_interpreter::make;
-//
-//   const auto foo {make<Double>(3.14)};
-//
-//   const auto result {foo.evaluate()};
-//
-//   EXPECT_TRUE(result.is<Double>());
-//   EXPECT_TRUE(result.as<Double>().data = 3.14);
-// }
+  {
+    expected_distribution.push_back(make_parameter_set(offset0, lane_id0));
+    expected_distribution.push_back(make_parameter_set(offset0, lane_id1));
+    expected_distribution.push_back(make_parameter_set(offset0, lane_id2));
+  }
+  {
+    expected_distribution.push_back(make_parameter_set(offset1, lane_id0));
+    expected_distribution.push_back(make_parameter_set(offset1, lane_id1));
+    expected_distribution.push_back(make_parameter_set(offset1, lane_id2));
+  }
+  {
+    expected_distribution.push_back(make_parameter_set(offset2, lane_id0));
+    expected_distribution.push_back(make_parameter_set(offset2, lane_id1));
+    expected_distribution.push_back(make_parameter_set(offset2, lane_id2));
+  }
+  {
+    expected_distribution.push_back(make_parameter_set(offset3, lane_id0));
+    expected_distribution.push_back(make_parameter_set(offset3, lane_id1));
+    expected_distribution.push_back(make_parameter_set(offset3, lane_id2));
+  }
 
-// TEST(Scenario, LaneChange)
-// {
-//   using namespace openscenario_interpreter;
-//
-//   OpenSCENARIO osc { XOSC("lane_change.xosc"), "127.0.0.1", 5555 };
-// }
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+// Histogram
+TEST(ParameterValueDistribution, Histogram)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.Histogram.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.845241258489508595630468335003));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+TEST(ParameterValueDistribution, LogNormalDistribution)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.LogNormalDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.679981508546370405632330857770));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.032166799749118187012886238563));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.033371713868564217841949925969));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+TEST(ParameterValueDistribution, NormalDistribution)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.NormalDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.086242833039257865701543437353));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.768496409013107117935703627154));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.483866059556305461164527059736));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+TEST(ParameterValueDistribution, PoissonDistribution)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+  using openscenario_interpreter::make;
+  using openscenario_interpreter::String;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.PoissonDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.0));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+TEST(ParameterValueDistribution, ProbabilityDistributionSet)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::String;
+
+  std::string path =
+    get_package_share_directory("openscenario_interpreter") +
+    "/test/parameter_value_distribution/Stochastic.ProbabilityDistributionSet.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "3"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "3"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "3"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "1"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "3"));
+  expected_distribution.push_back(makeParameterListSharedPtr<String>("offset", "2"));
+
+  // NOTE:
+  // 1, ideal: 5/20,  actual: 6/20
+  // 2: ideal: 10/20, actual: 10/20
+  // 3: ideal: 5/20,  actual: 4/20
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
+
+TEST(ParameterValueDistribution, UniformDistribution)
+{
+  using ament_index_cpp::get_package_share_directory;
+  using openscenario_interpreter::Double;
+
+  std::string path = get_package_share_directory("openscenario_interpreter") +
+                     "/test/parameter_value_distribution/Stochastic.UniformDistribution.xosc";
+
+  ParameterDistribution expected_distribution;
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.736924424522478638266420603031));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.082699735953560393753036805720));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.562081627575042097610946711939));
+
+  checkParameterValueDistribution(path, expected_distribution);
+}
 
 int main(int argc, char ** argv)
 {

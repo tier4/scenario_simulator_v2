@@ -5,7 +5,7 @@
     <ScenarioFile filepath="$(ros2 pkg prefix --share openscenario_interpreter)/test/parameter_value_distribution/sample.xosc"/>
     <Stochastic numberOfTestRuns="3">
       <StochasticDistribution parameterName="offset">
-        <PoissonDistribution expectedValue="1.0">
+        <PoissonDistribution expectedValue="0.0">
           <Range lowerLimit="-1.0" upperLimit="1.0"/>
         </PoissonDistribution>
       </StochasticDistribution>

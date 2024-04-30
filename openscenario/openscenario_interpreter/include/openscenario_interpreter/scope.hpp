@@ -200,7 +200,7 @@ public:
 #endif  // PARAMETER_VALUE_DISTRIBUTION_ONLY
 
   // NOTE: `random_engine` is used only for sharing random number generator in Stochastic now
-  std::mt19937 random_engine;
+  std::default_random_engine random_engine;
 
   Scope() = delete;
 

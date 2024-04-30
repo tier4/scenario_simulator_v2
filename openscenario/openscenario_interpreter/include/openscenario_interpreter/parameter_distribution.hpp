@@ -24,17 +24,19 @@
 
 namespace openscenario_interpreter
 {
-// data container types of distribution
-using ParameterList = std::unordered_map<std::string, Object>;
-using ParameterListSharedPtr = std::shared_ptr<ParameterList>;
-using ParameterDistribution = std::vector<ParameterListSharedPtr>;
+// parameter set like {a: 1.0, b: 2.0,...}
+using ParameterSet = std::unordered_map<std::string, Object>;
+using ParameterSetSharedPtr = std::shared_ptr<ParameterSet>;
+// list of ParameterList
+using ParameterDistribution = std::vector<ParameterSetSharedPtr>;
 using SingleUnnamedParameterDistribution = std::vector<Object>;
 
-struct ParallelDerivableParameterDistributionBase
+// TODO(HansRobo): implement parallel derivable parameter distribution with this base struct
+struct ParallelDerivableParameterValueDistributionBase
 {
   virtual auto derive(
     std::size_t local_index, std::size_t local_size, std::size_t global_index,
-    std::size_t global_size) -> ParameterList = 0;
+    std::size_t global_size) -> ParameterSet = 0;
 
   virtual auto getNumberOfDeriveScenarios() const -> std::size_t
   {
@@ -65,7 +67,7 @@ struct ParameterDistributionContainer
 };
 
 auto mergeParameterDistribution(
-  ParameterDistribution & distribution, ParameterDistribution && additional_distribution)
+  const ParameterDistribution & distribution, const ParameterDistribution & additional_distribution)
   -> ParameterDistribution;
 
 template <typename DistributionT>

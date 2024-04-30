@@ -41,12 +41,12 @@ auto Stochastic::derive() -> ParameterDistribution
 {
   ParameterDistribution distribution;
   for (std::size_t i = 0; i < number_of_test_runs; i++) {
-    ParameterListSharedPtr parameter_list = std::make_shared<ParameterList>();
+    ParameterSetSharedPtr parameter_set = std::make_shared<ParameterSet>();
     for (auto & stochastic_distribution : stochastic_distributions) {
       auto derived = stochastic_distribution.derive();
-      parameter_list->emplace(stochastic_distribution.parameter_name, derived);
+      parameter_set->emplace(stochastic_distribution.parameter_name, derived);
     }
-    distribution.emplace_back(parameter_list);
+    distribution.emplace_back(parameter_set);
   }
   return distribution;
 }

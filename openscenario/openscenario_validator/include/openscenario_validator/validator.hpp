@@ -28,15 +28,6 @@
 
 namespace openscenario_validator
 {
-struct XMLPlatform
-{
-  XMLPlatform();
-
-  ~XMLPlatform();
-};
-
-static XMLPlatform platform{};
-
 class OpenSCENARIOValidator
 {
   struct ErrorHandler : public xercesc::HandlerBase
@@ -71,38 +62,46 @@ class OpenSCENARIOValidator
     }
   };
 
-  xercesc::XercesDOMParser parser;
+  std::unique_ptr<xercesc::XercesDOMParser> parser;
 
   ErrorHandler error_handler;
 
   static constexpr auto schema_filepath = "/tmp/OpenSCENARIO-1.3.xsd";
 
 public:
-  explicit OpenSCENARIOValidator()
+  OpenSCENARIOValidator()
   {
+    xercesc::XMLPlatformUtils::Initialize();
+    parser = std::make_unique<xercesc::XercesDOMParser>();
     if (auto file = std::ofstream(schema_filepath, std::ios::trunc)) {
       file << schema;
     } else {
       throw std::system_error(errno, std::system_category());
     }
 
-    if (not parser.loadGrammar(schema_filepath, xercesc::Grammar::SchemaGrammarType)) {
+    if (not parser->loadGrammar(schema_filepath, xercesc::Grammar::SchemaGrammarType)) {
       throw std::runtime_error(
         "Failed to load XSD schema. This is an unexpected error and an implementation issue. "
         "Please contact the developer.");
     } else {
-      parser.setDoNamespaces(true);
-      parser.setDoSchema(true);
-      parser.setErrorHandler(&error_handler);
-      parser.setExternalNoNamespaceSchemaLocation(schema_filepath);
-      parser.setValidationSchemaFullChecking(true);
-      parser.setValidationScheme(xercesc::XercesDOMParser::Val_Always);
+      parser->setDoNamespaces(true);
+      parser->setDoSchema(true);
+      parser->setErrorHandler(&error_handler);
+      parser->setExternalNoNamespaceSchemaLocation(schema_filepath);
+      parser->setValidationSchemaFullChecking(true);
+      parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
     }
+  }
+
+  ~OpenSCENARIOValidator()
+  {
+    parser.release();
+    xercesc::XMLPlatformUtils::Terminate();
   }
 
   auto validate(const boost::filesystem::path & xml_file) -> void
   {
-    parser.parse(xml_file.string().c_str());
+    parser->parse(xml_file.string().c_str());
   }
 
   template <typename... Ts>

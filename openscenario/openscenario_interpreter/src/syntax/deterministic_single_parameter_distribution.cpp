@@ -34,7 +34,7 @@ auto DeterministicSingleParameterDistribution::derive() -> ParameterDistribution
       ParameterDistribution distribution;
       for (const auto & unnamed_parameter : unnamed_distribution.derive()) {
         distribution.emplace_back(
-          std::make_shared<ParameterList>(ParameterList{{parameter_name, unnamed_parameter}}));
+          std::make_shared<ParameterSet>(ParameterSet{{parameter_name, unnamed_parameter}}));
       }
       return distribution;
     },

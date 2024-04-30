@@ -14,15 +14,16 @@
 
 #include <openscenario_validator/validator.hpp>
 
-int main(int argc, char *argv[]) {
-    assert(argc == 2);
-    std::string file_path = argv[1];
-    openscenario_validator::OpenSCENARIOValidator validate;
-    try {
-        validate(file_path);
-        return 0;
-    } catch (const std::exception &e) {
-        std::cerr << e.what() << std::endl;
-        return 1;
-    }
+int main(int argc, char * argv[])
+{
+  assert(argc == 2);
+  std::string file_path = argv[1];
+  openscenario_validator::OpenSCENARIOValidator validate;
+  try {
+    validate(file_path);
+    return 0;
+  } catch (const std::exception & e) {
+    std::cerr << e.what() << std::endl;
+    return 1;
+  }
 }

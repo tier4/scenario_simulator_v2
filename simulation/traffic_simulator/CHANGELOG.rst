@@ -13,6 +13,22 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.15.3 (2024-04-25)
+-------------------
+* Merge pull request `#1112 <https://github.com/tier4/scenario_simulator_v2/issues/1112>`_ from tier4/fix/standstill-duration-for-miscobjects
+  Fix/Standstill duration condition for MiscObjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* stanstill update for misc objects
+* Contributors: Masaya Kataoka, Piotr Zyskowski
+
+1.15.2 (2024-04-23)
+-------------------
+* Merge branch 'master' into feature/update_default_architecture_type
+* Contributors: Masaya Kataoka
+
 1.15.1 (2024-04-18)
 -------------------
 * Merge branch 'master' into fix/occluded-object-in-grid
