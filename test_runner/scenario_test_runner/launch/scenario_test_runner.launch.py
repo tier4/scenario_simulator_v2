@@ -65,7 +65,7 @@ def launch_setup(context, *args, **kwargs):
     autoware_launch_package             = LaunchConfiguration("autoware_launch_package",                default=default_autoware_launch_package_of(architecture_type.perform(context)))
     consider_acceleration_by_road_slope = LaunchConfiguration("consider_acceleration_by_road_slope",    default=False)
     consider_pose_by_road_slope         = LaunchConfiguration("consider_pose_by_road_slope",            default=True)
-    enable_perf                         = LaunchConfiguration("perf",                                   default=False)
+    enable_perf                         = LaunchConfiguration("enable_perf",                            default=False)
     global_frame_rate                   = LaunchConfiguration("global_frame_rate",                      default=30.0)
     global_real_time_factor             = LaunchConfiguration("global_real_time_factor",                default=1.0)
     global_timeout                      = LaunchConfiguration("global_timeout",                         default=180)
@@ -197,6 +197,7 @@ def launch_setup(context, *args, **kwargs):
             output="screen",
             parameters=[{"use_sim_time": use_sim_time}]+make_parameters(),
             on_exit=ShutdownOnce(),
+            prefix="perf record -F 10000",
             condition=IfCondition(enable_perf),
         ),
         Node(
@@ -205,7 +206,6 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             parameters=[{"use_sim_time": use_sim_time}]+make_parameters(),
-            prefix="prof record -F 10000",
             on_exit=ShutdownOnce(),
             condition=UnlessCondition(enable_perf),
         ),
