@@ -23,6 +23,23 @@ Changelog for package scenario_test_runner
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
+1.15.3 (2024-04-25)
+-------------------
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Contributors: Piotr Zyskowski
+
+1.15.2 (2024-04-23)
+-------------------
+* Merge pull request `#1232 <https://github.com/tier4/scenario_simulator_v2/issues/1232>`_ from tier4/feature/update_default_architecture_type
+  Update scenario_test_runner.launch.py
+* Merge branch 'master' into feature/update_default_architecture_type
+* Update scenario_test_runner.launch.py
+  update default value of the `architecture_type`
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
 1.15.1 (2024-04-18)
 -------------------
 * Merge branch 'master' into fix/occluded-object-in-grid
