@@ -106,6 +106,12 @@ def launch_setup(context, *args, **kwargs):
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
 
+    def make_launch_prefix():
+        if enable_perf.perform(context) == "True":
+            return "perf record -F 10000"
+        else:
+            return ""
+
     def make_parameters():
         parameters = [
             {"architecture_type": architecture_type},
@@ -196,18 +202,8 @@ def launch_setup(context, *args, **kwargs):
             namespace="simulation",
             output="screen",
             parameters=[{"use_sim_time": use_sim_time}]+make_parameters(),
+            prefix=make_launch_prefix(),
             on_exit=ShutdownOnce(),
-            prefix="perf record -F 10000",
-            condition=IfCondition(enable_perf),
-        ),
-        Node(
-            package="openscenario_interpreter",
-            executable="openscenario_interpreter_node",
-            namespace="simulation",
-            output="screen",
-            parameters=[{"use_sim_time": use_sim_time}]+make_parameters(),
-            on_exit=ShutdownOnce(),
-            condition=UnlessCondition(enable_perf),
         ),
         Node(
             package="openscenario_preprocessor",

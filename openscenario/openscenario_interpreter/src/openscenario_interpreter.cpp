@@ -162,7 +162,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
   auto evaluate_storyboard = [this]() {
     withExceptionHandler(
       [this](auto &&...) {
-        publishCurrentContext();
+        // publishCurrentContext();
         deactivate();
       },
       [this]() {
@@ -183,7 +183,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
 
           SimulatorCore::update();
 
-          publishCurrentContext();
+          // publishCurrentContext();
         });
       });
   };
@@ -193,7 +193,7 @@ auto Interpreter::on_activate(const rclcpp_lifecycle::State &) -> Result
   } else {
     return withExceptionHandler(
       [this](auto &&...) {
-        publishCurrentContext();
+        // publishCurrentContext();
         reset();
         return Interpreter::Result::FAILURE;  // => Inactive
       },
