@@ -106,6 +106,12 @@ def launch_setup(context, *args, **kwargs):
     print(f"use_sim_time                        := {use_sim_time.perform(context)}")
     print(f"vehicle_model                       := {vehicle_model.perform(context)}")
 
+    def make_launch_prefix():
+        if enable_perf.perform(context) == "True":
+            return "perf record -F 10000"
+        else:
+            return ""
+
     def make_parameters():
         parameters = [
             {"architecture_type": architecture_type},
