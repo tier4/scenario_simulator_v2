@@ -16,6 +16,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/intersection/collision.hpp>
+#include <geometry/linear_algebra.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
 #include <memory>
@@ -38,12 +39,27 @@ namespace entity
 void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
-  for (const auto & name : names) {
-    geometry_msgs::msg::PoseStamped pose;
-    pose.pose = getMapPose(name);
-    pose.header.stamp = clock_ptr_->now();
-    pose.header.frame_id = name;
-    broadcastTransform(pose);
+  if (entityExists("ego")) {
+    broadcastTransform(
+      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+        .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
+        .pose(getMapPose("ego")),
+      true);
+  }
+  if (!names.empty()) {
+    broadcastTransform(
+      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+        .header(
+          std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
+        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
+                .position(std::accumulate(
+                  names.begin(), names.end(), geometry_msgs::msg::Point(),
+                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
+                    return point +
+                           (getMapPose(name).position * (1.0 / static_cast<double>(names.size())));
+                  }))
+                .orientation(geometry_msgs::msg::Quaternion())),
+      true);
   }
 }
 
