@@ -676,6 +676,12 @@ void EntityBase::setDynamicConstraints(
   setBehaviorParameter(behavior_parameter);
 }
 
+void EntityBase::setEntityTypeList(
+  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & entity_type_list)
+{
+  entity_type_list_ = entity_type_list;
+}
+
 void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, CanonicalizedEntityStatus> & status)
 {

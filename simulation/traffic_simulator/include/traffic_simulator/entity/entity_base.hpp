@@ -203,6 +203,9 @@ public:
 
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
 
+  /*   */ void setEntityTypeList(
+    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);
+
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
   virtual auto setStatus(const CanonicalizedEntityStatus &) -> void;
