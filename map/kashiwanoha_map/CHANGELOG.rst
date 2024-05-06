@@ -13,6 +13,9 @@ Changelog for package kashiwanoha_map
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.15.4 (2024-05-01)
+-------------------
+
 1.15.3 (2024-04-25)
 -------------------
 * Merge branch 'master' into fix/standstill-duration-for-miscobjects
