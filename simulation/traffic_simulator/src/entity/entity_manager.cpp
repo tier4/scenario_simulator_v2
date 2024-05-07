@@ -39,12 +39,26 @@ namespace entity
 void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
-  if (entityExists("ego")) {
-    broadcastTransform(
-      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
-        .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-        .pose(getMapPose("ego")),
-      true);
+  /**
+   * @note This part of the process is intended to ensure that frames are issued in a position that makes 
+   * it as easy as possible to see the entities that will appear in the scenario.
+   * In the past, we used to publish the frames of all entities, but that would be too heavy processing, 
+   * so we publish the average of the coordinates of all entities.
+   */
+  if (isEgoSpawned()) {
+    const auto ego_name = getEgoName();
+    if (entityExists(ego_name)) {
+      broadcastTransform(
+        geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+          /**
+           * @note This is the intended implementation. 
+           * It is easier to create rviz config if the name “ego” is fixed, 
+           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           */
+          .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
+          .pose(getMapPose(ego_name)),
+        true);
+    }
   }
   if (!names.empty()) {
     broadcastTransform(
