@@ -39,12 +39,15 @@ namespace entity
 void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
-  if (entityExists("ego")) {
-    broadcastTransform(
-      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
-        .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-        .pose(getMapPose("ego")),
-      true);
+  if (isEgoSpawned()) {
+    const auto ego_name = getEgoName();
+    if (entityExists(ego_name)) {
+      broadcastTransform(
+        geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+          .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
+          .pose(getMapPose(ego_name)),
+        true);
+    }
   }
   if (!names.empty()) {
     broadcastTransform(
