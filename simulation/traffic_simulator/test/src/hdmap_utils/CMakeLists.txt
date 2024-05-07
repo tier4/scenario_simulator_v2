@@ -1,0 +1,2 @@
+ament_add_gtest(test_hdmap_utils test_hdmap_utils.cpp)
+target_link_libraries(test_hdmap_utils traffic_simulator)
