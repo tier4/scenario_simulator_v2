@@ -29,6 +29,15 @@ auto makeHdMapUtilsInstance() -> hdmap_utils::HdMapUtils
   return hdmap_utils::HdMapUtils(path, origin);
 }
 
+auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
+{
+  geometry_msgs::msg::Point point;
+  point.x = x;
+  point.y = y;
+  point.z = z;
+  return point;
+}
+
 int main(int argc, char ** argv)
 {
   testing::InitGoogleTest(&argc, argv);
@@ -281,4 +290,128 @@ TEST(HdMapUtils, CanonicalizeAll)
   EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(1));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34981);
   EXPECT_EQ(canonicalized_lanelet_poses[0].s, non_canonicalized_lanelet_s);
+}
+
+TEST(HdMapUtils, Construct_invalid)
+{
+  std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "invalid_path";
+  geographic_msgs::msg::GeoPoint origin;
+  origin.latitude = 35.61836750154;
+  origin.longitude = 139.78066608243;
+  EXPECT_THROW(hdmap_utils::HdMapUtils hdmap_utils(path, origin), std::runtime_error);
+}
+
+TEST(HdMapUtils, filterLaneletIds_emptyIds)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  lanelet::Ids ids = {};
+  const char * subtype = "crosswalk";
+  auto filtered = hdmap_utils.filterLaneletIds(ids, subtype);
+
+  EXPECT_TRUE(filtered.empty());
+}
+
+TEST(HdMapUtils, filterLaneletIds_invalidIds)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  lanelet::Id id_invalid_0 = 10000000;
+  lanelet::Id id_invalid_1 = 10000001;
+  lanelet::Id id_invalid_2 = 10000002;
+  lanelet::Ids ids = {id_invalid_0, id_invalid_1, id_invalid_2};
+  const char * subtype = "crosswalk";
+
+  EXPECT_THROW(auto filtered = hdmap_utils.filterLaneletIds(ids, subtype), std::runtime_error);
+}
+
+TEST(HdMapUtils, filterLaneletIds_correct)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  lanelet::Id id_crosswalk_0 = 34399;
+  lanelet::Id id_crosswalk_1 = 34385;
+  lanelet::Id id_road_0 = 34600;
+  lanelet::Id id_road_1 = 34675;
+  lanelet::Ids ids = {id_crosswalk_0, id_crosswalk_1, id_road_0, id_road_1};
+  const char * subtype = "crosswalk";
+
+  auto filtered = hdmap_utils.filterLaneletIds(ids, subtype);
+
+  EXPECT_EQ(filtered.size(), 2);
+  EXPECT_TRUE(std::find(filtered.begin(), filtered.end(), id_crosswalk_0) != filtered.end());
+  EXPECT_TRUE(std::find(filtered.begin(), filtered.end(), id_crosswalk_1) != filtered.end());
+}
+
+TEST(HdMapUtils, filterLaneletIds_invalidSubtype)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  lanelet::Id id_crosswalk_0 = 34399;
+  lanelet::Id id_crosswalk_1 = 34385;
+  lanelet::Id id_road_0 = 34600;
+  lanelet::Id id_road_1 = 34675;
+  lanelet::Ids ids = {id_crosswalk_0, id_crosswalk_1, id_road_0, id_road_1};
+  const char * subtype = "invalid_subtype";
+
+  auto filtered = hdmap_utils.filterLaneletIds(ids, subtype);
+
+  EXPECT_TRUE(filtered.empty());
+}
+
+TEST(HdMapUtils, getNearbyLaneletIds)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  auto point = makePoint(3807.34, 73817.95);
+  const double distance_threshold = 10.0;
+  size_t search_count = 100;
+  auto lanelets = hdmap_utils.getNearbyLaneletIds(point, distance_threshold, search_count);
+
+  lanelet::Ids nearbyLanelets = {34795, 120660, 34507, 34468, 120659, 34606};
+  EXPECT_EQ(lanelets, nearbyLanelets);
+}
+
+TEST(HdMapUtils, getNearbyLaneletIds_unsuccessful)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  auto point = makePoint(3826.26, 73837.32);
+  const double distance_threshold = 10.0;
+  size_t search_count = 100;
+  auto lanelets = hdmap_utils.getNearbyLaneletIds(point, distance_threshold, search_count);
+
+  EXPECT_TRUE(lanelets.empty());
+}
+
+TEST(HdMapUtils, getNearbyLaneletIds_crosswalkIncluded)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  auto point = makePoint(3768.01, 73750.97);
+  const double distance_threshold = 0.0;
+  bool include_crosswalk = true;
+  size_t search_count = 100;
+  auto lanelets = hdmap_utils.getNearbyLaneletIds(point, distance_threshold, include_crosswalk, search_count);
+
+  lanelet::Id id_crosswalk = 34399;
+  lanelet::Id id_road = 34633;
+  EXPECT_EQ(lanelets.size(), 2);
+  EXPECT_TRUE(std::find(lanelets.begin(), lanelets.end(), id_crosswalk) != lanelets.end());
+  EXPECT_TRUE(std::find(lanelets.begin(), lanelets.end(), id_road) != lanelets.end());
+  // bug at hdmap_utils.cpp:288, no predicate on distance threshold if first is closer than distance threshold
+}
+
+TEST(HdMapUtils, getNearbyLaneletIds_crosswalkNotIncluded)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  auto point = makePoint(3768.01, 73750.97);
+  const double distance_threshold = 0.0;
+  bool include_crosswalk = false;
+  size_t search_count = 100;
+  auto lanelets = hdmap_utils.getNearbyLaneletIds(point, distance_threshold, include_crosswalk, search_count);
+
+  lanelet::Id id_road = 34633;
+  EXPECT_EQ(lanelets.size(), 1);
+  EXPECT_EQ(lanelets[0], id_road);
+  // bug at hdmap_utils.cpp:288, no predicate on distance threshold if first is closer than distance threshold
 }
