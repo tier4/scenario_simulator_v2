@@ -83,6 +83,7 @@ add_library(parameter_value_distribution_without_ros STATIC
   src/syntax/histogram.cpp
   src/syntax/histogram_bin.cpp
   src/syntax/normal_distribution.cpp
+  src/syntax/log_normal_distribution.cpp
   src/syntax/poisson_distribution.cpp
   src/syntax/probability_distribution_set.cpp
   src/syntax/probability_distribution_set_element.cpp

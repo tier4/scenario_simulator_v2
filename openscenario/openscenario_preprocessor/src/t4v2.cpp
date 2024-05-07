@@ -293,14 +293,14 @@ auto T4V2::deriveScenarioWithScenarioModifiers(
 
   struct replace_walker : pugi::xml_tree_walker
   {
-    openscenario_interpreter::ParameterListSharedPtr parameter_list;
+    openscenario_interpreter::ParameterSetSharedPtr parameter_set;
 
     virtual bool for_each(pugi::xml_node & node)
     {
       for (pugi::xml_attribute_iterator attribute_iter = node.attributes_begin();
            attribute_iter != node.attributes_end(); ++attribute_iter) {
-        for (const auto & parameter : *parameter_list) {
-          attribute_iter->set_value(regex_replace(
+        for (const auto & parameter : *parameter_set) {
+          attribute_iter->set_value(std::regex_replace(
                                       attribute_iter->as_string(), std::regex(parameter.first),
                                       parameter.second.as<openscenario_interpreter::String>())
                                       .c_str());
@@ -312,13 +312,13 @@ auto T4V2::deriveScenarioWithScenarioModifiers(
 
   replace_walker walker;
 
-  for (const auto & parameter_list : scenario_modifier_distribution | boost::adaptors::indexed()) {
+  for (const auto & parameter_set : scenario_modifier_distribution | boost::adaptors::indexed()) {
     pugi::xml_document derived_script;
 
     derived_script.reset(base_scenario_doc);  // deep copy
 
     // overwrite with scenario modifiers
-    walker.parameter_list = parameter_list.value();
+    walker.parameter_set = parameter_set.value();
     derived_script.traverse(walker);
 
     derived_scripts.push_back(std::forward<pugi::xml_document>(derived_script));
