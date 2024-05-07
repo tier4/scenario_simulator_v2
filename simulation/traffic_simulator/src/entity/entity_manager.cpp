@@ -39,6 +39,12 @@ namespace entity
 void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
+  /**
+   * @note This part of the process is intended to ensure that frames are issued in a position that makes 
+   * it as easy as possible to see the entities that will appear in the scenario.
+   * In the past, we used to publish the frames of all entities, but that would be too heavy processing, 
+   * so we publish the average of the coordinates of all entities.
+   */
   if (isEgoSpawned()) {
     const auto ego_name = getEgoName();
     if (entityExists(ego_name)) {
