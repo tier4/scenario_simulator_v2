@@ -18,427 +18,173 @@
 #include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
-constexpr std::size_t spawning_lanes_limit = 1e3;
-constexpr double lanelet_sampling_step = 0.1;
-constexpr int max_randomization_attempts = 1e5;
-
 namespace traffic_simulator
 {
 namespace traffic
 {
-SpawnPoseValidator::LaneletArea::LaneletArea(
-  const lanelet::Id & id, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils)
-: first_id(id),
-  last_id(id),
-  ids({id}),
-  left_bound(hdmap_utils->getLeftBound(id)),
-  right_bound(hdmap_utils->getRightBound(id))
+TrafficSource::Validator::Validator(
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+  const geometry_msgs::msg::Pose & pose, const double radius, const bool include_crosswalk)
+: ids(hdmap_utils->getNearbyLaneletIds(
+    pose.position, radius, include_crosswalk, spawning_lanes_limit)),
+  lanelets(hdmap_utils->getLanelets(ids))
 {
 }
 
-auto SpawnPoseValidator::LaneletArea::operator+(const LaneletArea & other) const -> LaneletArea
+auto TrafficSource::Validator::operator()(
+  const std::vector<geometry_msgs::msg::Point> & points, lanelet::Id id) const -> bool
 {
-  return combine(*this, other);
-}
-
-auto SpawnPoseValidator::LaneletArea::combine(const LaneletArea & before, const LaneletArea & after)
-  -> LaneletArea
-{
-  LaneletArea ret;
-  ret.first_id = before.first_id;
-  ret.last_id = after.last_id;
-
-#define COMBINE_VECTOR(RET, VEC1, VEC2)            \
-  RET.reserve(VEC1.size() + VEC2.size());          \
-  RET.insert(RET.end(), VEC1.begin(), VEC1.end()); \
-  RET.insert(RET.end(), VEC2.begin(), VEC2.end());
-
-  COMBINE_VECTOR(ret.ids, before.ids, after.ids);
-  COMBINE_VECTOR(ret.left_bound, before.left_bound, after.left_bound);
-  COMBINE_VECTOR(ret.right_bound, before.right_bound, after.right_bound);
-
-#undef COMBINE_VECTOR
-
-  return ret;
-}
-
-auto SpawnPoseValidator::LaneletArea::contains(const LaneletArea & other) const -> bool
-{
-  for (const auto & other_id : other.ids) {
-    if (!contains(other_id)) {
-      return false;
+  const auto points2d = [&]() {
+    auto points2d = lanelet::Points2d();
+    for (const auto point : points) {
+      points2d.emplace_back(lanelet::utils::getId(), point.x, point.y);
     }
-  }
-  return true;
-}
+    return points2d;
+  }();
 
-auto SpawnPoseValidator::LaneletArea::contains(const lanelet::Id & id) const -> bool
-{
-  for (const auto & this_id : this->ids) {
-    if (id == this_id) {
-      return true;
-    }
-  }
-  return false;
-}
-
-auto SpawnPoseValidator::LaneletArea::toBoostPolygon(
-  const std::vector<geometry_msgs::msg::Point> & points) -> boost_polygon
-{
-  boost_polygon poly;
-  poly.outer().reserve(points.size() + 1);
-
-  std::transform(
-    points.begin(), points.end(), std::back_inserter(poly.outer()),
-    [](const geometry_msgs::msg::Point & p) { return math::geometry::toBoostPoint(p); });
-
-  poly.outer().push_back(poly.outer().front());
-  return poly;
-}
-
-auto SpawnPoseValidator::LaneletArea::getBoostPolygon() const -> const boost_polygon &
-{
-  // recalculate only when necessary (+1 because boost polygon is closed)
-  if (polygon_b.outer().size() != getPolygon().size() + static_cast<std::size_t>(1)) {
-    polygon_b = toBoostPolygon(getPolygon());
-  }
-  return polygon_b;
-}
-
-auto SpawnPoseValidator::LaneletArea::getPolygon() const
-  -> const std::vector<geometry_msgs::msg::Point> &
-{
-  if (left_bound.empty() || right_bound.empty()) {
-    polygon.clear();
-    return polygon;
-  }
-  if (polygon.size() != left_bound.size() + right_bound.size()) {
-    createPolygon();
-  }
-  return polygon;
-}
-
-void SpawnPoseValidator::LaneletArea::createPolygon() const
-{
-  polygon.clear();
-  polygon.reserve(left_bound.size() + right_bound.size());
-  polygon.insert(polygon.end(), left_bound.begin(), left_bound.end());
-  polygon.insert(polygon.end(), right_bound.rbegin(), right_bound.rend());
-}
-
-auto hasCommonElements(const lanelet::Ids & ids, const std::set<lanelet::Id> & other) -> bool
-{
-  for (const auto & id : ids) {
-    if (other.find(id) != other.end()) {
-      return true;
-    }
-  }
-  return false;
-}
-
-SpawnPoseValidator::SpawnPoseValidator(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
-  const geometry_msgs::msg::Pose & source_pose, const double source_radius, const bool disabled,
-  const bool include_crosswalk)
-: disabled_(disabled), hdmap_utils_(hdmap_utils)
-{
-  if (disabled) {
-    return;
-  }
-
-  const auto spawning_lanelets = hdmap_utils_->getNearbyLaneletIds(
-    source_pose.position, source_radius, include_crosswalk, spawning_lanes_limit);
-  std::set<lanelet::Id> spawning_ids(spawning_lanelets.begin(), spawning_lanelets.end());
-
-  if (spawning_ids.empty()) {
-    THROW_SIMULATION_ERROR("TrafficSource has no spawning lanelets.");
-  }
-
-  /**
-   * @note find all "starting" lanelets out of spawning lanelets.
-   * These are the lanelets that have no previous lanelets inside the area of TrafficSource.
-   * Slightly increases computation time for small areas (~0.1ms), but reduces this time for larger areas.
-   */
-  std::set<lanelet::Id> start_ids;
-  for (const auto & id : spawning_ids) {
-    auto previous = hdmap_utils_->getPreviousLaneletIds(id);
-    previous.erase(std::remove(previous.begin(), previous.end(), id), previous.end());
-
-    if (previous.empty() || !hasCommonElements(previous, spawning_ids)) {
-      start_ids.insert(id);
-    }
-  }
-
-  for (const auto & id : start_ids) {
-    findAllSpawningAreas(id, spawning_ids, true);
-  }
-
-  /// @note find all lanelets that are not reachable from "starting" lanelets (detached loops within area of TrafficSource)
-  for (const auto & id : spawning_ids) {
-    if (std::none_of(areas_.begin(), areas_.end(), [&id](const LaneletArea & area) {
-          return area.contains(id);
-        })) {
-      findAllSpawningAreas(id, spawning_ids, true);
-    }
-  }
-
-  removeRedundantAreas();
-}
-
-auto SpawnPoseValidator::isValid(
-  const std::vector<geometry_msgs::msg::Point> & polygon, const lanelet::Id & id) const -> bool
-{
-  if (disabled_) {
-    return true;
-  }
-  const auto boost_polygon = LaneletArea::toBoostPolygon(polygon);
-
-  for (const auto & area : areas_) {
-    if (area.contains(id) && boost::geometry::within(boost_polygon, area.getBoostPolygon())) {
-      return true;
-    }
-  }
-  return false;
-}
-
-void SpawnPoseValidator::findAllSpawningAreas(
-  const lanelet::Id id, const std::set<lanelet::Id> & valid_ids, const bool in_front,
-  const std::optional<LaneletArea> & previous_area)
-{
-  LaneletArea area(id, hdmap_utils_);
-  if (previous_area) {
-    /// @note check if this ID is already in the area - prevents loops
-    if (previous_area->contains(id)) {
-      return;
-    }
-    if (in_front) {
-      area = previous_area.value() + area;
-    } else {
-      area = area + previous_area.value();
-    }
-  }
-  areas_.push_back(area);
-
-  lanelet::Ids ids_to_consider;
-  const lanelet::Id border_id = in_front ? area.last_id : area.first_id;
-  if (in_front) {
-    ids_to_consider = hdmap_utils_->getNextLaneletIds(border_id);
-  } else {
-    ids_to_consider = hdmap_utils_->getPreviousLaneletIds(border_id);
-  }
-
-  for (const auto & id_to_consider : ids_to_consider) {
-    if (id_to_consider != border_id && valid_ids.count(id_to_consider) > 0) {
-      findAllSpawningAreas(id_to_consider, valid_ids, in_front, area);
-    }
-  }
-}
-
-void SpawnPoseValidator::removeRedundantAreas()
-{
-  // sort so that the biggest areas are first
-  std::sort(areas_.begin(), areas_.end(), [](const LaneletArea & lhs, const LaneletArea & rhs) {
-    return lhs.ids.size() > rhs.ids.size();
+  return std::any_of(lanelets.begin(), lanelets.end(), [&](const auto & lane) {
+    return std::find(ids.begin(), ids.end(), id) != ids.end() and
+           std::all_of(points2d.begin(), points2d.end(), [&](const auto & point) {
+             return lanelet::geometry::inside(lane, point);
+           });
   });
-
-  // remove redundant areas
-  for (size_t i = 0; i < areas_.size(); ++i) {
-    for (size_t j = 0; j < i; ++j) {
-      if (areas_[j].contains(areas_[i])) {
-        areas_.erase(areas_.begin() + i);
-        --i;    // adjust the index after erasing
-        break;  // no need to check other larger areas
-      }
-    }
-  }
 }
 
-TrafficSource::TrafficSource(
-  const double radius, const double rate, const double speed,
-  const geometry_msgs::msg::Pose & position,
-  const std::vector<std::tuple<ParamsVariant, std::string, std::string, double>> & params,
-  const std::optional<int> random_seed, const double current_time,
-#define MAKE_FUNCTION_REF_TYPE(PARAMS, POSE)                                                     \
-  const std::function<void(                                                                      \
-    const std::string &, const POSE &, const PARAMS &, const std::string &, const std::string &, \
-    const double)> &
-  // clang-format off
-  MAKE_FUNCTION_REF_TYPE(VehicleParams,    CanonicalizedLaneletPose) vehicle_ll_spawn_function,
-  MAKE_FUNCTION_REF_TYPE(PedestrianParams, CanonicalizedLaneletPose) pedestrian_ll_spawn_function,
-  MAKE_FUNCTION_REF_TYPE(VehicleParams,    geometry_msgs::msg::Pose) vehicle_spawn_function,
-  MAKE_FUNCTION_REF_TYPE(PedestrianParams, geometry_msgs::msg::Pose) pedestrian_spawn_function,
-// clang-format on
-#undef MAKE_FUNCTION_REF_TYPE
-  const Configuration & configuration, std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils)
-: radius_(radius),
-  rate_(rate),
-  speed_(speed),
-  source_pose_(position),
-  source_id_(next_source_id_++),
-  vehicle_ll_spawn_function_(vehicle_ll_spawn_function),
-  pedestrian_ll_spawn_function_(pedestrian_ll_spawn_function),
-  vehicle_spawn_function_(vehicle_spawn_function),
-  pedestrian_spawn_function_(pedestrian_spawn_function),
-  hdmap_utils_(hdmap_utils),
-  angle_distribution_(0.0, M_PI * 2.0),
-  radius_distribution_(0.0, radius_),
-  start_execution_time_(
-    /// @note Failsafe for the case where TrafficSource is added before the simulation starts or delay is negative
-    (!std::isnan(current_time) ? current_time : 0.0) + std::max(configuration.start_delay, 0.0)),
-  config_(configuration),
-  params_(obtainParams<ParamsVariant, 0>(params)),
-  behaviors_(obtainParams<std::string, 1>(params)),
-  models3d_(obtainParams<std::string, 2>(params)),
-  validator_(hdmap_utils, position, radius, !configuration.require_footprint_fitting, false),
-  validator_crosswalk_(
-    hdmap_utils, position, radius, !configuration.require_footprint_fitting, true)
-{
-  // Create a parameter distribution from the weights
-  const auto weights = obtainParams<double, 3>(params);
-  params_distribution_ = std::discrete_distribution<>(weights.begin(), weights.end());
-
-  if (random_seed) {
-    engine_.seed(random_seed.value());
-  }
-}
-
-auto TrafficSource::getRandomPose(const bool random_orientation) -> geometry_msgs::msg::Pose
+auto TrafficSource::makeRandomPose(const bool random_orientation) -> geometry_msgs::msg::Pose
 {
   const double angle = angle_distribution_(engine_);
+
   const double radius = radius_distribution_(engine_);
 
-  geometry_msgs::msg::Pose pose = source_pose_;
-  pose.position.x += radius * std::cos(angle);
-  pose.position.y += radius * std::sin(angle);
+  auto random_pose = pose;
+
+  random_pose.position.x += radius * std::cos(angle);
+  random_pose.position.y += radius * std::sin(angle);
 
   if (random_orientation) {
-    pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    random_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
       traffic_simulator::helper::constructRPY(0.0, 0.0, angle_distribution_(engine_)));
   }
 
-  return pose;
-}
-
-auto TrafficSource::getNewEntityName() -> std::string
-{
-  return "traffic_source_" + std::to_string(source_id_) + "_entity_" + std::to_string(entity_id_++);
+  return random_pose;
 }
 
 void TrafficSource::execute(
   [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time)
 {
-  while (current_time - start_execution_time_ > 1.0 / rate_ * spawn_count_) {
-    ++spawn_count_;
+  for (; current_time - start_execution_time_ > 1.0 / rate * entity_count_; ++entity_count_) {
+    const auto index = params_distribution_(engine_);
 
-    randomizeCurrentParams();
-    const auto name = getNewEntityName();
-    const auto [pose, lanelet_pose] = getValidRandomPose();
+    const auto & parameter = std::get<0>(distribution_[index]);
 
-    // clang-format off
+    const auto name =
+      "TrafficSource_" + std::to_string(id) + "_Entity_" + std::to_string(entity_count_);
+
+    const auto [pose, lanelet_pose] = [&]() {
+      static constexpr auto max_randomization_attempts = 10000;
+
+      for (auto tries = 0; tries < max_randomization_attempts; ++tries) {
+        auto candidate_pose = makeRandomPose(configuration_.use_random_orientation);
+        if (auto [valid, lanelet_pose] = isPoseValid(parameter, candidate_pose); valid) {
+          return std::make_pair(candidate_pose, lanelet_pose);
+        }
+      }
+      THROW_SIMULATION_ERROR(
+        "TrafficSource ", id, " failed to generate valid random pose in ",
+        max_randomization_attempts, ".");
+    }();
+
     if (lanelet_pose) {
       /// @note If lanelet pose is valid spawn using lanelet pose
-      if (isCurrentPedestrian()) {
-        pedestrian_ll_spawn_function_(name, lanelet_pose.value(), std::get<PedestrianParams>(*current_params_), *current_behavior_, *current_model3d_, speed_);
+      if (std::holds_alternative<PedestrianParameter>(parameter)) {
+        spawn_pedestrian_in_lane_coordinate(
+          name, lanelet_pose.value(), std::get<PedestrianParameter>(parameter),
+          std::get<1>(distribution_[index]), std::get<2>(distribution_[index]));
       } else {
-        vehicle_ll_spawn_function_(   name, lanelet_pose.value(), std::get<VehicleParams>(*current_params_),    *current_behavior_, *current_model3d_, speed_);
+        spawn_vehicle_in_lane_coordinate(
+          name, lanelet_pose.value(), std::get<VehicleParameter>(parameter),
+          std::get<1>(distribution_[index]), std::get<2>(distribution_[index]));
       }
     } else {
       /// @note If lanelet pose is not valid spawn using normal map pose
-      if (isCurrentPedestrian()) {
-        pedestrian_spawn_function_(   name, pose,                 std::get<PedestrianParams>(*current_params_), *current_behavior_, *current_model3d_, speed_);
+      if (std::holds_alternative<PedestrianParameter>(parameter)) {
+        spawn_pedestrian_in_world_coordinate(
+          name, pose, std::get<PedestrianParameter>(parameter), std::get<1>(distribution_[index]),
+          std::get<2>(distribution_[index]));
       } else {
-        vehicle_spawn_function_(      name, pose,                 std::get<VehicleParams>(*current_params_),    *current_behavior_, *current_model3d_, speed_);
+        spawn_vehicle_in_world_coordinate(
+          name, pose, std::get<VehicleParameter>(parameter), std::get<1>(distribution_[index]),
+          std::get<2>(distribution_[index]));
       }
     }
-    // clang-format on
   }
-}
-
-auto TrafficSource::randomizeCurrentParams() -> void
-{
-  const auto current_params_idx = params_distribution_(engine_);
-  current_params_ = std::next(params_.begin(), current_params_idx);
-  current_behavior_ = std::next(behaviors_.begin(), current_params_idx);
-  current_model3d_ = std::next(models3d_.begin(), current_params_idx);
-}
-
-auto TrafficSource::isPedestrian(const ParamsVariant & params) -> bool
-{
-  return std::holds_alternative<PedestrianParams>(params);
-}
-
-auto TrafficSource::isCurrentPedestrian() -> bool { return isPedestrian(*current_params_); }
-
-auto TrafficSource::getCurrentBoundingBox() -> traffic_simulator_msgs::msg::BoundingBox
-{
-  if (isCurrentPedestrian()) {
-    return std::get<PedestrianParams>(*current_params_).bounding_box;
-  }
-  return std::get<VehicleParams>(*current_params_).bounding_box;
 }
 
 auto TrafficSource::isPoseValid(
-  geometry_msgs::msg::Pose & pose, std::optional<CanonicalizedLaneletPose> & out_pose) -> bool
+  const VehicleOrPedestrianParameter & parameter, const geometry_msgs::msg::Pose & pose)
+  -> std::pair<bool, std::optional<CanonicalizedLaneletPose>>
 {
-  out_pose = std::nullopt;
-  /// @note transform bounding box corners to world coordinate system
-  const auto bbox_corners = math::geometry::getPointsFromBbox(getCurrentBoundingBox());
-  auto bbox_corners_transformed = math::geometry::transformPoints(pose, bbox_corners);
+  const auto bbox_corners = math::geometry::getPointsFromBbox(
+    std::holds_alternative<PedestrianParameter>(parameter)
+      ? std::get<PedestrianParameter>(parameter).bounding_box
+      : std::get<VehicleParameter>(parameter).bounding_box);
 
-  /// @note 2D validation - does not account for height
-  const auto is_outside_spawning_area = [&](const geometry_msgs::msg::Point & corner) -> bool {
-    return std::hypot(corner.x - source_pose_.position.x, corner.y - source_pose_.position.y) >
-           radius_;
+  auto are_all_corners_inside_the_spawning_area = [&]() {
+    /// @note transform bounding box corners to world coordinate system
+    const auto corners = math::geometry::transformPoints(pose, bbox_corners);
+
+    return std::all_of(corners.begin(), corners.end(), [&](const auto & corner) {
+      /// @note 2D validation - does not account for height
+      return std::hypot(corner.x - pose.position.x, corner.y - pose.position.y) <
+             radius_distribution_.max();
+    });
   };
 
   /// @note Step 1: check whether all corners are inside spawning area
-  if (const auto first_corner_outside = std::find_if(
-        bbox_corners_transformed.begin(), bbox_corners_transformed.end(), is_outside_spawning_area);
-      first_corner_outside != bbox_corners_transformed.end()) {
-    return false;
+  if (not are_all_corners_inside_the_spawning_area()) {
+    return {false, std::nullopt};
   }
 
   /// @note Step 2: check whether can be outside lanelet
-  if (config_.allow_spawn_outside_lane) {
-    return true;
+  if (configuration_.allow_spawn_outside_lane) {
+    return {true, std::nullopt};
   }
 
-  const auto lanelet_pose = hdmap_utils_->toLaneletPose(pose, isCurrentPedestrian());
-  if (lanelet_pose) {
+  if (const auto lanelet_pose =
+        hdmap_utils_->toLaneletPose(pose, std::holds_alternative<PedestrianParameter>(parameter));
+      lanelet_pose) {
     /// @note reset orientation - to align the entity with lane
     auto corrected_pose = lanelet_pose.value();
     corrected_pose.rpy.z = 0.0;
-    out_pose.emplace(corrected_pose, hdmap_utils_);
-    pose = hdmap_utils_->toMapPose(corrected_pose).pose;
+
+    auto out_pose = std::make_optional<CanonicalizedLaneletPose>(corrected_pose, hdmap_utils_);
 
     /// @note Step 3: check whether the bounding box can be outside lanelet
-    if (!config_.require_footprint_fitting) {
-      return true;
+    if (not configuration_.require_footprint_fitting) {
+      return std::make_pair(true, out_pose);
     }
 
     /// @note Step 4: check whether the bounding box fits inside the lanelet
-    bbox_corners_transformed = math::geometry::transformPoints(pose, bbox_corners);
-    if (isCurrentPedestrian()) {
-      return validator_crosswalk_.isValid(bbox_corners_transformed, corrected_pose.lanelet_id);
+    if (std::holds_alternative<PedestrianParameter>(parameter)) {
+      return std::make_pair(
+        not configuration_.require_footprint_fitting or
+          validate_considering_crosswalk(
+            math::geometry::transformPoints(
+              hdmap_utils_->toMapPose(corrected_pose).pose, bbox_corners),
+            corrected_pose.lanelet_id),
+        out_pose);
+    } else {
+      return std::make_pair(
+        not configuration_.require_footprint_fitting or
+          validate(
+            math::geometry::transformPoints(
+              hdmap_utils_->toMapPose(corrected_pose).pose, bbox_corners),
+            corrected_pose.lanelet_id),
+        out_pose);
     }
-    return validator_.isValid(bbox_corners_transformed, corrected_pose.lanelet_id);
+  } else {
+    return {false, std::nullopt};
   }
-  return false;
-}
-
-auto TrafficSource::getValidRandomPose()
-  -> std::pair<geometry_msgs::msg::Pose, std::optional<CanonicalizedLaneletPose>>
-{
-  for (int tries = 0; tries < max_randomization_attempts; ++tries) {
-    auto candidate_pose = getRandomPose(config_.use_random_orientation);
-    std::optional<CanonicalizedLaneletPose> out_pose;
-    if (isPoseValid(candidate_pose, out_pose)) {
-      return std::make_pair(candidate_pose, out_pose);
-    }
-  }
-  THROW_SIMULATION_ERROR(
-    "TrafficSource ", source_id_, " failed to get valid random pose in ",
-    max_randomization_attempts, ".");
 }
 }  // namespace traffic
 }  // namespace traffic_simulator

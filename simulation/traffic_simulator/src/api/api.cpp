@@ -323,40 +323,23 @@ void API::requestLaneChange(
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
 
-void API::defineTrafficSource(
-  const double radius, const double rate, const double speed,
-  const geometry_msgs::msg::Pose & position,
-  const std::vector<std::tuple<
-    std::variant<
-      traffic_simulator_msgs::msg::VehicleParameters,
-      traffic_simulator_msgs::msg::PedestrianParameters>,
-    std::string, std::string, double>> & params_with_weights,
-  const bool allow_spawn_outside_lane, const bool require_footprint_fitting,
-  const bool random_orientation, std::optional<int> random_seed)
+auto API::addTrafficSource(
+  const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
+  const traffic::TrafficSource::Distribution & distribution, const bool allow_spawn_outside_lane,
+  const bool require_footprint_fitting, const bool random_orientation, std::optional<int> seed)
+  -> void
 {
-#define MAKE_SPAWN_LAMBDA(PARAMS, POSE)                                                      \
-  [this](                                                                                    \
-    const std::string & name, const POSE & pose, const PARAMS & params,                      \
-    const std::string & behavior, const std::string & model3d, const double speed) -> void { \
-    spawn(name, pose, params, behavior, model3d);                                            \
-    setLinearVelocity(name, speed);                                                          \
-  }
-
-  traffic_simulator::traffic::TrafficSource::Configuration config;
-  config.allow_spawn_outside_lane = allow_spawn_outside_lane;
-  config.require_footprint_fitting = require_footprint_fitting;
-  config.use_random_orientation = random_orientation;
+  traffic_simulator::traffic::TrafficSource::Configuration configuration;
+  configuration.allow_spawn_outside_lane = allow_spawn_outside_lane;
+  configuration.require_footprint_fitting = require_footprint_fitting;
+  configuration.use_random_orientation = random_orientation;
 
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
-    radius, rate, speed, position, params_with_weights, random_seed, getCurrentTime(),
-    // clang-format off
-    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters,    CanonicalizedLaneletPose),
-    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters, CanonicalizedLaneletPose),
-    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::VehicleParameters,    geometry_msgs::msg::Pose),
-    MAKE_SPAWN_LAMBDA(traffic_simulator_msgs::msg::PedestrianParameters, geometry_msgs::msg::Pose),
-    // clang-format on
-    config, entity_manager_ptr_->getHdmapUtils());
-#undef MAKE_SPAWN_LAMBDA
+    radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
+    entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
+      this->spawn(name, std::forward<decltype(xs)>(xs)...);
+      setLinearVelocity(name, speed);
+    });
 }
 
 auto API::canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose) const

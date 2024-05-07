@@ -72,7 +72,7 @@ private:
 
   void onInitialize() override
   {
-    api_.defineTrafficSource(
+    api_.addTrafficSource(
       10.0, 2.0, 3.0,
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(3745.0).y(73710.0).z(0.0))

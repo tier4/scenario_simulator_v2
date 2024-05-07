@@ -75,8 +75,8 @@ private:
 
   void onInitialize() override
   {
-    api_.defineTrafficSource(
-      2.0, 5.0, 3.0,
+    api_.addTrafficSource(
+      1.0, 5.0, 3.0,
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(3757.0).y(73750.3).z(0.0))
         .orientation(quaternion_operation::convertEulerAngleToQuaternion(

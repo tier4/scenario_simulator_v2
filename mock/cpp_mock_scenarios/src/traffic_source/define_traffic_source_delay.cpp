@@ -55,7 +55,7 @@ private:
     if (api_.getCurrentTime() >= 2.0 && !traffic_source_added_) {
       traffic_source_added_ = true;
 
-      api_.defineTrafficSource(
+      api_.addTrafficSource(
         5.0, 2.0, 10.0,
         geometry_msgs::build<geometry_msgs::msg::Pose>()
           .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(3755.0).y(73692.5).z(0.0))
