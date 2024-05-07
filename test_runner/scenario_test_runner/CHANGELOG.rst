@@ -23,6 +23,16 @@ Changelog for package scenario_test_runner
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
+1.15.4 (2024-05-01)
+-------------------
+* Merge pull request `#1237 <https://github.com/tier4/scenario_simulator_v2/issues/1237>`_ from tier4/feature/perf
+  Feature/perf
+* simplify launch file
+* add make_launch_prefix function
+* add enable_perf launch configuration
+* add enable perf option
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
 1.15.3 (2024-04-25)
 -------------------
 * Merge branch 'master' into fix/standstill-duration-for-miscobjects
