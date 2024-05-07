@@ -50,6 +50,11 @@ void EntityManager::broadcastEntityTransform()
     if (entityExists(ego_name)) {
       broadcastTransform(
         geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+          /**
+           * @note This is the intended implementation. 
+           * It is easier to create rviz config if the name “ego” is fixed, 
+           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           */
           .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
           .pose(getMapPose(ego_name)),
         true);
