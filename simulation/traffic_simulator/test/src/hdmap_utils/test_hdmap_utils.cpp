@@ -19,25 +19,33 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
-TEST(HdMapUtils, Construct)
+auto makeHdMapUtilsInstance() -> hdmap_utils::HdMapUtils
 {
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
   geographic_msgs::msg::GeoPoint origin;
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  return hdmap_utils::HdMapUtils(path, origin);
+}
+
+int main(int argc, char ** argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
+
+TEST(HdMapUtils, Construct)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
   ASSERT_NO_THROW(hdmap_utils.toMapBin());
 }
 
 TEST(HdMapUtils, MatchToLane)
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
   traffic_simulator_msgs::msg::BoundingBox bbox;
   bbox.center.x = 0.0;
   bbox.center.y = 0.0;
@@ -61,12 +69,8 @@ TEST(HdMapUtils, MatchToLane)
 
 TEST(HdMapUtils, AlongLaneletPose)
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
   EXPECT_EQ(
     hdmap_utils
       .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), 30)
@@ -104,12 +108,8 @@ TEST(HdMapUtils, AlongLaneletPose)
 
 TEST(HdMapUtils, RoadShoulder)
 {
-  std::string path = ament_index_cpp::get_package_share_directory("traffic_simulator") +
-                     "/map/with_road_shoulder/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
   const auto next_lanelet_ids = hdmap_utils.getNextLaneletIds(34696);
   EXPECT_EQ(next_lanelet_ids.size(), static_cast<std::size_t>(1));
   if (next_lanelet_ids.size() == 1) {
@@ -130,12 +130,7 @@ TEST(HdMapUtils, RoadShoulder)
  */
 TEST(HdMapUtils, CanonicalizeNegative)
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  auto hdmap_utils = makeHdMapUtilsInstance();
 
   double non_canonicalized_lanelet_s = -22;
   const auto non_canonicalized_lanelet_pose =
@@ -158,12 +153,7 @@ TEST(HdMapUtils, CanonicalizeNegative)
  */
 TEST(HdMapUtils, CanonicalizePositive)
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  auto hdmap_utils = makeHdMapUtilsInstance();
 
   double non_canonicalized_lanelet_s = 30;
   const auto non_canonicalized_lanelet_pose =
@@ -185,12 +175,7 @@ TEST(HdMapUtils, CanonicalizePositive)
  */
 TEST(HdMapUtils, Canonicalize)
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  auto hdmap_utils = makeHdMapUtilsInstance();
 
   double non_canonicalized_lanelet_s = 2;
   const auto non_canonicalized_lanelet_pose =
@@ -214,12 +199,7 @@ TEST(HdMapUtils, Canonicalize)
  */
 TEST(HdMapUtils, CanonicalizeAllNegative)
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  auto hdmap_utils = makeHdMapUtilsInstance();
 
   double non_canonicalized_lanelet_s = -22;
   const auto non_canonicalized_lanelet_pose =
@@ -257,12 +237,7 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
  */
 TEST(HdMapUtils, CanonicalizeAllPositive)
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  auto hdmap_utils = makeHdMapUtilsInstance();
 
   double non_canonicalized_lanelet_s = 30;
   const auto non_canonicalized_lanelet_pose =
@@ -295,12 +270,7 @@ TEST(HdMapUtils, CanonicalizeAllPositive)
  */
 TEST(HdMapUtils, CanonicalizeAll)
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  hdmap_utils::HdMapUtils hdmap_utils(path, origin);
+  auto hdmap_utils = makeHdMapUtilsInstance();
 
   double non_canonicalized_lanelet_s = 2;
   const auto non_canonicalized_lanelet_pose =
@@ -311,10 +281,4 @@ TEST(HdMapUtils, CanonicalizeAll)
   EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(1));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34981);
   EXPECT_EQ(canonicalized_lanelet_poses[0].s, non_canonicalized_lanelet_s);
-}
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
 }
