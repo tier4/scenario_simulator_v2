@@ -19,10 +19,8 @@
 
 namespace traffic_simulator
 {
-namespace pose
+inline namespace pose
 {
-using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;
-
 // Constructors
 auto getQuietNaNPose() -> geometry_msgs::msg::Pose;
 
@@ -31,23 +29,23 @@ auto getQuietNaNLaneletPose() -> traffic_simulator::LaneletPose;
 // Conversions
 auto canonicalize(
   const LaneletPose & lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> lanelet_pose::CanonicalizedLaneletPose;
 
-auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> const geometry_msgs::msg::Pose;
+auto toMapPose(const lanelet_pose::CanonicalizedLaneletPose & lanelet_pose) -> const geometry_msgs::msg::Pose;
 
 auto toLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, bool include_crosswalk,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<CanonicalizedLaneletPose>;
+  -> std::optional<lanelet_pose::CanonicalizedLaneletPose>;
 
 // Relative msg::Pose
 auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>;
 
-auto getRelativePose(const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
+auto getRelativePose(const geometry_msgs::msg::Pose & from, const lanelet_pose::CanonicalizedLaneletPose & to)
   -> std::optional<geometry_msgs::msg::Pose>;
 
-auto getRelativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
+auto getRelativePose(const lanelet_pose::CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>;
 
 auto getBoundingBoxRelativePose(
@@ -59,14 +57,14 @@ auto getBoundingBoxRelativePose(
 
 // Relative LaneletPose
 auto getRelativeLaneletPose(
-  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+  const lanelet_pose::CanonicalizedLaneletPose & from, const lanelet_pose::CanonicalizedLaneletPose & to,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> traffic_simulator::LaneletPose;
 
 auto getBoundingBoxRelativeLaneletPose(
-  const CanonicalizedLaneletPose & from,
+  const lanelet_pose::CanonicalizedLaneletPose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
-  const CanonicalizedLaneletPose & to,
+  const lanelet_pose::CanonicalizedLaneletPose & to,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool allow_lane_change,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> traffic_simulator::LaneletPose;
