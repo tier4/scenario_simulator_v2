@@ -470,17 +470,17 @@ TEST(EntityBase, setDynamicConstraints)
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
-  traffic_simulator_msgs::msg::DynamicConstraints default_constraints{};
+  traffic_simulator_msgs::msg::DynamicConstraints custom_constraints{};
 
-  default_constraints.max_speed = 5.0;
-  default_constraints.max_acceleration = 7.0;
-  default_constraints.max_deceleration = 11.0;
-  default_constraints.max_acceleration_rate = 13.0;
-  default_constraints.max_deceleration_rate = 17.0;
-  dummy.setDynamicConstraints(default_constraints);
-  auto current_constraints = dummy.getDynamicConstraints();
+  custom_constraints.max_speed = 5.0;
+  custom_constraints.max_acceleration = 7.0;
+  custom_constraints.max_deceleration = 11.0;
+  custom_constraints.max_acceleration_rate = 13.0;
+  custom_constraints.max_deceleration_rate = 17.0;
+  dummy.setDynamicConstraints(custom_constraints);
+  auto result_constraints = dummy.getDynamicConstraints();
 
-  EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
+  EXPECT_DYNAMIC_CONSTRAINTS_EQ(custom_constraints, result_constraints);
 }
 
 TEST(EntityBase, setOtherStatus)
