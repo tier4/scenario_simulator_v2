@@ -122,17 +122,17 @@ public:
     getLocalizationState("/api/localization/initialization_state", *this),
 #endif
     getMrmState("/api/fail_safe/mrm_state", *this, [this](const auto & v) { receiveMrmState(v); }),
+    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this),
     getTrajectory("/api/iv_msgs/planning/scenario_planning/trajectory", *this),
     getTurnIndicatorsCommandImpl("/control/command/turn_indicators_cmd", *this),
+    requestClearRoute("/api/routing/clear_route", *this),
     requestCooperateCommands("/api/external/set/rtc_commands", *this),
     requestEngage("/api/external/set/engage", *this),
     requestInitialPose("/api/localization/initialize", *this),
     // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
     requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
-    requestClearRoute("/api/routing/clear_route", *this),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
-    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
-    getPathWithLaneId("/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this)
+    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this)
   // clang-format on
   {
   }

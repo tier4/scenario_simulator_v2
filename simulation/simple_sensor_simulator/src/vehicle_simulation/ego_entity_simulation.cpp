@@ -97,8 +97,9 @@ auto EgoEntitySimulation::makeSimulationModel(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
   -> const std::shared_ptr<SimModelInterface>
 {
-  rclcpp::Node node{"get_parameter", "simulation"};
-  auto get_parameter = [](rclcpp::Node & node, const std::string & name, auto value = {}) {
+  auto node = rclcpp::Node("get_parameter", "simulation");
+
+  auto get_parameter = [&](const std::string & name, auto value = {}) {
     node.declare_parameter<decltype(value)>(name, value);
     node.get_parameter<decltype(value)>(name, value);
     return value;
