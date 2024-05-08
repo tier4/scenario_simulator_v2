@@ -74,16 +74,10 @@ public:
         RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
 
       if (supported.find(routing_algorithm) == supported.end()) {
-        std::unordered_map<RoutingAlgorithm::value_type, std::string> name_map = {
-          {RoutingAlgorithm::value_type::assigned_route, "assignedRoute"},
-          {RoutingAlgorithm::value_type::fastest, "fastest"},
-          {RoutingAlgorithm::value_type::least_intersections, "leastIntersections"},
-          {RoutingAlgorithm::value_type::shortest, "shortest"},
-          {RoutingAlgorithm::value_type::undefined, "undefined"}};
         std::stringstream what;
-        what << "There was an operation to calculate relative lane position with RoutingAlgorithm "
-                "set to "
-             << name_map[routing_algorithm] << ", but this is currently not supported. ";
+        what << "There was an operation to calculate relative lane position with"
+                " RoutingAlgorithm set to "
+             << routing_algorithm << ", but this is currently not supported. ";
         what << "Please set RoutingAlgorithm to either 'shortest' or 'undefined'.";
         throw common::Error(what.str());
       }
