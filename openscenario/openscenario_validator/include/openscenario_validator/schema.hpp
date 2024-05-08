@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <string_view>
-
 namespace openscenario_validator
 {
-extern const std::string_view schema;
+extern const char schema[];
 }  // namespace openscenario_validator
