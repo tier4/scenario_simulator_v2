@@ -118,18 +118,16 @@ auto relativeLaneletPose(
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
 
-  traffic_simulator::LaneletPose position = traffic_simulator::pose::quietNaNLaneletPose();
+  traffic_simulator::LaneletPose position = quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if it is not possible to
   // calculate one of them - it happens that one is sufficient
   if (
-    const auto longitudinal_distance = traffic_simulator::distance::longitudinalDistance(
+    const auto longitudinal_distance = longitudinalDistance(
       from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change,
       hdmap_utils_ptr)) {
     position.s = longitudinal_distance.value();
   }
-  if (
-    const auto lateral_distance =
-      traffic_simulator::distance::lateralDistance(from, to, allow_lane_change, hdmap_utils_ptr)) {
+  if (const auto lateral_distance = lateralDistance(from, to, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_distance.value();
   }
   return position;
@@ -146,18 +144,17 @@ auto boundingBoxRelativeLaneletPose(
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
 
-  traffic_simulator::LaneletPose position = traffic_simulator::pose::quietNaNLaneletPose();
+  traffic_simulator::LaneletPose position = quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if it is not possible to
   // calculate one of them - it happens that one is sufficient
   if (
-    const auto longitudinal_bb_distance =
-      traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
-        from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
-        include_opposite_direction, allow_lane_change, hdmap_utils_ptr)) {
+    const auto longitudinal_bb_distance = boundingBoxLaneLongitudinalDistance(
+      from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
+      include_opposite_direction, allow_lane_change, hdmap_utils_ptr)) {
     position.s = longitudinal_bb_distance.value();
   }
   if (
-    const auto lateral_bb_distance = traffic_simulator::distance::boundingBoxLaneLateralDistance(
+    const auto lateral_bb_distance = boundingBoxLaneLateralDistance(
       from, from_bounding_box, to, to_bounding_box, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_bb_distance.value();
   }
