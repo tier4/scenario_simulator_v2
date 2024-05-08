@@ -148,15 +148,15 @@ auto boundingBoxRelativeLaneletPose(
   // here the s and offset are intentionally assigned independently, even if it is not possible to
   // calculate one of them - it happens that one is sufficient
   if (
-    const auto longitudinal_bb_distance = boundingBoxLaneLongitudinalDistance(
+    const auto longitudinal_bounding_box_distance = boundingBoxLaneLongitudinalDistance(
       from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
       include_opposite_direction, allow_lane_change, hdmap_utils_ptr)) {
-    position.s = longitudinal_bb_distance.value();
+    position.s = longitudinal_bounding_box_distance.value();
   }
   if (
-    const auto lateral_bb_distance = boundingBoxLaneLateralDistance(
+    const auto lateral_bounding_box_distance = boundingBoxLaneLateralDistance(
       from, from_bounding_box, to, to_bounding_box, allow_lane_change, hdmap_utils_ptr)) {
-    position.offset = lateral_bb_distance.value();
+    position.offset = lateral_bounding_box_distance.value();
   }
   return position;
 }
