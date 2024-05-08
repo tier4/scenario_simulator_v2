@@ -80,7 +80,9 @@ public:
     return std::nullopt;
   }
 
-  auto getRouteLanelets(double) -> lanelet::Ids override { return std::vector<lanelet::Id>{}; }
+  auto getRouteLanelets(double) -> lanelet::Ids override { return route_lanelet_ids_TEST_; }
+
+  auto setRouteLanelets(const lanelet::Ids & ids) { route_lanelet_ids_TEST_ = ids; }
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override
   {
@@ -119,10 +121,12 @@ public:
   {
     lane_change_param_TEST_ = param;
   }
+
   auto requestLaneChangeTEST() const -> traffic_simulator::lane_change::Parameter
   {
     return lane_change_param_TEST_;
   }
+
   auto getOtherstatus() const
     -> const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
   {
@@ -132,6 +136,7 @@ public:
   traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
   traffic_simulator_msgs::msg::EntityType entity_type;
   traffic_simulator::lane_change::Parameter lane_change_param_TEST_;
+  lanelet::Ids route_lanelet_ids_TEST_;
 };
 
 #endif

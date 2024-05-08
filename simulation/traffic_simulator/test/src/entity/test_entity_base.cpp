@@ -754,50 +754,69 @@ TEST(EntityBase, getDistanceToLaneBound_one)
 
 TEST(EntityBase, getDistanceToLeftLaneBound)
 {
+  const double lane_width = 3.0;
+  const double entity_center_offset = -0.5;
+  lanelet::Id id_previous = 34666;
   lanelet::Id id = 120659;
+  lanelet::Id id_next = 120660;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox();
+  auto bbox = makeBoundingBox(entity_center_offset);
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setRouteLanelets({id_previous, id, id_next});
 
-  // auto distance = dummy.getDistanceToLeftLaneBound();
-
-  throw std::runtime_error("Fix not implemented");
+  auto distance_result = dummy.getDistanceToLeftLaneBound();
+  double distance_actual = (lane_width - bbox.dimensions.y) / 2 - entity_center_offset;
+  EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
 
 TEST(EntityBase, getDistanceToRightLaneBound)
 {
+  // see issue 1 at the end of this file
+  const double lane_width = 3.0;
+  const double entity_center_offset = -0.5;
+  lanelet::Id id_previous = 34666;
   lanelet::Id id = 120659;
+  lanelet::Id id_next = 120660;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox();
+  auto bbox = makeBoundingBox(entity_center_offset);
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setRouteLanelets({id_previous, id, id_next});
 
-  // auto distance = dummy.getDistanceToRightLaneBound();
-
-  throw std::runtime_error("Fix not implemented");
+  auto distance_result = dummy.getDistanceToRightLaneBound();
+  double distance_actual = (lane_width - bbox.dimensions.y) / 2 + entity_center_offset;
+  EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
 
 TEST(EntityBase, getDistanceToLaneBound)
 {
-  // fix is to be implemented, 2nd issue
+  // see issue 1 at the end of this file
+  const double lane_width = 3.0;
+  const double entity_center_offset = -0.5;
+  lanelet::Id id_previous = 34666;
   lanelet::Id id = 120659;
+  lanelet::Id id_next = 120660;
 
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox();
+  auto bbox = makeBoundingBox(entity_center_offset);
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  dummy.setRouteLanelets({id_previous, id, id_next});
 
-  // auto distance = dummy.getDistanceToLaneBound();
-  throw std::runtime_error("Fix not implemented");
+  auto distance_result = dummy.getDistanceToLaneBound();
+  double distance_actual = std::min(
+    (lane_width - bbox.dimensions.y) / 2 - entity_center_offset,
+    (lane_width - bbox.dimensions.y) / 2 + entity_center_offset);
+  EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
 
 TEST(EntityBase, getDistanceToLeftLaneBound_empty)
@@ -1552,8 +1571,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintNoneReached)
   auto transition = traffic_simulator::speed_change::Transition::AUTO;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   const double current_time = 5.0;
   const double step_time = 7.0;
@@ -1577,8 +1595,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintNone)
   auto transition = traffic_simulator::speed_change::Transition::AUTO;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   const double current_time = 5.0;
   const double step_time = 7.0;
@@ -1608,8 +1625,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTra
   auto transition = traffic_simulator::speed_change::Transition::STEP;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
 }
@@ -1634,8 +1650,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintTimeTransitionS
   auto transition = traffic_simulator::speed_change::Transition::STEP;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
 }
@@ -1660,8 +1675,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintTimeTransitionN
   auto transition = traffic_simulator::speed_change::Transition::LINEAR;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   EXPECT_EQ(dummy.getCurrentTwist().linear.x, target_speed);
 }
@@ -1685,8 +1699,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTra
   auto transition = traffic_simulator::speed_change::Transition::LINEAR;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   EXPECT_EQ(dummy.getCurrentTwist().linear.x, initial_speed);
 
@@ -1705,7 +1718,8 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTra
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
-TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTransitionAutoAccelerate)
+TEST(
+  EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTransitionAutoAccelerate)
 {
   lanelet::Id id = 120659;
 
@@ -1724,8 +1738,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTra
   auto transition = traffic_simulator::speed_change::Transition::AUTO;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   EXPECT_EQ(dummy.getCurrentTwist().linear.x, initial_speed);
 
@@ -1744,7 +1757,8 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTra
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
-TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTransitionAutoDecelerate)
+TEST(
+  EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTransitionAutoDecelerate)
 {
   lanelet::Id id = 120659;
 
@@ -1763,8 +1777,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTra
   auto transition = traffic_simulator::speed_change::Transition::AUTO;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   EXPECT_EQ(dummy.getCurrentTwist().linear.x, initial_speed);
 
@@ -1812,8 +1825,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
   auto transition = traffic_simulator::speed_change::Transition::LINEAR;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   EXPECT_EQ(dummy.getCurrentTwist().linear.x, initial_speed);
 
@@ -1832,7 +1844,8 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
-TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTransitionAutoAccelerate)
+TEST(
+  EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTransitionAutoAccelerate)
 {
   // "requestSpeedChange" is unable to change the "target_speed", explained in the 4th issue
   lanelet::Id id = 120659;
@@ -1882,7 +1895,8 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
-TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTransitionAutoDecelerate)
+TEST(
+  EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTransitionAutoDecelerate)
 {
   // "requestSpeedChange" is unable to change the "target_speed", explained in the 4th issue
   lanelet::Id id = 120659;
@@ -1951,8 +1965,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintTimeTransitionL
   auto transition = traffic_simulator::speed_change::Transition::LINEAR;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   const double current_time = 5.0;
   const double step_time = 7.0;
@@ -1988,8 +2001,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintTimeTransitionA
   auto transition = traffic_simulator::speed_change::Transition::AUTO;
   bool continuous = false;
 
-  EXPECT_NO_THROW(
-    dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
+  EXPECT_NO_THROW(dummy.requestSpeedChange(target_speed, transition, constraint, continuous));
 
   const double current_time = 5.0;
   const double step_time = 7.0;
