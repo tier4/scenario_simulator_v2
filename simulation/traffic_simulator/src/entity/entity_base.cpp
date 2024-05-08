@@ -919,9 +919,7 @@ auto EntityBase::requestSynchronize(
     THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
   }
 
-  /**
-   * @brief Check if the entity has already arrived to the target lanelet.
-   */
+  ///@brief Check if the entity has already arrived to the target lanelet.
   if (isArrivedToTargetLaneletPose(entity_target, threshold)) {
     if (this->getStatus().getTwist().linear.x < accel_limit * loop_period / 1000) {
     } else {
@@ -936,9 +934,6 @@ auto EntityBase::requestSynchronize(
 
   job_list_.append(
     [this, ego_target, entity_target, accel_limit, threshold, loop_period](double) {
-      /**
-       * @brief This is function for synchronization.
-       */
       auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
       auto ego_distance = this->hdmap_utils_ptr_->getLongitudinalDistance(
         static_cast<LaneletPose>(other_status_.find("ego")->second.getLaneletPose()),
@@ -947,41 +942,35 @@ auto EntityBase::requestSynchronize(
       if (!ego_distance.has_value()) {
         RCLCPP_WARN_ONCE(
           rclcpp::get_logger("traffic_simulator"),
-          "ego has already passed away or has some problem");
+          "Failed to get distance between Ego and target lanelet pose. Check if Ego has already "
+          "passed the target lanelet. If not, please contact the developer since there might be an "
+          "undiscovered bug.");
         return true;
       }
       const auto ego_velocity = other_status_.find("ego")->second.getTwist().linear.x;
       const auto entity_velocity = this->getStatus().getTwist().linear.x;
-      const auto ego_arrival_time = (ego_velocity != 0) ? ego_distance.value() / ego_velocity : 0;
+      const auto ego_arrival_time = (std::abs(ego_velocity) > std::numeric_limits<double>::epsilon()) ? ego_distance.value() / ego_velocity : 0;
 
       auto entity_velocity_to_synchronize = entity_velocity;
 
-      auto accel_limit_ = accel_limit * 1;
-      auto const distance_margin = threshold;
+      const auto accel_limit_ = accel_limit;
+      const auto distance_margin = threshold;
 
       if (entity_velocity > accel_limit * ego_arrival_time) {
-        /**
-         * @brief Making entity slow down since the speed is too fast
-         */
+        ///@brief Making entity slow down since the speed is too fast
         entity_velocity_to_synchronize = entity_velocity - accel_limit_ * loop_period / 1000;
       } else if (
         entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / (accel_limit * 2) <
         entity_distance - distance_margin) {
-        /**
-         * @brief Making entity speed up
-         */
+        ///@brief Making entity speed up
         entity_velocity_to_synchronize = entity_velocity + accel_limit_ * loop_period / 1000;
       } else if (
         entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / (accel_limit * 2) >
         entity_distance - distance_margin) {
-        /**
-         * @brief Making entity slow down
-         */
+        ///@brief Making entity slow down
         entity_velocity_to_synchronize = entity_velocity - accel_limit_ * loop_period / 1000;
       } else {
-        /**
-         * @brief Making entity keep the current speed
-         */
+        ///@brief Making entity keep the current speed
         entity_velocity_to_synchronize = entity_velocity;
       }
       /**
