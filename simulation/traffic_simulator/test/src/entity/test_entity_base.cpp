@@ -215,9 +215,9 @@ TEST(EntityBase, onUpdate)
   auto second_event = traffic_simulator::job::Event::POST_UPDATE;
   auto is_exclusive = true;
 
-  dummy.appendToJobList(
+  dummy._appendToJobList(
     first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
-  dummy.appendToJobList(
+  dummy._appendToJobList(
     second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
 
   double current_time = 0.0;
@@ -255,9 +255,9 @@ TEST(EntityBase, onPostUpdate)
   auto second_event = traffic_simulator::job::Event::POST_UPDATE;
   auto is_exclusive = true;
 
-  dummy.appendToJobList(
+  dummy._appendToJobList(
     first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
-  dummy.appendToJobList(
+  dummy._appendToJobList(
     second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
 
   double current_time = 0.0;
@@ -307,7 +307,7 @@ TEST(EntityBase, requestLaneChange_absoluteTarget)
     traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
 
   dummy_base->requestLaneChange(target, trajectory_shape, constraint);
-  auto result_param = dummy.requestLaneChangeTEST();
+  auto result_param = dummy._getLaneChangeParameter();
 
   EXPECT_LANE_CHANGE_ABSOLUTE_TARGET_EQ(result_param.target, target);
   EXPECT_EQ(result_param.trajectory_shape, trajectory_shape);
@@ -347,7 +347,7 @@ TEST(EntityBase, requestLaneChange_relativeTarget)
   dummy_base->setOtherStatus(other_status);
 
   dummy_base->requestLaneChange(target, trajectory_shape, constraint);
-  auto result_param = dummy.requestLaneChangeTEST();
+  auto result_param = dummy._getLaneChangeParameter();
 
   traffic_simulator::lane_change::AbsoluteTarget ref_target(target_id, target_offset);
 
@@ -512,7 +512,7 @@ TEST(EntityBase, setOtherStatus)
 
   dummy_base->setOtherStatus(other_status);
 
-  const auto & result_status = dummy.getOtherstatus();
+  const auto & result_status = dummy._getOtherStatus();
 
   EXPECT_EQ(other_status.size(), result_status.size());
   EXPECT_EQ(
@@ -531,7 +531,7 @@ TEST(EntityBase, setStatus)
   const auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  dummy.setEntityType(traffic_simulator_msgs::msg::EntityType::VEHICLE);
+  dummy._setEntityType(traffic_simulator_msgs::msg::EntityType::VEHICLE);
   traffic_simulator::entity::EntityBase * dummy_base = &dummy;
 
   auto new_type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
@@ -945,7 +945,7 @@ TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy.setEntityType(status_base.type.type);
+  dummy._setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(5.0);
   EXPECT_FALSE(lanelet_pose);
@@ -966,7 +966,7 @@ TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy.setEntityType(status_base.type.type);
+  dummy._setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(1.0);
   EXPECT_TRUE(lanelet_pose);
@@ -987,7 +987,7 @@ TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy.setEntityType(status_base.type.type);
+  dummy._setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(1.0);
   EXPECT_TRUE(lanelet_pose);
@@ -1007,7 +1007,7 @@ TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy.setEntityType(status_base.type.type);
+  dummy._setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(5.0);
   EXPECT_FALSE(lanelet_pose);
@@ -1028,7 +1028,7 @@ TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy.setEntityType(status_base.type.type);
+  dummy._setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(1.0);
   EXPECT_TRUE(lanelet_pose);
@@ -1049,7 +1049,7 @@ TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy.setEntityType(status_base.type.type);
+  dummy._setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(1.0);
   EXPECT_FALSE(lanelet_pose);
@@ -1087,25 +1087,25 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteNotContinuous)
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   const double target_speed = 3.0;
   const bool continuous = false;
 
   dummy.requestSpeedChange(target_speed, continuous);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
 
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteContinuous)
@@ -1118,26 +1118,26 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteContinuous)
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   const double target_speed = 3.0;
   const bool continuous = true;
 
   dummy.requestSpeedChange(target_speed, continuous);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
 
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteReached)
@@ -1150,14 +1150,14 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteReached)
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   const double target_speed = 3.0;
   const bool continuous = false;
 
   dummy.setLinearVelocity(target_speed);
   dummy.requestSpeedChange(target_speed, continuous);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarget)
@@ -1188,7 +1188,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuousInvalidTarge
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
 
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuous)
@@ -1220,13 +1220,13 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeNotContinuous)
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
 
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(dummy.getTargetSpeed().value(), target_speed);
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(dummy._getTargetSpeed().value(), target_speed);
 
   dummy.setLinearVelocity(target_speed);
 
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuousInvalidTarget)
@@ -1258,7 +1258,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuousInvalidTarget)
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
 
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuous)
@@ -1290,14 +1290,14 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeContinuous)
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
 
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNoneReached)
@@ -1334,7 +1334,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNoneReached)
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNone)
@@ -1370,12 +1370,12 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintNone)
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTransitionStep)
@@ -1440,7 +1440,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeContinuous)
     dummy.requestSpeedChange(relative_taget_speed, transition, constraint, continuous),
     common::Error);
 
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeReached)
@@ -1478,7 +1478,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeReached)
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeTransitionStep)
@@ -1576,7 +1576,7 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintNoneReached)
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintNone)
@@ -1600,12 +1600,12 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintNone)
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 }
 
 TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTransitionStep)
@@ -1706,12 +1706,12 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintAccelerationTra
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -1745,12 +1745,12 @@ TEST(
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -1784,12 +1784,12 @@ TEST(
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -1832,12 +1832,12 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintAccelerationTra
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -1883,12 +1883,12 @@ TEST(
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -1934,12 +1934,12 @@ TEST(
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -1970,12 +1970,12 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintTimeTransitionL
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -2006,12 +2006,12 @@ TEST(EntityBase, requestSpeedChange_targetSpeedAbsoluteConstraintTimeTransitionA
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -2053,12 +2053,12 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeTransitionL
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -2100,12 +2100,12 @@ TEST(EntityBase, requestSpeedChange_targetSpeedRelativeConstraintTimeTransitionA
   const double current_time = 5.0;
   const double step_time = 7.0;
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_TRUE(dummy.getTargetSpeed().has_value());
-  EXPECT_EQ(target_speed, dummy.getTargetSpeed().value());
+  EXPECT_TRUE(dummy._getTargetSpeed().has_value());
+  EXPECT_EQ(target_speed, dummy._getTargetSpeed().value());
 
   dummy.setLinearVelocity(target_speed);
   dummy.onPostUpdate(current_time, step_time);
-  EXPECT_FALSE(dummy.getTargetSpeed().has_value());
+  EXPECT_FALSE(dummy._getTargetSpeed().has_value());
 
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
