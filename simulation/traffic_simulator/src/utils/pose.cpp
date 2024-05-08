@@ -91,16 +91,20 @@ auto getRelativePose(const CanonicalizedLaneletPose & from, const geometry_msgs:
 }
 
 auto getBoundingBoxRelativePose(
-  const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const geometry_msgs::msg::Pose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox)
+  const geometry_msgs::msg::Pose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const geometry_msgs::msg::Pose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box)
   -> std::optional<geometry_msgs::msg::Pose>
 {
-  if (const auto closest_points = math::geometry::getClosestPoses(from, from_bbox, to, to_bbox);
+  if (const auto closest_points =
+        math::geometry::getClosestPoses(from, from_bounding_box, to, to_bounding_box);
       closest_points) {
-    const auto from_pose_bbox = getRelativePose(from, closest_points.value().first);
-    const auto to_pose_bbox = getRelativePose(from, closest_points.value().second);
-    if (from_pose_bbox && to_pose_bbox) {
-      return math::geometry::subtractPoses(from_pose_bbox.value(), to_pose_bbox.value());
+    const auto from_pose_bounding_box = getRelativePose(from, closest_points.value().first);
+    const auto to_pose_bounding_box = getRelativePose(from, closest_points.value().second);
+    if (from_pose_bounding_box && to_pose_bounding_box) {
+      return math::geometry::subtractPoses(
+        from_pose_bounding_box.value(), to_pose_bounding_box.value());
     }
   }
   return std::nullopt;
@@ -132,9 +136,11 @@ auto getRelativeLaneletPose(
 }
 
 auto getBoundingBoxRelativeLaneletPose(
-  const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
-  bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool allow_lane_change,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> traffic_simulator::LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
@@ -146,13 +152,13 @@ auto getBoundingBoxRelativeLaneletPose(
   if (
     const auto longitudinal_bb_distance =
       traffic_simulator::distance::getBoundingBoxLaneLongitudinalDistance(
-        from, from_bbox, to, to_bbox, include_adjacent_lanelet, include_opposite_direction,
-        allow_lane_change, hdmap_utils_ptr)) {
+        from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
+        include_opposite_direction, allow_lane_change, hdmap_utils_ptr)) {
     position.s = longitudinal_bb_distance.value();
   }
   if (
     const auto lateral_bb_distance = traffic_simulator::distance::getBoundingBoxLaneLateralDistance(
-      from, from_bbox, to, to_bbox, allow_lane_change, hdmap_utils_ptr)) {
+      from, from_bounding_box, to, to_bounding_box, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_bb_distance.value();
   }
   return position;

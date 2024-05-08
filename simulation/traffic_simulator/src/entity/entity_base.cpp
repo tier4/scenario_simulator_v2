@@ -60,7 +60,7 @@ void EntityBase::cancelRequest() {}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
-  return math::geometry::get2DPolygon(getBoundingBox());
+  return math::geometry::toPolygon2D(getBoundingBox());
 }
 
 auto EntityBase::getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>

@@ -123,68 +123,80 @@ auto getLongitudinalDistance(
 }
 
 auto getBoundingBoxDistance(
-  const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const geometry_msgs::msg::Pose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox)
-  -> std::optional<double>
+  const geometry_msgs::msg::Pose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const geometry_msgs::msg::Pose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box) -> std::optional<double>
 {
-  return math::geometry::getPolygonDistance(from, from_bbox, to, to_bbox);
+  return math::geometry::getPolygonDistance(from, from_bounding_box, to, to_bounding_box);
 }
 
 auto getBoundingBoxLaneLateralDistance(
-  const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
-  bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<double>
+  const CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool allow_lane_change,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
 {
   if (const auto lateral_distance =
         getLateralDistance(from, to, allow_lane_change, hdmap_utils_ptr);
       lateral_distance) {
-    const auto from_bbox_distances = math::geometry::getDistancesFromCenterToEdge(from_bbox);
-    const auto to_bbox_distances = math::geometry::getDistancesFromCenterToEdge(to_bbox);
-    auto bbox_distance = 0.0;
+    const auto from_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
+    const auto to_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(to_bounding_box);
+    auto bounding_box_distance = 0.0;
     if (lateral_distance.value() > 0.0) {
-      bbox_distance = -std::abs(from_bbox_distances.right) - std::abs(to_bbox_distances.left);
+      bounding_box_distance =
+        -std::abs(from_bounding_box_distances.right) - std::abs(to_bounding_box_distances.left);
     } else if (lateral_distance.value() < 0.0) {
-      bbox_distance = std::abs(from_bbox_distances.left) + std::abs(to_bbox_distances.right);
+      bounding_box_distance =
+        std::abs(from_bounding_box_distances.left) + std::abs(to_bounding_box_distances.right);
     }
-    return lateral_distance.value() + bbox_distance;
+    return lateral_distance.value() + bounding_box_distance;
   }
   return std::nullopt;
 }
 
 auto getBoundingBoxLaneLongitudinalDistance(
-  const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
-  bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
+  const CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool include_adjacent_lanelet,
+  bool include_opposite_direction, bool allow_lane_change,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>
 {
   if (const auto longitudinal_distance = traffic_simulator::distance::getLongitudinalDistance(
         from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change,
         hdmap_utils_ptr);
       longitudinal_distance) {
-    const auto from_bbox_distances = math::geometry::getDistancesFromCenterToEdge(from_bbox);
-    const auto to_bbox_distances = math::geometry::getDistancesFromCenterToEdge(to_bbox);
-    auto bbox_distance = 0.0;
+    const auto from_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(from_bounding_box);
+    const auto to_bounding_box_distances =
+      math::geometry::getDistancesFromCenterToEdge(to_bounding_box);
+    auto bounding_box_distance = 0.0;
     if (longitudinal_distance.value() > 0.0) {
-      bbox_distance = -std::abs(from_bbox_distances.front) - std::abs(to_bbox_distances.rear);
+      bounding_box_distance =
+        -std::abs(from_bounding_box_distances.front) - std::abs(to_bounding_box_distances.rear);
     } else if (longitudinal_distance.value() < 0.0) {
-      bbox_distance = +std::abs(from_bbox_distances.rear) + std::abs(to_bbox_distances.front);
+      bounding_box_distance =
+        +std::abs(from_bounding_box_distances.rear) + std::abs(to_bounding_box_distances.front);
     }
-    return longitudinal_distance.value() + bbox_distance;
+    return longitudinal_distance.value() + bounding_box_distance;
   }
   return std::nullopt;
 }
 
 auto getDistanceToLeftLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> double
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
   if (const auto bound = hdmap_utils_ptr->getLeftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
   } else if (const auto polygon =
-               math::geometry::transformPoints(map_pose, math::geometry::get2DPolygon(bbox));
+               math::geometry::transformPoints(map_pose, math::geometry::toPolygon2D(bounding_box));
              polygon.empty()) {
     THROW_SEMANTIC_ERROR("Failed to calculate 2d polygon.");
   } else {
@@ -193,29 +205,29 @@ auto getDistanceToLeftLaneBound(
 }
 
 auto getDistanceToLeftLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const lanelet::Ids & lanelet_ids,
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances), [&](auto lanelet_id) {
-      return getDistanceToLeftLaneBound(map_pose, bbox, lanelet_id, hdmap_utils_ptr);
+      return getDistanceToLeftLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     });
   return *std::min_element(distances.begin(), distances.end());
 }
 
 auto getDistanceToRightLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> double
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
   if (const auto bound = hdmap_utils_ptr->getRightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
   } else if (const auto polygon =
-               math::geometry::transformPoints(map_pose, math::geometry::get2DPolygon(bbox));
+               math::geometry::transformPoints(map_pose, math::geometry::toPolygon2D(bounding_box));
              polygon.empty()) {
     THROW_SEMANTIC_ERROR("Failed to calculate 2d polygon.");
   } else {
@@ -224,36 +236,36 @@ auto getDistanceToRightLaneBound(
 }
 
 auto getDistanceToRightLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const lanelet::Ids & lanelet_ids,
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
   std::vector<double> distances;
   std::transform(
     lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances), [&](auto lanelet_id) {
-      return getDistanceToLeftLaneBound(map_pose, bbox, lanelet_id, hdmap_utils_ptr);
+      return getDistanceToLeftLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr);
     });
   return *std::min_element(distances.begin(), distances.end());
 }
 
 auto getDistanceToLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> double
-{
-  return std::min(
-    getDistanceToLeftLaneBound(map_pose, bbox, lanelet_id, hdmap_utils_ptr),
-    getDistanceToRightLaneBound(map_pose, bbox, lanelet_id, hdmap_utils_ptr));
-}
-
-auto getDistanceToLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const lanelet::Ids & lanelet_ids,
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
 {
   return std::min(
-    getDistanceToLeftLaneBound(map_pose, bbox, lanelet_ids, hdmap_utils_ptr),
-    getDistanceToRightLaneBound(map_pose, bbox, lanelet_ids, hdmap_utils_ptr));
+    getDistanceToLeftLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr),
+    getDistanceToRightLaneBound(map_pose, bounding_box, lanelet_id, hdmap_utils_ptr));
+}
+
+auto getDistanceToLaneBound(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double
+{
+  return std::min(
+    getDistanceToLeftLaneBound(map_pose, bounding_box, lanelet_ids, hdmap_utils_ptr),
+    getDistanceToRightLaneBound(map_pose, bounding_box, lanelet_ids, hdmap_utils_ptr));
 }
 
 auto getDistanceToCrosswalk(

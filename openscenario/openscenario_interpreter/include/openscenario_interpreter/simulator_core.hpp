@@ -229,16 +229,16 @@ public:
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
       const NativeLanePosition & from_lanelet_pose,
-      const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
+      const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
       const NativeLanePosition & to_lanelet_pose,
-      const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
+      const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
       checkRoutingAlgorithm(routing_algorithm);
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::getBoundingBoxRelativeLaneletPose(
-        from_lanelet_pose, from_bbox, to_lanelet_pose, to_bbox, allow_lane_change,
+        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box, allow_lane_change,
         core->getHdmapUtils());
     }
 
