@@ -47,7 +47,7 @@ private:
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     auto ego_entity = api_.getEntity("ego");
-    const auto distance = traffic_simulator::distance::getDistanceToLaneBound(
+    const auto distance = traffic_simulator::distance::distanceToLaneBound(
       ego_entity->getMapPose(), ego_entity->getBoundingBox(), ego_entity->getRouteLanelets(),
       api_.getHdmapUtils());
     // LCOV_EXCL_START

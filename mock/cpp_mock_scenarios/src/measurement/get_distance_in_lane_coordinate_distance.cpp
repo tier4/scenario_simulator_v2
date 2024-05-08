@@ -48,7 +48,7 @@ private:
     const auto from_lanelet_pose_opt = api_.getEntity(from_entity_name)->getLaneletPose();
     const auto to_lanelet_pose_opt = api_.getEntity(to_entity_name)->getLaneletPose();
     if (from_lanelet_pose_opt && to_lanelet_pose_opt) {
-      return traffic_simulator::distance::getLateralDistance(
+      return traffic_simulator::distance::lateralDistance(
         *from_lanelet_pose_opt, *to_lanelet_pose_opt, false, api_.getHdmapUtils());
     } else {
       return std::nullopt;
@@ -64,7 +64,7 @@ private:
     const auto to_lanelet_pose_opt =
       api_.getEntity(to_entity_name)->getLaneletPose(matching_distance);
     if (from_lanelet_pose_opt && to_lanelet_pose_opt) {
-      return traffic_simulator::distance::getLateralDistance(
+      return traffic_simulator::distance::lateralDistance(
         *from_lanelet_pose_opt, *to_lanelet_pose_opt, false, api_.getHdmapUtils());
     } else {
       return std::nullopt;
@@ -78,7 +78,7 @@ private:
     const auto from_lanelet_pose_opt = api_.getEntity(from_entity_name)->getLaneletPose();
     const auto to_lanelet_pose_opt = api_.getEntity(to_entity_name)->getLaneletPose();
     if (from_lanelet_pose_opt && to_lanelet_pose_opt) {
-      return traffic_simulator::distance::getLongitudinalDistance(
+      return traffic_simulator::distance::longitudinalDistance(
         *from_lanelet_pose_opt, *to_lanelet_pose_opt, false, true, false, api_.getHdmapUtils());
 
     } else {

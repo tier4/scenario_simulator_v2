@@ -122,14 +122,14 @@ auto getRelativeLaneletPose(
   // here the s and offset are intentionally assigned independently, even if it is not possible to
   // calculate one of them - it happens that one is sufficient
   if (
-    const auto longitudinal_distance = traffic_simulator::distance::getLongitudinalDistance(
+    const auto longitudinal_distance = traffic_simulator::distance::longitudinalDistance(
       from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change,
       hdmap_utils_ptr)) {
     position.s = longitudinal_distance.value();
   }
   if (
-    const auto lateral_distance = traffic_simulator::distance::getLateralDistance(
-      from, to, allow_lane_change, hdmap_utils_ptr)) {
+    const auto lateral_distance =
+      traffic_simulator::distance::lateralDistance(from, to, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_distance.value();
   }
   return position;
@@ -151,13 +151,13 @@ auto getBoundingBoxRelativeLaneletPose(
   // calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_bb_distance =
-      traffic_simulator::distance::getBoundingBoxLaneLongitudinalDistance(
+      traffic_simulator::distance::boundingBoxLaneLongitudinalDistance(
         from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
         include_opposite_direction, allow_lane_change, hdmap_utils_ptr)) {
     position.s = longitudinal_bb_distance.value();
   }
   if (
-    const auto lateral_bb_distance = traffic_simulator::distance::getBoundingBoxLaneLateralDistance(
+    const auto lateral_bb_distance = traffic_simulator::distance::boundingBoxLaneLateralDistance(
       from, from_bounding_box, to, to_bounding_box, allow_lane_change, hdmap_utils_ptr)) {
     position.offset = lateral_bb_distance.value();
   }

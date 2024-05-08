@@ -493,7 +493,7 @@ public:
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
           if (
-            const auto distance = traffic_simulator::distance::getBoundingBoxDistance(
+            const auto distance = traffic_simulator::distance::boundingBoxDistance(
               from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
               to_entity->getBoundingBox())) {
             return distance.value();
