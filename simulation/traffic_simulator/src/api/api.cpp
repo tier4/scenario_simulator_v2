@@ -93,18 +93,18 @@ auto API::setEntityStatus(
 std::optional<double> API::getTimeHeadway(
   const std::string & from_entity_name, const std::string & to_entity_name)
 {
-  const auto from_map_pose = getEntity(from_entity_name)->getMapPose();
-  const auto to_map_pose = getEntity(to_entity_name)->getMapPose();
-  if (auto relative_pose_opt = pose::getRelativePose(from_map_pose, to_map_pose);
-      !relative_pose_opt || relative_pose_opt.value().position.x > 0) {
-    return std::nullopt;
-  } else if (const double ret = (relative_pose_opt.value().position.x * -1) /
-                                (getCurrentTwist(to_entity_name).linear.x);
-             std::isnan(ret)) {
-    return std::numeric_limits<double>::infinity();
-  } else {
-    return ret;
+  if (auto from_entity = getEntity(from_entity_name); from_entity) {
+    if (auto to_entity = getEntity(to_entity_name); to_entity) {
+      if (auto relative_pose =
+            pose::getRelativePose(from_entity->getMapPose(), to_entity->getMapPose());
+          relative_pose && relative_pose->position.x <= 0) {
+        const double time_headway =
+          (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;
+        return std::isnan(time_headway) ? std::numeric_limits<double>::infinity() : time_headway;
+      }
+    }
   }
+  return std::nullopt;
 }
 
 auto API::setEntityStatus(
