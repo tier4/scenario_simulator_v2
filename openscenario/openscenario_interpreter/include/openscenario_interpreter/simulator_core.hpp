@@ -122,12 +122,12 @@ public:
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
           if (
-            const auto relative_pose = traffic_simulator::pose::getRelativePose(
+            const auto relative_pose = traffic_simulator::pose::relativePose(
               from_entity->getMapPose(), to_entity->getMapPose()))
             return relative_pose.value();
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
 
     static auto makeNativeRelativeWorldPosition(
@@ -136,11 +136,11 @@ public:
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (
           const auto relative_pose =
-            traffic_simulator::pose::getRelativePose(from_entity->getMapPose(), to_map_pose)) {
+            traffic_simulator::pose::relativePose(from_entity->getMapPose(), to_map_pose)) {
           return relative_pose.value();
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
 
     static auto makeNativeRelativeWorldPosition(
@@ -149,11 +149,11 @@ public:
       if (const auto to_entity = core->getEntity(to_entity_name)) {
         if (
           const auto relative_pose =
-            traffic_simulator::pose::getRelativePose(from_map_pose, to_entity->getMapPose())) {
+            traffic_simulator::pose::relativePose(from_map_pose, to_entity->getMapPose())) {
           return relative_pose.value();
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
 
     static auto makeNativeRelativeLanePosition(
@@ -167,7 +167,7 @@ public:
             from_entity_name, to_lanelet_pose_opt.value(), routing_algorithm);
         }
       }
-      return traffic_simulator::pose::getQuietNaNLaneletPose();
+      return traffic_simulator::pose::quietNaNLaneletPose();
     }
 
     static auto makeNativeRelativeLanePosition(
@@ -181,7 +181,7 @@ public:
             from_lanelet_pose_opt.value(), to_lanelet_pose, routing_algorithm);
         }
       }
-      return traffic_simulator::pose::getQuietNaNLaneletPose();
+      return traffic_simulator::pose::quietNaNLaneletPose();
     }
 
     static auto makeNativeRelativeLanePosition(
@@ -191,7 +191,7 @@ public:
     {
       checkRoutingAlgorithm(routing_algorithm);
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      return traffic_simulator::pose::getRelativeLaneletPose(
+      return traffic_simulator::pose::relativeLaneletPose(
         from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
     }
 
@@ -210,7 +210,7 @@ public:
           }
         }
       }
-      return traffic_simulator::pose::getQuietNaNLaneletPose();
+      return traffic_simulator::pose::quietNaNLaneletPose();
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -224,7 +224,7 @@ public:
             traffic_simulator_msgs::msg::BoundingBox(), routing_algorithm);
         }
       }
-      return traffic_simulator::pose::getQuietNaNLaneletPose();
+      return traffic_simulator::pose::quietNaNLaneletPose();
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -237,7 +237,7 @@ public:
     {
       checkRoutingAlgorithm(routing_algorithm);
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      return traffic_simulator::pose::getBoundingBoxRelativeLaneletPose(
+      return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
         from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box, allow_lane_change,
         core->getHdmapUtils());
     }
@@ -248,14 +248,14 @@ public:
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
           if (
-            const auto relative_pose = traffic_simulator::pose::getBoundingBoxRelativePose(
+            const auto relative_pose = traffic_simulator::pose::boundingBoxRelativePose(
               from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
               to_entity->getBoundingBox())) {
             return relative_pose.value();
           }
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(
@@ -263,13 +263,13 @@ public:
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (
-          const auto relative_pose = traffic_simulator::pose::getBoundingBoxRelativePose(
+          const auto relative_pose = traffic_simulator::pose::boundingBoxRelativePose(
             from_entity->getMapPose(), from_entity->getBoundingBox(), to_map_pose,
             traffic_simulator_msgs::msg::BoundingBox())) {
           return relative_pose.value();
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
   };
 
@@ -334,7 +334,8 @@ public:
       core->setBehaviorParameter(entity_ref, [&]() {
         auto message = core->getBehaviorParameter(entity_ref);
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
-        /// The default values written in https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
+        /// The default values written in
+        /// https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
         message.dynamic_constraints.max_acceleration =
           controller.properties.template get<Double>("maxAcceleration", 10.0);
         message.dynamic_constraints.max_acceleration_rate =
@@ -576,7 +577,7 @@ public:
       const auto to_map_pose = static_cast<NativeWorldPosition>(osc_lane_position);
       if (
         const auto relative_pose =
-          traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
+          traffic_simulator::pose::relativePose(from_map_pose, to_map_pose)) {
         return static_cast<Double>(std::abs(
           quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
             .z));

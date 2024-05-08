@@ -96,7 +96,7 @@ std::optional<double> API::getTimeHeadway(
   if (auto from_entity = getEntity(from_entity_name); from_entity) {
     if (auto to_entity = getEntity(to_entity_name); to_entity) {
       if (auto relative_pose =
-            pose::getRelativePose(from_entity->getMapPose(), to_entity->getMapPose());
+            pose::relativePose(from_entity->getMapPose(), to_entity->getMapPose());
           relative_pose && relative_pose->position.x <= 0) {
         const double time_headway =
           (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;

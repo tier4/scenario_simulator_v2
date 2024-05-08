@@ -21,7 +21,7 @@ namespace traffic_simulator
 {
 namespace pose
 {
-auto getQuietNaNPose() -> geometry_msgs::msg::Pose
+auto quietNaNPose() -> geometry_msgs::msg::Pose
 {
   return geometry_msgs::build<geometry_msgs::msg::Pose>()
     .position(geometry_msgs::build<geometry_msgs::msg::Point>()
@@ -31,7 +31,7 @@ auto getQuietNaNPose() -> geometry_msgs::msg::Pose
     .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
 }
 
-auto getQuietNaNLaneletPose() -> traffic_simulator::LaneletPose
+auto quietNaNLaneletPose() -> traffic_simulator::LaneletPose
 {
   return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
     .lanelet_id(std::numeric_limits<std::int64_t>::max())
@@ -68,7 +68,7 @@ auto toLaneletPose(
   }
 }
 
-auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
+auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>
 {
   try {
@@ -78,19 +78,19 @@ auto getRelativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs:
   }
 }
 
-auto getRelativePose(const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
+auto relativePose(const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
   -> std::optional<geometry_msgs::msg::Pose>
 {
-  return getRelativePose(from, static_cast<geometry_msgs::msg::Pose>(to));
+  return relativePose(from, static_cast<geometry_msgs::msg::Pose>(to));
 }
 
-auto getRelativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
+auto relativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
   -> std::optional<geometry_msgs::msg::Pose>
 {
-  return getRelativePose(static_cast<geometry_msgs::msg::Pose>(from), to);
+  return relativePose(static_cast<geometry_msgs::msg::Pose>(from), to);
 }
 
-auto getBoundingBoxRelativePose(
+auto boundingBoxRelativePose(
   const geometry_msgs::msg::Pose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const geometry_msgs::msg::Pose & to,
@@ -100,8 +100,8 @@ auto getBoundingBoxRelativePose(
   if (const auto closest_points =
         math::geometry::getClosestPoses(from, from_bounding_box, to, to_bounding_box);
       closest_points) {
-    const auto from_pose_bounding_box = getRelativePose(from, closest_points.value().first);
-    const auto to_pose_bounding_box = getRelativePose(from, closest_points.value().second);
+    const auto from_pose_bounding_box = relativePose(from, closest_points.value().first);
+    const auto to_pose_bounding_box = relativePose(from, closest_points.value().second);
     if (from_pose_bounding_box && to_pose_bounding_box) {
       return math::geometry::subtractPoses(
         from_pose_bounding_box.value(), to_pose_bounding_box.value());
@@ -110,7 +110,7 @@ auto getBoundingBoxRelativePose(
   return std::nullopt;
 }
 
-auto getRelativeLaneletPose(
+auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> traffic_simulator::LaneletPose
@@ -118,7 +118,7 @@ auto getRelativeLaneletPose(
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
 
-  traffic_simulator::LaneletPose position = traffic_simulator::pose::getQuietNaNLaneletPose();
+  traffic_simulator::LaneletPose position = traffic_simulator::pose::quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if it is not possible to
   // calculate one of them - it happens that one is sufficient
   if (
@@ -135,7 +135,7 @@ auto getRelativeLaneletPose(
   return position;
 }
 
-auto getBoundingBoxRelativeLaneletPose(
+auto boundingBoxRelativeLaneletPose(
   const CanonicalizedLaneletPose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
@@ -146,7 +146,7 @@ auto getBoundingBoxRelativeLaneletPose(
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
 
-  traffic_simulator::LaneletPose position = traffic_simulator::pose::getQuietNaNLaneletPose();
+  traffic_simulator::LaneletPose position = traffic_simulator::pose::quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if it is not possible to
   // calculate one of them - it happens that one is sufficient
   if (
