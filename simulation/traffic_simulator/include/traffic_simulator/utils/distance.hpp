@@ -24,19 +24,21 @@ inline namespace distance
 {
 // Lateral
 auto getLateralDistance(
-  const lanelet_pose::lanelet_pose::CanonicalizedLaneletPose & from, const lanelet_pose::CanonicalizedLaneletPose & to,
+  const lanelet_pose::CanonicalizedLaneletPose & from,
+  const lanelet_pose::CanonicalizedLaneletPose & to, bool allow_lane_change,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
+
+auto getLateralDistance(
+  const lanelet_pose::CanonicalizedLaneletPose & from,
+  const lanelet_pose::CanonicalizedLaneletPose & to, double matching_distance,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<double>;
 
-auto getLateralDistance(
-  const lanelet_pose::CanonicalizedLaneletPose & from, const lanelet_pose::CanonicalizedLaneletPose & to,
-  double matching_distance, bool allow_lane_change,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
-
 // Longitudinal
 auto getLongitudinalDistance(
-  const lanelet_pose::CanonicalizedLaneletPose & from, const lanelet_pose::CanonicalizedLaneletPose & to,
-  bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
+  const lanelet_pose::CanonicalizedLaneletPose & from,
+  const lanelet_pose::CanonicalizedLaneletPose & to, bool include_adjacent_lanelet,
+  bool include_opposite_direction, bool allow_lane_change,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
 // BoundingBox

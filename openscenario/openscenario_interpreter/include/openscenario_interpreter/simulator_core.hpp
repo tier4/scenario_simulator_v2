@@ -68,7 +68,7 @@ public:
   class CoordinateSystemConversion
   {
   protected:
-    static auto checkRoutingAlgorithm(const RoutingAlgorithm::value_type & routing_algorithm)
+    static auto checkRoutingAlgorithm(RoutingAlgorithm::value_type routing_algorithm)
     {
       std::set<RoutingAlgorithm::value_type> supported = {
         RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
