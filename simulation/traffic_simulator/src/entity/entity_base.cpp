@@ -949,7 +949,10 @@ auto EntityBase::requestSynchronize(
       }
       const auto ego_velocity = other_status_.find("ego")->second.getTwist().linear.x;
       const auto entity_velocity = this->getStatus().getTwist().linear.x;
-      const auto ego_arrival_time = (std::abs(ego_velocity) > std::numeric_limits<double>::epsilon()) ? ego_distance.value() / ego_velocity : 0;
+      const auto ego_arrival_time =
+        (std::abs(ego_velocity) > std::numeric_limits<double>::epsilon())
+          ? ego_distance.value() / ego_velocity
+          : 0;
 
       auto entity_velocity_to_synchronize = entity_velocity;
 
@@ -974,10 +977,9 @@ auto EntityBase::requestSynchronize(
         entity_velocity_to_synchronize = entity_velocity;
       }
       /**
-       * using this->requestSpeedChange here does not work in some kind of reason.
-       * it seems that after this function is called by some reason, func_on_cleanup will be deleted and become nullptr
-      */
-      // this->requestSpeedChange(entity_velocity_to_synchronize, true);
+       * @warning using this->requestSpeedChange here does not work in some kind of reason.
+       * It seems that after this function is called by some reason, func_on_cleanup will be deleted and become nullptr
+       */
       target_speed_ = entity_velocity_to_synchronize;
       return false;
     },
