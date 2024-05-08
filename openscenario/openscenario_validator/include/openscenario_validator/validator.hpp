@@ -21,6 +21,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
+#include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
@@ -81,13 +82,11 @@ public:
   OpenSCENARIOValidator()
   {
     parser = std::make_unique<xercesc::XercesDOMParser>();
-    if (auto file = std::ofstream(schema_filepath, std::ios::trunc)) {
-      file << schema;
-    } else {
-      throw std::system_error(errno, std::system_category());
-    }
 
-    if (not parser->loadGrammar(schema_filepath, xercesc::Grammar::SchemaGrammarType)) {
+    xercesc::MemBufInputSource pMemBufIS(
+      reinterpret_cast<const XMLByte *>(schema), strlen(schema), "xsd");
+
+    if (not parser->loadGrammar(pMemBufIS, xercesc::Grammar::SchemaGrammarType)) {
       throw std::runtime_error(
         "Failed to load XSD schema. This is an unexpected error and an implementation issue. "
         "Please contact the developer.");
