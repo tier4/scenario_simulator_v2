@@ -126,7 +126,10 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
   }
-  if (!target_speed) {
+
+  if (request == traffic_simulator::behavior::Request::NONE) {
+    target_speed = 0.0;
+  } else if (!target_speed) {
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   setOutput(
