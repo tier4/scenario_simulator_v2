@@ -68,10 +68,18 @@ class OpenSCENARIOValidator
 
   static constexpr auto schema_filepath = "/tmp/OpenSCENARIO-1.3.xsd";
 
+  struct XMLPlatformLifecycleHandler
+  {
+    XMLPlatformLifecycleHandler() { xercesc::XMLPlatformUtils::Initialize(); }
+
+    ~XMLPlatformLifecycleHandler() { xercesc::XMLPlatformUtils::Terminate(); }
+  };
+
+  static inline XMLPlatformLifecycleHandler xml_platform_lifecycle_handler;
+
 public:
   OpenSCENARIOValidator()
   {
-    xercesc::XMLPlatformUtils::Initialize();
     parser = std::make_unique<xercesc::XercesDOMParser>();
     if (auto file = std::ofstream(schema_filepath, std::ios::trunc)) {
       file << schema;
@@ -93,11 +101,7 @@ public:
     }
   }
 
-  ~OpenSCENARIOValidator()
-  {
-    parser.release();
-    xercesc::XMLPlatformUtils::Terminate();
-  }
+  ~OpenSCENARIOValidator() { parser.release(); }
 
   auto validate(const boost::filesystem::path & xml_file) -> void
   {
