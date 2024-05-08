@@ -110,7 +110,7 @@ public:
   {
     _lane_change_param = param;
   }
-  
+
   void _setEntityType(uint8_t value) { _entity_type.type = value; }
 
   void _appendToJobList(
