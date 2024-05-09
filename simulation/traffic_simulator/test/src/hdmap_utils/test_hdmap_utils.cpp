@@ -19,8 +19,10 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
-auto makeHdMapUtilsInstance(std::string relative_path = "/map/lanelet2_map.osm")
-  -> hdmap_utils::HdMapUtils
+static const std::string map_path = "/map/lanelet2_map.osm";
+static const std::string shoulder_map_path = "/map/with_road_shoulder/lanelet2_map.osm";
+
+auto makeHdMapUtilsInstance(const std::string relative_path = map_path) -> hdmap_utils::HdMapUtils
 {
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + relative_path;
@@ -666,7 +668,7 @@ TEST(HdMapUtils, getNextLaneletIds)
 
 TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
 {
-  std::string map_path("/map/with_road_shoulder/lanelet2_map.osm");
+  std::string map_path(shoulder_map_path);
   auto hdmap_utils = makeHdMapUtilsInstance(map_path);
   const lanelet::Id curr_lanelet = 34768;
   const lanelet::Id prev_lanelet = 34696;
@@ -680,7 +682,7 @@ TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
 
 TEST(HdMapUtils, getNextLaneletIds_RoadShoulder)
 {
-  std::string map_path("/map/with_road_shoulder/lanelet2_map.osm");
+  std::string map_path(shoulder_map_path);
   auto hdmap_utils = makeHdMapUtilsInstance(map_path);
   const lanelet::Id curr_lanelet = 34696;
   const lanelet::Id next_lanelet = 34768;
