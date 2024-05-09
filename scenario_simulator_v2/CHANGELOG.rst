@@ -13,6 +13,12 @@ Changelog for package scenario_simulator_v2
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.15.7 (2024-05-09)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/master' into feature/speed_up_set_other_status
+* Contributors: hakuturu583
+
 1.15.6 (2024-05-07)
 -------------------
 * Merge branch 'master' into feature/publish_scenario_frame
