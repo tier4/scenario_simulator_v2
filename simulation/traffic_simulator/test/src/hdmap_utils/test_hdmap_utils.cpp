@@ -402,6 +402,7 @@ TEST(HdMapUtils, getNearbyLaneletIds_unsuccessful)
 
 TEST(HdMapUtils, getNearbyLaneletIds_crosswalkIncluded)
 {
+  // refer to 1st issue at the end of this file
   auto hdmap_utils = makeHdMapUtilsInstance();
 
   auto point = makePoint(3768.01, 73750.97);
@@ -416,11 +417,11 @@ TEST(HdMapUtils, getNearbyLaneletIds_crosswalkIncluded)
   EXPECT_EQ(lanelets.size(), 2);
   EXPECT_TRUE(std::find(lanelets.begin(), lanelets.end(), id_crosswalk) != lanelets.end());
   EXPECT_TRUE(std::find(lanelets.begin(), lanelets.end(), id_road) != lanelets.end());
-  // bug at hdmap_utils.cpp:288, no predicate on distance threshold if first is closer than distance threshold
 }
 
 TEST(HdMapUtils, getNearbyLaneletIds_crosswalkNotIncluded)
 {
+  // refer to 1st issue at the end of this file
   auto hdmap_utils = makeHdMapUtilsInstance();
 
   auto point = makePoint(3768.01, 73750.97);
@@ -433,7 +434,6 @@ TEST(HdMapUtils, getNearbyLaneletIds_crosswalkNotIncluded)
   lanelet::Id id_road = 34633;
   EXPECT_EQ(lanelets.size(), 1);
   EXPECT_EQ(lanelets[0], id_road);
-  // bug at hdmap_utils.cpp:288, no predicate on distance threshold if first is closer than distance threshold
 }
 
 TEST(HdMapUtils, getNearbyLaneletIds_crosswalkUnsuccessful)
@@ -773,3 +773,9 @@ TEST(HdMapUtils, getPreviousLaneletIds_direction)
     }
   }
 }
+
+/*
+ISSUES:
+1: 288, missing predicate if first is closer than distance threshold.
+  Differning from line 265.
+*/
