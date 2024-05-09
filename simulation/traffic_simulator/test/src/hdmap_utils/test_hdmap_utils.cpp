@@ -19,6 +19,8 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
+#include "../expect_eq_macros.hpp"
+
 static const std::string map_path = "/map/lanelet2_map.osm";
 static const std::string shoulder_map_path = "/map/with_road_shoulder/lanelet2_map.osm";
 
@@ -72,6 +74,13 @@ auto makeSmallBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs
   bbox.dimensions.y = 1.0;
   bbox.dimensions.z = 1.0;
   return bbox;
+}
+
+auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
+{
+  geometry_msgs::msg::Vector3 v;
+  v.z = yaw;
+  return quaternion_operation::convertEulerAngleToQuaternion(v);
 }
 
 int main(int argc, char ** argv)
@@ -809,6 +818,163 @@ TEST(HdMapUtils, isInRoute_onRoute)
   lanelet::Ids route = {route_part_0, route_part_1, route_part_2, route_part_3};
 
   EXPECT_TRUE(hdmap_utils.isInRoute(lanelet_id, route));
+}
+
+TEST(HdMapUtils, isInLanelet_correct)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+  const double s = 10;
+
+  EXPECT_TRUE(hdmap_utils.isInLanelet(lanelet_id, s));
+}
+
+TEST(HdMapUtils, isInLanelet_after)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+  const double s = hdmap_utils.getLaneletLength(lanelet_id) + 5.0;
+
+  EXPECT_FALSE(hdmap_utils.isInLanelet(lanelet_id, s));
+}
+
+TEST(HdMapUtils, isInLanelet_before)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+  const double s = -5;
+
+  EXPECT_FALSE(hdmap_utils.isInLanelet(lanelet_id, s));
+}
+
+TEST(HdMapUtils, toMapPoints_correctPoints)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+  const std::vector<double> s{10.0, 20.0, 30.0};
+
+  const auto points = hdmap_utils.toMapPoints(lanelet_id, s);
+
+  EXPECT_EQ(points.size(), static_cast<std::size_t>(3));
+  EXPECT_POINT_NEAR(points[0], makePoint(3768.7, 73696.2, 1.9), 0.1);
+  EXPECT_POINT_NEAR(points[1], makePoint(3759.8, 73691.6, 2.1), 0.1);
+  EXPECT_POINT_NEAR(points[2], makePoint(3750.9, 73687.1, 2.3), 0.1);
+}
+
+TEST(HdMapUtils, toMapPoints_negativeS)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+  const std::vector<double> s{-10.0, -20.0, -30.0};
+
+  const auto points = hdmap_utils.toMapPoints(lanelet_id, s);
+
+  EXPECT_EQ(points.size(), static_cast<std::size_t>(3));
+
+  EXPECT_POINT_NEAR(points[0], makePoint(3786.5, 73705.3, 1.5), 0.1);
+  EXPECT_POINT_NEAR(points[1], makePoint(3795.4, 73709.9, 1.3), 0.1);
+  EXPECT_POINT_NEAR(points[2], makePoint(3804.3, 73714.5, 1.1), 0.1);
+}
+
+TEST(HdMapUtils, toMapPoints_sLargerThanLaneletLength)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+
+  const auto lanelet_length = hdmap_utils.getLaneletLength(lanelet_id);
+  const std::vector<double> s{lanelet_length + 10.0, lanelet_length + 20.0, lanelet_length + 30.0};
+
+  const auto points = hdmap_utils.toMapPoints(lanelet_id, s);
+
+  EXPECT_EQ(points.size(), static_cast<std::size_t>(3));
+  EXPECT_POINT_NEAR(points[0], makePoint(3725.8, 73674.2, 3.0), 0.1);
+  EXPECT_POINT_NEAR(points[1], makePoint(3716.9, 73669.6, 3.1), 0.1);
+  EXPECT_POINT_NEAR(points[2], makePoint(3708.0, 73665.0, 3.3), 0.1);
+}
+
+TEST(HdMapUtils, toMapPoints_empty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+
+  std::vector<geometry_msgs::msg::Point> points;
+
+  EXPECT_NO_THROW(points = hdmap_utils.toMapPoints(lanelet_id, {}));
+
+  EXPECT_TRUE(points.empty());
+}
+
+TEST(HdMapUtils, toMapPose_onlyOffset)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+  const double s = 10.0;
+
+  traffic_simulator_msgs::msg::LaneletPose pose;
+  pose.lanelet_id = lanelet_id;
+  pose.s = s;
+  pose.offset = 0.5;
+
+  const auto map_pose = hdmap_utils.toMapPose(pose);
+
+  EXPECT_STREQ(map_pose.header.frame_id.c_str(), "map");
+  EXPECT_POSE_NEAR(
+    map_pose.pose, makePose(makePoint(3768.9, 73695.8, 1.9), makeQuaternionFromYaw(-2.667)), 0.1);
+}
+
+TEST(HdMapUtils, toMapPose_additionalRotation)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+  const double s = 10.0;
+
+  traffic_simulator_msgs::msg::LaneletPose pose;
+  pose.lanelet_id = lanelet_id;
+  pose.s = s;
+  pose.rpy.z = M_PI_4;
+
+  const auto map_pose = hdmap_utils.toMapPose(pose);
+
+  EXPECT_STREQ(map_pose.header.frame_id.c_str(), "map");
+  EXPECT_POSE_NEAR(
+    map_pose.pose,
+    makePose(makePoint(3768.7, 73696.2, 1.9), makeQuaternionFromYaw(-2.667 + M_PI_4)), 0.1);
+}
+
+TEST(HdMapUtils, toMapPose_negativeS)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+  const double s = -10.0;
+
+  traffic_simulator_msgs::msg::LaneletPose pose;
+  pose.lanelet_id = lanelet_id;
+  pose.s = s;
+
+  geometry_msgs::msg::PoseStamped map_pose;
+  EXPECT_NO_THROW(map_pose = hdmap_utils.toMapPose(pose));
+
+  EXPECT_STREQ(map_pose.header.frame_id.c_str(), "map");
+  EXPECT_POSE_NEAR(
+    map_pose.pose, makePose(makePoint(3784.0, 73707.8, 1.5), makeQuaternionFromYaw(-1.595)), 0.1);
+}
+
+TEST(HdMapUtils, toMapPose_sLargerThanLaneletLength)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34696;
+  const double s = hdmap_utils.getLaneletLength(lanelet_id) + 10.0;
+
+  traffic_simulator_msgs::msg::LaneletPose pose;
+  pose.lanelet_id = lanelet_id;
+  pose.s = s;
+
+  geometry_msgs::msg::PoseStamped map_pose;
+  EXPECT_NO_THROW(map_pose = hdmap_utils.toMapPose(pose));
+
+  EXPECT_STREQ(map_pose.header.frame_id.c_str(), "map");
+  EXPECT_POSE_NEAR(
+    map_pose.pose, makePose(makePoint(3724.9, 73678.1, 2.7), makeQuaternionFromYaw(2.828)), 0.1);
 }
 
 /*
