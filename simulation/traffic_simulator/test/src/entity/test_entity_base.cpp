@@ -774,105 +774,6 @@ TEST(EntityBase, getDistanceToLeftLaneBound)
   EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
 
-TEST(EntityBase, getDistanceToRightLaneBound)
-{
-  // see issue 1 at the end of this file
-  const double lane_width = 3.0;
-  const double entity_center_offset = -0.5;
-  lanelet::Id id_previous = 34666;
-  lanelet::Id id = 120659;
-  lanelet::Id id_next = 120660;
-
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox(entity_center_offset);
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  dummy.setRouteLanelets({id_previous, id, id_next});
-
-  auto distance_result = dummy.getDistanceToRightLaneBound();
-  double distance_actual = (lane_width - bbox.dimensions.y) / 2 + entity_center_offset;
-  EXPECT_NEAR(distance_result, distance_actual, 0.1);
-}
-
-TEST(EntityBase, getDistanceToLaneBound)
-{
-  // see issue 1 at the end of this file
-  const double lane_width = 3.0;
-  const double entity_center_offset = -0.5;
-  lanelet::Id id_previous = 34666;
-  lanelet::Id id = 120659;
-  lanelet::Id id_next = 120660;
-
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox(entity_center_offset);
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  dummy.setRouteLanelets({id_previous, id, id_next});
-
-  auto distance_result = dummy.getDistanceToLaneBound();
-  double distance_actual = std::min(
-    (lane_width - bbox.dimensions.y) / 2 - entity_center_offset,
-    (lane_width - bbox.dimensions.y) / 2 + entity_center_offset);
-  EXPECT_NEAR(distance_result, distance_actual, 0.1);
-}
-
-TEST(EntityBase, getDistanceToLeftLaneBound_empty)
-{
-  // fix is to be implemented, 2nd issue
-  lanelet::Id id = 120659;
-
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  auto ids = std::vector<lanelet::Id>{};
-
-  // auto left = dummy.getDistanceToLeftLaneBound(ids);
-
-  throw std::runtime_error("Fix not implemented");
-}
-
-TEST(EntityBase, getDistanceToRightLaneBound_empty)
-{
-  // fix is to be implemented, 2nd issue
-  lanelet::Id id = 120659;
-
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  auto ids = std::vector<lanelet::Id>{};
-
-  // auto right = dummy.getDistanceToRightLaneBound(ids);
-  throw std::runtime_error("Fix not implemented");
-}
-
-TEST(EntityBase, getDistanceToLaneBound_empty)
-{
-  // fix is to be implemented, 2nd issue
-  lanelet::Id id = 120659;
-
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  auto ids = std::vector<lanelet::Id>{};
-
-  // auto distance = dummy.getDistanceToLaneBound(ids);
-
-  throw std::runtime_error("Fix not implemented");
-}
-
 TEST(EntityBase, getDistanceToLeftLaneBound_many)
 {
   const double entity_center_offset = -0.5;
@@ -889,46 +790,6 @@ TEST(EntityBase, getDistanceToLeftLaneBound_many)
   lanelet::Ids ids{id_0, id_1};
   auto distance_result = dummy.getDistanceToLeftLaneBound(ids);
   auto distance_actual = dummy.getDistanceToLeftLaneBound(id_0);
-  EXPECT_NEAR(distance_result, distance_actual, 0.1);
-}
-
-TEST(EntityBase, getDistanceToRightLaneBound_many)
-{
-  // typo, 1st issue
-  const double entity_center_offset = -0.5;
-  lanelet::Id id_0 = 120659;
-  lanelet::Id id_1 = 120659;
-
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
-  auto bbox = makeBoundingBox(entity_center_offset);
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
-  lanelet::Ids ids{id_0, id_1};
-  auto distance_result = dummy.getDistanceToRightLaneBound(ids);
-  auto distance_actual = dummy.getDistanceToRightLaneBound(id_0);
-  EXPECT_NEAR(distance_result, distance_actual, 0.1);
-}
-
-TEST(EntityBase, getDistanceToLaneBound_many)
-{
-  // typo, 1st issue
-  const double entity_center_offset = -0.5;
-  lanelet::Id id_0 = 120659;
-  lanelet::Id id_1 = 120659;
-
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
-  auto bbox = makeBoundingBox(entity_center_offset);
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
-  lanelet::Ids ids{id_0, id_1};
-  auto distance_result = dummy.getDistanceToLaneBound(ids);
-  auto distance_actual = dummy.getDistanceToLaneBound(id_0);
   EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
 
@@ -1077,25 +938,3 @@ TEST(EntityBase, getMapPoseFromRelativePose_relative)
   auto ref_pose = makeCanonicalizedLaneletPose(hdmap_utils, id, s);
   EXPECT_POSE_NEAR(result_pose, static_cast<geometry_msgs::msg::Pose>(ref_pose), eps);
 }
-
-/*
-ISSUES:
-1: 182: "getDistanceToRightLaneBound" typo
-2: 183: sigsegv on empty "distances" vector
-3: 595, 581: removal of these lines might be considered.
-  It looks like a job to change the "target_speed" is added after
-  the "target_speed" is already set for the desired value.
-  The job will do nothing, if continuous == false and the target_speed is already set
-4: 644: this line should be moved down, just like in 604, 630, 587.
-  "target_speed" often will not be set because of this line.
-5: 385, 437, 512, 545: it is unclear, why is a request to change the speed being issued,
-  and then, immediately, the speed is forcefully changed.
-  The job assigned to change the target speed will return early anyway,
-  after checking "isTargetSpeedReached" (if continuous == false)
-6: 551, 618: "requestSpeedChange" throws on invalid entity name if-and-only-if continuous is false.
-  Order of checking in the if statement might be swapped to fix this.
-7: 49, 59: it should be considered to make the "cancelRequest" and "appendDebugMarker" functions
-  purely virtual, or make them throw.
-8: 565: "requestSpeedChange" throws if "continuous" == true with "RelativeTargetSpeed",
-  whereas it does not when called with absolute ratget speed, in line 456.
-*/
