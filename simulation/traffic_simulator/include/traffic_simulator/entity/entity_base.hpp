@@ -186,6 +186,8 @@ public:
 
   virtual auto isControlledBySimulator() const -> bool;
 
+  virtual auto setControlledBySimulator(bool) -> void;
+
   virtual auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void;
 
