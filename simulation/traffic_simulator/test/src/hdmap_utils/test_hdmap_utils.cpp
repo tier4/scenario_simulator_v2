@@ -49,6 +49,17 @@ auto makeBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg
   return bbox;
 }
 
+auto makePose(
+  geometry_msgs::msg::Point position,
+  geometry_msgs::msg::Quaternion orientation = geometry_msgs::msg::Quaternion())
+  -> geometry_msgs::msg::Pose
+{
+  geometry_msgs::msg::Pose pose;
+  pose.position = position;
+  pose.orientation = orientation;
+  return pose;
+}
+
 auto makeSmallBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
 {
   traffic_simulator_msgs::msg::BoundingBox bbox;
@@ -477,7 +488,6 @@ TEST(HdMapUtils, getCollisionPointInLaneCoordinate_disjoint)
   EXPECT_FALSE(distance.has_value());
 }
 
-
 TEST(HdMapUtils, getCollisionPointInLaneCoordinate_invalidLanelet)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
@@ -519,8 +529,8 @@ TEST(HdMapUtils, matchToLane_includeCrosswalk)
     const auto id = hdmap_utils.matchToLane(
       hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34399, 1, 0)).pose,
       bbox, false);
-    if(id.has_value()){
-      EXPECT_NE(id.value(), 34399);      
+    if (id.has_value()) {
+      EXPECT_NE(id.value(), 34399);
     }
   }
 }
@@ -541,4 +551,104 @@ TEST(HdMapUtils, matchToLane_noMatch)
       bbox, false);
     EXPECT_FALSE(id.has_value());
   }
+}
+
+TEST(HdMapUtils, getSpeedLimit_correct)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  lanelet::Id id_road_0 = 34600;
+  lanelet::Id id_road_1 = 34675;
+  lanelet::Ids ids = {id_road_0, id_road_1};
+
+  double speed_limit = hdmap_utils.getSpeedLimit(ids);
+
+  const double true_limit = 50.0 / 3.6;
+  const double eps = 0.01;
+  EXPECT_NEAR(speed_limit, true_limit, eps);
+}
+
+TEST(HdMapUtils, getSpeedLimit_crosswalk)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  lanelet::Id id_crosswalk_0 = 34399;
+  lanelet::Id id_crosswalk_1 = 34385;
+  lanelet::Id id_road_0 = 34600;
+  lanelet::Id id_road_1 = 34675;
+  lanelet::Ids ids = {id_crosswalk_0, id_crosswalk_1, id_road_0, id_road_1};
+
+  double speed_limit = hdmap_utils.getSpeedLimit(ids);
+
+  const double true_limit = 0.0 / 3.6;
+  const double eps = 0.01;
+  EXPECT_NEAR(speed_limit, true_limit, eps);
+}
+
+TEST(HdMapUtils, getSpeedLimit_empty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  lanelet::Ids ids = {};
+
+  EXPECT_THROW(static_cast<void>(hdmap_utils.getSpeedLimit(ids)), std::runtime_error);
+}
+
+TEST(HdMapUtils, getClosestLaneletId_near)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  lanelet::Id id = 120659;
+  auto position = makePoint(3818.91, 73787.95);
+  auto pose = makePose(position);
+  const double distance_threshold = 1.0;
+  const bool include_crosswalk = false;
+
+  auto result = hdmap_utils.getClosestLaneletId(pose, distance_threshold, include_crosswalk);
+
+  EXPECT_TRUE(result.has_value());
+  EXPECT_EQ(result.value(), id);
+}
+
+TEST(HdMapUtils, getClosestLaneletId_away)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  auto position = makePoint(3775.82, 73743.29);
+  auto pose = makePose(position);
+  const double distance_threshold = 1.0;
+  const bool include_crosswalk = false;
+
+  auto result = hdmap_utils.getClosestLaneletId(pose, distance_threshold, include_crosswalk);
+
+  EXPECT_FALSE(result.has_value());
+}
+
+TEST(HdMapUtils, getClosestLaneletId_crosswalkCloserButExcluded)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  lanelet::Id id_crosswalk = 34399;
+  lanelet::Id id_road = 34639;
+  auto position = makePoint(3774.73, 73744.38);
+  auto pose = makePose(position);
+  const double distance_threshold = 5.0;
+  const bool include_crosswalk = false;
+
+  auto result = hdmap_utils.getClosestLaneletId(pose, distance_threshold, include_crosswalk);
+
+  EXPECT_TRUE(result.has_value());
+  EXPECT_EQ(result.value(), id_road);
+  EXPECT_NE(result.value(), id_crosswalk);
+}
+
+TEST(HdMapUtils, getClosestLaneletId_onlyCrosswalkNearButExcluded)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  lanelet::Id id_crosswalk = 34399;
+  lanelet::Id id_road = 34639;
+  auto position = makePoint(3774.73, 73744.38);
+  auto pose = makePose(position);
+  const double distance_threshold = 5.0;
+  const bool include_crosswalk = true;
+
+  auto result = hdmap_utils.getClosestLaneletId(pose, distance_threshold, include_crosswalk);
+
+  EXPECT_TRUE(result.has_value());
+  EXPECT_EQ(result.value(), id_crosswalk);
+  EXPECT_NE(result.value(), id_road);
 }
