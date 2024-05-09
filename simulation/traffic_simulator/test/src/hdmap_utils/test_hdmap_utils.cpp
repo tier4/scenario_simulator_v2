@@ -774,6 +774,41 @@ TEST(HdMapUtils, getPreviousLaneletIds_direction)
   }
 }
 
+TEST(HdMapUtils, isInRoute_empty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34468;
+  lanelet::Ids route = {};
+
+  EXPECT_FALSE(hdmap_utils.isInRoute(lanelet_id, route));
+}
+
+TEST(HdMapUtils, isInRoute_notOnRoute)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34468;
+  const lanelet::Id route_part_0 = 34741;
+  const lanelet::Id route_part_1 = 34850;
+  const lanelet::Id route_part_2 = 34603;
+  const lanelet::Id route_part_3 = 34777;
+  lanelet::Ids route = {route_part_0, route_part_1, route_part_2, route_part_3};
+
+  EXPECT_FALSE(hdmap_utils.isInRoute(lanelet_id, route));
+}
+
+TEST(HdMapUtils, isInRoute_onRoute)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id route_part_0 = 34741;
+  const lanelet::Id route_part_1 = 34850;
+  const lanelet::Id route_part_2 = 34603;
+  const lanelet::Id route_part_3 = 34777;
+  const lanelet::Id lanelet_id = route_part_1;
+  lanelet::Ids route = {route_part_0, route_part_1, route_part_2, route_part_3};
+
+  EXPECT_TRUE(hdmap_utils.isInRoute(lanelet_id, route));
+}
+
 /*
 ISSUES:
 1: 288, missing predicate if first is closer than distance threshold.
