@@ -19,10 +19,10 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
-auto makeHdMapUtilsInstance() -> hdmap_utils::HdMapUtils
+auto makeHdMapUtilsInstance(std::string relative_path = "/map/lanelet2_map.osm") -> hdmap_utils::HdMapUtils
 {
   std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + relative_path;
   geographic_msgs::msg::GeoPoint origin;
   origin.latitude = 35.61836750154;
   origin.longitude = 139.78066608243;
@@ -146,22 +146,6 @@ TEST(HdMapUtils, AlongLaneletPose)
       .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), -10.0)
       .s,
     hdmap_utils.getLaneletLength(34684) - 10.0);
-}
-
-TEST(HdMapUtils, RoadShoulder)
-{
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
-  const auto next_lanelet_ids = hdmap_utils.getNextLaneletIds(34696);
-  EXPECT_EQ(next_lanelet_ids.size(), static_cast<std::size_t>(1));
-  if (next_lanelet_ids.size() == 1) {
-    EXPECT_EQ(next_lanelet_ids[0], static_cast<lanelet::Id>(34768));
-  }
-  const auto previous_lanelet_ids = hdmap_utils.getPreviousLaneletIds(34768);
-  EXPECT_EQ(previous_lanelet_ids.size(), static_cast<std::size_t>(1));
-  if (previous_lanelet_ids.size() == 1) {
-    EXPECT_EQ(previous_lanelet_ids[0], static_cast<lanelet::Id>(34696));
-  }
 }
 
 /**
@@ -651,4 +635,58 @@ TEST(HdMapUtils, getClosestLaneletId_onlyCrosswalkNearButExcluded)
   EXPECT_TRUE(result.has_value());
   EXPECT_EQ(result.value(), id_crosswalk);
   EXPECT_NE(result.value(), id_road);
+}
+
+TEST(HdMapUtils, getPreviousLaneletIds)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id curr_lanelet = 34468;
+  const lanelet::Id prev_lanelet = 120660;
+  
+  const auto previous_lanelet_ids = hdmap_utils.getPreviousLaneletIds(curr_lanelet);
+  EXPECT_EQ(previous_lanelet_ids.size(), static_cast<std::size_t>(1));
+  if (previous_lanelet_ids.size() == 1) {
+    EXPECT_EQ(previous_lanelet_ids[0], static_cast<lanelet::Id>(prev_lanelet));
+  }
+}
+
+TEST(HdMapUtils, getNextLaneletIds)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id curr_lanelet = 120660;
+  const lanelet::Id next_lanelet = 34468;
+  
+  const auto next_lanelet_ids = hdmap_utils.getNextLaneletIds(curr_lanelet);
+  EXPECT_EQ(next_lanelet_ids.size(), static_cast<std::size_t>(1));
+  if (next_lanelet_ids.size() == 1) {
+    EXPECT_EQ(next_lanelet_ids[0], static_cast<lanelet::Id>(next_lanelet));
+  }
+}
+
+TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
+{
+  std::string map_path("/map/with_road_shoulder/lanelet2_map.osm");
+  auto hdmap_utils = makeHdMapUtilsInstance(map_path);
+  const lanelet::Id curr_lanelet = 34768;
+  const lanelet::Id prev_lanelet = 34696;
+
+  const auto previous_lanelet_ids = hdmap_utils.getPreviousLaneletIds(34768);
+  EXPECT_EQ(previous_lanelet_ids.size(), static_cast<std::size_t>(1));
+  if (previous_lanelet_ids.size() == 1) {
+    EXPECT_EQ(previous_lanelet_ids[0], static_cast<lanelet::Id>(34696));
+  }
+}
+
+TEST(HdMapUtils, getNextLaneletIds_RoadShoulder)
+{
+  std::string map_path("/map/with_road_shoulder/lanelet2_map.osm");
+  auto hdmap_utils = makeHdMapUtilsInstance(map_path);
+  const lanelet::Id curr_lanelet = 34696;
+  const lanelet::Id next_lanelet = 34768;
+
+  const auto next_lanelet_ids = hdmap_utils.getNextLaneletIds(34696);
+  EXPECT_EQ(next_lanelet_ids.size(), static_cast<std::size_t>(1));
+  if (next_lanelet_ids.size() == 1) {
+    EXPECT_EQ(next_lanelet_ids[0], static_cast<lanelet::Id>(34768));
+  }
 }
