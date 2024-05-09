@@ -16,6 +16,20 @@ Changelog for package openscenario_utility
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
+1.16.0 (2024-05-09)
+-------------------
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin-ssh/master' into feature/respawn-entity
+* Contributors: DMoszynski, Dawid Moszyński, Paweł Lech, Tatsuya Yamasaki
+
 1.15.7 (2024-05-09)
 -------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
