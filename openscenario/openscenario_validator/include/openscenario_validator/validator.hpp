@@ -79,14 +79,12 @@ class OpenSCENARIOValidator
   static inline XMLPlatformLifecycleHandler xml_platform_lifecycle_handler;
 
 public:
-  OpenSCENARIOValidator()
+  OpenSCENARIOValidator() : parser(std::make_unique<xercesc::XercesDOMParser>())
   {
-    parser = std::make_unique<xercesc::XercesDOMParser>();
-
-    xercesc::MemBufInputSource pMemBufIS(
+    xercesc::MemBufInputSource schema_input_source(
       reinterpret_cast<const XMLByte *>(schema), strlen(schema), "xsd");
 
-    if (not parser->loadGrammar(pMemBufIS, xercesc::Grammar::SchemaGrammarType)) {
+    if (not parser->loadGrammar(schema_input_source, xercesc::Grammar::SchemaGrammarType)) {
       throw std::runtime_error(
         "Failed to load XSD schema. This is an unexpected error and an implementation issue. "
         "Please contact the developer.");
@@ -99,8 +97,6 @@ public:
       parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
     }
   }
-
-  ~OpenSCENARIOValidator() { parser.release(); }
 
   auto validate(const boost::filesystem::path & xml_file) -> void
   {
