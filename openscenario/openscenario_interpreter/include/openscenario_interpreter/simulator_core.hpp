@@ -68,20 +68,6 @@ public:
   class CoordinateSystemConversion
   {
   protected:
-    static auto checkRoutingAlgorithm(RoutingAlgorithm::value_type routing_algorithm)
-    {
-      std::set<RoutingAlgorithm::value_type> supported = {
-        RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
-      if (supported.find(routing_algorithm) == supported.end()) {
-        std::stringstream what;
-        what << "There was an operation to calculate relative lane position with"
-                " RoutingAlgorithm set to "
-             << routing_algorithm << ", but this is currently not supported. ";
-        what << "Please set RoutingAlgorithm to either 'shortest' or 'undefined'.";
-        throw common::Error(what.str());
-      }
-    }
-
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
@@ -188,7 +174,6 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      checkRoutingAlgorithm(routing_algorithm);
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::relativeLaneletPose(
         from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
@@ -234,7 +219,6 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      checkRoutingAlgorithm(routing_algorithm);
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
         from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box, allow_lane_change,
