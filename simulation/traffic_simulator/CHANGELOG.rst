@@ -13,6 +13,19 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.15.7 (2024-05-09)
+-------------------
+* Merge pull request `#1239 <https://github.com/tier4/scenario_simulator_v2/issues/1239>`_ from tier4/feature/speed_up_set_other_status
+  Feature/speed up set other status
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/feature/publish_scenario_frame' into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/master' into feature/speed_up_set_other_status
+* Revert "remove entity status type"
+  This reverts commit 17b871e35d689cb23eb4ffd1d16dbaaeade40370.
+* remove entity status type
+* speed up setOtherStatus logic
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
 1.15.6 (2024-05-07)
 -------------------
 * Merge pull request `#1238 <https://github.com/tier4/scenario_simulator_v2/issues/1238>`_ from tier4/feature/publish_scenario_frame
