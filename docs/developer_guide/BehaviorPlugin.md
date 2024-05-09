@@ -63,7 +63,6 @@ public:
   DEFINE_GETTER_SETTER(DebugMarker, std::vector<visualization_msgs::msg::Marker>)
   DEFINE_GETTER_SETTER(DriverModel, traffic_simulator_msgs::msg::DriverModel)
   DEFINE_GETTER_SETTER(EntityStatus, traffic_simulator_msgs::msg::EntityStatus)
-  DEFINE_GETTER_SETTER(EntityTypeList, EntityTypeDict)
   DEFINE_GETTER_SETTER(HdMapUtils, std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(Obstacle, std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus, EntityStatusDict)
@@ -119,7 +118,6 @@ Setters are named as set(Foo), such as `BehaviorPluginClass::setDriverModel(traf
 | DebugMarker          | Rviz marker for debugging NPC behavior                | `std::vector<visualization_msgs::msg::Marker>`                  |
 | DriverModel          | Driver behavior parameters                            | `traffic_simulator_msgs::msg::DriverModel`                      |
 | EntityStatus         | Entity status of the NPC you want to control          | `std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>` |
-| EntityTypeList       | Dictionary of NPC name and it's type.                 | `EntityTypeDict`                                                |
 | GoalPoses            | Goal poses of entity.                                 | `std::vector<geometry_msgs::msg::Pose>`                         |
 | HdMapUtils           | Shared pointer of HdMapUtils class.                   | `std::shared_ptr<hdmap_utils::HdMapUtils>`                      |
 | Obstacle             | Target obstacle of your NPC.                          | `std::optional<traffic_simulator_msgs::msg::Obstacle>`          |
