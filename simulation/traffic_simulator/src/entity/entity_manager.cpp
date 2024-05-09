@@ -142,6 +142,13 @@ auto EntityManager::getEntity(const std::string & name) const
   if (auto it = entities_.find(name); it != entities_.end()) {
     return it->second;
   } else {
+    /*
+      This method returns nullptr, due to the fact that the interpretation of the scenario operates in
+      such a way that checking a condition, e.g. DistanceCondition, is called also for Entities that
+      have not yet been spawned. For example, if for DistanceCondition any getEntity() returns
+      nullptr, the condition returns a distance equal to NaN. For this reason, throwing an exception
+      through getEntity() is not recommended.
+    */
     return nullptr;
   }
 };
