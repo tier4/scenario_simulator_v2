@@ -20,87 +20,90 @@
 
 namespace traffic_simulator
 {
-namespace distance
+inline namespace distance
 {
-using CanonicalizedLaneletPose = lanelet_pose::CanonicalizedLaneletPose;
-
 // Lateral
-auto getLateralDistance(
-  const lanelet_pose::CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
+auto lateralDistance(
+  const lanelet_pose::CanonicalizedLaneletPose & from,
+  const lanelet_pose::CanonicalizedLaneletPose & to, bool allow_lane_change,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
+
+auto lateralDistance(
+  const lanelet_pose::CanonicalizedLaneletPose & from,
+  const lanelet_pose::CanonicalizedLaneletPose & to, double matching_distance,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<double>;
 
-auto getLateralDistance(
-  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  double matching_distance, bool allow_lane_change,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
-
 // Longitudinal
-auto getLongitudinalDistance(
-  const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
+auto longitudinalDistance(
+  const lanelet_pose::CanonicalizedLaneletPose & from,
+  const lanelet_pose::CanonicalizedLaneletPose & to, bool include_adjacent_lanelet,
+  bool include_opposite_direction, bool allow_lane_change,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
 // BoundingBox
-auto getBoundingBoxDistance(
-  const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const geometry_msgs::msg::Pose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox)
-  -> std::optional<double>;
+auto boundingBoxDistance(
+  const geometry_msgs::msg::Pose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const geometry_msgs::msg::Pose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box) -> std::optional<double>;
 
-auto getBoundingBoxLaneLateralDistance(
-  const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
-  bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<double>;
+auto boundingBoxLaneLateralDistance(
+  const lanelet_pose::CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const lanelet_pose::CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool allow_lane_change,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
-auto getBoundingBoxLaneLongitudinalDistance(
-  const CanonicalizedLaneletPose & from, const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
-  const CanonicalizedLaneletPose & to, const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
-  bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
+auto boundingBoxLaneLongitudinalDistance(
+  const lanelet_pose::CanonicalizedLaneletPose & from,
+  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
+  const lanelet_pose::CanonicalizedLaneletPose & to,
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool include_adjacent_lanelet,
+  bool include_opposite_direction, bool allow_lane_change,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
 // Bounds
-auto getDistanceToLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> double;
-
-auto getDistanceToLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const lanelet::Ids & lanelet_ids,
+auto distanceToLaneBound(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
 
-auto getDistanceToLeftLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> double;
-
-auto getDistanceToLeftLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const lanelet::Ids & lanelet_ids,
+auto distanceToLaneBound(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
 
-auto getDistanceToRightLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> double;
+auto distanceToLeftLaneBound(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
 
-auto getDistanceToRightLaneBound(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const lanelet::Ids & lanelet_ids,
+auto distanceToLeftLaneBound(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+
+auto distanceToRightLaneBound(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
+
+auto distanceToRightLaneBound(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Ids & lanelet_ids,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> double;
 
 // Other objects
-auto getDistanceToCrosswalk(
+auto distanceToCrosswalk(
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
   const lanelet::Id target_crosswalk_id,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
 
-auto getDistanceToStopLine(
+auto distanceToStopLine(
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
   const lanelet::Id target_stop_line_id,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> std::optional<double>;
-
 }  // namespace distance
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_

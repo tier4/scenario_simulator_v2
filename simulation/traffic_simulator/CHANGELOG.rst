@@ -13,6 +13,49 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.15.7 (2024-05-09)
+-------------------
+* Merge pull request `#1239 <https://github.com/tier4/scenario_simulator_v2/issues/1239>`_ from tier4/feature/speed_up_set_other_status
+  Feature/speed up set other status
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/feature/publish_scenario_frame' into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/master' into feature/speed_up_set_other_status
+* Revert "remove entity status type"
+  This reverts commit 17b871e35d689cb23eb4ffd1d16dbaaeade40370.
+* remove entity status type
+* speed up setOtherStatus logic
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
+1.15.6 (2024-05-07)
+-------------------
+* Merge pull request `#1238 <https://github.com/tier4/scenario_simulator_v2/issues/1238>`_ from tier4/feature/publish_scenario_frame
+  Publish `entities` frame
+* Merge branch 'master' into feature/publish_scenario_frame
+* add doxygen comment
+* add doxygen comment
+* Merge remote-tracking branch 'origin/feature/publish_scenario_frame' into feature/publish_scenario_frame
+* use getEgoName function in broadcastEntityTransform function
+* Merge branch 'master' into feature/publish_scenario_frame
+* fix frame_id of visualization
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
+1.15.5 (2024-05-07)
+-------------------
+
+1.15.4 (2024-05-01)
+-------------------
+
+1.15.3 (2024-04-25)
+-------------------
+* Merge pull request `#1112 <https://github.com/tier4/scenario_simulator_v2/issues/1112>`_ from tier4/fix/standstill-duration-for-miscobjects
+  Fix/Standstill duration condition for MiscObjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* stanstill update for misc objects
+* Contributors: Masaya Kataoka, Piotr Zyskowski
+
 1.15.2 (2024-04-23)
 -------------------
 * Merge branch 'master' into feature/update_default_architecture_type

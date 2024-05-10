@@ -42,7 +42,7 @@ public:
   explicit operator EntityStatus() const noexcept { return entity_status_; }
   CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj);
   auto setAction(const std::string & action) -> void;
-  auto getName() const noexcept -> std::string { return entity_status_.name; };
+  auto getName() const noexcept -> const std::string & { return entity_status_.name; };
   auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
   auto laneMatchingSucceed() const noexcept -> bool;
   auto getMapPose() const noexcept -> geometry_msgs::msg::Pose;

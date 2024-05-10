@@ -13,6 +13,32 @@ Changelog for package openscenario_preprocessor_msgs
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.15.7 (2024-05-09)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/master' into feature/speed_up_set_other_status
+* Contributors: hakuturu583
+
+1.15.6 (2024-05-07)
+-------------------
+* Merge branch 'master' into feature/publish_scenario_frame
+* Merge remote-tracking branch 'origin/feature/publish_scenario_frame' into feature/publish_scenario_frame
+* Merge branch 'master' into feature/publish_scenario_frame
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
+1.15.5 (2024-05-07)
+-------------------
+
+1.15.4 (2024-05-01)
+-------------------
+
+1.15.3 (2024-04-25)
+-------------------
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Contributors: Piotr Zyskowski
+
 1.15.2 (2024-04-23)
 -------------------
 * Merge branch 'master' into feature/update_default_architecture_type

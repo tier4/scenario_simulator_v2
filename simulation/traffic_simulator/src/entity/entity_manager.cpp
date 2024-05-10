@@ -16,6 +16,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/intersection/collision.hpp>
+#include <geometry/linear_algebra.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
 #include <memory>
@@ -39,12 +40,41 @@ namespace entity
 void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
-  for (const auto & name : names) {
-    geometry_msgs::msg::PoseStamped pose;
-    pose.pose = getMapPose(name);
-    pose.header.stamp = clock_ptr_->now();
-    pose.header.frame_id = name;
-    broadcastTransform(pose);
+  /**
+   * @note This part of the process is intended to ensure that frames are issued in a position that makes 
+   * it as easy as possible to see the entities that will appear in the scenario.
+   * In the past, we used to publish the frames of all entities, but that would be too heavy processing, 
+   * so we publish the average of the coordinates of all entities.
+   */
+  if (isEgoSpawned()) {
+    const auto ego_name = getEgoName();
+    if (entityExists(ego_name)) {
+      broadcastTransform(
+        geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+          /**
+           * @note This is the intended implementation. 
+           * It is easier to create rviz config if the name “ego” is fixed, 
+           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           */
+          .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
+          .pose(getMapPose(ego_name)),
+        true);
+    }
+  }
+  if (!names.empty()) {
+    broadcastTransform(
+      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+        .header(
+          std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
+        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
+                .position(std::accumulate(
+                  names.begin(), names.end(), geometry_msgs::msg::Point(),
+                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
+                    return point +
+                           (getMapPose(name).position * (1.0 / static_cast<double>(names.size())));
+                  }))
+                .orientation(geometry_msgs::msg::Quaternion())),
+      true);
   }
 }
 
@@ -112,6 +142,13 @@ auto EntityManager::getEntity(const std::string & name) const
   if (auto it = entities_.find(name); it != entities_.end()) {
     return it->second;
   } else {
+    /*
+      This method returns nullptr, due to the fact that the interpretation of the scenario operates in
+      such a way that checking a condition, e.g. DistanceCondition, is called also for Entities that
+      have not yet been spawned. For example, if for DistanceCondition any getEntity() returns
+      nullptr, the condition returns a distance equal to NaN. For this reason, throwing an exception
+      through getEntity() is not recommended.
+    */
     return nullptr;
   }
 };
