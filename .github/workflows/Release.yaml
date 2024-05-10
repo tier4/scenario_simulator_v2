@@ -33,6 +33,7 @@ jobs:
       - name: Restore branch
         if: github.event.pull_request.merged == true
         uses: levonet/action-restore-branch@master
+        continue-on-error: true
 
       - name: Install bloom
         run: apt update && apt install -y python3-bloom git
