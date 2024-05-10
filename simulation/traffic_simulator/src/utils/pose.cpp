@@ -179,8 +179,7 @@ auto relativeLaneletPose(
 
   traffic_simulator::LaneletPose position = quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if it
-  // is not possible to calculate one of them - it happens that one is
-  // sufficient
+  // is not possible to calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_distance = longitudinalDistance(
       from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change,
@@ -206,8 +205,7 @@ auto boundingBoxRelativeLaneletPose(
 
   traffic_simulator::LaneletPose position = quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if it
-  // is not possible to calculate one of them - it happens that one is
-  // sufficient
+  // is not possible to calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_bounding_box_distance = boundingBoxLaneLongitudinalDistance(
       from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
