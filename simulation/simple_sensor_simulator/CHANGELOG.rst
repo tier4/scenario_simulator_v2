@@ -13,6 +13,11 @@ Changelog for package simple_sensor_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.16.1 (2024-05-10)
+-------------------
+* Merge branch 'master' into doc/support_awesome-pages
+* Contributors: Taiga
+
 1.16.0 (2024-05-09)
 -------------------
 * Merge pull request `#1198 <https://github.com/tier4/scenario_simulator_v2/issues/1198>`_ from tier4/feature/respawn-entity
