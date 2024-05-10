@@ -86,7 +86,7 @@ To keep the commit hashes consistent, **please DO NOT force-push the commit to y
 If you want to force-push the commit during the review, please contact the maintainers for approval in advance.
 
 If at least one maintainer approves your pull request and all checks are passed, your pull request will be merged into the `master` branch.
-Your contribution will be recorded in the [release note](https://tier4.github.io/scenario_simulator_v2-docs/ReleaseNotes/).
+Your contribution will be recorded in the [release note](https://tier4.github.io/scenario_simulator_v2-docs/release/ReleaseNotes/).
 
 Pull requests must be labeled `bump major`, `bump minor` or `bump patch`.
 
