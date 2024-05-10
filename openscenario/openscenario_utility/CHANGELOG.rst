@@ -16,6 +16,9 @@ Changelog for package openscenario_utility
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
+1.16.2 (2024-05-10)
+-------------------
+
 1.16.1 (2024-05-10)
 -------------------
 * Merge branch 'master' into doc/support_awesome-pages
