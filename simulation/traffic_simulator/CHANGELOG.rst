@@ -13,6 +13,44 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.16.2 (2024-05-10)
+-------------------
+
+1.16.1 (2024-05-10)
+-------------------
+* Merge branch 'master' into doc/support_awesome-pages
+* Contributors: Taiga
+
+1.16.0 (2024-05-09)
+-------------------
+* Merge pull request `#1198 <https://github.com/tier4/scenario_simulator_v2/issues/1198>`_ from tier4/feature/respawn-entity
+  Feature/respawn entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* ref(traffic_simulator, respawn): apply requested PR changes
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* ref(respawn): remove engagable() check
+* ref(respawn): improve current solution
+* feat(EgoEntity): add setControlledBySimulator
+* fix(respawn): fix after merge - add updateFrame, adjust isEgo
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Despawning and Spawning entity replaced with UpdateEntityStatusRequest
+* updateFrame removed from API::respawn
+* Code cleaning
+* Exceptions inside API::respawn
+* Merge remote-tracking branch 'origin-ssh/master' into feature/respawn-entity
+* Spellcheck fix
+* Code cleaning
+* Respawn logic moved to API
+* Interface to get vehicle parameters of entity
+* RespawnEntity added
+* Contributors: DMoszynski, Dawid Moszyński, Paweł Lech, Tatsuya Yamasaki
+
 1.15.7 (2024-05-09)
 -------------------
 * Merge pull request `#1239 <https://github.com/tier4/scenario_simulator_v2/issues/1239>`_ from tier4/feature/speed_up_set_other_status

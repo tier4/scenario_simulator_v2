@@ -13,6 +13,28 @@ Changelog for package scenario_simulator_exception
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.16.2 (2024-05-10)
+-------------------
+
+1.16.1 (2024-05-10)
+-------------------
+* Merge branch 'master' into doc/support_awesome-pages
+* Contributors: Taiga
+
+1.16.0 (2024-05-09)
+-------------------
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin-ssh/master' into feature/respawn-entity
+* Contributors: DMoszynski, Dawid Moszyński, Paweł Lech, Tatsuya Yamasaki
+
 1.15.7 (2024-05-09)
 -------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
