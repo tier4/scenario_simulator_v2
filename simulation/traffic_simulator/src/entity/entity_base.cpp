@@ -536,6 +536,12 @@ void EntityBase::requestSpeedChange(
 
 auto EntityBase::isControlledBySimulator() const -> bool { return true; }
 
+auto EntityBase::setControlledBySimulator(bool /*unused*/) -> void
+{
+  THROW_SEMANTIC_ERROR(
+    getEntityTypename(), " type entities do not support setControlledBySimulator");
+}
+
 auto EntityBase::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void
 {
