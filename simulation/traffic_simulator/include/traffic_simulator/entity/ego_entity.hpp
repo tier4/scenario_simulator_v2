@@ -112,6 +112,11 @@ public:
 
   auto isControlledBySimulator() const -> bool override;
 
+  auto setControlledBySimulator(bool state) -> void override
+  {
+    is_controlled_by_simulator_ = state;
+  }
+
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
 

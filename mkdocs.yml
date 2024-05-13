@@ -20,6 +20,7 @@ extra:
     - icon: fontawesome/solid/code-pull-request
       link: https://github.com/tier4/scenario_simulator_v2/pulls
 plugins:
+  - awesome-pages
   - search
   - git-revision-date-localized
   - redirects:
@@ -53,49 +54,3 @@ extra_css:
 extra_javascript:
   - http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML
   - https://unpkg.com/mermaid/dist/mermaid.min.js
-
-nav:
-  - Home: README.md
-  - Release Note: 
-    - Since version 1.0.0: https://github.com/tier4/scenario_simulator_v2/releases
-    - Prior to version 1.0.0: ReleaseNotes.md
-  - User Guide:
-      - Quick Start: user_guide/QuickStart.md
-      - Build Instructions: user_guide/BuildInstructions.md
-      - Run on Docker: user_guide/RunWithDocker.md
-      - Scenario Writing Tips: user_guide/ScenarioTips.md
-      - Scenario Editor:
-          - Overview: user_guide/scenario_editor/ScenarioEditorUserGuide.md
-      - Scenario Test Runner:
-          - Overview: user_guide/scenario_test_runner/ScenarioTestRunner.md
-          - user_guide/scenario_test_runner/ScenarioFormatConversion.md
-          - user_guide/scenario_test_runner/HowToWriteWorkflowFile.md
-          - user_guide/scenario_test_runner/Tips.md
-      - Random Test Runner:
-          - Quick Start: user_guide/random_test_runner/QuickStart.md
-          - Usage: user_guide/random_test_runner/Usage.md
-          - Design: user_guide/random_test_runner/Design.md
-  - Developer Guide:
-      - About: developer_guide/About.md
-      - developer_guide/AutowareAPI.md
-      - developer_guide/DistanceCalculation.md
-      - developer_guide/NPCBehavior.md
-      - developer_guide/BehaviorPlugin.md
-      # - developer_guide/ErrorCategories.md
-      - developer_guide/OpenSCENARIOSupport.md
-      - developer_guide/SimpleSensorSimulator.md
-      - developer_guide/SystemArchitecture.md
-      - developer_guide/TrafficSimulator.md
-      - developer_guide/ZeroMQ.md
-      - developer_guide/VehicleDynamics.md
-      - developer_guide/SimulationResultFormat.md
-      - Lane Pose Calculation:
-          Timing of lane pose calculation: developer_guide/lane_pose_calculation/LanePoseCalculation.md
-          Process of lane pose calculation when spawning entity: developer_guide/lane_pose_calculation/Spawn.md
-          Process of lane pose calculation when updating frame: developer_guide/lane_pose_calculation/UpdateFrame.md
-          Process of lane pose calculation when getting longitudinal distance: developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
-      # cspell: ignore TIERIV
-      - developer_guide/TIERIVScenarioFormatVersion2.md
-      - developer_guide/CONTRIBUTING.md
-      - developer_guide/Communication.md
-      - developer_guide/ConfiguringPerceptionTopics.md

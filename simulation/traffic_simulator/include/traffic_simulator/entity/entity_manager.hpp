@@ -290,6 +290,7 @@ public:
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
   FORWARD_TO_ENTITY(setBehaviorParameter, );
+  FORWARD_TO_ENTITY(setControlledBySimulator, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationRateLimit, );
   FORWARD_TO_ENTITY(setLinearJerk, );

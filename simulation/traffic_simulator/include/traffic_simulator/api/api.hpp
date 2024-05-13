@@ -223,9 +223,10 @@ public:
   bool despawn(const std::string & name);
   bool despawnEntities();
 
-  auto setEntityStatus(
-    const std::string & name, const CanonicalizedEntityStatus & canonicalized_status) -> void;
   auto setEntityStatus(const std::string & name, const EntityStatus & status) -> void;
+  auto respawn(
+    const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
+    const geometry_msgs::msg::PoseStamped & goal_pose) -> void;
   auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
