@@ -17,8 +17,8 @@
 
 #include <simulation_api_schema.pb.h>
 
-#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
-#include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
+#include <autoware_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <iomanip>
 #include <memory>
@@ -57,8 +57,8 @@ public:
     -> void
   {
     if (configuration.architecture_type().find("awf/universe") != std::string::npos) {
-      using Message = autoware_auto_perception_msgs::msg::DetectedObjects;
-      using GroundTruthMessage = autoware_auto_perception_msgs::msg::TrackedObjects;
+      using Message = autoware_perception_msgs::msg::DetectedObjects;
+      using GroundTruthMessage = autoware_perception_msgs::msg::TrackedObjects;
       detection_sensors_.push_back(std::make_unique<DetectionSensor<Message>>(
         current_simulation_time, configuration,
         node.create_publisher<Message>("/perception/object_recognition/detection/objects", 1),

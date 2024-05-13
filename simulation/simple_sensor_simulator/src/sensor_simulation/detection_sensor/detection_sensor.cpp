@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
-#include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
-#include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
+#include <autoware_perception_msgs/msg/detected_objects.hpp>
+#include <autoware_perception_msgs/msg/tracked_objects.hpp>
 #include <boost/uuid/string_generator.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
@@ -111,9 +111,9 @@ auto DetectionSensorBase::filterObjectsBySensorRange(
 }
 
 template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
-  autoware_auto_perception_msgs::msg::DetectedObject detected_object)
-  -> autoware_auto_perception_msgs::msg::DetectedObject
+auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::applyPositionNoise(
+  autoware_perception_msgs::msg::DetectedObject detected_object)
+  -> autoware_perception_msgs::msg::DetectedObject
 {
   auto position_noise_distribution =
     std::normal_distribution<>(0.0, configuration_.pos_noise_stddev());
@@ -135,14 +135,14 @@ unique_identifier_msgs::msg::UUID generateUUIDMsg(const std::string & input)
 }
 
 template <>
-auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::update(
+auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
   const double current_simulation_time,
   const std::vector<traffic_simulator_msgs::EntityStatus> & statuses,
   const rclcpp::Time & current_ros_time, const std::vector<std::string> & lidar_detected_entities)
   -> void
 {
   auto makeObjectClassification = [](const auto & label) {
-    autoware_auto_perception_msgs::msg::ObjectClassification object_classification;
+    autoware_perception_msgs::msg::ObjectClassification object_classification;
     object_classification.label = label;
     object_classification.probability = 1;
     return object_classification;
@@ -157,11 +157,11 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
                                                    : lidar_detected_entities,
       configuration_.range());
 
-    autoware_auto_perception_msgs::msg::DetectedObjects msg;
+    autoware_perception_msgs::msg::DetectedObjects msg;
     msg.header.stamp = current_ros_time;
     msg.header.frame_id = "map";
 
-    autoware_auto_perception_msgs::msg::TrackedObjects ground_truth_msg;
+    autoware_perception_msgs::msg::TrackedObjects ground_truth_msg;
     ground_truth_msg.header = msg.header;
 
     previous_simulation_time_ = current_simulation_time;
@@ -171,47 +171,47 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         std::find(detected_objects.begin(), detected_objects.end(), status.name()) !=
           detected_objects.end() and
         status.type().type() != traffic_simulator_msgs::EntityType_Enum::EntityType_Enum_EGO) {
-        autoware_auto_perception_msgs::msg::DetectedObject object;
+        autoware_perception_msgs::msg::DetectedObject object;
         switch (status.subtype().value()) {
           case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_UNKNOWN:
             object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
+              autoware_perception_msgs::msg::ObjectClassification::UNKNOWN));
             break;
           case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_CAR:
             object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::CAR));
+              autoware_perception_msgs::msg::ObjectClassification::CAR));
             break;
           case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRUCK:
             object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::TRUCK));
+              autoware_perception_msgs::msg::ObjectClassification::TRUCK));
             break;
           case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BUS:
             object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::BUS));
+              autoware_perception_msgs::msg::ObjectClassification::BUS));
             break;
           case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_TRAILER:
             object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::TRAILER));
+              autoware_perception_msgs::msg::ObjectClassification::TRAILER));
             break;
           case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_MOTORCYCLE:
             object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::MOTORCYCLE));
+              autoware_perception_msgs::msg::ObjectClassification::MOTORCYCLE));
             object.kinematics.orientation_availability =
-              autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
+              autoware_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
             break;
           case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_BICYCLE:
             object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::BICYCLE));
+              autoware_perception_msgs::msg::ObjectClassification::BICYCLE));
             object.kinematics.orientation_availability =
-              autoware_auto_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
+              autoware_perception_msgs::msg::DetectedObjectKinematics::SIGN_UNKNOWN;
             break;
           case traffic_simulator_msgs::EntitySubtype_Enum::EntitySubtype_Enum_PEDESTRIAN:
             object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
+              autoware_perception_msgs::msg::ObjectClassification::PEDESTRIAN));
             break;
           default:
             object.classification.push_back(makeObjectClassification(
-              autoware_auto_perception_msgs::msg::ObjectClassification::UNKNOWN));
+              autoware_perception_msgs::msg::ObjectClassification::UNKNOWN));
             break;
         }
 
@@ -240,9 +240,9 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
         static auto toTrackedObject =
           [&](
             const std::string & name,
-            const autoware_auto_perception_msgs::msg::DetectedObject & detected_object)
-          -> autoware_auto_perception_msgs::msg::TrackedObject {
-          autoware_auto_perception_msgs::msg::TrackedObject tracked_object;
+            const autoware_perception_msgs::msg::DetectedObject & detected_object)
+          -> autoware_perception_msgs::msg::TrackedObject {
+          autoware_perception_msgs::msg::TrackedObject tracked_object;
           tracked_object.existence_probability = detected_object.existence_probability;
 
           tracked_object.classification = detected_object.classification;
@@ -264,21 +264,21 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
       }
     }
 
-    static std::queue<std::pair<autoware_auto_perception_msgs::msg::DetectedObjects, double>>
+    static std::queue<std::pair<autoware_perception_msgs::msg::DetectedObjects, double>>
       queue_objects;
-    static std::queue<std::pair<autoware_auto_perception_msgs::msg::TrackedObjects, double>>
+    static std::queue<std::pair<autoware_perception_msgs::msg::TrackedObjects, double>>
       queue_ground_truth_objects;
 
     queue_objects.push(std::make_pair(msg, current_simulation_time));
     queue_ground_truth_objects.push(std::make_pair(ground_truth_msg, current_simulation_time));
 
-    static rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>::SharedPtr
+    static rclcpp::Publisher<autoware_perception_msgs::msg::TrackedObjects>::SharedPtr
       ground_truth_publisher = std::dynamic_pointer_cast<
-        rclcpp::Publisher<autoware_auto_perception_msgs::msg::TrackedObjects>>(
+        rclcpp::Publisher<autoware_perception_msgs::msg::TrackedObjects>>(
         ground_truth_publisher_base_ptr_);
 
-    autoware_auto_perception_msgs::msg::DetectedObjects delayed_msg;
-    autoware_auto_perception_msgs::msg::TrackedObjects delayed_ground_truth_msg;
+    autoware_perception_msgs::msg::DetectedObjects delayed_msg;
+    autoware_perception_msgs::msg::TrackedObjects delayed_ground_truth_msg;
 
     if (
       current_simulation_time - queue_objects.front().second >=
@@ -295,7 +295,7 @@ auto DetectionSensor<autoware_auto_perception_msgs::msg::DetectedObjects>::updat
       queue_ground_truth_objects.pop();
     }
 
-    autoware_auto_perception_msgs::msg::DetectedObjects noised_msg;
+    autoware_perception_msgs::msg::DetectedObjects noised_msg;
     noised_msg.header = delayed_msg.header;
     noised_msg.objects.reserve(delayed_msg.objects.size());
     for (const auto & object : delayed_msg.objects) {
