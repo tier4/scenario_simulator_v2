@@ -140,7 +140,7 @@ private:
       /// Checking the ego entity overs the lane change position.
       if (const auto entity = api_.getEntity("ego"); entity->laneMatchingSucceed()) {
         if (
-          entity->getStatus().getLaneletPose().lanelet_id == 34684 &&
+          entity->getStatus().getLaneletId() == 34684 &&
           std::abs(entity->getStatus().getLaneletPose().s) >= lane_change_position) {
           api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
           lane_change_requested = true;

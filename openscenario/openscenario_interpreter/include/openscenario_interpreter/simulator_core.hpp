@@ -86,8 +86,7 @@ public:
           "The specified WorldPosition = [", pose.position.x, ", ", pose.position.y, ", ",
           pose.position.z,
           "] could not be approximated to the proper Lane. Perhaps the "
-          "WorldPosition points to a location where multiple lanes overlap, "
-          "and "
+          "WorldPosition points to a location where multiple lanes overlap, and "
           "there are at least two or more candidates for a LanePosition that "
           "can be approximated to that WorldPosition. This issue can be "
           "resolved by strictly specifying the location using LanePosition "
