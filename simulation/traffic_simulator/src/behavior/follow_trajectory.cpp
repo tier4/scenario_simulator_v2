@@ -560,7 +560,8 @@ auto makeUpdatedStatus(
 
     // matching distance has been set to 3.0 due to matching problems during lane changes
     if (const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-          updated_status.pose, entity_status.bounding_box, false, 3.0, hdmap_utils);
+          updated_status.pose, entity_status.bounding_box, {entity_status.lanelet_pose.lanelet_id},
+          false, 3.0, hdmap_utils);
         canonicalized_lanelet_pose) {
       updated_status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
       updated_status.lanelet_pose_valid = true;

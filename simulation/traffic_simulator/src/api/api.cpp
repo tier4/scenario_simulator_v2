@@ -99,7 +99,7 @@ auto API::setEntityStatus(const std::string & name, const EntityStatus & status)
     }(entity->getEntityType());
 
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      status.pose, entity->getBoundingBox(), include_crosswalk,
+      status.pose, entity->getBoundingBox(), {status.lanelet_pose.lanelet_id}, include_crosswalk,
       entity->getDefaultMatchingDistanceForLaneletPoseCalculation(),
       entity_manager_ptr_->getHdmapUtils());
     entity->setStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));

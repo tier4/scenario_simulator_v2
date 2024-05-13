@@ -78,7 +78,8 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
   }(getEntityType());
 
   return pose::toCanonicalizedLaneletPose(
-    getMapPose(), getBoundingBox(), include_crosswalk, matching_distance, hdmap_utils_ptr_);
+    getMapPose(), getBoundingBox(), {status_.getLaneletId()}, include_crosswalk, matching_distance,
+    hdmap_utils_ptr_);
 }
 
 auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double

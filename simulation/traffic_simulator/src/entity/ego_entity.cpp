@@ -159,7 +159,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         behavior_parameter_, hdmap_utils_ptr_, step_time,
         target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        updated_status.value().pose, getBoundingBox(), false,
+        updated_status.value().pose, getBoundingBox(), {status_.getLaneletId()}, false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
       setStatus(CanonicalizedEntityStatus(*updated_status, canonicalized_lanelet_pose));
     } else {
