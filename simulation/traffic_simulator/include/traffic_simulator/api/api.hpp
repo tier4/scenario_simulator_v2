@@ -141,13 +141,15 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
+      } else if (const auto entity = entity_manager_ptr_->getEntity(name); not entity) {
+        throw common::SemanticError(
+          "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
         simulation_api_schema::SpawnVehicleEntityRequest req;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(
-          entity_manager_ptr_->getEntity(name)->getMapPose(), *req.mutable_pose());
+        simulation_interface::toProto(entity->getMapPose(), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
         /// @todo Should be filled from function API
         req.set_initial_speed(0.0);
@@ -173,13 +175,15 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
+      } else if (const auto entity = entity_manager_ptr_->getEntity(name); not entity) {
+        throw common::SemanticError(
+          "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
         simulation_api_schema::SpawnPedestrianEntityRequest req;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(
-          entity_manager_ptr_->getEntity(name)->getMapPose(), *req.mutable_pose());
+        simulation_interface::toProto(entity->getMapPose(), *req.mutable_pose());
         return zeromq_client_.call(req).result().success();
       }
     };
@@ -200,13 +204,15 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
+      } else if (const auto entity = entity_manager_ptr_->getEntity(name); not entity) {
+        throw common::SemanticError(
+          "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
         simulation_api_schema::SpawnMiscObjectEntityRequest req;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(
-          entity_manager_ptr_->getEntity(name)->getMapPose(), *req.mutable_pose());
+        simulation_interface::toProto(entity->getMapPose(), *req.mutable_pose());
         return zeromq_client_.call(req).result().success();
       }
     };
