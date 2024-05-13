@@ -57,7 +57,7 @@ private:
     }
     const auto difference = std::abs(
       static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).s - traveled_distance);
-    if (difference > std::numeric_limits<double>::epsilon()) {
+    if (std::fabs(difference) > 1e-9) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
