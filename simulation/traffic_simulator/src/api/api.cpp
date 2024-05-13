@@ -48,6 +48,54 @@ bool API::despawnEntities()
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
 
+auto API::respawn(
+  const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
+  const geometry_msgs::msg::PoseStamped & goal_pose) -> void
+{
+  if (not entity_manager_ptr_->is<entity::EgoEntity>(name)) {
+    throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
+  } else if (new_pose.header.frame_id != "map") {
+    throw std::runtime_error("Respawn request with frame id other than map not supported.");
+  } else {
+    // set new pose and default action status in EntityManager
+    entity_manager_ptr_->setControlledBySimulator(name, true);
+    setEntityStatus(name, new_pose.pose.pose, helper::constructActionStatus());
+
+    // read status from EntityManager, then send it to SimpleSensorSimulator
+    simulation_api_schema::UpdateEntityStatusRequest req;
+    simulation_interface::toProto(
+      static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name)), *req.add_status());
+    req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
+    req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(name));
+    entity_manager_ptr_->setControlledBySimulator(name, false);
+
+    // check response
+    if (const auto res = zeromq_client_.call(req); not res.result().success()) {
+      throw common::SimulationError(
+        "UpdateEntityStatus request failed for \"" + name + "\" entity during respawn.");
+    } else if (const auto res_status = res.status().begin(); res.status().size() != 1) {
+      throw common::SimulationError(
+        "Failed to receive the new status of \"" + name + "\" entity after the update request.");
+    } else if (const auto res_name = res_status->name(); res_name != name) {
+      throw common::SimulationError(
+        "Wrong entity status received during respawn. Expected: \"" + name + "\". Received: \"" +
+        res_name + "\".");
+    } else {
+      // if valid, set response in EntityManager, then plan path and engage
+      auto entity_status = static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name));
+      simulation_interface::toMsg(res_status->pose(), entity_status.pose);
+      simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
+      setMapPose(name, entity_status.pose);
+      setTwist(name, entity_status.action_status.twist);
+      setAcceleration(name, entity_status.action_status.accel);
+
+      entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
+      entity_manager_ptr_->asFieldOperatorApplication(name).plan({goal_pose});
+      entity_manager_ptr_->asFieldOperatorApplication(name).engage();
+    }
+  }
+}
+
 auto API::setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status)
   -> void
 {

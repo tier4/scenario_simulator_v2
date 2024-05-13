@@ -97,22 +97,29 @@ auto EgoEntitySimulation::makeSimulationModel(
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
   -> const std::shared_ptr<SimModelInterface>
 {
+  auto node = rclcpp::Node("get_parameter", "simulation");
+
+  auto get_parameter = [&](const std::string & name, auto value = {}) {
+    node.declare_parameter<decltype(value)>(name, value);
+    node.get_parameter<decltype(value)>(name, value);
+    return value;
+  };
   // clang-format off
-  const auto acc_time_constant          = getParameter<double>("acc_time_constant",           0.1);
-  const auto acc_time_delay             = getParameter<double>("acc_time_delay",              0.1);
-  const auto acceleration_map_path      = getParameter<std::string>("acceleration_map_path",  "");
-  const auto debug_acc_scaling_factor   = getParameter<double>("debug_acc_scaling_factor",    1.0);
-  const auto debug_steer_scaling_factor = getParameter<double>("debug_steer_scaling_factor",  1.0);
-  const auto steer_lim                  = getParameter<double>("steer_lim",                   parameters.axles.front_axle.max_steering);  // 1.0
-  const auto steer_dead_band            = getParameter<double>("steer_dead_band",             0.0);
-  const auto steer_rate_lim             = getParameter<double>("steer_rate_lim",              5.0);
-  const auto steer_time_constant        = getParameter<double>("steer_time_constant",         0.27);
-  const auto steer_time_delay           = getParameter<double>("steer_time_delay",            0.24);
-  const auto vel_lim                    = getParameter<double>("vel_lim",                     parameters.performance.max_speed);  // 50.0
-  const auto vel_rate_lim               = getParameter<double>("vel_rate_lim",                parameters.performance.max_acceleration);  // 7.0
-  const auto vel_time_constant          = getParameter<double>("vel_time_constant",           0.1);  /// @note 0.5 is default value on simple_planning_simulator
-  const auto vel_time_delay             = getParameter<double>("vel_time_delay",              0.1);  /// @note 0.25 is default value on simple_planning_simulator
-  const auto wheel_base                 = getParameter<double>("wheel_base",                  parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
+  const auto acc_time_constant          = get_parameter("acc_time_constant",           0.1);
+  const auto acc_time_delay             = get_parameter("acc_time_delay",              0.1);
+  const auto acceleration_map_path      = get_parameter("acceleration_map_path",       std::string(""));
+  const auto debug_acc_scaling_factor   = get_parameter("debug_acc_scaling_factor",    1.0);
+  const auto debug_steer_scaling_factor = get_parameter("debug_steer_scaling_factor",  1.0);
+  const auto steer_lim                  = get_parameter("steer_lim",                   parameters.axles.front_axle.max_steering);  // 1.0
+  const auto steer_dead_band            = get_parameter("steer_dead_band",             0.0);
+  const auto steer_rate_lim             = get_parameter("steer_rate_lim",              5.0);
+  const auto steer_time_constant        = get_parameter("steer_time_constant",         0.27);
+  const auto steer_time_delay           = get_parameter("steer_time_delay",            0.24);
+  const auto vel_lim                    = get_parameter("vel_lim",                     parameters.performance.max_speed);  // 50.0
+  const auto vel_rate_lim               = get_parameter("vel_rate_lim",                parameters.performance.max_acceleration);  // 7.0
+  const auto vel_time_constant          = get_parameter("vel_time_constant",           0.1);  /// @note 0.5 is default value on simple_planning_simulator
+  const auto vel_time_delay             = get_parameter("vel_time_delay",              0.1);  /// @note 0.25 is default value on simple_planning_simulator
+  const auto wheel_base                 = get_parameter("wheel_base",                  parameters.axles.front_axle.position_x - parameters.axles.rear_axle.position_x);
   // clang-format on
 
   switch (vehicle_model_type) {
