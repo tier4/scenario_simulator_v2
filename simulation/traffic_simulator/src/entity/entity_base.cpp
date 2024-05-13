@@ -656,6 +656,12 @@ void EntityBase::requestSpeedChange(
 
 auto EntityBase::isControlledBySimulator() const -> bool { return true; }
 
+auto EntityBase::setControlledBySimulator(bool /*unused*/) -> void
+{
+  THROW_SEMANTIC_ERROR(
+    getEntityTypename(), " type entities do not support setControlledBySimulator");
+}
+
 auto EntityBase::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void
 {
@@ -685,25 +691,8 @@ void EntityBase::setEntityTypeList(
 void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, CanonicalizedEntityStatus> & status)
 {
-  other_status_.clear();
-  for (const auto & [other_name, other_status] : status) {
-    if (other_name != name) {
-      /*
-         The following filtering is the code written for the purpose of
-         reducing the calculation load, but it is commented out experimentally
-         because it adversely affects "processing that needs to identify other
-         entities regardless of distance" such as RelativeTargetSpeed of
-         requestSpeedChange.
-      */
-      // const auto p0 = other_status.pose.position;
-      // const auto p1 = status_.pose.position;
-      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance <
-      // 30)
-      // {
-      other_status_.emplace(other_name, other_status);
-      // }
-    }
-  }
+  other_status_ = status;
+  other_status_.erase(name);
 }
 
 auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
