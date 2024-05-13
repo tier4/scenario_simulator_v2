@@ -22,7 +22,9 @@
 #include "../expect_eq_macros.hpp"
 
 static const std::string map_path = "/map/lanelet2_map.osm";
-static const std::string shoulder_map_path = "/map/with_road_shoulder/lanelet2_map.osm";
+static const std::string with_road_shoulder_map_path = "/map/with_road_shoulder/lanelet2_map.osm";
+static const std::string empty_map_path = "/map/empty/lanelet2_map.osm";
+static const std::string four_track_map_path = "/map/four_track_highway/lanelet2_map.osm";
 
 auto makeHdMapUtilsInstance(const std::string relative_path = map_path) -> hdmap_utils::HdMapUtils
 {
@@ -649,6 +651,19 @@ TEST(HdMapUtils, getClosestLaneletId_onlyCrosswalkNearButExcluded)
   EXPECT_NE(result.value(), id_road);
 }
 
+TEST(HdMapUtils, getClosestLaneletId_emptyMap)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(empty_map_path);
+  auto position = makePoint(3.0, 5.0);
+  auto pose = makePose(position);
+  const double distance_threshold = 7.0;
+  const bool include_crosswalk = false;
+
+  auto result = hdmap_utils.getClosestLaneletId(pose, distance_threshold, include_crosswalk);
+
+  EXPECT_FALSE(result.has_value());
+}
+
 TEST(HdMapUtils, getPreviousLaneletIds)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
@@ -677,7 +692,7 @@ TEST(HdMapUtils, getNextLaneletIds)
 
 TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
 {
-  std::string map_path(shoulder_map_path);
+  std::string map_path(with_road_shoulder_map_path);
   auto hdmap_utils = makeHdMapUtilsInstance(map_path);
   const lanelet::Id curr_lanelet = 34768;
   const lanelet::Id prev_lanelet = 34696;
@@ -691,7 +706,7 @@ TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
 
 TEST(HdMapUtils, getNextLaneletIds_RoadShoulder)
 {
-  std::string map_path(shoulder_map_path);
+  std::string map_path(with_road_shoulder_map_path);
   auto hdmap_utils = makeHdMapUtilsInstance(map_path);
   const lanelet::Id curr_lanelet = 34696;
   const lanelet::Id next_lanelet = 34768;
@@ -975,6 +990,217 @@ TEST(HdMapUtils, toMapPose_sLargerThanLaneletLength)
   EXPECT_STREQ(map_pose.header.frame_id.c_str(), "map");
   EXPECT_POSE_NEAR(
     map_pose.pose, makePose(makePoint(3724.9, 73678.1, 2.7), makeQuaternionFromYaw(2.828)), 0.1);
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 199;
+  const lanelet::Id end_lanelet = start_lanelet;
+  const auto direction = traffic_simulator::lane_change::Direction::STRAIGHT;
+
+  const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction);
+
+  EXPECT_TRUE(result_lanelet.has_value());
+  EXPECT_EQ(end_lanelet, result_lanelet);
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangable)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 199;
+  const auto direction = traffic_simulator::lane_change::Direction::LEFT;
+
+  const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction);
+
+  EXPECT_FALSE(result_lanelet.has_value());
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangable)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 200;
+  const lanelet::Id end_lanelet = 199;
+  const auto direction = traffic_simulator::lane_change::Direction::LEFT;
+
+  const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction);
+
+  EXPECT_TRUE(result_lanelet.has_value());
+  EXPECT_EQ(result_lanelet.value(), end_lanelet);
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangable)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 202;
+  const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
+
+  const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction);
+
+  EXPECT_FALSE(result_lanelet.has_value());
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangable)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 200;
+  const lanelet::Id end_lanelet = 201;
+  const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
+
+  const auto result_lanelet = hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction);
+
+  EXPECT_TRUE(result_lanelet.has_value());
+  EXPECT_EQ(result_lanelet.value(), end_lanelet);
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftPossible)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 201;
+  const lanelet::Id end_lanelet = 199;
+  const auto direction = traffic_simulator::lane_change::Direction::LEFT;
+  const uint8_t shift = 2;
+
+  const auto result_lanelet =
+    hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction, shift);
+
+  EXPECT_TRUE(result_lanelet.has_value());
+  EXPECT_EQ(result_lanelet.value(), end_lanelet);
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftNotPossible)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 200;
+  const auto direction = traffic_simulator::lane_change::Direction::LEFT;
+  const uint8_t shift = 2;
+
+  const auto result_lanelet =
+    hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction, shift);
+
+  EXPECT_FALSE(result_lanelet.has_value());
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightPossible)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 200;
+  const lanelet::Id end_lanelet = 202;
+  const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
+  const uint8_t shift = 2;
+
+  const auto result_lanelet =
+    hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction, shift);
+
+  EXPECT_TRUE(result_lanelet.has_value());
+  EXPECT_EQ(result_lanelet.value(), end_lanelet);
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightNotPossible)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 201;
+  const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
+  const uint8_t shift = 2;
+
+  const auto result_lanelet =
+    hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction, shift);
+
+  EXPECT_FALSE(result_lanelet.has_value());
+}
+
+TEST(HdMapUtils, getLaneChangeableLaneletId_shift0)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id start_lanelet = 201;
+  const lanelet::Id end_lanelet = 201;
+  const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
+  const uint8_t shift = 0;
+
+  const auto result_lanelet =
+    hdmap_utils.getLaneChangeableLaneletId(start_lanelet, direction, shift);
+
+  EXPECT_TRUE(result_lanelet.has_value());
+  EXPECT_EQ(result_lanelet.value(), end_lanelet);
+}
+
+TEST(HdMapUtils, getTrafficLightIds_correct)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Ids traffic_lights = {34802, 34836};
+
+  auto result_traffic_lights = hdmap_utils.getTrafficLightIds();
+
+  std::sort(result_traffic_lights.begin(), result_traffic_lights.end());
+  EXPECT_EQ(result_traffic_lights, traffic_lights);
+}
+
+TEST(HdMapUtils, getTrafficLightIds_noTrafficLight)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  auto result_traffic_lights = hdmap_utils.getTrafficLightIds();
+
+  EXPECT_EQ(result_traffic_lights.size(), static_cast<size_t>(0));
+}
+
+TEST(HdMapUtils, getTrafficLightBulbPosition_correct)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id light_id = 34802;
+  const double epsilon = 0.1;
+
+  {
+    const std::string color = "green";
+    const auto actual_bulb_position = makePoint(3761.05, 73755.30, 5.35);
+
+    const auto return_bulb_position = hdmap_utils.getTrafficLightBulbPosition(light_id, color);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), actual_bulb_position, epsilon);
+  }
+
+  {
+    const std::string color = "yellow";
+    const auto actual_bulb_position = makePoint(3760.60, 73755.07, 5.35);
+
+    const auto return_bulb_position = hdmap_utils.getTrafficLightBulbPosition(light_id, color);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), actual_bulb_position, epsilon);
+  }
+
+  {
+    const std::string color = "red";
+    const auto actual_bulb_position = makePoint(3760.16, 73754.87, 5.35);
+
+    const auto return_bulb_position = hdmap_utils.getTrafficLightBulbPosition(light_id, color);
+
+    EXPECT_TRUE(return_bulb_position.has_value());
+    EXPECT_POINT_NEAR(return_bulb_position.value(), actual_bulb_position, epsilon);
+  }
+
+  {
+    const std::string color = "pink";
+
+    const auto return_bulb_position = hdmap_utils.getTrafficLightBulbPosition(light_id, color);
+
+    EXPECT_FALSE(return_bulb_position.has_value());
+  }
+}
+
+TEST(HdMapUtils, getTrafficLightBulbPosition_invalidTrafficLight)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id light_id = 1000003;
+
+  {
+    const std::string color = "red";
+
+    const auto return_bulb_position = hdmap_utils.getTrafficLightBulbPosition(light_id, color);
+
+    EXPECT_FALSE(return_bulb_position.has_value());
+  }
 }
 
 /*
