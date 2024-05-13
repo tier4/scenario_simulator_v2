@@ -69,8 +69,8 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters()),
-      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing();
+      "ego", traffic_simulator::helper::constructLaneletPose(34741, 0, 0), getVehicleParameters(),
+      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
     api_.spawn(
       "pedestrian", traffic_simulator::helper::constructLaneletPose(34741, 3, 0),
       getPedestrianParameters(),
