@@ -43,6 +43,13 @@ auto TrafficSource::Validator::operator()(
   }();
 
   /**
+   * @note Possibly undesirable behavior
+   * This implementation will consider cases like intersections as one big spawning area.
+   * If an Entity is positioned in the middle of the intersection (where it does not fit in any of
+   * the lanes alone, but it does fit in all of the lanes combined) it will be considered valid.
+   */
+
+  /**
    * @note This implementation does not cover the case, when the Entity is on a curve and the curved
    * lanelet bound intersects with en edge of the Entity's bounding box, but all corners are still
    * inside the lanelet bounds.
