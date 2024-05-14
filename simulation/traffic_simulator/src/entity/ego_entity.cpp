@@ -158,8 +158,13 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
         behavior_parameter_, hdmap_utils_ptr_, step_time,
         target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
+      // prefer the current lanelet
+      lanelet::Ids unique_route_lanelets;
+      if (status_.laneMatchingSucceed()) {
+        unique_route_lanelets.push_back(status_.getLaneletId());
+      }
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        updated_status.value().pose, getBoundingBox(), {status_.getLaneletId()}, false,
+        updated_status.value().pose, getBoundingBox(), unique_route_lanelets, false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
       setStatus(CanonicalizedEntityStatus(*updated_status, canonicalized_lanelet_pose));
     } else {

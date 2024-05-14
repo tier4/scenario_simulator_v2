@@ -77,8 +77,13 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
            (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
   }(getEntityType());
 
+  // prefer the current lanelet
+  lanelet::Ids unique_route_lanelets;
+  if (status_.laneMatchingSucceed()) {
+    unique_route_lanelets.push_back(status_.getLaneletId());
+  }
   return pose::toCanonicalizedLaneletPose(
-    getMapPose(), getBoundingBox(), {status_.getLaneletId()}, include_crosswalk, matching_distance,
+    getMapPose(), getBoundingBox(), unique_route_lanelets, include_crosswalk, matching_distance,
     hdmap_utils_ptr_);
 }
 
