@@ -116,7 +116,8 @@ auto API::respawn(
 }
 
 auto API::setEntityStatus(
-  const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const std::string & name,
+  const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   if (const auto entity = getEntity(name)) {
@@ -131,16 +132,21 @@ auto API::setEntityStatus(
 auto API::setEntityStatus(const std::string & name, const EntityStatus & status) -> void
 {
   if (const auto entity = getEntity(name)) {
-    const auto include_crosswalk = [](const auto & entity_type) {
-      return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
-             (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
-    }(entity->getEntityType());
-
-    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      status.pose, entity->getBoundingBox(), {status.lanelet_pose.lanelet_id}, include_crosswalk,
-      entity->getDefaultMatchingDistanceForLaneletPoseCalculation(),
-      entity_manager_ptr_->getHdmapUtils());
-    entity->setStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
+    if (status.lanelet_pose_valid) {
+      const auto canonicalized_lanelet_pose =
+        pose::canonicalize(status.lanelet_pose, entity_manager_ptr_->getHdmapUtils(), true);
+      entity->setStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
+    } else {
+      const auto include_crosswalk = [](const auto & entity_type) {
+        return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
+               (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
+      }(entity->getEntityType());
+      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+        status.pose, entity->getBoundingBox(), include_crosswalk,
+        entity->getDefaultMatchingDistanceForLaneletPoseCalculation(),
+        entity_manager_ptr_->getHdmapUtils());
+      entity->setStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
+    }
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
   }

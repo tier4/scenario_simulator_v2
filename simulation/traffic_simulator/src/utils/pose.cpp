@@ -46,9 +46,13 @@ auto quietNaNLaneletPose() -> traffic_simulator::LaneletPose
 
 auto canonicalize(
   const LaneletPose & lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr, bool verbose)
+  -> std::optional<CanonicalizedLaneletPose>
 {
-  return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
+  if (lanelet_pose == LaneletPose())
+    return std::nullopt;
+  else
+    return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
 }
 
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose

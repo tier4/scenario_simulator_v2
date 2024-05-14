@@ -235,7 +235,8 @@ public:
     const std::string & name, const LaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void;
   auto setEntityStatus(
-    const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+    const std::string & name,
+    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
   auto setEntityStatus(

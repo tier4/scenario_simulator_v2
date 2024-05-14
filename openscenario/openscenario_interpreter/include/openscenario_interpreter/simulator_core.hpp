@@ -71,7 +71,7 @@ public:
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
-      return traffic_simulator::pose::canonicalize(non_canonicalized, core->getHdmapUtils());
+      return NativeLanePosition(non_canonicalized, core->getHdmapUtils());
     }
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
