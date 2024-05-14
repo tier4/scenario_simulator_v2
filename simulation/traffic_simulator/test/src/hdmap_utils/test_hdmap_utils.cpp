@@ -1203,8 +1203,139 @@ TEST(HdMapUtils, getTrafficLightBulbPosition_invalidTrafficLight)
   }
 }
 
+TEST(HdMapUtils, getConflictingLaneIds_conflicting)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id = 34510;
+  lanelet::Ids actual_ids = {34495, 34498};
+
+  auto result_ids = hdmap_utils.getConflictingLaneIds({id});
+
+  std::sort(actual_ids.begin(), actual_ids.end());
+  std::sort(result_ids.begin(), result_ids.end());
+  EXPECT_EQ(actual_ids, result_ids);
+}
+
+TEST(HdMapUtils, getConflictingLaneIds_notConflicting)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id = 34513;
+
+  auto result_ids = hdmap_utils.getConflictingLaneIds({id});
+
+  EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(0));
+}
+
+TEST(HdMapUtils, getConflictingLaneIds_empty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  auto result_ids = hdmap_utils.getConflictingLaneIds({});
+
+  EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(0));
+}
+
+TEST(HdMapUtils, getConflictingCrosswalkIds_conflicting)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id = 34633;
+  lanelet::Ids actual_ids = {34399, 34385};
+
+  auto result_ids = hdmap_utils.getConflictingCrosswalkIds({id});
+
+  std::sort(actual_ids.begin(), actual_ids.end());
+  std::sort(result_ids.begin(), result_ids.end());
+  EXPECT_EQ(actual_ids, result_ids);
+}
+
+TEST(HdMapUtils, getConflictingCrosswalkIds_notConflictingWithCrosswalk)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id = 34510;
+
+  auto result_ids = hdmap_utils.getConflictingCrosswalkIds({id});
+
+  EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(0));
+}
+
+TEST(HdMapUtils, getConflictingCrosswalkIds_notConflicting)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id = 34513;
+
+  auto result_ids = hdmap_utils.getConflictingCrosswalkIds({id});
+
+  EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(0));
+}
+
+TEST(HdMapUtils, getConflictingCrosswalkIds_empty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  auto result_ids = hdmap_utils.getConflictingCrosswalkIds({});
+
+  EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(0));
+}
+
+TEST(HdMapUtils, getFollowingLanelets_straightAfter)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 120660;
+  const double distance = 1.0;
+  const bool include_self = true;
+
+  const auto result_ids = hdmap_utils.getFollowingLanelets(id, distance, include_self);
+  const lanelet::Ids actual_ids = {id, 34468};
+
+  EXPECT_EQ(result_ids, actual_ids);
+}
+
+TEST(HdMapUtils, getFollowingLanelets_notEnoughLaneletsAfter)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  const lanelet::Id id = 199;
+  const double distance = 1.0e100;
+  const bool include_self = true;
+
+  const auto result_ids = hdmap_utils.getFollowingLanelets(id, distance, include_self);
+  const lanelet::Ids actual_ids = {id, 203};
+
+  EXPECT_EQ(result_ids, actual_ids);
+}
+
+TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryEmpty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 120660;
+  const double distance = 1.0e100;
+  const bool include_self = true;
+
+  const auto result_ids = hdmap_utils.getFollowingLanelets(id, {}, distance, include_self);
+
+  EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(0));
+}
+
+TEST(HdMapUtils, getFollowingLanelets_candidatesDoNotMatch)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 120660;
+  const lanelet::Ids candidates = {34981};
+  const double distance = 1.0e100;
+  const bool include_self = true;
+
+
+  EXPECT_THROW(hdmap_utils.getFollowingLanelets(id, candidates, distance, include_self), common::Error);
+}
+
 /*
 ISSUES:
 1: 288, missing predicate if first is closer than distance threshold.
   Differning from line 265.
+2: 776: confusing naming or functionality: 
+  consider getFollowingLanelets(120660, {120660, <random-lanelets>}, 10000, true);
+  then <random-lanelets> will be added unconditionally.
 */
