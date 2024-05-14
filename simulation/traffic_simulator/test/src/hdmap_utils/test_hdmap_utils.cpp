@@ -1327,8 +1327,42 @@ TEST(HdMapUtils, getFollowingLanelets_candidatesDoNotMatch)
   const double distance = 1.0e100;
   const bool include_self = true;
 
+  EXPECT_THROW(
+    hdmap_utils.getFollowingLanelets(id, candidates, distance, include_self), common::Error);
+}
 
-  EXPECT_THROW(hdmap_utils.getFollowingLanelets(id, candidates, distance, include_self), common::Error);
+TEST(HdMapUtils, canChangeLane_canChange)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  const lanelet::Id from_id = 199;
+  const lanelet::Id to_id = 200;
+
+  const bool verdict = hdmap_utils.canChangeLane(from_id, to_id);
+
+  EXPECT_TRUE(verdict);
+}
+
+TEST(HdMapUtils, canChangeLane_canNotChange)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  const lanelet::Id from_id = 199;
+  const lanelet::Id to_id = 201;
+
+  const bool verdict = hdmap_utils.canChangeLane(from_id, to_id);
+
+  EXPECT_FALSE(verdict);
+}
+
+TEST(HdMapUtils, canChangeLane_invalidLaneletId)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  const lanelet::Id from_id = 1000003;
+  const lanelet::Id to_id = 1000033;
+
+  EXPECT_THROW(hdmap_utils.canChangeLane(from_id, to_id), std::runtime_error);
 }
 
 /*
