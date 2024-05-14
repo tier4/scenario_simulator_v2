@@ -551,6 +551,109 @@ TEST(HdMapUtils, matchToLane_noMatch)
   }
 }
 
+TEST(HdMapUtils, toLaneletPose_correct)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id_road = 34600;
+  const double yaw = M_PI + M_PI_2 / 3.0;
+  const auto pose = makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(yaw));
+
+  const auto lanelet_pose = hdmap_utils.toLaneletPose(pose, false);
+
+  const auto reference_lanelet_pose =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
+      .lanelet_id(id_road)
+      .s(35.0)
+      .offset(0.0)
+      .rpy(geometry_msgs::msg::Vector3());
+
+  EXPECT_TRUE(lanelet_pose.has_value());
+  EXPECT_LANELET_POSE_NEAR(lanelet_pose.value(), reference_lanelet_pose, 0.1);
+}
+
+TEST(HdMapUtils, toLaneletPose_negativeOffset)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id_road = 34600;
+  const double yaw = M_PI + M_PI_2 / 3.0;
+
+  const double offset_yaw = yaw - M_PI_2;
+  const double offset = -0.5;
+  const double offset_x = std::cos(offset_yaw) * std::abs(offset);
+  const double offset_y = std::sin(offset_yaw) * std::abs(offset);
+
+  const auto pose =
+    makePose(makePoint(3790.0 + offset_x, 73757.0 + offset_y), makeQuaternionFromYaw(yaw));
+
+  const auto lanelet_pose = hdmap_utils.toLaneletPose(pose, false);
+
+  const auto reference_lanelet_pose =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
+      .lanelet_id(id_road)
+      .s(35.0)
+      .offset(offset)
+      .rpy(geometry_msgs::msg::Vector3());
+
+  EXPECT_TRUE(lanelet_pose.has_value());
+  EXPECT_LANELET_POSE_NEAR(lanelet_pose.value(), reference_lanelet_pose, 0.1);
+}
+
+TEST(HdMapUtils, toLaneletPose_reverse)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const double yaw = M_PI_2 + M_PI_2 / 3.0;
+  const auto pose = makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(yaw));
+
+  const auto lanelet_pose = hdmap_utils.toLaneletPose(pose, false);
+
+  EXPECT_FALSE(lanelet_pose.has_value());
+}
+
+TEST(HdMapUtils, toLaneletPose_notOnLanelet)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const double yaw = M_PI + M_PI_2 / 3.0;
+  const auto pose = makePose(makePoint(3790.0 + 5.0, 73757.0 - 5.0), makeQuaternionFromYaw(yaw));
+
+  const auto lanelet_pose = hdmap_utils.toLaneletPose(pose, true);
+
+  EXPECT_FALSE(lanelet_pose.has_value());
+}
+
+TEST(HdMapUtils, toLaneletPose_empty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const double yaw = M_PI + M_PI_2 / 3.0;
+  const auto pose = makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(yaw));
+
+  const lanelet::Ids ids{};
+
+  const auto lanelet_pose = hdmap_utils.toLaneletPose(pose, ids);
+
+  EXPECT_FALSE(lanelet_pose.has_value());
+}
+
+TEST(HdMapUtils, toLaneletPose_boundingBoxMatchPrevious)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id_road = 34600;
+  const double yaw = M_PI + M_PI_2 / 3.0;
+  const auto pose = makePose(makePoint(3774.9, 73749.2), makeQuaternionFromYaw(yaw));
+
+  const auto bbox = makeBoundingBox();
+
+  const auto lanelet_pose = hdmap_utils.toLaneletPose(pose, bbox, false, 0.5);
+
+  const auto reference_lanelet_pose =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
+      .lanelet_id(id_road)
+      .s(52.0)
+      .offset(0.0)
+      .rpy(geometry_msgs::msg::Vector3());
+
+  EXPECT_LANELET_POSE_NEAR(lanelet_pose.value(), reference_lanelet_pose, 0.1);
+}
+
 TEST(HdMapUtils, getSpeedLimit_correct)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
