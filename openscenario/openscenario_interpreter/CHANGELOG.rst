@@ -14,6 +14,13 @@ Changelog for package openscenario_interpreter
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.16.3 (2024-05-13)
+-------------------
+* Fixed incorrect comment out
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/contributing_md
+* update CONTRIBUTING.md
+* Contributors: hakuturu583
+
 1.16.2 (2024-05-10)
 -------------------
 
