@@ -132,7 +132,7 @@ void EntityBase::requestLaneChange(
 {
   lanelet::Id reference_lanelet_id = 0;
   if (target.entity_name == name) {
-    if (laneMatchingSucceed()) {
+    if (not laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(
         "Source entity does not assigned to lanelet. Please check source entity name : ", name,
         " exists on lane.");
