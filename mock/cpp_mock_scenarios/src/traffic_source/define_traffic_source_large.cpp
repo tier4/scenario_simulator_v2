@@ -25,12 +25,6 @@
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
-/**
- * NOTE: This scenario is almost identical as define_traffic_source_vehicle except the radius is
- * bigger. It is supposed to demonstrate the performance limitations of TrafficSource.
- * At the time of this writing, the TrafficSource initializes for ~1.5 seconds in this configuration.
- */
-
 namespace cpp_mock_scenarios
 {
 class DefineTrafficSourceLarge : public cpp_mock_scenarios::CppScenarioNode
