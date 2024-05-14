@@ -1365,6 +1365,61 @@ TEST(HdMapUtils, canChangeLane_invalidLaneletId)
   EXPECT_THROW(hdmap_utils.canChangeLane(from_id, to_id), std::runtime_error);
 }
 
+TEST(HdMapUtils, getRoute_correct)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id from_id = 34579;
+  const lanelet::Id to_id = 34630;
+  const bool allow_lane_change = true;
+
+  const auto result_route = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
+
+  const lanelet::Ids actual_route = {34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630};
+
+  EXPECT_EQ(result_route, actual_route);
+}
+
+TEST(HdMapUtils, getRoute_correctCache)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id from_id = 34579;
+  const lanelet::Id to_id = 34630;
+  const bool allow_lane_change = true;
+  
+  const auto result_route_nohit = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
+  const auto result_route_hit = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
+
+  EXPECT_EQ(result_route_hit, result_route_nohit);
+}
+
+TEST(HdMapUtils, getRoute_impossibleRouting)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  const lanelet::Id from_id = 199;
+  const lanelet::Id to_id = 196;
+  const bool allow_lane_change = true;
+  
+  const auto result_route = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
+
+  EXPECT_EQ(result_route.size(), static_cast<std::size_t>(0));
+}
+
+TEST(HdMapUtils, getRoute_circular)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id from_id = 120659;
+  const lanelet::Id to_id = 120659;
+  const bool allow_lane_change = false;
+
+  const auto result_route = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
+
+  EXPECT_EQ(result_route, lanelet::Ids{120659});
+}
+
 /*
 ISSUES:
 1: 288, missing predicate if first is closer than distance threshold.
