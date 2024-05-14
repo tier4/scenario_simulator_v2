@@ -42,6 +42,20 @@ auto TrafficSource::Validator::operator()(
     return points2d;
   }();
 
+  /**
+   * @note This implementation does not cover the case, when the Entity is on a curve and the curved
+   * lanelet bound intersects with en edge of the Entity's bounding box, but all corners are still
+   * inside the lanelet bounds.
+   * Example:
+   *   . ______  .
+   *    .|    |   .
+   *     |.   |    .
+   *     | .  |     .
+   *     | .  |     .
+   *     |.   |    .
+   *    .|    |   .
+   *   . |____|  .
+   */
   return std::find(ids.begin(), ids.end(), id) != ids.end() and
          std::all_of(points2d.begin(), points2d.end(), [&](const auto & point) {
            return std::any_of(lanelets.begin(), lanelets.end(), [&](const auto & lane) {
