@@ -42,12 +42,12 @@ auto TrafficSource::Validator::operator()(
     return points2d;
   }();
 
-  return std::any_of(lanelets.begin(), lanelets.end(), [&](const auto & lane) {
-    return std::find(ids.begin(), ids.end(), id) != ids.end() and
-           std::all_of(points2d.begin(), points2d.end(), [&](const auto & point) {
+  return std::find(ids.begin(), ids.end(), id) != ids.end() and
+         std::all_of(points2d.begin(), points2d.end(), [&](const auto & point) {
+           return std::any_of(lanelets.begin(), lanelets.end(), [&](const auto & lane) {
              return lanelet::geometry::inside(lane, point);
            });
-  });
+         });
 }
 
 auto TrafficSource::makeRandomPose(const bool random_orientation) -> geometry_msgs::msg::Pose
