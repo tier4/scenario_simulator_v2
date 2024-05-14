@@ -13,6 +13,97 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.16.3 (2024-05-13)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/contributing_md
+* Contributors: hakuturu583
+
+1.16.2 (2024-05-10)
+-------------------
+
+1.16.1 (2024-05-10)
+-------------------
+* Merge branch 'master' into doc/support_awesome-pages
+* Contributors: Taiga
+
+1.16.0 (2024-05-09)
+-------------------
+* Merge pull request `#1198 <https://github.com/tier4/scenario_simulator_v2/issues/1198>`_ from tier4/feature/respawn-entity
+  Feature/respawn entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* ref(traffic_simulator, respawn): apply requested PR changes
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* ref(respawn): remove engagable() check
+* ref(respawn): improve current solution
+* feat(EgoEntity): add setControlledBySimulator
+* fix(respawn): fix after merge - add updateFrame, adjust isEgo
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Despawning and Spawning entity replaced with UpdateEntityStatusRequest
+* updateFrame removed from API::respawn
+* Code cleaning
+* Exceptions inside API::respawn
+* Merge remote-tracking branch 'origin-ssh/master' into feature/respawn-entity
+* Spellcheck fix
+* Code cleaning
+* Respawn logic moved to API
+* Interface to get vehicle parameters of entity
+* RespawnEntity added
+* Contributors: DMoszynski, Dawid Moszyński, Paweł Lech, Tatsuya Yamasaki
+
+1.15.7 (2024-05-09)
+-------------------
+* Merge pull request `#1239 <https://github.com/tier4/scenario_simulator_v2/issues/1239>`_ from tier4/feature/speed_up_set_other_status
+  Feature/speed up set other status
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/feature/publish_scenario_frame' into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/master' into feature/speed_up_set_other_status
+* Revert "remove entity status type"
+  This reverts commit 17b871e35d689cb23eb4ffd1d16dbaaeade40370.
+* remove entity status type
+* speed up setOtherStatus logic
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
+1.15.6 (2024-05-07)
+-------------------
+* Merge pull request `#1238 <https://github.com/tier4/scenario_simulator_v2/issues/1238>`_ from tier4/feature/publish_scenario_frame
+  Publish `entities` frame
+* Merge branch 'master' into feature/publish_scenario_frame
+* add doxygen comment
+* add doxygen comment
+* Merge remote-tracking branch 'origin/feature/publish_scenario_frame' into feature/publish_scenario_frame
+* use getEgoName function in broadcastEntityTransform function
+* Merge branch 'master' into feature/publish_scenario_frame
+* fix frame_id of visualization
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
+1.15.5 (2024-05-07)
+-------------------
+
+1.15.4 (2024-05-01)
+-------------------
+
+1.15.3 (2024-04-25)
+-------------------
+* Merge pull request `#1112 <https://github.com/tier4/scenario_simulator_v2/issues/1112>`_ from tier4/fix/standstill-duration-for-miscobjects
+  Fix/Standstill duration condition for MiscObjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* stanstill update for misc objects
+* Contributors: Masaya Kataoka, Piotr Zyskowski
+
+1.15.2 (2024-04-23)
+-------------------
+* Merge branch 'master' into feature/update_default_architecture_type
+* Contributors: Masaya Kataoka
+
 1.15.1 (2024-04-18)
 -------------------
 * Merge branch 'master' into fix/occluded-object-in-grid
