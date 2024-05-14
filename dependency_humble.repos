@@ -21,5 +21,5 @@ repositories:
     version: master
   tier4_msgs:
     type: git
-    url: https://github.com/tier4/tier4_autoware_msgs.git
-    version: tier4/universe # for Autoware.Universe (TIER IV)
+    url: https://github.com/HansRobo/tier4_autoware_msgs.git
+    version: feat/add-simulation-traffic-light-v1 # to be merged
