@@ -14,6 +14,7 @@
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 
 namespace traffic_simulator
@@ -71,6 +72,27 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
         message.signals.push_back(traffic_light_message);
       }
     }
+  }
+  traffic_light_state_array_publisher_->publish(message);
+}
+
+template <>
+auto TrafficLightPublisher<tier4_simulation_msgs::msg::TrafficLightArrayV1>::publish(
+  [[maybe_unused]] const rclcpp::Time & current_ros_time,
+  const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
+{
+  tier4_simulation_msgs::msg::TrafficLightArrayV1 message;
+  using TrafficLightType = tier4_simulation_msgs::msg::TrafficLightV1;
+  for (const auto & traffic_light : request.states()) {
+    TrafficLightType traffic_light_message;
+    traffic_light_message.lanelet_way_id = traffic_light.id();
+    for (auto bulb_status : traffic_light.traffic_light_status()) {
+      using TrafficLightBulbType = tier4_simulation_msgs::msg::TrafficLightBulbV1;
+      TrafficLightBulbType light_bulb_message;
+      simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
+      traffic_light_message.traffic_light_bulbs.push_back(light_bulb_message);
+    }
+    message.traffic_lights.push_back(traffic_light_message);
   }
   traffic_light_state_array_publisher_->publish(message);
 }
