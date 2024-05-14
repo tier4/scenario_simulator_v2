@@ -1375,7 +1375,8 @@ TEST(HdMapUtils, getRoute_correct)
 
   const auto result_route = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
 
-  const lanelet::Ids actual_route = {34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630};
+  const lanelet::Ids actual_route = {34579, 34774, 120659, 120660, 34468,
+                                     34438, 34408, 34624,  34630};
 
   EXPECT_EQ(result_route, actual_route);
 }
@@ -1387,7 +1388,7 @@ TEST(HdMapUtils, getRoute_correctCache)
   const lanelet::Id from_id = 34579;
   const lanelet::Id to_id = 34630;
   const bool allow_lane_change = true;
-  
+
   const auto result_route_nohit = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
   const auto result_route_hit = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
 
@@ -1401,7 +1402,7 @@ TEST(HdMapUtils, getRoute_impossibleRouting)
   const lanelet::Id from_id = 199;
   const lanelet::Id to_id = 196;
   const bool allow_lane_change = true;
-  
+
   const auto result_route = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
 
   EXPECT_EQ(result_route.size(), static_cast<std::size_t>(0));
@@ -1418,6 +1419,72 @@ TEST(HdMapUtils, getRoute_circular)
   const auto result_route = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
 
   EXPECT_EQ(result_route, lanelet::Ids{120659});
+}
+
+TEST(HdMapUtils, isTrafficLight_trafficLight)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34836;
+
+  const auto verdict = hdmap_utils.isTrafficLight(id);
+
+  EXPECT_TRUE(verdict);
+}
+
+TEST(HdMapUtils, isTrafficLight_notTrafficLight)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 120659;
+
+  const auto verdict = hdmap_utils.isTrafficLight(id);
+
+  EXPECT_FALSE(verdict);
+}
+
+TEST(HdMapUtils, isTrafficLight_invalidId)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 1000003;
+
+  const auto verdict = hdmap_utils.isTrafficLight(id);
+
+  EXPECT_FALSE(verdict);
+}
+
+TEST(HdMapUtils, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34806;
+
+  const auto verdict = hdmap_utils.isTrafficLightRegulatoryElement(id);
+
+  EXPECT_TRUE(verdict);
+}
+
+TEST(HdMapUtils, isTrafficLightRegulatoryElement_noTrafficLightRegulatoryElement)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 120659;
+
+  const auto verdict = hdmap_utils.isTrafficLightRegulatoryElement(id);
+
+  EXPECT_FALSE(verdict);
+}
+
+TEST(HdMapUtils, isTrafficLightRegulatoryElement_invalidId)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 1000003;
+
+  const auto verdict = hdmap_utils.isTrafficLightRegulatoryElement(id);
+
+  EXPECT_FALSE(verdict);
 }
 
 /*
