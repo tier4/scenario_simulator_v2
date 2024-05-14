@@ -1487,6 +1487,31 @@ TEST(HdMapUtils, isTrafficLightRegulatoryElement_invalidId)
   EXPECT_FALSE(verdict);
 }
 
+TEST(HdMapUtils, getLaneletLength_simple)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34468;
+
+  const double result_length = hdmap_utils.getLaneletLength(id);
+  const double actual_length = 55.5;
+  const double epsilon = 1.0;
+
+  EXPECT_NEAR(result_length, actual_length, epsilon);
+}
+
+TEST(HdMapUtils, getLaneletLength_cache)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34468;
+
+  const double result_length_nohit = hdmap_utils.getLaneletLength(id);
+  const double result_length_hit = hdmap_utils.getLaneletLength(id);
+
+  EXPECT_EQ(result_length_nohit, result_length_hit);
+}
+
 /*
 ISSUES:
 1: 288, missing predicate if first is closer than distance threshold.
