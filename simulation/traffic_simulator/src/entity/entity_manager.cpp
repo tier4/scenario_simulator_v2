@@ -39,7 +39,6 @@ namespace entity
 {
 void EntityManager::broadcastEntityTransform()
 {
-  std::vector<std::string> names = getEntityNames();
   /**
    * @note This part of the process is intended to ensure that frames are issued in a position that makes 
    * it as easy as possible to see the entities that will appear in the scenario.
@@ -47,8 +46,7 @@ void EntityManager::broadcastEntityTransform()
    * so we publish the average of the coordinates of all entities.
    */
   if (isEgoSpawned()) {
-    const auto ego_name = getEgoName();
-    if (entityExists(ego_name)) {
+    if (const auto ego = getEntity(getEgoName())) {
       broadcastTransform(
         geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
           /**
@@ -57,11 +55,11 @@ void EntityManager::broadcastEntityTransform()
            * so the frame_id “ego” is issued regardless of the name of the ego entity.
            */
           .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-          .pose(getMapPose(ego_name)),
+          .pose(ego->getMapPose()),
         true);
     }
   }
-  if (!names.empty()) {
+  if (const auto names = getEntityNames(); !names.empty()) {
     broadcastTransform(
       geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
         .header(
@@ -70,8 +68,8 @@ void EntityManager::broadcastEntityTransform()
                 .position(std::accumulate(
                   names.begin(), names.end(), geometry_msgs::msg::Point(),
                   [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
-                    return point +
-                           (getMapPose(name).position * (1.0 / static_cast<double>(names.size())));
+                    return point + (getEntity(name)->getMapPose().position *
+                                    (1.0 / static_cast<double>(names.size())));
                   }))
                 .orientation(geometry_msgs::msg::Quaternion())),
       true);
@@ -99,11 +97,18 @@ void EntityManager::broadcastTransform(
   }
 }
 
-bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
+bool EntityManager::checkCollision(
+  const std::string & first_entity_name, const std::string & second_entity_name)
 {
-  return name0 != name1 and
-         math::geometry::checkCollision2D(
-           getMapPose(name0), getBoundingBox(name0), getMapPose(name1), getBoundingBox(name1));
+  if (const auto first_entity = getEntity(first_entity_name)) {
+    if (const auto second_entity = getEntity(second_entity_name)) {
+      return first_entity != second_entity and
+             math::geometry::checkCollision2D(
+               first_entity->getMapPose(), first_entity->getBoundingBox(),
+               second_entity->getMapPose(), second_entity->getBoundingBox());
+    }
+  }
+  return false;
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
@@ -273,14 +278,22 @@ bool EntityManager::isStopping(const std::string & name) const
 bool EntityManager::reachPosition(
   const std::string & name, const std::string & target_name, const double tolerance) const
 {
-  return reachPosition(name, getMapPose(target_name), tolerance);
+  if (const auto entity = getEntity(name)) {
+    return reachPosition(name, entity->getMapPose(), tolerance);
+  } else {
+    return false;
+  }
 }
 
 bool EntityManager::reachPosition(
   const std::string & name, const geometry_msgs::msg::Pose & target_pose,
   const double tolerance) const
 {
-  return math::geometry::getDistance(getMapPose(name), target_pose) < tolerance;
+  if (const auto entity = getEntity(name)) {
+    return math::geometry::getDistance(entity->getMapPose(), target_pose) < tolerance;
+  } else {
+    return false;
+  }
 }
 
 bool EntityManager::reachPosition(

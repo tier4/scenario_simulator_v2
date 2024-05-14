@@ -273,7 +273,6 @@ public:
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
-  FORWARD_TO_ENTITY(getMapPose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
@@ -330,7 +329,8 @@ public:
   void broadcastTransform(
     const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true);
 
-  bool checkCollision(const std::string & name0, const std::string & name1);
+  bool checkCollision(
+    const std::string & first_entity_name, const std::string & second_entity_name);
 
   bool despawnEntity(const std::string & name);
 

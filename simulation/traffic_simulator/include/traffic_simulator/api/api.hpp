@@ -68,7 +68,12 @@ public:
     entity_manager_ptr_(std::make_shared<entity::EntityManager>(node, configuration)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
-      [this](const auto & name) { return API::getMapPose(name); },
+      [this](const auto & entity_name) {
+        if (const auto entity = getEntity(entity_name)) {
+          return entity->getMapPose();
+        }
+        THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " doeas not exists.");
+      },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
@@ -326,7 +331,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
-  FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
