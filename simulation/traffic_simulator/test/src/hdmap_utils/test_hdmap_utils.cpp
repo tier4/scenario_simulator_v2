@@ -1445,6 +1445,20 @@ TEST(HdMapUtils, getFollowingLanelets_straightAfter)
   EXPECT_EQ(result_ids, actual_ids);
 }
 
+TEST(HdMapUtils, getFollowingLanelets_curveAfter)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34564;
+  const double distance = 40.0;
+  const bool include_self = true;
+
+  const auto result_ids = hdmap_utils.getFollowingLanelets(id, distance, include_self);
+  const lanelet::Ids actual_ids = {id, 34411, 34462};
+
+  EXPECT_EQ(result_ids, actual_ids);
+}
+
 TEST(HdMapUtils, getFollowingLanelets_notEnoughLaneletsAfter)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
@@ -1457,6 +1471,40 @@ TEST(HdMapUtils, getFollowingLanelets_notEnoughLaneletsAfter)
   const lanelet::Ids actual_ids = {id, 203};
 
   EXPECT_EQ(result_ids, actual_ids);
+}
+
+TEST(HdMapUtils, getFollowingLanelets_candidateTrajectory)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34564;
+  const double distance = 40;
+  const bool include_self = true;
+
+  const lanelet::Ids route{id, 34495, 34507, 34795, 34606};
+
+  const auto result_following = hdmap_utils.getFollowingLanelets(id, route, distance, include_self);
+
+  const lanelet::Ids actual_following{id, 34495, 34507};
+
+  EXPECT_EQ(result_following, actual_following);
+}
+
+TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryNotEnough)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34564;
+  const double distance = 100;
+  const bool include_self = true;
+
+  const lanelet::Ids route{id, 34495, 34507};
+
+  const auto result_following = hdmap_utils.getFollowingLanelets(id, route, distance, include_self);
+
+  const lanelet::Ids actual_following{id, 34495, 34507, 34795, 34606};
+
+  EXPECT_EQ(result_following, actual_following);
 }
 
 TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryEmpty)
