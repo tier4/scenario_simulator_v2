@@ -268,10 +268,10 @@ bool EntityManager::isStopping(const std::string & name) const
 }
 
 bool EntityManager::reachPosition(
-  const std::string & name, const std::string & target_name, const double tolerance) const
+  const std::string & name, const std::string & target_entity_name, const double tolerance) const
 {
-  if (const auto entity = getEntity(name)) {
-    return reachPosition(name, entity->getMapPose(), tolerance);
+  if (const auto target_entity = getEntity(target_entity_name)) {
+    return reachPosition(name, target_entity->getMapPose(), tolerance);
   } else {
     return false;
   }

@@ -402,7 +402,7 @@ public:
     const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
     const double tolerance) const;
   bool reachPosition(
-    const std::string & name, const std::string & target_name, const double tolerance) const;
+    const std::string & name, const std::string & target_entity_name, const double tolerance) const;
 
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
