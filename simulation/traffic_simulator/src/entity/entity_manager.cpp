@@ -146,16 +146,6 @@ auto EntityManager::getEntityStatus(const std::string & name) const -> Canonical
   }
 }
 
-auto EntityManager::getEntityTypeList() const
-  -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>
-{
-  std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> ret;
-  for (auto && [name, entity] : entities_) {
-    ret.emplace(name, getEntityType(name));
-  }
-  return ret;
-}
-
 auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
 {
   return hdmap_utils_ptr_;
@@ -385,15 +375,11 @@ void EntityManager::setVerbose(const bool verbose)
   }
 }
 
-auto EntityManager::updateNpcLogic(
-  const std::string & name,
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
-  -> const CanonicalizedEntityStatus &
+auto EntityManager::updateNpcLogic(const std::string & name) -> const CanonicalizedEntityStatus &
 {
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  entities_[name]->setEntityTypeList(type_list);
   entities_[name]->onUpdate(current_time_, step_time_);
   return entities_[name]->getStatus();
 }
@@ -410,7 +396,6 @@ void EntityManager::update(const double current_time, const double step_time)
       configuration.conventional_traffic_light_publish_rate);
     v2i_traffic_light_updater_.createTimer(configuration.v2i_traffic_light_publish_rate);
   }
-  auto type_list = getEntityTypeList();
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {
     all_status.emplace(name, entity->getStatus());
@@ -420,7 +405,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   all_status.clear();
   for (auto && [name, entity] : entities_) {
-    all_status.emplace(name, updateNpcLogic(name, type_list));
+    all_status.emplace(name, updateNpcLogic(name));
   }
   for (auto && [name, entity] : entities_) {
     entity->setOtherStatus(all_status);

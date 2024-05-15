@@ -75,10 +75,6 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<EntityStatusDict>("other_entity_status", other_entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status in ActionNode");
   }
-  if (!getInput<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>(
-        "entity_type_list", entity_type_list)) {
-    THROW_SIMULATION_ERROR("failed to get input entity_type_list in ActionNode");
-  }
   if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets)) {
     THROW_SIMULATION_ERROR("failed to get input route_lanelets in ActionNode");
   }

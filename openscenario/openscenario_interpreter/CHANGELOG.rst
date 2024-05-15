@@ -14,6 +14,15 @@ Changelog for package openscenario_interpreter
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.16.4 (2024-05-15)
+-------------------
+* Merge branch 'master' into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge remote-tracking branch 'origin/feature/remove_entity_type_list' into feature/remove_entity_type_list
+* Merge branch 'master' into feature/remove_entity_type_list
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
 1.16.3 (2024-05-13)
 -------------------
 * Fixed incorrect comment out
