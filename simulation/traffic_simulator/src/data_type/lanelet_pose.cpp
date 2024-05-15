@@ -29,7 +29,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
   lanelet_poses_(
     hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
-  map_pose_(pose::toMapPose(lanelet_pose_, hdmap_utils))
+  map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
 {
   adjustOrientationAndOzPosition(hdmap_utils);
 }
@@ -40,7 +40,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, route_lanelets, hdmap_utils)),
   lanelet_poses_(
     hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
-  map_pose_(pose::toMapPose(lanelet_pose_, hdmap_utils))
+  map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
 {
   adjustOrientationAndOzPosition(hdmap_utils);
 }
@@ -158,15 +158,12 @@ auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition(
 
 }  // namespace lanelet_pose
 
-bool isSameLaneletId(
-  const lanelet_pose::CanonicalizedLaneletPose & p0,
-  const lanelet_pose::CanonicalizedLaneletPose & p1)
+bool isSameLaneletId(const CanonicalizedLaneletPose & p0, const CanonicalizedLaneletPose & p1)
 {
   return static_cast<LaneletPose>(p0).lanelet_id == static_cast<LaneletPose>(p1).lanelet_id;
 }
 
-auto isSameLaneletId(const lanelet_pose::CanonicalizedLaneletPose & p, const lanelet::Id lanelet_id)
-  -> bool
+auto isSameLaneletId(const CanonicalizedLaneletPose & p, const lanelet::Id lanelet_id) -> bool
 {
   return static_cast<LaneletPose>(p).lanelet_id == lanelet_id;
 }

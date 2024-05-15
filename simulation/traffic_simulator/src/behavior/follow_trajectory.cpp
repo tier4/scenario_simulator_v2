@@ -565,7 +565,7 @@ auto makeUpdatedStatus(
     if (entity_status.lanelet_pose_valid) {
       unique_route_lanelets.push_back(entity_status.lanelet_pose.lanelet_id);
     }
-    if (const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+    if (const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
           updated_status.pose, entity_status.bounding_box, unique_route_lanelets, false, 3.0,
           hdmap_utils);
         canonicalized_lanelet_pose) {

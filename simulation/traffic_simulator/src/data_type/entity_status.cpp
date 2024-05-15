@@ -67,7 +67,7 @@ auto CanonicalizedEntityStatus::canonicalize() -> void
       The Oz position and orientation based on LaneletPose are rewritten to the used map_pose,
       since such adjustment relative to the lanelet is necessary,
       The position in Ox and Oy is not rewritten because the map_pose retrieved via
-      lanelet_pose=pose::toCanonicalizedLaneletPose(map_pose), then map_pose=pose::toMapPose(lanelet_pose)
+      lanelet_pose = toCanonicalizedLaneletPose(map_pose), then map_pose = toMapPose(lanelet_pose)
       can be different from the original one (especially if the entity changes lane)
     */
     const auto map_pose_based_on_lanelet_pose =

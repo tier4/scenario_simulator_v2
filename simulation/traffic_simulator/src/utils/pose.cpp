@@ -299,10 +299,10 @@ auto isInLanelet(
       lanelet_id, 0.0, 0.0, hdmap_utils_ptr);
     const auto end_edge = traffic_simulator::helper::constructCanonicalizedLaneletPose(
       lanelet_id, hdmap_utils_ptr->getLaneletLength(lanelet_id), 0.0, hdmap_utils_ptr);
-    auto dist0 = distance::longitudinalDistance(
+    auto dist0 = longitudinalDistance(
       start_edge, canonicalized_lanelet_pose, include_adjacent_lanelet, include_opposite_direction,
       allow_lane_change, hdmap_utils_ptr);
-    auto dist1 = distance::longitudinalDistance(
+    auto dist1 = longitudinalDistance(
       canonicalized_lanelet_pose, end_edge, include_adjacent_lanelet, include_opposite_direction,
       allow_lane_change, hdmap_utils_ptr);
     if (dist0 and dist0.value() < tolerance) {

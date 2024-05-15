@@ -121,14 +121,14 @@ auto API::setEntityStatus(const std::string & name, const EntityStatus & status)
   if (const auto entity = getEntity(name)) {
     if (status.lanelet_pose_valid) {
       const auto canonicalized_lanelet_pose =
-        pose::canonicalize(status.lanelet_pose, entity_manager_ptr_->getHdmapUtils());
+        canonicalize(status.lanelet_pose, entity_manager_ptr_->getHdmapUtils());
       entity->setStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
     } else {
       const auto include_crosswalk = [](const auto & entity_type) {
         return (traffic_simulator_msgs::msg::EntityType::PEDESTRIAN == entity_type.type) ||
                (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
       }(entity->getEntityType());
-      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
         status.pose, entity->getBoundingBox(), include_crosswalk,
         entity->getDefaultMatchingDistanceForLaneletPoseCalculation(),
         entity_manager_ptr_->getHdmapUtils());
@@ -161,7 +161,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   setEntityStatus(
-    name, pose::canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
+    name, canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
 }
 
 auto API::setEntityStatus(
@@ -185,7 +185,7 @@ auto API::setEntityStatus(
 {
   if (const auto reference_entity = getEntity(reference_entity_name)) {
     setEntityStatus(
-      name, pose::transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
+      name, transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
       action_status);
   } else {
     THROW_SIMULATION_ERROR(

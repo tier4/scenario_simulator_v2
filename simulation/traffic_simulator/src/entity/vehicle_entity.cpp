@@ -165,8 +165,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->update(current_time, step_time);
     const auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (const auto canonicalized_lanelet_pose = status_updated->getCanonicalizedLaneletPose()) {
-      if (traffic_simulator::pose::isAtEndOfLanelets(
-            canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
+      if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
         stopAtCurrentPosition();
         updateStandStillDuration(step_time);
         updateTraveledDistance(step_time);
@@ -195,7 +194,7 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
-    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
       map_pose, status_.getBoundingBox(), false,
       getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
     requestAcquirePosition(canonicalized_lanelet_pose.value());
@@ -223,7 +222,7 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
-      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
         waypoint, status_.getBoundingBox(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       route.emplace_back(canonicalized_lanelet_pose.value());
@@ -242,7 +241,7 @@ auto VehicleEntity::requestFollowTrajectory(
   std::vector<CanonicalizedLaneletPose> waypoints;
   for (const auto & vertex : parameter->shape.vertices) {
     if (
-      const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
         vertex.position, status_.getBoundingBox(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
       waypoints.emplace_back(canonicalized_lanelet_pose.value());
