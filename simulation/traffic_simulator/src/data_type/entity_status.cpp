@@ -69,8 +69,17 @@ auto CanonicalizedEntityStatus::canonicalize() -> void
   if (canonicalized_lanelet_pose_) {
     entity_status_.lanelet_pose_valid = true;
     entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
-    entity_status_.pose =
+    /*
+      The Oz position and orientation based on LaneletPose are rewritten to the used map_pose,
+      since such adjustment relative to the lanelet is necessary,
+      The position in Ox and Oy is not rewritten because the map_pose retrieved via
+      lanelet_pose=pose::toCanonicalizedLaneletPose(map_pose), then map_pose=pose::toMapPose(lanelet_pose)
+      can be different from the original one (especially if the entity changes lane)
+    */
+    const auto map_pose_based_on_lanelet_pose =
       static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose_.value());
+    entity_status_.pose.position.z = map_pose_based_on_lanelet_pose.position.z;
+    entity_status_.pose.orientation = map_pose_based_on_lanelet_pose.orientation;
   } else {
     entity_status_.lanelet_pose_valid = false;
     entity_status_.lanelet_pose = LaneletPose();
@@ -90,11 +99,7 @@ auto CanonicalizedEntityStatus::getBoundingBox() const noexcept
 
 auto CanonicalizedEntityStatus::getMapPose() const noexcept -> geometry_msgs::msg::Pose
 {
-  if (canonicalized_lanelet_pose_) {
-    return static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose_.value());
-  } else {
-    return entity_status_.pose;
-  }
+  return entity_status_.pose;
 }
 
 auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose

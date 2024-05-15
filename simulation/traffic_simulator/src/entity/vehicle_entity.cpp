@@ -163,7 +163,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     }
     behavior_plugin_ptr_->setReferenceTrajectory(spline_);
     behavior_plugin_ptr_->update(current_time, step_time);
-    auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
+    const auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
     if (const auto canonicalized_lanelet_pose = status_updated->getCanonicalizedLaneletPose()) {
       if (traffic_simulator::pose::isAtEndOfLanelets(
             canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
