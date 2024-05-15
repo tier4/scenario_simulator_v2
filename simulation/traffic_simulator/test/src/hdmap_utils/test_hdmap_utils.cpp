@@ -1227,6 +1227,57 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift0)
   EXPECT_EQ(result_lanelet.value(), end_lanelet);
 }
 
+TEST(HdMapUtils, getPreviousLanelets_straightBefore)
+{
+  // refer to 3rd issue at the end of this file
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id lanelet_id = 202;
+
+  auto result_previous = hdmap_utils.getPreviousLanelets(lanelet_id, 50.0);
+
+  lanelet::Ids actual_previous{202, 3002185, 3002181};
+
+  EXPECT_EQ(result_previous.size(), actual_previous.size());
+  EXPECT_EQ(result_previous[0], actual_previous[0]);
+  EXPECT_EQ(result_previous[1], actual_previous[1]);
+  EXPECT_EQ(result_previous[2], actual_previous[2]);
+}
+
+TEST(HdMapUtils, getPreviousLanelets_curveBefore)
+{
+  // refer to 3rd issue at the end of this file
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id lanelet_id = 34600;
+
+  auto result_previous = hdmap_utils.getPreviousLanelets(lanelet_id, 100.0);
+
+  lanelet::Ids actual_previous{34600, 34783, 34606, 34795, 34507};
+
+  EXPECT_EQ(result_previous.size(), actual_previous.size());
+  EXPECT_EQ(result_previous[0], actual_previous[0]);
+  EXPECT_EQ(result_previous[1], actual_previous[1]);
+  EXPECT_EQ(result_previous[2], actual_previous[2]);
+  EXPECT_EQ(result_previous[3], actual_previous[3]);
+  EXPECT_EQ(result_previous[4], actual_previous[4]);
+}
+
+TEST(HdMapUtils, getPreviousLanelets_notEnoughLaneletsBefore)
+{
+  // refer to 3rd issue at the end of this file
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  const lanelet::Id lanelet_id = 202;
+
+  auto result_previous = hdmap_utils.getPreviousLanelets(lanelet_id, 200.0);
+
+  lanelet::Ids actual_previous{202, 3002185, 3002181, 3002178};
+
+  EXPECT_EQ(result_previous.size(), actual_previous.size());
+  EXPECT_EQ(result_previous[0], actual_previous[0]);
+  EXPECT_EQ(result_previous[1], actual_previous[1]);
+  EXPECT_EQ(result_previous[2], actual_previous[2]);
+  EXPECT_EQ(result_previous[3], actual_previous[3]);
+}
+
 TEST(HdMapUtils, getTrafficLightIds_correct)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
@@ -1622,4 +1673,10 @@ ISSUES:
 2: 776: confusing naming or functionality: 
   consider getFollowingLanelets(120660, {120660, <random-lanelets>}, 10000, true);
   then <random-lanelets> will be added unconditionally.
+3: 743: the function has mistake:
+  The function is supposed to reverse one lanelet in every iteration, but every iteration starts
+  from the lanelet passed as argument, so the result will be the lanelet passed as argument and many
+  copies of the one previous lanelet.
+  The mistake was introduced here: https://github.com/tier4/scenario_simulator_v2/commit/3fc8c0ad9f6aaf0762b16c0cb168e1dfcbf1ed29#diff-da44510bdbbba766d1ba47318640cfd8bcff2e350eafe3d77d364bfbf70e25cdL745-L770
+  The previous implementation seems to have been right.
 */
