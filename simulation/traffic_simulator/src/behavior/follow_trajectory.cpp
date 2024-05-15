@@ -560,6 +560,7 @@ auto makeUpdatedStatus(
 
     // matching distance has been set to 3.0 due to matching problems during lane changes
     // prefer the current lanelet
+    /// @todo matching_distance should be passed here
     lanelet::Ids unique_route_lanelets;
     if (entity_status.lanelet_pose_valid) {
       unique_route_lanelets.push_back(entity_status.lanelet_pose.lanelet_id);

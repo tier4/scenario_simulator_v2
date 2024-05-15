@@ -159,12 +159,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         behavior_parameter_, hdmap_utils_ptr_, step_time,
         target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       // prefer the current lanelet
-      lanelet::Ids unique_route_lanelets;
-      if (status_.laneMatchingSucceed()) {
-        unique_route_lanelets.push_back(status_.getLaneletId());
-      }
       const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-        updated_status.value().pose, getBoundingBox(), unique_route_lanelets, false,
+        updated_status.value().pose, status_.getBoundingBox(), status_.getLaneletIds(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
       setStatus(CanonicalizedEntityStatus(*updated_status, canonicalized_lanelet_pose));
     } else {
@@ -303,7 +299,7 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
   status.pose = map_pose;
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
   const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-    map_pose, getBoundingBox(), unique_route_lanelets, false,
+    map_pose, status_.getBoundingBox(), unique_route_lanelets, false,
     getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
   status_ = CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
 }

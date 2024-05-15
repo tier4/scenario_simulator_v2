@@ -46,7 +46,7 @@ auto quietNaNLaneletPose() -> traffic_simulator::LaneletPose
 
 auto canonicalize(
   const LaneletPose & lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr, bool verbose)
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>
 {
   if (lanelet_pose == LaneletPose())
@@ -112,7 +112,6 @@ auto toCanonicalizedLaneletPose(
     lanelet_pose =
       hdmap_utils_ptr->toLaneletPose(map_pose, bbox, include_crosswalk, matching_distance);
   }
-
   if (lanelet_pose) {
     return canonicalize(lanelet_pose.value(), hdmap_utils_ptr);
   } else {
@@ -183,8 +182,8 @@ auto relativeLaneletPose(
   constexpr bool include_opposite_direction{true};
 
   traffic_simulator::LaneletPose position = quietNaNLaneletPose();
-  // here the s and offset are intentionally assigned independently, even if it
-  // is not possible to calculate one of them - it happens that one is sufficient
+  // here the s and offset are intentionally assigned independently, even if
+  // it is not possible to calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_distance = longitudinalDistance(
       from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change,
@@ -209,8 +208,8 @@ auto boundingBoxRelativeLaneletPose(
   constexpr bool include_opposite_direction{true};
 
   traffic_simulator::LaneletPose position = quietNaNLaneletPose();
-  // here the s and offset are intentionally assigned independently, even if it
-  // is not possible to calculate one of them - it happens that one is sufficient
+  // here the s and offset are intentionally assigned independently, even if
+  // it is not possible to calculate one of them - it happens that one is sufficient
   if (
     const auto longitudinal_bounding_box_distance = boundingBoxLaneLongitudinalDistance(
       from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,

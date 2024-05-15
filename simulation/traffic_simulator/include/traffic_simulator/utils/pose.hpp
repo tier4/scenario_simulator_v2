@@ -29,7 +29,7 @@ auto quietNaNLaneletPose() -> traffic_simulator::LaneletPose;
 // Conversions
 auto canonicalize(
   const LaneletPose & lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr, bool verbose = false)
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<lanelet_pose::CanonicalizedLaneletPose>;
 
 auto toMapPose(const lanelet_pose::CanonicalizedLaneletPose & lanelet_pose)

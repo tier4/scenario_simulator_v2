@@ -141,12 +141,10 @@ auto EgoEntitySimulation::makeSimulationModel(
     case VehicleModelType::DELAY_STEER_MAP_ACC_GEARED:
       if (!std::filesystem::exists(acceleration_map_path)) {
         throw std::runtime_error(
-          "`acceleration_map_path` parameter is necessary "
-          "for `DELAY_STEER_MAP_ACC_GEARED` "
+          "`acceleration_map_path` parameter is necessary for `DELAY_STEER_MAP_ACC_GEARED` "
           "simulator model, but " +
           acceleration_map_path +
-          " does not exist. Please confirm that the "
-          "parameter is set correctly.");
+          " does not exist. Please confirm that the parameter is set correctly.");
       }
       return std::make_shared<SimModelDelaySteerMapAccGeared>(
         vel_lim, steer_lim, vel_rate_lim, steer_rate_lim, wheel_base, step_time, acc_time_delay,

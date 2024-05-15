@@ -29,6 +29,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   canonicalize();
 }
 
+/// @todo this consturctor will be removed (after adaptation of behavior_tree)
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
@@ -39,6 +40,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   canonicalize();
 }
 
+/// @todo this consturctor will be removed (after adaptation of behavior_tree)
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
@@ -53,14 +55,6 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntitySt
 : canonicalized_lanelet_pose_(obj.canonicalized_lanelet_pose_),
   entity_status_(static_cast<EntityStatus>(obj))
 {
-}
-
-CanonicalizedEntityStatus & CanonicalizedEntityStatus::operator=(
-  const CanonicalizedEntityStatus & obj)
-{
-  this->canonicalized_lanelet_pose_ = obj.canonicalized_lanelet_pose_;
-  this->entity_status_ = obj.entity_status_;
-  return *this;
 }
 
 auto CanonicalizedEntityStatus::canonicalize() -> void
@@ -114,6 +108,11 @@ auto CanonicalizedEntityStatus::getLaneletPose() const -> LaneletPose
 auto CanonicalizedEntityStatus::getLaneletId() const -> lanelet::Id
 {
   return getLaneletPose().lanelet_id;
+}
+
+auto CanonicalizedEntityStatus::getLaneletIds() const -> lanelet::Ids
+{
+  return laneMatchingSucceed() ? lanelet::Ids{getLaneletId()} : lanelet::Ids{};
 }
 
 auto CanonicalizedEntityStatus::getCanonicalizedLaneletPose() const

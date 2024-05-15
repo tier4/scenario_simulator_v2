@@ -77,9 +77,10 @@ public:
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const NativeWorldPosition & pose) -> NativeLanePosition
     {
+      constexpr bool include_crosswalk{false};
       if (
-        const auto result =
-          traffic_simulator::pose::toCanonicalizedLaneletPose(pose, false, core->getHdmapUtils())) {
+        const auto result = traffic_simulator::pose::toCanonicalizedLaneletPose(
+          pose, include_crosswalk, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(
@@ -573,7 +574,7 @@ public:
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
       if (const auto entity = core->getEntity(entity_ref)) {
-        if (auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+        if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
           return static_cast<Double>(std::abs(
             static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()).rpy.z));
         }

@@ -26,24 +26,6 @@
 
 namespace traffic_simulator
 {
-
-/// @todo it probably should be moved to SimulatorCore
-std::optional<double> API::getTimeHeadway(
-  const std::string & from_entity_name, const std::string & to_entity_name)
-{
-  if (auto from_entity = getEntity(from_entity_name); from_entity) {
-    if (auto to_entity = getEntity(to_entity_name); to_entity) {
-      if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
-          relative_pose && relative_pose->position.x <= 0) {
-        const double time_headway =
-          (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;
-        return std::isnan(time_headway) ? std::numeric_limits<double>::infinity() : time_headway;
-      }
-    }
-  }
-  return std::nullopt;
-}
-
 void API::setVerbose(const bool verbose) { entity_manager_ptr_->setVerbose(verbose); }
 
 bool API::despawn(const std::string & name)
@@ -139,7 +121,7 @@ auto API::setEntityStatus(const std::string & name, const EntityStatus & status)
   if (const auto entity = getEntity(name)) {
     if (status.lanelet_pose_valid) {
       const auto canonicalized_lanelet_pose =
-        pose::canonicalize(status.lanelet_pose, entity_manager_ptr_->getHdmapUtils(), true);
+        pose::canonicalize(status.lanelet_pose, entity_manager_ptr_->getHdmapUtils());
       entity->setStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
     } else {
       const auto include_crosswalk = [](const auto & entity_type) {
@@ -155,6 +137,23 @@ auto API::setEntityStatus(const std::string & name, const EntityStatus & status)
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
   }
+}
+
+/// @todo it probably should be moved to SimulatorCore
+std::optional<double> API::getTimeHeadway(
+  const std::string & from_entity_name, const std::string & to_entity_name)
+{
+  if (auto from_entity = getEntity(from_entity_name); from_entity) {
+    if (auto to_entity = getEntity(to_entity_name); to_entity) {
+      if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+          relative_pose && relative_pose->position.x <= 0) {
+        const double time_headway =
+          (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;
+        return std::isnan(time_headway) ? std::numeric_limits<double>::infinity() : time_headway;
+      }
+    }
+  }
+  return std::nullopt;
 }
 
 auto API::setEntityStatus(

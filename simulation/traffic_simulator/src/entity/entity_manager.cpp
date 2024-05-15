@@ -167,7 +167,8 @@ auto EntityManager::getEntityStatus(const std::string & name) const -> Canonical
     assert(entity_status.name == name && "The entity name in status is different from key!");
     entity_status.action_status.current_action = getCurrentAction(name);
     entity_status.time = current_time_;
-    return CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_);
+    return CanonicalizedEntityStatus(
+      entity_status, iter->second->getStatus().getCanonicalizedLaneletPose());
   }
 }
 

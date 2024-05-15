@@ -54,26 +54,19 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
   auto updated_status = static_cast<traffic_simulator::EntityStatus>(
     ActionNode::calculateUpdatedEntityStatusInWorldFrame(
       target_speed, behavior_parameter.dynamic_constraints));
-  const auto lanelet_pose = estimateLaneletPose(updated_status.pose);
-  if (lanelet_pose) {
+
+  if (
+    auto const canonicalized_lanelet_pose =
+      traffic_simulator::pose::estimateCanonicalizedLaneletPose(
+        updated_status.pose, entity_status->getBoundingBox(), entity_status->getLaneletIds(), true,
+        default_matching_distance_for_lanelet_pose_calculation, hdmap_utils)) {
     updated_status.lanelet_pose_valid = true;
-    updated_status.lanelet_pose = static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value());
+    updated_status.lanelet_pose =
+      static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value());
   } else {
     updated_status.lanelet_pose_valid = false;
     updated_status.lanelet_pose = traffic_simulator::LaneletPose();
   }
   return traffic_simulator::CanonicalizedEntityStatus(updated_status, hdmap_utils);
-}
-
-auto PedestrianActionNode::estimateLaneletPose(const geometry_msgs::msg::Pose & pose) const
-  -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
-{
-  lanelet::Ids unique_route_lanelets;
-  if (entity_status->laneMatchingSucceed()) {
-    unique_route_lanelets.push_back(entity_status->getLaneletId());
-  }
-  return traffic_simulator::pose::estimateCanonicalizedLaneletPose(
-    pose, entity_status->getBoundingBox(), unique_route_lanelets, true,
-    default_matching_distance_for_lanelet_pose_calculation, hdmap_utils);
 }
 }  // namespace entity_behavior

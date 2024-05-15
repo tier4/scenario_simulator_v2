@@ -40,7 +40,6 @@ public:
     const lanelet::Ids & route_lanelets);
   explicit CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
-  CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj);
   auto setAction(const std::string & action) -> void;
   auto getName() const noexcept -> const std::string & { return entity_status_.name; };
   auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
@@ -48,6 +47,7 @@ public:
   auto getMapPose() const noexcept -> geometry_msgs::msg::Pose;
   auto getLaneletPose() const -> LaneletPose;
   auto getLaneletId() const -> lanelet::Id;
+  auto getLaneletIds() const -> lanelet::Ids;
   auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
   auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
   auto getTwist() const noexcept -> geometry_msgs::msg::Twist;
