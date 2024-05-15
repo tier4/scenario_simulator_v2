@@ -39,40 +39,13 @@ namespace entity
 {
 void EntityManager::broadcastEntityTransform()
 {
-  /**
-   * @note This part of the process is intended to ensure that frames are issued in a position that makes 
-   * it as easy as possible to see the entities that will appear in the scenario.
-   * In the past, we used to publish the frames of all entities, but that would be too heavy processing, 
-   * so we publish the average of the coordinates of all entities.
-   */
-  if (isEgoSpawned()) {
-    if (const auto ego = getEntity(getEgoName())) {
-      broadcastTransform(
-        geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
-          /**
-           * @note This is the intended implementation. 
-           * It is easier to create rviz config if the name “ego” is fixed, 
-           * so the frame_id “ego” is issued regardless of the name of the ego entity.
-           */
-          .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-          .pose(ego->getMapPose()),
-        true);
-    }
-  }
-  if (const auto names = getEntityNames(); !names.empty()) {
-    broadcastTransform(
-      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
-        .header(
-          std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
-        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
-                .position(std::accumulate(
-                  names.begin(), names.end(), geometry_msgs::msg::Point(),
-                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
-                    return point + (getEntity(name)->getMapPose().position *
-                                    (1.0 / static_cast<double>(names.size())));
-                  }))
-                .orientation(geometry_msgs::msg::Quaternion())),
-      true);
+  std::vector<std::string> names = getEntityNames();
+  for (const auto & name : names) {
+    geometry_msgs::msg::PoseStamped pose;
+    pose.pose = getEntity(name)->getMapPose();
+    pose.header.stamp = clock_ptr_->now();
+    pose.header.frame_id = name;
+    broadcastTransform(pose);
   }
 }
 
