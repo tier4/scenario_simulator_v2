@@ -67,8 +67,6 @@ class OpenSCENARIOValidator
 
   ErrorHandler error_handler;
 
-  static constexpr auto schema_filepath = "/tmp/OpenSCENARIO-1.3.xsd";
-
   struct XMLPlatformLifecycleHandler
   {
     XMLPlatformLifecycleHandler() { xercesc::XMLPlatformUtils::Initialize(); }
@@ -92,7 +90,6 @@ public:
       parser->setDoNamespaces(true);
       parser->setDoSchema(true);
       parser->setErrorHandler(&error_handler);
-      parser->setExternalNoNamespaceSchemaLocation(schema_filepath);
       parser->setValidationSchemaFullChecking(true);
       parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
     }
