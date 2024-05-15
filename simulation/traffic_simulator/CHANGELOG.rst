@@ -13,6 +13,18 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.16.4 (2024-05-15)
+-------------------
+* Merge pull request `#1245 <https://github.com/tier4/scenario_simulator_v2/issues/1245>`_ from tier4/feature/remove_entity_type_list
+  remove unused member values in behavior plugin
+* Merge branch 'master' into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge remote-tracking branch 'origin/feature/remove_entity_type_list' into feature/remove_entity_type_list
+* Merge branch 'master' into feature/remove_entity_type_list
+* remove unused member values in behavior plugin
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
 1.16.3 (2024-05-13)
 -------------------
 * Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/contributing_md
