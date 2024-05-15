@@ -1615,6 +1615,121 @@ TEST(HdMapUtils, getLaneletLength_cache)
   EXPECT_EQ(result_length_nohit, result_length_hit);
 }
 
+TEST(HdMapUtils, getTrafficLightIdsOnPath_trafficLights)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Ids route = {34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630};
+
+  auto result_traffic_light_ids = hdmap_utils.getTrafficLightIdsOnPath(route);
+  auto actual_traffic_light_ids = lanelet::Ids{34802, 34836};
+
+  std::sort(result_traffic_light_ids.begin(), result_traffic_light_ids.end());
+  std::sort(actual_traffic_light_ids.begin(), actual_traffic_light_ids.end());
+
+  EXPECT_EQ(result_traffic_light_ids, actual_traffic_light_ids);
+}
+
+TEST(HdMapUtils, getTrafficLightIdsOnPath_noTrafficLights)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Ids route = {34579, 34774, 120659, 120660, 34468, 34438};
+
+  auto result_traffic_light_ids = hdmap_utils.getTrafficLightIdsOnPath(route);
+
+  EXPECT_EQ(result_traffic_light_ids.size(), static_cast<size_t>(0));
+}
+
+TEST(HdMapUtils, getTrafficLightIdsOnPath_empty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  auto result_traffic_light_ids = hdmap_utils.getTrafficLightIdsOnPath({});
+
+  EXPECT_EQ(result_traffic_light_ids.size(), static_cast<size_t>(0));
+}
+
+TEST(HdMapUtils, getLongitudinalDistance_sameLanelet)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  auto pose_from = hdmap_utils.toLaneletPose(
+    makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
+  auto pose_to = hdmap_utils.toLaneletPose(
+    makePose(makePoint(3825.10, 73786.34, -1.82), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
+  EXPECT_TRUE(pose_from.has_value());
+  EXPECT_TRUE(pose_to.has_value());
+
+  const bool allow_lane_change = false;
+
+  const auto result_distance =
+    hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), allow_lane_change);
+
+  const double actual_distance = 27.0;
+  const double epsilon = 1.0;
+
+  EXPECT_TRUE(result_distance.has_value());
+  EXPECT_NEAR(result_distance.value(), actual_distance, epsilon);
+}
+
+TEST(HdMapUtils, getLongitudinalDistance_differentLanelet)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  auto pose_from =
+    hdmap_utils.toLaneletPose(makePose(makePoint(3801.19, 73812.70, -2.86)), lanelet::Id{120660});
+  auto pose_to =
+    hdmap_utils.toLaneletPose(makePose(makePoint(3724.70, 73773.00, -1.20)), lanelet::Id{34462});
+  EXPECT_TRUE(pose_from.has_value());
+  EXPECT_TRUE(pose_to.has_value());
+
+  const bool allow_lane_change = false;
+
+  const auto result_distance =
+    hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), allow_lane_change);
+
+  const double actual_distance = 86.0;
+  const double epsilon = 1.0;
+
+  EXPECT_TRUE(result_distance.has_value());
+  EXPECT_NEAR(result_distance.value(), actual_distance, epsilon);
+}
+
+TEST(HdMapUtils, getLongitudinalDistance_sameLaneletBehind)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  auto pose_to = hdmap_utils.toLaneletPose(
+    makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
+  auto pose_from = hdmap_utils.toLaneletPose(
+    makePose(makePoint(3825.10, 73786.34, -1.82), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
+  EXPECT_TRUE(pose_from.has_value());
+  EXPECT_TRUE(pose_to.has_value());
+
+  const bool allow_lane_change = false;
+
+  const auto result_distance =
+    hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), allow_lane_change);
+
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getLongitudinalDistance_differentLaneletNoRoute)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto pose_to = hdmap_utils.toLaneletPose(
+    makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
+  auto pose_from = hdmap_utils.toLaneletPose(
+    makePose(makePoint(81596.20, 50068.04), makeQuaternionFromYaw(90.0)), lanelet::Id{3002166});
+  EXPECT_TRUE(pose_from.has_value());
+  EXPECT_TRUE(pose_to.has_value());
+
+  const bool allow_lane_change = false;
+
+  const auto result_distance =
+    hdmap_utils.getLongitudinalDistance(pose_from.value(), pose_to.value(), allow_lane_change);
+
+  EXPECT_FALSE(result_distance.has_value());
+}
+
 /*
 ISSUES:
 1: 288, missing predicate if first is closer than distance threshold.
