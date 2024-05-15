@@ -162,6 +162,26 @@ TEST(HdMapUtils, AlongLaneletPose)
     hdmap_utils.getLaneletLength(34684) - 10.0);
 }
 
+TEST(HdMapUtils, AlongLaneletPose_afterLast)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  const lanelet::Id lanelet_id = 206;
+  const auto pose = traffic_simulator::helper::constructLaneletPose(lanelet_id, 15.0);
+
+  EXPECT_THROW(hdmap_utils.getAlongLaneletPose(pose, 30.0), common::SemanticError);
+}
+
+TEST(HdMapUtils, AlongLaneletPose_beforeFirst)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  const lanelet::Id lanelet_id = 3002178;
+  const auto pose = traffic_simulator::helper::constructLaneletPose(lanelet_id, 15.0);
+
+  EXPECT_THROW(hdmap_utils.getAlongLaneletPose(pose, -30.0), common::SemanticError);
+}
+
 /**
  * @note Testcase for lanelet pose canonicalization when s < 0
  * Following lanelets: 34576 -> 34570 -> 34564
