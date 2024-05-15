@@ -1587,6 +1587,85 @@ TEST(HdMapUtils, canChangeLane_invalidLaneletId)
   EXPECT_THROW(hdmap_utils.canChangeLane(from_id, to_id), std::runtime_error);
 }
 
+TEST(HdMapUtils, getLateralDistance_sameLane)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  traffic_simulator_msgs::msg::LaneletPose from, to;
+  from.lanelet_id = 3002185;
+  from.s = 0.0;
+  from.offset = 0.5;
+
+  to.lanelet_id = 3002185;
+  to.s = 10.0;
+  to.offset = 0.2;
+
+  const auto result = hdmap_utils.getLateralDistance(from, to);
+  constexpr double epsilon = 1e-3;
+
+  EXPECT_TRUE(result.has_value());
+  EXPECT_NEAR(result.value(), to.offset - from.offset, epsilon);
+}
+
+TEST(HdMapUtils, getLateralDistance_parallelLanesCanNotChange)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  traffic_simulator_msgs::msg::LaneletPose from, to;
+  from.lanelet_id = 3002185;
+  from.s = 0.0;
+  from.offset = 0.5;
+
+  to.lanelet_id = 3002184;
+  to.s = 10.0;
+  to.offset = 0.2;
+
+  const auto result = hdmap_utils.getLateralDistance(from, to, false);
+
+  EXPECT_FALSE(result.has_value());
+}
+
+TEST(HdMapUtils, getLateralDistance_parallelLanesCanChange)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  traffic_simulator_msgs::msg::LaneletPose from, to;
+  from.lanelet_id = 3002185;
+  from.s = 0.0;
+  from.offset = 0.5;
+
+  to.lanelet_id = 3002184;
+  to.s = 10.0;
+  to.offset = 0.2;
+
+  const double width1 = 2.80373, width2 = 3.03463;
+  const double actual_distance = width1 / 2.0 + width2 / 2.0 + to.offset - from.offset;
+
+  const auto result = hdmap_utils.getLateralDistance(from, to, true);
+  constexpr double epsilon = 1e-3;
+
+  EXPECT_TRUE(result.has_value());
+  EXPECT_NEAR(result.value(), actual_distance, epsilon);
+}
+
+TEST(HdMapUtils, getLateralDistance_notConnected)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  traffic_simulator_msgs::msg::LaneletPose from, to;
+  from.lanelet_id = 3002185;
+  from.s = 0.0;
+  from.offset = 0.5;
+
+  to.lanelet_id = 3002166;
+  to.s = 10.0;
+  to.offset = 0.2;
+
+  const auto result = hdmap_utils.getLateralDistance(from, to, true);
+
+  EXPECT_FALSE(result.has_value());
+}
+
 TEST(HdMapUtils, getRoute_correct)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
