@@ -13,6 +13,48 @@ Changelog for package status_monitor
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.16.4 (2024-05-15)
+-------------------
+* Merge branch 'master' into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge remote-tracking branch 'origin/feature/remove_entity_type_list' into feature/remove_entity_type_list
+* Merge branch 'master' into feature/remove_entity_type_list
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
+1.16.3 (2024-05-13)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/contributing_md
+* Contributors: hakuturu583
+
+1.16.2 (2024-05-10)
+-------------------
+
+1.16.1 (2024-05-10)
+-------------------
+* Merge branch 'master' into doc/support_awesome-pages
+* Contributors: Taiga
+
+1.16.0 (2024-05-09)
+-------------------
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin-ssh/master' into feature/respawn-entity
+* Contributors: DMoszynski, Dawid Moszyński, Paweł Lech, Tatsuya Yamasaki
+
+1.15.7 (2024-05-09)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/master' into feature/speed_up_set_other_status
+* Contributors: hakuturu583
+
 1.15.6 (2024-05-07)
 -------------------
 * Merge branch 'master' into feature/publish_scenario_frame
