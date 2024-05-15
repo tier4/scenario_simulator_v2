@@ -88,6 +88,14 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   simulation_interface::toMsg(req.initialize_ros_time(), t);
   current_ros_time_ = t;
   hdmap_utils_ = std::make_shared<hdmap_utils::HdMapUtils>(req.lanelet2_map_path(), getOrigin());
+  const auto consider_pose_by_road_slope = [&]() {
+    if (!has_parameter("consider_pose_by_road_slope")) {
+      declare_parameter("consider_pose_by_road_slope", false);
+    }
+    return get_parameter("consider_pose_by_road_slope").as_bool();
+  }();
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
+    consider_pose_by_road_slope);
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");
@@ -220,19 +228,14 @@ auto ScenarioSimulator::spawnVehicleEntity(
       }
       return get_parameter("consider_acceleration_by_road_slope").as_bool();
     };
-    auto get_consider_pose_by_road_slope = [&]() {
-      if (!has_parameter("consider_pose_by_road_slope")) {
-        declare_parameter("consider_pose_by_road_slope", false);
-      }
-      return get_parameter("consider_pose_by_road_slope").as_bool();
-    };
     traffic_simulator_msgs::msg::EntityStatus initial_status;
     initial_status.name = parameters.name;
     initial_status.bounding_box = parameters.bounding_box;
+    simulation_interface::toMsg(req.pose(), initial_status.pose);
     ego_entity_simulation_ = std::make_shared<vehicle_simulation::EgoEntitySimulation>(
       initial_status, parameters, step_time_, hdmap_utils_,
       get_parameter_or("use_sim_time", rclcpp::Parameter("use_sim_time", false)),
-      get_consider_acceleration_by_road_slope(), get_consider_pose_by_road_slope());
+      get_consider_acceleration_by_road_slope());
   } else {
     vehicles_.emplace_back(req.parameters());
   }

@@ -64,8 +64,9 @@ auto toMapPose(
   const LaneletPose & lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> geometry_msgs::msg::Pose
 {
-  constexpr bool fill_pitch{true};
-  return hdmap_utils_ptr->toMapPose(lanelet_pose, fill_pitch).pose;
+  return hdmap_utils_ptr
+    ->toMapPose(lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
+    .pose;
 }
 
 auto toCanonicalizedLaneletPose(

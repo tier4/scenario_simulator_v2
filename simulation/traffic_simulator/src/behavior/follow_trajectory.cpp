@@ -560,20 +560,23 @@ auto makeUpdatedStatus(
 
     // matching distance has been set to 3.0 due to matching problems during lane changes
     // prefer the current lanelet
-    lanelet::Ids unique_route_lanelets;
-    if (entity_status.lanelet_pose_valid) {
-      unique_route_lanelets.push_back(entity_status.lanelet_pose.lanelet_id);
-    }
-    if (const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-          updated_status.pose, entity_status.bounding_box, unique_route_lanelets, false, 3.0,
-          hdmap_utils);
-        canonicalized_lanelet_pose) {
-      updated_status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
+    // lanelet::Ids unique_route_lanelets;
+    // if (entity_status.lanelet_pose_valid) {
+    //   unique_route_lanelets.push_back(entity_status.lanelet_pose.lanelet_id);
+    // }
+   
+    if (const auto lanelet_pose =
+          hdmap_utils->toLaneletPose(updated_status.pose, entity_status.bounding_box, false, 3.0);
+        lanelet_pose) {
+      updated_status.lanelet_pose = lanelet_pose.value();
       updated_status.lanelet_pose_valid = true;
     } else {
       updated_status.lanelet_pose_valid = false;
     }
-
+    std::cout<<" Updated pose: "<<updated_status.pose.position.x<<" "<<updated_status.pose.position.y<<" "<<updated_status.pose.position.z<<std::endl;
+    std::cout<<" Updated lanelet_pose: "<<updated_status.lanelet_pose.lanelet_id<<" "<<updated_status.lanelet_pose.s<<" "<<updated_status.lanelet_pose.offset<<std::endl;
+    std::cout<<" Updated v, acc: "<<updated_status.action_status.twist.linear.x<<" "<<updated_status.action_status.accel.linear.x<<std::endl;
+    std::cout<<" ### "<<std::endl;
     return updated_status;
   }
 }

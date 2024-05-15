@@ -62,8 +62,6 @@ private:
 
   const bool consider_acceleration_by_road_slope_;
 
-  const bool consider_pose_by_road_slope_;
-
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
@@ -89,7 +87,7 @@ public:
     const traffic_simulator_msgs::msg::EntityStatus &,
     const traffic_simulator_msgs::msg::VehicleParameters &, double,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &, const rclcpp::Parameter & use_sim_time,
-    const bool consider_acceleration_by_road_slope, const bool consider_pose_by_road_slope);
+    const bool consider_acceleration_by_road_slope);
 
   auto overwrite(
     const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,

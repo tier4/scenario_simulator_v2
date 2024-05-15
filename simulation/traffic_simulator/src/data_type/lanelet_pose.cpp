@@ -134,8 +134,6 @@ auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition(
   using quaternion_operation::convertEulerAngleToQuaternion;
   using quaternion_operation::convertQuaternionToEulerAngle;
   using quaternion_operation::getRotation;
-
-  constexpr auto consider_pose_by_road_slope{true};
   const math::geometry::CatmullRomSpline spline(
     hdmap_utils->getCenterPoints(lanelet_pose_.lanelet_id));
   // adjust Oz position
@@ -143,7 +141,7 @@ auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition(
     map_pose_.position.z = spline.getPoint(s_value.value()).z;
   }
   // adjust pitch
-  if (consider_pose_by_road_slope) {
+  if (consider_pose_by_road_slope_) {
     const auto lanelet_quaternion = spline.getPose(lanelet_pose_.s, true).orientation;
     const auto lanelet_rpy = convertQuaternionToEulerAngle(lanelet_quaternion);
     const auto entity_rpy = convertQuaternionToEulerAngle(map_pose_.orientation);

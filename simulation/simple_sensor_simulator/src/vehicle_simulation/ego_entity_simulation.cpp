@@ -36,14 +36,12 @@ EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::EntityStatus & initial_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope,
-  const bool consider_pose_by_road_slope)
+  const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
-  consider_pose_by_road_slope_(consider_pose_by_road_slope),
   hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters)
 {

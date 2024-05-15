@@ -37,10 +37,15 @@ public:
   CanonicalizedLaneletPose & operator=(const CanonicalizedLaneletPose & obj);
   explicit operator LaneletPose() const noexcept { return lanelet_pose_; }
   explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
-  bool hasAlternativeLaneletPose() const { return lanelet_poses_.size() > 1; }
+  auto hasAlternativeLaneletPose() const -> bool { return lanelet_poses_.size() > 1; }
   auto getAlternativeLaneletPoseBaseOnShortestRouteFrom(
     LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
     bool allow_lane_change = false) const -> std::optional<LaneletPose>;
+  static auto setConsiderPoseByRoadSlope(bool consider_pose_by_road_slope) -> void
+  {
+    consider_pose_by_road_slope_ = consider_pose_by_road_slope;
+  }
+  static auto getConsiderPoseByRoadSlope() -> bool { return consider_pose_by_road_slope_; }
 
 /**
    Note: The comparison operator for the CanonicalizedLaneletPose type compares
@@ -76,6 +81,7 @@ private:
   LaneletPose lanelet_pose_;
   std::vector<LaneletPose> lanelet_poses_;
   geometry_msgs::msg::Pose map_pose_;
+  inline static bool consider_pose_by_road_slope_{false};
 };
 }  // namespace lanelet_pose
 
