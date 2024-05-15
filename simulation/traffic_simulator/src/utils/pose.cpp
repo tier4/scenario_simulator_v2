@@ -325,7 +325,7 @@ auto isAtEndOfLanelets(
          hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
-auto getLaneletLength(
+auto laneletLength(
   const lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> double
 {

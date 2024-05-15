@@ -21,7 +21,7 @@ namespace traffic_simulator
 {
 inline namespace pose
 {
-// Constructors
+// Useful constructors
 auto quietNaNPose() -> geometry_msgs::msg::Pose;
 
 auto quietNaNLaneletPose() -> traffic_simulator::LaneletPose;
@@ -109,7 +109,8 @@ auto isAtEndOfLanelets(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
 
-auto getLaneletLength(
+// it will be moved to "lanelet" namespace
+auto laneletLength(
   const lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> double;
 }  // namespace pose
