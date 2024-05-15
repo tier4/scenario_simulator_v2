@@ -100,12 +100,13 @@ void EntityManager::broadcastTransform(
 bool EntityManager::checkCollision(
   const std::string & first_entity_name, const std::string & second_entity_name)
 {
-  if (const auto first_entity = getEntity(first_entity_name)) {
-    if (const auto second_entity = getEntity(second_entity_name)) {
-      return first_entity != second_entity and
-             math::geometry::checkCollision2D(
-               first_entity->getMapPose(), first_entity->getBoundingBox(),
-               second_entity->getMapPose(), second_entity->getBoundingBox());
+  if (first_entity_name != second_entity_name) {
+    if (const auto first_entity = getEntity(first_entity_name)) {
+      if (const auto second_entity = getEntity(second_entity_name)) {
+        return math::geometry::checkCollision2D(
+          first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
+          second_entity->getBoundingBox());
+      }
     }
   }
   return false;

@@ -32,9 +32,9 @@ auto quietNaNPose() -> geometry_msgs::msg::Pose
     .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
 }
 
-auto quietNaNLaneletPose() -> traffic_simulator::LaneletPose
+auto quietNaNLaneletPose() -> LaneletPose
 {
-  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
+  return traffic_simulator_msgs::build<LaneletPose>()
     .lanelet_id(std::numeric_limits<std::int64_t>::max())
     .s(std::numeric_limits<double>::quiet_NaN())
     .offset(std::numeric_limits<double>::quiet_NaN())
@@ -83,14 +83,14 @@ auto toCanonicalizedLaneletPose(
 }
 
 auto toCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
-  const bool include_crosswalk, const double matching_distance,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
+  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>
 {
   if (
-    const auto pose =
-      hdmap_utils_ptr->toLaneletPose(map_pose, bbox, include_crosswalk, matching_distance)) {
+    const auto pose = hdmap_utils_ptr->toLaneletPose(
+      map_pose, bounding_box, include_crosswalk, matching_distance)) {
     return canonicalize(pose.value(), hdmap_utils_ptr);
   } else {
     return std::nullopt;
@@ -98,19 +98,20 @@ auto toCanonicalizedLaneletPose(
 }
 
 auto toCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>
 {
-  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
+  std::optional<LaneletPose> lanelet_pose;
   if (!unique_route_lanelets.empty()) {
     lanelet_pose =
       hdmap_utils_ptr->toLaneletPose(map_pose, unique_route_lanelets, matching_distance);
   }
   if (!lanelet_pose) {
     lanelet_pose =
-      hdmap_utils_ptr->toLaneletPose(map_pose, bbox, include_crosswalk, matching_distance);
+      hdmap_utils_ptr->toLaneletPose(map_pose, bounding_box, include_crosswalk, matching_distance);
   }
   if (lanelet_pose) {
     return canonicalize(lanelet_pose.value(), hdmap_utils_ptr);
@@ -176,12 +177,12 @@ auto boundingBoxRelativePose(
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool allow_lane_change, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> traffic_simulator::LaneletPose
+  -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
 
-  traffic_simulator::LaneletPose position = quietNaNLaneletPose();
+  LaneletPose position = quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if
   // it is not possible to calculate one of them - it happens that one is sufficient
   if (
@@ -201,13 +202,12 @@ auto boundingBoxRelativeLaneletPose(
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool allow_lane_change,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> traffic_simulator::LaneletPose
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
 
-  traffic_simulator::LaneletPose position = quietNaNLaneletPose();
+  LaneletPose position = quietNaNLaneletPose();
   // here the s and offset are intentionally assigned independently, even if
   // it is not possible to calculate one of them - it happens that one is sufficient
   if (
@@ -224,11 +224,17 @@ auto boundingBoxRelativeLaneletPose(
   return position;
 }
 
+/*
+  This function has been moved from pedestrian_action_node and modified,
+  in case of inconsistency please compare in original:
+  https://github.com/tier4/scenario_simulator_v2/blob/090a8d08bcb065d293a530cf641a953edf311f9f/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L67-L128
+*/
 auto estimateCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Pose & map_pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
+  -> std::optional<CanonicalizedLaneletPose>
 {
   std::optional<traffic_simulator::LaneletPose> lanelet_pose;
   if (!unique_route_lanelets.empty()) {
@@ -236,7 +242,7 @@ auto estimateCanonicalizedLaneletPose(
       hdmap_utils_ptr->toLaneletPose(map_pose, unique_route_lanelets, matching_distance);
   } else {
     lanelet_pose =
-      hdmap_utils_ptr->toLaneletPose(map_pose, bbox, include_crosswalk, matching_distance);
+      hdmap_utils_ptr->toLaneletPose(map_pose, bounding_box, include_crosswalk, matching_distance);
   }
   if (!lanelet_pose) {
     /**
@@ -295,9 +301,9 @@ auto isInLanelet(
   if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
     return true;
   } else {
-    const auto start_edge = traffic_simulator::helper::constructCanonicalizedLaneletPose(
-      lanelet_id, 0.0, 0.0, hdmap_utils_ptr);
-    const auto end_edge = traffic_simulator::helper::constructCanonicalizedLaneletPose(
+    const auto start_edge =
+      helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0, hdmap_utils_ptr);
+    const auto end_edge = helper::constructCanonicalizedLaneletPose(
       lanelet_id, hdmap_utils_ptr->getLaneletLength(lanelet_id), 0.0, hdmap_utils_ptr);
     auto dist0 = longitudinalDistance(
       start_edge, canonicalized_lanelet_pose, include_adjacent_lanelet, include_opposite_direction,
