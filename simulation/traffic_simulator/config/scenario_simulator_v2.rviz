@@ -6,8 +6,6 @@ Panels:
       Expanded:
         - /Map1/Lanelet2VectorMap1
         - /Sensing1/LiDAR1/ConcatenatePointCloud1/Autocompute Value Bounds1
-        - /Simulation1
-        - /Simulation1/Condition Group1
       Splitter Ratio: 0.557669460773468
     Tree Height: 955
   - Class: rviz_common/Selection
@@ -134,6 +132,137 @@ Visualization Manager:
                 Expand Link Details: false
                 Expand Tree: false
                 Link Tree Style: Links in Alphabetic Order
+                base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera0/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera0/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera1/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera1/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera2/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera2/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera3/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera3/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera4/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera4/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                camera5/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                camera5/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                gnss_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                sensor_kit_base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                tamagawa/imu_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                traffic_light_left_camera/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                traffic_light_left_camera/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                traffic_light_right_camera/camera_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                traffic_light_right_camera/camera_optical_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                velodyne_left:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_left_base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_rear:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_rear_base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_right:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_right_base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_top:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
+                velodyne_top_base_link:
+                  Alpha: 1
+                  Show Axes: false
+                  Show Trail: false
+                  Value: true
               Mass Properties:
                 Inertia: false
                 Mass: false
@@ -224,7 +353,23 @@ Visualization Manager:
           Enabled: true
           Name: Lanelet2VectorMap
           Namespaces:
-            {}
+            center_lane_line: true
+            center_line_arrows: true
+            curbstone: true
+            lane_start_bound: true
+            lanelet direction: true
+            lanelet_id: true
+            left_lane_bound: true
+            no_parking_area: true
+            parking_lots: true
+            right_lane_bound: true
+            road_lanelets: true
+            shoulder_center_lane_line: true
+            shoulder_center_line_arrows: true
+            shoulder_lane_start_bound: true
+            shoulder_left_lane_bound: true
+            shoulder_right_lane_bound: true
+            shoulder_road_lanelets: true
           Topic:
             Depth: 5
             Durability Policy: Transient Local
@@ -714,7 +859,15 @@ Visualization Manager:
                     Color: 119; 11; 32
                   Name: PredictedObjects
                   Namespaces:
-                    {}
+                    acceleration: true
+                    label: true
+                    path: true
+                    path confidence: true
+                    position covariance: true
+                    shape: true
+                    twist: true
+                    uuid: true
+                    velocity: true
                   PEDESTRIAN:
                     Alpha: 0.9990000128746033
                     Color: 255; 192; 203
@@ -817,7 +970,11 @@ Visualization Manager:
               Enabled: true
               Name: RouteArea
               Namespaces:
-                {}
+                goal_lanelets: true
+                lane_start_bound: true
+                left_lane_bound: true
+                right_lane_bound: true
+                route_lanelets: true
               Topic:
                 Depth: 5
                 Durability Policy: Transient Local
@@ -1800,7 +1957,8 @@ Visualization Manager:
                           Enabled: true
                           Name: VirtualWall (StartPlanner)
                           Namespaces:
-                            {}
+                            stop_factor_text: true
+                            stop_virtual_wall: true
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2842,7 +3000,7 @@ Visualization Manager:
           Enabled: true
           Name: Entity Marker
           Namespaces:
-            car_1: true
+            Npc1: true
             ego: true
           Topic:
             Depth: 5
@@ -2852,30 +3010,17 @@ Visualization Manager:
             Value: /simulation/entity/marker
           Value: true
         - Class: rviz_default_plugins/MarkerArray
-          Enabled: true
+          Enabled: false
           Name: Lanelet Marker
           Namespaces:
-            center_lane_line: true
-            center_line_arrows: true
-            crosswalk_lanelets: true
-            lane_start_bound: true
-            lanelet direction: true
-            lanelet_id: true
-            left_lane_bound: true
-            parking_lots: true
-            parking_space: true
-            right_lane_bound: true
-            road_lanelets: true
-            stop_lines: true
-            traffic_light: true
-            traffic_light_triangle: true
+            {}
           Topic:
             Depth: 5
             Durability Policy: Transient Local
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /simulation/lanelet/marker
-          Value: true
+          Value: false
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Traffic Light Marker
@@ -2894,10 +3039,10 @@ Visualization Manager:
           Length: 2370
           Name: Condition Group
           Text Color: 255; 255; 255
-          Top: 300
+          Top: 533
           Topic: /simulation/context
           Value: true
-          Value Scale: 15
+          Value Scale: 41.481483459472656
           Width: 2370
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
@@ -2978,7 +3123,11 @@ Visualization Manager:
                 Color: 119; 11; 32
               Name: Detected Objects
               Namespaces:
-                {}
+                label: true
+                position covariance: true
+                shape: true
+                twist: true
+                velocity: true
               PEDESTRIAN:
                 Alpha: 0.9990000128746033
                 Color: 255; 192; 203
@@ -3132,11 +3281,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 30.979747772216797
+      Scale: 43.68341827392578
       Target Frame: ego
       Value: TopDownOrtho (rviz_default_plugins)
-      X: 0
-      Y: 0
+      X: 9.179686546325684
+      Y: -7.600139617919922
     Saved:
       - Class: rviz_default_plugins/ThirdPersonFollower
         Distance: 18
