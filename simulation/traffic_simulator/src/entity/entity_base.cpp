@@ -543,21 +543,21 @@ auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
   new_status.subtype = getEntitySubtype();
   new_status.bounding_box = getBoundingBox();
   new_status.action_status.current_action = getCurrentAction();
-  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
+  status_ = CanonicalizedEntityStatus(new_status, status.getCanonicalizedLaneletPose());
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
   auto status = static_cast<EntityStatus>(getStatus());
   status.action_status.twist.linear.x = linear_velocity;
-  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatus(status, status_.getCanonicalizedLaneletPose()));
 }
 
 auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
 {
   auto status = static_cast<EntityStatus>(getStatus());
   status.action_status.accel.linear.x = linear_acceleration;
-  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatus(status, status_.getCanonicalizedLaneletPose()));
 }
 
 void EntityBase::setTrafficLightManager(
@@ -570,21 +570,21 @@ auto EntityBase::setTwist(const geometry_msgs::msg::Twist & twist) -> void
 {
   auto new_status = static_cast<EntityStatus>(getStatus());
   new_status.action_status.twist = twist;
-  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
+  status_ = CanonicalizedEntityStatus(new_status, status_.getCanonicalizedLaneletPose());
 }
 
 auto EntityBase::setAcceleration(const geometry_msgs::msg::Accel & accel) -> void
 {
   auto new_status = static_cast<EntityStatus>(getStatus());
   new_status.action_status.accel = accel;
-  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
+  status_ = CanonicalizedEntityStatus(new_status, status_.getCanonicalizedLaneletPose());
 }
 
 auto EntityBase::setLinearJerk(const double linear_jerk) -> void
 {
   auto new_status = static_cast<EntityStatus>(getStatus());
   new_status.action_status.linear_jerk = linear_jerk;
-  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
+  status_ = CanonicalizedEntityStatus(new_status, status_.getCanonicalizedLaneletPose());
 }
 
 auto EntityBase::setMapPose(const geometry_msgs::msg::Pose &) -> void
@@ -643,14 +643,14 @@ void EntityBase::stopAtCurrentPosition()
   status.action_status.twist = geometry_msgs::msg::Twist();
   status.action_status.accel = geometry_msgs::msg::Accel();
   status.action_status.linear_jerk = 0;
-  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatus(status, status_.getCanonicalizedLaneletPose()));
 }
 
 void EntityBase::updateEntityStatusTimestamp(const double current_time)
 {
   auto status = static_cast<EntityStatus>(getStatus());
   status.time = current_time;
-  setStatus(CanonicalizedEntityStatus(status, hdmap_utils_ptr_));
+  setStatus(CanonicalizedEntityStatus(status, status_.getCanonicalizedLaneletPose()));
 }
 
 auto EntityBase::updateStandStillDuration(const double step_time) -> double

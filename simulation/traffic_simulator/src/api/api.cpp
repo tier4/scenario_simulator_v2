@@ -123,6 +123,11 @@ auto API::setEntityStatus(
   if (const auto entity = getEntity(name)) {
     auto status = static_cast<EntityStatus>(entity->getStatus());
     status.action_status = action_status;
+    if (canonicalized_lanelet_pose) {
+      status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
+      status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
+      status.lanelet_pose_valid = true;
+    }
     entity->setStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
