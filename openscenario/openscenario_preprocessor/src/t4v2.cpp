@@ -18,7 +18,7 @@
 #include <iostream>
 #include <openscenario_preprocessor/deriver.hpp>
 #include <openscenario_preprocessor/t4v2.hpp>
-#include <openscenario_validator/schema.hpp>
+#include <openscenario_validator/validator.hpp>
 #include <pugixml.hpp>
 #include <regex>
 
