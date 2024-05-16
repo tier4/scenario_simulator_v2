@@ -161,9 +161,15 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
       }
     }
     behavior_plugin_ptr_->setReferenceTrajectory(spline_);
+
     behavior_plugin_ptr_->update(current_time, step_time);
-    const auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
-    if (const auto canonicalized_lanelet_pose = status_updated->getCanonicalizedLaneletPose()) {
+    const auto non_canonicalized_updated_status = behavior_plugin_ptr_->getUpdatedStatus();
+    // prefer the current lanelet
+    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+      non_canonicalized_updated_status->pose, status_.getBoundingBox(), status_.getLaneletIds(),
+      false, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+    /// @note setStatus() is skipped when isAtEndOfLanelets return true
+    if (canonicalized_lanelet_pose) {
       if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
         stopAtCurrentPosition();
         updateStandStillDuration(step_time);
@@ -171,7 +177,8 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    setStatus(*status_updated);
+    setStatus(
+      CanonicalizedEntityStatus(*non_canonicalized_updated_status, canonicalized_lanelet_pose));
     updateStandStillDuration(step_time);
     updateTraveledDistance(step_time);
   } else {

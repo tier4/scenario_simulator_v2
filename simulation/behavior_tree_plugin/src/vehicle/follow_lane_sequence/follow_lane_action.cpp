@@ -76,7 +76,10 @@ BT::NodeStatus FollowLaneAction::tick()
   }
   if (!entity_status->laneMatchingSucceed()) {
     stopEntity();
-    setOutput("updated_status", entity_status);
+    setOutput(
+      "non_canonicalized_updated_status",
+      std::make_shared<traffic_simulator::EntityStatus>(
+        static_cast<traffic_simulator::EntityStatus>(*entity_status)));
     return BT::NodeStatus::RUNNING;
   }
   const auto waypoints = calculateWaypoints();
@@ -130,8 +133,8 @@ BT::NodeStatus FollowLaneAction::tick()
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   setOutput(
-    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                        calculateUpdatedEntityStatus(target_speed.value())));
+    "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
+                                          calculateUpdatedEntityStatus(target_speed.value())));
   setOutput("waypoints", waypoints);
   setOutput("obstacle", calculateObstacle(waypoints));
   return BT::NodeStatus::RUNNING;

@@ -159,12 +159,13 @@ auto EntityManager::getEntity(const std::string & name) const
   }
 };
 
-auto EntityManager::getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus
+auto EntityManager::getEntityStatus(const std::string & name) const
+  -> const CanonicalizedEntityStatus &
 {
-  if (const auto iter = entities_.find(name); iter == entities_.end()) {
-    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
+  if (const auto entity = getEntity(name)) {
+    return entity->getStatus();
   } else {
-    return traffic_simulator::CanonicalizedEntityStatus(iter->second->getStatus());
+    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   }
 }
 
@@ -305,7 +306,7 @@ void EntityManager::requestLaneChange(
 void EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name)
 {
-  const auto status = getEntityStatus(name);
+  const auto & status = getEntityStatus(name);
   const auto behavior_parameter = getBehaviorParameter(name);
   if (is<EgoEntity>(name)) {
     THROW_SEMANTIC_ERROR(

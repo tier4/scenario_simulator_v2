@@ -77,7 +77,7 @@ private:                                                               \
   DEFINE_GETTER_SETTER(PolylineTrajectory, std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory>, polyline_trajectory)
   DEFINE_GETTER_SETTER(Request,            traffic_simulator::behavior::Request,                             request)
   DEFINE_GETTER_SETTER(StepTime,           double,                                                           step_time_)
-  DEFINE_GETTER_SETTER(UpdatedStatus,      std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>,    updated_status_)
+  DEFINE_GETTER_SETTER(UpdatedStatus,      std::shared_ptr<traffic_simulator::EntityStatus>,    updated_status_)
   // clang-format on
 #undef DEFINE_GETTER_SETTER
 };

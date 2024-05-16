@@ -152,13 +152,26 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
 
+  // pose can be updated by ::setMapPose, canonicalization is required
+  auto const unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
+  const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+    status_.getMapPose(), status_.getBoundingBox(), unique_route_lanelets, false,
+    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  setStatus(
+    CanonicalizedEntityStatus(static_cast<EntityStatus>(status_), canonicalized_lanelet_pose));
+
   if (is_controlled_by_simulator_ && npc_logic_started_) {
     if (
-      const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
-        static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
-        behavior_parameter_, hdmap_utils_ptr_, step_time,
-        target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
-      setStatus(*updated_status);
+      const auto non_canonicalized_updated_status =
+        traffic_simulator::follow_trajectory::makeUpdatedStatus(
+          static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
+          behavior_parameter_, hdmap_utils_ptr_, step_time,
+          target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
+      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        non_canonicalized_updated_status->pose, status_.getBoundingBox(), status_.getLaneletIds(),
+        false, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+      setStatus(
+        CanonicalizedEntityStatus(*non_canonicalized_updated_status, canonicalized_lanelet_pose));
     } else {
       is_controlled_by_simulator_ = false;
     }
@@ -291,13 +304,7 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
-  auto status = static_cast<EntityStatus>(status_);
-  status.pose = map_pose;
-  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-  const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
-    map_pose, status_.getBoundingBox(), unique_route_lanelets, false,
-    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-  status_ = CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
+  status_.setMapPose(map_pose);
 }
 }  // namespace entity
 }  // namespace traffic_simulator

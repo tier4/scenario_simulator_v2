@@ -105,8 +105,8 @@ BT::NodeStatus YieldAction::tick()
       target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
     }
     setOutput(
-      "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                          calculateUpdatedEntityStatus(target_speed.value())));
+      "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
+                                            calculateUpdatedEntityStatus(target_speed.value())));
     const auto waypoints = calculateWaypoints();
     if (waypoints.waypoints.empty()) {
       return BT::NodeStatus::FAILURE;
@@ -122,8 +122,8 @@ BT::NodeStatus YieldAction::tick()
     target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
   }
   setOutput(
-    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                        calculateUpdatedEntityStatus(target_speed.value())));
+    "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
+                                          calculateUpdatedEntityStatus(target_speed.value())));
   const auto waypoints = calculateWaypoints();
   if (waypoints.waypoints.empty()) {
     return BT::NodeStatus::FAILURE;

@@ -146,10 +146,10 @@ void DoNothingBehavior::update(double current_time, double step_time)
         do_nothing_behavior::follow_trajectory::interpolateEntityStatusFromPolylineTrajectory(
           getPolylineTrajectory(), getEntityStatus(), getCurrentTime(), getStepTime())) {
       /// @note interpolated_status has invalid LaneletPose so cannot be canonicalize
-      return std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-        traffic_simulator::CanonicalizedEntityStatus(interpolated_status.value(), std::nullopt));
+      return std::make_shared<traffic_simulator::EntityStatus>(interpolated_status.value());
     } else {
-      return entity_status_;
+      return std::make_shared<traffic_simulator::EntityStatus>(
+        static_cast<traffic_simulator::EntityStatus>(*entity_status_));
     }
   };
 
@@ -162,7 +162,8 @@ void DoNothingBehavior::update(double current_time, double step_time)
       setRequest(traffic_simulator::behavior::Request::NONE);
     }
   } else {
-    setUpdatedStatus(entity_status_);
+    setUpdatedStatus(std::make_shared<traffic_simulator::EntityStatus>(
+      static_cast<traffic_simulator::EntityStatus>(*entity_status_)));
   }
 }
 

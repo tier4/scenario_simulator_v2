@@ -42,14 +42,14 @@ void PedestrianActionNode::getBlackBoardValues()
 }
 
 auto PedestrianActionNode::calculateUpdatedEntityStatus(double target_speed) const
-  -> traffic_simulator::CanonicalizedEntityStatus
+  -> traffic_simulator::EntityStatus
 {
   return ActionNode::calculateUpdatedEntityStatus(
     target_speed, behavior_parameter.dynamic_constraints);
 }
 
 auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double target_speed) const
-  -> traffic_simulator::CanonicalizedEntityStatus
+  -> traffic_simulator::EntityStatus
 {
   auto updated_status = static_cast<traffic_simulator::EntityStatus>(
     ActionNode::calculateUpdatedEntityStatusInWorldFrame(
@@ -63,11 +63,11 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
     updated_status.lanelet_pose_valid = true;
     updated_status.lanelet_pose =
       static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value());
-    return traffic_simulator::CanonicalizedEntityStatus(updated_status, canonicalized_lanelet_pose);
+    return updated_status;
   } else {
     updated_status.lanelet_pose_valid = false;
     updated_status.lanelet_pose = traffic_simulator::LaneletPose();
-    return traffic_simulator::CanonicalizedEntityStatus(updated_status, std::nullopt);
+    return updated_status;
   }
 }
 }  // namespace entity_behavior

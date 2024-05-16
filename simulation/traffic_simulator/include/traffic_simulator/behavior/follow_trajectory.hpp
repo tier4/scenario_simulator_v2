@@ -31,7 +31,7 @@ auto makeUpdatedStatus(
   traffic_simulator_msgs::msg::PolylineTrajectory &,
   const traffic_simulator_msgs::msg::BehaviorParameter &,
   const std::shared_ptr<hdmap_utils::HdMapUtils> &, double,
-  std::optional<double> target_speed = std::nullopt) -> std::optional<CanonicalizedEntityStatus>;
+  std::optional<double> target_speed = std::nullopt) -> std::optional<EntityStatus>;
 }  // namespace follow_trajectory
 }  // namespace traffic_simulator
 

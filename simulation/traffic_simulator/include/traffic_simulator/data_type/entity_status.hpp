@@ -38,6 +38,7 @@ public:
   auto getName() const noexcept -> const std::string & { return entity_status_.name; };
   auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
   auto laneMatchingSucceed() const noexcept -> bool;
+  auto setMapPose(const geometry_msgs::msg::Pose & pose) -> void;
   auto getMapPose() const noexcept -> geometry_msgs::msg::Pose;
   auto getLaneletPose() const -> LaneletPose;
   auto getLaneletId() const -> lanelet::Id;

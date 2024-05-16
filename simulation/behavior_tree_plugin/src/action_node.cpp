@@ -276,12 +276,13 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
 }
 
 auto ActionNode::getEntityStatus(const std::string & target_name) const
-  -> traffic_simulator::CanonicalizedEntityStatus
+  -> const traffic_simulator::CanonicalizedEntityStatus &
 {
-  if (other_entity_status.find(target_name) != other_entity_status.end()) {
-    return traffic_simulator::CanonicalizedEntityStatus(other_entity_status.at(target_name));
+  if (auto it = other_entity_status.find(target_name); it != other_entity_status.end()) {
+    return it->second;
+  } else {
+    THROW_SEMANTIC_ERROR("other entity : ", target_name, " does not exist.");
   }
-  THROW_SIMULATION_ERROR("other entity : ", target_name, " does not exist.");
 }
 
 auto ActionNode::getDistanceToTargetEntityPolygon(
@@ -289,7 +290,7 @@ auto ActionNode::getDistanceToTargetEntityPolygon(
   double width_extension_right, double width_extension_left, double length_extension_front,
   double length_extension_rear) const -> std::optional<double>
 {
-  const auto status = getEntityStatus(target_name);
+  const auto & status = getEntityStatus(target_name);
   if (status.laneMatchingSucceed()) {
     return getDistanceToTargetEntityPolygon(
       spline, status, width_extension_right, width_extension_left, length_extension_front,
@@ -396,7 +397,7 @@ auto ActionNode::foundConflictingEntity(const lanelet::Ids & following_lanelets)
 
 auto ActionNode::calculateUpdatedEntityStatus(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
-  -> traffic_simulator::CanonicalizedEntityStatus
+  -> traffic_simulator::EntityStatus
 {
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
@@ -425,9 +426,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
       entity_status_updated.action_status.linear_jerk = linear_jerk_new;
       entity_status_updated.pose = hdmap_utils->toMapPose(canonicalized_lanelet_pose.value()).pose;
     }
-    return traffic_simulator::CanonicalizedEntityStatus(
-      entity_status_updated,
-      traffic_simulator::pose::canonicalize(canonicalized_lanelet_pose.value(), hdmap_utils));
+    return entity_status_updated;
   } else {
     // If canonicalize failed, set end of road lanelet pose.
     if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
@@ -447,9 +446,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
           entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
         }
-        return traffic_simulator::CanonicalizedEntityStatus(
-          entity_status_updated,
-          traffic_simulator::pose::canonicalize(end_of_road_lanelet_pose, hdmap_utils));
+        return entity_status_updated;
       } else {
         traffic_simulator::LaneletPose end_of_road_lanelet_pose;
         {
@@ -467,9 +464,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
           entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
         }
-        return traffic_simulator::CanonicalizedEntityStatus(
-          entity_status_updated,
-          traffic_simulator::pose::canonicalize(end_of_road_lanelet_pose, hdmap_utils));
+        return entity_status_updated;
       }
     } else {
       THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
@@ -479,7 +474,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
 
 auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
-  -> traffic_simulator::CanonicalizedEntityStatus
+  -> traffic_simulator::EntityStatus
 {
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
@@ -511,8 +506,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;
   entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-  /// @note lanelet_pose_valid == false so cannot be canonicalized -> pass std::nullopt
-  return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, std::nullopt);
+  return entity_status_updated;
 }
 
 auto ActionNode::calculateStopDistance(

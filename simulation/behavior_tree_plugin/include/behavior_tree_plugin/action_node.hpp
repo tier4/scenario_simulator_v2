@@ -89,7 +89,7 @@ public:
       BT::InputPort<std::shared_ptr<traffic_simulator::TrafficLightManager>>("traffic_light_manager"),
       BT::InputPort<traffic_simulator::behavior::Request>("request"),
       BT::OutputPort<std::optional<traffic_simulator_msgs::msg::Obstacle>>("obstacle"),
-      BT::OutputPort<std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>>("updated_status"),
+      BT::OutputPort<std::shared_ptr<traffic_simulator::EntityStatus>>("non_canonicalized_updated_status"),
       BT::OutputPort<traffic_simulator_msgs::msg::WaypointsArray>("waypoints"),
       BT::OutputPort<traffic_simulator::behavior::Request>("request"),
       // clang-format on
@@ -97,7 +97,7 @@ public:
   }
   auto getBlackBoardValues() -> void;
   auto getEntityStatus(const std::string & target_name) const
-    -> traffic_simulator::CanonicalizedEntityStatus;
+    -> const traffic_simulator::CanonicalizedEntityStatus &;
   auto getDistanceToTargetEntityPolygon(
     const math::geometry::CatmullRomSplineInterface & spline, const std::string target_name,
     double width_extension_right = 0.0, double width_extension_left = 0.0,
@@ -105,10 +105,10 @@ public:
     -> std::optional<double>;
   auto calculateUpdatedEntityStatus(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
-    -> traffic_simulator::CanonicalizedEntityStatus;
+    -> traffic_simulator::EntityStatus;
   auto calculateUpdatedEntityStatusInWorldFrame(
     double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints &) const
-    -> traffic_simulator::CanonicalizedEntityStatus;
+    -> traffic_simulator::EntityStatus;
 
 protected:
   traffic_simulator::behavior::Request request;
@@ -119,7 +119,7 @@ protected:
   double step_time;
   double default_matching_distance_for_lanelet_pose_calculation;
   std::optional<double> target_speed;
-  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> updated_status;
+  std::shared_ptr<traffic_simulator::EntityStatus> non_canonicalized_updated_status;
   EntityStatusDict other_entity_status;
   lanelet::Ids route_lanelets;
 

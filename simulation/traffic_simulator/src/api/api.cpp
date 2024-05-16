@@ -294,8 +294,9 @@ bool API::updateEntitiesStatusInSim()
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
-    auto entity_status = entity_manager_ptr_->getEntityStatus(entity_name);
-    simulation_interface::toProto(static_cast<EntityStatus>(entity_status), *req.add_status());
+    const auto entity_status =
+      static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(entity_name));
+    simulation_interface::toProto(entity_status, *req.add_status());
     if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
       req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(entity_name));
     }
@@ -304,17 +305,18 @@ bool API::updateEntitiesStatusInSim()
   simulation_api_schema::UpdateEntityStatusResponse res;
   if (auto res = zeromq_client_.call(req); res.result().success()) {
     for (const auto & res_status : res.status()) {
-      auto name = res_status.name();
-      auto entity_status = static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name));
+      auto entity_name = res_status.name();
+      auto entity_status =
+        static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(entity_name));
       simulation_interface::toMsg(res_status.pose(), entity_status.pose);
       simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
 
-      if (entity_manager_ptr_->is<entity::EgoEntity>(name)) {
-        setMapPose(name, entity_status.pose);
-        setTwist(name, entity_status.action_status.twist);
-        setAcceleration(name, entity_status.action_status.accel);
+      if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
+        setMapPose(entity_name, entity_status.pose);
+        setTwist(entity_name, entity_status.action_status.twist);
+        setAcceleration(entity_name, entity_status.action_status.accel);
       } else {
-        setEntityStatus(name, entity_status);
+        setEntityStatus(entity_name, entity_status);
       }
     }
     return true;

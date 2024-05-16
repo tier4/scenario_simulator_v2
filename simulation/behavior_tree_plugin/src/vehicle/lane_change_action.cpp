@@ -224,13 +224,9 @@ BT::NodeStatus LaneChangeAction::tick()
       traffic_simulator::EntityStatus entity_status_updated;
       entity_status_updated.pose = pose;
       entity_status_updated.action_status = getActionStatus();
-      /// @note here matching_distance
-      const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
-        entity_status_updated.pose, entity_status->getBoundingBox(), false, 1.0, hdmap_utils);
       setOutput(
-        "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                            traffic_simulator::CanonicalizedEntityStatus(
-                              entity_status_updated, canonicalized_lanelet_pose)));
+        "non_canonicalized_updated_status",
+        std::make_shared<traffic_simulator::EntityStatus>(entity_status_updated));
       const auto waypoints = calculateWaypoints();
       if (waypoints.waypoints.empty()) {
         return BT::NodeStatus::FAILURE;
@@ -259,10 +255,8 @@ BT::NodeStatus LaneChangeAction::tick()
       entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose).pose;
       entity_status_updated.action_status = getActionStatus();
       setOutput(
-        "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                            traffic_simulator::CanonicalizedEntityStatus(
-                              entity_status_updated,
-                              traffic_simulator::pose::canonicalize(lanelet_pose, hdmap_utils))));
+        "non_canonicalized_updated_status",
+        std::make_shared<traffic_simulator::EntityStatus>(entity_status_updated));
       return BT::NodeStatus::SUCCESS;
     }
   }

@@ -340,7 +340,7 @@ public:
   auto getEntity(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
-  auto getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus;
+  auto getEntityStatus(const std::string & name) const -> const CanonicalizedEntityStatus &;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
