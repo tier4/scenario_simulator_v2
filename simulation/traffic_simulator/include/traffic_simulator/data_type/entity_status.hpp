@@ -36,11 +36,13 @@ public:
   explicit operator EntityStatus() const noexcept { return entity_status_; }
   CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj);
   auto setAction(const std::string & action) -> void;
-  auto getName() const noexcept -> std::string { return entity_status_.name; };
+  auto getName() const noexcept -> const std::string & { return entity_status_.name; };
   auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
   auto laneMatchingSucceed() const noexcept -> bool;
-  auto getMapPose() const noexcept -> geometry_msgs::msg::Pose { return entity_status_.pose; }
+  auto getMapPose() const noexcept -> geometry_msgs::msg::Pose;
   auto getLaneletPose() const -> LaneletPose;
+  auto getLaneletId() const -> lanelet::Id;
+  auto getLaneletIds() const -> lanelet::Ids;
   auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
   auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
   auto getTwist() const noexcept -> geometry_msgs::msg::Twist;
@@ -54,6 +56,7 @@ public:
   auto getTime() const noexcept -> double;
 
 private:
+  auto canonicalize() -> void;
   std::optional<CanonicalizedLaneletPose> canonicalized_lanelet_pose_;
   EntityStatus entity_status_;
 };

@@ -16,6 +16,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/intersection/collision.hpp>
+#include <geometry/linear_algebra.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
 #include <memory>
@@ -38,13 +39,40 @@ namespace entity
 {
 void EntityManager::broadcastEntityTransform()
 {
-  std::vector<std::string> names = getEntityNames();
-  for (const auto & name : names) {
-    geometry_msgs::msg::PoseStamped pose;
-    pose.pose = getMapPose(name);
-    pose.header.stamp = clock_ptr_->now();
-    pose.header.frame_id = name;
-    broadcastTransform(pose);
+  /**
+   * @note This part of the process is intended to ensure that frames are issued in a position that makes 
+   * it as easy as possible to see the entities that will appear in the scenario.
+   * In the past, we used to publish the frames of all entities, but that would be too heavy processing, 
+   * so we publish the average of the coordinates of all entities.
+   */
+  if (isEgoSpawned()) {
+    if (const auto ego = getEntity(getEgoName())) {
+      broadcastTransform(
+        geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+          /**
+           * @note This is the intended implementation. 
+           * It is easier to create rviz config if the name “ego” is fixed, 
+           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           */
+          .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
+          .pose(ego->getMapPose()),
+        true);
+    }
+  }
+  if (const auto names = getEntityNames(); !names.empty()) {
+    broadcastTransform(
+      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+        .header(
+          std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
+        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
+                .position(std::accumulate(
+                  names.begin(), names.end(), geometry_msgs::msg::Point(),
+                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
+                    return point + (getEntity(name)->getMapPose().position *
+                                    (1.0 / static_cast<double>(names.size())));
+                  }))
+                .orientation(geometry_msgs::msg::Quaternion())),
+      true);
   }
 }
 
@@ -69,11 +97,19 @@ void EntityManager::broadcastTransform(
   }
 }
 
-bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
+bool EntityManager::checkCollision(
+  const std::string & first_entity_name, const std::string & second_entity_name)
 {
-  return name0 != name1 and
-         math::geometry::checkCollision2D(
-           getMapPose(name0), getBoundingBox(name0), getMapPose(name1), getBoundingBox(name1));
+  if (first_entity_name != second_entity_name) {
+    if (const auto first_entity = getEntity(first_entity_name)) {
+      if (const auto second_entity = getEntity(second_entity_name)) {
+        return math::geometry::checkCollision2D(
+          first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
+          second_entity->getBoundingBox());
+      }
+    }
+  }
+  return false;
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
@@ -112,6 +148,13 @@ auto EntityManager::getEntity(const std::string & name) const
   if (auto it = entities_.find(name); it != entities_.end()) {
     return it->second;
   } else {
+    /*
+      This method returns nullptr, due to the fact that the interpretation of the scenario operates in
+      such a way that checking a condition, e.g. DistanceCondition, is called also for Entities that
+      have not yet been spawned. For example, if for DistanceCondition any getEntity() returns
+      nullptr, the condition returns a distance equal to NaN. For this reason, throwing an exception
+      through getEntity() is not recommended.
+    */
     return nullptr;
   }
 };
@@ -123,16 +166,6 @@ auto EntityManager::getEntityStatus(const std::string & name) const -> Canonical
   } else {
     return traffic_simulator::CanonicalizedEntityStatus(iter->second->getStatus());
   }
-}
-
-auto EntityManager::getEntityTypeList() const
-  -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>
-{
-  std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> ret;
-  for (auto && [name, entity] : entities_) {
-    ret.emplace(name, getEntityType(name));
-  }
-  return ret;
 }
 
 auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
@@ -215,23 +248,10 @@ bool EntityManager::isEgoSpawned() const
 bool EntityManager::isInLanelet(
   const std::string & name, const lanelet::Id lanelet_id, const double tolerance)
 {
-  const auto status = getEntityStatus(name);
-  if (not status.laneMatchingSucceed()) {
-    return false;
-  }
-  if (isSameLaneletId(status, lanelet_id)) {
-    return true;
-  } else {
-    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(
-      helper::constructLaneletPose(lanelet_id, hdmap_utils_ptr_->getLaneletLength(lanelet_id)),
-      status.getLaneletPose());
-    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(
-      status.getLaneletPose(), helper::constructLaneletPose(lanelet_id, 0));
-    if (dist0 and dist0.value() < tolerance) {
-      return true;
-    }
-    if (dist1 and dist1.value() < tolerance) {
-      return true;
+  if (const auto entity = getEntity(name)) {
+    if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+      return pose::isInLanelet(
+        canonicalized_lanelet_pose.value(), lanelet_id, tolerance, hdmap_utils_ptr_);
     }
   }
   return false;
@@ -243,16 +263,24 @@ bool EntityManager::isStopping(const std::string & name) const
 }
 
 bool EntityManager::reachPosition(
-  const std::string & name, const std::string & target_name, const double tolerance) const
+  const std::string & name, const std::string & target_entity_name, const double tolerance) const
 {
-  return reachPosition(name, getMapPose(target_name), tolerance);
+  if (const auto target_entity = getEntity(target_entity_name)) {
+    return reachPosition(name, target_entity->getMapPose(), tolerance);
+  } else {
+    return false;
+  }
 }
 
 bool EntityManager::reachPosition(
   const std::string & name, const geometry_msgs::msg::Pose & target_pose,
   const double tolerance) const
 {
-  return math::geometry::getDistance(getMapPose(name), target_pose) < tolerance;
+  if (const auto entity = getEntity(name)) {
+    return math::geometry::getDistance(entity->getMapPose(), target_pose) < tolerance;
+  } else {
+    return false;
+  }
 }
 
 bool EntityManager::reachPosition(
@@ -265,10 +293,10 @@ bool EntityManager::reachPosition(
 void EntityManager::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
-  if (const auto canonicalized_lanelet_pose = getEntity(name)->getCanonicalizedLaneletPose()) {
+  if (const auto entity = getEntity(name); entity && entity->laneMatchingSucceed()) {
     if (
       const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-        static_cast<LaneletPose>(canonicalized_lanelet_pose.value()).lanelet_id, direction)) {
+        entity->getStatus().getLaneletId(), direction)) {
       requestLaneChange(name, target.value());
     }
   }
@@ -352,7 +380,7 @@ void EntityManager::requestSpeedChange(
 auto EntityManager::setEntityStatus(
   const std::string & name, const CanonicalizedEntityStatus & status) -> void
 {
-  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && getCurrentTime() > 0 && not isControlledBySimulator(name)) {
     THROW_SEMANTIC_ERROR(
       "You cannot set entity status to the ego vehicle name ", std::quoted(name),
       " after starting scenario.");
@@ -369,15 +397,11 @@ void EntityManager::setVerbose(const bool verbose)
   }
 }
 
-auto EntityManager::updateNpcLogic(
-  const std::string & name,
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
-  -> const CanonicalizedEntityStatus &
+auto EntityManager::updateNpcLogic(const std::string & name) -> const CanonicalizedEntityStatus &
 {
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  entities_[name]->setEntityTypeList(type_list);
   entities_[name]->onUpdate(current_time_, step_time_);
   return entities_[name]->getStatus();
 }
@@ -394,7 +418,6 @@ void EntityManager::update(const double current_time, const double step_time)
       configuration.conventional_traffic_light_publish_rate);
     v2i_traffic_light_updater_.createTimer(configuration.v2i_traffic_light_publish_rate);
   }
-  auto type_list = getEntityTypeList();
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {
     all_status.emplace(name, entity->getStatus());
@@ -404,7 +427,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   all_status.clear();
   for (auto && [name, entity] : entities_) {
-    all_status.emplace(name, updateNpcLogic(name, type_list));
+    all_status.emplace(name, updateNpcLogic(name));
   }
   for (auto && [name, entity] : entities_) {
     entity->setOtherStatus(all_status);

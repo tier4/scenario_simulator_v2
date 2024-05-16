@@ -46,15 +46,16 @@ private:
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    auto ego_entity = api_.getEntity("ego");
-    const auto distance = traffic_simulator::distance::getDistanceToLaneBound(
-      ego_entity->getMapPose(), ego_entity->getBoundingBox(), ego_entity->getRouteLanelets(),
-      api_.getHdmapUtils());
-    // LCOV_EXCL_START
-    if (distance <= 0.4 && distance >= 0.52) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
+    if (auto ego_entity = api_.getEntity("ego")) {
+      const auto distance = traffic_simulator::distance::distanceToLaneBound(
+        ego_entity->getMapPose(), ego_entity->getBoundingBox(), ego_entity->getRouteLanelets(),
+        api_.getHdmapUtils());
+      // LCOV_EXCL_START
+      if (distance <= 0.4 && distance >= 0.52) {
+        stop(cpp_mock_scenarios::Result::FAILURE);
+      }
+      // LCOV_EXCL_STOP
     }
-    // LCOV_EXCL_STOP
   }
   void onInitialize() override
   {

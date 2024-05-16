@@ -561,13 +561,22 @@ auto makeUpdatedStatus(
     updated_status.time = entity_status.time + step_time;
 
     // matching distance has been set to 3.0 due to matching problems during lane changes
-    if (const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
-          updated_status.pose, entity_status.bounding_box, false, 3.0, hdmap_utils);
-        lanelet_pose) {
-      return std::optional(CanonicalizedEntityStatus(updated_status, lanelet_pose));
+    // prefer the current lanelet
+    /// @todo matching_distance should be passed here
+    lanelet::Ids unique_route_lanelets;
+    if (entity_status.lanelet_pose_valid) {
+      unique_route_lanelets.push_back(entity_status.lanelet_pose.lanelet_id);
+    }
+    if (const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+          updated_status.pose, entity_status.bounding_box, unique_route_lanelets, false, 3.0,
+          hdmap_utils);
+        canonicalized_lanelet_pose) {
+      updated_status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
+      updated_status.lanelet_pose_valid = true;
     } else {
       return std::optional(CanonicalizedEntityStatus(updated_status, std::nullopt));
     }
+    return updated_status;
   }
 }
 }  // namespace follow_trajectory

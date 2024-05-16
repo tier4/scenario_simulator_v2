@@ -72,7 +72,7 @@ private:
           traffic_simulator::helper::constructLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
-                api_.getLaneletLength(spawn_lanelet_id) +
+                traffic_simulator::pose::laneletLength(spawn_lanelet_id, api_.getHdmapUtils()) +
               normal_dist(engine_),
             offset, 0, 0),
           getVehicleParameters(
@@ -124,8 +124,8 @@ private:
       if (!api_.entityExists(entity_name)) {
         api_.spawn(
           entity_name,
-          traffic_simulator::helper::constructLaneletPose(34513, spawn_s_value, 0, 0, 0, 0)),
-          getVehicleParameters();
+          traffic_simulator::helper::constructLaneletPose(34513, spawn_s_value, 0, 0, 0, 0),
+          getVehicleParameters());
         std::uniform_real_distribution<> speed_distribution(
           params_.random_parameters.lane_following_vehicle.min_speed,
           params_.random_parameters.lane_following_vehicle.max_speed);
@@ -133,17 +133,15 @@ private:
         api_.requestSpeedChange(entity_name, speed, true);
         api_.setLinearVelocity(entity_name, speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
-          0.0, api_.getLaneletLength(34684));
+          0.0, traffic_simulator::pose::laneletLength(34684, api_.getHdmapUtils()));
         lane_change_position = lane_change_position_distribution(engine_);
         lane_change_requested = false;
       }
       /// Checking the ego entity overs the lane change position.
-      if (const auto entity = api_.getEntity("ego")) {
-        if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose();
-            lanelet_pose &&
-            static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).lanelet_id == 34684 &&
-            std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).s) >=
-              lane_change_position) {
+      if (const auto entity = api_.getEntity("ego"); entity->laneMatchingSucceed()) {
+        if (
+          entity->getStatus().getLaneletId() == 34684 &&
+          std::abs(entity->getStatus().getLaneletPose().s) >= lane_change_position) {
           api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
           lane_change_requested = true;
         }
@@ -161,7 +159,10 @@ private:
       if (
         !api_.entityExists(entity_name) &&
         !api_.reachPosition(
-          "ego", canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 25.0)), 5.0)) {
+          "ego",
+          traffic_simulator::helper::constructCanonicalizedLaneletPose(
+            34576, 25.0, 0.0, api_.getHdmapUtils()),
+          5.0)) {
         std::normal_distribution<> offset_distribution(
           0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
         std::uniform_real_distribution<> speed_distribution(
@@ -185,18 +186,23 @@ private:
     }
 
     {
-      const auto trigger_position =
-        canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0));
+      const auto trigger_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34621, 10, 0.0, api_.getHdmapUtils());
       const auto entity_name = "spawn_nearby_ego";
-      if (api_.reachPosition("ego", trigger_position, 20.0) && !api_.entityExists(entity_name)) {
-        api_.spawn(
-          entity_name,
-          api_.getMapPoseFromRelativePose(
-            "ego", geometry_msgs::build<geometry_msgs::msg::Pose>()
-                     .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(-5).z(0))
-                     .orientation(geometry_msgs::msg::Quaternion())),
-          getVehicleParameters(),
-          traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+      if (const auto ego = api_.getEntity("ego")) {
+        if (api_.reachPosition("ego", trigger_position, 20.0) && !api_.entityExists(entity_name)) {
+          api_.spawn(
+            entity_name,
+            traffic_simulator::pose::transformRelativePoseToGlobal(
+              ego->getMapPose(),
+              geometry_msgs::build<geometry_msgs::msg::Pose>()
+                .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(-5).z(0))
+                .orientation(geometry_msgs::msg::Quaternion())),
+            getVehicleParameters(),
+            traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+        } else {
+          stop(cpp_mock_scenarios::Result::FAILURE);
+        }
       }
       if (!api_.reachPosition("ego", trigger_position, 20.0) && api_.entityExists(entity_name)) {
         api_.despawn(entity_name);
@@ -213,16 +219,22 @@ private:
 
     spawnEgoEntity(
       traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0),
-      {canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0))},
+      {traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34606, 0.0, 0.0, api_.getHdmapUtils())},
       getVehicleParameters());
-    api_.spawn(
-      "parking_outside",
-      api_.getMapPoseFromRelativePose(
-        "ego", geometry_msgs::build<geometry_msgs::msg::Pose>()
-                 .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(15).z(0))
-                 .orientation(geometry_msgs::msg::Quaternion())),
-      getVehicleParameters(),
-      traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+    if (const auto ego = api_.getEntity("ego")) {
+      api_.spawn(
+        "parking_outside",
+        traffic_simulator::pose::transformRelativePoseToGlobal(
+          ego->getMapPose(),
+          geometry_msgs::build<geometry_msgs::msg::Pose>()
+            .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(10).y(15).z(0))
+            .orientation(geometry_msgs::msg::Quaternion())),
+        getVehicleParameters(),
+        traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
+    } else {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
   }
 };
 

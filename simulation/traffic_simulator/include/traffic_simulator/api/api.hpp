@@ -68,7 +68,12 @@ public:
     entity_manager_ptr_(std::make_shared<entity::EntityManager>(node, configuration)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
-      [this](const auto & name) { return API::getMapPose(name); },
+      [this](const auto & entity_name) {
+        if (const auto entity = getEntity(entity_name)) {
+          return entity->getMapPose();
+        }
+        THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " doeas not exists.");
+      },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
@@ -141,13 +146,15 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
+      } else if (const auto entity = entity_manager_ptr_->getEntity(name); not entity) {
+        throw common::SemanticError(
+          "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
         simulation_api_schema::SpawnVehicleEntityRequest req;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(
-          entity_manager_ptr_->getEntity(name)->getMapPose(), *req.mutable_pose());
+        simulation_interface::toProto(entity->getMapPose(), *req.mutable_pose());
         req.set_is_ego(behavior == VehicleBehavior::autoware());
         /// @todo Should be filled from function API
         req.set_initial_speed(0.0);
@@ -173,13 +180,15 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
+      } else if (const auto entity = entity_manager_ptr_->getEntity(name); not entity) {
+        throw common::SemanticError(
+          "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
         simulation_api_schema::SpawnPedestrianEntityRequest req;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(
-          entity_manager_ptr_->getEntity(name)->getMapPose(), *req.mutable_pose());
+        simulation_interface::toProto(entity->getMapPose(), *req.mutable_pose());
         return zeromq_client_.call(req).result().success();
       }
     };
@@ -200,13 +209,15 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
+      } else if (const auto entity = entity_manager_ptr_->getEntity(name); not entity) {
+        throw common::SemanticError(
+          "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
         simulation_api_schema::SpawnMiscObjectEntityRequest req;
         simulation_interface::toProto(parameters, *req.mutable_parameters());
         req.mutable_parameters()->set_name(name);
         req.set_asset_key(model3d);
-        simulation_interface::toProto(
-          entity_manager_ptr_->getEntity(name)->getMapPose(), *req.mutable_pose());
+        simulation_interface::toProto(entity->getMapPose(), *req.mutable_pose());
         return zeromq_client_.call(req).result().success();
       }
     };
@@ -217,9 +228,10 @@ public:
   bool despawn(const std::string & name);
   bool despawnEntities();
 
-  auto setEntityStatus(
-    const std::string & name, const CanonicalizedEntityStatus & canonicalized_status) -> void;
   auto setEntityStatus(const std::string & name, const EntityStatus & status) -> void;
+  auto respawn(
+    const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
+    const geometry_msgs::msg::PoseStamped & goal_pose) -> void;
   auto setEntityStatus(
     const std::string & name, const geometry_msgs::msg::Pose & map_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
@@ -228,7 +240,8 @@ public:
     const std::string & name, const LaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void;
   auto setEntityStatus(
-    const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+    const std::string & name,
+    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
   auto setEntityStatus(
@@ -317,11 +330,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
-  FORWARD_TO_ENTITY_MANAGER(getLaneletLength);
-  // FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
-  FORWARD_TO_ENTITY_MANAGER(getMapPose);
-  FORWARD_TO_ENTITY_MANAGER(getMapPoseFromRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
@@ -356,11 +365,6 @@ private:
 
 public:
 #undef FORWARD_TO_ENTITY_MANAGER
-
-  // auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
-  //   -> CanonicalizedLaneletPose;
-  // auto canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
-  //   -> CanonicalizedEntityStatus;
 
 private:
   bool updateTimeInSim();

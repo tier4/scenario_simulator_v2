@@ -72,10 +72,10 @@ void PedestrianEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
-      const auto lanelet_waypoint = pose::toCanonicalizedLaneletPose(
-        waypoint, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation(),
-        hdmap_utils_ptr_)) {
-      route.emplace_back(lanelet_waypoint.value());
+      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        waypoint, status_.getBoundingBox(), true,
+        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+      route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of pedestrian entity should be on lane.");
     }
@@ -151,10 +151,10 @@ void PedestrianEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & m
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
-    const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
-      map_pose, getBoundingBox(), true, getDefaultMatchingDistanceForLaneletPoseCalculation(),
-      hdmap_utils_ptr_)) {
-    requestAcquirePosition(lanelet_pose.value());
+    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+      map_pose, status_.getBoundingBox(), true,
+      getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+    requestAcquirePosition(canonicalized_lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the pedestrian entity should be on lane.");
   }
@@ -248,28 +248,19 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
   setBehaviorParameter(behavior_parameter);
 }
 
-auto PedestrianEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-{
-  EntityBase::fillLaneletPose(status, true);
-}
-
 void PedestrianEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
   if (npc_logic_started_) {
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
-    behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(
       std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(status_));
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
     behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
     behavior_plugin_ptr_->update(current_time, step_time);
     auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
-    if (status_updated->laneMatchingSucceed()) {
-      const auto lanelet_pose = status_updated->getLaneletPose();
-      if (
-        hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-        hdmap_utils_ptr_->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s) {
+    if (const auto canonicalized_lanelet_pose = status_updated->getCanonicalizedLaneletPose()) {
+      if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
         stopAtCurrentPosition();
         updateStandStillDuration(step_time);
         updateTraveledDistance(step_time);

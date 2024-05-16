@@ -68,39 +68,19 @@ public:
   class CoordinateSystemConversion
   {
   protected:
-    static auto checkRoutingAlgorithm(const RoutingAlgorithm::value_type & routing_algorithm)
-    {
-      std::set<RoutingAlgorithm::value_type> supported = {
-        RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
-
-      if (supported.find(routing_algorithm) == supported.end()) {
-        std::unordered_map<RoutingAlgorithm::value_type, std::string> name_map = {
-          {RoutingAlgorithm::value_type::assigned_route, "assignedRoute"},
-          {RoutingAlgorithm::value_type::fastest, "fastest"},
-          {RoutingAlgorithm::value_type::least_intersections, "leastIntersections"},
-          {RoutingAlgorithm::value_type::shortest, "shortest"},
-          {RoutingAlgorithm::value_type::undefined, "undefined"}};
-        std::stringstream what;
-        what << "There was an operation to calculate relative lane position with RoutingAlgorithm "
-                "set to "
-             << name_map[routing_algorithm] << ", but this is currently not supported. ";
-        what << "Please set RoutingAlgorithm to either 'shortest' or 'undefined'.";
-        throw common::Error(what.str());
-      }
-    }
-
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
-      return traffic_simulator::pose::canonicalize(non_canonicalized, core->getHdmapUtils());
+      return NativeLanePosition(non_canonicalized, core->getHdmapUtils());
     }
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const NativeWorldPosition & pose) -> NativeLanePosition
     {
+      constexpr bool include_crosswalk{false};
       if (
-        const auto result =
-          traffic_simulator::pose::toCanonicalizedLaneletPose(pose, false, core->getHdmapUtils())) {
+        const auto result = traffic_simulator::pose::toCanonicalizedLaneletPose(
+          pose, include_crosswalk, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(
@@ -128,12 +108,12 @@ public:
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
           if (
-            const auto relative_pose = traffic_simulator::pose::getRelativePose(
+            const auto relative_pose = traffic_simulator::pose::relativePose(
               from_entity->getMapPose(), to_entity->getMapPose()))
             return relative_pose.value();
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
 
     static auto makeNativeRelativeWorldPosition(
@@ -142,11 +122,11 @@ public:
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (
           const auto relative_pose =
-            traffic_simulator::pose::getRelativePose(from_entity->getMapPose(), to_map_pose)) {
+            traffic_simulator::pose::relativePose(from_entity->getMapPose(), to_map_pose)) {
           return relative_pose.value();
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
 
     static auto makeNativeRelativeWorldPosition(
@@ -155,11 +135,11 @@ public:
       if (const auto to_entity = core->getEntity(to_entity_name)) {
         if (
           const auto relative_pose =
-            traffic_simulator::pose::getRelativePose(from_map_pose, to_entity->getMapPose())) {
+            traffic_simulator::pose::relativePose(from_map_pose, to_entity->getMapPose())) {
           return relative_pose.value();
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
 
     static auto makeNativeRelativeLanePosition(
@@ -168,12 +148,12 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto to_entity = core->getEntity(to_entity_name)) {
-        if (const auto to_lanelet_pose_opt = to_entity->getCanonicalizedLaneletPose()) {
+        if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
-            from_entity_name, to_lanelet_pose_opt.value(), routing_algorithm);
+            from_entity_name, to_lanelet_pose.value(), routing_algorithm);
         }
       }
-      return traffic_simulator::pose::getQuietNaNLaneletPose();
+      return traffic_simulator::pose::quietNaNLaneletPose();
     }
 
     static auto makeNativeRelativeLanePosition(
@@ -182,12 +162,12 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose_opt = from_entity->getCanonicalizedLaneletPose()) {
+        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
-            from_lanelet_pose_opt.value(), to_lanelet_pose, routing_algorithm);
+            from_lanelet_pose.value(), to_lanelet_pose, routing_algorithm);
         }
       }
-      return traffic_simulator::pose::getQuietNaNLaneletPose();
+      return traffic_simulator::pose::quietNaNLaneletPose();
     }
 
     static auto makeNativeRelativeLanePosition(
@@ -195,9 +175,8 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      checkRoutingAlgorithm(routing_algorithm);
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      return traffic_simulator::pose::getRelativeLaneletPose(
+      return traffic_simulator::pose::relativeLaneletPose(
         from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
     }
 
@@ -207,16 +186,16 @@ public:
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
-          if (const auto from_lanelet_pose_opt = from_entity->getCanonicalizedLaneletPose()) {
-            if (const auto to_lanelet_pose_opt = to_entity->getCanonicalizedLaneletPose()) {
+          if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
+            if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
               return makeNativeBoundingBoxRelativeLanePosition(
-                from_lanelet_pose_opt.value(), from_entity->getBoundingBox(),
-                to_lanelet_pose_opt.value(), to_entity->getBoundingBox(), routing_algorithm);
+                from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose.value(),
+                to_entity->getBoundingBox(), routing_algorithm);
             }
           }
         }
       }
-      return traffic_simulator::pose::getQuietNaNLaneletPose();
+      return traffic_simulator::pose::quietNaNLaneletPose();
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -224,27 +203,26 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose_opt = from_entity->getCanonicalizedLaneletPose()) {
+        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeBoundingBoxRelativeLanePosition(
-            from_lanelet_pose_opt.value(), from_entity->getBoundingBox(), to_lanelet_pose,
+            from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose,
             traffic_simulator_msgs::msg::BoundingBox(), routing_algorithm);
         }
       }
-      return traffic_simulator::pose::getQuietNaNLaneletPose();
+      return traffic_simulator::pose::quietNaNLaneletPose();
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
       const NativeLanePosition & from_lanelet_pose,
-      const traffic_simulator_msgs::msg::BoundingBox & from_bbox,
+      const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
       const NativeLanePosition & to_lanelet_pose,
-      const traffic_simulator_msgs::msg::BoundingBox & to_bbox,
+      const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      checkRoutingAlgorithm(routing_algorithm);
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      return traffic_simulator::pose::getBoundingBoxRelativeLaneletPose(
-        from_lanelet_pose, from_bbox, to_lanelet_pose, to_bbox, allow_lane_change,
+      return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
+        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box, allow_lane_change,
         core->getHdmapUtils());
     }
 
@@ -254,14 +232,14 @@ public:
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
           if (
-            const auto relative_pose = traffic_simulator::pose::getBoundingBoxRelativePose(
+            const auto relative_pose = traffic_simulator::pose::boundingBoxRelativePose(
               from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
               to_entity->getBoundingBox())) {
             return relative_pose.value();
           }
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(
@@ -269,13 +247,13 @@ public:
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (
-          const auto relative_pose = traffic_simulator::pose::getBoundingBoxRelativePose(
+          const auto relative_pose = traffic_simulator::pose::boundingBoxRelativePose(
             from_entity->getMapPose(), from_entity->getBoundingBox(), to_map_pose,
             traffic_simulator_msgs::msg::BoundingBox())) {
           return relative_pose.value();
         }
       }
-      return traffic_simulator::pose::getQuietNaNPose();
+      return traffic_simulator::pose::quietNaNPose();
     }
   };
 
@@ -499,7 +477,7 @@ public:
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
           if (
-            const auto distance = traffic_simulator::distance::getBoundingBoxDistance(
+            const auto distance = traffic_simulator::distance::boundingBoxDistance(
               from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
               to_entity->getBoundingBox())) {
             return distance.value();
@@ -583,7 +561,7 @@ public:
         const auto to_map_pose = static_cast<NativeWorldPosition>(osc_lane_position);
         if (
           const auto relative_pose =
-            traffic_simulator::pose::getRelativePose(from_map_pose, to_map_pose)) {
+            traffic_simulator::pose::relativePose(from_map_pose, to_map_pose)) {
           return static_cast<Double>(std::abs(
             quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
               .z));
@@ -596,7 +574,7 @@ public:
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
       if (const auto entity = core->getEntity(entity_ref)) {
-        if (auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+        if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
           return static_cast<Double>(std::abs(
             static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()).rpy.z));
         }

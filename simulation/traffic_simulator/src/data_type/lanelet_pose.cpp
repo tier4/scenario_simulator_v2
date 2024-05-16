@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
+#include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -25,8 +29,9 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
   lanelet_poses_(
     hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
-  map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
+  map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
 {
+  adjustOrientationAndOzPosition(hdmap_utils);
 }
 
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
@@ -35,8 +40,9 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, route_lanelets, hdmap_utils)),
   lanelet_poses_(
     hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
-  map_pose_(hdmap_utils->toMapPose(lanelet_pose_).pose)
+  map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
 {
+  adjustOrientationAndOzPosition(hdmap_utils);
 }
 
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(const CanonicalizedLaneletPose & other)
@@ -122,17 +128,42 @@ auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
   }
   return alternative_lanelet_pose;
 }
+
+auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition(
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> void
+{
+  using quaternion_operation::convertEulerAngleToQuaternion;
+  using quaternion_operation::convertQuaternionToEulerAngle;
+  using quaternion_operation::getRotation;
+  const math::geometry::CatmullRomSpline spline(
+    hdmap_utils->getCenterPoints(lanelet_pose_.lanelet_id));
+  // adjust Oz position
+  if (const auto s_value = spline.getSValue(map_pose_)) {
+    map_pose_.position.z = spline.getPoint(s_value.value()).z;
+  }
+  // adjust pitch
+  if (consider_pose_by_road_slope_) {
+    const auto lanelet_quaternion = spline.getPose(lanelet_pose_.s, true).orientation;
+    const auto lanelet_rpy = convertQuaternionToEulerAngle(lanelet_quaternion);
+    const auto entity_rpy = convertQuaternionToEulerAngle(map_pose_.orientation);
+    map_pose_.orientation =
+      convertEulerAngleToQuaternion(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+                                      .x(entity_rpy.x)
+                                      .y(lanelet_rpy.y)
+                                      .z(entity_rpy.z));
+    lanelet_pose_.rpy =
+      convertQuaternionToEulerAngle(getRotation(lanelet_quaternion, map_pose_.orientation));
+  }
+}
+
 }  // namespace lanelet_pose
 
-bool isSameLaneletId(
-  const lanelet_pose::CanonicalizedLaneletPose & p0,
-  const lanelet_pose::CanonicalizedLaneletPose & p1)
+bool isSameLaneletId(const CanonicalizedLaneletPose & p0, const CanonicalizedLaneletPose & p1)
 {
   return static_cast<LaneletPose>(p0).lanelet_id == static_cast<LaneletPose>(p1).lanelet_id;
 }
 
-auto isSameLaneletId(const lanelet_pose::CanonicalizedLaneletPose & p, const lanelet::Id lanelet_id)
-  -> bool
+auto isSameLaneletId(const CanonicalizedLaneletPose & p, const lanelet::Id lanelet_id) -> bool
 {
   return static_cast<LaneletPose>(p).lanelet_id == lanelet_id;
 }

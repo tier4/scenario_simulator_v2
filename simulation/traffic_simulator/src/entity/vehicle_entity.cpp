@@ -144,7 +144,6 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
   EntityBase::onUpdate(current_time, step_time);
   if (npc_logic_started_) {
     behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
-    behavior_plugin_ptr_->setEntityTypeList(entity_type_list_);
     behavior_plugin_ptr_->setEntityStatus(std::make_unique<CanonicalizedEntityStatus>(status_));
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
     auto route_lanelets = getRouteLanelets();
@@ -163,12 +162,9 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
     }
     behavior_plugin_ptr_->setReferenceTrajectory(spline_);
     behavior_plugin_ptr_->update(current_time, step_time);
-    auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
-    if (status_updated->laneMatchingSucceed()) {
-      const auto lanelet_pose = status_updated->getLaneletPose();
-      if (
-        hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-        hdmap_utils_ptr_->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s) {
+    const auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
+    if (const auto canonicalized_lanelet_pose = status_updated->getCanonicalizedLaneletPose()) {
+      if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
         stopAtCurrentPosition();
         updateStandStillDuration(step_time);
         updateTraveledDistance(step_time);
@@ -197,10 +193,10 @@ void VehicleEntity::requestAcquirePosition(const geometry_msgs::msg::Pose & map_
 {
   behavior_plugin_ptr_->setRequest(behavior::Request::FOLLOW_LANE);
   if (
-    const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
-      map_pose, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation(),
-      hdmap_utils_ptr_)) {
-    requestAcquirePosition(lanelet_pose.value());
+    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+      map_pose, status_.getBoundingBox(), false,
+      getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+    requestAcquirePosition(canonicalized_lanelet_pose.value());
   } else {
     THROW_SEMANTIC_ERROR("Goal of the vehicle entity should be on lane.");
   }
@@ -225,10 +221,10 @@ void VehicleEntity::requestAssignRoute(const std::vector<geometry_msgs::msg::Pos
   std::vector<CanonicalizedLaneletPose> route;
   for (const auto & waypoint : waypoints) {
     if (
-      const auto lanelet_waypoint = pose::toCanonicalizedLaneletPose(
-        waypoint, getBoundingBox(), false, getDefaultMatchingDistanceForLaneletPoseCalculation(),
-        hdmap_utils_ptr_)) {
-      route.emplace_back(lanelet_waypoint.value());
+      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        waypoint, status_.getBoundingBox(), false,
+        getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
+      route.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       THROW_SEMANTIC_ERROR("Waypoint of vehicle entity should be on lane.");
     }
@@ -244,10 +240,10 @@ auto VehicleEntity::requestFollowTrajectory(
   std::vector<CanonicalizedLaneletPose> waypoints;
   for (const auto & vertex : parameter->shape.vertices) {
     if (
-      const auto lanelet_waypoint = pose::toCanonicalizedLaneletPose(
-        vertex.position, getBoundingBox(), false,
+      const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        vertex.position, status_.getBoundingBox(), false,
         getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_)) {
-      waypoints.emplace_back(lanelet_waypoint.value());
+      waypoints.emplace_back(canonicalized_lanelet_pose.value());
     } else {
       /// @todo such a protection most likely makes sense, but test scenario
       /// RoutingAction.FollowTrajectoryAction-star has waypoints outside lanelet2
@@ -333,11 +329,6 @@ void VehicleEntity::setTrafficLightManager(
 {
   EntityBase::setTrafficLightManager(ptr);
   behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
-}
-
-auto VehicleEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-{
-  EntityBase::fillLaneletPose(status, false);
 }
 
 }  // namespace entity

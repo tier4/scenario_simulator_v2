@@ -66,7 +66,7 @@ void EntityBase::cancelRequest()
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
-  return math::geometry::get2DPolygon(getBoundingBox());
+  return math::geometry::toPolygon2D(getBoundingBox());
 }
 
 auto EntityBase::getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
@@ -82,37 +82,10 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
            (traffic_simulator_msgs::msg::EntityType::MISC_OBJECT == entity_type.type);
   }(getEntityType());
 
-  return pose::toCanonicalizedLaneletPose(
-    getMapPose(), getBoundingBox(), include_crosswalk, matching_distance, hdmap_utils_ptr_);
-}
-
-auto EntityBase::fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk) -> void
-{
-  auto non_canonicalized_status = static_cast<EntityStatus>(status);
-  const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
-  const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-    non_canonicalized_status.pose, getBoundingBox(), unique_route_lanelets, include_crosswalk,
-    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-
-  if (canonicalized_lanelet_pose) {
-    math::geometry::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(non_canonicalized_status.lanelet_pose.lanelet_id));
-    if (const auto s_value = spline.getSValue(non_canonicalized_status.pose)) {
-      non_canonicalized_status.pose.position.z = spline.getPoint(s_value.value()).z;
-    }
-  }
-  status = CanonicalizedEntityStatus(non_canonicalized_status, canonicalized_lanelet_pose);
-}
-
-auto EntityBase::getMapPoseFromRelativePose(const geometry_msgs::msg::Pose & relative_pose) const
-  -> geometry_msgs::msg::Pose
-{
-  tf2::Transform ref_transform, relative_transform;
-  tf2::fromMsg(getMapPose(), ref_transform);
-  tf2::fromMsg(relative_pose, relative_transform);
-  geometry_msgs::msg::Pose ret;
-  tf2::toMsg(ref_transform * relative_transform, ret);
-  return ret;
+  // prefer the current lanelet
+  return toCanonicalizedLaneletPose(
+    status_.getMapPose(), status_.getBoundingBox(), status_.getLaneletIds(), include_crosswalk,
+    matching_distance, hdmap_utils_ptr_);
 }
 
 auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
@@ -164,31 +137,30 @@ void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::Constraint & constraint)
 {
   lanelet::Id reference_lanelet_id = 0;
-  const auto lanelet_pose = getCanonicalizedLaneletPose();
-  if (lanelet_pose && target.entity_name == name) {
-    if (!lanelet_pose) {
+  if (target.entity_name == name) {
+    if (not laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(
-        "Target entity does not assigned to lanelet. Please check Target entity name : ",
-        target.entity_name, " exists on lane.");
+        "Source entity does not assigned to lanelet. Please check source entity name : ", name,
+        " exists on lane.");
     }
-    reference_lanelet_id = static_cast<LaneletPose>(lanelet_pose.value()).lanelet_id;
+    reference_lanelet_id = getStatus().getLaneletId();
   } else {
     if (other_status_.find(target.entity_name) == other_status_.end()) {
       THROW_SEMANTIC_ERROR(
         "Target entity : ", target.entity_name, " does not exist. Please check ",
         target.entity_name, " exists.");
-    }
-    if (!other_status_.at(target.entity_name).laneMatchingSucceed()) {
+    } else if (!other_status_.at(target.entity_name).laneMatchingSucceed()) {
       THROW_SEMANTIC_ERROR(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");
+    } else {
+      reference_lanelet_id = other_status_.at(target.entity_name).getLaneletId();
     }
-    reference_lanelet_id =
-      static_cast<EntityStatus>(other_status_.at(target.entity_name)).lanelet_pose.lanelet_id;
   }
-  const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-    reference_lanelet_id, target.direction, target.shift);
-  if (lane_change_target_id) {
+
+  if (
+    const auto lane_change_target_id = hdmap_utils_ptr_->getLaneChangeableLaneletId(
+      reference_lanelet_id, target.direction, target.shift)) {
     requestLaneChange(
       traffic_simulator::lane_change::AbsoluteTarget(lane_change_target_id.value(), target.offset),
       trajectory_shape, constraint);
@@ -520,6 +492,12 @@ auto EntityBase::isControlledBySimulator() const -> bool
   return true;
 }
 
+auto EntityBase::setControlledBySimulator(bool /*unused*/) -> void
+{
+  THROW_SEMANTIC_ERROR(
+    getEntityTypename(), " type entities do not support setControlledBySimulator");
+}
+
 auto EntityBase::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void
 {
@@ -540,34 +518,11 @@ void EntityBase::setDynamicConstraints(
   setBehaviorParameter(behavior_parameter);
 }
 
-void EntityBase::setEntityTypeList(
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & entity_type_list)
-{
-  entity_type_list_ = entity_type_list;
-}
-
 void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, CanonicalizedEntityStatus> & status)
 {
-  other_status_.clear();
-  for (const auto & [other_name, other_status] : status) {
-    if (other_name != name) {
-      /*
-         The following filtering is the code written for the purpose of
-         reducing the calculation load, but it is commented out experimentally
-         because it adversely affects "processing that needs to identify other
-         entities regardless of distance" such as RelativeTargetSpeed of
-         requestSpeedChange.
-      */
-      // const auto p0 = other_status.pose.position;
-      // const auto p1 = status_.pose.position;
-      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance <
-      // 30)
-      // {
-      other_status_.emplace(other_name, other_status);
-      // }
-    }
-  }
+  other_status_ = status;
+  other_status_.erase(name);
 }
 
 auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void

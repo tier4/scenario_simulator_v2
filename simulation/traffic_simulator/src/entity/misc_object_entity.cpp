@@ -26,12 +26,15 @@ MiscObjectEntity::MiscObjectEntity(
 {
 }
 
-void MiscObjectEntity::onUpdate(double, double)
+void MiscObjectEntity::onUpdate(double, double step_time)
 {
   setTwist(geometry_msgs::msg::Twist());
   setAcceleration(geometry_msgs::msg::Accel());
   setLinearJerk(0.0);
   setAction("static");
+  if (npc_logic_started_) {
+    updateStandStillDuration(step_time);
+  }
   status_before_update_ = status_;
 }
 
@@ -85,11 +88,6 @@ void MiscObjectEntity::requestSpeedChange(
   const double, const speed_change::Transition, const speed_change::Constraint, const bool)
 {
   THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
-}
-
-auto MiscObjectEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-{
-  EntityBase::fillLaneletPose(status, false);
 }
 
 }  // namespace entity

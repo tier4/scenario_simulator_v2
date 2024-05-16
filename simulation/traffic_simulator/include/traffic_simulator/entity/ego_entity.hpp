@@ -112,6 +112,11 @@ public:
 
   auto isControlledBySimulator() const -> bool override;
 
+  auto setControlledBySimulator(bool state) -> void override
+  {
+    is_controlled_by_simulator_ = state;
+  }
+
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &)
     -> void override;
 
@@ -123,8 +128,6 @@ public:
   auto setVelocityLimit(double) -> void override;
 
   auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
-
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -245,25 +245,6 @@ public:
   }
 
   // clang-format off
-#define FORWARD_TO_HDMAP_UTILS(NAME)                                  \
-  /*!                                                                 \
-   @brief Forward to arguments to the HDMapUtils::NAME function.      \
-   @return return value of the HDMapUtils::NAME function.             \
-   @note This function was defined by FORWARD_TO_HDMAP_UTILS macro.   \
-   */                                                                 \
-  template <typename... Ts>                                           \
-  decltype(auto) NAME(Ts &&... xs) const                              \
-  {                                                                   \
-    return hdmap_utils_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                   \
-  static_assert(true, "")
-  // clang-format on
-
-  FORWARD_TO_HDMAP_UTILS(getLaneletLength);
-
-#undef FORWARD_TO_HDMAP_UTILS
-
-  // clang-format off
 #define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
   /*!                                                                            \
    @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
@@ -281,7 +262,6 @@ public:
   // clang-format on
 
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-  FORWARD_TO_ENTITY(fillLaneletPose, const);
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
@@ -292,10 +272,7 @@ public:
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
-  // FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
-  FORWARD_TO_ENTITY(getMapPose, const);
-  FORWARD_TO_ENTITY(getMapPoseFromRelativePose, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
@@ -312,6 +289,7 @@ public:
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
   FORWARD_TO_ENTITY(setBehaviorParameter, );
+  FORWARD_TO_ENTITY(setControlledBySimulator, );
   FORWARD_TO_ENTITY(setDecelerationLimit, );
   FORWARD_TO_ENTITY(setDecelerationRateLimit, );
   FORWARD_TO_ENTITY(setLinearJerk, );
@@ -341,17 +319,15 @@ public:
     const speed_change::Transition transition, const speed_change::Constraint constraint,
     const bool continuous);
 
-  auto updateNpcLogic(
-    const std::string & name,
-    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
-    -> const CanonicalizedEntityStatus &;
+  auto updateNpcLogic(const std::string & name) -> const CanonicalizedEntityStatus &;
 
   void broadcastEntityTransform();
 
   void broadcastTransform(
     const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true);
 
-  bool checkCollision(const std::string & name0, const std::string & name1);
+  bool checkCollision(
+    const std::string & first_entity_name, const std::string & second_entity_name);
 
   bool despawnEntity(const std::string & name);
 
@@ -365,9 +341,6 @@ public:
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
   auto getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus;
-
-  auto getEntityTypeList() const
-    -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
@@ -401,7 +374,7 @@ public:
       } else {
         std::vector<geometry_msgs::msg::Pose> poses;
         for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPose>(name)) {
-          poses.push_back(pose::toMapPose(lanelet_pose));
+          poses.push_back(toMapPose(lanelet_pose));
         }
         return poses;
       }
@@ -429,7 +402,7 @@ public:
     const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
     const double tolerance) const;
   bool reachPosition(
-    const std::string & name, const std::string & target_name, const double tolerance) const;
+    const std::string & name, const std::string & target_entity_name, const double tolerance) const;
 
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
@@ -498,21 +471,19 @@ public:
       }(parameters);
 
       if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
-        entity_status.pose = pose::toMapPose(pose);
+        entity_status.pose = toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
-        entity_status.pose = pose::toMapPose(pose, hdmap_utils_ptr_);
-        return CanonicalizedEntityStatus(entity_status, pose::canonicalize(pose, hdmap_utils_ptr_));
+        entity_status.pose = toMapPose(pose, hdmap_utils_ptr_);
+        // here bounding_box and matching_distance are not used to adjust LaneletPose
+        // it is just rewritten, assuming that in the scenario is right, alternatively:
+        // toCanonicalizedLaneletPose(entity_status.pose, parameters.bounding_box,
+        // {pose.lanelet_id}, include_crosswalk, matching_distance, hdmap_utils_ptr_);
+        return CanonicalizedEntityStatus(entity_status, canonicalize(pose, hdmap_utils_ptr_));
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
-        const auto lanelet_pose = pose::toCanonicalizedLaneletPose(
+        const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
-        /// @note fix z, roll and pitch in msg::Pose to fitting to the lanelet
-        if (lanelet_pose && getParameter<bool>("consider_pose_by_road_slope", false)) {
-          entity_status.pose = pose::toMapPose(lanelet_pose.value());
-        } else {
-          entity_status.pose = pose;
-        }
-        return CanonicalizedEntityStatus(entity_status, lanelet_pose);
+        return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }
     };
 

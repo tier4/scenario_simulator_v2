@@ -111,26 +111,16 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
 
-  /*   */ auto getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
-
-  /*   */ auto getLaneletPose(double matching_distance) const
-    -> std::optional<CanonicalizedLaneletPose>;
-
   /*   */ auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
 
   /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
     -> std::optional<CanonicalizedLaneletPose>;
-
-  /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
-    -> geometry_msgs::msg::Pose;
 
   virtual auto getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double;
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
-
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
@@ -173,6 +163,8 @@ public:
 
   virtual auto isControlledBySimulator() const -> bool;
 
+  virtual auto setControlledBySimulator(bool) -> void;
+
   virtual auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void;
 
@@ -189,9 +181,6 @@ public:
   /*   */ void setDynamicConstraints(const traffic_simulator_msgs::msg::DynamicConstraints &);
 
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
-
-  /*   */ void setEntityTypeList(
-    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);
 
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
@@ -230,9 +219,6 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
-    -> void final;
-
   const std::string name;
 
   bool verbose;
@@ -250,7 +236,6 @@ protected:
   double traveled_distance_ = 0.0;
 
   std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
-  std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
   std::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;

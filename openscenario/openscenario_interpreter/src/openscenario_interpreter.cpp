@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <status_monitor/status_monitor.hpp>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
@@ -106,6 +107,17 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(record);
 
       script = std::make_shared<OpenScenario>(osc_path);
+
+      // CanonicalizedLaneletPose is also used on the OpenScenarioInterpretes side as NativeLanePose.
+      // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
+      const auto consider_pose_by_road_slope = [&]() {
+        if (!has_parameter("consider_pose_by_road_slope")) {
+          declare_parameter("consider_pose_by_road_slope", false);
+        }
+        return get_parameter("consider_pose_by_road_slope").as_bool();
+      }();
+      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
+        consider_pose_by_road_slope);
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};

@@ -56,13 +56,6 @@ protected:
   traffic_simulator::API api_;
   common::junit::JUnit5 junit_;
 
-  /// @todo it should be separated into the API helper collection for the cpp_mock_scenario
-  auto canonicalize(const traffic_simulator::LaneletPose & lanelet_pose)
-    -> traffic_simulator::CanonicalizedLaneletPose
-  {
-    return traffic_simulator::pose::canonicalize(lanelet_pose, api_.getHdmapUtils());
-  }
-
 private:
   std::string scenario_filename_;
   bool exception_expect_;

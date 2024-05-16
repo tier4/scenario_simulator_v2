@@ -79,10 +79,6 @@ auto ActionNode::getBlackBoardValues() -> void
   if (!getInput<EntityStatusDict>("other_entity_status", other_entity_status)) {
     THROW_SIMULATION_ERROR("failed to get input other_entity_status in ActionNode");
   }
-  if (!getInput<std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>>(
-        "entity_type_list", entity_type_list)) {
-    THROW_SIMULATION_ERROR("failed to get input entity_type_list in ActionNode");
-  }
   if (!getInput<lanelet::Ids>("route_lanelets", route_lanelets)) {
     THROW_SIMULATION_ERROR("failed to get input route_lanelets in ActionNode");
   }
@@ -177,8 +173,7 @@ auto ActionNode::getRightOfWayEntities() const
     return {};
   }
   std::vector<traffic_simulator::CanonicalizedEntityStatus> ret;
-  const auto lanelet_ids =
-    hdmap_utils->getRightOfWayLaneletIds(entity_status->getLaneletPose().lanelet_id);
+  const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(entity_status->getLaneletId());
   if (lanelet_ids.empty()) {
     return ret;
   }
@@ -279,7 +274,7 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
 {
   if (status.laneMatchingSucceed()) {
     return spline.getCollisionPointIn2D(
-      hdmap_utils->getLaneletPolygon(status.getLaneletPose().lanelet_id), false);
+      hdmap_utils->getLaneletPolygon(status.getLaneletId()), false);
   }
   return std::nullopt;
 }
@@ -358,7 +353,7 @@ auto ActionNode::getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & rout
       status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.getLaneletPose().lanelet_id) >= 1) {
+        status.second.getLaneletId()) >= 1) {
       conflicting_entity_status.emplace_back(status.second);
     }
   }
@@ -372,9 +367,9 @@ auto ActionNode::getConflictingEntityStatusOnLane(const lanelet::Ids & route_lan
   auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
-      status.second.laneMatchingSucceed() && std::count(
-                                               conflicting_lanes.begin(), conflicting_lanes.end(),
-                                               status.second.getLaneletPose().lanelet_id) >= 1) {
+      status.second.laneMatchingSucceed() &&
+      std::count(
+        conflicting_lanes.begin(), conflicting_lanes.end(), status.second.getLaneletId()) >= 1) {
       conflicting_entity_status.emplace_back(status.second);
     }
   }
@@ -390,13 +385,13 @@ auto ActionNode::foundConflictingEntity(const lanelet::Ids & following_lanelets)
       status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.getLaneletPose().lanelet_id) >= 1) {
+        status.second.getLaneletId()) >= 1) {
       return true;
     }
     if (
-      status.second.laneMatchingSucceed() && std::count(
-                                               conflicting_lanes.begin(), conflicting_lanes.end(),
-                                               status.second.getLaneletPose().lanelet_id) >= 1) {
+      status.second.laneMatchingSucceed() &&
+      std::count(
+        conflicting_lanes.begin(), conflicting_lanes.end(), status.second.getLaneletId()) >= 1) {
       return true;
     }
   }
