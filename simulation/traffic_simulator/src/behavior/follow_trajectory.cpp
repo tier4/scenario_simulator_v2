@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <arithmetic/floating_point/comparison.hpp>
 #include <geometry/linear_algebra.hpp>
 #include <geometry/vector3/hypot.hpp>
@@ -19,14 +21,11 @@
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <geometry/vector3/truncate.hpp>
+#include <iostream>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/behavior/follow_waypoint_controller.hpp>
 #include <traffic_simulator/utils/pose.hpp>
-
-#include <quaternion_operation/quaternion_operation.h>
-
-#include <iostream>
 
 namespace traffic_simulator
 {
@@ -573,10 +572,10 @@ auto makeUpdatedStatus(
         canonicalized_lanelet_pose) {
       updated_status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
       updated_status.lanelet_pose_valid = true;
+      return std::optional(CanonicalizedEntityStatus(updated_status, canonicalized_lanelet_pose));
     } else {
       return std::optional(CanonicalizedEntityStatus(updated_status, std::nullopt));
     }
-    return updated_status;
   }
 }
 }  // namespace follow_trajectory

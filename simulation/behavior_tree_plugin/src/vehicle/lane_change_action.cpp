@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <algorithm>
 #include <behavior_tree_plugin/vehicle/behavior_tree.hpp>
 #include <behavior_tree_plugin/vehicle/lane_change_action.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/transform.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-
-#include <algorithm>
 #include <memory>
 #include <optional>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <vector>
 

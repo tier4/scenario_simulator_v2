@@ -13,11 +13,9 @@
 // limitations under the License.
 
 #include <behavior_tree_plugin/pedestrian/pedestrian_action_node.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/helper/helper.hpp>
-
 #include <memory>
 #include <optional>
+#include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -65,10 +63,11 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
     updated_status.lanelet_pose_valid = true;
     updated_status.lanelet_pose =
       static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value());
+    return traffic_simulator::CanonicalizedEntityStatus(updated_status, canonicalized_lanelet_pose);
   } else {
     updated_status.lanelet_pose_valid = false;
     updated_status.lanelet_pose = traffic_simulator::LaneletPose();
+    return traffic_simulator::CanonicalizedEntityStatus(updated_status, std::nullopt);
   }
-  return traffic_simulator::CanonicalizedEntityStatus(updated_status, hdmap_utils);
 }
 }  // namespace entity_behavior

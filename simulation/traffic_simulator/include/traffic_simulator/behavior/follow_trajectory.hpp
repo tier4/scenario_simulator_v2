@@ -15,14 +15,12 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__FOLLOW_TRAJECTORY_HPP_
 
+#include <optional>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/polyline_trajectory.hpp>
-
-#include <optional>
 
 namespace traffic_simulator
 {

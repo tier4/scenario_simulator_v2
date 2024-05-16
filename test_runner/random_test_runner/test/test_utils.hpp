@@ -17,7 +17,6 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <random_test_runner/lanelet_utils.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
-
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 
 traffic_simulator::CanonicalizedEntityStatus getCanonicalizedEntityStatus(

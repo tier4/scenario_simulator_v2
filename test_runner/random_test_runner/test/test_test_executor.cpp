@@ -14,9 +14,9 @@
 //
 // Co-developed by TIER IV, Inc. and Robotec.AI sp. z o.o.
 
-#include <random_test_runner/test_executor.hpp>
-
 #include <gmock/gmock.h>
+
+#include <random_test_runner/test_executor.hpp>
 
 class MockFieldOperatorApplication
 {

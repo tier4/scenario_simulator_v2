@@ -17,7 +17,6 @@
 
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
 
 namespace traffic_simulator

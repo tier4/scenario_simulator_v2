@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <behavior_tree_plugin/action_node.hpp>
-#include <geometry/bounding_box.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
-#include <traffic_simulator/helper/helper.hpp>
-
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
+#include <behavior_tree_plugin/action_node.hpp>
+#include <geometry/bounding_box.hpp>
 #include <memory>
 #include <optional>
+#include <rclcpp/rclcpp.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 #include <set>
 #include <string>
+#include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -37,10 +36,7 @@ ActionNode::ActionNode(const std::string & name, const BT::NodeConfiguration & c
 {
 }
 
-auto ActionNode::executeTick() -> BT::NodeStatus
-{
-  return BT::ActionNodeBase::executeTick();
-}
+auto ActionNode::executeTick() -> BT::NodeStatus { return BT::ActionNodeBase::executeTick(); }
 
 auto ActionNode::getBlackBoardValues() -> void
 {

@@ -29,27 +29,27 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   canonicalize();
 }
 
-/// @todo this consturctor will be removed (after adaptation of behavior_tree)
-CanonicalizedEntityStatus::CanonicalizedEntityStatus(
-  const EntityStatus & may_non_canonicalized_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-: canonicalized_lanelet_pose_{may_non_canonicalized_entity_status.lanelet_pose_valid?std::optional(CanonicalizedLaneletPose(
-    may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils)):std::nullopt},
-  entity_status_{may_non_canonicalized_entity_status}
-{
-  canonicalize();
-}
+// /// @todo this consturctor will be removed (after adaptation of behavior_tree)
+// CanonicalizedEntityStatus::CanonicalizedEntityStatus(
+//   const EntityStatus & may_non_canonicalized_entity_status,
+//   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
+// : canonicalized_lanelet_pose_{may_non_canonicalized_entity_status.lanelet_pose_valid?std::optional(CanonicalizedLaneletPose(
+//     may_non_canonicalized_entity_status.lanelet_pose, hdmap_utils)):std::nullopt},
+//   entity_status_{may_non_canonicalized_entity_status}
+// {
+//   canonicalize();
+// }
 
-/// @todo this consturctor will be removed (after adaptation of behavior_tree)
-CanonicalizedEntityStatus::CanonicalizedEntityStatus(
-  const EntityStatus & may_non_canonicalized_entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
-: canonicalized_lanelet_pose_{may_non_canonicalized_entity_status.lanelet_pose_valid?std::optional(CanonicalizedLaneletPose(
-    may_non_canonicalized_entity_status.lanelet_pose, route_lanelets, hdmap_utils )):std::nullopt},
-      entity_status_{may_non_canonicalized_entity_status}
-{
-  canonicalize();
-}
+// /// @todo this consturctor will be removed (after adaptation of behavior_tree)
+// CanonicalizedEntityStatus::CanonicalizedEntityStatus(
+//   const EntityStatus & may_non_canonicalized_entity_status,
+//   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
+// : canonicalized_lanelet_pose_{may_non_canonicalized_entity_status.lanelet_pose_valid?std::optional(CanonicalizedLaneletPose(
+//     may_non_canonicalized_entity_status.lanelet_pose, route_lanelets, hdmap_utils )):std::nullopt},
+//       entity_status_{may_non_canonicalized_entity_status}
+// {
+//   canonicalize();
+// }
 
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj)
 : canonicalized_lanelet_pose_(obj.canonicalized_lanelet_pose_),
