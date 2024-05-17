@@ -24,7 +24,9 @@
 static const std::string map_path = "/map/lanelet2_map.osm";
 static const std::string with_road_shoulder_map_path = "/map/with_road_shoulder/lanelet2_map.osm";
 static const std::string empty_map_path = "/map/empty/lanelet2_map.osm";
-static const std::string four_track_map_path = "/map/four_track_highway/lanelet2_map.osm";
+static const std::string four_track_highway_map_path = "/map/four_track_highway/lanelet2_map.osm";
+static const std::string crossroads_with_stoplines_map_path =
+  "/map/crossroads_with_stoplines/lanelet2_map.osm";
 
 auto makeHdMapUtilsInstance(const std::string relative_path = map_path) -> hdmap_utils::HdMapUtils
 {
@@ -1097,7 +1099,7 @@ TEST(HdMapUtils, toMapPose_sLargerThanLaneletLength)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 199;
   const lanelet::Id end_lanelet = start_lanelet;
   const auto direction = traffic_simulator::lane_change::Direction::STRAIGHT;
@@ -1110,7 +1112,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangable)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 199;
   const auto direction = traffic_simulator::lane_change::Direction::LEFT;
 
@@ -1121,7 +1123,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangable)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangable)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
   const lanelet::Id end_lanelet = 199;
   const auto direction = traffic_simulator::lane_change::Direction::LEFT;
@@ -1134,7 +1136,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangable)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangable)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 202;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
 
@@ -1145,7 +1147,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangable)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangable)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
   const lanelet::Id end_lanelet = 201;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
@@ -1158,7 +1160,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangable)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftPossible)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 201;
   const lanelet::Id end_lanelet = 199;
   const auto direction = traffic_simulator::lane_change::Direction::LEFT;
@@ -1173,7 +1175,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftPossible)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftNotPossible)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
   const auto direction = traffic_simulator::lane_change::Direction::LEFT;
   const uint8_t shift = 2;
@@ -1186,7 +1188,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftNotPossible)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightPossible)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
   const lanelet::Id end_lanelet = 202;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
@@ -1201,7 +1203,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightPossible)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightNotPossible)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 201;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
   const uint8_t shift = 2;
@@ -1214,7 +1216,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightNotPossible)
 
 TEST(HdMapUtils, getLaneChangeableLaneletId_shift0)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 201;
   const lanelet::Id end_lanelet = 201;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
@@ -1230,7 +1232,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift0)
 TEST(HdMapUtils, getPreviousLanelets_straightBefore)
 {
   // refer to 3rd issue at the end of this file
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id lanelet_id = 202;
 
   auto result_previous = hdmap_utils.getPreviousLanelets(lanelet_id, 50.0);
@@ -1264,7 +1266,7 @@ TEST(HdMapUtils, getPreviousLanelets_curveBefore)
 TEST(HdMapUtils, getPreviousLanelets_notEnoughLaneletsBefore)
 {
   // refer to 3rd issue at the end of this file
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id lanelet_id = 202;
 
   auto result_previous = hdmap_utils.getPreviousLanelets(lanelet_id, 200.0);
@@ -1291,7 +1293,7 @@ TEST(HdMapUtils, getTrafficLightIds_correct)
 
 TEST(HdMapUtils, getTrafficLightIds_noTrafficLight)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   auto result_traffic_lights = hdmap_utils.getTrafficLightIds();
 
@@ -1447,7 +1449,7 @@ TEST(HdMapUtils, getFollowingLanelets_straightAfter)
 
 TEST(HdMapUtils, getFollowingLanelets_notEnoughLaneletsAfter)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   const lanelet::Id id = 199;
   const double distance = 1.0e100;
@@ -1487,7 +1489,7 @@ TEST(HdMapUtils, getFollowingLanelets_candidatesDoNotMatch)
 
 TEST(HdMapUtils, canChangeLane_canChange)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   const lanelet::Id from_id = 199;
   const lanelet::Id to_id = 200;
@@ -1499,7 +1501,7 @@ TEST(HdMapUtils, canChangeLane_canChange)
 
 TEST(HdMapUtils, canChangeLane_canNotChange)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   const lanelet::Id from_id = 199;
   const lanelet::Id to_id = 201;
@@ -1511,7 +1513,7 @@ TEST(HdMapUtils, canChangeLane_canNotChange)
 
 TEST(HdMapUtils, canChangeLane_invalidLaneletId)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   const lanelet::Id from_id = 1000003;
   const lanelet::Id to_id = 1000033;
@@ -1551,7 +1553,7 @@ TEST(HdMapUtils, getRoute_correctCache)
 
 TEST(HdMapUtils, getRoute_impossibleRouting)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   const lanelet::Id from_id = 199;
   const lanelet::Id to_id = 196;
@@ -1765,7 +1767,7 @@ TEST(HdMapUtils, getLongitudinalDistance_sameLaneletBehind)
 
 TEST(HdMapUtils, getLongitudinalDistance_differentLaneletNoRoute)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   auto pose_to = hdmap_utils.toLaneletPose(
     makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
   auto pose_from = hdmap_utils.toLaneletPose(
@@ -1781,6 +1783,179 @@ TEST(HdMapUtils, getLongitudinalDistance_differentLaneletNoRoute)
   EXPECT_FALSE(result_distance.has_value());
 }
 
+TEST(HdMapUtils, getStopLineIdsOnPath_someStopLines)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Ids route = {34507, 34795, 34606, 34672, 34675, 34744, 34690};
+
+  const auto result_stoplines = hdmap_utils.getStopLineIdsOnPath(route);
+  const auto actual_stoplines = lanelet::Ids{120635};
+
+  EXPECT_EQ(result_stoplines, actual_stoplines);
+}
+
+TEST(HdMapUtils, getStopLineIdsOnPath_noStopLines)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Ids route = {34507, 34795, 34606, 34672};
+
+  const auto result_stoplines = hdmap_utils.getStopLineIdsOnPath(route);
+
+  EXPECT_EQ(result_stoplines.size(), static_cast<size_t>(0));
+}
+
+TEST(HdMapUtils, getStopLineIdsOnPath_empty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const auto result_stoplines = hdmap_utils.getStopLineIdsOnPath({});
+
+  EXPECT_EQ(result_stoplines.size(), static_cast<size_t>(0));
+}
+
+TEST(HdMapUtils, getTrafficLightStopLineIds_stopLine)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto result_stoplines = hdmap_utils.getTrafficLightStopLineIds(34802);
+  auto actual_stoplines = lanelet::Ids{34805};
+
+  EXPECT_EQ(result_stoplines, actual_stoplines);
+}
+
+TEST(HdMapUtils, getTrafficLightStopLineIds_severalStopLines)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto result_stoplines = hdmap_utils.getTrafficLightStopLineIds(34836);
+  auto actual_stoplines = lanelet::Ids{120663, 34805};
+
+  std::sort(result_stoplines.begin(), result_stoplines.end());
+  std::sort(actual_stoplines.begin(), actual_stoplines.end());
+
+  EXPECT_EQ(result_stoplines, actual_stoplines);
+}
+
+TEST(HdMapUtils, getTrafficLightStopLineIds_invalidTrafficLightId)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  const lanelet::Id invalid_id = 1000039;
+  EXPECT_THROW(hdmap_utils.getTrafficLightStopLineIds(invalid_id), std::runtime_error);
+}
+
+void sortStoplines(std::vector<std::vector<geometry_msgs::msg::Point>> & stoplines)
+{
+  auto point_comparator =
+    [](const geometry_msgs::msg::Point & a, const geometry_msgs::msg::Point & b) -> bool {
+    if (a.x != b.x) return a.x < b.x;
+    if (a.y != b.y) return a.y < b.y;
+    return a.z < b.z;
+  };
+
+  std::for_each(
+    stoplines.begin(), stoplines.end(),
+    [&point_comparator](std::vector<geometry_msgs::msg::Point> & v) {
+      std::sort(v.begin(), v.end(), point_comparator);
+    });
+  std::sort(
+    stoplines.begin(), stoplines.end(),
+    [&point_comparator](
+      const std::vector<geometry_msgs::msg::Point> & a,
+      const std::vector<geometry_msgs::msg::Point> & b) {
+      return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), point_comparator);
+    });
+}
+
+void compareStoplines(
+  const std::vector<std::vector<geometry_msgs::msg::Point>> & a,
+  const std::vector<std::vector<geometry_msgs::msg::Point>> & b)
+{
+  const double epsilon = 1.0;
+  for (auto a_lines_it = a.begin(), b_lines_it = b.begin();
+       a_lines_it != a.end() && b_lines_it != b.end(); a_lines_it++, b_lines_it++) {
+    for (auto a_points_it = a_lines_it->begin(), b_points_it = b_lines_it->begin();
+         a_points_it != a_lines_it->end() && b_points_it != b_lines_it->end();
+         a_points_it++, b_points_it++) {
+      EXPECT_POINT_NEAR((*a_points_it), (*b_points_it), epsilon);
+    }
+  }
+}
+
+TEST(HdMapUtils, getTrafficLightStopLinesPoints_stopLine)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto result_stoplines_points = hdmap_utils.getTrafficLightStopLinesPoints(34802);
+  auto actual_stoplines_points = std::vector<std::vector<geometry_msgs::msg::Point>>{
+    {makePoint(3762.0, 73756.0, -0.5), makePoint(3759.0, 73754.5, -0.5)}};
+
+  EXPECT_EQ(result_stoplines_points.size(), actual_stoplines_points.size());
+
+  sortStoplines(result_stoplines_points);
+  sortStoplines(actual_stoplines_points);
+
+  compareStoplines(actual_stoplines_points, result_stoplines_points);
+}
+
+TEST(HdMapUtils, getTrafficLightStopLinesPoints_severalStopLines)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto result_stoplines_points = hdmap_utils.getTrafficLightStopLinesPoints(34836);
+  auto actual_stoplines_points = std::vector<std::vector<geometry_msgs::msg::Point>>{
+    {makePoint(3762.0, 73756.0, -0.5), makePoint(3759.0, 73754.5, -0.5)},
+    {makePoint(3768.5, 73737.0, -0.5), makePoint(3765.5, 73736.0, -0.5)}};
+
+  EXPECT_EQ(result_stoplines_points.size(), actual_stoplines_points.size());
+
+  sortStoplines(result_stoplines_points);
+  sortStoplines(actual_stoplines_points);
+
+  compareStoplines(actual_stoplines_points, result_stoplines_points);
+}
+
+TEST(HdMapUtils, getTrafficLightStopLinesPoints_invalidTrafficLightId)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  const lanelet::Id invalid_id = 1000039;
+  EXPECT_THROW(hdmap_utils.getTrafficLightStopLinesPoints(invalid_id), std::runtime_error);
+}
+
+TEST(HdMapUtils, getStopLinePolygon_stopLine)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+  const lanelet::Id linestring_id_with_stopline{120663};
+
+  auto result_stoplines_points = hdmap_utils.getStopLinePolygon(linestring_id_with_stopline);
+  auto actual_stoplines_points = std::vector<geometry_msgs::msg::Point>{
+    makePoint(3768.5, 73737.5, -0.5), makePoint(3765.5, 73735.5, -0.5)};
+
+  const double epsilon = 1.0;
+  EXPECT_EQ(result_stoplines_points.size(), actual_stoplines_points.size());
+  EXPECT_POINT_NEAR(result_stoplines_points.at(0), actual_stoplines_points.at(0), epsilon);
+  EXPECT_POINT_NEAR(result_stoplines_points.at(1), actual_stoplines_points.at(1), epsilon);
+}
+
+TEST(HdMapUtils, getStopLinePolygon_noStopLine)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+  const lanelet::Id linestring_id_no_stopline{34629};
+
+  EXPECT_THROW(hdmap_utils.getStopLinePolygon(linestring_id_no_stopline), std::runtime_error);
+}
+
+TEST(HdMapUtils, getStopLinePolygon_invalidLaneletId)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  const lanelet::Id invalid_id = 1000039;
+  EXPECT_THROW(hdmap_utils.getStopLinePolygon(invalid_id), std::runtime_error);
+}
+
 /*
 ISSUES:
 1: 288, missing predicate if first is closer than distance threshold.
@@ -1794,4 +1969,5 @@ ISSUES:
   copies of the one previous lanelet.
   The mistake was introduced here: https://github.com/tier4/scenario_simulator_v2/commit/3fc8c0ad9f6aaf0762b16c0cb168e1dfcbf1ed29#diff-da44510bdbbba766d1ba47318640cfd8bcff2e350eafe3d77d364bfbf70e25cdL745-L770
   The previous implementation seems to have been right.
+4: 1853: This function does not check if "lanelet_id" represents a stopline. Any linestring can be passed. 
 */
