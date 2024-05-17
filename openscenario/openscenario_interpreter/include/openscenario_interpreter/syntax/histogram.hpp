@@ -44,19 +44,6 @@ struct Histogram : public ComplexType, private Scope, public StochasticParameter
    */
   const std::list<HistogramBin> bins;
 
-  struct BinAdaptor
-  {
-    explicit BinAdaptor(const std::list<HistogramBin> & bins)
-    {
-      intervals.emplace_back(bins.front().range.lower_limit.data);
-      for (const auto & bin : bins) {
-        intervals.emplace_back(bin.range.upper_limit.data);
-        densities.emplace_back(bin.weight.data);
-      }
-    }
-    std::vector<double> intervals, densities;
-  } bin_adaptor;
-
   std::piecewise_constant_distribution<Double::value_type> distribute;
 
   explicit Histogram(const pugi::xml_node &, Scope & scope);
