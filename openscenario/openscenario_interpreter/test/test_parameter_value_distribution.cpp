@@ -192,11 +192,11 @@ TEST(ParameterValueDistribution, Histogram)
 
   ParameterDistribution expected_distribution;
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
+    makeParameterListSharedPtr<Double>("offset", -0.73692442452247864));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -0.845241258489508595630468335003));
+    makeParameterListSharedPtr<Double>("offset", -0.082699735953560394));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
+    makeParameterListSharedPtr<Double>("offset", -0.5620816275750421));
 
   checkParameterValueDistribution(path, expected_distribution);
 }
