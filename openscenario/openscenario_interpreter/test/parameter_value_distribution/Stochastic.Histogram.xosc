@@ -3,7 +3,7 @@
   <FileHeader author="" date="2022-08-26T07:17:21.031Z" description="" revMajor="0" revMinor="0"/>
   <ParameterValueDistribution>
     <ScenarioFile filepath="$(ros2 pkg prefix --share openscenario_interpreter)/test/parameter_value_distribution/sample.xosc"/>
-    <Stochastic numberOfTestRuns="3">
+    <Stochastic numberOfTestRuns="20">
       <StochasticDistribution parameterName="offset">
         <Histogram>
           <Bin weight="1">
