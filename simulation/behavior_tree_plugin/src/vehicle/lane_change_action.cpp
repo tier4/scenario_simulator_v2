@@ -221,8 +221,9 @@ BT::NodeStatus LaneChangeAction::tick()
     }
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
-      traffic_simulator::EntityStatus entity_status_updated;
+      auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
       entity_status_updated.pose = pose;
+      entity_status_updated.lanelet_pose_valid = false;
       entity_status_updated.action_status = getActionStatus();
       setOutput(
         "non_canonicalized_updated_status",
@@ -247,11 +248,13 @@ BT::NodeStatus LaneChangeAction::tick()
       curve_ = std::nullopt;
       current_s_ = 0;
       lane_change_velocity_ = 0;
-      traffic_simulator::EntityStatus entity_status_updated;
+      auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
       traffic_simulator::LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;
+      entity_status_updated.lanelet_pose = lanelet_pose;
+      entity_status_updated.lanelet_pose_valid = true;
       entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose).pose;
       entity_status_updated.action_status = getActionStatus();
       setOutput(

@@ -418,9 +418,11 @@ auto ActionNode::calculateUpdatedEntityStatus(
     const auto canonicalized_lanelet_pose =
       std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
     // If canonicalize succeed, set canonicalized pose and set other values.
-    traffic_simulator::EntityStatus entity_status_updated;
+    auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
     {
       entity_status_updated.time = current_time + step_time;
+      entity_status_updated.lanelet_pose = canonicalized_lanelet_pose.value();
+      entity_status_updated.lanelet_pose_valid = true;
       entity_status_updated.action_status.twist = twist_new;
       entity_status_updated.action_status.accel = accel_new;
       entity_status_updated.action_status.linear_jerk = linear_jerk_new;
@@ -438,9 +440,11 @@ auto ActionNode::calculateUpdatedEntityStatus(
           end_of_road_lanelet_pose.offset = lanelet_pose.offset;
           end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
         }
-        traffic_simulator::EntityStatus entity_status_updated;
+        auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
         {
           entity_status_updated.time = current_time + step_time;
+          entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
+          entity_status_updated.lanelet_pose_valid = true;
           entity_status_updated.action_status.twist = twist_new;
           entity_status_updated.action_status.accel = accel_new;
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
@@ -456,9 +460,11 @@ auto ActionNode::calculateUpdatedEntityStatus(
           end_of_road_lanelet_pose.offset = lanelet_pose.offset;
           end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
         }
-        traffic_simulator::EntityStatus entity_status_updated;
+        auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
         {
           entity_status_updated.time = current_time + step_time;
+          entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
+          entity_status_updated.lanelet_pose_valid = true;
           entity_status_updated.action_status.twist = twist_new;
           entity_status_updated.action_status.accel = accel_new;
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
@@ -500,8 +506,10 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   pose_new.position.x = trans_vec(0) + entity_status->getMapPose().position.x;
   pose_new.position.y = trans_vec(1) + entity_status->getMapPose().position.y;
   pose_new.position.z = trans_vec(2) + entity_status->getMapPose().position.z;
-  traffic_simulator::EntityStatus entity_status_updated;
+  auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
   entity_status_updated.time = current_time + step_time;
+  entity_status_updated.lanelet_pose = traffic_simulator::LaneletPose();
+  entity_status_updated.lanelet_pose_valid = false;
   entity_status_updated.pose = pose_new;
   entity_status_updated.action_status.twist = twist_new;
   entity_status_updated.action_status.accel = accel_new;

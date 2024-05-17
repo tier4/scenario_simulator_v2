@@ -559,6 +559,8 @@ auto makeUpdatedStatus(
 
     updated_status.time = entity_status.time + step_time;
 
+    updated_status.lanelet_pose_valid = false;
+
     return updated_status;
   }
 }

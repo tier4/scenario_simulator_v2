@@ -164,10 +164,16 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
 
     behavior_plugin_ptr_->update(current_time, step_time);
     const auto non_canonicalized_updated_status = behavior_plugin_ptr_->getUpdatedStatus();
-    // prefer the current lanelet
-    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
-      non_canonicalized_updated_status->pose, status_.getBoundingBox(), status_.getLaneletIds(),
-      false, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+    std::optional<CanonicalizedLaneletPose> canonicalized_lanelet_pose;
+    if (non_canonicalized_updated_status->lanelet_pose_valid) {
+      canonicalized_lanelet_pose =
+        canonicalize(non_canonicalized_updated_status->lanelet_pose, hdmap_utils_ptr_);
+    } else {
+      // prefer the current lanelet
+      canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        non_canonicalized_updated_status->pose, status_.getBoundingBox(), status_.getLaneletIds(),
+        false, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+    }
     /// @note setStatus() is skipped when isAtEndOfLanelets return true
     if (canonicalized_lanelet_pose) {
       if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
