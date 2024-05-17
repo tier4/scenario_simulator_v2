@@ -116,11 +116,9 @@ BT::NodeStatus LaneChangeAction::tick()
         case traffic_simulator::lane_change::Constraint::Type::NONE:
           /**
           @note Hard coded parameter,
-          10.0 is a maximum_curvature_threshold (If the curvature of the trajectory is over 10.0,
-          the trajectory was not selected.) 20.0 is a target_trajectory_length (The one with the
-          closest length to 20 m is selected from the candidate trajectories.) 1.0 is a
-          forward_distance_threshold (If the goal x position in the cartesian coordinate was
-          under 1.0, the goal was rejected.)
+          10.0 is a maximum_curvature_threshold (If the curvature of the trajectory is over 10.0, the trajectory was not selected.)
+          20.0 is a target_trajectory_length (The one with the closest length to 20 m is selected from the candidate trajectories.)
+          1.0 is a forward_distance_threshold (If the goal x position in the cartesian coordinate was under 1.0, the goal was rejected.)
           */
           traj_with_goal = hdmap_utils->getLaneChangeTrajectory(
             hdmap_utils->toMapPose(lanelet_pose).pose, lane_change_parameters_.value(), 10.0, 20.0,
@@ -205,7 +203,7 @@ BT::NodeStatus LaneChangeAction::tick()
         geometry_msgs::msg::Twist twist_new;
         /**
          * @note Hard coded parameter, -10.0 is a minimum linear velocity of the entity.
-         */
+        */
         twist_new.linear.x = std::clamp(
           entity_status->getTwist().linear.x + accel_new.linear.x * step_time, -10.0,
           vehicle_parameters.performance.max_speed);

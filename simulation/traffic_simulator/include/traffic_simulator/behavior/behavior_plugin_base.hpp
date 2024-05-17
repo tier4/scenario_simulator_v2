@@ -44,13 +44,13 @@ public:
   virtual void update(double current_time, double step_time) = 0;
   virtual const std::string & getCurrentAction() const = 0;
 
-#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)        \
-  virtual TYPE get##NAME() = 0;                      \
-  virtual void set##NAME(const TYPE & value) = 0;    \
-  auto get##NAME##Key() const -> const std::string & \
-  {                                                  \
-    static const std::string key = KEY;              \
-    return key;                                      \
+#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
+  virtual TYPE get##NAME() = 0;                    \
+  virtual void set##NAME(const TYPE & value) = 0;  \
+  auto get##NAME##Key() const->const std::string & \
+  {                                                \
+    static const std::string key = KEY;            \
+    return key;                                    \
   }
 
   // clang-format off
@@ -72,7 +72,7 @@ public:
   DEFINE_GETTER_SETTER(StepTime,                                         "step_time",                                      double)
   DEFINE_GETTER_SETTER(TargetSpeed,                                      "target_speed",                                   std::optional<double>)
   DEFINE_GETTER_SETTER(TrafficLightManager,                              "traffic_light_manager",                          std::shared_ptr<traffic_simulator::TrafficLightManager>)
-  DEFINE_GETTER_SETTER(UpdatedStatus,                                    "non_canonicalized_updated_status",               std::shared_ptr<traffic_simulator::EntityStatus>)
+  DEFINE_GETTER_SETTER(UpdatedStatus,                                    "updated_status",                                 std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(VehicleParameters,                                "vehicle_parameters",                             traffic_simulator_msgs::msg::VehicleParameters)
   DEFINE_GETTER_SETTER(Waypoints,                                        "waypoints",                                      traffic_simulator_msgs::msg::WaypointsArray)
   // clang-format on

@@ -119,8 +119,7 @@ auto makeUpdatedStatus(
      "Steering Behaviors For Autonomous Characters" by Craig Reynolds for more
      information.
 
-     See
-     https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
+     See https://www.researchgate.net/publication/2495826_Steering_Behaviors_For_Autonomous_Characters
   */
   if (polyline_trajectory.shape.vertices.empty()) {
     return std::nullopt;

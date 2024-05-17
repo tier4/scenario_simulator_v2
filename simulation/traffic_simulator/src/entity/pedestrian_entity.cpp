@@ -257,7 +257,6 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
       std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(status_));
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
     behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
-
     behavior_plugin_ptr_->update(current_time, step_time);
     const auto non_canonicalized_updated_status = behavior_plugin_ptr_->getUpdatedStatus();
     std::optional<CanonicalizedLaneletPose> canonicalized_lanelet_pose;
