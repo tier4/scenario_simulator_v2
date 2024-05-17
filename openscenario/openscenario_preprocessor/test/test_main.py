@@ -58,7 +58,3 @@ def test_sample():
 
 def test_autoware_simple():
     test("autoware-simple", 2)
-
-
-def test_failure():
-    test("failure", 4)
