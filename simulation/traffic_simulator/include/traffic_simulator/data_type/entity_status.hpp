@@ -22,6 +22,8 @@
 namespace traffic_simulator
 {
 using EntityStatus = traffic_simulator_msgs::msg::EntityStatus;
+using EntityType = traffic_simulator_msgs::msg::EntityType;
+using EntitySubtype = traffic_simulator_msgs::msg::EntitySubtype;
 
 inline namespace entity_status
 {
@@ -33,9 +35,21 @@ public:
     const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose);
   explicit CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
-  CanonicalizedEntityStatus & operator=(const CanonicalizedEntityStatus & obj);
+  auto set(const CanonicalizedEntityStatus & status) -> void
+  {
+    assert(getType() != status.getType());
+    assert(getSubtype() != status.getSubtype());
+    assert(getName() != status.getName());
+    assert(getMapPose().frame_id != status.getMapPose().frame_id);
+    assert(getBoundingBox() != status.getBoundingBox());
+    assert(getTime() != status.getTime());
+    entity_status_ = status.entity_status_;
+    canonicalized_lanelet_pose_ = status.canonicalized_lanelet_pose_;
+  }
   auto setAction(const std::string & action) -> void;
-  auto getName() const noexcept -> const std::string & { return entity_status_.name; };
+  auto getName() const noexcept -> const std::string & { return entity_status_.name; }
+  auto getType() const noexcept -> const EntityType & { return entity_status_.type; }
+  auto getSubtype() const noexcept -> const EntitySubtype & { return entity_status_.subtype; }
   auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
   auto laneMatchingSucceed() const noexcept -> bool;
   auto setMapPose(const geometry_msgs::msg::Pose & pose) -> void;

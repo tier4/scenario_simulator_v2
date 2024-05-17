@@ -35,7 +35,7 @@ void MiscObjectEntity::onUpdate(double, double step_time)
   if (npc_logic_started_) {
     updateStandStillDuration(step_time);
   }
-  status_before_update_ = status_;
+  status_before_update_.set(status_);
 }
 
 auto MiscObjectEntity::getCurrentAction() const -> std::string

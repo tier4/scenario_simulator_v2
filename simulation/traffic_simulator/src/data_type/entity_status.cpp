@@ -34,15 +34,6 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntitySt
   entity_status_(static_cast<EntityStatus>(obj))
 {
 }
-
-CanonicalizedEntityStatus & CanonicalizedEntityStatus::operator=(
-  const CanonicalizedEntityStatus & obj)
-{
-  this->canonicalized_lanelet_pose_ = obj.canonicalized_lanelet_pose_;
-  this->entity_status_ = obj.entity_status_;
-  return *this;
-}
-
 auto CanonicalizedEntityStatus::canonicalize() -> void
 {
   assert(entity_status_.lanelet_pose_valid == canonicalized_lanelet_pose_.has_value());

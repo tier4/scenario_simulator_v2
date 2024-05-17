@@ -102,7 +102,7 @@ auto EntityBase::isTargetSpeedReached(const speed_change::RelativeTargetSpeed & 
 void EntityBase::onUpdate(double /*current_time*/, double step_time)
 {
   job_list_.update(step_time, job::Event::PRE_UPDATE);
-  status_before_update_ = status_;
+  status_before_update_.set(status_);
   speed_planner_ =
     std::make_unique<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>(
       step_time, name);
@@ -517,7 +517,10 @@ void EntityBase::setOtherStatus(
   other_status_.erase(name);
 }
 
-auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void { status_ = status; }
+auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
+{
+  status_.set(status);
+}
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
 {
