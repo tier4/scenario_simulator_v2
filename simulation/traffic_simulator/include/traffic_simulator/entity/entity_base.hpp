@@ -184,7 +184,9 @@ public:
 
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
-  virtual auto setStatus(const CanonicalizedEntityStatus &) -> void;
+  virtual void setStatus(const EntityStatus & status);
+
+  virtual auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 

@@ -378,18 +378,6 @@ void EntityManager::requestSpeedChange(
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 
-auto EntityManager::setEntityStatus(
-  const std::string & name, const CanonicalizedEntityStatus & status) -> void
-{
-  if (is<EgoEntity>(name) && getCurrentTime() > 0 && not isControlledBySimulator(name)) {
-    THROW_SEMANTIC_ERROR(
-      "You cannot set entity status to the ego vehicle name ", std::quoted(name),
-      " after starting scenario.");
-  } else {
-    entities_.at(name)->setStatus(status);
-  }
-}
-
 void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;

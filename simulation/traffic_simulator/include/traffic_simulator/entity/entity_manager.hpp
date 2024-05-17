@@ -417,8 +417,6 @@ public:
    */
   void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
 
-  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status) -> void;
-
   void setVerbose(const bool verbose);
 
   template <typename Entity, typename Pose, typename Parameters, typename... Ts>

@@ -450,12 +450,12 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
 {
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
-  const auto matching_length =
+  const auto matching_distance =
     [](const auto & entity_width) { return entity_width * 0.5 + 1.0; }(std::max(
       vehicle_parameters.axles.front_axle.track_width,
       vehicle_parameters.axles.rear_axle.track_width));
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
-    status.pose, status.bounding_box, unique_route_lanelets, false, matching_length,
+    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
     hdmap_utils_ptr_);
   status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();

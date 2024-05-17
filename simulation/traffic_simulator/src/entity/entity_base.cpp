@@ -517,7 +517,12 @@ void EntityBase::setOtherStatus(
   other_status_.erase(name);
 }
 
-auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
+void EntityBase::setStatus(const EntityStatus & status)
+{
+  status_.set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+}
+
+auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void
 {
   status_.set(status);
 }

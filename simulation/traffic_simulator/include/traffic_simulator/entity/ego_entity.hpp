@@ -127,6 +127,10 @@ public:
 
   auto setVelocityLimit(double) -> void override;
 
+  void setStatus(const EntityStatus & status) override;
+
+  auto setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void;
+
   auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
 };
 }  // namespace entity

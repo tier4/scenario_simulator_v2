@@ -55,7 +55,6 @@ auto canonicalize(
     return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
 }
 
-
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
 {
   return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
