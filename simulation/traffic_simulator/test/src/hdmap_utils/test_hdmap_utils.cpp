@@ -164,6 +164,26 @@ TEST(HdMapUtils, AlongLaneletPose)
     hdmap_utils.getLaneletLength(34684) - 10.0);
 }
 
+TEST(HdMapUtils, AlongLaneletPose_afterLast)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  const lanelet::Id lanelet_id = 206;
+  const auto pose = traffic_simulator::helper::constructLaneletPose(lanelet_id, 15.0);
+
+  EXPECT_THROW(hdmap_utils.getAlongLaneletPose(pose, 30.0), common::SemanticError);
+}
+
+TEST(HdMapUtils, AlongLaneletPose_beforeFirst)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  const lanelet::Id lanelet_id = 3002178;
+  const auto pose = traffic_simulator::helper::constructLaneletPose(lanelet_id, 15.0);
+
+  EXPECT_THROW(hdmap_utils.getAlongLaneletPose(pose, -30.0), common::SemanticError);
+}
+
 /**
  * @note Testcase for lanelet pose canonicalization when s < 0
  * Following lanelets: 34576 -> 34570 -> 34564
@@ -1447,6 +1467,20 @@ TEST(HdMapUtils, getFollowingLanelets_straightAfter)
   EXPECT_EQ(result_ids, actual_ids);
 }
 
+TEST(HdMapUtils, getFollowingLanelets_curveAfter)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34564;
+  const double distance = 40.0;
+  const bool include_self = true;
+
+  const auto result_ids = hdmap_utils.getFollowingLanelets(id, distance, include_self);
+  const lanelet::Ids actual_ids = {id, 34411, 34462};
+
+  EXPECT_EQ(result_ids, actual_ids);
+}
+
 TEST(HdMapUtils, getFollowingLanelets_notEnoughLaneletsAfter)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
@@ -1459,6 +1493,40 @@ TEST(HdMapUtils, getFollowingLanelets_notEnoughLaneletsAfter)
   const lanelet::Ids actual_ids = {id, 203};
 
   EXPECT_EQ(result_ids, actual_ids);
+}
+
+TEST(HdMapUtils, getFollowingLanelets_candidateTrajectory)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34564;
+  const double distance = 40;
+  const bool include_self = true;
+
+  const lanelet::Ids route{id, 34495, 34507, 34795, 34606};
+
+  const auto result_following = hdmap_utils.getFollowingLanelets(id, route, distance, include_self);
+
+  const lanelet::Ids actual_following{id, 34495, 34507};
+
+  EXPECT_EQ(result_following, actual_following);
+}
+
+TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryNotEnough)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+
+  const lanelet::Id id = 34564;
+  const double distance = 100;
+  const bool include_self = true;
+
+  const lanelet::Ids route{id, 34495, 34507};
+
+  const auto result_following = hdmap_utils.getFollowingLanelets(id, route, distance, include_self);
+
+  const lanelet::Ids actual_following{id, 34495, 34507, 34795, 34606};
+
+  EXPECT_EQ(result_following, actual_following);
 }
 
 TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryEmpty)
@@ -1519,6 +1587,85 @@ TEST(HdMapUtils, canChangeLane_invalidLaneletId)
   const lanelet::Id to_id = 1000033;
 
   EXPECT_THROW(hdmap_utils.canChangeLane(from_id, to_id), std::runtime_error);
+}
+
+TEST(HdMapUtils, getLateralDistance_sameLane)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  traffic_simulator_msgs::msg::LaneletPose from, to;
+  from.lanelet_id = 3002185;
+  from.s = 0.0;
+  from.offset = 0.5;
+
+  to.lanelet_id = 3002185;
+  to.s = 10.0;
+  to.offset = 0.2;
+
+  const auto result = hdmap_utils.getLateralDistance(from, to);
+  constexpr double epsilon = 1e-3;
+
+  EXPECT_TRUE(result.has_value());
+  EXPECT_NEAR(result.value(), to.offset - from.offset, epsilon);
+}
+
+TEST(HdMapUtils, getLateralDistance_parallelLanesCanNotChange)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  traffic_simulator_msgs::msg::LaneletPose from, to;
+  from.lanelet_id = 3002185;
+  from.s = 0.0;
+  from.offset = 0.5;
+
+  to.lanelet_id = 3002184;
+  to.s = 10.0;
+  to.offset = 0.2;
+
+  const auto result = hdmap_utils.getLateralDistance(from, to, false);
+
+  EXPECT_FALSE(result.has_value());
+}
+
+TEST(HdMapUtils, getLateralDistance_parallelLanesCanChange)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  traffic_simulator_msgs::msg::LaneletPose from, to;
+  from.lanelet_id = 3002185;
+  from.s = 0.0;
+  from.offset = 0.5;
+
+  to.lanelet_id = 3002184;
+  to.s = 10.0;
+  to.offset = 0.2;
+
+  const double width1 = 2.80373, width2 = 3.03463;
+  const double actual_distance = width1 / 2.0 + width2 / 2.0 + to.offset - from.offset;
+
+  const auto result = hdmap_utils.getLateralDistance(from, to, true);
+  constexpr double epsilon = 1e-3;
+
+  EXPECT_TRUE(result.has_value());
+  EXPECT_NEAR(result.value(), actual_distance, epsilon);
+}
+
+TEST(HdMapUtils, getLateralDistance_notConnected)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+
+  traffic_simulator_msgs::msg::LaneletPose from, to;
+  from.lanelet_id = 3002185;
+  from.s = 0.0;
+  from.offset = 0.5;
+
+  to.lanelet_id = 3002166;
+  to.s = 10.0;
+  to.offset = 0.2;
+
+  const auto result = hdmap_utils.getLateralDistance(from, to, true);
+
+  EXPECT_FALSE(result.has_value());
 }
 
 TEST(HdMapUtils, getRoute_correct)
