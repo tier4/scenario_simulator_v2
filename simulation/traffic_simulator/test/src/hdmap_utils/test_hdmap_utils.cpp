@@ -166,7 +166,7 @@ TEST(HdMapUtils, AlongLaneletPose)
 
 TEST(HdMapUtils, AlongLaneletPose_afterLast)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   const lanelet::Id lanelet_id = 206;
   const auto pose = traffic_simulator::helper::constructLaneletPose(lanelet_id, 15.0);
@@ -176,7 +176,7 @@ TEST(HdMapUtils, AlongLaneletPose_afterLast)
 
 TEST(HdMapUtils, AlongLaneletPose_beforeFirst)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   const lanelet::Id lanelet_id = 3002178;
   const auto pose = traffic_simulator::helper::constructLaneletPose(lanelet_id, 15.0);
@@ -1591,7 +1591,7 @@ TEST(HdMapUtils, canChangeLane_invalidLaneletId)
 
 TEST(HdMapUtils, getLateralDistance_sameLane)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   traffic_simulator_msgs::msg::LaneletPose from, to;
   from.lanelet_id = 3002185;
@@ -1611,7 +1611,7 @@ TEST(HdMapUtils, getLateralDistance_sameLane)
 
 TEST(HdMapUtils, getLateralDistance_parallelLanesCanNotChange)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   traffic_simulator_msgs::msg::LaneletPose from, to;
   from.lanelet_id = 3002185;
@@ -1629,7 +1629,7 @@ TEST(HdMapUtils, getLateralDistance_parallelLanesCanNotChange)
 
 TEST(HdMapUtils, getLateralDistance_parallelLanesCanChange)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   traffic_simulator_msgs::msg::LaneletPose from, to;
   from.lanelet_id = 3002185;
@@ -1652,7 +1652,7 @@ TEST(HdMapUtils, getLateralDistance_parallelLanesCanChange)
 
 TEST(HdMapUtils, getLateralDistance_notConnected)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
   traffic_simulator_msgs::msg::LaneletPose from, to;
   from.lanelet_id = 3002185;
