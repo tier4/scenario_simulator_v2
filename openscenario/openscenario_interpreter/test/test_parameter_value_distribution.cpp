@@ -192,11 +192,47 @@ TEST(ParameterValueDistribution, Histogram)
 
   ParameterDistribution expected_distribution;
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
+    makeParameterListSharedPtr<Double>("offset", -0.73692442452247864));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -0.845241258489508595630468335003));
+    makeParameterListSharedPtr<Double>("offset", -0.082699735953560394));
   expected_distribution.push_back(
-    makeParameterListSharedPtr<Double>("offset", -1.000000000000000000000000000000));
+    makeParameterListSharedPtr<Double>("offset", -0.5620816275750421));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.35772943348137098));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.86938579245347758));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.038832744045494971));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.93085577907030514));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.059400386282114415));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.98460362787680167));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.8663155254748649));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.3735454248180905));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.86087298993938566));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.053857555519812195));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.3078379243610454));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.40238118899835329));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", 0.52439607999726823));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.90507097322737606));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.34353154767998462));
+  expected_distribution.push_back(makeParameterListSharedPtr<Double>("offset", 0.5128209722651722));
+  expected_distribution.push_back(
+    makeParameterListSharedPtr<Double>("offset", -0.26932265821684642));
+
+  // NOTE:
+  // 1, range: -1.0 ~ -0.5, ideal: 5/20,  actual: 6/20
+  // 2: range: -0.5 ~  0.5, ideal: 10/20, actual: 10/20
+  // 3: range:  0.5 ~  1.0, ideal: 5/20,  actual: 4/20
 
   checkParameterValueDistribution(path, expected_distribution);
 }
