@@ -101,7 +101,7 @@ struct ConditionEdge
     sticky,
   } value;
 
-  explicit ConditionEdge() = default;
+  ConditionEdge() = default;
 
   operator value_type() const noexcept { return value; }
 };

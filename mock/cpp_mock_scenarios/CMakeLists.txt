@@ -45,6 +45,7 @@ if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/crosswalk)
   add_subdirectory(src/follow_front_entity)
   add_subdirectory(src/follow_lane)
+  add_subdirectory(src/follow_trajectory)
   add_subdirectory(src/lane_change)
   add_subdirectory(src/measurement)
   add_subdirectory(src/merge)
@@ -53,6 +54,8 @@ if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/pedestrian)
   add_subdirectory(src/random_scenario)
   add_subdirectory(src/speed_planning)
+  # add_subdirectory(src/respawn_ego)
+
 endif()
 
 install(

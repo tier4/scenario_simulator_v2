@@ -26,22 +26,24 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- Position ---------------------------------------------------------------
- *
- * <xsd:complexType name="Position">
- *   <xsd:choice>
- *     <xsd:element name="WorldPosition" type="WorldPosition"/>
- *     <xsd:element name="RelativeWorldPosition" type="RelativeWorldPosition"/>
- *     <xsd:element name="RelativeObjectPosition" type="RelativeObjectPosition"/>
- *     <xsd:element name="RoadPosition" type="RoadPosition"/>
- *     <xsd:element name="RelativeRoadPosition" type="RelativeRoadPosition"/>
- *     <xsd:element name="LanePosition" type="LanePosition"/>
- *     <xsd:element name="RelativeLanePosition" type="RelativeLanePosition"/>
- *     <xsd:element name="RoutePosition" type="RoutePosition"/>
- *   </xsd:choice>
- * </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   Position (OpenSCENARIO XML 1.3)
+
+   <xsd:complexType name="Position">
+     <xsd:choice>
+       <xsd:element name="WorldPosition" type="WorldPosition"/>
+       <xsd:element name="RelativeWorldPosition" type="RelativeWorldPosition"/>
+       <xsd:element name="RelativeObjectPosition" type="RelativeObjectPosition"/>
+       <xsd:element name="RoadPosition" type="RoadPosition"/>
+       <xsd:element name="RelativeRoadPosition" type="RelativeRoadPosition"/>
+       <xsd:element name="LanePosition" type="LanePosition"/>
+       <xsd:element name="RelativeLanePosition" type="RelativeLanePosition"/>
+       <xsd:element name="RoutePosition" type="RoutePosition"/>
+       <xsd:element name="GeoPosition" type="GeoPosition"/>
+       <xsd:element name="TrajectoryPosition" type="TrajectoryPosition"/>
+     </xsd:choice>
+   </xsd:complexType>
+*/
 struct Position : public ComplexType
 {
   explicit Position(const pugi::xml_node &, Scope &);
@@ -61,6 +63,8 @@ DEFINE_LAZY_VISITOR(
   CASE(LanePosition),
   // CASE(RelativeLanePosition),
   // CASE(RoutePosition),
+  // CASE(GeoPosition),
+  // CASE(TrajectoryPosition),
 );
 
 DEFINE_LAZY_VISITOR(
@@ -73,6 +77,8 @@ DEFINE_LAZY_VISITOR(
   CASE(LanePosition),
   // CASE(RelativeLanePosition),
   // CASE(RoutePosition),
+  // CASE(GeoPosition),
+  // CASE(TrajectoryPosition),
 );
 }  // namespace syntax
 }  // namespace openscenario_interpreter

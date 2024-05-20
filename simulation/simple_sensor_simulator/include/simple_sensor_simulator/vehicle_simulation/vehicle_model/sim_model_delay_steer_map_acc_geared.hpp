@@ -27,7 +27,7 @@
 #include "eigen3/Eigen/Core"
 #include "eigen3/Eigen/LU"
 
-// @note copied from https://github.com/tier4/autoware.universe/blob/v0.17.0/common/interpolation/include/interpolation/interpolation_utils.hpp
+/// @note copied from https://github.com/tier4/autoware.universe/blob/v0.17.0/common/interpolation/include/interpolation/interpolation_utils.hpp
 namespace interpolation_utils
 {
 inline bool isIncreasing(const std::vector<double> & x)
@@ -119,7 +119,7 @@ void validateKeysAndValues(
 }
 }  // namespace interpolation_utils
 
-// @note copied from https://github.com/tier4/autoware.universe/blob/v0.17.0/common/interpolation/include/interpolation/linear_interpolation.hpp
+/// @note copied from https://github.com/tier4/autoware.universe/blob/v0.17.0/common/interpolation/include/interpolation/linear_interpolation.hpp
 namespace interpolation
 {
 double lerp(const double src_val, const double dst_val, const double ratio);
@@ -137,7 +137,7 @@ double lerp(
 using Table = std::vector<std::vector<std::string>>;
 using Map = std::vector<std::vector<double>>;
 
-// @note copied from https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/include/simple_planning_simulator/utils/csv_loader.hpp
+/// @note copied from https://github.com/autowarefoundation/autoware.universe/blob/main/simulator/simple_planning_simulator/include/simple_planning_simulator/utils/csv_loader.hpp
 class CSVLoader
 {
 public:

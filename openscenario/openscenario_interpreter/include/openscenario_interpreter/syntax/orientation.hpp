@@ -39,7 +39,7 @@ struct Orientation
 {
   const ReferenceContext type{};
 
-  const Double h, p, r;
+  Double h, p, r;
 
   Orientation() = default;
 

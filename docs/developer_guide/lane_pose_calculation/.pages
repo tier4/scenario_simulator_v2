@@ -1,0 +1,5 @@
+nav:
+    - Timing of lane pose calculation: LanePoseCalculation.md
+    - Process of lane pose calculation when spawning entity: Spawn.md
+    - Process of lane pose calculation when updating frame: UpdateFrame.md
+    - Process of lane pose calculation when getting longitudinal distance: GetLongitudinalDistance.md

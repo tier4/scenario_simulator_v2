@@ -656,6 +656,12 @@ void EntityBase::requestSpeedChange(
 
 auto EntityBase::isControlledBySimulator() const -> bool { return true; }
 
+auto EntityBase::setControlledBySimulator(bool /*unused*/) -> void
+{
+  THROW_SEMANTIC_ERROR(
+    getEntityTypename(), " type entities do not support setControlledBySimulator");
+}
+
 auto EntityBase::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void
 {
@@ -676,34 +682,11 @@ void EntityBase::setDynamicConstraints(
   setBehaviorParameter(behavior_parameter);
 }
 
-void EntityBase::setEntityTypeList(
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & entity_type_list)
-{
-  entity_type_list_ = entity_type_list;
-}
-
 void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, CanonicalizedEntityStatus> & status)
 {
-  other_status_.clear();
-  for (const auto & [other_name, other_status] : status) {
-    if (other_name != name) {
-      /*
-         The following filtering is the code written for the purpose of
-         reducing the calculation load, but it is commented out experimentally
-         because it adversely affects "processing that needs to identify other
-         entities regardless of distance" such as RelativeTargetSpeed of
-         requestSpeedChange.
-      */
-      // const auto p0 = other_status.pose.position;
-      // const auto p1 = status_.pose.position;
-      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance <
-      // 30)
-      // {
-      other_status_.emplace(other_name, other_status);
-      // }
-    }
-  }
+  other_status_ = status;
+  other_status_.erase(name);
 }
 
 auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
@@ -759,6 +742,13 @@ auto EntityBase::setAcceleration(const geometry_msgs::msg::Accel & accel) -> voi
   status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
 }
 
+auto EntityBase::setLinearJerk(const double linear_jerk) -> void
+{
+  auto new_status = static_cast<EntityStatus>(getStatus());
+  new_status.action_status.linear_jerk = linear_jerk;
+  status_ = CanonicalizedEntityStatus(new_status, hdmap_utils_ptr_);
+}
+
 auto EntityBase::setMapPose(const geometry_msgs::msg::Pose &) -> void
 {
   THROW_SEMANTIC_ERROR(
@@ -806,8 +796,6 @@ void EntityBase::activateOutOfRangeJob(
      */
     [this]() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
 }
-
-auto EntityBase::setVelocityLimit(double) -> void {}
 
 void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
 

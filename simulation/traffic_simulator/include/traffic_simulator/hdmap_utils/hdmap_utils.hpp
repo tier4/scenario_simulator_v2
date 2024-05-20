@@ -170,7 +170,8 @@ public:
 
   auto getLateralDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>;
+    const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false) const
+    -> std::optional<double>;
 
   auto getLeftBound(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
@@ -180,7 +181,8 @@ public:
 
   auto getLongitudinalDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
-    const traffic_simulator_msgs::msg::LaneletPose & to) const -> std::optional<double>;
+    const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false) const
+    -> std::optional<double>;
 
   auto getNearbyLaneletIds(
     const geometry_msgs::msg::Point &, const double distance_threshold,
@@ -223,7 +225,8 @@ public:
 
   auto getRightOfWayLaneletIds(const lanelet::Id) const -> lanelet::Ids;
 
-  auto getRoute(const lanelet::Id from, const lanelet::Id to) const -> lanelet::Ids;
+  auto getRoute(const lanelet::Id from, const lanelet::Id to, bool allow_lane_change = false) const
+    -> lanelet::Ids;
 
   auto getSpeedLimit(const lanelet::Ids &) const -> double;
 
@@ -266,8 +269,8 @@ public:
 
   auto matchToLane(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
-    const bool include_crosswalk, const double reduction_ratio = 0.8) const
-    -> std::optional<lanelet::Id>;
+    const bool include_crosswalk, const double matching_distance = 1.0,
+    const double reduction_ratio = 0.8) const -> std::optional<lanelet::Id>;
 
   auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const bool include_crosswalk,
@@ -298,8 +301,8 @@ public:
   auto toMapPoints(const lanelet::Id, const std::vector<double> & s) const
     -> std::vector<geometry_msgs::msg::Point>;
 
-  auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &) const
-    -> geometry_msgs::msg::PoseStamped;
+  auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &, const bool fill_pitch = true)
+    const -> geometry_msgs::msg::PoseStamped;
 
 private:
   /** @defgroup cache

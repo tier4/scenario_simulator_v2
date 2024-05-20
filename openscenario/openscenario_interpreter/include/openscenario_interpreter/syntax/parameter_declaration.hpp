@@ -44,7 +44,7 @@ struct ParameterDeclaration
 
   const String value;
 
-  explicit ParameterDeclaration() = default;
+  ParameterDeclaration() = default;
 
   explicit ParameterDeclaration(const pugi::xml_node &, Scope &);
 
