@@ -13,7 +13,6 @@
   <depend>openscenario_preprocessor_msgs</depend>
   <depend>openscenario_validator</depend>
   <depend>rclcpp</depend>
-  <depend>xerces</depend>
   <depend>pugixml-dev</depend>
   <depend>yaml-cpp</depend>
   <depend>nlohmann-json-dev</depend>

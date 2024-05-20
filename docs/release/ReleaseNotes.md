@@ -117,8 +117,6 @@ Major Changes :race_car: :red_car: :blue_car:
 | UserDefinedValueCondition `RelativeHeadingCondition`                 | Added one-argument version to `RelativeHeadingCondition`. This version of `RelativeHeadingCondition` returns the lane coordinate system heading of the entity with the name given in the first argument. | `openscenario_interpreter` | [#978](https://github.com/tier4/scenario_simulator_v2/pull/978) | [yamacir-kit](https://github.com/yamacir-kit) |
 | OpenSCENARIO 1.2 `Controller.Properties.Property`                    | Added support for delaying the publication of object detection data by setting the value `detectedObjectPublishingDelay` (in seconds) to `Controller.Properties.Property`.                               | `openscenario_interpreter` | [#986](https://github.com/tier4/scenario_simulator_v2/pull/986) | [yamacir-kit](https://github.com/yamacir-kit) |
 | OpenSCENARIO 1.2 `EnvironmentAction`                                 | The parsing of `EnvironmentAction` is now supported                                                                                                                                                      | `openscenario_interpreter` | [#980](https://github.com/tier4/scenario_simulator_v2/pull/980) | [f0reachARR](https://github.com/f0reachARR)   |
-| OpenSCENARIO 1.2 `ParameterValueDistribution`                        | Start supporting parameter sweeping using official OpenSCENARIO feature ( it was supported by TIER IV V2 format previously)                                                                              | `openscenario_interpreter`, `openscenario_preprocessor` | [#878](https://github.com/tier4/scenario_simulator_v2/pull/878) | [HansRobo](https://github.com/HansRobo)       |
-
 
 Bug Fixes:bug:
 
