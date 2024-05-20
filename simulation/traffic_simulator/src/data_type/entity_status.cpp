@@ -55,15 +55,14 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(const CanonicalizedEntitySt
 
 auto CanonicalizedEntityStatus::set(const CanonicalizedEntityStatus & status) -> void
 {
-  assert(getType() != status.getType());
-  assert(getSubtype() != status.getSubtype());
-  assert(getName() != status.getName());
-  assert(getMapPose().frame_id != status.getMapPose().frame_id);
-  assert(getBoundingBox() != status.getBoundingBox());
-  assert(getTime() != status.getTime());
+  assert(getType() == status.getType());
+  assert(getSubtype() == status.getSubtype());
+  assert(getName() == status.getName());
+  assert(getBoundingBox() == status.getBoundingBox());
   entity_status_ = status.entity_status_;
   canonicalized_lanelet_pose_ = status.canonicalized_lanelet_pose_;
 }
+
 auto CanonicalizedEntityStatus::set(
   const EntityStatus & status, const double matching_distance,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void
