@@ -214,20 +214,24 @@ void EgoEntitySimulation::requestSpeedChange(double value)
 void EgoEntitySimulation::overwrite(
   const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
   double step_time, bool npc_logic_started)
-{
+{    
+  using quaternion_operation::getRotationMatrix;
+
   autoware->rethrow();
+
+  // SimModelInterface only  supports 2D, therefore the position in Oz is considered unchangeable and
+  // stored in an additional variable world_relative_position_z_ that is used in calculations
+  auto world_relative_position = [&]() -> Eigen::VectorXd {
+    auto v = Eigen::VectorXd(3);
+    v(0) = status.pose.position.x - initial_pose_.position.x;
+    v(1) = status.pose.position.y - initial_pose_.position.y;
+    v(2) = status.pose.position.z - initial_pose_.position.z;
+    return getRotationMatrix(initial_pose_.orientation).transpose() * v;
+  }();
+  world_relative_position_z_ = world_relative_position(2);
 
   if (npc_logic_started) {
     using quaternion_operation::convertQuaternionToEulerAngle;
-    using quaternion_operation::getRotationMatrix;
-
-    auto world_relative_position = [&]() -> Eigen::VectorXd {
-      auto v = Eigen::VectorXd(3);
-      v(0) = status.pose.position.x - initial_pose_.position.x;
-      v(1) = status.pose.position.y - initial_pose_.position.y;
-      v(2) = status.pose.position.z - initial_pose_.position.z;
-      return getRotationMatrix(initial_pose_.orientation).transpose() * v;
-    }();
 
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
@@ -241,6 +245,7 @@ void EgoEntitySimulation::overwrite(
       return convertQuaternionToEulerAngle(relative_orientation).z -
              (previous_linear_velocity_ ? *previous_angular_velocity_ : 0) * step_time;
     }();
+
     switch (auto state = Eigen::VectorXd(vehicle_model_ptr_->getDimX()); vehicle_model_type_) {
       case VehicleModelType::DELAY_STEER_ACC:
       case VehicleModelType::DELAY_STEER_ACC_GEARED:
@@ -255,7 +260,6 @@ void EgoEntitySimulation::overwrite(
       case VehicleModelType::IDEAL_STEER_ACC:
       case VehicleModelType::IDEAL_STEER_ACC_GEARED:
         state(3) = status.action_status.twist.linear.x;
-        state(6) = world_relative_position(2);
         [[fallthrough]];
 
       case VehicleModelType::IDEAL_STEER_VEL:
@@ -277,7 +281,20 @@ void EgoEntitySimulation::overwrite(
 void EgoEntitySimulation::update(
   double current_scenario_time, double step_time, bool npc_logic_started)
 {
+  using quaternion_operation::getRotationMatrix;
+
   autoware->rethrow();
+
+  // SimModelInterface only  supports 2D, therefore the position in Oz is considered unchangeable and
+  // stored in an additional variable world_relative_position_z_ that is used in calculations
+  auto world_relative_position = [&]() -> Eigen::VectorXd {
+    auto v = Eigen::VectorXd(3);
+    v(0) = status_.pose.position.x - initial_pose_.position.x;
+    v(1) = status_.pose.position.y - initial_pose_.position.y;
+    v(2) = status_.pose.position.z - initial_pose_.position.z;
+    return getRotationMatrix(initial_pose_.orientation).transpose() * v;
+  }();
+  world_relative_position_z_ = world_relative_position(2);
 
   if (npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
@@ -426,7 +443,8 @@ auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   Eigen::VectorXd relative_position(3);
   relative_position(0) = vehicle_model_ptr_->getX();
   relative_position(1) = vehicle_model_ptr_->getY();
-  relative_position(2) = vehicle_model_ptr_->getZ();
+  // use stored Oz position
+  relative_position(2) = world_relative_position_z_;
   relative_position =
     quaternion_operation::getRotationMatrix(initial_pose_.orientation) * relative_position;
 
