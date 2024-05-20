@@ -145,7 +145,6 @@ void DoNothingBehavior::update(double current_time, double step_time)
       const auto interpolated_status =
         do_nothing_behavior::follow_trajectory::interpolateEntityStatusFromPolylineTrajectory(
           getPolylineTrajectory(), getEntityStatus(), getCurrentTime(), getStepTime())) {
-      /// @note interpolated_status has invalid LaneletPose so cannot be canonicalize
       return std::make_shared<traffic_simulator::EntityStatus>(interpolated_status.value());
     } else {
       return std::make_shared<traffic_simulator::EntityStatus>(
