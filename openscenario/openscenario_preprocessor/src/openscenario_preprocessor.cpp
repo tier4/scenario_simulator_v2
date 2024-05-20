@@ -39,9 +39,8 @@ void Preprocessor::preprocessScenario(const Scenario & scenario)
 
       OpenScenario scenario_file{scenario_file_path};
 
-      auto p = parameter_value_distribution.derive();
-
-      for (const auto & parameter_list : p | boost::adaptors::indexed()) {
+      for (const auto & parameter_list :
+           parameter_value_distribution.derive() | boost::adaptors::indexed()) {
         pugi::xml_document derived_script;
 
         derived_script.reset(scenario_file.script);  // deep copy

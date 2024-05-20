@@ -38,6 +38,7 @@ auto LogNormalDistribution::derive() -> Object
     auto in_range = [this](double value) {
       return range.lower_limit.data <= value and value <= range.upper_limit.data;
     };
+    // retry until the generated value is within the range
     do {
       value = distribute(random_engine);
     } while (not in_range(value));
