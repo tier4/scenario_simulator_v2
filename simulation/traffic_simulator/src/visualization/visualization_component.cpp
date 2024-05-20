@@ -211,7 +211,6 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   bbox.ns = status.name;
   bbox.id = 0;
   bbox.action = bbox.ADD;
-  bbox.pose.orientation = status.pose.orientation;
   bbox.type = bbox.LINE_LIST;
   bbox.lifetime = rclcpp::Duration::from_seconds(0.1);
   geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
