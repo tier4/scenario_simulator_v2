@@ -206,7 +206,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   }
 
   visualization_msgs::msg::Marker bbox;
-  bbox.header.frame_id = "entities";
+  bbox.header.frame_id = "map";
   bbox.header.stamp = stamp;
   bbox.ns = status.name;
   bbox.id = 0;
@@ -311,7 +311,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   ret.markers.emplace_back(bbox);
 
   visualization_msgs::msg::Marker text;
-  text.header.frame_id = "entities";
+  text.header.frame_id = "map";
   text.header.stamp = stamp;
   text.ns = status.name;
   text.id = 1;
@@ -332,7 +332,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   ret.markers.emplace_back(text);
 
   visualization_msgs::msg::Marker arrow;
-  arrow.header.frame_id = "entities";
+  arrow.header.frame_id = "map";
   arrow.header.stamp = stamp;
   arrow.ns = status.name;
   arrow.id = 2;
@@ -370,7 +370,7 @@ const visualization_msgs::msg::MarkerArray VisualizationComponent::generateMarke
   ret.markers.emplace_back(arrow);
 
   visualization_msgs::msg::Marker text_action;
-  text_action.header.frame_id = "entities";
+  text_action.header.frame_id = "map";
   text_action.header.stamp = stamp;
   text_action.ns = status.name;
   text_action.id = 3;
