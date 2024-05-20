@@ -17,7 +17,6 @@
 
 #include <boost/filesystem.hpp>
 #include <iostream>
-#include <openscenario_validator/schema.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
@@ -79,20 +78,11 @@ class OpenSCENARIOValidator
 public:
   OpenSCENARIOValidator() : parser(std::make_unique<xercesc::XercesDOMParser>())
   {
-    xercesc::MemBufInputSource schema_input_source(
-      reinterpret_cast<const XMLByte *>(schema), strlen(schema), "xsd");
-
-    if (not parser->loadGrammar(schema_input_source, xercesc::Grammar::SchemaGrammarType)) {
-      throw std::runtime_error(
-        "Failed to load XSD schema. This is an unexpected error and an implementation issue. "
-        "Please contact the developer.");
-    } else {
-      parser->setDoNamespaces(true);
-      parser->setDoSchema(true);
-      parser->setErrorHandler(&error_handler);
-      parser->setValidationSchemaFullChecking(true);
-      parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
-    }
+    parser->setDoNamespaces(true);
+    parser->setDoSchema(true);
+    parser->setErrorHandler(&error_handler);
+    parser->setValidationSchemaFullChecking(true);
+    parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
   }
 
   auto validate(const boost::filesystem::path & xml_file) -> void
