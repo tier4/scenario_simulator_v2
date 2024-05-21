@@ -2176,6 +2176,7 @@ TEST(HdMapUtils, getStopLinePolygon_stopLine)
 
 TEST(HdMapUtils, getStopLinePolygon_noStopLine)
 {
+  // refer to 4th issue at the end of this file
   auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
   const lanelet::Id linestring_id_no_stopline{34629};
 
