@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_SPEED_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_SPEED_CONDITION_HPP_
 
+#include <geometry/vector3/norm.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/directional_dimension.hpp>
@@ -42,13 +43,26 @@ inline namespace syntax
 */
 struct RelativeSpeedCondition : private SimulatorCore::ConditionEvaluation
 {
+  /*
+     Reference entity.
+  */
   const EntityRef entity_ref;
 
+  /*
+     The operator (less, greater, equal).
+  */
   const Rule rule;
 
+  /*
+     Relative speed value. Unit: [m/s]. Range: ]-inf..inf[. Relative speed is
+     defined as speed_rel = speed(triggering entity) - speed(reference entity)
+  */
   const Double value;
 
-  const DirectionalDimension direction;
+  /*
+     Direction of the speed (if not given, the total speed is considered).
+  */
+  const std::optional<DirectionalDimension> direction;
 
   const TriggeringEntities triggering_entities;
 
@@ -59,7 +73,7 @@ struct RelativeSpeedCondition : private SimulatorCore::ConditionEvaluation
   : entity_ref(readAttribute<EntityRef>("entityRef", node, scope)),
     rule(readAttribute<Rule>("rule", node, scope)),
     value(readAttribute<Double>("value", node, scope)),
-    direction(readAttribute<DirectionalDimension>("direction", node, scope)),
+    direction(readAttribute<DirectionalDimension>("direction", node, scope, std::nullopt)),
     triggering_entities(triggering_entities),
     evaluations(triggering_entities.entity_refs.size(), Double::nan())
   {
@@ -69,8 +83,13 @@ struct RelativeSpeedCondition : private SimulatorCore::ConditionEvaluation
   {
     auto description = std::stringstream();
 
-    description << triggering_entities.description() << "'s relative speed to given entity "
-                << entity_ref << " = ";
+    description << triggering_entities.description() << "'s relative ";
+
+    if (direction) {
+      description << *direction << " ";
+    }
+
+    description << "speed to given entity " << entity_ref << " = ";
 
     print_to(description, evaluations);
 
@@ -84,8 +103,22 @@ struct RelativeSpeedCondition : private SimulatorCore::ConditionEvaluation
     evaluations.clear();
 
     return asBoolean(triggering_entities.apply([this](auto && triggering_entity) {
-      [[deprecated]] auto evaluateRelativeSpeed = [](auto &&...) { return Double(); };
-      evaluations.push_back(evaluateRelativeSpeed(triggering_entity, entity_ref));
+      evaluations.push_back([this](auto && v) {
+        if (direction) {
+          switch (*direction) {
+            case DirectionalDimension::longitudinal:
+              return v.x;
+            case DirectionalDimension::lateral:
+              return v.y;
+            case DirectionalDimension::vertical:
+              return v.z;
+            default:
+              return math::geometry::norm(v);
+          }
+        } else {
+          return math::geometry::norm(v);
+        }
+      }(evaluateRelativeSpeed(triggering_entity, entity_ref)));
       return std::invoke(rule, evaluations.back(), value);
     }));
   }

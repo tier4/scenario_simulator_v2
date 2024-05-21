@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/vector3/operator.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -483,12 +484,6 @@ public:
     }
 
     template <typename... Ts>
-    static auto evaluateCollisionCondition(Ts &&... xs) -> bool
-    {
-      return core->checkCollision(std::forward<decltype(xs)>(xs)...);
-    }
-
-    template <typename... Ts>
     static auto evaluateBoundingBoxEuclideanDistance(Ts &&... xs)  // for RelativeDistanceCondition
     {
       if (const auto result = core->getBoundingBoxDistance(std::forward<decltype(xs)>(xs)...);
@@ -498,6 +493,19 @@ public:
         using value_type = typename std::decay<decltype(result)>::type::value_type;
         return std::numeric_limits<value_type>::quiet_NaN();
       }
+    }
+
+    template <typename... Ts>
+    static auto evaluateCollisionCondition(Ts &&... xs) -> bool
+    {
+      return core->checkCollision(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename T, typename U>
+    static auto evaluateRelativeSpeed(const T & x, const U & y)
+    {
+      using math::geometry::operator-;
+      return core->getCurrentTwist(x).linear - core->getCurrentTwist(y).linear;
     }
 
     template <typename... Ts>
