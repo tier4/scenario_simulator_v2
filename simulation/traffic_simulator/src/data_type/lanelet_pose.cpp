@@ -17,6 +17,7 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator/utils/lanelet.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
@@ -27,8 +28,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPose & maybe_non_canonicalized_lanelet_pose,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
-  lanelet_poses_(
-    hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
+  lanelet_poses_(lanelet2::getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
 {
   adjustOrientationAndOzPosition(hdmap_utils);
@@ -38,8 +38,7 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPose & maybe_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
 : lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, route_lanelets, hdmap_utils)),
-  lanelet_poses_(
-    hdmap_utils->getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
+  lanelet_poses_(lanelet2::getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
 {
   adjustOrientationAndOzPosition(hdmap_utils);
@@ -74,7 +73,7 @@ auto CanonicalizedLaneletPose::canonicalize(
 {
   if (
     const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
-      hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose))) {
+      lanelet2::canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose))) {
     return canonicalized.value();
   } else {
     THROW_SEMANTIC_ERROR(
@@ -94,7 +93,7 @@ auto CanonicalizedLaneletPose::canonicalize(
 {
   if (
     const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
-      hdmap_utils->canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose, route_lanelets))) {
+      lanelet2::canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose, route_lanelets))) {
     return canonicalized.value();
   } else {
     THROW_SEMANTIC_ERROR(
@@ -115,12 +114,11 @@ auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
   if (lanelet_poses_.empty()) {
     return std::nullopt;
   }
-  lanelet::Ids shortest_route =
-    hdmap_utils->getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
+  lanelet::Ids shortest_route = lanelet2::getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
   LaneletPose alternative_lanelet_pose = lanelet_poses_[0];
   for (const auto & laneletPose : lanelet_poses_) {
     const auto route =
-      hdmap_utils->getRoute(from.lanelet_id, laneletPose.lanelet_id, allow_lane_change);
+      lanelet2::getRoute(from.lanelet_id, laneletPose.lanelet_id, allow_lane_change);
     if (shortest_route.size() > route.size()) {
       shortest_route = route;
       alternative_lanelet_pose = laneletPose;
@@ -136,7 +134,7 @@ auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition(
   using quaternion_operation::convertQuaternionToEulerAngle;
   using quaternion_operation::getRotation;
   const math::geometry::CatmullRomSpline spline(
-    hdmap_utils->getCenterPoints(lanelet_pose_.lanelet_id));
+    lanelet2::getCenterPoints(lanelet_pose_.lanelet_id));
   // adjust Oz position
   if (const auto s_value = spline.getSValue(map_pose_)) {
     map_pose_.position.z = spline.getPoint(s_value.value()).z;

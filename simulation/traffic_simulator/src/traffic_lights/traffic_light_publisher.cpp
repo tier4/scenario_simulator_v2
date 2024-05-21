@@ -15,6 +15,7 @@
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator/utils/lanelet.hpp>
 
 namespace traffic_simulator
 {
@@ -52,7 +53,7 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
   message.stamp = current_ros_time;
   for (const auto & traffic_light : request.states()) {
     auto relation_ids =
-      hdmap_utils_->getTrafficLightRegulatoryElementIDsFromTrafficLight(traffic_light.id());
+      lanelet2::getTrafficLightRegulatoryElementIDsFromTrafficLight(traffic_light.id());
 
     for (auto relation_id : relation_ids) {
       // skip if the traffic light has no bulbs

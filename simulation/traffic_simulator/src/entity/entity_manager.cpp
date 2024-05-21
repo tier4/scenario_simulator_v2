@@ -296,8 +296,8 @@ void EntityManager::requestLaneChange(
 {
   if (const auto entity = getEntity(name); entity && entity->laneMatchingSucceed()) {
     if (
-      const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-        entity->getStatus().getLaneletId(), direction)) {
+      const auto target =
+        lanelet2::getLaneChangeableLaneletId(entity->getStatus().getLaneletId(), direction)) {
       requestLaneChange(name, target.value());
     }
   }

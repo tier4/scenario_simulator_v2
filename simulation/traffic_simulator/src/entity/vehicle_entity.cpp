@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
+#include <traffic_simulator/utils/lanelet.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <vector>
@@ -38,6 +39,8 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
   route_planner_(hdmap_utils_ptr_)
 {
+  std::cout << name << " make pose: " << entity_status.getLaneletPose().s << " "
+            << entity_status.getLaneletPose().offset << std::endl;
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
@@ -154,7 +157,7 @@ void VehicleEntity::onUpdate(double current_time, double step_time)
       previous_route_lanelets_ = route_lanelets;
       try {
         spline_ = std::make_shared<math::geometry::CatmullRomSpline>(
-          hdmap_utils_ptr_->getCenterPoints(route_lanelets));
+          lanelet2::getCenterPoints(route_lanelets));
       } catch (const common::scenario_simulator_exception::SemanticError & error) {
         // reset the ptr when spline cannot be calculated
         spline_.reset();
