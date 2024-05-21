@@ -13,6 +13,13 @@ Changelog for package cpp_mock_scenarios
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.17.1 (2024-05-21)
+-------------------
+* Merge pull request `#1255 <https://github.com/tier4/scenario_simulator_v2/issues/1255>`_ from tier4/fix/visualization
+  Fix/visualization
+* update rviz config
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
 1.17.0 (2024-05-16)
 -------------------
 * Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
