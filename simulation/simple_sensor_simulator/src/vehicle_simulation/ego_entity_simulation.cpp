@@ -214,7 +214,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
 void EgoEntitySimulation::overwrite(
   const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
   double step_time, bool npc_logic_started)
-{    
+{
   using quaternion_operation::getRotationMatrix;
 
   autoware->rethrow();
