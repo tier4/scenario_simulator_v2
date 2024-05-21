@@ -1536,8 +1536,8 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_smallForwardDistance)
   constexpr double epsilon = 0.1;
 
   EXPECT_EQ(result_trajectory.size(), static_cast<std::size_t>(2));
-  EXPECT_POINT_NEAR(result_trajectory[0], makePoint(3785.52, 73754.7, -0.528264), epsilon)
-  EXPECT_POINT_NEAR(result_trajectory[1], makePoint(3784.63, 73754.2, -0.508742), epsilon);
+  EXPECT_POINT_NEAR(result_trajectory[0], makePoint(3785.5, 73754.7, -0.5), epsilon)
+  EXPECT_POINT_NEAR(result_trajectory[1], makePoint(3784.6, 73754.2, -0.5), epsilon);
 }
 
 TEST(HdMapUtils, getFollowingLanelets_straightAfter)
