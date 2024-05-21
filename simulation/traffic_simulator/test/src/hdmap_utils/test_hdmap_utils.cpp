@@ -1785,6 +1785,92 @@ TEST(HdMapUtils, getRoute_circular)
   EXPECT_EQ(result_route, lanelet::Ids{120659});
 }
 
+TEST(HdMapUtils, getCenterPoints_correct)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id = 34594;
+
+  const std::vector<geometry_msgs::msg::Point> actual_center_points{
+    makePoint(3774.1, 73748.8, -0.3), makePoint(3772.5, 73748.0, -0.2),
+    makePoint(3770.8, 73747.1, -0.2), makePoint(3769.2, 73746.3, -0.2),
+    makePoint(3767.6, 73745.4, -0.2), makePoint(3766.0, 73744.6, -0.1),
+    makePoint(3764.4, 73743.8, -0.1), makePoint(3762.7, 73742.9, -0.1),
+    makePoint(3761.1, 73742.1, 0.0),  makePoint(3759.5, 73741.3, 0.0),
+    makePoint(3757.9, 73740.4, 0.1),  makePoint(3756.3, 73739.6, 0.1)};
+
+  constexpr double epsilon = 0.1;
+
+  const auto result_center_points = hdmap_utils.getCenterPoints(id);
+
+  EXPECT_EQ(result_center_points.size(), actual_center_points.size());
+  for (std::size_t i = 0; i < result_center_points.size(); ++i) {
+    EXPECT_POINT_NEAR_STREAM(
+      result_center_points[i], actual_center_points[i], epsilon, "In this test i = " << i);
+  }
+}
+
+TEST(HdMapUtils, getCenterPoints_correctCache)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Id id = 34594;
+
+  const auto result_center_points = hdmap_utils.getCenterPoints(id);
+  const auto result_center_points2 = hdmap_utils.getCenterPoints(id);
+
+  EXPECT_EQ(result_center_points.size(), result_center_points2.size());
+  for (std::size_t i = 0; i < result_center_points.size(); ++i) {
+    EXPECT_POINT_EQ_STREAM(
+      result_center_points[i], result_center_points2[i], "In this test i = " << i);
+  }
+}
+
+TEST(HdMapUtils, getCenterPoints_correctVector)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Ids ids{34594, 34621};
+
+  const std::vector<geometry_msgs::msg::Point> actual_center_points{
+    makePoint(3774.1, 73748.8, -0.3), makePoint(3772.4, 73748.0, -0.2),
+    makePoint(3770.8, 73747.1, -0.2), makePoint(3769.2, 73746.3, -0.2),
+    makePoint(3767.6, 73745.4, -0.1), makePoint(3766.0, 73744.6, -0.1),
+    makePoint(3764.4, 73743.8, -0.1), makePoint(3762.7, 73742.9, -0.0),
+    makePoint(3761.1, 73742.1, -0.0), makePoint(3759.5, 73741.3, 0.0),
+    makePoint(3757.9, 73740.4, 0.1),  makePoint(3756.3, 73739.6, 0.1),
+    makePoint(3754.5, 73738.7, 0.1),  makePoint(3752.7, 73737.8, 0.2),
+    makePoint(3750.9, 73736.9, 0.2),  makePoint(3749.1, 73736.0, 0.3),
+    makePoint(3747.4, 73735.1, 0.3),  makePoint(3745.6, 73734.2, 0.3),
+    makePoint(3743.8, 73733.2, 0.4),  makePoint(3742.0, 73732.3, 0.4),
+    makePoint(3740.3, 73731.4, 0.4),  makePoint(3738.5, 73730.5, 0.5),
+    makePoint(3736.7, 73729.6, 0.5),  makePoint(3734.9, 73728.7, 0.6),
+    makePoint(3733.2, 73727.8, 0.6),  makePoint(3731.4, 73726.9, 0.6),
+    makePoint(3729.6, 73725.9, 0.7),  makePoint(3727.8, 73725.0, 0.7),
+    makePoint(3726.1, 73724.1, 0.7),  makePoint(3724.3, 73723.2, 0.8),
+    makePoint(3722.5, 73722.3, 0.8),  makePoint(3720.7, 73721.4, 0.8),
+    makePoint(3719.0, 73720.5, 0.9),  makePoint(3717.2, 73719.5, 0.9),
+    makePoint(3715.4, 73718.6, 1.0),  makePoint(3713.7, 73717.7, 1.0),
+    makePoint(3711.9, 73716.7, 1.1)};
+
+  constexpr double epsilon = 0.1;
+
+  const auto result_center_points = hdmap_utils.getCenterPoints(ids);
+
+  EXPECT_EQ(result_center_points.size(), actual_center_points.size());
+  for (std::size_t i = 0; i < result_center_points.size(); ++i) {
+    EXPECT_POINT_NEAR_STREAM(
+      result_center_points[i], actual_center_points[i], epsilon, "In this test i = " << i);
+  }
+}
+
+TEST(HdMapUtils, getCenterPoints_empty)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance();
+  const lanelet::Ids ids{};
+
+  const auto result_center_points = hdmap_utils.getCenterPoints(ids);
+
+  EXPECT_EQ(result_center_points.size(), static_cast<std::size_t>(0));
+}
+
 TEST(HdMapUtils, isTrafficLight_trafficLight)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
