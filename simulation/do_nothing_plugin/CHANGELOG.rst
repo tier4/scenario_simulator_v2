@@ -13,6 +13,9 @@ Changelog for package do_nothing_plugin
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.17.1 (2024-05-21)
+-------------------
+
 1.17.0 (2024-05-16)
 -------------------
 * Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
