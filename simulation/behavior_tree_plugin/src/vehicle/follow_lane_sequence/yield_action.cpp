@@ -102,7 +102,7 @@ BT::NodeStatus YieldAction::tick()
   const auto right_of_way_entities = getRightOfWayEntities(route_lanelets);
   if (right_of_way_entities.empty()) {
     if (!target_speed) {
-      target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+      target_speed = traffic_simulator::lanelet2::getSpeedLimit(route_lanelets);
     }
     setOutput(
       "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
@@ -119,7 +119,7 @@ BT::NodeStatus YieldAction::tick()
   distance_to_stop_target_ = getYieldStopDistance(route_lanelets);
   target_speed = calculateTargetSpeed();
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::lanelet2::getSpeedLimit(route_lanelets);
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(

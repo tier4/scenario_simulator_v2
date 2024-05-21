@@ -109,7 +109,8 @@ BT::NodeStatus FollowLaneAction::tick()
         return BT::NodeStatus::FAILURE;
       }
     }
-    auto distance_to_stopline = hdmap_utils->getDistanceToStopLine(route_lanelets, *trajectory);
+    auto distance_to_stopline =
+      traffic_simulator::lanelet2::getDistanceToStopLine(route_lanelets, *trajectory);
     auto distance_to_conflicting_entity =
       getDistanceToConflictingEntity(route_lanelets, *trajectory);
     if (distance_to_stopline) {
@@ -130,7 +131,7 @@ BT::NodeStatus FollowLaneAction::tick()
     }
   }
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::lanelet2::getSpeedLimit(route_lanelets);
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
