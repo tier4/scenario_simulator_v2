@@ -2081,13 +2081,13 @@ void compareStoplines(
   const std::vector<std::vector<geometry_msgs::msg::Point>> & a,
   const std::vector<std::vector<geometry_msgs::msg::Point>> & b)
 {
-  const double epsilon = 1.0;
-  for (auto a_lines_it = a.begin(), b_lines_it = b.begin();
-       a_lines_it != a.end() && b_lines_it != b.end(); a_lines_it++, b_lines_it++) {
-    for (auto a_points_it = a_lines_it->begin(), b_points_it = b_lines_it->begin();
-         a_points_it != a_lines_it->end() && b_points_it != b_lines_it->end();
-         a_points_it++, b_points_it++) {
-      EXPECT_POINT_NEAR((*a_points_it), (*b_points_it), epsilon);
+  constexpr double epsilon = 1.0;
+  EXPECT_EQ(a.size(), b.size());
+  for (std::size_t i = 0; i < a.size(); ++i) {
+    EXPECT_EQ(a[i].size(), b[i].size()) << "In this test i = " << i;
+    for (std::size_t j = 0; j < a[i].size(); ++j) {
+      EXPECT_POINT_NEAR_STREAM(
+        a[i][j], b[i][j], epsilon, "In this test i = " << i << ", j = " << j);
     }
   }
 }
