@@ -1259,10 +1259,7 @@ TEST(HdMapUtils, getPreviousLanelets_straightBefore)
 
   lanelet::Ids actual_previous{202, 3002185, 3002181};
 
-  EXPECT_EQ(result_previous.size(), actual_previous.size());
-  EXPECT_EQ(result_previous[0], actual_previous[0]);
-  EXPECT_EQ(result_previous[1], actual_previous[1]);
-  EXPECT_EQ(result_previous[2], actual_previous[2]);
+  EXPECT_EQ(result_previous, actual_previous);
 }
 
 TEST(HdMapUtils, getPreviousLanelets_curveBefore)
@@ -1275,12 +1272,7 @@ TEST(HdMapUtils, getPreviousLanelets_curveBefore)
 
   lanelet::Ids actual_previous{34600, 34783, 34606, 34795, 34507};
 
-  EXPECT_EQ(result_previous.size(), actual_previous.size());
-  EXPECT_EQ(result_previous[0], actual_previous[0]);
-  EXPECT_EQ(result_previous[1], actual_previous[1]);
-  EXPECT_EQ(result_previous[2], actual_previous[2]);
-  EXPECT_EQ(result_previous[3], actual_previous[3]);
-  EXPECT_EQ(result_previous[4], actual_previous[4]);
+  EXPECT_EQ(result_previous, actual_previous);
 }
 
 TEST(HdMapUtils, getPreviousLanelets_notEnoughLaneletsBefore)
@@ -1293,11 +1285,7 @@ TEST(HdMapUtils, getPreviousLanelets_notEnoughLaneletsBefore)
 
   lanelet::Ids actual_previous{202, 3002185, 3002181, 3002178};
 
-  EXPECT_EQ(result_previous.size(), actual_previous.size());
-  EXPECT_EQ(result_previous[0], actual_previous[0]);
-  EXPECT_EQ(result_previous[1], actual_previous[1]);
-  EXPECT_EQ(result_previous[2], actual_previous[2]);
-  EXPECT_EQ(result_previous[3], actual_previous[3]);
+  EXPECT_EQ(result_previous, actual_previous);
 }
 
 TEST(HdMapUtils, getTrafficLightIds_correct)
