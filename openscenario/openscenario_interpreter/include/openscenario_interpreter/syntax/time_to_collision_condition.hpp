@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/time_to_collision_condition_target.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
 namespace openscenario_interpreter
@@ -24,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   TimeToCollisionCondition
+   TimeToCollisionCondition 1.3
 
    The currently predicted time to collision of a triggering entity/entities
    and either a reference entity or an explicit position is compared to a given
@@ -38,8 +39,6 @@ inline namespace syntax
    comparison is defined by the rule attribute. The property "alongRoute" is
    deprecated. If "coordinateSystem" or "relativeDistanceType" are set,
    "alongRoute" is ignored.
-
-   XSD 1.3 Representation
 
    <xsd:complexType name="TimeToCollisionCondition">
      <xsd:all>
@@ -62,6 +61,8 @@ inline namespace syntax
 */
 struct TimeToCollisionCondition : private SimulatorCore::ConditionEvaluation
 {
+  const TimeToCollisionConditionTarget time_to_collision_condition_target;
+
   const Boolean freespace;
 
   const Rule rule;
@@ -80,7 +81,9 @@ struct TimeToCollisionCondition : private SimulatorCore::ConditionEvaluation
 
   explicit TimeToCollisionCondition(
     const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-  : freespace(readAttribute<Boolean>("freespace", node, scope)),
+  : time_to_collision_condition_target(
+      readElement<TimeToCollisionConditionTarget>("TimeToCollisionConditionTarget", node, scope)),
+    freespace(readAttribute<Boolean>("freespace", node, scope)),
     rule(readAttribute<Rule>("rule", node, scope)),
     value(readAttribute<Double>("value", node, scope)),
     relative_distance_type(
