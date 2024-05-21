@@ -1454,32 +1454,18 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_correct)
 
   constexpr double epsilon = 0.1;
 
-  // clang-format off
   const std::vector<geometry_msgs::msg::Point> actual_trajectory{
-    makePoint(3785.5, 73754.7, -0.5),
-    makePoint(3784.6, 73754.2, -0.5),
-    makePoint(3783.7, 73753.8, -0.5),
-    makePoint(3782.9, 73753.3, -0.5),
-    makePoint(3782.0, 73752.9, -0.5),
-    makePoint(3781.1, 73752.4, -0.4),
-    makePoint(3780.2, 73751.9, -0.4),
-    makePoint(3779.3, 73751.5, -0.4),
-    makePoint(3778.4, 73751.0, -0.4),
-    makePoint(3777.5, 73750.6, -0.4)
-  };
-  // clang-format on
+    makePoint(3785.5, 73754.7, -0.5), makePoint(3784.6, 73754.2, -0.5),
+    makePoint(3783.7, 73753.8, -0.5), makePoint(3782.9, 73753.3, -0.5),
+    makePoint(3782.0, 73752.9, -0.5), makePoint(3781.1, 73752.4, -0.4),
+    makePoint(3780.2, 73751.9, -0.4), makePoint(3779.3, 73751.5, -0.4),
+    makePoint(3778.4, 73751.0, -0.4), makePoint(3777.5, 73750.6, -0.4)};
 
   EXPECT_EQ(result_trajectory.size(), actual_trajectory.size());
-  EXPECT_POINT_NEAR(result_trajectory[0], actual_trajectory[0], epsilon);
-  EXPECT_POINT_NEAR(result_trajectory[1], actual_trajectory[1], epsilon);
-  EXPECT_POINT_NEAR(result_trajectory[2], actual_trajectory[2], epsilon);
-  EXPECT_POINT_NEAR(result_trajectory[3], actual_trajectory[3], epsilon);
-  EXPECT_POINT_NEAR(result_trajectory[4], actual_trajectory[4], epsilon);
-  EXPECT_POINT_NEAR(result_trajectory[5], actual_trajectory[5], epsilon);
-  EXPECT_POINT_NEAR(result_trajectory[6], actual_trajectory[6], epsilon);
-  EXPECT_POINT_NEAR(result_trajectory[7], actual_trajectory[7], epsilon);
-  EXPECT_POINT_NEAR(result_trajectory[8], actual_trajectory[8], epsilon);
-  EXPECT_POINT_NEAR(result_trajectory[9], actual_trajectory[9], epsilon);
+  for (std::size_t i = 0; i < actual_trajectory.size(); ++i) {
+    EXPECT_POINT_NEAR_STREAM(
+      result_trajectory[i], actual_trajectory[i], epsilon, "In this test i = " << i);
+  }
 }
 
 TEST(HdMapUtils, clipTrajectoryFromLaneletIds_startNotOnTrajectory)
