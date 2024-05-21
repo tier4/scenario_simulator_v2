@@ -25,7 +25,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 /*
-   TimeToCollisionCondition 1.3
+   TimeToCollisionCondition (OpenSCENARIO XML 1.3)
 
    The currently predicted time to collision of a triggering entity/entities
    and either a reference entity or an explicit position is compared to a given
@@ -97,11 +97,11 @@ struct TimeToCollisionCondition : private SimulatorCore::ConditionEvaluation
   {
   }
 
-  auto description() const -> String
+  auto description() const
   {
     auto description = std::stringstream();
 
-    description << triggering_entities.description() << "'s time-to-collision to given entity "
+    description << triggering_entities.description() << "'s time to collision to given entity "
                 << "TODO-RELATIVE-DISTANCE-TARGET"
                 << " = ";
 

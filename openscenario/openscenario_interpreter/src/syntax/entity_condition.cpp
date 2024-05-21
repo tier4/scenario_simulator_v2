@@ -19,6 +19,7 @@
 #include <openscenario_interpreter/syntax/entity_condition.hpp>
 #include <openscenario_interpreter/syntax/reach_position_condition.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
+#include <openscenario_interpreter/syntax/relative_speed_condition.hpp>
 #include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/syntax/stand_still_condition.hpp>
 #include <openscenario_interpreter/syntax/time_headway_condition.hpp>
@@ -41,7 +42,7 @@ EntityCondition::EntityCondition(
       std::make_pair(    "AccelerationCondition", [&](const auto & node) { return make<    AccelerationCondition>(node, scope, triggering_entities); }),
       std::make_pair(      "StandStillCondition", [&](const auto & node) { return make<      StandStillCondition>(node, scope, triggering_entities); }),
       std::make_pair(           "SpeedCondition", [&](const auto & node) { return make<           SpeedCondition>(node, scope, triggering_entities); }),
-      std::make_pair(   "RelativeSpeedCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
+      std::make_pair(   "RelativeSpeedCondition", [&](const auto & node) { return make<   RelativeSpeedCondition>(node, scope, triggering_entities); }),
       std::make_pair("TraveledDistanceCondition", [&](const auto & node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }),
       std::make_pair(   "ReachPositionCondition", [&](const auto & node) { return make<   ReachPositionCondition>(node, scope, triggering_entities); }),
       std::make_pair(        "DistanceCondition", [&](const auto & node) { return make<        DistanceCondition>(node, scope, triggering_entities); }),
