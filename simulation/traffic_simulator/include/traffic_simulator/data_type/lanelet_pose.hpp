@@ -16,6 +16,8 @@
 #define TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_
 
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/utils/lanelet.hpp>
+#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
@@ -26,12 +28,9 @@ inline namespace lanelet_pose
 class CanonicalizedLaneletPose
 {
 public:
+  explicit CanonicalizedLaneletPose(const LaneletPose & maybe_non_canonicalized_lanelet_pose);
   explicit CanonicalizedLaneletPose(
-    const LaneletPose & maybe_non_canonicalized_lanelet_pose,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
-  explicit CanonicalizedLaneletPose(
-    const LaneletPose & maybe_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils);
+    const LaneletPose & maybe_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets);
   CanonicalizedLaneletPose(const CanonicalizedLaneletPose & other);
   CanonicalizedLaneletPose(CanonicalizedLaneletPose && other) noexcept;
   CanonicalizedLaneletPose & operator=(const CanonicalizedLaneletPose & obj);
@@ -39,8 +38,7 @@ public:
   explicit operator geometry_msgs::msg::Pose() const noexcept { return map_pose_; }
   auto hasAlternativeLaneletPose() const -> bool { return lanelet_poses_.size() > 1; }
   auto getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-    LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-    bool allow_lane_change = false) const -> std::optional<LaneletPose>;
+    LaneletPose from, bool allow_lane_change = false) const -> std::optional<LaneletPose>;
   static auto setConsiderPoseByRoadSlope(bool consider_pose_by_road_slope) -> void
   {
     consider_pose_by_road_slope_ = consider_pose_by_road_slope;
@@ -70,14 +68,11 @@ public:
 #undef DEFINE_COMPARISON_OPERATOR
 
 private:
-  auto adjustOrientationAndOzPosition(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-    -> void;
+  auto adjustOrientationAndOzPosition() -> void;
+  auto canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose) -> LaneletPose;
   auto canonicalize(
-    const LaneletPose & may_non_canonicalized_lanelet_pose,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPose;
-  auto canonicalize(
-    const LaneletPose & may_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPose;
+    const LaneletPose & may_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets)
+    -> LaneletPose;
   LaneletPose lanelet_pose_;
   std::vector<LaneletPose> lanelet_poses_;
   geometry_msgs::msg::Pose map_pose_;

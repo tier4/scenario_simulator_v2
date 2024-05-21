@@ -25,8 +25,8 @@
 #include <iostream>
 #include <string>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator/utils/lanelet.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 #include <unordered_set>
 #include <vector>
 
@@ -57,7 +57,7 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
  * @param yaw yaw value in the lane coordinate
  * @return LaneletPose
  */
-LaneletPose constructLaneletPose(
+traffic_simulator_msgs::msg::LaneletPose constructLaneletPose(
   lanelet::Id lanelet_id, double s, double offset = 0, double roll = 0, double pitch = 0,
   double yaw = 0);
 
@@ -67,12 +67,10 @@ LaneletPose constructLaneletPose(
  * @param lanelet_id lanelet id
  * @param s s value in lane coordinate
  * @param offset offset value in lane coordinate
- * @param hdmap_utils_ptr pointer to HdmapUtils
  * @return LaneletPose
  */
-CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
+traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset);
 
 /**
  * @brief helper function for constructing canonicalized lanelet pose
@@ -83,12 +81,10 @@ CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
  * @param roll roll value in the lane coordinate
  * @param pitch pitch value in the lane coordinate
  * @param yaw yaw value in the lane coordinate
- * @param hdmap_utils_ptr pointer to HdmapUtils
  * @return LaneletPose
  */
-CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
+traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw);
 
 /**
  * @brief helper function for constructing rpy
@@ -157,7 +153,8 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPose & ll_pose);
+std::ostream & operator<<(
+  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose);
 
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Point & point);
 

@@ -23,13 +23,14 @@ traffic_simulator::CanonicalizedEntityStatus getCanonicalizedEntityStatus(
   const double time, const double twist_x, const double x, const double y = 0.0,
   const double z = 0.0, const std::string & name = "name")
 {
-  static const std::string path =
-    ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
-  static const auto origin = geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
-                               .latitude(35.61836750154)
-                               .longitude(139.78066608243)
-                               .altitude(0.0);
-  static const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
+  /// @todo set ros params
+  // static const std::string path =
+  //   ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
+  // static const auto origin = geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+  //                              .latitude(35.61836750154)
+  //                              .longitude(139.78066608243)
+  //                              .altitude(0.0);
+  // static const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
 
   traffic_simulator::EntityStatus entity_status;
   entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;

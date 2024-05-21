@@ -72,7 +72,7 @@ private:
           traffic_simulator::helper::constructLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
-                traffic_simulator::pose::laneletLength(spawn_lanelet_id, api_.getHdmapUtils()) +
+                traffic_simulator::pose::laneletLength(spawn_lanelet_id) +
               normal_dist(engine_),
             offset, 0, 0),
           getVehicleParameters(
@@ -133,7 +133,7 @@ private:
         api_.requestSpeedChange(entity_name, speed, true);
         api_.setLinearVelocity(entity_name, speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
-          0.0, traffic_simulator::pose::laneletLength(34684, api_.getHdmapUtils()));
+          0.0, traffic_simulator::pose::laneletLength(34684));
         lane_change_position = lane_change_position_distribution(engine_);
         lane_change_requested = false;
       }
@@ -159,9 +159,7 @@ private:
       if (
         !api_.entityExists(entity_name) &&
         !api_.reachPosition(
-          "ego",
-          traffic_simulator::helper::constructCanonicalizedLaneletPose(
-            34576, 25.0, 0.0, api_.getHdmapUtils()),
+          "ego", traffic_simulator::helper::constructCanonicalizedLaneletPose(34576, 25.0, 0.0),
           5.0)) {
         std::normal_distribution<> offset_distribution(
           0.0, params_.random_parameters.crossing_pedestrian.offset_variance);
@@ -186,8 +184,8 @@ private:
     }
 
     {
-      const auto trigger_position = traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34621, 10, 0.0, api_.getHdmapUtils());
+      const auto trigger_position =
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(34621, 10, 0.0);
       const auto entity_name = "spawn_nearby_ego";
       if (const auto ego = api_.getEntity("ego")) {
         if (api_.reachPosition("ego", trigger_position, 20.0) && !api_.entityExists(entity_name)) {
@@ -219,8 +217,7 @@ private:
 
     spawnEgoEntity(
       traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0),
-      {traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34606, 0.0, 0.0, api_.getHdmapUtils())},
+      {traffic_simulator::helper::constructCanonicalizedLaneletPose(34606, 0.0, 0.0)},
       getVehicleParameters());
     if (const auto ego = api_.getEntity("ego")) {
       api_.spawn(

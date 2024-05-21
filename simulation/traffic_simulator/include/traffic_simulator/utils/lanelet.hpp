@@ -33,6 +33,7 @@
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
 #include <lanelet2_extension/io/autoware_osm_parser.hpp>
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <lanelet2_extension/utility/message_conversion.hpp>
@@ -40,8 +41,9 @@
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
 #include <optional>
+#include <traffic_simulator/data_type/lane_change.hpp>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -309,6 +311,17 @@ auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
 
 auto getTrafficLights(const lanelet::Id traffic_light_id)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>;
+
+auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool;
+
+auto getTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::TrafficLight::Ptr;
+
+auto isTrafficLight(const lanelet::Id lanelet_id) -> bool;
+
+auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
+  -> std::optional<geometry_msgs::msg::Point>;
+
+auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
 }  // namespace lanelet2
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_HPP_

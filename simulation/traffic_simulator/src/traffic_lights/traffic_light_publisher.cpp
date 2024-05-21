@@ -47,13 +47,12 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
   const rclcpp::Time & current_ros_time,
   const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
 {
-  assert(hdmap_utils_ != nullptr);
-
   autoware_perception_msgs::msg::TrafficSignalArray message;
   message.stamp = current_ros_time;
   for (const auto & traffic_light : request.states()) {
     auto relation_ids =
-      lanelet2::getTrafficLightRegulatoryElementIDsFromTrafficLight(traffic_light.id());
+      traffic_simulator::lanelet2::getTrafficLightRegulatoryElementIDsFromTrafficLight(
+        traffic_light.id());
 
     for (auto relation_id : relation_ids) {
       // skip if the traffic light has no bulbs

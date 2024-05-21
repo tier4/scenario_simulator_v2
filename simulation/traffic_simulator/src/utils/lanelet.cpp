@@ -16,6 +16,7 @@
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <geometry/transform.hpp>
 #include <traffic_simulator/color_utils/color_utils.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet.hpp>
 
 namespace traffic_simulator
@@ -1870,5 +1871,76 @@ auto getTrafficLights(const lanelet::Id traffic_light_id)
   }
   return ret;
 }
+
+auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool
+{
+  return Memory::getInstance().lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
+         std::dynamic_pointer_cast<lanelet::TrafficLight>(
+           Memory::getInstance().lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+}
+
+auto getTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::TrafficLight::Ptr
+{
+  assert(isTrafficLightRegulatoryElement(lanelet_id));
+  return std::dynamic_pointer_cast<lanelet::TrafficLight>(
+    Memory::getInstance().lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+}
+
+auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
+{
+  using namespace lanelet;
+
+  if (Memory::getInstance().lanelet_map_ptr_->lineStringLayer.exists(lanelet_id)) {
+    if (auto && linestring =
+          Memory::getInstance().lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
+        linestring.hasAttribute(AttributeName::Type)) {
+      return linestring.attribute(AttributeName::Type).value() == "traffic_light";
+    }
+  }
+
+  return false;
+}
+
+auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
+  -> std::optional<geometry_msgs::msg::Point>
+{
+  lanelet::ConstLanelets all_lanelets =
+    lanelet::utils::query::laneletLayer(Memory::getInstance().lanelet_map_ptr_);
+  auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
+
+  auto areBulbsAssignedToTrafficLight = [traffic_light_id](auto red_yellow_green_bulbs) -> bool {
+    return red_yellow_green_bulbs.hasAttribute("traffic_light_id") and
+           red_yellow_green_bulbs.attribute("traffic_light_id").asId() and
+           red_yellow_green_bulbs.attribute("traffic_light_id").asId().value() == traffic_light_id;
+  };
+
+  auto isBulbOfExpectedColor = [color_name](auto bulb) -> bool {
+    return bulb.hasAttribute("color") and !bulb.hasAttribute("arrow") and
+           bulb.attribute("color").value().compare(color_name) == 0;
+  };
+
+  for (const auto & light : autoware_traffic_lights) {
+    for (auto three_light_bulbs : light->lightBulbs()) {
+      if (areBulbsAssignedToTrafficLight(three_light_bulbs)) {
+        for (auto bulb : static_cast<lanelet::ConstLineString3d>(three_light_bulbs)) {
+          if (isBulbOfExpectedColor(bulb)) {
+            geometry_msgs::msg::Point point;
+            point.x = bulb.x();
+            point.y = bulb.y();
+            point.z = bulb.z();
+            return point;
+          }
+        }
+      }
+    }
+  }
+  return std::nullopt;
+}
+
+auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
+{
+  return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
+}
+
 }  // namespace lanelet2
 }  // namespace traffic_simulator

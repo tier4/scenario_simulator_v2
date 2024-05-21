@@ -29,14 +29,11 @@ namespace traffic_simulator
 {
 namespace entity
 {
-EntityBase::EntityBase(
-  const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+EntityBase::EntityBase(const std::string & name, const CanonicalizedEntityStatus & entity_status)
 : name(name),
   verbose(true),
   status_(entity_status),
   status_before_update_(status_),
-  hdmap_utils_ptr_(hdmap_utils_ptr),
   npc_logic_started_(false)
 {
   if (name != static_cast<EntityStatus>(entity_status).name) {
@@ -81,7 +78,7 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
   // prefer the current lanelet
   return toCanonicalizedLaneletPose(
     status_.getMapPose(), status_.getBoundingBox(), status_.getLaneletIds(), include_crosswalk,
-    matching_distance, hdmap_utils_ptr_);
+    matching_distance);
 }
 
 auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
@@ -520,7 +517,7 @@ void EntityBase::setOtherStatus(
 
 void EntityBase::setStatus(const EntityStatus & status)
 {
-  status_.set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  status_.set(status, getDefaultMatchingDistanceForLaneletPoseCalculation());
 }
 
 auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void

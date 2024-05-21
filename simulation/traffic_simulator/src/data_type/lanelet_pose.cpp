@@ -25,23 +25,21 @@ namespace traffic_simulator
 namespace lanelet_pose
 {
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
-  const LaneletPose & maybe_non_canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-: lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, hdmap_utils)),
+  const LaneletPose & maybe_non_canonicalized_lanelet_pose)
+: lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose)),
   lanelet_poses_(lanelet2::getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
-  map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
+  map_pose_(pose::toMapPose(lanelet_pose_))
 {
-  adjustOrientationAndOzPosition(hdmap_utils);
+  adjustOrientationAndOzPosition();
 }
 
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
-  const LaneletPose & maybe_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-: lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, route_lanelets, hdmap_utils)),
+  const LaneletPose & maybe_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets)
+: lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, route_lanelets)),
   lanelet_poses_(lanelet2::getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
-  map_pose_(toMapPose(lanelet_pose_, hdmap_utils))
+  map_pose_(pose::toMapPose(lanelet_pose_))
 {
-  adjustOrientationAndOzPosition(hdmap_utils);
+  adjustOrientationAndOzPosition();
 }
 
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(const CanonicalizedLaneletPose & other)
@@ -67,9 +65,8 @@ CanonicalizedLaneletPose & CanonicalizedLaneletPose::operator=(
   return *this;
 }
 
-auto CanonicalizedLaneletPose::canonicalize(
-  const LaneletPose & may_non_canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPose
+auto CanonicalizedLaneletPose::canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose)
+  -> LaneletPose
 {
   if (
     const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
@@ -88,8 +85,8 @@ auto CanonicalizedLaneletPose::canonicalize(
 }
 
 auto CanonicalizedLaneletPose::canonicalize(
-  const LaneletPose & may_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> LaneletPose
+  const LaneletPose & may_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets)
+  -> LaneletPose
 {
   if (
     const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
@@ -108,8 +105,7 @@ auto CanonicalizedLaneletPose::canonicalize(
 }
 
 auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
-  LaneletPose from, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  bool allow_lane_change) const -> std::optional<LaneletPose>
+  LaneletPose from, bool allow_lane_change) const -> std::optional<LaneletPose>
 {
   if (lanelet_poses_.empty()) {
     return std::nullopt;
@@ -127,8 +123,7 @@ auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
   return alternative_lanelet_pose;
 }
 
-auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> void
+auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition() -> void
 {
   using quaternion_operation::convertEulerAngleToQuaternion;
   using quaternion_operation::convertQuaternionToEulerAngle;

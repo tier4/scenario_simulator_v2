@@ -17,7 +17,6 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace entity_behavior
@@ -57,7 +56,7 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
     auto const canonicalized_lanelet_pose =
       traffic_simulator::pose::estimateCanonicalizedLaneletPose(
         updated_status.pose, entity_status->getBoundingBox(), entity_status->getLaneletIds(), true,
-        default_matching_distance_for_lanelet_pose_calculation, hdmap_utils)) {
+        default_matching_distance_for_lanelet_pose_calculation)) {
     updated_status.lanelet_pose_valid = true;
     updated_status.lanelet_pose =
       static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value());

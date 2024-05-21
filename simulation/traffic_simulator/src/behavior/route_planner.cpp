@@ -17,10 +17,7 @@
 
 namespace traffic_simulator
 {
-RoutePlanner::RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-: hdmap_utils_ptr_(hdmap_utils_ptr)
-{
-}
+RoutePlanner::RoutePlanner() {}
 
 auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & waypoints) -> void
 {

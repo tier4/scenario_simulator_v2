@@ -22,10 +22,7 @@
 
 namespace traffic_simulator
 {
-TrafficLightManager::TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap)
-: hdmap_(hdmap)
-{
-}
+TrafficLightManager::TrafficLightManager() {}
 
 auto TrafficLightManager::hasAnyLightChanged() -> bool
 {
@@ -44,7 +41,7 @@ auto TrafficLightManager::getTrafficLight(const lanelet::Id traffic_light_id) ->
   } else {
     traffic_lights_.emplace(
       std::piecewise_construct, std::forward_as_tuple(traffic_light_id),
-      std::forward_as_tuple(traffic_light_id, *hdmap_));
+      std::forward_as_tuple(traffic_light_id));
     return traffic_lights_.at(traffic_light_id);
   }
 }
@@ -70,12 +67,13 @@ auto TrafficLightManager::getTrafficLights(const lanelet::Id lanelet_id)
 {
   std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
 
-  if (hdmap_->isTrafficLightRegulatoryElement(lanelet_id)) {
+  if (lanelet2::isTrafficLightRegulatoryElement(lanelet_id)) {
     for (auto && traffic_light :
-         hdmap_->getTrafficLightRegulatoryElement(lanelet_id)->trafficLights()) {
+         traffic_simulator::lanelet2::getTrafficLightRegulatoryElement(lanelet_id)
+           ->trafficLights()) {
       traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
     }
-  } else if (hdmap_->isTrafficLight(lanelet_id)) {
+  } else if (lanelet2::isTrafficLight(lanelet_id)) {
     traffic_lights.emplace_back(getTrafficLight(lanelet_id));
   } else {
     throw common::scenario_simulator_exception::Error(

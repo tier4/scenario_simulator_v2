@@ -20,7 +20,6 @@
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
@@ -44,13 +43,13 @@ public:
   virtual void update(double current_time, double step_time) = 0;
   virtual const std::string & getCurrentAction() const = 0;
 
-#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \
-  virtual TYPE get##NAME() = 0;                    \
-  virtual void set##NAME(const TYPE & value) = 0;  \
-  auto get##NAME##Key() const->const std::string & \
-  {                                                \
-    static const std::string key = KEY;            \
-    return key;                                    \
+#define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)        \
+  virtual TYPE get##NAME() = 0;                      \
+  virtual void set##NAME(const TYPE & value) = 0;    \
+  auto get##NAME##Key() const -> const std::string & \
+  {                                                  \
+    static const std::string key = KEY;              \
+    return key;                                      \
   }
 
   // clang-format off
@@ -60,7 +59,6 @@ public:
   DEFINE_GETTER_SETTER(DefaultMatchingDistanceForLaneletPoseCalculation, "matching_distance_for_lanelet_pose_calculation", double)
   DEFINE_GETTER_SETTER(EntityStatus,                                     "entity_status",                                  std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus>)
   DEFINE_GETTER_SETTER(GoalPoses,                                        "goal_poses",                                     std::vector<geometry_msgs::msg::Pose>)
-  DEFINE_GETTER_SETTER(HdMapUtils,                                       "hdmap_utils",                                    std::shared_ptr<hdmap_utils::HdMapUtils>)
   DEFINE_GETTER_SETTER(LaneChangeParameters,                             "lane_change_parameters",                         traffic_simulator::lane_change::Parameter)
   DEFINE_GETTER_SETTER(Obstacle,                                         "obstacle",                                       std::optional<traffic_simulator_msgs::msg::Obstacle>)
   DEFINE_GETTER_SETTER(OtherEntityStatus,                                "other_entity_status",                            EntityStatusDict)

@@ -37,10 +37,10 @@ traffic_simulator_msgs::msg::ActionStatus constructActionStatus(
   return status;
 }
 
-LaneletPose constructLaneletPose(
+traffic_simulator_msgs::msg::LaneletPose constructLaneletPose(
   lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
 {
-  LaneletPose lanelet_pose;
+  traffic_simulator_msgs::msg::LaneletPose lanelet_pose;
   lanelet_pose.lanelet_id = lanelet_id;
   lanelet_pose.s = s;
   lanelet_pose.offset = offset;
@@ -50,14 +50,12 @@ LaneletPose constructLaneletPose(
   return lanelet_pose;
 }
 
-CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
 {
   if (
     auto canonicalized_lanelet_pose = canonicalize(
-      traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
-      hdmap_utils_ptr)) {
+      traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw))) {
     return canonicalized_lanelet_pose.value();
   } else {
     THROW_SEMANTIC_ERROR(
@@ -67,11 +65,10 @@ CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
   }
 }
 
-CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
-  lanelet::Id lanelet_id, double s, double offset,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset)
 {
-  return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0, hdmap_utils_ptr);
+  return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0);
 }
 
 geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)
@@ -190,7 +187,8 @@ const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
 }  // namespace helper
 }  // namespace traffic_simulator
 
-std::ostream & operator<<(std::ostream & os, const traffic_simulator::LaneletPose & ll_pose)
+std::ostream & operator<<(
+  std::ostream & os, const traffic_simulator_msgs::msg::LaneletPose & ll_pose)
 {
   os << "lanelet id : " << ll_pose.lanelet_id << "\ns : " << ll_pose.s;
   return os;

@@ -27,7 +27,7 @@
 #include <set>
 #include <simulation_interface/conversions.hpp>
 #include <stdexcept>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/utils/lanelet.hpp>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
@@ -328,7 +328,7 @@ struct TrafficLight
 
   const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
 
-  explicit TrafficLight(const lanelet::Id, hdmap_utils::HdMapUtils &);
+  explicit TrafficLight(const lanelet::Id);
 
   auto clear() { bulbs.clear(); }
 

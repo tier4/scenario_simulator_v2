@@ -37,7 +37,6 @@
 #include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
@@ -108,8 +107,6 @@ class EntityManager
   using MarkerArray = visualization_msgs::msg::MarkerArray;
   const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
 
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-
   MarkerArray markers_raw_;
 
   const std::shared_ptr<TrafficLightManager> conventional_traffic_light_manager_ptr_;
@@ -172,20 +169,17 @@ public:
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
-      configuration.lanelet2_map_path(), getOrigin(*node))),
     markers_raw_(lanelet2::generateMarker()),
-    conventional_traffic_light_manager_ptr_(
-      std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
+    conventional_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>()),
     conventional_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(conventional_traffic_light_manager_ptr_, node)),
-    v2i_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
+    v2i_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>()),
     v2i_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
     v2i_traffic_light_legacy_topic_publisher_ptr_(
-      makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_)),
+      makeV2ITrafficLightPublisher("/v2x/traffic_signals", node)),
     v2i_traffic_light_publisher_ptr_(makeV2ITrafficLightPublisher(
-      "/perception/traffic_light_recognition/external/traffic_signals", node, hdmap_utils_ptr_)),
+      "/perception/traffic_light_recognition/external/traffic_signals", node)),
     v2i_traffic_light_updater_(
       node,
       [this]() {
@@ -343,8 +337,6 @@ public:
 
   auto getEntityStatus(const std::string & name) const -> const CanonicalizedEntityStatus &;
 
-  auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
-
   auto getNumberOfEgo() const -> std::size_t;
 
   auto getObstacle(const std::string & name)
@@ -470,26 +462,25 @@ public:
       }(parameters);
 
       if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
-        entity_status.pose = toMapPose(pose);
+        entity_status.pose = pose::toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
-        entity_status.pose = toMapPose(pose, hdmap_utils_ptr_);
+        entity_status.pose = pose::toMapPose(pose);
         // here bounding_box and matching_distance are not used to adjust LaneletPose
         // it is just rewritten, assuming that in the scenario is right, alternatively:
         // toCanonicalizedLaneletPose(entity_status.pose, parameters.bounding_box,
-        // {pose.lanelet_id}, include_crosswalk, matching_distance, hdmap_utils_ptr_);
-        return CanonicalizedEntityStatus(entity_status, canonicalize(pose, hdmap_utils_ptr_));
+        // {pose.lanelet_id}, include_crosswalk, matching_distance);
+        return CanonicalizedEntityStatus(entity_status, canonicalize(pose));
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
         const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
-          pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
+          pose, parameters.bounding_box, include_crosswalk, matching_distance);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }
     };
 
     if (const auto [iter, success] = entities_.emplace(
           name, std::make_unique<Entity>(
-                  name, makeEntityStatus(), hdmap_utils_ptr_, parameters,
-                  std::forward<decltype(xs)>(xs)...));
+                  name, makeEntityStatus(), parameters, std::forward<decltype(xs)>(xs)...));
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);

@@ -52,7 +52,7 @@ private:
           to_entity && to_entity->laneMatchingSucceed()) {
         return traffic_simulator::distance::lateralDistance(
           from_entity->getCanonicalizedLaneletPose().value(),
-          to_entity->getCanonicalizedLaneletPose().value(), false, api_.getHdmapUtils());
+          to_entity->getCanonicalizedLaneletPose().value(), false);
       }
     }
     return std::nullopt;
@@ -68,8 +68,7 @@ private:
         auto to_entity_lanelet_pose = to_entity->getCanonicalizedLaneletPose(matching_distance);
         if (from_entity_lanelet_pose && to_entity_lanelet_pose) {
           return traffic_simulator::distance::lateralDistance(
-            from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(), false,
-            api_.getHdmapUtils());
+            from_entity_lanelet_pose.value(), to_entity_lanelet_pose.value(), false);
         }
       }
     }
@@ -86,8 +85,7 @@ private:
           to_entity && to_entity->laneMatchingSucceed()) {
         return traffic_simulator::distance::longitudinalDistance(
           from_entity->getCanonicalizedLaneletPose().value(),
-          to_entity->getCanonicalizedLaneletPose().value(), false, true, false,
-          api_.getHdmapUtils());
+          to_entity->getCanonicalizedLaneletPose().value(), false, true, false);
       }
     }
     return std::nullopt;

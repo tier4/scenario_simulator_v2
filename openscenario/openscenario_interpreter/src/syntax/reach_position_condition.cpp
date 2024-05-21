@@ -19,7 +19,6 @@
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 #include <rclcpp/rclcpp.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 
 namespace openscenario_interpreter
 {

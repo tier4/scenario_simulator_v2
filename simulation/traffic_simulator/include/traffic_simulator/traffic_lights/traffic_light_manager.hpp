@@ -21,7 +21,6 @@
 #include <simulation_interface/conversions.hpp>
 #include <stdexcept>  // std::out_of_range
 #include <string>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <tuple>
 #include <unordered_map>
@@ -37,10 +36,8 @@ protected:
 
   TrafficLightMap traffic_lights_;
 
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
-
 public:
-  explicit TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap);
+  explicit TrafficLightManager();
 
   auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
 
