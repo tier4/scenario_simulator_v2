@@ -2,6 +2,9 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.17.1 (2024-05-21)
+-------------------
+
 1.17.0 (2024-05-16)
 -------------------
 * Merge pull request `#1228 <https://github.com/tier4/scenario_simulator_v2/issues/1228>`_ from tier4/feature/openscenario_validator
