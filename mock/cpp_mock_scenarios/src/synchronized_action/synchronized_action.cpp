@@ -52,8 +52,7 @@ private:
     // SUCCESS
     if (
       api_.requestSynchronize("npc", ego_target, npc_target, 1.0, 1.0, 50) &&
-      api_.isArrivedToTargetLaneletPose("ego", ego_target, 1.0) &&
-      api_.isArrivedToTargetLaneletPose("npc", npc_target, 1.0)) {
+      api_.reachPosition("ego", ego_target, 1.0) && api_.reachPosition("npc", npc_target, 1.0)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
 

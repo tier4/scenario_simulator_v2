@@ -244,8 +244,16 @@ public:
   /*   */ auto getDistanceToTargetLaneletPose(const CanonicalizedLaneletPose & target_lanelet_pose)
     -> double;
 
-  /*   */ auto isArrivedToTargetLaneletPose(
-    const CanonicalizedLaneletPose & target_lanelet_pose, const double threshold) -> bool;
+  /*   */ bool reachPosition(
+    const geometry_msgs::msg::Pose & target_pose,
+    const double tolerance) const;
+
+  /*   */ bool reachPosition(
+    const CanonicalizedLaneletPose & lanelet_pose,
+    const double tolerance) const;
+
+  /*   */ bool reachPosition(
+    const std::string & target_name, const double tolerance) const;
 
   /*   */ auto requestSynchronize(
     const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,

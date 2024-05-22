@@ -298,7 +298,7 @@ public:
   FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
-  FORWARD_TO_ENTITY(isArrivedToTargetLaneletPose, const);
+  FORWARD_TO_ENTITY(reachPosition, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLaneletPose, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
@@ -477,15 +477,6 @@ public:
   bool isInLanelet(const std::string & name, const lanelet::Id lanelet_id, const double tolerance);
 
   bool isStopping(const std::string & name) const;
-
-  bool reachPosition(
-    const std::string & name, const geometry_msgs::msg::Pose & target_pose,
-    const double tolerance) const;
-  bool reachPosition(
-    const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
-    const double tolerance) const;
-  bool reachPosition(
-    const std::string & name, const std::string & target_name, const double tolerance) const;
 
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);

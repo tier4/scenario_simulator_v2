@@ -899,16 +899,21 @@ auto EntityBase::getDistanceToTargetLaneletPose(
   }
 }
 
-auto EntityBase::isArrivedToTargetLaneletPose(
-  const CanonicalizedLaneletPose & target_lanelet_pose, const double threshold) -> bool
+bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const
 {
-  const auto entity_distance_to_target = getDistanceToTargetLaneletPose(target_lanelet_pose);
+  return reachPosition(other_status_.find(target_name)->second.getMapPose(), tolerance);
+}
 
-  if (entity_distance_to_target <= threshold) {
-    return true;
-  } else {
-    return false;
-  }
+bool EntityBase::reachPosition(
+  const geometry_msgs::msg::Pose & target_pose, const double tolerance) const
+{
+  return math::geometry::getDistance(getMapPose(), target_pose) < tolerance;
+}
+
+bool EntityBase::reachPosition(
+  const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const
+{
+  return reachPosition(static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
 }
 
 auto EntityBase::requestSynchronize(
@@ -920,7 +925,7 @@ auto EntityBase::requestSynchronize(
   }
 
   ///@brief Check if the entity has already arrived to the target lanelet.
-  if (isArrivedToTargetLaneletPose(entity_target, threshold)) {
+  if (reachPosition(entity_target, threshold)) {
     if (this->getStatus().getTwist().linear.x < accel_limit * loop_period / 1000) {
     } else {
       RCLCPP_WARN_ONCE(

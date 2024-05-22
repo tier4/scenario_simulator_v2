@@ -333,7 +333,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLights);
-  FORWARD_TO_ENTITY_MANAGER(isArrivedToTargetLaneletPose);
+  FORWARD_TO_ENTITY_MANAGER(reachPosition);
   FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
