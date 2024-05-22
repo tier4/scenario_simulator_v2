@@ -133,8 +133,6 @@ auto operator+=(T & a, const U & b) -> decltype(auto)
   return a;
 }
 
-// gogo!!
-
 template <
   typename T, typename U,
   std::enable_if_t<std::conjunction_v<IsLikeQuaternion<T>, IsLikeQuaternion<U>>, std::nullptr_t> =
