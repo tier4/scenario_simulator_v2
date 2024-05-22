@@ -20,6 +20,7 @@
 #include <memory>
 #include <openscenario_interpreter/syntax/open_scenario.hpp>
 #include <openscenario_preprocessor/deriver.hpp>
+#include <openscenario_preprocessor/schema.hpp>
 #include <openscenario_validator/validator.hpp>
 #include <queue>
 
@@ -50,7 +51,12 @@ class Preprocessor
 {
 public:
   explicit Preprocessor(const boost::filesystem::path & output_directory)
-  : output_directory(output_directory)
+  : output_directory(output_directory), derive([]() -> std::string {
+      auto file = std::ofstream("/tmp/openscenario_preprocessor/schema.xsd", std::ios::trunc);
+      file << openscenario_preprocessor::schema;
+      file.close();
+      return "/tmp/openscenario_preprocessor/schema.xsd";
+    }())
   {
     if (not boost::filesystem::exists(output_directory)) {
       boost::filesystem::create_directories(output_directory);

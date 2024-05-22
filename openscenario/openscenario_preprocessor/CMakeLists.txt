@@ -53,7 +53,6 @@ target_link_libraries(${PROJECT_NAME}_command pugixml)
 target_link_libraries(${PROJECT_NAME}_command yaml-cpp)
 
 target_link_libraries(${PROJECT_NAME}_command ${parameter_value_distribution_LIBRARIES})
-target_link_libraries(${PROJECT_NAME}_command openscenario_validator::openscenario_validator)
 
 install(TARGETS ${PROJECT_NAME}_node ${PROJECT_NAME}_command
   RUNTIME DESTINATION lib/${PROJECT_NAME}

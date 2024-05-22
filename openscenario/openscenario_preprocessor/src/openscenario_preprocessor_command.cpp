@@ -17,7 +17,6 @@
 #include <nlohmann/json.hpp>
 #include <openscenario_preprocessor/openscenario_preprocessor.hpp>
 #include <openscenario_preprocessor/t4v2.hpp>
-#include <openscenario_validator/schema.hpp>
 
 const std::string_view template_scenario = R"###(
 <OpenSCENARIO>
@@ -100,11 +99,6 @@ try {
   std::vector<boost::filesystem::path> xosc_scenario_paths;
 
   boost::filesystem::path scenario_modifiers_path{};
-
-  // setup xsd file
-  auto file = std::ofstream("/tmp/openscenario_preprocessor/schema.xsd", std::ios::trunc);
-  file << openscenario_validator::schema;
-  file.close();
 
   // preprocess t4v2 format and convert to xosc scenarios
   if (scenario_path.extension() == ".yaml" or scenario_path.extension() == ".yml") {
