@@ -38,8 +38,6 @@ VehicleEntity::VehicleEntity(
   behavior_plugin_ptr_(loader_.createSharedInstance(plugin_name)),
   route_planner_()
 {
-  std::cout << name << " make pose: " << entity_status.getLaneletPose().s << " "
-            << entity_status.getLaneletPose().offset << std::endl;
   behavior_plugin_ptr_->configure(rclcpp::get_logger(name));
   behavior_plugin_ptr_->setVehicleParameters(parameters);
   behavior_plugin_ptr_->setDebugMarker({});
