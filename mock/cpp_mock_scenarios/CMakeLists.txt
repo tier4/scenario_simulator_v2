@@ -54,7 +54,8 @@ if(BUILD_CPP_MOCK_SCENARIOS)
   add_subdirectory(src/pedestrian)
   add_subdirectory(src/random_scenario)
   add_subdirectory(src/speed_planning)
-  add_subdirectory(src/synchronized_action)
+  # add_subdirectory(src/respawn_ego)
+
 endif()
 
 install(
