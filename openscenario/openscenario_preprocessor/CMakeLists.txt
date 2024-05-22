@@ -19,6 +19,7 @@ find_package(pugixml          REQUIRED)
 ament_auto_find_build_dependencies()
 
 ament_auto_add_executable(${PROJECT_NAME}_node
+  src/schema.cpp
   src/${PROJECT_NAME}.cpp
   src/${PROJECT_NAME}_node.cpp)
 
@@ -27,8 +28,12 @@ target_link_libraries(${PROJECT_NAME}_node yaml-cpp)
 
 find_library(parameter_value_distribution_LIBRARIES parameter_value_distribution_without_ros)
 
+file(READ ${openscenario_validator_DIR}/../../openscenario_validator/schema/OpenSCENARIO-1.3.xsd ${PROJECT_NAME}_OPENSCENARIO_1_3_XSD)
+configure_file(configure/schema.cpp src/schema.cpp)
+
 add_executable(${PROJECT_NAME}_command
   src/t4v2.cpp
+  src/schema.cpp
   src/${PROJECT_NAME}.cpp
   src/${PROJECT_NAME}_command.cpp)
 
