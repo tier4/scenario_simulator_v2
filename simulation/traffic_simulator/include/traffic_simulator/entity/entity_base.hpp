@@ -161,9 +161,9 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id){};
+  virtual void requestLaneChange(const lanelet::Id) {};
 
-  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
+  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &) {};
 
   /*   */ void requestLaneChange(
     const lane_change::AbsoluteTarget &, const lane_change::TrajectoryShape,
@@ -244,15 +244,12 @@ public:
     -> double;
 
   /*   */ bool reachPosition(
-    const geometry_msgs::msg::Pose & target_pose,
-    const double tolerance) const;
+    const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
 
   /*   */ bool reachPosition(
-    const CanonicalizedLaneletPose & lanelet_pose,
-    const double tolerance) const;
+    const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const;
 
-  /*   */ bool reachPosition(
-    const std::string & target_name, const double tolerance) const;
+  /*   */ bool reachPosition(const std::string & target_name, const double tolerance) const;
 
   /*   */ auto requestSynchronize(
     const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,
