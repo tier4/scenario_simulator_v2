@@ -23,6 +23,9 @@ Changelog for package scenario_test_runner
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
+1.17.2 (2024-05-22)
+-------------------
+
 1.17.1 (2024-05-21)
 -------------------
 
