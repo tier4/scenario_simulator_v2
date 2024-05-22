@@ -68,7 +68,8 @@ auto Interpreter::makeCurrentConfiguration() const -> traffic_simulator::Configu
   // XXX DIRTY HACK!!!
   if (not logic_file.isDirectory() and logic_file.filepath.extension() == ".osm") {
     return traffic_simulator::Configuration(
-      logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path(), logic_file.filepath.filename().string(), osc_path, auto_sink);
+      logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path(),
+      logic_file.filepath.filename().string(), osc_path, auto_sink);
   } else {
     return traffic_simulator::Configuration(
       logic_file.isDirectory() ? logic_file : logic_file.filepath.parent_path(), osc_path,

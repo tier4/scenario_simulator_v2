@@ -59,6 +59,7 @@ ament_auto_add_library(traffic_simulator SHARED
   src/utils/distance.cpp
   src/utils/pose.cpp
   src/utils/lanelet.cpp
+  src/utils/lanelet/memory.cpp
 )
 
 ament_auto_add_library(visualization_component SHARED

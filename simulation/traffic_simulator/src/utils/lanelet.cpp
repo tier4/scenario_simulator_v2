@@ -141,7 +141,7 @@ auto getCenterPointsSpline(const lanelet::Id lanelet_id)
   -> std::shared_ptr<math::geometry::CatmullRomSpline>
 {
   getCenterPoints(lanelet_id);
-  return Memory::getInstance().center_points_cache_.getCenterPointsSpline(lanelet_id);
+  return Memory::centerPointsCache().getCenterPointsSpline(lanelet_id);
 }
 
 auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<geometry_msgs::msg::Point>
@@ -163,8 +163,8 @@ auto getNearbyLaneletIds(
 {
   lanelet::Ids lanelet_ids;
   lanelet::BasicPoint2d search_point(position.x, position.y);
-  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet = lanelet::geometry::findNearest(
-    Memory::getInstance().lanelet_map_ptr_->laneletLayer, search_point, search_count);
+  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
+    lanelet::geometry::findNearest(Memory::laneletMap()->laneletLayer, search_point, search_count);
   if (nearest_lanelet.empty()) {
     return {};
   }
@@ -182,8 +182,8 @@ auto getNearbyLaneletIds(
 {
   lanelet::Ids lanelet_ids;
   lanelet::BasicPoint2d search_point(point.x, point.y);
-  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet = lanelet::geometry::findNearest(
-    Memory::getInstance().lanelet_map_ptr_->laneletLayer, search_point, search_count);
+  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
+    lanelet::geometry::findNearest(Memory::laneletMap()->laneletLayer, search_point, search_count);
   if (include_crosswalk) {
     if (nearest_lanelet.empty()) {
       return {};
@@ -217,27 +217,27 @@ auto getLeftLaneletIds(
   switch (type.type) {
     case traffic_simulator_msgs::msg::EntityType::EGO:
       if (include_opposite_direction) {
-        return getLaneletIds(Memory::getInstance().vehicle_routing_graph_ptr_->lefts(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(
+          Memory::vehicleRoutingGraph()->lefts(Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       } else {
-        return getLaneletIds(Memory::getInstance().vehicle_routing_graph_ptr_->adjacentLefts(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::vehicleRoutingGraph()->adjacentLefts(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       }
     case traffic_simulator_msgs::msg::EntityType::VEHICLE:
       if (include_opposite_direction) {
-        return getLaneletIds(Memory::getInstance().vehicle_routing_graph_ptr_->lefts(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(
+          Memory::vehicleRoutingGraph()->lefts(Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       } else {
-        return getLaneletIds(Memory::getInstance().vehicle_routing_graph_ptr_->adjacentLefts(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::vehicleRoutingGraph()->adjacentLefts(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       }
     case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
       if (include_opposite_direction) {
-        return getLaneletIds(Memory::getInstance().pedestrian_routing_graph_ptr_->lefts(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::pedestrianRoutingGraph()->lefts(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       } else {
-        return getLaneletIds(Memory::getInstance().pedestrian_routing_graph_ptr_->adjacentLefts(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::pedestrianRoutingGraph()->adjacentLefts(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       }
     default:
     case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
@@ -252,27 +252,27 @@ auto getRightLaneletIds(
   switch (type.type) {
     case traffic_simulator_msgs::msg::EntityType::EGO:
       if (include_opposite_direction) {
-        return getLaneletIds(Memory::getInstance().vehicle_routing_graph_ptr_->rights(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::vehicleRoutingGraph()->rights(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       } else {
-        return getLaneletIds(Memory::getInstance().vehicle_routing_graph_ptr_->adjacentRights(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::vehicleRoutingGraph()->adjacentRights(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       }
     case traffic_simulator_msgs::msg::EntityType::VEHICLE:
       if (include_opposite_direction) {
-        return getLaneletIds(Memory::getInstance().vehicle_routing_graph_ptr_->rights(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::vehicleRoutingGraph()->rights(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       } else {
-        return getLaneletIds(Memory::getInstance().vehicle_routing_graph_ptr_->adjacentRights(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::vehicleRoutingGraph()->adjacentRights(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       }
     case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
       if (include_opposite_direction) {
-        return getLaneletIds(Memory::getInstance().pedestrian_routing_graph_ptr_->rights(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::pedestrianRoutingGraph()->rights(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       } else {
-        return getLaneletIds(Memory::getInstance().pedestrian_routing_graph_ptr_->adjacentRights(
-          Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(Memory::pedestrianRoutingGraph()->adjacentRights(
+          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
       }
     default:
     case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
@@ -300,11 +300,11 @@ auto matchToLane(
         bbox.center.x - bbox.dimensions.x * 0.5 * reduction_ratio,
         bbox.center.y - bbox.dimensions.y * 0.5 * reduction_ratio}},
     obj.pose);
-  auto matches = lanelet::matching::getDeterministicMatches(
-    *Memory::getInstance().lanelet_map_ptr_, obj, matching_distance);
+  auto matches =
+    lanelet::matching::getDeterministicMatches(*Memory::laneletMap(), obj, matching_distance);
   if (!include_crosswalk) {
-    matches = lanelet::matching::removeNonRuleCompliantMatches(
-      matches, Memory::getInstance().traffic_rules_vehicle_ptr_);
+    matches =
+      lanelet::matching::removeNonRuleCompliantMatches(matches, Memory::trafficRulesVehicle());
   }
   if (matches.empty()) {
     return std::nullopt;
@@ -327,8 +327,8 @@ auto matchToLane(
 auto getNextLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   lanelet::Ids ids;
-  const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt : Memory::getInstance().vehicle_routing_graph_ptr_->following(lanelet)) {
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+  for (const auto & llt : Memory::vehicleRoutingGraph()->following(lanelet)) {
     ids.push_back(llt.id());
   }
   for (const auto & id : getNextRoadShoulderLanelet(lanelet_id)) {
@@ -350,8 +350,8 @@ auto getNextLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_di
   -> lanelet::Ids
 {
   lanelet::Ids ids;
-  const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt : Memory::getInstance().vehicle_routing_graph_ptr_->following(lanelet)) {
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+  for (const auto & llt : Memory::vehicleRoutingGraph()->following(lanelet)) {
     if (llt.attributeOr("turn_direction", "else") == turn_direction) {
       ids.push_back(llt.id());
     }
@@ -372,8 +372,8 @@ auto getNextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & tur
 auto getPreviousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   lanelet::Ids ids;
-  const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt : Memory::getInstance().vehicle_routing_graph_ptr_->previous(lanelet)) {
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+  for (const auto & llt : Memory::vehicleRoutingGraph()->previous(lanelet)) {
     ids.push_back(llt.id());
   }
   for (const auto & id : getPreviousRoadShoulderLanelet(lanelet_id)) {
@@ -395,8 +395,8 @@ auto getPreviousLaneletIds(const lanelet::Id lanelet_id, const std::string & tur
   -> lanelet::Ids
 {
   lanelet::Ids ids;
-  const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & llt : Memory::getInstance().vehicle_routing_graph_ptr_->previous(lanelet)) {
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+  for (const auto & llt : Memory::vehicleRoutingGraph()->previous(lanelet)) {
     if (llt.attributeOr("turn_direction", "else") == turn_direction) {
       ids.push_back(llt.id());
     }
@@ -417,17 +417,17 @@ auto getPreviousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string &
 auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> ret;
-  if (!Memory::getInstance().lanelet_map_ptr_) {
+  if (!Memory::laneletMap()) {
     THROW_SIMULATION_ERROR("lanelet map is null pointer");
   }
-  if (Memory::getInstance().lanelet_map_ptr_->laneletLayer.empty()) {
+  if (Memory::laneletMap()->laneletLayer.empty()) {
     THROW_SIMULATION_ERROR("lanelet layer is empty");
   }
-  if (Memory::getInstance().center_points_cache_.exists(lanelet_id)) {
-    return Memory::getInstance().center_points_cache_.getCenterPoints(lanelet_id);
+  if (Memory::centerPointsCache().exists(lanelet_id)) {
+    return Memory::centerPointsCache().getCenterPoints(lanelet_id);
   }
 
-  const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
   const auto centerline = lanelet.centerline();
   for (const auto & point : centerline) {
     geometry_msgs::msg::Point p;
@@ -448,14 +448,14 @@ auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs:
     ret.push_back(p1);
     ret.push_back(p2);
   }
-  Memory::getInstance().center_points_cache_.appendData(lanelet_id, ret);
+  Memory::centerPointsCache().appendData(lanelet_id, ret);
   return ret;
 }
 
 auto getLaneletIds() -> lanelet::Ids
 {
   lanelet::Ids ids;
-  for (const auto & lanelet : Memory::getInstance().lanelet_map_ptr_->laneletLayer) {
+  for (const auto & lanelet : Memory::laneletMap()->laneletLayer) {
     ids.push_back(lanelet.id());
   }
   return ids;
@@ -464,8 +464,8 @@ auto getLaneletIds() -> lanelet::Ids
 auto getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   lanelet::Ids ids;
-  const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & shoulder_lanelet : Memory::getInstance().shoulder_lanelets_) {
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : Memory::shoulderLanelets()) {
     if (lanelet::geometry::follows(lanelet, shoulder_lanelet)) {
       ids.push_back(shoulder_lanelet.id());
     }
@@ -476,8 +476,8 @@ auto getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Ids
 auto getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   lanelet::Ids ids;
-  const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-  for (const auto & shoulder_lanelet : Memory::getInstance().shoulder_lanelets_) {
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : Memory::shoulderLanelets()) {
     if (lanelet::geometry::follows(shoulder_lanelet, lanelet)) {
       ids.push_back(shoulder_lanelet.id());
     }
@@ -648,44 +648,38 @@ auto getRoute(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, bool allow_lane_change)
   -> lanelet::Ids
 {
-  if (Memory::getInstance().route_cache_.exists(
-        from_lanelet_id, to_lanelet_id, allow_lane_change)) {
-    return Memory::getInstance().route_cache_.getRoute(
-      from_lanelet_id, to_lanelet_id, allow_lane_change);
+  if (Memory::routeCache().exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {
+    return Memory::routeCache().getRoute(from_lanelet_id, to_lanelet_id, allow_lane_change);
   }
   lanelet::Ids ids;
-  const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
-  const auto to_lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(from_lanelet_id);
+  const auto to_lanelet = Memory::laneletMap()->laneletLayer.get(to_lanelet_id);
   lanelet::Optional<lanelet::routing::Route> route =
-    Memory::getInstance().vehicle_routing_graph_ptr_->getRoute(
-      lanelet, to_lanelet, 0, allow_lane_change);
+    Memory::vehicleRoutingGraph()->getRoute(lanelet, to_lanelet, 0, allow_lane_change);
   if (!route) {
-    Memory::getInstance().route_cache_.appendData(
-      from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+    Memory::routeCache().appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
     return ids;
   }
   lanelet::routing::LaneletPath shortest_path = route->shortestPath();
   if (shortest_path.empty()) {
-    Memory::getInstance().route_cache_.appendData(
-      from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+    Memory::routeCache().appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
     return ids;
   }
   for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
     ids.push_back(lane_itr->id());
   }
-  Memory::getInstance().route_cache_.appendData(
-    from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+  Memory::routeCache().appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
   return ids;
 }
 
 auto getLaneletLength(const lanelet::Id lanelet_id) -> double
 {
-  if (Memory::getInstance().lanelet_length_cache_.exists(lanelet_id)) {
-    return Memory::getInstance().lanelet_length_cache_.getLength(lanelet_id);
+  if (Memory::laneletLengthCache().exists(lanelet_id)) {
+    return Memory::laneletLengthCache().getLength(lanelet_id);
   }
-  double ret = lanelet::utils::getLaneletLength2d(
-    Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id));
-  Memory::getInstance().lanelet_length_cache_.appendData(lanelet_id, ret);
+  double ret =
+    lanelet::utils::getLaneletLength2d(Memory::laneletMap()->laneletLayer.get(lanelet_id));
+  Memory::laneletLengthCache().appendData(lanelet_id, ret);
   return ret;
 }
 
@@ -771,8 +765,7 @@ auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traff
 {
   assert(isTrafficLight(traffic_light_way_id));
   lanelet::Ids traffic_light_regulatory_element_ids;
-  for (const auto & regulatory_element :
-       Memory::getInstance().lanelet_map_ptr_->regulatoryElementLayer) {
+  for (const auto & regulatory_element : Memory::laneletMap()->regulatoryElementLayer) {
     if (regulatory_element->attribute(lanelet::AttributeName::Subtype).value() == "traffic_light") {
       for (const auto & ref_member :
            regulatory_element->getParameters<lanelet::ConstLineString3d>("refers")) {
@@ -914,21 +907,19 @@ auto getLongitudinalDistance(
 
 auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
 {
-  return toPolygon(
-    Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id).leftBound());
+  return toPolygon(Memory::laneletMap()->laneletLayer.get(lanelet_id).leftBound());
 }
 
 auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
 {
-  return toPolygon(
-    Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id).rightBound());
+  return toPolygon(Memory::laneletMap()->laneletLayer.get(lanelet_id).rightBound());
 }
 
 auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
   lanelet::CompoundPolygon3d lanelet_polygon =
-    Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id).polygon3d();
+    Memory::laneletMap()->laneletLayer.get(lanelet_id).polygon3d();
   for (const auto & lanelet_point : lanelet_polygon) {
     geometry_msgs::msg::Point p;
     p.x = lanelet_point.x();
@@ -942,7 +933,7 @@ auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msg
 auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
 {
   std::vector<geometry_msgs::msg::Point> points;
-  const auto stop_line = Memory::getInstance().lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
+  const auto stop_line = Memory::laneletMap()->lineStringLayer.get(lanelet_id);
   for (const auto & point : stop_line) {
     geometry_msgs::msg::Point p;
     p.x = point.x();
@@ -1024,20 +1015,20 @@ auto getLaneChangeableLaneletId(
   const lanelet::Id lanelet_id, const traffic_simulator::lane_change::Direction direction)
   -> std::optional<lanelet::Id>
 {
-  const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
   std::optional<lanelet::Id> target = std::nullopt;
   switch (direction) {
     case traffic_simulator::lane_change::Direction::STRAIGHT:
       target = lanelet.id();
       break;
     case traffic_simulator::lane_change::Direction::LEFT:
-      if (Memory::getInstance().vehicle_routing_graph_ptr_->left(lanelet)) {
-        target = Memory::getInstance().vehicle_routing_graph_ptr_->left(lanelet)->id();
+      if (Memory::vehicleRoutingGraph()->left(lanelet)) {
+        target = Memory::vehicleRoutingGraph()->left(lanelet)->id();
       }
       break;
     case traffic_simulator::lane_change::Direction::RIGHT:
-      if (Memory::getInstance().vehicle_routing_graph_ptr_->right(lanelet)) {
-        target = Memory::getInstance().vehicle_routing_graph_ptr_->right(lanelet)->id();
+      if (Memory::vehicleRoutingGraph()->right(lanelet)) {
+        target = Memory::vehicleRoutingGraph()->right(lanelet)->id();
       }
       break;
   }
@@ -1047,8 +1038,7 @@ auto getLaneChangeableLaneletId(
 auto generateMarker() -> visualization_msgs::msg::MarkerArray
 {
   visualization_msgs::msg::MarkerArray markers;
-  lanelet::ConstLanelets all_lanelets =
-    lanelet::utils::query::laneletLayer(Memory::getInstance().lanelet_map_ptr_);
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(Memory::laneletMap());
   lanelet::ConstLanelets road_lanelets = lanelet::utils::query::roadLanelets(all_lanelets);
   lanelet::ConstLanelets crosswalk_lanelets =
     lanelet::utils::query::crosswalkLanelets(all_lanelets);
@@ -1059,9 +1049,9 @@ auto generateMarker() -> visualization_msgs::msg::MarkerArray
   std::vector<lanelet::DetectionAreaConstPtr> da_reg_elems =
     lanelet::utils::query::detectionAreas(all_lanelets);
   lanelet::ConstLineStrings3d parking_spaces =
-    lanelet::utils::query::getAllParkingSpaces(Memory::getInstance().lanelet_map_ptr_);
+    lanelet::utils::query::getAllParkingSpaces(Memory::laneletMap());
   lanelet::ConstPolygons3d parking_lots =
-    lanelet::utils::query::getAllParkingLots(Memory::getInstance().lanelet_map_ptr_);
+    lanelet::utils::query::getAllParkingLots(Memory::laneletMap());
 
   auto cl_ll_borders = color_utils::fromRgba(1.0, 1.0, 1.0, 0.999);
   auto cl_road = color_utils::fromRgba(0.2, 0.7, 0.7, 0.3);
@@ -1185,8 +1175,8 @@ auto getSpeedLimit(const lanelet::Ids & lanelet_ids) -> double
     THROW_SEMANTIC_ERROR("size of the vector lanelet ids should be more than 1");
   }
   for (auto itr = lanelet_ids.begin(); itr != lanelet_ids.end(); itr++) {
-    const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(*itr);
-    const auto limit = Memory::getInstance().traffic_rules_vehicle_ptr_->speedLimit(lanelet);
+    const auto lanelet = Memory::laneletMap()->laneletLayer.get(*itr);
+    const auto limit = Memory::trafficRulesVehicle()->speedLimit(lanelet);
     limits.push_back(lanelet::units::KmHQuantity(limit.speedLimit).value() / 3.6);
   }
   return *std::min_element(limits.begin(), limits.end());
@@ -1194,10 +1184,9 @@ auto getSpeedLimit(const lanelet::Ids & lanelet_ids) -> double
 
 auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool
 {
-  const auto from_lanelet =
-    Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(from_lanelet_id);
-  const auto to_lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(to_lanelet_id);
-  return Memory::getInstance().traffic_rules_vehicle_ptr_->canChangeLane(from_lanelet, to_lanelet);
+  const auto from_lanelet = Memory::laneletMap()->laneletLayer.get(from_lanelet_id);
+  const auto to_lanelet = Memory::laneletMap()->laneletLayer.get(to_lanelet_id);
+  return Memory::trafficRulesVehicle()->canChangeLane(from_lanelet, to_lanelet);
 }
 
 auto getAlongLaneletPose(
@@ -1256,7 +1245,7 @@ auto getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+    const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
     const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
     for (const auto & traffic_sign : traffic_signs) {
       ret.emplace_back(traffic_sign);
@@ -1303,8 +1292,8 @@ auto getRightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
 auto getRightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   lanelet::Ids ids;
-  for (const auto & right_of_way : Memory::getInstance()
-                                     .lanelet_map_ptr_->laneletLayer.get(lanelet_id)
+  for (const auto & right_of_way : Memory::laneletMap()
+                                     ->laneletLayer.get(lanelet_id)
                                      .regulatoryElementsAs<lanelet::RightOfWay>()) {
     for (const auto & ll : right_of_way->rightOfWayLanelets()) {
       if (lanelet_id != ll.id()) {
@@ -1564,11 +1553,11 @@ auto getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Id
 {
   lanelet::Ids ids;
   std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
-  graphs.emplace_back(Memory::getInstance().vehicle_routing_graph_ptr_);
-  graphs.emplace_back(Memory::getInstance().pedestrian_routing_graph_ptr_);
+  graphs.emplace_back(Memory::vehicleRoutingGraph());
+  graphs.emplace_back(Memory::pedestrianRoutingGraph());
   lanelet::routing::RoutingGraphContainer container(graphs);
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+    const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
     double height_clearance = 4;
     size_t routing_graph_id = 1;
     const auto conflicting_crosswalks =
@@ -1584,9 +1573,9 @@ auto getConflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
 {
   lanelet::Ids ids;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
-    const auto conflicting_lanelets = lanelet::utils::getConflictingLanelets(
-      Memory::getInstance().vehicle_routing_graph_ptr_, lanelet);
+    const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+    const auto conflicting_lanelets =
+      lanelet::utils::getConflictingLanelets(Memory::vehicleRoutingGraph(), lanelet);
     for (const auto & conflicting_lanelet : conflicting_lanelets) {
       ids.emplace_back(conflicting_lanelet.id());
     }
@@ -1621,7 +1610,7 @@ auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
 {
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = Memory::getInstance().lanelet_map_ptr_->laneletLayer.get(lanelet_id);
+    const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
     const auto traffic_lights =
       lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
     for (const auto & traffic_light : traffic_lights) {
@@ -1635,8 +1624,7 @@ auto getTrafficLights(const lanelet::Id traffic_light_id)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>
 {
   std::vector<lanelet::AutowareTrafficLightConstPtr> ret;
-  lanelet::ConstLanelets all_lanelets =
-    lanelet::utils::query::laneletLayer(Memory::getInstance().lanelet_map_ptr_);
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(Memory::laneletMap());
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto & light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
@@ -1656,25 +1644,24 @@ auto getTrafficLights(const lanelet::Id traffic_light_id)
 
 auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool
 {
-  return Memory::getInstance().lanelet_map_ptr_->regulatoryElementLayer.exists(lanelet_id) and
+  return Memory::laneletMap()->regulatoryElementLayer.exists(lanelet_id) and
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
-           Memory::getInstance().lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+           Memory::laneletMap()->regulatoryElementLayer.get(lanelet_id));
 }
 
 auto getTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::TrafficLight::Ptr
 {
   assert(isTrafficLightRegulatoryElement(lanelet_id));
   return std::dynamic_pointer_cast<lanelet::TrafficLight>(
-    Memory::getInstance().lanelet_map_ptr_->regulatoryElementLayer.get(lanelet_id));
+    Memory::laneletMap()->regulatoryElementLayer.get(lanelet_id));
 }
 
 auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
 {
   using namespace lanelet;
 
-  if (Memory::getInstance().lanelet_map_ptr_->lineStringLayer.exists(lanelet_id)) {
-    if (auto && linestring =
-          Memory::getInstance().lanelet_map_ptr_->lineStringLayer.get(lanelet_id);
+  if (Memory::laneletMap()->lineStringLayer.exists(lanelet_id)) {
+    if (auto && linestring = Memory::laneletMap()->lineStringLayer.get(lanelet_id);
         linestring.hasAttribute(AttributeName::Type)) {
       return linestring.attribute(AttributeName::Type).value() == "traffic_light";
     }
@@ -1686,8 +1673,7 @@ auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
 auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
   -> std::optional<geometry_msgs::msg::Point>
 {
-  lanelet::ConstLanelets all_lanelets =
-    lanelet::utils::query::laneletLayer(Memory::getInstance().lanelet_map_ptr_);
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(Memory::laneletMap());
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
 
   auto areBulbsAssignedToTrafficLight = [traffic_light_id](auto red_yellow_green_bulbs) -> bool {
