@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <openscenario_validator/validator.hpp>
 
 int main(int argc, char * argv[])
 {
   assert(argc == 2);
   std::string file_path = argv[1];
-  openscenario_validator::OpenSCENARIOValidator validate;
+  std::string schema_path = ament_index_cpp::get_package_share_directory("openscenario_validator") +
+                            "/schema/OpenSCENARIO-1.3.xsd";
+  openscenario_validator::OpenSCENARIOValidator validate(schema_path);
   try {
     validate(file_path);
     return 0;
