@@ -161,9 +161,9 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id) {};
+  virtual void requestLaneChange(const lanelet::Id){};
 
-  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &) {};
+  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
 
   /*   */ void requestLaneChange(
     const lane_change::AbsoluteTarget &, const lane_change::TrajectoryShape,
