@@ -15,6 +15,7 @@ find_package(XercesC          REQUIRED)
 find_package(Boost            REQUIRED COMPONENTS filesystem program_options regex)
 find_package(pugixml          REQUIRED)
 
+
 ament_auto_find_build_dependencies()
 
 ament_auto_add_executable(${PROJECT_NAME}_node
