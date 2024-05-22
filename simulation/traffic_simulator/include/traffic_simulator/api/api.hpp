@@ -342,7 +342,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(laneMatchingSucceed);
-  FORWARD_TO_ENTITY_MANAGER(reachPosition);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
