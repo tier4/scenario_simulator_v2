@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2024 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY__VECTOR3__NORMALIZE_HPP_
-#define GEOMETRY__VECTOR3__NORMALIZE_HPP_
+#ifndef GEOMETRY__VECTOR3__VECTOR3_HPP_
+#define GEOMETRY__VECTOR3__VECTOR3_HPP_
 
 #include <geometry/vector3/is_like_vector3.hpp>
-#include <geometry/vector3/norm.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 
 namespace math
 {
 namespace geometry
 {
-template <typename T, std::enable_if_t<IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
-auto normalize(const T & v)
+template <
+  typename T, typename U, typename V,
+  std::enable_if_t<std::conjunction_v<std::is_scalar<T>, std::is_scalar<U>, std::is_scalar<V>>, std::nullptr_t> =
+    nullptr>
+auto vector3(const T & x, const U & y, const V & z)
 {
-  return v / norm(v);
+    geometry_msgs::msg::Vector3 vec;
+    vec.x = x;
+    vec.y = y;
+    vec.z = z;
+    return vec;
 }
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY__VECTOR3__NORMALIZE_HPP_
+#endif  // GEOMETRY__VECTOR3__VECTOR3_HPP_

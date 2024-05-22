@@ -23,16 +23,43 @@ namespace math
 namespace geometry
 {
 template <typename T, typename = void>
+struct HasMemberW : std::false_type {};
+
+template <typename T>
+struct HasMemberW<T, std::void_t<decltype(std::declval<T>().w)>> : std::true_type {};
+
+template <typename T, typename = void>
 struct IsLikeVector3 : public std::false_type
 {
 };
 
 template <typename T>
 struct IsLikeVector3<
-  T, std::void_t<decltype(std::declval<T>().x, std::declval<T>().y, std::declval<T>().z)>>
+  T, std::void_t<
+      decltype(std::declval<T>().x),
+      decltype(std::declval<T>().y),
+      decltype(std::declval<T>().z),
+      std::enable_if_t<!HasMemberW<T>::value>
+  >>
 : public std::true_type
 {
 };
+
+template <typename T, typename = void>
+struct IsLikeQuaternion : std::false_type {};
+
+template <typename T>
+struct IsLikeQuaternion<
+  T, std::void_t<
+      decltype(std::declval<T>().x),
+      decltype(std::declval<T>().y),
+      decltype(std::declval<T>().z),
+      decltype(std::declval<T>().w)
+  >>
+: std::true_type
+{
+};
+
 }  // namespace geometry
 }  // namespace math
 

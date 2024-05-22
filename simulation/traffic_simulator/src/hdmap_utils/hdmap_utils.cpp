@@ -27,7 +27,9 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <deque>
-#include <geometry/linear_algebra.hpp>
+#include <geometry/vector3/operator.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/inner_product.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry/transform.hpp>
@@ -1394,6 +1396,8 @@ auto HdMapUtils::toMapPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch) const
   -> geometry_msgs::msg::PoseStamped
 {
+  using math::geometry::operator*;
+  using math::geometry::operator+=;
   if (
     const auto pose = std::get<std::optional<traffic_simulator_msgs::msg::LaneletPose>>(
       canonicalizeLaneletPose(lanelet_pose))) {
@@ -1402,8 +1406,8 @@ auto HdMapUtils::toMapPose(
     const auto spline = getCenterPointsSpline(pose->lanelet_id);
     ret.pose = spline->getPose(pose->s);
     const auto normal_vec = spline->getNormalVector(pose->s);
-    const auto diff = math::geometry::normalize(normal_vec) * pose->offset;
-    ret.pose.position = ret.pose.position + diff;
+    const auto diff = math::geometry::normalize(normal_vec) * pose->offset; //this
+    ret.pose.position += diff;
     const auto tangent_vec = spline->getTangentVector(pose->s);
     geometry_msgs::msg::Vector3 rpy;
     rpy.x = 0.0;

@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2024 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY__VECTOR3__NORMALIZE_HPP_
-#define GEOMETRY__VECTOR3__NORMALIZE_HPP_
+#ifndef GEOMETRY__VECTOR3__INNER_PRODUCT_HPP_
+#define GEOMETRY__VECTOR3__INNER_PRODUCT_HPP_
 
 #include <geometry/vector3/is_like_vector3.hpp>
-#include <geometry/vector3/norm.hpp>
 
 namespace math
 {
 namespace geometry
 {
-template <typename T, std::enable_if_t<IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
-auto normalize(const T & v)
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, IsLikeVector3<U>>, std::nullptr_t> =
+    nullptr>
+auto innerProduct(const T & v0, const U & v1)
 {
-  return v / norm(v);
+  return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
 }
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY__VECTOR3__NORMALIZE_HPP_
+#endif  // GEOMETRY__VECTOR3__INNER_PRODUCT_HPP_
