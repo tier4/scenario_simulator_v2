@@ -13,6 +13,9 @@ Changelog for package openscenario_visualization
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.17.2 (2024-05-22)
+-------------------
+
 1.17.1 (2024-05-21)
 -------------------
 
