@@ -35,7 +35,7 @@ Entities::Entities(const pugi::xml_node & node, Scope & scope)
   });
 }
 
-auto Entities::isAdded(const GroupedEntity & entity_ref) const -> bool
+auto Entities::isAdded(const Entity & entity_ref) const -> bool
 {
   auto evaluation = entity_ref.apply(
     [&](const auto & object) { return object.template as<ScenarioObject>().is_added; });

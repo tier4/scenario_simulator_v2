@@ -37,7 +37,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Private : public Scope
 {
-  const GroupedEntity entity_ref;
+  const Entity entity_ref;
 
   std::list<PrivateAction> private_actions;
 

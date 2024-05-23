@@ -59,7 +59,7 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   /*
      Reference entity.
   */
-  const SingleEntity entity_ref;
+  const Entity entity_ref;
 
   /*
      True: distance is measured between closest bounding box points.

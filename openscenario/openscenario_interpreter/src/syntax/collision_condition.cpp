@@ -29,7 +29,7 @@ CollisionCondition::CollisionCondition(
 : Scope(scope),
   another_given_entity(
     choice(node,
-      std::make_pair("EntityRef", [&](auto && node) { return make<SingleEntity>(node, scope); }),
+      std::make_pair("EntityRef", [&](auto && node) { return make<Entity>(node, scope); }),
       std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
   triggering_entities(triggering_entities)
 // clang-format on
@@ -52,11 +52,11 @@ auto CollisionCondition::description() const -> std::string
 auto CollisionCondition::evaluate() const -> Object
 {
   if (
-    another_given_entity.is<SingleEntity>() and
-    global().entities->isAdded(another_given_entity.as<SingleEntity>())) {
+    another_given_entity.is<Entity>() and
+    global().entities->isAdded(another_given_entity.as<Entity>())) {
     return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
       auto evaluation = triggering_entity.apply([&](const auto & object) {
-        return evaluateCollisionCondition(object, another_given_entity.as<SingleEntity>());
+        return evaluateCollisionCondition(object, another_given_entity.as<Entity>());
       });
       return not evaluation.size() or evaluation.min();
     }));

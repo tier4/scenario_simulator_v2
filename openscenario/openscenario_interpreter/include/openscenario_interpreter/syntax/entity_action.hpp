@@ -39,7 +39,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntityAction : public ComplexType
 {
-  const GroupedEntity entity_ref;
+  const Entity entity_ref;
 
   explicit EntityAction(const pugi::xml_node &, Scope &);
 

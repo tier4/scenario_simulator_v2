@@ -24,20 +24,6 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-struct SelectedEntityRefs : public Object
-{
-  const std::list<GroupedEntity> entityRefs;
-
-  explicit SelectedEntityRefs(const pugi::xml_node &, Scope &);
-};
-
-struct SelectedByTypes : public Object
-{
-  const std::list<ByType> byTypes;
-
-  explicit SelectedByTypes(const pugi::xml_node &, Scope &);
-};
-
 /* ---- SelectedEntities -------------------------------------------------------
  *
  *  <xsd:complexType name="SelectedEntities">
@@ -50,11 +36,12 @@ struct SelectedByTypes : public Object
  * -------------------------------------------------------------------------- */
 struct SelectedEntities : public ComplexType
 {
+  const std::list<Entity> entityRef;
+
+  const std::list<ByType> byTypes;
+
   explicit SelectedEntities(const pugi::xml_node &, Scope &);
 };
-
-DEFINE_LAZY_VISITOR(SelectedEntities, CASE(SelectedEntityRefs), CASE(SelectedByTypes));
-DEFINE_LAZY_VISITOR(const SelectedEntities, CASE(SelectedEntityRefs), CASE(SelectedByTypes));
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 

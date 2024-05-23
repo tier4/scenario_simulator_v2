@@ -37,7 +37,7 @@ EntitySelection::EntitySelection(const pugi::xml_node & node, Scope & scope)
 {
 }
 
-auto EntitySelection::objects() const -> std::set<SingleEntity>
+auto EntitySelection::objects() const -> std::set<Entity>
 {
   return apply<std::set<SingleEntity>>(
     overload(

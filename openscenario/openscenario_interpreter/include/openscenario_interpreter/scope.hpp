@@ -190,7 +190,7 @@ class Scope
 public:
   const std::string name;
 
-  std::list<GroupedEntity> actors;
+  std::list<Entity> actors;
 
   double seed;  // NOTE: `seed` is used only for sharing randomSeed in Stochastic now
 

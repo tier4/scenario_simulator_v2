@@ -67,7 +67,7 @@ struct FollowTrajectoryAction : private Scope,
 
   const TrajectoryRef trajectory_ref;
 
-  std::unordered_map<GroupedEntity, Boolean> accomplishments;
+  std::unordered_map<Entity, Boolean> accomplishments;
 
   explicit FollowTrajectoryAction(const pugi::xml_node &, Scope &);
 

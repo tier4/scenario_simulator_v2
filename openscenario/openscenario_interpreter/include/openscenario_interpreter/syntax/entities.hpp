@@ -38,7 +38,7 @@ struct Entities : public std::unordered_map<std::string, Object>  // TODO to be 
 {
   explicit Entities(const pugi::xml_node &, Scope &);
 
-  auto isAdded(const GroupedEntity &) const -> bool;
+  auto isAdded(const Entity &) const -> bool;
 
   auto ref(const EntityRef &) const -> Object;
 };

@@ -32,54 +32,35 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-EntityBase::EntityBase(const ScenarioObject & object) : Object(make(object)) {}
+Entity::Entity(const ScenarioObject & object) : Object(make(object)) {}
 
-EntityBase::EntityBase(const EntitySelection & object) : Object(make(object)) {}
+Entity::Entity(const EntitySelection & selection) : Object(make(selection)) {}
 
-EntityBase::EntityBase(const String & name, const Scope & scope)
+Entity::Entity(const String & name, const Scope & scope)
 : Object(name.empty() ? nullptr : scope.global().entities->ref(name))
 {
 }
 
-EntityBase::EntityBase(const pugi::xml_node & node, const Scope & scope)
-: EntityBase(readAttribute<String>("entityRef", node, scope), scope)
+Entity::Entity(const pugi::xml_node & node, const Scope & scope)
+: Entity(readAttribute<String>("entityRef", node, scope), scope)
 {
 }
 
-auto operator==(const EntityBase & left, const EntityBase & right) -> bool
+auto operator==(const Entity & left, const Entity & right) -> bool
 {
   return left.get() == right.get();
 }
 
-auto EntityBase::name() const -> String { return this->as<Scope>().name; }
+auto Entity::name() const -> String { return this->as<Scope>().name; }
 
-auto throwIfNotSingle(const SingleEntity & entity) -> void
+auto throwIfNotSingle(const Entity & entity) -> void
 {
   if (entity and not entity.is<ScenarioObject>()) {
     THROW_SEMANTIC_ERROR("Tried to reference `EntitySelection` where it is forbidden.");
   }
 }
 
-SingleEntity::SingleEntity(const ScenarioObject & object) : EntityBase(object) {}
-
-SingleEntity::SingleEntity(const String & name, const Scope & scope) : EntityBase(name, scope)
-{
-  throwIfNotSingle(*this);
-}
-
-SingleEntity::SingleEntity(const pugi::xml_node & node, const Scope & scope)
-: EntityBase(node, scope)
-{
-  throwIfNotSingle(*this);
-}
-
-SingleEntity::operator String() const { return this->name(); }
-
-SingleEntity::operator EntityRef() const { return this->name(); }
-
-GroupedEntity::GroupedEntity(const SingleEntity & single) : EntityBase(single) {}
-
-auto GroupedEntity::objects() const -> std::set<SingleEntity>
+auto Entity::objects() const -> std::set<Entity>
 {
   if (is<ScenarioObject>()) {
     return {as<ScenarioObject>()};
@@ -90,7 +71,7 @@ auto GroupedEntity::objects() const -> std::set<SingleEntity>
   }
 }
 
-auto GroupedEntity::objectTypes() const -> std::set<ObjectType::value_type>
+auto Entity::objectTypes() const -> std::set<ObjectType::value_type>
 {
   if (is<ScenarioObject>()) {
     return {as<ScenarioObject>().objectType()};
@@ -98,6 +79,17 @@ auto GroupedEntity::objectTypes() const -> std::set<ObjectType::value_type>
     return as<EntitySelection>().objectTypes();
   } else {
     throw std::runtime_error{"Unexpected entity type is detected. This is a simulator bug."};
+  }
+}
+
+Entity::operator EntityRef() const
+{
+  if (is<ScenarioObject>()) {
+    return name();
+  } else {
+    throw std::runtime_error{
+      "Entity::operator EntityRef() is called for non-ScenarioObject entity."
+      "This is a simulator bug."};
   }
 }
 }  // namespace syntax

@@ -40,7 +40,7 @@ struct EntitySelection : public Scope, public SelectedEntities
 {
   explicit EntitySelection(const pugi::xml_node &, Scope &);
 
-  auto objects() const -> std::set<SingleEntity>;
+  auto objects() const -> std::set<Entity>;
 
   auto objectTypes() const -> std::set<ObjectType::value_type>;
 };

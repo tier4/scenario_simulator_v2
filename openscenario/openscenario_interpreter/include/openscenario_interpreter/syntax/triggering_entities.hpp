@@ -40,7 +40,7 @@ struct TriggeringEntities
 {
   const TriggeringEntitiesRule triggering_entities_rule;
 
-  const std::list<GroupedEntity> entity_refs;
+  const std::list<Entity> entity_refs;
 
   explicit TriggeringEntities(const pugi::xml_node &, Scope &);
 

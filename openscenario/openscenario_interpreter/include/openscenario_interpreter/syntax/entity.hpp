@@ -32,7 +32,7 @@
 
 namespace openscenario_interpreter
 {
-class Scope;
+struct Scope;
 
 inline namespace syntax
 {
@@ -42,52 +42,28 @@ struct ScenarioObject;
 
 struct EntitySelection;
 
-struct EntityBase : public Object
+struct Entity : public Object
 {
-  EntityBase() = default;
+  Entity() = default;
 
-  EntityBase(const ScenarioObject &);
+  Entity(const ScenarioObject &);
 
-  EntityBase(const EntitySelection &);
+  Entity(const EntitySelection &);
 
-  EntityBase(const String &, const Scope &);
+  Entity(const String &, const Scope &);
 
-  EntityBase(const pugi::xml_node &, const Scope &);
+  Entity(const pugi::xml_node &, const Scope &);
 
   auto name() const -> String;
-};
 
-auto operator==(const EntityBase &, const EntityBase &) -> bool;
-
-struct SingleEntity : public EntityBase
-{
-  SingleEntity() = default;
-
-  SingleEntity(const ScenarioObject &);
-
-  SingleEntity(const String &, const Scope &);
-
-  SingleEntity(const pugi::xml_node &, const Scope &);
-
-  operator String() const;
-
-  operator EntityRef() const;
-};
-
-struct GroupedEntity : public EntityBase
-{
-  using EntityBase::EntityBase;
-
-  GroupedEntity(const SingleEntity &);
-
-  auto objects() const -> std::set<SingleEntity>;
+  auto objects() const -> std::set<Entity>;
 
   auto objectTypes() const -> std::set<ObjectType::value_type>;
 
   template <typename Function>
   auto apply(const Function & function) const
   {
-    using Result = std::invoke_result_t<Function, SingleEntity>;
+    using Result = std::invoke_result_t<Function, Entity>;
     auto objects = this->objects();
     if constexpr (std::is_same_v<Result, void>) {
       std::for_each(std::begin(objects), std::end(objects), function);
@@ -97,23 +73,24 @@ struct GroupedEntity : public EntityBase
       return results;
     }
   }
+
+  /**
+   * This function is for ScenarioObject only.
+   * @throws std::runtime_error if the entity is not a ScenarioObject.
+   * @note To iterate over all objects, use `apply` function instead.
+   * @note To get the name of the entity, use `name` function instead.
+   */
+  operator EntityRef() const;
 };
+
+auto operator==(const Entity &, const Entity &) -> bool;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
 template <>
-struct std::hash<openscenario_interpreter::SingleEntity>
+struct std::hash<openscenario_interpreter::Entity>
 {
-  auto operator()(const openscenario_interpreter::SingleEntity & entity) const -> std::size_t
-  {
-    return std::hash<void *>{}(entity.get());
-  }
-};
-
-template <>
-struct std::hash<openscenario_interpreter::GroupedEntity>
-{
-  auto operator()(const openscenario_interpreter::GroupedEntity & entity) const -> std::size_t
+  auto operator()(const openscenario_interpreter::Entity & entity) const -> std::size_t
   {
     return std::hash<void *>{}(entity.get());
   }
