@@ -14,8 +14,11 @@
 
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
-#include <tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+
+#if __has_include(<tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>)
+#include <tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>
+#endif
 
 namespace traffic_simulator
 {
@@ -76,6 +79,7 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
   traffic_light_state_array_publisher_->publish(message);
 }
 
+#if __has_include(<tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>)
 template <>
 auto TrafficLightPublisher<tier4_simulation_msgs::msg::TrafficLightArrayV1>::publish(
   [[maybe_unused]] const rclcpp::Time & current_ros_time,
@@ -96,4 +100,5 @@ auto TrafficLightPublisher<tier4_simulation_msgs::msg::TrafficLightArrayV1>::pub
   }
   traffic_light_state_array_publisher_->publish(message);
 }
+#endif
 }  // namespace traffic_simulator
