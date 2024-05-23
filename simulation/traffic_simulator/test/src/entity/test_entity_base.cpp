@@ -30,14 +30,31 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
-TEST(EntityBase, appendDebugMarker)
+class EntityBaseTest : public testing::Test
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+protected:
+  EntityBaseTest()
+  : id(120659),
+    hdmap_utils(makeHdMapUtilsSharedPointer()),
+    pose(makeCanonicalizedLaneletPose(hdmap_utils, id)),
+    bbox(makeBoundingBox()),
+    status(makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox)),
+    dummy("dummy_entity", status, hdmap_utils),
+    dummy_base(&dummy)
+  {
+  }
 
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  const lanelet::Id id;
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose;
+  traffic_simulator_msgs::msg::BoundingBox bbox;
+  traffic_simulator::entity_status::CanonicalizedEntityStatus status;
+  DummyEntity dummy;
+  traffic_simulator::entity::EntityBase * dummy_base;
+};
+
+TEST_F(EntityBaseTest, appendDebugMarker)
+{
   visualization_msgs::msg::MarkerArray markers{};
 
   {
@@ -61,27 +78,13 @@ TEST(EntityBase, appendDebugMarker)
   }
 }
 
-TEST(EntityBase, asFieldOperatorApplication)
+TEST_F(EntityBaseTest, asFieldOperatorApplication)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   EXPECT_THROW(dummy.asFieldOperatorApplication(), common::Error);
 }
 
-TEST(EntityBase, get2DPolygon)
+TEST_F(EntityBaseTest, get2DPolygon)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   const auto polygon = dummy.get2DPolygon();
 
   std::vector<geometry_msgs::msg::Point> ref_poly{};
@@ -101,29 +104,15 @@ TEST(EntityBase, get2DPolygon)
   }
 }
 
-TEST(EntityBase, startNpcLogic)
+TEST_F(EntityBaseTest, startNpcLogic)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   EXPECT_FALSE(dummy.isNpcLogicStarted());
   dummy.startNpcLogic();
   EXPECT_TRUE(dummy.isNpcLogicStarted());
 }
 
-TEST(EntityBase, activateOutOfRangeJob_speed)
+TEST_F(EntityBaseTest, activateOutOfRangeJob_speed)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   double min_velocity = 0.0;
   double max_velocity = 0.0;
   double min_acceleration = -100.0;
@@ -140,15 +129,8 @@ TEST(EntityBase, activateOutOfRangeJob_speed)
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
 
-TEST(EntityBase, activateOutOfRangeJob_acceleration)
+TEST_F(EntityBaseTest, activateOutOfRangeJob_acceleration)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   double min_velocity = -100.0;
   double max_velocity = 100.0;
   double min_acceleration = 0.0;
@@ -165,15 +147,8 @@ TEST(EntityBase, activateOutOfRangeJob_acceleration)
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
 
-TEST(EntityBase, activateOutOfRangeJob_jerk)
+TEST_F(EntityBaseTest, activateOutOfRangeJob_jerk)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   double min_velocity = -100.0;
   double max_velocity = 100.0;
   double min_acceleration = -100.0;
@@ -190,15 +165,8 @@ TEST(EntityBase, activateOutOfRangeJob_jerk)
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
 
-TEST(EntityBase, onUpdate)
+TEST_F(EntityBaseTest, onUpdate)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   bool first_cleanup = false;
   bool first_update = false;
   bool second_cleanup = false;
@@ -230,15 +198,8 @@ TEST(EntityBase, onUpdate)
   EXPECT_FALSE(second_update);
 }
 
-TEST(EntityBase, onPostUpdate)
+TEST_F(EntityBaseTest, onPostUpdate)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   bool first_cleanup = false;
   bool first_update = false;
   bool second_cleanup = false;
@@ -270,15 +231,8 @@ TEST(EntityBase, onPostUpdate)
   EXPECT_TRUE(second_update);
 }
 
-TEST(EntityBase, resetDynamicConstraints)
+TEST_F(EntityBaseTest, resetDynamicConstraints)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   auto default_constraints = dummy.getDefaultDynamicConstraints();
   dummy.resetDynamicConstraints();
   auto current_constraints = dummy.getDynamicConstraints();
@@ -286,17 +240,8 @@ TEST(EntityBase, resetDynamicConstraints)
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
-TEST(EntityBase, requestLaneChange_absoluteTarget)
+TEST_F(EntityBaseTest, requestLaneChange_absoluteTarget)
 {
-  const lanelet::Id id = 120659;
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
-
   traffic_simulator::lane_change::AbsoluteTarget target(id, 1.0);
 
   traffic_simulator::lane_change::TrajectoryShape trajectory_shape =
@@ -314,21 +259,12 @@ TEST(EntityBase, requestLaneChange_absoluteTarget)
   EXPECT_LANE_CHANGE_CONSTRAINT_EQ(result_param.constraint, constraint);
 }
 
-TEST(EntityBase, requestLaneChange_relativeTarget)
+TEST_F(EntityBaseTest, requestLaneChange_relativeTarget)
 {
-  const lanelet::Id id = 120659;
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
-
   const lanelet::Id target_id = 34468;
   const std::string target_name = "target_name";
   auto target_pose = makeCanonicalizedLaneletPose(hdmap_utils, target_id, 5.0);
   auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
 
   const double target_offset = 1.0;
   traffic_simulator::lane_change::RelativeTarget target(
@@ -356,22 +292,13 @@ TEST(EntityBase, requestLaneChange_relativeTarget)
   EXPECT_LANE_CHANGE_CONSTRAINT_EQ(result_param.constraint, constraint);
 }
 
-TEST(EntityBase, requestLaneChange_relativeTargetLaneletPose)
+TEST_F(EntityBaseTest, requestLaneChange_relativeTargetLaneletPose)
 {
-  const lanelet::Id id = 120659;
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
-
   const std::string target_name = "target_name";
   geometry_msgs::msg::Pose target_pose;
   target_pose.position = makePoint(3810.0, 73745.0);  // outside of road
 
   auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
 
   const double target_offset = 1.0;
   traffic_simulator::lane_change::RelativeTarget target(
@@ -392,21 +319,12 @@ TEST(EntityBase, requestLaneChange_relativeTargetLaneletPose)
   EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint);, common::Error);
 }
 
-TEST(EntityBase, requestLaneChange_relativeTargetnName)
+TEST_F(EntityBaseTest, requestLaneChange_relativeTargetnName)
 {
-  const lanelet::Id id = 120659;
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
-
   const lanelet::Id target_id = 34468;
   const std::string target_name = "target_name";
   auto target_pose = makeCanonicalizedLaneletPose(hdmap_utils, target_id, 5.0);
   auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
 
   const double target_offset = 1.0;
   traffic_simulator::lane_change::RelativeTarget target(
@@ -426,21 +344,12 @@ TEST(EntityBase, requestLaneChange_relativeTargetnName)
   EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint);, common::Error);
 }
 
-TEST(EntityBase, requestLaneChange_relativeTargetInvalid)
+TEST_F(EntityBaseTest, requestLaneChange_relativeTargetInvalid)
 {
-  const lanelet::Id id = 120659;
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
-
   const lanelet::Id target_id = 34468;
   const std::string target_name = "target_name";
   auto target_pose = makeCanonicalizedLaneletPose(hdmap_utils, target_id, 5.0);
   auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
 
   const double target_offset = 1.0;
   traffic_simulator::lane_change::RelativeTarget target(
@@ -461,15 +370,8 @@ TEST(EntityBase, requestLaneChange_relativeTargetInvalid)
   EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint), common::Error);
 }
 
-TEST(EntityBase, setDynamicConstraints)
+TEST_F(EntityBaseTest, setDynamicConstraints)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   traffic_simulator_msgs::msg::DynamicConstraints custom_constraints{};
 
   custom_constraints.max_speed = 5.0;
@@ -483,18 +385,8 @@ TEST(EntityBase, setDynamicConstraints)
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(custom_constraints, result_constraints);
 }
 
-TEST(EntityBase, setOtherStatus)
+TEST_F(EntityBaseTest, setOtherStatus)
 {
-  const lanelet::Id id = 120659;
-
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
-
   const std::string name0 = "other_entity0", name1 = "other_entity1";
 
   std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> other_status;
@@ -523,16 +415,9 @@ TEST(EntityBase, setOtherStatus)
     static_cast<traffic_simulator_msgs::msg::EntityStatus>(result_status.at(name1)));
 }
 
-TEST(EntityBase, setStatus)
+TEST_F(EntityBaseTest, setStatus)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  const auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
   dummy._setEntityType(traffic_simulator_msgs::msg::EntityType::VEHICLE);
-  traffic_simulator::entity::EntityBase * dummy_base = &dummy;
 
   auto new_type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
   auto new_subtype = traffic_simulator_msgs::msg::EntitySubtype::CAR;
@@ -577,62 +462,34 @@ TEST(EntityBase, setStatus)
   }
 
   dummy_base->setStatus(
-    traffic_simulator::entity_status::CanonicalizedEntityStatus(new_status, hdmap_utils_ptr));
+    traffic_simulator::entity_status::CanonicalizedEntityStatus(new_status, hdmap_utils));
 
   EXPECT_EQ(
     static_cast<traffic_simulator_msgs::msg::EntityStatus>(dummy_base->getStatus()),
     static_cast<traffic_simulator_msgs::msg::EntityStatus>(ref_status));
 }
 
-TEST(EntityBase, requestFollowTrajectory)
+TEST_F(EntityBaseTest, requestFollowTrajectory)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   auto ptr = std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>();
   EXPECT_THROW(dummy.requestFollowTrajectory(ptr), common::Error);
 }
 
-TEST(EntityBase, requestWalkStraight)
+TEST_F(EntityBaseTest, requestWalkStraight)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   EXPECT_THROW(dummy.requestWalkStraight(), common::Error);
 }
 
-TEST(EntityBase, updateStandStillDuration_startedMoving)
+TEST_F(EntityBaseTest, updateStandStillDuration_startedMoving)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   dummy.startNpcLogic();
   dummy.setLinearVelocity(3.0);
 
   EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
 }
 
-TEST(EntityBase, updateStandStillDuration_notStarted)
+TEST_F(EntityBaseTest, updateStandStillDuration_notStarted)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   dummy.setLinearVelocity(3.0);
   EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
 
@@ -640,15 +497,8 @@ TEST(EntityBase, updateStandStillDuration_notStarted)
   EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
 }
 
-TEST(EntityBase, updateTraveledDistance_startedMoving)
+TEST_F(EntityBaseTest, updateTraveledDistance_startedMoving)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   double velocity = 3.0;
   double step_time = 0.1;
   dummy.startNpcLogic();
@@ -660,15 +510,8 @@ TEST(EntityBase, updateTraveledDistance_startedMoving)
   EXPECT_EQ(4.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
 }
 
-TEST(EntityBase, updateTraveledDistance_notStarted)
+TEST_F(EntityBaseTest, updateTraveledDistance_notStarted)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   double velocity = 3.0;
   double step_time = 0.1;
   dummy.setLinearVelocity(velocity);
@@ -678,15 +521,8 @@ TEST(EntityBase, updateTraveledDistance_notStarted)
   EXPECT_EQ(0.0, dummy.updateTraveledDistance(step_time));
 }
 
-TEST(EntityBase, stopAtCurrentPosition)
+TEST_F(EntityBaseTest, stopAtCurrentPosition)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-
   double velocity = 3.0;
   dummy.setLinearVelocity(velocity);
   auto curr_twist = dummy.getCurrentTwist();
@@ -703,12 +539,12 @@ TEST(EntityBase, getDistanceToLeftLaneBound_one)
   const double entity_center_offset = -0.5;
   lanelet::Id id = 120659;
 
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
   auto bbox = makeBoundingBox(entity_center_offset);
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
 
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
 
   auto distance_result = dummy.getDistanceToLeftLaneBound(id);
   double distance_actual = (lane_width - bbox.dimensions.y) / 2.0 - entity_center_offset;
@@ -721,12 +557,12 @@ TEST(EntityBase, getDistanceToRightLaneBound_one)
   const double entity_center_offset = -0.5;
   lanelet::Id id = 120659;
 
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
   auto bbox = makeBoundingBox(entity_center_offset);
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
 
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
 
   auto distance_result = dummy.getDistanceToRightLaneBound(id);
   double distance_actual = (lane_width - bbox.dimensions.y) / 2.0 + entity_center_offset;
@@ -739,12 +575,12 @@ TEST(EntityBase, getDistanceToLaneBound_one)
   const double entity_center_offset = -0.5;
   lanelet::Id id = 120659;
 
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
   auto bbox = makeBoundingBox(entity_center_offset);
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
 
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
 
   auto distance_result = dummy.getDistanceToLaneBound(id);
   double distance_actual = std::min(
@@ -761,12 +597,12 @@ TEST(EntityBase, getDistanceToLeftLaneBound)
   lanelet::Id id = 120659;
   lanelet::Id id_next = 120660;
 
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id);
   auto bbox = makeBoundingBox(entity_center_offset);
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
 
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
   dummy._setRouteLanelets({id_previous, id, id_next});
 
   auto distance_result = dummy.getDistanceToLeftLaneBound();
@@ -780,12 +616,12 @@ TEST(EntityBase, getDistanceToLeftLaneBound_many)
   lanelet::Id id_0 = 120659;
   lanelet::Id id_1 = 120659;
 
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
+  auto hdmap_utils = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id_0);
   auto bbox = makeBoundingBox(entity_center_offset);
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
+  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
 
-  DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
+  DummyEntity dummy("dummy_entity", status, hdmap_utils);
 
   lanelet::Ids ids{id_0, id_1};
   auto distance_result = dummy.getDistanceToLeftLaneBound(ids);
@@ -917,18 +753,10 @@ TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
   EXPECT_FALSE(lanelet_pose);
 }
 
-TEST(EntityBase, getMapPoseFromRelativePose_relative)
+TEST_F(EntityBaseTest, getMapPoseFromRelativePose_relative)
 {
-  const lanelet::Id id = 120659;
   const double s = 5.0;
   constexpr double eps = 0.1;
-
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils, id, 0.0);
-  auto bbox = makeBoundingBox();
-  auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
-
-  DummyEntity dummy("dummy_entity", status, hdmap_utils);
 
   geometry_msgs::msg::Pose relative_pose;
   relative_pose.position.x = s;
