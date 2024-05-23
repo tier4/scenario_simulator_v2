@@ -25,6 +25,11 @@
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/lanelet/pose.hpp>
+#include <traffic_simulator/utils/lanelet/distance.hpp>
+#include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -108,15 +113,18 @@ auto ActionNode::getYieldStopDistance(const lanelet::Ids & following_lanelets) c
 {
   std::set<double> distances;
   for (const auto & lanelet : following_lanelets) {
-    const auto right_of_way_ids = traffic_simulator::lanelet2::getRightOfWayLaneletIds(lanelet);
+    const auto right_of_way_ids =
+      traffic_simulator::lanelet2::route::getRightOfWayLaneletIds(lanelet);
     for (const auto right_of_way_id : right_of_way_ids) {
       const auto other_status = getOtherEntityStatus(right_of_way_id);
       if (!other_status.empty() && entity_status->laneMatchingSucceed()) {
         const auto lanelet_pose = entity_status->getLaneletPose();
-        const auto distance_forward = traffic_simulator::lanelet2::getLongitudinalDistance(
-          lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
-        const auto distance_backward = traffic_simulator::lanelet2::getLongitudinalDistance(
-          traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
+        const auto distance_forward =
+          traffic_simulator::lanelet2::distance::getLongitudinalDistance(
+            lanelet_pose, traffic_simulator::helper::constructLaneletPose(lanelet, 0));
+        const auto distance_backward =
+          traffic_simulator::lanelet2::distance::getLongitudinalDistance(
+            traffic_simulator::helper::constructLaneletPose(lanelet, 0), lanelet_pose);
         if (distance_forward) {
           distances.insert(distance_forward.value());
         } else if (distance_backward) {
@@ -137,7 +145,7 @@ auto ActionNode::getRightOfWayEntities(const lanelet::Ids & following_lanelets) 
   auto is_the_same_right_of_way =
     [&](const std::int64_t & lanelet_id, const std::int64_t & following_lanelet) {
       const auto right_of_way_lanelet_ids =
-        traffic_simulator::lanelet2::getRightOfWayLaneletIds(lanelet_id);
+        traffic_simulator::lanelet2::route::getRightOfWayLaneletIds(lanelet_id);
       const auto the_same_right_of_way_it = std::find(
         right_of_way_lanelet_ids.begin(), right_of_way_lanelet_ids.end(), following_lanelet);
       return the_same_right_of_way_it != std::end(right_of_way_lanelet_ids);
@@ -145,7 +153,7 @@ auto ActionNode::getRightOfWayEntities(const lanelet::Ids & following_lanelets) 
 
   std::vector<traffic_simulator::CanonicalizedEntityStatus> ret;
   const auto lanelet_ids_list =
-    traffic_simulator::lanelet2::getRightOfWayLaneletIds(following_lanelets);
+    traffic_simulator::lanelet2::route::getRightOfWayLaneletIds(following_lanelets);
   for (const auto & status : other_entity_status) {
     for (const auto & following_lanelet : following_lanelets) {
       for (const lanelet::Id & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
@@ -169,7 +177,7 @@ auto ActionNode::getRightOfWayEntities() const
   }
   std::vector<traffic_simulator::CanonicalizedEntityStatus> ret;
   const auto lanelet_ids =
-    traffic_simulator::lanelet2::getRightOfWayLaneletIds(entity_status->getLaneletId());
+    traffic_simulator::lanelet2::route::getRightOfWayLaneletIds(entity_status->getLaneletId());
   if (lanelet_ids.empty()) {
     return ret;
   }
@@ -190,7 +198,7 @@ auto ActionNode::getDistanceToTrafficLightStopLine(
   const math::geometry::CatmullRomSplineInterface & spline) const -> std::optional<double>
 {
   const auto traffic_light_ids =
-    traffic_simulator::lanelet2::getTrafficLightIdsOnPath(route_lanelets);
+    traffic_simulator::lanelet2::traffic_lights::getTrafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.empty()) {
     return std::nullopt;
   }
@@ -203,7 +211,7 @@ auto ActionNode::getDistanceToTrafficLightStopLine(
         traffic_light.contains(Color::red, Status::solid_on, Shape::circle) or
         traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
       const auto collision_point =
-        traffic_simulator::lanelet2::getDistanceToTrafficLightStopLine(spline, id);
+        traffic_simulator::lanelet2::distance::getDistanceToTrafficLightStopLine(spline, id);
       if (collision_point) {
         collision_points.insert(collision_point.value());
       }
@@ -219,7 +227,7 @@ auto ActionNode::getDistanceToStopLine(
   const lanelet::Ids & route_lanelets,
   const std::vector<geometry_msgs::msg::Point> & waypoints) const -> std::optional<double>
 {
-  return traffic_simulator::lanelet2::getDistanceToStopLine(route_lanelets, waypoints);
+  return traffic_simulator::lanelet2::distance::getDistanceToStopLine(route_lanelets, waypoints);
 }
 
 auto ActionNode::getDistanceToFrontEntity(
@@ -271,7 +279,7 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
 {
   if (status.laneMatchingSucceed()) {
     return spline.getCollisionPointIn2D(
-      traffic_simulator::lanelet2::getLaneletPolygon(status.getLaneletId()), false);
+      traffic_simulator::lanelet2::other::getLaneletPolygon(status.getLaneletId()), false);
   }
   return std::nullopt;
 }
@@ -346,7 +354,7 @@ auto ActionNode::getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & rout
 {
   std::vector<traffic_simulator::CanonicalizedEntityStatus> conflicting_entity_status;
   auto conflicting_crosswalks =
-    traffic_simulator::lanelet2::getConflictingCrosswalkIds(route_lanelets);
+    traffic_simulator::lanelet2::route::getConflictingCrosswalkIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
       status.second.laneMatchingSucceed() &&
@@ -363,7 +371,8 @@ auto ActionNode::getConflictingEntityStatusOnLane(const lanelet::Ids & route_lan
   -> std::vector<traffic_simulator::CanonicalizedEntityStatus>
 {
   std::vector<traffic_simulator::CanonicalizedEntityStatus> conflicting_entity_status;
-  auto conflicting_lanes = traffic_simulator::lanelet2::getConflictingLaneIds(route_lanelets);
+  auto conflicting_lanes =
+    traffic_simulator::lanelet2::route::getConflictingLaneIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
       status.second.laneMatchingSucceed() &&
@@ -378,8 +387,9 @@ auto ActionNode::getConflictingEntityStatusOnLane(const lanelet::Ids & route_lan
 auto ActionNode::foundConflictingEntity(const lanelet::Ids & following_lanelets) const -> bool
 {
   auto conflicting_crosswalks =
-    traffic_simulator::lanelet2::getConflictingCrosswalkIds(following_lanelets);
-  auto conflicting_lanes = traffic_simulator::lanelet2::getConflictingLaneIds(following_lanelets);
+    traffic_simulator::lanelet2::route::getConflictingCrosswalkIds(following_lanelets);
+  auto conflicting_lanes =
+    traffic_simulator::lanelet2::route::getConflictingLaneIds(following_lanelets);
   for (const auto & status : other_entity_status) {
     if (
       status.second.laneMatchingSucceed() &&
@@ -417,7 +427,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
   lanelet_pose.s =
     lanelet_pose.s + (twist_new.linear.x + entity_status->getTwist().linear.x) / 2.0 * step_time;
   const auto canonicalized =
-    traffic_simulator::lanelet2::canonicalizeLaneletPose(lanelet_pose, route_lanelets);
+    traffic_simulator::lanelet2::pose::canonicalizeLaneletPose(lanelet_pose, route_lanelets);
   if (
     const auto canonicalized_lanelet_pose =
       std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
@@ -431,7 +441,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
       entity_status_updated.action_status.accel = accel_new;
       entity_status_updated.action_status.linear_jerk = linear_jerk_new;
       entity_status_updated.pose =
-        traffic_simulator::lanelet2::toMapPose(canonicalized_lanelet_pose.value()).pose;
+        traffic_simulator::lanelet2::other::toMapPose(canonicalized_lanelet_pose.value()).pose;
     }
     return entity_status_updated;
   } else {
@@ -454,7 +464,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
           entity_status_updated.action_status.accel = accel_new;
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
           entity_status_updated.pose =
-            traffic_simulator::lanelet2::toMapPose(end_of_road_lanelet_pose).pose;
+            traffic_simulator::lanelet2::other::toMapPose(end_of_road_lanelet_pose).pose;
         }
         return entity_status_updated;
       } else {
@@ -462,7 +472,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
         {
           end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
           end_of_road_lanelet_pose.s =
-            traffic_simulator::lanelet2::getLaneletLength(end_of_road_lanelet_id.value());
+            traffic_simulator::lanelet2::other::getLaneletLength(end_of_road_lanelet_id.value());
           end_of_road_lanelet_pose.offset = lanelet_pose.offset;
           end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
         }
@@ -475,7 +485,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
           entity_status_updated.action_status.accel = accel_new;
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
           entity_status_updated.pose =
-            traffic_simulator::lanelet2::toMapPose(end_of_road_lanelet_pose).pose;
+            traffic_simulator::lanelet2::other::toMapPose(end_of_road_lanelet_pose).pose;
         }
         return entity_status_updated;
       }

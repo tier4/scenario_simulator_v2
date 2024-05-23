@@ -16,6 +16,8 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/lanelet/distance.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -109,7 +111,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   distance_to_stopline_ =
-    traffic_simulator::lanelet2::getDistanceToStopLine(route_lanelets, *trajectory);
+    traffic_simulator::lanelet2::distance::getDistanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stopline_) {
@@ -138,7 +140,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   if (stopped_) {
     if (!target_speed) {
-      target_speed = traffic_simulator::lanelet2::getSpeedLimit(route_lanelets);
+      target_speed = traffic_simulator::lanelet2::route::getSpeedLimit(route_lanelets);
     }
     if (!distance_to_stopline_) {
       stopped_ = false;

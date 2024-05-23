@@ -28,7 +28,6 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-#include <traffic_simulator/utils/lanelet.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>

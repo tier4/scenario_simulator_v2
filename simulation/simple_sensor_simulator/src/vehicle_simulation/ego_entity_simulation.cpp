@@ -16,6 +16,7 @@
 #include <filesystem>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace vehicle_simulation
@@ -333,7 +334,7 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
   }
 
   /// @note Copied from motion_util::findNearestSegmentIndex
-  auto centerline_points = traffic_simulator::lanelet2::getCenterPoints(status_.getLaneletId());
+  auto centerline_points = traffic_simulator::lanelet2::other::getCenterPoints(status_.getLaneletId());
   auto find_nearest_segment_index = [](
                                       const std::vector<geometry_msgs::msg::Point> & points,
                                       const geometry_msgs::msg::Point & point) {

@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/geometry/Lanelet.h>
+
 #include <iterator>
 #include <memory>
 #include <string>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
 #include <type_traits>
 #include <utility>
 #include <vector>
@@ -67,13 +70,13 @@ auto TrafficLightManager::getTrafficLights(const lanelet::Id lanelet_id)
 {
   std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
 
-  if (lanelet2::isTrafficLightRegulatoryElement(lanelet_id)) {
+  if (lanelet2::traffic_lights::isTrafficLightRegulatoryElement(lanelet_id)) {
     for (auto && traffic_light :
-         traffic_simulator::lanelet2::getTrafficLightRegulatoryElement(lanelet_id)
+         traffic_simulator::lanelet2::traffic_lights::getTrafficLightRegulatoryElement(lanelet_id)
            ->trafficLights()) {
       traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
     }
-  } else if (lanelet2::isTrafficLight(lanelet_id)) {
+  } else if (lanelet2::traffic_lights::isTrafficLight(lanelet_id)) {
     traffic_lights.emplace_back(getTrafficLight(lanelet_id));
   } else {
     throw common::scenario_simulator_exception::Error(

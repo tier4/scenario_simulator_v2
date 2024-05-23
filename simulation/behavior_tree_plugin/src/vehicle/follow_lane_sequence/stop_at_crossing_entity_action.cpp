@@ -17,6 +17,7 @@
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/utils/lanelet/distance.hpp>
 #include <string>
 #include <utility>
 #include <vector>
@@ -113,7 +114,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   }
   distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, *trajectory);
   auto distance_to_stopline =
-    traffic_simulator::lanelet2::getDistanceToStopLine(route_lanelets, *trajectory);
+    traffic_simulator::lanelet2::distance::getDistanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stop_target_) {
     in_stop_sequence_ = false;

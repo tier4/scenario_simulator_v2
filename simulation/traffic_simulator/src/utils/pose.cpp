@@ -15,7 +15,9 @@
 #include <geometry/bounding_box.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
-#include <traffic_simulator/utils/lanelet.hpp>
+#include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet/pose.hpp>
+#include <traffic_simulator/utils/lanelet/route.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
@@ -60,7 +62,8 @@ auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::
 
 auto toMapPose(const LaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
 {
-  return lanelet2::toMapPose(lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
+  return lanelet2::other::toMapPose(
+           lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
     .pose;
 }
 
@@ -69,7 +72,7 @@ auto toCanonicalizedLaneletPose(
   -> std::optional<CanonicalizedLaneletPose>
 {
   /// @todo here matching_distance should be passed
-  if (const auto pose = lanelet2::toLaneletPose(map_pose, include_crosswalk)) {
+  if (const auto pose = lanelet2::pose::toLaneletPose(map_pose, include_crosswalk)) {
     return canonicalize(pose.value());
   } else {
     return std::nullopt;
@@ -83,7 +86,7 @@ auto toCanonicalizedLaneletPose(
 {
   if (
     const auto pose =
-      lanelet2::toLaneletPose(map_pose, bounding_box, include_crosswalk, matching_distance)) {
+      lanelet2::pose::toLaneletPose(map_pose, bounding_box, include_crosswalk, matching_distance)) {
     return canonicalize(pose.value());
   } else {
     return std::nullopt;
@@ -98,11 +101,12 @@ auto toCanonicalizedLaneletPose(
 {
   std::optional<LaneletPose> lanelet_pose;
   if (!unique_route_lanelets.empty()) {
-    lanelet_pose = lanelet2::toLaneletPose(map_pose, unique_route_lanelets, matching_distance);
+    lanelet_pose =
+      lanelet2::pose::toLaneletPose(map_pose, unique_route_lanelets, matching_distance);
   }
   if (!lanelet_pose) {
     lanelet_pose =
-      lanelet2::toLaneletPose(map_pose, bounding_box, include_crosswalk, matching_distance);
+      lanelet2::pose::toLaneletPose(map_pose, bounding_box, include_crosswalk, matching_distance);
   }
   if (lanelet_pose) {
     return canonicalize(lanelet_pose.value());
@@ -233,8 +237,8 @@ auto estimateCanonicalizedLaneletPose(
    * @note Hard coded parameter. 2.0 is a matching threshold for lanelet.
    * In this branch, the algorithm only consider entity pose.
    */
-  if (const auto lanelet_pose = lanelet2::toLaneletPose(map_pose, include_crosswalk, 2.0)) {
-    const auto canonicalized_tuple = lanelet2::canonicalizeLaneletPose(lanelet_pose.value());
+  if (const auto lanelet_pose = lanelet2::pose::toLaneletPose(map_pose, include_crosswalk, 2.0)) {
+    const auto canonicalized_tuple = lanelet2::pose::canonicalizeLaneletPose(lanelet_pose.value());
     if (
       const auto canonicalized_lanelet_pose =
         std::get<std::optional<LaneletPose>>(canonicalized_tuple)) {
@@ -254,7 +258,7 @@ auto estimateCanonicalizedLaneletPose(
           return CanonicalizedLaneletPose(
             traffic_simulator_msgs::build<LaneletPose>()
               .lanelet_id(end_of_road_lanelet_id.value())
-              .s(lanelet2::getLaneletLength(end_of_road_lanelet_id.value()))
+              .s(lanelet2::other::getLaneletLength(end_of_road_lanelet_id.value()))
               .offset(lanelet_pose.value().offset)
               .rpy(lanelet_pose.value().rpy));
         }
@@ -280,7 +284,7 @@ auto isInLanelet(
   } else {
     const auto start_edge = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
     const auto end_edge = helper::constructCanonicalizedLaneletPose(
-      lanelet_id, lanelet2::getLaneletLength(lanelet_id), 0.0);
+      lanelet_id, lanelet2::other::getLaneletLength(lanelet_id), 0.0);
     auto dist0 = longitudinalDistance(
       start_edge, canonicalized_lanelet_pose, include_adjacent_lanelet, include_opposite_direction,
       allow_lane_change);
@@ -300,13 +304,13 @@ auto isInLanelet(
 auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
 {
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  return lanelet2::getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-         lanelet2::getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
+  return lanelet2::route::getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
+         lanelet2::other::getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
-  return lanelet2::getLaneletLength(lanelet_id);
+  return lanelet2::other::getLaneletLength(lanelet_id);
 }
 }  // namespace pose
 }  // namespace traffic_simulator

@@ -25,7 +25,6 @@
 #include <iostream>
 #include <string>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/utils/lanelet.hpp>
 #include <traffic_simulator_msgs/msg/action_status.hpp>
 #include <unordered_set>
 #include <vector>

@@ -17,6 +17,7 @@
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -168,12 +169,13 @@ auto operator<<(std::ostream & os, const TrafficLight::Bulb & bulb) -> std::ostr
 
 TrafficLight::TrafficLight(const lanelet::Id lanelet_id)
 : way_id([&]() {
-    if (lanelet2::isTrafficLight(lanelet_id)) {
+    if (lanelet2::traffic_lights::isTrafficLight(lanelet_id)) {
       return lanelet_id;
     } else {
       // lanelet::RoleName::Refers
       if (auto traffic_light_members =
-            traffic_simulator::lanelet2::getTrafficLightRegulatoryElement(lanelet_id)
+            traffic_simulator::lanelet2::traffic_lights::getTrafficLightRegulatoryElement(
+              lanelet_id)
               ->getParameters<lanelet::ConstLineString3d>("refers");
           traffic_light_members.size() > 0) {
         // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.
@@ -188,13 +190,13 @@ TrafficLight::TrafficLight(const lanelet::Id lanelet_id)
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
-      traffic_simulator::lanelet2::getTrafficLightBulbPosition(way_id, "green")),
+      traffic_simulator::lanelet2::traffic_lights::getTrafficLightBulbPosition(way_id, "green")),
     std::make_pair(
       Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(),
-      traffic_simulator::lanelet2::getTrafficLightBulbPosition(way_id, "yellow")),
+      traffic_simulator::lanelet2::traffic_lights::getTrafficLightBulbPosition(way_id, "yellow")),
     std::make_pair(
       Bulb(Color::red, Status::solid_on, Shape::circle).hash(),
-      traffic_simulator::lanelet2::getTrafficLightBulbPosition(way_id, "red")),
+      traffic_simulator::lanelet2::traffic_lights::getTrafficLightBulbPosition(way_id, "red")),
   }
 {
 }

@@ -18,6 +18,8 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
+#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/lanelet/distance.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -110,7 +112,7 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
     auto distance_to_stopline =
-      traffic_simulator::lanelet2::getDistanceToStopLine(route_lanelets, *trajectory);
+      traffic_simulator::lanelet2::distance::getDistanceToStopLine(route_lanelets, *trajectory);
     auto distance_to_conflicting_entity =
       getDistanceToConflictingEntity(route_lanelets, *trajectory);
     if (distance_to_stopline) {
@@ -131,7 +133,7 @@ BT::NodeStatus FollowLaneAction::tick()
     }
   }
   if (!target_speed) {
-    target_speed = traffic_simulator::lanelet2::getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::lanelet2::route::getSpeedLimit(route_lanelets);
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(

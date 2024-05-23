@@ -41,7 +41,7 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
-#include <traffic_simulator/utils/lanelet.hpp>
+#include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -169,7 +169,7 @@ public:
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    markers_raw_(lanelet2::generateMarker()),
+    markers_raw_(lanelet2::other::generateMarker()),
     conventional_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>()),
     conventional_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(conventional_traffic_light_manager_ptr_, node)),

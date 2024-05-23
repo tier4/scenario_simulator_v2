@@ -15,23 +15,15 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_MEMORY_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__LANELET_MEMORY_HPP_
 
-#include <lanelet2_core/LaneletMap.h>
-#include <lanelet2_core/geometry/Lanelet.h>
-#include <lanelet2_io/Io.h>
-#include <lanelet2_routing/Route.h>
-#include <lanelet2_routing/RoutingCost.h>
 #include <lanelet2_routing/RoutingGraph.h>
-#include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
 #include <filesystem>
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
-#include <lanelet2_extension/utility/query.hpp>
 #include <traffic_simulator/hdmap_utils/cache.hpp>
 
 namespace traffic_simulator
 {
-inline namespace lanelet2
+namespace lanelet2
 {
 class Memory
 {

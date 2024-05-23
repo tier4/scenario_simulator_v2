@@ -23,7 +23,7 @@
 #include <iomanip>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/utils/lanelet.hpp>
+#include <traffic_simulator/utils/lanelet/memory.hpp>
 
 namespace traffic_simulator
 {

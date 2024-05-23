@@ -15,6 +15,8 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
+#include <lanelet2_core/geometry/Lanelet.h>
+
 #include <color_names/color_names.hpp>
 #include <cstdint>
 #include <geometry_msgs/msg/point.hpp>
@@ -27,12 +29,12 @@
 #include <set>
 #include <simulation_interface/conversions.hpp>
 #include <stdexcept>
-#include <traffic_simulator/utils/lanelet.hpp>
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <visualization_msgs/msg/marker.hpp>
 
 namespace traffic_simulator
 {

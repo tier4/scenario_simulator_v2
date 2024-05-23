@@ -26,6 +26,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <traffic_simulator/utils/lanelet/memory.hpp>
 
 namespace simple_sensor_simulator
 {

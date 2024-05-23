@@ -16,6 +16,7 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+#include <geographic_msgs/msg/geo_point.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 
 TEST(TrafficLightManager, getIds)

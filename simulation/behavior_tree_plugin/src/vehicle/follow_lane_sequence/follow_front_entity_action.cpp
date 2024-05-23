@@ -18,6 +18,8 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/lanelet/distance.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -91,7 +93,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   auto distance_to_stopline =
-    traffic_simulator::lanelet2::getDistanceToStopLine(route_lanelets, *trajectory);
+    traffic_simulator::lanelet2::distance::getDistanceToStopLine(route_lanelets, *trajectory);
   auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *trajectory);
   const auto front_entity_name = getFrontEntityName(*trajectory);
   if (!front_entity_name) {
@@ -114,7 +116,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   }
   const auto & front_entity_status = getEntityStatus(front_entity_name.value());
   if (!target_speed) {
-    target_speed = traffic_simulator::lanelet2::getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::lanelet2::route::getSpeedLimit(route_lanelets);
   }
   const double front_entity_linear_velocity = front_entity_status.getTwist().linear.x;
   if (target_speed.value() <= front_entity_linear_velocity) {

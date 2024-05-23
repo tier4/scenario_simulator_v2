@@ -29,6 +29,7 @@
 #include <traffic_simulator/entity/entity_manager.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/lanelet/lane_change.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -289,8 +290,8 @@ void EntityManager::requestLaneChange(
 {
   if (const auto entity = getEntity(name); entity && entity->laneMatchingSucceed()) {
     if (
-      const auto target =
-        lanelet2::getLaneChangeableLaneletId(entity->getStatus().getLaneletId(), direction)) {
+      const auto target = lanelet2::lane_change::getLaneChangeableLaneletId(
+        entity->getStatus().getLaneletId(), direction)) {
       requestLaneChange(name, target.value());
     }
   }

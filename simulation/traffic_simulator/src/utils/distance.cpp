@@ -16,7 +16,10 @@
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
 #include <traffic_simulator/utils/distance.hpp>
-#include <traffic_simulator/utils/lanelet.hpp>
+#include <traffic_simulator/utils/lanelet/distance.hpp>
+#include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet/pose.hpp>
+#include <traffic_simulator/utils/lanelet/route.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -27,7 +30,7 @@ auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool allow_lane_change) -> std::optional<double>
 {
-  return lanelet2::getLateralDistance(
+  return lanelet2::distance::getLateralDistance(
     static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), allow_lane_change);
 }
 
@@ -59,10 +62,10 @@ auto longitudinalDistance(
       }
     }
 
-    const auto forward_distance = lanelet2::getLongitudinalDistance(
+    const auto forward_distance = lanelet2::distance::getLongitudinalDistance(
       static_cast<LaneletPose>(from), to_canonicalized, allow_lane_change);
 
-    const auto backward_distance = lanelet2::getLongitudinalDistance(
+    const auto backward_distance = lanelet2::distance::getLongitudinalDistance(
       to_canonicalized, static_cast<LaneletPose>(from), allow_lane_change);
 
     if (forward_distance && backward_distance) {
@@ -83,7 +86,7 @@ auto longitudinalDistance(
      * A matching distance of about 1.5 lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
      */
-    auto from_poses = lanelet2::toLaneletPoses(
+    auto from_poses = lanelet2::pose::toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(from), static_cast<LaneletPose>(from).lanelet_id,
       matching_distance, include_opposite_direction);
     from_poses.emplace_back(from);
@@ -92,7 +95,7 @@ auto longitudinalDistance(
      * A matching distance of about 1.5 lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
      */
-    auto to_poses = lanelet2::toLaneletPoses(
+    auto to_poses = lanelet2::pose::toLaneletPoses(
       static_cast<geometry_msgs::msg::Pose>(to), static_cast<LaneletPose>(to).lanelet_id,
       matching_distance, include_opposite_direction);
     to_poses.emplace_back(to);
@@ -185,7 +188,7 @@ auto distanceToLeftLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id) -> double
 {
-  if (const auto bound = lanelet2::getLeftBound(lanelet_id); bound.empty()) {
+  if (const auto bound = lanelet2::route::getLeftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
   } else if (const auto polygon =
@@ -213,7 +216,7 @@ auto distanceToRightLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id) -> double
 {
-  if (const auto bound = lanelet2::getRightBound(lanelet_id); bound.empty()) {
+  if (const auto bound = lanelet2::route::getRightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
@@ -265,7 +268,7 @@ auto distanceToCrosswalk(
     return std::nullopt;
   } else {
     math::geometry::CatmullRomSpline spline(waypoints_array.waypoints);
-    auto polygon = lanelet2::getLaneletPolygon(target_crosswalk_id);
+    auto polygon = lanelet2::other::getLaneletPolygon(target_crosswalk_id);
     return spline.getCollisionPointIn2D(polygon);
   }
 }
@@ -278,7 +281,7 @@ auto distanceToStopLine(
     return std::nullopt;
   } else {
     const math::geometry::CatmullRomSpline spline(waypoints_array.waypoints);
-    const auto polygon = lanelet2::getStopLinePolygon(target_stop_line_id);
+    const auto polygon = lanelet2::other::getStopLinePolygon(target_stop_line_id);
     return spline.getCollisionPointIn2D(polygon);
   }
 }

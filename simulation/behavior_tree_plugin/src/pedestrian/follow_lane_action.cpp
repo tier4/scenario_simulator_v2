@@ -20,6 +20,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <traffic_simulator/utils/lanelet/route.hpp>
+
 
 namespace entity_behavior
 {
@@ -49,9 +51,9 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::RUNNING;
   }
   auto following_lanelets =
-    traffic_simulator::lanelet2::getFollowingLanelets(entity_status->getLaneletId());
+    traffic_simulator::lanelet2::route::getFollowingLanelets(entity_status->getLaneletId());
   if (!target_speed) {
-    target_speed = traffic_simulator::lanelet2::getSpeedLimit(following_lanelets);
+    target_speed = traffic_simulator::lanelet2::route::getSpeedLimit(following_lanelets);
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(

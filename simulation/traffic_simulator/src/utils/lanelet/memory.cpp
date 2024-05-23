@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_io/Io.h>
+
+#include <lanelet2_extension/projection/mgrs_projector.hpp>
+#include <lanelet2_extension/utility/query.hpp>
 #include <traffic_simulator/utils/lanelet/memory.hpp>
 
 namespace traffic_simulator
 {
-inline namespace lanelet2
+namespace lanelet2
 {
 auto Memory::activate(const std::string & lanelet_map_path) -> void
 {
