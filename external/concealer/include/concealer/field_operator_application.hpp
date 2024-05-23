@@ -127,6 +127,8 @@ public:
    * -------------------------------------------------------------------------- */
   virtual auto plan(const std::vector<geometry_msgs::msg::PoseStamped> &) -> void = 0;
 
+  virtual auto clearRoute() -> void = 0;
+
   virtual auto getAutowareStateName() const -> std::string = 0;
 
   virtual auto getMinimumRiskManeuverBehaviorName() const -> std::string = 0;

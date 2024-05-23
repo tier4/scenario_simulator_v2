@@ -94,7 +94,7 @@ geometry_msgs::msg::Point operator*(const geometry_msgs::msg::Point & point, con
 {
   return geometry_msgs::build<geometry_msgs::msg::Point>()
     .x(point.x * value)
-    .y(point.z * value)
+    .y(point.y * value)
     .z(point.z * value);
 }
 
