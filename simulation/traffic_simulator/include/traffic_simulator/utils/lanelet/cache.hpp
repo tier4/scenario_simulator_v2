@@ -23,137 +23,13 @@
 #include <unordered_map>
 #include <vector>
 
-namespace std
-{
-template <>
-struct hash<std::tuple<lanelet::Id, lanelet::Id, bool>>
-{
-public:
-  size_t operator()(const std::tuple<lanelet::Id, lanelet::Id, bool> & data) const
-  {
-    std::hash<lanelet::Id> lanelet_id_hash;
-    size_t seed = 0;
-    // hash combine like boost library
-    seed ^= lanelet_id_hash(std::get<0>(data)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    seed ^= lanelet_id_hash(std::get<1>(data)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    seed ^= std::hash<bool>{}(std::get<2>(data)) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-    return seed;
-  }
-};
-}  // namespace std
+
 
 namespace traffic_simulator
 {
 namespace lanelet2
 {
-class RouteCache
-{
-public:
-  auto exists(lanelet::Id from, lanelet::Id to, bool allow_lane_change)
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    std::tuple<lanelet::Id, lanelet::Id, bool> key = {from, to, allow_lane_change};
-    return data_.find(key) != data_.end();
-  }
 
-  auto getRoute(const lanelet::Id from, const lanelet::Id to, const bool allow_lane_change)
-    -> decltype(auto)
-  {
-    if (!exists(from, to, allow_lane_change)) {
-      THROW_SIMULATION_ERROR(
-        "route from : ", from, " to : ", to, (allow_lane_change ? " with" : " without"),
-        " lane change does not exists on route cache.");
-    } else {
-      std::lock_guard<std::mutex> lock(mutex_);
-      return data_.at({from, to, allow_lane_change});
-    }
-  }
-
-  auto appendData(
-    lanelet::Id from, lanelet::Id to, const bool allow_lane_change, const lanelet::Ids & route)
-    -> void
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    data_[{from, to, allow_lane_change}] = route;
-  }
-
-private:
-  std::unordered_map<std::tuple<lanelet::Id, lanelet::Id, bool>, lanelet::Ids> data_;
-
-  std::mutex mutex_;
-};
-
-class CenterPointsCache
-{
-public:
-  auto exists(lanelet::Id lanelet_id) -> bool
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    return data_.find(lanelet_id) != data_.end();
-  }
-
-  auto getCenterPoints(lanelet::Id lanelet_id) -> decltype(auto)
-  {
-    if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    return data_.at(lanelet_id);
-  }
-
-  auto getCenterPointsSpline(lanelet::Id lanelet_id) -> decltype(auto)
-  {
-    if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    return splines_[lanelet_id];
-  }
-
-  auto appendData(lanelet::Id lanelet_id, const std::vector<geometry_msgs::msg::Point> & route)
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    data_[lanelet_id] = route;
-    splines_[lanelet_id] = std::make_shared<math::geometry::CatmullRomSpline>(route);
-  }
-
-private:
-  std::unordered_map<lanelet::Id, std::vector<geometry_msgs::msg::Point>> data_;
-
-  std::unordered_map<lanelet::Id, std::shared_ptr<math::geometry::CatmullRomSpline>> splines_;
-
-  std::mutex mutex_;
-};
-
-class LaneletLengthCache
-{
-public:
-  auto exists(lanelet::Id lanelet_id)
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    return data_.find(lanelet_id) != data_.end();
-  }
-
-  auto getLength(lanelet::Id lanelet_id)
-  {
-    if (!exists(lanelet_id)) {
-      THROW_SIMULATION_ERROR("length of : ", lanelet_id, " does not exists on route cache.");
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    return data_[lanelet_id];
-  }
-
-  auto appendData(lanelet::Id lanelet_id, double length)
-  {
-    std::lock_guard<std::mutex> lock(mutex_);
-    data_[lanelet_id] = length;
-  }
-
-private:
-  std::unordered_map<lanelet::Id, double> data_;
-
-  std::mutex mutex_;
-};
 }  // namespace lanelet2
 }  // namespace traffic_simulator
 
