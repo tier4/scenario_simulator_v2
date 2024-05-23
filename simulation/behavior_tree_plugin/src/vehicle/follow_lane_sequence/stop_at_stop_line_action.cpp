@@ -16,9 +16,9 @@
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/stop_at_stop_line_action.hpp>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
-#include <traffic_simulator/utils/lanelet/distance.hpp>
 #include <string>
+#include <traffic_simulator/utils/lanelet/distance.hpp>
+#include <traffic_simulator/utils/lanelet/route.hpp>
 #include <utility>
 #include <vector>
 

@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/move_backward_action.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
 #include <optional>
+#include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet/route.hpp>
 
 namespace entity_behavior
 {

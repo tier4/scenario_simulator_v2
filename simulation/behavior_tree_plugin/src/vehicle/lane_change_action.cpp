@@ -20,10 +20,10 @@
 #include <memory>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
-#include <traffic_simulator/utils/lanelet/lane_change.hpp>
 #include <string>
+#include <traffic_simulator/utils/lanelet/lane_change.hpp>
+#include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -124,7 +124,7 @@ BT::NodeStatus LaneChangeAction::tick()
           1.0 is a forward_distance_threshold (If the goal x position in the cartesian coordinate was under 1.0, the goal was rejected.)
           */
           traj_with_goal = traffic_simulator::lanelet2::lane_change::getLaneChangeTrajectory(
-            traffic_simulator::lanelet2::other::toMapPose(lanelet_pose).pose,
+            traffic_simulator::lanelet2::pose::toMapPose(lanelet_pose).pose,
             lane_change_parameters_.value(), 10.0, 20.0, 1.0);
           along_pose = traffic_simulator::lanelet2::lane_change::getAlongLaneletPose(
             lanelet_pose, traffic_simulator::lane_change::Parameter::default_lanechange_distance);
@@ -154,8 +154,8 @@ BT::NodeStatus LaneChangeAction::tick()
         goal_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
         goal_pose.s = traj_with_goal->second;
         double offset = std::fabs(math::geometry::getRelativePose(
-                                    traffic_simulator::lanelet2::other::toMapPose(along_pose).pose,
-                                    traffic_simulator::lanelet2::other::toMapPose(goal_pose).pose)
+                                    traffic_simulator::lanelet2::pose::toMapPose(along_pose).pose,
+                                    traffic_simulator::lanelet2::pose::toMapPose(goal_pose).pose)
                                     .position.y);
         switch (lane_change_parameters_->constraint.type) {
           case traffic_simulator::lane_change::Constraint::Type::NONE:
@@ -256,7 +256,7 @@ BT::NodeStatus LaneChangeAction::tick()
       lanelet_pose.offset = 0;
       entity_status_updated.lanelet_pose = lanelet_pose;
       entity_status_updated.lanelet_pose_valid = true;
-      entity_status_updated.pose = traffic_simulator::lanelet2::other::toMapPose(lanelet_pose).pose;
+      entity_status_updated.pose = traffic_simulator::lanelet2::pose::toMapPose(lanelet_pose).pose;
       entity_status_updated.action_status = getActionStatus();
       setOutput(
         "non_canonicalized_updated_status",

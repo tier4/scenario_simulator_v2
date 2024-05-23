@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <traffic_simulator/behavior/route_planner.hpp>
+#include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/lanelet/route.hpp>
 
 namespace traffic_simulator
@@ -41,7 +42,7 @@ auto RoutePlanner::getRouteLanelets(
   if (!route_) {
     return lanelet2::route::getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
   }
-  if (route_ && lanelet2::route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
+  if (route_ && lanelet2::other::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return lanelet2::route::getFollowingLanelets(
       lanelet_pose.lanelet_id, route_.value(), horizon, true);
   }
@@ -105,7 +106,7 @@ auto RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_p
       lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id);
     return;
   }
-  if (lanelet2::route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
+  if (lanelet2::other::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return;
   } else {
     route_ = lanelet2::route::getRoute(

@@ -26,6 +26,12 @@ namespace lanelet2
 {
 namespace other
 {
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool
+{
+  return std::find_if(route.begin(), route.end(), [lanelet_id](const auto id) {
+           return lanelet_id == id;
+         }) != route.end();
+}
 
 auto getLaneletIds() -> lanelet::Ids
 {
@@ -34,6 +40,16 @@ auto getLaneletIds() -> lanelet::Ids
     ids.push_back(lanelet.id());
   }
   return ids;
+}
+
+auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
+{
+  return other::toPolygon(Memory::laneletMap()->laneletLayer.get(lanelet_id).leftBound());
+}
+
+auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
+{
+  return other::toPolygon(Memory::laneletMap()->laneletLayer.get(lanelet_id).rightBound());
 }
 
 auto getLaneletLength(const lanelet::Id lanelet_id) -> double
@@ -105,18 +121,6 @@ auto getCenterPointsSpline(const lanelet::Id lanelet_id)
   return Memory::centerPointsCache().getCenterPointsSpline(lanelet_id);
 }
 
-auto getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Ids
-{
-  lanelet::Ids ids;
-  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
-  for (const auto & shoulder_lanelet : Memory::shoulderLanelets()) {
-    if (lanelet::geometry::follows(lanelet, shoulder_lanelet)) {
-      ids.push_back(shoulder_lanelet.id());
-    }
-  }
-  return ids;
-}
-
 auto getNextLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -162,18 +166,6 @@ auto getNextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & tur
   return sortAndUnique(ids);
 }
 
-auto getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Ids
-{
-  lanelet::Ids ids;
-  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
-  for (const auto & shoulder_lanelet : Memory::shoulderLanelets()) {
-    if (lanelet::geometry::follows(shoulder_lanelet, lanelet)) {
-      ids.push_back(shoulder_lanelet.id());
-    }
-  }
-  return ids;
-}
-
 auto getPreviousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   lanelet::Ids ids;
@@ -217,54 +209,6 @@ auto getPreviousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string &
     ids += other::getPreviousLaneletIds(id, turn_direction);
   }
   return sortAndUnique(ids);
-}
-
-auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch)
-  -> geometry_msgs::msg::PoseStamped
-{
-  if (
-    const auto pose = std::get<std::optional<traffic_simulator_msgs::msg::LaneletPose>>(
-      pose::canonicalizeLaneletPose(lanelet_pose))) {
-    geometry_msgs::msg::PoseStamped ret;
-    ret.header.frame_id = "map";
-    const auto spline = getCenterPointsSpline(pose->lanelet_id);
-    ret.pose = spline->getPose(pose->s);
-    const auto normal_vec = spline->getNormalVector(pose->s);
-    const auto diff = math::geometry::normalize(normal_vec) * pose->offset;
-    ret.pose.position = ret.pose.position + diff;
-    const auto tangent_vec = spline->getTangentVector(pose->s);
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0.0;
-    rpy.y = fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0;
-    rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
-    ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy) *
-                           quaternion_operation::convertEulerAngleToQuaternion(pose->rpy);
-    return ret;
-  } else {
-    THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
-      ",offset=", lanelet_pose.offset, ",rpy.x=", lanelet_pose.rpy.x, ",rpy.y=", lanelet_pose.rpy.y,
-      ",rpy.z=", lanelet_pose.rpy.z, ") is invalid, please check lanelet length and connection.");
-  }
-}
-
-auto toPolygon(const lanelet::ConstLineString3d & line_string)
-  -> std::vector<geometry_msgs::msg::Point>
-{
-  std::vector<geometry_msgs::msg::Point> ret;
-  for (const auto & p : line_string) {
-    geometry_msgs::msg::Point point;
-    point.x = p.x();
-    point.y = p.y();
-    point.z = p.z();
-    ret.emplace_back(point);
-  }
-  return ret;
-}
-
-auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
-{
-  return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
 }
 
 auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
@@ -356,12 +300,58 @@ auto generateMarker() -> visualization_msgs::msg::MarkerArray
   return markers;
 }
 
+namespace
+{
+auto getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : Memory::shoulderLanelets()) {
+    if (lanelet::geometry::follows(lanelet, shoulder_lanelet)) {
+      ids.push_back(shoulder_lanelet.id());
+    }
+  }
+  return ids;
+}
+
+auto getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : Memory::shoulderLanelets()) {
+    if (lanelet::geometry::follows(shoulder_lanelet, lanelet)) {
+      ids.push_back(shoulder_lanelet.id());
+    }
+  }
+  return ids;
+}
+
+auto toPolygon(const lanelet::ConstLineString3d & line_string)
+  -> std::vector<geometry_msgs::msg::Point>
+{
+  std::vector<geometry_msgs::msg::Point> ret;
+  for (const auto & p : line_string) {
+    geometry_msgs::msg::Point point;
+    point.x = p.x();
+    point.y = p.y();
+    point.z = p.z();
+    ret.emplace_back(point);
+  }
+  return ret;
+}
+
 auto insertMarkerArray(
   visualization_msgs::msg::MarkerArray & a1, const visualization_msgs::msg::MarkerArray & a2)
   -> void
 {
   a1.markers.insert(a1.markers.end(), a2.markers.begin(), a2.markers.end());
 }
+
+auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
+{
+  return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
+}
+}  // namespace
 }  // namespace other
 }  // namespace lanelet2
 }  // namespace traffic_simulator

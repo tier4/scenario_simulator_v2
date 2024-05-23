@@ -21,24 +21,6 @@ namespace lanelet2
 {
 namespace traffic_lights
 {
-auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traffic_light_way_id)
-  -> lanelet::Ids
-{
-  assert(isTrafficLight(traffic_light_way_id));
-  lanelet::Ids traffic_light_regulatory_element_ids;
-  for (const auto & regulatory_element : Memory::laneletMap()->regulatoryElementLayer) {
-    if (regulatory_element->attribute(lanelet::AttributeName::Subtype).value() == "traffic_light") {
-      for (const auto & ref_member :
-           regulatory_element->getParameters<lanelet::ConstLineString3d>("refers")) {
-        if (ref_member.id() == traffic_light_way_id) {
-          traffic_light_regulatory_element_ids.push_back(regulatory_element->id());
-        }
-      }
-    }
-  }
-  return traffic_light_regulatory_element_ids;
-}
-
 auto getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
 {
@@ -85,21 +67,6 @@ auto getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
         p.z = point.z();
         current_stop_line.emplace_back(p);
       }
-    }
-  }
-  return ret;
-}
-
-auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
-  -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
-{
-  std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
-  for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
-    const auto traffic_lights =
-      lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
-    for (const auto & traffic_light : traffic_lights) {
-      ret.emplace_back(traffic_light);
     }
   }
   return ret;
@@ -189,6 +156,44 @@ auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::
   }
   return std::nullopt;
 }
+
+auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traffic_light_way_id)
+  -> lanelet::Ids
+{
+  assert(isTrafficLight(traffic_light_way_id));
+  lanelet::Ids traffic_light_regulatory_element_ids;
+  for (const auto & regulatory_element : Memory::laneletMap()->regulatoryElementLayer) {
+    if (regulatory_element->attribute(lanelet::AttributeName::Subtype).value() == "traffic_light") {
+      for (const auto & ref_member :
+           regulatory_element->getParameters<lanelet::ConstLineString3d>("refers")) {
+        if (ref_member.id() == traffic_light_way_id) {
+          traffic_light_regulatory_element_ids.push_back(regulatory_element->id());
+        }
+      }
+    }
+  }
+  return traffic_light_regulatory_element_ids;
+}
+
+namespace
+{
+
+auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
+  -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
+{
+  std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+    const auto traffic_lights =
+      lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
+    for (const auto & traffic_light : traffic_lights) {
+      ret.emplace_back(traffic_light);
+    }
+  }
+  return ret;
+}
+
+}  // namespace
 }  // namespace traffic_lights
 }  // namespace lanelet2
 }  // namespace traffic_simulator

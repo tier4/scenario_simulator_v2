@@ -25,6 +25,8 @@ namespace lanelet2
 {
 namespace other
 {
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
+
 template <typename Lanelet>
 auto getLaneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
 {
@@ -34,6 +36,10 @@ auto getLaneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
     [](const auto & lanelet) { return lanelet.id(); });
   return ids;
 }
+
+auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
+
+auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
 
 auto getLaneletIds() -> lanelet::Ids;
 
@@ -45,8 +51,6 @@ auto getCenterPointsSpline(const lanelet::Id) -> std::shared_ptr<math::geometry:
 
 auto getLaneletLength(const lanelet::Id lanelet_id) -> double;
 
-auto getNextRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
-
 auto getNextLaneletIds(const lanelet::Ids &) -> lanelet::Ids;
 
 auto getNextLaneletIds(const lanelet::Ids &, const std::string & turn_direction) -> lanelet::Ids;
@@ -54,8 +58,6 @@ auto getNextLaneletIds(const lanelet::Ids &, const std::string & turn_direction)
 auto getNextLaneletIds(const lanelet::Id) -> lanelet::Ids;
 
 auto getNextLaneletIds(const lanelet::Id, const std::string & turn_direction) -> lanelet::Ids;
-
-auto getPreviousRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
 
 auto getPreviousLaneletIds(const lanelet::Ids &) -> lanelet::Ids;
 
@@ -66,13 +68,7 @@ auto getPreviousLaneletIds(const lanelet::Id) -> lanelet::Ids;
 
 auto getPreviousLaneletIds(const lanelet::Id, const std::string & turn_direction) -> lanelet::Ids;
 
-auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &, const bool fill_pitch = true)
-  -> geometry_msgs::msg::PoseStamped;
-
-auto toPolygon(const lanelet::ConstLineString3d & line_string)
-  -> std::vector<geometry_msgs::msg::Point>;
-
-auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
+// Polygon and marker
 
 auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
 
@@ -80,8 +76,20 @@ auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_ms
 
 auto generateMarker() -> visualization_msgs::msg::MarkerArray;
 
+namespace
+{
+auto getNextRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
+
+auto getPreviousRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
+
+auto toPolygon(const lanelet::ConstLineString3d & line_string)
+  -> std::vector<geometry_msgs::msg::Point>;
+
+auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
+
 auto insertMarkerArray(
   visualization_msgs::msg::MarkerArray &, const visualization_msgs::msg::MarkerArray &) -> void;
+}  // namespace
 }  // namespace other
 }  // namespace lanelet2
 }  // namespace traffic_simulator

@@ -24,9 +24,9 @@
 #include <simple_sensor_simulator/simple_sensor_simulator.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
+#include <traffic_simulator/utils/lanelet/memory.hpp>
 #include <utility>
 #include <vector>
-#include <traffic_simulator/utils/lanelet/memory.hpp>
 
 namespace simple_sensor_simulator
 {

@@ -62,7 +62,7 @@ auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::
 
 auto toMapPose(const LaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
 {
-  return lanelet2::other::toMapPose(
+  return lanelet2::pose::toMapPose(
            lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
     .pose;
 }

@@ -24,20 +24,6 @@ namespace lanelet2
 {
 namespace distance
 {
-auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d
-{
-  lanelet::ConstLineStrings3d ret;
-  for (const auto & traffic_sign :
-       traffic_lights::getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
-    if (traffic_sign->type() == "stop_sign") {
-      for (const auto & stop_line : traffic_sign->refLines()) {
-        ret.emplace_back(stop_line);
-      }
-    }
-  }
-  return ret;
-}
-
 auto getLateralDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change)
@@ -62,14 +48,14 @@ auto getLateralDistance(
 
         if (
           auto next_lanelet_origin_from_current_lanelet =
-            pose::toLaneletPose(other::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
+            pose::toLaneletPose(pose::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
           lateral_distance_by_lane_change += next_lanelet_origin_from_current_lanelet->offset;
         } else {
           traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
           current_lanelet_pose.lanelet_id = route[i];
           if (
-            auto current_lanelet_origin_from_next_lanelet = pose::toLaneletPose(
-              other::toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
+            auto current_lanelet_origin_from_next_lanelet =
+              pose::toLaneletPose(pose::toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
             lateral_distance_by_lane_change -= current_lanelet_origin_from_next_lanelet->offset;
           } else {
             return std::nullopt;
@@ -127,14 +113,14 @@ auto getLongitudinalDistance(
 
       if (
         auto next_lanelet_origin_from_current_lanelet =
-          pose::toLaneletPose(other::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
+          pose::toLaneletPose(pose::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
         distance += next_lanelet_origin_from_current_lanelet->s;
       } else {
         traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
         current_lanelet_pose.lanelet_id = route[i];
         if (
           auto current_lanelet_origin_from_next_lanelet =
-            pose::toLaneletPose(other::toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
+            pose::toLaneletPose(pose::toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
           distance -= current_lanelet_origin_from_next_lanelet->s;
         } else {
           return std::nullopt;
@@ -303,6 +289,24 @@ auto getDistanceToTrafficLightStopLine(
   }
   return std::nullopt;
 }
+
+namespace
+{
+auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d
+{
+  lanelet::ConstLineStrings3d ret;
+  for (const auto & traffic_sign :
+       traffic_lights::getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
+    if (traffic_sign->type() == "stop_sign") {
+      for (const auto & stop_line : traffic_sign->refLines()) {
+        ret.emplace_back(stop_line);
+      }
+    }
+  }
+  return ret;
+}
+
+}  // namespace
 }  // namespace distance
 }  // namespace lanelet2
 }  // namespace traffic_simulator

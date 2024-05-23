@@ -17,6 +17,7 @@
 #include <traffic_simulator/utils/lanelet/lane_change.hpp>
 #include <traffic_simulator/utils/lanelet/memory.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -144,10 +145,10 @@ auto getLaneChangeTrajectory(
   const auto along_pose = getAlongLaneletPose(from_pose, longitudinal_distance);
   // clang-format off
   const auto left_point =
-    other::toMapPose(traffic_simulator::helper::constructLaneletPose(
+    pose::toMapPose(traffic_simulator::helper::constructLaneletPose(
       along_pose.lanelet_id, along_pose.s, along_pose.offset + 5.0)).pose.position;
   const auto right_point =
-    other::toMapPose(traffic_simulator::helper::constructLaneletPose(
+    pose::toMapPose(traffic_simulator::helper::constructLaneletPose(
       along_pose.lanelet_id, along_pose.s, along_pose.offset - 5.0)).pose.position;
   // clang-format on
   const auto collision_point = other::getCenterPointsSpline(lane_change_parameter.target.lanelet_id)
@@ -158,15 +159,15 @@ auto getLaneChangeTrajectory(
   const auto to_pose = traffic_simulator::helper::constructLaneletPose(
     lane_change_parameter.target.lanelet_id, collision_point.value(),
     lane_change_parameter.target.offset);
-  const auto goal_pose_in_map = other::toMapPose(to_pose).pose;
-  const auto from_pose_in_map = other::toMapPose(from_pose).pose;
+  const auto goal_pose_in_map = pose::toMapPose(to_pose).pose;
+  const auto from_pose_in_map = pose::toMapPose(from_pose).pose;
   double start_to_goal_distance = std::sqrt(
     std::pow(from_pose_in_map.position.x - goal_pose_in_map.position.x, 2) +
     std::pow(from_pose_in_map.position.y - goal_pose_in_map.position.y, 2) +
     std::pow(from_pose_in_map.position.z - goal_pose_in_map.position.z, 2));
 
   auto traj = getLaneChangeTrajectory(
-    other::toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape,
+    pose::toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape,
     start_to_goal_distance * 0.5);
   return std::make_pair(traj, collision_point.value());
 }
@@ -183,7 +184,7 @@ auto getLaneChangeTrajectory(
   std::vector<math::geometry::HermiteCurve> curves;
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
-    auto goal_pose = other::toMapPose(traffic_simulator::helper::constructLaneletPose(
+    auto goal_pose = pose::toMapPose(traffic_simulator::helper::constructLaneletPose(
       lane_change_parameter.target.lanelet_id, to_s));
     if (
       math::geometry::getRelativePose(from_pose, goal_pose.pose).position.x <=
@@ -214,24 +215,6 @@ auto getLaneChangeTrajectory(
   return std::make_pair(curves[min_index], target_s[min_index]);
 }
 
-auto getVectorFromPose(const geometry_msgs::msg::Pose & pose, const double magnitude)
-  -> geometry_msgs::msg::Vector3
-{
-  geometry_msgs::msg::Vector3 dir =
-    quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
-  geometry_msgs::msg::Vector3 vector;
-  vector.x = magnitude * std::cos(dir.z);
-  vector.y = magnitude * std::sin(dir.z);
-  vector.z = 0;
-  return vector;
-}
-
-auto getTangentVector(const lanelet::Id lanelet_id, const double s)
-  -> std::optional<geometry_msgs::msg::Vector3>
-{
-  return other::getCenterPointsSpline(lanelet_id)->getTangentVector(s);
-}
-
 auto getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
@@ -240,7 +223,7 @@ auto getLaneChangeTrajectory(
 {
   geometry_msgs::msg::Vector3 start_vec;
   geometry_msgs::msg::Vector3 to_vec;
-  geometry_msgs::msg::Pose goal_pose = other::toMapPose(to_pose).pose;
+  geometry_msgs::msg::Pose goal_pose = pose::toMapPose(to_pose).pose;
   double tangent_vector_size_in_curve = 0.0;
   switch (trajectory_shape) {
     case traffic_simulator::lane_change::TrajectoryShape::CUBIC:
@@ -269,6 +252,27 @@ auto getLaneChangeTrajectory(
       .y(to_vec.y * tangent_vector_size_in_curve)
       .z(to_vec.z * tangent_vector_size_in_curve));
 }
+
+namespace
+{
+auto getVectorFromPose(const geometry_msgs::msg::Pose & pose, const double magnitude)
+  -> geometry_msgs::msg::Vector3
+{
+  geometry_msgs::msg::Vector3 dir =
+    quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
+  geometry_msgs::msg::Vector3 vector;
+  vector.x = magnitude * std::cos(dir.z);
+  vector.y = magnitude * std::sin(dir.z);
+  vector.z = 0;
+  return vector;
+}
+
+auto getTangentVector(const lanelet::Id lanelet_id, const double s)
+  -> std::optional<geometry_msgs::msg::Vector3>
+{
+  return other::getCenterPointsSpline(lanelet_id)->getTangentVector(s);
+}
+}  // namespace
 }  // namespace lane_change
 }  // namespace lanelet2
 }  // namespace traffic_simulator

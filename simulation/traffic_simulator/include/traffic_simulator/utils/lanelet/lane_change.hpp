@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__UTILS__LANELET_LANE_CHANGE_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
+
 #include <geometry/spline/hermite_curve.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -26,17 +27,11 @@ namespace lanelet2
 {
 namespace lane_change
 {
-auto getVectorFromPose(const geometry_msgs::msg::Pose & pose, const double magnitude)
-  -> geometry_msgs::msg::Vector3;
-
-auto getTangentVector(const lanelet::Id lanelet_id, const double s)
-  -> std::optional<geometry_msgs::msg::Vector3>;
+auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool;
 
 auto getAlongLaneletPose(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose, const double along)
   -> traffic_simulator_msgs::msg::LaneletPose;
-
-auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool;
 
 auto getLaneChangeableLaneletId(const lanelet::Id, const traffic_simulator::lane_change::Direction)
   -> std::optional<lanelet::Id>;
@@ -62,6 +57,15 @@ auto getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const double tangent_vector_size) -> math::geometry::HermiteCurve;
+
+namespace
+{
+auto getVectorFromPose(const geometry_msgs::msg::Pose & pose, const double magnitude)
+  -> geometry_msgs::msg::Vector3;
+
+auto getTangentVector(const lanelet::Id lanelet_id, const double s)
+  -> std::optional<geometry_msgs::msg::Vector3>;
+}  // namespace
 }  // namespace lane_change
 }  // namespace lanelet2
 }  // namespace traffic_simulator

@@ -17,9 +17,10 @@
 #define TRAFFIC_SIMULATOR__UTILS__LANELET_DISTANCE_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
-#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
+
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
+#include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
@@ -27,8 +28,6 @@ namespace lanelet2
 {
 namespace distance
 {
-auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
-
 auto getLateralDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
   const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change)
@@ -62,6 +61,11 @@ auto getDistanceToTrafficLightStopLine(
 auto getDistanceToTrafficLightStopLine(
   const math::geometry::CatmullRomSplineInterface & spline, const lanelet::Id traffic_light_id)
   -> std::optional<double>;
+
+namespace
+{
+auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
+}
 }  // namespace distance
 }  // namespace lanelet2
 }  // namespace traffic_simulator

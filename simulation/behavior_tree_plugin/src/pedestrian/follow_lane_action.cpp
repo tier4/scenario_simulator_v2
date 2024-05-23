@@ -19,9 +19,8 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <vector>
 #include <traffic_simulator/utils/lanelet/route.hpp>
-
+#include <vector>
 
 namespace entity_behavior
 {

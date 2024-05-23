@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__UTILS__LANELET_ROUTE_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
+
 #include <geometry_msgs/msg/point.hpp>
 
 namespace traffic_simulator
@@ -34,15 +35,9 @@ auto getFollowingLanelets(
 auto getFollowingLanelets(
   const lanelet::Id, const double distance = 100, const bool include_self = true) -> lanelet::Ids;
 
-auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
+auto getPreviousLanelets(const lanelet::Id, const double distance = 100) -> lanelet::Ids;
 
 auto getSpeedLimit(const lanelet::Ids & lanelet_ids) -> double;
-
-auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
-
-auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
-
-auto getPreviousLanelets(const lanelet::Id, const double distance = 100) -> lanelet::Ids;
 
 auto getRightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
   -> std::unordered_map<lanelet::Id, lanelet::Ids>;

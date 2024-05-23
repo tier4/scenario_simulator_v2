@@ -25,9 +25,9 @@
 #include <string>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator/utils/lanelet/distance.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator/utils/lanelet/route.hpp>
 #include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
 #include <unordered_map>
@@ -441,7 +441,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
       entity_status_updated.action_status.accel = accel_new;
       entity_status_updated.action_status.linear_jerk = linear_jerk_new;
       entity_status_updated.pose =
-        traffic_simulator::lanelet2::other::toMapPose(canonicalized_lanelet_pose.value()).pose;
+        traffic_simulator::lanelet2::pose::toMapPose(canonicalized_lanelet_pose.value()).pose;
     }
     return entity_status_updated;
   } else {
@@ -464,7 +464,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
           entity_status_updated.action_status.accel = accel_new;
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
           entity_status_updated.pose =
-            traffic_simulator::lanelet2::other::toMapPose(end_of_road_lanelet_pose).pose;
+            traffic_simulator::lanelet2::pose::toMapPose(end_of_road_lanelet_pose).pose;
         }
         return entity_status_updated;
       } else {
@@ -485,7 +485,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
           entity_status_updated.action_status.accel = accel_new;
           entity_status_updated.action_status.linear_jerk = linear_jerk_new;
           entity_status_updated.pose =
-            traffic_simulator::lanelet2::other::toMapPose(end_of_road_lanelet_pose).pose;
+            traffic_simulator::lanelet2::pose::toMapPose(end_of_road_lanelet_pose).pose;
         }
         return entity_status_updated;
       }

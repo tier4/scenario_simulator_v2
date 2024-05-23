@@ -18,8 +18,8 @@
 #include <memory>
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
 #include <string>
+#include <traffic_simulator/utils/lanelet/route.hpp>
 #include <vector>
 
 namespace entity_behavior

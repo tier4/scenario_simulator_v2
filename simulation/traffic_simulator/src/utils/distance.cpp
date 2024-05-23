@@ -188,7 +188,7 @@ auto distanceToLeftLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id) -> double
 {
-  if (const auto bound = lanelet2::route::getLeftBound(lanelet_id); bound.empty()) {
+  if (const auto bound = lanelet2::other::getLeftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
   } else if (const auto polygon =
@@ -216,7 +216,7 @@ auto distanceToRightLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id) -> double
 {
-  if (const auto bound = lanelet2::route::getRightBound(lanelet_id); bound.empty()) {
+  if (const auto bound = lanelet2::other::getRightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");

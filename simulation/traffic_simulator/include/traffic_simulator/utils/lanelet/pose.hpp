@@ -15,8 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_POSE_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__LANELET_POSE_HPP_
 
-#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <lanelet2_matching/LaneletMatching.h>
+
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 
 namespace traffic_simulator
@@ -25,35 +26,8 @@ namespace lanelet2
 {
 namespace pose
 {
-auto excludeSubtypeLanelets(
-  const std::vector<std::pair<double, lanelet::Lanelet>> &, const char subtype[])
-  -> std::vector<std::pair<double, lanelet::Lanelet>>;
-
-auto toPoint2d(const geometry_msgs::msg::Point &) -> lanelet::BasicPoint2d;
-
-auto absoluteHull(const lanelet::BasicPolygon2d & relative_hull, const lanelet::matching::Pose2d &)
-  -> lanelet::BasicPolygon2d;
-
-auto getNearbyLaneletIds(
-  const geometry_msgs::msg::Point &, const double distance_threshold, const bool include_crosswalk,
-  const std::size_t search_count = 5) -> lanelet::Ids;
-
-auto getNearbyLaneletIds(
-  const geometry_msgs::msg::Point &, const double distance_threshold,
-  const std::size_t search_count = 5) -> lanelet::Ids;
-
-auto getLeftLaneletIds(
-  const lanelet::Id, const traffic_simulator_msgs::msg::EntityType &,
-  const bool include_opposite_direction = true) -> lanelet::Ids;
-
-auto getRightLaneletIds(
-  lanelet::Id, traffic_simulator_msgs::msg::EntityType, bool include_opposite_direction = true)
-  -> lanelet::Ids;
-
-auto matchToLane(
-  const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
-  const bool include_crosswalk, const double matching_distance = 1.0,
-  const double reduction_ratio = 0.8) -> std::optional<lanelet::Id>;
+auto toMapPose(const traffic_simulator_msgs::msg::LaneletPose &, const bool fill_pitch = true)
+  -> geometry_msgs::msg::PoseStamped;
 
 auto toLaneletPose(
   const geometry_msgs::msg::Pose &, const bool include_crosswalk,
@@ -89,6 +63,40 @@ auto canonicalizeLaneletPose(
   const lanelet::Ids & route_lanelets)
   -> std::tuple<
     std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<lanelet::Id>>;
+
+// private for pose namespace
+namespace
+{
+auto matchToLane(
+  const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
+  const bool include_crosswalk, const double matching_distance = 1.0,
+  const double reduction_ratio = 0.8) -> std::optional<lanelet::Id>;
+
+auto excludeSubtypeLanelets(
+  const std::vector<std::pair<double, lanelet::Lanelet>> &, const char subtype[])
+  -> std::vector<std::pair<double, lanelet::Lanelet>>;
+
+auto toPoint2d(const geometry_msgs::msg::Point &) -> lanelet::BasicPoint2d;
+
+auto absoluteHull(const lanelet::BasicPolygon2d & relative_hull, const lanelet::matching::Pose2d &)
+  -> lanelet::BasicPolygon2d;
+
+auto getNearbyLaneletIds(
+  const geometry_msgs::msg::Point &, const double distance_threshold, const bool include_crosswalk,
+  const std::size_t search_count = 5) -> lanelet::Ids;
+
+auto getNearbyLaneletIds(
+  const geometry_msgs::msg::Point &, const double distance_threshold,
+  const std::size_t search_count = 5) -> lanelet::Ids;
+
+auto getLeftLaneletIds(
+  const lanelet::Id, const traffic_simulator_msgs::msg::EntityType &,
+  const bool include_opposite_direction = true) -> lanelet::Ids;
+
+auto getRightLaneletIds(
+  lanelet::Id, traffic_simulator_msgs::msg::EntityType, bool include_opposite_direction = true)
+  -> lanelet::Ids;
+}  // namespace
 }  // namespace pose
 }  // namespace lanelet2
 }  // namespace traffic_simulator

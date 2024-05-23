@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/utility/Units.h>
+
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet/memory.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/lanelet/route.hpp>
-#include <lanelet2_core/utility/Units.h>
 
 namespace traffic_simulator
 {
@@ -118,13 +119,6 @@ auto getFollowingLanelets(
   return ret;
 }
 
-auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool
-{
-  return std::find_if(route.begin(), route.end(), [lanelet_id](const auto id) {
-           return lanelet_id == id;
-         }) != route.end();
-}
-
 auto getSpeedLimit(const lanelet::Ids & lanelet_ids) -> double
 {
   std::vector<double> limits;
@@ -137,16 +131,6 @@ auto getSpeedLimit(const lanelet::Ids & lanelet_ids) -> double
     limits.push_back(lanelet::units::KmHQuantity(limit.speedLimit).value() / 3.6);
   }
   return *std::min_element(limits.begin(), limits.end());
-}
-
-auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
-{
-  return other::toPolygon(Memory::laneletMap()->laneletLayer.get(lanelet_id).leftBound());
-}
-
-auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
-{
-  return other::toPolygon(Memory::laneletMap()->laneletLayer.get(lanelet_id).rightBound());
 }
 
 auto getPreviousLanelets(const lanelet::Id lanelet_id, const double distance) -> lanelet::Ids
