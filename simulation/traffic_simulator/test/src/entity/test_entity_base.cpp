@@ -654,10 +654,10 @@ TEST(EntityBase, updateTraveledDistance_startedMoving)
   dummy.startNpcLogic();
   dummy.setLinearVelocity(velocity);
 
-  EXPECT_EQ(1 * step_time * velocity, dummy.updateTraveledDistance(step_time));
-  EXPECT_EQ(2 * step_time * velocity, dummy.updateTraveledDistance(step_time));
-  EXPECT_EQ(3 * step_time * velocity, dummy.updateTraveledDistance(step_time));
-  EXPECT_EQ(4 * step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(1.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(2.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(3.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(4.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
 }
 
 TEST(EntityBase, updateTraveledDistance_notStarted)
@@ -711,7 +711,7 @@ TEST(EntityBase, getDistanceToLeftLaneBound_one)
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   auto distance_result = dummy.getDistanceToLeftLaneBound(id);
-  double distance_actual = (lane_width - bbox.dimensions.y) / 2 - entity_center_offset;
+  double distance_actual = (lane_width - bbox.dimensions.y) / 2.0 - entity_center_offset;
   EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
 
@@ -729,7 +729,7 @@ TEST(EntityBase, getDistanceToRightLaneBound_one)
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
 
   auto distance_result = dummy.getDistanceToRightLaneBound(id);
-  double distance_actual = (lane_width - bbox.dimensions.y) / 2 + entity_center_offset;
+  double distance_actual = (lane_width - bbox.dimensions.y) / 2.0 + entity_center_offset;
   EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
 
@@ -748,8 +748,8 @@ TEST(EntityBase, getDistanceToLaneBound_one)
 
   auto distance_result = dummy.getDistanceToLaneBound(id);
   double distance_actual = std::min(
-    (lane_width - bbox.dimensions.y) / 2 - entity_center_offset,
-    (lane_width - bbox.dimensions.y) / 2 + entity_center_offset);
+    (lane_width - bbox.dimensions.y) / 2.0 - entity_center_offset,
+    (lane_width - bbox.dimensions.y) / 2.0 + entity_center_offset);
   EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
 
@@ -770,7 +770,7 @@ TEST(EntityBase, getDistanceToLeftLaneBound)
   dummy._setRouteLanelets({id_previous, id, id_next});
 
   auto distance_result = dummy.getDistanceToLeftLaneBound();
-  double distance_actual = (lane_width - bbox.dimensions.y) / 2 - entity_center_offset;
+  double distance_actual = (lane_width - bbox.dimensions.y) / 2.0 - entity_center_offset;
   EXPECT_NEAR(distance_result, distance_actual, 0.1);
 }
 
