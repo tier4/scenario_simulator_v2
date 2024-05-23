@@ -38,7 +38,7 @@ struct SelectedEntities : public ComplexType
 {
   const std::list<Entity> entityRef;
 
-  const std::list<ByType> byTypes;
+  const std::list<ByType> byType;
 
   explicit SelectedEntities(const pugi::xml_node &, Scope &);
 };

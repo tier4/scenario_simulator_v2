@@ -30,7 +30,7 @@ inline namespace syntax
 {
 SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
 : entityRef(readElements<Entity, 0>("EntityRef", tree, scope)),
-  byTypes(readElements<ByType, 0>("ByType", tree, scope))
+  byType(readElements<ByType, 0>("ByType", tree, scope))
 {
   // clang-format off
   // This function call is added to check the correctness of the syntax.

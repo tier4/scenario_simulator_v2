@@ -61,7 +61,7 @@ auto EntitySelection::objectTypes() const -> std::set<ObjectType::value_type>
       result.merge(entity_ref.objectTypes());
     }
   } else {
-    result.insert(byTypes.cbegin(), byTypes.cend());
+    result.insert(byType.cbegin(), byType.cend());
   }
   return result;
 }
