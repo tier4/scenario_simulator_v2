@@ -26,6 +26,10 @@ namespace lanelet2
 auto Memory::activate(const std::string & lanelet_map_path) -> void
 {
   lanelet_map_path_ = lanelet_map_path;
+  if (instance) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    instance.reset();
+  }
 }
 
 Memory & Memory::getInstance()

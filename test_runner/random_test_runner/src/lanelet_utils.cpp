@@ -28,45 +28,6 @@
 #include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator/utils/lanelet/route.hpp>
-//
-// #include <geometry_msgs/msg/vector3.h>
-// #include <lanelet2_core/LaneletMap.h>
-// #include <lanelet2_core/geometry/Lanelet.h>
-// #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
-// #include <lanelet2_core/primitives/LaneletSequence.h>
-// #include <lanelet2_matching/LaneletMatching.h>
-// #include <lanelet2_routing/Route.h>
-// #include <lanelet2_routing/RoutingCost.h>
-// #include <lanelet2_routing/RoutingGraph.h>
-// #include <lanelet2_routing/RoutingGraphContainer.h>
-// #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
-// #include <tf2/LinearMath/Matrix3x3.h>
-
-// #include <autoware_auto_mapping_msgs/msg/had_map_bin.hpp>
-// #include <boost/filesystem.hpp>
-// #include <geographic_msgs/msg/geo_point.hpp>
-// #include <geometry/spline/catmull_rom_spline.hpp>
-// #include <geometry/spline/catmull_rom_spline_interface.hpp>
-// #include <geometry/spline/hermite_curve.hpp>
-// #include <geometry_msgs/msg/pose_stamped.hpp>
-// #include <lanelet2_extension/utility/message_conversion.hpp>
-// #include <lanelet2_extension/utility/query.hpp>
-// #include <lanelet2_extension/utility/utilities.hpp>
-// #include <map>
-// #include <memory>
-// #include <optional>
-// #include <rclcpp/rclcpp.hpp>
-// #include <string>
-// #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-// #include <traffic_simulator/data_type/lane_change.hpp>
-// // #include <traffic_simulator/hdmap_utils/cache.hpp>
-// #include <traffic_simulator_msgs/msg/bounding_box.hpp>
-// #include <traffic_simulator_msgs/msg/entity_status.hpp>
-// #include <tuple>
-// #include <unordered_map>
-// #include <utility>
-// #include <vector>
-// #include <visualization_msgs/msg/marker_array.hpp>
 
 LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 {

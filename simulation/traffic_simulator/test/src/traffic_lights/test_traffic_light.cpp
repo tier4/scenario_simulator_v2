@@ -19,6 +19,7 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator/utils/lanelet/memory.hpp>
 
 TEST(TrafficLight, Color)
 {
@@ -328,7 +329,8 @@ TEST(TrafficLight, TrafficLight)
   using Status = TrafficLight::Status;
   using Shape = TrafficLight::Shape;
 
-  /// @todo set ros params
+  traffic_simulator::lanelet2::Memory::activate(ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm");
+
   {
     auto traffic_light = TrafficLight(34802);
 

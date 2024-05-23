@@ -17,12 +17,15 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <geographic_msgs/msg/geo_point.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+#include <traffic_simulator/utils/lanelet/memory.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 
 TEST(TrafficLightManager, getIds)
 {
   const auto node = std::make_shared<rclcpp::Node>("getIds");
-  /// @todo set ros params
+  std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+  traffic_simulator::lanelet2::Memory::activate(path);
   traffic_simulator::TrafficLightManager manager;
   manager.getTrafficLight(34836);
   EXPECT_FALSE(manager.getTrafficLights().find(34836) == std::end(manager.getTrafficLights()));
@@ -34,7 +37,9 @@ TEST(TrafficLightManager, getIds)
 TEST(TrafficLightManager, setColor)
 {
   const auto node = std::make_shared<rclcpp::Node>("setColor");
-  /// @todo set ros params
+  std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+  traffic_simulator::lanelet2::Memory::activate(path);
   traffic_simulator::TrafficLightManager manager;
   for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
     using Color = traffic_simulator::TrafficLight::Color;
@@ -59,10 +64,7 @@ TEST(TrafficLightManager, setArrow)
   const auto node = std::make_shared<rclcpp::Node>("setArrow");
   std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  /// @todo set ros params
+  traffic_simulator::lanelet2::Memory::activate(path);
   traffic_simulator::TrafficLightManager manager;
   for (const auto & [id, traffic_light] : manager.getTrafficLights()) {
     using Color = traffic_simulator::TrafficLight::Color;
