@@ -369,10 +369,7 @@ public:
     const speed_change::Transition transition, const speed_change::Constraint constraint,
     const bool continuous);
 
-  auto updateNpcLogic(
-    const std::string & name,
-    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & type_list)
-    -> const CanonicalizedEntityStatus &;
+  auto updateNpcLogic(const std::string & name) -> const CanonicalizedEntityStatus &;
 
   void broadcastEntityTransform();
 
@@ -399,9 +396,6 @@ public:
   auto getEntityNames() const -> const std::vector<std::string>;
 
   auto getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus;
-
-  auto getEntityTypeList() const
-    -> const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType>;
 
   // clang-format off
   auto getBoundingBoxLaneLateralDistance(const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &, const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &, bool allow_lane_change = false) const -> std::optional<double>;
