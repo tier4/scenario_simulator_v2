@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <iterator>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 #include <openscenario_interpreter/syntax/entity_selection.hpp>
 #include <openscenario_interpreter/syntax/object_type.hpp>
@@ -24,8 +24,6 @@
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <set>
-
-#include "openscenario_interpreter/syntax/entity.hpp"
 
 namespace openscenario_interpreter
 {
@@ -39,45 +37,33 @@ EntitySelection::EntitySelection(const pugi::xml_node & node, Scope & scope)
 
 auto EntitySelection::objects() const -> std::set<Entity>
 {
-  return apply<std::set<SingleEntity>>(
-    overload(
-      [&](const SelectedEntityRefs & entity_refs) {
-        auto result = std::set<SingleEntity>{};
-        for (const auto & entity_ref : entity_refs.entityRefs) {
-          result.merge(entity_ref.objects());
-        }
-        return result;
-      },
-      [&](const SelectedByTypes &) {
-        auto result = std::set<SingleEntity>{};
-        auto types = objectTypes();
-        for (const auto & [name, object] : *global().entities) {
-          if (
-            object.is<ScenarioObject>() and types.count(object.as<ScenarioObject>().objectType())) {
-            result.emplace(name, *this);
-          }
-        }
-        return result;
-      }),
-    *this);
+  auto result = std::set<Entity>{};
+  if (not entityRef.empty()) {
+    for (const auto & entity_ref : entityRef) {
+      result.merge(entity_ref.objects());
+    }
+  } else {
+    auto types = objectTypes();
+    for (const auto & [name, object] : *global().entities) {
+      if (object.is<ScenarioObject>() and types.count(object.as<ScenarioObject>().objectType())) {
+        result.emplace(name, *this);
+      }
+    }
+  }
+  return result;
 }
 
 auto EntitySelection::objectTypes() const -> std::set<ObjectType::value_type>
 {
-  return apply<std::set<ObjectType::value_type>>(
-    overload(
-      [&](const SelectedEntityRefs & entity_refs) {
-        auto result = std::set<ObjectType::value_type>{};
-        for (const auto & entity_ref : entity_refs.entityRefs) {
-          result.merge(entity_ref.objectTypes());
-        }
-        return result;
-      },
-      [&](const SelectedByTypes & by_types) {
-        return std::set<ObjectType::value_type>{
-          std::begin(by_types.byTypes), std::end(by_types.byTypes)};
-      }),
-    *this);
+  auto result = std::set<ObjectType::value_type>{};
+  if (not entityRef.empty()) {
+    for (const auto & entity_ref : entityRef) {
+      result.merge(entity_ref.objectTypes());
+    }
+  } else {
+    result.insert(byTypes.cbegin(), byTypes.cend());
+  }
+  return result;
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

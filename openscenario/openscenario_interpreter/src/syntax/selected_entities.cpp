@@ -28,24 +28,17 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-SelectedEntityRefs::SelectedEntityRefs(const pugi::xml_node & tree, Scope & scope)
-: entityRefs(readElements<GroupedEntity, 0>("EntityRef", tree, scope))
-{
-}
-
-SelectedByTypes::SelectedByTypes(const pugi::xml_node & tree, Scope & scope)
-: byTypes(readElements<ByType, 0>("ByType", tree, scope))
-{
-}
-
 SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
-// clang-format off
-: ComplexType(
-    choice(tree,
-      std::make_pair("EntityRef", [&](const auto & tree) { return make<SelectedEntityRefs>(tree.parent(), scope); }),
-      std::make_pair(   "ByType", [&](const auto & tree) { return make<   SelectedByTypes>(tree.parent(), scope); })))
-// clang-format on
+: entityRef(readElements<Entity, 0>("EntityRef", tree, scope)),
+  byTypes(readElements<ByType, 0>("ByType", tree, scope))
 {
+  // clang-format off
+  // This function call is added to check the correctness of the syntax.
+  // DO NOT REMOVE unless syntax check is conducted in another way.
+  choice(tree,
+    std::pair{"EntityRef", [](const auto &) { return unspecified; }},
+    std::pair{"ByType",    [](const auto &) { return unspecified; }});
+  // clang-format on
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter
