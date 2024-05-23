@@ -2103,6 +2103,345 @@ TEST(HdMapUtils, getStopLinePolygon_invalidLaneletId)
   EXPECT_THROW(hdmap_utils.getStopLinePolygon(invalid_id), std::runtime_error);
 }
 
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnSpline)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3771.06, 73728.35);
+  auto waypoint_1 = makePoint(3756.30, 73755.87);
+  auto waypoint_2 = makePoint(3746.90, 73774.44);
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto traffic_light_id = lanelet::Id{34836};
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(spline, traffic_light_id);
+  EXPECT_TRUE(result_distance.has_value());
+
+  auto stopline_midpoint = makePoint(3767.00, 73736.47);
+  double approx_distance =
+    std::hypot(waypoint_0.x - stopline_midpoint.x, waypoint_0.y - stopline_midpoint.y);
+  double epsilon = 1.0;
+
+  EXPECT_NEAR(approx_distance, result_distance.value(), epsilon);
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_noTrafficLightOnSpline)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto traffic_light_id = lanelet::Id{34836};
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(spline, traffic_light_id);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnWaypoints)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3771.06, 73728.35);
+  auto waypoint_1 = makePoint(3756.30, 73755.87);
+  auto waypoint_2 = makePoint(3746.90, 73774.44);
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto traffic_light_id = lanelet::Id{34836};
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(waypoints, traffic_light_id);
+  EXPECT_TRUE(result_distance.has_value());
+
+  auto stopline_midpoint = makePoint(3767.00, 73736.47);
+  double approx_distance =
+    std::hypot(waypoint_0.x - stopline_midpoint.x, waypoint_0.y - stopline_midpoint.y);
+  double epsilon = 1.0;
+
+  EXPECT_NEAR(approx_distance, result_distance.value(), epsilon);
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_noTrafficLightOnWaypoints)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto traffic_light_id = lanelet::Id{34836};
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(waypoints, traffic_light_id);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_waypoints)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{};
+
+  auto traffic_light_id = lanelet::Id{34836};
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(waypoints, traffic_light_id);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnSpline)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3771.06, 73728.35);
+  auto waypoint_1 = makePoint(3756.30, 73755.87);
+  auto waypoint_2 = makePoint(3746.90, 73774.44);
+  auto lanelets = lanelet::Ids{34576, 34570, 34564};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(lanelets, spline);
+  EXPECT_TRUE(result_distance.has_value());
+
+  auto stopline_midpoint = makePoint(3767.00, 73736.47);
+  double approx_distance =
+    std::hypot(waypoint_0.x - stopline_midpoint.x, waypoint_0.y - stopline_midpoint.y);
+  double epsilon = 1.0;
+
+  EXPECT_NEAR(approx_distance, result_distance.value(), epsilon);
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnSplineCongruent)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto lanelets = lanelet::Ids{34690, 34759, 34576};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(lanelets, spline);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnSplineIncongruent)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto lanelets = lanelet::Ids{34576, 34570, 34564};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(lanelets, spline);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_splineRoute)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine({}, spline);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnWaypoints)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3771.06, 73728.35);
+  auto waypoint_1 = makePoint(3756.30, 73755.87);
+  auto waypoint_2 = makePoint(3746.90, 73774.44);
+  auto lanelets = lanelet::Ids{34576, 34570, 34564};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(lanelets, waypoints);
+  EXPECT_TRUE(result_distance.has_value());
+
+  auto stopline_midpoint = makePoint(3767.00, 73736.47);
+  double approx_distance =
+    std::hypot(waypoint_0.x - stopline_midpoint.x, waypoint_0.y - stopline_midpoint.y);
+  double epsilon = 1.0;
+
+  EXPECT_NEAR(approx_distance, result_distance.value(), epsilon);
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnWaypointsIncongruent)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto lanelets = lanelet::Ids{34690, 34759, 34576};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(lanelets, waypoints);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnWaypointsCongruent)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto lanelets = lanelet::Ids{34576, 34570, 34564};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine(lanelets, waypoints);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_waypointsRoute)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto result_distance = hdmap_utils.getDistanceToTrafficLightStopLine({}, waypoints);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToStopLine_stopLineOnSpline)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3821.86, 73777.20);
+  auto waypoint_1 = makePoint(3837.28, 73762.67);
+  auto waypoint_2 = makePoint(3846.10, 73741.38);
+  auto lanelets = lanelet::Ids{34780, 34675, 34744};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto result_distance = hdmap_utils.getDistanceToStopLine(lanelets, spline);
+  EXPECT_TRUE(result_distance.has_value());
+
+  auto stopline_midpoint = makePoint(3838.98, 73759.28);
+  double approx_distance =
+    std::hypot(waypoint_0.x - stopline_midpoint.x, waypoint_0.y - stopline_midpoint.y);
+  double epsilon = 1.0;
+
+  EXPECT_NEAR(approx_distance, result_distance.value(), epsilon);
+}
+
+TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnSplineIncongruent)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3821.86, 73777.20);
+  auto waypoint_1 = makePoint(3837.28, 73762.67);
+  auto waypoint_2 = makePoint(3846.10, 73741.38);
+  auto lanelets = lanelet::Ids{34576, 34570, 34564};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto result_distance = hdmap_utils.getDistanceToStopLine(lanelets, spline);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnSplineCongruent)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto lanelets = lanelet::Ids{34690, 34759, 34576};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto result_distance = hdmap_utils.getDistanceToStopLine(lanelets, spline);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToStopLine_emptyVector_spline)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+  auto spline = math::geometry::CatmullRomSpline(waypoints);
+
+  auto result_distance = hdmap_utils.getDistanceToStopLine({}, spline);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToStopLine_stopLineOnWaypoints)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3821.86, 73777.20);
+  auto waypoint_1 = makePoint(3837.28, 73762.67);
+  auto waypoint_2 = makePoint(3846.10, 73741.38);
+  auto lanelets = lanelet::Ids{34780, 34675, 34744};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto result_distance = hdmap_utils.getDistanceToStopLine(lanelets, waypoints);
+  EXPECT_TRUE(result_distance.has_value());
+
+  auto stopline_midpoint = makePoint(3838.98, 73759.28);
+  double approx_distance =
+    std::hypot(waypoint_0.x - stopline_midpoint.x, waypoint_0.y - stopline_midpoint.y);
+  double epsilon = 1.0;
+
+  EXPECT_NEAR(approx_distance, result_distance.value(), epsilon);
+}
+
+TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnWaypointsIncongruent)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3821.86, 73777.20);
+  auto waypoint_1 = makePoint(3837.28, 73762.67);
+  auto waypoint_2 = makePoint(3846.10, 73741.38);
+  auto lanelets = lanelet::Ids{34576, 34570, 34564};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto result_distance = hdmap_utils.getDistanceToStopLine(lanelets, waypoints);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnWaypointsCongruent)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto lanelets = lanelet::Ids{34690, 34759, 34576};
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto result_distance = hdmap_utils.getDistanceToStopLine(lanelets, waypoints);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
+TEST(HdMapUtils, getDistanceToStopLine_emptyVector_waypoints)
+{
+  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
+
+  auto waypoint_0 = makePoint(3807.63, 73715.99);
+  auto waypoint_1 = makePoint(3785.76, 73707.70);
+  auto waypoint_2 = makePoint(3773.19, 73723.27);
+  auto waypoints = std::vector<geometry_msgs::msg::Point>{waypoint_0, waypoint_1, waypoint_2};
+
+  auto result_distance = hdmap_utils.getDistanceToStopLine({}, waypoints);
+  EXPECT_FALSE(result_distance.has_value());
+}
+
 /*
 ISSUES:
 1: 288, missing predicate if first is closer than distance threshold.
