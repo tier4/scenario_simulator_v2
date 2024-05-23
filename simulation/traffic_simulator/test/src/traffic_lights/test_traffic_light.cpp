@@ -329,15 +329,6 @@ TEST(TrafficLight, TrafficLight)
   using Shape = TrafficLight::Shape;
 
   /// @todo set ros params
-  // hdmap_utils::HdMapUtils map_manager(
-  //   ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
-  //   []() {
-  //     geographic_msgs::msg::GeoPoint geo_point;
-  //     geo_point.latitude = 35.61836750154;
-  //     geo_point.longitude = 139.78066608243;
-  //     return geo_point;
-  //   }());
-
   {
     auto traffic_light = TrafficLight(34802);
 

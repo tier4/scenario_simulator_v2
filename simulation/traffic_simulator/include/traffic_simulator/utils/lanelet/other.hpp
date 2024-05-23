@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_OTHER_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__LANELET_OTHER_HPP_
 
+#include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -25,7 +26,11 @@ namespace lanelet2
 {
 namespace other
 {
+auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
+
 auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
+
+auto getLaneletIds() -> lanelet::Ids;
 
 template <typename Lanelet>
 auto getLaneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
@@ -40,8 +45,6 @@ auto getLaneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
 auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
 
 auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
-
-auto getLaneletIds() -> lanelet::Ids;
 
 auto getCenterPoints(const lanelet::Ids &) -> std::vector<geometry_msgs::msg::Point>;
 
@@ -84,8 +87,6 @@ auto getPreviousRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
 
 auto toPolygon(const lanelet::ConstLineString3d & line_string)
   -> std::vector<geometry_msgs::msg::Point>;
-
-auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
 
 auto insertMarkerArray(
   visualization_msgs::msg::MarkerArray &, const visualization_msgs::msg::MarkerArray &) -> void;

@@ -14,6 +14,7 @@
 
 #include <geometry/linear_algebra.hpp>
 #include <geometry/vector3/normalize.hpp>
+#include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet/memory.hpp>
@@ -26,6 +27,11 @@ namespace lanelet2
 {
 namespace other
 {
+auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
+{
+  return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
+}
+
 auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool
 {
   return std::find_if(route.begin(), route.end(), [lanelet_id](const auto id) {
@@ -347,10 +353,6 @@ auto insertMarkerArray(
   a1.markers.insert(a1.markers.end(), a2.markers.begin(), a2.markers.end());
 }
 
-auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
-{
-  return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
-}
 }  // namespace
 }  // namespace other
 }  // namespace lanelet2

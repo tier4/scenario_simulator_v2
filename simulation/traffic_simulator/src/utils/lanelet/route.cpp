@@ -13,7 +13,9 @@
 // limitations under the License.
 
 #include <lanelet2_core/utility/Units.h>
+#include <lanelet2_routing/RoutingGraphContainer.h>
 
+#include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet/memory.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>

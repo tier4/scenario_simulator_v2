@@ -15,11 +15,13 @@
 #ifndef TRAFFIC_SIMULATOR__BEHAVIOR__BEHAVIOR_PLUGIN_BASE_HPP_
 #define TRAFFIC_SIMULATOR__BEHAVIOR__BEHAVIOR_PLUGIN_BASE_HPP_
 
+#include <geometry/spline/catmull_rom_spline.hpp>
 #include <optional>
 #include <string>
 #include <traffic_simulator/behavior/follow_trajectory.hpp>
 #include <traffic_simulator/data_type/behavior.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
+#include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>

@@ -22,6 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <rclcpp/logger.hpp>
+#include <rclcpp/rclcpp.hpp>
 
 #include "random_test_runner/data_types.hpp"
 #include "spdlog/fmt/fmt.h"

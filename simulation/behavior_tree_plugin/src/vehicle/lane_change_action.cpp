@@ -23,6 +23,7 @@
 #include <string>
 #include <traffic_simulator/utils/lanelet/lane_change.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator/utils/lanelet/route.hpp>
 #include <vector>
 

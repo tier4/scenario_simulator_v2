@@ -15,7 +15,11 @@
 #ifndef TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_
 #define TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_
 
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <lanelet2_core/geometry/Lanelet.h>
+
+#include <geometry_msgs/msg/pose.hpp>
+#include <optional>
+#include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator

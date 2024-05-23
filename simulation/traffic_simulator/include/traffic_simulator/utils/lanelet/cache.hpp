@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__HDMAP_UTILS__CACHE_HPP_
-#define TRAFFIC_SIMULATOR__HDMAP_UTILS__CACHE_HPP_
+#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CACHE_HPP_
+#define TRAFFIC_SIMULATOR__UTILS__LANELET_CACHE_HPP_
 
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/point.hpp>
@@ -42,7 +42,9 @@ public:
 };
 }  // namespace std
 
-namespace hdmap_utils
+namespace traffic_simulator
+{
+namespace lanelet2
 {
 class RouteCache
 {
@@ -152,6 +154,7 @@ private:
 
   std::mutex mutex_;
 };
-}  // namespace hdmap_utils
+}  // namespace lanelet2
+}  // namespace traffic_simulator
 
-#endif  // TRAFFIC_SIMULATOR__HDMAP_UTILS__CACHE_HPP_
+#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CACHE_HPP_

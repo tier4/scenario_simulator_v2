@@ -19,7 +19,7 @@
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
 #include <filesystem>
-#include <traffic_simulator/hdmap_utils/cache.hpp>
+#include <traffic_simulator/utils/lanelet/cache.hpp>
 
 namespace traffic_simulator
 {
@@ -28,9 +28,9 @@ namespace lanelet2
 class Memory
 {
 public:
-  static auto routeCache() -> hdmap_utils::RouteCache &;
-  static auto centerPointsCache() -> hdmap_utils::CenterPointsCache &;
-  static auto laneletLengthCache() -> hdmap_utils::LaneletLengthCache &;
+  static auto routeCache() -> RouteCache &;
+  static auto centerPointsCache() -> CenterPointsCache &;
+  static auto laneletLengthCache() -> LaneletLengthCache &;
 
   static auto activate(const std::string & lanelet_map_path) -> void;
   static auto laneletMap() -> const lanelet::LaneletMapPtr &;
@@ -67,9 +67,9 @@ private:
   inline static std::string lanelet_map_path_{""};
   inline static std::mutex mutex_;
 
-  mutable hdmap_utils::RouteCache route_cache_;
-  mutable hdmap_utils::CenterPointsCache center_points_cache_;
-  mutable hdmap_utils::LaneletLengthCache lanelet_length_cache_;
+  mutable RouteCache route_cache_;
+  mutable CenterPointsCache center_points_cache_;
+  mutable LaneletLengthCache lanelet_length_cache_;
 
   lanelet::LaneletMapPtr lanelet_map_ptr_;
   lanelet::ConstLanelets shoulder_lanelets_;

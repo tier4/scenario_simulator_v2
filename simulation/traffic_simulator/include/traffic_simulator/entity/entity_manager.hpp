@@ -20,6 +20,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+#include <geographic_msgs/msg/geo_point.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>

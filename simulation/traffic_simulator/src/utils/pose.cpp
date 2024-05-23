@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <geometry/bounding_box.hpp>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>

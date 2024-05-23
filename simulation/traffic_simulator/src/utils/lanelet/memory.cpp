@@ -42,14 +42,14 @@ Memory & Memory::getInstance()
   return *instance;
 }
 
-auto Memory::routeCache() -> hdmap_utils::RouteCache & { return getInstance().route_cache_; }
+auto Memory::routeCache() -> RouteCache & { return getInstance().route_cache_; }
 
-auto Memory::centerPointsCache() -> hdmap_utils::CenterPointsCache &
+auto Memory::centerPointsCache() -> CenterPointsCache &
 {
   return getInstance().center_points_cache_;
 }
 
-auto Memory::laneletLengthCache() -> hdmap_utils::LaneletLengthCache &
+auto Memory::laneletLengthCache() -> LaneletLengthCache &
 {
   return getInstance().lanelet_length_cache_;
 }

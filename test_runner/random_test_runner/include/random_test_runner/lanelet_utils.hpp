@@ -68,7 +68,6 @@ public:
 private:
   lanelet::LaneletMapPtr lanelet_map_ptr_;
   lanelet::routing::RoutingGraphConstPtr vehicle_routing_graph_ptr_;
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 };
 
 #endif  // RANDOM_TEST_RUNNER__LANELET_UTILS_HPP
