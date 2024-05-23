@@ -767,7 +767,7 @@ TEST(EntityBase, getDistanceToLeftLaneBound)
   auto status = makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils_ptr);
-  dummy.setRouteLanelets({id_previous, id, id_next});
+  dummy._setRouteLanelets({id_previous, id, id_next});
 
   auto distance_result = dummy.getDistanceToLeftLaneBound();
   double distance_actual = (lane_width - bbox.dimensions.y) / 2 - entity_center_offset;

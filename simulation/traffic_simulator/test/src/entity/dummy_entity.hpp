@@ -34,7 +34,8 @@ public:
     return _behavior_parameter;
   }
 
-  void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter & params) override
+  auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter & params)
+    -> void override
   {
     _behavior_parameter = params;
   }
@@ -75,14 +76,12 @@ public:
     return {};
   }
 
-  std::optional<traffic_simulator_msgs::msg::Obstacle> getObstacle() override
+  auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> override
   {
     return std::nullopt;
   }
 
   auto getRouteLanelets(double) -> lanelet::Ids override { return _route_lanelet_ids; }
-
-  auto setRouteLanelets(const lanelet::Ids & ids) { _route_lanelet_ids = ids; }
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override
   {
@@ -90,38 +89,45 @@ public:
   }
 
   // clang-format off
-  void fillLaneletPose(traffic_simulator::CanonicalizedEntityStatus &) override {}
-  void setVelocityLimit(double) override {}
-  void setAccelerationLimit(double) override {}
-  void setAccelerationRateLimit(double) override {}
-  void setDecelerationLimit(double) override {}
-  void setDecelerationRateLimit(double) override {}
-  void requestAssignRoute(const std::vector<traffic_simulator::CanonicalizedLaneletPose> &) override {}
-  void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) override {}
-  void requestAcquirePosition(const traffic_simulator::CanonicalizedLaneletPose &) override {}
-  void requestAcquirePosition(const geometry_msgs::msg::Pose &) override {}
+  auto fillLaneletPose(traffic_simulator::CanonicalizedEntityStatus &) -> void override {}
+  auto setVelocityLimit(double) -> void override {}
+  auto setAccelerationLimit(double) -> void override {}
+  auto setAccelerationRateLimit(double) -> void override {}
+  auto setDecelerationLimit(double) -> void override {}
+  auto setDecelerationRateLimit(double) -> void override {}
+  auto requestAssignRoute(const std::vector<traffic_simulator::CanonicalizedLaneletPose> &) -> void override {}
+  auto requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) -> void override {}
+  auto requestAcquirePosition(const traffic_simulator::CanonicalizedLaneletPose &) -> void override {}
+  auto requestAcquirePosition(const geometry_msgs::msg::Pose &) -> void override {}
   // clang-format on
 
   /**
-   * @brief Additional fields and functions used in tests.
+   * Function overriden so that other `requestLaneChange` functions can be tested.
    */
 
-  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter & param) override
+  virtual auto requestLaneChange(const traffic_simulator::lane_change::Parameter & param)
+    -> void override
   {
     _lane_change_param = param;
   }
 
-  void _setEntityType(uint8_t value) { _entity_type.type = value; }
+  /**
+   * Additional fields and functions used in tests.
+   */
 
-  void _appendToJobList(
+  auto _setRouteLanelets(const lanelet::Ids & ids) -> void { _route_lanelet_ids = ids; }
+
+  auto _setEntityType(uint8_t value) -> void { _entity_type.type = value; }
+
+  auto _appendToJobList(
     const std::function<bool(const double)> & func_on_update,
     const std::function<void()> & func_on_cleanup, traffic_simulator::job::Type type,
-    bool exclusive, const traffic_simulator::job::Event event)
+    bool exclusive, const traffic_simulator::job::Event event) -> void
   {
     job_list_.append(func_on_update, func_on_cleanup, type, exclusive, event);
   }
 
-  std::optional<double> _getTargetSpeed() { return target_speed_; }
+  auto _getTargetSpeed() -> std::optional<double> { return target_speed_; }
 
   auto _getLaneChangeParameter() const -> traffic_simulator::lane_change::Parameter
   {
@@ -140,4 +146,4 @@ public:
   lanelet::Ids _route_lanelet_ids;
 };
 
-#endif
+#endif  // TRAFFIC_SIMULATOR__TEST__ENTITY__DUMMY_ENTITY_HPP_
