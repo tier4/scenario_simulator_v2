@@ -14,6 +14,26 @@ Changelog for package openscenario_interpreter
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.17.2 (2024-05-22)
+-------------------
+
+1.17.1 (2024-05-21)
+-------------------
+
+1.17.0 (2024-05-16)
+-------------------
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/feature/openscenario_validator' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
 1.16.4 (2024-05-15)
 -------------------
 * Merge branch 'master' into feature/remove_entity_type_list
