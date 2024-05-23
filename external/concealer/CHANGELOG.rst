@@ -13,6 +13,101 @@ Changelog for package concealer
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.17.2 (2024-05-22)
+-------------------
+
+1.17.1 (2024-05-21)
+-------------------
+
+1.17.0 (2024-05-16)
+-------------------
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/feature/openscenario_validator' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.16.4 (2024-05-15)
+-------------------
+* Merge branch 'master' into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge remote-tracking branch 'origin/feature/remove_entity_type_list' into feature/remove_entity_type_list
+* Merge branch 'master' into feature/remove_entity_type_list
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
+1.16.3 (2024-05-13)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/contributing_md
+* Contributors: hakuturu583
+
+1.16.2 (2024-05-10)
+-------------------
+
+1.16.1 (2024-05-10)
+-------------------
+* Merge branch 'master' into doc/support_awesome-pages
+* Contributors: Taiga
+
+1.16.0 (2024-05-09)
+-------------------
+* Merge pull request `#1198 <https://github.com/tier4/scenario_simulator_v2/issues/1198>`_ from tier4/feature/respawn-entity
+  Feature/respawn entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* ref(sss, concealer): apply requested PR changes - style
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* ref(traffic_simulator, respawn): apply requested PR changes
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin-ssh/master' into feature/respawn-entity
+* Codestyle
+* Removing unnecessary changes in field_operator_application_for_autoware_universe
+* RespawnEntity added
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Paweł Lech, Tatsuya Yamasaki
+
+1.15.7 (2024-05-09)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/master' into feature/speed_up_set_other_status
+* Contributors: hakuturu583
+
+1.15.6 (2024-05-07)
+-------------------
+* Merge branch 'master' into feature/publish_scenario_frame
+* Merge remote-tracking branch 'origin/feature/publish_scenario_frame' into feature/publish_scenario_frame
+* Merge branch 'master' into feature/publish_scenario_frame
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
+1.15.5 (2024-05-07)
+-------------------
+
+1.15.4 (2024-05-01)
+-------------------
+
+1.15.3 (2024-04-25)
+-------------------
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Contributors: Piotr Zyskowski
+
+1.15.2 (2024-04-23)
+-------------------
+* Merge branch 'master' into feature/update_default_architecture_type
+* Contributors: Masaya Kataoka
+
 1.15.1 (2024-04-18)
 -------------------
 * Merge branch 'master' into fix/occluded-object-in-grid
