@@ -105,8 +105,7 @@ public:
    * Function overriden so that other `requestLaneChange` functions can be tested.
    */
 
-  virtual auto requestLaneChange(const traffic_simulator::lane_change::Parameter & param)
-    -> void override
+  auto requestLaneChange(const traffic_simulator::lane_change::Parameter & param) -> void override
   {
     _lane_change_param = param;
   }
