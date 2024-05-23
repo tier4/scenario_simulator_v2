@@ -16,7 +16,7 @@
 
 #include <geometry/linear_algebra.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet/memory.hpp>
+#include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -316,10 +316,10 @@ auto matchToLane(
         bbox.center.y - bbox.dimensions.y * 0.5 * reduction_ratio}},
     obj.pose);
   auto matches =
-    lanelet::matching::getDeterministicMatches(*Memory::laneletMap(), obj, matching_distance);
+    lanelet::matching::getDeterministicMatches(*LaneletMap::map(), obj, matching_distance);
   if (!include_crosswalk) {
     matches =
-      lanelet::matching::removeNonRuleCompliantMatches(matches, Memory::trafficRulesVehicle());
+      lanelet::matching::removeNonRuleCompliantMatches(matches, LaneletMap::trafficRulesVehicle());
   }
   if (matches.empty()) {
     return std::nullopt;
@@ -347,7 +347,7 @@ auto getNearbyLaneletIds(
   lanelet::Ids lanelet_ids;
   lanelet::BasicPoint2d search_point(position.x, position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(Memory::laneletMap()->laneletLayer, search_point, search_count);
+    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
   if (nearest_lanelet.empty()) {
     return {};
   }
@@ -366,7 +366,7 @@ auto getNearbyLaneletIds(
   lanelet::Ids lanelet_ids;
   lanelet::BasicPoint2d search_point(point.x, point.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(Memory::laneletMap()->laneletLayer, search_point, search_count);
+    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
   if (include_crosswalk) {
     if (nearest_lanelet.empty()) {
       return {};
@@ -433,27 +433,27 @@ auto getLeftLaneletIds(
   switch (type.type) {
     case traffic_simulator_msgs::msg::EntityType::EGO:
       if (include_opposite_direction) {
-        return other::getLaneletIds(
-          Memory::vehicleRoutingGraph()->lefts(Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->lefts(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(Memory::vehicleRoutingGraph()->adjacentLefts(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->adjacentLefts(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       }
     case traffic_simulator_msgs::msg::EntityType::VEHICLE:
       if (include_opposite_direction) {
-        return other::getLaneletIds(
-          Memory::vehicleRoutingGraph()->lefts(Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->lefts(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(Memory::vehicleRoutingGraph()->adjacentLefts(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->adjacentLefts(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       }
     case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
       if (include_opposite_direction) {
-        return other::getLaneletIds(Memory::pedestrianRoutingGraph()->lefts(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::pedestrianRoutingGraph()->lefts(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(Memory::pedestrianRoutingGraph()->adjacentLefts(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::pedestrianRoutingGraph()->adjacentLefts(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       }
     default:
     case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:
@@ -468,27 +468,27 @@ auto getRightLaneletIds(
   switch (type.type) {
     case traffic_simulator_msgs::msg::EntityType::EGO:
       if (include_opposite_direction) {
-        return other::getLaneletIds(Memory::vehicleRoutingGraph()->rights(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->rights(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(Memory::vehicleRoutingGraph()->adjacentRights(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->adjacentRights(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       }
     case traffic_simulator_msgs::msg::EntityType::VEHICLE:
       if (include_opposite_direction) {
-        return other::getLaneletIds(Memory::vehicleRoutingGraph()->rights(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->rights(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(Memory::vehicleRoutingGraph()->adjacentRights(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->adjacentRights(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       }
     case traffic_simulator_msgs::msg::EntityType::PEDESTRIAN:
       if (include_opposite_direction) {
-        return other::getLaneletIds(Memory::pedestrianRoutingGraph()->rights(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::pedestrianRoutingGraph()->rights(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(Memory::pedestrianRoutingGraph()->adjacentRights(
-          Memory::laneletMap()->laneletLayer.get(lanelet_id)));
+        return other::getLaneletIds(LaneletMap::pedestrianRoutingGraph()->adjacentRights(
+          LaneletMap::map()->laneletLayer.get(lanelet_id)));
       }
     default:
     case traffic_simulator_msgs::msg::EntityType::MISC_OBJECT:

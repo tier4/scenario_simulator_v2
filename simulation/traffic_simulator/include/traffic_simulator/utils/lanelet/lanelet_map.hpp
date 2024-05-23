@@ -17,11 +17,12 @@
 
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
-#include <geometry/spline/catmull_rom_spline.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <mutex>
-#include <geometry_msgs/msg/point.hpp>
+
 #include <filesystem>
+#include <geometry/spline/catmull_rom_spline.hpp>
+#include <geometry_msgs/msg/point.hpp>
+#include <mutex>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace std
 {
@@ -155,7 +156,7 @@ private:
   std::mutex mutex_;
 };
 
-class Memory
+class LaneletMap
 {
 public:
   static auto routeCache() -> RouteCache &;
@@ -163,7 +164,7 @@ public:
   static auto laneletLengthCache() -> LaneletLengthCache &;
 
   static auto activate(const std::string & lanelet_map_path) -> void;
-  static auto laneletMap() -> const lanelet::LaneletMapPtr &;
+  static auto map() -> const lanelet::LaneletMapPtr &;
   static auto shoulderLanelets() -> const lanelet::ConstLanelets &;
   static auto vehicleRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &;
   static auto pedestrianRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &;
@@ -171,8 +172,8 @@ public:
   static auto trafficRulesPedestrian() -> const lanelet::traffic_rules::TrafficRulesPtr &;
 
 private:
-  Memory(const std::filesystem::path & lanelet2_map_path);
-  static Memory & getInstance();
+  LaneletMap(const std::filesystem::path & lanelet2_map_path);
+  static LaneletMap & getInstance();
 
   auto overwriteLaneletsCenterline() -> void;
 
@@ -193,7 +194,7 @@ private:
   auto calculateSegmentDistances(const lanelet::ConstLineString3d & line_string)
     -> std::vector<double>;
 
-  inline static std::unique_ptr<Memory> instance{nullptr};
+  inline static std::unique_ptr<LaneletMap> instance{nullptr};
   inline static std::string lanelet_map_path_{""};
   inline static std::mutex mutex_;
 

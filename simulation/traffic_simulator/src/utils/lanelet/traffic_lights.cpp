@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/utils/lanelet/memory.hpp>
+#include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
 
 namespace traffic_simulator
@@ -26,7 +26,7 @@ auto getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+    const auto lanelet = LaneletMap::map()->laneletLayer.get(lanelet_id);
     const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
     for (const auto & traffic_sign : traffic_signs) {
       ret.emplace_back(traffic_sign);
@@ -76,7 +76,7 @@ auto getTrafficLights(const lanelet::Id traffic_light_id)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>
 {
   std::vector<lanelet::AutowareTrafficLightConstPtr> ret;
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(Memory::laneletMap());
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(LaneletMap::map());
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
   for (const auto & light : autoware_traffic_lights) {
     for (auto light_string : light->lightBulbs()) {
@@ -96,24 +96,24 @@ auto getTrafficLights(const lanelet::Id traffic_light_id)
 
 auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool
 {
-  return Memory::laneletMap()->regulatoryElementLayer.exists(lanelet_id) and
+  return LaneletMap::map()->regulatoryElementLayer.exists(lanelet_id) and
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
-           Memory::laneletMap()->regulatoryElementLayer.get(lanelet_id));
+           LaneletMap::map()->regulatoryElementLayer.get(lanelet_id));
 }
 
 auto getTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::TrafficLight::Ptr
 {
   assert(isTrafficLightRegulatoryElement(lanelet_id));
   return std::dynamic_pointer_cast<lanelet::TrafficLight>(
-    Memory::laneletMap()->regulatoryElementLayer.get(lanelet_id));
+    LaneletMap::map()->regulatoryElementLayer.get(lanelet_id));
 }
 
 auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
 {
   using namespace lanelet;
 
-  if (Memory::laneletMap()->lineStringLayer.exists(lanelet_id)) {
-    if (auto && linestring = Memory::laneletMap()->lineStringLayer.get(lanelet_id);
+  if (LaneletMap::map()->lineStringLayer.exists(lanelet_id)) {
+    if (auto && linestring = LaneletMap::map()->lineStringLayer.get(lanelet_id);
         linestring.hasAttribute(AttributeName::Type)) {
       return linestring.attribute(AttributeName::Type).value() == "traffic_light";
     }
@@ -125,7 +125,7 @@ auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
 auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
   -> std::optional<geometry_msgs::msg::Point>
 {
-  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(Memory::laneletMap());
+  lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(LaneletMap::map());
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
 
   auto areBulbsAssignedToTrafficLight = [traffic_light_id](auto red_yellow_green_bulbs) -> bool {
@@ -162,7 +162,7 @@ auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traff
 {
   assert(isTrafficLight(traffic_light_way_id));
   lanelet::Ids traffic_light_regulatory_element_ids;
-  for (const auto & regulatory_element : Memory::laneletMap()->regulatoryElementLayer) {
+  for (const auto & regulatory_element : LaneletMap::map()->regulatoryElementLayer) {
     if (regulatory_element->attribute(lanelet::AttributeName::Subtype).value() == "traffic_light") {
       for (const auto & ref_member :
            regulatory_element->getParameters<lanelet::ConstLineString3d>("refers")) {
@@ -183,7 +183,7 @@ auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
 {
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = Memory::laneletMap()->laneletLayer.get(lanelet_id);
+    const auto lanelet = LaneletMap::map()->laneletLayer.get(lanelet_id);
     const auto traffic_lights =
       lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
     for (const auto & traffic_light : traffic_lights) {

@@ -17,13 +17,13 @@
 
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <lanelet2_extension/utility/query.hpp>
-#include <traffic_simulator/utils/lanelet/memory.hpp>
+#include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
 
 namespace traffic_simulator
 {
 namespace lanelet2
 {
-auto Memory::activate(const std::string & lanelet_map_path) -> void
+auto LaneletMap::activate(const std::string & lanelet_map_path) -> void
 {
   lanelet_map_path_ = lanelet_map_path;
   if (instance) {
@@ -32,58 +32,55 @@ auto Memory::activate(const std::string & lanelet_map_path) -> void
   }
 }
 
-Memory & Memory::getInstance()
+LaneletMap & LaneletMap::getInstance()
 {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!instance) {
     std::cout << std::endl
               << std::endl
-              << " ###### Make Memory ###### " << lanelet_map_path_ << std::endl
+              << " ###### Make LaneletMap ###### " << lanelet_map_path_ << std::endl
               << std::endl
               << std::endl;
-    instance.reset(new Memory(lanelet_map_path_));
+    instance.reset(new LaneletMap(lanelet_map_path_));
   }
   return *instance;
 }
 
-auto Memory::routeCache() -> RouteCache & { return getInstance().route_cache_; }
+auto LaneletMap::routeCache() -> RouteCache & { return getInstance().route_cache_; }
 
-auto Memory::centerPointsCache() -> CenterPointsCache &
+auto LaneletMap::centerPointsCache() -> CenterPointsCache &
 {
   return getInstance().center_points_cache_;
 }
 
-auto Memory::laneletLengthCache() -> LaneletLengthCache &
+auto LaneletMap::laneletLengthCache() -> LaneletLengthCache &
 {
   return getInstance().lanelet_length_cache_;
 }
 
-auto Memory::laneletMap() -> const lanelet::LaneletMapPtr &
-{
-  return getInstance().lanelet_map_ptr_;
-}
-auto Memory::shoulderLanelets() -> const lanelet::ConstLanelets &
+auto LaneletMap::map() -> const lanelet::LaneletMapPtr & { return getInstance().lanelet_map_ptr_; }
+auto LaneletMap::shoulderLanelets() -> const lanelet::ConstLanelets &
 {
   return getInstance().shoulder_lanelets_;
 }
-auto Memory::vehicleRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
+auto LaneletMap::vehicleRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
 {
   return getInstance().vehicle_routing_graph_ptr_;
 }
-auto Memory::pedestrianRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
+auto LaneletMap::pedestrianRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
 {
   return getInstance().pedestrian_routing_graph_ptr_;
 }
-auto Memory::trafficRulesVehicle() -> const lanelet::traffic_rules::TrafficRulesPtr &
+auto LaneletMap::trafficRulesVehicle() -> const lanelet::traffic_rules::TrafficRulesPtr &
 {
   return getInstance().traffic_rules_vehicle_ptr_;
 }
-auto Memory::trafficRulesPedestrian() -> const lanelet::traffic_rules::TrafficRulesPtr &
+auto LaneletMap::trafficRulesPedestrian() -> const lanelet::traffic_rules::TrafficRulesPtr &
 {
   return getInstance().traffic_rules_pedestrian_ptr_;
 }
 
-Memory::Memory(const std::filesystem::path & lanelet2_map_path)
+LaneletMap::LaneletMap(const std::filesystem::path & lanelet2_map_path)
 {
   lanelet::projection::MGRSProjector projector;
   lanelet::ErrorMessages errors;
@@ -114,7 +111,7 @@ Memory::Memory(const std::filesystem::path & lanelet2_map_path)
     lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
 }
 
-auto Memory::overwriteLaneletsCenterline() -> void
+auto LaneletMap::overwriteLaneletsCenterline() -> void
 {
   for (auto & lanelet_obj : lanelet_map_ptr_->laneletLayer) {
     if (!lanelet_obj.hasCustomCenterline()) {
@@ -124,7 +121,7 @@ auto Memory::overwriteLaneletsCenterline() -> void
   }
 }
 
-auto Memory::generateFineCenterline(
+auto LaneletMap::generateFineCenterline(
   const lanelet::ConstLanelet & lanelet_obj, const double resolution) -> lanelet::LineString3d
 {
   // Get length of longer border
@@ -153,7 +150,7 @@ auto Memory::generateFineCenterline(
   return centerline;
 }
 
-auto Memory::resamplePoints(
+auto LaneletMap::resamplePoints(
   const lanelet::ConstLineString3d & line_string, const std::int32_t num_segments)
   -> lanelet::BasicPoints3d
 {
@@ -188,7 +185,7 @@ auto Memory::resamplePoints(
   return resampled_points;
 }
 
-auto Memory::findNearestIndexPair(
+auto LaneletMap::findNearestIndexPair(
   const std::vector<double> & accumulated_lengths, const double target_length)
   -> std::pair<std::size_t, std::size_t>
 {
@@ -216,7 +213,7 @@ auto Memory::findNearestIndexPair(
   THROW_SEMANTIC_ERROR("findNearestIndexPair(): No nearest point found.");
 }
 
-auto Memory::calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
+auto LaneletMap::calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
   -> std::vector<double>
 {
   const auto segment_distances = calculateSegmentDistances(line_string);
@@ -229,7 +226,7 @@ auto Memory::calculateAccumulatedLengths(const lanelet::ConstLineString3d & line
   return accumulated_lengths;
 }
 
-auto Memory::calculateSegmentDistances(const lanelet::ConstLineString3d & line_string)
+auto LaneletMap::calculateSegmentDistances(const lanelet::ConstLineString3d & line_string)
   -> std::vector<double>
 {
   std::vector<double> segment_distances;
