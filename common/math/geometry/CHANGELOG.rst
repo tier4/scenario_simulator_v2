@@ -13,6 +13,14 @@ Changelog for package geometry
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.18.0 (2024-05-24)
+-------------------
+* Merge branch 'master' into feature/traffic-source
+* Merge branch 'master' into feature/traffic-source
+* Merge remote-tracking branch 'origin/master' into feature/traffic-source
+* Merge branch 'master' into feature/traffic-source
+* Contributors: Mateusz Palczuk, Tatsuya Yamasaki
+
 1.17.2 (2024-05-22)
 -------------------
 

@@ -13,6 +13,24 @@ Changelog for package cpp_mock_scenarios
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+1.18.0 (2024-05-24)
+-------------------
+* Merge pull request `#1231 <https://github.com/tier4/scenario_simulator_v2/issues/1231>`_ from tier4/feature/traffic-source
+  Feature/traffic source
+* Merge branch 'master' into feature/traffic-source
+* Merge branch 'master' into feature/traffic-source
+* Merge remote-tracking branch 'origin/master' into feature/traffic-source
+* Remove comment from TrafficSource large scenario - the issue no longer exists
+* Remove "headers in STL" comments
+* Apply patched changes
+* Merge branch 'master' into feature/traffic-source
+* Fix scenarios
+* Merge branch 'feature/traffic-source-scenarios' into feature/traffic-source
+* Add cpp mock scenario that demonstrates the performance limitations
+* Add high rate test
+* Add TrafficSource scenarios
+* Contributors: Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki
+
 1.17.2 (2024-05-22)
 -------------------
 
