@@ -73,9 +73,7 @@ void EntityManager::broadcastEntityTransform()
                   names.begin(), names.end(), geometry_msgs::msg::Point(),
                   [this, names](geometry_msgs::msg::Point point, const std::string & name) {
                     auto vec = getMapPose(name).position * (1.0 / static_cast<double>(names.size()));
-                    point.x += vec.x;
-                    point.y += vec.y;
-                    point.z += vec.z;
+                    point += vec;
                     return point;
                   }))
                 .orientation(geometry_msgs::msg::Quaternion())),
