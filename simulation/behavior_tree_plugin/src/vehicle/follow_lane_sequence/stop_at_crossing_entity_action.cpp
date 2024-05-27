@@ -18,7 +18,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/utils/lanelet/distance.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -101,7 +102,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if (getRightOfWayEntities(route_lanelets).size() != 0) {
+  if (traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
@@ -112,9 +113,8 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_stop_target_ = getDistanceToConflictingEntity(route_lanelets, *trajectory);
-  auto distance_to_stopline =
-    traffic_simulator::lanelet2::distance::getDistanceToStopLine(route_lanelets, *trajectory);
+  distance_to_stop_target_ = traffic_simulator::distance::distanceToNearestConflictingPose(
+    route_lanelets, *trajectory, getOtherEntities());
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stop_target_) {
     in_stop_sequence_ = false;
@@ -126,7 +126,9 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
       return BT::NodeStatus::FAILURE;
     }
   }
-  if (distance_to_stopline) {
+  if (
+    const auto distance_to_stopline =
+      traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory)) {
     if (distance_to_stopline.value() <= distance_to_stop_target_.value()) {
       in_stop_sequence_ = false;
       return BT::NodeStatus::FAILURE;
