@@ -18,8 +18,8 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <traffic_simulator/utils/lanelet/distance.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -89,7 +89,7 @@ BT::NodeStatus FollowLaneAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (behavior_parameter.see_around) {
-    if (getRightOfWayEntities(route_lanelets).size() != 0) {
+    if (traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
       return BT::NodeStatus::FAILURE;
     }
     if (trajectory == nullptr) {
@@ -105,17 +105,16 @@ BT::NodeStatus FollowLaneAction::tick()
       }
     }
     const auto distance_to_traffic_stop_line =
-      getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
+      traffic_light_manager->getDistanceToActiveTrafficLightStopLine(route_lanelets, *trajectory);
     if (distance_to_traffic_stop_line) {
       if (distance_to_traffic_stop_line.value() <= getHorizon()) {
         return BT::NodeStatus::FAILURE;
       }
     }
-    auto distance_to_stopline =
-      traffic_simulator::lanelet2::distance::getDistanceToStopLine(route_lanelets, *trajectory);
-    auto distance_to_conflicting_entity =
-      getDistanceToConflictingEntity(route_lanelets, *trajectory);
-    if (distance_to_stopline) {
+
+    if (
+      const auto distance_to_stopline =
+        traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory)) {
       if (
         distance_to_stopline.value() <=
         calculateStopDistance(behavior_parameter.dynamic_constraints) +
@@ -123,7 +122,10 @@ BT::NodeStatus FollowLaneAction::tick()
         return BT::NodeStatus::FAILURE;
       }
     }
-    if (distance_to_conflicting_entity) {
+    if (
+      const auto distance_to_conflicting_entity =
+        traffic_simulator::distance::distanceToNearestConflictingPose(
+          route_lanelets, *trajectory, getOtherEntities())) {
       if (
         distance_to_conflicting_entity.value() <
         (vehicle_parameters.bounding_box.dimensions.x + 3 +
@@ -133,7 +135,7 @@ BT::NodeStatus FollowLaneAction::tick()
     }
   }
   if (!target_speed) {
-    target_speed = traffic_simulator::lanelet2::route::getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::route::getSpeedLimit(route_lanelets);
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
