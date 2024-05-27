@@ -17,8 +17,8 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/utils/lanelet/distance.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -100,7 +100,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   if (!behavior_parameter.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  if (getRightOfWayEntities(route_lanelets).size() != 0) {
+  if (traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
@@ -111,8 +111,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   distance_to_stopline_ =
-    traffic_simulator::lanelet2::distance::getDistanceToStopLine(route_lanelets, *trajectory);
-  const auto distance_to_stop_target = getDistanceToConflictingEntity(route_lanelets, *trajectory);
+    traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
   const auto distance_to_front_entity = getDistanceToFrontEntity(*trajectory);
   if (!distance_to_stopline_) {
     stopped_ = false;
@@ -124,7 +123,10 @@ BT::NodeStatus StopAtStopLineAction::tick()
       return BT::NodeStatus::FAILURE;
     }
   }
-  if (distance_to_stop_target) {
+  if (
+    const auto distance_to_stop_target =
+      traffic_simulator::distance::distanceToNearestConflictingPose(
+        route_lanelets, *trajectory, getOtherEntities())) {
     if (distance_to_stop_target.value() <= distance_to_stopline_.value()) {
       stopped_ = false;
       return BT::NodeStatus::FAILURE;
@@ -140,7 +142,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   if (stopped_) {
     if (!target_speed) {
-      target_speed = traffic_simulator::lanelet2::route::getSpeedLimit(route_lanelets);
+      target_speed = traffic_simulator::route::getSpeedLimit(route_lanelets);
     }
     if (!distance_to_stopline_) {
       stopped_ = false;
