@@ -21,7 +21,8 @@ TEST(SimulationClock, Initialize)
   const double realtime_factor = 1.0;
   const double frame_rate = 10.0;
   const bool use_sim_time = true;
-  auto simulation_clock = traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
+  auto simulation_clock =
+    traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
 
   EXPECT_FALSE(simulation_clock.started());
   simulation_clock.update();
@@ -37,7 +38,8 @@ TEST(SimulationClock, getCurrentRosTime)
   const double realtime_factor = 2.0;
   const double frame_rate = 10.0;
   const bool use_sim_time = true;
-  auto simulation_clock = traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
+  auto simulation_clock =
+    traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
   simulation_clock.start();
 
   const auto initial_time = simulation_clock.getCurrentRosTime();
@@ -60,7 +62,8 @@ TEST(SimulationClock, getCurrentScenarioTime)
   const double realtime_factor = 1.0;
   const double frame_rate = 30.0;
   const bool use_sim_time = true;
-  auto simulation_clock = traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
+  auto simulation_clock =
+    traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
 
   simulation_clock.start();
 
@@ -83,7 +86,8 @@ TEST(SimulationClock, Update)
   const double realtime_factor = 1.0;
   const double frame_rate = 10.0;
   const bool use_sim_time = true;
-  auto simulation_clock = traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
+  auto simulation_clock =
+    traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
 
   simulation_clock.start();
 
@@ -95,7 +99,8 @@ TEST(SimulationClock, Update)
 
   for (int i = 0; i < iterations; ++i) {
     simulation_clock.update();
-    const double expected_simulation_time = initial_simulation_time + static_cast<double>(i + 1) * step_time;
+    const double expected_simulation_time =
+      initial_simulation_time + static_cast<double>(i + 1) * step_time;
     const double actual_simulation_time = simulation_clock.getCurrentSimulationTime();
     EXPECT_NEAR(actual_simulation_time, expected_simulation_time, tolerance);
   }
