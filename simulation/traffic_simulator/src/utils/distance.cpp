@@ -15,6 +15,7 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/lanelet/distance.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
@@ -260,6 +261,13 @@ auto distanceToLaneBound(
     distanceToRightLaneBound(map_pose, bounding_box, lanelet_ids));
 }
 
+auto distanceToTrafficLightStopLine(
+  const math::geometry::CatmullRomSplineInterface & spline, const lanelet::Id traffic_light_id)
+  -> std::optional<double>
+{
+  return lanelet2::distance::getDistanceToTrafficLightStopLine(spline, traffic_light_id);
+}
+
 auto distanceToCrosswalk(
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
   const lanelet::Id target_crosswalk_id) -> std::optional<double>
@@ -268,9 +276,16 @@ auto distanceToCrosswalk(
     return std::nullopt;
   } else {
     math::geometry::CatmullRomSpline spline(waypoints_array.waypoints);
-    auto polygon = lanelet2::other::getLaneletPolygon(target_crosswalk_id);
-    return spline.getCollisionPointIn2D(polygon);
+    return spline.getCollisionPointIn2D(lanelet2::other::getLaneletPolygon(target_crosswalk_id));
   }
+}
+
+auto distanceToCrosswalk(
+  const math::geometry::CatmullRomSplineInterface & spline, const lanelet::Id target_crosswalk_id)
+  -> std::optional<double>
+{
+  return spline.getCollisionPointIn2D(
+    traffic_simulator::lanelet2::other::getLaneletPolygon(target_crosswalk_id), false);
 }
 
 auto distanceToStopLine(
@@ -283,6 +298,126 @@ auto distanceToStopLine(
     const math::geometry::CatmullRomSpline spline(waypoints_array.waypoints);
     const auto polygon = lanelet2::other::getStopLinePolygon(target_stop_line_id);
     return spline.getCollisionPointIn2D(polygon);
+  }
+}
+
+auto distanceToYieldStop(
+  const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
+  const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>
+{
+  auto getPosesOnLanelet = [&other_poses](const auto & lanelet_id) {
+    std::vector<traffic_simulator::CanonicalizedLaneletPose> ret;
+    for (const auto & pose : other_poses) {
+      if (traffic_simulator::isSameLaneletId(pose, lanelet_id)) {
+        ret.emplace_back(pose);
+      }
+    }
+    return ret;
+  };
+
+  std::set<double> distances;
+  for (const auto & lanelet_id : following_lanelets) {
+    const auto right_of_way_ids =
+      traffic_simulator::lanelet2::route::getRightOfWayLaneletIds(lanelet_id);
+    for (const auto right_of_way_id : right_of_way_ids) {
+      const auto other_poses = getPosesOnLanelet(right_of_way_id);
+      if (!other_poses.empty()) {
+        const auto distance_forward = lanelet2::distance::getLongitudinalDistance(
+          static_cast<LaneletPose>(reference_pose),
+          traffic_simulator::helper::constructLaneletPose(lanelet_id, 0.0, 0.0));
+        const auto distance_backward = lanelet2::distance::getLongitudinalDistance(
+          traffic_simulator::helper::constructLaneletPose(lanelet_id, 0.0, 0.0),
+          static_cast<LaneletPose>(reference_pose));
+        if (distance_forward) {
+          distances.insert(distance_forward.value());
+        } else if (distance_backward) {
+          distances.insert(-distance_backward.value());
+        }
+      }
+    }
+    if (distances.size() != 0) {
+      return *distances.begin();
+    }
+  }
+  return std::nullopt;
+}
+
+auto splineDistanceToBoundingBox(
+  const math::geometry::CatmullRomSplineInterface & spline,
+  const traffic_simulator::CanonicalizedLaneletPose & pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, double width_extension_right,
+  double width_extension_left, double length_extension_front, double length_extension_rear)
+  -> std::optional<double>
+{
+  const auto polygon = math::geometry::transformPoints(
+    static_cast<geometry_msgs::msg::Pose>(pose),
+    math::geometry::getPointsFromBbox(
+      bounding_box, width_extension_right, width_extension_left, length_extension_front,
+      length_extension_rear));
+  return spline.getCollisionPointIn2D(polygon, false);
+}
+
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>
+{
+  const auto conflicting_entities_on_crosswalk =
+    [&other_statuses](const lanelet::Ids & following_lanelets)
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatus> {
+    std::vector<traffic_simulator::CanonicalizedEntityStatus> conflicting_entity_status;
+    const auto conflicting_crosswalks =
+      traffic_simulator::lanelet2::route::getConflictingCrosswalkIds(following_lanelets);
+    for (const auto & status : other_statuses) {
+      if (
+        status.laneMatchingSucceed() &&
+        std::count(
+          conflicting_crosswalks.begin(), conflicting_crosswalks.end(), status.getLaneletId()) >=
+          1) {
+        conflicting_entity_status.emplace_back(status);
+      }
+    }
+    return conflicting_entity_status;
+  }(following_lanelets);
+
+  const auto conflicting_entities_on_lane =
+    [&other_statuses](const lanelet::Ids & following_lanelets)
+    -> std::vector<traffic_simulator::CanonicalizedEntityStatus> {
+    std::vector<traffic_simulator::CanonicalizedEntityStatus> conflicting_entity_status;
+    const auto conflicting_lanes =
+      traffic_simulator::lanelet2::route::getConflictingLaneIds(following_lanelets);
+    for (const auto & status : other_statuses) {
+      if (
+        status.laneMatchingSucceed() &&
+        std::count(conflicting_lanes.begin(), conflicting_lanes.end(), status.getLaneletId()) >=
+          1) {
+        conflicting_entity_status.emplace_back(status);
+      }
+    }
+    return conflicting_entity_status;
+  }(following_lanelets);
+
+  std::set<double> distances;
+  for (const auto & status : conflicting_entities_on_crosswalk) {
+    if (const auto pose = status.getCanonicalizedLaneletPose()) {
+      if (const auto s = distanceToCrosswalk(spline, pose->getLaneletId())) {
+        distances.insert(s.value());
+      }
+    }
+  }
+  for (const auto & status : conflicting_entities_on_lane) {
+    if (const auto pose = status.getCanonicalizedLaneletPose()) {
+      if (
+        const auto s = splineDistanceToBoundingBox(
+          spline, pose.value(), status.getBoundingBox(), 0.0, 0.0, 0.0, 1.0)) {
+        distances.insert(s.value());
+      }
+    }
+  }
+
+  if (distances.empty()) {
+    return std::nullopt;
+  } else {
+    return *distances.begin();
   }
 }
 }  // namespace distance

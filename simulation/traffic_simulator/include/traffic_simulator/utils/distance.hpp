@@ -15,7 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_
 
+#include <geometry/spline/catmull_rom_spline_interface.hpp>
+#include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator/utils/lanelet/distance.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -58,6 +61,13 @@ auto boundingBoxLaneLongitudinalDistance(
   const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool include_adjacent_lanelet,
   bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>;
 
+auto splineDistanceToBoundingBox(
+  const math::geometry::CatmullRomSplineInterface & spline,
+  const traffic_simulator::CanonicalizedLaneletPose & pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, double width_extension_right = 0.0,
+  double width_extension_left = 0.0, double length_extension_front = 0.0,
+  double length_extension_rear = 0.0) -> std::optional<double>;
+
 // Bounds
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
@@ -87,13 +97,35 @@ auto distanceToRightLaneBound(
   -> double;
 
 // Other objects
+auto distanceToTrafficLightStopLine(
+  const math::geometry::CatmullRomSplineInterface & spline, const lanelet::Id traffic_light_id)
+  -> std::optional<double>;
+
 auto distanceToCrosswalk(
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
   const lanelet::Id target_crosswalk_id) -> std::optional<double>;
 
+auto distanceToCrosswalk(
+  const math::geometry::CatmullRomSplineInterface & spline,
+  const traffic_simulator::CanonicalizedLaneletPose & pose) -> std::optional<double>;
+
 auto distanceToStopLine(
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,
   const lanelet::Id target_stop_line_id) -> std::optional<double>;
+
+template <typename... Ts>
+auto distanceToStopLine(Ts &&... xs)
+{
+  return lanelet2::distance::getDistanceToStopLine(std::forward<decltype(xs)>(xs)...);
+}
+
+auto distanceToYieldStop(
+  const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
+  const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>;
+
+auto distanceToNearestConflictingPose(
+  const lanelet::Ids & following_lanelets, const math::geometry::CatmullRomSplineInterface & spline,
+  const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>;
 }  // namespace distance
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__DISTANCE_HPP_
