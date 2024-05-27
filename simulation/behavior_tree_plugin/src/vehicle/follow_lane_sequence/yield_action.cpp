@@ -19,7 +19,8 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -100,10 +101,9 @@ BT::NodeStatus YieldAction::tick()
   if (!entity_status->laneMatchingSucceed()) {
     return BT::NodeStatus::FAILURE;
   }
-  const auto right_of_way_entities = getRightOfWayEntities(route_lanelets);
-  if (right_of_way_entities.empty()) {
+  if (!traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
     if (!target_speed) {
-      target_speed = traffic_simulator::lanelet2::route::getSpeedLimit(route_lanelets);
+      target_speed = traffic_simulator::route::getSpeedLimit(route_lanelets);
     }
     setOutput(
       "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
@@ -120,7 +120,7 @@ BT::NodeStatus YieldAction::tick()
   distance_to_stop_target_ = getYieldStopDistance(route_lanelets);
   target_speed = calculateTargetSpeed();
   if (!target_speed) {
-    target_speed = traffic_simulator::lanelet2::route::getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::route::getSpeedLimit(route_lanelets);
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
