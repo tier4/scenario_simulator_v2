@@ -31,13 +31,13 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter override
   {
-    return _behavior_parameter;
+    return behavior_parameter_;
   }
 
   auto setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter & params)
     -> void override
   {
-    _behavior_parameter = params;
+    behavior_parameter_ = params;
   }
 
   auto getCurrentAction() const -> std::string override { return {}; }
@@ -60,7 +60,7 @@ public:
 
   auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override
   {
-    return _entity_type;
+    return entity_type_;
   }
 
   auto getEntityTypename() const -> const std::string & override
@@ -81,7 +81,7 @@ public:
     return std::nullopt;
   }
 
-  auto getRouteLanelets(double) -> lanelet::Ids override { return _route_lanelet_ids; }
+  auto getRouteLanelets(double) -> lanelet::Ids override { return route_lanelet_ids_; }
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override
   {
@@ -107,18 +107,18 @@ public:
 
   auto requestLaneChange(const traffic_simulator::lane_change::Parameter & param) -> void override
   {
-    _lane_change_param = param;
+    lane_change_param_ = param;
   }
 
   /**
    * Additional fields and functions used in tests.
    */
 
-  auto _setRouteLanelets(const lanelet::Ids & ids) -> void { _route_lanelet_ids = ids; }
+  auto setRouteLanelets(const lanelet::Ids & ids) -> void { route_lanelet_ids_ = ids; }
 
-  auto _setEntityType(uint8_t value) -> void { _entity_type.type = value; }
+  auto setEntityType(uint8_t value) -> void { entity_type_.type = value; }
 
-  auto _appendToJobList(
+  auto appendToJobList(
     const std::function<bool(const double)> & func_on_update,
     const std::function<void()> & func_on_cleanup, traffic_simulator::job::Type type,
     bool exclusive, const traffic_simulator::job::Event event) -> void
@@ -126,23 +126,23 @@ public:
     job_list_.append(func_on_update, func_on_cleanup, type, exclusive, event);
   }
 
-  auto _getTargetSpeed() -> std::optional<double> { return target_speed_; }
+  auto getTargetSpeed() -> std::optional<double> { return target_speed_; }
 
-  auto _getLaneChangeParameter() const -> traffic_simulator::lane_change::Parameter
+  auto getLaneChangeParameter() const -> traffic_simulator::lane_change::Parameter
   {
-    return _lane_change_param;
+    return lane_change_param_;
   }
 
-  auto _getOtherStatus() const
+  auto getOtherStatus() const
     -> const std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> &
   {
     return other_status_;
   }
 
-  traffic_simulator_msgs::msg::BehaviorParameter _behavior_parameter;
-  traffic_simulator_msgs::msg::EntityType _entity_type;
-  traffic_simulator::lane_change::Parameter _lane_change_param;
-  lanelet::Ids _route_lanelet_ids;
+  traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter_;
+  traffic_simulator_msgs::msg::EntityType entity_type_;
+  traffic_simulator::lane_change::Parameter lane_change_param_;
+  lanelet::Ids route_lanelet_ids_;
 };
 
 #endif  // TRAFFIC_SIMULATOR__TEST__ENTITY__DUMMY_ENTITY_HPP_

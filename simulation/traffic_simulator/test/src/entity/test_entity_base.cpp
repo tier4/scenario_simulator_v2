@@ -183,9 +183,9 @@ TEST_F(EntityBaseTest, onUpdate)
   auto second_event = traffic_simulator::job::Event::POST_UPDATE;
   auto is_exclusive = true;
 
-  dummy._appendToJobList(
+  dummy.appendToJobList(
     first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
-  dummy._appendToJobList(
+  dummy.appendToJobList(
     second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
 
   double current_time = 0.0;
@@ -216,9 +216,9 @@ TEST_F(EntityBaseTest, onPostUpdate)
   auto second_event = traffic_simulator::job::Event::POST_UPDATE;
   auto is_exclusive = true;
 
-  dummy._appendToJobList(
+  dummy.appendToJobList(
     first_update_func, first_cleanup_func, type_first, is_exclusive, first_event);
-  dummy._appendToJobList(
+  dummy.appendToJobList(
     second_update_func, second_cleanup_func, type_second, is_exclusive, second_event);
 
   double current_time = 0.0;
@@ -252,7 +252,7 @@ TEST_F(EntityBaseTest, requestLaneChange_absoluteTarget)
     traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
 
   dummy_base->requestLaneChange(target, trajectory_shape, constraint);
-  auto result_param = dummy._getLaneChangeParameter();
+  auto result_param = dummy.getLaneChangeParameter();
 
   EXPECT_LANE_CHANGE_ABSOLUTE_TARGET_EQ(result_param.target, target);
   EXPECT_EQ(result_param.trajectory_shape, trajectory_shape);
@@ -283,7 +283,7 @@ TEST_F(EntityBaseTest, requestLaneChange_relativeTarget)
   dummy_base->setOtherStatus(other_status);
 
   dummy_base->requestLaneChange(target, trajectory_shape, constraint);
-  auto result_param = dummy._getLaneChangeParameter();
+  auto result_param = dummy.getLaneChangeParameter();
 
   traffic_simulator::lane_change::AbsoluteTarget ref_target(target_id, target_offset);
 
@@ -404,7 +404,7 @@ TEST_F(EntityBaseTest, setOtherStatus)
 
   dummy_base->setOtherStatus(other_status);
 
-  const auto & result_status = dummy._getOtherStatus();
+  const auto & result_status = dummy.getOtherStatus();
 
   EXPECT_EQ(other_status.size(), result_status.size());
   EXPECT_EQ(
@@ -417,7 +417,7 @@ TEST_F(EntityBaseTest, setOtherStatus)
 
 TEST_F(EntityBaseTest, setStatus)
 {
-  dummy._setEntityType(traffic_simulator_msgs::msg::EntityType::VEHICLE);
+  dummy.setEntityType(traffic_simulator_msgs::msg::EntityType::VEHICLE);
 
   auto new_type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
   auto new_subtype = traffic_simulator_msgs::msg::EntitySubtype::CAR;
@@ -603,7 +603,7 @@ TEST(EntityBase, getDistanceToLeftLaneBound)
   auto status = makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy._setRouteLanelets({id_previous, id, id_next});
+  dummy.setRouteLanelets({id_previous, id, id_next});
 
   auto distance_result = dummy.getDistanceToLeftLaneBound();
   double distance_actual = (lane_width - bbox.dimensions.y) / 2.0 - entity_center_offset;
@@ -643,7 +643,7 @@ TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy._setEntityType(status_base.type.type);
+  dummy.setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(5.0);
   EXPECT_FALSE(lanelet_pose);
@@ -664,7 +664,7 @@ TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy._setEntityType(status_base.type.type);
+  dummy.setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(1.0);
   EXPECT_TRUE(lanelet_pose);
@@ -685,7 +685,7 @@ TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy._setEntityType(status_base.type.type);
+  dummy.setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(1.0);
   EXPECT_TRUE(lanelet_pose);
@@ -705,7 +705,7 @@ TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy._setEntityType(status_base.type.type);
+  dummy.setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(5.0);
   EXPECT_FALSE(lanelet_pose);
@@ -726,7 +726,7 @@ TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy._setEntityType(status_base.type.type);
+  dummy.setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(1.0);
   EXPECT_TRUE(lanelet_pose);
@@ -747,7 +747,7 @@ TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
   traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
 
   DummyEntity dummy("dummy_entity", status, hdmap_utils);
-  dummy._setEntityType(status_base.type.type);
+  dummy.setEntityType(status_base.type.type);
 
   auto lanelet_pose = dummy.getLaneletPose(1.0);
   EXPECT_FALSE(lanelet_pose);
