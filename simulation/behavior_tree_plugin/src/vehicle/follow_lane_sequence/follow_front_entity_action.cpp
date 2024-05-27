@@ -18,8 +18,8 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/utils/lanelet/distance.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <vector>
 
 namespace entity_behavior
@@ -79,7 +79,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     request != traffic_simulator::behavior::Request::FOLLOW_LANE) {
     return BT::NodeStatus::FAILURE;
   }
-  if (getRightOfWayEntities(route_lanelets).size() != 0) {
+  if (traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
     return BT::NodeStatus::FAILURE;
   }
   if (!behavior_parameter.see_around) {
@@ -92,15 +92,19 @@ BT::NodeStatus FollowFrontEntityAction::tick()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  auto distance_to_stopline =
-    traffic_simulator::lanelet2::distance::getDistanceToStopLine(route_lanelets, *trajectory);
-  auto distance_to_conflicting_entity = getDistanceToConflictingEntity(route_lanelets, *trajectory);
+  const auto distance_to_stopline =
+    traffic_simulator::distance::distanceToStopLine(route_lanelets, *trajectory);
+  const auto distance_to_conflicting_entity =
+    traffic_simulator::distance::distanceToNearestConflictingPose(
+      route_lanelets, *trajectory, getOtherEntities());
   const auto front_entity_name = getFrontEntityName(*trajectory);
   if (!front_entity_name) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_front_entity_ =
-    getDistanceToTargetEntityPolygon(*trajectory, front_entity_name.value());
+  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
+  distance_to_front_entity_ = traffic_simulator::distance::splineDistanceToBoundingBox(
+    *trajectory, front_entity_status.getCanonicalizedLaneletPose().value(),
+    front_entity_status.getBoundingBox());
   if (!distance_to_front_entity_) {
     return BT::NodeStatus::FAILURE;
   }
@@ -114,9 +118,8 @@ BT::NodeStatus FollowFrontEntityAction::tick()
       return BT::NodeStatus::FAILURE;
     }
   }
-  const auto & front_entity_status = getEntityStatus(front_entity_name.value());
   if (!target_speed) {
-    target_speed = traffic_simulator::lanelet2::route::getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::route::getSpeedLimit(route_lanelets);
   }
   const double front_entity_linear_velocity = front_entity_status.getTwist().linear.x;
   if (target_speed.value() <= front_entity_linear_velocity) {
