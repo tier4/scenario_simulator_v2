@@ -227,7 +227,7 @@ auto ActionNode::calculateUpdatedEntityStatus(
     entity_status_updated.action_status.twist = twist_new;
     entity_status_updated.action_status.accel = accel_new;
     entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-    entity_status_updated.lanelet_pose = traffic_simulator::route::moveAlongLanelet(
+    entity_status_updated.lanelet_pose = traffic_simulator::route::moveAlongLaneletPose(
       canonicalized_lanelet_pose.value(), route_lanelets, distance);
     entity_status_updated.lanelet_pose_valid = true;
     entity_status_updated.pose =

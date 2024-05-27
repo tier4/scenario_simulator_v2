@@ -142,7 +142,7 @@ BT::NodeStatus StopAtStopLineAction::tick()
   }
   if (stopped_) {
     if (!target_speed) {
-      target_speed = traffic_simulator::route::getSpeedLimit(route_lanelets);
+      target_speed = traffic_simulator::route::speedLimit(route_lanelets);
     }
     if (!distance_to_stopline_) {
       stopped_ = false;

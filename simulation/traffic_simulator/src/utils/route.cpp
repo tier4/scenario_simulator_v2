@@ -15,14 +15,39 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <traffic_simulator/utils/lanelet/lane_change.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
-#include <traffic_simulator/utils/lanelet/pose.hpp>
 
 namespace traffic_simulator
 {
 namespace route
 {
+auto isAnyConflictingEntity(
+  const lanelet::Ids & following_lanelets,
+  const std::vector<CanonicalizedLaneletPose> & other_poses) -> bool
+{
+  auto conflicting_crosswalks =
+    traffic_simulator::lanelet2::route::getConflictingCrosswalkIds(following_lanelets);
+  auto conflicting_lanes =
+    traffic_simulator::lanelet2::route::getConflictingLaneIds(following_lanelets);
+  for (const auto & pose : other_poses) {
+    if (
+      std::count(
+        conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
+        static_cast<traffic_simulator::LaneletPose>(pose).lanelet_id) >= 1) {
+      return true;
+    }
+    if (
+      std::count(
+        conflicting_lanes.begin(), conflicting_lanes.end(),
+        static_cast<traffic_simulator::LaneletPose>(pose).lanelet_id) >= 1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 auto isNeedToRightOfWay(
   const lanelet::Ids & following_lanelets,
   std::vector<traffic_simulator::CanonicalizedLaneletPose> other_poses) -> bool
@@ -50,32 +75,7 @@ auto isNeedToRightOfWay(
   return false;
 }
 
-auto isAnyConflictingEntity(
-  const lanelet::Ids & following_lanelets,
-  const std::vector<CanonicalizedLaneletPose> & other_poses) -> bool
-{
-  auto conflicting_crosswalks =
-    traffic_simulator::lanelet2::route::getConflictingCrosswalkIds(following_lanelets);
-  auto conflicting_lanes =
-    traffic_simulator::lanelet2::route::getConflictingLaneIds(following_lanelets);
-  for (const auto & pose : other_poses) {
-    if (
-      std::count(
-        conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        static_cast<traffic_simulator::LaneletPose>(pose).lanelet_id) >= 1) {
-      return true;
-    }
-    if (
-      std::count(
-        conflicting_lanes.begin(), conflicting_lanes.end(),
-        static_cast<traffic_simulator::LaneletPose>(pose).lanelet_id) >= 1) {
-      return true;
-    }
-  }
-  return false;
-}
-
-auto moveAlongLanelet(
+auto moveAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
   const double distance) -> traffic_simulator::LaneletPose
 {
@@ -105,11 +105,35 @@ auto moveAlongLanelet(
   }
 }
 
+auto laneChangeAlongLaneletPose(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const traffic_simulator::lane_change::Parameter & parameter) -> traffic_simulator::LaneletPose
+{
+  const auto lanelet_pose = static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose);
+  switch (parameter.constraint.type) {
+    case traffic_simulator::lane_change::Constraint::Type::NONE:
+      return traffic_simulator::lanelet2::lane_change::getAlongLaneletPose(
+        lanelet_pose, traffic_simulator::lane_change::Parameter::default_lanechange_distance);
+    case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
+      return traffic_simulator::lanelet2::lane_change::getAlongLaneletPose(
+        lanelet_pose, traffic_simulator::lane_change::Parameter::default_lanechange_distance);
+    case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
+      return traffic_simulator::lanelet2::lane_change::getAlongLaneletPose(
+        lanelet_pose, parameter.constraint.value);
+    case traffic_simulator::lane_change::Constraint::Type::TIME:
+      return traffic_simulator::lanelet2::lane_change::getAlongLaneletPose(
+        lanelet_pose, parameter.constraint.value);
+    default:
+      throw std::invalid_argument("Unknown lane change constraint type");
+  }
+  return pose::quietNaNLaneletPose();
+}
+
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
   -> std::vector<geometry_msgs::msg::Point>
 {
   const auto lanelet_pose = static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose);
-  const auto ids = traffic_simulator::route::getPreviousLanelets(lanelet_pose.lanelet_id);
+  const auto ids = traffic_simulator::route::previousLanelets(lanelet_pose.lanelet_id);
   // DIFFERENT SPLINE - recalculation needed
   math::geometry::CatmullRomSpline spline(traffic_simulator::lanelet2::other::getCenterPoints(ids));
   double s_in_spline = 0;
@@ -122,25 +146,6 @@ auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
     }
   }
   return spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0, lanelet_pose.offset);
-}
-
-auto laneChangePoints(
-  const math::geometry::HermiteCurve & curve, const double current_s, const double target_s,
-  const double horizon, const traffic_simulator::lane_change::Parameter & parameter)
-  -> std::vector<geometry_msgs::msg::Point>
-{
-  if (const double rest_s = current_s + horizon - curve.getLength(); rest_s < 0) {
-    return curve.getTrajectory(current_s, current_s + horizon, 1.0, true);
-  } else {
-    const auto following_lanelets =
-      traffic_simulator::route::getFollowingLanelets(parameter.target.lanelet_id, 0);
-    const auto center_points =
-      traffic_simulator::lanelet2::other::getCenterPoints(following_lanelets);
-    // DIFFERENT SPLINE - recalculation needed
-    const math::geometry::CatmullRomSpline spline(center_points);
-    /// @note not the same as orginal one - here were duplicates and curve_waypoints
-    return spline.getTrajectory(target_s, target_s + rest_s, 1.0);
-  }
 }
 
 auto laneChangeTrajectory(
@@ -178,28 +183,23 @@ auto laneChangeTrajectory(
   return std::nullopt;
 }
 
-auto laneChangeAlongLaneletPose(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const traffic_simulator::lane_change::Parameter & parameter) -> traffic_simulator::LaneletPose
+auto laneChangePoints(
+  const math::geometry::HermiteCurve & curve, const double current_s, const double target_s,
+  const double horizon, const traffic_simulator::lane_change::Parameter & parameter)
+  -> std::vector<geometry_msgs::msg::Point>
 {
-  const auto lanelet_pose = static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose);
-  switch (parameter.constraint.type) {
-    case traffic_simulator::lane_change::Constraint::Type::NONE:
-      return traffic_simulator::lanelet2::lane_change::getAlongLaneletPose(
-        lanelet_pose, traffic_simulator::lane_change::Parameter::default_lanechange_distance);
-    case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
-      return traffic_simulator::lanelet2::lane_change::getAlongLaneletPose(
-        lanelet_pose, traffic_simulator::lane_change::Parameter::default_lanechange_distance);
-    case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
-      return traffic_simulator::lanelet2::lane_change::getAlongLaneletPose(
-        lanelet_pose, parameter.constraint.value);
-    case traffic_simulator::lane_change::Constraint::Type::TIME:
-      return traffic_simulator::lanelet2::lane_change::getAlongLaneletPose(
-        lanelet_pose, parameter.constraint.value);
-    default:
-      throw std::invalid_argument("Unknown lane change constraint type");
+  if (const double rest_s = current_s + horizon - curve.getLength(); rest_s < 0) {
+    return curve.getTrajectory(current_s, current_s + horizon, 1.0, true);
+  } else {
+    const auto following_lanelets =
+      traffic_simulator::route::followingLanelets(parameter.target.lanelet_id, 0);
+    const auto center_points =
+      traffic_simulator::lanelet2::other::getCenterPoints(following_lanelets);
+    // DIFFERENT SPLINE - recalculation needed
+    const math::geometry::CatmullRomSpline spline(center_points);
+    /// @note not the same as orginal one - here were duplicates and curve_waypoints
+    return spline.getTrajectory(target_s, target_s + rest_s, 1.0);
   }
-  return pose::quietNaNLaneletPose();
 }
 }  // namespace route
 }  // namespace traffic_simulator

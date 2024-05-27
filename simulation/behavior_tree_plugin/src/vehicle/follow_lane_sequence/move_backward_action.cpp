@@ -67,8 +67,8 @@ BT::NodeStatus MoveBackwardAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!target_speed) {
-    target_speed = traffic_simulator::route::getSpeedLimit(
-      traffic_simulator::route::getPreviousLanelets(entity_status->getLaneletId()));
+    target_speed = traffic_simulator::route::speedLimit(
+      traffic_simulator::route::previousLanelets(entity_status->getLaneletId()));
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(

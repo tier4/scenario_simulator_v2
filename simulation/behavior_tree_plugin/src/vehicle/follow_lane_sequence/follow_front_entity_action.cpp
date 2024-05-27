@@ -119,7 +119,7 @@ BT::NodeStatus FollowFrontEntityAction::tick()
     }
   }
   if (!target_speed) {
-    target_speed = traffic_simulator::route::getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::route::speedLimit(route_lanelets);
   }
   const double front_entity_linear_velocity = front_entity_status.getTwist().linear.x;
   if (target_speed.value() <= front_entity_linear_velocity) {

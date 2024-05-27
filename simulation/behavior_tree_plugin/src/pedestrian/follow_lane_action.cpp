@@ -51,8 +51,8 @@ BT::NodeStatus FollowLaneAction::tick()
   }
   if (!target_speed) {
     const auto following_lanelets =
-      traffic_simulator::route::getFollowingLanelets(entity_status->getLaneletId());
-    target_speed = traffic_simulator::route::getSpeedLimit(following_lanelets);
+      traffic_simulator::route::followingLanelets(entity_status->getLaneletId());
+    target_speed = traffic_simulator::route::speedLimit(following_lanelets);
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(

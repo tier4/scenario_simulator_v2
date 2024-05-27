@@ -25,7 +25,33 @@ namespace traffic_simulator
 {
 inline namespace route
 {
-auto moveAlongLanelet(
+template <typename... Ts>
+auto followingLanelets(Ts &&... xs)
+{
+  return lanelet2::route::getFollowingLanelets(std::forward<decltype(xs)>(xs)...);
+}
+
+template <typename... Ts>
+auto previousLanelets(Ts &&... xs)
+{
+  return lanelet2::route::getPreviousLanelets(std::forward<decltype(xs)>(xs)...);
+}
+
+template <typename... Ts>
+auto speedLimit(Ts &&... xs)
+{
+  return lanelet2::route::getSpeedLimit(std::forward<decltype(xs)>(xs)...);
+}
+
+auto isAnyConflictingEntity(
+  const lanelet::Ids & following_lanelets,
+  const std::vector<CanonicalizedLaneletPose> & other_poses) -> bool;
+
+auto isNeedToRightOfWay(
+  const lanelet::Ids & following_lanelets, std::vector<CanonicalizedLaneletPose> other_entity_poses)
+  -> bool;
+
+auto moveAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
   const double distance) -> traffic_simulator::LaneletPose;
 
@@ -45,32 +71,6 @@ auto laneChangePoints(
   const math::geometry::HermiteCurve & curve, const double target_s, const double current_s,
   const double horizon, const traffic_simulator::lane_change::Parameter & parameter)
   -> std::vector<geometry_msgs::msg::Point>;
-
-auto isAnyConflictingEntity(
-  const lanelet::Ids & following_lanelets,
-  const std::vector<CanonicalizedLaneletPose> & other_poses) -> bool;
-
-auto isNeedToRightOfWay(
-  const lanelet::Ids & following_lanelets, std::vector<CanonicalizedLaneletPose> other_entity_poses)
-  -> bool;
-
-template <typename... Ts>
-auto getFollowingLanelets(Ts &&... xs)
-{
-  return lanelet2::route::getFollowingLanelets(std::forward<decltype(xs)>(xs)...);
-}
-
-template <typename... Ts>
-auto getPreviousLanelets(Ts &&... xs)
-{
-  return lanelet2::route::getPreviousLanelets(std::forward<decltype(xs)>(xs)...);
-}
-
-template <typename... Ts>
-auto getSpeedLimit(Ts &&... xs)
-{
-  return lanelet2::route::getSpeedLimit(std::forward<decltype(xs)>(xs)...);
-}
 }  // namespace route
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__ROUTE_HPP_

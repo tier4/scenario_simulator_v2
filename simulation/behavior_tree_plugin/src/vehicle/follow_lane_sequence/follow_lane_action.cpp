@@ -135,7 +135,7 @@ BT::NodeStatus FollowLaneAction::tick()
     }
   }
   if (!target_speed) {
-    target_speed = traffic_simulator::route::getSpeedLimit(route_lanelets);
+    target_speed = traffic_simulator::route::speedLimit(route_lanelets);
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(
