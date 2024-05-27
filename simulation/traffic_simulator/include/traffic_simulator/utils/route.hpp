@@ -19,7 +19,6 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator/utils/lanelet/route.hpp>
 
 namespace traffic_simulator
@@ -28,7 +27,7 @@ inline namespace route
 {
 auto moveAlongLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
-  const auto distance) -> traffic_simulator::LaneletPose;
+  const double distance) -> traffic_simulator::LaneletPose;
 
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
   -> std::vector<geometry_msgs::msg::Point>;

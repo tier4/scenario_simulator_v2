@@ -17,6 +17,7 @@
 #include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
+#include <traffic_simulator/utils/lanelet/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -76,7 +77,7 @@ auto isAnyConflictingEntity(
 
 auto moveAlongLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
-  const auto distance) -> traffic_simulator::LaneletPose
+  const double distance) -> traffic_simulator::LaneletPose
 {
   auto lanelet_pose = static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose);
   lanelet_pose.s = lanelet_pose.s + distance;
@@ -85,16 +86,16 @@ auto moveAlongLanelet(
   if (
     const auto canonicalized_lanelet_pose =
       std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
-    // If canonicalize succeed, just set canonicalized pose
+    // If canonicalize succeed, just return canonicalized pose
     return canonicalized_lanelet_pose.value();
   } else {
-    // If canonicalize failed, set lanelet pose as end of road
+    // If canonicalize failed, return lanelet pose as end of road
     if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
       traffic_simulator::LaneletPose end_of_road_lanelet_pose;
       end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
       end_of_road_lanelet_pose.offset = lanelet_pose.offset;
       end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
-      /// @note here was condition: .s < 0
+      /// @note here was condition: .s < 0, now try to use .s <= 0
       end_of_road_lanelet_pose.s =
         lanelet_pose.s <= 0 ? 0 : lanelet2::other::getLaneletLength(end_of_road_lanelet_id.value());
       return end_of_road_lanelet_pose;

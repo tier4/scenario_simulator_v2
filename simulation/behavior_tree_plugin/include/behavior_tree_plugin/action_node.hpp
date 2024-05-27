@@ -28,8 +28,6 @@
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
-#include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/obstacle.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
@@ -108,11 +106,6 @@ protected:
   std::shared_ptr<traffic_simulator::EntityStatus> non_canonicalized_updated_status;
   EntityStatusDict other_entity_status;
   lanelet::Ids route_lanelets;
-
-  auto moveAlongLanelet(
-    const traffic_simulator::CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-    const lanelet::Ids & route_lanelets, const auto distance) const
-    -> traffic_simulator::LaneletPose;
 };
 }  // namespace entity_behavior
 
