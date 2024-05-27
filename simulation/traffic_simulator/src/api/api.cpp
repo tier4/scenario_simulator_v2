@@ -22,8 +22,8 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
-#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
