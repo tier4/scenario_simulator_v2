@@ -46,7 +46,7 @@ public:
     const std::function<void(std::string)> & despawn_function);
   const double radius;
   const geometry_msgs::msg::Point position;
-  void execute() override;
+  void execute(const double current_time, const double step_time) override;
 
 private:
   const std::function<std::vector<std::string>(void)> get_entity_names_function;

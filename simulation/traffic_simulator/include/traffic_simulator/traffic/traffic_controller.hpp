@@ -30,6 +30,7 @@
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_module_base.hpp>
+#include <traffic_simulator/traffic/traffic_source.hpp>
 #include <utility>
 #include <vector>
 
@@ -51,7 +52,7 @@ public:
     auto module_ptr = std::make_shared<T>(std::forward<Ts>(xs)...);
     modules_.emplace_back(module_ptr);
   }
-  void execute();
+  void execute(const double current_time, const double step_time);
 
 private:
   void autoSink();

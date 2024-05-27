@@ -185,7 +185,7 @@ std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Vector3 &
 
 std::ostream & operator<<(std::ostream & os, const geometry_msgs::msg::Quaternion & quat)
 {
-  os << "x : " << quat.x << ",y : " << quat.y << ",z : " << quat.z << ",w : " << quat.z
+  os << "x : " << quat.x << ",y : " << quat.y << ",z : " << quat.z << ",w : " << quat.w
      << std::endl;
   return os;
 }

@@ -168,6 +168,8 @@ public:
 
   auto getLaneletPolygon(const lanelet::Id) const -> std::vector<geometry_msgs::msg::Point>;
 
+  auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
+
   auto getLateralDistance(
     const traffic_simulator_msgs::msg::LaneletPose & from,
     const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false) const
@@ -360,8 +362,6 @@ private:
     const geometry_msgs::msg::Pose & from, const traffic_simulator_msgs::msg::LaneletPose & to,
     const traffic_simulator::lane_change::TrajectoryShape,
     const double tangent_vector_size = 100) const -> math::geometry::HermiteCurve;
-
-  auto getLanelets(const lanelet::Ids &) const -> lanelet::Lanelets;
 
   auto getNextRoadShoulderLanelet(const lanelet::Id) const -> lanelet::Ids;
 
