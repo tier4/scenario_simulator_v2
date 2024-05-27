@@ -28,11 +28,19 @@ auto quietNaNPose() -> geometry_msgs::msg::Pose;
 auto quietNaNLaneletPose() -> LaneletPose;
 
 // Conversions
-auto canonicalize(const LaneletPose & lanelet_pose) -> std::optional<CanonicalizedLaneletPose>;
-
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose;
 
 auto toMapPose(const LaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose;
+
+auto canonicalize(const LaneletPose & lanelet_pose) -> LaneletPose;
+
+auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_lanelets)
+  -> LaneletPose;
+
+auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
+
+auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
+  -> std::optional<CanonicalizedLaneletPose>;
 
 auto toCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk)

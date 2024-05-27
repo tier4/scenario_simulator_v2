@@ -146,7 +146,7 @@ auto API::setEntityStatus(
   const std::string & name, const LaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  setEntityStatus(name, canonicalize(lanelet_pose), action_status);
+  setEntityStatus(name, toCanonicalizedLaneletPose(lanelet_pose), action_status);
 }
 
 auto API::setEntityStatus(

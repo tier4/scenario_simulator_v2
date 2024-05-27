@@ -15,9 +15,10 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_OTHER_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__LANELET_OTHER_HPP_
 
+#include <lanelet2_core/geometry/Lanelet.h>
+
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <lanelet2_extension/visualization/visualization.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
@@ -77,8 +78,6 @@ auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msg
 
 auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
 
-auto generateMarker() -> visualization_msgs::msg::MarkerArray;
-
 namespace
 {
 auto getNextRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
@@ -87,9 +86,6 @@ auto getPreviousRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
 
 auto toPolygon(const lanelet::ConstLineString3d & line_string)
   -> std::vector<geometry_msgs::msg::Point>;
-
-auto insertMarkerArray(
-  visualization_msgs::msg::MarkerArray &, const visualization_msgs::msg::MarkerArray &) -> void;
 }  // namespace
 }  // namespace other
 }  // namespace lanelet2

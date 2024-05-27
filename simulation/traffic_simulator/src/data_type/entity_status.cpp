@@ -72,7 +72,7 @@ auto CanonicalizedEntityStatus::set(const EntityStatus & status, const double ma
 
   std::optional<CanonicalizedLaneletPose> canonicalized_lanelet_pose;
   if (status.lanelet_pose_valid) {
-    canonicalized_lanelet_pose = pose::canonicalize(status.lanelet_pose);
+    canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(status.lanelet_pose);
   } else {
     // prefer the current lanelet
     canonicalized_lanelet_pose = toCanonicalizedLaneletPose(

@@ -19,8 +19,8 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/lanelet/pose.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace traffic_simulator
 {
@@ -28,9 +28,8 @@ namespace lanelet_pose
 {
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPose & maybe_non_canonicalized_lanelet_pose)
-: lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose)),
-  lanelet_poses_(
-    lanelet2::pose::getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
+: lanelet_pose_(pose::canonicalize(maybe_non_canonicalized_lanelet_pose)),
+  lanelet_poses_(pose::alternativeLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(pose::toMapPose(lanelet_pose_))
 {
   adjustOrientationAndOzPosition();
@@ -38,9 +37,8 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(
 
 CanonicalizedLaneletPose::CanonicalizedLaneletPose(
   const LaneletPose & maybe_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets)
-: lanelet_pose_(canonicalize(maybe_non_canonicalized_lanelet_pose, route_lanelets)),
-  lanelet_poses_(
-    lanelet2::pose::getAllCanonicalizedLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
+: lanelet_pose_(pose::canonicalize(maybe_non_canonicalized_lanelet_pose, route_lanelets)),
+  lanelet_poses_(pose::alternativeLaneletPoses(maybe_non_canonicalized_lanelet_pose)),
   map_pose_(pose::toMapPose(lanelet_pose_))
 {
   adjustOrientationAndOzPosition();
@@ -69,58 +67,16 @@ CanonicalizedLaneletPose & CanonicalizedLaneletPose::operator=(
   return *this;
 }
 
-auto CanonicalizedLaneletPose::canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose)
-  -> LaneletPose
-{
-  if (
-    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
-      lanelet2::pose::canonicalizeLaneletPose(may_non_canonicalized_lanelet_pose))) {
-    return canonicalized.value();
-  } else {
-    THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", may_non_canonicalized_lanelet_pose.lanelet_id,
-      ",s=", may_non_canonicalized_lanelet_pose.s,
-      ",offset=", may_non_canonicalized_lanelet_pose.offset,
-      ",rpy.x=", may_non_canonicalized_lanelet_pose.rpy.x,
-      ",rpy.y=", may_non_canonicalized_lanelet_pose.rpy.y,
-      ",rpy.z=", may_non_canonicalized_lanelet_pose.rpy.z,
-      ") is invalid, please check lanelet length and connection.");
-  }
-}
-
-auto CanonicalizedLaneletPose::canonicalize(
-  const LaneletPose & may_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets)
-  -> LaneletPose
-{
-  if (
-    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
-      lanelet2::pose::canonicalizeLaneletPose(
-        may_non_canonicalized_lanelet_pose, route_lanelets))) {
-    return canonicalized.value();
-  } else {
-    THROW_SEMANTIC_ERROR(
-      "Lanelet pose (id=", may_non_canonicalized_lanelet_pose.lanelet_id,
-      ",s=", may_non_canonicalized_lanelet_pose.s,
-      ",offset=", may_non_canonicalized_lanelet_pose.offset,
-      ",rpy.x=", may_non_canonicalized_lanelet_pose.rpy.x,
-      ",rpy.y=", may_non_canonicalized_lanelet_pose.rpy.y,
-      ",rpy.z=", may_non_canonicalized_lanelet_pose.rpy.z,
-      ") is invalid, please check lanelet length, connection and entity route.");
-  }
-}
-
 auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
   LaneletPose from, bool allow_lane_change) const -> std::optional<LaneletPose>
 {
   if (lanelet_poses_.empty()) {
     return std::nullopt;
   }
-  lanelet::Ids shortest_route =
-    lanelet2::route::getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
+  auto shortest_route = route::getRoute(from.lanelet_id, lanelet_poses_[0].lanelet_id);
   LaneletPose alternative_lanelet_pose = lanelet_poses_[0];
   for (const auto & laneletPose : lanelet_poses_) {
-    const auto route =
-      lanelet2::route::getRoute(from.lanelet_id, laneletPose.lanelet_id, allow_lane_change);
+    const auto route = route::getRoute(from.lanelet_id, laneletPose.lanelet_id, allow_lane_change);
     if (shortest_route.size() > route.size()) {
       shortest_route = route;
       alternative_lanelet_pose = laneletPose;
@@ -134,8 +90,7 @@ auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition() -> void
   using quaternion_operation::convertEulerAngleToQuaternion;
   using quaternion_operation::convertQuaternionToEulerAngle;
   using quaternion_operation::getRotation;
-  const math::geometry::CatmullRomSpline spline(
-    lanelet2::other::getCenterPoints(lanelet_pose_.lanelet_id));
+  const auto spline = route::toSpline({lanelet_pose_.lanelet_id});
   // adjust Oz position
   if (const auto s_value = spline.getSValue(map_pose_)) {
     map_pose_.position.z = spline.getPoint(s_value.value()).z;

@@ -73,10 +73,6 @@ public:
 
 private:
   auto adjustOrientationAndOzPosition() -> void;
-  auto canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose) -> LaneletPose;
-  auto canonicalize(
-    const LaneletPose & may_non_canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets)
-    -> LaneletPose;
   LaneletPose lanelet_pose_;
   std::vector<LaneletPose> lanelet_poses_;
   geometry_msgs::msg::Pose map_pose_;

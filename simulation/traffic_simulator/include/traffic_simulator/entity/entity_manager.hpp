@@ -42,7 +42,7 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -170,7 +170,7 @@ public:
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
-    markers_raw_(lanelet2::other::generateMarker()),
+    markers_raw_(lanelet_map::visualizationMarker()),
     conventional_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>()),
     conventional_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(conventional_traffic_light_manager_ptr_, node)),
@@ -471,7 +471,7 @@ public:
         // it is just rewritten, assuming that in the scenario is right, alternatively:
         // toCanonicalizedLaneletPose(entity_status.pose, parameters.bounding_box,
         // {pose.lanelet_id}, include_crosswalk, matching_distance);
-        return CanonicalizedEntityStatus(entity_status, canonicalize(pose));
+        return CanonicalizedEntityStatus(entity_status, toCanonicalizedLaneletPose(pose));
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
         const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance);

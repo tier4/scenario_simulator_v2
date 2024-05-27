@@ -54,7 +54,7 @@ traffic_simulator::lanelet_pose::CanonicalizedLaneletPose constructCanonicalized
   lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw)
 {
   if (
-    auto canonicalized_lanelet_pose = canonicalize(
+    auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
       traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw))) {
     return canonicalized_lanelet_pose.value();
   } else {
