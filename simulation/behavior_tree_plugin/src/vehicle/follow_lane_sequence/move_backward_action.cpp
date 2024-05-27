@@ -14,7 +14,6 @@
 
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/move_backward_action.hpp>
 #include <optional>
-#include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/route.hpp>
 
 namespace entity_behavior
