@@ -23,6 +23,7 @@
 #include <string>
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -138,17 +139,20 @@ auto API::setEntityStatus(
   setEntityStatus(name, canonicalize(status));
 }
 
-std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
+std::optional<double> API::getTimeHeadway(
+  const std::string & from_entity_name, const std::string & to_entity_name)
 {
-  geometry_msgs::msg::Pose pose = getRelativePose(from, to);
-  if (pose.position.x > 0) {
-    return std::nullopt;
+  if (auto from_entity = getEntity(from_entity_name); from_entity) {
+    if (auto to_entity = getEntity(to_entity_name); to_entity) {
+      if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+          relative_pose && relative_pose->position.x <= 0) {
+        const double time_headway =
+          (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;
+        return std::isnan(time_headway) ? std::numeric_limits<double>::infinity() : time_headway;
+      }
+    }
   }
-  double ret = (pose.position.x * -1) / (getCurrentTwist(to).linear.x);
-  if (std::isnan(ret)) {
-    return std::numeric_limits<double>::infinity();
-  }
-  return ret;
+  return std::nullopt;
 }
 
 auto API::setEntityStatus(
