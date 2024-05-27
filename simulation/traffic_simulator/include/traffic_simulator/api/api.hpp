@@ -286,6 +286,31 @@ public:
     const lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
+  /**
+   * @brief Add a traffic source to the simulation
+   * @param radius The radius defining the area on which entities will be spawned
+   * @param rate The rate at which entities will be spawned [Hz]
+   * @param speed The speed of the spawned entities
+   * @param position The center of the area on which entities will be spawned (includes orientation)
+   * @param distribution The parameters of the spawned entities with their respective weights for random distribution
+   *                     For each entity there are 4 parameters in a tuple:
+   *                     - VehicleParameters or PedestrianParameters - parameters of entity
+   *                     - std::string - name of behavior to be used when spawning
+   *                     - std::string - name of 3D model to be used when spawning
+   *                     - double - weight of entity for random distribution
+   * @param allow_spawn_outside_lane Whether entities can be spawned outside the lane
+   * @param require_footprint_fitting Whether entities are required to fit inside lanelet polygon when spawned
+   *                                  (allow_spawn_outside_lane has higher priority)
+   * @param random_orientation Whether entities should have their orientation randomized before lane matching
+   * @param random_seed [Optional] The seed for the random number generator
+   */
+  auto addTrafficSource(
+    const double radius, const double rate, const double speed,
+    const geometry_msgs::msg::Pose & position,
+    const traffic::TrafficSource::Distribution & distribution,
+    const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
+    const bool random_orientation = false, std::optional<int> random_seed = std::nullopt) -> void;
+
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
