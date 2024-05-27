@@ -17,6 +17,8 @@
 #include <optional>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <utility>
 #include <vector>
 
@@ -98,7 +100,7 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   if (!behavior_parameter.see_around) {
     return BT::NodeStatus::FAILURE;
   }
-  if (getRightOfWayEntities(route_lanelets).size() != 0) {
+  if (traffic_simulator::route::isNeedToRightOfWay(route_lanelets, getOtherEntitiesPoses())) {
     return BT::NodeStatus::FAILURE;
   }
   const auto waypoints = calculateWaypoints();
@@ -108,7 +110,8 @@ BT::NodeStatus StopAtTrafficLightAction::tick()
   if (trajectory == nullptr) {
     return BT::NodeStatus::FAILURE;
   }
-  distance_to_stop_target_ = getDistanceToTrafficLightStopLine(route_lanelets, *trajectory);
+  distance_to_stop_target_ =
+    traffic_light_manager->getDistanceToActiveTrafficLightStopLine(route_lanelets, *trajectory);
   std::optional<double> target_linear_speed;
   if (distance_to_stop_target_) {
     if (distance_to_stop_target_.value() > getHorizon()) {
