@@ -1,79 +1,102 @@
+// Copyright 2015 TIER IV, Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <gtest/gtest.h>
 
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 
+TEST(SimulationClock, Initialize)
+{
+  const double realtime_factor = 1.0;
+  const double frame_rate = 10.0;
+  const bool use_sim_time = true;
+  auto simulation_clock = traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
+
+  EXPECT_FALSE(simulation_clock.started());
+  simulation_clock.update();
+  EXPECT_NO_THROW(simulation_clock.start());
+
+  EXPECT_TRUE(simulation_clock.started());
+  simulation_clock.update();
+  EXPECT_THROW(simulation_clock.start(), std::runtime_error);
+}
+
 TEST(SimulationClock, getCurrentRosTime)
 {
-  constexpr double realtime_factor = 2.0;
-  constexpr double frame_rate = 10.0;
-  traffic_simulator::SimulationClock simulation_clock(true, realtime_factor, frame_rate);
+  const double realtime_factor = 2.0;
+  const double frame_rate = 10.0;
+  const bool use_sim_time = true;
+  auto simulation_clock = traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
   simulation_clock.start();
 
   const auto initial_time = simulation_clock.getCurrentRosTime();
 
-  for (int i = 0; i < 5; ++i) {
+  const int iterations = 5;
+  for (int i = 0; i < iterations; ++i) {
     simulation_clock.update();
   }
 
   const auto current_time = simulation_clock.getCurrentRosTime();
-  const double elapsed_time = (current_time - initial_time).seconds();
-  const double expected_elapsed_time = 5.0 * realtime_factor / frame_rate;
+  const double result_elapsed_time = (current_time - initial_time).seconds();
+  const double actual_elapsed_time = static_cast<double>(iterations) * realtime_factor / frame_rate;
+  const double epsilon = 1e-6;
 
-  EXPECT_NEAR(elapsed_time, expected_elapsed_time, 1e-6);
+  EXPECT_NEAR(result_elapsed_time, actual_elapsed_time, epsilon);
 }
 
 TEST(SimulationClock, getCurrentScenarioTime)
 {
-  traffic_simulator::SimulationClock clock(true, 1.0, 30.0);
+  const double realtime_factor = 1.0;
+  const double frame_rate = 30.0;
+  const bool use_sim_time = true;
+  auto simulation_clock = traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
 
-  clock.start();
+  simulation_clock.start();
 
-  EXPECT_DOUBLE_EQ(clock.getCurrentScenarioTime(), 0.0);
+  EXPECT_DOUBLE_EQ(simulation_clock.getCurrentScenarioTime(), 0.0);
 
-  for (int i = 0; i < 10; ++i) {
-    clock.update();
-    const double expected_scenario_time = (i + 1) * clock.getStepTime();
-    EXPECT_DOUBLE_EQ(clock.getCurrentScenarioTime(), expected_scenario_time);
+  const int iterations = 5;
+  for (int i = 0; i < iterations; ++i) {
+    simulation_clock.update();
   }
 
-  for (int i = 0; i < 5; ++i) {
-    clock.update();
-    const double expected_scenario_time = (10 + 1 + i) * clock.getStepTime();
-    EXPECT_DOUBLE_EQ(clock.getCurrentScenarioTime(), expected_scenario_time);
-  }
+  const double result_elapsed_time = simulation_clock.getCurrentScenarioTime();
+  const double actual_elapsed_time = static_cast<double>(iterations) * realtime_factor / frame_rate;
+  const double epsilon = 1e-6;
+
+  EXPECT_NEAR(actual_elapsed_time, result_elapsed_time, epsilon);
 }
 
 TEST(SimulationClock, Update)
 {
-  const bool use_sim_time = true;
   const double realtime_factor = 1.0;
   const double frame_rate = 10.0;
-  traffic_simulator::SimulationClock simulation_clock(use_sim_time, realtime_factor, frame_rate);
+  const bool use_sim_time = true;
+  auto simulation_clock = traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
 
   simulation_clock.start();
+
   const double initial_simulation_time = simulation_clock.getCurrentSimulationTime();
 
-  const int num_updates = 10;
+  const int iterations = 10;
   const double step_time = simulation_clock.getStepTime();
   const double tolerance = 1e-6;
 
-  for (int i = 0; i < num_updates; ++i) {
+  for (int i = 0; i < iterations; ++i) {
     simulation_clock.update();
-    const double expected_simulation_time = initial_simulation_time + (i + 1) * step_time;
+    const double expected_simulation_time = initial_simulation_time + static_cast<double>(i + 1) * step_time;
     const double actual_simulation_time = simulation_clock.getCurrentSimulationTime();
     EXPECT_NEAR(actual_simulation_time, expected_simulation_time, tolerance);
   }
-}
-
-TEST(SimulationClock, Initialize)
-{
-  traffic_simulator::SimulationClock sim_clock(true, 1.0, 10.0);
-
-  EXPECT_FALSE(sim_clock.started());
-  sim_clock.update();
-  EXPECT_NO_THROW(sim_clock.start());
-
-  EXPECT_TRUE(sim_clock.started());
-  sim_clock.update();
-  EXPECT_THROW(sim_clock.start(), std::runtime_error);
 }

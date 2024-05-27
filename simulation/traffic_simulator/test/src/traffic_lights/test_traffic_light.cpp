@@ -711,33 +711,33 @@ TEST(TrafficLight, Color_make_wrong)
 {
   using Color = traffic_simulator::TrafficLight::Color;
   Color color;
-  EXPECT_THROW(color = Color::make("karmazynowy"), std::runtime_error);
-  EXPECT_FALSE(boost::lexical_cast<std::string>(color) == "karmazynowy");
+  EXPECT_THROW(color = Color::make("wrong_color"), std::runtime_error);
+  EXPECT_FALSE(boost::lexical_cast<std::string>(color) == "wrong_color");
 }
 
 TEST(TrafficLight, Shape_make_wrong)
 {
   using Shape = traffic_simulator::TrafficLight::Shape;
   Shape shape;
-  EXPECT_THROW(shape = Shape::make("dwunastoscian foremny"), std::runtime_error);
-  EXPECT_FALSE(boost::lexical_cast<std::string>(shape) == "dwunastoscian foremny");
+  EXPECT_THROW(shape = Shape::make("wrong_shape"), std::runtime_error);
+  EXPECT_FALSE(boost::lexical_cast<std::string>(shape) == "wrong_shape");
 }
 
 TEST(TrafficLight, Status_make_wrong)
 {
   using Status = traffic_simulator::TrafficLight::Status;
   Status status;
-  EXPECT_THROW(status = Status::make("ekonomiczny"), std::runtime_error);
-  EXPECT_FALSE(boost::lexical_cast<std::string>(status) == "ekonomiczny");
+  EXPECT_THROW(status = Status::make("wrong_status"), std::runtime_error);
+  EXPECT_FALSE(boost::lexical_cast<std::string>(status) == "wrong_status");
 }
 
 TEST(TrafficLight, Bulb_make_wrong)
 {
   using Bulb = traffic_simulator::TrafficLight::Bulb;
 
-  EXPECT_THROW(Bulb("red flashing dwunastoscian foremny"), std::runtime_error);
-  EXPECT_THROW(Bulb("red ekonomiczny circle"), std::runtime_error);
-  EXPECT_THROW(Bulb("karmazynowy flashing circle"), std::runtime_error);
+  EXPECT_THROW(Bulb("red flashing wrong_shape"), std::runtime_error);
+  EXPECT_THROW(Bulb("red wrong_status circle"), std::runtime_error);
+  EXPECT_THROW(Bulb("wrong_color flashing circle"), std::runtime_error);
 
-  EXPECT_THROW(Bulb("karmazynowy ekonomiczny dwunastoscian foremny"), std::runtime_error);
+  EXPECT_THROW(Bulb("wrong_color wrong_status wrong_shape"), std::runtime_error);
 }
