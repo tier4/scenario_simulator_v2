@@ -18,6 +18,7 @@
 #include <memory>
 #include <string>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
 #include <type_traits>
 #include <utility>
@@ -84,6 +85,36 @@ auto TrafficLightManager::getTrafficLights(const lanelet::Id lanelet_id)
   }
 
   return traffic_lights;
+}
+
+auto TrafficLightManager::getDistanceToActiveTrafficLightStopLine(
+  const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+  -> std::optional<double>
+{
+  const auto traffic_light_ids =
+    traffic_simulator::lanelet2::traffic_lights::getTrafficLightIdsOnPath(route_lanelets);
+  if (traffic_light_ids.empty()) {
+    return std::nullopt;
+  }
+  std::set<double> collision_points = {};
+  for (const auto id : traffic_light_ids) {
+    using Color = traffic_simulator::TrafficLight::Color;
+    using Status = traffic_simulator::TrafficLight::Status;
+    using Shape = traffic_simulator::TrafficLight::Shape;
+    if (auto && traffic_light = getTrafficLight(id);
+        traffic_light.contains(Color::red, Status::solid_on, Shape::circle) or
+        traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
+      const auto collision_point =
+        traffic_simulator::distance::distanceToTrafficLightStopLine(spline, id);
+      if (collision_point) {
+        collision_points.insert(collision_point.value());
+      }
+    }
+  }
+  if (collision_points.empty()) {
+    return std::nullopt;
+  }
+  return *collision_points.begin();
 }
 
 auto TrafficLightManager::generateUpdateTrafficLightsRequest()

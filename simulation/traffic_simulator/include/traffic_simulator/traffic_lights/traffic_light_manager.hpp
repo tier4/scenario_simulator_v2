@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
 
+#include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -51,6 +52,10 @@ public:
     -> std::vector<std::reference_wrapper<TrafficLight>>;
 
   auto hasAnyLightChanged() -> bool;
+
+  auto getDistanceToActiveTrafficLightStopLine(
+    const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+    -> std::optional<double>;
 
   auto generateUpdateTrafficLightsRequest() -> simulation_api_schema::UpdateTrafficLightsRequest;
 };
