@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/utility/Units.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 

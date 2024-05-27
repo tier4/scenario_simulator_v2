@@ -14,7 +14,7 @@
 
 #include <traffic_simulator/behavior/route_planner.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace traffic_simulator
 {
@@ -40,15 +40,14 @@ auto RoutePlanner::getRouteLanelets(
   // If the route from the entity_lanelet_pose to waypoint_queue_.front() was failed to calculate in updateRoute function,
   // use following lanelet as route.
   if (!route_) {
-    return lanelet2::route::getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
+    return route::followingLanelets(lanelet_pose.lanelet_id, horizon, true);
   }
-  if (route_ && lanelet2::other::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
-    return lanelet2::route::getFollowingLanelets(
-      lanelet_pose.lanelet_id, route_.value(), horizon, true);
+  if (route_ && route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
+    return route::followingLanelets(lanelet_pose.lanelet_id, route_.value(), horizon, true);
   }
   // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
   cancelWaypoint(entity_lanelet_pose);
-  return lanelet2::route::getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
+  return route::followingLanelets(lanelet_pose.lanelet_id, horizon, true);
 }
 
 void RoutePlanner::cancelRoute()
@@ -102,14 +101,14 @@ auto RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_p
   }
   const auto lanelet_pose = static_cast<LaneletPose>(entity_lanelet_pose);
   if (!route_) {
-    route_ = lanelet2::route::getRoute(
+    route_ = route::getRoute(
       lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id);
     return;
   }
-  if (lanelet2::other::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
+  if (route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return;
   } else {
-    route_ = lanelet2::route::getRoute(
+    route_ = route::getRoute(
       lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id);
     return;
   }

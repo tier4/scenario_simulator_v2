@@ -15,16 +15,28 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__ROUTE_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__ROUTE_HPP_
 
+#include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
+#include <traffic_simulator/utils/lanelet/lane_change.hpp>
 #include <traffic_simulator/utils/lanelet/route.hpp>
 
 namespace traffic_simulator
 {
 inline namespace route
 {
+template <typename... Ts>
+auto getRoute(Ts &&... xs)
+{
+  return lanelet2::route::getRoute(std::forward<decltype(xs)>(xs)...);
+}
+
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
+
+auto toSpline(const lanelet::Ids & route) -> math::geometry::CatmullRomSpline;
+
 template <typename... Ts>
 auto followingLanelets(Ts &&... xs)
 {
@@ -57,6 +69,12 @@ auto moveAlongLaneletPose(
 
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
   -> std::vector<geometry_msgs::msg::Point>;
+
+template <typename... Ts>
+auto laneChangeableLaneletId(Ts &&... xs)
+{
+  return lanelet2::lane_change::getLaneChangeableLaneletId(std::forward<decltype(xs)>(xs)...);
+}
 
 auto laneChangeAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,

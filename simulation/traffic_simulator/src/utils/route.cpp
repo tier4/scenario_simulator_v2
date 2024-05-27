@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <geometry/spline/catmull_rom_spline.hpp>
-#include <traffic_simulator/utils/lanelet/lane_change.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -23,6 +22,18 @@ namespace traffic_simulator
 {
 namespace route
 {
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route_lanelets) -> bool
+{
+  return std::find_if(route_lanelets.begin(), route_lanelets.end(), [lanelet_id](const auto id) {
+           return lanelet_id == id;
+         }) != route_lanelets.end();
+}
+
+auto toSpline(const lanelet::Ids & route_lanelets) -> math::geometry::CatmullRomSpline
+{
+  return math::geometry::CatmullRomSpline(lanelet2::other::getCenterPoints(route_lanelets));
+}
+
 auto isAnyConflictingEntity(
   const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> bool
