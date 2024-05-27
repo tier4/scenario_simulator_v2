@@ -13,6 +13,34 @@ Changelog for package cpp_mock_scenarios
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.0 (2024-05-27)
+------------------
+* Merge pull request `#1233 <https://github.com/tier4/scenario_simulator_v2/issues/1233>`_ from tier4/ref/RJD-1054-implement-distance-utils
+  ref(traffic_simulator): implement separate class for distance calculations, adapt make positions in SimulatorCore
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* ref(cpp_mock, simulator_core, pose): improve names
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1054-implement-distance-utils
+* ref(traffic_simulator, distance): rename from getters to noun function name
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* ref(traffic_simulator,distance): ref getDistanceToLaneBound
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* ref(traffic_simulator): transform DistanceUtils to distance namespace
+* feat(distance): use separated getDistanceToBound
+* feat(distance): use separated getLateral and getLongitudinal distances
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Tatsuya Yamasaki
+
 1.18.0 (2024-05-24)
 -------------------
 * Merge pull request `#1231 <https://github.com/tier4/scenario_simulator_v2/issues/1231>`_ from tier4/feature/traffic-source

@@ -13,6 +13,26 @@ Changelog for package status_monitor
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.0 (2024-05-27)
+------------------
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Contributors: DMoszynski, Dawid Moszynski, Masaya Kataoka, Tatsuya Yamasaki
+
 1.18.0 (2024-05-24)
 -------------------
 * Merge branch 'master' into feature/traffic-source
