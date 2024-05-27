@@ -16,7 +16,7 @@
 #include <filesystem>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace vehicle_simulation
@@ -332,43 +332,11 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
   if (!status_.laneMatchingSucceed()) {
     return 0.0;
   }
-
-  /// @note Copied from motion_util::findNearestSegmentIndex
-  auto centerline_points =
-    traffic_simulator::lanelet2::other::getCenterPoints(status_.getLaneletId());
-  auto find_nearest_segment_index = [](
-                                      const std::vector<geometry_msgs::msg::Point> & points,
-                                      const geometry_msgs::msg::Point & point) {
-    assert(not points.empty());
-
-    double min_dist = std::numeric_limits<double>::max();
-    size_t min_idx = 0;
-
-    for (size_t i = 0; i < points.size(); ++i) {
-      const auto dist = [](const auto point1, const auto point2) {
-        const auto dx = point1.x - point2.x;
-        const auto dy = point1.y - point2.y;
-        return dx * dx + dy * dy;
-      }(points.at(i), point);
-
-      if (dist < min_dist) {
-        min_dist = dist;
-        min_idx = i;
-      }
-    }
-    return min_idx;
-  };
-
   geometry_msgs::msg::Point ego_point;
   ego_point.x = vehicle_model_ptr_->getX();
   ego_point.y = vehicle_model_ptr_->getY();
-  const size_t ego_seg_idx = find_nearest_segment_index(centerline_points, ego_point);
-
-  const auto & prev_point = centerline_points.at(ego_seg_idx);
-  const auto & next_point = centerline_points.at(ego_seg_idx + 1);
-
-  /// @note Calculate ego yaw angle on lanelet coordinates
-  const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
+  auto [lanelet_yaw, prev_point, next_point] =
+    traffic_simulator::lanelet_map::yaw(status_.getLaneletId(), ego_point);
   const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
 
   /// @note calculate ego pitch angle considering ego yaw.
