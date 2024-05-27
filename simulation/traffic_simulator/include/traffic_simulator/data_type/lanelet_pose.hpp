@@ -47,6 +47,7 @@ public:
     consider_pose_by_road_slope_ = consider_pose_by_road_slope;
   }
   static auto getConsiderPoseByRoadSlope() -> bool { return consider_pose_by_road_slope_; }
+  auto getLaneletId() const noexcept -> lanelet::Id { return lanelet_pose_.lanelet_id; }
 
 /**
    Note: The comparison operator for the CanonicalizedLaneletPose type compares
