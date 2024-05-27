@@ -23,7 +23,7 @@
 #include <iomanip>
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
-#include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 namespace traffic_simulator
 {
@@ -78,7 +78,7 @@ struct Configuration
     pointcloud_map_file(findLexicographicallyFirstFilenameOf(map_path, ".pcd")),
     scenario_path(scenario_path)
   {
-    traffic_simulator::lanelet2::LaneletMap::activate(lanelet2_map_path().string());
+    traffic_simulator::lanelet_map::activate(lanelet2_map_path().string());
   }
 
   explicit Configuration(
@@ -90,7 +90,7 @@ struct Configuration
     pointcloud_map_file(findLexicographicallyFirstFilenameOf(map_path, ".pcd")),
     scenario_path(scenario_path)
   {
-    traffic_simulator::lanelet2::LaneletMap::activate(lanelet2_map_path().string());
+    traffic_simulator::lanelet_map::activate(lanelet2_map_path().string());
   }
 
   auto assertMapPath(const Pathname & map_path) const -> const Pathname &
