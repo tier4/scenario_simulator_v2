@@ -52,21 +52,4 @@ geometry_msgs::msg::Vector3 operator-(
   const geometry_msgs::msg::Vector3 & v0, const geometry_msgs::msg::Vector3 & v1);
 geometry_msgs::msg::Point operator-(
   const geometry_msgs::msg::Point & v0, const geometry_msgs::msg::Point & v1);
-
-template <typename T>
-auto operator+(const std::vector<T> & v0, const std::vector<T> & v1) -> decltype(auto)
-{
-  auto result = v0;
-  result.reserve(v0.size() + v1.size());
-  result.insert(result.end(), v1.begin(), v1.end());
-  return result;
-}
-
-template <typename T>
-auto operator+=(std::vector<T> & v0, const std::vector<T> & v1) -> decltype(auto)
-{
-  v0.reserve(v0.size() + v1.size());
-  v0.insert(v0.end(), v1.begin(), v1.end());
-  return v0;
-}
 #endif  // GEOMETRY__LINEAR_ALGEBRA_HPP_
