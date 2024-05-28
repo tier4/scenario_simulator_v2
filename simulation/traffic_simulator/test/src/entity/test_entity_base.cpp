@@ -318,7 +318,7 @@ TEST_F(EntityBaseTest, requestLaneChange_relativeTargetLaneletPose)
   EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint);, common::Error);
 }
 
-TEST_F(EntityBaseTest, requestLaneChange_relativeTargetnName)
+TEST_F(EntityBaseTest, requestLaneChange_relativeTargetName)
 {
   const lanelet::Id target_id = 34468;
   const std::string target_name = "target_name";
