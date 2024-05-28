@@ -437,7 +437,6 @@ TEST(HdMapUtils, getNearbyLaneletIds_unsuccessful)
 
 TEST(HdMapUtils, getNearbyLaneletIds_crosswalkIncluded)
 {
-  // refer to 1st issue at the end of this file
   auto hdmap_utils = makeHdMapUtilsInstance();
 
   auto point = makePoint(3768.01, 73750.97);
@@ -456,7 +455,6 @@ TEST(HdMapUtils, getNearbyLaneletIds_crosswalkIncluded)
 
 TEST(HdMapUtils, getNearbyLaneletIds_crosswalkNotIncluded)
 {
-  // refer to 1st issue at the end of this file
   auto hdmap_utils = makeHdMapUtilsInstance();
 
   auto point = makePoint(3768.01, 73750.97);
@@ -1251,7 +1249,6 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift0)
 
 TEST(HdMapUtils, getPreviousLanelets_straightBefore)
 {
-  // refer to 3rd issue at the end of this file
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id lanelet_id = 202;
 
@@ -1264,7 +1261,6 @@ TEST(HdMapUtils, getPreviousLanelets_straightBefore)
 
 TEST(HdMapUtils, getPreviousLanelets_curveBefore)
 {
-  // refer to 3rd issue at the end of this file
   auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34600;
 
@@ -1277,7 +1273,6 @@ TEST(HdMapUtils, getPreviousLanelets_curveBefore)
 
 TEST(HdMapUtils, getPreviousLanelets_notEnoughLaneletsBefore)
 {
-  // refer to 3rd issue at the end of this file
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id lanelet_id = 202;
 
@@ -2236,7 +2231,6 @@ TEST(HdMapUtils, getStopLinePolygon_stopLine)
 
 TEST(HdMapUtils, getStopLinePolygon_noStopLine)
 {
-  // refer to 4th issue at the end of this file
   auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
   const lanelet::Id linestring_id_no_stopline{34629};
 
@@ -2589,19 +2583,3 @@ TEST(HdMapUtils, getDistanceToStopLine_emptyVector_waypoints)
   auto result_distance = hdmap_utils.getDistanceToStopLine({}, waypoints);
   EXPECT_FALSE(result_distance.has_value());
 }
-
-/*
-ISSUES:
-1: 288, missing predicate if first is closer than distance threshold.
-  Differning from line 265.
-2: 776: confusing naming or functionality: 
-  consider getFollowingLanelets(120660, {120660, <random-lanelets>}, 10000, true);
-  then <random-lanelets> will be added unconditionally.
-3: 743: the function has mistake:
-  The function is supposed to reverse one lanelet in every iteration, but every iteration starts
-  from the lanelet passed as argument, so the result will be the lanelet passed as argument and many
-  copies of the one previous lanelet.
-  The mistake was introduced here: https://github.com/tier4/scenario_simulator_v2/commit/3fc8c0ad9f6aaf0762b16c0cb168e1dfcbf1ed29#diff-da44510bdbbba766d1ba47318640cfd8bcff2e350eafe3d77d364bfbf70e25cdL745-L770
-  The previous implementation seems to have been right.
-4: 1853: This function does not check if "lanelet_id" represents a stopline. Any linestring can be passed. 
-*/
