@@ -36,8 +36,7 @@ inline auto activate(Ts &&... xs)
 
 auto borderlinePoses() -> std::vector<Pose>;
 
-auto yaw(const lanelet::Id lanelet_id, const Point & point)
--> std::tuple<double, Point, Point>;
+auto yaw(const lanelet::Id lanelet_id, const Point & point) -> std::tuple<double, Point, Point>;
 
 auto visualizationMarker() -> visualization_msgs::msg::MarkerArray;
 }  // namespace lanelet_map

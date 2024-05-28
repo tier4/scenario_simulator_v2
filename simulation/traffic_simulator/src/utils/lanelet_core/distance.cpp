@@ -69,7 +69,8 @@ auto getLateralDistance(
 }
 
 auto getLongitudinalDistance(
-  const LaneletPose & from, const LaneletPose & to, bool const allow_lane_change) -> std::optional<double>
+  const LaneletPose & from, const LaneletPose & to, bool const allow_lane_change)
+  -> std::optional<double>
 {
   if (from.lanelet_id == to.lanelet_id) {
     if (from.s > to.s) {

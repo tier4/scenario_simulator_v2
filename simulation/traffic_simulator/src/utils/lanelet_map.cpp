@@ -32,8 +32,7 @@ auto borderlinePoses() -> std::vector<Pose>
   return borderline_poses;
 }
 
-auto yaw(const lanelet::Id lanelet_id, const Point & point)
-  -> std::tuple<double, Point, Point>
+auto yaw(const lanelet::Id lanelet_id, const Point & point) -> std::tuple<double, Point, Point>
 {
   /// @note Copied from motion_util::findNearestSegmentIndex
   const auto centerline_points = lanelet_core::other::getCenterPoints(lanelet_id);

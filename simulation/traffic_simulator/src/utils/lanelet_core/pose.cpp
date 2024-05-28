@@ -90,7 +90,10 @@ auto toLaneletPose(const Pose & pose, const lanelet::Id lanelet_id, const double
 auto toLaneletPose(const Pose & pose, const bool include_crosswalk, const double matching_distance)
   -> std::optional<LaneletPose>
 {
-  const auto lanelet_ids = getNearbyLaneletIds(pose.position, 0.1, include_crosswalk);
+  constexpr double distance_threshold{0.1};
+  constexpr std::size_t search_count{5};
+  const auto lanelet_ids =
+    getNearbyLaneletIds(pose.position, distance_threshold, include_crosswalk, search_count);
   if (lanelet_ids.empty()) {
     return std::nullopt;
   }
