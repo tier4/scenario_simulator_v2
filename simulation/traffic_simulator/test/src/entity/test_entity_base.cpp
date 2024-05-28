@@ -88,20 +88,19 @@ TEST_F(EntityBaseTest, get2DPolygon)
   const auto polygon = dummy.get2DPolygon();
 
   std::vector<geometry_msgs::msg::Point> ref_poly{};
-  {
-    ref_poly.push_back(makePoint(-1.0, -1.0));
-    ref_poly.push_back(makePoint(-1.0, 1.0));
-    ref_poly.push_back(makePoint(3.0, 1.0));
-    ref_poly.push_back(makePoint(3.0, -1.0));
-    ref_poly.push_back(ref_poly.front());
 
-    EXPECT_EQ(polygon.size(), ref_poly.size());
-    EXPECT_POINT_EQ(polygon.at(0), ref_poly.at(0));
-    EXPECT_POINT_EQ(polygon.at(1), ref_poly.at(1));
-    EXPECT_POINT_EQ(polygon.at(2), ref_poly.at(2));
-    EXPECT_POINT_EQ(polygon.at(3), ref_poly.at(3));
-    EXPECT_POINT_EQ(polygon.at(4), ref_poly.at(4));
-  }
+  ref_poly.push_back(makePoint(-1.0, -1.0));
+  ref_poly.push_back(makePoint(-1.0, 1.0));
+  ref_poly.push_back(makePoint(3.0, 1.0));
+  ref_poly.push_back(makePoint(3.0, -1.0));
+  ref_poly.push_back(ref_poly.front());
+
+  EXPECT_EQ(polygon.size(), ref_poly.size());
+  EXPECT_POINT_EQ(polygon.at(0), ref_poly.at(0));
+  EXPECT_POINT_EQ(polygon.at(1), ref_poly.at(1));
+  EXPECT_POINT_EQ(polygon.at(2), ref_poly.at(2));
+  EXPECT_POINT_EQ(polygon.at(3), ref_poly.at(3));
+  EXPECT_POINT_EQ(polygon.at(4), ref_poly.at(4));
 }
 
 TEST_F(EntityBaseTest, startNpcLogic)
