@@ -131,8 +131,6 @@ bool EntityManager::entityExists(const std::string & name)
   return entities_.find(name) != std::end(entities_);
 }
 
-auto EntityManager::getCurrentTime() const noexcept -> double { return current_time_; }
-
 auto EntityManager::getEntityNames() const -> const std::vector<std::string>
 {
   std::vector<std::string> names{};
@@ -213,8 +211,6 @@ auto EntityManager::getPedestrianParameters(const std::string & name) const
     "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
     "Please check description of the scenario and entity type of the Entity: " + name);
 }
-
-auto EntityManager::getStepTime() const noexcept -> double { return step_time_; }
 
 auto EntityManager::getVehicleParameters(const std::string & name) const
   -> const traffic_simulator_msgs::msg::VehicleParameters &
@@ -304,7 +300,7 @@ void EntityManager::requestLaneChange(
 }
 
 void EntityManager::resetBehaviorPlugin(
-  const std::string & name, const std::string & behavior_plugin_name)
+  const double current_time, const std::string & name, const std::string & behavior_plugin_name)
 {
   const auto & status = getEntityStatus(name);
   const auto behavior_parameter = getBehaviorParameter(name);
@@ -318,11 +314,13 @@ void EntityManager::resetBehaviorPlugin(
   } else if (is<VehicleEntity>(name)) {
     const auto parameters = getVehicleParameters(name);
     despawnEntity(name);
-    spawnEntity<VehicleEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+    spawnEntity<VehicleEntity>(
+      name, status.getMapPose(), parameters, current_time, behavior_plugin_name);
   } else if (is<PedestrianEntity>(name)) {
     const auto parameters = getPedestrianParameters(name);
     despawnEntity(name);
-    spawnEntity<PedestrianEntity>(name, status.getMapPose(), parameters, behavior_plugin_name);
+    spawnEntity<PedestrianEntity>(
+      name, status.getMapPose(), parameters, current_time, behavior_plugin_name);
   } else {
     THROW_SIMULATION_ERROR(
       "Entity :", name, "is unkown entity type.", "Please contact to developer.");
@@ -340,39 +338,41 @@ bool EntityManager::trafficLightsChanged()
 }
 
 void EntityManager::requestSpeedChange(
-  const std::string & name, double target_speed, bool continuous)
+  const double current_time, const std::string & name, double target_speed, bool continuous)
 {
-  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && current_time > 0.0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, continuous);
 }
 
 void EntityManager::requestSpeedChange(
-  const std::string & name, const double target_speed, const speed_change::Transition transition,
-  const speed_change::Constraint constraint, const bool continuous)
+  const double current_time, const std::string & name, const double target_speed,
+  const speed_change::Transition transition, const speed_change::Constraint constraint,
+  const bool continuous)
 {
-  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && current_time > 0.0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 
 void EntityManager::requestSpeedChange(
-  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
+  const double current_time, const std::string & name,
+  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
 {
-  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && current_time > 0.0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, continuous);
 }
 
 void EntityManager::requestSpeedChange(
-  const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-  const speed_change::Transition transition, const speed_change::Constraint constraint,
-  const bool continuous)
+  const double current_time, const std::string & name,
+  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
+  const speed_change::Constraint constraint, const bool continuous)
 {
-  if (is<EgoEntity>(name) && getCurrentTime() > 0) {
+  if (is<EgoEntity>(name) && current_time > 0.0) {
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
@@ -386,12 +386,14 @@ void EntityManager::setVerbose(const bool verbose)
   }
 }
 
-auto EntityManager::updateNpcLogic(const std::string & name) -> const CanonicalizedEntityStatus &
+auto EntityManager::updateNpcLogic(
+  const std::string & name, const double current_time, const double step_time)
+  -> const CanonicalizedEntityStatus &
 {
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  entities_[name]->onUpdate(current_time_, step_time_);
+  entities_[name]->onUpdate(current_time, step_time);
   return entities_[name]->getStatus();
 }
 
@@ -399,8 +401,6 @@ void EntityManager::update(const double current_time, const double step_time)
 {
   traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
     "EntityManager::update", configuration.verbose);
-  step_time_ = step_time;
-  current_time_ = current_time;
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
     conventional_traffic_light_updater_.createTimer(
@@ -416,7 +416,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   all_status.clear();
   for (auto && [name, entity] : entities_) {
-    all_status.emplace(name, updateNpcLogic(name));
+    all_status.emplace(name, updateNpcLogic(name, current_time, step_time));
   }
   for (auto && [name, entity] : entities_) {
     entity->setOtherStatus(all_status);
@@ -444,7 +444,6 @@ void EntityManager::update(const double current_time, const double step_time)
   if (configuration.verbose) {
     stop_watch_update.print();
   }
-  current_time_ += step_time;
 }
 
 void EntityManager::updateHdmapMarker()

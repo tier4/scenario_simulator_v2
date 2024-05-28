@@ -94,10 +94,6 @@ class EntityManager
 
   std::unordered_map<std::string, std::shared_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
-  double step_time_;
-
-  double current_time_;
-
   bool npc_logic_started_;
 
   using EntityStatusWithTrajectoryArray =
@@ -163,7 +159,6 @@ public:
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
-    current_time_(std::numeric_limits<double>::quiet_NaN()),
     npc_logic_started_(false),
     entity_status_array_pub_ptr_(rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
       node, "entity/status", EntityMarkerQoS(),
@@ -304,22 +299,26 @@ public:
 
   bool trafficLightsChanged();
 
-  void requestSpeedChange(const std::string & name, double target_speed, bool continuous);
+  void requestSpeedChange(
+    const double current_time, const std::string & name, double target_speed, bool continuous);
 
   void requestSpeedChange(
-    const std::string & name, const double target_speed, const speed_change::Transition transition,
-    const speed_change::Constraint constraint, const bool continuous);
-
-  void requestSpeedChange(
-    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
-    bool continuous);
-
-  void requestSpeedChange(
-    const std::string & name, const speed_change::RelativeTargetSpeed & target_speed,
+    const double current_time, const std::string & name, const double target_speed,
     const speed_change::Transition transition, const speed_change::Constraint constraint,
     const bool continuous);
 
-  auto updateNpcLogic(const std::string & name) -> const CanonicalizedEntityStatus &;
+  void requestSpeedChange(
+    const double current_time, const std::string & name,
+    const speed_change::RelativeTargetSpeed & target_speed, bool continuous);
+
+  void requestSpeedChange(
+    const double current_time, const std::string & name,
+    const speed_change::RelativeTargetSpeed & target_speed,
+    const speed_change::Transition transition, const speed_change::Constraint constraint,
+    const bool continuous);
+
+  auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
+    -> const CanonicalizedEntityStatus &;
 
   void broadcastEntityTransform();
 
@@ -332,8 +331,6 @@ public:
   bool despawnEntity(const std::string & name);
 
   bool entityExists(const std::string & name);
-
-  auto getCurrentTime() const noexcept -> double;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
@@ -351,8 +348,6 @@ public:
 
   auto getPedestrianParameters(const std::string & name) const
     -> const traffic_simulator_msgs::msg::PedestrianParameters &;
-
-  auto getStepTime() const noexcept -> double;
 
   auto getVehicleParameters(const std::string & name) const
     -> const traffic_simulator_msgs::msg::VehicleParameters &;
@@ -415,13 +410,15 @@ public:
    * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
    * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
    */
-  void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
+  void resetBehaviorPlugin(
+    const double current_time, const std::string & name, const std::string & behavior_plugin_name);
 
   void setVerbose(const bool verbose);
 
   template <typename Entity, typename Pose, typename Parameters, typename... Ts>
   auto spawnEntity(
-    const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
+    const std::string & name, const Pose & pose, const Parameters & parameters,
+    const double current_time, Ts &&... xs)
   {
     auto makeEntityStatus = [&]() {
       EntityStatus entity_status;
@@ -444,7 +441,7 @@ public:
       }
 
       entity_status.subtype = parameters.subtype;
-      entity_status.time = getCurrentTime();
+      entity_status.time = current_time;
       entity_status.name = name;
       entity_status.bounding_box = parameters.bounding_box;
       entity_status.action_status = traffic_simulator_msgs::msg::ActionStatus();

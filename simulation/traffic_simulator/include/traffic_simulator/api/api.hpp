@@ -136,10 +136,10 @@ public:
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration);
+                 name, pose, parameters, getCurrentTime(), configuration);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
-          name, pose, parameters, behavior);
+          name, pose, parameters, getCurrentTime(), behavior);
       }
     };
 
@@ -174,7 +174,7 @@ public:
   {
     auto register_to_entity_manager = [&]() {
       return entity_manager_ptr_->spawnEntity<entity::PedestrianEntity>(
-        name, pose, parameters, behavior);
+        name, pose, parameters, getCurrentTime(), behavior);
     };
 
     auto register_to_environment_simulator = [&]() {
@@ -203,7 +203,8 @@ public:
     const std::string & model3d = "")
   {
     auto register_to_entity_manager = [&]() {
-      return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(name, pose, parameters);
+      return entity_manager_ptr_->spawnEntity<entity::MiscObjectEntity>(
+        name, pose, parameters, getCurrentTime());
     };
 
     auto register_to_environment_simulator = [&]() {
@@ -297,7 +298,7 @@ public:
     const lane_change::Constraint & constraint);
 
   // clang-format off
-#define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
+#define FORWARD_TO_ENTITY_MANAGER(NAME, ...)                               \
   /*!                                                                      \
    @brief Forward to arguments to the EntityManager::NAME function.        \
    @return return value of the EntityManager::NAME function.               \
@@ -307,7 +308,7 @@ public:
   decltype(auto) NAME(Ts &&... xs)                                         \
   {                                                                        \
     assert(entity_manager_ptr_);                                           \
-    return (*entity_manager_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
+    return (*entity_manager_ptr_).NAME(__VA_ARGS__ std::forward<decltype(xs)>(xs)...); \
   }                                                                        \
   static_assert(true, "")
   // clang-format on
@@ -343,9 +344,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
-  FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
+  FORWARD_TO_ENTITY_MANAGER(requestSpeedChange, getCurrentTime(), );
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
-  FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
+  FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin, getCurrentTime(), );
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(setAcceleration);
