@@ -31,13 +31,6 @@ auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
   return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
 }
 
-auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool
-{
-  return std::find_if(route.begin(), route.end(), [lanelet_id](const auto id) {
-           return lanelet_id == id;
-         }) != route.end();
-}
-
 auto getLaneletIds() -> lanelet::Ids
 {
   lanelet::Ids ids;

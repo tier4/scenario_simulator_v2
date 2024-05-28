@@ -25,6 +25,13 @@ namespace lanelet2
 {
 namespace lane_change
 {
+auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool
+{
+  const auto from_lanelet = LaneletMap::map()->laneletLayer.get(from_lanelet_id);
+  const auto to_lanelet = LaneletMap::map()->laneletLayer.get(to_lanelet_id);
+  return LaneletMap::trafficRulesVehicle()->canChangeLane(from_lanelet, to_lanelet);
+}
+
 auto getAlongLaneletPose(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose, const double along)
   -> traffic_simulator_msgs::msg::LaneletPose
@@ -61,13 +68,6 @@ auto getAlongLaneletPose(
     }
   }
   return along_pose;
-}
-
-auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool
-{
-  const auto from_lanelet = LaneletMap::map()->laneletLayer.get(from_lanelet_id);
-  const auto to_lanelet = LaneletMap::map()->laneletLayer.get(to_lanelet_id);
-  return LaneletMap::trafficRulesVehicle()->canChangeLane(from_lanelet, to_lanelet);
 }
 
 auto getLaneChangeableLaneletId(

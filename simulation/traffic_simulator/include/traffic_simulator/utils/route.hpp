@@ -27,15 +27,15 @@ namespace traffic_simulator
 {
 inline namespace route
 {
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
+
+auto toSpline(const lanelet::Ids & route) -> math::geometry::CatmullRomSpline;
+
 template <typename... Ts>
 auto getRoute(Ts &&... xs)
 {
   return lanelet2::route::getRoute(std::forward<decltype(xs)>(xs)...);
 }
-
-auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
-
-auto toSpline(const lanelet::Ids & route) -> math::geometry::CatmullRomSpline;
 
 template <typename... Ts>
 auto followingLanelets(Ts &&... xs)

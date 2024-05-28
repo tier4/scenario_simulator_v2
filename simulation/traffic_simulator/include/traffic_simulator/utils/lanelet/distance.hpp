@@ -62,6 +62,7 @@ auto getDistanceToTrafficLightStopLine(
   const math::geometry::CatmullRomSplineInterface & spline, const lanelet::Id traffic_light_id)
   -> std::optional<double>;
 
+// private for distance namespace
 namespace
 {
 auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;

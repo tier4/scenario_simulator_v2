@@ -29,8 +29,6 @@ namespace other
 {
 auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
 
-auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
-
 auto getLaneletIds() -> lanelet::Ids;
 
 template <typename Lanelet>
@@ -72,12 +70,11 @@ auto getPreviousLaneletIds(const lanelet::Id) -> lanelet::Ids;
 
 auto getPreviousLaneletIds(const lanelet::Id, const std::string & turn_direction) -> lanelet::Ids;
 
-// Polygon and marker
-
 auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
 
 auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
 
+// private for other namespace
 namespace
 {
 auto getNextRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;

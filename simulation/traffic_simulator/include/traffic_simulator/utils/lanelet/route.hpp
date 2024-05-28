@@ -25,6 +25,8 @@ namespace lanelet2
 {
 namespace route
 {
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
+
 auto getRoute(const lanelet::Id from, const lanelet::Id to, bool allow_lane_change = false)
   -> lanelet::Ids;
 

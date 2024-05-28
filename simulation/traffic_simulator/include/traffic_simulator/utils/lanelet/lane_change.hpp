@@ -58,6 +58,7 @@ auto getLaneChangeTrajectory(
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
   const double tangent_vector_size) -> math::geometry::HermiteCurve;
 
+// private for lane_change namespace
 namespace
 {
 auto getVectorFromPose(const geometry_msgs::msg::Pose & pose, const double magnitude)

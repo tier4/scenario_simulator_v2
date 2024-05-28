@@ -29,6 +29,13 @@ namespace lanelet2
 {
 namespace route
 {
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool
+{
+  return std::find_if(route.begin(), route.end(), [lanelet_id](const auto id) {
+           return lanelet_id == id;
+         }) != route.end();
+}
+
 auto getRoute(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, bool allow_lane_change)
   -> lanelet::Ids

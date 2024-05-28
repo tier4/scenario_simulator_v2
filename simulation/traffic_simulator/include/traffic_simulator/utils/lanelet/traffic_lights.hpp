@@ -50,6 +50,7 @@ auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::
 auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traffic_light_way_id)
   -> lanelet::Ids;
 
+// private for traffic_lights namespace
 namespace
 {
 auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)

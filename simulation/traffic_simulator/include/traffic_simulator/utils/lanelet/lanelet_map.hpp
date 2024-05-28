@@ -80,7 +80,6 @@ public:
 
 private:
   std::unordered_map<std::tuple<lanelet::Id, lanelet::Id, bool>, lanelet::Ids> data_;
-
   std::mutex mutex_;
 };
 
@@ -120,9 +119,7 @@ public:
 
 private:
   std::unordered_map<lanelet::Id, std::vector<geometry_msgs::msg::Point>> data_;
-
   std::unordered_map<lanelet::Id, std::shared_ptr<math::geometry::CatmullRomSpline>> splines_;
-
   std::mutex mutex_;
 };
 
@@ -152,7 +149,6 @@ public:
 
 private:
   std::unordered_map<lanelet::Id, double> data_;
-
   std::mutex mutex_;
 };
 

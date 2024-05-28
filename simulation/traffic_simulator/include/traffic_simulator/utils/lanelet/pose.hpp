@@ -51,9 +51,6 @@ auto toLaneletPoses(
   const bool include_opposite_direction = true)
   -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
-auto getAllCanonicalizedLaneletPoses(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
-  -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
-
 auto canonicalizeLaneletPose(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
   -> std::tuple<
     std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<lanelet::Id>>;
@@ -63,6 +60,9 @@ auto canonicalizeLaneletPose(
   const lanelet::Ids & route_lanelets)
   -> std::tuple<
     std::optional<traffic_simulator_msgs::msg::LaneletPose>, std::optional<lanelet::Id>>;
+
+auto getAllCanonicalizedLaneletPoses(const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose)
+  -> std::vector<traffic_simulator_msgs::msg::LaneletPose>;
 
 // private for pose namespace
 namespace
