@@ -66,10 +66,10 @@ void TrafficController::autoSink()
   }
 }
 
-void TrafficController::execute()
+void TrafficController::execute(const double current_time, const double step_time)
 {
   for (const auto & module : modules_) {
-    module->execute();
+    module->execute(current_time, step_time);
   }
 }
 }  // namespace traffic

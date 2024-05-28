@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/traffic/traffic_source.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
@@ -333,7 +334,7 @@ bool API::updateFrame()
   }
 
   entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
-  traffic_controller_ptr_->execute();
+  traffic_controller_ptr_->execute(getCurrentTime(), clock_.getStepTime());
 
   if (not configuration.standalone_mode) {
     if (!updateTrafficLightsInSim() || !updateTimeInSim()) {
@@ -390,4 +391,22 @@ void API::requestLaneChange(
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
 }
 
+auto API::addTrafficSource(
+  const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
+  const traffic::TrafficSource::Distribution & distribution, const bool allow_spawn_outside_lane,
+  const bool require_footprint_fitting, const bool random_orientation, std::optional<int> seed)
+  -> void
+{
+  traffic_simulator::traffic::TrafficSource::Configuration configuration;
+  configuration.allow_spawn_outside_lane = allow_spawn_outside_lane;
+  configuration.require_footprint_fitting = require_footprint_fitting;
+  configuration.use_random_orientation = random_orientation;
+
+  traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
+    radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
+    entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
+      this->spawn(name, std::forward<decltype(xs)>(xs)...);
+      setLinearVelocity(name, speed);
+    });
+}
 }  // namespace traffic_simulator
