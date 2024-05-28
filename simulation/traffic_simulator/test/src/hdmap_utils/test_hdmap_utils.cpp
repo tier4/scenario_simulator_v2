@@ -111,15 +111,15 @@ TEST(HdMapUtils, matchToLane)
   bbox.dimensions.y = 1.0;
   {
     const auto id = hdmap_utils.matchToLane(
-      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(120659, 1, 0)).pose,
-      bbox, false);
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(120659, 1)).pose, bbox,
+      false);
     EXPECT_TRUE(id);
     EXPECT_EQ(id.value(), 120659);
   }
   {
     const auto id = hdmap_utils.matchToLane(
-      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34411, 1, 0)).pose,
-      bbox, false);
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34411, 1)).pose, bbox,
+      false);
     EXPECT_TRUE(id);
     EXPECT_EQ(id.value(), 34411);
   }
@@ -130,36 +130,33 @@ TEST(HdMapUtils, AlongLaneletPose)
   auto hdmap_utils = makeHdMapUtilsInstance();
 
   EXPECT_EQ(
-    hdmap_utils
-      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), 30)
+    hdmap_utils.getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), 30)
       .lanelet_id,
     34513);
   EXPECT_EQ(
     hdmap_utils
       .getAlongLaneletPose(
-        traffic_simulator::helper::constructLaneletPose(34513, 0, 0),
+        traffic_simulator::helper::constructLaneletPose(34513, 0),
         hdmap_utils.getLaneletLength(34513) + 10.0)
       .lanelet_id,
     34510);
   EXPECT_DOUBLE_EQ(
-    hdmap_utils
-      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), 30.0)
+    hdmap_utils.getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), 30.0)
       .s,
     30.0);
   EXPECT_EQ(
-    hdmap_utils
-      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), 30.0)
+    hdmap_utils.getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), 30.0)
       .lanelet_id,
     34513);
 
   EXPECT_EQ(
     hdmap_utils
-      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), -10.0)
+      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), -10.0)
       .lanelet_id,
     34684);
   EXPECT_DOUBLE_EQ(
     hdmap_utils
-      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0, 0), -10.0)
+      .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), -10.0)
       .s,
     hdmap_utils.getLaneletLength(34684) - 10.0);
 }
@@ -194,9 +191,9 @@ TEST(HdMapUtils, CanonicalizeNegative)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
 
-  double non_canonicalized_lanelet_s = -22;
+  double non_canonicalized_lanelet_s = -22.0;
   const auto non_canonicalized_lanelet_pose =
-    traffic_simulator::helper::constructLaneletPose(34564, non_canonicalized_lanelet_s, 0);
+    traffic_simulator::helper::constructLaneletPose(34564, non_canonicalized_lanelet_s);
   const auto canonicalized_lanelet_pose = std::get<std::optional<traffic_simulator::LaneletPose>>(
     hdmap_utils.canonicalizeLaneletPose(non_canonicalized_lanelet_pose));
 
@@ -217,9 +214,9 @@ TEST(HdMapUtils, CanonicalizePositive)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
 
-  double non_canonicalized_lanelet_s = 30;
+  double non_canonicalized_lanelet_s = 30.0;
   const auto non_canonicalized_lanelet_pose =
-    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s, 0);
+    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s);
   const auto canonicalized_lanelet_pose = std::get<std::optional<traffic_simulator::LaneletPose>>(
     hdmap_utils.canonicalizeLaneletPose(non_canonicalized_lanelet_pose));
 
@@ -239,9 +236,9 @@ TEST(HdMapUtils, Canonicalize)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
 
-  double non_canonicalized_lanelet_s = 2;
+  double non_canonicalized_lanelet_s = 2.0;
   const auto non_canonicalized_lanelet_pose =
-    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s, 0);
+    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s);
   const auto canonicalized_lanelet_pose = std::get<std::optional<traffic_simulator::LaneletPose>>(
     hdmap_utils.canonicalizeLaneletPose(non_canonicalized_lanelet_pose));
 
@@ -263,9 +260,9 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
 
-  double non_canonicalized_lanelet_s = -22;
+  double non_canonicalized_lanelet_s = -22.0;
   const auto non_canonicalized_lanelet_pose =
-    traffic_simulator::helper::constructLaneletPose(34564, non_canonicalized_lanelet_s, 0);
+    traffic_simulator::helper::constructLaneletPose(34564, non_canonicalized_lanelet_s);
   const auto canonicalized_lanelet_poses =
     hdmap_utils.getAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
@@ -301,9 +298,9 @@ TEST(HdMapUtils, CanonicalizeAllPositive)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
 
-  double non_canonicalized_lanelet_s = 30;
+  double non_canonicalized_lanelet_s = 30.0;
   const auto non_canonicalized_lanelet_pose =
-    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s, 0);
+    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s);
   const auto canonicalized_lanelet_poses =
     hdmap_utils.getAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
@@ -334,9 +331,9 @@ TEST(HdMapUtils, CanonicalizeAll)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
 
-  double non_canonicalized_lanelet_s = 2;
+  double non_canonicalized_lanelet_s = 2.0;
   const auto non_canonicalized_lanelet_pose =
-    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s, 0);
+    traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s);
   const auto canonicalized_lanelet_poses =
     hdmap_utils.getAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
@@ -504,15 +501,15 @@ TEST(HdMapUtils, matchToLane_includeCrosswalk)
   auto bbox = makeSmallBoundingBox();
   {
     const auto id = hdmap_utils.matchToLane(
-      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34399, 1, 0)).pose,
-      bbox, true);
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34399, 1)).pose, bbox,
+      true);
     EXPECT_TRUE(id.has_value());
     EXPECT_EQ(id.value(), 34399);
   }
   {
     const auto id = hdmap_utils.matchToLane(
-      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34399, 1, 0)).pose,
-      bbox, false);
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34399, 1)).pose, bbox,
+      false);
     if (id.has_value()) {
       EXPECT_NE(id.value(), 34399);
     }
@@ -525,14 +522,14 @@ TEST(HdMapUtils, matchToLane_noMatch)
   auto bbox = makeSmallBoundingBox();
   {
     const auto id = hdmap_utils.matchToLane(
-      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34392, 0, 0)).pose,
-      bbox, false);
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34392, 0)).pose, bbox,
+      false);
     EXPECT_FALSE(id.has_value());
   }
   {
     const auto id = hdmap_utils.matchToLane(
-      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34378, 0, 0)).pose,
-      bbox, false);
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(34378, 0)).pose, bbox,
+      false);
     EXPECT_FALSE(id.has_value());
   }
 }

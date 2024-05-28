@@ -28,22 +28,20 @@
   EXPECT_DOUBLE_EQ(DATA0.y, DATA1.y); \
   EXPECT_DOUBLE_EQ(DATA0.z, DATA1.z);
 
-// This macro adds a stream like message to checks so that they can be printed when the test fails.
-#define EXPECT_POINT_EQ_STREAM(DATA0, DATA1, STREAM) \
-  EXPECT_DOUBLE_EQ(DATA0.x, DATA1.x) << STREAM;      \
-  EXPECT_DOUBLE_EQ(DATA0.y, DATA1.y) << STREAM;      \
-  EXPECT_DOUBLE_EQ(DATA0.z, DATA1.z) << STREAM;
+#define EXPECT_POINT_EQ_STREAM(DATA0, DATA1, STREAM_MESSAGE) \
+  EXPECT_DOUBLE_EQ(DATA0.x, DATA1.x) << STREAM_MESSAGE;      \
+  EXPECT_DOUBLE_EQ(DATA0.y, DATA1.y) << STREAM_MESSAGE;      \
+  EXPECT_DOUBLE_EQ(DATA0.z, DATA1.z) << STREAM_MESSAGE;
 
 #define EXPECT_POINT_NEAR(DATA0, DATA1, EPS) \
   EXPECT_NEAR(DATA0.x, DATA1.x, EPS);        \
   EXPECT_NEAR(DATA0.y, DATA1.y, EPS);        \
   EXPECT_NEAR(DATA0.z, DATA1.z, EPS);
 
-// This macro adds a stream like message to checks so that they can be printed when the test fails.
-#define EXPECT_POINT_NEAR_STREAM(DATA0, DATA1, EPS, STREAM) \
-  EXPECT_NEAR(DATA0.x, DATA1.x, EPS) << STREAM;             \
-  EXPECT_NEAR(DATA0.y, DATA1.y, EPS) << STREAM;             \
-  EXPECT_NEAR(DATA0.z, DATA1.z, EPS) << STREAM;
+#define EXPECT_POINT_NEAR_STREAM(DATA0, DATA1, EPS, STREAM_MESSAGE) \
+  EXPECT_NEAR(DATA0.x, DATA1.x, EPS) << STREAM_MESSAGE;             \
+  EXPECT_NEAR(DATA0.y, DATA1.y, EPS) << STREAM_MESSAGE;             \
+  EXPECT_NEAR(DATA0.z, DATA1.z, EPS) << STREAM_MESSAGE;
 
 #define EXPECT_VECTOR3_EQ(DATA0, DATA1) \
   EXPECT_DOUBLE_EQ(DATA0.x, DATA1.x);   \
