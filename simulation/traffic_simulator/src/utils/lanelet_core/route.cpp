@@ -19,13 +19,13 @@
 
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/route.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 namespace route
 {
@@ -228,5 +228,5 @@ auto getConflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
   return ids;
 }
 }  // namespace route
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator

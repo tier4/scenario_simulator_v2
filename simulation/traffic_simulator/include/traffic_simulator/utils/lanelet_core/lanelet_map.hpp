@@ -45,7 +45,7 @@ public:
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 class RouteCache
 {
@@ -205,6 +205,6 @@ private:
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_pedestrian_ptr_;
 };
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_MEMORY_HPP_

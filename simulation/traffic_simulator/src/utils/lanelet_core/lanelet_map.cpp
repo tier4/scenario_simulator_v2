@@ -17,11 +17,11 @@
 
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <lanelet2_extension/utility/query.hpp>
-#include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 auto LaneletMap::activate(const std::string & lanelet_map_path) -> void
 {
@@ -59,6 +59,7 @@ auto LaneletMap::laneletLengthCache() -> LaneletLengthCache &
 }
 
 auto LaneletMap::map() -> const lanelet::LaneletMapPtr & { return getInstance().lanelet_map_ptr_; }
+
 auto LaneletMap::shoulderLanelets() -> const lanelet::ConstLanelets &
 {
   return getInstance().shoulder_lanelets_;
@@ -237,5 +238,5 @@ auto LaneletMap::calculateSegmentDistances(const lanelet::ConstLineString3d & li
   }
   return segment_distances;
 }
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator

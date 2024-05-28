@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 namespace traffic_lights
 {
@@ -193,5 +193,5 @@ auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
 }
 }  // namespace
 }  // namespace traffic_lights
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator

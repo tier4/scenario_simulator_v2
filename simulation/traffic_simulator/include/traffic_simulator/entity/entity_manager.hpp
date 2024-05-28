@@ -192,7 +192,7 @@ public:
     conventional_traffic_light_updater_(
       node, [this]() { conventional_traffic_light_marker_publisher_ptr_->publish(); })
   {
-    updateHdmapMarker();
+    updateLaneletMarker();
   }
 
   ~EntityManager() = default;
@@ -508,7 +508,7 @@ public:
 
   void update(const double current_time, const double step_time);
 
-  void updateHdmapMarker();
+  void updateLaneletMarker();
 
   void startNpcLogic();
 

@@ -23,7 +23,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 namespace lane_change
 {
@@ -68,6 +68,6 @@ auto getTangentVector(const lanelet::Id lanelet_id, const double s)
   -> std::optional<geometry_msgs::msg::Vector3>;
 }  // namespace
 }  // namespace lane_change
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_LANE_CHANGE_HPP_

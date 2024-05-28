@@ -18,7 +18,7 @@
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/utils/lanelet/distance.hpp>
+#include <traffic_simulator/utils/lanelet_core/distance.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -116,7 +116,7 @@ auto distanceToStopLine(
 template <typename... Ts>
 auto distanceToStopLine(Ts &&... xs)
 {
-  return lanelet2::distance::getDistanceToStopLine(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::distance::getDistanceToStopLine(std::forward<decltype(xs)>(xs)...);
 }
 
 auto distanceToYieldStop(

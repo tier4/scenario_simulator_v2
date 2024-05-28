@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__TRAFFIC_LIGHTS_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__TRAFFIC_LIGHTS_HPP_
 
-#include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
+#include <traffic_simulator/utils/lanelet_core/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
@@ -24,20 +24,21 @@ inline namespace traffic_lights
 template <typename... Ts>
 inline auto trafficLightIdsOnPath(Ts &&... xs)
 {
-  return lanelet2::traffic_lights::getTrafficLightIdsOnPath(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::traffic_lights::getTrafficLightIdsOnPath(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 inline auto trafficLightRegulatoryElementIdsFromTrafficLightId(Ts &&... xs)
 {
-  return lanelet2::traffic_lights::getTrafficLightRegulatoryElementIDsFromTrafficLight(
+  return lanelet_core::traffic_lights::getTrafficLightRegulatoryElementIDsFromTrafficLight(
     std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 inline auto bulbPosition(Ts &&... xs)
 {
-  return lanelet2::traffic_lights::getTrafficLightBulbPosition(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::traffic_lights::getTrafficLightBulbPosition(
+    std::forward<decltype(xs)>(xs)...);
 }
 
 auto wayId(const lanelet::Id lanelet_id) -> lanelet::Id;

@@ -16,13 +16,13 @@
 #include <geometry/vector3/normalize.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
-#include <traffic_simulator/utils/lanelet/pose.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/pose.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 namespace other
 {
@@ -278,5 +278,5 @@ auto toPolygon(const lanelet::ConstLineString3d & line_string)
 }
 }  // namespace
 }  // namespace other
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator

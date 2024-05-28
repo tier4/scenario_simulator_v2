@@ -20,8 +20,8 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/utils/lanelet/lane_change.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
+#include <traffic_simulator/utils/lanelet_core/lane_change.hpp>
+#include <traffic_simulator/utils/lanelet_core/route.hpp>
 
 namespace traffic_simulator
 {
@@ -34,25 +34,25 @@ auto toSpline(const lanelet::Ids & route) -> math::geometry::CatmullRomSpline;
 template <typename... Ts>
 auto getRoute(Ts &&... xs)
 {
-  return lanelet2::route::getRoute(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::route::getRoute(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 auto followingLanelets(Ts &&... xs)
 {
-  return lanelet2::route::getFollowingLanelets(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::route::getFollowingLanelets(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 auto previousLanelets(Ts &&... xs)
 {
-  return lanelet2::route::getPreviousLanelets(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::route::getPreviousLanelets(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 auto speedLimit(Ts &&... xs)
 {
-  return lanelet2::route::getSpeedLimit(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::route::getSpeedLimit(std::forward<decltype(xs)>(xs)...);
 }
 
 auto isAnyConflictingEntity(
@@ -73,7 +73,7 @@ auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
 template <typename... Ts>
 auto laneChangeableLaneletId(Ts &&... xs)
 {
-  return lanelet2::lane_change::getLaneChangeableLaneletId(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::lane_change::getLaneChangeableLaneletId(std::forward<decltype(xs)>(xs)...);
 }
 
 auto laneChangeAlongLaneletPose(

@@ -21,7 +21,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 namespace route
 {
@@ -50,6 +50,6 @@ auto getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Id
 
 auto getConflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 }  // namespace route
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_ROUTE_HPP_

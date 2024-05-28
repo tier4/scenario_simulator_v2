@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/utils/lanelet/distance.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
-#include <traffic_simulator/utils/lanelet/pose.hpp>
-#include <traffic_simulator/utils/lanelet/route.hpp>
-#include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
+#include <traffic_simulator/utils/lanelet_core/distance.hpp>
+#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/pose.hpp>
+#include <traffic_simulator/utils/lanelet_core/route.hpp>
+#include <traffic_simulator/utils/lanelet_core/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 namespace distance
 {
@@ -308,5 +308,5 @@ auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineS
 
 }  // namespace
 }  // namespace distance
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator

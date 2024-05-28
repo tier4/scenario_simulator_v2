@@ -18,8 +18,8 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
 #include <traffic_simulator/color_utils/color_utils.hpp>
-#include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/other.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
@@ -29,14 +29,14 @@ inline namespace lanelet_map
 template <typename... Ts>
 inline auto activate(Ts &&... xs)
 {
-  return lanelet2::LaneletMap::activate(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::LaneletMap::activate(std::forward<decltype(xs)>(xs)...);
 }
 
 inline auto borderlinePoses() -> std::vector<geometry_msgs::msg::Pose>
 {
   std::vector<geometry_msgs::msg::Pose> borderline_poses;
-  for (const auto & lanelet_id : lanelet2::other::getLaneletIds()) {
-    if (lanelet2::other::getNextLaneletIds(lanelet_id).empty()) {
+  for (const auto & lanelet_id : lanelet_core::other::getLaneletIds()) {
+    if (lanelet_core::other::getNextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = pose::laneletLength(lanelet_id);
@@ -50,7 +50,8 @@ inline auto yaw(const lanelet::Id & lanelet_id, const geometry_msgs::msg::Point 
   -> std::tuple<double, geometry_msgs::msg::Point, geometry_msgs::msg::Point>
 {
   /// @note Copied from motion_util::findNearestSegmentIndex
-  const auto centerline_points = traffic_simulator::lanelet2::other::getCenterPoints(lanelet_id);
+  const auto centerline_points =
+    traffic_simulator::lanelet_core::other::getCenterPoints(lanelet_id);
   auto find_nearest_segment_index = [](
                                       const std::vector<geometry_msgs::msg::Point> & points,
                                       const geometry_msgs::msg::Point & point) {
@@ -88,7 +89,7 @@ inline auto visualizationMarker() -> visualization_msgs::msg::MarkerArray
   };
 
   lanelet::ConstLanelets all_lanelets =
-    lanelet::utils::query::laneletLayer(lanelet2::LaneletMap::map());
+    lanelet::utils::query::laneletLayer(lanelet_core::LaneletMap::map());
   lanelet::ConstLanelets road_lanelets = lanelet::utils::query::roadLanelets(all_lanelets);
   lanelet::ConstLanelets crosswalk_lanelets =
     lanelet::utils::query::crosswalkLanelets(all_lanelets);
@@ -99,9 +100,9 @@ inline auto visualizationMarker() -> visualization_msgs::msg::MarkerArray
   std::vector<lanelet::DetectionAreaConstPtr> da_reg_elems =
     lanelet::utils::query::detectionAreas(all_lanelets);
   lanelet::ConstLineStrings3d parking_spaces =
-    lanelet::utils::query::getAllParkingSpaces(lanelet2::LaneletMap::map());
+    lanelet::utils::query::getAllParkingSpaces(lanelet_core::LaneletMap::map());
   lanelet::ConstPolygons3d parking_lots =
-    lanelet::utils::query::getAllParkingLots(lanelet2::LaneletMap::map());
+    lanelet::utils::query::getAllParkingLots(lanelet_core::LaneletMap::map());
 
   auto cl_ll_borders = color_utils::fromRgba(1.0, 1.0, 1.0, 0.999);
   auto cl_road = color_utils::fromRgba(0.2, 0.7, 0.7, 0.3);

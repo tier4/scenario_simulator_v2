@@ -22,7 +22,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 namespace pose
 {
@@ -98,6 +98,6 @@ auto getRightLaneletIds(
   -> lanelet::Ids;
 }  // namespace
 }  // namespace pose
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_POSE_HPP_

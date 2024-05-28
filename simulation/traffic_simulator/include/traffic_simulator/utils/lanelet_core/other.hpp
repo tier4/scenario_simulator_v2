@@ -23,7 +23,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet2
+namespace lanelet_core
 {
 namespace other
 {
@@ -85,6 +85,6 @@ auto toPolygon(const lanelet::ConstLineString3d & line_string)
   -> std::vector<geometry_msgs::msg::Point>;
 }  // namespace
 }  // namespace other
-}  // namespace lanelet2
+}  // namespace lanelet_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_OTHER_HPP_

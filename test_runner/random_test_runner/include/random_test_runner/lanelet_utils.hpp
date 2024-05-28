@@ -26,11 +26,6 @@
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "random_test_runner/data_types.hpp"
 
-namespace hdmap_utils
-{
-class HdMapUtils;
-}
-
 struct LaneletPart
 {
   int64_t lanelet_id;

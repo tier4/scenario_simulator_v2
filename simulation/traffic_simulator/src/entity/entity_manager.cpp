@@ -441,7 +441,7 @@ void EntityManager::update(const double current_time, const double step_time)
   current_time_ += step_time;
 }
 
-void EntityManager::updateHdmapMarker()
+void EntityManager::updateLaneletMarker()
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();
