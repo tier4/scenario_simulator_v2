@@ -60,8 +60,8 @@ auto isAnyConflictingEntity(
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> bool;
 
 auto isNeedToRightOfWay(
-  const lanelet::Ids & following_lanelets, std::vector<CanonicalizedLaneletPose> other_entity_poses)
-  -> bool;
+  const lanelet::Ids & following_lanelets,
+  const std::vector<CanonicalizedLaneletPose> & other_entity_poses) -> bool;
 
 auto moveAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,

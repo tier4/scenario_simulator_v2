@@ -61,7 +61,7 @@ auto isAnyConflictingEntity(
 
 auto isNeedToRightOfWay(
   const lanelet::Ids & following_lanelets,
-  std::vector<traffic_simulator::CanonicalizedLaneletPose> other_poses) -> bool
+  const std::vector<traffic_simulator::CanonicalizedLaneletPose> & other_poses) -> bool
 {
   auto isTheSameRightOfWay =
     [&](const std::int64_t & lanelet_id, const std::int64_t & following_lanelet) {

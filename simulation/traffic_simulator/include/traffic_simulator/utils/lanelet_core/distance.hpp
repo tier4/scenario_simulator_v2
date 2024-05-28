@@ -30,13 +30,13 @@ namespace distance
 {
 auto getLateralDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change)
+  const traffic_simulator_msgs::msg::LaneletPose & to, const bool allow_lane_change)
   -> std::optional<double>;
 
 auto getLongitudinalDistance(
   const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change = false)
-  -> std::optional<double>;
+  const traffic_simulator_msgs::msg::LaneletPose & to,
+  const bool allow_lane_change = false) -> std::optional<double>;
 
 auto getDistanceToStopLine(
   const lanelet::Ids & route_lanelets, const std::vector<geometry_msgs::msg::Point> & waypoints)

@@ -415,15 +415,15 @@ auto toPoint2d(const geometry_msgs::msg::Point & point) -> lanelet::BasicPoint2d
 }
 
 auto absoluteHull(
-  const lanelet::BasicPolygon2d & relativeHull, const lanelet::matching::Pose2d & pose)
+  const lanelet::BasicPolygon2d & relative_hull, const lanelet::matching::Pose2d & pose)
   -> lanelet::BasicPolygon2d
 {
-  lanelet::BasicPolygon2d hullPoints;
-  hullPoints.reserve(relativeHull.size());
-  for (const auto & hullPt : relativeHull) {
-    hullPoints.push_back(pose * hullPt);
+  lanelet::BasicPolygon2d hull_points;
+  hull_points.reserve(relative_hull.size());
+  for (const auto & hull_ptr : relative_hull) {
+    hull_points.push_back(pose * hull_ptr);
   }
-  return hullPoints;
+  return hull_points;
 }
 
 auto getLeftLaneletIds(
@@ -462,10 +462,10 @@ auto getLeftLaneletIds(
 }
 
 auto getRightLaneletIds(
-  lanelet::Id lanelet_id, traffic_simulator_msgs::msg::EntityType type,
-  bool include_opposite_direction) -> lanelet::Ids
+    const lanelet::Id lanelet_id, const traffic_simulator_msgs::msg::EntityType & entity_type,
+  const bool include_opposite_direction) -> lanelet::Ids
 {
-  switch (type.type) {
+  switch (entity_type.type) {
     case traffic_simulator_msgs::msg::EntityType::EGO:
       if (include_opposite_direction) {
         return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->rights(

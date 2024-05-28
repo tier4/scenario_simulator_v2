@@ -45,30 +45,34 @@ auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::ms
 
 auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
 
-auto getCenterPoints(const lanelet::Ids &) -> std::vector<geometry_msgs::msg::Point>;
+auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<geometry_msgs::msg::Point>;
 
-auto getCenterPoints(const lanelet::Id) -> std::vector<geometry_msgs::msg::Point>;
+auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
 
-auto getCenterPointsSpline(const lanelet::Id) -> std::shared_ptr<math::geometry::CatmullRomSpline>;
+auto getCenterPointsSpline(const lanelet::Id lanelet_id)
+  -> std::shared_ptr<math::geometry::CatmullRomSpline>;
 
 auto getLaneletLength(const lanelet::Id lanelet_id) -> double;
 
-auto getNextLaneletIds(const lanelet::Ids &) -> lanelet::Ids;
+auto getNextLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 
-auto getNextLaneletIds(const lanelet::Ids &, const std::string & turn_direction) -> lanelet::Ids;
-
-auto getNextLaneletIds(const lanelet::Id) -> lanelet::Ids;
-
-auto getNextLaneletIds(const lanelet::Id, const std::string & turn_direction) -> lanelet::Ids;
-
-auto getPreviousLaneletIds(const lanelet::Ids &) -> lanelet::Ids;
-
-auto getPreviousLaneletIds(const lanelet::Ids &, const std::string & turn_direction)
+auto getNextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
   -> lanelet::Ids;
 
-auto getPreviousLaneletIds(const lanelet::Id) -> lanelet::Ids;
+auto getNextLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 
-auto getPreviousLaneletIds(const lanelet::Id, const std::string & turn_direction) -> lanelet::Ids;
+auto getNextLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
+  -> lanelet::Ids;
+
+auto getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+
+auto getPreviousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
+  -> lanelet::Ids;
+
+auto getPreviousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+
+auto getPreviousLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
+  -> lanelet::Ids;
 
 auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
 

@@ -37,7 +37,7 @@ auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool
 }
 
 auto getRoute(
-  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, bool allow_lane_change)
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, const bool allow_lane_change)
   -> lanelet::Ids
 {
   if (LaneletMap::routeCache().exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {

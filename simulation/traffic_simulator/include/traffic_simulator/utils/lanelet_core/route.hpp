@@ -27,8 +27,9 @@ namespace route
 {
 auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
 
-auto getRoute(const lanelet::Id from, const lanelet::Id to, bool allow_lane_change = false)
-  -> lanelet::Ids;
+auto getRoute(
+  const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
+  const bool allow_lane_change = false) -> lanelet::Ids;
 
 auto getFollowingLanelets(
   const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids,

@@ -29,7 +29,7 @@ namespace distance
 {
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  bool allow_lane_change) -> std::optional<double>
+  const bool allow_lane_change) -> std::optional<double>
 {
   return lanelet_core::distance::getLateralDistance(
     static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), allow_lane_change);
@@ -37,7 +37,7 @@ auto lateralDistance(
 
 auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  double matching_distance, bool allow_lane_change) -> std::optional<double>
+  const double matching_distance, const bool allow_lane_change) -> std::optional<double>
 {
   if (
     std::abs(static_cast<LaneletPose>(from).offset) <= matching_distance &&
@@ -50,7 +50,7 @@ auto lateralDistance(
 
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
-  bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change)
+  bool const include_adjacent_lanelet, bool const include_opposite_direction, const bool allow_lane_change)
   -> std::optional<double>
 {
   if (!include_adjacent_lanelet) {
@@ -136,7 +136,7 @@ auto boundingBoxLaneLateralDistance(
   const CanonicalizedLaneletPose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool allow_lane_change)
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box,const bool allow_lane_change)
   -> std::optional<double>
 {
   if (const auto lateral_distance = lateralDistance(from, to, allow_lane_change);
@@ -162,8 +162,8 @@ auto boundingBoxLaneLongitudinalDistance(
   const CanonicalizedLaneletPose & from,
   const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
   const CanonicalizedLaneletPose & to,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, bool include_adjacent_lanelet,
-  bool include_opposite_direction, bool allow_lane_change) -> std::optional<double>
+  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const bool include_adjacent_lanelet,
+  const bool include_opposite_direction, const bool allow_lane_change) -> std::optional<double>
 {
   if (const auto longitudinal_distance = longitudinalDistance(
         from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change);
@@ -187,7 +187,7 @@ auto boundingBoxLaneLongitudinalDistance(
 
 auto distanceToLeftLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id) -> double
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id) -> double
 {
   if (const auto bound = lanelet_core::other::getLeftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
@@ -215,7 +215,7 @@ auto distanceToLeftLaneBound(
 
 auto distanceToRightLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id) -> double
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id) -> double
 {
   if (const auto bound = lanelet_core::other::getRightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
@@ -244,7 +244,7 @@ auto distanceToRightLaneBound(
 
 auto distanceToLaneBound(
   const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, lanelet::Id lanelet_id) -> double
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const lanelet::Id lanelet_id) -> double
 {
   return std::min(
     distanceToLeftLaneBound(map_pose, bounding_box, lanelet_id),
@@ -346,8 +346,8 @@ auto distanceToYieldStop(
 auto splineDistanceToBoundingBox(
   const math::geometry::CatmullRomSplineInterface & spline,
   const traffic_simulator::CanonicalizedLaneletPose & pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, double width_extension_right,
-  double width_extension_left, double length_extension_front, double length_extension_rear)
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const double width_extension_right,
+  const double width_extension_left, const double length_extension_front, const double length_extension_rear)
   -> std::optional<double>
 {
   const auto polygon = math::geometry::transformPoints(
