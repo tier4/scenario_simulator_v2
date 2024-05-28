@@ -24,9 +24,7 @@ namespace lanelet_core
 {
 namespace distance
 {
-auto getLateralDistance(
-  const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change)
+auto getLateralDistance(const LaneletPose & from, const LaneletPose & to, bool allow_lane_change)
   -> std::optional<double>
 {
   const auto route = route::getRoute(from.lanelet_id, to.lanelet_id, allow_lane_change);
@@ -41,7 +39,7 @@ auto getLateralDistance(
             next_lanelet_ids.begin(), next_lanelet_ids.end(),
             [&route, i](const lanelet::Id id) { return id == route[i + 1]; });
           next_lanelet == next_lanelet_ids.end()) {
-        traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
+        LaneletPose next_lanelet_pose;
         next_lanelet_pose.lanelet_id = route[i + 1];
         next_lanelet_pose.s = 0.0;
         next_lanelet_pose.offset = 0.0;
@@ -51,7 +49,7 @@ auto getLateralDistance(
             pose::toLaneletPose(pose::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
           lateral_distance_by_lane_change += next_lanelet_origin_from_current_lanelet->offset;
         } else {
-          traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
+          LaneletPose current_lanelet_pose = next_lanelet_pose;
           current_lanelet_pose.lanelet_id = route[i];
           if (
             auto current_lanelet_origin_from_next_lanelet =
@@ -70,9 +68,7 @@ auto getLateralDistance(
 }
 
 auto getLongitudinalDistance(
-  const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to, bool allow_lane_change)
-  -> std::optional<double>
+  const LaneletPose & from, const LaneletPose & to, bool allow_lane_change) -> std::optional<double>
 {
   if (from.lanelet_id == to.lanelet_id) {
     if (from.s > to.s) {
@@ -106,7 +102,7 @@ auto getLongitudinalDistance(
   for (unsigned int i = 0; i < route.size(); i++) {
     if (i < route.size() - 1 && with_lane_change(allow_lane_change, route[i], route[i + 1])) {
       /// @note "the lanelet before the lane change" case
-      traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
+      LaneletPose next_lanelet_pose;
       next_lanelet_pose.lanelet_id = route[i + 1];
       next_lanelet_pose.s = 0.0;
       next_lanelet_pose.offset = 0.0;
@@ -116,7 +112,7 @@ auto getLongitudinalDistance(
           pose::toLaneletPose(pose::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
         distance += next_lanelet_origin_from_current_lanelet->s;
       } else {
-        traffic_simulator_msgs::msg::LaneletPose current_lanelet_pose = next_lanelet_pose;
+        LaneletPose current_lanelet_pose = next_lanelet_pose;
         current_lanelet_pose.lanelet_id = route[i];
         if (
           auto current_lanelet_origin_from_next_lanelet =
@@ -152,7 +148,7 @@ auto getLongitudinalDistance(
 }
 
 auto getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets, const std::vector<geometry_msgs::msg::Point> & waypoints)
+  const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
   -> std::optional<double>
 {
   if (waypoints.empty()) {
@@ -162,12 +158,12 @@ auto getDistanceToStopLine(
   if (waypoints.empty()) {
     return std::nullopt;
   }
-  math::geometry::CatmullRomSpline spline(waypoints);
+  Spline spline(waypoints);
   const auto stop_lines = getStopLinesOnPath({route_lanelets});
   for (const auto & stop_line : stop_lines) {
-    std::vector<geometry_msgs::msg::Point> stop_line_points;
+    std::vector<Point> stop_line_points;
     for (const auto & point : stop_line) {
-      geometry_msgs::msg::Point p;
+      Point p;
       p.x = point.x();
       p.y = point.y();
       p.z = point.z();
@@ -184,8 +180,7 @@ auto getDistanceToStopLine(
   return *collision_points.begin();
 }
 
-auto getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+auto getDistanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & spline)
   -> std::optional<double>
 {
   if (spline.getLength() <= 0) {
@@ -194,9 +189,9 @@ auto getDistanceToStopLine(
   std::set<double> collision_points;
   const auto stop_lines = getStopLinesOnPath({route_lanelets});
   for (const auto & stop_line : stop_lines) {
-    std::vector<geometry_msgs::msg::Point> stop_line_points;
+    std::vector<Point> stop_line_points;
     for (const auto & point : stop_line) {
-      geometry_msgs::msg::Point p;
+      Point p;
       p.x = point.x();
       p.y = point.y();
       p.z = point.z();
@@ -214,7 +209,7 @@ auto getDistanceToStopLine(
 }
 
 auto getDistanceToTrafficLightStopLine(
-  const lanelet::Ids & route_lanelets, const std::vector<geometry_msgs::msg::Point> & waypoints)
+  const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
   -> std::optional<double>
 {
   auto traffic_light_ids = traffic_lights::getTrafficLightIdsOnPath(route_lanelets);
@@ -235,8 +230,7 @@ auto getDistanceToTrafficLightStopLine(
 }
 
 auto getDistanceToTrafficLightStopLine(
-  const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
-  -> std::optional<double>
+  const lanelet::Ids & route_lanelets, const SplineInterface & spline) -> std::optional<double>
 {
   auto traffic_light_ids = traffic_lights::getTrafficLightIdsOnPath(route_lanelets);
   if (traffic_light_ids.empty()) {
@@ -256,13 +250,12 @@ auto getDistanceToTrafficLightStopLine(
 }
 
 auto getDistanceToTrafficLightStopLine(
-  const std::vector<geometry_msgs::msg::Point> & waypoints, const lanelet::Id traffic_light_id)
-  -> std::optional<double>
+  const std::vector<Point> & waypoints, const lanelet::Id traffic_light_id) -> std::optional<double>
 {
   if (waypoints.empty()) {
     return std::nullopt;
   }
-  math::geometry::CatmullRomSpline spline(waypoints);
+  Spline spline(waypoints);
   const auto stop_lines = traffic_lights::getTrafficLightStopLinesPoints(traffic_light_id);
   for (const auto & stop_line : stop_lines) {
     const auto collision_point = spline.getCollisionPointIn2D(stop_line);
@@ -274,8 +267,7 @@ auto getDistanceToTrafficLightStopLine(
 }
 
 auto getDistanceToTrafficLightStopLine(
-  const math::geometry::CatmullRomSplineInterface & spline, const lanelet::Id traffic_light_id)
-  -> std::optional<double>
+  const SplineInterface & spline, const lanelet::Id traffic_light_id) -> std::optional<double>
 {
   if (spline.getLength() <= 0) {
     return std::nullopt;

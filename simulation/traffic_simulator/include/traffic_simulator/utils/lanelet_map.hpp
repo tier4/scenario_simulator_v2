@@ -26,15 +26,17 @@ namespace traffic_simulator
 {
 inline namespace lanelet_map
 {
+using Point = geometry_msgs::msg::Point;
+
 template <typename... Ts>
 inline auto activate(Ts &&... xs)
 {
   return lanelet_core::LaneletMap::activate(std::forward<decltype(xs)>(xs)...);
 }
 
-inline auto borderlinePoses() -> std::vector<geometry_msgs::msg::Pose>
+inline auto borderlinePoses() -> std::vector<Pose>
 {
-  std::vector<geometry_msgs::msg::Pose> borderline_poses;
+  std::vector<Pose> borderline_poses;
   for (const auto & lanelet_id : lanelet_core::other::getLaneletIds()) {
     if (lanelet_core::other::getNextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
@@ -46,15 +48,12 @@ inline auto borderlinePoses() -> std::vector<geometry_msgs::msg::Pose>
   return borderline_poses;
 }
 
-inline auto yaw(const lanelet::Id lanelet_id, const geometry_msgs::msg::Point & point)
-  -> std::tuple<double, geometry_msgs::msg::Point, geometry_msgs::msg::Point>
+inline auto yaw(const lanelet::Id lanelet_id, const Point & point)
+  -> std::tuple<double, Point, Point>
 {
   /// @note Copied from motion_util::findNearestSegmentIndex
-  const auto centerline_points =
-    lanelet_core::other::getCenterPoints(lanelet_id);
-  auto find_nearest_segment_index = [](
-                                      const std::vector<geometry_msgs::msg::Point> & points,
-                                      const geometry_msgs::msg::Point & point) {
+  const auto centerline_points = lanelet_core::other::getCenterPoints(lanelet_id);
+  auto find_nearest_segment_index = [](const std::vector<Point> & points, const Point & point) {
     assert(not points.empty());
     double min_distance = std::numeric_limits<double>::max();
     size_t min_index = 0;

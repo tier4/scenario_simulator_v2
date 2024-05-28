@@ -51,17 +51,17 @@ auto getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::I
 }
 
 auto getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
-  -> std::vector<std::vector<geometry_msgs::msg::Point>>
+  -> std::vector<std::vector<Point>>
 {
-  std::vector<std::vector<geometry_msgs::msg::Point>> ret;
+  std::vector<std::vector<Point>> ret;
   const auto traffic_lights = getTrafficLights(traffic_light_id);
   for (const auto & traffic_light : traffic_lights) {
-    ret.emplace_back(std::vector<geometry_msgs::msg::Point>{});
+    ret.emplace_back(std::vector<Point>{});
     const auto stop_line = traffic_light->stopLine();
     if (stop_line) {
       auto & current_stop_line = ret.back();
       for (const auto & point : stop_line.value()) {
-        geometry_msgs::msg::Point p;
+        Point p;
         p.x = point.x();
         p.y = point.y();
         p.z = point.z();
@@ -110,20 +110,17 @@ auto getTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::
 
 auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
 {
-  using namespace lanelet;
-
   if (LaneletMap::map()->lineStringLayer.exists(lanelet_id)) {
     if (auto && linestring = LaneletMap::map()->lineStringLayer.get(lanelet_id);
-        linestring.hasAttribute(AttributeName::Type)) {
-      return linestring.attribute(AttributeName::Type).value() == "traffic_light";
+        linestring.hasAttribute(lanelet::AttributeName::Type)) {
+      return linestring.attribute(lanelet::AttributeName::Type).value() == "traffic_light";
     }
   }
-
   return false;
 }
 
 auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
-  -> std::optional<geometry_msgs::msg::Point>
+  -> std::optional<Point>
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(LaneletMap::map());
   auto autoware_traffic_lights = lanelet::utils::query::autowareTrafficLights(all_lanelets);
@@ -144,7 +141,7 @@ auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::
       if (areBulbsAssignedToTrafficLight(three_light_bulbs)) {
         for (auto bulb : static_cast<lanelet::ConstLineString3d>(three_light_bulbs)) {
           if (isBulbOfExpectedColor(bulb)) {
-            geometry_msgs::msg::Point point;
+            Point point;
             point.x = bulb.x();
             point.y = bulb.y();
             point.z = bulb.z();

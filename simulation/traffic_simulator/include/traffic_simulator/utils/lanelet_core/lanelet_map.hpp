@@ -47,6 +47,9 @@ namespace traffic_simulator
 {
 namespace lanelet_core
 {
+using Point = geometry_msgs::msg::Point;
+using Spline = math::geometry::CatmullRomSpline;
+
 class RouteCache
 {
 public:
@@ -110,16 +113,16 @@ public:
     return splines_[lanelet_id];
   }
 
-  auto appendData(lanelet::Id lanelet_id, const std::vector<geometry_msgs::msg::Point> & route)
+  auto appendData(lanelet::Id lanelet_id, const std::vector<Point> & route)
   {
     std::lock_guard<std::mutex> lock(mutex_);
     data_[lanelet_id] = route;
-    splines_[lanelet_id] = std::make_shared<math::geometry::CatmullRomSpline>(route);
+    splines_[lanelet_id] = std::make_shared<Spline>(route);
   }
 
 private:
-  std::unordered_map<lanelet::Id, std::vector<geometry_msgs::msg::Point>> data_;
-  std::unordered_map<lanelet::Id, std::shared_ptr<math::geometry::CatmullRomSpline>> splines_;
+  std::unordered_map<lanelet::Id, std::vector<Point>> data_;
+  std::unordered_map<lanelet::Id, std::shared_ptr<Spline>> splines_;
   std::mutex mutex_;
 };
 

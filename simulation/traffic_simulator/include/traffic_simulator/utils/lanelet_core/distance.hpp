@@ -28,39 +28,39 @@ namespace lanelet_core
 {
 namespace distance
 {
+using Point = geometry_msgs::msg::Point;
+using Spline = math::geometry::CatmullRomSpline;
+using SplineInterface = math::geometry::CatmullRomSplineInterface;
+using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
+
 auto getLateralDistance(
-  const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to, const bool allow_lane_change)
+  const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
   -> std::optional<double>;
 
 auto getLongitudinalDistance(
-  const traffic_simulator_msgs::msg::LaneletPose & from,
-  const traffic_simulator_msgs::msg::LaneletPose & to, const bool allow_lane_change = false)
+  const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change = false)
   -> std::optional<double>;
 
 auto getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets, const std::vector<geometry_msgs::msg::Point> & waypoints)
+  const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
   -> std::optional<double>;
 
-auto getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
-  -> std::optional<double>;
-
-auto getDistanceToTrafficLightStopLine(
-  const lanelet::Ids & route_lanelets, const std::vector<geometry_msgs::msg::Point> & waypoints)
+auto getDistanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & spline)
   -> std::optional<double>;
 
 auto getDistanceToTrafficLightStopLine(
-  const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+  const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
   -> std::optional<double>;
 
 auto getDistanceToTrafficLightStopLine(
-  const std::vector<geometry_msgs::msg::Point> & waypoints, const lanelet::Id traffic_light_id)
+  const lanelet::Ids & route_lanelets, const SplineInterface & spline) -> std::optional<double>;
+
+auto getDistanceToTrafficLightStopLine(
+  const std::vector<Point> & waypoints, const lanelet::Id traffic_light_id)
   -> std::optional<double>;
 
 auto getDistanceToTrafficLightStopLine(
-  const math::geometry::CatmullRomSplineInterface & spline, const lanelet::Id traffic_light_id)
-  -> std::optional<double>;
+  const SplineInterface & spline, const lanelet::Id traffic_light_id) -> std::optional<double>;
 
 // private for distance namespace
 namespace

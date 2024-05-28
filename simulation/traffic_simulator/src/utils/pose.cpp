@@ -26,10 +26,10 @@ namespace traffic_simulator
 {
 namespace pose
 {
-auto quietNaNPose() -> geometry_msgs::msg::Pose
+auto quietNaNPose() -> Pose
 {
-  return geometry_msgs::build<geometry_msgs::msg::Pose>()
-    .position(geometry_msgs::build<geometry_msgs::msg::Point>()
+  return geometry_msgs::build<Pose>()
+    .position(geometry_msgs::build<Point>()
                 .x(std::numeric_limits<double>::quiet_NaN())
                 .y(std::numeric_limits<double>::quiet_NaN())
                 .z(std::numeric_limits<double>::quiet_NaN()))
@@ -42,18 +42,18 @@ auto quietNaNLaneletPose() -> LaneletPose
     .lanelet_id(std::numeric_limits<std::int64_t>::max())
     .s(std::numeric_limits<double>::quiet_NaN())
     .offset(std::numeric_limits<double>::quiet_NaN())
-    .rpy(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+    .rpy(geometry_msgs::build<Vector3>()
            .x(std::numeric_limits<double>::quiet_NaN())
            .y(std::numeric_limits<double>::quiet_NaN())
            .z(std::numeric_limits<double>::quiet_NaN()));
 }
 
-auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
+auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose
 {
-  return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
+  return static_cast<Pose>(lanelet_pose);
 }
 
-auto toMapPose(const LaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
+auto toMapPose(const LaneletPose & lanelet_pose) -> Pose
 {
   return lanelet_core::pose::toMapPose(
            lanelet_pose, CanonicalizedLaneletPose::getConsiderPoseByRoadSlope())
@@ -104,8 +104,7 @@ auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
     return CanonicalizedLaneletPose(lanelet_pose);
 }
 
-auto toCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Pose & map_pose, const bool include_crosswalk)
+auto toCanonicalizedLaneletPose(const Pose & map_pose, const bool include_crosswalk)
   -> std::optional<CanonicalizedLaneletPose>
 {
   /// @todo here matching_distance should be passed
@@ -117,8 +116,7 @@ auto toCanonicalizedLaneletPose(
 }
 
 auto toCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box, const bool include_crosswalk,
+  const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
 {
   if (
@@ -131,8 +129,7 @@ auto toCanonicalizedLaneletPose(
 }
 
 auto toCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
+  const Pose & map_pose, const BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
 {
@@ -152,20 +149,17 @@ auto toCanonicalizedLaneletPose(
   }
 }
 
-auto transformRelativePoseToGlobal(
-  const geometry_msgs::msg::Pose & global_pose, const geometry_msgs::msg::Pose & relative_pose)
-  -> geometry_msgs::msg::Pose
+auto transformRelativePoseToGlobal(const Pose & global_pose, const Pose & relative_pose) -> Pose
 {
   tf2::Transform ref_transform, relative_transform;
   tf2::fromMsg(global_pose, ref_transform);
   tf2::fromMsg(relative_pose, relative_transform);
-  geometry_msgs::msg::Pose ret;
+  Pose ret;
   tf2::toMsg(ref_transform * relative_transform, ret);
   return ret;
 }
 
-auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::msg::Pose & to)
-  -> std::optional<geometry_msgs::msg::Pose>
+auto relativePose(const Pose & from, const Pose & to) -> std::optional<Pose>
 {
   try {
     return math::geometry::getRelativePose(from, to);
@@ -174,24 +168,19 @@ auto relativePose(const geometry_msgs::msg::Pose & from, const geometry_msgs::ms
   }
 }
 
-auto relativePose(const geometry_msgs::msg::Pose & from, const CanonicalizedLaneletPose & to)
-  -> std::optional<geometry_msgs::msg::Pose>
+auto relativePose(const Pose & from, const CanonicalizedLaneletPose & to) -> std::optional<Pose>
 {
-  return relativePose(from, static_cast<geometry_msgs::msg::Pose>(to));
+  return relativePose(from, static_cast<Pose>(to));
 }
 
-auto relativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose & to)
-  -> std::optional<geometry_msgs::msg::Pose>
+auto relativePose(const CanonicalizedLaneletPose & from, const Pose & to) -> std::optional<Pose>
 {
-  return relativePose(static_cast<geometry_msgs::msg::Pose>(from), to);
+  return relativePose(static_cast<Pose>(from), to);
 }
 
 auto boundingBoxRelativePose(
-  const geometry_msgs::msg::Pose & from,
-  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
-  const geometry_msgs::msg::Pose & to,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box)
-  -> std::optional<geometry_msgs::msg::Pose>
+  const Pose & from, const BoundingBox & from_bounding_box, const Pose & to,
+  const BoundingBox & to_bounding_box) -> std::optional<Pose>
 {
   if (const auto closest_points =
         math::geometry::getClosestPoses(from, from_bounding_box, to, to_bounding_box);
@@ -228,11 +217,9 @@ auto relativeLaneletPose(
 }
 
 auto boundingBoxRelativeLaneletPose(
-  const CanonicalizedLaneletPose & from,
-  const traffic_simulator_msgs::msg::BoundingBox & from_bounding_box,
-  const CanonicalizedLaneletPose & to,
-  const traffic_simulator_msgs::msg::BoundingBox & to_bounding_box, const bool allow_lane_change)
-  -> LaneletPose
+  const CanonicalizedLaneletPose & from, const BoundingBox & from_bounding_box,
+  const CanonicalizedLaneletPose & to, const BoundingBox & to_bounding_box,
+  const bool allow_lane_change) -> LaneletPose
 {
   constexpr bool include_adjacent_lanelet{false};
   constexpr bool include_opposite_direction{true};
@@ -260,8 +247,7 @@ auto boundingBoxRelativeLaneletPose(
   https://github.com/tier4/scenario_simulator_v2/blob/090a8d08bcb065d293a530cf641a953edf311f9f/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L67-L128
 */
 auto estimateCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
+  const Pose & map_pose, const BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
 {

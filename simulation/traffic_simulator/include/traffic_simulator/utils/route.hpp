@@ -27,9 +27,13 @@ namespace traffic_simulator
 {
 inline namespace route
 {
+using Point = geometry_msgs::msg::Point;
+using Curve = math::geometry::HermiteCurve;
+using Spline = math::geometry::CatmullRomSpline;
+
 auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
 
-auto toSpline(const lanelet::Ids & route) -> math::geometry::CatmullRomSpline;
+auto toSpline(const lanelet::Ids & route) -> Spline;
 
 template <typename... Ts>
 auto getRoute(Ts &&... xs)
@@ -68,7 +72,7 @@ auto moveAlongLaneletPose(
   const double distance) -> LaneletPose;
 
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
-  -> std::vector<geometry_msgs::msg::Point>;
+  -> std::vector<Point>;
 
 template <typename... Ts>
 auto laneChangeableLaneletId(Ts &&... xs)
@@ -82,13 +86,11 @@ auto laneChangeAlongLaneletPose(
 
 auto laneChangeTrajectory(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const lane_change::Parameter & parameter)
-  -> std::optional<std::pair<math::geometry::HermiteCurve, double>>;
+  const lane_change::Parameter & parameter) -> std::optional<std::pair<Curve, double>>;
 
 auto laneChangePoints(
-  const math::geometry::HermiteCurve & curve, const double target_s, const double current_s,
-  const double horizon, const lane_change::Parameter & parameter)
-  -> std::vector<geometry_msgs::msg::Point>;
+  const Curve & curve, const double target_s, const double current_s, const double horizon,
+  const lane_change::Parameter & parameter) -> std::vector<Point>;
 }  // namespace route
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__ROUTE_HPP_

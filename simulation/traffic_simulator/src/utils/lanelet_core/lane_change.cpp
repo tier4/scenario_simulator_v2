@@ -32,11 +32,9 @@ auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanel
   return LaneletMap::trafficRulesVehicle()->canChangeLane(from_lanelet, to_lanelet);
 }
 
-auto getAlongLaneletPose(
-  const traffic_simulator_msgs::msg::LaneletPose & from_pose, const double along)
-  -> traffic_simulator_msgs::msg::LaneletPose
+auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> LaneletPose
 {
-  traffic_simulator_msgs::msg::LaneletPose along_pose = from_pose;
+  LaneletPose along_pose = from_pose;
   along_pose.s = along_pose.s + along;
   if (along_pose.s >= 0) {
     while (along_pose.s >= other::getLaneletLength(along_pose.lanelet_id)) {
@@ -93,8 +91,7 @@ auto getLaneChangeableLaneletId(
   return std::nullopt;
 }
 
-auto getLaneChangeableLaneletId(
-  const lanelet::Id lanelet_id, const Direction direction)
+auto getLaneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction direction)
   -> std::optional<lanelet::Id>
 {
   const auto lanelet = LaneletMap::map()->laneletLayer.get(lanelet_id);
@@ -117,10 +114,8 @@ auto getLaneChangeableLaneletId(
   return target;
 }
 
-auto getLaneChangeTrajectory(
-  const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-  const Parameter & lane_change_parameter)
-  -> std::optional<std::pair<math::geometry::HermiteCurve, double>>
+auto getLaneChangeTrajectory(const LaneletPose & from_pose, const Parameter & lane_change_parameter)
+  -> std::optional<std::pair<Curve, double>>
 {
   double longitudinal_distance = Parameter::default_lanechange_distance;
   switch (lane_change_parameter.constraint.type) {
@@ -168,14 +163,13 @@ auto getLaneChangeTrajectory(
 }
 
 auto getLaneChangeTrajectory(
-  const geometry_msgs::msg::Pose & from_pose, const Parameter & lane_change_parameter,
+  const Pose & from_pose, const Parameter & lane_change_parameter,
   const double maximum_curvature_threshold, const double target_trajectory_length,
-  const double forward_distance_threshold)
-  -> std::optional<std::pair<math::geometry::HermiteCurve, double>>
+  const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>
 {
   double to_length = other::getLaneletLength(lane_change_parameter.target.lanelet_id);
   std::vector<double> evaluation, target_s;
-  std::vector<math::geometry::HermiteCurve> curves;
+  std::vector<Curve> curves;
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
     auto goal_pose =
@@ -189,7 +183,7 @@ auto getLaneChangeTrajectory(
       std::pow(from_pose.position.x - goal_pose.pose.position.x, 2) +
       std::pow(from_pose.position.y - goal_pose.pose.position.y, 2) +
       std::pow(from_pose.position.z - goal_pose.pose.position.z, 2));
-    traffic_simulator_msgs::msg::LaneletPose to_pose;
+    LaneletPose to_pose;
     to_pose.lanelet_id = lane_change_parameter.target.lanelet_id;
     to_pose.s = to_s;
     auto traj = getLaneChangeTrajectory(
@@ -210,14 +204,12 @@ auto getLaneChangeTrajectory(
 }
 
 auto getLaneChangeTrajectory(
-  const geometry_msgs::msg::Pose & from_pose,
-  const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-  const TrajectoryShape trajectory_shape, const double tangent_vector_size)
-  -> math::geometry::HermiteCurve
+  const Pose & from_pose, const LaneletPose & to_pose, const TrajectoryShape trajectory_shape,
+  const double tangent_vector_size) -> Curve
 {
-  geometry_msgs::msg::Vector3 start_vec;
-  geometry_msgs::msg::Vector3 to_vec;
-  geometry_msgs::msg::Pose goal_pose = pose::toMapPose(to_pose).pose;
+  Vector3 start_vec;
+  Vector3 to_vec;
+  Pose goal_pose = pose::toMapPose(to_pose).pose;
   double tangent_vector_size_in_curve = 0.0;
   switch (trajectory_shape) {
     case TrajectoryShape::CUBIC:
@@ -239,9 +231,9 @@ auto getLaneChangeTrajectory(
       tangent_vector_size_in_curve = 1;
       break;
   }
-  return math::geometry::HermiteCurve(
+  return Curve(
     from_pose, goal_pose, start_vec,
-    geometry_msgs::build<geometry_msgs::msg::Vector3>()
+    geometry_msgs::build<Vector3>()
       .x(to_vec.x * tangent_vector_size_in_curve)
       .y(to_vec.y * tangent_vector_size_in_curve)
       .z(to_vec.z * tangent_vector_size_in_curve));
@@ -249,20 +241,17 @@ auto getLaneChangeTrajectory(
 
 namespace
 {
-auto getVectorFromPose(const geometry_msgs::msg::Pose & pose, const double magnitude)
-  -> geometry_msgs::msg::Vector3
+auto getVectorFromPose(const Pose & pose, const double magnitude) -> Vector3
 {
-  geometry_msgs::msg::Vector3 dir =
-    quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
-  geometry_msgs::msg::Vector3 vector;
+  Vector3 dir = quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
+  Vector3 vector;
   vector.x = magnitude * std::cos(dir.z);
   vector.y = magnitude * std::sin(dir.z);
   vector.z = 0;
   return vector;
 }
 
-auto getTangentVector(const lanelet::Id lanelet_id, const double s)
-  -> std::optional<geometry_msgs::msg::Vector3>
+auto getTangentVector(const lanelet::Id lanelet_id, const double s) -> std::optional<Vector3>
 {
   return other::getCenterPointsSpline(lanelet_id)->getTangentVector(s);
 }

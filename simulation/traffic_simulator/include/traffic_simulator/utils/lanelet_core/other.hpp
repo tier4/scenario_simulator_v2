@@ -27,6 +27,9 @@ namespace lanelet_core
 {
 namespace other
 {
+using Point = geometry_msgs::msg::Point;
+using Spline = math::geometry::CatmullRomSpline;
+
 auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
 
 auto getLaneletIds() -> lanelet::Ids;
@@ -41,16 +44,15 @@ auto getLaneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
   return ids;
 }
 
-auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
+auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
-auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
+auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
-auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<geometry_msgs::msg::Point>;
+auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>;
 
-auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
+auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
-auto getCenterPointsSpline(const lanelet::Id lanelet_id)
-  -> std::shared_ptr<math::geometry::CatmullRomSpline>;
+auto getCenterPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>;
 
 auto getLaneletLength(const lanelet::Id lanelet_id) -> double;
 
@@ -74,9 +76,9 @@ auto getPreviousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 auto getPreviousLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
   -> lanelet::Ids;
 
-auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
+auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
-auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>;
+auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 // private for other namespace
 namespace
@@ -85,8 +87,7 @@ auto getNextRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
 
 auto getPreviousRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
 
-auto toPolygon(const lanelet::ConstLineString3d & line_string)
-  -> std::vector<geometry_msgs::msg::Point>;
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
 }  // namespace
 }  // namespace other
 }  // namespace lanelet_core

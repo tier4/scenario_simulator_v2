@@ -29,9 +29,9 @@ auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route_lanelets
          }) != route_lanelets.end();
 }
 
-auto toSpline(const lanelet::Ids & route_lanelets) -> math::geometry::CatmullRomSpline
+auto toSpline(const lanelet::Ids & route_lanelets) -> Spline
 {
-  return math::geometry::CatmullRomSpline(lanelet_core::other::getCenterPoints(route_lanelets));
+  return Spline(lanelet_core::other::getCenterPoints(route_lanelets));
 }
 
 auto isAnyConflictingEntity(
@@ -139,12 +139,12 @@ auto laneChangeAlongLaneletPose(
 }
 
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
-  -> std::vector<geometry_msgs::msg::Point>
+  -> std::vector<Point>
 {
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
   const auto ids = route::previousLanelets(lanelet_pose.lanelet_id);
   // DIFFERENT SPLINE - recalculation needed
-  math::geometry::CatmullRomSpline spline(lanelet_core::other::getCenterPoints(ids));
+  Spline spline(lanelet_core::other::getCenterPoints(ids));
   double s_in_spline = 0;
   for (const auto id : ids) {
     if (id == lanelet_pose.lanelet_id) {
@@ -159,8 +159,7 @@ auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
 
 auto laneChangeTrajectory(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const lane_change::Parameter & parameter)
-  -> std::optional<std::pair<math::geometry::HermiteCurve, double>>
+  const lane_change::Parameter & parameter) -> std::optional<std::pair<Curve, double>>
 {
   if (lanelet_core::lane_change::canChangeLane(
         canonicalized_lanelet_pose.getLaneletId(), parameter.target.lanelet_id)) {
@@ -189,9 +188,8 @@ auto laneChangeTrajectory(
 }
 
 auto laneChangePoints(
-  const math::geometry::HermiteCurve & curve, const double current_s, const double target_s,
-  const double horizon, const lane_change::Parameter & parameter)
-  -> std::vector<geometry_msgs::msg::Point>
+  const Curve & curve, const double current_s, const double target_s, const double horizon,
+  const lane_change::Parameter & parameter) -> std::vector<Point>
 {
   if (const double rest_s = current_s + horizon - curve.getLength(); rest_s < 0) {
     return curve.getTrajectory(current_s, current_s + horizon, 1.0, true);
@@ -199,7 +197,7 @@ auto laneChangePoints(
     const auto following_lanelets = route::followingLanelets(parameter.target.lanelet_id, 0);
     const auto center_points = lanelet_core::other::getCenterPoints(following_lanelets);
     // DIFFERENT SPLINE - recalculation needed
-    const math::geometry::CatmullRomSpline spline(center_points);
+    const Spline spline(center_points);
     /// @note not the same as orginal one - here were duplicates and curve_waypoints
     return spline.getTrajectory(target_s, target_s + rest_s, 1.0);
   }

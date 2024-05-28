@@ -40,12 +40,12 @@ auto getLaneletIds() -> lanelet::Ids
   return ids;
 }
 
-auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
+auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
   return other::toPolygon(LaneletMap::map()->laneletLayer.get(lanelet_id).leftBound());
 }
 
-auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
+auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
   return other::toPolygon(LaneletMap::map()->laneletLayer.get(lanelet_id).rightBound());
 }
@@ -60,9 +60,9 @@ auto getLaneletLength(const lanelet::Id lanelet_id) -> double
   return ret;
 }
 
-auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<geometry_msgs::msg::Point>
+auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
 {
-  std::vector<geometry_msgs::msg::Point> ret;
+  std::vector<Point> ret;
   if (lanelet_ids.empty()) {
     return ret;
   }
@@ -73,9 +73,9 @@ auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<geometry_m
   return ret;
 }
 
-auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
+auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
-  std::vector<geometry_msgs::msg::Point> ret;
+  std::vector<Point> ret;
   if (!LaneletMap::map()) {
     THROW_SIMULATION_ERROR("lanelet map is null pointer");
   }
@@ -89,7 +89,7 @@ auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs:
   const auto lanelet = LaneletMap::map()->laneletLayer.get(lanelet_id);
   const auto centerline = lanelet.centerline();
   for (const auto & point : centerline) {
-    geometry_msgs::msg::Point p;
+    Point p;
     p.x = point.x();
     p.y = point.y();
     p.z = point.z();
@@ -98,7 +98,7 @@ auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs:
   if (static_cast<int>(ret.size()) == 2) {
     const auto p0 = ret[0];
     const auto p2 = ret[1];
-    geometry_msgs::msg::Point p1;
+    Point p1;
     p1.x = (p0.x + p2.x) * 0.5;
     p1.y = (p0.y + p2.y) * 0.5;
     p1.z = (p0.z + p2.z) * 0.5;
@@ -111,8 +111,7 @@ auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs:
   return ret;
 }
 
-auto getCenterPointsSpline(const lanelet::Id lanelet_id)
-  -> std::shared_ptr<math::geometry::CatmullRomSpline>
+auto getCenterPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
 {
   getCenterPoints(lanelet_id);
   return LaneletMap::centerPointsCache().getCenterPointsSpline(lanelet_id);
@@ -208,13 +207,13 @@ auto getPreviousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string &
   return sortAndUnique(ids);
 }
 
-auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
+auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
-  std::vector<geometry_msgs::msg::Point> points;
+  std::vector<Point> points;
   lanelet::CompoundPolygon3d lanelet_polygon =
     LaneletMap::map()->laneletLayer.get(lanelet_id).polygon3d();
   for (const auto & lanelet_point : lanelet_polygon) {
-    geometry_msgs::msg::Point p;
+    Point p;
     p.x = lanelet_point.x();
     p.y = lanelet_point.y();
     p.z = lanelet_point.z();
@@ -223,12 +222,12 @@ auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msg
   return points;
 }
 
-auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<geometry_msgs::msg::Point>
+auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
-  std::vector<geometry_msgs::msg::Point> points;
+  std::vector<Point> points;
   const auto stop_line = LaneletMap::map()->lineStringLayer.get(lanelet_id);
   for (const auto & point : stop_line) {
-    geometry_msgs::msg::Point p;
+    Point p;
     p.x = point.x();
     p.y = point.y();
     p.z = point.z();
@@ -263,12 +262,11 @@ auto getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Id
   return ids;
 }
 
-auto toPolygon(const lanelet::ConstLineString3d & line_string)
-  -> std::vector<geometry_msgs::msg::Point>
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>
 {
-  std::vector<geometry_msgs::msg::Point> ret;
+  std::vector<Point> ret;
   for (const auto & p : line_string) {
-    geometry_msgs::msg::Point point;
+    Point point;
     point.x = p.x();
     point.y = p.y();
     point.z = p.z();
