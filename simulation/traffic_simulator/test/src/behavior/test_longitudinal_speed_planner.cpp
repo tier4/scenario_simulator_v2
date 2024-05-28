@@ -90,7 +90,7 @@ TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
 
   const double epsilon = 1e-5;
 
-  const double target_speed = 8.5f;
+  const double target_speed = 8.5;
   const double expected_duration = 4.0;
 
   const double result_duration =
