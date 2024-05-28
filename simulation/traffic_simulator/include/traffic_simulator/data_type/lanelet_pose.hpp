@@ -78,7 +78,6 @@ private:
 
 bool isSameLaneletId(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &);
 bool isSameLaneletId(const CanonicalizedLaneletPose &, const lanelet::Id lanelet_id);
-
 }  // namespace traffic_simulator
 
 #endif  // TRAFFIC_SIMULATOR__DATA_TYPE__LANELET_POSE_HPP_

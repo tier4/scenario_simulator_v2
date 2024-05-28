@@ -100,24 +100,6 @@ public:
 
   virtual auto getCurrentAction() const -> std::string = 0;
 
-  /*   */ auto getDistanceToLaneBound() -> double;
-
-  /*   */ auto getDistanceToLaneBound(lanelet::Id lanelet_id) const -> double;
-
-  /*   */ auto getDistanceToLaneBound(const lanelet::Ids &) const -> double;
-
-  /*   */ auto getDistanceToLeftLaneBound() -> double;
-
-  /*   */ auto getDistanceToLeftLaneBound(lanelet::Id lanelet_id) const -> double;
-
-  /*   */ auto getDistanceToLeftLaneBound(const lanelet::Ids &) const -> double;
-
-  /*   */ auto getDistanceToRightLaneBound() -> double;
-
-  /*   */ auto getDistanceToRightLaneBound(lanelet::Id lanelet_id) const -> double;
-
-  /*   */ auto getDistanceToRightLaneBound(const lanelet::Ids &) const -> double;
-
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
   virtual auto getDefaultDynamicConstraints() const
