@@ -41,6 +41,7 @@ void EntityManager::broadcastEntityTransform()
   using math::geometry::operator/;
   using math::geometry::operator*;
   using math::geometry::operator+;
+  using math::geometry::operator+=;
   std::vector<std::string> names = getEntityNames();
   /**
    * @note This part of the process is intended to ensure that frames are issued in a position that makes 
