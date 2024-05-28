@@ -46,7 +46,7 @@ inline auto borderlinePoses() -> std::vector<geometry_msgs::msg::Pose>
   return borderline_poses;
 }
 
-inline auto yaw(const lanelet::Id & lanelet_id, const geometry_msgs::msg::Point & point)
+inline auto yaw(const lanelet::Id lanelet_id, const geometry_msgs::msg::Point & point)
   -> std::tuple<double, geometry_msgs::msg::Point, geometry_msgs::msg::Point>
 {
   /// @note Copied from motion_util::findNearestSegmentIndex

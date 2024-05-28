@@ -39,7 +39,7 @@ auto getLateralDistance(
       auto next_lanelet_ids = other::getNextLaneletIds(route[i]);
       if (auto next_lanelet = std::find_if(
             next_lanelet_ids.begin(), next_lanelet_ids.end(),
-            [&route, i](const lanelet::Id & id) { return id == route[i + 1]; });
+            [&route, i](const lanelet::Id id) { return id == route[i + 1]; });
           next_lanelet == next_lanelet_ids.end()) {
         traffic_simulator_msgs::msg::LaneletPose next_lanelet_pose;
         next_lanelet_pose.lanelet_id = route[i + 1];
@@ -94,7 +94,7 @@ auto getLongitudinalDistance(
       auto next_lanelet_ids = other::getNextLaneletIds(current_lanelet);
       auto next_lanelet_itr = std::find_if(
         next_lanelet_ids.begin(), next_lanelet_ids.end(),
-        [next_lanelet](const lanelet::Id & id) { return id == next_lanelet; });
+        [next_lanelet](const lanelet::Id id) { return id == next_lanelet; });
       return next_lanelet_itr == next_lanelet_ids.end();
     } else {
       return false;

@@ -75,7 +75,7 @@ auto isNeedToRightOfWay(
   const auto lanelet_ids_list = lanelet_core::route::getRightOfWayLaneletIds(following_lanelets);
   for (const auto & pose : other_poses) {
     for (const auto & following_lanelet : following_lanelets) {
-      for (const lanelet::Id & lanelet_id : lanelet_ids_list.at(following_lanelet)) {
+      for (const lanelet::Id lanelet_id : lanelet_ids_list.at(following_lanelet)) {
         if (
           traffic_simulator::isSameLaneletId(pose, lanelet_id) &&
           not isTheSameRightOfWay(lanelet_id, following_lanelet)) {
