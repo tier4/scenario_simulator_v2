@@ -71,12 +71,11 @@ auto getAlongLaneletPose(
 }
 
 auto getLaneChangeableLaneletId(
-  const lanelet::Id lanelet_id, const traffic_simulator::lane_change::Direction direction,
-  const std::uint8_t shift) -> std::optional<lanelet::Id>
+  const lanelet::Id lanelet_id, const Direction direction, const std::uint8_t shift)
+  -> std::optional<lanelet::Id>
 {
   if (shift == 0) {
-    return getLaneChangeableLaneletId(
-      lanelet_id, traffic_simulator::lane_change::Direction::STRAIGHT);
+    return getLaneChangeableLaneletId(lanelet_id, Direction::STRAIGHT);
   } else {
     auto reference_id = lanelet_id;
     for (uint8_t i = 0; i < shift; i++) {
@@ -95,21 +94,21 @@ auto getLaneChangeableLaneletId(
 }
 
 auto getLaneChangeableLaneletId(
-  const lanelet::Id lanelet_id, const traffic_simulator::lane_change::Direction direction)
+  const lanelet::Id lanelet_id, const Direction direction)
   -> std::optional<lanelet::Id>
 {
   const auto lanelet = LaneletMap::map()->laneletLayer.get(lanelet_id);
   std::optional<lanelet::Id> target = std::nullopt;
   switch (direction) {
-    case traffic_simulator::lane_change::Direction::STRAIGHT:
+    case Direction::STRAIGHT:
       target = lanelet.id();
       break;
-    case traffic_simulator::lane_change::Direction::LEFT:
+    case Direction::LEFT:
       if (LaneletMap::vehicleRoutingGraph()->left(lanelet)) {
         target = LaneletMap::vehicleRoutingGraph()->left(lanelet)->id();
       }
       break;
-    case traffic_simulator::lane_change::Direction::RIGHT:
+    case Direction::RIGHT:
       if (LaneletMap::vehicleRoutingGraph()->right(lanelet)) {
         target = LaneletMap::vehicleRoutingGraph()->right(lanelet)->id();
       }
@@ -120,35 +119,31 @@ auto getLaneChangeableLaneletId(
 
 auto getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-  const traffic_simulator::lane_change::Parameter & lane_change_parameter)
+  const Parameter & lane_change_parameter)
   -> std::optional<std::pair<math::geometry::HermiteCurve, double>>
 {
-  double longitudinal_distance =
-    traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+  double longitudinal_distance = Parameter::default_lanechange_distance;
   switch (lane_change_parameter.constraint.type) {
-    case traffic_simulator::lane_change::Constraint::Type::NONE:
-      longitudinal_distance =
-        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+    case Constraint::Type::NONE:
+      longitudinal_distance = Parameter::default_lanechange_distance;
       break;
-    case traffic_simulator::lane_change::Constraint::Type::LATERAL_VELOCITY:
-      longitudinal_distance =
-        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+    case Constraint::Type::LATERAL_VELOCITY:
+      longitudinal_distance = Parameter::default_lanechange_distance;
       break;
-    case traffic_simulator::lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
+    case Constraint::Type::LONGITUDINAL_DISTANCE:
       longitudinal_distance = lane_change_parameter.constraint.value;
       break;
-    case traffic_simulator::lane_change::Constraint::Type::TIME:
-      longitudinal_distance =
-        traffic_simulator::lane_change::Parameter::default_lanechange_distance;
+    case Constraint::Type::TIME:
+      longitudinal_distance = Parameter::default_lanechange_distance;
       break;
   }
   const auto along_pose = getAlongLaneletPose(from_pose, longitudinal_distance);
   // clang-format off
   const auto left_point =
-    pose::toMapPose(traffic_simulator::helper::constructLaneletPose(
+    pose::toMapPose(helper::constructLaneletPose(
       along_pose.lanelet_id, along_pose.s, along_pose.offset + 5.0)).pose.position;
   const auto right_point =
-    pose::toMapPose(traffic_simulator::helper::constructLaneletPose(
+    pose::toMapPose(helper::constructLaneletPose(
       along_pose.lanelet_id, along_pose.s, along_pose.offset - 5.0)).pose.position;
   // clang-format on
   const auto collision_point = other::getCenterPointsSpline(lane_change_parameter.target.lanelet_id)
@@ -156,7 +151,7 @@ auto getLaneChangeTrajectory(
   if (!collision_point) {
     return std::nullopt;
   }
-  const auto to_pose = traffic_simulator::helper::constructLaneletPose(
+  const auto to_pose = helper::constructLaneletPose(
     lane_change_parameter.target.lanelet_id, collision_point.value(),
     lane_change_parameter.target.offset);
   const auto goal_pose_in_map = pose::toMapPose(to_pose).pose;
@@ -173,8 +168,7 @@ auto getLaneChangeTrajectory(
 }
 
 auto getLaneChangeTrajectory(
-  const geometry_msgs::msg::Pose & from_pose,
-  const traffic_simulator::lane_change::Parameter & lane_change_parameter,
+  const geometry_msgs::msg::Pose & from_pose, const Parameter & lane_change_parameter,
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold)
   -> std::optional<std::pair<math::geometry::HermiteCurve, double>>
@@ -184,8 +178,8 @@ auto getLaneChangeTrajectory(
   std::vector<math::geometry::HermiteCurve> curves;
 
   for (double to_s = 0; to_s < to_length; to_s = to_s + 1.0) {
-    auto goal_pose = pose::toMapPose(traffic_simulator::helper::constructLaneletPose(
-      lane_change_parameter.target.lanelet_id, to_s));
+    auto goal_pose =
+      pose::toMapPose(helper::constructLaneletPose(lane_change_parameter.target.lanelet_id, to_s));
     if (
       math::geometry::getRelativePose(from_pose, goal_pose.pose).position.x <=
       forward_distance_threshold) {
@@ -218,15 +212,15 @@ auto getLaneChangeTrajectory(
 auto getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const double tangent_vector_size) -> math::geometry::HermiteCurve
+  const TrajectoryShape trajectory_shape, const double tangent_vector_size)
+  -> math::geometry::HermiteCurve
 {
   geometry_msgs::msg::Vector3 start_vec;
   geometry_msgs::msg::Vector3 to_vec;
   geometry_msgs::msg::Pose goal_pose = pose::toMapPose(to_pose).pose;
   double tangent_vector_size_in_curve = 0.0;
   switch (trajectory_shape) {
-    case traffic_simulator::lane_change::TrajectoryShape::CUBIC:
+    case TrajectoryShape::CUBIC:
       start_vec = getVectorFromPose(from_pose, tangent_vector_size);
       if (getTangentVector(to_pose.lanelet_id, to_pose.s)) {
         to_vec = getTangentVector(to_pose.lanelet_id, to_pose.s).value();
@@ -237,7 +231,7 @@ auto getLaneChangeTrajectory(
       }
       tangent_vector_size_in_curve = tangent_vector_size;
       break;
-    case traffic_simulator::lane_change::TrajectoryShape::LINEAR:
+    case TrajectoryShape::LINEAR:
       start_vec.x = (goal_pose.position.x - from_pose.position.x);
       start_vec.y = (goal_pose.position.y - from_pose.position.y);
       start_vec.z = (goal_pose.position.z - from_pose.position.z);

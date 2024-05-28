@@ -51,7 +51,7 @@ inline auto yaw(const lanelet::Id lanelet_id, const geometry_msgs::msg::Point & 
 {
   /// @note Copied from motion_util::findNearestSegmentIndex
   const auto centerline_points =
-    traffic_simulator::lanelet_core::other::getCenterPoints(lanelet_id);
+    lanelet_core::other::getCenterPoints(lanelet_id);
   auto find_nearest_segment_index = [](
                                       const std::vector<geometry_msgs::msg::Point> & points,
                                       const geometry_msgs::msg::Point & point) {

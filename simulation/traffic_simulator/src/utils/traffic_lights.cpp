@@ -25,8 +25,7 @@ auto wayId(const lanelet::Id lanelet_id) -> lanelet::Id
   } else {
     // lanelet::RoleName::Refers
     if (auto traffic_light_members =
-          traffic_simulator::lanelet_core::traffic_lights::getTrafficLightRegulatoryElement(
-            lanelet_id)
+          lanelet_core::traffic_lights::getTrafficLightRegulatoryElement(lanelet_id)
             ->getParameters<lanelet::ConstLineString3d>("refers");
         traffic_light_members.size() > 0) {
       // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.

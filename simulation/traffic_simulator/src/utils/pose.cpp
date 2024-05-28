@@ -63,7 +63,7 @@ auto toMapPose(const LaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
 auto canonicalize(const LaneletPose & lanelet_pose) -> LaneletPose
 {
   if (
-    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
+    const auto canonicalized = std::get<std::optional<LaneletPose>>(
       lanelet_core::pose::canonicalizeLaneletPose(lanelet_pose))) {
     return canonicalized.value();
   } else {
@@ -78,7 +78,7 @@ auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_l
   -> LaneletPose
 {
   if (
-    const auto canonicalized = std::get<std::optional<traffic_simulator::LaneletPose>>(
+    const auto canonicalized = std::get<std::optional<LaneletPose>>(
       lanelet_core::pose::canonicalizeLaneletPose(lanelet_pose, route_lanelets))) {
     return canonicalized.value();
   } else {

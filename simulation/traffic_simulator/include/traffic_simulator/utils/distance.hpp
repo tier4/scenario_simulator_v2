@@ -64,7 +64,7 @@ auto boundingBoxLaneLongitudinalDistance(
 
 auto splineDistanceToBoundingBox(
   const math::geometry::CatmullRomSplineInterface & spline,
-  const traffic_simulator::CanonicalizedLaneletPose & pose,
+  const CanonicalizedLaneletPose & pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box, double width_extension_right = 0.0,
   double width_extension_left = 0.0, double length_extension_front = 0.0,
   double length_extension_rear = 0.0) -> std::optional<double>;
@@ -110,7 +110,7 @@ auto distanceToCrosswalk(
 
 auto distanceToCrosswalk(
   const math::geometry::CatmullRomSplineInterface & spline,
-  const traffic_simulator::CanonicalizedLaneletPose & pose) -> std::optional<double>;
+  const CanonicalizedLaneletPose & pose) -> std::optional<double>;
 
 auto distanceToStopLine(
   const traffic_simulator_msgs::msg::WaypointsArray & waypoints_array,

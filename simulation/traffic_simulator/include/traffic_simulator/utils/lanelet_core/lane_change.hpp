@@ -27,27 +27,32 @@ namespace lanelet_core
 {
 namespace lane_change
 {
+using Direction = traffic_simulator::lane_change::Direction;
+using Constraint = traffic_simulator::lane_change::Constraint;
+using Parameter = traffic_simulator::lane_change::Parameter;
+using TrajectoryShape = traffic_simulator::lane_change::TrajectoryShape;
+
 auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool;
 
 auto getAlongLaneletPose(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose, const double along)
   -> traffic_simulator_msgs::msg::LaneletPose;
 
-auto getLaneChangeableLaneletId(const lanelet::Id, const traffic_simulator::lane_change::Direction)
+auto getLaneChangeableLaneletId(const lanelet::Id, const Direction)
   -> std::optional<lanelet::Id>;
 
 auto getLaneChangeableLaneletId(
-  const lanelet::Id, const traffic_simulator::lane_change::Direction, const std::uint8_t shift)
+  const lanelet::Id, const Direction, const std::uint8_t shift)
   -> std::optional<lanelet::Id>;
 
 auto getLaneChangeTrajectory(
   const traffic_simulator_msgs::msg::LaneletPose & from_pose,
-  const traffic_simulator::lane_change::Parameter & lane_change_parameter)
+  const Parameter & lane_change_parameter)
   -> std::optional<std::pair<math::geometry::HermiteCurve, double>>;
 
 auto getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
-  const traffic_simulator::lane_change::Parameter & lane_change_parameter,
+  const Parameter & lane_change_parameter,
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold)
   -> std::optional<std::pair<math::geometry::HermiteCurve, double>>;
@@ -55,7 +60,7 @@ auto getLaneChangeTrajectory(
 auto getLaneChangeTrajectory(
   const geometry_msgs::msg::Pose & from_pose,
   const traffic_simulator_msgs::msg::LaneletPose & to_pose,
-  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
+  const TrajectoryShape trajectory_shape,
   const double tangent_vector_size) -> math::geometry::HermiteCurve;
 
 // private for lane_change namespace

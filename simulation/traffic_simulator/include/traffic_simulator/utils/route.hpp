@@ -65,7 +65,7 @@ auto isNeedToRightOfWay(
 
 auto moveAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
-  const double distance) -> traffic_simulator::LaneletPose;
+  const double distance) -> LaneletPose;
 
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
   -> std::vector<geometry_msgs::msg::Point>;
@@ -78,16 +78,16 @@ auto laneChangeableLaneletId(Ts &&... xs)
 
 auto laneChangeAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const traffic_simulator::lane_change::Parameter & parameter) -> traffic_simulator::LaneletPose;
+  const lane_change::Parameter & parameter) -> LaneletPose;
 
 auto laneChangeTrajectory(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const traffic_simulator::lane_change::Parameter & parameter)
+  const lane_change::Parameter & parameter)
   -> std::optional<std::pair<math::geometry::HermiteCurve, double>>;
 
 auto laneChangePoints(
   const math::geometry::HermiteCurve & curve, const double target_s, const double current_s,
-  const double horizon, const traffic_simulator::lane_change::Parameter & parameter)
+  const double horizon, const lane_change::Parameter & parameter)
   -> std::vector<geometry_msgs::msg::Point>;
 }  // namespace route
 }  // namespace traffic_simulator
