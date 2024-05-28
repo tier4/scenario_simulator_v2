@@ -24,7 +24,8 @@ namespace lanelet_core
 {
 namespace distance
 {
-auto getLateralDistance(const LaneletPose & from, const LaneletPose & to, bool allow_lane_change)
+auto getLateralDistance(
+  const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
   -> std::optional<double>
 {
   const auto route = route::getRoute(from.lanelet_id, to.lanelet_id, allow_lane_change);
@@ -68,7 +69,7 @@ auto getLateralDistance(const LaneletPose & from, const LaneletPose & to, bool a
 }
 
 auto getLongitudinalDistance(
-  const LaneletPose & from, const LaneletPose & to, bool allow_lane_change) -> std::optional<double>
+  const LaneletPose & from, const LaneletPose & to, bool const allow_lane_change) -> std::optional<double>
 {
   if (from.lanelet_id == to.lanelet_id) {
     if (from.s > to.s) {

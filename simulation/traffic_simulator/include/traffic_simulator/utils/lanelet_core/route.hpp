@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_ROUTE_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_ROUTE_HPP_
+#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_ROUTE_HPP_
+#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_ROUTE_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
@@ -53,4 +53,4 @@ auto getConflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 }  // namespace route
 }  // namespace lanelet_core
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_ROUTE_HPP_
+#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_ROUTE_HPP_

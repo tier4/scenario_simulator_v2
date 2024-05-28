@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_DISTANCE_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_DISTANCE_HPP_
+#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_DISTANCE_HPP_
+#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_DISTANCE_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
@@ -38,7 +38,7 @@ auto getLateralDistance(
   -> std::optional<double>;
 
 auto getLongitudinalDistance(
-  const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change = false)
+  const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
   -> std::optional<double>;
 
 auto getDistanceToStopLine(
@@ -70,4 +70,4 @@ auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineS
 }  // namespace distance
 }  // namespace lanelet_core
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_DISTANCE_HPP_
+#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_DISTANCE_HPP_

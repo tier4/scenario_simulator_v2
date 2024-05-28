@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_OTHER_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_OTHER_HPP_
+#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_OTHER_HPP_
+#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_OTHER_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
@@ -92,4 +92,4 @@ auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Po
 }  // namespace other
 }  // namespace lanelet_core
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_OTHER_HPP_
+#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_OTHER_HPP_

@@ -291,6 +291,7 @@ auto distanceToYieldStop(
   const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>
 {
+  constexpr bool allow_lane_change{false};
   auto getPosesOnLanelet = [&other_poses](const auto & lanelet_id) {
     std::vector<CanonicalizedLaneletPose> ret;
     for (const auto & pose : other_poses) {
@@ -309,10 +310,10 @@ auto distanceToYieldStop(
       if (!other_poses.empty()) {
         const auto distance_forward = lanelet_core::distance::getLongitudinalDistance(
           static_cast<LaneletPose>(reference_pose),
-          helper::constructLaneletPose(lanelet_id, 0.0, 0.0));
+          helper::constructLaneletPose(lanelet_id, 0.0, 0.0), allow_lane_change);
         const auto distance_backward = lanelet_core::distance::getLongitudinalDistance(
           helper::constructLaneletPose(lanelet_id, 0.0, 0.0),
-          static_cast<LaneletPose>(reference_pose));
+          static_cast<LaneletPose>(reference_pose), allow_lane_change);
         if (distance_forward) {
           distances.insert(distance_forward.value());
         } else if (distance_backward) {

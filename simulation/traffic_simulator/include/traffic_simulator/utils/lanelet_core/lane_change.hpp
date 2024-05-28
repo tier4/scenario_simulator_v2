@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_LANE_CHANGE_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_LANE_CHANGE_HPP_
+#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANE_CHANGE_HPP_
+#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANE_CHANGE_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
@@ -67,4 +67,4 @@ auto getTangentVector(const lanelet::Id lanelet_id, const double s) -> std::opti
 }  // namespace lane_change
 }  // namespace lanelet_core
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_LANE_CHANGE_HPP_
+#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANE_CHANGE_HPP_

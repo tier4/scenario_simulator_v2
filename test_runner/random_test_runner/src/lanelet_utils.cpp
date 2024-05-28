@@ -133,7 +133,7 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
   global_pose.position.y = opposite_lane_global_position.y;
   global_pose.position.z = opposite_lane_global_position.z;
 
-  return traffic_simulator::lanelet_core::pose::toLaneletPose(global_pose, false);
+  return traffic_simulator::lanelet_core::pose::toLaneletPose(global_pose, false, 1.0);
 }
 
 enum SearchDirection { FORWARD, BACKWARD, INVALID };

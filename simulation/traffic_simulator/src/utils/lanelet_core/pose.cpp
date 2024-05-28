@@ -119,7 +119,9 @@ auto toLaneletPose(
   const Pose & pose, const BoundingBox & bbox, const bool include_crosswalk,
   const double matching_distance) -> std::optional<LaneletPose>
 {
-  const auto lanelet_id = matchToLane(pose, bbox, include_crosswalk, matching_distance);
+  constexpr double reduction_ratio{0.8};
+  const auto lanelet_id =
+    matchToLane(pose, bbox, include_crosswalk, matching_distance, reduction_ratio);
   if (!lanelet_id) {
     return toLaneletPose(pose, include_crosswalk, matching_distance);
   }
@@ -141,7 +143,7 @@ auto toLaneletPose(
       return pose_in_next;
     }
   }
-  return toLaneletPose(pose, include_crosswalk);
+  return toLaneletPose(pose, include_crosswalk, matching_distance);
 }
 
 auto toLaneletPoses(

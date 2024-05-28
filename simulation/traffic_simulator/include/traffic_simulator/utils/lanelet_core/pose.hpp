@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_POSE_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_POSE_HPP_
+#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_POSE_HPP_
+#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_POSE_HPP_
 
 #include <lanelet2_matching/LaneletMatching.h>
 
@@ -36,24 +36,22 @@ using EntityType = traffic_simulator_msgs::msg::EntityType;
 
 auto toMapPose(const LaneletPose &, const bool fill_pitch = true) -> PoseStamped;
 
-auto toLaneletPose(
-  const Pose & pose, const bool include_crosswalk, const double matching_distance = 1.0)
+auto toLaneletPose(const Pose & pose, const bool include_crosswalk, const double matching_distance)
   -> std::optional<LaneletPose>;
 
-auto toLaneletPose(const Pose & pose, const lanelet::Ids &, const double matching_distance = 1.0)
+auto toLaneletPose(const Pose & pose, const lanelet::Ids &, const double matching_distance)
   -> std::optional<LaneletPose>;
 
 auto toLaneletPose(
   const Pose & pose, const BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance = 1.0) -> std::optional<LaneletPose>;
+  const double matching_distance) -> std::optional<LaneletPose>;
 
-auto toLaneletPose(
-  const Pose & pose, const lanelet::Id lanelet_id, const double matching_distance = 1.0)
+auto toLaneletPose(const Pose & pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>;
 
 auto toLaneletPoses(
-  const Pose & pose, const lanelet::Id lanelet_id, const double matching_distance = 5.0,
-  const bool include_opposite_direction = true) -> std::vector<LaneletPose>;
+  const Pose & pose, const lanelet::Id lanelet_id, const double matching_distance,
+  const bool include_opposite_direction) -> std::vector<LaneletPose>;
 
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>;
@@ -68,8 +66,7 @@ namespace
 {
 auto matchToLane(
   const Pose & pose, const BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance = 1.0, const double reduction_ratio = 0.8)
-  -> std::optional<lanelet::Id>;
+  const double matching_distance, const double reduction_ratio) -> std::optional<lanelet::Id>;
 
 auto excludeSubtypeLanelets(
   const std::vector<std::pair<double, lanelet::Lanelet>> & pair, const char subtype[])
@@ -83,21 +80,19 @@ auto absoluteHull(
 
 auto getNearbyLaneletIds(
   const Point &, const double distance_threshold, const bool include_crosswalk,
-  const std::size_t search_count = 5) -> lanelet::Ids;
+  const std::size_t search_count) -> lanelet::Ids;
 
 auto getNearbyLaneletIds(
-  const Point &, const double distance_threshold, const std::size_t search_count = 5)
-  -> lanelet::Ids;
+  const Point &, const double distance_threshold, const std::size_t search_count) -> lanelet::Ids;
 
-auto getLeftLaneletIds(
-  const lanelet::Id, const EntityType &, const bool include_opposite_direction = true)
+auto getLeftLaneletIds(const lanelet::Id, const EntityType &, const bool include_opposite_direction)
   -> lanelet::Ids;
 
 auto getRightLaneletIds(
   const lanelet::Id lanelet_id, const EntityType & entity_type,
-  const bool include_opposite_direction = true) -> lanelet::Ids;
+  const bool include_opposite_direction) -> lanelet::Ids;
 }  // namespace
 }  // namespace pose
 }  // namespace lanelet_core
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_POSE_HPP_
+#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_POSE_HPP_

@@ -14,8 +14,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_TRAFFIC_LIGHTS_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_TRAFFIC_LIGHTS_HPP_
+#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_TRAFFIC_LIGHTS_HPP_
+#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_TRAFFIC_LIGHTS_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
 #include <lanelet2_extension/utility/query.hpp>
@@ -61,4 +61,4 @@ auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
 }  // namespace traffic_lights
 }  // namespace lanelet_core
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_TRAFFIC_LIGHTS_HPP_
+#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_TRAFFIC_LIGHTS_HPP_

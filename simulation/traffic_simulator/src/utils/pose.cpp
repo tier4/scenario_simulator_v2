@@ -108,7 +108,10 @@ auto toCanonicalizedLaneletPose(const Pose & map_pose, const bool include_crossw
   -> std::optional<CanonicalizedLaneletPose>
 {
   /// @todo here matching_distance should be passed
-  if (const auto pose = lanelet_core::pose::toLaneletPose(map_pose, include_crosswalk)) {
+  constexpr double matching_distance{1.0};
+  if (
+    const auto pose =
+      lanelet_core::pose::toLaneletPose(map_pose, include_crosswalk, matching_distance)) {
     return toCanonicalizedLaneletPose(pose.value());
   } else {
     return std::nullopt;

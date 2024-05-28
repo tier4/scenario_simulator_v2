@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_MEMORY_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_MEMORY_HPP_
+#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_MEMORY_HPP_
+#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_MEMORY_HPP_
 
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
@@ -210,4 +210,4 @@ private:
 };
 }  // namespace lanelet_core
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_MEMORY_HPP_
+#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_MEMORY_HPP_

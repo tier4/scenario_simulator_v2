@@ -96,7 +96,7 @@ auto distanceToTrafficLightStopLine(
 auto distanceToCrosswalk(const Waypoints & waypoints_array, const lanelet::Id target_crosswalk_id)
   -> std::optional<double>;
 
-auto distanceToCrosswalk(const SplineInterface & spline, const CanonicalizedLaneletPose & pose)
+auto distanceToCrosswalk(const SplineInterface & spline, const lanelet::Id target_crosswalk_id)
   -> std::optional<double>;
 
 auto distanceToStopLine(const Waypoints & waypoints_array, const lanelet::Id target_stop_line_id)

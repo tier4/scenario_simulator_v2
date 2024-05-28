@@ -31,6 +31,7 @@ auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & wa
 auto RoutePlanner::getRouteLanelets(
   const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon) -> lanelet::Ids
 {
+  constexpr bool include_current_lanelet{true};
   const auto lanelet_pose = static_cast<LaneletPose>(entity_lanelet_pose);
   // If the queue is not empty, calculating route from the entity_lanelet_pose to waypoint_queue_.front()
   if (!waypoint_queue_.empty()) {
@@ -39,14 +40,14 @@ auto RoutePlanner::getRouteLanelets(
   // If the route from the entity_lanelet_pose to waypoint_queue_.front() was failed to calculate in updateRoute function,
   // use following lanelet as route.
   if (!route_) {
-    return route::followingLanelets(lanelet_pose.lanelet_id, horizon, true);
+    return route::followingLanelets(lanelet_pose.lanelet_id, horizon, include_current_lanelet);
   }
   if (route_ && route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return route::followingLanelets(lanelet_pose.lanelet_id, route_.value(), horizon, true);
   }
   // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
   cancelWaypoint(entity_lanelet_pose);
-  return route::followingLanelets(lanelet_pose.lanelet_id, horizon, true);
+  return route::followingLanelets(lanelet_pose.lanelet_id, horizon, include_current_lanelet);
 }
 
 void RoutePlanner::cancelRoute()

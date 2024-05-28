@@ -36,11 +36,6 @@ LaneletMap & LaneletMap::getInstance()
 {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!instance) {
-    std::cout << std::endl
-              << std::endl
-              << " ###### Make LaneletMap ###### " << lanelet_map_path_ << std::endl
-              << std::endl
-              << std::endl;
     instance.reset(new LaneletMap(lanelet_map_path_));
   }
   return *instance;
