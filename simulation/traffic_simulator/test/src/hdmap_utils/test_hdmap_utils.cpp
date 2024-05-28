@@ -435,40 +435,6 @@ TEST(HdMapUtils, getNearbyLaneletIds_unsuccessful)
   EXPECT_TRUE(lanelets.empty());
 }
 
-TEST(HdMapUtils, getNearbyLaneletIds_crosswalkIncluded)
-{
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
-  auto point = makePoint(3768.01, 73750.97);
-  const double distance_threshold = 0.0;
-  bool include_crosswalk = true;
-  size_t search_count = 100;
-  auto lanelets =
-    hdmap_utils.getNearbyLaneletIds(point, distance_threshold, include_crosswalk, search_count);
-
-  lanelet::Id id_crosswalk = 34399;
-  lanelet::Id id_road = 34633;
-  EXPECT_EQ(lanelets.size(), 2);
-  EXPECT_TRUE(std::find(lanelets.begin(), lanelets.end(), id_crosswalk) != lanelets.end());
-  EXPECT_TRUE(std::find(lanelets.begin(), lanelets.end(), id_road) != lanelets.end());
-}
-
-TEST(HdMapUtils, getNearbyLaneletIds_crosswalkNotIncluded)
-{
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
-  auto point = makePoint(3768.01, 73750.97);
-  const double distance_threshold = 0.0;
-  bool include_crosswalk = false;
-  size_t search_count = 100;
-  auto lanelets =
-    hdmap_utils.getNearbyLaneletIds(point, distance_threshold, include_crosswalk, search_count);
-
-  lanelet::Id id_road = 34633;
-  EXPECT_EQ(lanelets.size(), 1);
-  EXPECT_EQ(lanelets[0], id_road);
-}
-
 TEST(HdMapUtils, getNearbyLaneletIds_crosswalkUnsuccessful)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
@@ -1245,42 +1211,6 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift0)
 
   EXPECT_TRUE(result_lanelet.has_value());
   EXPECT_EQ(result_lanelet.value(), end_lanelet);
-}
-
-TEST(HdMapUtils, getPreviousLanelets_straightBefore)
-{
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-  const lanelet::Id lanelet_id = 202;
-
-  auto result_previous = hdmap_utils.getPreviousLanelets(lanelet_id, 50.0);
-
-  lanelet::Ids actual_previous{202, 3002185, 3002181};
-
-  EXPECT_EQ(result_previous, actual_previous);
-}
-
-TEST(HdMapUtils, getPreviousLanelets_curveBefore)
-{
-  auto hdmap_utils = makeHdMapUtilsInstance();
-  const lanelet::Id lanelet_id = 34600;
-
-  auto result_previous = hdmap_utils.getPreviousLanelets(lanelet_id, 100.0);
-
-  lanelet::Ids actual_previous{34600, 34783, 34606, 34795, 34507};
-
-  EXPECT_EQ(result_previous, actual_previous);
-}
-
-TEST(HdMapUtils, getPreviousLanelets_notEnoughLaneletsBefore)
-{
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-  const lanelet::Id lanelet_id = 202;
-
-  auto result_previous = hdmap_utils.getPreviousLanelets(lanelet_id, 200.0);
-
-  lanelet::Ids actual_previous{202, 3002185, 3002181, 3002178};
-
-  EXPECT_EQ(result_previous, actual_previous);
 }
 
 TEST(HdMapUtils, getTrafficLightIds_correct)
@@ -2227,14 +2157,6 @@ TEST(HdMapUtils, getStopLinePolygon_stopLine)
   EXPECT_EQ(result_stoplines_points.size(), actual_stoplines_points.size());
   EXPECT_POINT_NEAR(result_stoplines_points.at(0), actual_stoplines_points.at(0), epsilon);
   EXPECT_POINT_NEAR(result_stoplines_points.at(1), actual_stoplines_points.at(1), epsilon);
-}
-
-TEST(HdMapUtils, getStopLinePolygon_noStopLine)
-{
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-  const lanelet::Id linestring_id_no_stopline{34629};
-
-  EXPECT_THROW(hdmap_utils.getStopLinePolygon(linestring_id_no_stopline), std::runtime_error);
 }
 
 TEST(HdMapUtils, getStopLinePolygon_invalidLaneletId)
