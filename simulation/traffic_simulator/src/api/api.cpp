@@ -22,6 +22,8 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/api/api.hpp>
+#include <traffic_simulator/traffic/traffic_source.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -46,6 +48,54 @@ bool API::despawnEntities()
   auto entities = getEntityNames();
   return std::all_of(
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
+}
+
+auto API::respawn(
+  const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
+  const geometry_msgs::msg::PoseStamped & goal_pose) -> void
+{
+  if (not entity_manager_ptr_->is<entity::EgoEntity>(name)) {
+    throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
+  } else if (new_pose.header.frame_id != "map") {
+    throw std::runtime_error("Respawn request with frame id other than map not supported.");
+  } else {
+    // set new pose and default action status in EntityManager
+    entity_manager_ptr_->setControlledBySimulator(name, true);
+    setEntityStatus(name, new_pose.pose.pose, helper::constructActionStatus());
+
+    // read status from EntityManager, then send it to SimpleSensorSimulator
+    simulation_api_schema::UpdateEntityStatusRequest req;
+    simulation_interface::toProto(
+      static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name)), *req.add_status());
+    req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
+    req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(name));
+    entity_manager_ptr_->setControlledBySimulator(name, false);
+
+    // check response
+    if (const auto res = zeromq_client_.call(req); not res.result().success()) {
+      throw common::SimulationError(
+        "UpdateEntityStatus request failed for \"" + name + "\" entity during respawn.");
+    } else if (const auto res_status = res.status().begin(); res.status().size() != 1) {
+      throw common::SimulationError(
+        "Failed to receive the new status of \"" + name + "\" entity after the update request.");
+    } else if (const auto res_name = res_status->name(); res_name != name) {
+      throw common::SimulationError(
+        "Wrong entity status received during respawn. Expected: \"" + name + "\". Received: \"" +
+        res_name + "\".");
+    } else {
+      // if valid, set response in EntityManager, then plan path and engage
+      auto entity_status = static_cast<EntityStatus>(entity_manager_ptr_->getEntityStatus(name));
+      simulation_interface::toMsg(res_status->pose(), entity_status.pose);
+      simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
+      setMapPose(name, entity_status.pose);
+      setTwist(name, entity_status.action_status.twist);
+      setAcceleration(name, entity_status.action_status.accel);
+
+      entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
+      entity_manager_ptr_->asFieldOperatorApplication(name).plan({goal_pose});
+      entity_manager_ptr_->asFieldOperatorApplication(name).engage();
+    }
+  }
 }
 
 auto API::setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status)
@@ -89,17 +139,20 @@ auto API::setEntityStatus(
   setEntityStatus(name, canonicalize(status));
 }
 
-std::optional<double> API::getTimeHeadway(const std::string & from, const std::string & to)
+std::optional<double> API::getTimeHeadway(
+  const std::string & from_entity_name, const std::string & to_entity_name)
 {
-  geometry_msgs::msg::Pose pose = getRelativePose(from, to);
-  if (pose.position.x > 0) {
-    return std::nullopt;
+  if (auto from_entity = getEntity(from_entity_name); from_entity) {
+    if (auto to_entity = getEntity(to_entity_name); to_entity) {
+      if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+          relative_pose && relative_pose->position.x <= 0) {
+        const double time_headway =
+          (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;
+        return std::isnan(time_headway) ? std::numeric_limits<double>::infinity() : time_headway;
+      }
+    }
   }
-  double ret = (pose.position.x * -1) / (getCurrentTwist(to).linear.x);
-  if (std::isnan(ret)) {
-    return std::numeric_limits<double>::infinity();
-  }
-  return ret;
+  return std::nullopt;
 }
 
 auto API::setEntityStatus(
@@ -265,7 +318,7 @@ bool API::updateFrame()
   }
 
   entity_manager_ptr_->update(getCurrentTime(), clock_.getStepTime());
-  traffic_controller_ptr_->execute();
+  traffic_controller_ptr_->execute(getCurrentTime(), clock_.getStepTime());
 
   if (not configuration.standalone_mode) {
     if (!updateTrafficLightsInSim() || !updateTimeInSim()) {
@@ -320,6 +373,25 @@ void API::requestLaneChange(
   const lane_change::Constraint & constraint)
 {
   entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
+}
+
+auto API::addTrafficSource(
+  const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
+  const traffic::TrafficSource::Distribution & distribution, const bool allow_spawn_outside_lane,
+  const bool require_footprint_fitting, const bool random_orientation, std::optional<int> seed)
+  -> void
+{
+  traffic_simulator::traffic::TrafficSource::Configuration configuration;
+  configuration.allow_spawn_outside_lane = allow_spawn_outside_lane;
+  configuration.require_footprint_fitting = require_footprint_fitting;
+  configuration.use_random_orientation = random_orientation;
+
+  traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
+    radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
+    entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
+      this->spawn(name, std::forward<decltype(xs)>(xs)...);
+      setLinearVelocity(name, speed);
+    });
 }
 
 auto API::canonicalize(const LaneletPose & may_non_canonicalized_lanelet_pose) const

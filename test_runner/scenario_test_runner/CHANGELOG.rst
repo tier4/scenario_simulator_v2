@@ -2,6 +2,264 @@
 Changelog for package scenario_test_runner
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.15.0 (2024-04-18)
+-------------------
+* Merge pull request `#1223 <https://github.com/tier4/scenario_simulator_v2/issues/1223>`_ from tier4/refactor/drop_workflow
+  Delete workflow feature and add alternative bash script
+* chore: delete unnecessary diff
+* Merge branch 'master' into refactor/drop_workflow
+* fix: add dropped scenario to workflow.txt
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* refactor: rename workflow.csv to workflow.txt
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* chore: use remote workflow file(test)
+* Merge branch 'master' into refactor/drop_workflow
+* chore: revert scenario failure
+* chore: test for scenario failure
+* chore: update way to run workflow
+* refactor: delete workflow.Workflow and rename workflow.py to scenario.py
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+2.0.0 (2024-05-27)
+------------------
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Contributors: DMoszynski, Dawid Moszynski, Masaya Kataoka, Tatsuya Yamasaki
+
+1.18.0 (2024-05-24)
+-------------------
+* Merge branch 'master' into feature/traffic-source
+* Merge branch 'master' into feature/traffic-source
+* Merge remote-tracking branch 'origin/master' into feature/traffic-source
+* Merge branch 'master' into feature/traffic-source
+* Contributors: Mateusz Palczuk, Tatsuya Yamasaki
+
+1.17.2 (2024-05-22)
+-------------------
+
+1.17.1 (2024-05-21)
+-------------------
+
+1.17.0 (2024-05-16)
+-------------------
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/feature/openscenario_validator' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.16.4 (2024-05-15)
+-------------------
+* Merge branch 'master' into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge remote-tracking branch 'origin/feature/remove_entity_type_list' into feature/remove_entity_type_list
+* Merge branch 'master' into feature/remove_entity_type_list
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
+1.16.3 (2024-05-13)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/contributing_md
+* Contributors: hakuturu583
+
+1.16.2 (2024-05-10)
+-------------------
+
+1.16.1 (2024-05-10)
+-------------------
+* Merge branch 'master' into doc/support_awesome-pages
+* Contributors: Taiga
+
+1.16.0 (2024-05-09)
+-------------------
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin-ssh/master' into feature/respawn-entity
+* Contributors: DMoszynski, Dawid Moszyński, Paweł Lech, Tatsuya Yamasaki
+
+1.15.7 (2024-05-09)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/master' into feature/speed_up_set_other_status
+* Contributors: hakuturu583
+
+1.15.6 (2024-05-07)
+-------------------
+* Merge branch 'master' into feature/publish_scenario_frame
+* Merge remote-tracking branch 'origin/feature/publish_scenario_frame' into feature/publish_scenario_frame
+* Merge branch 'master' into feature/publish_scenario_frame
+* fix launch
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
+1.15.5 (2024-05-07)
+-------------------
+
+1.15.4 (2024-05-01)
+-------------------
+* Merge pull request `#1237 <https://github.com/tier4/scenario_simulator_v2/issues/1237>`_ from tier4/feature/perf
+  Feature/perf
+* simplify launch file
+* add make_launch_prefix function
+* add enable_perf launch configuration
+* add enable perf option
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
+1.15.3 (2024-04-25)
+-------------------
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge branch 'master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Merge remote-tracking branch 'origin/master' into fix/standstill-duration-for-miscobjects
+* Contributors: Piotr Zyskowski
+
+1.15.2 (2024-04-23)
+-------------------
+* Merge pull request `#1232 <https://github.com/tier4/scenario_simulator_v2/issues/1232>`_ from tier4/feature/update_default_architecture_type
+  Update scenario_test_runner.launch.py
+* Merge branch 'master' into feature/update_default_architecture_type
+* Update scenario_test_runner.launch.py
+  update default value of the `architecture_type`
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka
+
+1.15.1 (2024-04-18)
+-------------------
+* Merge branch 'master' into fix/occluded-object-in-grid
+* Bump version of scenario_simulator_v2 from version 1.14.1 to version 1.15.0
+* Merge branch 'master' into fix/occluded-object-in-grid
+* Merge pull request `#1223 <https://github.com/tier4/scenario_simulator_v2/issues/1223>`_ from tier4/refactor/drop_workflow
+  Delete workflow feature and add alternative bash script
+* chore: delete unnecessary diff
+* Merge branch 'master' into refactor/drop_workflow
+* fix: add dropped scenario to workflow.txt
+* Merge remote-tracking branch 'origin/master' into refactor/drop_workflow
+  # Conflicts:
+  #	test_runner/scenario_test_runner/config/workflow_example.yaml
+* refactor: rename workflow.csv to workflow.txt
+* Merge branch 'master' into refactor/drop_workflow
+* Merge branch 'master' into refactor/drop_workflow
+* chore: use remote workflow file(test)
+* Merge branch 'master' into refactor/drop_workflow
+* chore: revert scenario failure
+* chore: test for scenario failure
+* chore: update way to run workflow
+* refactor: delete workflow.Workflow and rename workflow.py to scenario.py
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, hakuturu583, ぐるぐる
+
+1.14.1 (2024-04-12)
+-------------------
+
+1.14.0 (2024-04-12)
+-------------------
+
+1.13.0 (2024-04-11)
+-------------------
+* Merge pull request `#1216 <https://github.com/tier4/scenario_simulator_v2/issues/1216>`_ from tier4/feature/routing-algorithm
+  Implement `DistanceCondition` / `RelativeDistanceCondition` for `shortest` of `RoutingAlgorithm`
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/feature/routing-algorithm' into feature/routing-algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* chore: update ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* doc: add clear names to conditions in ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* chore: add tests for RelativeDistanceCondition with shortest routing algorithm
+* Merge branch 'master' into feature/routing-algorithm
+* chore: update parameters in ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* chore: add test case for distance to backward point in adjacent lane
+* fix: ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* chore: update ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml for distance conditions for freespace=true
+* chore: update parameters in ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* chore: add ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml to scenario test
+* chore: update parameters in ByEntityCondition.EntityCondition.DistanceCondition.Shortest.yaml
+* Merge branch 'master' into feature/routing-algorithm
+* chore: add test scenario for shortest routing algorithm
+* Merge remote-tracking branch 'origin/master' into feature/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/routing-algorithm
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, yamacir-kit
+
+1.12.0 (2024-04-10)
+-------------------
+* Merge pull request `#1222 <https://github.com/tier4/scenario_simulator_v2/issues/1222>`_ from tier4/feature/user-defined-controller
+  Feature/user defined controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge branch 'master' into feature/user-defined-controller
+* Merge remote-tracking branch 'origin/master' into feature/user-defined-controller
+* Update sample scenarios to specify controller name
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki, yamacir-kit
+
+1.11.3 (2024-04-09)
+-------------------
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Merge branch 'master' into refactor/basic_types
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.11.2 (2024-04-08)
+-------------------
+
+1.11.1 (2024-04-05)
+-------------------
+
+1.11.0 (2024-04-02)
+-------------------
+* Merge pull request `#1173 <https://github.com/tier4/scenario_simulator_v2/issues/1173>`_ from tier4/feature/arm_support
+  Feature/arm_build_test
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin/master' into feature/arm_support
+* Merge remote-tracking branch 'upstream/master' into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/arm_support
+* Merge remote-tracking branch 'origin' into feature/arm_support
+* add scenario
+* Contributors: Masaya Kataoka, Ubuntu, f0reachARR
+
 1.10.0 (2024-03-28)
 -------------------
 * Merge branch 'master' into feature/simple_sensor_simulator/custom_noise

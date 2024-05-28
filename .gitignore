@@ -14,6 +14,7 @@ log
 # external packages
 external/*
 !external/concealer
+!external/embree_vendor
 
 # auto-generated files
 html

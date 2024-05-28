@@ -14,6 +14,7 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
+#include <algorithm>
 #include <memory>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <optional>
@@ -39,11 +40,19 @@ geometry_msgs::Pose OccupancyGridSensorBase::getSensorPose(
 }
 
 const std::vector<std::string> OccupancyGridSensorBase::getDetectedObjects(
-  const std::vector<traffic_simulator_msgs::EntityStatus> & status) const
+  const std::vector<traffic_simulator_msgs::EntityStatus> & status,
+  const std::vector<std::string> & lidar_detected_entities) const
 {
   std::vector<std::string> detected_entities;
   const auto pose = getSensorPose(status);
   for (const auto & s : status) {
+    if (const auto has_detected =
+          std::find(lidar_detected_entities.begin(), lidar_detected_entities.end(), s.name()) !=
+          lidar_detected_entities.end();
+        !has_detected) {
+      continue;
+    }
+
     double distance = std::hypot(
       s.pose().position().x() - pose.position().x(), s.pose().position().y() - pose.position().y(),
       s.pose().position().z() - pose.position().z());
@@ -57,7 +66,7 @@ const std::vector<std::string> OccupancyGridSensorBase::getDetectedObjects(
 template <>
 auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   const std::vector<traffic_simulator_msgs::EntityStatus> & status, const rclcpp::Time & stamp,
-  const std::vector<std::string> & lidar_detected_entity) -> nav_msgs::msg::OccupancyGrid
+  const std::vector<std::string> & lidar_detected_entities) -> nav_msgs::msg::OccupancyGrid
 {
   // check if entities in `status` have unique names
   {
@@ -96,10 +105,10 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
   auto detected_entities = std::set<std::string>();
   {
     if (configuration_.filter_by_range()) {
-      auto v = getDetectedObjects(status);
+      auto v = getDetectedObjects(status, lidar_detected_entities);
       detected_entities.insert(v.begin(), v.end());
     } else {
-      detected_entities.insert(lidar_detected_entity.begin(), lidar_detected_entity.end());
+      detected_entities.insert(lidar_detected_entities.begin(), lidar_detected_entities.end());
     }
   }
 

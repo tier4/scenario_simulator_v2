@@ -15,9 +15,8 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__OBJECT_CONTROLLER_HPP_
 
-#include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/object.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
 namespace openscenario_interpreter
 {
@@ -38,16 +37,11 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct ObjectController : public ComplexType
 {
-  // inline static int ego_count= 0;
-  static int ego_count;
-
   explicit ObjectController();
 
   explicit ObjectController(const pugi::xml_node &, Scope &);
 
-  ~ObjectController();
-
-  auto isUserDefinedController() const & -> bool;
+  auto isAutoware() const & -> bool;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

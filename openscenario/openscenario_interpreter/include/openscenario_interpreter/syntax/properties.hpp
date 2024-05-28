@@ -61,7 +61,7 @@ struct Properties
   explicit Properties(const pugi::xml_node &, Scope &);
 
   template <typename T>
-  auto get(const String & name, const T & default_value = T()) const -> auto
+  auto get(const String & name, const T & default_value) const -> auto
   {
     if (auto iter = properties.find(name); iter != std::end(properties)) {
       if (const auto [name, property] = *iter; not property.value.empty()) {
@@ -72,6 +72,12 @@ struct Properties
     } else {
       return default_value;
     }
+  }
+
+  template <typename T>
+  auto get(const String & name) const -> auto
+  {
+    return get<T>(name, T());
   }
 };
 }  // namespace syntax

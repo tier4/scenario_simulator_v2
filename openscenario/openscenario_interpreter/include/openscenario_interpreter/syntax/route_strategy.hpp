@@ -49,7 +49,7 @@ struct RouteStrategy
     random,              // Random route.
   } value;
 
-  explicit RouteStrategy() = default;
+  RouteStrategy() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
