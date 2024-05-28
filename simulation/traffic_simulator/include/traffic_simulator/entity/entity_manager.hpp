@@ -95,7 +95,7 @@ class EntityManager
 
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
-  std::unordered_map<std::string, std::unique_ptr<traffic_simulator::entity::EntityBase>> entities_;
+  std::unordered_map<std::string, std::shared_ptr<traffic_simulator::entity::EntityBase>> entities_;
 
   double step_time_;
 
@@ -310,12 +310,6 @@ public:
   FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
-  FORWARD_TO_ENTITY(getDistanceToLaneBound, );
-  FORWARD_TO_ENTITY(getDistanceToLaneBound, const);
-  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, );
-  FORWARD_TO_ENTITY(getDistanceToLeftLaneBound, const);
-  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, );
-  FORWARD_TO_ENTITY(getDistanceToRightLaneBound, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
@@ -382,52 +376,16 @@ public:
 
   bool entityExists(const std::string & name);
 
-  auto getBoundingBoxDistance(const std::string & from, const std::string & to)
-    -> std::optional<double>;
-
   auto getCurrentTime() const noexcept -> double;
-
-  auto getDistanceToCrosswalk(const std::string & name, const lanelet::Id target_crosswalk_id)
-    -> std::optional<double>;
-
-  auto getDistanceToStopLine(const std::string & name, const lanelet::Id target_stop_line_id)
-    -> std::optional<double>;
 
   auto getEntityNames() const -> const std::vector<std::string>;
 
+  auto getEntity(const std::string & name) const
+    -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
+
   auto getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus;
 
-  // clang-format off
-  auto getBoundingBoxLaneLateralDistance(const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &, const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &, bool allow_lane_change = false) const -> std::optional<double>;
-  auto getBoundingBoxLaneLateralDistance(const std::string &,              const CanonicalizedLaneletPose &, bool allow_lane_change = false)                                                                                                     const -> std::optional<double>;
-  auto getBoundingBoxLaneLateralDistance(const std::string &,              const std::string &, bool allow_lane_change = false)                                                                                                                  const -> std::optional<double>;
-
-  auto getBoundingBoxLaneLongitudinalDistance(const CanonicalizedLaneletPose &, const traffic_simulator_msgs::msg::BoundingBox &, const CanonicalizedLaneletPose &,      const traffic_simulator_msgs::msg::BoundingBox &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true, bool allow_lane_change = false) -> std::optional<double>;
-  auto getBoundingBoxLaneLongitudinalDistance(const std::string &,              const CanonicalizedLaneletPose &,                 bool include_adjacent_lanelet = false, bool include_opposite_direction = true, bool allow_lane_change = false)                                                                                          -> std::optional<double>;
-  auto getBoundingBoxLaneLongitudinalDistance(const std::string &,              const std::string &,                              bool include_adjacent_lanelet = false, bool include_opposite_direction = true, bool allow_lane_change = false)                                                                                          -> std::optional<double>;
-
-  auto getBoundingBoxRelativePose(const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &, const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &) const -> std::optional<geometry_msgs::msg::Pose>;
-  auto getBoundingBoxRelativePose(const std::string &,              const geometry_msgs::msg::Pose & )                                                                                                    const -> std::optional<geometry_msgs::msg::Pose>;
-  auto getBoundingBoxRelativePose(const std::string &,              const std::string & )                                                                                                                 const -> std::optional<geometry_msgs::msg::Pose>;
-  // clang-format on
-
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
-
-  // clang-format off
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, bool allow_lane_change = false)                           const -> std::optional<double>;
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &, bool allow_lane_change = false)                                        const -> std::optional<double>;
-  auto getLateralDistance(const std::string &,              const CanonicalizedLaneletPose &, bool allow_lane_change = false)                           const -> std::optional<double>;
-  auto getLateralDistance(const std::string &,              const std::string &, bool allow_lane_change = false)                                        const -> std::optional<double>;
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, double matching_distance, bool allow_lane_change = false) const -> std::optional<double>;
-  auto getLateralDistance(const CanonicalizedLaneletPose &, const std::string &,              double matching_distance, bool allow_lane_change = false) const -> std::optional<double>;
-  auto getLateralDistance(const std::string &,              const CanonicalizedLaneletPose &, double matching_distance, bool allow_lane_change = false) const -> std::optional<double>;
-  auto getLateralDistance(const std::string &,              const std::string &,              double matching_distance, bool allow_lane_change = false) const -> std::optional<double>;
-
-  auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const CanonicalizedLaneletPose &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true, bool allow_lane_change = false) -> std::optional<double>;
-  auto getLongitudinalDistance(const CanonicalizedLaneletPose &, const std::string &,              bool include_adjacent_lanelet = false, bool include_opposite_direction = true, bool allow_lane_change = false) -> std::optional<double>;
-  auto getLongitudinalDistance(const std::string &,              const CanonicalizedLaneletPose &, bool include_adjacent_lanelet = false, bool include_opposite_direction = true, bool allow_lane_change = false) -> std::optional<double>;
-  auto getLongitudinalDistance(const std::string &,              const std::string &,              bool include_adjacent_lanelet = false, bool include_opposite_direction = true, bool allow_lane_change = false) -> std::optional<double>;
-  // clang-format on
 
   auto getNumberOfEgo() const -> std::size_t;
 
@@ -436,17 +394,6 @@ public:
 
   auto getPedestrianParameters(const std::string & name) const
     -> const traffic_simulator_msgs::msg::PedestrianParameters &;
-
-  // clang-format off
-  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string                  & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string                  & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const geometry_msgs::msg::Pose     & from, const CanonicalizedLaneletPose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const CanonicalizedLaneletPose & from, const geometry_msgs::msg::Pose     & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const std::string                  & from, const CanonicalizedLaneletPose & to) const -> geometry_msgs::msg::Pose;
-  auto getRelativePose(const CanonicalizedLaneletPose & from, const std::string                  & to) const -> geometry_msgs::msg::Pose;
-  // clang-format on
 
   auto getStepTime() const noexcept -> double;
 

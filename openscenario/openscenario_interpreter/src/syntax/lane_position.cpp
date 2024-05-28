@@ -37,7 +37,17 @@ LanePosition::LanePosition(
 {
 }
 
-LanePosition::operator NativeLanePosition() const { return makeNativeLanePosition(*this); }
+LanePosition::operator NativeLanePosition() const
+{
+  traffic_simulator::LaneletPose native_lane_position;
+  native_lane_position.lanelet_id = boost::lexical_cast<std::int64_t>(lane_id);
+  native_lane_position.s = s;
+  native_lane_position.offset = offset;
+  native_lane_position.rpy.x = orientation.r;
+  native_lane_position.rpy.y = orientation.p;
+  native_lane_position.rpy.z = orientation.h;
+  return canonicalize(native_lane_position);
+}
 
 LanePosition::operator NativeWorldPosition() const
 {
