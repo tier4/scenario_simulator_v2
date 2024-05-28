@@ -40,7 +40,6 @@ void EntityManager::broadcastEntityTransform()
 {
   using math::geometry::operator/;
   using math::geometry::operator*;
-  using math::geometry::operator+;
   using math::geometry::operator+=;
   std::vector<std::string> names = getEntityNames();
   /**

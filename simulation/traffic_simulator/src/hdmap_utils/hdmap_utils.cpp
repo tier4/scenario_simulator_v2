@@ -30,6 +30,7 @@
 #include <geometry/vector3/operator.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/inner_product.hpp>
+#include <geometry/quaternion/operator.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry/transform.hpp>

@@ -132,61 +132,6 @@ auto operator+=(T & a, const U & b) -> decltype(auto)
   a.z += b.z;
   return a;
 }
-
-template <
-  typename T, typename U,
-  std::enable_if_t<std::conjunction_v<IsLikeQuaternion<T>, IsLikeQuaternion<U>>, std::nullptr_t> =
-    nullptr>
-auto operator+(const T & a, const U & b)
-{
-  geometry_msgs::msg::Quaternion v;
-  v.x = a.x + b.x;
-  v.y = a.y + b.y;
-  v.z = a.z + b.z;
-  v.w = a.w + b.w;
-  return v;
-}
-
-template <
-  typename T, typename U,
-  std::enable_if_t<std::conjunction_v<IsLikeQuaternion<T>, IsLikeQuaternion<U>>, std::nullptr_t> =
-    nullptr>
-auto operator-(const T & a, const U & b)
-{
-  geometry_msgs::msg::Quaternion v;
-  v.x = a.x - b.x;
-  v.y = a.y - b.y;
-  v.z = a.z - b.z;
-  v.w = a.w - b.w;
-  return v;
-}
-
-template <
-  typename T, typename U,
-  std::enable_if_t<std::conjunction_v<IsLikeQuaternion<T>, IsLikeQuaternion<U>>, std::nullptr_t> =
-    nullptr>
-auto operator*(const T & a, const U & b)
-{
-  geometry_msgs::msg::Quaternion v;
-  v.x = a.w  * b.x - a.z * b.y + a.y * b.z + a.x * b.w;
-  v.y = a.z  * b.x + a.w * b.y - a.x * b.z + a.y * b.w;
-  v.z = -a.y * b.x + a.x * b.y + a.w * b.z + a.z * b.w;
-  v.w = -a.x * b.x - a.y * b.y - a.z * b.z + a.w * b.w;
-  return v;
-}
-
-template <
-  typename T, typename U,
-  std::enable_if_t<std::conjunction_v<IsLikeQuaternion<T>, IsLikeQuaternion<U>>, std::nullptr_t> =
-    nullptr>
-auto operator+=(T & a, const U & b) -> decltype(auto)
-{
-  a.x += b.x;
-  a.y += b.y;
-  a.z += b.z;
-  a.w += b.w;
-  return a;
-}
 }  // namespace geometry
 }  // namespace math
 
