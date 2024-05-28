@@ -28,8 +28,7 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
-#include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <utility>
 #include <vector>
 
@@ -53,15 +52,10 @@ TrafficController::TrafficController(
 
 void TrafficController::autoSink()
 {
-  for (const auto & lanelet_id : lanelet2::other::getLaneletIds()) {
-    if (lanelet2::other::getNextLaneletIds(lanelet_id).empty()) {
-      LaneletPose lanelet_pose;
-      lanelet_pose.lanelet_id = lanelet_id;
-      lanelet_pose.s = pose::laneletLength(lanelet_id);
-      const auto pose = pose::toMapPose(lanelet_pose);
-      addModule<traffic_simulator::traffic::TrafficSink>(
-        1, pose.position, get_entity_names_function, get_entity_pose_function, despawn_function);
-    }
+  const auto borderline_poses = lanelet_map::borderlinePoses();
+  for (const auto & pose : borderline_poses) {
+    addModule<traffic_simulator::traffic::TrafficSink>(
+      1, pose.position, get_entity_names_function, get_entity_pose_function, despawn_function);
   }
 }
 

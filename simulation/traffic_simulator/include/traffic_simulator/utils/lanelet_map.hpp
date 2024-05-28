@@ -20,15 +20,30 @@
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/utils/lanelet/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet/other.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
 inline namespace lanelet_map
 {
 template <typename... Ts>
-auto activate(Ts &&... xs)
+inline auto activate(Ts &&... xs)
 {
   return lanelet2::LaneletMap::activate(std::forward<decltype(xs)>(xs)...);
+}
+
+inline auto borderlinePoses() -> std::vector<geometry_msgs::msg::Pose>
+{
+  std::vector<geometry_msgs::msg::Pose> borderline_poses;
+  for (const auto & lanelet_id : lanelet2::other::getLaneletIds()) {
+    if (lanelet2::other::getNextLaneletIds(lanelet_id).empty()) {
+      LaneletPose lanelet_pose;
+      lanelet_pose.lanelet_id = lanelet_id;
+      lanelet_pose.s = pose::laneletLength(lanelet_id);
+      borderline_poses.push_back(pose::toMapPose(lanelet_pose));
+    }
+  }
+  return borderline_poses;
 }
 
 inline auto yaw(const lanelet::Id & lanelet_id, const geometry_msgs::msg::Point & point)

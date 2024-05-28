@@ -17,8 +17,6 @@
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
-#include <traffic_simulator/utils/lanelet/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
 

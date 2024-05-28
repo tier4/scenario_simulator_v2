@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <concealer/autoware_universe.hpp>
 #include <filesystem>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>

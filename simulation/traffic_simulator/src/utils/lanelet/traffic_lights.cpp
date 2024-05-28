@@ -177,7 +177,6 @@ auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traff
 
 namespace
 {
-
 auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
 {
@@ -192,7 +191,6 @@ auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
   }
   return ret;
 }
-
 }  // namespace
 }  // namespace traffic_lights
 }  // namespace lanelet2

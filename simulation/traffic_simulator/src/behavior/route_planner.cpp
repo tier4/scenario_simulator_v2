@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <traffic_simulator/behavior/route_planner.hpp>
-#include <traffic_simulator/utils/lanelet/other.hpp>
 #include <traffic_simulator/utils/route.hpp>
 
 namespace traffic_simulator

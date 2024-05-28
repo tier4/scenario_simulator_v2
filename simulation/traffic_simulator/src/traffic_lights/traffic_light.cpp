@@ -17,7 +17,7 @@
 #include <string>
 #include <traffic_simulator/color_utils/color_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
-#include <traffic_simulator/utils/lanelet/traffic_lights.hpp>
+#include <traffic_simulator/utils/traffic_lights.hpp>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -168,35 +168,17 @@ auto operator<<(std::ostream & os, const TrafficLight::Bulb & bulb) -> std::ostr
 }
 
 TrafficLight::TrafficLight(const lanelet::Id lanelet_id)
-: way_id([&]() {
-    if (lanelet2::traffic_lights::isTrafficLight(lanelet_id)) {
-      return lanelet_id;
-    } else {
-      // lanelet::RoleName::Refers
-      if (auto traffic_light_members =
-            traffic_simulator::lanelet2::traffic_lights::getTrafficLightRegulatoryElement(
-              lanelet_id)
-              ->getParameters<lanelet::ConstLineString3d>("refers");
-          traffic_light_members.size() > 0) {
-        // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.
-        // This is because the output can be guaranteed for the original relation id by the way id.
-        return traffic_light_members.front().id();
-      } else {
-        throw common::SyntaxError(
-          "Given lanelet ID ", lanelet_id, " is neither relation id nor way id.");
-      }
-    }
-  }()),
+: way_id(traffic_lights::wayId(lanelet_id)),
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
-      traffic_simulator::lanelet2::traffic_lights::getTrafficLightBulbPosition(way_id, "green")),
+      traffic_lights::bulbPosition(way_id, "green")),
     std::make_pair(
       Bulb(Color::yellow, Status::solid_on, Shape::circle).hash(),
-      traffic_simulator::lanelet2::traffic_lights::getTrafficLightBulbPosition(way_id, "yellow")),
+      traffic_lights::bulbPosition(way_id, "yellow")),
     std::make_pair(
       Bulb(Color::red, Status::solid_on, Shape::circle).hash(),
-      traffic_simulator::lanelet2::traffic_lights::getTrafficLightBulbPosition(way_id, "red")),
+      traffic_lights::bulbPosition(way_id, "red")),
   }
 {
 }
