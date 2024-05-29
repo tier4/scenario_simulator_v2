@@ -78,6 +78,9 @@ auto LaneletMap::trafficRulesPedestrian() -> const lanelet::traffic_rules::Traff
 
 LaneletMap::LaneletMap(const std::filesystem::path & lanelet2_map_path)
 {
+  if (lanelet2_map_path.empty()) {
+    THROW_SIMULATION_ERROR("lanelet_map_path is empty! Please call lanelet_map::activate() first.");
+  }
   lanelet::projection::MGRSProjector projector;
   lanelet::ErrorMessages errors;
   lanelet_map_ptr_ = lanelet::load(lanelet2_map_path.string(), projector, &errors);

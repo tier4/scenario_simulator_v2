@@ -289,6 +289,63 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   return {canonicalized, std::nullopt};
 }
 
+auto getNearbyLaneletIds(
+  const Point & position, const double distance_threshold, const std::size_t search_count)
+  -> lanelet::Ids
+{
+  lanelet::Ids lanelet_ids;
+  lanelet::BasicPoint2d search_point(position.x, position.y);
+  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
+    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
+  if (nearest_lanelet.empty()) {
+    return {};
+  }
+  for (const auto & lanelet : nearest_lanelet) {
+    if (lanelet.first <= distance_threshold) {
+      lanelet_ids.emplace_back(lanelet.second.id());
+    }
+  }
+  return lanelet_ids;
+}
+
+auto getNearbyLaneletIds(
+  const Point & point, const double distance_thresh, const bool include_crosswalk,
+  const std::size_t search_count) -> lanelet::Ids
+{
+  lanelet::Ids lanelet_ids;
+  lanelet::BasicPoint2d search_point(point.x, point.y);
+  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
+    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
+  if (include_crosswalk) {
+    if (nearest_lanelet.empty()) {
+      return {};
+    }
+    if (nearest_lanelet.front().first > distance_thresh) {
+      return {};
+    }
+    for (const auto & lanelet : nearest_lanelet) {
+      if (lanelet.first <= distance_thresh) {
+        lanelet_ids.emplace_back(lanelet.second.id());
+      }
+    }
+  } else {
+    const auto nearest_road_lanelet =
+      excludeSubtypeLanelets(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
+    if (nearest_road_lanelet.empty()) {
+      return {};
+    }
+    if (nearest_road_lanelet.front().first > distance_thresh) {
+      return {};
+    }
+    for (const auto & lanelet : nearest_road_lanelet) {
+      if (lanelet.first <= distance_thresh) {
+        lanelet_ids.emplace_back(lanelet.second.id());
+      }
+    }
+  }
+  return lanelet_ids;
+}
+
 // private for pose namespace
 namespace
 {
@@ -334,59 +391,6 @@ auto matchToLane(
     id_and_distance.begin(), id_and_distance.end(),
     [](auto const & lhs, auto const & rhs) { return lhs.second < rhs.second; });
   return min_id_and_distance->first;
-}
-
-auto getNearbyLaneletIds(
-  const Point & position, const double distance_threshold, const std::size_t search_count)
-  -> lanelet::Ids
-{
-  lanelet::Ids lanelet_ids;
-  lanelet::BasicPoint2d search_point(position.x, position.y);
-  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
-  if (nearest_lanelet.empty()) {
-    return {};
-  }
-  for (const auto & lanelet : nearest_lanelet) {
-    if (lanelet.first <= distance_threshold) {
-      lanelet_ids.emplace_back(lanelet.second.id());
-    }
-  }
-  return lanelet_ids;
-}
-
-auto getNearbyLaneletIds(
-  const Point & point, const double distance_thresh, const bool include_crosswalk,
-  const std::size_t search_count) -> lanelet::Ids
-{
-  lanelet::Ids lanelet_ids;
-  lanelet::BasicPoint2d search_point(point.x, point.y);
-  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
-  if (include_crosswalk) {
-    if (nearest_lanelet.empty()) {
-      return {};
-    }
-    if (nearest_lanelet.front().first > distance_thresh) {
-      return {};
-    }
-    for (const auto & lanelet : nearest_lanelet) {
-      lanelet_ids.emplace_back(lanelet.second.id());
-    }
-  } else {
-    const auto nearest_road_lanelet =
-      excludeSubtypeLanelets(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
-    if (nearest_road_lanelet.empty()) {
-      return {};
-    }
-    if (nearest_road_lanelet.front().first > distance_thresh) {
-      return {};
-    }
-    for (const auto & lanelet : nearest_lanelet) {
-      lanelet_ids.emplace_back(lanelet.second.id());
-    }
-  }
-  return lanelet_ids;
 }
 
 auto excludeSubtypeLanelets(

@@ -391,7 +391,7 @@ auto API::addTrafficSource(
 
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
     radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
-    entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
+    [this, speed](const auto & name, auto &&... xs) {
       this->spawn(name, std::forward<decltype(xs)>(xs)...);
       setLinearVelocity(name, speed);
     });

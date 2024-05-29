@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_OTHER_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_core/primitives/LaneletSequence.h>
 
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
@@ -31,6 +32,8 @@ using Point = geometry_msgs::msg::Point;
 using Spline = math::geometry::CatmullRomSpline;
 
 auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
+
+auto getLanelets(const lanelet::Ids & lanelet_ids) -> lanelet::Lanelets;
 
 auto getLaneletIds() -> lanelet::Ids;
 

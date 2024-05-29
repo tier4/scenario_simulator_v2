@@ -75,7 +75,7 @@ auto CanonicalizedEntityStatus::set(const EntityStatus & status, const double ma
     canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(status.lanelet_pose);
   } else {
     // prefer the current lanelet
-    canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+    canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       status.pose, getBoundingBox(), getLaneletIds(), include_crosswalk, matching_distance);
   }
   set(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));

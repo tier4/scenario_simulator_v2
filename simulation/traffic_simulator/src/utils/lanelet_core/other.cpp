@@ -31,6 +31,15 @@ auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
   return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
 }
 
+auto getLanelets(const lanelet::Ids & lanelet_ids) -> lanelet::Lanelets
+{
+  lanelet::Lanelets lanelets;
+  for (const auto & id : lanelet_ids) {
+    lanelets.emplace_back(LaneletMap::map()->laneletLayer.get(id));
+  }
+  return lanelets;
+}
+
 auto getLaneletIds() -> lanelet::Ids
 {
   lanelet::Ids ids;

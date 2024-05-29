@@ -16,6 +16,9 @@
 #include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
+#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/pose.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
@@ -23,11 +26,10 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficSource::Validator::Validator(
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
   const geometry_msgs::msg::Pose & pose, const double radius, const bool include_crosswalk)
-: ids(hdmap_utils->getNearbyLaneletIds(
+: ids(lanelet_core::pose::getNearbyLaneletIds(
     pose.position, radius, include_crosswalk, spawning_lanes_limit)),
-  lanelets(hdmap_utils->getLanelets(ids))
+  lanelets(lanelet_core::other::getLanelets(ids))
 {
 }
 
@@ -171,18 +173,12 @@ auto TrafficSource::isPoseValid(
     return {true, std::nullopt};
   }
 
-  if (const auto lanelet_pose =
-        hdmap_utils_->toLaneletPose(pose, std::holds_alternative<PedestrianParameter>(parameter));
-      lanelet_pose) {
-    /// @note reset orientation - to align the entity with lane
-    auto corrected_pose = lanelet_pose.value();
-    corrected_pose.rpy.z = 0.0;
-
-    auto out_pose = std::make_optional<CanonicalizedLaneletPose>(corrected_pose, hdmap_utils_);
-
+  if (
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      pose, std::holds_alternative<PedestrianParameter>(parameter))) {
     /// @note Step 3: check whether the bounding box can be outside lanelet
     if (not configuration_.require_footprint_fitting) {
-      return std::make_pair(true, out_pose);
+      return std::make_pair(true, canonicalized_lanelet_pose.value());
     }
 
     /// @note Step 4: check whether the bounding box fits inside the lanelet
@@ -191,17 +187,17 @@ auto TrafficSource::isPoseValid(
         not configuration_.require_footprint_fitting or
           validate_considering_crosswalk(
             math::geometry::transformPoints(
-              hdmap_utils_->toMapPose(corrected_pose).pose, bbox_corners),
-            corrected_pose.lanelet_id),
-        out_pose);
+              pose::toMapPose(canonicalized_lanelet_pose.value()), bbox_corners),
+            canonicalized_lanelet_pose->getLaneletId()),
+        canonicalized_lanelet_pose.value());
     } else {
       return std::make_pair(
         not configuration_.require_footprint_fitting or
           validate(
             math::geometry::transformPoints(
-              hdmap_utils_->toMapPose(corrected_pose).pose, bbox_corners),
-            corrected_pose.lanelet_id),
-        out_pose);
+              pose::toMapPose(canonicalized_lanelet_pose.value()), bbox_corners),
+            canonicalized_lanelet_pose->getLaneletId()),
+        canonicalized_lanelet_pose.value());
     }
   } else {
     return {false, std::nullopt};
