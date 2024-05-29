@@ -70,7 +70,6 @@ public:
     ());
   MOCK_METHOD(void, requestSpeedChange, (const std::string &, double, bool), ());
   MOCK_METHOD(bool, isEgoSpawned, (), ());
-  MOCK_METHOD(bool, isNpcLogicStarted, (), ());
   MOCK_METHOD(void, startNpcLogic, (), ());
   MOCK_METHOD(bool, despawn, (const std::string), ());
   MOCK_METHOD(std::string, getEgoName, (), ());
@@ -147,10 +146,6 @@ TEST(TestExecutor, UpdateNoNPCs)
     ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
 
   EXPECT_CALL(*MockAPI, isEgoSpawned)
-    .Times(1)
-    .InSequence(sequence)
-    .WillOnce(::testing::Return(false));
-  EXPECT_CALL(*MockAPI, isNpcLogicStarted)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(false));
