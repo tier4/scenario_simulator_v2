@@ -1091,7 +1091,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
   EXPECT_EQ(end_lanelet, result_lanelet);
 }
 
-TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangable)
+TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangeable)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 199;
@@ -1102,7 +1102,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangable)
   EXPECT_FALSE(result_lanelet.has_value());
 }
 
-TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangable)
+TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangeable)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
@@ -1115,7 +1115,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangable)
   EXPECT_EQ(result_lanelet.value(), end_lanelet);
 }
 
-TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangable)
+TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangeable)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 202;
@@ -1126,7 +1126,7 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangable)
   EXPECT_FALSE(result_lanelet.has_value());
 }
 
-TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangable)
+TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangeable)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
@@ -1675,10 +1675,10 @@ TEST(HdMapUtils, getRoute_correctCache)
   const lanelet::Id to_id = 34630;
   const bool allow_lane_change = true;
 
-  const auto result_route_nohit = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
+  const auto result_route_no_hit = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
   const auto result_route_hit = hdmap_utils.getRoute(from_id, to_id, allow_lane_change);
 
-  EXPECT_EQ(result_route_hit, result_route_nohit);
+  EXPECT_EQ(result_route_hit, result_route_no_hit);
 }
 
 TEST(HdMapUtils, getRoute_impossibleRouting)
@@ -1878,10 +1878,10 @@ TEST(HdMapUtils, getLaneletLength_cache)
 
   const lanelet::Id id = 34468;
 
-  const double result_length_nohit = hdmap_utils.getLaneletLength(id);
+  const double result_length_no_hit = hdmap_utils.getLaneletLength(id);
   const double result_length_hit = hdmap_utils.getLaneletLength(id);
 
-  EXPECT_EQ(result_length_nohit, result_length_hit);
+  EXPECT_EQ(result_length_no_hit, result_length_hit);
 }
 
 TEST(HdMapUtils, getTrafficLightIdsOnPath_trafficLights)
