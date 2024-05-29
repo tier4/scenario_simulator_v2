@@ -59,14 +59,17 @@ boost_polygon toBoostPolygon(const std::vector<geometry_msgs::msg::Point> & poin
 geometry_msgs::msg::Pose toPose(const boost_point & point);
 geometry_msgs::msg::Pose subtractPoses(
   const geometry_msgs::msg::Pose & pose1, const geometry_msgs::msg::Pose & pose2);
-const boost_polygon get2DPolygon(
-  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox);
+auto toPolygon2D(const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
+  -> std::vector<geometry_msgs::msg::Point>;
+auto toPolygon2D(
+  const geometry_msgs::msg::Pose & pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box) -> const boost_polygon;
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
-  traffic_simulator_msgs::msg::BoundingBox bbox, double width_extension_right = 0.0,
+  traffic_simulator_msgs::msg::BoundingBox bounding_box, double width_extension_right = 0.0,
   double width_extension_left = 0.0, double length_extension_front = 0.0,
   double length_extension_rear = 0.0);
 DistancesFromCenterToEdge getDistancesFromCenterToEdge(
-  const traffic_simulator_msgs::msg::BoundingBox & bbox);
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box);
 
 }  // namespace geometry
 }  // namespace math

@@ -24,8 +24,8 @@
 TEST(BoundingBox, getPointsFromBboxDefault)
 {
   geometry_msgs::msg::Pose pose;
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  std::vector<geometry_msgs::msg::Point> points = math::geometry::getPointsFromBbox(bbox);
+  traffic_simulator_msgs::msg::BoundingBox bounding_box;
+  std::vector<geometry_msgs::msg::Point> points = math::geometry::getPointsFromBbox(bounding_box);
   EXPECT_EQ(points.size(), size_t(4));
   EXPECT_POINT_EQ(points[0], makePoint(0.0, 0.0, 0.0));
   EXPECT_POINT_EQ(points[1], makePoint(0.0, 0.0, 0.0));
@@ -36,9 +36,9 @@ TEST(BoundingBox, getPointsFromBboxDefault)
 TEST(BoundingBox, getPointsFromBboxCustom)
 {
   geometry_msgs::msg::Pose pose;
-  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(5.0, 2.0, 2.0, 1.0);
+  traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(5.0, 2.0, 2.0, 1.0);
   std::vector<geometry_msgs::msg::Point> points =
-    math::geometry::getPointsFromBbox(bbox, 1.0, 2.0, 3.0, 4.0);
+    math::geometry::getPointsFromBbox(bounding_box, 1.0, 2.0, 3.0, 4.0);
   EXPECT_EQ(points.size(), size_t(4));
   EXPECT_POINT_EQ(points[0], makePoint(6.5, 3.0, 1.0));
   EXPECT_POINT_EQ(points[1], makePoint(-5.5, 3.0, 1.0));
@@ -49,9 +49,9 @@ TEST(BoundingBox, getPointsFromBboxCustom)
 TEST(BoundingBox, get2DPolygonZeroPose)
 {
   geometry_msgs::msg::Pose pose;
-  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(2.0, 2.0, 2.0);
+  traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(2.0, 2.0, 2.0);
   boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =
-    math::geometry::get2DPolygon(pose, bbox);
+    math::geometry::toPolygon2D(pose, bounding_box);
   EXPECT_EQ(poly.inners().size(), size_t(0));
   EXPECT_EQ(poly.outer().size(), size_t(5));
   EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[0], makePoint(1.0, 1.0));
@@ -64,9 +64,9 @@ TEST(BoundingBox, get2DPolygonZeroPose)
 TEST(BoundingBox, get2DPolygonOnlyTranslation)
 {
   geometry_msgs::msg::Pose pose = makePose(1.0, 2.0);
-  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(2.0, 2.0, 2.0);
+  traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(2.0, 2.0, 2.0);
   boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =
-    math::geometry::get2DPolygon(pose, bbox);
+    math::geometry::toPolygon2D(pose, bounding_box);
   EXPECT_EQ(poly.inners().size(), size_t(0));
   EXPECT_EQ(poly.outer().size(), size_t(5));
   EXPECT_BOOST_POINT_2D_AND_POINT_EQ(poly.outer()[0], makePoint(2.0, 3.0));
@@ -81,9 +81,9 @@ TEST(BoundingBox, get2DPolygonFullPose)
   geometry_msgs::msg::Pose pose = makePose(1.0, 2.0);
   pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(30.0 * M_PI / 180.0));
-  traffic_simulator_msgs::msg::BoundingBox bbox = makeBbox(2.0, 2.0, 2.0);
+  traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(2.0, 2.0, 2.0);
   boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =
-    math::geometry::get2DPolygon(pose, bbox);
+    math::geometry::toPolygon2D(pose, bounding_box);
   EXPECT_EQ(poly.inners().size(), size_t(0));
   EXPECT_EQ(poly.outer().size(), size_t(5));
   const double x = std::sqrt(2.0) * std::cos((30.0 + 45.0) * M_PI / 180.0);

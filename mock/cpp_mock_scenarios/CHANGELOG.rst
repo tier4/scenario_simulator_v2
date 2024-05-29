@@ -13,6 +13,132 @@ Changelog for package cpp_mock_scenarios
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.0 (2024-05-27)
+------------------
+* Merge pull request `#1233 <https://github.com/tier4/scenario_simulator_v2/issues/1233>`_ from tier4/ref/RJD-1054-implement-distance-utils
+  ref(traffic_simulator): implement separate class for distance calculations, adapt make positions in SimulatorCore
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* ref(cpp_mock, simulator_core, pose): improve names
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1054-implement-distance-utils
+* ref(traffic_simulator, distance): rename from getters to noun function name
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* ref(traffic_simulator,distance): ref getDistanceToLaneBound
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* ref(traffic_simulator): transform DistanceUtils to distance namespace
+* feat(distance): use separated getDistanceToBound
+* feat(distance): use separated getLateral and getLongitudinal distances
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Tatsuya Yamasaki
+
+1.18.0 (2024-05-24)
+-------------------
+* Merge pull request `#1231 <https://github.com/tier4/scenario_simulator_v2/issues/1231>`_ from tier4/feature/traffic-source
+  Feature/traffic source
+* Merge branch 'master' into feature/traffic-source
+* Merge branch 'master' into feature/traffic-source
+* Merge remote-tracking branch 'origin/master' into feature/traffic-source
+* Remove comment from TrafficSource large scenario - the issue no longer exists
+* Remove "headers in STL" comments
+* Apply patched changes
+* Merge branch 'master' into feature/traffic-source
+* Fix scenarios
+* Merge branch 'feature/traffic-source-scenarios' into feature/traffic-source
+* Add cpp mock scenario that demonstrates the performance limitations
+* Add high rate test
+* Add TrafficSource scenarios
+* Contributors: Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki
+
+1.17.2 (2024-05-22)
+-------------------
+
+1.17.1 (2024-05-21)
+-------------------
+* Merge pull request `#1255 <https://github.com/tier4/scenario_simulator_v2/issues/1255>`_ from tier4/fix/visualization
+  Fix/visualization
+* update rviz config
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
+1.17.0 (2024-05-16)
+-------------------
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/master' into feature/openscenario_validator
+* Merge remote-tracking branch 'origin/feature/openscenario_validator' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Merge branch 'master' into feature/openscenario_validator
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
+
+1.16.4 (2024-05-15)
+-------------------
+* Merge branch 'master' into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/remove_entity_type_list
+* Merge remote-tracking branch 'origin/feature/remove_entity_type_list' into feature/remove_entity_type_list
+* Merge branch 'master' into feature/remove_entity_type_list
+* Contributors: Kotaro Yoshimoto, Masaya Kataoka, hakuturu583
+
+1.16.3 (2024-05-13)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/contributing_md
+* Contributors: hakuturu583
+
+1.16.2 (2024-05-10)
+-------------------
+
+1.16.1 (2024-05-10)
+-------------------
+* Merge branch 'master' into doc/support_awesome-pages
+* Contributors: Taiga
+
+1.16.0 (2024-05-09)
+-------------------
+* Merge pull request `#1198 <https://github.com/tier4/scenario_simulator_v2/issues/1198>`_ from tier4/feature/respawn-entity
+  Feature/respawn entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* Merge branch 'master' into feature/respawn-entity
+* Merge remote-tracking branch 'origin/master' into feature/respawn-entity
+* QoS of the subscriber in respawn_ego scenario changed to match the one used in the initial_pose_adaptor
+* Code cleaning
+* Merge remote-tracking branch 'origin-ssh/master' into feature/respawn-entity
+* RespawnEgo scenario temporarly removed from build
+* Respawn ego scenario test time adjustment
+* CMakeList style
+* Code cleaning
+* Removing unnecessary changes in field_operator_application_for_autoware_universe
+* Adapting respawn_ego scenario time to tests timeout
+* Code cleaning
+* Respawn scenario simplification
+* Respawn logic moved to API
+* RespawnEntity added
+* Contributors: DMoszynski, Dawid Moszyński, Paweł Lech, Tatsuya Yamasaki
+
+1.15.7 (2024-05-09)
+-------------------
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/speed_up_set_other_status
+* Merge remote-tracking branch 'origin/master' into feature/speed_up_set_other_status
+* Contributors: hakuturu583
+
 1.15.6 (2024-05-07)
 -------------------
 * Merge branch 'master' into feature/publish_scenario_frame

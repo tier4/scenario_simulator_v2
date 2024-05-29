@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
-#include <geometry/polygon/polygon.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
@@ -60,127 +60,7 @@ void EntityBase::cancelRequest() {}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>
 {
-  const auto bounding_box = getBoundingBox();
-
-  std::vector<geometry_msgs::msg::Point> points_bbox;
-  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
-
-  p0.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
-  p0.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
-  p0.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p0);
-
-  p1.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
-  p1.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
-  p1.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p1);
-
-  p2.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
-  p2.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
-  p2.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p2);
-
-  p3.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
-  p3.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
-  p3.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p3);
-
-  p4.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
-  p4.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
-  p4.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p4);
-
-  p5.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
-  p5.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
-  p5.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p5);
-
-  p6.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
-  p6.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
-  p6.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p6);
-
-  p7.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
-  p7.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
-  p7.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
-  points_bbox.emplace_back(p7);
-
-  return math::geometry::get2DConvexHull(points_bbox);
-}
-
-auto EntityBase::getDistanceToLaneBound() -> double
-{
-  return std::min(getDistanceToLeftLaneBound(), getDistanceToRightLaneBound());
-}
-
-auto EntityBase::getDistanceToLaneBound(lanelet::Id lanelet_id) const -> double
-{
-  return std::min(getDistanceToLeftLaneBound(lanelet_id), getDistanceToRightLaneBound(lanelet_id));
-}
-
-auto EntityBase::getDistanceToLaneBound(const lanelet::Ids & lanelet_ids) const -> double
-{
-  return std::min(
-    getDistanceToLeftLaneBound(lanelet_ids), getDistanceToRightLaneBound(lanelet_ids));
-}
-
-auto EntityBase::getDistanceToLeftLaneBound() -> double
-{
-  return getDistanceToLeftLaneBound(getRouteLanelets());
-}
-
-auto EntityBase::getDistanceToLeftLaneBound(lanelet::Id lanelet_id) const -> double
-{
-  if (const auto bound = hdmap_utils_ptr_->getLeftBound(lanelet_id); bound.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
-  } else if (const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
-             polygon.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
-      " exists and it's definition");
-  } else {
-    return math::geometry::getDistance2D(bound, polygon);
-  }
-}
-
-auto EntityBase::getDistanceToLeftLaneBound(const lanelet::Ids & lanelet_ids) const -> double
-{
-  std::vector<double> distances;
-  std::transform(
-    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [this](auto lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
-  return *std::min_element(distances.begin(), distances.end());
-}
-
-auto EntityBase::getDistanceToRightLaneBound() -> double
-{
-  return getDistanceToRightLaneBound(getRouteLanelets());
-}
-
-auto EntityBase::getDistanceToRightLaneBound(lanelet::Id lanelet_id) const -> double
-{
-  if (const auto bound = hdmap_utils_ptr_->getRightBound(lanelet_id); bound.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
-      " please check lanelet map.");
-  } else if (const auto polygon = math::geometry::transformPoints(getMapPose(), get2DPolygon());
-             polygon.empty()) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to calculate 2d polygon of entity: ", name, " . Please check ", name,
-      " exists and it's definition");
-  } else {
-    return math::geometry::getDistance2D(bound, polygon);
-  }
-}
-
-auto EntityBase::getDistanceToRightLaneBound(const lanelet::Ids & lanelet_ids) const -> double
-{
-  std::vector<double> distances;
-  std::transform(
-    lanelet_ids.begin(), lanelet_ids.end(), std::back_inserter(distances),
-    [this](auto lanelet_id) { return getDistanceToLeftLaneBound(lanelet_id); });
-  return *std::min_element(distances.begin(), distances.end());
+  return math::geometry::toPolygon2D(getBoundingBox());
 }
 
 auto EntityBase::getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>
@@ -656,6 +536,12 @@ void EntityBase::requestSpeedChange(
 
 auto EntityBase::isControlledBySimulator() const -> bool { return true; }
 
+auto EntityBase::setControlledBySimulator(bool /*unused*/) -> void
+{
+  THROW_SEMANTIC_ERROR(
+    getEntityTypename(), " type entities do not support setControlledBySimulator");
+}
+
 auto EntityBase::requestFollowTrajectory(
   const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void
 {
@@ -676,34 +562,11 @@ void EntityBase::setDynamicConstraints(
   setBehaviorParameter(behavior_parameter);
 }
 
-void EntityBase::setEntityTypeList(
-  const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> & entity_type_list)
-{
-  entity_type_list_ = entity_type_list;
-}
-
 void EntityBase::setOtherStatus(
   const std::unordered_map<std::string, CanonicalizedEntityStatus> & status)
 {
-  other_status_.clear();
-  for (const auto & [other_name, other_status] : status) {
-    if (other_name != name) {
-      /*
-         The following filtering is the code written for the purpose of
-         reducing the calculation load, but it is commented out experimentally
-         because it adversely affects "processing that needs to identify other
-         entities regardless of distance" such as RelativeTargetSpeed of
-         requestSpeedChange.
-      */
-      // const auto p0 = other_status.pose.position;
-      // const auto p1 = status_.pose.position;
-      // if (const auto distance = std::hypot(p0.x - p1.x, p0.y - p1.y, p0.z - p1.z); distance <
-      // 30)
-      // {
-      other_status_.emplace(other_name, other_status);
-      // }
-    }
-  }
+  other_status_ = status;
+  other_status_.erase(name);
 }
 
 auto EntityBase::setStatus(const CanonicalizedEntityStatus & status) -> void
