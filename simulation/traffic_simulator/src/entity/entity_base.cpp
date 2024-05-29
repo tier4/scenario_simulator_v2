@@ -822,33 +822,35 @@ auto EntityBase::requestSynchronize(
           ? ego_distance.value() / ego_velocity
           : 0;
 
-      auto entity_velocity_to_synchronize = entity_velocity;
+      auto entity_velocity_to_synchronize = [this, ego_velocity, entity_velocity, ego_arrival_time,
+                                             entity_distance, accel_limit, threshold,
+                                             loop_period]() {
+        if (entity_velocity > accel_limit * ego_arrival_time) {
+          ///@brief Making entity slow down since the speed is too fast
+          return entity_velocity - accel_limit * loop_period / 1000;
+        } else if (
+          entity_velocity * ego_arrival_time -
+            entity_velocity * entity_velocity / (accel_limit * 2) <
+          entity_distance - threshold) {
+          ///@brief Making entity speed up
+          return entity_velocity + accel_limit * loop_period / 1000;
+        } else if (
+          entity_velocity * ego_arrival_time -
+            entity_velocity * entity_velocity / (accel_limit * 2) >
+          entity_distance - threshold) {
+          ///@brief Making entity slow down
+          return entity_velocity - accel_limit * loop_period / 1000;
+        } else {
+          ///@brief Making entity keep the current speed
+          return entity_velocity;
+        }
+      };
 
-      const auto accel_limit_ = accel_limit;
-      const auto distance_margin = threshold;
-
-      if (entity_velocity > accel_limit * ego_arrival_time) {
-        ///@brief Making entity slow down since the speed is too fast
-        entity_velocity_to_synchronize = entity_velocity - accel_limit_ * loop_period / 1000;
-      } else if (
-        entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / (accel_limit * 2) <
-        entity_distance - distance_margin) {
-        ///@brief Making entity speed up
-        entity_velocity_to_synchronize = entity_velocity + accel_limit_ * loop_period / 1000;
-      } else if (
-        entity_velocity * ego_arrival_time - entity_velocity * entity_velocity / (accel_limit * 2) >
-        entity_distance - distance_margin) {
-        ///@brief Making entity slow down
-        entity_velocity_to_synchronize = entity_velocity - accel_limit_ * loop_period / 1000;
-      } else {
-        ///@brief Making entity keep the current speed
-        entity_velocity_to_synchronize = entity_velocity;
-      }
       /**
        * @warning using this->requestSpeedChange here does not work in some kind of reason.
-       * It seems that after this function is called by some reason, func_on_cleanup will be deleted and become nullptr
+       * It seems that after this, function is called by some reason. func_on_cleanup will be deleted and becomes nullptr
        */
-      target_speed_ = entity_velocity_to_synchronize;
+      target_speed_ = entity_velocity_to_synchronize();
       return false;
     },
     [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);

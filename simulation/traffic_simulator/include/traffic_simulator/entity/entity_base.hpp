@@ -31,6 +31,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -143,9 +144,9 @@ public:
 
   virtual void requestAssignRoute(const std::vector<geometry_msgs::msg::Pose> &) = 0;
 
-  virtual void requestLaneChange(const lanelet::Id){};
+  virtual void requestLaneChange(const lanelet::Id) {};
 
-  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
+  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &) {};
 
   /*   */ void requestLaneChange(
     const lane_change::AbsoluteTarget &, const lane_change::TrajectoryShape,
