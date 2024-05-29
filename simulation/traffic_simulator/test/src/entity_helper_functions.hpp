@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__TEST__ENTITY__ENTITY_HELPER_FUNCTIONS_HPP_
-#define TRAFFIC_SIMULATOR__TEST__ENTITY__ENTITY_HELPER_FUNCTIONS_HPP_
+#ifndef TRAFFIC_SIMULATOR__TEST__ENTITY_HELPER_FUNCTIONS_HPP_
+#define TRAFFIC_SIMULATOR__TEST__ENTITY_HELPER_FUNCTIONS_HPP_
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -130,4 +130,4 @@ auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
   return quaternion_operation::convertEulerAngleToQuaternion(v);
 }
 
-#endif
+#endif  // TRAFFIC_SIMULATOR__TEST__ENTITY_HELPER_FUNCTIONS_HPP_
