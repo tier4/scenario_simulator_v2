@@ -35,8 +35,7 @@ EntityBase::EntityBase(
   verbose(true),
   status_(entity_status),
   status_before_update_(status_),
-  hdmap_utils_ptr_(hdmap_utils_ptr),
-  npc_logic_started_(false)
+  hdmap_utils_ptr_(hdmap_utils_ptr)
 {
   if (name != static_cast<EntityStatus>(entity_status).name) {
     THROW_SIMULATION_ERROR(
@@ -608,8 +607,6 @@ void EntityBase::activateOutOfRangeJob(
     [this]() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
 }
 
-void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
-
 void EntityBase::stopAtCurrentPosition()
 {
   status_.setTwist(geometry_msgs::msg::Twist());
@@ -624,9 +621,7 @@ void EntityBase::updateEntityStatusTimestamp(const double current_time)
 
 auto EntityBase::updateStandStillDuration(const double step_time) -> double
 {
-  if (
-    npc_logic_started_ and
-    std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
+  if (std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
     return stand_still_duration_ += step_time;
   }
   return stand_still_duration_ = 0.0;
@@ -634,9 +629,7 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
 
 auto EntityBase::updateTraveledDistance(const double step_time) -> double
 {
-  if (npc_logic_started_) {
-    traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
-  }
+  traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
   return traveled_distance_;
 }
 

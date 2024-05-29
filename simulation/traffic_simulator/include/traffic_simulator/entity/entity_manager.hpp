@@ -492,9 +492,6 @@ public:
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
-      if (npc_logic_started_ && not is<EgoEntity>(name)) {
-        iter->second->startNpcLogic();
-      }
       return success;
     } else {
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");

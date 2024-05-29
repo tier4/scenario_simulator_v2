@@ -152,7 +152,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
 
-  if (is_controlled_by_simulator_ && npc_logic_started_) {
+  if (is_controlled_by_simulator_) {
     if (
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
