@@ -266,7 +266,6 @@ public:
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAccel, const);
-  FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
@@ -299,6 +298,17 @@ public:
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_ENTITY
+
+  auto getCurrentAction(const std::string & name) const -> std::string
+  {
+    if (entities_.find(name) == entities_.end()) {
+      THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+    }
+    if (not is<entity::EgoEntity>(name) and not isNpcLogicStarted()) {
+      return "waiting";
+    }
+    return entities_.at(name)->getCurrentAction();
+  }
 
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 
