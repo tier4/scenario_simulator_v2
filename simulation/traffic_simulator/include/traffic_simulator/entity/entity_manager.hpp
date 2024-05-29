@@ -373,13 +373,13 @@ public:
   auto getGoalPoses(const std::string & name) -> std::vector<T>
   {
     if constexpr (std::is_same_v<std::decay_t<T>, CanonicalizedLaneletPose>) {
-      if (not npc_logic_started_) {
+      if (not isNpcLogicStarted()) {
         return {};
       } else {
         return entities_.at(name)->getGoalPoses();
       }
     } else {
-      if (not npc_logic_started_) {
+      if (not isNpcLogicStarted()) {
         return {};
       } else {
         std::vector<geometry_msgs::msg::Pose> poses;
@@ -527,7 +527,7 @@ public:
 
   void startNpcLogic();
 
-  auto isNpcLogicStarted() const { return npc_logic_started_; }
+  auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 };
 }  // namespace entity
 }  // namespace traffic_simulator

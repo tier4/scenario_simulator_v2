@@ -197,7 +197,7 @@ const std::string EntityManager::getEgoName() const
 auto EntityManager::getObstacle(const std::string & name)
   -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  if (!npc_logic_started_) {
+  if (not isNpcLogicStarted()) {
     return std::nullopt;
   }
   return entities_.at(name)->getObstacle();
@@ -230,7 +230,7 @@ auto EntityManager::getVehicleParameters(const std::string & name) const
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  if (!npc_logic_started_) {
+  if (not isNpcLogicStarted()) {
     return traffic_simulator_msgs::msg::WaypointsArray();
   }
   return entities_.at(name)->getWaypoints();
@@ -402,7 +402,7 @@ void EntityManager::update(const double current_time, const double step_time)
   step_time_ = step_time;
   current_time_ = current_time;
   setVerbose(configuration.verbose);
-  if (npc_logic_started_) {
+  if (isNpcLogicStarted()) {
     conventional_traffic_light_updater_.createTimer(
       configuration.conventional_traffic_light_publish_rate);
     v2i_traffic_light_updater_.createTimer(configuration.v2i_traffic_light_publish_rate);
