@@ -391,7 +391,9 @@ auto EntityManager::updateNpcLogic(const std::string & name) -> const Canonicali
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  entities_[name]->onUpdate(current_time_, step_time_);
+  if (isNpcLogicStarted()) {
+    entities_[name]->onUpdate(current_time_, step_time_);
+  }
   return entities_[name]->getStatus();
 }
 
