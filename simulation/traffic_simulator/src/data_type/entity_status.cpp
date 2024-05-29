@@ -29,7 +29,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   canonicalize();
 }
 
-/// @todo this consturctor will be removed (after adaptation of behavior_tree)
+/// @todo this constructor will be removed (after adaptation of behavior_tree)
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
@@ -40,7 +40,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   canonicalize();
 }
 
-/// @todo this consturctor will be removed (after adaptation of behavior_tree)
+/// @todo this constructor will be removed (after adaptation of behavior_tree)
 CanonicalizedEntityStatus::CanonicalizedEntityStatus(
   const EntityStatus & may_non_canonicalized_entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const lanelet::Ids & route_lanelets)
