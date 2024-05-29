@@ -298,18 +298,18 @@ public:
     const lane_change::Constraint & constraint);
 
   // clang-format off
-#define FORWARD_TO_ENTITY_MANAGER(NAME, ...)                                           \
-  /*!                                                                                  \
-   @brief Forward to arguments to the EntityManager::NAME function.                    \
-   @return return value of the EntityManager::NAME function.                           \
-   @note This function was defined by FORWARD_TO_ENTITY_MANAGER macro.                 \
-   */                                                                                  \
-  template <typename... Ts>                                                            \
-  decltype(auto) NAME(Ts &&... xs)                                                     \
-  {                                                                                    \
-    assert(entity_manager_ptr_);                                                       \
-    return (*entity_manager_ptr_).NAME(__VA_ARGS__ std::forward<decltype(xs)>(xs)...); \
-  }                                                                                    \
+#define FORWARD_TO_ENTITY_MANAGER(NAME)                                  \
+  /*!                                                                    \
+   @brief Forward to arguments to the EntityManager::NAME function.      \
+   @return return value of the EntityManager::NAME function.             \
+   @note This function was defined by FORWARD_TO_ENTITY_MANAGER macro.   \
+   */                                                                    \
+  template <typename... Ts>                                              \
+  decltype(auto) NAME(Ts &&... xs)                                       \
+  {                                                                      \
+    assert(entity_manager_ptr_);                                         \
+    return entity_manager_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
+  }                                                                      \
   static_assert(true, "")
   // clang-format on
 
@@ -344,9 +344,9 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
-  FORWARD_TO_ENTITY_MANAGER(requestSpeedChange, getCurrentTime(), );
+  FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
-  FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin, getCurrentTime(), );
+  FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(setAcceleration);

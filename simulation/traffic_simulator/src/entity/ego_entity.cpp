@@ -276,6 +276,9 @@ auto EgoEntity::setBehaviorParameter(
 
 void EgoEntity::requestSpeedChange(double value, bool)
 {
+  if (getStatus().getTime() > 0.0) {
+    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
+  }
   target_speed_ = value;
   field_operator_application->restrictTargetSpeed(value);
 }
@@ -283,6 +286,9 @@ void EgoEntity::requestSpeedChange(double value, bool)
 void EgoEntity::requestSpeedChange(
   const speed_change::RelativeTargetSpeed & /*target_speed*/, bool /*continuous*/)
 {
+  THROW_SEMANTIC_ERROR(
+    "The traffic_simulator's request to set speed to the Ego type entity is for initialization "
+    "purposes only.");
 }
 
 auto EgoEntity::setVelocityLimit(double value) -> void  //

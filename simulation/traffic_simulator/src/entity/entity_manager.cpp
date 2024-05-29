@@ -300,7 +300,7 @@ void EntityManager::requestLaneChange(
 }
 
 void EntityManager::resetBehaviorPlugin(
-  const double current_time, const std::string & name, const std::string & behavior_plugin_name)
+  const std::string & name, const std::string & behavior_plugin_name)
 {
   const auto & status = getEntityStatus(name);
   const auto behavior_parameter = getBehaviorParameter(name);
@@ -315,12 +315,12 @@ void EntityManager::resetBehaviorPlugin(
     const auto parameters = getVehicleParameters(name);
     despawnEntity(name);
     spawnEntity<VehicleEntity>(
-      name, status.getMapPose(), parameters, current_time, behavior_plugin_name);
+      name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else if (is<PedestrianEntity>(name)) {
     const auto parameters = getPedestrianParameters(name);
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(
-      name, status.getMapPose(), parameters, current_time, behavior_plugin_name);
+      name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else {
     THROW_SIMULATION_ERROR(
       "Entity :", name, "is unkown entity type.", "Please contact to developer.");
@@ -335,47 +335,6 @@ bool EntityManager::trafficLightsChanged()
 {
   return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
          v2i_traffic_light_manager_ptr_->hasAnyLightChanged();
-}
-
-void EntityManager::requestSpeedChange(
-  const double current_time, const std::string & name, double target_speed, bool continuous)
-{
-  if (is<EgoEntity>(name) && current_time > 0.0) {
-    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
-  }
-  return entities_.at(name)->requestSpeedChange(target_speed, continuous);
-}
-
-void EntityManager::requestSpeedChange(
-  const double current_time, const std::string & name, const double target_speed,
-  const speed_change::Transition transition, const speed_change::Constraint constraint,
-  const bool continuous)
-{
-  if (is<EgoEntity>(name) && current_time > 0.0) {
-    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
-  }
-  return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
-}
-
-void EntityManager::requestSpeedChange(
-  const double current_time, const std::string & name,
-  const speed_change::RelativeTargetSpeed & target_speed, bool continuous)
-{
-  if (is<EgoEntity>(name) && current_time > 0.0) {
-    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
-  }
-  return entities_.at(name)->requestSpeedChange(target_speed, continuous);
-}
-
-void EntityManager::requestSpeedChange(
-  const double current_time, const std::string & name,
-  const speed_change::RelativeTargetSpeed & target_speed, const speed_change::Transition transition,
-  const speed_change::Constraint constraint, const bool continuous)
-{
-  if (is<EgoEntity>(name) && current_time > 0.0) {
-    THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
-  }
-  return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
 }
 
 void EntityManager::setVerbose(const bool verbose)

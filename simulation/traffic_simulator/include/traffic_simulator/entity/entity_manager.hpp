@@ -292,30 +292,13 @@ public:
   FORWARD_TO_ENTITY(setMapPose, );
   FORWARD_TO_ENTITY(setTwist, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
+  FORWARD_TO_ENTITY(requestSpeedChange, );
 
 #undef FORWARD_TO_ENTITY
 
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 
   bool trafficLightsChanged();
-
-  void requestSpeedChange(
-    const double current_time, const std::string & name, double target_speed, bool continuous);
-
-  void requestSpeedChange(
-    const double current_time, const std::string & name, const double target_speed,
-    const speed_change::Transition transition, const speed_change::Constraint constraint,
-    const bool continuous);
-
-  void requestSpeedChange(
-    const double current_time, const std::string & name,
-    const speed_change::RelativeTargetSpeed & target_speed, bool continuous);
-
-  void requestSpeedChange(
-    const double current_time, const std::string & name,
-    const speed_change::RelativeTargetSpeed & target_speed,
-    const speed_change::Transition transition, const speed_change::Constraint constraint,
-    const bool continuous);
 
   auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
     -> const CanonicalizedEntityStatus &;
@@ -410,8 +393,7 @@ public:
    * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
    * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
    */
-  void resetBehaviorPlugin(
-    const double current_time, const std::string & name, const std::string & behavior_plugin_name);
+  void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
 
   void setVerbose(const bool verbose);
 
