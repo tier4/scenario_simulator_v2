@@ -286,6 +286,31 @@ public:
     const lane_change::TrajectoryShape trajectory_shape,
     const lane_change::Constraint & constraint);
 
+  /**
+   * @brief Add a traffic source to the simulation
+   * @param radius The radius defining the area on which entities will be spawned
+   * @param rate The rate at which entities will be spawned [Hz]
+   * @param speed The speed of the spawned entities
+   * @param position The center of the area on which entities will be spawned (includes orientation)
+   * @param distribution The parameters of the spawned entities with their respective weights for random distribution
+   *                     For each entity there are 4 parameters in a tuple:
+   *                     - VehicleParameters or PedestrianParameters - parameters of entity
+   *                     - std::string - name of behavior to be used when spawning
+   *                     - std::string - name of 3D model to be used when spawning
+   *                     - double - weight of entity for random distribution
+   * @param allow_spawn_outside_lane Whether entities can be spawned outside the lane
+   * @param require_footprint_fitting Whether entities are required to fit inside lanelet polygon when spawned
+   *                                  (allow_spawn_outside_lane has higher priority)
+   * @param random_orientation Whether entities should have their orientation randomized before lane matching
+   * @param random_seed [Optional] The seed for the random number generator
+   */
+  auto addTrafficSource(
+    const double radius, const double rate, const double speed,
+    const geometry_msgs::msg::Pose & position,
+    const traffic::TrafficSource::Distribution & distribution,
+    const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
+    const bool random_orientation = false, std::optional<int> random_seed = std::nullopt) -> void;
+
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
@@ -309,30 +334,22 @@ public:
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
-  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxDistance);
-  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLateralDistance);
-  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxLaneLongitudinalDistance);
-  FORWARD_TO_ENTITY_MANAGER(getBoundingBoxRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
-  FORWARD_TO_ENTITY_MANAGER(getDistanceToLaneBound);
-  FORWARD_TO_ENTITY_MANAGER(getDistanceToLeftLaneBound);
-  FORWARD_TO_ENTITY_MANAGER(getDistanceToRightLaneBound);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
+  FORWARD_TO_ENTITY_MANAGER(getEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
+  FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLaneletLength);
   FORWARD_TO_ENTITY_MANAGER(getLaneletPose);
-  FORWARD_TO_ENTITY_MANAGER(getLateralDistance);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
-  FORWARD_TO_ENTITY_MANAGER(getLongitudinalDistance);
   FORWARD_TO_ENTITY_MANAGER(getMapPose);
   FORWARD_TO_ENTITY_MANAGER(getMapPoseFromRelativePose);
-  FORWARD_TO_ENTITY_MANAGER(getRelativePose);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
