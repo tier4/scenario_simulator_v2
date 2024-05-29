@@ -108,7 +108,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
 
       script = std::make_shared<OpenScenario>(osc_path);
 
-      // CanonicalizedLaneletPose is also used on the OpenScenarioInterpretes side as NativeLanePose.
+      // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
       // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
       const auto consider_pose_by_road_slope = [&]() {
         if (!has_parameter("consider_pose_by_road_slope")) {
