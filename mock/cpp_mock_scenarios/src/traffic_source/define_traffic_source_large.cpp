@@ -53,15 +53,13 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
       }
       for (const auto & name : names) {
-        const traffic_simulator::CanonicalizedEntityStatus entity_status =
-          api_.getEntityStatus(name);
+        if (const auto entity = api_.getEntity(name)) {
+          const bool is_vehicle =
+            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
 
-        const bool is_vehicle =
-          static_cast<traffic_simulator_msgs::msg::EntityStatus>(entity_status).type.type ==
-          traffic_simulator_msgs::msg::EntityType::VEHICLE;
-
-        if (!entity_status.laneMatchingSucceed() || !is_vehicle) {
-          stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+          if (!entity->laneMatchingSucceed() || !is_vehicle) {
+            stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
+          }
         }
       }
       stop(cpp_mock_scenarios::Result::SUCCESS);
