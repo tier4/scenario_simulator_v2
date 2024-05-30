@@ -51,14 +51,12 @@ auto operator==(const Entity & left, const Entity & right) -> bool
   return left.get() == right.get();
 }
 
-auto Entity::name() const -> String { return this->as<Scope>().name; }
-
-auto throwIfNotSingle(const Entity & entity) -> void
+auto operator<<(std::ostream & os, const Entity & entity) -> std::ostream &
 {
-  if (entity and not entity.is<ScenarioObject>()) {
-    THROW_SEMANTIC_ERROR("Tried to reference `EntitySelection` where it is forbidden.");
-  }
+  return os << (entity ? entity.name() : "");
 }
+
+auto Entity::name() const -> String { return this->as<Scope>().name; }
 
 auto Entity::objects() const -> std::set<Entity>
 {

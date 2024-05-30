@@ -84,6 +84,8 @@ struct Entity : public Object
 };
 
 auto operator==(const Entity &, const Entity &) -> bool;
+
+auto operator<<(std::ostream &, const Entity &) -> std::ostream &;
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
