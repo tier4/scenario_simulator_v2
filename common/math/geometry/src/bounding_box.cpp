@@ -15,6 +15,7 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <geometry/bounding_box.hpp>
+#include <geometry/polygon/polygon.hpp>
 
 // headers in Eigen
 #define EIGEN_MPL2_ONLY
@@ -40,8 +41,8 @@ std::optional<double> getPolygonDistance(
   const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
   const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1)
 {
-  const auto poly0 = get2DPolygon(pose0, bbox0);
-  const auto poly1 = get2DPolygon(pose1, bbox1);
+  const auto poly0 = toPolygon2D(pose0, bbox0);
+  const auto poly1 = toPolygon2D(pose1, bbox1);
   if (boost::geometry::intersects(poly0, poly1)) {
     return std::nullopt;
   }
@@ -60,8 +61,8 @@ std::optional<std::pair<geometry_msgs::msg::Pose, geometry_msgs::msg::Pose>> get
   const geometry_msgs::msg::Pose & pose0, const traffic_simulator_msgs::msg::BoundingBox & bbox0,
   const geometry_msgs::msg::Pose & pose1, const traffic_simulator_msgs::msg::BoundingBox & bbox1)
 {
-  const auto poly0 = get2DPolygon(pose0, bbox0);
-  const auto poly1 = get2DPolygon(pose1, bbox1);
+  const auto poly0 = toPolygon2D(pose0, bbox0);
+  const auto poly1 = toPolygon2D(pose1, bbox1);
 
   if (boost::geometry::intersects(poly0, poly1)) {
     return std::nullopt;
@@ -116,18 +117,19 @@ boost_point pointToSegmentProjection(
   return prj;
 }
 
-const boost_polygon get2DPolygon(
-  const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox)
+auto toPolygon2D(
+  const geometry_msgs::msg::Pose & pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box) -> const boost_polygon
 {
-  return toBoostPolygon(transformPoints(pose, getPointsFromBbox(bbox)));
+  return toBoostPolygon(transformPoints(pose, getPointsFromBbox(bounding_box)));
 }
 
 std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
-  traffic_simulator_msgs::msg::BoundingBox bbox, double width_extension_right,
+  traffic_simulator_msgs::msg::BoundingBox bounding_box, double width_extension_right,
   double width_extension_left, double length_extension_front, double length_extension_rear)
 {
   std::vector<geometry_msgs::msg::Point> points;
-  auto distances_from_center_to_edge = getDistancesFromCenterToEdge(bbox);
+  auto distances_from_center_to_edge = getDistancesFromCenterToEdge(bounding_box);
   geometry_msgs::msg::Point p0;
   p0.x = distances_from_center_to_edge.front + length_extension_front;
   p0.y = distances_from_center_to_edge.left + width_extension_left;
@@ -149,6 +151,55 @@ std::vector<geometry_msgs::msg::Point> getPointsFromBbox(
   p3.z = distances_from_center_to_edge.up;
   points.emplace_back(p3);
   return points;
+}
+
+auto toPolygon2D(const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
+  -> std::vector<geometry_msgs::msg::Point>
+{
+  std::vector<geometry_msgs::msg::Point> points_bounding_box;
+  geometry_msgs::msg::Point p0, p1, p2, p3, p4, p5, p6, p7;
+
+  p0.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p0.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p0.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
+  points_bounding_box.emplace_back(p0);
+
+  p1.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p1.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p1.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
+  points_bounding_box.emplace_back(p1);
+
+  p2.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p2.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p2.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
+  points_bounding_box.emplace_back(p2);
+
+  p3.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p3.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p3.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
+  points_bounding_box.emplace_back(p3);
+
+  p4.x = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  p4.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p4.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
+  points_bounding_box.emplace_back(p4);
+
+  p5.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p5.y = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  p5.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
+  points_bounding_box.emplace_back(p5);
+
+  p6.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p6.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p6.z = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
+  points_bounding_box.emplace_back(p6);
+
+  p7.x = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  p7.y = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  p7.z = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
+  points_bounding_box.emplace_back(p7);
+
+  return math::geometry::get2DConvexHull(points_bounding_box);
 }
 
 boost_point toBoostPoint(const geometry_msgs::msg::Point & point)
@@ -188,15 +239,15 @@ geometry_msgs::msg::Pose subtractPoses(
 }
 
 DistancesFromCenterToEdge getDistancesFromCenterToEdge(
-  const traffic_simulator_msgs::msg::BoundingBox & bbox)
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box)
 {
   DistancesFromCenterToEdge distances;
-  distances.front = bbox.center.x + bbox.dimensions.x * 0.5;
-  distances.rear = bbox.center.x - bbox.dimensions.x * 0.5;
-  distances.left = bbox.center.y + bbox.dimensions.y * 0.5;
-  distances.right = bbox.center.y - bbox.dimensions.y * 0.5;
-  distances.up = bbox.center.z + bbox.dimensions.z * 0.5;
-  distances.down = bbox.center.z - bbox.dimensions.z * 0.5;
+  distances.front = bounding_box.center.x + bounding_box.dimensions.x * 0.5;
+  distances.rear = bounding_box.center.x - bounding_box.dimensions.x * 0.5;
+  distances.left = bounding_box.center.y + bounding_box.dimensions.y * 0.5;
+  distances.right = bounding_box.center.y - bounding_box.dimensions.y * 0.5;
+  distances.up = bounding_box.center.z + bounding_box.dimensions.z * 0.5;
+  distances.down = bounding_box.center.z - bounding_box.dimensions.z * 0.5;
 
   return distances;
 }

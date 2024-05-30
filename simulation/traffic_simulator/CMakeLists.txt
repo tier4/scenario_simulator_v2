@@ -51,11 +51,14 @@ ament_auto_add_library(traffic_simulator SHARED
   src/simulation_clock/simulation_clock.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
+  src/traffic/traffic_source.cpp
   src/traffic_lights/configurable_rate_updater.cpp
   src/traffic_lights/traffic_light.cpp
   src/traffic_lights/traffic_light_manager.cpp
   src/traffic_lights/traffic_light_marker_publisher.cpp
   src/traffic_lights/traffic_light_publisher.cpp
+  src/utils/distance.cpp
+  src/utils/pose.cpp
 )
 
 ament_auto_add_library(visualization_component SHARED
