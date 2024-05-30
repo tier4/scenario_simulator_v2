@@ -2,6 +2,17 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.1 (2024-05-30)
+------------------
+* Merge pull request `#1254 <https://github.com/tier4/scenario_simulator_v2/issues/1254>`_ from tier4/refactor/openscenario_validator
+  refactor `openscenario validator` package
+* refactor: validator.hpp
+* Merge branch 'master' into refactor/openscenario_validator
+* Merge branch 'master' into refactor/openscenario_validator
+* refactor: use noNamespaceSchemaLocation for validation in openscenario_validator
+* refactor: delete in-memory xml schema from openscenario_validator
+* Contributors: Kotaro Yoshimoto
+
 2.0.0 (2024-05-27)
 ------------------
 * Merge branch 'master' into ref/RJD-1054-implement-distance-utils
