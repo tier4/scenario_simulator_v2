@@ -42,6 +42,7 @@ public:
     this->entity_status_ = obj.entity_status_;
     return *this;
   }
+  auto getName() const noexcept -> const std::string & { return entity_status_.name; };
   auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
   auto laneMatchingSucceed() const noexcept -> bool { return entity_status_.lanelet_pose_valid; }
   auto getMapPose() const noexcept -> geometry_msgs::msg::Pose { return entity_status_.pose; }

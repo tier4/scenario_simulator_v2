@@ -100,24 +100,6 @@ public:
 
   virtual auto getCurrentAction() const -> std::string = 0;
 
-  /*   */ auto getDistanceToLaneBound() -> double;
-
-  /*   */ auto getDistanceToLaneBound(lanelet::Id lanelet_id) const -> double;
-
-  /*   */ auto getDistanceToLaneBound(const lanelet::Ids &) const -> double;
-
-  /*   */ auto getDistanceToLeftLaneBound() -> double;
-
-  /*   */ auto getDistanceToLeftLaneBound(lanelet::Id lanelet_id) const -> double;
-
-  /*   */ auto getDistanceToLeftLaneBound(const lanelet::Ids &) const -> double;
-
-  /*   */ auto getDistanceToRightLaneBound() -> double;
-
-  /*   */ auto getDistanceToRightLaneBound(lanelet::Id lanelet_id) const -> double;
-
-  /*   */ auto getDistanceToRightLaneBound(const lanelet::Ids &) const -> double;
-
   virtual auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter = 0;
 
   virtual auto getDefaultDynamicConstraints() const
@@ -186,6 +168,8 @@ public:
 
   virtual auto isControlledBySimulator() const -> bool;
 
+  virtual auto setControlledBySimulator(bool) -> void;
+
   virtual auto requestFollowTrajectory(
     const std::shared_ptr<traffic_simulator_msgs::msg::PolylineTrajectory> &) -> void;
 
@@ -202,9 +186,6 @@ public:
   /*   */ void setDynamicConstraints(const traffic_simulator_msgs::msg::DynamicConstraints &);
 
   virtual void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &) = 0;
-
-  /*   */ void setEntityTypeList(
-    const std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> &);
 
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
@@ -261,7 +242,6 @@ protected:
   double traveled_distance_ = 0.0;
 
   std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
-  std::unordered_map<std::string, traffic_simulator_msgs::msg::EntityType> entity_type_list_;
 
   std::optional<double> target_speed_;
   traffic_simulator::job::JobList job_list_;

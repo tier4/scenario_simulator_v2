@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
@@ -45,6 +46,12 @@ RelativeDistanceCondition::RelativeDistanceCondition(
     return node.get_parameter("consider_pose_by_road_slope").as_bool();
   }())
 {
+  std::set<RoutingAlgorithm::value_type> supported = {
+    RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
+  if (supported.find(routing_algorithm) == supported.end()) {
+    throw UNSUPPORTED_ENUMERATION_VALUE_SPECIFIED(
+      RelativeDistanceCondition, boost::lexical_cast<std::string>(routing_algorithm));
+  }
 }
 
 auto RelativeDistanceCondition::description() const -> String

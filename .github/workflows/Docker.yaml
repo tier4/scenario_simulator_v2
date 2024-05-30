@@ -9,6 +9,7 @@ on:
       - "**"
       - "!docs/**"
       - "!README.md"
+      - "!CONTRIBUTING.md"
       - "!.github/**"
       - ".github/workflows/Docker.yaml"
       - "!mkdocs.yml"
