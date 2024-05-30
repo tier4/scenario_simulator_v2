@@ -13,6 +13,120 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.0 (2024-05-27)
+------------------
+* Merge pull request `#1233 <https://github.com/tier4/scenario_simulator_v2/issues/1233>`_ from tier4/ref/RJD-1054-implement-distance-utils
+  ref(traffic_simulator): implement separate class for distance calculations, adapt make positions in SimulatorCore
+* apply reformat
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* ref(traffic_simulator): tidy up namespaces in ::distance, ::pose
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* doc(entity_manager): add an explanation why there is no exception thrown in getEntity()
+* ref(cpp_mock, simulator_core, pose): improve names
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1054-implement-distance-utils
+* ref(traffic_simulator): tidy up pose, distance namespaces usage
+* ref(traffic_simulator, pose): rename from getters to noun function name
+* ref(traffic_simulator, distance): rename from getters to noun function name
+* fix(traffic_simulator): fix getTimeHeadway in api
+* ref(traffic_simulator, simulator_core): improve passed and returned value, fix format
+* ref(traffic_simulator): remove unnecessary using and blank lines, add inline namespace - pose and distance
+* ref(traffic_simulator): sort libs in CMakeLists
+* ref(traffic_simulator, geometry): rename get2DPolygon to toPolygon2D, avoid abbreviation to bbox
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* ref(traffic_simulator,distance): ref getDistanceToLaneBound
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* fix(traffic_simulator): fix pose utils
+* fix(traffic_simulator: fix pose and distance utils collections, improve
+* fix(traffic_simulator): fix missing changes
+* ref(traffic_simulator,openscenario_interpreter): improve make pose names
+* ref(traffic_simulator): little format improve
+* ref(traffic_simulator): remove old distance utils
+* rev(traffic_simulator): remove unexpected changes - comments etc
+* fix(entity_manager): add exception when try getEntity
+* ref(traffic_simulator): move get quiet nan pose to pose ns
+* ref(traffic_simulator): separate pose functions as namespace
+* ref(traffic_simulator): transform DistanceUtils to distance namespace
+* ref(traffic_simulator): tidy up distance utils, move get2DPolygon to bbox
+* ref(distance) use separated getDistanceToCrosswalk and getDistanceToStopLine
+* feat(distance): use separated getDistanceToBound
+* feat(pose): use separated getRelativePose, makeNative**, convert and canonicalize, move poses casts definition
+* feat(distance): use separated getBoundingBox..
+* feat(distance): use separated getLateral and getLongitudinal distances
+* feat(traffic_simulator): add getEntity, getHdmapUtils, getName
+* feat(distance): init separate class for distance calc
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Tatsuya Yamasaki, hakuturu583
+
+1.18.0 (2024-05-24)
+-------------------
+* Merge pull request `#1231 <https://github.com/tier4/scenario_simulator_v2/issues/1231>`_ from tier4/feature/traffic-source
+  Feature/traffic source
+* Merge branch 'master' into feature/traffic-source
+* Merge branch 'master' into feature/traffic-source
+* Merge remote-tracking branch 'origin/master' into feature/traffic-source
+* Add comment explaining the possibly undesirable behavior
+* Add comment explaining the issue
+* Change lanelet fitting behavior in TrafficSource
+  Enable footprint fitting to many lanelets. This allows positions on the boundary of two lanelets one after another
+* Apply patched changes
+* Merge branch 'master' into feature/traffic-source
+* Rename unknown variables and functions for spell-check test
+* Add API comment
+* Optimize polygon search
+  Add first search from starting lanelets which improves performance
+* Add debugging function
+* Fix polygon search
+* Change algorithm to less greedy
+* Correct redundant areas removal algorithm
+* Fix compile error
+* Add disable option to SpawnPoseValidator
+* Prevent loops
+* Fix style in TrafficSource
+* First attempt at behavior and model3d support for TrafficSimulator
+* Clean TrafficSource code
+* Fix style
+* Fix getNearbyLaneletIds not filtering out crosswalks
+* Enable footprint fitting before spawning
+  The solution has been optimized for a high rates, meaning combined lane polygons are precomputed when TrafficSource is added and when validating a spawn pose the polygons are only accessed
+* Add require footprint fitting to API
+* Enable align entity orientation to lane
+* Rename API::defineTrafficSource function
+* Make more readable
+* Enable TrafficSource spawn rate higher than execute() rate
+* Refactor TrafficSource
+* Change bounding box inside circle check to 2D
+* Add bounding box inside circle check
+* Fix timing issues
+* Fix compile error
+* Rename function
+* Forward arguments from API
+* Fix minor helper mistake
+* Add orientation and improve
+* Fix function types
+* Initial TrafficSource changes to randomize poses in cartesian coordinates
+* Minor refactor
+* Add API comment
+* Fix copyright
+* Rename TrafficSource member variables
+* Precalculate valid S value ranges for performance improvement
+* Fix HdMapUtils::getNearbyLaneletIds
+  After the fix only lanelets in the specified distance are returned
+* Improve TrafficSource
+* Add random valid pose generation
+* Refactor TrafficSource
+* Add TrafficSource class
+* Contributors: Masaya Kataoka, Mateusz Palczuk, Tatsuya Yamasaki
+
 1.17.2 (2024-05-22)
 -------------------
 
