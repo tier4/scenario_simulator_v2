@@ -16,9 +16,9 @@
 #define GEOMETRY__VECTOR3__OPERATOR_HPP_
 
 #include <geometry/vector3/is_like_vector3.hpp>
-#include <geometry_msgs/msg/vector3.hpp>
-#include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 
 namespace math
 {

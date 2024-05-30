@@ -16,11 +16,11 @@
 
 #include <cmath>
 #include <geometry/vector3/hypot.hpp>
+#include <geometry/vector3/inner_product.hpp>
+#include <geometry/vector3/internal_angle.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
-#include <geometry/vector3/inner_product.hpp>
-#include <geometry/vector3/internal_angle.hpp>
 
 #include "../expect_eq_macros.hpp"
 #include "../test_utils.hpp"

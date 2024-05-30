@@ -14,10 +14,9 @@
 
 #include <gtest/gtest.h>
 
-#include <geometry/quaternion/operator.hpp>
 #include <geometry/quaternion/is_like_quaternion.hpp>
 #include <geometry/quaternion/make_quaternion.hpp>
-
+#include <geometry/quaternion/operator.hpp>
 
 #include "expect_eq_macros.hpp"
 #include "test_utils.hpp"

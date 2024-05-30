@@ -15,11 +15,10 @@
 #ifndef GEOMETRY__VECTOR3__INTERNAL_ANGLE_HPP_
 #define GEOMETRY__VECTOR3__INTERNAL_ANGLE_HPP_
 
-#include <scenario_simulator_exception/exception.hpp>
-
+#include <geometry/vector3/inner_product.hpp>
 #include <geometry/vector3/is_like_vector3.hpp>
 #include <geometry/vector3/norm.hpp>
-#include <geometry/vector3/inner_product.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace math
 {
