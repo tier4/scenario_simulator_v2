@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <do_nothing_plugin/plugin.hpp>
-#include <geometry/vector3/operator.hpp>
 #include <geometry/vector3/hypot.hpp>
+#include <geometry/vector3/operator.hpp>
 
 namespace entity_behavior
 {

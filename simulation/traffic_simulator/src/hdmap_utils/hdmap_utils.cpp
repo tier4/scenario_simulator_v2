@@ -27,13 +27,13 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <deque>
-#include <geometry/vector3/operator.hpp>
-#include <geometry/vector3/normalize.hpp>
-#include <geometry/vector3/inner_product.hpp>
 #include <geometry/quaternion/operator.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry/transform.hpp>
+#include <geometry/vector3/inner_product.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <lanelet2_extension/io/autoware_osm_parser.hpp>
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <lanelet2_extension/utility/message_conversion.hpp>
@@ -1407,7 +1407,7 @@ auto HdMapUtils::toMapPose(
     const auto spline = getCenterPointsSpline(pose->lanelet_id);
     ret.pose = spline->getPose(pose->s);
     const auto normal_vec = spline->getNormalVector(pose->s);
-    const auto diff = math::geometry::normalize(normal_vec) * pose->offset; //this
+    const auto diff = math::geometry::normalize(normal_vec) * pose->offset;  //this
     ret.pose.position += diff;
     const auto tangent_vec = spline->getTangentVector(pose->s);
     geometry_msgs::msg::Vector3 rpy;

@@ -57,8 +57,8 @@ template <
 auto operator*(const T & a, const U & b)
 {
   auto v = T();
-  v.x = a.w  * b.x - a.z * b.y + a.y * b.z + a.x * b.w;
-  v.y = a.z  * b.x + a.w * b.y - a.x * b.z + a.y * b.w;
+  v.x = a.w * b.x - a.z * b.y + a.y * b.z + a.x * b.w;
+  v.y = a.z * b.x + a.w * b.y - a.x * b.z + a.y * b.w;
   v.z = -a.y * b.x + a.x * b.y + a.w * b.z + a.z * b.w;
   v.w = -a.x * b.x - a.y * b.y - a.z * b.z + a.w * b.w;
   return v;

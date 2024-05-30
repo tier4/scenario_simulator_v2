@@ -23,16 +23,17 @@ namespace geometry
 {
 template <
   typename T, typename U, typename V, typename W,
-  std::enable_if_t<std::conjunction_v<std::is_scalar<T>, std::is_scalar<U>, std::is_scalar<V>, std::is_scalar<W>>, std::nullptr_t> =
-    nullptr>
-auto makeQuaternion (const T & x, const U & y, const V & z, const W & w)
+  std::enable_if_t<
+    std::conjunction_v<std::is_scalar<T>, std::is_scalar<U>, std::is_scalar<V>, std::is_scalar<W>>,
+    std::nullptr_t> = nullptr>
+auto makeQuaternion(const T & x, const U & y, const V & z, const W & w)
 {
-    geometry_msgs::msg::Quaternion quat;
-    quat.x = x;
-    quat.y = y;
-    quat.z = z;
-    quat.w = w;
-    return quat;
+  geometry_msgs::msg::Quaternion quat;
+  quat.x = x;
+  quat.y = y;
+  quat.z = z;
+  quat.w = w;
+  return quat;
 }
 }  // namespace geometry
 }  // namespace math

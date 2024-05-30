@@ -23,17 +23,15 @@ namespace math
 namespace geometry
 {
 template <typename T, typename = void>
-struct IsLikeQuaternion : std::false_type {};
+struct IsLikeQuaternion : std::false_type
+{
+};
 
 template <typename T>
 struct IsLikeQuaternion<
   T, std::void_t<
-      decltype(std::declval<T>().x),
-      decltype(std::declval<T>().y),
-      decltype(std::declval<T>().z),
-      decltype(std::declval<T>().w)
-  >>
-: std::true_type
+       decltype(std::declval<T>().x), decltype(std::declval<T>().y), decltype(std::declval<T>().z),
+       decltype(std::declval<T>().w)>> : std::true_type
 {
 };
 

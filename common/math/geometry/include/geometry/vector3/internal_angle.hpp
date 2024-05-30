@@ -30,13 +30,13 @@ template <
     nullptr>
 auto getInternalAngle(const T & v0, const U & v1)
 {
-    const auto val = innerProduct(v0, v1) / (norm(v0) * norm(v1));
-    if (-1 <= val && val <= 1) {
-        return std::acos(val);
-    }
-    THROW_SIMULATION_ERROR(
-        "value of v0*v1/(size(v0)*size(v1)) in vector v0 : ", v0.x, ",", v0.y, ",", v0.z,
-        " and v1 : ", v1.x, ",", v1.y, ",", v1.z, "is out of range, value = ", val);
+  const auto val = innerProduct(v0, v1) / (norm(v0) * norm(v1));
+  if (-1 <= val && val <= 1) {
+    return std::acos(val);
+  }
+  THROW_SIMULATION_ERROR(
+    "value of v0*v1/(size(v0)*size(v1)) in vector v0 : ", v0.x, ",", v0.y, ",", v0.z,
+    " and v1 : ", v1.x, ",", v1.y, ",", v1.z, "is out of range, value = ", val);
 }
 }  // namespace geometry
 }  // namespace math

@@ -24,15 +24,16 @@ namespace geometry
 {
 template <
   typename T, typename U, typename V,
-  std::enable_if_t<std::conjunction_v<std::is_scalar<T>, std::is_scalar<U>, std::is_scalar<V>>, std::nullptr_t> =
+  std::enable_if_t<
+    std::conjunction_v<std::is_scalar<T>, std::is_scalar<U>, std::is_scalar<V>>, std::nullptr_t> =
     nullptr>
 auto vector3(const T & x, const U & y, const V & z)
 {
-    geometry_msgs::msg::Vector3 vec;
-    vec.x = x;
-    vec.y = y;
-    vec.z = z;
-    return vec;
+  geometry_msgs::msg::Vector3 vec;
+  vec.x = x;
+  vec.y = y;
+  vec.z = z;
+  return vec;
 }
 }  // namespace geometry
 }  // namespace math

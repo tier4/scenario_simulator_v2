@@ -30,16 +30,13 @@ template <
     nullptr>
 auto operator+(const T & a, const U & b)
 {
-  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value)
-  {
+  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value) {
     geometry_msgs::msg::Vector3 v;
     v.x = a.x + b.x;
     v.y = a.y + b.y;
     v.z = a.z + b.z;
     return v;
-  }
-  else
-  {
+  } else {
     geometry_msgs::msg::Point v;
     v.x = a.x + b.x;
     v.y = a.y + b.y;
@@ -54,16 +51,13 @@ template <
     nullptr>
 auto operator-(const T & a, const U & b)
 {
-  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value)
-  {
+  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value) {
     geometry_msgs::msg::Vector3 v;
     v.x = a.x - b.x;
     v.y = a.y - b.y;
     v.z = a.z - b.z;
     return v;
-  }
-  else
-  {
+  } else {
     geometry_msgs::msg::Point v;
     v.x = a.x - b.x;
     v.y = a.y - b.y;
@@ -78,23 +72,19 @@ template <
     nullptr>
 auto operator*(const T & a, const U & b)
 {
-  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value)
-  {
+  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value) {
     geometry_msgs::msg::Vector3 v;
     v.x = a.x * b;
     v.y = a.y * b;
     v.z = a.z * b;
     return v;
-  }
-  else
-  {
+  } else {
     geometry_msgs::msg::Point v;
     v.x = a.x * b;
     v.y = a.y * b;
     v.z = a.z * b;
     return v;
   }
-  
 }
 
 template <
@@ -103,16 +93,13 @@ template <
     nullptr>
 auto operator/(const T & a, const U & b)
 {
-  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value)
-  {
+  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value) {
     geometry_msgs::msg::Vector3 v;
     v.x = a.x / b;
     v.y = a.y / b;
     v.z = a.z / b;
     return v;
-  }
-  else
-  {
+  } else {
     geometry_msgs::msg::Point v;
     v.x = a.x / b;
     v.y = a.y / b;

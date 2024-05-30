@@ -16,8 +16,8 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/intersection/collision.hpp>
-#include <geometry/vector3/operator.hpp>
 #include <geometry/transform.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -72,7 +72,8 @@ void EntityManager::broadcastEntityTransform()
                 .position(std::accumulate(
                   names.begin(), names.end(), geometry_msgs::msg::Point(),
                   [this, names](geometry_msgs::msg::Point point, const std::string & name) {
-                    auto vec = getMapPose(name).position * (1.0 / static_cast<double>(names.size()));
+                    auto vec =
+                      getMapPose(name).position * (1.0 / static_cast<double>(names.size()));
                     point += vec;
                     return point;
                   }))
