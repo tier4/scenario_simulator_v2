@@ -41,6 +41,3 @@ struct IsLikeQuaternion<
 }  // namespace math
 
 #endif  // GEOMETRY__QUATERNION__IS_LIKE_QUATERNION_HPP_
-
-
-// quaternion
