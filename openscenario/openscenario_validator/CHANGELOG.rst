@@ -2,6 +2,23 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.0.0 (2024-05-27)
+------------------
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Merge branch 'master' into ref/RJD-1054-implement-distance-utils
+* Contributors: DMoszynski, Masaya Kataoka, Tatsuya Yamasaki
+
+1.18.0 (2024-05-24)
+-------------------
+* Merge branch 'master' into feature/traffic-source
+* Merge branch 'master' into feature/traffic-source
+* Contributors: Tatsuya Yamasaki
+
+1.17.2 (2024-05-22)
+-------------------
+
 1.17.1 (2024-05-21)
 -------------------
 
