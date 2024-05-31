@@ -169,8 +169,8 @@ void toProto(const std_msgs::msg::Header & header, std_msgs::Header & proto);
 void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header);
 
 #define DEFINE_CONVERSION(PACKAGE, TYPENAME)                               \
-  auto toProto(const PACKAGE::msg::TYPENAME &, PACKAGE::TYPENAME &)-> void; \
-  auto toMsg(const PACKAGE::TYPENAME &, PACKAGE::msg::TYPENAME &)-> void
+  auto toProto(const PACKAGE::msg::TYPENAME &, PACKAGE::TYPENAME &)->void; \
+  auto toMsg(const PACKAGE::TYPENAME &, PACKAGE::msg::TYPENAME &)->void
 
 DEFINE_CONVERSION(autoware_auto_control_msgs, AckermannLateralCommand);
 DEFINE_CONVERSION(autoware_auto_control_msgs, LongitudinalCommand);
