@@ -111,7 +111,7 @@ auto AutowareUniverse::updateVehicleState() -> void
 {
   setControlModeReport([this]() {
     autoware_auto_vehicle_msgs::msg::ControlModeReport message;
-    message.mode = autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS;
+    message.mode = current_control_mode.load();
     return message;
   }());
 
@@ -178,5 +178,15 @@ auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
     std::copy(point.lane_ids.begin(), point.lane_ids.end(), std::back_inserter(ids));
   }
   return ids;
+}
+
+auto AutowareUniverse::setManualMode() -> void
+{
+  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::MANUAL);
+}
+
+auto AutowareUniverse::setAutonomousMode() -> void
+{
+  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS);
 }
 }  // namespace concealer

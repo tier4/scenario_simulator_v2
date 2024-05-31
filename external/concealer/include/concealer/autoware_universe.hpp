@@ -59,6 +59,9 @@ class AutowareUniverse : public Autoware
 
   std::atomic<bool> is_stop_requested = false;
 
+  std::atomic<uint8_t> current_control_mode =
+    autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS;
+
   std::atomic<bool> is_thrown = false;
 
   std::exception_ptr thrown;
@@ -91,6 +94,10 @@ public:
     autoware_auto_vehicle_msgs::msg::GearCommand> override;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
+
+  auto setManualMode() -> void override;
+
+  auto setAutonomousMode() -> void override;
 };
 
 }  // namespace concealer

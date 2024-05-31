@@ -73,6 +73,10 @@ public:
   auto set(const geometry_msgs::msg::Pose &) -> void;
 
   virtual auto rethrow() -> void;
+
+  virtual auto setManualMode() -> void = 0;
+
+  virtual auto setAutonomousMode() -> void = 0;
 };
 }  // namespace concealer
 
