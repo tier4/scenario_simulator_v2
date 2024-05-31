@@ -30,10 +30,7 @@ TEST(Quaternion, testCase1)
   auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
   auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
   auto ans = q1 + q2;
-  EXPECT_DOUBLE_EQ(ans.x, 0);
-  EXPECT_DOUBLE_EQ(ans.y, 2);
-  EXPECT_DOUBLE_EQ(ans.z, 0);
-  EXPECT_DOUBLE_EQ(ans.w, 2);
+  EXPECT_QUATERNION_EQ(ans, math::geometry::makeQuaternion(0, 2, 0, 2))
 }
 
 TEST(Quaternion, testCase2)
@@ -43,10 +40,7 @@ TEST(Quaternion, testCase2)
   auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
   auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
   auto ans = q1 - q2;
-  EXPECT_DOUBLE_EQ(ans.x, 0);
-  EXPECT_DOUBLE_EQ(ans.y, 0);
-  EXPECT_DOUBLE_EQ(ans.z, 0);
-  EXPECT_DOUBLE_EQ(ans.w, 0);
+  EXPECT_QUATERNION_EQ(ans, math::geometry::makeQuaternion(0, 0, 0, 0))
 }
 
 TEST(Quaternion, testCase3)
@@ -56,10 +50,7 @@ TEST(Quaternion, testCase3)
   auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
   auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
   auto ans = q1 * q2;
-  EXPECT_DOUBLE_EQ(ans.x, 0);
-  EXPECT_DOUBLE_EQ(ans.y, 2);
-  EXPECT_DOUBLE_EQ(ans.z, 0);
-  EXPECT_DOUBLE_EQ(ans.w, 0);
+  EXPECT_QUATERNION_EQ(ans, math::geometry::makeQuaternion(0, 2, 0, 0))
 }
 
 TEST(Quaternion, testCase4)
@@ -69,8 +60,11 @@ TEST(Quaternion, testCase4)
   auto q1 = math::geometry::makeQuaternion(0, 1, 0, 1);
   auto q2 = math::geometry::makeQuaternion(0, 1, 0, 1);
   q1 += q2;
-  EXPECT_DOUBLE_EQ(q1.x, 0);
-  EXPECT_DOUBLE_EQ(q1.y, 2);
-  EXPECT_DOUBLE_EQ(q1.z, 0);
-  EXPECT_DOUBLE_EQ(q1.w, 2);
+  EXPECT_QUATERNION_EQ(q1, math::geometry::makeQuaternion(0, 2, 0, 2))
+}
+
+int main(int argc, char ** argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
