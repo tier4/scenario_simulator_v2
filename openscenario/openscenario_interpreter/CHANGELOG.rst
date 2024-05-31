@@ -14,6 +14,12 @@ Changelog for package openscenario_interpreter
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.1 (2024-05-30)
+------------------
+* Merge branch 'master' into refactor/openscenario_validator
+* Merge branch 'master' into refactor/openscenario_validator
+* Contributors: Kotaro Yoshimoto
+
 2.0.0 (2024-05-27)
 ------------------
 * Merge pull request `#1233 <https://github.com/tier4/scenario_simulator_v2/issues/1233>`_ from tier4/ref/RJD-1054-implement-distance-utils
