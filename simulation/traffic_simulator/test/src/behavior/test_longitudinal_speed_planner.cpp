@@ -44,9 +44,9 @@ auto makeLongitudinalSpeedPlanner()
   -> traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner
 {
   const double step_time = 0.001;
-  const std::string entity = "entity";
+  const std::string entity_name = "entity";
   return traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner{
-    step_time, entity};
+    step_time, entity_name};
 }
 
 auto makeTwistWithLinearX(double x) -> geometry_msgs::msg::Twist
@@ -188,7 +188,6 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
 
   const double speed_difference = 1e-8;
   double target_speed, result_jerk;
-
   {
     current_twist.linear.x = 10.0;
     target_speed = current_twist.linear.x - speed_difference;
