@@ -15,6 +15,9 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
+#include <geometry_msgs/msg/accel.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <traffic_simulator/behavior/longitudinal_speed_planning.hpp>
 
 #include "../expect_eq_macros.hpp"
@@ -46,12 +49,24 @@ auto makeLongitudinalSpeedPlanner()
     step_time, entity};
 }
 
+auto makeTwistWithLinearX(double x) -> geometry_msgs::msg::Twist
+{
+  return geometry_msgs::build<geometry_msgs::msg::Twist>()
+    .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(x).y(0.0).z(0.0))
+    .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.0));
+}
+
+auto makeAccelWithLinearX(double x) -> geometry_msgs::msg::Accel
+{
+  return geometry_msgs::build<geometry_msgs::msg::Accel>()
+    .linear(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(x).y(0.0).z(0.0))
+    .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.0));
+}
+
 TEST(LongitudinalSpeedPlanner, isAccelerating_true)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
-
-  geometry_msgs::msg::Twist current_twist{};
-  current_twist.linear.x = 1.0;
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(1.0);
 
   const double target_speed = 2.0;
   EXPECT_TRUE(planner.isAccelerating(target_speed, current_twist));
@@ -59,10 +74,8 @@ TEST(LongitudinalSpeedPlanner, isAccelerating_true)
 
 TEST(LongitudinalSpeedPlanner, isAccelerating_false)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
-
-  geometry_msgs::msg::Twist current_twist{};
-  current_twist.linear.x = 3.0;
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(3.0);
 
   const double target_speed = 2.0;
   EXPECT_FALSE(planner.isAccelerating(target_speed, current_twist));
@@ -70,10 +83,8 @@ TEST(LongitudinalSpeedPlanner, isAccelerating_false)
 
 TEST(LongitudinalSpeedPlanner, isDecelerating_true)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
-
-  geometry_msgs::msg::Twist current_twist{};
-  current_twist.linear.x = 3.0;
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(3.0);
 
   const double target_speed = 2.0;
   EXPECT_TRUE(planner.isDecelerating(target_speed, current_twist));
@@ -81,9 +92,8 @@ TEST(LongitudinalSpeedPlanner, isDecelerating_true)
 
 TEST(LongitudinalSpeedPlanner, isDecelerating_false)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
-  geometry_msgs::msg::Twist current_twist{};
-  current_twist.linear.x = 1.0;
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(1.0);
 
   const double target_speed = 2.0;
   EXPECT_FALSE(planner.isDecelerating(target_speed, current_twist));
@@ -91,48 +101,46 @@ TEST(LongitudinalSpeedPlanner, isDecelerating_false)
 
 TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(1.0);
+  const auto current_accel = makeAccelWithLinearX(1.0);
+  const auto constraints =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
+      .max_acceleration(2.0)
+      .max_acceleration_rate(1.0)
+      .max_deceleration(0.0)
+      .max_deceleration_rate(0.0)
+      .max_speed(10.0);
 
-  geometry_msgs::msg::Twist current_twist{};
-  geometry_msgs::msg::Accel current_accel{};
-  traffic_simulator_msgs::msg::DynamicConstraints constraints{};
-  current_twist.linear.x = 1.0;
-  current_accel.linear.x = 1.0;
-  constraints.max_speed = 10.0;
-  constraints.max_acceleration = 2.0;
-  constraints.max_acceleration_rate = 1.0;
-
-  const double epsilon = 1e-5;
+  const double tolerance = 1e-5;
 
   const double target_speed = 8.5;
   const double expected_duration = 4.0;
 
   const double result_duration =
     planner.getAccelerationDuration(target_speed, constraints, current_twist, current_accel);
-  EXPECT_NEAR(result_duration, expected_duration, epsilon);
+  EXPECT_NEAR(result_duration, expected_duration, tolerance);
 }
 
 TEST(LongitudinalSpeedPlanner, getDynamicStates_targetSpeedOverLimit)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
-
-  geometry_msgs::msg::Twist current_twist{};
-  geometry_msgs::msg::Accel current_accel{};
-  traffic_simulator_msgs::msg::DynamicConstraints constraints{};
-  current_twist.linear.x = 10.0;
-  current_accel.linear.x = 1.0;
-  constraints.max_speed = 20.0;
-  constraints.max_acceleration = 1.0;
-  constraints.max_deceleration = 1.0;
-  constraints.max_acceleration_rate = 1.0;
-  constraints.max_deceleration_rate = 1.0;
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(10.0);
+  const auto current_accel = makeAccelWithLinearX(1.0);
+  const auto constraints =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
+      .max_acceleration(1.0)
+      .max_acceleration_rate(1.0)
+      .max_deceleration(1.0)
+      .max_deceleration_rate(1.0)
+      .max_speed(20.0);
 
   double target_speed = 100.0;
-  auto [result0_twist, result0_accel, result0_jerk] =
+  const auto [result0_twist, result0_accel, result0_jerk] =
     planner.getDynamicStates(target_speed, constraints, current_twist, current_accel);
 
   target_speed = constraints.max_speed;
-  auto [result1_twist, result1_accel, result1_jerk] =
+  const auto [result1_twist, result1_accel, result1_jerk] =
     planner.getDynamicStates(target_speed, constraints, current_twist, current_accel);
 
   EXPECT_ACCEL_EQ(result0_accel, result1_accel);
@@ -142,18 +150,16 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_targetSpeedOverLimit)
 
 TEST(LongitudinalSpeedPlanner, getDynamicStates_maxJerk)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
-
-  geometry_msgs::msg::Twist current_twist{};
-  geometry_msgs::msg::Accel current_accel{};
-  traffic_simulator_msgs::msg::DynamicConstraints constraints{};
-  current_twist.linear.x = 0.0;
-  current_accel.linear.x = 0.0;
-  constraints.max_speed = 20.0;
-  constraints.max_acceleration = 5.0;
-  constraints.max_deceleration = 5.0;
-  constraints.max_acceleration_rate = 1.0;
-  constraints.max_deceleration_rate = 1.0;
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(0.0);
+  const auto current_accel = makeAccelWithLinearX(0.0);
+  auto constraints =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
+      .max_acceleration(5.0)
+      .max_acceleration_rate(1.0)
+      .max_deceleration(5.0)
+      .max_deceleration_rate(1.0)
+      .max_speed(20.0);
 
   const double target_speed = constraints.max_speed;
 
@@ -169,31 +175,30 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_maxJerk)
 
 TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
+  const auto planner = makeLongitudinalSpeedPlanner();
+  auto current_twist = makeTwistWithLinearX(0.0);
+  const auto current_accel = makeAccelWithLinearX(0.0);
+  const auto constraints =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
+      .max_acceleration(5.0)
+      .max_acceleration_rate(5.0)
+      .max_deceleration(5.0)
+      .max_deceleration_rate(5.0)
+      .max_speed(20.0);
 
-  geometry_msgs::msg::Twist current_twist{};
-  geometry_msgs::msg::Accel current_accel{};
-  traffic_simulator_msgs::msg::DynamicConstraints constraints{};
-  current_accel.linear.x = 0.0;
-  constraints.max_speed = 20.0;
-  constraints.max_acceleration = 5.0;
-  constraints.max_deceleration = 5.0;
-  constraints.max_acceleration_rate = 5.0;
-  constraints.max_deceleration_rate = 5.0;
-
-  const double epsilon = 1e-8;
+  const double speed_difference = 1e-8;
   double target_speed, result_jerk;
 
   {
     current_twist.linear.x = 10.0;
-    target_speed = current_twist.linear.x - epsilon;
+    target_speed = current_twist.linear.x - speed_difference;
     result_jerk = std::get<2>(
       planner.getDynamicStates(target_speed, constraints, current_twist, current_accel));
     EXPECT_NE(result_jerk, -constraints.max_deceleration_rate);
   }
   {
     current_twist.linear.x = 0.0;
-    target_speed = current_twist.linear.x - epsilon;
+    target_speed = current_twist.linear.x - speed_difference;
     result_jerk = std::get<2>(
       planner.getDynamicStates(target_speed, constraints, current_twist, current_accel));
     EXPECT_NE(result_jerk, -constraints.max_deceleration_rate);
@@ -202,10 +207,9 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
 
 TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
+  const auto planner = makeLongitudinalSpeedPlanner();
 
-  geometry_msgs::msg::Twist current_twist{};
-  current_twist.linear.x = 13.0;
+  const auto current_twist = makeTwistWithLinearX(13.0);
   const double target_speed = 15.0;
   const double tolerance = 0.1;
 
@@ -214,10 +218,9 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
 
 TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(10.0);
 
-  geometry_msgs::msg::Twist current_twist{};
-  current_twist.linear.x = 10.0;
   const double target_speed = 10.09;
   const double tolerance = 0.1;
 
@@ -226,21 +229,19 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
 
 TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(10.0);
+  const auto current_accel = makeAccelWithLinearX(0.0);
+  const auto constraints =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
+      .max_acceleration(18.0)
+      .max_acceleration_rate(6.0)
+      .max_deceleration(18.0)
+      .max_deceleration_rate(6.0)
+      .max_speed(70.0);
 
-  geometry_msgs::msg::Twist current_twist{};
-  geometry_msgs::msg::Accel current_accel{};
-  traffic_simulator_msgs::msg::DynamicConstraints constraints{};
-  current_twist.linear.x = 10.0;
-  current_accel.linear.x = 0.0;
-  constraints.max_speed = 70.0;
-  constraints.max_acceleration = 18.0;
-  constraints.max_deceleration = 18.0;
-  constraints.max_acceleration_rate = 6.0;
-  constraints.max_deceleration_rate = 6.0;
-
-  const double epsilon = 0.1;
-  const double target_speed = current_twist.linear.x - epsilon;
+  const double speed_difference = 0.1;
+  const double target_speed = current_twist.linear.x - speed_difference;
   const double current_linear_jerk = 0.0;
   const double distance = planner.getRunningDistance(
     target_speed, constraints, current_twist, current_accel, current_linear_jerk);
@@ -254,18 +255,16 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
 
 TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
-
-  geometry_msgs::msg::Twist current_twist{};
-  geometry_msgs::msg::Accel current_accel{};
-  traffic_simulator_msgs::msg::DynamicConstraints constraints{};
-  current_twist.linear.x = 60.0;
-  current_accel.linear.x = 0.0;
-  constraints.max_speed = 70.0;
-  constraints.max_acceleration = 1.0;
-  constraints.max_deceleration = 1.0;
-  constraints.max_acceleration_rate = 5.0;
-  constraints.max_deceleration_rate = 5.0;
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(60.0);
+  const auto current_accel = makeAccelWithLinearX(0.0);
+  const auto constraints =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
+      .max_acceleration(1.0)
+      .max_acceleration_rate(5.0)
+      .max_deceleration(1.0)
+      .max_deceleration_rate(5.0)
+      .max_speed(70.0);
 
   const double target_speed = 0.0;
   const double current_linear_jerk = 0.0;
@@ -281,18 +280,16 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
 
 TEST(LongitudinalSpeedPlanner, getRunningDistance_zero)
 {
-  auto planner = makeLongitudinalSpeedPlanner();
-
-  geometry_msgs::msg::Twist current_twist{};
-  geometry_msgs::msg::Accel current_accel{};
-  traffic_simulator_msgs::msg::DynamicConstraints constraints{};
-  current_twist.linear.x = 10.0;
-  current_accel.linear.x = 0.0;
-  constraints.max_speed = 20.0;
-  constraints.max_acceleration = 5.0;
-  constraints.max_deceleration = 5.0;
-  constraints.max_acceleration_rate = 5.0;
-  constraints.max_deceleration_rate = 5.0;
+  const auto planner = makeLongitudinalSpeedPlanner();
+  const auto current_twist = makeTwistWithLinearX(10.0);
+  const auto current_accel = makeAccelWithLinearX(0.0);
+  const auto constraints =
+    traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
+      .max_acceleration(5.0)
+      .max_acceleration_rate(5.0)
+      .max_deceleration(5.0)
+      .max_deceleration_rate(5.0)
+      .max_speed(20.0);
 
   const double target_speed = current_twist.linear.x;
   const double current_linear_jerk = 1.0;
