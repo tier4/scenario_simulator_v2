@@ -13,6 +13,9 @@ Changelog for package openscenario_interpreter_example
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.2 (2024-06-03)
+------------------
+
 2.0.1 (2024-05-30)
 ------------------
 * Merge branch 'master' into refactor/openscenario_validator

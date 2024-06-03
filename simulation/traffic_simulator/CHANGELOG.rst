@@ -13,6 +13,13 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.2 (2024-06-03)
+------------------
+* Merge pull request `#1271 <https://github.com/tier4/scenario_simulator_v2/issues/1271>`_ from tier4/fix/rviz_config
+  fix rviz config
+* fix rviz config
+* Contributors: Masaya Kataoka, hakuturu583
+
 2.0.1 (2024-05-30)
 ------------------
 * Merge branch 'master' into refactor/openscenario_validator
