@@ -215,23 +215,22 @@ void EgoEntitySimulation::overwrite(
   const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
   double step_time, bool npc_logic_started)
 {
-  using quaternion_operation::getRotationMatrix;
-
   autoware->rethrow();
-
-  // SimModelInterface only  supports 2D, therefore the position in Oz is considered unchangeable and
-  // stored in an additional variable world_relative_position_z_ that is used in calculations
-  auto world_relative_position = [&]() -> Eigen::VectorXd {
-    auto v = Eigen::VectorXd(3);
-    v(0) = status.pose.position.x - initial_pose_.position.x;
-    v(1) = status.pose.position.y - initial_pose_.position.y;
-    v(2) = status.pose.position.z - initial_pose_.position.z;
-    return getRotationMatrix(initial_pose_.orientation).transpose() * v;
-  }();
-  world_relative_position_z_ = world_relative_position(2);
 
   if (npc_logic_started) {
     using quaternion_operation::convertQuaternionToEulerAngle;
+    using quaternion_operation::getRotationMatrix;
+
+    /*
+       SimModelInterface only supports 2D, therefore the position in Oz is
+       considered unchangeable and stored in an additional variable
+       world_relative_position_ that is used in calculations.
+    */
+    world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+                               Eigen::Vector3d(
+                                 status.pose.position.x - initial_pose_.position.x,
+                                 status.pose.position.y - initial_pose_.position.y,
+                                 status.pose.position.z - initial_pose_.position.z);
 
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
@@ -263,8 +262,8 @@ void EgoEntitySimulation::overwrite(
         [[fallthrough]];
 
       case VehicleModelType::IDEAL_STEER_VEL:
-        state(0) = world_relative_position(0);
-        state(1) = world_relative_position(1);
+        state(0) = world_relative_position_.x();
+        state(1) = world_relative_position_.y();
         state(2) = yaw;
         vehicle_model_ptr_->setState(state);
         break;
@@ -285,18 +284,18 @@ void EgoEntitySimulation::update(
 
   autoware->rethrow();
 
-  // SimModelInterface only  supports 2D, therefore the position in Oz is considered unchangeable and
-  // stored in an additional variable world_relative_position_z_ that is used in calculations
-  auto world_relative_position = [&]() -> Eigen::VectorXd {
-    auto v = Eigen::VectorXd(3);
-    v(0) = status_.pose.position.x - initial_pose_.position.x;
-    v(1) = status_.pose.position.y - initial_pose_.position.y;
-    v(2) = status_.pose.position.z - initial_pose_.position.z;
-    return getRotationMatrix(initial_pose_.orientation).transpose() * v;
-  }();
-  world_relative_position_z_ = world_relative_position(2);
-
   if (npc_logic_started) {
+    /*
+       SimModelInterface only supports 2D, therefore the position in Oz is
+       considered unchangeable and stored in an additional variable
+       world_relative_position_ that is used in calculations.
+    */
+    world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+                               Eigen::Vector3d(
+                                 status_.pose.position.x - initial_pose_.position.x,
+                                 status_.pose.position.y - initial_pose_.position.y,
+                                 status_.pose.position.z - initial_pose_.position.z);
+
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
     auto acceleration_by_slope = [this]() {
@@ -443,8 +442,7 @@ auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   Eigen::VectorXd relative_position(3);
   relative_position(0) = vehicle_model_ptr_->getX();
   relative_position(1) = vehicle_model_ptr_->getY();
-  // use stored Oz position
-  relative_position(2) = world_relative_position_z_;
+  relative_position(2) = world_relative_position_.z();  // Use stored Oz position
   relative_position =
     quaternion_operation::getRotationMatrix(initial_pose_.orientation) * relative_position;
 
