@@ -41,9 +41,9 @@ void EntityManager::broadcastEntityTransform()
 {
   std::vector<std::string> names = getEntityNames();
   /**
-   * @note This part of the process is intended to ensure that frames are issued in a position that makes 
+   * @note This part of the process is intended to ensure that frames are issued in a position that makes
    * it as easy as possible to see the entities that will appear in the scenario.
-   * In the past, we used to publish the frames of all entities, but that would be too heavy processing, 
+   * In the past, we used to publish the frames of all entities, but that would be too heavy processing,
    * so we publish the average of the coordinates of all entities.
    */
   if (isEgoSpawned()) {
@@ -52,8 +52,8 @@ void EntityManager::broadcastEntityTransform()
       broadcastTransform(
         geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
           /**
-           * @note This is the intended implementation. 
-           * It is easier to create rviz config if the name “ego” is fixed, 
+           * @note This is the intended implementation.
+           * It is easier to create rviz config if the name "ego" is fixed,
            * so the frame_id “ego” is issued regardless of the name of the ego entity.
            */
           .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
@@ -481,12 +481,13 @@ void EntityManager::updateHdmapMarker()
 
 void EntityManager::startNpcLogic(const double current_time)
 {
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    it->second->startNpcLogic(current_time);
-  }
-  current_time_ = current_time;
   npc_logic_started_ = true;
-}
 
+  current_time_ = current_time;
+
+  for ([[maybe_unused]] auto && [name, entity] : entities_) {
+    entity->startNpcLogic(current_time_);
+  }
+}
 }  // namespace entity
 }  // namespace traffic_simulator

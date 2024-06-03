@@ -66,10 +66,6 @@ auto makeUpdatedStatus(
   using math::geometry::normalize;
   using math::geometry::truncate;
 
-  using quaternion_operation::convertEulerAngleToQuaternion;
-  using quaternion_operation::convertQuaternionToEulerAngle;
-  using quaternion_operation::getRotation;
-
   auto distance_along_lanelet =
     [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
     if (const auto from_lanelet_pose =
@@ -96,16 +92,18 @@ auto makeUpdatedStatus(
         status.lanelet_pose = lanelet_pose.value();
         const CatmullRomSpline spline(hdmap_utils->getCenterPoints(status.lanelet_pose.lanelet_id));
         const auto lanelet_quaternion = spline.getPose(status.lanelet_pose.s, true).orientation;
-        const auto lanelet_rpy = convertQuaternionToEulerAngle(lanelet_quaternion);
-        const auto entity_rpy = convertQuaternionToEulerAngle(status.pose.orientation);
+        const auto lanelet_rpy =
+          quaternion_operation::convertQuaternionToEulerAngle(lanelet_quaternion);
+        const auto entity_rpy =
+          quaternion_operation::convertQuaternionToEulerAngle(status.pose.orientation);
         // adjust orientation in EntityStatus.pose (only pitch) and in EntityStatus.LaneletPose
-        status.pose.orientation =
-          convertEulerAngleToQuaternion(geometry_msgs::build<geometry_msgs::msg::Vector3>()
-                                          .x(entity_rpy.x)
-                                          .y(lanelet_rpy.y)
-                                          .z(entity_rpy.z));
-        status.lanelet_pose.rpy =
-          convertQuaternionToEulerAngle(getRotation(lanelet_quaternion, status.pose.orientation));
+        status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>()
+            .x(entity_rpy.x)
+            .y(lanelet_rpy.y)
+            .z(entity_rpy.z));
+        status.lanelet_pose.rpy = quaternion_operation::convertQuaternionToEulerAngle(
+          quaternion_operation::getRotation(lanelet_quaternion, status.pose.orientation));
         status.lanelet_pose_valid = true;
       } else {
         status.lanelet_pose_valid = false;
@@ -388,10 +386,11 @@ auto makeUpdatedStatus(
                    // if entity is on lane use pitch from lanelet, otherwise use pitch on target
                    const auto pitch =
                      entity_status.lanelet_pose_valid
-                       ? -convertQuaternionToEulerAngle(entity_status.pose.orientation).y
+                       ? -quaternion_operation::convertQuaternionToEulerAngle(
+                            entity_status.pose.orientation)
+                            .y
                        : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
-                   // use yaw on target
-                   const auto yaw = std::atan2(dy, dx);
+                   const auto yaw = std::atan2(dy, dx);  // Use yaw on target
                    return geometry_msgs::build<geometry_msgs::msg::Vector3>()
                      .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
                      .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
@@ -418,9 +417,12 @@ auto makeUpdatedStatus(
       desired_velocity.y, ", ", desired_velocity.z, "].");
   } else if (const auto current_velocity =
                [&]() {
-                 const auto pitch =
-                   -convertQuaternionToEulerAngle(entity_status.pose.orientation).y;
-                 const auto yaw = convertQuaternionToEulerAngle(entity_status.pose.orientation).z;
+                 const auto pitch = -quaternion_operation::convertQuaternionToEulerAngle(
+                                       entity_status.pose.orientation)
+                                       .y;
+                 const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(
+                                    entity_status.pose.orientation)
+                                    .z;
                  return geometry_msgs::build<geometry_msgs::msg::Vector3>()
                    .x(std::cos(pitch) * std::cos(yaw) * speed)
                    .y(std::cos(pitch) * std::sin(yaw) * speed)
@@ -591,7 +593,7 @@ auto makeUpdatedStatus(
             .x(0.0)
             .y(std::atan2(-desired_velocity.z, std::hypot(desired_velocity.x, desired_velocity.y)))
             .z(std::atan2(desired_velocity.y, desired_velocity.x));
-        return convertEulerAngleToQuaternion(direction);
+        return quaternion_operation::convertEulerAngleToQuaternion(direction);
       }
     }();
 
@@ -609,8 +611,8 @@ auto makeUpdatedStatus(
     updated_status.action_status.twist.linear.z = 0;
 
     updated_status.action_status.twist.angular =
-      convertQuaternionToEulerAngle(
-        getRotation(entity_status.pose.orientation, updated_status.pose.orientation)) /
+      quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
+        entity_status.pose.orientation, updated_status.pose.orientation)) /
       step_time;
 
     updated_status.action_status.accel.linear =
