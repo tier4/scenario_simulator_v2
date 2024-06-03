@@ -448,7 +448,7 @@ TEST_F(EntityBaseTest, setDynamicConstraints)
 
 /**
  * @note Test basic functionality; test setting other Entities status correctness
- * with a sample other entites status unordered map.
+ * with a sample other entities status unordered map.
  */
 TEST_F(EntityBaseTest, setOtherStatus)
 {
