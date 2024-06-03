@@ -221,17 +221,6 @@ void EgoEntitySimulation::overwrite(
     using quaternion_operation::convertQuaternionToEulerAngle;
     using quaternion_operation::getRotationMatrix;
 
-    /*
-       SimModelInterface only supports 2D, therefore the position in Oz is
-       considered unchangeable and stored in an additional variable
-       world_relative_position_ that is used in calculations.
-    */
-    world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
-                               Eigen::Vector3d(
-                                 status.pose.position.x - initial_pose_.position.x,
-                                 status.pose.position.y - initial_pose_.position.y,
-                                 status.pose.position.z - initial_pose_.position.z);
-
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
         getRotationMatrix(initial_pose_.orientation).transpose() *
@@ -272,6 +261,17 @@ void EgoEntitySimulation::overwrite(
         THROW_SEMANTIC_ERROR(
           "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
     }
+
+    /*
+       SimModelInterface only supports 2D, therefore the position in Oz is
+       considered unchangeable and stored in an additional variable
+       world_relative_position_ that is used in calculations.
+    */
+    world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+                               Eigen::Vector3d(
+                                 status.pose.position.x - initial_pose_.position.x,
+                                 status.pose.position.y - initial_pose_.position.y,
+                                 status.pose.position.z - initial_pose_.position.z);
   }
   updateStatus(current_scenario_time, step_time);
   updatePreviousValues();
@@ -280,22 +280,9 @@ void EgoEntitySimulation::overwrite(
 void EgoEntitySimulation::update(
   double current_scenario_time, double step_time, bool npc_logic_started)
 {
-  using quaternion_operation::getRotationMatrix;
-
   autoware->rethrow();
 
   if (npc_logic_started) {
-    /*
-       SimModelInterface only supports 2D, therefore the position in Oz is
-       considered unchangeable and stored in an additional variable
-       world_relative_position_ that is used in calculations.
-    */
-    world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
-                               Eigen::Vector3d(
-                                 status_.pose.position.x - initial_pose_.position.x,
-                                 status_.pose.position.y - initial_pose_.position.y,
-                                 status_.pose.position.z - initial_pose_.position.z);
-
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
     auto acceleration_by_slope = [this]() {
@@ -334,6 +321,13 @@ void EgoEntitySimulation::update(
     vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
+    /*
+       SimModelInterface only supports 2D, therefore the position in Oz is
+       considered unchangeable and stored in an additional variable
+       world_relative_position_ that is used in calculations.
+    */
+    world_relative_position_ = Eigen::Vector3d(
+      vehicle_model_ptr_->getX(), vehicle_model_ptr_->getY(), world_relative_position_.z());
   }
   updateStatus(current_scenario_time, step_time);
   updatePreviousValues();
@@ -383,33 +377,31 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
   auto centerline_points = hdmap_utils_ptr_->getCenterPoints(ego_lanelet.value().lanelet_id);
 
   /// @note Copied from motion_util::findNearestSegmentIndex
-  auto find_nearest_segment_index = [](
-                                      const std::vector<geometry_msgs::msg::Point> & points,
-                                      const geometry_msgs::msg::Point & point) {
-    assert(not points.empty());
+  auto find_nearest_segment_index =
+    [](const std::vector<geometry_msgs::msg::Point> & points, const Eigen::Vector3d & point) {
+      assert(not points.empty());
 
-    double min_dist = std::numeric_limits<double>::max();
-    size_t min_idx = 0;
+      double min_dist = std::numeric_limits<double>::max();
+      size_t min_idx = 0;
 
-    for (size_t i = 0; i < points.size(); ++i) {
-      const auto dist = [](const auto point1, const auto point2) {
-        const auto dx = point1.x - point2.x;
-        const auto dy = point1.y - point2.y;
-        return dx * dx + dy * dy;
-      }(points.at(i), point);
+      for (size_t i = 0; i < points.size(); ++i) {
+        const auto dist =
+          [](const geometry_msgs::msg::Point & point1, const Eigen::Vector3d & point2) {
+            const auto dx = point1.x - point2.x();
+            const auto dy = point1.y - point2.y();
+            return dx * dx + dy * dy;
+          }(points.at(i), point);
 
-      if (dist < min_dist) {
-        min_dist = dist;
-        min_idx = i;
+        if (dist < min_dist) {
+          min_dist = dist;
+          min_idx = i;
+        }
       }
-    }
-    return min_idx;
-  };
+      return min_idx;
+    };
 
-  geometry_msgs::msg::Point ego_point;
-  ego_point.x = vehicle_model_ptr_->getX();
-  ego_point.y = vehicle_model_ptr_->getY();
-  const size_t ego_seg_idx = find_nearest_segment_index(centerline_points, ego_point);
+  const size_t ego_seg_idx =
+    find_nearest_segment_index(centerline_points, world_relative_position_);
 
   const auto & prev_point = centerline_points.at(ego_seg_idx);
   const auto & next_point = centerline_points.at(ego_seg_idx + 1);
@@ -439,26 +431,20 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
 auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   -> geometry_msgs::msg::Pose
 {
-  Eigen::VectorXd relative_position(3);
-  relative_position(0) = vehicle_model_ptr_->getX();
-  relative_position(1) = vehicle_model_ptr_->getY();
-  relative_position(2) = world_relative_position_.z();  // Use stored Oz position
-  relative_position =
-    quaternion_operation::getRotationMatrix(initial_pose_.orientation) * relative_position;
+  const auto relative_position =
+    quaternion_operation::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
+  const auto relative_orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    geometry_msgs::build<geometry_msgs::msg::Vector3>()
+      .x(0)
+      .y(pitch_angle)
+      .z(vehicle_model_ptr_->getYaw()));
 
-  geometry_msgs::msg::Pose current_pose;
-  current_pose.position.x = initial_pose_.position.x + relative_position(0);
-  current_pose.position.y = initial_pose_.position.y + relative_position(1);
-  current_pose.position.z = initial_pose_.position.z + relative_position(2);
-  current_pose.orientation = [&]() {
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0;
-    rpy.y = pitch_angle;
-    rpy.z = vehicle_model_ptr_->getYaw();
-    return initial_pose_.orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
-  }();
-
-  return current_pose;
+  return geometry_msgs::build<geometry_msgs::msg::Pose>()
+    .position(geometry_msgs::build<geometry_msgs::msg::Point>()
+                .x(initial_pose_.position.x + relative_position(0))
+                .y(initial_pose_.position.y + relative_position(1))
+                .z(initial_pose_.position.z + relative_position(2)))
+    .orientation(initial_pose_.orientation * relative_orientation);
 }
 
 auto EgoEntitySimulation::getCurrentAccel(const double step_time) const -> geometry_msgs::msg::Accel
