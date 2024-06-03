@@ -28,12 +28,7 @@ template <
     std::nullptr_t> = nullptr>
 auto makeQuaternion(const T & x, const U & y, const V & z, const W & w)
 {
-  geometry_msgs::msg::Quaternion quat;
-  quat.x = x;
-  quat.y = y;
-  quat.z = z;
-  quat.w = w;
-  return quat;
+  return geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(x).y(y).z(z).w(w);
 }
 }  // namespace geometry
 }  // namespace math
