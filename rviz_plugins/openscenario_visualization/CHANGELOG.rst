@@ -13,6 +13,15 @@ Changelog for package openscenario_visualization
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.2 (2024-06-03)
+------------------
+
+2.0.1 (2024-05-30)
+------------------
+* Merge branch 'master' into refactor/openscenario_validator
+* Merge branch 'master' into refactor/openscenario_validator
+* Contributors: Kotaro Yoshimoto
+
 2.0.0 (2024-05-27)
 ------------------
 * Merge branch 'master' into ref/RJD-1054-implement-distance-utils
