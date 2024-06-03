@@ -299,16 +299,7 @@ public:
 
 #undef FORWARD_TO_ENTITY
 
-  auto getCurrentAction(const std::string & name) const -> std::string
-  {
-    if (entities_.find(name) == entities_.end()) {
-      THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
-    }
-    if (not is<entity::EgoEntity>(name) and not isNpcLogicStarted()) {
-      return "waiting";
-    }
-    return entities_.at(name)->getCurrentAction();
-  }
+  auto getCurrentAction(const std::string & name) const -> std::string;
 
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 

@@ -333,6 +333,18 @@ void EntityManager::resetBehaviorPlugin(
   setBehaviorParameter(name, behavior_parameter);
 }
 
+auto EntityManager::getCurrentAction(const std::string & name) const -> std::string
+{
+  if (entities_.find(name) == entities_.end()) {
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+  }
+  if (not is<entity::EgoEntity>(name) and not isNpcLogicStarted()) {
+    return "waiting";
+  } else {
+    return entities_.at(name)->getCurrentAction();
+  }
+}
+
 bool EntityManager::trafficLightsChanged()
 {
   return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
