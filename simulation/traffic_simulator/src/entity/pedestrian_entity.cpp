@@ -248,7 +248,7 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
   setBehaviorParameter(behavior_parameter);
 }
 
-void PedestrianEntity::onUpdate(double current_time, double step_time)
+void PedestrianEntity::onUpdate(const double current_time, const double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
   if (npc_logic_started_) {

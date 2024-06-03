@@ -148,7 +148,7 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
   return field_operator_application->getWaypoints();
 }
 
-void EgoEntity::onUpdate(double current_time, double step_time)
+void EgoEntity::onUpdate(const double current_time, const double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
 
