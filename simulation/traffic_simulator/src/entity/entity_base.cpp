@@ -623,8 +623,9 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
 {
   if (std::abs(getCurrentTwist().linear.x) <= std::numeric_limits<double>::epsilon()) {
     return stand_still_duration_ += step_time;
+  } else {
+    return stand_still_duration_ = 0.0;
   }
-  return stand_still_duration_ = 0.0;
 }
 
 auto EntityBase::updateTraveledDistance(const double step_time) -> double

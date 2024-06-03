@@ -199,8 +199,9 @@ auto EntityManager::getObstacle(const std::string & name)
 {
   if (not isNpcLogicStarted()) {
     return std::nullopt;
+  } else {
+    return entities_.at(name)->getObstacle();
   }
-  return entities_.at(name)->getObstacle();
 }
 
 auto EntityManager::getPedestrianParameters(const std::string & name) const
@@ -232,8 +233,9 @@ auto EntityManager::getWaypoints(const std::string & name)
 {
   if (not isNpcLogicStarted()) {
     return traffic_simulator_msgs::msg::WaypointsArray();
+  } else {
+    return entities_.at(name)->getWaypoints();
   }
-  return entities_.at(name)->getWaypoints();
 }
 
 bool EntityManager::isEgoSpawned() const
