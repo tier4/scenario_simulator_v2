@@ -15,17 +15,14 @@
 #ifndef OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_
 #define OPENSCENARIO_VALIDATOR__VALIDATOR_HPP_
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
-#include <openscenario_validator/schema.hpp>
 #include <sstream>
 #include <stdexcept>
 #include <system_error>
-#include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/validators/common/Grammar.hpp>
 
 namespace openscenario_validator
 {
@@ -79,20 +76,16 @@ class OpenSCENARIOValidator
 public:
   OpenSCENARIOValidator() : parser(std::make_unique<xercesc::XercesDOMParser>())
   {
-    xercesc::MemBufInputSource schema_input_source(
-      reinterpret_cast<const XMLByte *>(schema), strlen(schema), "xsd");
+    parser->setDoNamespaces(true);
+    parser->setDoSchema(true);
+    parser->setErrorHandler(&error_handler);
+    parser->setValidationSchemaFullChecking(true);
+    parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
 
-    if (not parser->loadGrammar(schema_input_source, xercesc::Grammar::SchemaGrammarType)) {
-      throw std::runtime_error(
-        "Failed to load XSD schema. This is an unexpected error and an implementation issue. "
-        "Please contact the developer.");
-    } else {
-      parser->setDoNamespaces(true);
-      parser->setDoSchema(true);
-      parser->setErrorHandler(&error_handler);
-      parser->setValidationSchemaFullChecking(true);
-      parser->setValidationScheme(xercesc::XercesDOMParser::Val_Always);
-    }
+    parser->setExternalNoNamespaceSchemaLocation(
+      (ament_index_cpp::get_package_share_directory("openscenario_validator") +
+       "/schema/OpenSCENARIO-1.3.xsd")
+        .c_str());
   }
 
   auto validate(const boost::filesystem::path & xml_file) -> void
