@@ -63,6 +63,9 @@ auto makeAccelWithLinearX(double x) -> geometry_msgs::msg::Accel
     .angular(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.0));
 }
 
+/**
+ * @note Test basic functionality. Test with an accelerating situation.
+ */
 TEST(LongitudinalSpeedPlanner, isAccelerating_true)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -72,6 +75,9 @@ TEST(LongitudinalSpeedPlanner, isAccelerating_true)
   EXPECT_TRUE(planner.isAccelerating(target_speed, current_twist));
 }
 
+/**
+ * @note Test basic functionality. Test with non accelerating situation.
+ */
 TEST(LongitudinalSpeedPlanner, isAccelerating_false)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -81,6 +87,9 @@ TEST(LongitudinalSpeedPlanner, isAccelerating_false)
   EXPECT_FALSE(planner.isAccelerating(target_speed, current_twist));
 }
 
+/**
+ * @note Test basic functionality. Test with a decelerating situation.
+ */
 TEST(LongitudinalSpeedPlanner, isDecelerating_true)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -90,6 +99,9 @@ TEST(LongitudinalSpeedPlanner, isDecelerating_true)
   EXPECT_TRUE(planner.isDecelerating(target_speed, current_twist));
 }
 
+/**
+ * @note Test basic functionality. Test with non decelerating situation.
+ */
 TEST(LongitudinalSpeedPlanner, isDecelerating_false)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -99,6 +111,10 @@ TEST(LongitudinalSpeedPlanner, isDecelerating_false)
   EXPECT_FALSE(planner.isDecelerating(target_speed, current_twist));
 }
 
+/**
+ * @note Test calculations correctness of acceleration
+ * duration with some positive acceleration and speed substantially below target_speed.
+ */
 TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -122,6 +138,10 @@ TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
   EXPECT_NEAR(result_duration, expected_duration, tolerance);
 }
 
+/**
+ * @note Test functionality aggregation used in other classes; test function behavior
+ * when target_speed is bigger than max speed.
+ */
 TEST(LongitudinalSpeedPlanner, getDynamicStates_targetSpeedOverLimit)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -148,6 +168,11 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_targetSpeedOverLimit)
   EXPECT_DOUBLE_EQ(result0_jerk, result1_jerk);
 }
 
+/**
+ * @note Test functionality aggregation used in other classes; test calculations correctness
+ * with target_speed = max speed and current speed = 0 - goal is to test the situation
+ * when acceleration is so long that max jerk is reached.
+ */
 TEST(LongitudinalSpeedPlanner, getDynamicStates_maxJerk)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -173,6 +198,11 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_maxJerk)
   EXPECT_DOUBLE_EQ(result1_jerk, constraints.max_acceleration_rate);
 }
 
+/**
+ * @note Test functionality aggregation used in other classes; test calculations correctness
+ * with target_speed slightly smaller than current speed - goal is to test the situation
+ * when the max jerk is not reached because the target_speed is reached first.
+ */
 TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -204,6 +234,10 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
   }
 }
 
+/**
+ * @note Test functionality used in other classes; test calculations correctness with target_speed
+ * differing from current speed by several units.
+ */
 TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -215,6 +249,11 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
   EXPECT_FALSE(planner.isTargetSpeedReached(target_speed, current_twist, tolerance));
 }
 
+/**
+ * @note Test functionality used in other classes; test calculations correctness
+ * with target_speed differing from current speed by very small amount
+ * - goal is to simulate equal speed but with numerical noise.
+ */
 TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -226,6 +265,12 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
   EXPECT_TRUE(planner.isTargetSpeedReached(target_speed, current_twist, tolerance));
 }
 
+/**
+ * @note Test functionality aggregation used in other classes; test calculations
+ * correctness with target_speed slightly bigger than current speed
+ * - goal is to test the situation when the target speed is reached in little time,
+ * so the loop executes only once.
+ */
 TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -252,6 +297,12 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
   EXPECT_LE(distance, distance_upper_bound);
 }
 
+/**
+ * @note Test functionality aggregation used in other classes; test calculations correctness
+ * with target_speed = 0 and current speed = 50 (or other cruising speed) - goal is to test
+ * the situation when the target speed is reached takes longer to reach
+ * so the loop has to run miltiple times.
+ */
 TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
@@ -277,6 +328,10 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
   EXPECT_LE(distance, distance_upper_bound);
 }
 
+/**
+ * @note Test functionality aggregation used in other classes; test calculations correctness
+ * with target_speed identical to current speed so that the time is 0.
+ */
 TEST(LongitudinalSpeedPlanner, getRunningDistance_zero)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
