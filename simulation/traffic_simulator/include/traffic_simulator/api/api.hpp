@@ -337,6 +337,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLights);
   FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
+  FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(laneMatchingSucceed);
   FORWARD_TO_ENTITY_MANAGER(reachPosition);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);

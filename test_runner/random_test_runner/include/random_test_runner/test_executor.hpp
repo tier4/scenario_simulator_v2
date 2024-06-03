@@ -133,21 +133,21 @@ public:
           traffic_simulator::helper::constructActionStatus(npc_descr.speed));
         api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
       }
-
-      if (not api_->isEgoSpawned()) {
-        api_->startNpcLogic();
-      }
-      if (
-        api_->isEgoSpawned() and
-        api_->asFieldOperatorApplication(api_->getEgoName()).engageable()) {
-        api_->startNpcLogic();
-      }
     });
   }
 
   void update()
   {
     executeWithErrorHandling([this]() {
+      if (not api_->isEgoSpawned() and not api_->isNpcLogicStarted()) {
+        api_->startNpcLogic();
+      }
+      if (
+        api_->isEgoSpawned() and not api_->isNpcLogicStarted() and
+        api_->asFieldOperatorApplication(api_->getEgoName()).engageable()) {
+        api_->startNpcLogic();
+      }
+
       auto current_time = api_->getCurrentTime();
 
       if (!std::isnan(current_time)) {
