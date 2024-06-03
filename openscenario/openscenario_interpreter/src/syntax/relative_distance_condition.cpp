@@ -328,13 +328,13 @@ auto RelativeDistanceCondition::distance<
 #define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, entity_ref)
 
 auto RelativeDistanceCondition::distance(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref, const Entities & entities,
+  const EntityRef & triggering_entity, const EntityRef & entity_ref, const Entities * entities,
   CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
   RoutingAlgorithm routing_algorithm, bool freespace) -> double
 {
   if (
-    entities.at(triggering_entity).as<ScenarioObject>().is_added and
-    entities.at(entity_ref).as<ScenarioObject>().is_added) {
+    entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    entities->at(entity_ref).as<ScenarioObject>().is_added) {
     SWITCH_COORDINATE_SYSTEM(
       SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
   } else {
@@ -348,7 +348,7 @@ auto RelativeDistanceCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
     results.push_back(distance(
-      triggering_entity, entity_ref, *global().entities, coordinate_system, relative_distance_type,
+      triggering_entity, entity_ref, global().entities, coordinate_system, relative_distance_type,
       routing_algorithm, freespace));
     return rule(static_cast<double>(results.back()), value);
   }));

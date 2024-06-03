@@ -103,7 +103,7 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
   }
 
   static auto distance(
-    const EntityRef &, const EntityRef &, const Entities &, CoordinateSystem, RelativeDistanceType,
+    const EntityRef &, const EntityRef &, const Entities *, CoordinateSystem, RelativeDistanceType,
     RoutingAlgorithm, bool) -> double;
 
   auto evaluate() -> Object;

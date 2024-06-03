@@ -15,11 +15,11 @@
 #ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_SPEED_CONDITION_HPP_
 #define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_SPEED_CONDITION_HPP_
 
-#include <geometry/vector3/norm.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/directional_dimension.hpp>
-#include <openscenario_interpreter/utility/print.hpp>
+#include <openscenario_interpreter/syntax/rule.hpp>
+#include <openscenario_interpreter/syntax/triggering_entities.hpp>
 
 namespace openscenario_interpreter
 {
@@ -41,7 +41,7 @@ inline namespace syntax
      <xsd:attribute name="direction" type="DirectionalDimension"/>
    </xsd:complexType>
 */
-struct RelativeSpeedCondition : private SimulatorCore::ConditionEvaluation
+struct RelativeSpeedCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   /*
      Reference entity.
@@ -68,60 +68,15 @@ struct RelativeSpeedCondition : private SimulatorCore::ConditionEvaluation
 
   std::vector<Double> evaluations;
 
-  explicit RelativeSpeedCondition(
-    const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-  : entity_ref(readAttribute<EntityRef>("entityRef", node, scope)),
-    rule(readAttribute<Rule>("rule", node, scope)),
-    value(readAttribute<Double>("value", node, scope)),
-    direction(readAttribute<DirectionalDimension>("direction", node, scope, std::nullopt)),
-    triggering_entities(triggering_entities),
-    evaluations(triggering_entities.entity_refs.size(), Double::nan())
-  {
-  }
+  explicit RelativeSpeedCondition(const pugi::xml_node &, Scope &, const TriggeringEntities &);
 
-  auto description() const
-  {
-    auto description = std::stringstream();
+  auto description() const -> String;
 
-    description << triggering_entities.description() << "'s relative ";
+  static auto evaluate(
+    const EntityRef &, const EntityRef &, const Entities *,
+    const std::optional<DirectionalDimension> &) -> double;
 
-    if (direction) {
-      description << *direction << " ";
-    }
-
-    description << "speed to given entity " << entity_ref << " = ";
-
-    print_to(description, evaluations);
-
-    description << " " << rule << " " << value << "?";
-
-    return description.str();
-  }
-
-  auto evaluate()
-  {
-    evaluations.clear();
-
-    return asBoolean(triggering_entities.apply([this](auto && triggering_entity) {
-      evaluations.push_back([this](auto && v) {
-        if (direction) {
-          switch (*direction) {
-            case DirectionalDimension::longitudinal:
-              return v.x;
-            case DirectionalDimension::lateral:
-              return v.y;
-            case DirectionalDimension::vertical:
-              return v.z;
-            default:
-              return math::geometry::norm(v);
-          }
-        } else {
-          return math::geometry::norm(v);
-        }
-      }(evaluateRelativeSpeed(triggering_entity, entity_ref)));
-      return std::invoke(rule, evaluations.back(), value);
-    }));
-  }
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter

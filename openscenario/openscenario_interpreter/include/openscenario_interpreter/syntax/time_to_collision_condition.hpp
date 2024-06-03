@@ -17,6 +17,8 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
+#include <openscenario_interpreter/syntax/relative_speed_condition.hpp>
 #include <openscenario_interpreter/syntax/time_to_collision_condition_target.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -59,7 +61,7 @@ inline namespace syntax
      <xsd:attribute name="routingAlgorithm" type="RoutingAlgorithm"/>
    </xsd:complexType>
 */
-struct TimeToCollisionCondition : private SimulatorCore::ConditionEvaluation
+struct TimeToCollisionCondition : private Scope, private SimulatorCore::ConditionEvaluation
 {
   const TimeToCollisionConditionTarget time_to_collision_condition_target;
 
@@ -81,7 +83,8 @@ struct TimeToCollisionCondition : private SimulatorCore::ConditionEvaluation
 
   explicit TimeToCollisionCondition(
     const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-  : time_to_collision_condition_target(
+  : Scope(scope),
+    time_to_collision_condition_target(
       readElement<TimeToCollisionConditionTarget>("TimeToCollisionConditionTarget", node, scope)),
     freespace(readAttribute<Boolean>("freespace", node, scope)),
     rule(readAttribute<Rule>("rule", node, scope)),
@@ -117,8 +120,27 @@ struct TimeToCollisionCondition : private SimulatorCore::ConditionEvaluation
     evaluations.clear();
 
     return asBoolean(triggering_entities.apply([this](auto && triggering_entity) {
-      [[deprecated]] auto evaluateTimeToCollision = [](auto &&...) { return Double(); };
-      evaluations.push_back(evaluateTimeToCollision(triggering_entity, "TODO"));
+      [[deprecated]] auto evaluateTimeToCollision =
+        [this](
+          const EntityRef & triggering_entity,
+          const TimeToCollisionConditionTarget & time_to_collision_condition_target) {
+          if (time_to_collision_condition_target.is<EntityRef>()) {
+            std::cerr << "RELATIVE DISTANCE = "
+                      << RelativeDistanceCondition::distance(
+                           triggering_entity, time_to_collision_condition_target.as<EntityRef>(),
+                           global().entities, coordinate_system, relative_distance_type,
+                           routing_algorithm, freespace)
+                      << ", "
+                      << "RELATIVE SPEED = "
+                      << RelativeSpeedCondition::evaluate(
+                           triggering_entity, time_to_collision_condition_target.as<EntityRef>(),
+                           global().entities, std::nullopt)
+                      << std::endl;
+          }
+          return Double();
+        };
+      evaluations.push_back(
+        evaluateTimeToCollision(triggering_entity, time_to_collision_condition_target));
       return std::invoke(rule, evaluations.back(), value);
     }));
   }
