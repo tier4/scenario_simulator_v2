@@ -38,7 +38,7 @@ namespace entity_behavior
 class VehicleBehaviorTree : public BehaviorPluginBase
 {
 public:
-  void update(double current_time, double step_time) override;
+  void update(const double current_time, const double step_time) override;
   void configure(const rclcpp::Logger & logger) override;
   const std::string & getCurrentAction() const override;
 
@@ -79,7 +79,7 @@ public:
 #undef DEFINE_GETTER_SETTER
 
 private:
-  BT::NodeStatus tickOnce(double current_time, double step_time);
+  BT::NodeStatus tickOnce(const double current_time, const double step_time);
   auto createBehaviorTree(const std::string & format_path) -> BT::Tree;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;

@@ -39,7 +39,7 @@ class PedestrianBehaviorTree : public BehaviorPluginBase
 {
 public:
   void configure(const rclcpp::Logger & logger) override;
-  void update(double current_time, double step_time) override;
+  void update(const double current_time, const double step_time) override;
   const std::string & getCurrentAction() const override;
 
 #define DEFINE_GETTER_SETTER(NAME, TYPE)                                                    \
@@ -76,7 +76,7 @@ public:
 #undef DEFINE_GETTER_SETTER
 
 private:
-  BT::NodeStatus tickOnce(double current_time, double step_time);
+  BT::NodeStatus tickOnce(const double current_time, const double step_time);
   auto createBehaviorTree(const std::string & format_path) -> BT::Tree;
   BT::BehaviorTreeFactory factory_;
   BT::Tree tree_;

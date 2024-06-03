@@ -47,7 +47,7 @@ auto makeUpdatedStatus(
   const traffic_simulator_msgs::msg::EntityStatus & entity_status,
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, double step_time,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, const double step_time,
   std::optional<double> target_speed) -> std::optional<EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
