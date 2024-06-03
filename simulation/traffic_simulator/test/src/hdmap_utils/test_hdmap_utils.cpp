@@ -179,7 +179,7 @@ TEST(HdMapUtils, matchToLane_includeCrosswalk)
  * @note Test basic functionality; test lanelet matching correctness with a small bounding box (1, 1)
  * and such a pose so that no lanelets are in the distance of 1 unit
  * - the goal is to test the branch where getDeterministicMatches returns nullopt and thus
- * this function returnes nullopt as well.
+ * this function returns nullopt as well.
  */
 TEST(HdMapUtils, matchToLane_noMatch)
 {
@@ -261,8 +261,8 @@ TEST(HdMapUtils, AlongLaneletPose_negativeDistance)
 }
 
 /**
- * @note Test function behavior when passed a sufficielntyl large along distance
- * and the last lanelet on the map as start - the goal is to test the situatioin
+ * @note Test function behavior when passed a sufficiently large along distance
+ * and the last lanelet on the map as start - the goal is to test the situation
  * when desired pose is outside the lanelet map.
  */
 TEST(HdMapUtils, AlongLaneletPose_afterLast)
@@ -277,7 +277,7 @@ TEST(HdMapUtils, AlongLaneletPose_afterLast)
 
 /**
  * @note Test function behavior when passed a negative along distance and first
- * lanelet on the map as start - the goal is to test the situatioin
+ * lanelet on the map as start - the goal is to test the situation
  * when desired pose is outside the lanelet map.
  */
 TEST(HdMapUtils, AlongLaneletPose_beforeFirst)
@@ -519,7 +519,7 @@ TEST(HdMapUtils, filterLaneletIds_invalidIds)
 }
 
 /**
- * @note Test basic functionality; test obtaining neares lanelet ids correctness
+ * @note Test basic functionality; test obtaining nearest lanelet ids correctness
  * with a position in the middle of the lane and relatively big distance threshold
  * - the goal is to test successful scenario when there should be lanelets returned.
  */
@@ -537,7 +537,7 @@ TEST(HdMapUtils, getNearbyLaneletIds)
 }
 
 /**
- * @note Test basic functionality; test obtaining neares lanelet ids correctness
+ * @note Test basic functionality; test obtaining nearest lanelet ids correctness
  * with a position on the side of the map and with fairly small distance threshold
  * - the goal is to test unsuccessful scenario when there should be no lanelets returned.
  */
@@ -554,7 +554,7 @@ TEST(HdMapUtils, getNearbyLaneletIds_unsuccessful)
 }
 
 /**
- * @note Test basic functionality; test obtaining neares lanelet ids correctness
+ * @note Test basic functionality; test obtaining nearest lanelet ids correctness
  * (with a crosswalk) with a position on the side of the map and with fairly small distance threshold
  * - the goal is to test unsuccessful scenario when there should be no lanelets returned.
  */
@@ -750,7 +750,7 @@ TEST(HdMapUtils, toLaneletPose_empty)
  * - exactly on the centerline of a lanelet
  * - <0.9; 1) away from the next lanelet and a fairly small matching_distance (e.g. 0.5)
  * - the goal is to test the branch in bounding box variant where the bounding box is matched
- * to the next lanelet (with hardcoded max distanmce of 1), but the distance is more than
+ * to the next lanelet (with hardcoded max distance of 1), but the distance is more than
  * the matching_distance. In this situation the previous lanelet has to be matched
  * - so the loop over previous lanelets is executed.
  */
@@ -794,7 +794,7 @@ TEST(HdMapUtils, getSpeedLimit_correct)
 }
 
 /**
- * @note Test function behavior when corsswalk lanelet id is included in the vector.
+ * @note Test function behavior when crosswalk lanelet id is included in the vector.
  */
 TEST(HdMapUtils, getSpeedLimit_crosswalk)
 {
@@ -886,9 +886,9 @@ TEST(HdMapUtils, getClosestLaneletId_crosswalkCloserButExcluded)
 /**
  * @note Test basic functionality; test obtaining closest lanelet id with a pose near
  * the crosswalk lanelet (closer than the distance_threshold) and include_crosswalk = false
- * and road lanelet further than crosswalkand further away than distance_threshold
+ * and road lanelet further than crosswalk and further away than distance_threshold
  * - the goal is to test scenario when the only lanelet in the
- * considered distance is crosswalk, but shopuld not be included.
+ * considered distance is crosswalk, but should not be included.
  */
 TEST(HdMapUtils, getClosestLaneletId_onlyCrosswalkNearButExcluded)
 {
@@ -1341,8 +1341,8 @@ TEST(HdMapUtils, toMapPose_sLargerThanLaneletLength)
 }
 
 /**
- * @note Test basic functionality; test changable lanelets id obtaining with a lanelet
- * that has no changable lanelets and direction = STRAIGHT.
+ * @note Test basic functionality; test changeable lanelets id obtaining with a lanelet
+ * that has no changeable lanelets and direction = STRAIGHT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
 {
@@ -1358,8 +1358,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
 }
 
 /**
- * @note Test basic functionality; test changable lanelets id obtaining
- * with a lanelet that has no changable lanelets and direction = LEFT.
+ * @note Test basic functionality; test changeable lanelets id obtaining
+ * with a lanelet that has no changeable lanelets and direction = LEFT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangeable)
 {
@@ -1373,8 +1373,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangeable)
 }
 
 /**
- * @note Test basic functionality; test changable lanelets id obtaining with
- * a lanelet that has changable lanelets (left direction) and direction = LEFT.
+ * @note Test basic functionality; test changeable lanelets id obtaining with
+ * a lanelet that has changeable lanelets (left direction) and direction = LEFT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangeable)
 {
@@ -1390,8 +1390,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangeable)
 }
 
 /**
- * @note Test basic functionality; test changable lanelets id obtaining
- * with a lanelet that has no changable lanelets and direction = RIGHT.
+ * @note Test basic functionality; test changeable lanelets id obtaining
+ * with a lanelet that has no changeable lanelets and direction = RIGHT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangeable)
 {
@@ -1405,8 +1405,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangeable)
 }
 
 /**
- * @note Test basic functionality; test changable lanelets id obtaining with
- * a lanelet that has changable lanelets (right direction) and direction = RIGHT.
+ * @note Test basic functionality; test changeable lanelets id obtaining with
+ * a lanelet that has changeable lanelets (right direction) and direction = RIGHT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangeable)
 {
@@ -1422,8 +1422,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangeable)
 }
 
 /**
- * @note Test basic functionality; test changable lanelets id obtaining
- * with a lanelet that has at least two changable lanes to the left,
+ * @note Test basic functionality; test changeable lanelets id obtaining
+ * with a lanelet that has at least two changeable lanes to the left,
  * direction = LEFT and shift = 2.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftPossible)
@@ -1442,8 +1442,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftPossible)
 }
 
 /**
- * @note Test basic functionality; test changable lanelets id obtaining
- * with a lanelet that has 1 changable lane to the left, direction = LEFT and shift = 2
+ * @note Test basic functionality; test changeable lanelets id obtaining
+ * with a lanelet that has 1 changeable lane to the left, direction = LEFT and shift = 2
  * - the goal is to test the branch where we expect lanelet id
  * for shifting 2 times left, but shifting 2 lanes is not possible.
  */
@@ -1461,8 +1461,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftNotPossible)
 }
 
 /**
- * @note Test basic functionality; test changable lanelets id obtaining
- * with a lanelet that has at least two changable lanes to the right,
+ * @note Test basic functionality; test changeable lanelets id obtaining
+ * with a lanelet that has at least two changeable lanes to the right,
  * direction = RIGHT and shift = 2.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightPossible)
@@ -1481,8 +1481,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightPossible)
 }
 
 /**
- * @note Test basic functionality; test changable lanelets id obtaining
- * with a lanelet that has 1 changable lane to the right,
+ * @note Test basic functionality; test changeable lanelets id obtaining
+ * with a lanelet that has 1 changeable lane to the right,
  * direction = RIGHT and shift = 2 - the goal is to test the branch where
  * we expect lanelet id for shifting 2 times right, but shifting 2 lanes is not possible.
  */
@@ -1532,7 +1532,7 @@ TEST(HdMapUtils, getTrafficLightIds_correct)
 }
 
 /**
- * @note Test function behavior when there areno traffic lights on the map.
+ * @note Test function behavior when there are no traffic lights on the map.
  */
 TEST(HdMapUtils, getTrafficLightIds_noTrafficLight)
 {
@@ -1782,7 +1782,7 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_emptyTrajectory)
 
 /**
  * @note Test basic functionality; test clipping trajectory correctness
- * with a correct vector of lanelets, and the reference lanenet
+ * with a correct vector of lanelets, and the reference lanelet
  * also correct and forward distance fairly small (e.g. 2).
  */
 TEST(HdMapUtils, clipTrajectoryFromLaneletIds_smallForwardDistance)
@@ -1953,7 +1953,7 @@ TEST(HdMapUtils, canChangeLane_canChange)
 
 /**
  * @note Test basic functionality; test lane change possibility checking correctness with lanelets
- * that can not be changed (e.g. goal lenalet is behind the start lanelet).
+ * that can not be changed (e.g. goal lanelet is behind the start lanelet).
  */
 TEST(HdMapUtils, canChangeLane_canNotChange)
 {
