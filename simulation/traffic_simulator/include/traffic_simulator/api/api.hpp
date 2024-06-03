@@ -298,18 +298,18 @@ public:
     const lane_change::Constraint & constraint);
 
   // clang-format off
-#define FORWARD_TO_ENTITY_MANAGER(NAME)                                  \
-  /*!                                                                    \
-   @brief Forward to arguments to the EntityManager::NAME function.      \
-   @return return value of the EntityManager::NAME function.             \
-   @note This function was defined by FORWARD_TO_ENTITY_MANAGER macro.   \
-   */                                                                    \
-  template <typename... Ts>                                              \
-  decltype(auto) NAME(Ts &&... xs)                                       \
-  {                                                                      \
-    assert(entity_manager_ptr_);                                         \
-    return entity_manager_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                      \
+#define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
+  /*!                                                                      \
+   @brief Forward to arguments to the EntityManager::NAME function.        \
+   @return return value of the EntityManager::NAME function.               \
+   @note This function was defined by FORWARD_TO_ENTITY_MANAGER macro.     \
+   */                                                                      \
+  template <typename... Ts>                                                \
+  decltype(auto) NAME(Ts &&... xs)                                         \
+  {                                                                        \
+    assert(entity_manager_ptr_);                                           \
+    return (*entity_manager_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
+  }                                                                        \
   static_assert(true, "")
   // clang-format on
 
