@@ -56,7 +56,7 @@ auto PedestrianActionNode::calculateUpdatedEntityStatusInWorldFrame(double targe
       target_speed, behavior_parameter.dynamic_constraints));
 
   if (
-    auto const canonicalized_lanelet_pose =
+    const auto canonicalized_lanelet_pose =
       traffic_simulator::pose::estimateCanonicalizedLaneletPose(
         updated_status.pose, entity_status->getBoundingBox(), entity_status->getLaneletIds(), true,
         default_matching_distance_for_lanelet_pose_calculation, hdmap_utils)) {
