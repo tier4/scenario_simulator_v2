@@ -301,7 +301,7 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
  * @note Test functionality aggregation used in other classes; test calculations correctness
  * with target_speed = 0 and current speed = 50 (or other cruising speed) - goal is to test
  * the situation when the target speed is reached takes longer to reach
- * so the loop has to run miltiple times.
+ * so the loop has to run multiple times.
  */
 TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
 {
