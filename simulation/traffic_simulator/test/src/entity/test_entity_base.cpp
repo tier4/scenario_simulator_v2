@@ -53,6 +53,9 @@ protected:
   traffic_simulator::entity::EntityBase * dummy_base;
 };
 
+/**
+ * @note Test basic functionality; test whether the function does nothing.
+ */
 TEST_F(EntityBaseTest, appendDebugMarker)
 {
   visualization_msgs::msg::MarkerArray markers{};
@@ -78,11 +81,17 @@ TEST_F(EntityBaseTest, appendDebugMarker)
   }
 }
 
+/**
+ * @note Test basic functionality; test whether the function throws an error.
+ */
 TEST_F(EntityBaseTest, asFieldOperatorApplication)
 {
   EXPECT_THROW(dummy.asFieldOperatorApplication(), common::Error);
 }
 
+/**
+ * @note Test functionality used by other units; test correctness of 2d polygon calculations.
+ */
 TEST_F(EntityBaseTest, get2DPolygon)
 {
   const auto polygon = dummy.get2DPolygon();
@@ -103,6 +112,9 @@ TEST_F(EntityBaseTest, get2DPolygon)
   EXPECT_POINT_EQ(polygon.at(4), ref_poly.at(4));
 }
 
+/**
+ * @note Test basic functionality; test whether the NPC logic is started correctly.
+ */
 TEST_F(EntityBaseTest, startNpcLogic)
 {
   EXPECT_FALSE(dummy.isNpcLogicStarted());
@@ -110,6 +122,10 @@ TEST_F(EntityBaseTest, startNpcLogic)
   EXPECT_TRUE(dummy.isNpcLogicStarted());
 }
 
+/**
+ * @note Test basic functionality; test activating an out of range job with
+ * an entity that has a positive speed and a speed range specified in the job = [0, 0]
+ */
 TEST_F(EntityBaseTest, activateOutOfRangeJob_speed)
 {
   double min_velocity = 0.0;
@@ -128,6 +144,11 @@ TEST_F(EntityBaseTest, activateOutOfRangeJob_speed)
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
 
+/**
+ * @note Test basic functionality; test activating an out of range job
+ * with an entity that has a positive acceleration
+ * and an acceleration range specified in the job = [0, 0].
+ */
 TEST_F(EntityBaseTest, activateOutOfRangeJob_acceleration)
 {
   double min_velocity = -100.0;
@@ -146,6 +167,11 @@ TEST_F(EntityBaseTest, activateOutOfRangeJob_acceleration)
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
 
+/**
+ * @note Test basic functionality; test activating an out of range job
+ * with an entity that has a positive jerk
+ * and a jerk range specified in the job = [0, 0].
+ */
 TEST_F(EntityBaseTest, activateOutOfRangeJob_jerk)
 {
   double min_velocity = -100.0;
@@ -164,6 +190,12 @@ TEST_F(EntityBaseTest, activateOutOfRangeJob_jerk)
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
 
+/**
+ * @note Test functionality used by other units; test update execution correctness
+ * with a PRE_UPDATE task type added to the task queue (can be done in one of
+ * the implemented pure virtual member functions) - the goal is to check whether
+ * the task has been executed and whether the status and speed planner have been updated.
+ */
 TEST_F(EntityBaseTest, onUpdate)
 {
   bool first_cleanup = false;
@@ -197,6 +229,12 @@ TEST_F(EntityBaseTest, onUpdate)
   EXPECT_FALSE(second_update);
 }
 
+/**
+ * @note Test functionality used by other units; test post update execution
+ * correctness with a POST_UPDATE task type added to the task queue (can be done
+ * in one of the implemented pure virtual member functions)
+ * - the goal is to check whether the task has been executed.
+ */
 TEST_F(EntityBaseTest, onPostUpdate)
 {
   bool first_cleanup = false;
@@ -230,6 +268,11 @@ TEST_F(EntityBaseTest, onPostUpdate)
   EXPECT_TRUE(second_update);
 }
 
+/**
+ * @note Test basic functionality; test dynamic constraints resetting correctness
+ * - the goal is to check whether the dynamic constraints of the object are set
+ * to the same values as the ones returned by getDefaultDynamicConstraints.
+ */
 TEST_F(EntityBaseTest, resetDynamicConstraints)
 {
   auto default_constraints = dummy.getDefaultDynamicConstraints();
@@ -239,6 +282,9 @@ TEST_F(EntityBaseTest, resetDynamicConstraints)
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(default_constraints, current_constraints);
 }
 
+/**
+ * @note Test basic functionality; test wrapper function with absolute target.
+ */
 TEST_F(EntityBaseTest, requestLaneChange_absoluteTarget)
 {
   traffic_simulator::lane_change::AbsoluteTarget target(id, 1.0);
@@ -258,6 +304,9 @@ TEST_F(EntityBaseTest, requestLaneChange_absoluteTarget)
   EXPECT_LANE_CHANGE_CONSTRAINT_EQ(result_param.constraint, constraint);
 }
 
+/**
+ * @note Test basic functionality; test wrapper function with valid relative target.
+ */
 TEST_F(EntityBaseTest, requestLaneChange_relativeTarget)
 {
   const lanelet::Id target_id = 34468;
@@ -291,6 +340,9 @@ TEST_F(EntityBaseTest, requestLaneChange_relativeTarget)
   EXPECT_LANE_CHANGE_CONSTRAINT_EQ(result_param.constraint, constraint);
 }
 
+/**
+ * @note Test basic functionality; test wrapper function with invalid relative target lanelet pose.
+ */
 TEST_F(EntityBaseTest, requestLaneChange_relativeTargetLaneletPose)
 {
   const std::string target_name = "target_name";
@@ -318,6 +370,9 @@ TEST_F(EntityBaseTest, requestLaneChange_relativeTargetLaneletPose)
   EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint);, common::Error);
 }
 
+/**
+ * @note Test basic functionality; test wrapper function with invalid relative target name.
+ */
 TEST_F(EntityBaseTest, requestLaneChange_relativeTargetName)
 {
   const lanelet::Id target_id = 34468;
@@ -343,6 +398,10 @@ TEST_F(EntityBaseTest, requestLaneChange_relativeTargetName)
   EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint);, common::Error);
 }
 
+/**
+ * @note Test basic functionality; test wrapper function with invalid relative target lane change
+ * - the goal is to request a lane change in the location where the lane change is impossible.
+ */
 TEST_F(EntityBaseTest, requestLaneChange_relativeTargetInvalid)
 {
   const lanelet::Id target_id = 34468;
@@ -369,6 +428,9 @@ TEST_F(EntityBaseTest, requestLaneChange_relativeTargetInvalid)
   EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint), common::Error);
 }
 
+/**
+ * @note Test basic functionality; test setting dynamic constraints correctness with a sample dynamic constraints.
+ */
 TEST_F(EntityBaseTest, setDynamicConstraints)
 {
   traffic_simulator_msgs::msg::DynamicConstraints custom_constraints{};
@@ -384,6 +446,10 @@ TEST_F(EntityBaseTest, setDynamicConstraints)
   EXPECT_DYNAMIC_CONSTRAINTS_EQ(custom_constraints, result_constraints);
 }
 
+/**
+ * @note Test basic functionality; test setting other Entities status correctness
+ * with a sample other entites status unordered map.
+ */
 TEST_F(EntityBaseTest, setOtherStatus)
 {
   const std::string name0 = "other_entity0", name1 = "other_entity1";
@@ -414,6 +480,9 @@ TEST_F(EntityBaseTest, setOtherStatus)
     static_cast<traffic_simulator_msgs::msg::EntityStatus>(result_status.at(name1)));
 }
 
+/**
+ * @note Test basic functionality; test setting a status correctness with a sample status.
+ */
 TEST_F(EntityBaseTest, setStatus)
 {
   dummy.setEntityType(traffic_simulator_msgs::msg::EntityType::VEHICLE);
@@ -468,17 +537,27 @@ TEST_F(EntityBaseTest, setStatus)
     static_cast<traffic_simulator_msgs::msg::EntityStatus>(ref_status));
 }
 
+/**
+ * @note Test function behavior when called with any argument - the goal is to test error throwing.
+ */
 TEST_F(EntityBaseTest, requestFollowTrajectory)
 {
   auto ptr = std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>();
   EXPECT_THROW(dummy.requestFollowTrajectory(ptr), common::Error);
 }
 
+/**
+ * @note Test function behavior when called with any argument - the goal is to test error throwing.
+ */
 TEST_F(EntityBaseTest, requestWalkStraight)
 {
   EXPECT_THROW(dummy.requestWalkStraight(), common::Error);
 }
 
+/**
+ * @note test basic functionality; test updating stand still duration
+ * when NPC logic is started and velocity is greater than 0.
+ */
 TEST_F(EntityBaseTest, updateStandStillDuration_startedMoving)
 {
   dummy.startNpcLogic();
@@ -487,6 +566,10 @@ TEST_F(EntityBaseTest, updateStandStillDuration_startedMoving)
   EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
 }
 
+/**
+ * @note Test basic functionality; test updating stand still duration
+ * when NPC logic is not started.
+ */
 TEST_F(EntityBaseTest, updateStandStillDuration_notStarted)
 {
   dummy.setLinearVelocity(3.0);
@@ -496,6 +579,10 @@ TEST_F(EntityBaseTest, updateStandStillDuration_notStarted)
   EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
 }
 
+/**
+ * @note Test basic functionality; test updating traveled distance correctness
+ * with NPC logic started and velocity greater than 0.
+ */
 TEST_F(EntityBaseTest, updateTraveledDistance_startedMoving)
 {
   double velocity = 3.0;
@@ -509,6 +596,9 @@ TEST_F(EntityBaseTest, updateTraveledDistance_startedMoving)
   EXPECT_EQ(4.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
 }
 
+/**
+ * @note Test basic functionality; test updating traveled distance correctness with NPC not started.
+ */
 TEST_F(EntityBaseTest, updateTraveledDistance_notStarted)
 {
   double velocity = 3.0;
@@ -520,6 +610,10 @@ TEST_F(EntityBaseTest, updateTraveledDistance_notStarted)
   EXPECT_EQ(0.0, dummy.updateTraveledDistance(step_time));
 }
 
+/**
+ * @note Test basic functionality; test stopping correctness - the goal
+ * is to check whether the entity status is changed to stopped (no velocity etc.).
+ */
 TEST_F(EntityBaseTest, stopAtCurrentPosition)
 {
   double velocity = 3.0;
@@ -532,6 +626,11 @@ TEST_F(EntityBaseTest, stopAtCurrentPosition)
   EXPECT_EQ(curr_twist.linear.x, 0.0);
 }
 
+/**
+ * @note Test functionality used by other units; test lanelet pose obtaining
+ * with a matching distance smaller than a distance from an entity to the lanelet
+ * (both crosswalk and road) and status_.type.type = PEDESTRIAN.
+ */
 TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkPedestrian)
 {
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
@@ -552,6 +651,11 @@ TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkPedestrian)
   EXPECT_FALSE(lanelet_pose);
 }
 
+/**
+ * @note Test functionality used by other units; test lanelet pose obtaining
+ * with a matching distance greater than a distance from an entity to the lanelet
+ * (both crosswalk and road) and status_.type.type = PEDESTRIAN.
+ */
 TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkPedestrian)
 {
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
@@ -573,6 +677,11 @@ TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkPedestrian)
   EXPECT_TRUE(lanelet_pose);
 }
 
+/**
+ * @note Test functionality used by other units; test lanelet pose obtaining
+ * with a matching distance greater than a distance from an entity to the crosswalk lanelet,
+ * but smaller than to the road lanelet and status_.type.type = PEDESTRIAN.
+ */
 TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadPedestrian)
 {
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
@@ -594,6 +703,11 @@ TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadPedestrian)
   EXPECT_TRUE(lanelet_pose);
 }
 
+/**
+ * @note Test functionality used by other units; test lanelet pose obtaining
+ * with a matching distance smaller than a distance from an entity to the lanelet
+ * (both crosswalk and road) and status_.type.type != PEDESTRIAN.
+ */
 TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
 {
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
@@ -614,6 +728,11 @@ TEST(EntityBase, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
   EXPECT_FALSE(lanelet_pose);
 }
 
+/**
+ * @note Test functionality used by other units; test lanelet pose obtaining
+ * with a matching distance greater than a distance from an entity to the lanelet
+ * (both crosswalk and road) and status_.type.type != PEDESTRIAN.
+ */
 TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
 {
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
@@ -635,6 +754,11 @@ TEST(EntityBase, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
   EXPECT_TRUE(lanelet_pose);
 }
 
+/**
+ * @note Test functionality used by other units; test lanelet pose obtaining
+ * with a matching distance greater than a distance from an entity to the crosswalk lanelet,
+ * but smaller than to the road lanelet and status_.type.type != PEDESTRIAN.
+ */
 TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
 {
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
@@ -656,6 +780,10 @@ TEST(EntityBase, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
   EXPECT_FALSE(lanelet_pose);
 }
 
+/**
+ * @note Test functionality used by other units; test relative pose calculations
+ * correctness with a transformation argument passed.
+ */
 TEST_F(EntityBaseTest, getMapPoseFromRelativePose_relative)
 {
   const double s = 5.0;
