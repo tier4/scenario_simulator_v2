@@ -35,127 +35,6 @@ enum class VehicleModelType {
   IDEAL_STEER_VEL,
 };
 
-class VehicleModelState
-{
-  const int input_dimension;
-  const int output_dimension;
-  const Eigen::Vector3d relative_position;
-  const double yaw_angle;
-  const double linear_velocity;
-  const double angular_velocity;
-  const double linear_acceleration;
-  const std::optional<double> previous_linear_velocity;
-  const std::optional<double> previous_angular_velocity;
-
-public:
-  VehicleModelState(
-    SimModelInterface & model_interface, const double relative_position_z,
-    const std::optional<VehicleModelState> & previous_state)
-  : input_dimension{model_interface.getDimU()},
-    output_dimension{model_interface.getDimX()},
-    yaw_angle{model_interface.getYaw()},
-    relative_position{model_interface.getX(), model_interface.getY(), relative_position_z},
-    linear_velocity{model_interface.getVx()},
-    angular_velocity{model_interface.getWz()},
-    linear_acceleration{model_interface.getAx()},
-    previous_linear_velocity{
-      previous_state ? std::optional(previous_state->linear_velocity) : std::nullopt},
-    previous_angular_velocity{
-      previous_state ? std::optional(previous_state->angular_velocity) : std::nullopt}
-  {
-  }
-
-  VehicleModelState(
-    SimModelInterface & model_interface, const Eigen::Vector3d & relative_position,
-    const std::optional<VehicleModelState> & previous_state)
-  : input_dimension{model_interface.getDimU()},
-    output_dimension{model_interface.getDimX()},
-    relative_position{relative_position},
-    yaw_angle{model_interface.getYaw()},
-    linear_velocity{model_interface.getVx()},
-    angular_velocity{model_interface.getWz()},
-    linear_acceleration{model_interface.getAx()},
-    previous_linear_velocity{
-      previous_state ? std::optional(previous_state->linear_velocity) : std::nullopt},
-    previous_angular_velocity{
-      previous_state ? std::optional(previous_state->angular_velocity) : std::nullopt}
-  {
-  }
-
-  auto getInputDimension() const -> int { return input_dimension; }
-  auto getOutputDimension() const -> int { return output_dimension; }
-  auto getRelativePosition() const -> Eigen::Vector3d { return relative_position; }
-
-  auto getRelativeYaw(
-    const geometry_msgs::msg::Pose & initial_pose, const geometry_msgs::msg::Pose & current_pose,
-    const double step_time) const
-  {
-    const auto q = Eigen::Quaterniond(
-      quaternion_operation::getRotationMatrix(initial_pose.orientation).transpose() *
-      quaternion_operation::getRotationMatrix(current_pose.orientation));
-    geometry_msgs::msg::Quaternion relative_orientation;
-    relative_orientation.x = q.x();
-    relative_orientation.y = q.y();
-    relative_orientation.z = q.z();
-    relative_orientation.w = q.w();
-    return quaternion_operation::convertQuaternionToEulerAngle(relative_orientation).z -
-           (previous_angular_velocity ? *previous_angular_velocity : 0) * step_time;
-  }
-
-  auto getYaw() const -> double { return yaw_angle; }
-
-  auto getPose(const geometry_msgs::msg::Pose & initial_pose, const double pitch_angle = 0.) const
-    -> geometry_msgs::msg::Pose
-  {
-    const auto position =
-      quaternion_operation::getRotationMatrix(initial_pose.orientation) * relative_position;
-    const auto orientation = quaternion_operation::convertEulerAngleToQuaternion(
-      geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0).y(pitch_angle).z(yaw_angle));
-
-    return geometry_msgs::build<geometry_msgs::msg::Pose>()
-      .position(geometry_msgs::build<geometry_msgs::msg::Point>()
-                  .x(initial_pose.position.x + position(0))
-                  .y(initial_pose.position.y + position(1))
-                  .z(initial_pose.position.z + position(2)))
-      .orientation(initial_pose.orientation * orientation);
-  }
-
-  auto getTwist() const -> geometry_msgs::msg::Twist
-  {
-    geometry_msgs::msg::Twist current_twist;
-    current_twist.linear.x = linear_velocity;
-    current_twist.angular.z = angular_velocity;
-    return current_twist;
-  }
-
-  auto getAccel(const double step_time) const -> geometry_msgs::msg::Accel
-  {
-    geometry_msgs::msg::Accel accel;
-    accel.linear.x = angular_velocity;
-    if (previous_angular_velocity) {
-      accel.angular.z = (angular_velocity - previous_angular_velocity.value()) / step_time;
-    }
-    return accel;
-  }
-
-  auto getAccel() const -> geometry_msgs::msg::Accel
-  {
-    geometry_msgs::msg::Accel accel;
-    accel.linear.x = angular_velocity;
-    return accel;
-  }
-
-  auto getLinearJerk(const double step_time) -> double
-  {
-    // FIXME: This seems to be an acceleration, not jerk
-    if (previous_linear_velocity) {
-      return (linear_velocity - previous_linear_velocity.value()) / step_time;
-    } else {
-      return 0;
-    }
-  }
-};
-
 class EgoEntitySimulation
 {
 public:
@@ -166,7 +45,7 @@ private:
 
   const std::shared_ptr<SimModelInterface> vehicle_model_ptr_;
 
-  std::optional<VehicleModelState> vehicle_model_state{std::nullopt};
+  std::optional<double> previous_linear_velocity_, previous_angular_velocity_;
 
   geometry_msgs::msg::Pose initial_pose_;
 
@@ -183,6 +62,8 @@ private:
 
   const bool consider_pose_by_road_slope_;
 
+  Eigen::Vector3d world_relative_position_;
+
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 
@@ -191,9 +72,19 @@ public:
 private:
   auto calculateEgoPitch() const -> double;
 
+  auto getCurrentPose(const double pitch_angle) const -> geometry_msgs::msg::Pose;
+
+  auto getCurrentTwist() const -> geometry_msgs::msg::Twist;
+
+  auto getCurrentAccel(const double step_time) const -> geometry_msgs::msg::Accel;
+
+  auto getLinearJerk(double step_time) -> double;
+
   auto getMatchedLaneletPoseFromEntityStatus(
     const traffic_simulator_msgs::msg::EntityStatus & status, const double entity_width) const
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
+  auto updatePreviousValues() -> void;
 
 public:
   auto setAutowareStatus() -> void;
