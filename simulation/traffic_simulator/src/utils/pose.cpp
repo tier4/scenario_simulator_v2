@@ -49,10 +49,11 @@ auto canonicalize(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> std::optional<CanonicalizedLaneletPose>
 {
-  if (lanelet_pose == LaneletPose())
+  if (lanelet_pose == LaneletPose()) {
     return std::nullopt;
-  else
+  } else {
     return CanonicalizedLaneletPose(lanelet_pose, hdmap_utils_ptr);
+  }
 }
 
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> geometry_msgs::msg::Pose
