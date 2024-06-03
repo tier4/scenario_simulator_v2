@@ -283,6 +283,8 @@ void EgoEntitySimulation::update(
   autoware->rethrow();
 
   if (npc_logic_started) {
+    using quaternion_operation::getRotationMatrix;
+
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
     auto acceleration_by_slope = [this]() {
@@ -326,8 +328,13 @@ void EgoEntitySimulation::update(
        considered unchangeable and stored in an additional variable
        world_relative_position_ that is used in calculations.
     */
-    world_relative_position_ = Eigen::Vector3d(
-      vehicle_model_ptr_->getX(), vehicle_model_ptr_->getY(), world_relative_position_.z());
+    world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+                               Eigen::Vector3d(
+                                 status_.pose.position.x - initial_pose_.position.x,
+                                 status_.pose.position.y - initial_pose_.position.y,
+                                 status_.pose.position.z - initial_pose_.position.z);
+    world_relative_position_.x() = vehicle_model_ptr_->getX();
+    world_relative_position_.y() = vehicle_model_ptr_->getY();
   }
   updateStatus(current_scenario_time, step_time);
   updatePreviousValues();
