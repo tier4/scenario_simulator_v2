@@ -215,12 +215,23 @@ void EgoEntitySimulation::overwrite(
   const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
   double step_time, bool npc_logic_started)
 {
+  using quaternion_operation::convertQuaternionToEulerAngle;
+  using quaternion_operation::getRotationMatrix;
+
   autoware->rethrow();
 
-  if (npc_logic_started) {
-    using quaternion_operation::convertQuaternionToEulerAngle;
-    using quaternion_operation::getRotationMatrix;
+  /*
+     SimModelInterface only supports 2D, therefore the position in Oz is
+     considered unchangeable and stored in an additional variable
+     world_relative_position_ that is used in calculations.
+  */
+  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+                             Eigen::Vector3d(
+                               status.pose.position.x - initial_pose_.position.x,
+                               status.pose.position.y - initial_pose_.position.y,
+                               status.pose.position.z - initial_pose_.position.z);
 
+  if (npc_logic_started) {
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
         getRotationMatrix(initial_pose_.orientation).transpose() *
@@ -261,17 +272,6 @@ void EgoEntitySimulation::overwrite(
         THROW_SEMANTIC_ERROR(
           "Unsupported simulation model ", toString(vehicle_model_type_), " specified");
     }
-
-    /*
-       SimModelInterface only supports 2D, therefore the position in Oz is
-       considered unchangeable and stored in an additional variable
-       world_relative_position_ that is used in calculations.
-    */
-    world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
-                               Eigen::Vector3d(
-                                 status.pose.position.x - initial_pose_.position.x,
-                                 status.pose.position.y - initial_pose_.position.y,
-                                 status.pose.position.z - initial_pose_.position.z);
   }
   updateStatus(current_scenario_time, step_time);
   updatePreviousValues();
@@ -280,11 +280,22 @@ void EgoEntitySimulation::overwrite(
 void EgoEntitySimulation::update(
   double current_scenario_time, double step_time, bool npc_logic_started)
 {
+  using quaternion_operation::getRotationMatrix;
+
   autoware->rethrow();
 
-  if (npc_logic_started) {
-    using quaternion_operation::getRotationMatrix;
+  /*
+     SimModelInterface only supports 2D, therefore the position in Oz is
+     considered unchangeable and stored in an additional variable
+     world_relative_position_ that is used in calculations.
+  */
+  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+                             Eigen::Vector3d(
+                               status_.pose.position.x - initial_pose_.position.x,
+                               status_.pose.position.y - initial_pose_.position.y,
+                               status_.pose.position.z - initial_pose_.position.z);
 
+  if (npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
     auto acceleration_by_slope = [this]() {
@@ -323,19 +334,10 @@ void EgoEntitySimulation::update(
     vehicle_model_ptr_->setGear(autoware->getGearCommand().command);
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
-    /*
-       SimModelInterface only supports 2D, therefore the position in Oz is
-       considered unchangeable and stored in an additional variable
-       world_relative_position_ that is used in calculations.
-    */
-    world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
-                               Eigen::Vector3d(
-                                 status_.pose.position.x - initial_pose_.position.x,
-                                 status_.pose.position.y - initial_pose_.position.y,
-                                 status_.pose.position.z - initial_pose_.position.z);
-    world_relative_position_.x() = vehicle_model_ptr_->getX();
-    world_relative_position_.y() = vehicle_model_ptr_->getY();
   }
+  // only the position in the Oz axis is left unchanged, the rest is taken from SimModelInterface
+  world_relative_position_.x() = vehicle_model_ptr_->getX();
+  world_relative_position_.y() = vehicle_model_ptr_->getY();
   updateStatus(current_scenario_time, step_time);
   updatePreviousValues();
 }
