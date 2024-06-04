@@ -893,18 +893,24 @@ TEST(HdMapUtils, getClosestLaneletId_crosswalkCloserButExcluded)
 TEST(HdMapUtils, getClosestLaneletId_onlyCrosswalkNearButExcluded)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
-  lanelet::Id id_crosswalk = 34399;
-  lanelet::Id id_road = 34639;
-  auto position = makePoint(3774.73, 73744.38);
-  auto pose = makePose(position);
-  const double distance_threshold = 5.0;
-  const bool include_crosswalk = true;
+  const lanelet::Id id_crosswalk = 34399;
+  const auto position = makePoint(3774.73, 73744.38);
+  const auto pose = makePose(position);
+  const double distance_threshold = 1.0;
 
-  auto result = hdmap_utils.getClosestLaneletId(pose, distance_threshold, include_crosswalk);
+  {
+    const bool include_crosswalk = true;
+    auto result = hdmap_utils.getClosestLaneletId(pose, distance_threshold, include_crosswalk);
 
-  EXPECT_TRUE(result.has_value());
-  EXPECT_EQ(result.value(), id_crosswalk);
-  EXPECT_NE(result.value(), id_road);
+    EXPECT_TRUE(result.has_value());
+    EXPECT_EQ(result.value(), id_crosswalk);
+  }
+  {
+    const bool include_crosswalk = false;
+    auto result = hdmap_utils.getClosestLaneletId(pose, distance_threshold, include_crosswalk);
+
+    EXPECT_FALSE(result.has_value());
+  }
 }
 
 /**
