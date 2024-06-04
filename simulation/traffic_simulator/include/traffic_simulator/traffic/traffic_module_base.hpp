@@ -34,7 +34,7 @@ class TrafficModuleBase
 {
 public:
   TrafficModuleBase() {}
-  virtual void execute() = 0;
+  virtual void execute(const double current_time, const double step_time) = 0;
 };
 }  // namespace traffic
 }  // namespace traffic_simulator
