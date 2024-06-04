@@ -31,11 +31,11 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
     entity_status_.lanelet_pose_valid = true;
     entity_status_.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
     /*
-      The Oz position and orientation based on LaneletPose are rewritten to the used map_pose,
-      since such adjustment relative to the lanelet is necessary,
-      The position in Ox and Oy is not rewritten because the map_pose retrieved via
+      The position in Oz axis and orientation based on LaneletPose are rewritten to
+      the used msg::Pose (map_pose) since such adjustment relative to the lanelet is necessary,
+      The position in Ox and Oy axis is not rewritten because the map_pose retrieved via
       lanelet_pose = toCanonicalizedLaneletPose(map_pose), then map_pose = toMapPose(lanelet_pose)
-      can be different from the original one (especially if the entity changes lane)
+      can be slightly different from the original one (especially if the entity changes lane).
     */
     const auto map_pose_based_on_lanelet_pose =
       static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose_.value());
