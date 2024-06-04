@@ -337,13 +337,14 @@ void EntityManager::resetBehaviorPlugin(
 
 auto EntityManager::getCurrentAction(const std::string & name) const -> std::string
 {
-  if (entities_.find(name) == entities_.end()) {
-    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
-  }
-  if (not is<entity::EgoEntity>(name) and not npc_logic_started_) {
-    return "waiting";
+  if (const auto entity = getEntity(name)) {
+    if (not npc_logic_started_ and not is<EgoEntity>(name)) {
+      return "waiting";
+    } else {
+      return entity->getCurrentAction();
+    }
   } else {
-    return entities_.at(name)->getCurrentAction();
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
   }
 }
 
