@@ -197,7 +197,7 @@ const std::string EntityManager::getEgoName() const
 auto EntityManager::getObstacle(const std::string & name)
   -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  if (not isNpcLogicStarted()) {
+  if (not npc_logic_started_) {
     return std::nullopt;
   } else {
     return entities_.at(name)->getObstacle();
@@ -231,7 +231,7 @@ auto EntityManager::getVehicleParameters(const std::string & name) const
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  if (not isNpcLogicStarted()) {
+  if (not npc_logic_started_) {
     return traffic_simulator_msgs::msg::WaypointsArray();
   } else {
     return entities_.at(name)->getWaypoints();
@@ -340,7 +340,7 @@ auto EntityManager::getCurrentAction(const std::string & name) const -> std::str
   if (entities_.find(name) == entities_.end()) {
     THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
   }
-  if (not is<entity::EgoEntity>(name) and not isNpcLogicStarted()) {
+  if (not is<entity::EgoEntity>(name) and not npc_logic_started_) {
     return "waiting";
   } else {
     return entities_.at(name)->getCurrentAction();
@@ -405,7 +405,7 @@ auto EntityManager::updateNpcLogic(const std::string & name) -> const Canonicali
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  if (isNpcLogicStarted()) {
+  if (npc_logic_started_) {
     entities_[name]->onUpdate(current_time_, step_time_);
   }
   return entities_[name]->getStatus();
@@ -418,7 +418,7 @@ void EntityManager::update(const double current_time, const double step_time)
   step_time_ = step_time;
   current_time_ = current_time;
   setVerbose(configuration.verbose);
-  if (isNpcLogicStarted()) {
+  if (npc_logic_started_) {
     conventional_traffic_light_updater_.createTimer(
       configuration.conventional_traffic_light_publish_rate);
     v2i_traffic_light_updater_.createTimer(configuration.v2i_traffic_light_publish_rate);
