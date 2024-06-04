@@ -269,7 +269,7 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
  * @note Test functionality aggregation used in other classes; test calculations
  * correctness with target_speed slightly bigger than current speed
  * - goal is to test the situation when the target speed is reached in little time,
- * so the loop executes only once.
+ * so the loop executes only several times.
  */
 TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
 {
@@ -285,14 +285,14 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
       .max_speed(70.0);
 
   const double speed_difference = 0.1;
-  const double target_speed = current_twist.linear.x - speed_difference;
+  const double target_speed = current_twist.linear.x + speed_difference;
   const double current_linear_jerk = 0.0;
   const double distance = planner.getRunningDistance(
     target_speed, constraints, current_twist, current_accel, current_linear_jerk);
 
   EXPECT_GE(distance, 0.0);
   const double quad_time = constraints.max_deceleration / constraints.max_deceleration_rate;
-  const double lin_time = (current_twist.linear.x - target_speed) / constraints.max_deceleration;
+  const double lin_time = speed_difference / constraints.max_deceleration;
   const double distance_upper_bound = current_twist.linear.x * std::max(quad_time, lin_time);
   EXPECT_LE(distance, distance_upper_bound);
 }
