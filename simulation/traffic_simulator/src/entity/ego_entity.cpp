@@ -224,6 +224,7 @@ auto EgoEntity::requestFollowTrajectory(
 {
   polyline_trajectory_ = parameter;
   VehicleEntity::requestFollowTrajectory(parameter);
+  field_operator_application->requestAutowareControl(false);
   is_controlled_by_simulator_ = true;
 }
 

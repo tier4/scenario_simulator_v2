@@ -481,6 +481,16 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   }
 }
 
+auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutowareContro(
+  const bool autoware_control) -> void
+{
+  task_queue.delay([this, autoware_control]() {
+    auto request = std::make_shared<tier4_system_msgs::srv::ChangeAutowareControl::Request>();
+    request->autoware_control = autoware_control;
+    requestChangeAutowareControl(request);
+  });
+}
+
 auto FieldOperatorApplicationFor<AutowareUniverse>::receiveEmergencyState(
   const tier4_external_api_msgs::msg::Emergency & message) -> void
 {

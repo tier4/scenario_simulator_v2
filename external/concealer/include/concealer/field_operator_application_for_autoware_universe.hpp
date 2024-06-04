@@ -43,6 +43,7 @@
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 #include <tier4_system_msgs/msg/autoware_state.hpp>
+#include <tier4_system_msgs/srv/change_autoware_control.hpp>
 
 namespace concealer
 {
@@ -72,6 +73,7 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>              requestSetRoutePoints;
   ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>                  requestSetRtcAutoMode;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>           requestSetVelocityLimit;
+  ServiceWithValidation<tier4_system_msgs::srv::ChangeAutowareControl>            requestChangeAutowareControl;
   // clang-format on
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
@@ -132,7 +134,8 @@ public:
     // NOTE: /api/routing/set_route_points takes a long time to return. But the specified duration is not decided by any technical reasons.
     requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
-    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this)
+    requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
+    requestChangeAutowareControl("/system/operation_mode/change_autoware_control", *this)
   // clang-format on
   {
   }
@@ -171,6 +174,8 @@ public:
   auto sendCooperateCommand(const std::string &, const std::string &) -> void override;
 
   auto setVelocityLimit(double) -> void override;
+
+  auto requestAutowareControl(const bool autoware_control) -> void override;
 };
 }  // namespace concealer
 
