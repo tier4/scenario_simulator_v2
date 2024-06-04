@@ -33,7 +33,7 @@ using Spline = math::geometry::CatmullRomSpline;
 
 auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
 
-auto getLanelets(const lanelet::Ids & lanelet_ids) -> lanelet::Lanelets;
+auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
 
 auto getLaneletIds() -> lanelet::Ids;
 

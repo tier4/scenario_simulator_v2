@@ -299,6 +299,14 @@ auto estimateCanonicalizedLaneletPose(
   }
 }
 
+auto nearbyLaneletIds(
+  const Pose & pose, const double distance_thresh, const bool include_crosswalk,
+  const std::size_t search_count) -> lanelet::Ids
+{
+  return lanelet_core::pose::getNearbyLaneletIds(
+    pose.position, distance_thresh, include_crosswalk, search_count);
+}
+
 auto isInLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
   const double tolerance) -> bool
@@ -327,6 +335,11 @@ auto isInLanelet(
     }
   }
   return false;
+}
+
+auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool
+{
+  return lanelet_core::other::isInLanelet(lanelet_id, point);
 }
 
 auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool

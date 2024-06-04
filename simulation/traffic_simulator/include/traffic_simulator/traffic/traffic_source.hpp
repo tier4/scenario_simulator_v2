@@ -42,15 +42,14 @@ public:
 
     const lanelet::Ids ids;
 
-    const lanelet::Lanelets lanelets;
-
     explicit Validator(
       const geometry_msgs::msg::Pose &, const double source_radius, const bool include_crosswalk);
 
     /**
      * @brief whether the 2D polygon does fit inside the lanelet with the given id
      */
-    auto operator()(const std::vector<geometry_msgs::msg::Point> &, lanelet::Id) const -> bool;
+    auto operator()(const std::vector<geometry_msgs::msg::Point> &, const lanelet::Id) const
+      -> bool;
   };
 
   struct Configuration

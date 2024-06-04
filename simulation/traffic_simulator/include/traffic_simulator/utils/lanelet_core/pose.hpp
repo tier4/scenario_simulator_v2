@@ -65,12 +65,12 @@ auto getNearbyLaneletIds(
   const Point &, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids;
 
-auto getNearbyLaneletIds(
-  const Point &, const double distance_threshold, const std::size_t search_count) -> lanelet::Ids;
-
 // private for pose namespace
 namespace
 {
+auto getNearbyLaneletIds(
+  const Point &, const double distance_threshold, const std::size_t search_count) -> lanelet::Ids;
+
 auto matchToLane(
   const Pose & pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance, const double reduction_ratio) -> std::optional<lanelet::Id>;

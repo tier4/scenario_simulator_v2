@@ -36,7 +36,12 @@ LaneletMap & LaneletMap::getInstance()
 {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!instance) {
-    instance.reset(new LaneletMap(lanelet_map_path_));
+    if (!lanelet_map_path_.empty()) {
+      instance.reset(new LaneletMap(lanelet_map_path_));
+    } else {
+      THROW_SIMULATION_ERROR(
+        "lanelet_map_path is empty! Please call lanelet_map::activate() first.");
+    }
   }
   return *instance;
 }
@@ -78,9 +83,6 @@ auto LaneletMap::trafficRulesPedestrian() -> const lanelet::traffic_rules::Traff
 
 LaneletMap::LaneletMap(const std::filesystem::path & lanelet2_map_path)
 {
-  if (lanelet2_map_path.empty()) {
-    THROW_SIMULATION_ERROR("lanelet_map_path is empty! Please call lanelet_map::activate() first.");
-  }
   lanelet::projection::MGRSProjector projector;
   lanelet::ErrorMessages errors;
   lanelet_map_ptr_ = lanelet::load(lanelet2_map_path.string(), projector, &errors);

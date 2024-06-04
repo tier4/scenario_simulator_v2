@@ -290,25 +290,6 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
 }
 
 auto getNearbyLaneletIds(
-  const Point & position, const double distance_threshold, const std::size_t search_count)
-  -> lanelet::Ids
-{
-  lanelet::Ids lanelet_ids;
-  lanelet::BasicPoint2d search_point(position.x, position.y);
-  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
-  if (nearest_lanelet.empty()) {
-    return {};
-  }
-  for (const auto & lanelet : nearest_lanelet) {
-    if (lanelet.first <= distance_threshold) {
-      lanelet_ids.emplace_back(lanelet.second.id());
-    }
-  }
-  return lanelet_ids;
-}
-
-auto getNearbyLaneletIds(
   const Point & point, const double distance_thresh, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids
 {
@@ -349,6 +330,25 @@ auto getNearbyLaneletIds(
 // private for pose namespace
 namespace
 {
+auto getNearbyLaneletIds(
+  const Point & position, const double distance_threshold, const std::size_t search_count)
+  -> lanelet::Ids
+{
+  lanelet::Ids lanelet_ids;
+  lanelet::BasicPoint2d search_point(position.x, position.y);
+  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
+    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
+  if (nearest_lanelet.empty()) {
+    return {};
+  }
+  for (const auto & lanelet : nearest_lanelet) {
+    if (lanelet.first <= distance_threshold) {
+      lanelet_ids.emplace_back(lanelet.second.id());
+    }
+  }
+  return lanelet_ids;
+}
+
 auto matchToLane(
   const Pose & pose, const BoundingBox & bbox, const bool include_crosswalk,
   const double matching_distance, const double reduction_ratio) -> std::optional<lanelet::Id>

@@ -83,6 +83,21 @@ auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
   return alternative_lanelet_pose;
 }
 
+auto CanonicalizedLaneletPose::alignOrientationToLanelet() -> void
+{
+  using quaternion_operation::convertEulerAngleToQuaternion;
+  using quaternion_operation::convertQuaternionToEulerAngle;
+  const auto spline = route::toSpline({lanelet_pose_.lanelet_id});
+  const auto lanelet_quaternion = spline.getPose(lanelet_pose_.s, true).orientation;
+  const auto lanelet_rpy = convertQuaternionToEulerAngle(lanelet_quaternion);
+  map_pose_.orientation =
+    convertEulerAngleToQuaternion(geometry_msgs::build<geometry_msgs::msg::Vector3>()
+                                    .x(lanelet_rpy.x)
+                                    .y(lanelet_rpy.y)
+                                    .z(lanelet_rpy.z));
+  lanelet_pose_.rpy = geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.0);
+}
+
 auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition() -> void
 {
   using quaternion_operation::convertEulerAngleToQuaternion;

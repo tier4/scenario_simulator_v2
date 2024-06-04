@@ -31,13 +31,10 @@ auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
   return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
 }
 
-auto getLanelets(const lanelet::Ids & lanelet_ids) -> lanelet::Lanelets
+auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool
 {
-  lanelet::Lanelets lanelets;
-  for (const auto & id : lanelet_ids) {
-    lanelets.emplace_back(LaneletMap::map()->laneletLayer.get(id));
-  }
-  return lanelets;
+  return lanelet::geometry::inside(
+    LaneletMap::map()->laneletLayer.get(lanelet_id), lanelet::BasicPoint2d(point.x, point.y));
 }
 
 auto getLaneletIds() -> lanelet::Ids

@@ -48,6 +48,7 @@ public:
   }
   static auto getConsiderPoseByRoadSlope() -> bool { return consider_pose_by_road_slope_; }
   auto getLaneletId() const noexcept -> lanelet::Id { return lanelet_pose_.lanelet_id; }
+  auto alignOrientationToLanelet() -> void;
 
 /**
    Note: The comparison operator for the CanonicalizedLaneletPose type compares

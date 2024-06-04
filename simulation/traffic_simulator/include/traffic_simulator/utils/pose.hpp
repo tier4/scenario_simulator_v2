@@ -88,9 +88,15 @@ auto estimateCanonicalizedLaneletPose(
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>;
 
+auto nearbyLaneletIds(
+  const Pose & pose, const double distance_threshold, const bool include_crosswalk,
+  const std::size_t search_count) -> lanelet::Ids;
+
 auto isInLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
   const double tolerance) -> bool;
+
+auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool;
 
 auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool;
 
