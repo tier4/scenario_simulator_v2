@@ -475,7 +475,7 @@ void EntityManager::updateHdmapMarker()
   lanelet_marker_pub_ptr_->publish(markers);
 }
 
-void EntityManager::startNpcLogic() { npc_logic_started_ = true; }
+auto EntityManager::startNpcLogic() -> void { npc_logic_started_ = true; }
 
 }  // namespace entity
 }  // namespace traffic_simulator

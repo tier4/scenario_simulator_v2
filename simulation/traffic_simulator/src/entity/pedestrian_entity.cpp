@@ -245,7 +245,7 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
   setBehaviorParameter(behavior_parameter);
 }
 
-void PedestrianEntity::onUpdate(double current_time, double step_time)
+auto PedestrianEntity::onUpdate(double current_time, double step_time) -> void
 {
   EntityBase::onUpdate(current_time, step_time);
 

@@ -630,8 +630,7 @@ auto EntityBase::updateStandStillDuration(const double step_time) -> double
 
 auto EntityBase::updateTraveledDistance(const double step_time) -> double
 {
-  traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
-  return traveled_distance_;
+  return traveled_distance_ += std::abs(getCurrentTwist().linear.x) * step_time;
 }
 
 }  // namespace entity

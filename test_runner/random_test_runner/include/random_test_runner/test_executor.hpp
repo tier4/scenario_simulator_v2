@@ -136,7 +136,7 @@ public:
     });
   }
 
-  void update()
+  auto update() -> void
   {
     executeWithErrorHandling([this]() {
       if (not api_->isEgoSpawned() and not api_->isNpcLogicStarted()) {
