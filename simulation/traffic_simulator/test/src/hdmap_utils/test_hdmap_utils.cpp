@@ -953,8 +953,7 @@ TEST(HdMapUtils, getPreviousLaneletIds)
  */
 TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
 {
-  std::string map_path(with_road_shoulder_map_path);
-  auto hdmap_utils = makeHdMapUtilsInstance(map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(with_road_shoulder_map_path);
   const lanelet::Id curr_lanelet = 34768;
   const lanelet::Id prev_lanelet = 34696;
 
@@ -1039,8 +1038,7 @@ TEST(HdMapUtils, getNextLaneletIds)
  */
 TEST(HdMapUtils, getNextLaneletIds_RoadShoulder)
 {
-  std::string map_path(with_road_shoulder_map_path);
-  auto hdmap_utils = makeHdMapUtilsInstance(map_path);
+  auto hdmap_utils = makeHdMapUtilsInstance(with_road_shoulder_map_path);
   const lanelet::Id curr_lanelet = 34696;
   const lanelet::Id next_lanelet = 34768;
 
