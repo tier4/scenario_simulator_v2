@@ -98,10 +98,11 @@ auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<La
 auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
   -> std::optional<CanonicalizedLaneletPose>
 {
-  if (lanelet_pose == LaneletPose())
+  if (lanelet_pose == LaneletPose()) {
     return std::nullopt;
-  else
+  } else {
     return CanonicalizedLaneletPose(lanelet_pose);
+  }
 }
 
 auto toCanonicalizedLaneletPose(const Pose & map_pose, const bool include_crosswalk)
@@ -318,19 +319,22 @@ auto isInLanelet(
   if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
     return true;
   } else {
-    const auto start_edge = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
-    const auto end_edge = helper::constructCanonicalizedLaneletPose(
-      lanelet_id, lanelet_core::other::getLaneletLength(lanelet_id), 0.0);
-    auto dist0 = longitudinalDistance(
-      start_edge, canonicalized_lanelet_pose, include_adjacent_lanelet, include_opposite_direction,
-      allow_lane_change);
-    auto dist1 = longitudinalDistance(
-      canonicalized_lanelet_pose, end_edge, include_adjacent_lanelet, include_opposite_direction,
-      allow_lane_change);
-    if (dist0 and dist0.value() < tolerance) {
+    const auto start_lanelet_pose = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
+    if (const auto distance_to_start_lanelet_pose = longitudinalDistance(
+          start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, allow_lane_change);
+        distance_to_start_lanelet_pose and
+        std::abs(distance_to_start_lanelet_pose.value()) < tolerance) {
       return true;
     }
-    if (dist1 and dist1.value() < tolerance) {
+
+    const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
+      lanelet_id, lanelet_core::other::getLaneletLength(lanelet_id), 0.0);
+    if (const auto distance_to_end_lanelet_pose = longitudinalDistance(
+          canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, allow_lane_change);
+        distance_to_end_lanelet_pose and
+        std::abs(distance_to_end_lanelet_pose.value()) < tolerance) {
       return true;
     }
   }
