@@ -2102,7 +2102,7 @@ TEST(HdMapUtils, getRoute_correct)
 
 /**
  * @note Test basic functionality; test route obtaining correctness
- * with a feasible route and obtain it two times measuring time
+ * with a feasible route and obtain it two times
  * - the goal is to test whether the route cache works correctly.
  */
 TEST(HdMapUtils, getRoute_correctCache)
@@ -2182,7 +2182,7 @@ TEST(HdMapUtils, getCenterPoints_correct)
 
 /**
  * @note Test basic functionality with a lanelet that has a centerline with 3 or more points
- * and call the function 2 times with time tracking
+ * and call the function 2 times
  * - the goal is to test whether the centerline cache works correctly.
  */
 TEST(HdMapUtils, getCenterPoints_correctCache)
@@ -2359,7 +2359,7 @@ TEST(HdMapUtils, getLaneletLength_simple)
 
 /**
  * @note Test basic functionality; test lanelet length obtaining with some lanelet id two times
- * (the same lanelet id) with time tracking - the goal is to test lanelet length caching correctness.
+ * (the same lanelet id) - the goal is to test lanelet length caching correctness.
  */
 TEST(HdMapUtils, getLaneletLength_cache)
 {
