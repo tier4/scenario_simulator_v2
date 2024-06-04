@@ -112,6 +112,10 @@ auto distanceToYieldStop(
   const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>;
 
+/*
+   Here it is required to pass the CanonicalizedEntityStatus vector, instead of just 
+   the CanonicalizedLaneletPose vector, since it is necessary to know the BoundingBox of each Entity
+*/
 auto distanceToNearestConflictingPose(
   const lanelet::Ids & following_lanelets, const SplineInterface & spline,
   const std::vector<CanonicalizedEntityStatus> & other_statuses) -> std::optional<double>;
