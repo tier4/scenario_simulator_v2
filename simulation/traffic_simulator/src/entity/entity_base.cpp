@@ -99,7 +99,7 @@ auto EntityBase::isTargetSpeedReached(const speed_change::RelativeTargetSpeed & 
   return isTargetSpeedReached(target_speed.getAbsoluteValue(getStatus(), other_status_));
 }
 
-void EntityBase::onUpdate(const double /*current_time*/, const double step_time)
+auto EntityBase::onUpdate(const double /*current_time*/, const double step_time) -> void
 {
   job_list_.update(step_time, job::Event::PRE_UPDATE);
   status_before_update_.set(status_);
@@ -108,7 +108,7 @@ void EntityBase::onUpdate(const double /*current_time*/, const double step_time)
       step_time, name);
 }
 
-void EntityBase::onPostUpdate(const double /*current_time*/, const double step_time)
+auto EntityBase::onPostUpdate(const double /*current_time*/, const double step_time) -> void
 {
   job_list_.update(step_time, job::Event::POST_UPDATE);
 }

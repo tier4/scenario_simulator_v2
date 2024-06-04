@@ -139,7 +139,7 @@ auto VehicleEntity::getWaypoints() -> const traffic_simulator_msgs::msg::Waypoin
   }
 }
 
-void VehicleEntity::onUpdate(const double current_time, const double step_time)
+auto VehicleEntity::onUpdate(const double current_time, const double step_time) -> void
 {
   EntityBase::onUpdate(current_time, step_time);
   if (npc_logic_started_) {

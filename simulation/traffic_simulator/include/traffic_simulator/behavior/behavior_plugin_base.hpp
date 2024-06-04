@@ -41,7 +41,7 @@ class BehaviorPluginBase
 public:
   virtual ~BehaviorPluginBase() = default;
   virtual void configure(const rclcpp::Logger & logger) = 0;
-  virtual void update(const double current_time, const double step_time) = 0;
+  virtual auto update(const double current_time, const double step_time) -> void = 0;
   virtual const std::string & getCurrentAction() const = 0;
 
 #define DEFINE_GETTER_SETTER(NAME, KEY, TYPE)      \

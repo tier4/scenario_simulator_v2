@@ -70,7 +70,7 @@ public:
 
   auto getEntityTypename() const -> const std::string & override;
 
-  void onUpdate(const double current_time, const double step_time) override;
+  auto onUpdate(const double current_time, const double step_time) -> void override;
 
   void requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose) override;
 
