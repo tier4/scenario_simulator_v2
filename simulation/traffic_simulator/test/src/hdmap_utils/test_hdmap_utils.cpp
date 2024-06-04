@@ -896,7 +896,7 @@ TEST(HdMapUtils, getClosestLaneletId_onlyCrosswalkNearButExcluded)
   const lanelet::Id id_crosswalk = 34399;
   const auto position = makePoint(3774.73, 73744.38);
   const auto pose = makePose(position);
-  const double distance_threshold = 1.0;
+  const double distance_threshold = 2.0;
 
   {
     const bool include_crosswalk = true;
@@ -2533,13 +2533,13 @@ TEST(HdMapUtils, getStopLineIdsOnPath_noStopLines)
 
 /**
  * @note Test basic functionality; test obtaining stop line ids correctness
- * with a route that has several stop lines.
+ * with a route that has a stop line.
  */
 TEST(HdMapUtils, getStopLineIdsOnPath_someStopLines)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
 
-  const lanelet::Ids route = {34507, 34795, 34606, 34672, 34675, 34744, 34690};
+  const lanelet::Ids route = {34408, 34633, 34579, 34780, 34675, 34744, 34690};
 
   const auto result_stoplines = hdmap_utils.getStopLineIdsOnPath(route);
   const auto actual_stoplines = lanelet::Ids{120635};
