@@ -388,6 +388,13 @@ private:
 public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
+  template <typename ParameterT>
+  decltype(auto) getParameter(const std::string & name, const ParameterT & default_value = {})
+  {
+    return parameter_manager_.getParameter(
+      std::forward<decltype(name)>(name), std::forward<decltype(default_value)>(default_value));
+  }
+
   auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
     -> CanonicalizedLaneletPose;
   auto canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
