@@ -282,7 +282,8 @@ TEST(HdMapUtils, AlongLaneletPose_beforeFirst)
 }
 
 /**
- * @note Testcase for lanelet pose canonicalization when s < 0
+ * @note Test lanelet pose obtaining corectness when s < 0.
+ * Function should find correct lanelet id and canonicalize lanelet pose even when s < 0.
  * Following lanelets: 34576 -> 34570 -> 34564
  * Canonicalized lanelet pose of (id=34564, s=-22) is suppose to be
  *                               (id=34576, s=-22 + length of 34570 + length of 34576)
@@ -305,7 +306,8 @@ TEST(HdMapUtils, CanonicalizeNegative)
 }
 
 /**
- * @note Testcase for lanelet pose canonicalization when s > length of lanelet pose
+ * @note Test lanelet pose obtaining corectness when s is larger than lanelet length.
+ * Function should find correct lanelet id and canonicalize lanelet pose for s larger than lanelet length.
  * Following lanelets: 34981 -> 34585 -> 34579
  * Canonicalized lanelet pose of (id=34981, s=30) is suppose to be
  *                               (id=34579, s=30 - length of 34585 - length of 34981)
@@ -330,7 +332,7 @@ TEST(HdMapUtils, CanonicalizePositive)
 /**
  * @note Testcase for lanelet pose canonicalization when s in
  * range [0,length_of_the_lanelet]
- * Canonicalized lanelet pose of (id=34981, s=2) is suppose to be the same
+ * Canonicalized lanelet pose of (id=34981, s=2) is suppose to be the same.
  */
 TEST(HdMapUtils, Canonicalize)
 {
@@ -347,7 +349,8 @@ TEST(HdMapUtils, Canonicalize)
 }
 
 /**
- * @note Testcase for getAllCanonicalizedLaneletPoses() function when s < 0
+ * @note Test lanelet pose vector obtaining corectness when s < 0.
+ * Function should find correct lanelet ids and canonicalize lanelet pose even when s < 0.
  * Following lanelets: 34576 -> 34570 -> 34564
  *                     34981 -> 34636 -> 34564
  *                     34600 -> 34648 -> 34564
@@ -366,7 +369,7 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
   const auto canonicalized_lanelet_poses =
     hdmap_utils.getAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
-  EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(3));
+  EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<std::size_t>(3));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34576);
   EXPECT_EQ(
     canonicalized_lanelet_poses[0].s, non_canonicalized_lanelet_s +
@@ -385,7 +388,8 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
 }
 
 /**
- * @note Testcase for getAllCanonicalizedLaneletPoses() function when s > length of lanelet pose
+ * @note Test lanelet pose vector obtaining corectness when s is larger than lanelet length.
+ * Function should find correct lanelet ids and canonicalize lanelet pose for s larger than lanelet length.
  * Following lanelets: 34981 -> 34585 -> 34579
  *                     34981 -> 34636 -> 34564
  *                     34981 -> 34651 -> 34630
@@ -404,7 +408,7 @@ TEST(HdMapUtils, CanonicalizeAllPositive)
   const auto canonicalized_lanelet_poses =
     hdmap_utils.getAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
-  EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(3));
+  EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<std::size_t>(3));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34579);
   EXPECT_EQ(
     canonicalized_lanelet_poses[0].s, non_canonicalized_lanelet_s -
@@ -425,7 +429,7 @@ TEST(HdMapUtils, CanonicalizeAllPositive)
 /**
  * @note Testcase for getAllCanonicalizedLaneletPoses() function when s in
  * range [0,length_of_the_lanelet]
- * Canonicalized lanelet pose of (id=34981, s=2) is suppose to be the same
+ * Canonicalized lanelet pose of (id=34981, s=2) is supposed to be the same.
  */
 TEST(HdMapUtils, CanonicalizeAll)
 {
@@ -437,7 +441,7 @@ TEST(HdMapUtils, CanonicalizeAll)
   const auto canonicalized_lanelet_poses =
     hdmap_utils.getAllCanonicalizedLaneletPoses(non_canonicalized_lanelet_pose);
 
-  EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<long unsigned int>(1));
+  EXPECT_EQ(canonicalized_lanelet_poses.size(), static_cast<std::size_t>(1));
   EXPECT_EQ(canonicalized_lanelet_poses[0].lanelet_id, 34981);
   EXPECT_EQ(canonicalized_lanelet_poses[0].s, non_canonicalized_lanelet_s);
 }
