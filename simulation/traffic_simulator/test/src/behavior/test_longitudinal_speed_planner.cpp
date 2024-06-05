@@ -43,10 +43,7 @@ int main(int argc, char ** argv)
 auto makeLongitudinalSpeedPlanner()
   -> traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner
 {
-  const double step_time = 0.001;
-  const std::string entity_name = "entity";
-  return traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner{
-    step_time, entity_name};
+  return traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner{0.001, "entity"};
 }
 
 auto makeTwistWithLinearX(double x) -> geometry_msgs::msg::Twist
@@ -69,10 +66,8 @@ auto makeAccelWithLinearX(double x) -> geometry_msgs::msg::Accel
 TEST(LongitudinalSpeedPlanner, isAccelerating_true)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
-  const auto current_twist = makeTwistWithLinearX(1.0);
 
-  const double target_speed = 2.0;
-  EXPECT_TRUE(planner.isAccelerating(target_speed, current_twist));
+  EXPECT_TRUE(planner.isAccelerating(2.0, makeTwistWithLinearX(1.0)));
 }
 
 /**
@@ -81,10 +76,8 @@ TEST(LongitudinalSpeedPlanner, isAccelerating_true)
 TEST(LongitudinalSpeedPlanner, isAccelerating_false)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
-  const auto current_twist = makeTwistWithLinearX(3.0);
 
-  const double target_speed = 2.0;
-  EXPECT_FALSE(planner.isAccelerating(target_speed, current_twist));
+  EXPECT_FALSE(planner.isAccelerating(2.0, makeTwistWithLinearX(3.0)));
 }
 
 /**
@@ -93,10 +86,8 @@ TEST(LongitudinalSpeedPlanner, isAccelerating_false)
 TEST(LongitudinalSpeedPlanner, isDecelerating_true)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
-  const auto current_twist = makeTwistWithLinearX(3.0);
 
-  const double target_speed = 2.0;
-  EXPECT_TRUE(planner.isDecelerating(target_speed, current_twist));
+  EXPECT_TRUE(planner.isDecelerating(2.0, makeTwistWithLinearX(3.0)));
 }
 
 /**
@@ -105,10 +96,8 @@ TEST(LongitudinalSpeedPlanner, isDecelerating_true)
 TEST(LongitudinalSpeedPlanner, isDecelerating_false)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
-  const auto current_twist = makeTwistWithLinearX(1.0);
 
-  const double target_speed = 2.0;
-  EXPECT_FALSE(planner.isDecelerating(target_speed, current_twist));
+  EXPECT_FALSE(planner.isDecelerating(2.0, makeTwistWithLinearX(1.0)));
 }
 
 /**
@@ -118,8 +107,6 @@ TEST(LongitudinalSpeedPlanner, isDecelerating_false)
 TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
-  const auto current_twist = makeTwistWithLinearX(1.0);
-  const auto current_accel = makeAccelWithLinearX(1.0);
   const auto constraints =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
       .max_acceleration(2.0)
@@ -128,14 +115,10 @@ TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
       .max_deceleration_rate(0.0)
       .max_speed(10.0);
 
-  const double tolerance = 1e-5;
-
-  const double target_speed = 8.5;
-  const double expected_duration = 4.0;
-
-  const double result_duration =
-    planner.getAccelerationDuration(target_speed, constraints, current_twist, current_accel);
-  EXPECT_NEAR(result_duration, expected_duration, tolerance);
+  EXPECT_NEAR(
+    planner.getAccelerationDuration(
+      8.5, constraints, makeTwistWithLinearX(1.0), makeAccelWithLinearX(1.0)),
+    4.0, 1e-5);
 }
 
 /**
@@ -242,11 +225,7 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
 
-  const auto current_twist = makeTwistWithLinearX(13.0);
-  const double target_speed = 15.0;
-  const double tolerance = 0.1;
-
-  EXPECT_FALSE(planner.isTargetSpeedReached(target_speed, current_twist, tolerance));
+  EXPECT_FALSE(planner.isTargetSpeedReached(15.0, makeTwistWithLinearX(13.0), 0.1));
 }
 
 /**
@@ -257,12 +236,8 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
 TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
-  const auto current_twist = makeTwistWithLinearX(10.0);
 
-  const double target_speed = 10.09;
-  const double tolerance = 0.1;
-
-  EXPECT_TRUE(planner.isTargetSpeedReached(target_speed, current_twist, tolerance));
+  EXPECT_TRUE(planner.isTargetSpeedReached(10.09, makeTwistWithLinearX(10.0), 0.1));
 }
 
 /**
@@ -275,7 +250,6 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
   const auto current_twist = makeTwistWithLinearX(10.0);
-  const auto current_accel = makeAccelWithLinearX(0.0);
   const auto constraints =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
       .max_acceleration(18.0)
@@ -285,16 +259,14 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
       .max_speed(70.0);
 
   const double speed_difference = 0.1;
-  const double target_speed = current_twist.linear.x + speed_difference;
-  const double current_linear_jerk = 0.0;
   const double distance = planner.getRunningDistance(
-    target_speed, constraints, current_twist, current_accel, current_linear_jerk);
+    current_twist.linear.x + speed_difference, constraints, current_twist,
+    makeAccelWithLinearX(0.0), 0.0);
 
   EXPECT_GE(distance, 0.0);
   const double quad_time = constraints.max_deceleration / constraints.max_deceleration_rate;
   const double lin_time = speed_difference / constraints.max_deceleration;
-  const double distance_upper_bound = current_twist.linear.x * std::max(quad_time, lin_time);
-  EXPECT_LE(distance, distance_upper_bound);
+  EXPECT_LE(distance, current_twist.linear.x * std::max(quad_time, lin_time));
 }
 
 /**
@@ -307,7 +279,6 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
   const auto current_twist = makeTwistWithLinearX(60.0);
-  const auto current_accel = makeAccelWithLinearX(0.0);
   const auto constraints =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
       .max_acceleration(1.0)
@@ -317,15 +288,13 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
       .max_speed(70.0);
 
   const double target_speed = 0.0;
-  const double current_linear_jerk = 0.0;
   const double distance = planner.getRunningDistance(
-    target_speed, constraints, current_twist, current_accel, current_linear_jerk);
+    target_speed, constraints, current_twist, makeAccelWithLinearX(0.0), 0.0);
 
   EXPECT_GE(distance, 0.0);
   const double quad_time = constraints.max_deceleration / constraints.max_deceleration_rate;
   const double lin_time = (current_twist.linear.x - target_speed) / constraints.max_deceleration;
-  const double distance_upper_bound = current_twist.linear.x * std::max(quad_time, lin_time);
-  EXPECT_LE(distance, distance_upper_bound);
+  EXPECT_LE(distance, current_twist.linear.x * std::max(quad_time, lin_time));
 }
 
 /**
@@ -336,7 +305,6 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_zero)
 {
   const auto planner = makeLongitudinalSpeedPlanner();
   const auto current_twist = makeTwistWithLinearX(10.0);
-  const auto current_accel = makeAccelWithLinearX(0.0);
   const auto constraints =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
       .max_acceleration(5.0)
@@ -345,10 +313,8 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_zero)
       .max_deceleration_rate(5.0)
       .max_speed(20.0);
 
-  const double target_speed = current_twist.linear.x;
-  const double current_linear_jerk = 1.0;
   const double distance = planner.getRunningDistance(
-    target_speed, constraints, current_twist, current_accel, current_linear_jerk);
+    current_twist.linear.x, constraints, current_twist, makeAccelWithLinearX(0.0), 1.0);
 
   EXPECT_EQ(distance, 0.0);
 }
