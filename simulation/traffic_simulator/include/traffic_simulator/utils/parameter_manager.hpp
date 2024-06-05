@@ -30,7 +30,7 @@ public:
   }
 
   template <typename ParameterT>
-  auto getParameter(const std::string & name, const ParameterT & default_value = {})
+  auto getParameter(const std::string & name, const ParameterT & default_value = {}) const
   {
     if (not node_parameters_interface_->has_parameter(name)) {
       node_parameters_interface_->declare_parameter(name, rclcpp::ParameterValue(default_value));

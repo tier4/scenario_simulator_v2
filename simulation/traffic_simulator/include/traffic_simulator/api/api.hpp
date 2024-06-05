@@ -389,7 +389,7 @@ public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
   template <typename ParameterT>
-  decltype(auto) getParameter(const std::string & name, const ParameterT & default_value = {})
+  decltype(auto) getParameter(const std::string & name, const ParameterT & default_value = {}) const
   {
     return parameter_manager_.getParameter(
       std::forward<decltype(name)>(name), std::forward<decltype(default_value)>(default_value));
@@ -412,7 +412,7 @@ private:
 
   const Configuration configuration;
 
-  ParameterManager parameter_manager_;
+  const ParameterManager parameter_manager_;
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
 

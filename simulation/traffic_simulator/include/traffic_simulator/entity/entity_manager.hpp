@@ -86,7 +86,7 @@ class EntityManager
   Configuration configuration;
 
   std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
-  ParameterManager parameter_manager_;
+  const ParameterManager parameter_manager_;
 
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
