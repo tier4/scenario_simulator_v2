@@ -122,8 +122,8 @@ TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
 }
 
 /**
- * @note Test functionality aggregation used in other classes; test function behavior
- * when target_speed is bigger than max speed.
+ * @note Test functionality aggregation used in other classes.
+ * Test function behavior when target_speed is bigger than max speed.
  */
 TEST(LongitudinalSpeedPlanner, getDynamicStates_targetSpeedOverLimit)
 {
@@ -152,9 +152,9 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_targetSpeedOverLimit)
 }
 
 /**
- * @note Test functionality aggregation used in other classes; test calculations correctness
- * with target_speed = max speed and current speed = 0 - goal is to test the situation
- * when acceleration is so long that max jerk is reached.
+ * @note Test functionality aggregation used in other classes.
+ * Test calculations correctness with target_speed = max speed and current speed = 0
+ * - goal is to test the situation when acceleration is so long that max jerk is reached.
  */
 TEST(LongitudinalSpeedPlanner, getDynamicStates_maxJerk)
 {
@@ -182,9 +182,9 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_maxJerk)
 }
 
 /**
- * @note Test functionality aggregation used in other classes; test calculations correctness
- * with target_speed slightly smaller than current speed - goal is to test the situation
- * when the max jerk is not reached because the target_speed is reached first.
+ * @note Test functionality aggregation used in other classes.
+ * Test calculations correctness with target_speed slightly smaller than current speed
+ * - goal is to test the situation when the max jerk is not reached because the target_speed is reached first.
  */
 TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
 {
@@ -218,8 +218,8 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
 }
 
 /**
- * @note Test functionality used in other classes; test calculations correctness with target_speed
- * differing from current speed by several units.
+ * @note Test functionality used in other classes.
+ * Test calculations correctness with target_speed differing from current speed by several units.
  */
 TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
 {
@@ -229,8 +229,8 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
 }
 
 /**
- * @note Test functionality used in other classes; test calculations correctness
- * with target_speed differing from current speed by very small amount
+ * @note Test functionality used in other classes.
+ * Test calculations correctness with target_speed differing from current speed by very small amount
  * - goal is to simulate equal speed but with numerical noise.
  */
 TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
@@ -241,8 +241,8 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
 }
 
 /**
- * @note Test functionality aggregation used in other classes; test calculations
- * correctness with target_speed slightly bigger than current speed
+ * @note Test functionality aggregation used in other classes.
+ * Test calculations correctness with target_speed slightly bigger than current speed
  * - goal is to test the situation when the target speed is reached in little time,
  * so the loop executes only several times.
  */
@@ -270,9 +270,9 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
 }
 
 /**
- * @note Test functionality aggregation used in other classes; test calculations correctness
- * with target_speed = 0 and current speed = 50 (or other cruising speed) - goal is to test
- * the situation when the target speed is reached takes longer to reach
+ * @note Test functionality aggregation used in other classes.
+ * Test calculations correctness with target_speed = 0 and current speed = 50 (or other cruising speed)
+ * - goal is to test the situation when the target speed is reached takes longer to reach
  * so the loop has to run multiple times.
  */
 TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
@@ -298,8 +298,8 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
 }
 
 /**
- * @note Test functionality aggregation used in other classes; test calculations correctness
- * with target_speed identical to current speed so that the time is 0.
+ * @note Test functionality aggregation used in other classes.
+ * Test calculations correctness with target_speed identical to current speed so that the time is 0.
  */
 TEST(LongitudinalSpeedPlanner, getRunningDistance_zero)
 {
