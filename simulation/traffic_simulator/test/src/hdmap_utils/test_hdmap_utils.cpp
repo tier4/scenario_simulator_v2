@@ -646,7 +646,7 @@ TEST(HdMapUtils, toLaneletPose_correct)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id_road = 34600;
-  const double yaw = M_PI + M_PI_2 / 3.0;
+  const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
   const auto pose = makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(yaw));
 
   const auto lanelet_pose = hdmap_utils.toLaneletPose(pose, false);
@@ -676,9 +676,9 @@ TEST(HdMapUtils, toLaneletPose_negativeOffset)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id_road = 34600;
-  const double yaw = M_PI + M_PI_2 / 3.0;
+  const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
 
-  const double offset_yaw = yaw - M_PI_2;
+  const double offset_yaw = yaw - M_PI_2;  // offset pose
   const double offset = -0.5;
   const double offset_x = std::cos(offset_yaw) * std::abs(offset);
   const double offset_y = std::sin(offset_yaw) * std::abs(offset);
@@ -708,7 +708,7 @@ TEST(HdMapUtils, toLaneletPose_negativeOffset)
 TEST(HdMapUtils, toLaneletPose_reverse)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
-  const double yaw = M_PI_2 + M_PI_2 / 3.0;
+  const double yaw = M_PI_2 + M_PI_2 / 3.0;  // angle to make pose reverse aligned with the lanelet
   const auto pose = makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(yaw));
 
   const auto lanelet_pose = hdmap_utils.toLaneletPose(pose, false);
@@ -723,7 +723,7 @@ TEST(HdMapUtils, toLaneletPose_reverse)
 TEST(HdMapUtils, toLaneletPose_notOnLanelet)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
-  const double yaw = M_PI + M_PI_2 / 3.0;
+  const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
   const auto pose = makePose(makePoint(3790.0 + 5.0, 73757.0 - 5.0), makeQuaternionFromYaw(yaw));
 
   const auto lanelet_pose = hdmap_utils.toLaneletPose(pose, true);
@@ -738,7 +738,7 @@ TEST(HdMapUtils, toLaneletPose_notOnLanelet)
 TEST(HdMapUtils, toLaneletPose_empty)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
-  const double yaw = M_PI + M_PI_2 / 3.0;
+  const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
   const auto pose = makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(yaw));
 
   const lanelet::Ids ids{};
@@ -762,7 +762,7 @@ TEST(HdMapUtils, toLaneletPose_boundingBoxMatchPrevious)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id_road = 34600;
-  const double yaw = M_PI + M_PI_2 / 3.0;
+  const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
   const auto pose = makePose(makePoint(3774.9, 73749.2), makeQuaternionFromYaw(yaw));
 
   const auto bbox = makeBoundingBox();
