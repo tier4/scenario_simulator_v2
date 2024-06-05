@@ -22,21 +22,22 @@
 
 #include "../expect_eq_macros.hpp"
 
-static const std::string map_path = "/map/lanelet2_map.osm";
+static const std::string standard_map_path = "/map/lanelet2_map.osm";
 static const std::string with_road_shoulder_map_path = "/map/with_road_shoulder/lanelet2_map.osm";
 static const std::string empty_map_path = "/map/empty/lanelet2_map.osm";
 static const std::string four_track_highway_map_path = "/map/four_track_highway/lanelet2_map.osm";
 static const std::string crossroads_with_stoplines_map_path =
   "/map/crossroads_with_stoplines/lanelet2_map.osm";
 
-auto makeHdMapUtilsInstance(const std::string relative_path = map_path) -> hdmap_utils::HdMapUtils
+auto makeHdMapUtilsInstance(const std::string relative_path = standard_map_path)
+  -> hdmap_utils::HdMapUtils
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + relative_path;
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  return hdmap_utils::HdMapUtils(path, origin);
+  return hdmap_utils::HdMapUtils(
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + relative_path,
+    geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+      .latitude(35.61836750154)
+      .longitude(139.78066608243)
+      .altitude(0.0));
 }
 
 auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
@@ -79,6 +80,51 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
+class HdMapUtilsTest_StandardMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_StandardMap() : hdmap_utils(makeHdMapUtilsInstance(standard_map_path)) {}
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
+class HdMapUtilsTest_WithRoadShoulderMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_WithRoadShoulderMap()
+  : hdmap_utils(makeHdMapUtilsInstance(with_road_shoulder_map_path))
+  {
+  }
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
+class HdMapUtilsTest_EmptyMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_EmptyMap() : hdmap_utils(makeHdMapUtilsInstance(empty_map_path)) {}
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
+class HdMapUtilsTest_FourTrackHighwayMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_FourTrackHighwayMap()
+  : hdmap_utils(makeHdMapUtilsInstance(four_track_highway_map_path))
+  {
+  }
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
+class HdMapUtilsTest_CrossroadsWithStoplinesMap : public testing::Test
+{
+protected:
+  HdMapUtilsTest_CrossroadsWithStoplinesMap()
+  : hdmap_utils(makeHdMapUtilsInstance(crossroads_with_stoplines_map_path))
+  {
+  }
+
+  hdmap_utils::HdMapUtils hdmap_utils;
+};
+
 /**
  * @note Test basic functionality.
  * Test initialization correctness with a correct path to a lanelet map.
@@ -91,34 +137,22 @@ TEST(HdMapUtils, Construct) { ASSERT_NO_THROW(auto hdmap_utils = makeHdMapUtilsI
  */
 TEST(HdMapUtils, Construct_invalid)
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "invalid_path";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.61836750154;
-  origin.longitude = 139.78066608243;
-  EXPECT_THROW(hdmap_utils::HdMapUtils hdmap_utils(path, origin), std::runtime_error);
+  EXPECT_THROW(makeHdMapUtilsInstance("invalid_path"), std::runtime_error);
 }
 
 /**
  * @note Test basic functionality.
  * Test map conversion to binary message correctness with a sample map.
  */
-TEST(HdMapUtils, toMapBin)
-{
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
-  ASSERT_NO_THROW(hdmap_utils.toMapBin());
-}
+TEST_F(HdMapUtilsTest_StandardMap, toMapBin) { ASSERT_NO_THROW(hdmap_utils.toMapBin()); }
 
 /**
  * @note Test basic functionality.
  * Test lanelet matching correctness with a small bounding box (1, 1)
  * and a pose on a lanelet and without including the crosswalk.
  */
-TEST(HdMapUtils, matchToLane)
+TEST_F(HdMapUtilsTest_StandardMap, matchToLane)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const auto bbox = makeSmallBoundingBox();
   {
     const auto id = hdmap_utils.matchToLane(
@@ -141,9 +175,8 @@ TEST(HdMapUtils, matchToLane)
  * Test lanelet matching correctness with a small bounding box (1, 1)
  * and a pose on a crosswalk lanelet and including the crosswalk.
  */
-TEST(HdMapUtils, matchToLane_includeCrosswalk)
+TEST_F(HdMapUtilsTest_StandardMap, matchToLane_includeCrosswalk)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   auto bbox = makeSmallBoundingBox();
   {
     const auto id = hdmap_utils.matchToLane(
@@ -169,9 +202,8 @@ TEST(HdMapUtils, matchToLane_includeCrosswalk)
  * - the goal is to test the branch where getDeterministicMatches returns nullopt and thus
  * this function returns nullopt as well.
  */
-TEST(HdMapUtils, matchToLane_noMatch)
+TEST_F(HdMapUtilsTest_StandardMap, matchToLane_noMatch)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   auto bbox = makeSmallBoundingBox();
   {
     const auto id = hdmap_utils.matchToLane(
@@ -192,10 +224,8 @@ TEST(HdMapUtils, matchToLane_noMatch)
  * Test along lanelet pose obtaining with a distance
  * along the lanelet less than the lanelet length - so the along pose is still the same lanelet.
 */
-TEST(HdMapUtils, AlongLaneletPose_insideDistance)
+TEST_F(HdMapUtilsTest_StandardMap, AlongLaneletPose_insideDistance)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   EXPECT_DOUBLE_EQ(
     hdmap_utils.getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), 30.0)
       .s,
@@ -212,10 +242,8 @@ TEST(HdMapUtils, AlongLaneletPose_insideDistance)
  * along the lanelet more than the lanelet length - the goal is
  * to test the situation when the next lanelet is returned.
 */
-TEST(HdMapUtils, AlongLaneletPose_outsideDistance)
+TEST_F(HdMapUtilsTest_StandardMap, AlongLaneletPose_outsideDistance)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   EXPECT_EQ(
     hdmap_utils.getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), 30)
       .lanelet_id,
@@ -235,10 +263,8 @@ TEST(HdMapUtils, AlongLaneletPose_outsideDistance)
  * along the lanelet and start from the beginning of one lanelet - the goal is to test
  * the situation when the previous lanelet is returned.
 */
-TEST(HdMapUtils, AlongLaneletPose_negativeDistance)
+TEST_F(HdMapUtilsTest_StandardMap, AlongLaneletPose_negativeDistance)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   EXPECT_EQ(
     hdmap_utils
       .getAlongLaneletPose(traffic_simulator::helper::constructLaneletPose(34513, 0), -10.0)
@@ -256,10 +282,8 @@ TEST(HdMapUtils, AlongLaneletPose_negativeDistance)
  * and the last lanelet on the map as start - the goal is to test the situation
  * when desired pose is outside the lanelet map.
  */
-TEST(HdMapUtils, AlongLaneletPose_afterLast)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, AlongLaneletPose_afterLast)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const lanelet::Id lanelet_id = 206;
   const auto pose = traffic_simulator::helper::constructLaneletPose(lanelet_id, 15.0);
 
@@ -271,10 +295,8 @@ TEST(HdMapUtils, AlongLaneletPose_afterLast)
  * lanelet on the map as start - the goal is to test the situation
  * when desired pose is outside the lanelet map.
  */
-TEST(HdMapUtils, AlongLaneletPose_beforeFirst)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, AlongLaneletPose_beforeFirst)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const lanelet::Id lanelet_id = 3002178;
   const auto pose = traffic_simulator::helper::constructLaneletPose(lanelet_id, 15.0);
 
@@ -288,10 +310,8 @@ TEST(HdMapUtils, AlongLaneletPose_beforeFirst)
  * Canonicalized lanelet pose of (id=34564, s=-22) is suppose to be
  *                               (id=34576, s=-22 + length of 34570 + length of 34576)
  */
-TEST(HdMapUtils, CanonicalizeNegative)
+TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeNegative)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   double non_canonicalized_lanelet_s = -22.0;
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34564, non_canonicalized_lanelet_s);
@@ -312,10 +332,8 @@ TEST(HdMapUtils, CanonicalizeNegative)
  * Canonicalized lanelet pose of (id=34981, s=30) is suppose to be
  *                               (id=34579, s=30 - length of 34585 - length of 34981)
  */
-TEST(HdMapUtils, CanonicalizePositive)
+TEST_F(HdMapUtilsTest_StandardMap, CanonicalizePositive)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   double non_canonicalized_lanelet_s = 30.0;
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s);
@@ -334,10 +352,8 @@ TEST(HdMapUtils, CanonicalizePositive)
  * range [0,length_of_the_lanelet]
  * Canonicalized lanelet pose of (id=34981, s=2) is suppose to be the same.
  */
-TEST(HdMapUtils, Canonicalize)
+TEST_F(HdMapUtilsTest_StandardMap, Canonicalize)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   double non_canonicalized_lanelet_s = 2.0;
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s);
@@ -359,10 +375,8 @@ TEST(HdMapUtils, Canonicalize)
  *                               (id=34981, s=-22 + length of 34636 + length of 34981)
  *                               (id=34600, s=-22 + length of 34648 + length of 34600)
  */
-TEST(HdMapUtils, CanonicalizeAllNegative)
+TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAllNegative)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   double non_canonicalized_lanelet_s = -22.0;
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34564, non_canonicalized_lanelet_s);
@@ -398,10 +412,8 @@ TEST(HdMapUtils, CanonicalizeAllNegative)
  *                               (id=34564, s=30 - length of 34636 - length of 34981)
  *                               (id=34630, s=30 - length of 34651 - length of 34981)
  */
-TEST(HdMapUtils, CanonicalizeAllPositive)
+TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAllPositive)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   double non_canonicalized_lanelet_s = 30.0;
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s);
@@ -431,10 +443,8 @@ TEST(HdMapUtils, CanonicalizeAllPositive)
  * range [0,length_of_the_lanelet]
  * Canonicalized lanelet pose of (id=34981, s=2) is supposed to be the same.
  */
-TEST(HdMapUtils, CanonicalizeAll)
+TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAll)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   double non_canonicalized_lanelet_s = 2.0;
   const auto non_canonicalized_lanelet_pose =
     traffic_simulator::helper::constructLaneletPose(34981, non_canonicalized_lanelet_s);
@@ -450,9 +460,8 @@ TEST(HdMapUtils, CanonicalizeAll)
  * @note Test basic functionality.
  * Test filtering correctness with some lanelet ids and a valid subtype name.
  */
-TEST(HdMapUtils, filterLaneletIds_correct)
+TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_correct)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   lanelet::Id id_crosswalk_0 = 34399;
   lanelet::Id id_crosswalk_1 = 34385;
   lanelet::Id id_road_0 = 34600;
@@ -470,10 +479,8 @@ TEST(HdMapUtils, filterLaneletIds_correct)
 /**
  * @note Test function behavior when passed an empty lanelet ids vector.
  */
-TEST(HdMapUtils, filterLaneletIds_emptyIds)
+TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_emptyIds)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   lanelet::Ids ids = {};
   const char * subtype = "crosswalk";
   auto filtered = hdmap_utils.filterLaneletIds(ids, subtype);
@@ -484,9 +491,8 @@ TEST(HdMapUtils, filterLaneletIds_emptyIds)
 /**
  * @note Test function behavior when passed an invalid subtype name.
  */
-TEST(HdMapUtils, filterLaneletIds_invalidSubtype)
+TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_invalidSubtype)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   lanelet::Id id_crosswalk_0 = 34399;
   lanelet::Id id_crosswalk_1 = 34385;
   lanelet::Id id_road_0 = 34600;
@@ -502,7 +508,7 @@ TEST(HdMapUtils, filterLaneletIds_invalidSubtype)
 /**
  * @note Test function behavior when passed a vector of invalid lanelet ids.
  */
-TEST(HdMapUtils, filterLaneletIds_invalidIds)
+TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_invalidIds)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
   lanelet::Id id_invalid_0 = 10000000;
@@ -520,10 +526,8 @@ TEST(HdMapUtils, filterLaneletIds_invalidIds)
  * with a position in the middle of the lane and relatively big distance threshold
  * - the goal is to test successful scenario when there should be lanelets returned.
  */
-TEST(HdMapUtils, getNearbyLaneletIds)
+TEST_F(HdMapUtilsTest_StandardMap, getNearbyLaneletIds)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   auto point = makePoint(3807.34, 73817.95);
   const double distance_threshold = 10.0;
   size_t search_count = 100;
@@ -539,10 +543,8 @@ TEST(HdMapUtils, getNearbyLaneletIds)
  * with a position on the side of the map and with fairly small distance threshold
  * - the goal is to test unsuccessful scenario when there should be no lanelets returned.
  */
-TEST(HdMapUtils, getNearbyLaneletIds_unsuccessful)
+TEST_F(HdMapUtilsTest_StandardMap, getNearbyLaneletIds_unsuccessful)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   auto point = makePoint(3826.26, 73837.32);
   const double distance_threshold = 10.0;
   size_t search_count = 100;
@@ -557,10 +559,8 @@ TEST(HdMapUtils, getNearbyLaneletIds_unsuccessful)
  * (with a crosswalk) with a position on the side of the map and with fairly small distance threshold
  * - the goal is to test unsuccessful scenario when there should be no lanelets returned.
  */
-TEST(HdMapUtils, getNearbyLaneletIds_crosswalkUnsuccessful)
+TEST_F(HdMapUtilsTest_StandardMap, getNearbyLaneletIds_crosswalkUnsuccessful)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   auto point = makePoint(3826.26, 73837.32);
   const double distance_threshold = 10.0;
   bool include_crosswalk = true;
@@ -576,10 +576,8 @@ TEST(HdMapUtils, getNearbyLaneletIds_crosswalkUnsuccessful)
  * Test collision point calculations
  * correctness with ids of a road and a crosswalk that do intersect.
  */
-TEST(HdMapUtils, getCollisionPointInLaneCoordinate_intersects)
+TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_intersects)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   lanelet::Id id_crosswalk = 34399;
   lanelet::Id id_road = 34633;
   auto distance = hdmap_utils.getCollisionPointInLaneCoordinate(id_road, id_crosswalk);
@@ -593,7 +591,7 @@ TEST(HdMapUtils, getCollisionPointInLaneCoordinate_intersects)
  * Test collision point calculations
  * correctness with ids of a road and a crosswalk that do not intersect.
  */
-TEST(HdMapUtils, getCollisionPointInLaneCoordinate_disjoint)
+TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_disjoint)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
 
@@ -607,10 +605,8 @@ TEST(HdMapUtils, getCollisionPointInLaneCoordinate_disjoint)
 /**
  * @note Test function behavior when called with an id of non existing lanelet.
  */
-TEST(HdMapUtils, getCollisionPointInLaneCoordinate_invalidLanelet)
+TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_invalidLanelet)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   lanelet::Id id_crosswalk = 34399;
   lanelet::Id id_road_invalid = 1000000;
 
@@ -623,10 +619,8 @@ TEST(HdMapUtils, getCollisionPointInLaneCoordinate_invalidLanelet)
 /**
  * @note Test function behavior when called with an id of non existing crosswalk lanelet.
  */
-TEST(HdMapUtils, getCollisionPointInLaneCoordinate_invalidCrosswalkLanelet)
+TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_invalidCrosswalkLanelet)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   lanelet::Id id_crosswalk_invalid = 1000000;
   lanelet::Id id_road = 34600;
 
@@ -642,9 +636,8 @@ TEST(HdMapUtils, getCollisionPointInLaneCoordinate_invalidCrosswalkLanelet)
  * positioned on a given lanelet with the given matching distance
  * - the goal is to test a regular usecase of correct conversion.
  */
-TEST(HdMapUtils, toLaneletPose_correct)
+TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_correct)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id_road = 34600;
   const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
   const auto pose = makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(yaw));
@@ -672,9 +665,8 @@ TEST(HdMapUtils, toLaneletPose_correct)
  * - the normal vector to the nearest point on the spline
  * is negative - meaning the offset should be calculated negative
  */
-TEST(HdMapUtils, toLaneletPose_negativeOffset)
+TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_negativeOffset)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id_road = 34600;
   const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
 
@@ -705,9 +697,8 @@ TEST(HdMapUtils, toLaneletPose_negativeOffset)
  * - the goal is to test the branch of execution where alignment with the lanelet
  * is checked and if pose is nor oriented in similar direction the result is decided incorrect.
  */
-TEST(HdMapUtils, toLaneletPose_reverse)
+TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_reverse)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const double yaw = M_PI_2 + M_PI_2 / 3.0;  // angle to make pose reverse aligned with the lanelet
   const auto pose = makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(yaw));
 
@@ -720,9 +711,8 @@ TEST(HdMapUtils, toLaneletPose_reverse)
  * @note Test function behavior when passed a pose that is away
  * from the given lanelet (over the matching distance).
  */
-TEST(HdMapUtils, toLaneletPose_notOnLanelet)
+TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_notOnLanelet)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
   const auto pose = makePose(makePoint(3790.0 + 5.0, 73757.0 - 5.0), makeQuaternionFromYaw(yaw));
 
@@ -735,9 +725,8 @@ TEST(HdMapUtils, toLaneletPose_notOnLanelet)
  * @note test function behavior when passed an empty vector
  * of lanelet ids (for the vector specialization).
  */
-TEST(HdMapUtils, toLaneletPose_empty)
+TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
   const auto pose = makePose(makePoint(3790.0, 73757.0), makeQuaternionFromYaw(yaw));
 
@@ -758,9 +747,8 @@ TEST(HdMapUtils, toLaneletPose_empty)
  * the matching_distance. In this situation the previous lanelet has to be matched
  * - so the loop over previous lanelets is executed.
  */
-TEST(HdMapUtils, toLaneletPose_boundingBoxMatchPrevious)
+TEST_F(HdMapUtilsTest_StandardMap, toLaneletPose_boundingBoxMatchPrevious)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id_road = 34600;
   const double yaw = M_PI + M_PI_2 / 3.0;  // angle to make pose aligned with the lanelet
   const auto pose = makePose(makePoint(3774.9, 73749.2), makeQuaternionFromYaw(yaw));
@@ -784,9 +772,8 @@ TEST(HdMapUtils, toLaneletPose_boundingBoxMatchPrevious)
  * Test speed limit obtaining correctness
  * with ids of lanelets that have different speed limits.
  */
-TEST(HdMapUtils, getSpeedLimit_correct)
+TEST_F(HdMapUtilsTest_StandardMap, getSpeedLimit_correct)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   lanelet::Id id_road_0 = 34600;
   lanelet::Id id_road_1 = 34675;
   lanelet::Ids ids = {id_road_0, id_road_1};
@@ -801,9 +788,8 @@ TEST(HdMapUtils, getSpeedLimit_correct)
 /**
  * @note Test function behavior when crosswalk lanelet id is included in the vector.
  */
-TEST(HdMapUtils, getSpeedLimit_crosswalk)
+TEST_F(HdMapUtilsTest_StandardMap, getSpeedLimit_crosswalk)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   lanelet::Id id_crosswalk_0 = 34399;
   lanelet::Id id_crosswalk_1 = 34385;
   lanelet::Id id_road_0 = 34600;
@@ -820,12 +806,11 @@ TEST(HdMapUtils, getSpeedLimit_crosswalk)
 /**
  * @note Test function behavior when an empty vector is passed.
  */
-TEST(HdMapUtils, getSpeedLimit_empty)
+TEST_F(HdMapUtilsTest_StandardMap, getSpeedLimit_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   lanelet::Ids ids = {};
 
-  EXPECT_THROW(static_cast<void>(hdmap_utils.getSpeedLimit(ids)), std::runtime_error);
+  EXPECT_THROW(hdmap_utils.getSpeedLimit(ids), std::runtime_error);
 }
 
 /**
@@ -833,9 +818,8 @@ TEST(HdMapUtils, getSpeedLimit_empty)
  * Test obtaining closest lanelet id with a pose near
  * the road lanelet (closer than the distance_threshold).
  */
-TEST(HdMapUtils, getClosestLaneletId_near)
+TEST_F(HdMapUtilsTest_StandardMap, getClosestLaneletId_near)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   lanelet::Id id = 120659;
   auto position = makePoint(3818.91, 73787.95);
   auto pose = makePose(position);
@@ -853,9 +837,8 @@ TEST(HdMapUtils, getClosestLaneletId_near)
  * Test obtaining closest lanelet id with a pose far
  * from the road lanelet (further than the distance_threshold).
  */
-TEST(HdMapUtils, getClosestLaneletId_away)
+TEST_F(HdMapUtilsTest_StandardMap, getClosestLaneletId_away)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   auto position = makePoint(3775.82, 73743.29);
   auto pose = makePose(position);
   const double distance_threshold = 1.0;
@@ -874,9 +857,8 @@ TEST(HdMapUtils, getClosestLaneletId_away)
  * - the goal is to test whether the function returns road lanelet,
  * when the crosswalk is closer, but should not be included.
  */
-TEST(HdMapUtils, getClosestLaneletId_crosswalkCloserButExcluded)
+TEST_F(HdMapUtilsTest_StandardMap, getClosestLaneletId_crosswalkCloserButExcluded)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   lanelet::Id id_crosswalk = 34399;
   lanelet::Id id_road = 34639;
   auto position = makePoint(3774.73, 73744.38);
@@ -899,9 +881,8 @@ TEST(HdMapUtils, getClosestLaneletId_crosswalkCloserButExcluded)
  * - the goal is to test scenario when the only lanelet in the
  * considered distance is crosswalk, but should not be included.
  */
-TEST(HdMapUtils, getClosestLaneletId_onlyCrosswalkNearButExcluded)
+TEST_F(HdMapUtilsTest_StandardMap, getClosestLaneletId_onlyCrosswalkNearButExcluded)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id_crosswalk = 34399;
   const auto position = makePoint(3774.73, 73744.38);
   const auto pose = makePose(position);
@@ -926,9 +907,8 @@ TEST(HdMapUtils, getClosestLaneletId_onlyCrosswalkNearButExcluded)
  * @note Test function behavior when the map contains no lanelets - the goal is to test
  * the branch when findNearest does not find anything and returns an empty vector.
  */
-TEST(HdMapUtils, getClosestLaneletId_emptyMap)
+TEST_F(HdMapUtilsTest_EmptyMap, getClosestLaneletId_emptyMap)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(empty_map_path);
   auto position = makePoint(3.0, 5.0);
   auto pose = makePose(position);
   const double distance_threshold = 7.0;
@@ -944,9 +924,8 @@ TEST(HdMapUtils, getClosestLaneletId_emptyMap)
  * Test previous lanelets id obtaining correctness
  * with a lanelet that has a lanelet preceding it.
  */
-TEST(HdMapUtils, getPreviousLaneletIds)
+TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id curr_lanelet = 34468;
   const lanelet::Id prev_lanelet = 120660;
 
@@ -962,9 +941,8 @@ TEST(HdMapUtils, getPreviousLaneletIds)
  * Test previous lanelets id obtaining correctness
  * with a lanelet that has a lanelet preceding it and is a shoulder lane.
  */
-TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
+TEST_F(HdMapUtilsTest_WithRoadShoulderMap, getPreviousLaneletIds_RoadShoulder)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(with_road_shoulder_map_path);
   const lanelet::Id curr_lanelet = 34768;
   const lanelet::Id prev_lanelet = 34696;
 
@@ -980,9 +958,8 @@ TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
  * Test previous lanelets id obtaining correctness
  * with a lanelet that has several lanelets preceding it.
  */
-TEST(HdMapUtils, getPreviousLaneletIds_multiplePrevious)
+TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds_multiplePrevious)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id curr_lanelet = 34462;
   const lanelet::Id prev_lanelet_0 = 34411;
   const lanelet::Id prev_lanelet_1 = 34465;
@@ -1003,9 +980,8 @@ TEST(HdMapUtils, getPreviousLaneletIds_multiplePrevious)
  * - the goal is to test the function specialization that takes a direction as an argument
  * and returns only the previous lanelets that have this turn direction.
  */
-TEST(HdMapUtils, getPreviousLaneletIds_direction)
+TEST_F(HdMapUtilsTest_StandardMap, getPreviousLaneletIds_direction)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id curr_lanelet = 34462;
   const lanelet::Id prev_lanelet_left = 34411;
   const lanelet::Id prev_lanelet_straight = 34465;
@@ -1033,9 +1009,8 @@ TEST(HdMapUtils, getPreviousLaneletIds_direction)
  * Test next lanelets id obtaining correctness
  * with a lanelet that has a lanelet following it.
  */
-TEST(HdMapUtils, getNextLaneletIds)
+TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id curr_lanelet = 120660;
   const lanelet::Id next_lanelet = 34468;
 
@@ -1051,9 +1026,8 @@ TEST(HdMapUtils, getNextLaneletIds)
  * Test next lanelets id obtaining correctness
  * with a lanelet that has a lanelet following it and is a shoulder lane.
  */
-TEST(HdMapUtils, getNextLaneletIds_RoadShoulder)
+TEST_F(HdMapUtilsTest_WithRoadShoulderMap, getNextLaneletIds_RoadShoulder)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(with_road_shoulder_map_path);
   const lanelet::Id curr_lanelet = 34696;
   const lanelet::Id next_lanelet = 34768;
 
@@ -1069,9 +1043,8 @@ TEST(HdMapUtils, getNextLaneletIds_RoadShoulder)
  * Test next lanelets id obtaining correctness
  * with a lanelet that has several lanelets following it.
  */
-TEST(HdMapUtils, getNextLaneletIds_multipleNext)
+TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds_multipleNext)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id curr_lanelet = 34468;
   const lanelet::Id next_lanelet_0 = 34438;
   const lanelet::Id next_lanelet_1 = 34465;
@@ -1092,9 +1065,8 @@ TEST(HdMapUtils, getNextLaneletIds_multipleNext)
  * - the goal is to test the function specialization that takes a direction as an argument
  * and returns only the next lanelets that have this turn direction.
  */
-TEST(HdMapUtils, getNextLaneletIds_direction)
+TEST_F(HdMapUtilsTest_StandardMap, getNextLaneletIds_direction)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id curr_lanelet = 34468;
   const lanelet::Id next_lanelet_left = 34438;
   const lanelet::Id next_lanelet_straight = 34465;
@@ -1122,9 +1094,8 @@ TEST(HdMapUtils, getNextLaneletIds_direction)
  * Test on route checking correctness
  * with a route and a lanelet that is on the route.
  */
-TEST(HdMapUtils, isInRoute_onRoute)
+TEST_F(HdMapUtilsTest_StandardMap, isInRoute_onRoute)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id route_part_0 = 34741;
   const lanelet::Id route_part_1 = 34850;
   const lanelet::Id route_part_2 = 34603;
@@ -1140,9 +1111,8 @@ TEST(HdMapUtils, isInRoute_onRoute)
  * Test on route checking correctness
  * with a route and a lanelet that is not on the route.
  */
-TEST(HdMapUtils, isInRoute_notOnRoute)
+TEST_F(HdMapUtilsTest_StandardMap, isInRoute_notOnRoute)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34468;
   const lanelet::Id route_part_0 = 34741;
   const lanelet::Id route_part_1 = 34850;
@@ -1156,9 +1126,8 @@ TEST(HdMapUtils, isInRoute_notOnRoute)
 /**
  * @note Test function behavior when an empty vector is passed.
  */
-TEST(HdMapUtils, isInRoute_empty)
+TEST_F(HdMapUtilsTest_StandardMap, isInRoute_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34468;
   lanelet::Ids route = {};
 
@@ -1170,9 +1139,8 @@ TEST(HdMapUtils, isInRoute_empty)
  * Test in lanelet presence correctness
  * with a position that is in the given lanelet.
  */
-TEST(HdMapUtils, isInLanelet_correct)
+TEST_F(HdMapUtilsTest_StandardMap, isInLanelet_correct)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
   const double s = 10;
 
@@ -1184,9 +1152,8 @@ TEST(HdMapUtils, isInLanelet_correct)
  * Test in lanelet presence correctness
  * with a position that is after the given lanelet.
  */
-TEST(HdMapUtils, isInLanelet_after)
+TEST_F(HdMapUtilsTest_StandardMap, isInLanelet_after)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
   const double s = hdmap_utils.getLaneletLength(lanelet_id) + 5.0;
 
@@ -1198,9 +1165,8 @@ TEST(HdMapUtils, isInLanelet_after)
  * Test in lanelet presence correctness
  * with a position that is before the given lanelet.
  */
-TEST(HdMapUtils, isInLanelet_before)
+TEST_F(HdMapUtilsTest_StandardMap, isInLanelet_before)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
   const double s = -5;
 
@@ -1212,9 +1178,8 @@ TEST(HdMapUtils, isInLanelet_before)
  * Test lanelet to map point transform correctness
  * with a vector of several s larger than 0 but smaller than the lanelet length.
  */
-TEST(HdMapUtils, toMapPoints_correctPoints)
+TEST_F(HdMapUtilsTest_StandardMap, toMapPoints_correctPoints)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
   const std::vector<double> s{10.0, 20.0, 30.0};
 
@@ -1229,9 +1194,8 @@ TEST(HdMapUtils, toMapPoints_correctPoints)
 /**
  * @note Test function behavior when called with a negative s.
  */
-TEST(HdMapUtils, toMapPoints_negativeS)
+TEST_F(HdMapUtilsTest_StandardMap, toMapPoints_negativeS)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
   const std::vector<double> s{-10.0, -20.0, -30.0};
 
@@ -1247,9 +1211,8 @@ TEST(HdMapUtils, toMapPoints_negativeS)
 /**
  * @note Test function behavior when called with a value of s larger than the lanelet length.
  */
-TEST(HdMapUtils, toMapPoints_sLargerThanLaneletLength)
+TEST_F(HdMapUtilsTest_StandardMap, toMapPoints_sLargerThanLaneletLength)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
 
   const auto lanelet_length = hdmap_utils.getLaneletLength(lanelet_id);
@@ -1266,9 +1229,8 @@ TEST(HdMapUtils, toMapPoints_sLargerThanLaneletLength)
 /**
  * @note Test function behavior when called with an empty vector.
  */
-TEST(HdMapUtils, toMapPoints_empty)
+TEST_F(HdMapUtilsTest_StandardMap, toMapPoints_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
 
   std::vector<geometry_msgs::msg::Point> points;
@@ -1284,9 +1246,8 @@ TEST(HdMapUtils, toMapPoints_empty)
  * with a position on the lanelet and a small offset (e.g. 0.5) - test the specialization
  * taking a lanelet id, s and an offset as parameters.
  */
-TEST(HdMapUtils, toMapPose_onlyOffset)
+TEST_F(HdMapUtilsTest_StandardMap, toMapPose_onlyOffset)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
   const double s = 10.0;
 
@@ -1304,9 +1265,8 @@ TEST(HdMapUtils, toMapPose_onlyOffset)
  * on the lanelet and additional rotation of 90 degrees
  * - test the specialization taking a lanelet pose object as a parameter.
  */
-TEST(HdMapUtils, toMapPose_additionalRotation)
+TEST_F(HdMapUtilsTest_StandardMap, toMapPose_additionalRotation)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
   const double s = 10.0;
 
@@ -1322,9 +1282,8 @@ TEST(HdMapUtils, toMapPose_additionalRotation)
 /**
  * @note Test function behavior when called with a negative s.
  */
-TEST(HdMapUtils, toMapPose_negativeS)
+TEST_F(HdMapUtilsTest_StandardMap, toMapPose_negativeS)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
   const double s = -10.0;
 
@@ -1341,9 +1300,8 @@ TEST(HdMapUtils, toMapPose_negativeS)
 /**
  * @note Test function behavior when called with a value of s larger than the lanelet length.
  */
-TEST(HdMapUtils, toMapPose_sLargerThanLaneletLength)
+TEST_F(HdMapUtilsTest_StandardMap, toMapPose_sLargerThanLaneletLength)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id lanelet_id = 34696;
   const double s = hdmap_utils.getLaneletLength(lanelet_id) + 10.0;
 
@@ -1362,9 +1320,8 @@ TEST(HdMapUtils, toMapPose_sLargerThanLaneletLength)
  * Test changeable lanelets id obtaining with a lanelet
  * that has no changeable lanelets and direction = STRAIGHT.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_straight)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 199;
   const lanelet::Id end_lanelet = start_lanelet;
   const auto direction = traffic_simulator::lane_change::Direction::STRAIGHT;
@@ -1380,9 +1337,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
  * Test changeable lanelets id obtaining
  * with a lanelet that has no changeable lanelets and direction = LEFT.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangeable)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftNoChangeable)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 199;
   const auto direction = traffic_simulator::lane_change::Direction::LEFT;
 
@@ -1396,9 +1352,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangeable)
  * Test changeable lanelets id obtaining with
  * a lanelet that has changeable lanelets (left direction) and direction = LEFT.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangeable)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_leftChangeable)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
   const lanelet::Id end_lanelet = 199;
   const auto direction = traffic_simulator::lane_change::Direction::LEFT;
@@ -1414,9 +1369,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangeable)
  * Test changeable lanelets id obtaining
  * with a lanelet that has no changeable lanelets and direction = RIGHT.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangeable)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightNoChangeable)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 202;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
 
@@ -1430,9 +1384,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangeable)
  * Test changeable lanelets id obtaining with
  * a lanelet that has changeable lanelets (right direction) and direction = RIGHT.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangeable)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_rightChangeable)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
   const lanelet::Id end_lanelet = 201;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
@@ -1449,9 +1402,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangeable)
  * with a lanelet that has at least two changeable lanes to the left,
  * direction = LEFT and shift = 2.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftPossible)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftPossible)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 201;
   const lanelet::Id end_lanelet = 199;
   const auto direction = traffic_simulator::lane_change::Direction::LEFT;
@@ -1471,9 +1423,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftPossible)
  * - the goal is to test the branch where we expect lanelet id
  * for shifting 2 times left, but shifting 2 lanes is not possible.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftNotPossible)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2LeftNotPossible)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
   const auto direction = traffic_simulator::lane_change::Direction::LEFT;
   const uint8_t shift = 2;
@@ -1490,9 +1441,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftNotPossible)
  * with a lanelet that has at least two changeable lanes to the right,
  * direction = RIGHT and shift = 2.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightPossible)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightPossible)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 200;
   const lanelet::Id end_lanelet = 202;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
@@ -1512,9 +1462,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightPossible)
  * direction = RIGHT and shift = 2 - the goal is to test the branch where
  * we expect lanelet id for shifting 2 times right, but shifting 2 lanes is not possible.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightNotPossible)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift2RightNotPossible)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 201;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
   const uint8_t shift = 2;
@@ -1528,9 +1477,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightNotPossible)
 /**
  * @note Test function behavior when called with a direction = RIGHT and shift = 0.
  */
-TEST(HdMapUtils, getLaneChangeableLaneletId_shift0)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLaneChangeableLaneletId_shift0)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   const lanelet::Id start_lanelet = 201;
   const lanelet::Id end_lanelet = 201;
   const auto direction = traffic_simulator::lane_change::Direction::RIGHT;
@@ -1547,9 +1495,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift0)
  * @note Test basic functionality.
  * Test traffic lights id obtaining correctness.
  */
-TEST(HdMapUtils, getTrafficLightIds_correct)
+TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIds_correct)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Ids traffic_lights = {34802, 34836};
 
   auto result_traffic_lights = hdmap_utils.getTrafficLightIds();
@@ -1561,10 +1508,8 @@ TEST(HdMapUtils, getTrafficLightIds_correct)
 /**
  * @note Test function behavior when there are no traffic lights on the map.
  */
-TEST(HdMapUtils, getTrafficLightIds_noTrafficLight)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getTrafficLightIds_noTrafficLight)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   auto result_traffic_lights = hdmap_utils.getTrafficLightIds();
 
   EXPECT_EQ(result_traffic_lights.size(), static_cast<size_t>(0));
@@ -1575,9 +1520,8 @@ TEST(HdMapUtils, getTrafficLightIds_noTrafficLight)
  * Test traffic light position obtaining
  * with a traffic light and bulb color specified.
  */
-TEST(HdMapUtils, getTrafficLightBulbPosition_correct)
+TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightBulbPosition_correct)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id light_id = 34802;
   const double epsilon = 0.1;
 
@@ -1626,9 +1570,8 @@ TEST(HdMapUtils, getTrafficLightBulbPosition_correct)
  * with an id of a traffic light that does not exist
  * - the goal is to test the branch when no traffic light is selected.
  */
-TEST(HdMapUtils, getTrafficLightBulbPosition_invalidTrafficLight)
+TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightBulbPosition_invalidTrafficLight)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id light_id = 1000003;
 
   {
@@ -1645,9 +1588,8 @@ TEST(HdMapUtils, getTrafficLightBulbPosition_invalidTrafficLight)
  * Test obtaining conflicting lanelets correctness
  * with lanelets that do conflict with other lanelets.
  */
-TEST(HdMapUtils, getConflictingLaneIds_conflicting)
+TEST_F(HdMapUtilsTest_StandardMap, getConflictingLaneIds_conflicting)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34510;
   lanelet::Ids actual_ids = {34495, 34498};
 
@@ -1663,9 +1605,8 @@ TEST(HdMapUtils, getConflictingLaneIds_conflicting)
  * Test obtaining conflicting lanelets correctness
  * with lanelets that do not conflict with any other lanelets.
  */
-TEST(HdMapUtils, getConflictingLaneIds_notConflicting)
+TEST_F(HdMapUtilsTest_StandardMap, getConflictingLaneIds_notConflicting)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34513;
 
   auto result_ids = hdmap_utils.getConflictingLaneIds({id});
@@ -1676,10 +1617,8 @@ TEST(HdMapUtils, getConflictingLaneIds_notConflicting)
 /**
  * @note Test function behavior when called with an empty vector.
  */
-TEST(HdMapUtils, getConflictingLaneIds_empty)
+TEST_F(HdMapUtilsTest_StandardMap, getConflictingLaneIds_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   auto result_ids = hdmap_utils.getConflictingLaneIds({});
 
   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(0));
@@ -1690,9 +1629,8 @@ TEST(HdMapUtils, getConflictingLaneIds_empty)
  * Test obtaining conflicting crosswalk lanelets
  * correctness with lanelets that do conflict with crosswalk lanelets.
  */
-TEST(HdMapUtils, getConflictingCrosswalkIds_conflicting)
+TEST_F(HdMapUtilsTest_StandardMap, getConflictingCrosswalkIds_conflicting)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34633;
   lanelet::Ids actual_ids = {34399, 34385};
 
@@ -1709,9 +1647,8 @@ TEST(HdMapUtils, getConflictingCrosswalkIds_conflicting)
  * correctness with lanelets that do not conflict with any crosswalk lanelets,
  * but do conflict with vehicle lanelets.
  */
-TEST(HdMapUtils, getConflictingCrosswalkIds_notConflictingWithCrosswalk)
+TEST_F(HdMapUtilsTest_StandardMap, getConflictingCrosswalkIds_notConflictingWithCrosswalk)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34510;
 
   auto result_ids = hdmap_utils.getConflictingCrosswalkIds({id});
@@ -1724,9 +1661,8 @@ TEST(HdMapUtils, getConflictingCrosswalkIds_notConflictingWithCrosswalk)
  * Test obtaining conflicting crosswalk lanelets
  * correctness with lanelets that do not conflict with any other lanelets.
  */
-TEST(HdMapUtils, getConflictingCrosswalkIds_notConflicting)
+TEST_F(HdMapUtilsTest_StandardMap, getConflictingCrosswalkIds_notConflicting)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34513;
 
   auto result_ids = hdmap_utils.getConflictingCrosswalkIds({id});
@@ -1737,10 +1673,8 @@ TEST(HdMapUtils, getConflictingCrosswalkIds_notConflicting)
 /**
  * @note Test function behavior when called with an empty vector.
  */
-TEST(HdMapUtils, getConflictingCrosswalkIds_empty)
+TEST_F(HdMapUtilsTest_StandardMap, getConflictingCrosswalkIds_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   auto result_ids = hdmap_utils.getConflictingCrosswalkIds({});
 
   EXPECT_EQ(result_ids.size(), static_cast<std::size_t>(0));
@@ -1752,9 +1686,8 @@ TEST(HdMapUtils, getConflictingCrosswalkIds_empty)
  * with a correct vector of lanelets and the reference lanelet
  * also correct and reasonable forward distance.
  */
-TEST(HdMapUtils, clipTrajectoryFromLaneletIds_correct)
+TEST_F(HdMapUtilsTest_StandardMap, clipTrajectoryFromLaneletIds_correct)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34600;
   const double s = 40.0;
   const double forward_distance = 10.0;
@@ -1785,9 +1718,8 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_correct)
  * with a correct vector of lanelets and the reference
  * lanelet not on the trajectory and reasonable forward distance.
  */
-TEST(HdMapUtils, clipTrajectoryFromLaneletIds_startNotOnTrajectory)
+TEST_F(HdMapUtilsTest_StandardMap, clipTrajectoryFromLaneletIds_startNotOnTrajectory)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34606;
   const double s = 40.0;
   const double forward_distance = 10.0;
@@ -1802,9 +1734,8 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_startNotOnTrajectory)
 /**
  * @note Test function behavior when passed an empty trajectory vector.
  */
-TEST(HdMapUtils, clipTrajectoryFromLaneletIds_emptyTrajectory)
+TEST_F(HdMapUtilsTest_StandardMap, clipTrajectoryFromLaneletIds_emptyTrajectory)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34600;
   const double s = 40.0;
   const double forward_distance = 10.0;
@@ -1822,9 +1753,8 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_emptyTrajectory)
  * with a correct vector of lanelets, and the reference lanelet
  * also correct and forward distance fairly small (e.g. 2).
  */
-TEST(HdMapUtils, clipTrajectoryFromLaneletIds_smallForwardDistance)
+TEST_F(HdMapUtilsTest_StandardMap, clipTrajectoryFromLaneletIds_smallForwardDistance)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34600;
   const double s = 40.0;
   const double forward_distance = 1.5;
@@ -1845,10 +1775,8 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_smallForwardDistance)
  * Test following lanelets obtaining with
  * a lanelet that has lanelets after it longer than parameter distance.
  */
-TEST(HdMapUtils, getFollowingLanelets_straightAfter)
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_straightAfter)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 120660;
   const double distance = 1.0;
   const bool include_self = true;
@@ -1865,10 +1793,8 @@ TEST(HdMapUtils, getFollowingLanelets_straightAfter)
  * that has lanelets after it longer than parameter distance, but the following lanelets
  * go through a curve (e.g there was an order to go right earlier on the lane).
  */
-TEST(HdMapUtils, getFollowingLanelets_curveAfter)
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_curveAfter)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 34564;
   const double distance = 40.0;
   const bool include_self = true;
@@ -1885,10 +1811,8 @@ TEST(HdMapUtils, getFollowingLanelets_curveAfter)
  * that has lanelets after it for less than specified in the distance parameter
  * - the goal is for the function to return trajectory shorter than distance specified.
  */
-TEST(HdMapUtils, getFollowingLanelets_notEnoughLaneletsAfter)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getFollowingLanelets_notEnoughLaneletsAfter)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const lanelet::Id id = 199;
   const double distance = 1.0e100;
   const bool include_self = true;
@@ -1904,10 +1828,8 @@ TEST(HdMapUtils, getFollowingLanelets_notEnoughLaneletsAfter)
  * Test following lanelets obtaining
  * with a candidate trajectory longer than the given distance.
  */
-TEST(HdMapUtils, getFollowingLanelets_candidateTrajectory)
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectory)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 34564;
   const double distance = 40;
   const bool include_self = true;
@@ -1927,10 +1849,8 @@ TEST(HdMapUtils, getFollowingLanelets_candidateTrajectory)
  * a candidate trajectory shorter than the given distance
  * - the goal is to test generating lacking part of the trajectory.
  */
-TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryNotEnough)
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectoryNotEnough)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 34564;
   const double distance = 100;
   const bool include_self = true;
@@ -1948,10 +1868,8 @@ TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryNotEnough)
  * @note Test function behavior when called with a candidate trajectory
  * that does not contain the starting lanelet.
  */
-TEST(HdMapUtils, getFollowingLanelets_candidatesDoNotMatch)
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidatesDoNotMatch)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 120660;
   const lanelet::Ids candidates = {34981};
   const double distance = 1.0e100;
@@ -1964,10 +1882,8 @@ TEST(HdMapUtils, getFollowingLanelets_candidatesDoNotMatch)
 /**
  * @note Test function behavior when an empty vector is passed.
  */
-TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryEmpty)
+TEST_F(HdMapUtilsTest_StandardMap, getFollowingLanelets_candidateTrajectoryEmpty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 120660;
   const double distance = 1.0e100;
   const bool include_self = true;
@@ -1982,10 +1898,8 @@ TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryEmpty)
  * Test lane change possibility checking
  * correctness with lanelets that can be changed.
  */
-TEST(HdMapUtils, canChangeLane_canChange)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, canChangeLane_canChange)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const lanelet::Id from_id = 199;
   const lanelet::Id to_id = 200;
 
@@ -1999,10 +1913,8 @@ TEST(HdMapUtils, canChangeLane_canChange)
  * Test lane change possibility checking correctness with lanelets
  * that can not be changed (e.g. goal lanelet is behind the start lanelet).
  */
-TEST(HdMapUtils, canChangeLane_canNotChange)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, canChangeLane_canNotChange)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const lanelet::Id from_id = 199;
   const lanelet::Id to_id = 201;
 
@@ -2014,10 +1926,8 @@ TEST(HdMapUtils, canChangeLane_canNotChange)
 /**
  * @note Test function behavior when either of the lanelet ids is invalid.
  */
-TEST(HdMapUtils, canChangeLane_invalidLaneletId)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, canChangeLane_invalidLaneletId)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const lanelet::Id from_id = 1000003;
   const lanelet::Id to_id = 1000033;
 
@@ -2029,10 +1939,8 @@ TEST(HdMapUtils, canChangeLane_invalidLaneletId)
  * Test lateral distance calculation correctness
  * with two lanelet poses on the same lanelet but with different offsets.
  */
-TEST(HdMapUtils, getLateralDistance_sameLane)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_sameLane)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
   const auto to = traffic_simulator::helper::constructLaneletPose(3002185, 10.0, 0.2);
   const auto result = hdmap_utils.getLateralDistance(from, to);
@@ -2046,10 +1954,8 @@ TEST(HdMapUtils, getLateralDistance_sameLane)
  * Test lateral distance calculation correctness
  * with two lanelet poses on parallel lanes with no possibility of changing the lane.
  */
-TEST(HdMapUtils, getLateralDistance_parallelLanesCanNotChange)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanNotChange)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
   const auto to = traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2);
 
@@ -2063,10 +1969,8 @@ TEST(HdMapUtils, getLateralDistance_parallelLanesCanNotChange)
  * Test lateral distance calculation correctness
  * with two lanelet poses on parallel lanes with a possibility of changing the lane.
  */
-TEST(HdMapUtils, getLateralDistance_parallelLanesCanChange)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_parallelLanesCanChange)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
   const auto to = traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2);
 
@@ -2087,10 +1991,8 @@ TEST(HdMapUtils, getLateralDistance_parallelLanesCanChange)
  * the scenario when the distance cannot be calculated because two positions
  * will never be able to come in contact.
  */
-TEST(HdMapUtils, getLateralDistance_notConnected)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLateralDistance_notConnected)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
   const auto to = traffic_simulator::helper::constructLaneletPose(3002166, 10.0, 0.2);
 
@@ -2103,10 +2005,8 @@ TEST(HdMapUtils, getLateralDistance_notConnected)
  * @note Test basic functionality.
  * Test route obtaining correctness with a feasible route.
  */
-TEST(HdMapUtils, getRoute_correct)
+TEST_F(HdMapUtilsTest_StandardMap, getRoute_correct)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id from_id = 34579;
   const lanelet::Id to_id = 34630;
   const bool allow_lane_change = true;
@@ -2124,10 +2024,8 @@ TEST(HdMapUtils, getRoute_correct)
  * Test route obtaining correctness with a feasible route and obtain it two times
  * - the goal is to test whether the route cache works correctly.
  */
-TEST(HdMapUtils, getRoute_correctCache)
+TEST_F(HdMapUtilsTest_StandardMap, getRoute_correctCache)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id from_id = 34579;
   const lanelet::Id to_id = 34630;
   const bool allow_lane_change = true;
@@ -2143,10 +2041,8 @@ TEST(HdMapUtils, getRoute_correctCache)
  * Test route obtaining correctness with the beginning
  * and ending that are impossible to route between.
  */
-TEST(HdMapUtils, getRoute_impossibleRouting)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getRoute_impossibleRouting)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
-
   const lanelet::Id from_id = 199;
   const lanelet::Id to_id = 196;
   const bool allow_lane_change = true;
@@ -2161,10 +2057,8 @@ TEST(HdMapUtils, getRoute_impossibleRouting)
  * Test route obtaining correctness with beginning
  * and ending of the route set to the same lanelet id.
  */
-TEST(HdMapUtils, getRoute_circular)
+TEST_F(HdMapUtilsTest_StandardMap, getRoute_circular)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id from_id = 120659;
   const lanelet::Id to_id = 120659;
   const bool allow_lane_change = false;
@@ -2177,9 +2071,8 @@ TEST(HdMapUtils, getRoute_circular)
 /**
  * @note Test basic functionality with a lanelet that has a centerline with 3 or more points.
  */
-TEST(HdMapUtils, getCenterPoints_correct)
+TEST_F(HdMapUtilsTest_StandardMap, getCenterPoints_correct)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34594;
 
   const std::vector<geometry_msgs::msg::Point> actual_center_points{
@@ -2206,9 +2099,8 @@ TEST(HdMapUtils, getCenterPoints_correct)
  * and call the function 2 times
  * - the goal is to test whether the centerline cache works correctly.
  */
-TEST(HdMapUtils, getCenterPoints_correctCache)
+TEST_F(HdMapUtilsTest_StandardMap, getCenterPoints_correctCache)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Id id = 34594;
 
   const auto result_center_points = hdmap_utils.getCenterPoints(id);
@@ -2224,9 +2116,8 @@ TEST(HdMapUtils, getCenterPoints_correctCache)
 /**
  * @note Test basic functionality with a vector containing valid lanelets.
  */
-TEST(HdMapUtils, getCenterPoints_correctVector)
+TEST_F(HdMapUtilsTest_StandardMap, getCenterPoints_correctVector)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Ids ids{34594, 34621};
 
   const std::vector<geometry_msgs::msg::Point> actual_center_points{
@@ -2264,9 +2155,8 @@ TEST(HdMapUtils, getCenterPoints_correctVector)
 /**
  * @note Test basic functionality with an empty lanelet vector.
  */
-TEST(HdMapUtils, getCenterPoints_empty)
+TEST_F(HdMapUtilsTest_StandardMap, getCenterPoints_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   const lanelet::Ids ids{};
 
   const auto result_center_points = hdmap_utils.getCenterPoints(ids);
@@ -2278,10 +2168,8 @@ TEST(HdMapUtils, getCenterPoints_empty)
  * @note Test basic functionality.
  * Test traffic light checking correctness with an id of a traffic light.
  */
-TEST(HdMapUtils, isTrafficLight_trafficLight)
+TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_trafficLight)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 34836;
 
   const auto verdict = hdmap_utils.isTrafficLight(id);
@@ -2293,10 +2181,8 @@ TEST(HdMapUtils, isTrafficLight_trafficLight)
  * @note Test basic functionality.
  * Test traffic light checking correctness with an id of not a traffic light.
  */
-TEST(HdMapUtils, isTrafficLight_notTrafficLight)
+TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_notTrafficLight)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 120659;
 
   const auto verdict = hdmap_utils.isTrafficLight(id);
@@ -2307,10 +2193,8 @@ TEST(HdMapUtils, isTrafficLight_notTrafficLight)
 /**
  * @note Test function behavior when called with an invalid lanelet id.
  */
-TEST(HdMapUtils, isTrafficLight_invalidId)
+TEST_F(HdMapUtilsTest_StandardMap, isTrafficLight_invalidId)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 1000003;
 
   const auto verdict = hdmap_utils.isTrafficLight(id);
@@ -2323,10 +2207,8 @@ TEST(HdMapUtils, isTrafficLight_invalidId)
  * Test traffic light relation checking correctness
  * with an id of a lanelet that has a relation with a traffic light.
  */
-TEST(HdMapUtils, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
+TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 34806;
 
   const auto verdict = hdmap_utils.isTrafficLightRegulatoryElement(id);
@@ -2339,10 +2221,8 @@ TEST(HdMapUtils, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
  * Test traffic light relation checking correctness
  * with an id of a lanelet that does not have a relation with a traffic light.
  */
-TEST(HdMapUtils, isTrafficLightRegulatoryElement_noTrafficLightRegulatoryElement)
+TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_noTrafficLightRegulatoryElement)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 120659;
 
   const auto verdict = hdmap_utils.isTrafficLightRegulatoryElement(id);
@@ -2353,10 +2233,8 @@ TEST(HdMapUtils, isTrafficLightRegulatoryElement_noTrafficLightRegulatoryElement
 /**
  * @note Test function behavior when called with an invalid lanelet id.
  */
-TEST(HdMapUtils, isTrafficLightRegulatoryElement_invalidId)
+TEST_F(HdMapUtilsTest_StandardMap, isTrafficLightRegulatoryElement_invalidId)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 1000003;
 
   const auto verdict = hdmap_utils.isTrafficLightRegulatoryElement(id);
@@ -2367,10 +2245,8 @@ TEST(HdMapUtils, isTrafficLightRegulatoryElement_invalidId)
 /**
  * @note Test basic functionality. Test lanelet length obtaining with some lanelet id.
  */
-TEST(HdMapUtils, getLaneletLength_simple)
+TEST_F(HdMapUtilsTest_StandardMap, getLaneletLength_simple)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 34468;
 
   const double result_length = hdmap_utils.getLaneletLength(id);
@@ -2385,10 +2261,8 @@ TEST(HdMapUtils, getLaneletLength_simple)
  * Test lanelet length obtaining with some lanelet id two times
  * (the same lanelet id) - the goal is to test lanelet length caching correctness.
  */
-TEST(HdMapUtils, getLaneletLength_cache)
+TEST_F(HdMapUtilsTest_StandardMap, getLaneletLength_cache)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Id id = 34468;
 
   const double result_length_no_hit = hdmap_utils.getLaneletLength(id);
@@ -2402,10 +2276,8 @@ TEST(HdMapUtils, getLaneletLength_cache)
  * Test traffic light ids obtaining correctness
  * with a route that does not have any traffic lights.
  */
-TEST(HdMapUtils, getTrafficLightIdsOnPath_noTrafficLights)
+TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_noTrafficLights)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Ids route = {34579, 34774, 120659, 120660, 34468, 34438};
 
   auto result_traffic_light_ids = hdmap_utils.getTrafficLightIdsOnPath(route);
@@ -2417,10 +2289,8 @@ TEST(HdMapUtils, getTrafficLightIdsOnPath_noTrafficLights)
  * @note Test basic functionality.
  * Test traffic light ids obtaining correctness with a route that has some traffic lights.
  */
-TEST(HdMapUtils, getTrafficLightIdsOnPath_trafficLights)
+TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_trafficLights)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Ids route = {34579, 34774, 120659, 120660, 34468, 34438, 34408, 34624, 34630};
 
   auto result_traffic_light_ids = hdmap_utils.getTrafficLightIdsOnPath(route);
@@ -2435,10 +2305,8 @@ TEST(HdMapUtils, getTrafficLightIdsOnPath_trafficLights)
 /**
  * @note Test function behavior when passed an empty vector of lanelet ids.
  */
-TEST(HdMapUtils, getTrafficLightIdsOnPath_empty)
+TEST_F(HdMapUtilsTest_StandardMap, getTrafficLightIdsOnPath_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   auto result_traffic_light_ids = hdmap_utils.getTrafficLightIdsOnPath({});
 
   EXPECT_EQ(result_traffic_light_ids.size(), static_cast<size_t>(0));
@@ -2449,9 +2317,8 @@ TEST(HdMapUtils, getTrafficLightIdsOnPath_empty)
  * Test longitudinal distance calculation correctness
  * with two poses on the same lanelet, where the goal pose is positioned in front of the start pose.
  */
-TEST(HdMapUtils, getLongitudinalDistance_sameLanelet)
+TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLanelet)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   auto pose_from = hdmap_utils.toLaneletPose(
     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
   auto pose_to = hdmap_utils.toLaneletPose(
@@ -2476,9 +2343,8 @@ TEST(HdMapUtils, getLongitudinalDistance_sameLanelet)
  * Test longitudinal distance calculation correctness
  * with two poses on the same lanelet, where the goal pose is positioned behind the start pose.
  */
-TEST(HdMapUtils, getLongitudinalDistance_sameLaneletBehind)
+TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_sameLaneletBehind)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   auto pose_to = hdmap_utils.toLaneletPose(
     makePose(makePoint(3812.65, 73810.13, -2.80), makeQuaternionFromYaw(90.0)), lanelet::Id{34606});
   auto pose_from = hdmap_utils.toLaneletPose(
@@ -2499,9 +2365,8 @@ TEST(HdMapUtils, getLongitudinalDistance_sameLaneletBehind)
  * Test longitudinal distance calculation correctness
  * with two poses on different lanelets  that are a few lanelets apart (e.g. 3).
  */
-TEST(HdMapUtils, getLongitudinalDistance_differentLanelet)
+TEST_F(HdMapUtilsTest_StandardMap, getLongitudinalDistance_differentLanelet)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   auto pose_from =
     hdmap_utils.toLaneletPose(makePose(makePoint(3801.19, 73812.70, -2.86)), lanelet::Id{120660});
   auto pose_to =
@@ -2526,9 +2391,8 @@ TEST(HdMapUtils, getLongitudinalDistance_differentLanelet)
  * with two poses on different lanelets where the goal pose is on lanelet unreachable
  * from the start pose lanelet - the goal is to test the branch of execution where no route is found.
  */
-TEST(HdMapUtils, getLongitudinalDistance_differentLaneletNoRoute)
+TEST_F(HdMapUtilsTest_FourTrackHighwayMap, getLongitudinalDistance_differentLaneletNoRoute)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
   auto pose_to = hdmap_utils.toLaneletPose(
     makePose(makePoint(81590.79, 50067.66), makeQuaternionFromYaw(90.0)), lanelet::Id{3002185});
   auto pose_from = hdmap_utils.toLaneletPose(
@@ -2548,10 +2412,8 @@ TEST(HdMapUtils, getLongitudinalDistance_differentLaneletNoRoute)
  * @note Test basic functionality.
  * Test obtaining stop line ids correctness with a route that has no stop lines.
  */
-TEST(HdMapUtils, getStopLineIdsOnPath_noStopLines)
+TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_noStopLines)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Ids route = {34507, 34795, 34606, 34672};
 
   const auto result_stoplines = hdmap_utils.getStopLineIdsOnPath(route);
@@ -2563,10 +2425,8 @@ TEST(HdMapUtils, getStopLineIdsOnPath_noStopLines)
  * @note Test basic functionality.
  * Test obtaining stop line ids correctness with a route that has a stop line.
  */
-TEST(HdMapUtils, getStopLineIdsOnPath_someStopLines)
+TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_someStopLines)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const lanelet::Ids route = {34408, 34633, 34579, 34780, 34675, 34744, 34690};
 
   const auto result_stoplines = hdmap_utils.getStopLineIdsOnPath(route);
@@ -2578,10 +2438,8 @@ TEST(HdMapUtils, getStopLineIdsOnPath_someStopLines)
 /**
  * @note Test function behavior when passed an empty vector of lanelet ids.
  */
-TEST(HdMapUtils, getStopLineIdsOnPath_empty)
+TEST_F(HdMapUtilsTest_StandardMap, getStopLineIdsOnPath_empty)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   const auto result_stoplines = hdmap_utils.getStopLineIdsOnPath({});
 
   EXPECT_EQ(result_stoplines.size(), static_cast<size_t>(0));
@@ -2592,10 +2450,8 @@ TEST(HdMapUtils, getStopLineIdsOnPath_empty)
  * Test obtaining traffic light stop line ids
  * correctness with a traffic light that has one stop line.
  */
-TEST(HdMapUtils, getTrafficLightStopLineIds_stopLine)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_stopLine)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto result_stoplines = hdmap_utils.getTrafficLightStopLineIds(34802);
   auto actual_stoplines = lanelet::Ids{34805};
 
@@ -2609,10 +2465,8 @@ TEST(HdMapUtils, getTrafficLightStopLineIds_stopLine)
  * - the goal is to test the scenario where one traffic light has multiple stop lines
  * (e.g. on a road with two parallel lanes with the same direction).
  */
-TEST(HdMapUtils, getTrafficLightStopLineIds_severalStopLines)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_severalStopLines)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto result_stoplines = hdmap_utils.getTrafficLightStopLineIds(34836);
   auto actual_stoplines = lanelet::Ids{120663, 34805};
 
@@ -2625,10 +2479,8 @@ TEST(HdMapUtils, getTrafficLightStopLineIds_severalStopLines)
 /**
  * @note Test function behavior when passed an invalid traffic light id.
  */
-TEST(HdMapUtils, getTrafficLightStopLineIds_invalidTrafficLightId)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLineIds_invalidTrafficLightId)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   const lanelet::Id invalid_id = 1000039;
   EXPECT_THROW(hdmap_utils.getTrafficLightStopLineIds(invalid_id), std::runtime_error);
 }
@@ -2676,10 +2528,8 @@ void compareStoplines(
  * Test obtaining traffic light stop line points correctness
  * with a traffic light id that has only one traffic light stop line.
  */
-TEST(HdMapUtils, getTrafficLightStopLinesPoints_stopLine)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_stopLine)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto result_stoplines_points = hdmap_utils.getTrafficLightStopLinesPoints(34802);
   auto actual_stoplines_points = std::vector<std::vector<geometry_msgs::msg::Point>>{
     {makePoint(3762.0, 73756.0, -0.5), makePoint(3759.0, 73754.5, -0.5)}};
@@ -2697,10 +2547,8 @@ TEST(HdMapUtils, getTrafficLightStopLinesPoints_stopLine)
  * Test obtaining traffic light stop line points correctness
  * with a traffic light id that has multiple traffic light stop lines.
  */
-TEST(HdMapUtils, getTrafficLightStopLinesPoints_severalStopLines)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_severalStopLines)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto result_stoplines_points = hdmap_utils.getTrafficLightStopLinesPoints(34836);
   auto actual_stoplines_points = std::vector<std::vector<geometry_msgs::msg::Point>>{
     {makePoint(3762.0, 73756.0, -0.5), makePoint(3759.0, 73754.5, -0.5)},
@@ -2717,10 +2565,9 @@ TEST(HdMapUtils, getTrafficLightStopLinesPoints_severalStopLines)
 /**
  * @note Test function behavior when passed an invalid traffic light id.
  */
-TEST(HdMapUtils, getTrafficLightStopLinesPoints_invalidTrafficLightId)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap, getTrafficLightStopLinesPoints_invalidTrafficLightId)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   const lanelet::Id invalid_id = 1000039;
   EXPECT_THROW(hdmap_utils.getTrafficLightStopLinesPoints(invalid_id), std::runtime_error);
 }
@@ -2729,9 +2576,8 @@ TEST(HdMapUtils, getTrafficLightStopLinesPoints_invalidTrafficLightId)
  * @note Test basic functionality.
  * Test stop line polygon obtaining correctness with a lanelet that has a stop line.
  */
-TEST(HdMapUtils, getStopLinePolygon_stopLine)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getStopLinePolygon_stopLine)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
   const lanelet::Id linestring_id_with_stopline{120663};
 
   auto result_stoplines_points = hdmap_utils.getStopLinePolygon(linestring_id_with_stopline);
@@ -2747,10 +2593,8 @@ TEST(HdMapUtils, getStopLinePolygon_stopLine)
 /**
  * @note Test function behavior with an invalid lanelet id.
  */
-TEST(HdMapUtils, getStopLinePolygon_invalidLaneletId)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getStopLinePolygon_invalidLaneletId)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   const lanelet::Id invalid_id = 1000039;
   EXPECT_THROW(hdmap_utils.getStopLinePolygon(invalid_id), std::runtime_error);
 }
@@ -2760,10 +2604,9 @@ TEST(HdMapUtils, getStopLinePolygon_invalidLaneletId)
  * Test distance to traffic light stop line obtaining
  * correctness with a spline and a traffic light id that has a stop line on the spline.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnSpline)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToTrafficLightStopLine_trafficLightOnSpline)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3771.06, 73728.35);
   auto waypoint_1 = makePoint(3756.30, 73755.87);
   auto waypoint_2 = makePoint(3746.90, 73774.44);
@@ -2787,10 +2630,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnSpline)
  * Test distance to traffic light stop line obtaining correctness
  * with a spline and a traffic light id that does not have a stop line on the spline.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_noTrafficLightOnSpline)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_noTrafficLightOnSpline)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -2807,10 +2650,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_noTrafficLightOnSpline)
  * Test distance to traffic light stop line obtaining correctness
  * with a road (waypoints) and a traffic light id has a stop line on the road.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnWaypoints)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_trafficLightOnWaypoints)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3771.06, 73728.35);
   auto waypoint_1 = makePoint(3756.30, 73755.87);
   auto waypoint_2 = makePoint(3746.90, 73774.44);
@@ -2833,10 +2676,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnWaypoints)
  * Test distance to traffic light stop line obtaining correctness
  * with a road (waypoints) and a traffic light id that does not have a stop line on the road.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_noTrafficLightOnWaypoints)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_noTrafficLightOnWaypoints)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -2850,10 +2693,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_noTrafficLightOnWaypoints)
 /**
  * @note Test function behavior when an empty vector is passed.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_waypoints)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_emptyVector_waypoints)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoints = std::vector<geometry_msgs::msg::Point>{};
 
   auto traffic_light_id = lanelet::Id{34836};
@@ -2866,10 +2709,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_waypoints)
  * Test distance to traffic light stop line obtaining correctness
  * with a spline and a route that is coherent with the spline and has a traffic light on it.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnSpline)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnSpline)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3771.06, 73728.35);
   auto waypoint_1 = makePoint(3756.30, 73755.87);
   auto waypoint_2 = makePoint(3746.90, 73774.44);
@@ -2893,10 +2736,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnSplin
  * Test distance to traffic light stop line obtaining correctness
  * with a spline and a route that is coherent with the spline and does not have a traffic light on it.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnSplineCongruent)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnSplineCongruent)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -2915,10 +2758,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnSpl
  * - the goal is to test the situation where the traffic light and its stop line are checked
  * against a spline that does not overlay with them.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnSplineIncongruent)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnSplineIncongruent)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -2933,10 +2776,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnSp
 /**
  * @note Test function behavior when an empty vector is passed.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_splineRoute)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_emptyVector_splineRoute)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -2952,10 +2795,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_splineRoute)
  * Test distance to traffic light stop line obtaining correctness
  * with a road (waypoints) and a route that is coherent with the road and has a traffic light on it.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnWaypoints)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnWaypoints)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3771.06, 73728.35);
   auto waypoint_1 = makePoint(3756.30, 73755.87);
   auto waypoint_2 = makePoint(3746.90, 73774.44);
@@ -2980,10 +2823,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnWaypo
  * and has a traffic light on it - the goal is to test the situation where
  * the traffic light and its stop line are checked against a road that does not overlay with them.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnWaypointsIncongruent)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnWaypointsIncongruent)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -2999,10 +2842,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnWay
  * Test distance to traffic light stop line obtaining correctness with a road (waypoints)
  * and a route that is coherent with the road and does not have a traffic light on it.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnWaypointsCongruent)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnWaypointsCongruent)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -3016,10 +2859,10 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnWa
 /**
  * @note Test function behavior when an empty vector is passed.
  */
-TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_waypointsRoute)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap,
+  getDistanceToTrafficLightStopLine_emptyVector_waypointsRoute)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -3034,10 +2877,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_waypointsRoute)
  * Test distance to stop line calculation correctness
  * with a spline and a route that is coherent with the spline and has a stop line on it.
  */
-TEST(HdMapUtils, getDistanceToStopLine_stopLineOnSpline)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_stopLineOnSpline)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3821.86, 73777.20);
   auto waypoint_1 = makePoint(3837.28, 73762.67);
   auto waypoint_2 = makePoint(3846.10, 73741.38);
@@ -3061,10 +2902,8 @@ TEST(HdMapUtils, getDistanceToStopLine_stopLineOnSpline)
  * Test distance to stop line calculation correctness
  * with a spline and a route that is coherent with the spline and does not have a stop line on it.
  */
-TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnSplineCongruent)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnSplineCongruent)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -3083,10 +2922,9 @@ TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnSplineCongruent)
  * - the goal is to test the situation where the stop line is checked
  * against a spline that does not overlay with it.
  */
-TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnSplineIncongruent)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnSplineIncongruent)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3821.86, 73777.20);
   auto waypoint_1 = makePoint(3837.28, 73762.67);
   auto waypoint_2 = makePoint(3846.10, 73741.38);
@@ -3101,10 +2939,8 @@ TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnSplineIncongruent)
 /**
  * @note Test function behavior when an empty vector is passed.
  */
-TEST(HdMapUtils, getDistanceToStopLine_emptyVector_spline)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVector_spline)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -3120,10 +2956,8 @@ TEST(HdMapUtils, getDistanceToStopLine_emptyVector_spline)
  * Test distance to stop line calculation correctness
  * with a road (waypoints) and a route that is coherent with the road and has a stop line on it.
  */
-TEST(HdMapUtils, getDistanceToStopLine_stopLineOnWaypoints)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_stopLineOnWaypoints)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3821.86, 73777.20);
   auto waypoint_1 = makePoint(3837.28, 73762.67);
   auto waypoint_2 = makePoint(3846.10, 73741.38);
@@ -3146,10 +2980,9 @@ TEST(HdMapUtils, getDistanceToStopLine_stopLineOnWaypoints)
  * Test distance to stop line calculation correctness with a road (waypoints)
  * and a route that is coherent with the road and does not have a stop line on it.
  */
-TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnWaypointsCongruent)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnWaypointsCongruent)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
@@ -3167,10 +3000,9 @@ TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnWaypointsCongruent)
  * and has a stop line on it - the goal is to test the situation where the stop line
  * is checked against a road that does not overlay with it.
  */
-TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnWaypointsIncongruent)
+TEST_F(
+  HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_noStopLineOnWaypointsIncongruent)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3821.86, 73777.20);
   auto waypoint_1 = makePoint(3837.28, 73762.67);
   auto waypoint_2 = makePoint(3846.10, 73741.38);
@@ -3184,10 +3016,8 @@ TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnWaypointsIncongruent)
 /**
  * @note Test function behavior when an empty vector is passed.
  */
-TEST(HdMapUtils, getDistanceToStopLine_emptyVector_waypoints)
+TEST_F(HdMapUtilsTest_CrossroadsWithStoplinesMap, getDistanceToStopLine_emptyVector_waypoints)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance(crossroads_with_stoplines_map_path);
-
   auto waypoint_0 = makePoint(3807.63, 73715.99);
   auto waypoint_1 = makePoint(3785.76, 73707.70);
   auto waypoint_2 = makePoint(3773.19, 73723.27);
