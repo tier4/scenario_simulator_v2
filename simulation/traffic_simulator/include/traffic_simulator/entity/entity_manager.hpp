@@ -367,7 +367,7 @@ public:
       } else {
         std::vector<geometry_msgs::msg::Pose> poses;
         for (const auto & lanelet_pose : getGoalPoses<CanonicalizedLaneletPose>(name)) {
-          poses.push_back(toMapPose(lanelet_pose));
+          poses.push_back(pose::toMapPose(lanelet_pose));
         }
         return poses;
       }
@@ -470,10 +470,10 @@ public:
         // it is just rewritten, assuming that in the scenario is right, alternatively:
         // toCanonicalizedLaneletPose(entity_status.pose, parameters.bounding_box,
         // {pose.lanelet_id}, include_crosswalk, matching_distance);
-        return CanonicalizedEntityStatus(entity_status, toCanonicalizedLaneletPose(pose));
+        return CanonicalizedEntityStatus(entity_status, pose::toCanonicalizedLaneletPose(pose));
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
         entity_status.pose = pose;
-        const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+        const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
       }

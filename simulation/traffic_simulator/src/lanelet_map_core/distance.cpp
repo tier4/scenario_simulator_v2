@@ -309,7 +309,8 @@ auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanel
     return std::nullopt;
   } else {
     Spline spline(route_waypoints);
-    return spline.getCollisionPointIn2D(lanelet_map_core::lanelet_map::getLaneletPolygon(crosswalk_id));
+    return spline.getCollisionPointIn2D(
+      lanelet_map_core::lanelet_map::getLaneletPolygon(crosswalk_id));
   }
 }
 

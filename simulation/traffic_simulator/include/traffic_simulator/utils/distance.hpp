@@ -19,6 +19,7 @@
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/lanelet_map_core/distance.hpp>
+#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -26,6 +27,7 @@ namespace traffic_simulator
 inline namespace distance
 {
 using Pose = geometry_msgs::msg::Pose;
+using BoundingBox = traffic_simulator_msgs::msg::BoundingBox;
 using Spline = math::geometry::CatmullRomSpline;
 using Waypoints = traffic_simulator_msgs::msg::WaypointsArray;
 using SplineInterface = math::geometry::CatmullRomSplineInterface;

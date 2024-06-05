@@ -15,10 +15,10 @@
 #include <geometry/bounding_box.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_map_core/pose.hpp>
 #include <traffic_simulator/lanelet_map_core/route.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
@@ -60,7 +60,7 @@ auto isInLanelet(
     return true;
   } else {
     const auto start_lanelet_pose = helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0);
-    if (const auto distance_to_start_lanelet_pose = longitudinalDistance(
+    if (const auto distance_to_start_lanelet_pose = distance::longitudinalDistance(
           start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, allow_lane_change);
         distance_to_start_lanelet_pose and
@@ -70,7 +70,7 @@ auto isInLanelet(
 
     const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
       lanelet_id, lanelet_map_core::lanelet_map::getLaneletLength(lanelet_id), 0.0);
-    if (const auto distance_to_end_lanelet_pose = longitudinalDistance(
+    if (const auto distance_to_end_lanelet_pose = distance::longitudinalDistance(
           canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, allow_lane_change);
         distance_to_end_lanelet_pose and
@@ -258,11 +258,11 @@ auto relativeLaneletPose(
   // here the s and offset are intentionally assigned independently, even if
   // it is not possible to calculate one of them - it happens that one is sufficient
   if (
-    const auto longitudinal_distance = longitudinalDistance(
+    const auto longitudinal_distance = distance::longitudinalDistance(
       from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change)) {
     position.s = longitudinal_distance.value();
   }
-  if (const auto lateral_distance = lateralDistance(from, to, allow_lane_change)) {
+  if (const auto lateral_distance = distance::lateralDistance(from, to, allow_lane_change)) {
     position.offset = lateral_distance.value();
   }
   return position;
@@ -280,13 +280,13 @@ auto boundingBoxRelativeLaneletPose(
   // here the s and offset are intentionally assigned independently, even if
   // it is not possible to calculate one of them - it happens that one is sufficient
   if (
-    const auto longitudinal_bounding_box_distance = boundingBoxLaneLongitudinalDistance(
+    const auto longitudinal_bounding_box_distance = distance::boundingBoxLaneLongitudinalDistance(
       from, from_bounding_box, to, to_bounding_box, include_adjacent_lanelet,
       include_opposite_direction, allow_lane_change)) {
     position.s = longitudinal_bounding_box_distance.value();
   }
   if (
-    const auto lateral_bounding_box_distance = boundingBoxLaneLateralDistance(
+    const auto lateral_bounding_box_distance = distance::boundingBoxLaneLateralDistance(
       from, from_bounding_box, to, to_bounding_box, allow_lane_change)) {
     position.offset = lateral_bounding_box_distance.value();
   }
@@ -313,7 +313,8 @@ auto estimateCanonicalizedLaneletPose(
    * In this branch, the algorithm only consider entity pose.
    */
   if (
-    const auto lanelet_pose = lanelet_map_core::pose::toLaneletPose(map_pose, include_crosswalk, 2.0)) {
+    const auto lanelet_pose =
+      lanelet_map_core::pose::toLaneletPose(map_pose, include_crosswalk, 2.0)) {
     const auto canonicalized_tuple =
       lanelet_map_core::pose::canonicalizeLaneletPose(lanelet_pose.value());
     if (

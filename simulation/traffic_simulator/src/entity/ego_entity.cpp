@@ -312,7 +312,7 @@ auto EgoEntity::setStatus(const EntityStatus & status, const lanelet::Ids & lane
       "You cannot set entity status to the ego vehicle named ", std::quoted(status.name),
       " after starting scenario.");
   } else {
-    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       status.pose, status.bounding_box, lanelet_ids, false,
       getDefaultMatchingDistanceForLaneletPoseCalculation());
     setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));

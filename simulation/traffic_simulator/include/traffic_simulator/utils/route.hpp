@@ -81,7 +81,8 @@ auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
 template <typename... Ts>
 auto laneChangeableLaneletId(Ts &&... xs)
 {
-  return lanelet_map_core::lane_change::getLaneChangeableLaneletId(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::lane_change::getLaneChangeableLaneletId(
+    std::forward<decltype(xs)>(xs)...);
 }
 
 auto laneChangeAlongLaneletPose(

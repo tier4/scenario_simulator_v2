@@ -16,11 +16,11 @@
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/lanelet_map_core/distance.hpp>
 #include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_map_core/pose.hpp>
 #include <traffic_simulator/lanelet_map_core/route.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
 namespace traffic_simulator
@@ -105,7 +105,7 @@ auto longitudinalDistance(
     for (const auto & from_pose : from_poses) {
       for (const auto & to_pose : to_poses) {
         if (
-          const auto distance = longitudinalDistance(
+          const auto distance = distance::longitudinalDistance(
             CanonicalizedLaneletPose(from_pose), CanonicalizedLaneletPose(to_pose), false,
             include_opposite_direction, allow_lane_change)) {
           distances.emplace_back(distance.value());
@@ -161,7 +161,7 @@ auto boundingBoxLaneLongitudinalDistance(
   const bool include_adjacent_lanelet, const bool include_opposite_direction,
   const bool allow_lane_change) -> std::optional<double>
 {
-  if (const auto longitudinal_distance = longitudinalDistance(
+  if (const auto longitudinal_distance = distance::longitudinalDistance(
         from, to, include_adjacent_lanelet, include_opposite_direction, allow_lane_change);
       longitudinal_distance) {
     const auto from_bounding_box_distances =
@@ -283,7 +283,8 @@ auto distanceToYieldStop(
 
   std::set<double> distances;
   for (const auto & lanelet_id : following_lanelets) {
-    const auto right_of_way_ids = lanelet_map_core::lanelet_map::getRightOfWayLaneletIds(lanelet_id);
+    const auto right_of_way_ids =
+      lanelet_map_core::lanelet_map::getRightOfWayLaneletIds(lanelet_id);
     for (const auto right_of_way_id : right_of_way_ids) {
       const auto other_poses = getPosesOnLanelet(right_of_way_id);
       if (!other_poses.empty()) {

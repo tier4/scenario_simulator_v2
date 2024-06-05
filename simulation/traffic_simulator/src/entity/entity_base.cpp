@@ -76,7 +76,7 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
   }(getEntityType());
 
   // prefer the current lanelet
-  return toCanonicalizedLaneletPose(
+  return pose::toCanonicalizedLaneletPose(
     status_.getMapPose(), status_.getBoundingBox(), status_.getLaneletIds(), include_crosswalk,
     matching_distance);
 }

@@ -27,6 +27,7 @@ namespace traffic_simulator
 inline namespace lanelet_map
 {
 using Point = geometry_msgs::msg::Point;
+using Pose = geometry_msgs::msg::Pose;
 
 template <typename... Ts>
 inline auto activate(Ts &&... xs)
