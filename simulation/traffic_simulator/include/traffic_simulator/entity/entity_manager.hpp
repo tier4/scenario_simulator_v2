@@ -23,6 +23,7 @@
 #include <memory>
 #include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
+#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 #include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -51,6 +52,28 @@
 #include <utility>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
+
+class ParameterManager
+{
+public:
+  template <typename NodeT>
+  ParameterManager(NodeT && node)
+  : node_parameters_interface_(rclcpp::node_interfaces::get_node_parameters_interface(node))
+  {
+  }
+
+  template <typename ParameterT>
+  auto getParameter(const std::string & name, const ParameterT & default_value = {})
+  {
+    if (not node_parameters_interface_->has_parameter(name)) {
+      node_parameters_interface_->declare_parameter(name, rclcpp::ParameterValue(default_value));
+    }
+    return node_parameters_interface_->get_parameter(name).get_value<ParameterT>();
+  }
+
+private:
+  rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_interface_;
+};
 
 /// @todo find some shared space for this function
 template <typename T>
@@ -85,6 +108,7 @@ class EntityManager
   Configuration configuration;
 
   std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
+  ParameterManager parameter_manager_;
 
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
@@ -159,6 +183,7 @@ public:
   explicit EntityManager(NodeT && node, const Configuration & configuration)
   : configuration(configuration),
     node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
+    parameter_manager_(node),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
@@ -506,7 +531,7 @@ public:
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
           /// @note fix z, roll and pitch to fitting to the lanelet
-          if (getParameter<bool>("consider_pose_by_road_slope", false)) {
+          if (parameter_manager_.getParameter<bool>("consider_pose_by_road_slope", false)) {
             entity_status.pose = hdmap_utils_ptr_->toMapPose(*lanelet_pose).pose;
           } else {
             entity_status.pose = pose;
