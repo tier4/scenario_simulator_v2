@@ -815,7 +815,7 @@ auto EntityBase::requestSynchronize(
           return entity_velocity;
         }
         /***
-         * @brief Deviding the loop_period by 1000 is to convert the unit from ms to s.
+         * @brief Dividing the loop_period by 1000 is to convert the unit from ms to s.
         */
       };
 
