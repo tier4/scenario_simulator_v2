@@ -34,18 +34,6 @@ namespace traffic_simulator
 {
 namespace entity
 {
-/// @todo find some shared space for this function
-template <typename T>
-static auto getParameter(const std::string & name, T value = {})
-{
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  node.declare_parameter<T>(name, value);
-  node.get_parameter<T>(name, value);
-
-  return value;
-}
-
 auto EgoEntity::makeFieldOperatorApplication(
   const Configuration & configuration, const ParameterManager & parameter_manager)
   -> std::unique_ptr<concealer::FieldOperatorApplication>
