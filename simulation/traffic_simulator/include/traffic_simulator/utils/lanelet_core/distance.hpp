@@ -41,13 +41,15 @@ auto getLongitudinalDistance(
   const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
   -> std::optional<double>;
 
+// StopLine
 auto getDistanceToStopLine(
-  const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
+  const lanelet::Ids & route_lanelets, const std::vector<Point> & route_waypoints)
   -> std::optional<double>;
 
 auto getDistanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & spline)
   -> std::optional<double>;
 
+// TrafficLigthStopLine
 auto getDistanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
   -> std::optional<double>;
@@ -56,13 +58,14 @@ auto getDistanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const SplineInterface & spline) -> std::optional<double>;
 
 auto getDistanceToTrafficLightStopLine(
-  const std::vector<Point> & waypoints, const lanelet::Id traffic_light_id)
+  const std::vector<Point> & route_waypoints, const lanelet::Id traffic_light_id)
   -> std::optional<double>;
 
 auto getDistanceToTrafficLightStopLine(
-  const SplineInterface & spline, const lanelet::Id traffic_light_id) -> std::optional<double>;
+  const SplineInterface & route_spline, const lanelet::Id traffic_light_id)
+  -> std::optional<double>;
 
-// private for distance namespace
+// private
 namespace
 {
 auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;

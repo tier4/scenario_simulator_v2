@@ -21,33 +21,22 @@ namespace lanelet_core
 {
 namespace traffic_lights
 {
-auto getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
-  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
+auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
 {
-  std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
-  for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
-    const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
-    for (const auto & traffic_sign : traffic_signs) {
-      ret.emplace_back(traffic_sign);
+  if (LaneletMapCore::map()->lineStringLayer.exists(lanelet_id)) {
+    if (auto && linestring = LaneletMapCore::map()->lineStringLayer.get(lanelet_id);
+        linestring.hasAttribute(lanelet::AttributeName::Type)) {
+      return linestring.attribute(lanelet::AttributeName::Type).value() == "traffic_light";
     }
   }
-  return ret;
+  return false;
 }
 
-auto getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids
+auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool
 {
-  lanelet::Ids ids;
-  for (const auto & traffic_light : getTrafficLightRegulatoryElementsOnPath(route_lanelets)) {
-    for (auto light_string : traffic_light->lightBulbs()) {
-      if (light_string.hasAttribute("traffic_light_id")) {
-        if (auto id = light_string.attribute("traffic_light_id").asId(); id) {
-          ids.push_back(id.value());
-        }
-      }
-    }
-  }
-  return ids;
+  return LaneletMapCore::map()->regulatoryElementLayer.exists(lanelet_id) and
+         std::dynamic_pointer_cast<lanelet::TrafficLight>(
+           LaneletMapCore::map()->regulatoryElementLayer.get(lanelet_id));
 }
 
 auto getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
@@ -94,31 +83,6 @@ auto getTrafficLights(const lanelet::Id traffic_light_id)
   return ret;
 }
 
-auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool
-{
-  return LaneletMapCore::map()->regulatoryElementLayer.exists(lanelet_id) and
-         std::dynamic_pointer_cast<lanelet::TrafficLight>(
-           LaneletMapCore::map()->regulatoryElementLayer.get(lanelet_id));
-}
-
-auto getTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::TrafficLight::Ptr
-{
-  assert(isTrafficLightRegulatoryElement(lanelet_id));
-  return std::dynamic_pointer_cast<lanelet::TrafficLight>(
-    LaneletMapCore::map()->regulatoryElementLayer.get(lanelet_id));
-}
-
-auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
-{
-  if (LaneletMapCore::map()->lineStringLayer.exists(lanelet_id)) {
-    if (auto && linestring = LaneletMapCore::map()->lineStringLayer.get(lanelet_id);
-        linestring.hasAttribute(lanelet::AttributeName::Type)) {
-      return linestring.attribute(lanelet::AttributeName::Type).value() == "traffic_light";
-    }
-  }
-  return false;
-}
-
 auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
   -> std::optional<Point>
 {
@@ -154,6 +118,13 @@ auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::
   return std::nullopt;
 }
 
+auto getTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::TrafficLight::Ptr
+{
+  assert(isTrafficLightRegulatoryElement(lanelet_id));
+  return std::dynamic_pointer_cast<lanelet::TrafficLight>(
+    LaneletMapCore::map()->regulatoryElementLayer.get(lanelet_id));
+}
+
 auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traffic_light_way_id)
   -> lanelet::Ids
 {
@@ -172,6 +143,37 @@ auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traff
   return traffic_light_regulatory_element_ids;
 }
 
+// On path
+auto getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  for (const auto & traffic_light : getTrafficLightRegulatoryElementsOnPath(route_lanelets)) {
+    for (auto light_string : traffic_light->lightBulbs()) {
+      if (light_string.hasAttribute("traffic_light_id")) {
+        if (auto id = light_string.attribute("traffic_light_id").asId(); id) {
+          ids.push_back(id.value());
+        }
+      }
+    }
+  }
+  return ids;
+}
+
+auto getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
+  -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
+{
+  std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
+  for (const auto & lanelet_id : lanelet_ids) {
+    const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+    const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
+    for (const auto & traffic_sign : traffic_signs) {
+      ret.emplace_back(traffic_sign);
+    }
+  }
+  return ret;
+}
+
+// private
 namespace
 {
 auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)

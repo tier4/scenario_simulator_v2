@@ -63,31 +63,16 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Ids & route_lanelets)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>;
 
-auto getAllCanonicalizedLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
+auto getAlternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
 
-auto getNearbyLaneletIds(
-  const Point &, const double distance_threshold, const bool include_crosswalk,
-  const std::size_t search_count) -> lanelet::Ids;
+auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> LaneletPose;
 
-// private for pose namespace
+// private
 namespace
 {
-auto getNearbyLaneletIds(
-  const Point &, const double distance_threshold, const std::size_t search_count) -> lanelet::Ids;
-
 auto matchToLane(
   const Pose & pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance, const double reduction_ratio) -> std::optional<lanelet::Id>;
-
-auto excludeSubtypeLanelets(
-  const std::vector<std::pair<double, lanelet::Lanelet>> & pair, const char subtype[])
-  -> std::vector<std::pair<double, lanelet::Lanelet>>;
-
-auto toPoint2d(const Point & point) -> lanelet::BasicPoint2d;
-
-auto absoluteHull(
-  const lanelet::BasicPolygon2d & relative_hull, const lanelet::matching::Pose2d & pose)
-  -> lanelet::BasicPolygon2d;
 
 auto getLeftLaneletIds(const lanelet::Id, const EntityType &, const bool include_opposite_direction)
   -> lanelet::Ids;

@@ -92,7 +92,7 @@ auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_l
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>
 {
-  return lanelet_core::pose::getAllCanonicalizedLaneletPoses(lanelet_pose);
+  return lanelet_core::pose::getAlternativeLaneletPoses(lanelet_pose);
 }
 
 auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
@@ -304,7 +304,7 @@ auto nearbyLaneletIds(
   const Pose & pose, const double distance_thresh, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids
 {
-  return lanelet_core::pose::getNearbyLaneletIds(
+  return lanelet_core::lanelet_map::getNearbyLaneletIds(
     pose.position, distance_thresh, include_crosswalk, search_count);
 }
 

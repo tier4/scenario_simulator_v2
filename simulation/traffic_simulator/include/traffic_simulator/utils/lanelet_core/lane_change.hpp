@@ -38,13 +38,14 @@ using TrajectoryShape = traffic_simulator::lane_change::TrajectoryShape;
 
 auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool;
 
-auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> LaneletPose;
-
-auto getLaneChangeableLaneletId(const lanelet::Id, const Direction) -> std::optional<lanelet::Id>;
-
-auto getLaneChangeableLaneletId(const lanelet::Id, const Direction, const std::uint8_t shift)
+auto getLaneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction & direction)
   -> std::optional<lanelet::Id>;
 
+auto getLaneChangeableLaneletId(
+  const lanelet::Id lanelet_id, const Direction & direction, const std::uint8_t shift)
+  -> std::optional<lanelet::Id>;
+
+// Trajectory
 auto getLaneChangeTrajectory(const LaneletPose & from_pose, const Parameter & lane_change_parameter)
   -> std::optional<std::pair<Curve, double>>;
 
@@ -54,16 +55,8 @@ auto getLaneChangeTrajectory(
   const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>;
 
 auto getLaneChangeTrajectory(
-  const Pose & from_pose, const LaneletPose & to_pose, const TrajectoryShape trajectory_shape,
+  const Pose & from_pose, const LaneletPose & to_pose, const TrajectoryShape & trajectory_shape,
   const double tangent_vector_size) -> Curve;
-
-// private for lane_change namespace
-namespace
-{
-auto getVectorFromPose(const Pose & pose, const double magnitude) -> Vector3;
-
-auto getTangentVector(const lanelet::Id lanelet_id, const double s) -> std::optional<Vector3>;
-}  // namespace
 }  // namespace lane_change
 }  // namespace lanelet_core
 }  // namespace traffic_simulator

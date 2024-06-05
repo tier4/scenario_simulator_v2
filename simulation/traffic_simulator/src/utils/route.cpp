@@ -38,8 +38,9 @@ auto isAnyConflictingEntity(
   const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> bool
 {
-  auto conflicting_crosswalks = lanelet_core::route::getConflictingCrosswalkIds(following_lanelets);
-  auto conflicting_lanes = lanelet_core::route::getConflictingLaneIds(following_lanelets);
+  auto conflicting_crosswalks =
+    lanelet_core::lanelet_map::getConflictingCrosswalkIds(following_lanelets);
+  auto conflicting_lanes = lanelet_core::lanelet_map::getConflictingLaneIds(following_lanelets);
   for (const auto & pose : other_poses) {
     if (
       std::count(
@@ -64,13 +65,14 @@ auto isNeedToRightOfWay(
   auto isTheSameRightOfWay =
     [&](const std::int64_t & lanelet_id, const std::int64_t & following_lanelet) {
       const auto right_of_way_lanelet_ids =
-        lanelet_core::route::getRightOfWayLaneletIds(lanelet_id);
+        lanelet_core::lanelet_map::getRightOfWayLaneletIds(lanelet_id);
       const auto the_same_right_of_way_it = std::find(
         right_of_way_lanelet_ids.begin(), right_of_way_lanelet_ids.end(), following_lanelet);
       return the_same_right_of_way_it != std::end(right_of_way_lanelet_ids);
     };
 
-  const auto lanelet_ids_list = lanelet_core::route::getRightOfWayLaneletIds(following_lanelets);
+  const auto lanelet_ids_list =
+    lanelet_core::lanelet_map::getRightOfWayLaneletIds(following_lanelets);
   for (const auto & pose : other_poses) {
     for (const auto & following_lanelet : following_lanelets) {
       for (const lanelet::Id lanelet_id : lanelet_ids_list.at(following_lanelet)) {
@@ -105,8 +107,9 @@ auto moveAlongLaneletPose(
       end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
       /// @note here was condition: .s < 0, now try to use .s <= 0
       end_of_road_lanelet_pose.s =
-        lanelet_pose.s <= 0 ? 0
-                            : lanelet_core::lanelet_map::getLaneletLength(end_of_road_lanelet_id.value());
+        lanelet_pose.s <= 0
+          ? 0
+          : lanelet_core::lanelet_map::getLaneletLength(end_of_road_lanelet_id.value());
       return end_of_road_lanelet_pose;
     } else {
       THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
@@ -121,17 +124,15 @@ auto laneChangeAlongLaneletPose(
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
   switch (parameter.constraint.type) {
     case lane_change::Constraint::Type::NONE:
-      return lanelet_core::lane_change::getAlongLaneletPose(
+      return lanelet_core::pose::getAlongLaneletPose(
         lanelet_pose, lane_change::Parameter::default_lanechange_distance);
     case lane_change::Constraint::Type::LATERAL_VELOCITY:
-      return lanelet_core::lane_change::getAlongLaneletPose(
+      return lanelet_core::pose::getAlongLaneletPose(
         lanelet_pose, lane_change::Parameter::default_lanechange_distance);
     case lane_change::Constraint::Type::LONGITUDINAL_DISTANCE:
-      return lanelet_core::lane_change::getAlongLaneletPose(
-        lanelet_pose, parameter.constraint.value);
+      return lanelet_core::pose::getAlongLaneletPose(lanelet_pose, parameter.constraint.value);
     case lane_change::Constraint::Type::TIME:
-      return lanelet_core::lane_change::getAlongLaneletPose(
-        lanelet_pose, parameter.constraint.value);
+      return lanelet_core::pose::getAlongLaneletPose(lanelet_pose, parameter.constraint.value);
     default:
       throw std::invalid_argument("Unknown lane change constraint type");
   }

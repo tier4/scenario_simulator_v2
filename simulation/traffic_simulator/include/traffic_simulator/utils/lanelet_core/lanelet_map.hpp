@@ -31,13 +31,17 @@ namespace lanelet_map
 using Point = geometry_msgs::msg::Point;
 using Spline = math::geometry::CatmullRomSpline;
 
-auto getLaneletIds() -> lanelet::Ids;
-
 auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
 
 auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
 
 auto getLaneletLength(const lanelet::Id lanelet_id) -> double;
+
+auto getLaneletIds() -> lanelet::Ids;
+
+auto getNearbyLaneletIds(
+  const Point &, const double distance_threshold, const bool include_crosswalk,
+  const std::size_t search_count) -> lanelet::Ids;
 
 // Center points
 auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>;
@@ -78,14 +82,24 @@ auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
-// private for other namespace
+// Relations
+auto getRightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
+  -> std::unordered_map<lanelet::Id, lanelet::Ids>;
+
+auto getRightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+
+auto getConflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+
+auto getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+
+// private
 namespace
 {
-auto getNextRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
-
-auto getPreviousRoadShoulderLanelet(const lanelet::Id) -> lanelet::Ids;
-
 auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
+
+auto excludeSubtypeLanelets(
+  const std::vector<std::pair<double, lanelet::Lanelet>> & pair, const char subtype[])
+  -> std::vector<std::pair<double, lanelet::Lanelet>>;
 }  // namespace
 }  // namespace lanelet_map
 }  // namespace lanelet_core

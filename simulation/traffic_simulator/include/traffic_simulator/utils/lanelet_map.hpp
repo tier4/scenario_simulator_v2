@@ -18,8 +18,8 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
 #include <traffic_simulator/color_utils/color_utils.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
 #include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator

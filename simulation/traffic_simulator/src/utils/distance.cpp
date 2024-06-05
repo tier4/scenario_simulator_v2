@@ -304,7 +304,7 @@ auto distanceToYieldStop(
 
   std::set<double> distances;
   for (const auto & lanelet_id : following_lanelets) {
-    const auto right_of_way_ids = lanelet_core::route::getRightOfWayLaneletIds(lanelet_id);
+    const auto right_of_way_ids = lanelet_core::lanelet_map::getRightOfWayLaneletIds(lanelet_id);
     for (const auto right_of_way_id : right_of_way_ids) {
       const auto other_poses = getPosesOnLanelet(right_of_way_id);
       if (!other_poses.empty()) {
@@ -350,7 +350,7 @@ auto distanceToNearestConflictingPose(
       const lanelet::Ids & following_lanelets) -> std::vector<CanonicalizedEntityStatus> {
     std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
     const auto conflicting_crosswalks =
-      lanelet_core::route::getConflictingCrosswalkIds(following_lanelets);
+      lanelet_core::lanelet_map::getConflictingCrosswalkIds(following_lanelets);
     for (const auto & status : other_statuses) {
       if (
         status.laneMatchingSucceed() &&
@@ -367,7 +367,8 @@ auto distanceToNearestConflictingPose(
     [&other_statuses](
       const lanelet::Ids & following_lanelets) -> std::vector<CanonicalizedEntityStatus> {
     std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
-    const auto conflicting_lanes = lanelet_core::route::getConflictingLaneIds(following_lanelets);
+    const auto conflicting_lanes =
+      lanelet_core::lanelet_map::getConflictingLaneIds(following_lanelets);
     for (const auto & status : other_statuses) {
       if (
         status.laneMatchingSucceed() &&

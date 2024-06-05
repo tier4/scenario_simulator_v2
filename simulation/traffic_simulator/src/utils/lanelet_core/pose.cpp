@@ -16,8 +16,8 @@
 
 #include <geometry/linear_algebra.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
 #include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
@@ -92,8 +92,8 @@ auto toLaneletPose(const Pose & pose, const bool include_crosswalk, const double
 {
   constexpr double distance_threshold{0.1};
   constexpr std::size_t search_count{5};
-  const auto lanelet_ids =
-    getNearbyLaneletIds(pose.position, distance_threshold, include_crosswalk, search_count);
+  const auto lanelet_ids = lanelet_map::getNearbyLaneletIds(
+    pose.position, distance_threshold, include_crosswalk, search_count);
   if (lanelet_ids.empty()) {
     return std::nullopt;
   }
@@ -169,18 +169,18 @@ auto toLaneletPoses(
   return ret;
 }
 
-auto getAllCanonicalizedLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>
+auto getAlternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>
 {
   /// @note Define lambda functions for canonicalizing previous/next lanelet.
   const auto canonicalize_to_previous_lanelet =
     [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
-    if (const auto ids = lanelet_map::getPreviousLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
+    if (const auto ids = lanelet_map::getPreviousLaneletIds(lanelet_pose.lanelet_id);
+        !ids.empty()) {
       std::vector<LaneletPose> canonicalized_all;
       for (const auto id : ids) {
         const auto lanelet_pose_tmp = helper::constructLaneletPose(
           id, lanelet_pose.s + lanelet_map::getLaneletLength(id), lanelet_pose.offset);
-        if (const auto canonicalized_lanelet_poses =
-              getAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
+        if (const auto canonicalized_lanelet_poses = getAlternativeLaneletPoses(lanelet_pose_tmp);
             canonicalized_lanelet_poses.empty()) {
           canonicalized_all.emplace_back(lanelet_pose_tmp);
         } else {
@@ -202,8 +202,7 @@ auto getAllCanonicalizedLaneletPoses(const LaneletPose & lanelet_pose) -> std::v
         const auto lanelet_pose_tmp = helper::constructLaneletPose(
           id, lanelet_pose.s - lanelet_map::getLaneletLength(lanelet_pose.lanelet_id),
           lanelet_pose.offset);
-        if (const auto canonicalized_lanelet_poses =
-              getAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
+        if (const auto canonicalized_lanelet_poses = getAlternativeLaneletPoses(lanelet_pose_tmp);
             canonicalized_lanelet_poses.empty()) {
           canonicalized_all.emplace_back(lanelet_pose_tmp);
         } else {
@@ -232,6 +231,42 @@ auto getAllCanonicalizedLaneletPoses(const LaneletPose & lanelet_pose) -> std::v
   }
 }
 
+auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> LaneletPose
+{
+  LaneletPose along_pose = from_pose;
+  along_pose.s = along_pose.s + along;
+  if (along_pose.s >= 0) {
+    while (along_pose.s >= lanelet_map::getLaneletLength(along_pose.lanelet_id)) {
+      auto next_ids = lanelet_map::getNextLaneletIds(along_pose.lanelet_id, "straight");
+      if (next_ids.empty()) {
+        next_ids = lanelet_map::getNextLaneletIds(along_pose.lanelet_id);
+        if (next_ids.empty()) {
+          THROW_SEMANTIC_ERROR(
+            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        }
+      }
+      along_pose.s = along_pose.s - lanelet_map::getLaneletLength(along_pose.lanelet_id);
+      along_pose.lanelet_id = next_ids[0];
+    }
+  } else {
+    while (along_pose.s < 0) {
+      auto previous_ids = lanelet_map::getPreviousLaneletIds(along_pose.lanelet_id, "straight");
+      if (previous_ids.empty()) {
+        previous_ids = lanelet_map::getPreviousLaneletIds(along_pose.lanelet_id);
+        if (previous_ids.empty()) {
+          THROW_SEMANTIC_ERROR(
+            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+        }
+      }
+      along_pose.s = along_pose.s + lanelet_map::getLaneletLength(previous_ids[0]);
+      along_pose.lanelet_id = previous_ids[0];
+    }
+  }
+  return along_pose;
+}
+
 // If route is not specified, the lanelet_id with the lowest array index is used as a candidate for
 // canonicalize destination.
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
@@ -239,7 +274,8 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
 {
   auto canonicalized = lanelet_pose;
   while (canonicalized.s < 0) {
-    if (const auto ids = lanelet_map::getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+    if (const auto ids = lanelet_map::getPreviousLaneletIds(canonicalized.lanelet_id);
+        ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
       canonicalized.s += lanelet_map::getLaneletLength(ids[0]);
@@ -263,7 +299,8 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   auto canonicalized = lanelet_pose;
   while (canonicalized.s < 0) {
     // When canonicalizing to backward lanelet_id, do not consider route
-    if (const auto ids = lanelet_map::getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+    if (const auto ids = lanelet_map::getPreviousLaneletIds(canonicalized.lanelet_id);
+        ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
       canonicalized.s += lanelet_map::getLaneletLength(ids[0]);
@@ -289,73 +326,27 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   return {canonicalized, std::nullopt};
 }
 
-auto getNearbyLaneletIds(
-  const Point & point, const double distance_thresh, const bool include_crosswalk,
-  const std::size_t search_count) -> lanelet::Ids
-{
-  lanelet::Ids lanelet_ids;
-  lanelet::BasicPoint2d search_point(point.x, point.y);
-  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(LaneletMapCore::map()->laneletLayer, search_point, search_count);
-  if (include_crosswalk) {
-    if (nearest_lanelet.empty()) {
-      return {};
-    }
-    if (nearest_lanelet.front().first > distance_thresh) {
-      return {};
-    }
-    for (const auto & lanelet : nearest_lanelet) {
-      if (lanelet.first <= distance_thresh) {
-        lanelet_ids.emplace_back(lanelet.second.id());
-      }
-    }
-  } else {
-    const auto nearest_road_lanelet =
-      excludeSubtypeLanelets(nearest_lanelet, lanelet::AttributeValueString::Crosswalk);
-    if (nearest_road_lanelet.empty()) {
-      return {};
-    }
-    if (nearest_road_lanelet.front().first > distance_thresh) {
-      return {};
-    }
-    for (const auto & lanelet : nearest_road_lanelet) {
-      if (lanelet.first <= distance_thresh) {
-        lanelet_ids.emplace_back(lanelet.second.id());
-      }
-    }
-  }
-  return lanelet_ids;
-}
-
 // private for pose namespace
 namespace
 {
-auto getNearbyLaneletIds(
-  const Point & position, const double distance_threshold, const std::size_t search_count)
-  -> lanelet::Ids
-{
-  lanelet::Ids lanelet_ids;
-  lanelet::BasicPoint2d search_point(position.x, position.y);
-  std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(LaneletMapCore::map()->laneletLayer, search_point, search_count);
-  if (nearest_lanelet.empty()) {
-    return {};
-  }
-  for (const auto & lanelet : nearest_lanelet) {
-    if (lanelet.first <= distance_threshold) {
-      lanelet_ids.emplace_back(lanelet.second.id());
-    }
-  }
-  return lanelet_ids;
-}
-
 auto matchToLane(
   const Pose & pose, const BoundingBox & bbox, const bool include_crosswalk,
   const double matching_distance, const double reduction_ratio) -> std::optional<lanelet::Id>
 {
+  auto absoluteHull = [](
+                        const lanelet::BasicPolygon2d & relative_hull,
+                        const lanelet::matching::Pose2d & pose) -> lanelet::BasicPolygon2d {
+    lanelet::BasicPolygon2d hull_points;
+    hull_points.reserve(relative_hull.size());
+    for (const auto & hull_ptr : relative_hull) {
+      hull_points.push_back(pose * hull_ptr);
+    }
+    return hull_points;
+  };
+
   std::optional<lanelet::Id> id;
   lanelet::matching::Object2d obj;
-  obj.pose.translation() = toPoint2d(pose.position);
+  obj.pose.translation() = lanelet::BasicPoint2d(pose.position.x, pose.position.y);
   obj.pose.linear() = Eigen::Rotation2D<double>(
                         quaternion_operation::convertQuaternionToEulerAngle(pose.orientation).z)
                         .matrix();
@@ -391,39 +382,6 @@ auto matchToLane(
     id_and_distance.begin(), id_and_distance.end(),
     [](auto const & lhs, auto const & rhs) { return lhs.second < rhs.second; });
   return min_id_and_distance->first;
-}
-
-auto excludeSubtypeLanelets(
-  const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[])
-  -> std::vector<std::pair<double, lanelet::Lanelet>>
-{
-  std::vector<std::pair<double, lanelet::Lanelet>> exclude_subtype_lanelets;
-  for (const auto & ll : lls) {
-    if (ll.second.hasAttribute(lanelet::AttributeName::Subtype)) {
-      lanelet::Attribute attr = ll.second.attribute(lanelet::AttributeName::Subtype);
-      if (attr.value() != subtype) {
-        exclude_subtype_lanelets.push_back(ll);
-      }
-    }
-  }
-  return exclude_subtype_lanelets;
-}
-
-auto toPoint2d(const Point & point) -> lanelet::BasicPoint2d
-{
-  return lanelet::BasicPoint2d{point.x, point.y};
-}
-
-auto absoluteHull(
-  const lanelet::BasicPolygon2d & relative_hull, const lanelet::matching::Pose2d & pose)
-  -> lanelet::BasicPolygon2d
-{
-  lanelet::BasicPolygon2d hull_points;
-  hull_points.reserve(relative_hull.size());
-  for (const auto & hull_ptr : relative_hull) {
-    hull_points.push_back(pose * hull_ptr);
-  }
-  return hull_points;
 }
 
 auto getLeftLaneletIds(
