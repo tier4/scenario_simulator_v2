@@ -285,6 +285,11 @@ public:
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
 
   auto toLaneletPose(
+    const geometry_msgs::msg::Point &, const traffic_simulator_msgs::msg::BoundingBox &,
+    const bool include_crosswalk, const double matching_distance = 1.0) const
+    -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;
+
+  auto toLaneletPose(
     const geometry_msgs::msg::Pose &, const traffic_simulator_msgs::msg::BoundingBox &,
     const bool include_crosswalk, const double matching_distance = 1.0) const
     -> std::optional<traffic_simulator_msgs::msg::LaneletPose>;

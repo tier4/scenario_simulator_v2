@@ -110,7 +110,7 @@ class FollowWaypointController
      There is no technical basis for this value, it was determined based on
      Dawid Moszynski experiments.
   */
-  static constexpr double finish_distance_tolerance = 1e-4;
+  static constexpr double finish_distance_tolerance = 1e-2;
 
   /*
      Accuracy of the predicted arrival distance at the waypoint with the
@@ -129,7 +129,7 @@ class FollowWaypointController
      There is no technical basis for this value, it was determined based on
      Dawid Moszynski experiments.
   */
-  static constexpr std::size_t number_of_acceleration_candidates = 20;
+  static constexpr std::size_t number_of_acceleration_candidates = 30;
 
   /*
      This is a debugging method, it is not worth giving it much attention.
