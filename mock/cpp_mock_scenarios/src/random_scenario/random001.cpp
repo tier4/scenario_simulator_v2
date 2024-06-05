@@ -72,7 +72,7 @@ private:
           traffic_simulator::helper::constructLaneletPose(
             spawn_lanelet_id,
             static_cast<double>(entity_index) / static_cast<double>(number_of_vehicles) *
-                traffic_simulator::pose::laneletLength(spawn_lanelet_id) +
+                traffic_simulator::lanelet_map::laneletLength(spawn_lanelet_id) +
               normal_dist(engine_),
             offset, 0, 0),
           getVehicleParameters(
@@ -133,7 +133,7 @@ private:
         api_.requestSpeedChange(entity_name, speed, true);
         api_.setLinearVelocity(entity_name, speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
-          0.0, traffic_simulator::pose::laneletLength(34684));
+          0.0, traffic_simulator::lanelet_map::laneletLength(34684));
         lane_change_position = lane_change_position_distribution(engine_);
         lane_change_requested = false;
       }

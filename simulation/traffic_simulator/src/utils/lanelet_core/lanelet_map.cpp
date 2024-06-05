@@ -29,12 +29,12 @@ namespace lanelet_core
 {
 namespace lanelet_map
 {
-auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
+auto isInLanelet(const double s, const lanelet::Id lanelet_id) -> bool
 {
   return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
 }
 
-auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool
+auto isInLanelet(const Point point, const lanelet::Id lanelet_id) -> bool
 {
   return lanelet::geometry::inside(
     LaneletMapCore::map()->laneletLayer.get(lanelet_id), lanelet::BasicPoint2d(point.x, point.y));

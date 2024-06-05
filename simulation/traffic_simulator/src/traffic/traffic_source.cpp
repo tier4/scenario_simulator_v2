@@ -16,9 +16,7 @@
 #include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet_core/pose.hpp>
-#include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
@@ -27,7 +25,7 @@ namespace traffic
 {
 TrafficSource::Validator::Validator(
   const geometry_msgs::msg::Pose & pose, const double radius, const bool include_crosswalk)
-: ids(pose::nearbyLaneletIds(pose, radius, include_crosswalk, spawning_lanes_limit))
+: ids(lanelet_map::nearbyLaneletIds(pose, radius, include_crosswalk, spawning_lanes_limit))
 {
 }
 

@@ -27,10 +27,19 @@ using Vector3 = geometry_msgs::msg::Vector3;
 using Pose = geometry_msgs::msg::Pose;
 using BoundingBox = traffic_simulator_msgs::msg::BoundingBox;
 
-// Useful constructors
 auto quietNaNPose() -> Pose;
 
 auto quietNaNLaneletPose() -> LaneletPose;
+
+auto isInLanelet(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
+  const double tolerance) -> bool;
+
+auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool;
+
+auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool;
+
+auto yaw(const Point & point, const lanelet::Id lanelet_id) -> std::tuple<double, Point, Point>;
 
 // Conversions
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose;
@@ -88,20 +97,6 @@ auto estimateCanonicalizedLaneletPose(
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>;
 
-auto nearbyLaneletIds(
-  const Pose & pose, const double distance_threshold, const bool include_crosswalk,
-  const std::size_t search_count) -> lanelet::Ids;
-
-auto isInLanelet(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
-  const double tolerance) -> bool;
-
-auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool;
-
-auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool;
-
-// it will be moved to "lanelet" namespace
-auto laneletLength(const lanelet::Id lanelet_id) -> double;
 }  // namespace pose
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__POSE_HPP_

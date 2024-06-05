@@ -123,6 +123,7 @@ auto longitudinalDistance(
   }
 }
 
+// BoundingBox
 auto boundingBoxDistance(
   const Pose & from, const BoundingBox & from_bounding_box, const Pose & to,
   const BoundingBox & to_bounding_box) -> std::optional<double>
@@ -180,6 +181,20 @@ auto boundingBoxLaneLongitudinalDistance(
   return std::nullopt;
 }
 
+auto splineDistanceToBoundingBox(
+  const SplineInterface & spline, const CanonicalizedLaneletPose & pose,
+  const BoundingBox & bounding_box, const double width_extension_right,
+  const double width_extension_left, const double length_extension_front,
+  const double length_extension_rear) -> std::optional<double>
+{
+  const auto polygon = math::geometry::transformPoints(
+    static_cast<Pose>(pose), math::geometry::getPointsFromBbox(
+                               bounding_box, width_extension_right, width_extension_left,
+                               length_extension_front, length_extension_rear));
+  return spline.getCollisionPointIn2D(polygon, false);
+}
+
+// Bounds
 auto distanceToLeftLaneBound(
   const Pose & map_pose, const BoundingBox & bounding_box, const lanelet::Id lanelet_id) -> double
 {
@@ -250,43 +265,7 @@ auto distanceToLaneBound(
     distanceToRightLaneBound(map_pose, bounding_box, lanelet_ids));
 }
 
-auto distanceToTrafficLightStopLine(
-  const SplineInterface & spline, const lanelet::Id traffic_light_id) -> std::optional<double>
-{
-  return lanelet_core::distance::getDistanceToTrafficLightStopLine(spline, traffic_light_id);
-}
-
-auto distanceToCrosswalk(const Waypoints & waypoints_array, const lanelet::Id target_crosswalk_id)
-  -> std::optional<double>
-{
-  if (waypoints_array.waypoints.empty()) {
-    return std::nullopt;
-  } else {
-    Spline spline(waypoints_array.waypoints);
-    return spline.getCollisionPointIn2D(
-      lanelet_core::lanelet_map::getLaneletPolygon(target_crosswalk_id));
-  }
-}
-
-auto distanceToCrosswalk(const SplineInterface & spline, const lanelet::Id target_crosswalk_id)
-  -> std::optional<double>
-{
-  return spline.getCollisionPointIn2D(
-    lanelet_core::lanelet_map::getLaneletPolygon(target_crosswalk_id), false);
-}
-
-auto distanceToStopLine(const Waypoints & waypoints_array, const lanelet::Id target_stop_line_id)
-  -> std::optional<double>
-{
-  if (waypoints_array.waypoints.empty()) {
-    return std::nullopt;
-  } else {
-    const Spline spline(waypoints_array.waypoints);
-    const auto polygon = lanelet_core::lanelet_map::getStopLinePolygon(target_stop_line_id);
-    return spline.getCollisionPointIn2D(polygon);
-  }
-}
-
+// Other objects
 auto distanceToYieldStop(
   const CanonicalizedLaneletPose & reference_pose, const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> std::optional<double>
@@ -326,19 +305,6 @@ auto distanceToYieldStop(
     }
   }
   return std::nullopt;
-}
-
-auto splineDistanceToBoundingBox(
-  const SplineInterface & spline, const CanonicalizedLaneletPose & pose,
-  const BoundingBox & bounding_box, const double width_extension_right,
-  const double width_extension_left, const double length_extension_front,
-  const double length_extension_rear) -> std::optional<double>
-{
-  const auto polygon = math::geometry::transformPoints(
-    static_cast<Pose>(pose), math::geometry::getPointsFromBbox(
-                               bounding_box, width_extension_right, width_extension_left,
-                               length_extension_front, length_extension_rear));
-  return spline.getCollisionPointIn2D(polygon, false);
 }
 
 auto distanceToNearestConflictingPose(

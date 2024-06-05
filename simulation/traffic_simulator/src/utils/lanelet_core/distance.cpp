@@ -212,6 +212,19 @@ auto getDistanceToStopLine(
   return *collision_points.begin();
 }
 
+auto getDistanceToStopLine(
+  const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
+  -> std::optional<double>
+{
+  if (route_waypoints.empty()) {
+    return std::nullopt;
+  } else {
+    const Spline spline(route_waypoints);
+    const auto polygon = lanelet_core::lanelet_map::getStopLinePolygon(stop_line_id);
+    return spline.getCollisionPointIn2D(polygon);
+  }
+}
+
 // TrafficLigthStopLine
 auto getDistanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
@@ -286,6 +299,25 @@ auto getDistanceToTrafficLightStopLine(
     }
   }
   return std::nullopt;
+}
+
+// crosswalk
+auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanelet::Id crosswalk_id)
+  -> std::optional<double>
+{
+  if (route_waypoints.empty()) {
+    return std::nullopt;
+  } else {
+    Spline spline(route_waypoints);
+    return spline.getCollisionPointIn2D(lanelet_core::lanelet_map::getLaneletPolygon(crosswalk_id));
+  }
+}
+
+auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id crosswalk_id)
+  -> std::optional<double>
+{
+  return route_spline.getCollisionPointIn2D(
+    lanelet_core::lanelet_map::getLaneletPolygon(crosswalk_id), false);
 }
 
 // private

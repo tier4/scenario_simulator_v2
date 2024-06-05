@@ -91,30 +91,8 @@ auto moveAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
   const double distance) -> LaneletPose
 {
-  auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  lanelet_pose.s = lanelet_pose.s + distance;
-  const auto canonicalized =
-    lanelet_core::pose::canonicalizeLaneletPose(lanelet_pose, route_lanelets);
-  if (const auto canonicalized_lanelet_pose = std::get<std::optional<LaneletPose>>(canonicalized)) {
-    // If canonicalize succeed, just return canonicalized pose
-    return canonicalized_lanelet_pose.value();
-  } else {
-    // If canonicalize failed, return lanelet pose as end of road
-    if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
-      LaneletPose end_of_road_lanelet_pose;
-      end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
-      end_of_road_lanelet_pose.offset = lanelet_pose.offset;
-      end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
-      /// @note here was condition: .s < 0, now try to use .s <= 0
-      end_of_road_lanelet_pose.s =
-        lanelet_pose.s <= 0
-          ? 0
-          : lanelet_core::lanelet_map::getLaneletLength(end_of_road_lanelet_id.value());
-      return end_of_road_lanelet_pose;
-    } else {
-      THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
-    }
-  }
+  return lanelet_core::pose::getAlongLaneletPose(
+    static_cast<LaneletPose>(canonicalized_lanelet_pose), route_lanelets, distance);
 }
 
 auto laneChangeAlongLaneletPose(

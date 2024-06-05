@@ -27,6 +27,35 @@ namespace lanelet_core
 {
 namespace pose
 {
+auto yaw(const Point & point, const lanelet::Id lanelet_id) -> std::tuple<double, Point, Point>
+{
+  /// @note Copied from motion_util::findNearestSegmentIndex
+  const auto centerline_points = lanelet_core::lanelet_map::getCenterPoints(lanelet_id);
+  auto find_nearest_segment_index = [](const std::vector<Point> & points, const Point & point) {
+    assert(not points.empty());
+    double min_distance = std::numeric_limits<double>::max();
+    size_t min_index = 0;
+    for (size_t i = 0; i < points.size(); ++i) {
+      const auto distance = [](const auto point1, const auto point2) {
+        const auto dx = point1.x - point2.x;
+        const auto dy = point1.y - point2.y;
+        return dx * dx + dy * dy;
+      }(points.at(i), point);
+      if (distance < min_distance) {
+        min_distance = distance;
+        min_index = i;
+      }
+    }
+    return min_index;
+  };
+  const size_t segment_index = find_nearest_segment_index(centerline_points, point);
+  const auto & previous_point = centerline_points.at(segment_index);
+  const auto & next_point = centerline_points.at(segment_index + 1);
+  return std::make_tuple(
+    std::atan2(next_point.y - previous_point.y, next_point.x - previous_point.x), previous_point,
+    next_point);
+}
+
 auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseStamped
 {
   if (
@@ -231,10 +260,10 @@ auto getAlternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector
   }
 }
 
-auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> LaneletPose
+auto getAlongLaneletPose(const LaneletPose & from_pose, const double distance) -> LaneletPose
 {
   LaneletPose along_pose = from_pose;
-  along_pose.s = along_pose.s + along;
+  along_pose.s = along_pose.s + distance;
   if (along_pose.s >= 0) {
     while (along_pose.s >= lanelet_map::getLaneletLength(along_pose.lanelet_id)) {
       auto next_ids = lanelet_map::getNextLaneletIds(along_pose.lanelet_id, "straight");
@@ -243,7 +272,7 @@ auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> L
         if (next_ids.empty()) {
           THROW_SEMANTIC_ERROR(
             "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
-            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+            from_pose.s + distance, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
         }
       }
       along_pose.s = along_pose.s - lanelet_map::getLaneletLength(along_pose.lanelet_id);
@@ -257,7 +286,7 @@ auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> L
         if (previous_ids.empty()) {
           THROW_SEMANTIC_ERROR(
             "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
-            from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
+            from_pose.s + distance, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
         }
       }
       along_pose.s = along_pose.s + lanelet_map::getLaneletLength(previous_ids[0]);
@@ -265,6 +294,33 @@ auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> L
     }
   }
   return along_pose;
+}
+
+auto getAlongLaneletPose(
+  const LaneletPose & from_pose, const lanelet::Ids & route_lanelets, const double distance)
+  -> LaneletPose
+{
+  auto lanelet_pose = from_pose;
+  lanelet_pose.s = lanelet_pose.s + distance;
+  const auto canonicalized = canonicalizeLaneletPose(lanelet_pose, route_lanelets);
+  if (const auto canonicalized_lanelet_pose = std::get<std::optional<LaneletPose>>(canonicalized)) {
+    // If canonicalize succeed, just return canonicalized pose
+    return canonicalized_lanelet_pose.value();
+  } else {
+    // If canonicalize failed, return lanelet pose as end of road
+    if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
+      LaneletPose end_of_road_lanelet_pose;
+      end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
+      end_of_road_lanelet_pose.offset = lanelet_pose.offset;
+      end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
+      /// @note here was condition: .s < 0, now try to use .s <= 0
+      end_of_road_lanelet_pose.s =
+        lanelet_pose.s <= 0 ? 0 : lanelet_map::getLaneletLength(end_of_road_lanelet_id.value());
+      return end_of_road_lanelet_pose;
+    } else {
+      THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
+    }
+  }
 }
 
 // If route is not specified, the lanelet_id with the lowest array index is used as a candidate for

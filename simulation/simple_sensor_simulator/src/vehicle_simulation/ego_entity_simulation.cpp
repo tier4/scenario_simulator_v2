@@ -18,7 +18,6 @@
 #include <filesystem>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace vehicle_simulation
@@ -338,7 +337,7 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
   ego_point.x = vehicle_model_ptr_->getX();
   ego_point.y = vehicle_model_ptr_->getY();
   auto [lanelet_yaw, prev_point, next_point] =
-    traffic_simulator::lanelet_map::yaw(status_.getLaneletId(), ego_point);
+    traffic_simulator::pose::yaw(ego_point, status_.getLaneletId());
   const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
 
   /// @note calculate ego pitch angle considering ego yaw.

@@ -90,22 +90,23 @@ auto distanceToRightLaneBound(
   -> double;
 
 // Other objects
-auto distanceToTrafficLightStopLine(
-  const SplineInterface & spline, const lanelet::Id traffic_light_id) -> std::optional<double>;
-
-auto distanceToCrosswalk(const Waypoints & waypoints_array, const lanelet::Id target_crosswalk_id)
-  -> std::optional<double>;
-
-auto distanceToCrosswalk(const SplineInterface & spline, const lanelet::Id target_crosswalk_id)
-  -> std::optional<double>;
-
-auto distanceToStopLine(const Waypoints & waypoints_array, const lanelet::Id target_stop_line_id)
-  -> std::optional<double>;
-
 template <typename... Ts>
 auto distanceToStopLine(Ts &&... xs)
 {
   return lanelet_core::distance::getDistanceToStopLine(std::forward<decltype(xs)>(xs)...);
+}
+
+template <typename... Ts>
+auto distanceToTrafficLightStopLine(Ts &&... xs)
+{
+  return lanelet_core::distance::getDistanceToTrafficLightStopLine(
+    std::forward<decltype(xs)>(xs)...);
+}
+
+template <typename... Ts>
+auto distanceToCrosswalk(Ts &&... xs)
+{
+  return lanelet_core::distance::distanceToCrosswalk(std::forward<decltype(xs)>(xs)...);
 }
 
 auto distanceToYieldStop(

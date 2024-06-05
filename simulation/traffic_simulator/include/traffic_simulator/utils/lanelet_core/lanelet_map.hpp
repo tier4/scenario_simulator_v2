@@ -31,9 +31,9 @@ namespace lanelet_map
 using Point = geometry_msgs::msg::Point;
 using Spline = math::geometry::CatmullRomSpline;
 
-auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
+auto isInLanelet(const double s, const lanelet::Id lanelet_id) -> bool;
 
-auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
+auto isInLanelet(const Point point, const lanelet::Id lanelet_id) -> bool;
 
 auto getLaneletLength(const lanelet::Id lanelet_id) -> double;
 

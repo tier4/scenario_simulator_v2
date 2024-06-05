@@ -49,6 +49,10 @@ auto getDistanceToStopLine(
 auto getDistanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & spline)
   -> std::optional<double>;
 
+auto getDistanceToStopLine(
+  const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
+  -> std::optional<double>;
+
 // TrafficLigthStopLine
 auto getDistanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
@@ -63,6 +67,13 @@ auto getDistanceToTrafficLightStopLine(
 
 auto getDistanceToTrafficLightStopLine(
   const SplineInterface & route_spline, const lanelet::Id traffic_light_id)
+  -> std::optional<double>;
+
+// Crosswalk
+auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanelet::Id crosswalk_id)
+  -> std::optional<double>;
+
+auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id crosswalk_id)
   -> std::optional<double>;
 
 // private

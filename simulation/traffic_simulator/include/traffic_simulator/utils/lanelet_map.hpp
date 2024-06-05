@@ -34,9 +34,13 @@ inline auto activate(Ts &&... xs)
   return lanelet_core::LaneletMapCore::activate(std::forward<decltype(xs)>(xs)...);
 }
 
-auto borderlinePoses() -> std::vector<Pose>;
+auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
-auto yaw(const lanelet::Id lanelet_id, const Point & point) -> std::tuple<double, Point, Point>;
+auto nearbyLaneletIds(
+  const Pose & pose, const double distance_threshold, const bool include_crosswalk,
+  const std::size_t search_count) -> lanelet::Ids;
+
+auto borderlinePoses() -> std::vector<Pose>;
 
 auto visualizationMarker() -> visualization_msgs::msg::MarkerArray;
 }  // namespace lanelet_map
