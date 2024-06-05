@@ -65,7 +65,9 @@ public:
   template <typename NodeT, typename AllocatorT = std::allocator<void>, typename... Ts>
   explicit API(NodeT && node, const Configuration & configuration, Ts &&... xs)
   : configuration(configuration),
-    entity_manager_ptr_(std::make_shared<entity::EntityManager>(node, configuration)),
+    parameter_manager_(node),
+    entity_manager_ptr_(
+      std::make_shared<entity::EntityManager>(node, configuration, parameter_manager_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getMapPose(name); },
@@ -402,6 +404,8 @@ private:
   bool updateTrafficLightsInSim();
 
   const Configuration configuration;
+
+  ParameterManager parameter_manager_;
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
 

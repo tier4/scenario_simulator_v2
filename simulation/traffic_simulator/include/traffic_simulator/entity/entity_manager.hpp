@@ -145,7 +145,7 @@ public:
   auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
   {
     if (const auto architecture_type =
-          getParameter<std::string>("architecture_type", "awf/universe");
+          parameter_manager_.getParameter<std::string>("architecture_type", "awf/universe");
         architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_shared<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
@@ -158,10 +158,11 @@ public:
   }
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
-  explicit EntityManager(NodeT && node, const Configuration & configuration)
+  explicit EntityManager(
+    NodeT && node, const Configuration & configuration, const ParameterManager & parameter_manager)
   : configuration(configuration),
     node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
-    parameter_manager_(node),
+    parameter_manager_(parameter_manager),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
