@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry_msgs/msg/point.h>
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
@@ -40,22 +41,14 @@ auto makeHdMapUtilsInstance(const std::string relative_path = map_path) -> hdmap
 
 auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
 {
-  geometry_msgs::msg::Point point;
-  point.x = x;
-  point.y = y;
-  point.z = z;
-  return point;
+  return geometry_msgs::build<geometry_msgs::msg::Point>().x(x).y(y).z(z);
 }
 
 auto makeBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
 {
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.center.x = 1.0;
-  bbox.center.y = center_y;
-  bbox.dimensions.x = 4.0;
-  bbox.dimensions.y = 2.0;
-  bbox.dimensions.z = 1.5;
-  return bbox;
+  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
+    .center(makePoint(1.0, center_y))
+    .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(4.0).y(2.0).z(1.5));
 }
 
 auto makePose(
@@ -63,28 +56,21 @@ auto makePose(
   geometry_msgs::msg::Quaternion orientation = geometry_msgs::msg::Quaternion())
   -> geometry_msgs::msg::Pose
 {
-  geometry_msgs::msg::Pose pose;
-  pose.position = position;
-  pose.orientation = orientation;
-  return pose;
+  return geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
+    orientation);
 }
 
 auto makeSmallBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
 {
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.center.x = 0.0;
-  bbox.center.y = center_y;
-  bbox.dimensions.x = 1.0;
-  bbox.dimensions.y = 1.0;
-  bbox.dimensions.z = 1.0;
-  return bbox;
+  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
+    .center(makePoint(0.0, center_y))
+    .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(1.0).y(1.0).z(1.0));
 }
 
 auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
 {
-  geometry_msgs::msg::Vector3 v;
-  v.z = yaw;
-  return quaternion_operation::convertEulerAngleToQuaternion(v);
+  return quaternion_operation::convertEulerAngleToQuaternion(
+    geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(yaw));
 }
 
 int main(int argc, char ** argv)
@@ -129,11 +115,7 @@ TEST(HdMapUtils, matchToLane)
 {
   auto hdmap_utils = makeHdMapUtilsInstance();
 
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.center.x = 0.0;
-  bbox.center.y = 0.0;
-  bbox.dimensions.x = 1.0;
-  bbox.dimensions.y = 1.0;
+  const auto bbox = makeSmallBoundingBox();
   {
     const auto id = hdmap_utils.matchToLane(
       hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(120659, 1)).pose, bbox,
@@ -1266,12 +1248,8 @@ TEST(HdMapUtils, toMapPose_onlyOffset)
   const lanelet::Id lanelet_id = 34696;
   const double s = 10.0;
 
-  traffic_simulator_msgs::msg::LaneletPose pose;
-  pose.lanelet_id = lanelet_id;
-  pose.s = s;
-  pose.offset = 0.5;
-
-  const auto map_pose = hdmap_utils.toMapPose(pose);
+  const auto map_pose =
+    hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(lanelet_id, s, 0.5));
 
   EXPECT_STREQ(map_pose.header.frame_id.c_str(), "map");
   EXPECT_POSE_NEAR(
@@ -1289,12 +1267,8 @@ TEST(HdMapUtils, toMapPose_additionalRotation)
   const lanelet::Id lanelet_id = 34696;
   const double s = 10.0;
 
-  traffic_simulator_msgs::msg::LaneletPose pose;
-  pose.lanelet_id = lanelet_id;
-  pose.s = s;
-  pose.rpy.z = M_PI_4;
-
-  const auto map_pose = hdmap_utils.toMapPose(pose);
+  const auto map_pose = hdmap_utils.toMapPose(
+    traffic_simulator::helper::constructLaneletPose(lanelet_id, s, 0.0, 0.0, 0.0, M_PI_4));
 
   EXPECT_STREQ(map_pose.header.frame_id.c_str(), "map");
   EXPECT_POSE_NEAR(
@@ -1311,12 +1285,10 @@ TEST(HdMapUtils, toMapPose_negativeS)
   const lanelet::Id lanelet_id = 34696;
   const double s = -10.0;
 
-  traffic_simulator_msgs::msg::LaneletPose pose;
-  pose.lanelet_id = lanelet_id;
-  pose.s = s;
-
   geometry_msgs::msg::PoseStamped map_pose;
-  EXPECT_NO_THROW(map_pose = hdmap_utils.toMapPose(pose));
+  EXPECT_NO_THROW(
+    map_pose =
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(lanelet_id, s)));
 
   EXPECT_STREQ(map_pose.header.frame_id.c_str(), "map");
   EXPECT_POSE_NEAR(
@@ -1332,12 +1304,10 @@ TEST(HdMapUtils, toMapPose_sLargerThanLaneletLength)
   const lanelet::Id lanelet_id = 34696;
   const double s = hdmap_utils.getLaneletLength(lanelet_id) + 10.0;
 
-  traffic_simulator_msgs::msg::LaneletPose pose;
-  pose.lanelet_id = lanelet_id;
-  pose.s = s;
-
   geometry_msgs::msg::PoseStamped map_pose;
-  EXPECT_NO_THROW(map_pose = hdmap_utils.toMapPose(pose));
+  EXPECT_NO_THROW(
+    map_pose =
+      hdmap_utils.toMapPose(traffic_simulator::helper::constructLaneletPose(lanelet_id, s)));
 
   EXPECT_STREQ(map_pose.header.frame_id.c_str(), "map");
   EXPECT_POSE_NEAR(
@@ -1992,20 +1962,12 @@ TEST(HdMapUtils, getLateralDistance_sameLane)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
-  traffic_simulator_msgs::msg::LaneletPose from, to;
-  from.lanelet_id = 3002185;
-  from.s = 0.0;
-  from.offset = 0.5;
-
-  to.lanelet_id = 3002185;
-  to.s = 10.0;
-  to.offset = 0.2;
-
+  const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
+  const auto to = traffic_simulator::helper::constructLaneletPose(3002185, 10.0, 0.2);
   const auto result = hdmap_utils.getLateralDistance(from, to);
-  constexpr double epsilon = 1e-3;
 
   EXPECT_TRUE(result.has_value());
-  EXPECT_NEAR(result.value(), to.offset - from.offset, epsilon);
+  EXPECT_NEAR(result.value(), to.offset - from.offset, 1e-3);
 }
 
 /**
@@ -2016,14 +1978,8 @@ TEST(HdMapUtils, getLateralDistance_parallelLanesCanNotChange)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
-  traffic_simulator_msgs::msg::LaneletPose from, to;
-  from.lanelet_id = 3002185;
-  from.s = 0.0;
-  from.offset = 0.5;
-
-  to.lanelet_id = 3002184;
-  to.s = 10.0;
-  to.offset = 0.2;
+  const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
+  const auto to = traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2);
 
   const auto result = hdmap_utils.getLateralDistance(from, to, false);
 
@@ -2038,14 +1994,8 @@ TEST(HdMapUtils, getLateralDistance_parallelLanesCanChange)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
-  traffic_simulator_msgs::msg::LaneletPose from, to;
-  from.lanelet_id = 3002185;
-  from.s = 0.0;
-  from.offset = 0.5;
-
-  to.lanelet_id = 3002184;
-  to.s = 10.0;
-  to.offset = 0.2;
+  const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
+  const auto to = traffic_simulator::helper::constructLaneletPose(3002184, 10.0, 0.2);
 
   const double width1 = 2.80373, width2 = 3.03463;
   const double actual_distance = width1 / 2.0 + width2 / 2.0 + to.offset - from.offset;
@@ -2067,14 +2017,8 @@ TEST(HdMapUtils, getLateralDistance_notConnected)
 {
   auto hdmap_utils = makeHdMapUtilsInstance(four_track_highway_map_path);
 
-  traffic_simulator_msgs::msg::LaneletPose from, to;
-  from.lanelet_id = 3002185;
-  from.s = 0.0;
-  from.offset = 0.5;
-
-  to.lanelet_id = 3002166;
-  to.s = 10.0;
-  to.offset = 0.2;
+  const auto from = traffic_simulator::helper::constructLaneletPose(3002185, 0.0, 0.5);
+  const auto to = traffic_simulator::helper::constructLaneletPose(3002166, 10.0, 0.2);
 
   const auto result = hdmap_utils.getLateralDistance(from, to, true);
 
