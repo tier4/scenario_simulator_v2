@@ -71,7 +71,7 @@ auto visualizationMarker() -> visualization_msgs::msg::MarkerArray
   };
 
   lanelet::ConstLanelets all_lanelets =
-    lanelet::utils::query::laneletLayer(lanelet_core::LaneletMap::map());
+    lanelet::utils::query::laneletLayer(lanelet_core::LaneletMapCore::map());
   lanelet::ConstLanelets road_lanelets = lanelet::utils::query::roadLanelets(all_lanelets);
   lanelet::ConstLanelets crosswalk_lanelets =
     lanelet::utils::query::crosswalkLanelets(all_lanelets);
@@ -82,9 +82,9 @@ auto visualizationMarker() -> visualization_msgs::msg::MarkerArray
   std::vector<lanelet::DetectionAreaConstPtr> da_reg_elems =
     lanelet::utils::query::detectionAreas(all_lanelets);
   lanelet::ConstLineStrings3d parking_spaces =
-    lanelet::utils::query::getAllParkingSpaces(lanelet_core::LaneletMap::map());
+    lanelet::utils::query::getAllParkingSpaces(lanelet_core::LaneletMapCore::map());
   lanelet::ConstPolygons3d parking_lots =
-    lanelet::utils::query::getAllParkingLots(lanelet_core::LaneletMap::map());
+    lanelet::utils::query::getAllParkingLots(lanelet_core::LaneletMapCore::map());
 
   auto cl_ll_borders = color_utils::fromRgba(1.0, 1.0, 1.0, 0.999);
   auto cl_road = color_utils::fromRgba(0.2, 0.7, 0.7, 0.3);

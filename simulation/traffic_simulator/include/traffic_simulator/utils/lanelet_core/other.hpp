@@ -37,16 +37,6 @@ auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
 
 auto getLaneletIds() -> lanelet::Ids;
 
-template <typename Lanelet>
-auto getLaneletIds(const std::vector<Lanelet> & lanelets) -> lanelet::Ids
-{
-  lanelet::Ids ids;
-  std::transform(
-    lanelets.begin(), lanelets.end(), std::back_inserter(ids),
-    [](const auto & lanelet) { return lanelet.id(); });
-  return ids;
-}
-
 auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;

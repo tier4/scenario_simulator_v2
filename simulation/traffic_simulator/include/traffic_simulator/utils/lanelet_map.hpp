@@ -18,7 +18,7 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
 #include <traffic_simulator/color_utils/color_utils.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
 #include <traffic_simulator/utils/lanelet_core/other.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
@@ -31,7 +31,7 @@ using Point = geometry_msgs::msg::Point;
 template <typename... Ts>
 inline auto activate(Ts &&... xs)
 {
-  return lanelet_core::LaneletMap::activate(std::forward<decltype(xs)>(xs)...);
+  return lanelet_core::LaneletMapCore::activate(std::forward<decltype(xs)>(xs)...);
 }
 
 auto borderlinePoses() -> std::vector<Pose>;

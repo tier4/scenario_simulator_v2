@@ -17,6 +17,10 @@
 
 #include <lanelet2_matching/LaneletMatching.h>
 
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <geometry_msgs/msg/vector3.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 

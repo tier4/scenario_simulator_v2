@@ -16,7 +16,7 @@
 
 #include <geometry/linear_algebra.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
 #include <traffic_simulator/utils/lanelet_core/other.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -296,7 +296,7 @@ auto getNearbyLaneletIds(
   lanelet::Ids lanelet_ids;
   lanelet::BasicPoint2d search_point(point.x, point.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
+    lanelet::geometry::findNearest(LaneletMapCore::map()->laneletLayer, search_point, search_count);
   if (include_crosswalk) {
     if (nearest_lanelet.empty()) {
       return {};
@@ -337,7 +337,7 @@ auto getNearbyLaneletIds(
   lanelet::Ids lanelet_ids;
   lanelet::BasicPoint2d search_point(position.x, position.y);
   std::vector<std::pair<double, lanelet::Lanelet>> nearest_lanelet =
-    lanelet::geometry::findNearest(LaneletMap::map()->laneletLayer, search_point, search_count);
+    lanelet::geometry::findNearest(LaneletMapCore::map()->laneletLayer, search_point, search_count);
   if (nearest_lanelet.empty()) {
     return {};
   }
@@ -369,10 +369,10 @@ auto matchToLane(
         bbox.center.y - bbox.dimensions.y * 0.5 * reduction_ratio}},
     obj.pose);
   auto matches =
-    lanelet::matching::getDeterministicMatches(*LaneletMap::map(), obj, matching_distance);
+    lanelet::matching::getDeterministicMatches(*LaneletMapCore::map(), obj, matching_distance);
   if (!include_crosswalk) {
-    matches =
-      lanelet::matching::removeNonRuleCompliantMatches(matches, LaneletMap::trafficRulesVehicle());
+    matches = lanelet::matching::removeNonRuleCompliantMatches(
+      matches, LaneletMapCore::trafficRulesVehicle());
   }
   if (matches.empty()) {
     return std::nullopt;
@@ -430,30 +430,38 @@ auto getLeftLaneletIds(
   const lanelet::Id lanelet_id, const EntityType & type, const bool include_opposite_direction)
   -> lanelet::Ids
 {
+  auto getLaneletIds = [](const auto & lanelets) -> lanelet::Ids {
+    lanelet::Ids ids;
+    std::transform(
+      lanelets.begin(), lanelets.end(), std::back_inserter(ids),
+      [](const auto & lanelet) { return lanelet.id(); });
+    return ids;
+  };
+
   switch (type.type) {
     case EntityType::EGO:
       if (include_opposite_direction) {
-        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->lefts(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::vehicleRoutingGraph()->lefts(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->adjacentLefts(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::vehicleRoutingGraph()->adjacentLefts(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       }
     case EntityType::VEHICLE:
       if (include_opposite_direction) {
-        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->lefts(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::vehicleRoutingGraph()->lefts(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->adjacentLefts(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::vehicleRoutingGraph()->adjacentLefts(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       }
     case EntityType::PEDESTRIAN:
       if (include_opposite_direction) {
-        return other::getLaneletIds(LaneletMap::pedestrianRoutingGraph()->lefts(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::pedestrianRoutingGraph()->lefts(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(LaneletMap::pedestrianRoutingGraph()->adjacentLefts(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::pedestrianRoutingGraph()->adjacentLefts(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       }
     default:
     case EntityType::MISC_OBJECT:
@@ -465,30 +473,38 @@ auto getRightLaneletIds(
   const lanelet::Id lanelet_id, const EntityType & entity_type,
   const bool include_opposite_direction) -> lanelet::Ids
 {
+  auto getLaneletIds = [](const auto & lanelets) -> lanelet::Ids {
+    lanelet::Ids ids;
+    std::transform(
+      lanelets.begin(), lanelets.end(), std::back_inserter(ids),
+      [](const auto & lanelet) { return lanelet.id(); });
+    return ids;
+  };
+
   switch (entity_type.type) {
     case EntityType::EGO:
       if (include_opposite_direction) {
-        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->rights(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::vehicleRoutingGraph()->rights(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->adjacentRights(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::vehicleRoutingGraph()->adjacentRights(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       }
     case EntityType::VEHICLE:
       if (include_opposite_direction) {
-        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->rights(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::vehicleRoutingGraph()->rights(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(LaneletMap::vehicleRoutingGraph()->adjacentRights(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::vehicleRoutingGraph()->adjacentRights(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       }
     case EntityType::PEDESTRIAN:
       if (include_opposite_direction) {
-        return other::getLaneletIds(LaneletMap::pedestrianRoutingGraph()->rights(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::pedestrianRoutingGraph()->rights(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       } else {
-        return other::getLaneletIds(LaneletMap::pedestrianRoutingGraph()->adjacentRights(
-          LaneletMap::map()->laneletLayer.get(lanelet_id)));
+        return getLaneletIds(LaneletMapCore::pedestrianRoutingGraph()->adjacentRights(
+          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
       }
     default:
     case EntityType::MISC_OBJECT:

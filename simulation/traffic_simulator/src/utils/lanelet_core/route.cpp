@@ -19,7 +19,7 @@
 
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
 #include <traffic_simulator/utils/lanelet_core/other.hpp>
 #include <traffic_simulator/utils/lanelet_core/route.hpp>
 
@@ -40,27 +40,27 @@ auto getRoute(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, const bool allow_lane_change)
   -> lanelet::Ids
 {
-  if (LaneletMap::routeCache().exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {
-    return LaneletMap::routeCache().getRoute(from_lanelet_id, to_lanelet_id, allow_lane_change);
+  if (LaneletMapCore::routeCache().exists(from_lanelet_id, to_lanelet_id, allow_lane_change)) {
+    return LaneletMapCore::routeCache().getRoute(from_lanelet_id, to_lanelet_id, allow_lane_change);
   }
   lanelet::Ids ids;
-  const auto lanelet = LaneletMap::map()->laneletLayer.get(from_lanelet_id);
-  const auto to_lanelet = LaneletMap::map()->laneletLayer.get(to_lanelet_id);
+  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(from_lanelet_id);
+  const auto to_lanelet = LaneletMapCore::map()->laneletLayer.get(to_lanelet_id);
   lanelet::Optional<lanelet::routing::Route> route =
-    LaneletMap::vehicleRoutingGraph()->getRoute(lanelet, to_lanelet, 0, allow_lane_change);
+    LaneletMapCore::vehicleRoutingGraph()->getRoute(lanelet, to_lanelet, 0, allow_lane_change);
   if (!route) {
-    LaneletMap::routeCache().appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+    LaneletMapCore::routeCache().appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
     return ids;
   }
   lanelet::routing::LaneletPath shortest_path = route->shortestPath();
   if (shortest_path.empty()) {
-    LaneletMap::routeCache().appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+    LaneletMapCore::routeCache().appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
     return ids;
   }
   for (auto lane_itr = shortest_path.begin(); lane_itr != shortest_path.end(); lane_itr++) {
     ids.push_back(lane_itr->id());
   }
-  LaneletMap::routeCache().appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
+  LaneletMapCore::routeCache().appendData(from_lanelet_id, to_lanelet_id, allow_lane_change, ids);
   return ids;
 }
 
@@ -137,8 +137,8 @@ auto getSpeedLimit(const lanelet::Ids & lanelet_ids) -> double
     THROW_SEMANTIC_ERROR("size of the vector lanelet ids should be more than 1");
   }
   for (auto itr = lanelet_ids.begin(); itr != lanelet_ids.end(); itr++) {
-    const auto lanelet = LaneletMap::map()->laneletLayer.get(*itr);
-    const auto limit = LaneletMap::trafficRulesVehicle()->speedLimit(lanelet);
+    const auto lanelet = LaneletMapCore::map()->laneletLayer.get(*itr);
+    const auto limit = LaneletMapCore::trafficRulesVehicle()->speedLimit(lanelet);
     limits.push_back(lanelet::units::KmHQuantity(limit.speedLimit).value() / 3.6);
   }
   return *std::min_element(limits.begin(), limits.end());
@@ -182,7 +182,7 @@ auto getRightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
 auto getRightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   lanelet::Ids ids;
-  for (const auto & right_of_way : LaneletMap::map()
+  for (const auto & right_of_way : LaneletMapCore::map()
                                      ->laneletLayer.get(lanelet_id)
                                      .regulatoryElementsAs<lanelet::RightOfWay>()) {
     for (const auto & ll : right_of_way->rightOfWayLanelets()) {
@@ -198,11 +198,11 @@ auto getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Id
 {
   lanelet::Ids ids;
   std::vector<lanelet::routing::RoutingGraphConstPtr> graphs;
-  graphs.emplace_back(LaneletMap::vehicleRoutingGraph());
-  graphs.emplace_back(LaneletMap::pedestrianRoutingGraph());
+  graphs.emplace_back(LaneletMapCore::vehicleRoutingGraph());
+  graphs.emplace_back(LaneletMapCore::pedestrianRoutingGraph());
   lanelet::routing::RoutingGraphContainer container(graphs);
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = LaneletMap::map()->laneletLayer.get(lanelet_id);
+    const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
     double height_clearance = 4;
     size_t routing_graph_id = 1;
     const auto conflicting_crosswalks =
@@ -218,9 +218,9 @@ auto getConflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
 {
   lanelet::Ids ids;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = LaneletMap::map()->laneletLayer.get(lanelet_id);
+    const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
     const auto conflicting_lanelets =
-      lanelet::utils::getConflictingLanelets(LaneletMap::vehicleRoutingGraph(), lanelet);
+      lanelet::utils::getConflictingLanelets(LaneletMapCore::vehicleRoutingGraph(), lanelet);
     for (const auto & conflicting_lanelet : conflicting_lanelets) {
       ids.emplace_back(conflicting_lanelet.id());
     }

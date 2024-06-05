@@ -12,231 +12,276 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <lanelet2_core/geometry/Lanelet.h>
-#include <lanelet2_io/Io.h>
-
-#include <lanelet2_extension/projection/mgrs_projector.hpp>
-#include <lanelet2_extension/utility/query.hpp>
+#include <geometry/linear_algebra.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <lanelet2_extension/utility/utilities.hpp>
+#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
+#include <traffic_simulator/utils/lanelet_core/pose.hpp>
 
 namespace traffic_simulator
 {
 namespace lanelet_core
 {
-auto LaneletMap::activate(const std::string & lanelet_map_path) -> void
+namespace lanelet_map
 {
-  lanelet_map_path_ = lanelet_map_path;
-  if (instance) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    instance.reset();
-  }
+auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool
+{
+  return 0 <= s and s <= getCenterPointsSpline(lanelet_id)->getLength();
 }
 
-LaneletMap & LaneletMap::getInstance()
+auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool
 {
-  std::lock_guard<std::mutex> lock(mutex_);
-  if (!instance) {
-    if (!lanelet_map_path_.empty()) {
-      instance.reset(new LaneletMap(lanelet_map_path_));
-    } else {
-      THROW_SIMULATION_ERROR(
-        "lanelet_map_path is empty! Please call lanelet_map::activate() first.");
+  return lanelet::geometry::inside(
+    LaneletMapCore::map()->laneletLayer.get(lanelet_id), lanelet::BasicPoint2d(point.x, point.y));
+}
+
+auto getLaneletIds() -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  for (const auto & lanelet : LaneletMapCore::map()->laneletLayer) {
+    ids.push_back(lanelet.id());
+  }
+  return ids;
+}
+
+auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  return toPolygon(LaneletMapCore::map()->laneletLayer.get(lanelet_id).leftBound());
+}
+
+auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  return toPolygon(LaneletMapCore::map()->laneletLayer.get(lanelet_id).rightBound());
+}
+
+auto getLaneletLength(const lanelet::Id lanelet_id) -> double
+{
+  if (LaneletMapCore::laneletLengthCache().exists(lanelet_id)) {
+    return LaneletMapCore::laneletLengthCache().getLength(lanelet_id);
+  }
+  double ret =
+    lanelet::utils::getLaneletLength2d(LaneletMapCore::map()->laneletLayer.get(lanelet_id));
+  LaneletMapCore::laneletLengthCache().appendData(lanelet_id, ret);
+  return ret;
+}
+
+auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>
+{
+  std::vector<Point> ret;
+  if (lanelet_ids.empty()) {
+    return ret;
+  }
+  for (const auto lanelet_id : lanelet_ids) {
+    ret += getCenterPoints(lanelet_id);
+  }
+  ret.erase(std::unique(ret.begin(), ret.end()), ret.end());
+  return ret;
+}
+
+auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<Point>
+{
+  std::vector<Point> ret;
+  if (!LaneletMapCore::map()) {
+    THROW_SIMULATION_ERROR("lanelet map is null pointer");
+  }
+  if (LaneletMapCore::map()->laneletLayer.empty()) {
+    THROW_SIMULATION_ERROR("lanelet layer is empty");
+  }
+  if (LaneletMapCore::centerPointsCache().exists(lanelet_id)) {
+    return LaneletMapCore::centerPointsCache().getCenterPoints(lanelet_id);
+  }
+
+  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+  const auto centerline = lanelet.centerline();
+  for (const auto & point : centerline) {
+    Point p;
+    p.x = point.x();
+    p.y = point.y();
+    p.z = point.z();
+    ret.push_back(p);
+  }
+  if (static_cast<int>(ret.size()) == 2) {
+    const auto p0 = ret[0];
+    const auto p2 = ret[1];
+    Point p1;
+    p1.x = (p0.x + p2.x) * 0.5;
+    p1.y = (p0.y + p2.y) * 0.5;
+    p1.z = (p0.z + p2.z) * 0.5;
+    ret.clear();
+    ret.push_back(p0);
+    ret.push_back(p1);
+    ret.push_back(p2);
+  }
+  LaneletMapCore::centerPointsCache().appendData(lanelet_id, ret);
+  return ret;
+}
+
+auto getCenterPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>
+{
+  getCenterPoints(lanelet_id);
+  return LaneletMapCore::centerPointsCache().getCenterPointsSpline(lanelet_id);
+}
+
+auto getNextLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+  for (const auto & llt : LaneletMapCore::vehicleRoutingGraph()->following(lanelet)) {
+    ids.push_back(llt.id());
+  }
+  for (const auto & id : getNextRoadShoulderLanelet(lanelet_id)) {
+    ids.push_back(id);
+  }
+  return ids;
+}
+
+auto getNextLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  for (const auto & id : lanelet_ids) {
+    ids += getNextLaneletIds(id);
+  }
+  return sortAndUnique(ids);
+}
+
+auto getNextLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
+  -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+  for (const auto & llt : LaneletMapCore::vehicleRoutingGraph()->following(lanelet)) {
+    if (llt.attributeOr("turn_direction", "else") == turn_direction) {
+      ids.push_back(llt.id());
     }
   }
-  return *instance;
+  return ids;
 }
 
-auto LaneletMap::routeCache() -> RouteCache & { return getInstance().route_cache_; }
-
-auto LaneletMap::centerPointsCache() -> CenterPointsCache &
+auto getNextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
+  -> lanelet::Ids
 {
-  return getInstance().center_points_cache_;
-}
-
-auto LaneletMap::laneletLengthCache() -> LaneletLengthCache &
-{
-  return getInstance().lanelet_length_cache_;
-}
-
-auto LaneletMap::map() -> const lanelet::LaneletMapPtr & { return getInstance().lanelet_map_ptr_; }
-
-auto LaneletMap::shoulderLanelets() -> const lanelet::ConstLanelets &
-{
-  return getInstance().shoulder_lanelets_;
-}
-auto LaneletMap::vehicleRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
-{
-  return getInstance().vehicle_routing_graph_ptr_;
-}
-auto LaneletMap::pedestrianRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
-{
-  return getInstance().pedestrian_routing_graph_ptr_;
-}
-auto LaneletMap::trafficRulesVehicle() -> const lanelet::traffic_rules::TrafficRulesPtr &
-{
-  return getInstance().traffic_rules_vehicle_ptr_;
-}
-auto LaneletMap::trafficRulesPedestrian() -> const lanelet::traffic_rules::TrafficRulesPtr &
-{
-  return getInstance().traffic_rules_pedestrian_ptr_;
-}
-
-LaneletMap::LaneletMap(const std::filesystem::path & lanelet2_map_path)
-{
-  lanelet::projection::MGRSProjector projector;
-  lanelet::ErrorMessages errors;
-  lanelet_map_ptr_ = lanelet::load(lanelet2_map_path.string(), projector, &errors);
-  if (not errors.empty()) {
-    std::stringstream ss;
-    const auto * separator = "";
-    for (const auto & error : errors) {
-      ss << separator << error;
-      separator = "\n";
-    }
-    THROW_SIMULATION_ERROR("Failed to load lanelet map (", ss.str(), ")");
+  lanelet::Ids ids;
+  for (const auto & id : lanelet_ids) {
+    ids += getNextLaneletIds(id, turn_direction);
   }
-
-  overwriteLaneletsCenterline();
-  traffic_rules_vehicle_ptr_ = lanelet::traffic_rules::TrafficRulesFactory::create(
-    lanelet::Locations::Germany, lanelet::Participants::Vehicle);
-  vehicle_routing_graph_ptr_ =
-    lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_vehicle_ptr_);
-  traffic_rules_pedestrian_ptr_ = lanelet::traffic_rules::TrafficRulesFactory::create(
-    lanelet::Locations::Germany, lanelet::Participants::Pedestrian);
-  pedestrian_routing_graph_ptr_ =
-    lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_pedestrian_ptr_);
-  std::vector<lanelet::routing::RoutingGraphConstPtr> all_graphs;
-  all_graphs.push_back(vehicle_routing_graph_ptr_);
-  all_graphs.push_back(pedestrian_routing_graph_ptr_);
-  shoulder_lanelets_ =
-    lanelet::utils::query::shoulderLanelets(lanelet::utils::query::laneletLayer(lanelet_map_ptr_));
+  return sortAndUnique(ids);
 }
 
-auto LaneletMap::overwriteLaneletsCenterline() -> void
+auto getPreviousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
-  for (auto & lanelet_obj : lanelet_map_ptr_->laneletLayer) {
-    if (!lanelet_obj.hasCustomCenterline()) {
-      const auto fine_center_line = generateFineCenterline(lanelet_obj, 2.0);
-      lanelet_obj.setCenterline(fine_center_line);
+  lanelet::Ids ids;
+  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+  for (const auto & llt : LaneletMapCore::vehicleRoutingGraph()->previous(lanelet)) {
+    ids.push_back(llt.id());
+  }
+  for (const auto & id : getPreviousRoadShoulderLanelet(lanelet_id)) {
+    ids.push_back(id);
+  }
+  return ids;
+}
+
+auto getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  for (const auto & id : lanelet_ids) {
+    ids += getNextLaneletIds(id);
+  }
+  return sortAndUnique(ids);
+}
+
+auto getPreviousLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
+  -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+  for (const auto & llt : LaneletMapCore::vehicleRoutingGraph()->previous(lanelet)) {
+    if (llt.attributeOr("turn_direction", "else") == turn_direction) {
+      ids.push_back(llt.id());
     }
   }
+  return ids;
 }
 
-auto LaneletMap::generateFineCenterline(
-  const lanelet::ConstLanelet & lanelet_obj, const double resolution) -> lanelet::LineString3d
+auto getPreviousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
+  -> lanelet::Ids
 {
-  // Get length of longer border
-  const double left_length =
-    static_cast<double>(lanelet::geometry::length(lanelet_obj.leftBound()));
-  const double right_length =
-    static_cast<double>(lanelet::geometry::length(lanelet_obj.rightBound()));
-  const double longer_distance = (left_length > right_length) ? left_length : right_length;
-  const int32_t num_segments =
-    std::max(static_cast<int32_t>(ceil(longer_distance / resolution)), 1);
-
-  // Resample points
-  const auto left_points = resamplePoints(lanelet_obj.leftBound(), num_segments);
-  const auto right_points = resamplePoints(lanelet_obj.rightBound(), num_segments);
-
-  // Create centerline
-  lanelet::LineString3d centerline(lanelet::utils::getId());
-  for (size_t i = 0; i < static_cast<size_t>(num_segments + 1); i++) {
-    // Add ID for the average point of left and right
-    const auto center_basic_point = (right_points.at(i) + left_points.at(i)) / 2.0;
-    const lanelet::Point3d center_point(
-      lanelet::utils::getId(), center_basic_point.x(), center_basic_point.y(),
-      center_basic_point.z());
-    centerline.push_back(center_point);
+  lanelet::Ids ids;
+  for (const auto & id : lanelet_ids) {
+    ids += getPreviousLaneletIds(id, turn_direction);
   }
-  return centerline;
+  return sortAndUnique(ids);
 }
 
-auto LaneletMap::resamplePoints(
-  const lanelet::ConstLineString3d & line_string, const std::int32_t num_segments)
-  -> lanelet::BasicPoints3d
+auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
-  // Calculate length
-  const auto line_length = lanelet::geometry::length(line_string);
-
-  // Calculate accumulated lengths
-  const auto accumulated_lengths = calculateAccumulatedLengths(line_string);
-
-  // Create each segment
-  lanelet::BasicPoints3d resampled_points;
-  for (auto i = 0; i <= num_segments; ++i) {
-    // Find two nearest points
-    const double target_length =
-      (static_cast<double>(i) / num_segments) * static_cast<double>(line_length);
-    const auto index_pair = findNearestIndexPair(accumulated_lengths, target_length);
-
-    // Apply linear interpolation
-    const lanelet::BasicPoint3d back_point = line_string[index_pair.first];
-    const lanelet::BasicPoint3d front_point = line_string[index_pair.second];
-    const auto direction_vector = (front_point - back_point);
-
-    const auto back_length = accumulated_lengths.at(index_pair.first);
-    const auto front_length = accumulated_lengths.at(index_pair.second);
-    const auto segment_length = front_length - back_length;
-    const auto target_point =
-      back_point + (direction_vector * (target_length - back_length) / segment_length);
-
-    // Add to list
-    resampled_points.push_back(target_point);
+  std::vector<Point> points;
+  lanelet::CompoundPolygon3d lanelet_polygon =
+    LaneletMapCore::map()->laneletLayer.get(lanelet_id).polygon3d();
+  for (const auto & lanelet_point : lanelet_polygon) {
+    Point p;
+    p.x = lanelet_point.x();
+    p.y = lanelet_point.y();
+    p.z = lanelet_point.z();
+    points.emplace_back(p);
   }
-  return resampled_points;
+  return points;
 }
 
-auto LaneletMap::findNearestIndexPair(
-  const std::vector<double> & accumulated_lengths, const double target_length)
-  -> std::pair<std::size_t, std::size_t>
+auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>
 {
-  // List size
-  const auto N = accumulated_lengths.size();
-  // Front
-  if (target_length < accumulated_lengths.at(1)) {
-    return std::make_pair(0, 1);
+  std::vector<Point> points;
+  const auto stop_line = LaneletMapCore::map()->lineStringLayer.get(lanelet_id);
+  for (const auto & point : stop_line) {
+    Point p;
+    p.x = point.x();
+    p.y = point.y();
+    p.z = point.z();
+    points.emplace_back(p);
   }
-  // Back
-  if (target_length > accumulated_lengths.at(N - 2)) {
-    return std::make_pair(N - 2, N - 1);
-  }
+  return points;
+}
 
-  // Middle
-  for (size_t i = 1; i < N; ++i) {
-    if (
-      accumulated_lengths.at(i - 1) <= target_length &&
-      target_length <= accumulated_lengths.at(i)) {
-      return std::make_pair(i - 1, i);
+namespace
+{
+auto getNextRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Ids
+{
+  lanelet::Ids ids;
+  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : LaneletMapCore::shoulderLanelets()) {
+    if (lanelet::geometry::follows(lanelet, shoulder_lanelet)) {
+      ids.push_back(shoulder_lanelet.id());
     }
   }
-
-  // Throw an exception because this never happens
-  THROW_SEMANTIC_ERROR("findNearestIndexPair(): No nearest point found.");
+  return ids;
 }
 
-auto LaneletMap::calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
-  -> std::vector<double>
+auto getPreviousRoadShoulderLanelet(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
-  const auto segment_distances = calculateSegmentDistances(line_string);
-
-  std::vector<double> accumulated_lengths{0};
-  accumulated_lengths.reserve(segment_distances.size() + 1);
-  std::partial_sum(
-    std::begin(segment_distances), std::end(segment_distances),
-    std::back_inserter(accumulated_lengths));
-  return accumulated_lengths;
-}
-
-auto LaneletMap::calculateSegmentDistances(const lanelet::ConstLineString3d & line_string)
-  -> std::vector<double>
-{
-  std::vector<double> segment_distances;
-  segment_distances.reserve(line_string.size() - 1);
-  for (size_t i = 1; i < line_string.size(); ++i) {
-    const auto distance = lanelet::geometry::distance(line_string[i], line_string[i - 1]);
-    segment_distances.push_back(distance);
+  lanelet::Ids ids;
+  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+  for (const auto & shoulder_lanelet : LaneletMapCore::shoulderLanelets()) {
+    if (lanelet::geometry::follows(shoulder_lanelet, lanelet)) {
+      ids.push_back(shoulder_lanelet.id());
+    }
   }
-  return segment_distances;
+  return ids;
 }
+
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>
+{
+  std::vector<Point> ret;
+  for (const auto & p : line_string) {
+    Point point;
+    point.x = p.x();
+    point.y = p.y();
+    point.z = p.z();
+    ret.emplace_back(point);
+  }
+  return ret;
+}
+}  // namespace
+}  // namespace lanelet_map
 }  // namespace lanelet_core
 }  // namespace traffic_simulator

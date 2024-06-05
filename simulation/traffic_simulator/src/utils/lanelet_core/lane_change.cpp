@@ -15,7 +15,7 @@
 #include <geometry/transform.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet_core/lane_change.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
 #include <traffic_simulator/utils/lanelet_core/other.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 
@@ -27,9 +27,9 @@ namespace lane_change
 {
 auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool
 {
-  const auto from_lanelet = LaneletMap::map()->laneletLayer.get(from_lanelet_id);
-  const auto to_lanelet = LaneletMap::map()->laneletLayer.get(to_lanelet_id);
-  return LaneletMap::trafficRulesVehicle()->canChangeLane(from_lanelet, to_lanelet);
+  const auto from_lanelet = LaneletMapCore::map()->laneletLayer.get(from_lanelet_id);
+  const auto to_lanelet = LaneletMapCore::map()->laneletLayer.get(to_lanelet_id);
+  return LaneletMapCore::trafficRulesVehicle()->canChangeLane(from_lanelet, to_lanelet);
 }
 
 auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> LaneletPose
@@ -94,20 +94,20 @@ auto getLaneChangeableLaneletId(
 auto getLaneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction direction)
   -> std::optional<lanelet::Id>
 {
-  const auto lanelet = LaneletMap::map()->laneletLayer.get(lanelet_id);
+  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
   std::optional<lanelet::Id> target = std::nullopt;
   switch (direction) {
     case Direction::STRAIGHT:
       target = lanelet.id();
       break;
     case Direction::LEFT:
-      if (LaneletMap::vehicleRoutingGraph()->left(lanelet)) {
-        target = LaneletMap::vehicleRoutingGraph()->left(lanelet)->id();
+      if (LaneletMapCore::vehicleRoutingGraph()->left(lanelet)) {
+        target = LaneletMapCore::vehicleRoutingGraph()->left(lanelet)->id();
       }
       break;
     case Direction::RIGHT:
-      if (LaneletMap::vehicleRoutingGraph()->right(lanelet)) {
-        target = LaneletMap::vehicleRoutingGraph()->right(lanelet)->id();
+      if (LaneletMapCore::vehicleRoutingGraph()->right(lanelet)) {
+        target = LaneletMapCore::vehicleRoutingGraph()->right(lanelet)->id();
       }
       break;
   }
