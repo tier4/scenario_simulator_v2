@@ -481,7 +481,7 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutowareContro(
+auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutowareControl(
   const bool autoware_control) -> void
 {
   task_queue.delay([this, autoware_control]() {

@@ -159,6 +159,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       setStatus(CanonicalizedEntityStatus(*updated_status, hdmap_utils_ptr_));
     } else {
+      field_operator_application->requestAutowareControl(true);
       is_controlled_by_simulator_ = false;
     }
   }
