@@ -23,7 +23,6 @@
 #include <memory>
 #include <optional>
 #include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
-#include <rclcpp/node_interfaces/node_parameters_interface.hpp>
 #include <rclcpp/node_interfaces/node_topics_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -43,6 +42,7 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator/utils/parameter_manager.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -52,28 +52,6 @@
 #include <utility>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
-
-class ParameterManager
-{
-public:
-  template <typename NodeT>
-  ParameterManager(NodeT && node)
-  : node_parameters_interface_(rclcpp::node_interfaces::get_node_parameters_interface(node))
-  {
-  }
-
-  template <typename ParameterT>
-  auto getParameter(const std::string & name, const ParameterT & default_value = {})
-  {
-    if (not node_parameters_interface_->has_parameter(name)) {
-      node_parameters_interface_->declare_parameter(name, rclcpp::ParameterValue(default_value));
-    }
-    return node_parameters_interface_->get_parameter(name).get_value<ParameterT>();
-  }
-
-private:
-  rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_interface_;
-};
 
 /// @todo find some shared space for this function
 template <typename T>
