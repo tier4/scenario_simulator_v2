@@ -115,6 +115,10 @@ TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
       .max_deceleration_rate(0.0)
       .max_speed(10.0);
 
+  /**
+   * Actual duration calculated by hand based on input.
+   * Tolerance value chosen as very small, but acceptable numerical error.
+   */
   EXPECT_NEAR(
     planner.getAccelerationDuration(
       8.5, constraints, makeTwistWithLinearX(1.0), makeAccelWithLinearX(1.0)),
