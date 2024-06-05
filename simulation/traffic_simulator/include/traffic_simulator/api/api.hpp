@@ -133,7 +133,7 @@ public:
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration);
+                 name, pose, parameters, configuration, parameter_manager_);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, behavior);

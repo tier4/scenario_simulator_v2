@@ -46,22 +46,24 @@ static auto getParameter(const std::string & name, T value = {})
   return value;
 }
 
-auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration)
+auto EgoEntity::makeFieldOperatorApplication(
+  const Configuration & configuration, const ParameterManager & parameter_manager)
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
-  if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
+  if (const auto architecture_type =
+        parameter_manager.getParameter<std::string>("architecture_type", "awf/universe");
       architecture_type.find("awf/universe") != std::string::npos) {
-    std::string rviz_config = getParameter<std::string>("rviz_config", "");
-    return getParameter<bool>("launch_autoware", true)
+    std::string rviz_config = parameter_manager.getParameter<std::string>("rviz_config", "");
+    return parameter_manager.getParameter<bool>("launch_autoware", true)
              ? std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
-                 getParameter<std::string>("autoware_launch_package"),
-                 getParameter<std::string>("autoware_launch_file"),
+                 parameter_manager.getParameter<std::string>("autoware_launch_package"),
+                 parameter_manager.getParameter<std::string>("autoware_launch_file"),
                  "map_path:=" + configuration.map_path.string(),
                  "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
                  "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                 "sensor_model:=" + parameter_manager.getParameter<std::string>("sensor_model"),
+                 "vehicle_model:=" + parameter_manager.getParameter<std::string>("vehicle_model"),
                  "rviz_config:=" + ((rviz_config == "")
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
@@ -80,9 +82,9 @@ EgoEntity::EgoEntity(
   const std::string & name, const CanonicalizedEntityStatus & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-  const Configuration & configuration)
+  const Configuration & configuration, const ParameterManager & parameter_manager)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
-  field_operator_application(makeFieldOperatorApplication(configuration))
+  field_operator_application(makeFieldOperatorApplication(configuration, parameter_manager))
 {
 }
 
