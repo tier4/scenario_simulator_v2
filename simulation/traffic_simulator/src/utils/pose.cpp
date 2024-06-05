@@ -93,11 +93,6 @@ auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_po
          lanelet_core::lanelet_map::getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
-auto yaw(const Point & point, const lanelet::Id lanelet_id) -> std::tuple<double, Point, Point>
-{
-  return lanelet_core::pose::yaw(point, lanelet_id);
-}
-
 // Conversions
 auto toMapPose(const CanonicalizedLaneletPose & lanelet_pose) -> Pose
 {
@@ -214,6 +209,7 @@ auto transformRelativePoseToGlobal(const Pose & global_pose, const Pose & relati
   return ret;
 }
 
+// Relative msg::Pose
 auto relativePose(const Pose & from, const Pose & to) -> std::optional<Pose>
 {
   try {
@@ -250,6 +246,7 @@ auto boundingBoxRelativePose(
   return std::nullopt;
 }
 
+// Relative LaneletPose
 auto relativeLaneletPose(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const bool allow_lane_change) -> LaneletPose
@@ -350,6 +347,5 @@ auto estimateCanonicalizedLaneletPose(
     return std::nullopt;
   }
 }
-
 }  // namespace pose
 }  // namespace traffic_simulator

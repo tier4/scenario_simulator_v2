@@ -37,6 +37,9 @@ auto isInLanelet(const Point point, const lanelet::Id lanelet_id) -> bool;
 
 auto getLaneletLength(const lanelet::Id lanelet_id) -> double;
 
+auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
+  -> std::tuple<double, Point, Point>;
+
 auto getLaneletIds() -> lanelet::Ids;
 
 auto getNearbyLaneletIds(

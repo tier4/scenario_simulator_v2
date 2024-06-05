@@ -35,22 +35,11 @@ auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool
 
 auto toSpline(const lanelet::Ids & route) -> Spline;
 
+// Move
 template <typename... Ts>
 auto getRoute(Ts &&... xs)
 {
   return lanelet_core::route::getRoute(std::forward<decltype(xs)>(xs)...);
-}
-
-template <typename... Ts>
-auto followingLanelets(Ts &&... xs)
-{
-  return lanelet_core::route::getFollowingLanelets(std::forward<decltype(xs)>(xs)...);
-}
-
-template <typename... Ts>
-auto previousLanelets(Ts &&... xs)
-{
-  return lanelet_core::route::getPreviousLanelets(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
@@ -67,13 +56,28 @@ auto isNeedToRightOfWay(
   const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_entity_poses) -> bool;
 
+// Move forward
+template <typename... Ts>
+auto followingLanelets(Ts &&... xs)
+{
+  return lanelet_core::route::getFollowingLanelets(std::forward<decltype(xs)>(xs)...);
+}
+
 auto moveAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
   const double distance) -> LaneletPose;
 
+// Move backward
+template <typename... Ts>
+auto previousLanelets(Ts &&... xs)
+{
+  return lanelet_core::route::getPreviousLanelets(std::forward<decltype(xs)>(xs)...);
+}
+
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
   -> std::vector<Point>;
 
+// Lane change
 template <typename... Ts>
 auto laneChangeableLaneletId(Ts &&... xs)
 {

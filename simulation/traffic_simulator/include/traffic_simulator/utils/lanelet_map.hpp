@@ -36,6 +36,9 @@ inline auto activate(Ts &&... xs)
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
+auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
+  -> std::tuple<double, Point, Point>;
+
 auto nearbyLaneletIds(
   const Pose & pose, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids;

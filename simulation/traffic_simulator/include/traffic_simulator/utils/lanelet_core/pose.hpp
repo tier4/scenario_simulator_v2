@@ -38,8 +38,6 @@ using BoundingBox = traffic_simulator_msgs::msg::BoundingBox;
 using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 using EntityType = traffic_simulator_msgs::msg::EntityType;
 
-auto yaw(const Point & point, const lanelet::Id lanelet_id) -> std::tuple<double, Point, Point>;
-
 auto toMapPose(const LaneletPose &, const bool fill_pitch = true) -> PoseStamped;
 
 auto toLaneletPose(const Pose & pose, const bool include_crosswalk, const double matching_distance)

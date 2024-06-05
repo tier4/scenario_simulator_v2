@@ -51,6 +51,36 @@ auto getLaneletLength(const lanelet::Id lanelet_id) -> double
   return ret;
 }
 
+auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
+  -> std::tuple<double, Point, Point>
+{
+  /// @note Copied from motion_util::findNearestSegmentIndex
+  const auto centerline_points = lanelet_core::lanelet_map::getCenterPoints(lanelet_id);
+  auto find_nearest_segment_index = [](const std::vector<Point> & points, const Point & point) {
+    assert(not points.empty());
+    double min_distance = std::numeric_limits<double>::max();
+    size_t min_index = 0;
+    for (size_t i = 0; i < points.size(); ++i) {
+      const auto distance = [](const auto point1, const auto point2) {
+        const auto dx = point1.x - point2.x;
+        const auto dy = point1.y - point2.y;
+        return dx * dx + dy * dy;
+      }(points.at(i), point);
+      if (distance < min_distance) {
+        min_distance = distance;
+        min_index = i;
+      }
+    }
+    return min_index;
+  };
+  const size_t segment_index = find_nearest_segment_index(centerline_points, point);
+  const auto & previous_point = centerline_points.at(segment_index);
+  const auto & next_point = centerline_points.at(segment_index + 1);
+  return std::make_tuple(
+    std::atan2(next_point.y - previous_point.y, next_point.x - previous_point.x), previous_point,
+    next_point);
+}
+
 auto getLaneletIds() -> lanelet::Ids
 {
   lanelet::Ids ids;

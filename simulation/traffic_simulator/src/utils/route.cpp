@@ -34,6 +34,7 @@ auto toSpline(const lanelet::Ids & route_lanelets) -> Spline
   return Spline(lanelet_core::lanelet_map::getCenterPoints(route_lanelets));
 }
 
+// Move
 auto isAnyConflictingEntity(
   const lanelet::Ids & following_lanelets,
   const std::vector<CanonicalizedLaneletPose> & other_poses) -> bool
@@ -87,6 +88,7 @@ auto isNeedToRightOfWay(
   return false;
 }
 
+// Move forward
 auto moveAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Ids & route_lanelets,
   const double distance) -> LaneletPose
@@ -95,6 +97,27 @@ auto moveAlongLaneletPose(
     static_cast<LaneletPose>(canonicalized_lanelet_pose), route_lanelets, distance);
 }
 
+// Move backward
+auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
+  -> std::vector<Point>
+{
+  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  const auto ids = route::previousLanelets(lanelet_pose.lanelet_id);
+  // DIFFERENT SPLINE - recalculation needed
+  Spline spline(lanelet_core::lanelet_map::getCenterPoints(ids));
+  double s_in_spline = 0;
+  for (const auto id : ids) {
+    if (id == lanelet_pose.lanelet_id) {
+      s_in_spline = s_in_spline + lanelet_pose.s;
+      break;
+    } else {
+      s_in_spline = lanelet_core::lanelet_map::getLaneletLength(id) + s_in_spline;
+    }
+  }
+  return spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0, lanelet_pose.offset);
+}
+
+// Lane change
 auto laneChangeAlongLaneletPose(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const lane_change::Parameter & parameter) -> LaneletPose
@@ -115,25 +138,6 @@ auto laneChangeAlongLaneletPose(
       throw std::invalid_argument("Unknown lane change constraint type");
   }
   return pose::quietNaNLaneletPose();
-}
-
-auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
-  -> std::vector<Point>
-{
-  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  const auto ids = route::previousLanelets(lanelet_pose.lanelet_id);
-  // DIFFERENT SPLINE - recalculation needed
-  Spline spline(lanelet_core::lanelet_map::getCenterPoints(ids));
-  double s_in_spline = 0;
-  for (const auto id : ids) {
-    if (id == lanelet_pose.lanelet_id) {
-      s_in_spline = s_in_spline + lanelet_pose.s;
-      break;
-    } else {
-      s_in_spline = lanelet_core::lanelet_map::getLaneletLength(id) + s_in_spline;
-    }
-  }
-  return spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0, lanelet_pose.offset);
 }
 
 auto laneChangeTrajectory(
