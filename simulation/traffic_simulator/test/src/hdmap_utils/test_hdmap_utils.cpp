@@ -80,12 +80,14 @@ int main(int argc, char ** argv)
 }
 
 /**
- * @note Test basic functionality; test initialization correctness with a correct path to a lanelet map.
+ * @note Test basic functionality.
+ * Test initialization correctness with a correct path to a lanelet map.
  */
 TEST(HdMapUtils, Construct) { ASSERT_NO_THROW(auto hdmap_utils = makeHdMapUtilsInstance()); }
 
 /**
- * @note Test basic functionality; test initialization correctness with an invalid path to a lanelet map.
+ * @note Test basic functionality.
+ * Test initialization correctness with an invalid path to a lanelet map.
  */
 TEST(HdMapUtils, Construct_invalid)
 {
@@ -98,7 +100,8 @@ TEST(HdMapUtils, Construct_invalid)
 }
 
 /**
- * @note Test basic functionality; test map conversion to binary message correctness with a sample map.
+ * @note Test basic functionality.
+ * Test map conversion to binary message correctness with a sample map.
  */
 TEST(HdMapUtils, toMapBin)
 {
@@ -108,7 +111,8 @@ TEST(HdMapUtils, toMapBin)
 }
 
 /**
- * @note Test basic functionality; test lanelet matching correctness with a small bounding box (1, 1)
+ * @note Test basic functionality.
+ * Test lanelet matching correctness with a small bounding box (1, 1)
  * and a pose on a lanelet and without including the crosswalk.
  */
 TEST(HdMapUtils, matchToLane)
@@ -133,7 +137,8 @@ TEST(HdMapUtils, matchToLane)
 }
 
 /**
- * @note Test basic functionality; test lanelet matching correctness with a small bounding box (1, 1)
+ * @note Test basic functionality.
+ * Test lanelet matching correctness with a small bounding box (1, 1)
  * and a pose on a crosswalk lanelet and including the crosswalk.
  */
 TEST(HdMapUtils, matchToLane_includeCrosswalk)
@@ -158,7 +163,8 @@ TEST(HdMapUtils, matchToLane_includeCrosswalk)
 }
 
 /**
- * @note Test basic functionality; test lanelet matching correctness with a small bounding box (1, 1)
+ * @note Test basic functionality.
+ * Test lanelet matching correctness with a small bounding box (1, 1)
  * and such a pose so that no lanelets are in the distance of 1 unit
  * - the goal is to test the branch where getDeterministicMatches returns nullopt and thus
  * this function returns nullopt as well.
@@ -182,7 +188,8 @@ TEST(HdMapUtils, matchToLane_noMatch)
 }
 
 /**
- * @note Test basic functionality; test along lanelet pose obtaining with a distance
+ * @note Test basic functionality.
+ * Test along lanelet pose obtaining with a distance
  * along the lanelet less than the lanelet length - so the along pose is still the same lanelet.
 */
 TEST(HdMapUtils, AlongLaneletPose_insideDistance)
@@ -200,7 +207,8 @@ TEST(HdMapUtils, AlongLaneletPose_insideDistance)
 }
 
 /**
- * @note Test basic functionality; test along lanelet pose obtaining with a distance
+ * @note Test basic functionality.
+ * Test along lanelet pose obtaining with a distance
  * along the lanelet more than the lanelet length - the goal is
  * to test the situation when the next lanelet is returned.
 */
@@ -222,7 +230,8 @@ TEST(HdMapUtils, AlongLaneletPose_outsideDistance)
 }
 
 /**
- * @note Test basic functionality; test along lanelet pose obtaining with a negative distance
+ * @note Test basic functionality.
+ * Test along lanelet pose obtaining with a negative distance
  * along the lanelet and start from the beginning of one lanelet - the goal is to test
  * the situation when the previous lanelet is returned.
 */
@@ -434,7 +443,8 @@ TEST(HdMapUtils, CanonicalizeAll)
 }
 
 /**
- * @note Test basic functionality; test filtering correctness with some lanelet ids and a valid subtype name.
+ * @note Test basic functionality.
+ * Test filtering correctness with some lanelet ids and a valid subtype name.
  */
 TEST(HdMapUtils, filterLaneletIds_correct)
 {
@@ -501,7 +511,8 @@ TEST(HdMapUtils, filterLaneletIds_invalidIds)
 }
 
 /**
- * @note Test basic functionality; test obtaining nearest lanelet ids correctness
+ * @note Test basic functionality.
+ * Test obtaining nearest lanelet ids correctness
  * with a position in the middle of the lane and relatively big distance threshold
  * - the goal is to test successful scenario when there should be lanelets returned.
  */
@@ -519,7 +530,8 @@ TEST(HdMapUtils, getNearbyLaneletIds)
 }
 
 /**
- * @note Test basic functionality; test obtaining nearest lanelet ids correctness
+ * @note Test basic functionality.
+ * Test obtaining nearest lanelet ids correctness
  * with a position on the side of the map and with fairly small distance threshold
  * - the goal is to test unsuccessful scenario when there should be no lanelets returned.
  */
@@ -536,7 +548,8 @@ TEST(HdMapUtils, getNearbyLaneletIds_unsuccessful)
 }
 
 /**
- * @note Test basic functionality; test obtaining nearest lanelet ids correctness
+ * @note Test basic functionality.
+ * Test obtaining nearest lanelet ids correctness
  * (with a crosswalk) with a position on the side of the map and with fairly small distance threshold
  * - the goal is to test unsuccessful scenario when there should be no lanelets returned.
  */
@@ -555,7 +568,8 @@ TEST(HdMapUtils, getNearbyLaneletIds_crosswalkUnsuccessful)
 }
 
 /**
- * @note Test basic functionality; test collision point calculations
+ * @note Test basic functionality.
+ * Test collision point calculations
  * correctness with ids of a road and a crosswalk that do intersect.
  */
 TEST(HdMapUtils, getCollisionPointInLaneCoordinate_intersects)
@@ -571,7 +585,8 @@ TEST(HdMapUtils, getCollisionPointInLaneCoordinate_intersects)
 }
 
 /**
- * @note Test basic functionality; test collision point calculations
+ * @note Test basic functionality.
+ * Test collision point calculations
  * correctness with ids of a road and a crosswalk that do not intersect.
  */
 TEST(HdMapUtils, getCollisionPointInLaneCoordinate_disjoint)
@@ -618,7 +633,8 @@ TEST(HdMapUtils, getCollisionPointInLaneCoordinate_invalidCrosswalkLanelet)
 }
 
 /**
- * @note Test basic functionality; test conversion to lanelet pose correctness with a point
+ * @note Test basic functionality.
+ * Test conversion to lanelet pose correctness with a point
  * positioned on a given lanelet with the given matching distance
  * - the goal is to test a regular usecase of correct conversion.
  */
@@ -643,7 +659,8 @@ TEST(HdMapUtils, toLaneletPose_correct)
 }
 
 /**
- * @note Test basic functionality; test conversion to lanelet pose correctness with a point
+ * @note Test basic functionality.
+ * Test conversion to lanelet pose correctness with a point
  * positioned near a given lanelet (closer than the given matching distance) and slightly behind
  * the normal vector of the nearest point on the lanelet - the goal is to test
  * the branch of execution where the inner product between:
@@ -728,7 +745,8 @@ TEST(HdMapUtils, toLaneletPose_empty)
 }
 
 /**
- * @note Test basic functionality; test lanelet matching correctness with a bounding box and a pose that is:
+ * @note Test basic functionality.
+ * Test lanelet matching correctness with a bounding box and a pose that is:
  * - exactly on the centerline of a lanelet
  * - <0.9; 1) away from the next lanelet and a fairly small matching_distance (e.g. 0.5)
  * - the goal is to test the branch in bounding box variant where the bounding box is matched
@@ -758,7 +776,8 @@ TEST(HdMapUtils, toLaneletPose_boundingBoxMatchPrevious)
 }
 
 /**
- * @note Test basic functionality; test speed limit obtaining correctness
+ * @note Test basic functionality.
+ * Test speed limit obtaining correctness
  * with ids of lanelets that have different speed limits.
  */
 TEST(HdMapUtils, getSpeedLimit_correct)
@@ -806,7 +825,8 @@ TEST(HdMapUtils, getSpeedLimit_empty)
 }
 
 /**
- * @note Test basic functionality; test obtaining closest lanelet id with a pose near
+ * @note Test basic functionality.
+ * Test obtaining closest lanelet id with a pose near
  * the road lanelet (closer than the distance_threshold).
  */
 TEST(HdMapUtils, getClosestLaneletId_near)
@@ -825,7 +845,8 @@ TEST(HdMapUtils, getClosestLaneletId_near)
 }
 
 /**
- * @note Test basic functionality; test obtaining closest lanelet id with a pose far
+ * @note Test basic functionality.
+ * Test obtaining closest lanelet id with a pose far
  * from the road lanelet (further than the distance_threshold).
  */
 TEST(HdMapUtils, getClosestLaneletId_away)
@@ -842,7 +863,8 @@ TEST(HdMapUtils, getClosestLaneletId_away)
 }
 
 /**
- * @note Test basic functionality; test obtaining closest lanelet id with a pose near
+ * @note Test basic functionality.
+ * Test obtaining closest lanelet id with a pose near
  * the crosswalk lanelet (closer than the distance_threshold) and include_crosswalk = false
  * and road lanelet further than crosswalk, but closer than distance_threshold
  * - the goal is to test whether the function returns road lanelet,
@@ -866,7 +888,8 @@ TEST(HdMapUtils, getClosestLaneletId_crosswalkCloserButExcluded)
 }
 
 /**
- * @note Test basic functionality; test obtaining closest lanelet id with a pose near
+ * @note Test basic functionality.
+ * Test obtaining closest lanelet id with a pose near
  * the crosswalk lanelet (closer than the distance_threshold) and include_crosswalk = false
  * and road lanelet further than crosswalk and further away than distance_threshold
  * - the goal is to test scenario when the only lanelet in the
@@ -913,7 +936,8 @@ TEST(HdMapUtils, getClosestLaneletId_emptyMap)
 }
 
 /**
- * @note Test basic functionality; test previous lanelets id obtaining correctness
+ * @note Test basic functionality.
+ * Test previous lanelets id obtaining correctness
  * with a lanelet that has a lanelet preceding it.
  */
 TEST(HdMapUtils, getPreviousLaneletIds)
@@ -930,7 +954,8 @@ TEST(HdMapUtils, getPreviousLaneletIds)
 }
 
 /**
- * @note Test basic functionality; test previous lanelets id obtaining correctness
+ * @note Test basic functionality.
+ * Test previous lanelets id obtaining correctness
  * with a lanelet that has a lanelet preceding it and is a shoulder lane.
  */
 TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
@@ -947,7 +972,8 @@ TEST(HdMapUtils, getPreviousLaneletIds_RoadShoulder)
 }
 
 /**
- * @note Test basic functionality; test previous lanelets id obtaining correctness
+ * @note Test basic functionality.
+ * Test previous lanelets id obtaining correctness
  * with a lanelet that has several lanelets preceding it.
  */
 TEST(HdMapUtils, getPreviousLaneletIds_multiplePrevious)
@@ -967,7 +993,8 @@ TEST(HdMapUtils, getPreviousLaneletIds_multiplePrevious)
 }
 
 /**
- * @note Test basic functionality; test previous lanelets id obtaining correctness
+ * @note Test basic functionality.
+ * Test previous lanelets id obtaining correctness
  * with a lanelet that has several lanelets preceding it and a direction specified (e.g. right)
  * - the goal is to test the function specialization that takes a direction as an argument
  * and returns only the previous lanelets that have this turn direction.
@@ -998,7 +1025,8 @@ TEST(HdMapUtils, getPreviousLaneletIds_direction)
 }
 
 /**
- * @note Test basic functionality; test next lanelets id obtaining correctness
+ * @note Test basic functionality.
+ * Test next lanelets id obtaining correctness
  * with a lanelet that has a lanelet following it.
  */
 TEST(HdMapUtils, getNextLaneletIds)
@@ -1015,7 +1043,8 @@ TEST(HdMapUtils, getNextLaneletIds)
 }
 
 /**
- * @note Test basic functionality; test next lanelets id obtaining correctness
+ * @note Test basic functionality.
+ * Test next lanelets id obtaining correctness
  * with a lanelet that has a lanelet following it and is a shoulder lane.
  */
 TEST(HdMapUtils, getNextLaneletIds_RoadShoulder)
@@ -1032,7 +1061,8 @@ TEST(HdMapUtils, getNextLaneletIds_RoadShoulder)
 }
 
 /**
- * @note Test basic functionality; test next lanelets id obtaining correctness
+ * @note Test basic functionality.
+ * Test next lanelets id obtaining correctness
  * with a lanelet that has several lanelets following it.
  */
 TEST(HdMapUtils, getNextLaneletIds_multipleNext)
@@ -1052,7 +1082,8 @@ TEST(HdMapUtils, getNextLaneletIds_multipleNext)
 }
 
 /**
- * @note Test basic functionality; test next lanelets id obtaining correctness
+ * @note Test basic functionality.
+ * Test next lanelets id obtaining correctness
  * with a lanelet that has several lanelets following it and a direction specified (e.g. right)
  * - the goal is to test the function specialization that takes a direction as an argument
  * and returns only the next lanelets that have this turn direction.
@@ -1083,7 +1114,8 @@ TEST(HdMapUtils, getNextLaneletIds_direction)
 }
 
 /**
- * @note Test basic functionality; test on route checking correctness
+ * @note Test basic functionality.
+ * Test on route checking correctness
  * with a route and a lanelet that is on the route.
  */
 TEST(HdMapUtils, isInRoute_onRoute)
@@ -1100,7 +1132,8 @@ TEST(HdMapUtils, isInRoute_onRoute)
 }
 
 /**
- * @note Test basic functionality; test on route checking correctness
+ * @note Test basic functionality.
+ * Test on route checking correctness
  * with a route and a lanelet that is not on the route.
  */
 TEST(HdMapUtils, isInRoute_notOnRoute)
@@ -1129,7 +1162,8 @@ TEST(HdMapUtils, isInRoute_empty)
 }
 
 /**
- * @note Test basic functionality; test in lanelet presence correctness
+ * @note Test basic functionality.
+ * Test in lanelet presence correctness
  * with a position that is in the given lanelet.
  */
 TEST(HdMapUtils, isInLanelet_correct)
@@ -1142,7 +1176,8 @@ TEST(HdMapUtils, isInLanelet_correct)
 }
 
 /**
- * @note Test basic functionality; test in lanelet presence correctness
+ * @note Test basic functionality.
+ * Test in lanelet presence correctness
  * with a position that is after the given lanelet.
  */
 TEST(HdMapUtils, isInLanelet_after)
@@ -1155,7 +1190,8 @@ TEST(HdMapUtils, isInLanelet_after)
 }
 
 /**
- * @note Test basic functionality; test in lanelet presence correctness
+ * @note Test basic functionality.
+ * Test in lanelet presence correctness
  * with a position that is before the given lanelet.
  */
 TEST(HdMapUtils, isInLanelet_before)
@@ -1168,7 +1204,8 @@ TEST(HdMapUtils, isInLanelet_before)
 }
 
 /**
- * @note Test basic functionality; test lanelet to map point transform correctness
+ * @note Test basic functionality.
+ * Test lanelet to map point transform correctness
  * with a vector of several s larger than 0 but smaller than the lanelet length.
  */
 TEST(HdMapUtils, toMapPoints_correctPoints)
@@ -1238,7 +1275,8 @@ TEST(HdMapUtils, toMapPoints_empty)
 }
 
 /**
- * @note Test basic functionality; test lanelet to map pose transform correctness
+ * @note Test basic functionality.
+ * Test lanelet to map pose transform correctness
  * with a position on the lanelet and a small offset (e.g. 0.5) - test the specialization
  * taking a lanelet id, s and an offset as parameters.
  */
@@ -1257,7 +1295,8 @@ TEST(HdMapUtils, toMapPose_onlyOffset)
 }
 
 /**
- * @note Test basic functionality; test lanelet to map pose transform correctness with a position
+ * @note Test basic functionality.
+ * Test lanelet to map pose transform correctness with a position
  * on the lanelet and additional rotation of 90 degrees
  * - test the specialization taking a lanelet pose object as a parameter.
  */
@@ -1315,7 +1354,8 @@ TEST(HdMapUtils, toMapPose_sLargerThanLaneletLength)
 }
 
 /**
- * @note Test basic functionality; test changeable lanelets id obtaining with a lanelet
+ * @note Test basic functionality.
+ * Test changeable lanelets id obtaining with a lanelet
  * that has no changeable lanelets and direction = STRAIGHT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
@@ -1332,7 +1372,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_straight)
 }
 
 /**
- * @note Test basic functionality; test changeable lanelets id obtaining
+ * @note Test basic functionality.
+ * Test changeable lanelets id obtaining
  * with a lanelet that has no changeable lanelets and direction = LEFT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangeable)
@@ -1347,7 +1388,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftNoChangeable)
 }
 
 /**
- * @note Test basic functionality; test changeable lanelets id obtaining with
+ * @note Test basic functionality.
+ * Test changeable lanelets id obtaining with
  * a lanelet that has changeable lanelets (left direction) and direction = LEFT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangeable)
@@ -1364,7 +1406,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_leftChangeable)
 }
 
 /**
- * @note Test basic functionality; test changeable lanelets id obtaining
+ * @note Test basic functionality.
+ * Test changeable lanelets id obtaining
  * with a lanelet that has no changeable lanelets and direction = RIGHT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangeable)
@@ -1379,7 +1422,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_rightNoChangeable)
 }
 
 /**
- * @note Test basic functionality; test changeable lanelets id obtaining with
+ * @note Test basic functionality.
+ * Test changeable lanelets id obtaining with
  * a lanelet that has changeable lanelets (right direction) and direction = RIGHT.
  */
 TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangeable)
@@ -1396,7 +1440,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_rightChangeable)
 }
 
 /**
- * @note Test basic functionality; test changeable lanelets id obtaining
+ * @note Test basic functionality.
+ * Test changeable lanelets id obtaining
  * with a lanelet that has at least two changeable lanes to the left,
  * direction = LEFT and shift = 2.
  */
@@ -1416,7 +1461,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftPossible)
 }
 
 /**
- * @note Test basic functionality; test changeable lanelets id obtaining
+ * @note Test basic functionality.
+ * Test changeable lanelets id obtaining
  * with a lanelet that has 1 changeable lane to the left, direction = LEFT and shift = 2
  * - the goal is to test the branch where we expect lanelet id
  * for shifting 2 times left, but shifting 2 lanes is not possible.
@@ -1435,7 +1481,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2LeftNotPossible)
 }
 
 /**
- * @note Test basic functionality; test changeable lanelets id obtaining
+ * @note Test basic functionality.
+ * Test changeable lanelets id obtaining
  * with a lanelet that has at least two changeable lanes to the right,
  * direction = RIGHT and shift = 2.
  */
@@ -1455,7 +1502,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift2RightPossible)
 }
 
 /**
- * @note Test basic functionality; test changeable lanelets id obtaining
+ * @note Test basic functionality.
+ * Test changeable lanelets id obtaining
  * with a lanelet that has 1 changeable lane to the right,
  * direction = RIGHT and shift = 2 - the goal is to test the branch where
  * we expect lanelet id for shifting 2 times right, but shifting 2 lanes is not possible.
@@ -1492,7 +1540,8 @@ TEST(HdMapUtils, getLaneChangeableLaneletId_shift0)
 }
 
 /**
- * @note Test basic functionality; test traffic lights id obtaining correctness.
+ * @note Test basic functionality.
+ * Test traffic lights id obtaining correctness.
  */
 TEST(HdMapUtils, getTrafficLightIds_correct)
 {
@@ -1518,7 +1567,8 @@ TEST(HdMapUtils, getTrafficLightIds_noTrafficLight)
 }
 
 /**
- * @note Test basic functionality; test traffic light position obtaining
+ * @note Test basic functionality.
+ * Test traffic light position obtaining
  * with a traffic light and bulb color specified.
  */
 TEST(HdMapUtils, getTrafficLightBulbPosition_correct)
@@ -1567,7 +1617,8 @@ TEST(HdMapUtils, getTrafficLightBulbPosition_correct)
 }
 
 /**
- * @note Test basic functionality; test traffic light position obtaining
+ * @note Test basic functionality.
+ * Test traffic light position obtaining
  * with an id of a traffic light that does not exist
  * - the goal is to test the branch when no traffic light is selected.
  */
@@ -1586,7 +1637,8 @@ TEST(HdMapUtils, getTrafficLightBulbPosition_invalidTrafficLight)
 }
 
 /**
- * @note Test basic functionality; test obtaining conflicting lanelets correctness
+ * @note Test basic functionality.
+ * Test obtaining conflicting lanelets correctness
  * with lanelets that do conflict with other lanelets.
  */
 TEST(HdMapUtils, getConflictingLaneIds_conflicting)
@@ -1603,7 +1655,8 @@ TEST(HdMapUtils, getConflictingLaneIds_conflicting)
 }
 
 /**
- * @note Test basic functionality; test obtaining conflicting lanelets correctness
+ * @note Test basic functionality.
+ * Test obtaining conflicting lanelets correctness
  * with lanelets that do not conflict with any other lanelets.
  */
 TEST(HdMapUtils, getConflictingLaneIds_notConflicting)
@@ -1629,7 +1682,8 @@ TEST(HdMapUtils, getConflictingLaneIds_empty)
 }
 
 /**
- * @note Test basic functionality; test obtaining conflicting crosswalk lanelets
+ * @note Test basic functionality.
+ * Test obtaining conflicting crosswalk lanelets
  * correctness with lanelets that do conflict with crosswalk lanelets.
  */
 TEST(HdMapUtils, getConflictingCrosswalkIds_conflicting)
@@ -1646,7 +1700,8 @@ TEST(HdMapUtils, getConflictingCrosswalkIds_conflicting)
 }
 
 /**
- * @note Test basic functionality; test obtaining conflicting crosswalk lanelets
+ * @note Test basic functionality.
+ * Test obtaining conflicting crosswalk lanelets
  * correctness with lanelets that do not conflict with any crosswalk lanelets,
  * but do conflict with vehicle lanelets.
  */
@@ -1661,7 +1716,8 @@ TEST(HdMapUtils, getConflictingCrosswalkIds_notConflictingWithCrosswalk)
 }
 
 /**
- * @note Test basic functionality; test obtaining conflicting crosswalk lanelets
+ * @note Test basic functionality.
+ * Test obtaining conflicting crosswalk lanelets
  * correctness with lanelets that do not conflict with any other lanelets.
  */
 TEST(HdMapUtils, getConflictingCrosswalkIds_notConflicting)
@@ -1687,7 +1743,8 @@ TEST(HdMapUtils, getConflictingCrosswalkIds_empty)
 }
 
 /**
- * @note Test basic functionality; test clipping trajectory correctness
+ * @note Test basic functionality.
+ * Test clipping trajectory correctness
  * with a correct vector of lanelets and the reference lanelet
  * also correct and reasonable forward distance.
  */
@@ -1719,7 +1776,8 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_correct)
 }
 
 /**
- * @note Test basic functionality; test clipping trajectory correctness
+ * @note Test basic functionality.
+ * Test clipping trajectory correctness
  * with a correct vector of lanelets and the reference
  * lanelet not on the trajectory and reasonable forward distance.
  */
@@ -1755,7 +1813,8 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_emptyTrajectory)
 }
 
 /**
- * @note Test basic functionality; test clipping trajectory correctness
+ * @note Test basic functionality.
+ * Test clipping trajectory correctness
  * with a correct vector of lanelets, and the reference lanelet
  * also correct and forward distance fairly small (e.g. 2).
  */
@@ -1778,7 +1837,8 @@ TEST(HdMapUtils, clipTrajectoryFromLaneletIds_smallForwardDistance)
 }
 
 /**
- * @note Test basic functionality; test following lanelets obtaining with
+ * @note Test basic functionality.
+ * Test following lanelets obtaining with
  * a lanelet that has lanelets after it longer than parameter distance.
  */
 TEST(HdMapUtils, getFollowingLanelets_straightAfter)
@@ -1796,7 +1856,8 @@ TEST(HdMapUtils, getFollowingLanelets_straightAfter)
 }
 
 /**
- * @note Test basic functionality; test following lanelets obtaining with a lanelet
+ * @note Test basic functionality.
+ * Test following lanelets obtaining with a lanelet
  * that has lanelets after it longer than parameter distance, but the following lanelets
  * go through a curve (e.g there was an order to go right earlier on the lane).
  */
@@ -1815,7 +1876,8 @@ TEST(HdMapUtils, getFollowingLanelets_curveAfter)
 }
 
 /**
- * @note Test basic functionality; test following lanelets obtaining with a lanelet
+ * @note Test basic functionality.
+ * Test following lanelets obtaining with a lanelet
  * that has lanelets after it for less than specified in the distance parameter
  * - the goal is for the function to return trajectory shorter than distance specified.
  */
@@ -1834,7 +1896,8 @@ TEST(HdMapUtils, getFollowingLanelets_notEnoughLaneletsAfter)
 }
 
 /**
- * @note Test basic functionality; test following lanelets obtaining
+ * @note Test basic functionality.
+ * Test following lanelets obtaining
  * with a candidate trajectory longer than the given distance.
  */
 TEST(HdMapUtils, getFollowingLanelets_candidateTrajectory)
@@ -1855,7 +1918,8 @@ TEST(HdMapUtils, getFollowingLanelets_candidateTrajectory)
 }
 
 /**
- * @note Test basic functionality; test following lanelets obtaining with
+ * @note Test basic functionality.
+ * Test following lanelets obtaining with
  * a candidate trajectory shorter than the given distance
  * - the goal is to test generating lacking part of the trajectory.
  */
@@ -1910,7 +1974,8 @@ TEST(HdMapUtils, getFollowingLanelets_candidateTrajectoryEmpty)
 }
 
 /**
- * @note Test basic functionality; test lane change possibility checking
+ * @note Test basic functionality.
+ * Test lane change possibility checking
  * correctness with lanelets that can be changed.
  */
 TEST(HdMapUtils, canChangeLane_canChange)
@@ -1926,7 +1991,8 @@ TEST(HdMapUtils, canChangeLane_canChange)
 }
 
 /**
- * @note Test basic functionality; test lane change possibility checking correctness with lanelets
+ * @note Test basic functionality.
+ * Test lane change possibility checking correctness with lanelets
  * that can not be changed (e.g. goal lanelet is behind the start lanelet).
  */
 TEST(HdMapUtils, canChangeLane_canNotChange)
@@ -1955,7 +2021,8 @@ TEST(HdMapUtils, canChangeLane_invalidLaneletId)
 }
 
 /**
- * @note Test basic functionality; test lateral distance calculation correctness
+ * @note Test basic functionality.
+ * Test lateral distance calculation correctness
  * with two lanelet poses on the same lanelet but with different offsets.
  */
 TEST(HdMapUtils, getLateralDistance_sameLane)
@@ -1971,7 +2038,8 @@ TEST(HdMapUtils, getLateralDistance_sameLane)
 }
 
 /**
- * @note Test basic functionality; test lateral distance calculation correctness
+ * @note Test basic functionality.
+ * Test lateral distance calculation correctness
  * with two lanelet poses on parallel lanes with no possibility of changing the lane.
  */
 TEST(HdMapUtils, getLateralDistance_parallelLanesCanNotChange)
@@ -1987,7 +2055,8 @@ TEST(HdMapUtils, getLateralDistance_parallelLanesCanNotChange)
 }
 
 /**
- * @note Test basic functionality; test lateral distance calculation correctness
+ * @note Test basic functionality.
+ * Test lateral distance calculation correctness
  * with two lanelet poses on parallel lanes with a possibility of changing the lane.
  */
 TEST(HdMapUtils, getLateralDistance_parallelLanesCanChange)
@@ -2008,7 +2077,8 @@ TEST(HdMapUtils, getLateralDistance_parallelLanesCanChange)
 }
 
 /**
- * @note Test basic functionality; test lateral distance calculation correctness
+ * @note Test basic functionality.
+ * Test lateral distance calculation correctness
  * with two poses on lanelets that are not connected - the goal is to test
  * the scenario when the distance cannot be calculated because two positions
  * will never be able to come in contact.
@@ -2026,7 +2096,8 @@ TEST(HdMapUtils, getLateralDistance_notConnected)
 }
 
 /**
- * @note Test basic functionality; test route obtaining correctness with a feasible route.
+ * @note Test basic functionality.
+ * Test route obtaining correctness with a feasible route.
  */
 TEST(HdMapUtils, getRoute_correct)
 {
@@ -2045,8 +2116,8 @@ TEST(HdMapUtils, getRoute_correct)
 }
 
 /**
- * @note Test basic functionality; test route obtaining correctness
- * with a feasible route and obtain it two times
+ * @note Test basic functionality.
+ * Test route obtaining correctness with a feasible route and obtain it two times
  * - the goal is to test whether the route cache works correctly.
  */
 TEST(HdMapUtils, getRoute_correctCache)
@@ -2064,7 +2135,8 @@ TEST(HdMapUtils, getRoute_correctCache)
 }
 
 /**
- * @note Test basic functionality; test route obtaining correctness with the beginning
+ * @note Test basic functionality.
+ * Test route obtaining correctness with the beginning
  * and ending that are impossible to route between.
  */
 TEST(HdMapUtils, getRoute_impossibleRouting)
@@ -2081,7 +2153,8 @@ TEST(HdMapUtils, getRoute_impossibleRouting)
 }
 
 /**
- * @note Test basic functionality; test route obtaining correctness with beginning
+ * @note Test basic functionality.
+ * Test route obtaining correctness with beginning
  * and ending of the route set to the same lanelet id.
  */
 TEST(HdMapUtils, getRoute_circular)
@@ -2198,8 +2271,8 @@ TEST(HdMapUtils, getCenterPoints_empty)
 }
 
 /**
- * @note Test basic functionality; test traffic light checking correctness
- * with an id of a traffic light.
+ * @note Test basic functionality.
+ * Test traffic light checking correctness with an id of a traffic light.
  */
 TEST(HdMapUtils, isTrafficLight_trafficLight)
 {
@@ -2213,8 +2286,8 @@ TEST(HdMapUtils, isTrafficLight_trafficLight)
 }
 
 /**
- * @note Test basic functionality; test traffic light checking correctness
- * with an id of not a traffic light.
+ * @note Test basic functionality.
+ * Test traffic light checking correctness with an id of not a traffic light.
  */
 TEST(HdMapUtils, isTrafficLight_notTrafficLight)
 {
@@ -2242,7 +2315,8 @@ TEST(HdMapUtils, isTrafficLight_invalidId)
 }
 
 /**
- * @note Test basic functionality; test traffic light relation checking correctness
+ * @note Test basic functionality.
+ * Test traffic light relation checking correctness
  * with an id of a lanelet that has a relation with a traffic light.
  */
 TEST(HdMapUtils, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
@@ -2257,7 +2331,8 @@ TEST(HdMapUtils, isTrafficLightRegulatoryElement_trafficLightRegulatoryElement)
 }
 
 /**
- * @note Test basic functionality; test traffic light relation checking correctness
+ * @note Test basic functionality.
+ * Test traffic light relation checking correctness
  * with an id of a lanelet that does not have a relation with a traffic light.
  */
 TEST(HdMapUtils, isTrafficLightRegulatoryElement_noTrafficLightRegulatoryElement)
@@ -2286,7 +2361,7 @@ TEST(HdMapUtils, isTrafficLightRegulatoryElement_invalidId)
 }
 
 /**
- * @note Test basic functionality; test lanelet length obtaining with some lanelet id.
+ * @note Test basic functionality. Test lanelet length obtaining with some lanelet id.
  */
 TEST(HdMapUtils, getLaneletLength_simple)
 {
@@ -2302,7 +2377,8 @@ TEST(HdMapUtils, getLaneletLength_simple)
 }
 
 /**
- * @note Test basic functionality; test lanelet length obtaining with some lanelet id two times
+ * @note Test basic functionality.
+ * Test lanelet length obtaining with some lanelet id two times
  * (the same lanelet id) - the goal is to test lanelet length caching correctness.
  */
 TEST(HdMapUtils, getLaneletLength_cache)
@@ -2318,7 +2394,8 @@ TEST(HdMapUtils, getLaneletLength_cache)
 }
 
 /**
- * @note Test basic functionality; test traffic light ids obtaining correctness
+ * @note Test basic functionality.
+ * Test traffic light ids obtaining correctness
  * with a route that does not have any traffic lights.
  */
 TEST(HdMapUtils, getTrafficLightIdsOnPath_noTrafficLights)
@@ -2333,8 +2410,8 @@ TEST(HdMapUtils, getTrafficLightIdsOnPath_noTrafficLights)
 }
 
 /**
- * @note Test basic functionality; test traffic light ids obtaining correctness
- * with a route that has some traffic lights.
+ * @note Test basic functionality.
+ * Test traffic light ids obtaining correctness with a route that has some traffic lights.
  */
 TEST(HdMapUtils, getTrafficLightIdsOnPath_trafficLights)
 {
@@ -2364,7 +2441,8 @@ TEST(HdMapUtils, getTrafficLightIdsOnPath_empty)
 }
 
 /**
- * @note Test basic functionality; test longitudinal distance calculation correctness
+ * @note Test basic functionality.
+ * Test longitudinal distance calculation correctness
  * with two poses on the same lanelet, where the goal pose is positioned in front of the start pose.
  */
 TEST(HdMapUtils, getLongitudinalDistance_sameLanelet)
@@ -2390,7 +2468,8 @@ TEST(HdMapUtils, getLongitudinalDistance_sameLanelet)
 }
 
 /**
- * @note Test basic functionality; test longitudinal distance calculation correctness
+ * @note Test basic functionality.
+ * Test longitudinal distance calculation correctness
  * with two poses on the same lanelet, where the goal pose is positioned behind the start pose.
  */
 TEST(HdMapUtils, getLongitudinalDistance_sameLaneletBehind)
@@ -2412,7 +2491,8 @@ TEST(HdMapUtils, getLongitudinalDistance_sameLaneletBehind)
 }
 
 /**
- * @note Test basic functionality; test longitudinal distance calculation correctness
+ * @note Test basic functionality.
+ * Test longitudinal distance calculation correctness
  * with two poses on different lanelets  that are a few lanelets apart (e.g. 3).
  */
 TEST(HdMapUtils, getLongitudinalDistance_differentLanelet)
@@ -2438,7 +2518,7 @@ TEST(HdMapUtils, getLongitudinalDistance_differentLanelet)
 }
 
 /**
- * @note Test basic functionality; test longitudinal distance calculation correctness
+ * @note Test basic functionality. Test longitudinal distance calculation correctness
  * with two poses on different lanelets where the goal pose is on lanelet unreachable
  * from the start pose lanelet - the goal is to test the branch of execution where no route is found.
  */
@@ -2461,8 +2541,8 @@ TEST(HdMapUtils, getLongitudinalDistance_differentLaneletNoRoute)
 }
 
 /**
- * @note Test basic functionality; test obtaining stop line ids correctness
- * with a route that has no stop lines.
+ * @note Test basic functionality.
+ * Test obtaining stop line ids correctness with a route that has no stop lines.
  */
 TEST(HdMapUtils, getStopLineIdsOnPath_noStopLines)
 {
@@ -2476,8 +2556,8 @@ TEST(HdMapUtils, getStopLineIdsOnPath_noStopLines)
 }
 
 /**
- * @note Test basic functionality; test obtaining stop line ids correctness
- * with a route that has a stop line.
+ * @note Test basic functionality.
+ * Test obtaining stop line ids correctness with a route that has a stop line.
  */
 TEST(HdMapUtils, getStopLineIdsOnPath_someStopLines)
 {
@@ -2504,7 +2584,8 @@ TEST(HdMapUtils, getStopLineIdsOnPath_empty)
 }
 
 /**
- * @note Test basic functionality; test obtaining traffic light stop line ids
+ * @note Test basic functionality.
+ * Test obtaining traffic light stop line ids
  * correctness with a traffic light that has one stop line.
  */
 TEST(HdMapUtils, getTrafficLightStopLineIds_stopLine)
@@ -2518,7 +2599,8 @@ TEST(HdMapUtils, getTrafficLightStopLineIds_stopLine)
 }
 
 /**
- * @note Test basic functionality; test obtaining traffic light stop line ids
+ * @note Test basic functionality.
+ * Test obtaining traffic light stop line ids
  * correctness with a traffic light that has several stop lines
  * - the goal is to test the scenario where one traffic light has multiple stop lines
  * (e.g. on a road with two parallel lanes with the same direction).
@@ -2586,7 +2668,8 @@ void compareStoplines(
 }
 
 /**
- * @note Test basic functionality; test obtaining traffic light stop line points correctness
+ * @note Test basic functionality.
+ * Test obtaining traffic light stop line points correctness
  * with a traffic light id that has only one traffic light stop line.
  */
 TEST(HdMapUtils, getTrafficLightStopLinesPoints_stopLine)
@@ -2606,7 +2689,8 @@ TEST(HdMapUtils, getTrafficLightStopLinesPoints_stopLine)
 }
 
 /**
- * @note Test basic functionality; test obtaining traffic light stop line points correctness
+ * @note Test basic functionality.
+ * Test obtaining traffic light stop line points correctness
  * with a traffic light id that has multiple traffic light stop lines.
  */
 TEST(HdMapUtils, getTrafficLightStopLinesPoints_severalStopLines)
@@ -2638,8 +2722,8 @@ TEST(HdMapUtils, getTrafficLightStopLinesPoints_invalidTrafficLightId)
 }
 
 /**
- * @note Test basic functionality; test stop line polygon obtaining
- * correctness with a lanelet that has a stop line.
+ * @note Test basic functionality.
+ * Test stop line polygon obtaining correctness with a lanelet that has a stop line.
  */
 TEST(HdMapUtils, getStopLinePolygon_stopLine)
 {
@@ -2668,7 +2752,8 @@ TEST(HdMapUtils, getStopLinePolygon_invalidLaneletId)
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining
  * correctness with a spline and a traffic light id that has a stop line on the spline.
  */
 TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnSpline)
@@ -2694,7 +2779,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnSpline)
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining correctness
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining correctness
  * with a spline and a traffic light id that does not have a stop line on the spline.
  */
 TEST(HdMapUtils, getDistanceToTrafficLightStopLine_noTrafficLightOnSpline)
@@ -2713,7 +2799,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_noTrafficLightOnSpline)
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining correctness
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining correctness
  * with a road (waypoints) and a traffic light id has a stop line on the road.
  */
 TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnWaypoints)
@@ -2738,7 +2825,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_trafficLightOnWaypoints)
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining correctness
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining correctness
  * with a road (waypoints) and a traffic light id that does not have a stop line on the road.
  */
 TEST(HdMapUtils, getDistanceToTrafficLightStopLine_noTrafficLightOnWaypoints)
@@ -2770,7 +2858,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_waypoints)
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining correctness
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining correctness
  * with a spline and a route that is coherent with the spline and has a traffic light on it.
  */
 TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnSpline)
@@ -2796,7 +2885,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnSplin
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining correctness
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining correctness
  * with a spline and a route that is coherent with the spline and does not have a traffic light on it.
  */
 TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnSplineCongruent)
@@ -2815,7 +2905,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnSpl
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining correctness
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining correctness
  * with a spline and a route that is not coherent with the spline and has a traffic light on it
  * - the goal is to test the situation where the traffic light and its stop line are checked
  * against a spline that does not overlay with them.
@@ -2853,7 +2944,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_splineRoute)
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining correctness
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining correctness
  * with a road (waypoints) and a route that is coherent with the road and has a traffic light on it.
  */
 TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnWaypoints)
@@ -2878,7 +2970,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsOnWaypo
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining correctness
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining correctness
  * with a road (waypoints) and a route that is not coherent with the road
  * and has a traffic light on it - the goal is to test the situation where
  * the traffic light and its stop line are checked against a road that does not overlay with them.
@@ -2898,9 +2991,9 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithNoTrafficLightsOnWay
 }
 
 /**
- * @note Test basic functionality; test distance to traffic light stop line obtaining correctness
- * with a road (waypoints) and a route that is coherent
- * with the road and does not have a traffic light on it.
+ * @note Test basic functionality.
+ * Test distance to traffic light stop line obtaining correctness with a road (waypoints)
+ * and a route that is coherent with the road and does not have a traffic light on it.
  */
 TEST(HdMapUtils, getDistanceToTrafficLightStopLine_routeWithTrafficLightsNotOnWaypointsCongruent)
 {
@@ -2933,7 +3026,8 @@ TEST(HdMapUtils, getDistanceToTrafficLightStopLine_emptyVector_waypointsRoute)
 }
 
 /**
- * @note Test basic functionality; test distance to stop line calculation correctness
+ * @note Test basic functionality.
+ * Test distance to stop line calculation correctness
  * with a spline and a route that is coherent with the spline and has a stop line on it.
  */
 TEST(HdMapUtils, getDistanceToStopLine_stopLineOnSpline)
@@ -2959,7 +3053,8 @@ TEST(HdMapUtils, getDistanceToStopLine_stopLineOnSpline)
 }
 
 /**
- * @note Test basic functionality; test distance to stop line calculation correctness
+ * @note Test basic functionality.
+ * Test distance to stop line calculation correctness
  * with a spline and a route that is coherent with the spline and does not have a stop line on it.
  */
 TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnSplineCongruent)
@@ -2978,7 +3073,8 @@ TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnSplineCongruent)
 }
 
 /**
- * @note Test basic functionality; test distance to stop line calculation correctness
+ * @note Test basic functionality.
+ * Test distance to stop line calculation correctness
  * with a spline and a route that is not coherent with the spline and has a stop line on it
  * - the goal is to test the situation where the stop line is checked
  * against a spline that does not overlay with it.
@@ -3016,7 +3112,8 @@ TEST(HdMapUtils, getDistanceToStopLine_emptyVector_spline)
 }
 
 /**
- * @note Test basic functionality; test distance to stop line calculation correctness
+ * @note Test basic functionality.
+ * Test distance to stop line calculation correctness
  * with a road (waypoints) and a route that is coherent with the road and has a stop line on it.
  */
 TEST(HdMapUtils, getDistanceToStopLine_stopLineOnWaypoints)
@@ -3041,9 +3138,9 @@ TEST(HdMapUtils, getDistanceToStopLine_stopLineOnWaypoints)
 }
 
 /**
- * @note Test basic functionality; test distance to stop line calculation correctness
- * with a road (waypoints) and a route that is coherent
- * with the road and does not have a stop line on it.
+ * @note Test basic functionality.
+ * Test distance to stop line calculation correctness with a road (waypoints)
+ * and a route that is coherent with the road and does not have a stop line on it.
  */
 TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnWaypointsCongruent)
 {
@@ -3060,7 +3157,8 @@ TEST(HdMapUtils, getDistanceToStopLine_noStopLineOnWaypointsCongruent)
 }
 
 /**
- * @note Test basic functionality; test distance to stop line calculation correctness
+ * @note Test basic functionality.
+ * Test distance to stop line calculation correctness
  * with a road (waypoints) and a route that is not coherent with the road
  * and has a stop line on it - the goal is to test the situation where the stop line
  * is checked against a road that does not overlay with it.
