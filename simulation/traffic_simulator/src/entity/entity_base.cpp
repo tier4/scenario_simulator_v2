@@ -20,6 +20,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <string>
 #include <traffic_simulator/entity/entity_base.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -713,55 +714,6 @@ auto EntityBase::updateTraveledDistance(const double step_time) -> double
   return traveled_distance_;
 }
 
-/**
- * @brief Calculates the distance between the entity and the target lanelet pose.
- *
- * This function calculates the longitudinal distance between the entity's current lanelet pose
- * and the target lanelet pose. It calculates the distance in both directions (forward and backward) since sometimes the entity may have already passed the target lanelet pose.
- *
- * @param target_lanelet_pose The target lanelet pose to calculate the distance to.
- * @return The distance between the entity and the target lanelet pose.
- * @throws SemanticError If the entity's lanelet pose is not available.
- * @throws SimulationError If the distance between the entity and the target lanelet pose cannot be calculated.
- */
-auto EntityBase::getDistanceToTargetLaneletPose(
-  const CanonicalizedLaneletPose & target_lanelet_pose) -> double
-{
-  const auto entity_lanelet_pose_ = getLaneletPose();
-  const auto target_lanelet_pose_ = target_lanelet_pose;
-
-  if (!entity_lanelet_pose_) {
-    THROW_SEMANTIC_ERROR(
-      "Failed to get entity's lanelet pose. Please check entity lanelet pose exists.");
-  }
-
-  const auto entity_distance_to_target = hdmap_utils_ptr_->getLongitudinalDistance(
-    static_cast<LaneletPose>(entity_lanelet_pose_.value()),
-    static_cast<LaneletPose>(target_lanelet_pose_));
-
-  const auto revert_entity_distance_to_target = hdmap_utils_ptr_->getLongitudinalDistance(
-    static_cast<LaneletPose>(target_lanelet_pose_),
-    static_cast<LaneletPose>(entity_lanelet_pose_.value()));
-
-  if (!revert_entity_distance_to_target.has_value() && !entity_distance_to_target.has_value()) {
-    THROW_SIMULATION_ERROR("Failed to get distance between entity and target lanelet pose.");
-  }
-
-  if (!revert_entity_distance_to_target.has_value()) {
-    return entity_distance_to_target.value();
-  }
-
-  if (!entity_distance_to_target.has_value()) {
-    return revert_entity_distance_to_target.value();
-  }
-
-  if (revert_entity_distance_to_target.value() < entity_distance_to_target.value()) {
-    return revert_entity_distance_to_target.value();
-  } else {
-    return entity_distance_to_target.value();
-  }
-}
-
 bool EntityBase::reachPosition(const std::string & target_name, const double tolerance) const
 {
   return reachPosition(other_status_.find(target_name)->second.getMapPose(), tolerance);
@@ -780,8 +732,9 @@ bool EntityBase::reachPosition(
 }
 
 auto EntityBase::requestSynchronize(
-  const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,
-  const double threshold, const double accel_limit, const double loop_period) -> bool
+  const std::string & target_name, const CanonicalizedLaneletPose & ego_target,
+  const CanonicalizedLaneletPose & entity_target, const double threshold, const double accel_limit,
+  const double loop_period) -> bool
 {
   if (traffic_simulator_msgs::msg::EntityType::EGO == getEntityType().type) {
     THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
@@ -801,49 +754,69 @@ auto EntityBase::requestSynchronize(
   }
 
   job_list_.append(
-    [this, ego_target, entity_target, accel_limit, threshold, loop_period](double) {
-      auto entity_distance = getDistanceToTargetLaneletPose(entity_target);
-      auto ego_distance = this->hdmap_utils_ptr_->getLongitudinalDistance(
-        static_cast<LaneletPose>(other_status_.find("ego")->second.getLaneletPose()),
-        static_cast<LaneletPose>(ego_target));
+    [this, target_name, ego_target, entity_target, accel_limit, threshold, loop_period](double) {
+      const auto entity_lanelet_pose = getLaneletPose();
+      if (!entity_lanelet_pose.has_value()) {
+        THROW_SEMANTIC_ERROR(
+          "Failed to get lanelet pose of the entity. Check if the entity is on the lane."
+          "If so please contact the developer since there might be an undiscovered bug.");
+      }
 
-      if (!ego_distance.has_value()) {
+      const auto entity_distance = longitudinalDistance(
+        entity_lanelet_pose.value(), entity_target, true, true, true, hdmap_utils_ptr_);
+      if (!entity_distance.has_value()) {
+        THROW_SEMANTIC_ERROR(
+          "Failed to get distance between entity and target lanelet pose. Check if the entity has "
+          "already passed the target lanelet. If not, please contact the developer since there "
+          "might be an undiscovered bug.");
+      }
+
+      const auto target_entity_lanelet_pose =
+        other_status_.find(target_name) == other_status_.end()
+          ? THROW_SEMANTIC_ERROR("Failed to find target entity. Check if the target entity exists.")
+          : other_status_.find(target_name)->second.getLaneletPose();
+
+      const auto target_entity_status = longitudinalDistance(
+        CanonicalizedLaneletPose(target_entity_lanelet_pose, hdmap_utils_ptr_), ego_target, true,
+        true, true, hdmap_utils_ptr_);
+      if (!target_entity_status.has_value()) {
         RCLCPP_WARN_ONCE(
           rclcpp::get_logger("traffic_simulator"),
-          "Failed to get distance between Ego and target lanelet pose. Check if Ego has already "
-          "passed the target lanelet. If not, please contact the developer since there might be an "
-          "undiscovered bug.");
+          "Failed to get distance between target entity and target lanelet pose. Check if target "
+          "entity has already passed the target lanelet. If not, please contact the developer "
+          "since there might be an undiscovered bug.");
         return true;
       }
-      const auto ego_velocity = other_status_.find("ego")->second.getTwist().linear.x;
+
+      const auto target_entity_velocity =
+        other_status_.find(target_name)->second.getTwist().linear.x;
       const auto entity_velocity = this->getStatus().getTwist().linear.x;
-      const auto ego_arrival_time =
-        (std::abs(ego_velocity) > std::numeric_limits<double>::epsilon())
-          ? ego_distance.value() / ego_velocity
+      const auto target_entity_arrival_time =
+        (std::abs(target_entity_velocity) > std::numeric_limits<double>::epsilon())
+          ? target_entity_status.value() / target_entity_velocity
           : 0;
 
-      auto entity_velocity_to_synchronize = [this, ego_velocity, entity_velocity, ego_arrival_time,
+      auto entity_velocity_to_synchronize = [this, entity_velocity, target_entity_arrival_time,
                                              entity_distance, accel_limit, threshold,
                                              loop_period]() {
-        if (entity_velocity > accel_limit * ego_arrival_time) {
+        const auto border_distance = entity_velocity * target_entity_arrival_time -
+                                     entity_velocity * entity_velocity / (accel_limit * 2);
+        if (entity_velocity > accel_limit * target_entity_arrival_time) {
           ///@brief Making entity slow down since the speed is too fast
           return entity_velocity - accel_limit * loop_period / 1000;
-        } else if (
-          entity_velocity * ego_arrival_time -
-            entity_velocity * entity_velocity / (accel_limit * 2) <
-          entity_distance - threshold) {
+        } else if (border_distance < entity_distance.value() - threshold) {
           ///@brief Making entity speed up
           return entity_velocity + accel_limit * loop_period / 1000;
-        } else if (
-          entity_velocity * ego_arrival_time -
-            entity_velocity * entity_velocity / (accel_limit * 2) >
-          entity_distance - threshold) {
+        } else if (border_distance > entity_distance.value() - threshold) {
           ///@brief Making entity slow down
           return entity_velocity - accel_limit * loop_period / 1000;
         } else {
           ///@brief Making entity keep the current speed
           return entity_velocity;
         }
+        /***
+         * @brief Deviding the loop_period by 1000 is to convert the unit from ms to s.
+        */
       };
 
       /**

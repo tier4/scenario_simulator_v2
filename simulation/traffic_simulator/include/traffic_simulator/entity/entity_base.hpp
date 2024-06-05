@@ -223,9 +223,6 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
-  /*   */ auto getDistanceToTargetLaneletPose(const CanonicalizedLaneletPose & target_lanelet_pose)
-    -> double;
-
   /*   */ bool reachPosition(
     const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
 
@@ -235,8 +232,9 @@ public:
   /*   */ bool reachPosition(const std::string & target_name, const double tolerance) const;
 
   /*   */ auto requestSynchronize(
-    const CanonicalizedLaneletPose & ego_target, const CanonicalizedLaneletPose & entity_target,
-    const double threshold, const double accel_limit, const double loop_period) -> bool;
+    const std::string & target_name, const CanonicalizedLaneletPose & ego_target,
+    const CanonicalizedLaneletPose & entity_target, const double threshold,
+    const double accel_limit, const double loop_period) -> bool;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
     -> void final;
