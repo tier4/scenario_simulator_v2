@@ -336,7 +336,7 @@ TEST_F(HdMapUtilsTest_FourTrackHighwayMap, AlongLaneletPose_beforeFirst)
 }
 
 /**
- * @note Test lanelet pose obtaining corectness when s < 0.
+ * @note Test lanelet pose obtaining correctness when s < 0.
  * Function should find correct lanelet id and canonicalize lanelet pose even when s < 0.
  * Following lanelets: 34576 -> 34570 -> 34564
  * Canonicalized lanelet pose of (id=34564, s=-22) is suppose to be
@@ -357,7 +357,7 @@ TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeNegative)
 }
 
 /**
- * @note Test lanelet pose obtaining corectness when s is larger than lanelet length.
+ * @note Test lanelet pose obtaining correctness when s is larger than lanelet length.
  * Function should find correct lanelet id and canonicalize lanelet pose for s larger than lanelet length.
  * Following lanelets: 34981 -> 34585 -> 34579
  * Canonicalized lanelet pose of (id=34981, s=30) is suppose to be
@@ -394,7 +394,7 @@ TEST_F(HdMapUtilsTest_StandardMap, Canonicalize)
 }
 
 /**
- * @note Test lanelet pose vector obtaining corectness when s < 0.
+ * @note Test lanelet pose vector obtaining correctness when s < 0.
  * Function should find correct lanelet ids and canonicalize lanelet pose even when s < 0.
  * Following lanelets: 34576 -> 34570 -> 34564
  *                     34981 -> 34636 -> 34564
@@ -429,7 +429,7 @@ TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAllNegative)
 }
 
 /**
- * @note Test lanelet pose vector obtaining corectness when s is larger than lanelet length.
+ * @note Test lanelet pose vector obtaining correctness when s is larger than lanelet length.
  * Function should find correct lanelet ids and canonicalize lanelet pose for s larger than lanelet length.
  * Following lanelets: 34981 -> 34585 -> 34579
  *                     34981 -> 34636 -> 34564
