@@ -45,7 +45,7 @@ public:
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 using Point = geometry_msgs::msg::Point;
 using Spline = math::geometry::CatmullRomSpline;
@@ -208,6 +208,6 @@ private:
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_pedestrian_ptr_;
 };
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator
 #endif  // LaneletMapCoreTRAFFIC_SIMULATOR__UTILS__LANELET_MAP_CORE_MEMORY_HPP_

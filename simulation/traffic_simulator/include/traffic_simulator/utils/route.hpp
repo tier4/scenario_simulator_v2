@@ -20,8 +20,8 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/utils/lanelet_core/lane_change.hpp>
-#include <traffic_simulator/utils/lanelet_core/route.hpp>
+#include <traffic_simulator/lanelet_map_core/lane_change.hpp>
+#include <traffic_simulator/lanelet_map_core/route.hpp>
 
 namespace traffic_simulator
 {
@@ -39,13 +39,13 @@ auto toSpline(const lanelet::Ids & route) -> Spline;
 template <typename... Ts>
 auto getRoute(Ts &&... xs)
 {
-  return lanelet_core::route::getRoute(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::route::getRoute(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 auto speedLimit(Ts &&... xs)
 {
-  return lanelet_core::route::getSpeedLimit(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::route::getSpeedLimit(std::forward<decltype(xs)>(xs)...);
 }
 
 auto isAnyConflictingEntity(
@@ -60,7 +60,7 @@ auto isNeedToRightOfWay(
 template <typename... Ts>
 auto followingLanelets(Ts &&... xs)
 {
-  return lanelet_core::route::getFollowingLanelets(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::route::getFollowingLanelets(std::forward<decltype(xs)>(xs)...);
 }
 
 auto moveAlongLaneletPose(
@@ -71,7 +71,7 @@ auto moveAlongLaneletPose(
 template <typename... Ts>
 auto previousLanelets(Ts &&... xs)
 {
-  return lanelet_core::route::getPreviousLanelets(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::route::getPreviousLanelets(std::forward<decltype(xs)>(xs)...);
 }
 
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
@@ -81,7 +81,7 @@ auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
 template <typename... Ts>
 auto laneChangeableLaneletId(Ts &&... xs)
 {
-  return lanelet_core::lane_change::getLaneChangeableLaneletId(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::lane_change::getLaneChangeableLaneletId(std::forward<decltype(xs)>(xs)...);
 }
 
 auto laneChangeAlongLaneletPose(

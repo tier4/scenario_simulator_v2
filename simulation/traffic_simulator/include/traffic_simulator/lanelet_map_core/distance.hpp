@@ -24,7 +24,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace distance
 {
@@ -82,6 +82,6 @@ namespace
 auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
 }
 }  // namespace distance
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_DISTANCE_HPP_

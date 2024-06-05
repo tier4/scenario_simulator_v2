@@ -17,11 +17,11 @@
 
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <lanelet2_extension/utility/query.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 auto LaneletMapCore::activate(const std::string & lanelet_map_path) -> void
 {
@@ -241,5 +241,5 @@ auto LaneletMapCore::calculateSegmentDistances(const lanelet::ConstLineString3d 
   }
   return segment_distances;
 }
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator

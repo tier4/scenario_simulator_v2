@@ -20,12 +20,12 @@ namespace traffic_lights
 {
 auto wayId(const lanelet::Id lanelet_id) -> lanelet::Id
 {
-  if (lanelet_core::traffic_lights::isTrafficLight(lanelet_id)) {
+  if (lanelet_map_core::traffic_lights::isTrafficLight(lanelet_id)) {
     return lanelet_id;
   } else {
     // lanelet::RoleName::Refers
     if (auto traffic_light_members =
-          lanelet_core::traffic_lights::getTrafficLightRegulatoryElement(lanelet_id)
+          lanelet_map_core::traffic_lights::getTrafficLightRegulatoryElement(lanelet_id)
             ->getParameters<lanelet::ConstLineString3d>("refers");
         traffic_light_members.size() > 0) {
       // Note: If `lanelet_id` is a relation id, it is okay to use only one of the referred way ids.
@@ -41,13 +41,13 @@ auto wayId(const lanelet::Id lanelet_id) -> lanelet::Id
 auto trafficLightsIds(const lanelet::Id lanelet_id) -> lanelet::Ids
 {
   lanelet::Ids traffic_lights_ids;
-  if (lanelet_core::traffic_lights::isTrafficLightRegulatoryElement(lanelet_id)) {
+  if (lanelet_map_core::traffic_lights::isTrafficLightRegulatoryElement(lanelet_id)) {
     for (auto && traffic_light :
-         lanelet_core::traffic_lights::getTrafficLightRegulatoryElement(lanelet_id)
+         lanelet_map_core::traffic_lights::getTrafficLightRegulatoryElement(lanelet_id)
            ->trafficLights()) {
       traffic_lights_ids.emplace_back(traffic_light.id());
     }
-  } else if (lanelet_core::traffic_lights::isTrafficLight(lanelet_id)) {
+  } else if (lanelet_map_core::traffic_lights::isTrafficLight(lanelet_id)) {
     traffic_lights_ids.emplace_back(lanelet_id);
   } else {
     throw std::invalid_argument(

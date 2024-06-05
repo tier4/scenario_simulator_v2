@@ -47,6 +47,13 @@ ament_auto_add_library(traffic_simulator SHARED
   src/helper/helper.cpp
   src/job/job.cpp
   src/job/job_list.cpp
+  src/lanelet_map_core/distance.cpp
+  src/lanelet_map_core/lane_change.cpp
+  src/lanelet_map_core/lanelet_map.cpp
+  src/lanelet_map_core/lanelet_map_core.cpp
+  src/lanelet_map_core/pose.cpp
+  src/lanelet_map_core/route.cpp
+  src/lanelet_map_core/traffic_lights.cpp
   src/simulation_clock/simulation_clock.cpp
   src/traffic/traffic_controller.cpp
   src/traffic/traffic_sink.cpp
@@ -57,13 +64,6 @@ ament_auto_add_library(traffic_simulator SHARED
   src/traffic_lights/traffic_light_marker_publisher.cpp
   src/traffic_lights/traffic_light_publisher.cpp
   src/utils/distance.cpp
-  src/utils/lanelet_core/distance.cpp
-  src/utils/lanelet_core/lane_change.cpp
-  src/utils/lanelet_core/lanelet_map.cpp
-  src/utils/lanelet_core/lanelet_map_core.cpp
-  src/utils/lanelet_core/pose.cpp
-  src/utils/lanelet_core/route.cpp
-  src/utils/lanelet_core/traffic_lights.cpp
   src/utils/lanelet_map.cpp
   src/utils/pose.cpp
   src/utils/route.cpp

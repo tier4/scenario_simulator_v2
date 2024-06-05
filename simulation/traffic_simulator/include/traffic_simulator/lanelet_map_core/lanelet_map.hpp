@@ -24,7 +24,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace lanelet_map
 {
@@ -105,6 +105,6 @@ auto excludeSubtypeLanelets(
   -> std::vector<std::pair<double, lanelet::Lanelet>>;
 }  // namespace
 }  // namespace lanelet_map
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANELET_MAP_HPP_

@@ -21,7 +21,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace route
 {
@@ -42,6 +42,6 @@ auto getFollowingLanelets(
 
 auto getPreviousLanelets(const lanelet::Id, const double distance = 100) -> lanelet::Ids;
 }  // namespace route
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_ROUTE_HPP_

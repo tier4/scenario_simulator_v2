@@ -14,14 +14,14 @@
 
 #include <geometry/transform.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet_core/lane_change.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
-#include <traffic_simulator/utils/lanelet_core/pose.hpp>
+#include <traffic_simulator/lanelet_map_core/lane_change.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
+#include <traffic_simulator/lanelet_map_core/pose.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace lane_change
 {
@@ -218,5 +218,5 @@ auto getLaneChangeTrajectory(
       .z(to_vec.z * tangent_vector_size_in_curve));
 }
 }  // namespace lane_change
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator

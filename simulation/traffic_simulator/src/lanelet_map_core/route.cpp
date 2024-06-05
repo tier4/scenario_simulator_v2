@@ -19,13 +19,13 @@
 
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
-#include <traffic_simulator/utils/lanelet_core/route.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
+#include <traffic_simulator/lanelet_map_core/route.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace route
 {
@@ -169,5 +169,5 @@ auto getPreviousLanelets(const lanelet::Id lanelet_id, const double distance) ->
   return ret;
 }
 }  // namespace route
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator

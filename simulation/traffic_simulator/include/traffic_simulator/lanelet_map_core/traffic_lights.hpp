@@ -23,7 +23,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace traffic_lights
 {
@@ -60,6 +60,6 @@ auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>;
 }  // namespace
 }  // namespace traffic_lights
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_TRAFFIC_LIGHTS_HPP_

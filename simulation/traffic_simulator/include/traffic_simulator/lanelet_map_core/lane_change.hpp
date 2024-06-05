@@ -23,7 +23,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace lane_change
 {
@@ -58,6 +58,6 @@ auto getLaneChangeTrajectory(
   const Pose & from_pose, const LaneletPose & to_pose, const TrajectoryShape & trajectory_shape,
   const double tangent_vector_size) -> Curve;
 }  // namespace lane_change
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANE_CHANGE_HPP_

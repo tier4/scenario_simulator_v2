@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/utils/lanelet_core/distance.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet_core/pose.hpp>
-#include <traffic_simulator/utils/lanelet_core/route.hpp>
-#include <traffic_simulator/utils/lanelet_core/traffic_lights.hpp>
+#include <traffic_simulator/lanelet_map_core/distance.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_map_core/pose.hpp>
+#include <traffic_simulator/lanelet_map_core/route.hpp>
+#include <traffic_simulator/lanelet_map_core/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace distance
 {
@@ -220,7 +220,7 @@ auto getDistanceToStopLine(
     return std::nullopt;
   } else {
     const Spline spline(route_waypoints);
-    const auto polygon = lanelet_core::lanelet_map::getStopLinePolygon(stop_line_id);
+    const auto polygon = lanelet_map_core::lanelet_map::getStopLinePolygon(stop_line_id);
     return spline.getCollisionPointIn2D(polygon);
   }
 }
@@ -309,7 +309,7 @@ auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanel
     return std::nullopt;
   } else {
     Spline spline(route_waypoints);
-    return spline.getCollisionPointIn2D(lanelet_core::lanelet_map::getLaneletPolygon(crosswalk_id));
+    return spline.getCollisionPointIn2D(lanelet_map_core::lanelet_map::getLaneletPolygon(crosswalk_id));
   }
 }
 
@@ -317,7 +317,7 @@ auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id
   -> std::optional<double>
 {
   return route_spline.getCollisionPointIn2D(
-    lanelet_core::lanelet_map::getLaneletPolygon(crosswalk_id), false);
+    lanelet_map_core::lanelet_map::getLaneletPolygon(crosswalk_id), false);
 }
 
 // private
@@ -338,5 +338,5 @@ auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineS
 }
 }  // namespace
 }  // namespace distance
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator

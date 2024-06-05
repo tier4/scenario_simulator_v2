@@ -16,14 +16,14 @@
 
 #include <geometry/linear_algebra.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
-#include <traffic_simulator/utils/lanelet_core/pose.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
+#include <traffic_simulator/lanelet_map_core/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace pose
 {
@@ -498,5 +498,5 @@ auto getRightLaneletIds(
 }
 }  // namespace
 }  // namespace pose
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator

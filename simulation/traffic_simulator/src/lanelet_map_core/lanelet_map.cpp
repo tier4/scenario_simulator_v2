@@ -19,13 +19,13 @@
 #include <geometry/vector3/normalize.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
-#include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
-#include <traffic_simulator/utils/lanelet_core/pose.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
+#include <traffic_simulator/lanelet_map_core/pose.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace lanelet_map
 {
@@ -55,7 +55,7 @@ auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
   -> std::tuple<double, Point, Point>
 {
   /// @note Copied from motion_util::findNearestSegmentIndex
-  const auto centerline_points = lanelet_core::lanelet_map::getCenterPoints(lanelet_id);
+  const auto centerline_points = lanelet_map_core::lanelet_map::getCenterPoints(lanelet_id);
   auto find_nearest_segment_index = [](const std::vector<Point> & points, const Point & point) {
     assert(not points.empty());
     double min_distance = std::numeric_limits<double>::max();
@@ -434,5 +434,5 @@ auto excludeSubtypeLanelets(
 }
 }  // namespace
 }  // namespace lanelet_map
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator

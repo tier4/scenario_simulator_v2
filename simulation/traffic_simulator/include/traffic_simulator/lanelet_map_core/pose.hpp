@@ -26,7 +26,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_core
+namespace lanelet_map_core
 {
 namespace pose
 {
@@ -86,6 +86,6 @@ auto getRightLaneletIds(
   const bool include_opposite_direction) -> lanelet::Ids;
 }  // namespace
 }  // namespace pose
-}  // namespace lanelet_core
+}  // namespace lanelet_map_core
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_POSE_HPP_
