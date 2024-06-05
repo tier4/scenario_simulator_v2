@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
 #include <traffic_simulator/lanelet_map_core/traffic_lights.hpp>
 
 namespace traffic_simulator
@@ -172,25 +171,6 @@ auto getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
   }
   return ret;
 }
-
-// private
-namespace
-{
-auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
-  -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
-{
-  std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;
-  for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
-    const auto traffic_lights =
-      lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>();
-    for (const auto & traffic_light : traffic_lights) {
-      ret.emplace_back(traffic_light);
-    }
-  }
-  return ret;
-}
-}  // namespace
 }  // namespace traffic_lights
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator

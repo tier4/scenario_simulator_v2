@@ -20,6 +20,7 @@
 
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
+#include <traffic_simulator/lanelet_map_core/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
@@ -79,8 +80,20 @@ auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id
 // private
 namespace
 {
-auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
+auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d
+{
+  lanelet::ConstLineStrings3d ret;
+  for (const auto & traffic_sign :
+       traffic_lights::getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
+    if (traffic_sign->type() == "stop_sign") {
+      for (const auto & stop_line : traffic_sign->refLines()) {
+        ret.emplace_back(stop_line);
+      }
+    }
+  }
+  return ret;
 }
+}  // namespace
 }  // namespace distance
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator

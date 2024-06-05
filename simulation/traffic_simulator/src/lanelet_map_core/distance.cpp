@@ -16,7 +16,6 @@
 #include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_map_core/pose.hpp>
 #include <traffic_simulator/lanelet_map_core/route.hpp>
-#include <traffic_simulator/lanelet_map_core/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
@@ -320,24 +319,6 @@ auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id
   return route_spline.getCollisionPointIn2D(
     lanelet_map_core::lanelet_map::getLaneletPolygon(crosswalk_id), false);
 }
-
-// private
-namespace
-{
-auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d
-{
-  lanelet::ConstLineStrings3d ret;
-  for (const auto & traffic_sign :
-       traffic_lights::getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
-    if (traffic_sign->type() == "stop_sign") {
-      for (const auto & stop_line : traffic_sign->refLines()) {
-        ret.emplace_back(stop_line);
-      }
-    }
-  }
-  return ret;
-}
-}  // namespace
 }  // namespace distance
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator
