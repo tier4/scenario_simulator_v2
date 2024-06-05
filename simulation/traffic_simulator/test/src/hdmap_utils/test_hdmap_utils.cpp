@@ -83,7 +83,15 @@ int main(int argc, char ** argv)
 class HdMapUtilsTest_StandardMap : public testing::Test
 {
 protected:
-  HdMapUtilsTest_StandardMap() : hdmap_utils(makeHdMapUtilsInstance(standard_map_path)) {}
+  HdMapUtilsTest_StandardMap()
+  : hdmap_utils(hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.61836750154)
+        .longitude(139.78066608243)
+        .altitude(0.0)))
+  {
+  }
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
@@ -91,7 +99,13 @@ class HdMapUtilsTest_WithRoadShoulderMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_WithRoadShoulderMap()
-  : hdmap_utils(makeHdMapUtilsInstance(with_road_shoulder_map_path))
+  : hdmap_utils(hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/with_road_shoulder/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.61836750154)
+        .longitude(139.78066608243)
+        .altitude(0.0)))
   {
   }
 
@@ -100,7 +114,16 @@ protected:
 class HdMapUtilsTest_EmptyMap : public testing::Test
 {
 protected:
-  HdMapUtilsTest_EmptyMap() : hdmap_utils(makeHdMapUtilsInstance(empty_map_path)) {}
+  HdMapUtilsTest_EmptyMap()
+  : hdmap_utils(hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/empty/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(0.0)
+        .longitude(0.0)
+        .altitude(0.0)))
+  {
+  }
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
@@ -108,7 +131,13 @@ class HdMapUtilsTest_FourTrackHighwayMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_FourTrackHighwayMap()
-  : hdmap_utils(makeHdMapUtilsInstance(four_track_highway_map_path))
+  : hdmap_utils(hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/four_track_highway/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.22312494055522)
+        .longitude(138.8024583466017)
+        .altitude(0.0)))
   {
   }
 
@@ -118,18 +147,32 @@ class HdMapUtilsTest_CrossroadsWithStoplinesMap : public testing::Test
 {
 protected:
   HdMapUtilsTest_CrossroadsWithStoplinesMap()
-  : hdmap_utils(makeHdMapUtilsInstance(crossroads_with_stoplines_map_path))
+  : hdmap_utils(hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") +
+        "/map/crossroads_with_stoplines/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.23808753540768)
+        .longitude(139.9009591876285)
+        .altitude(0.0)))
   {
   }
 
   hdmap_utils::HdMapUtils hdmap_utils;
 };
-
 /**
  * @note Test basic functionality.
  * Test initialization correctness with a correct path to a lanelet map.
  */
-TEST(HdMapUtils, Construct) { ASSERT_NO_THROW(auto hdmap_utils = makeHdMapUtilsInstance()); }
+TEST(HdMapUtils, Construct)
+{
+  ASSERT_NO_THROW(
+    auto hdmap_utils = hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.61836750154)
+        .longitude(139.78066608243)
+        .altitude(0.0)));
+}
 
 /**
  * @note Test basic functionality.
@@ -137,7 +180,14 @@ TEST(HdMapUtils, Construct) { ASSERT_NO_THROW(auto hdmap_utils = makeHdMapUtilsI
  */
 TEST(HdMapUtils, Construct_invalid)
 {
-  EXPECT_THROW(makeHdMapUtilsInstance("invalid_path"), std::runtime_error);
+  EXPECT_THROW(
+    auto hdmap_utils = hdmap_utils::HdMapUtils(
+      ament_index_cpp::get_package_share_directory("traffic_simulator") + "invalid_path",
+      geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+        .latitude(35.61836750154)
+        .longitude(139.78066608243)
+        .altitude(0.0)),
+    std::runtime_error);
 }
 
 /**
@@ -510,7 +560,6 @@ TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_invalidSubtype)
  */
 TEST_F(HdMapUtilsTest_StandardMap, filterLaneletIds_invalidIds)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
   lanelet::Id id_invalid_0 = 10000000;
   lanelet::Id id_invalid_1 = 10000001;
   lanelet::Id id_invalid_2 = 10000002;
@@ -593,8 +642,6 @@ TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_intersects)
  */
 TEST_F(HdMapUtilsTest_StandardMap, getCollisionPointInLaneCoordinate_disjoint)
 {
-  auto hdmap_utils = makeHdMapUtilsInstance();
-
   lanelet::Id id_crosswalk = 34399;
   lanelet::Id id_road = 34579;
   auto distance = hdmap_utils.getCollisionPointInLaneCoordinate(id_road, id_crosswalk);
