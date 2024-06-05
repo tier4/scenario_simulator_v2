@@ -21,8 +21,8 @@ inline namespace lanelet_map
 auto borderlinePoses() -> std::vector<Pose>
 {
   std::vector<Pose> borderline_poses;
-  for (const auto & lanelet_id : lanelet_core::other::getLaneletIds()) {
-    if (lanelet_core::other::getNextLaneletIds(lanelet_id).empty()) {
+  for (const auto & lanelet_id : lanelet_core::lanelet_map::getLaneletIds()) {
+    if (lanelet_core::lanelet_map::getNextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = pose::laneletLength(lanelet_id);
@@ -35,7 +35,7 @@ auto borderlinePoses() -> std::vector<Pose>
 auto yaw(const lanelet::Id lanelet_id, const Point & point) -> std::tuple<double, Point, Point>
 {
   /// @note Copied from motion_util::findNearestSegmentIndex
-  const auto centerline_points = lanelet_core::other::getCenterPoints(lanelet_id);
+  const auto centerline_points = lanelet_core::lanelet_map::getCenterPoints(lanelet_id);
   auto find_nearest_segment_index = [](const std::vector<Point> & points, const Point & point) {
     assert(not points.empty());
     double min_distance = std::numeric_limits<double>::max();

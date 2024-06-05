@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <traffic_simulator/utils/lanelet_core/distance.hpp>
-#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 #include <traffic_simulator/utils/lanelet_core/route.hpp>
 #include <traffic_simulator/utils/lanelet_core/traffic_lights.hpp>
@@ -35,7 +35,7 @@ auto getLateralDistance(
   if (allow_lane_change) {
     double lateral_distance_by_lane_change = 0.0;
     for (unsigned int i = 0; i < route.size() - 1; i++) {
-      auto next_lanelet_ids = other::getNextLaneletIds(route[i]);
+      auto next_lanelet_ids = lanelet_map::getNextLaneletIds(route[i]);
       if (auto next_lanelet = std::find_if(
             next_lanelet_ids.begin(), next_lanelet_ids.end(),
             [&route, i](const lanelet::Id id) { return id == route[i + 1]; });
@@ -89,7 +89,7 @@ auto getLongitudinalDistance(
                             const bool allow_lane_change, const lanelet::Id current_lanelet,
                             const lanelet::Id next_lanelet) -> bool {
     if (allow_lane_change) {
-      auto next_lanelet_ids = other::getNextLaneletIds(current_lanelet);
+      auto next_lanelet_ids = lanelet_map::getNextLaneletIds(current_lanelet);
       auto next_lanelet_itr = std::find_if(
         next_lanelet_ids.begin(), next_lanelet_ids.end(),
         [next_lanelet](const lanelet::Id id) { return id == next_lanelet; });
@@ -127,22 +127,22 @@ auto getLongitudinalDistance(
 
       /// @note "first lanelet before the lane change" case
       if (route[i] == from.lanelet_id) {
-        distance += other::getLaneletLength(route[i + 1]) - from.s;
+        distance += lanelet_map::getLaneletLength(route[i + 1]) - from.s;
         if (route[i + 1] == to.lanelet_id) {
-          distance -= other::getLaneletLength(route[i + 1]) - to.s;
+          distance -= lanelet_map::getLaneletLength(route[i + 1]) - to.s;
           return distance;
         }
       }
     } else {
       if (route[i] == from.lanelet_id) {
         /// @note "first lanelet" case
-        distance = other::getLaneletLength(from.lanelet_id) - from.s;
+        distance = lanelet_map::getLaneletLength(from.lanelet_id) - from.s;
       } else if (route[i] == to.lanelet_id) {
         /// @note "last lanelet" case
         distance += to.s;
       } else {
         ///@note "normal intermediate lanelet" case
-        distance += other::getLaneletLength(route[i]);
+        distance += lanelet_map::getLaneletLength(route[i]);
       }
     }
   }

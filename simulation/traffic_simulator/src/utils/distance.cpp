@@ -18,7 +18,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator/utils/lanelet_core/distance.hpp>
-#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 #include <traffic_simulator/utils/lanelet_core/route.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
@@ -183,7 +183,7 @@ auto boundingBoxLaneLongitudinalDistance(
 auto distanceToLeftLaneBound(
   const Pose & map_pose, const BoundingBox & bounding_box, const lanelet::Id lanelet_id) -> double
 {
-  if (const auto bound = lanelet_core::other::getLeftBound(lanelet_id); bound.empty()) {
+  if (const auto bound = lanelet_core::lanelet_map::getLeftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
   } else if (const auto polygon =
@@ -209,7 +209,7 @@ auto distanceToLeftLaneBound(
 auto distanceToRightLaneBound(
   const Pose & map_pose, const BoundingBox & bounding_box, const lanelet::Id lanelet_id) -> double
 {
-  if (const auto bound = lanelet_core::other::getRightBound(lanelet_id); bound.empty()) {
+  if (const auto bound = lanelet_core::lanelet_map::getRightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
@@ -264,7 +264,7 @@ auto distanceToCrosswalk(const Waypoints & waypoints_array, const lanelet::Id ta
   } else {
     Spline spline(waypoints_array.waypoints);
     return spline.getCollisionPointIn2D(
-      lanelet_core::other::getLaneletPolygon(target_crosswalk_id));
+      lanelet_core::lanelet_map::getLaneletPolygon(target_crosswalk_id));
   }
 }
 
@@ -272,7 +272,7 @@ auto distanceToCrosswalk(const SplineInterface & spline, const lanelet::Id targe
   -> std::optional<double>
 {
   return spline.getCollisionPointIn2D(
-    lanelet_core::other::getLaneletPolygon(target_crosswalk_id), false);
+    lanelet_core::lanelet_map::getLaneletPolygon(target_crosswalk_id), false);
 }
 
 auto distanceToStopLine(const Waypoints & waypoints_array, const lanelet::Id target_stop_line_id)
@@ -282,7 +282,7 @@ auto distanceToStopLine(const Waypoints & waypoints_array, const lanelet::Id tar
     return std::nullopt;
   } else {
     const Spline spline(waypoints_array.waypoints);
-    const auto polygon = lanelet_core::other::getStopLinePolygon(target_stop_line_id);
+    const auto polygon = lanelet_core::lanelet_map::getStopLinePolygon(target_stop_line_id);
     return spline.getCollisionPointIn2D(polygon);
   }
 }

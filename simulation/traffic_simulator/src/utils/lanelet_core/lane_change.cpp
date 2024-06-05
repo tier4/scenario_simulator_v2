@@ -16,7 +16,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet_core/lane_change.hpp>
 #include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
-#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 
 namespace traffic_simulator
@@ -37,31 +37,31 @@ auto getAlongLaneletPose(const LaneletPose & from_pose, const double along) -> L
   LaneletPose along_pose = from_pose;
   along_pose.s = along_pose.s + along;
   if (along_pose.s >= 0) {
-    while (along_pose.s >= other::getLaneletLength(along_pose.lanelet_id)) {
-      auto next_ids = other::getNextLaneletIds(along_pose.lanelet_id, "straight");
+    while (along_pose.s >= lanelet_map::getLaneletLength(along_pose.lanelet_id)) {
+      auto next_ids = lanelet_map::getNextLaneletIds(along_pose.lanelet_id, "straight");
       if (next_ids.empty()) {
-        next_ids = other::getNextLaneletIds(along_pose.lanelet_id);
+        next_ids = lanelet_map::getNextLaneletIds(along_pose.lanelet_id);
         if (next_ids.empty()) {
           THROW_SEMANTIC_ERROR(
             "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
             from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
         }
       }
-      along_pose.s = along_pose.s - other::getLaneletLength(along_pose.lanelet_id);
+      along_pose.s = along_pose.s - lanelet_map::getLaneletLength(along_pose.lanelet_id);
       along_pose.lanelet_id = next_ids[0];
     }
   } else {
     while (along_pose.s < 0) {
-      auto previous_ids = other::getPreviousLaneletIds(along_pose.lanelet_id, "straight");
+      auto previous_ids = lanelet_map::getPreviousLaneletIds(along_pose.lanelet_id, "straight");
       if (previous_ids.empty()) {
-        previous_ids = other::getPreviousLaneletIds(along_pose.lanelet_id);
+        previous_ids = lanelet_map::getPreviousLaneletIds(along_pose.lanelet_id);
         if (previous_ids.empty()) {
           THROW_SEMANTIC_ERROR(
             "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
             from_pose.s + along, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
         }
       }
-      along_pose.s = along_pose.s + other::getLaneletLength(previous_ids[0]);
+      along_pose.s = along_pose.s + lanelet_map::getLaneletLength(previous_ids[0]);
       along_pose.lanelet_id = previous_ids[0];
     }
   }
@@ -141,7 +141,7 @@ auto getLaneChangeTrajectory(const LaneletPose & from_pose, const Parameter & la
     pose::toMapPose(helper::constructLaneletPose(
       along_pose.lanelet_id, along_pose.s, along_pose.offset - 5.0)).pose.position;
   // clang-format on
-  const auto collision_point = other::getCenterPointsSpline(lane_change_parameter.target.lanelet_id)
+  const auto collision_point = lanelet_map::getCenterPointsSpline(lane_change_parameter.target.lanelet_id)
                                  ->getCollisionPointIn2D(left_point, right_point);
   if (!collision_point) {
     return std::nullopt;
@@ -167,7 +167,7 @@ auto getLaneChangeTrajectory(
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>
 {
-  double to_length = other::getLaneletLength(lane_change_parameter.target.lanelet_id);
+  double to_length = lanelet_map::getLaneletLength(lane_change_parameter.target.lanelet_id);
   std::vector<double> evaluation, target_s;
   std::vector<Curve> curves;
 
@@ -253,7 +253,7 @@ auto getVectorFromPose(const Pose & pose, const double magnitude) -> Vector3
 
 auto getTangentVector(const lanelet::Id lanelet_id, const double s) -> std::optional<Vector3>
 {
-  return other::getCenterPointsSpline(lanelet_id)->getTangentVector(s);
+  return lanelet_map::getCenterPointsSpline(lanelet_id)->getTangentVector(s);
 }
 }  // namespace
 }  // namespace lane_change

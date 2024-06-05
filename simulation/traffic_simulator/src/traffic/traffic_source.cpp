@@ -16,7 +16,7 @@
 #include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
-#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>

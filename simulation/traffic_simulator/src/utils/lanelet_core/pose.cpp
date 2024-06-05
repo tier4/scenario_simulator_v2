@@ -17,7 +17,7 @@
 #include <geometry/linear_algebra.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
-#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
@@ -34,7 +34,7 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
       std::get<std::optional<LaneletPose>>(pose::canonicalizeLaneletPose(lanelet_pose))) {
     PoseStamped ret;
     ret.header.frame_id = "map";
-    const auto spline = other::getCenterPointsSpline(pose->lanelet_id);
+    const auto spline = lanelet_map::getCenterPointsSpline(pose->lanelet_id);
     ret.pose = spline->getPose(pose->s);
     const auto normal_vec = spline->getNormalVector(pose->s);
     const auto diff = math::geometry::normalize(normal_vec) * pose->offset;
@@ -58,7 +58,7 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
 auto toLaneletPose(const Pose & pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>
 {
-  const auto spline = other::getCenterPointsSpline(lanelet_id);
+  const auto spline = lanelet_map::getCenterPointsSpline(lanelet_id);
   const auto s = spline->getSValue(pose, matching_distance);
   if (!s) {
     return std::nullopt;
@@ -132,14 +132,14 @@ auto toLaneletPose(
   if (pose_in_target_lanelet) {
     return pose_in_target_lanelet;
   }
-  const auto previous = other::getPreviousLaneletIds(lanelet_id.value());
+  const auto previous = lanelet_map::getPreviousLaneletIds(lanelet_id.value());
   for (const auto id : previous) {
     const auto pose_in_previous = toLaneletPose(pose, id, matching_distance);
     if (pose_in_previous) {
       return pose_in_previous;
     }
   }
-  const auto next = other::getNextLaneletIds(lanelet_id.value());
+  const auto next = lanelet_map::getNextLaneletIds(lanelet_id.value());
   for (const auto id : previous) {
     const auto pose_in_next = toLaneletPose(pose, id, matching_distance);
     if (pose_in_next) {
@@ -159,8 +159,8 @@ auto toLaneletPoses(
   std::vector lanelet_ids = {lanelet_id};
   lanelet_ids += getLeftLaneletIds(lanelet_id, type, include_opposite_direction);
   lanelet_ids += getRightLaneletIds(lanelet_id, type, include_opposite_direction);
-  lanelet_ids += other::getPreviousLaneletIds(lanelet_ids);
-  lanelet_ids += other::getNextLaneletIds(lanelet_ids);
+  lanelet_ids += lanelet_map::getPreviousLaneletIds(lanelet_ids);
+  lanelet_ids += lanelet_map::getNextLaneletIds(lanelet_ids);
   for (const auto & id : sortAndUnique(lanelet_ids)) {
     if (const auto & lanelet_pose = toLaneletPose(pose, id, matching_distance)) {
       ret.emplace_back(lanelet_pose.value());
@@ -174,11 +174,11 @@ auto getAllCanonicalizedLaneletPoses(const LaneletPose & lanelet_pose) -> std::v
   /// @note Define lambda functions for canonicalizing previous/next lanelet.
   const auto canonicalize_to_previous_lanelet =
     [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
-    if (const auto ids = other::getPreviousLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
+    if (const auto ids = lanelet_map::getPreviousLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
       std::vector<LaneletPose> canonicalized_all;
       for (const auto id : ids) {
         const auto lanelet_pose_tmp = helper::constructLaneletPose(
-          id, lanelet_pose.s + other::getLaneletLength(id), lanelet_pose.offset);
+          id, lanelet_pose.s + lanelet_map::getLaneletLength(id), lanelet_pose.offset);
         if (const auto canonicalized_lanelet_poses =
               getAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
             canonicalized_lanelet_poses.empty()) {
@@ -196,11 +196,11 @@ auto getAllCanonicalizedLaneletPoses(const LaneletPose & lanelet_pose) -> std::v
   };
   const auto canonicalize_to_next_lanelet =
     [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
-    if (const auto ids = other::getNextLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
+    if (const auto ids = lanelet_map::getNextLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
       std::vector<LaneletPose> canonicalized_all;
       for (const auto id : ids) {
         const auto lanelet_pose_tmp = helper::constructLaneletPose(
-          id, lanelet_pose.s - other::getLaneletLength(lanelet_pose.lanelet_id),
+          id, lanelet_pose.s - lanelet_map::getLaneletLength(lanelet_pose.lanelet_id),
           lanelet_pose.offset);
         if (const auto canonicalized_lanelet_poses =
               getAllCanonicalizedLaneletPoses(lanelet_pose_tmp);
@@ -223,7 +223,7 @@ auto getAllCanonicalizedLaneletPoses(const LaneletPose & lanelet_pose) -> std::v
     return canonicalize_to_previous_lanelet(lanelet_pose);
   }
   /// @note If s value overs it's lanelet length, it means this pose is on the next lanelet.
-  else if (lanelet_pose.s > (other::getLaneletLength(lanelet_pose.lanelet_id))) {
+  else if (lanelet_pose.s > (lanelet_map::getLaneletLength(lanelet_pose.lanelet_id))) {
     return canonicalize_to_next_lanelet(lanelet_pose);
   }
   /// @note If s value is in range [0,length_of_the_lanelet], return lanelet_pose.
@@ -239,18 +239,18 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
 {
   auto canonicalized = lanelet_pose;
   while (canonicalized.s < 0) {
-    if (const auto ids = other::getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+    if (const auto ids = lanelet_map::getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
-      canonicalized.s += other::getLaneletLength(ids[0]);
+      canonicalized.s += lanelet_map::getLaneletLength(ids[0]);
       canonicalized.lanelet_id = ids[0];
     }
   }
-  while (canonicalized.s > other::getLaneletLength(canonicalized.lanelet_id)) {
-    if (const auto ids = other::getNextLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+  while (canonicalized.s > lanelet_map::getLaneletLength(canonicalized.lanelet_id)) {
+    if (const auto ids = lanelet_map::getNextLaneletIds(canonicalized.lanelet_id); ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
-      canonicalized.s -= other::getLaneletLength(canonicalized.lanelet_id);
+      canonicalized.s -= lanelet_map::getLaneletLength(canonicalized.lanelet_id);
       canonicalized.lanelet_id = ids[0];
     }
   }
@@ -263,21 +263,21 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   auto canonicalized = lanelet_pose;
   while (canonicalized.s < 0) {
     // When canonicalizing to backward lanelet_id, do not consider route
-    if (const auto ids = other::getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
+    if (const auto ids = lanelet_map::getPreviousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
-      canonicalized.s += other::getLaneletLength(ids[0]);
+      canonicalized.s += lanelet_map::getLaneletLength(ids[0]);
       canonicalized.lanelet_id = ids[0];
     }
   }
-  while (canonicalized.s > other::getLaneletLength(canonicalized.lanelet_id)) {
+  while (canonicalized.s > lanelet_map::getLaneletLength(canonicalized.lanelet_id)) {
     bool next_lanelet_found = false;
     // When canonicalizing to forward lanelet_id, consider route
-    for (const auto id : other::getNextLaneletIds(canonicalized.lanelet_id)) {
+    for (const auto id : lanelet_map::getNextLaneletIds(canonicalized.lanelet_id)) {
       if (std::any_of(route_lanelets.begin(), route_lanelets.end(), [id](auto id_on_route) {
             return id == id_on_route;
           })) {
-        canonicalized.s -= other::getLaneletLength(canonicalized.lanelet_id);
+        canonicalized.s -= lanelet_map::getLaneletLength(canonicalized.lanelet_id);
         canonicalized.lanelet_id = id;
         next_lanelet_found = true;
       }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <geometry/spline/catmull_rom_spline.hpp>
-#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator/utils/route.hpp>
@@ -31,7 +31,7 @@ auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route_lanelets
 
 auto toSpline(const lanelet::Ids & route_lanelets) -> Spline
 {
-  return Spline(lanelet_core::other::getCenterPoints(route_lanelets));
+  return Spline(lanelet_core::lanelet_map::getCenterPoints(route_lanelets));
 }
 
 auto isAnyConflictingEntity(
@@ -106,7 +106,7 @@ auto moveAlongLaneletPose(
       /// @note here was condition: .s < 0, now try to use .s <= 0
       end_of_road_lanelet_pose.s =
         lanelet_pose.s <= 0 ? 0
-                            : lanelet_core::other::getLaneletLength(end_of_road_lanelet_id.value());
+                            : lanelet_core::lanelet_map::getLaneletLength(end_of_road_lanelet_id.value());
       return end_of_road_lanelet_pose;
     } else {
       THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
@@ -144,14 +144,14 @@ auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
   const auto ids = route::previousLanelets(lanelet_pose.lanelet_id);
   // DIFFERENT SPLINE - recalculation needed
-  Spline spline(lanelet_core::other::getCenterPoints(ids));
+  Spline spline(lanelet_core::lanelet_map::getCenterPoints(ids));
   double s_in_spline = 0;
   for (const auto id : ids) {
     if (id == lanelet_pose.lanelet_id) {
       s_in_spline = s_in_spline + lanelet_pose.s;
       break;
     } else {
-      s_in_spline = lanelet_core::other::getLaneletLength(id) + s_in_spline;
+      s_in_spline = lanelet_core::lanelet_map::getLaneletLength(id) + s_in_spline;
     }
   }
   return spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0, lanelet_pose.offset);
@@ -195,7 +195,7 @@ auto laneChangePoints(
     return curve.getTrajectory(current_s, current_s + horizon, 1.0, true);
   } else {
     const auto following_lanelets = route::followingLanelets(parameter.target.lanelet_id, 0);
-    const auto center_points = lanelet_core::other::getCenterPoints(following_lanelets);
+    const auto center_points = lanelet_core::lanelet_map::getCenterPoints(following_lanelets);
     // DIFFERENT SPLINE - recalculation needed
     const Spline spline(center_points);
     /// @note not the same as orginal one - here were duplicates and curve_waypoints

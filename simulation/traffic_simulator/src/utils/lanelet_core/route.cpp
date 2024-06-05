@@ -20,7 +20,7 @@
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/lanelet_core/lanelet_map_core.hpp>
-#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet_core/route.hpp>
 
 namespace traffic_simulator
@@ -77,7 +77,7 @@ auto getFollowingLanelets(
   for (const auto id : candidate_lanelet_ids) {
     if (found) {
       ids.emplace_back(id);
-      total_distance = total_distance + other::getLaneletLength(id);
+      total_distance = total_distance + lanelet_map::getLaneletLength(id);
       if (total_distance > distance) {
         return ids;
       }
@@ -112,14 +112,14 @@ auto getFollowingLanelets(
   }
   lanelet::Id end_lanelet_id = lanelet_id;
   while (total_distance < distance) {
-    if (const auto straight_ids = other::getNextLaneletIds(end_lanelet_id, "straight");
+    if (const auto straight_ids = lanelet_map::getNextLaneletIds(end_lanelet_id, "straight");
         !straight_ids.empty()) {
-      total_distance = total_distance + other::getLaneletLength(straight_ids[0]);
+      total_distance = total_distance + lanelet_map::getLaneletLength(straight_ids[0]);
       ret.push_back(straight_ids[0]);
       end_lanelet_id = straight_ids[0];
       continue;
-    } else if (const auto ids = other::getNextLaneletIds(end_lanelet_id); ids.size() != 0) {
-      total_distance = total_distance + other::getLaneletLength(ids[0]);
+    } else if (const auto ids = lanelet_map::getNextLaneletIds(end_lanelet_id); ids.size() != 0) {
+      total_distance = total_distance + lanelet_map::getLaneletLength(ids[0]);
       ret.push_back(ids[0]);
       end_lanelet_id = ids[0];
       continue;
@@ -150,15 +150,15 @@ auto getPreviousLanelets(const lanelet::Id lanelet_id, const double distance) ->
   double total_distance = 0.0;
   ret.push_back(lanelet_id);
   while (total_distance < distance) {
-    auto ids = other::getPreviousLaneletIds(lanelet_id, "straight");
+    auto ids = lanelet_map::getPreviousLaneletIds(lanelet_id, "straight");
     if (ids.size() != 0) {
-      total_distance = total_distance + other::getLaneletLength(ids[0]);
+      total_distance = total_distance + lanelet_map::getLaneletLength(ids[0]);
       ret.push_back(ids[0]);
       continue;
     } else {
-      auto else_ids = other::getPreviousLaneletIds(lanelet_id);
+      auto else_ids = lanelet_map::getPreviousLaneletIds(lanelet_id);
       if (else_ids.size() != 0) {
-        total_distance = total_distance + other::getLaneletLength(else_ids[0]);
+        total_distance = total_distance + lanelet_map::getLaneletLength(else_ids[0]);
         ret.push_back(else_ids[0]);
         continue;
       } else {

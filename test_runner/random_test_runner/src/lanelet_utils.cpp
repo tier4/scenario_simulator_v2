@@ -25,7 +25,7 @@
 #include <geometry/linear_algebra.hpp>
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <optional>
-#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 #include <traffic_simulator/utils/lanelet_core/route.hpp>
 
@@ -47,7 +47,7 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 
 std::vector<int64_t> LaneletUtils::getLaneletIds()
 {
-  return traffic_simulator::lanelet_core::other::getLaneletIds();
+  return traffic_simulator::lanelet_core::lanelet_map::getLaneletIds();
 }
 
 geometry_msgs::msg::PoseStamped LaneletUtils::toMapPose(
@@ -63,7 +63,7 @@ std::vector<int64_t> LaneletUtils::getRoute(int64_t from_lanelet_id, int64_t to_
 
 double LaneletUtils::getLaneletLength(int64_t lanelet_id)
 {
-  return traffic_simulator::lanelet_core::other::getLaneletLength(lanelet_id);
+  return traffic_simulator::lanelet_core::lanelet_map::getLaneletLength(lanelet_id);
 }
 
 double LaneletUtils::computeDistance(
@@ -81,7 +81,7 @@ double LaneletUtils::computeDistance(
 
 bool LaneletUtils::isInLanelet(int64_t lanelet_id, double s)
 {
-  return traffic_simulator::lanelet_core::other::isInLanelet(lanelet_id, s);
+  return traffic_simulator::lanelet_core::lanelet_map::isInLanelet(lanelet_id, s);
 }
 
 std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOppositeLaneLet(
@@ -100,7 +100,7 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
   }
 
   auto tangent_vector =
-    traffic_simulator::lanelet_core::other::getCenterPointsSpline(pose.lanelet_id)
+    traffic_simulator::lanelet_core::lanelet_map::getCenterPointsSpline(pose.lanelet_id)
       ->getTangentVector(pose.s);
   lanelet::ConstLanelet current_lanelet = lanelet_map_ptr_->laneletLayer.get(pose.lanelet_id);
   auto left_point = current_lanelet.leftBound().front();

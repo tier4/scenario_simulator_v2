@@ -16,7 +16,7 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/distance.hpp>
-#include <traffic_simulator/utils/lanelet_core/other.hpp>
+#include <traffic_simulator/utils/lanelet_core/lanelet_map.hpp>
 #include <traffic_simulator/utils/lanelet_core/pose.hpp>
 #include <traffic_simulator/utils/lanelet_core/route.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -287,7 +287,7 @@ auto estimateCanonicalizedLaneletPose(
           return CanonicalizedLaneletPose(
             traffic_simulator_msgs::build<LaneletPose>()
               .lanelet_id(end_of_road_lanelet_id.value())
-              .s(lanelet_core::other::getLaneletLength(end_of_road_lanelet_id.value()))
+              .s(lanelet_core::lanelet_map::getLaneletLength(end_of_road_lanelet_id.value()))
               .offset(lanelet_pose.value().offset)
               .rpy(lanelet_pose.value().rpy));
         }
@@ -329,7 +329,7 @@ auto isInLanelet(
     }
 
     const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
-      lanelet_id, lanelet_core::other::getLaneletLength(lanelet_id), 0.0);
+      lanelet_id, lanelet_core::lanelet_map::getLaneletLength(lanelet_id), 0.0);
     if (const auto distance_to_end_lanelet_pose = longitudinalDistance(
           canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, allow_lane_change);
@@ -343,19 +343,19 @@ auto isInLanelet(
 
 auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool
 {
-  return lanelet_core::other::isInLanelet(lanelet_id, point);
+  return lanelet_core::lanelet_map::isInLanelet(lanelet_id, point);
 }
 
 auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
 {
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
   return lanelet_core::route::getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-         lanelet_core::other::getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
+         lanelet_core::lanelet_map::getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
-  return lanelet_core::other::getLaneletLength(lanelet_id);
+  return lanelet_core::lanelet_map::getLaneletLength(lanelet_id);
 }
 }  // namespace pose
 }  // namespace traffic_simulator
