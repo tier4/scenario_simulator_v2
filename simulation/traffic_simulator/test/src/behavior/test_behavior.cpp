@@ -22,6 +22,9 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
+/**
+ * @note 
+ */
 TEST(Behavior, getRequestString_none)
 {
   const auto req = traffic_simulator::behavior::Request::NONE;
@@ -30,6 +33,9 @@ TEST(Behavior, getRequestString_none)
   EXPECT_TRUE("none" == str);
 }
 
+/**
+ * @note 
+ */
 TEST(Behavior, getRequestString_lane_change)
 {
   const auto req = traffic_simulator::behavior::Request::LANE_CHANGE;
@@ -38,6 +44,9 @@ TEST(Behavior, getRequestString_lane_change)
   EXPECT_TRUE("lane_change" == str);
 }
 
+/**
+ * @note 
+ */
 TEST(Behavior, getRequestString_follow_lane)
 {
   const auto req = traffic_simulator::behavior::Request::FOLLOW_LANE;
@@ -46,6 +55,9 @@ TEST(Behavior, getRequestString_follow_lane)
   EXPECT_TRUE("follow_lane" == str);
 }
 
+/**
+ * @note 
+ */
 TEST(Behavior, getRequestString_follow_polyline_trajectory)
 {
   const auto req = traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY;
@@ -54,6 +66,9 @@ TEST(Behavior, getRequestString_follow_polyline_trajectory)
   EXPECT_TRUE("follow_polyline_trajectory" == str);
 }
 
+/**
+ * @note 
+ */
 TEST(Behavior, getRequestString_walk_straight)
 {
   const auto req = traffic_simulator::behavior::Request::WALK_STRAIGHT;

@@ -241,26 +241,26 @@ TEST(TrafficLight, Bulb)
   using Bulb = TrafficLight::Bulb;
 
   // clang-format off
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
-  EXPECT_TRUE(Bulb(Color::yellow, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0001'0000'0000'0000'0000'0000'0000);
-  EXPECT_TRUE(Bulb(Color::red,    Status::solid_on,  Shape::circle     ).hash() == 0b0000'0010'0000'0000'0000'0000'0000'0000);
-  EXPECT_TRUE(Bulb(Color::white,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0011'0000'0000'0000'0000'0000'0000);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
+  static_assert(Bulb(Color::yellow, Status::solid_on,  Shape::circle     ).hash() == 0b0000'0001'0000'0000'0000'0000'0000'0000);
+  static_assert(Bulb(Color::red,    Status::solid_on,  Shape::circle     ).hash() == 0b0000'0010'0000'0000'0000'0000'0000'0000);
+  static_assert(Bulb(Color::white,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0011'0000'0000'0000'0000'0000'0000);
 
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_off, Shape::circle     ).hash() == 0b0000'0000'0000'0001'0000'0000'0000'0000);
-  EXPECT_TRUE(Bulb(Color::green,  Status::flashing,  Shape::circle     ).hash() == 0b0000'0000'0000'0010'0000'0000'0000'0000);
-  EXPECT_TRUE(Bulb(Color::green,  Status::unknown,   Shape::circle     ).hash() == 0b0000'0000'0000'0011'0000'0000'0000'0000);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
+  static_assert(Bulb(Color::green,  Status::solid_off, Shape::circle     ).hash() == 0b0000'0000'0000'0001'0000'0000'0000'0000);
+  static_assert(Bulb(Color::green,  Status::flashing,  Shape::circle     ).hash() == 0b0000'0000'0000'0010'0000'0000'0000'0000);
+  static_assert(Bulb(Color::green,  Status::unknown,   Shape::circle     ).hash() == 0b0000'0000'0000'0011'0000'0000'0000'0000);
 
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::cross      ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0001);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::left       ).hash() == 0b0000'0000'0000'0000'0000'1000'0000'0010);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::down       ).hash() == 0b0000'0000'0000'0000'0000'0100'0000'0010);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::up         ).hash() == 0b0000'0000'0000'0000'0000'0010'0000'0010);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::right      ).hash() == 0b0000'0000'0000'0000'0000'0001'0000'0010);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::lower_left ).hash() == 0b0000'0000'0000'0000'0000'1100'0000'0010);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::upper_left ).hash() == 0b0000'0000'0000'0000'0000'1010'0000'0010);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::lower_right).hash() == 0b0000'0000'0000'0000'0000'0101'0000'0010);
-  EXPECT_TRUE(Bulb(Color::green,  Status::solid_on,  Shape::upper_right).hash() == 0b0000'0000'0000'0000'0000'0011'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::circle     ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0000);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::cross      ).hash() == 0b0000'0000'0000'0000'0000'0000'0000'0001);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::left       ).hash() == 0b0000'0000'0000'0000'0000'1000'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::down       ).hash() == 0b0000'0000'0000'0000'0000'0100'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::up         ).hash() == 0b0000'0000'0000'0000'0000'0010'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::right      ).hash() == 0b0000'0000'0000'0000'0000'0001'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::lower_left ).hash() == 0b0000'0000'0000'0000'0000'1100'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::upper_left ).hash() == 0b0000'0000'0000'0000'0000'1010'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::lower_right).hash() == 0b0000'0000'0000'0000'0000'0101'0000'0010);
+  static_assert(Bulb(Color::green,  Status::solid_on,  Shape::upper_right).hash() == 0b0000'0000'0000'0000'0000'0011'0000'0010);
   // clang-format on
 
   {
@@ -373,6 +373,9 @@ TEST(TrafficLight, TrafficLight)
   }
 }
 
+/**
+ * @note 
+ */
 TEST(TrafficLight, Color_make)
 {
   using Color = traffic_simulator::TrafficLight::Color;
@@ -422,6 +425,9 @@ TEST(TrafficLight, Color_make)
   }
 }
 
+/**
+ * @note 
+ */
 TEST(TrafficLight, Shape_make)
 {
   using Shape = traffic_simulator::TrafficLight::Shape;
@@ -537,6 +543,9 @@ TEST(TrafficLight, Shape_make)
   }
 }
 
+/**
+ * @note 
+ */
 TEST(TrafficLight, Status_make)
 {
   using Status = traffic_simulator::TrafficLight::Status;
@@ -578,6 +587,9 @@ TEST(TrafficLight, Status_make)
   }
 }
 
+/**
+ * @note 
+ */
 TEST(TrafficLight, Bulb_make)
 {
   using TrafficLight = traffic_simulator::TrafficLight;
@@ -649,6 +661,9 @@ TEST(TrafficLight, Bulb_make)
   }
 }
 
+/**
+ * @note 
+ */
 TEST(TrafficLight, Bulb_trafficLightMessageConversion)
 {
   using TrafficLight = traffic_simulator::TrafficLight;
@@ -707,6 +722,9 @@ TEST(TrafficLight, Bulb_trafficLightMessageConversion)
   }
 }
 
+/**
+ * @note 
+ */
 TEST(TrafficLight, Color_make_wrong)
 {
   using Color = traffic_simulator::TrafficLight::Color;
@@ -715,6 +733,9 @@ TEST(TrafficLight, Color_make_wrong)
   EXPECT_FALSE(boost::lexical_cast<std::string>(color) == "wrong_color");
 }
 
+/**
+ * @note 
+ */
 TEST(TrafficLight, Shape_make_wrong)
 {
   using Shape = traffic_simulator::TrafficLight::Shape;
@@ -723,6 +744,9 @@ TEST(TrafficLight, Shape_make_wrong)
   EXPECT_FALSE(boost::lexical_cast<std::string>(shape) == "wrong_shape");
 }
 
+/**
+ * @note 
+ */
 TEST(TrafficLight, Status_make_wrong)
 {
   using Status = traffic_simulator::TrafficLight::Status;
@@ -731,6 +755,9 @@ TEST(TrafficLight, Status_make_wrong)
   EXPECT_FALSE(boost::lexical_cast<std::string>(status) == "wrong_status");
 }
 
+/**
+ * @note 
+ */
 TEST(TrafficLight, Bulb_make_wrong)
 {
   using Bulb = traffic_simulator::TrafficLight::Bulb;

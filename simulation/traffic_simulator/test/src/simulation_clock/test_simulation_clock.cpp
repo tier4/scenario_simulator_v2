@@ -16,6 +16,9 @@
 
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 
+/**
+ * @note 
+ */
 TEST(SimulationClock, Initialize)
 {
   const double realtime_factor = 1.0;
@@ -33,6 +36,9 @@ TEST(SimulationClock, Initialize)
   EXPECT_THROW(simulation_clock.start(), std::runtime_error);
 }
 
+/**
+ * @note 
+ */
 TEST(SimulationClock, getCurrentRosTime)
 {
   const double realtime_factor = 2.0;
@@ -57,6 +63,9 @@ TEST(SimulationClock, getCurrentRosTime)
   EXPECT_NEAR(result_elapsed_time, actual_elapsed_time, epsilon);
 }
 
+/**
+ * @note 
+ */
 TEST(SimulationClock, getCurrentScenarioTime)
 {
   const double realtime_factor = 1.0;
@@ -81,6 +90,9 @@ TEST(SimulationClock, getCurrentScenarioTime)
   EXPECT_NEAR(actual_elapsed_time, result_elapsed_time, epsilon);
 }
 
+/**
+ * @note 
+ */
 TEST(SimulationClock, Update)
 {
   const double realtime_factor = 1.0;
