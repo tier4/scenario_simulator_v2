@@ -58,7 +58,7 @@ struct SpeedTargetValueType
     factor,
   } value;
 
-  explicit SpeedTargetValueType() = default;
+  SpeedTargetValueType() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 

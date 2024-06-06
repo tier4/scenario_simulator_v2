@@ -49,7 +49,8 @@ TrafficSink::TrafficSink(
 {
 }
 
-void TrafficSink::execute()
+void TrafficSink::execute(
+  [[maybe_unused]] const double current_time, [[maybe_unused]] const double step_time)
 {
   const auto names = get_entity_names_function();
   for (const auto & name : names) {

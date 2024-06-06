@@ -243,8 +243,8 @@ private:
   EgoCollisionMetric ego_collision_metric_;
   JunitXmlReporterTestCase error_reporter_;
 
-  ArchitectureType architecture_type_;
   double test_timeout_;
+  ArchitectureType architecture_type_;
 
   bool scenario_completed_ = false;
 

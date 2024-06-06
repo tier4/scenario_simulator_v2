@@ -32,9 +32,8 @@ from rclpy.executors import ExternalShutdownException
 from shutil import rmtree
 from sys import exit
 from typing import List
-from workflow import Scenario
-from workflow import Workflow
-from workflow import substitute_ros_package
+from scenario import Scenario
+from scenario import substitute_ros_package
 
 
 def convert_scenarios_to_xosc(scenarios: List[Scenario], output_directory: Path):
@@ -110,8 +109,6 @@ class ScenarioTestRunner(LifecycleController):
                     os.remove(target)
         self.output_directory.mkdir(parents=True, exist_ok=True)
 
-        self.current_workflow = None
-
         self.check_preprocessor_client = self.create_client(CheckDerivativeRemained,
                                                             '/simulation/openscenario_preprocessor/check')
         while not self.check_preprocessor_client.wait_for_service(timeout_sec=1.0):
@@ -128,32 +125,6 @@ class ScenarioTestRunner(LifecycleController):
             self.get_logger().warn('/simulation/openscenario_preprocessor/load service not available, waiting again...')
 
         self.print_debug('connection established with preprocessor')
-
-    def run_workflow(self, path: Path):
-        """
-        Run workflow.
-
-        Arguments
-        ---------
-        path : Path
-            Path to the workflow file.
-
-        Returns
-        -------
-        None
-
-        """
-        self.current_workflow = Workflow(
-            path,
-            self.global_frame_rate,
-            # TODO self.global_real_time_factor,
-        )
-
-        converted_scenarios = convert_scenarios_to_xosc(
-            self.current_workflow.scenarios, self.output_directory
-        )
-
-        self.run_scenarios(converted_scenarios)
 
     def spin(self):
         """Run scenario."""
@@ -313,13 +284,6 @@ def main(args=None):
 
     parser.add_argument("-s", "--scenario", default="/dev/null", type=Path)
 
-    parser.add_argument(
-        "-w",
-        "--workflow",
-        type=Path,
-        default="$(find-pkg-share scenario_test_runner)/config/workflow_example.yaml",
-    )
-
     parser.add_argument("--ros-args", nargs="*")  # XXX DIRTY HACK
     parser.add_argument("-r", nargs="*")  # XXX DIRTY HACK
 
@@ -339,12 +303,8 @@ def main(args=None):
                 args.global_frame_rate,
             )]
         )
-
-    elif args.workflow != Path("/dev/null"):
-        test_runner.run_workflow(substitute_ros_package(args.workflow).resolve())
-
     else:
-        print("Neither the scenario nor the workflow is specified. Specify either one.")
+        print("No scenario is specified. Specify one.")
 
 
 if __name__ == "__main__":

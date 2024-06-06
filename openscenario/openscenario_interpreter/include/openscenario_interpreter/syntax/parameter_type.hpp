@@ -62,7 +62,7 @@ struct ParameterType
     UNSIGNED_SHORT,
   } value;
 
-  explicit ParameterType() = default;
+  ParameterType() = default;
 
   constexpr operator value_type() const noexcept { return value; }
 };
