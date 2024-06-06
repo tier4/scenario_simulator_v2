@@ -45,7 +45,7 @@ TEST_F(MiscObjectEntityTest, getCurrentAction_npcNotStarted)
   auto non_canonicalized_status = makeEntityStatus(
     hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(), 0.0,
     entity_name);
-  non_canonicalized_status.action_status.current_action = "purposelessly_existing";
+  non_canonicalized_status.action_status.current_action = "current_action_name";
 
   const auto blob = traffic_simulator::entity::MiscObjectEntity(
     entity_name,
@@ -65,7 +65,7 @@ TEST_F(MiscObjectEntityTest, getCurrentAction_npcStarted)
   auto non_canonicalized_status = makeEntityStatus(
     hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(), 0.0,
     entity_name);
-  non_canonicalized_status.action_status.current_action = "purposelessly_existing";
+  non_canonicalized_status.action_status.current_action = "current_action_name";
 
   auto blob = traffic_simulator::entity::MiscObjectEntity(
     entity_name,
@@ -75,7 +75,7 @@ TEST_F(MiscObjectEntityTest, getCurrentAction_npcStarted)
 
   blob.startNpcLogic();
   EXPECT_TRUE(blob.isNpcLogicStarted());
-  EXPECT_TRUE(blob.getCurrentAction() == "purposelessly_existing");
+  EXPECT_TRUE(blob.getCurrentAction() == "current_action_name");
 }
 
 /**
