@@ -24,10 +24,14 @@ class ParameterManager
 {
 public:
   template <typename NodeT>
-  ParameterManager(NodeT && node)
+  explicit ParameterManager(NodeT && node)
   : node_parameters_interface_(rclcpp::node_interfaces::get_node_parameters_interface(node))
   {
   }
+
+  ParameterManager() = delete;
+
+  ParameterManager(const ParameterManager &) = default;
 
   template <typename ParameterT>
   auto getParameter(const std::string & name, const ParameterT & default_value = {}) const
