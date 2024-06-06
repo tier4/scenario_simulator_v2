@@ -30,7 +30,54 @@ int main(int argc, char ** argv)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test current action obtaining when NPC logic is not started.
+ */
+TEST(MiscObjectEntity, getCurrentAction_npcNotStarted)
+{
+  lanelet::Id id = 120659;
+  const double initial_speed = 0.0;
+  std::string entity_name("blob");
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto non_canonicalized_status =
+    makeEntityStatus(hdmap_utils_ptr, pose, bbox, initial_speed, entity_name);
+  non_canonicalized_status.action_status.current_action = "purposelessly_existing";
+  traffic_simulator::entity_status::CanonicalizedEntityStatus status(
+    non_canonicalized_status, hdmap_utils_ptr);
+  traffic_simulator_msgs::msg::MiscObjectParameters params{};
+  traffic_simulator::entity::MiscObjectEntity blob(entity_name, status, hdmap_utils_ptr, params);
+
+  EXPECT_FALSE(blob.isNpcLogicStarted());
+  EXPECT_TRUE(blob.getCurrentAction() == "waiting");
+}
+
+/**
+ * @note Test basic functionality. Test current action obtaining when NPC logic is started.
+ */
+TEST(MiscObjectEntity, getCurrentAction_npcStarted)
+{
+  lanelet::Id id = 120659;
+  const double initial_speed = 0.0;
+  std::string entity_name("blob");
+  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
+  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
+  auto bbox = makeBoundingBox();
+  auto non_canonicalized_status =
+    makeEntityStatus(hdmap_utils_ptr, pose, bbox, initial_speed, entity_name);
+  non_canonicalized_status.action_status.current_action = "purposelessly_existing";
+  traffic_simulator::entity_status::CanonicalizedEntityStatus status(
+    non_canonicalized_status, hdmap_utils_ptr);
+  traffic_simulator_msgs::msg::MiscObjectParameters params{};
+  traffic_simulator::entity::MiscObjectEntity blob(entity_name, status, hdmap_utils_ptr, params);
+
+  blob.startNpcLogic();
+  EXPECT_TRUE(blob.isNpcLogicStarted());
+  EXPECT_TRUE(blob.getCurrentAction() == "purposelessly_existing");
+}
+
+/**
+ * @note Test function behavior when absolute speed change is requested - the goal is to test throwing error.
  */
 TEST(MiscObjectEntity, requestSpeedChange_absolute)
 {
@@ -51,7 +98,7 @@ TEST(MiscObjectEntity, requestSpeedChange_absolute)
 }
 
 /**
- * @note 
+ * @note Test function behavior when relative speed change is requested - the goal is to test throwing error.
  */
 TEST(MiscObjectEntity, requestSpeedChange_relative)
 {
@@ -82,7 +129,8 @@ TEST(MiscObjectEntity, requestSpeedChange_relative)
 }
 
 /**
- * @note 
+ * @note Test function behavior when relative speed change with transition type is requested
+ * - the goal is to test throwing error.
  */
 TEST(MiscObjectEntity, requestSpeedChange_absoluteTransition)
 {
@@ -108,30 +156,8 @@ TEST(MiscObjectEntity, requestSpeedChange_absoluteTransition)
 }
 
 /**
- * @note 
- */
-TEST(MiscObjectEntity, requestAcquirePosition_pose)
-{
-  lanelet::Id id = 120659;
-  const double initial_speed = 0.0;
-  std::string entity_name("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox();
-  auto status =
-    makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, initial_speed, entity_name);
-  traffic_simulator_msgs::msg::MiscObjectParameters params{};
-  traffic_simulator::entity::MiscObjectEntity blob(entity_name, status, hdmap_utils_ptr, params);
-
-  geometry_msgs::msg::Pose target_pose;
-  target_pose.position.x = 3759.34;
-  target_pose.position.y = 73791.38;
-
-  EXPECT_THROW(blob.requestAcquirePosition(target_pose), common::Error);
-}
-
-/**
- * @note 
+ * @note Test function behavior when route assigning is requested with lanelet pose
+ * - the goal is to test throwing error.
  */
 TEST(MiscObjectEntity, requestAssignRoute_laneletPose)
 {
@@ -156,7 +182,8 @@ TEST(MiscObjectEntity, requestAssignRoute_laneletPose)
 }
 
 /**
- * @note 
+ * @note Test function behavior when route assigning is requested with pose
+ * - the goal is to test throwing error.
  */
 TEST(MiscObjectEntity, requestAssignRoute_pose)
 {
@@ -182,7 +209,8 @@ TEST(MiscObjectEntity, requestAssignRoute_pose)
 }
 
 /**
- * @note 
+ * @note Test function behavior when position acquiring is requested with lanelet pose
+ * - the goal is to test throwing error.
  */
 TEST(MiscObjectEntity, requestAcquirePosition_laneletPose)
 {
@@ -204,9 +232,10 @@ TEST(MiscObjectEntity, requestAcquirePosition_laneletPose)
 }
 
 /**
- * @note 
+ * @note Test function behavior when position acquiring is requested with pose
+ * - the goal is to test throwing error.
  */
-TEST(MiscObjectEntity, getCurrentAction_npcStarted)
+TEST(MiscObjectEntity, requestAcquirePosition_pose)
 {
   lanelet::Id id = 120659;
   const double initial_speed = 0.0;
@@ -214,44 +243,20 @@ TEST(MiscObjectEntity, getCurrentAction_npcStarted)
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
   auto bbox = makeBoundingBox();
-  auto non_canonicalized_status =
-    makeEntityStatus(hdmap_utils_ptr, pose, bbox, initial_speed, entity_name);
-  non_canonicalized_status.action_status.current_action = "purposelessly_existing";
-  traffic_simulator::entity_status::CanonicalizedEntityStatus status(
-    non_canonicalized_status, hdmap_utils_ptr);
+  auto status =
+    makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, initial_speed, entity_name);
   traffic_simulator_msgs::msg::MiscObjectParameters params{};
   traffic_simulator::entity::MiscObjectEntity blob(entity_name, status, hdmap_utils_ptr, params);
 
-  blob.startNpcLogic();
-  EXPECT_TRUE(blob.isNpcLogicStarted());
-  EXPECT_TRUE(blob.getCurrentAction() == "purposelessly_existing");
+  geometry_msgs::msg::Pose target_pose;
+  target_pose.position.x = 3759.34;
+  target_pose.position.y = 73791.38;
+
+  EXPECT_THROW(blob.requestAcquirePosition(target_pose), common::Error);
 }
 
 /**
- * @note 
- */
-TEST(MiscObjectEntity, getCurrentAction_npcNotStarted)
-{
-  lanelet::Id id = 120659;
-  const double initial_speed = 0.0;
-  std::string entity_name("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id);
-  auto bbox = makeBoundingBox();
-  auto non_canonicalized_status =
-    makeEntityStatus(hdmap_utils_ptr, pose, bbox, initial_speed, entity_name);
-  non_canonicalized_status.action_status.current_action = "purposelessly_existing";
-  traffic_simulator::entity_status::CanonicalizedEntityStatus status(
-    non_canonicalized_status, hdmap_utils_ptr);
-  traffic_simulator_msgs::msg::MiscObjectParameters params{};
-  traffic_simulator::entity::MiscObjectEntity blob(entity_name, status, hdmap_utils_ptr, params);
-
-  EXPECT_FALSE(blob.isNpcLogicStarted());
-  EXPECT_TRUE(blob.getCurrentAction() == "waiting");
-}
-
-/**
- * @note 
+ * @note Test function behavior when called with any argument - the goal is to test error throwing.
  */
 TEST(MiscObjectEntity, getRouteLanelets)
 {

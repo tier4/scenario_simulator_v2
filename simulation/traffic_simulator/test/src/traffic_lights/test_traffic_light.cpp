@@ -374,7 +374,8 @@ TEST(TrafficLight, TrafficLight)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test whether the function
+ * creates Color object appropriate to the argument.
  */
 TEST(TrafficLight, Color_make)
 {
@@ -426,7 +427,7 @@ TEST(TrafficLight, Color_make)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test whether the function creates Color object appropriate to the argument.
  */
 TEST(TrafficLight, Shape_make)
 {
@@ -544,7 +545,7 @@ TEST(TrafficLight, Shape_make)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test whether the function creates Status object appropriate to the argument.
  */
 TEST(TrafficLight, Status_make)
 {
@@ -588,7 +589,7 @@ TEST(TrafficLight, Status_make)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test whether the function creates Color object appropriate to the argument.
  */
 TEST(TrafficLight, Bulb_make)
 {
@@ -662,7 +663,8 @@ TEST(TrafficLight, Bulb_make)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test whether the TrafficLight message
+ * is constructed configured according to the Bulb object.
  */
 TEST(TrafficLight, Bulb_trafficLightMessageConversion)
 {
@@ -723,7 +725,7 @@ TEST(TrafficLight, Bulb_trafficLightMessageConversion)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test function behavior when called with invalid name.
  */
 TEST(TrafficLight, Color_make_wrong)
 {
@@ -734,7 +736,7 @@ TEST(TrafficLight, Color_make_wrong)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test function behavior when called with invalid name. 
  */
 TEST(TrafficLight, Shape_make_wrong)
 {
@@ -745,7 +747,7 @@ TEST(TrafficLight, Shape_make_wrong)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test function behavior when called with invalid name.
  */
 TEST(TrafficLight, Status_make_wrong)
 {
@@ -756,7 +758,7 @@ TEST(TrafficLight, Status_make_wrong)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test function behavior when called with invalid name.
  */
 TEST(TrafficLight, Bulb_make_wrong)
 {

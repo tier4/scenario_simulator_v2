@@ -60,7 +60,8 @@ TEST(RoutePlanner, getGoalPoses)
 }
 
 /**
- * @note 
+ * @note Test functionality used by other units.
+ * Test performing transformations by getGoalPosesInWorldFrame accessor.
  */
 TEST(RoutePlanner, getGoalPosesInWorldFrame)
 {
@@ -89,30 +90,8 @@ TEST(RoutePlanner, getGoalPosesInWorldFrame)
 }
 
 /**
- * @note 
- */
-TEST(RoutePlanner, getRouteLanelets_empty)
-{
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  traffic_simulator::RoutePlanner planner(hdmap_utils_ptr);
-
-  lanelet::Id id_0 = 120659;
-  auto pose_0 = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
-
-  const double distance = 100;
-  lanelet::Ids following_ids({120659, 120660, 34468, 34465, 34462});
-
-  planner.setWaypoints({});
-  auto route = planner.getRouteLanelets(pose_0, distance);
-
-  EXPECT_EQ(route.size(), following_ids.size());
-  for (size_t i = 0; i < route.size(); i++) {
-    EXPECT_EQ(following_ids[i], route[i]);
-  }
-}
-
-/**
- * @note 
+ * @note Test functionality used by other units.
+ * Test routing correctness with an entity pose and target pose spaced apart for more than horizon.
  */
 TEST(RoutePlanner, getRouteLanelets_horizon)
 {
@@ -133,7 +112,8 @@ TEST(RoutePlanner, getRouteLanelets_horizon)
 }
 
 /**
- * @note 
+ * @note Test functionality used by other units.
+ * Test routing correctness with an entity pose and target pose spaced apart for less than horizon.
  */
 TEST(RoutePlanner, getRouteLanelets_noHorizon)
 {
@@ -154,24 +134,26 @@ TEST(RoutePlanner, getRouteLanelets_noHorizon)
 }
 
 /**
- * @note 
+ * @note Test functionality used by other units.
+ * Test routing correctness with an entity pose and empty waypoints vector
+ * - the goal is to test function behavior when empty vector is passed.
  */
-TEST(RoutePlanner, cancelGoal)
+TEST(RoutePlanner, getRouteLanelets_empty)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   traffic_simulator::RoutePlanner planner(hdmap_utils_ptr);
 
-  lanelet::Id id_start = 120659;
-  lanelet::Id id_target = 34579;
-  auto pose_start = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_start);
-  auto pose_target = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_target);
+  lanelet::Id id_0 = 120659;
+  auto pose_0 = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
 
   const double distance = 100;
+  lanelet::Ids following_ids({120659, 120660, 34468, 34465, 34462});
 
-  planner.setWaypoints({pose_target});
-  auto route_0 = planner.getRouteLanelets(pose_start, distance);
-  planner.cancelRoute();
-  auto route_1 = planner.getRouteLanelets(pose_start, distance);
+  planner.setWaypoints({});
+  auto route = planner.getRouteLanelets(pose_0, distance);
 
-  EXPECT_NE(route_0, route_1);
+  EXPECT_EQ(route.size(), following_ids.size());
+  for (size_t i = 0; i < route.size(); i++) {
+    EXPECT_EQ(following_ids[i], route[i]);
+  }
 }

@@ -17,7 +17,9 @@
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 
 /**
- * @note 
+ * @note Test basic functionality used in API.
+ * Test initialization logic by calling update without initialized clock
+ * - the goal is to verify that mandatory initialization works.
  */
 TEST(SimulationClock, Initialize)
 {
@@ -37,7 +39,9 @@ TEST(SimulationClock, Initialize)
 }
 
 /**
- * @note 
+ * @note Test basic functionality used in API. Test time obtaining correctness with initialized object
+ * and not using raw clock - the goal is to test whether the time has increased
+ * according to the times of update function calls.
  */
 TEST(SimulationClock, getCurrentRosTime)
 {
@@ -64,7 +68,8 @@ TEST(SimulationClock, getCurrentRosTime)
 }
 
 /**
- * @note 
+ * @note Test basic functionality used in API. Test scenario time calculation correctness with initialized obejct,
+ * npc logic started after several update() calls and additional update() calls after starting npc logic.
  */
 TEST(SimulationClock, getCurrentScenarioTime)
 {
@@ -91,7 +96,8 @@ TEST(SimulationClock, getCurrentScenarioTime)
 }
 
 /**
- * @note 
+ * @note Test basic functionality used in API. Test updating correctness with initialized object
+ * by calling update several times expecting the current time to increase accordingly.
  */
 TEST(SimulationClock, Update)
 {

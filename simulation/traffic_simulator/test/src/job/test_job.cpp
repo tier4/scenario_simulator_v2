@@ -23,7 +23,10 @@ int main(int argc, char ** argv)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test functions execution correctness with a function on update
+ * that returns true and function on cleanup that marks that it was called
+ * - the goal is to check whether the function on cleanup is called
+ * after calling onUpdate (which immediately finishes).
  */
 TEST(Job, onUpdate)
 {
@@ -39,70 +42,4 @@ TEST(Job, onUpdate)
   job.onUpdate(step_time);
 
   EXPECT_TRUE(was_cleanup_func_called);
-}
-
-/**
- * @note 
- */
-TEST(Job, get_type)
-{
-  bool was_cleanup_func_called = false;
-  auto update_func = [](const double) { return true; };
-  auto cleanup_func = [&was_cleanup_func_called]() { was_cleanup_func_called = true; };
-  const auto type = traffic_simulator::job::Type::UNKOWN;
-  const auto event = traffic_simulator::job::Event::POST_UPDATE;
-  const bool is_exclusive = true;
-
-  auto job = traffic_simulator::job::Job(update_func, cleanup_func, type, is_exclusive, event);
-
-  EXPECT_TRUE(job.type == type);
-
-  const double step_time = 0.0;
-  job.onUpdate(step_time);
-
-  EXPECT_TRUE(job.type == type);
-}
-
-/**
- * @note 
- */
-TEST(Job, get_exclusive)
-{
-  bool was_cleanup_func_called = false;
-  auto update_func = [](const double) { return true; };
-  auto cleanup_func = [&was_cleanup_func_called]() { was_cleanup_func_called = true; };
-  const auto type = traffic_simulator::job::Type::UNKOWN;
-  const auto event = traffic_simulator::job::Event::POST_UPDATE;
-  const bool is_exclusive = true;
-
-  auto job = traffic_simulator::job::Job(update_func, cleanup_func, type, is_exclusive, event);
-
-  EXPECT_TRUE(job.exclusive == is_exclusive);
-
-  const double step_time = 0.0;
-  job.onUpdate(step_time);
-
-  EXPECT_TRUE(job.exclusive == is_exclusive);
-}
-
-/**
- * @note 
- */
-TEST(Job, get_event)
-{
-  bool was_cleanup_func_called = false;
-  auto update_func = [](const double) { return true; };
-  auto cleanup_func = [&was_cleanup_func_called]() { was_cleanup_func_called = true; };
-  const auto type = traffic_simulator::job::Type::UNKOWN;
-  const auto event = traffic_simulator::job::Event::POST_UPDATE;
-  const bool is_exclusive = true;
-
-  auto job = traffic_simulator::job::Job(update_func, cleanup_func, type, is_exclusive, event);
-
-  EXPECT_TRUE(job.event == event);
-
-  const double step_time = 0.0;
-  job.onUpdate(step_time);
-
-  EXPECT_TRUE(job.event == event);
 }

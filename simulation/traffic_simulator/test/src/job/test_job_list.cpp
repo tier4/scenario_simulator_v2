@@ -23,7 +23,8 @@ int main(int argc, char ** argv)
 }
 
 /**
- * @note 
+ * @note Test basic functionality.
+ * Test adding a job to an empty job list and (test whether adding worked by calling update).
  */
 TEST(JobList, append)
 {
@@ -45,7 +46,9 @@ TEST(JobList, append)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test adding a job to a job list that already
+ * has an identical job (test whether adding worked by calling update)
+ * - the goal is to test whether the old job was removed when adding identical one.
  */
 TEST(JobList, append_doubled)
 {
@@ -78,7 +81,8 @@ TEST(JobList, append_doubled)
 }
 
 /**
- * @note 
+ * @note Test basic functionality. Test updating process with a job that will end after 2 updates
+ * and will mark that it has cleaned up.
  */
 TEST(JobList, update)
 {
