@@ -33,22 +33,16 @@ int main(int argc, char ** argv)
 TEST(RoutePlanner, getGoalPoses)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  traffic_simulator::RoutePlanner planner(hdmap_utils_ptr);
-  lanelet::Id id_0 = 120659;
-  lanelet::Id id_1 = 120660;
-  lanelet::Id id_2 = 34468;
-  auto pose_0 = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
-  auto pose_1 = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_1);
-  auto pose_2 = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_2);
+  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
 
-  std::vector<traffic_simulator::CanonicalizedLaneletPose> in_poses;
-  in_poses.push_back(pose_0);
-  in_poses.push_back(pose_1);
-  in_poses.push_back(pose_2);
+  const auto in_poses = std::vector<traffic_simulator::CanonicalizedLaneletPose>{
+    makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659),
+    makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120660),
+    makeCanonicalizedLaneletPose(hdmap_utils_ptr, 34468)};
 
   planner.setWaypoints(in_poses);
 
-  auto out_poses = planner.getGoalPoses();
+  const auto out_poses = planner.getGoalPoses();
 
   EXPECT_EQ(in_poses.size(), out_poses.size());
   for (auto it_in = in_poses.begin(), it_out = out_poses.end();
@@ -66,22 +60,16 @@ TEST(RoutePlanner, getGoalPoses)
 TEST(RoutePlanner, getGoalPosesInWorldFrame)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  traffic_simulator::RoutePlanner planner(hdmap_utils_ptr);
-  lanelet::Id id_0 = 120659;
-  lanelet::Id id_1 = 120660;
-  lanelet::Id id_2 = 34468;
-  auto pose_0 = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
-  auto pose_1 = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_1);
-  auto pose_2 = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_2);
+  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
 
-  std::vector<traffic_simulator::CanonicalizedLaneletPose> in_poses;
-  in_poses.push_back(pose_0);
-  in_poses.push_back(pose_1);
-  in_poses.push_back(pose_2);
+  const auto in_poses = std::vector<traffic_simulator::CanonicalizedLaneletPose>{
+    makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659),
+    makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120660),
+    makeCanonicalizedLaneletPose(hdmap_utils_ptr, 34468)};
 
   planner.setWaypoints(in_poses);
 
-  auto out_poses = planner.getGoalPosesInWorldFrame();
+  const auto out_poses = planner.getGoalPosesInWorldFrame();
 
   EXPECT_EQ(in_poses.size(), out_poses.size());
   for (size_t i = 0; i < in_poses.size(); i++) {
@@ -96,17 +84,13 @@ TEST(RoutePlanner, getGoalPosesInWorldFrame)
 TEST(RoutePlanner, getRouteLanelets_horizon)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  traffic_simulator::RoutePlanner planner(hdmap_utils_ptr);
+  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
 
-  lanelet::Id id_start = 120659;
-  lanelet::Id id_target = 34579;
-  auto pose_start = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_start);
-  auto pose_target = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_target);
+  const lanelet::Id id_target = 34579;
 
-  const double distance = 1000;
-
-  planner.setWaypoints({pose_target});
-  auto route = planner.getRouteLanelets(pose_start, distance);
+  planner.setWaypoints({makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_target)});
+  auto route =
+    planner.getRouteLanelets(makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), 1000.0);
 
   EXPECT_TRUE(std::find(route.begin(), route.end(), id_target) != route.end());
 }
@@ -118,17 +102,13 @@ TEST(RoutePlanner, getRouteLanelets_horizon)
 TEST(RoutePlanner, getRouteLanelets_noHorizon)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  traffic_simulator::RoutePlanner planner(hdmap_utils_ptr);
+  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
 
-  lanelet::Id id_start = 120659;
   lanelet::Id id_target = 34579;
-  auto pose_start = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_start);
-  auto pose_target = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_target);
 
-  const double distance = 100;
-
-  planner.setWaypoints({pose_target});
-  auto route = planner.getRouteLanelets(pose_start, distance);
+  planner.setWaypoints({makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_target)});
+  const auto route =
+    planner.getRouteLanelets(makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), 100.0);
 
   EXPECT_FALSE(std::find(route.begin(), route.end(), id_target) != route.end());
 }
@@ -141,16 +121,13 @@ TEST(RoutePlanner, getRouteLanelets_noHorizon)
 TEST(RoutePlanner, getRouteLanelets_empty)
 {
   auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  traffic_simulator::RoutePlanner planner(hdmap_utils_ptr);
+  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
 
-  lanelet::Id id_0 = 120659;
-  auto pose_0 = makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_0);
-
-  const double distance = 100;
-  lanelet::Ids following_ids({120659, 120660, 34468, 34465, 34462});
+  const lanelet::Ids following_ids({120659, 120660, 34468, 34465, 34462});
 
   planner.setWaypoints({});
-  auto route = planner.getRouteLanelets(pose_0, distance);
+  const auto route =
+    planner.getRouteLanelets(makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), 100.0);
 
   EXPECT_EQ(route.size(), following_ids.size());
   for (size_t i = 0; i < route.size(); i++) {

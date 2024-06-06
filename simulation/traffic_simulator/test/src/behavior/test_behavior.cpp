@@ -28,37 +28,42 @@ int main(int argc, char ** argv)
 TEST(Behavior, getRequestString)
 {
   {
-    const auto req = traffic_simulator::behavior::Request::NONE;
     std::string str;
-    EXPECT_NO_THROW(str = traffic_simulator::behavior::getRequestString(req));
+    EXPECT_NO_THROW(
+      str =
+        traffic_simulator::behavior::getRequestString(traffic_simulator::behavior::Request::NONE));
     EXPECT_TRUE("none" == str);
   }
 
   {
-    const auto req = traffic_simulator::behavior::Request::LANE_CHANGE;
     std::string str;
-    EXPECT_NO_THROW(str = traffic_simulator::behavior::getRequestString(req));
+    EXPECT_NO_THROW(
+      str = traffic_simulator::behavior::getRequestString(
+        traffic_simulator::behavior::Request::LANE_CHANGE));
     EXPECT_TRUE("lane_change" == str);
   }
 
   {
-    const auto req = traffic_simulator::behavior::Request::FOLLOW_LANE;
     std::string str;
-    EXPECT_NO_THROW(str = traffic_simulator::behavior::getRequestString(req));
+    EXPECT_NO_THROW(
+      str = traffic_simulator::behavior::getRequestString(
+        traffic_simulator::behavior::Request::FOLLOW_LANE));
     EXPECT_TRUE("follow_lane" == str);
   }
 
   {
-    const auto req = traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY;
     std::string str;
-    EXPECT_NO_THROW(str = traffic_simulator::behavior::getRequestString(req));
+    EXPECT_NO_THROW(
+      str = traffic_simulator::behavior::getRequestString(
+        traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY));
     EXPECT_TRUE("follow_polyline_trajectory" == str);
   }
 
   {
-    const auto req = traffic_simulator::behavior::Request::WALK_STRAIGHT;
     std::string str;
-    EXPECT_NO_THROW(str = traffic_simulator::behavior::getRequestString(req));
+    EXPECT_NO_THROW(
+      str = traffic_simulator::behavior::getRequestString(
+        traffic_simulator::behavior::Request::WALK_STRAIGHT));
     EXPECT_TRUE("walk_straight" == str);
   }
 }

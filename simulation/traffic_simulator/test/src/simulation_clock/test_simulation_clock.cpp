@@ -23,11 +23,7 @@
  */
 TEST(SimulationClock, Initialize)
 {
-  const double realtime_factor = 1.0;
-  const double frame_rate = 10.0;
-  const bool use_sim_time = true;
-  auto simulation_clock =
-    traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
+  auto simulation_clock = traffic_simulator::SimulationClock(true, 1.0, 10.0);
 
   EXPECT_FALSE(simulation_clock.started());
   simulation_clock.update();
@@ -47,9 +43,7 @@ TEST(SimulationClock, getCurrentRosTime)
 {
   const double realtime_factor = 2.0;
   const double frame_rate = 10.0;
-  const bool use_sim_time = true;
-  auto simulation_clock =
-    traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
+  auto simulation_clock = traffic_simulator::SimulationClock(true, realtime_factor, frame_rate);
   simulation_clock.start();
 
   const auto initial_time = simulation_clock.getCurrentRosTime();
@@ -59,12 +53,9 @@ TEST(SimulationClock, getCurrentRosTime)
     simulation_clock.update();
   }
 
-  const auto current_time = simulation_clock.getCurrentRosTime();
-  const double result_elapsed_time = (current_time - initial_time).seconds();
-  const double actual_elapsed_time = static_cast<double>(iterations) * realtime_factor / frame_rate;
-  const double epsilon = 1e-6;
-
-  EXPECT_NEAR(result_elapsed_time, actual_elapsed_time, epsilon);
+  EXPECT_NEAR(
+    (simulation_clock.getCurrentRosTime() - initial_time).seconds(),
+    static_cast<double>(iterations) * realtime_factor / frame_rate, 1e-6);
 }
 
 /**
@@ -75,9 +66,7 @@ TEST(SimulationClock, getCurrentScenarioTime)
 {
   const double realtime_factor = 1.0;
   const double frame_rate = 30.0;
-  const bool use_sim_time = true;
-  auto simulation_clock =
-    traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
+  auto simulation_clock = traffic_simulator::SimulationClock(true, realtime_factor, frame_rate);
 
   simulation_clock.start();
 
@@ -88,11 +77,9 @@ TEST(SimulationClock, getCurrentScenarioTime)
     simulation_clock.update();
   }
 
-  const double result_elapsed_time = simulation_clock.getCurrentScenarioTime();
-  const double actual_elapsed_time = static_cast<double>(iterations) * realtime_factor / frame_rate;
-  const double epsilon = 1e-6;
-
-  EXPECT_NEAR(actual_elapsed_time, result_elapsed_time, epsilon);
+  EXPECT_NEAR(
+    static_cast<double>(iterations) * realtime_factor / frame_rate,
+    simulation_clock.getCurrentScenarioTime(), 1e-6);
 }
 
 /**
@@ -101,25 +88,18 @@ TEST(SimulationClock, getCurrentScenarioTime)
  */
 TEST(SimulationClock, Update)
 {
-  const double realtime_factor = 1.0;
-  const double frame_rate = 10.0;
-  const bool use_sim_time = true;
-  auto simulation_clock =
-    traffic_simulator::SimulationClock(use_sim_time, realtime_factor, frame_rate);
+  auto simulation_clock = traffic_simulator::SimulationClock(true, 1.0, 10.0);
 
   simulation_clock.start();
 
   const double initial_simulation_time = simulation_clock.getCurrentSimulationTime();
-
-  const int iterations = 10;
   const double step_time = simulation_clock.getStepTime();
-  const double tolerance = 1e-6;
 
-  for (int i = 0; i < iterations; ++i) {
+  for (int i = 0; i < 10; ++i) {
     simulation_clock.update();
     const double expected_simulation_time =
       initial_simulation_time + static_cast<double>(i + 1) * step_time;
     const double actual_simulation_time = simulation_clock.getCurrentSimulationTime();
-    EXPECT_NEAR(actual_simulation_time, expected_simulation_time, tolerance);
+    EXPECT_NEAR(actual_simulation_time, expected_simulation_time, 1e-6);
   }
 }
