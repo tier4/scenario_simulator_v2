@@ -338,7 +338,7 @@ public:
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(core->getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getParameterOrDeclare<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
           configuration.set_detect_all_objects_in_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_object_recognition_delay(controller.properties.template get<Double>("detectedObjectPublishingDelay"));
@@ -355,7 +355,7 @@ public:
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(core->getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getParameterOrDeclare<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
@@ -370,7 +370,7 @@ public:
         core->attachPseudoTrafficLightDetector([&]() {
           simulation_api_schema::PseudoTrafficLightDetectorConfiguration configuration;
           configuration.set_architecture_type(
-            core->getParameter<std::string>("architecture_type", "awf/universe"));
+            core->getParameterOrDeclare<std::string>("architecture_type", "awf/universe"));
           return configuration;
         }());
 

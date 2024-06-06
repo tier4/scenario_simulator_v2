@@ -42,7 +42,7 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
-#include <traffic_simulator/utils/parameter_manager.hpp>
+#include <traffic_simulator/utils/node_parameter_handler.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
@@ -74,7 +74,7 @@ class EntityManager
   Configuration configuration;
 
   std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
-  const ParameterManager parameter_manager_;
+  const std::shared_ptr<NodeParameterHandler> node_parameter_handler_;
 
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
@@ -132,8 +132,8 @@ public:
   template <typename... Ts>
   auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
   {
-    if (const auto architecture_type =
-          parameter_manager_.getParameter<std::string>("architecture_type", "awf/universe");
+    if (const auto architecture_type = node_parameter_handler_->getParameterOrDeclare<std::string>(
+          "architecture_type", "awf/universe");
         architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_shared<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
@@ -147,10 +147,11 @@ public:
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(
-    NodeT && node, const Configuration & configuration, const ParameterManager & parameter_manager)
+    NodeT && node, const Configuration & configuration,
+    const std::shared_ptr<NodeParameterHandler> & node_parameter_handler)
   : configuration(configuration),
     node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
-    parameter_manager_(parameter_manager),
+    node_parameter_handler_(node_parameter_handler),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
@@ -498,7 +499,8 @@ public:
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
           /// @note fix z, roll and pitch to fitting to the lanelet
-          if (parameter_manager_.getParameter<bool>("consider_pose_by_road_slope", false)) {
+          if (node_parameter_handler_->getParameterOrDeclare<bool>(
+                "consider_pose_by_road_slope", false)) {
             entity_status.pose = hdmap_utils_ptr_->toMapPose(*lanelet_pose).pose;
           } else {
             entity_status.pose = pose;

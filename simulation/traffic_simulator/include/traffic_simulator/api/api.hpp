@@ -65,9 +65,9 @@ public:
   template <typename NodeT, typename AllocatorT = std::allocator<void>, typename... Ts>
   explicit API(NodeT && node, const Configuration & configuration, Ts &&... xs)
   : configuration(configuration),
-    parameter_manager_(node),
+    node_parameter_handler_(std::make_shared<NodeParameterHandler>(node)),
     entity_manager_ptr_(
-      std::make_shared<entity::EntityManager>(node, configuration, parameter_manager_)),
+      std::make_shared<entity::EntityManager>(node, configuration, node_parameter_handler_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getMapPose(name); },
@@ -133,7 +133,7 @@ public:
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration, parameter_manager_);
+                 name, pose, parameters, configuration, node_parameter_handler_);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, behavior);
@@ -388,11 +388,11 @@ private:
 public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
-  template <typename ParameterT>
-  decltype(auto) getParameter(const std::string & name, const ParameterT & default_value = {}) const
+  template <typename ParameterType>
+  auto getParameterOrDeclare(
+    const std::string & name, const ParameterType & default_value = {}) const -> decltype(auto)
   {
-    return parameter_manager_.getParameter(
-      std::forward<decltype(name)>(name), std::forward<decltype(default_value)>(default_value));
+    return node_parameter_handler_->getParameterOrDeclare(name, default_value);
   }
 
   auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
@@ -412,7 +412,7 @@ private:
 
   const Configuration configuration;
 
-  const ParameterManager parameter_manager_;
+  const std::shared_ptr<NodeParameterHandler> node_parameter_handler_;
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
 
