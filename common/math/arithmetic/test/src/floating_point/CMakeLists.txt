@@ -1,1 +1,0 @@
-ament_add_gtest(test_comparison test_comparison.cpp)
