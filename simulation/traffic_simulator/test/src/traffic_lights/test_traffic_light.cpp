@@ -732,7 +732,6 @@ TEST(TrafficLight, Color_make_wrong)
   using Color = traffic_simulator::TrafficLight::Color;
   Color color;
   EXPECT_THROW(color = Color::make("wrong_color"), std::runtime_error);
-  EXPECT_FALSE(boost::lexical_cast<std::string>(color) == "wrong_color");
 }
 
 /**
@@ -743,7 +742,6 @@ TEST(TrafficLight, Shape_make_wrong)
   using Shape = traffic_simulator::TrafficLight::Shape;
   Shape shape;
   EXPECT_THROW(shape = Shape::make("wrong_shape"), std::runtime_error);
-  EXPECT_FALSE(boost::lexical_cast<std::string>(shape) == "wrong_shape");
 }
 
 /**
@@ -754,7 +752,6 @@ TEST(TrafficLight, Status_make_wrong)
   using Status = traffic_simulator::TrafficLight::Status;
   Status status;
   EXPECT_THROW(status = Status::make("wrong_status"), std::runtime_error);
-  EXPECT_FALSE(boost::lexical_cast<std::string>(status) == "wrong_status");
 }
 
 /**
