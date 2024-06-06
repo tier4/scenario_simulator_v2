@@ -92,9 +92,6 @@ auto PedestrianEntity::requestFollowTrajectory(
 
 std::string PedestrianEntity::getCurrentAction() const
 {
-  if (!npc_logic_started_) {
-    return "waiting";
-  }
   return behavior_plugin_ptr_->getCurrentAction();
 }
 
@@ -251,28 +248,26 @@ void PedestrianEntity::setDecelerationRateLimit(double deceleration_rate)
 auto PedestrianEntity::onUpdate(const double current_time, const double step_time) -> void
 {
   EntityBase::onUpdate(current_time, step_time);
-  if (npc_logic_started_) {
-    behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
-    behavior_plugin_ptr_->setEntityStatus(
-      std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(status_));
-    behavior_plugin_ptr_->setTargetSpeed(target_speed_);
-    behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
-    behavior_plugin_ptr_->update(current_time, step_time);
-    setStatus(*behavior_plugin_ptr_->getUpdatedStatus());
-    /// @note setStatus() is not skipped even if isAtEndOfLanelets return true
-    if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
-      if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
-        stopAtCurrentPosition();
-        updateStandStillDuration(step_time);
-        updateTraveledDistance(step_time);
-        return;
-      }
+
+  behavior_plugin_ptr_->setOtherEntityStatus(other_status_);
+  behavior_plugin_ptr_->setEntityStatus(
+    std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(status_));
+  behavior_plugin_ptr_->setTargetSpeed(target_speed_);
+  behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
+  behavior_plugin_ptr_->update(current_time, step_time);
+  setStatus(*behavior_plugin_ptr_->getUpdatedStatus());
+  /// @note setStatus() is not skipped even if isAtEndOfLanelets return true
+  if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
+    if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
+      stopAtCurrentPosition();
+      updateStandStillDuration(step_time);
+      updateTraveledDistance(step_time);
+      return;
     }
-    updateStandStillDuration(step_time);
-    updateTraveledDistance(step_time);
-  } else {
-    updateEntityStatusTimestamp(current_time);
   }
+  updateStandStillDuration(step_time);
+  updateTraveledDistance(step_time);
+
   EntityBase::onPostUpdate(current_time, step_time);
 }
 }  // namespace entity

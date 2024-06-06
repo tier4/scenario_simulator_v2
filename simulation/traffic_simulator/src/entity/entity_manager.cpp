@@ -195,10 +195,11 @@ const std::string EntityManager::getEgoName() const
 auto EntityManager::getObstacle(const std::string & name)
   -> std::optional<traffic_simulator_msgs::msg::Obstacle>
 {
-  if (!npc_logic_started_) {
+  if (not npc_logic_started_) {
     return std::nullopt;
+  } else {
+    return entities_.at(name)->getObstacle();
   }
-  return entities_.at(name)->getObstacle();
 }
 
 auto EntityManager::getPedestrianParameters(const std::string & name) const
@@ -226,10 +227,11 @@ auto EntityManager::getVehicleParameters(const std::string & name) const
 auto EntityManager::getWaypoints(const std::string & name)
   -> traffic_simulator_msgs::msg::WaypointsArray
 {
-  if (!npc_logic_started_) {
+  if (not npc_logic_started_) {
     return traffic_simulator_msgs::msg::WaypointsArray();
+  } else {
+    return entities_.at(name)->getWaypoints();
   }
-  return entities_.at(name)->getWaypoints();
 }
 
 bool EntityManager::isEgoSpawned() const
@@ -331,6 +333,19 @@ void EntityManager::resetBehaviorPlugin(
   setBehaviorParameter(name, behavior_parameter);
 }
 
+auto EntityManager::getCurrentAction(const std::string & name) const -> std::string
+{
+  if (const auto entity = getEntity(name)) {
+    if (not npc_logic_started_ and not is<EgoEntity>(name)) {
+      return "waiting";
+    } else {
+      return entity->getCurrentAction();
+    }
+  } else {
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+  }
+}
+
 bool EntityManager::trafficLightsChanged()
 {
   return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
@@ -352,7 +367,9 @@ auto EntityManager::updateNpcLogic(
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  entities_[name]->onUpdate(current_time, step_time);
+  if (npc_logic_started_) {
+    entities_[name]->onUpdate(current_time_, step_time_);
+  }
   return entities_[name]->getStatus();
 }
 
@@ -417,13 +434,7 @@ void EntityManager::updateHdmapMarker()
   lanelet_marker_pub_ptr_->publish(markers);
 }
 
-void EntityManager::startNpcLogic()
-{
-  npc_logic_started_ = true;
-  for (auto it = entities_.begin(); it != entities_.end(); it++) {
-    it->second->startNpcLogic();
-  }
-}
+auto EntityManager::startNpcLogic() -> void { npc_logic_started_ = true; }
 
 }  // namespace entity
 }  // namespace traffic_simulator
