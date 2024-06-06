@@ -767,6 +767,5 @@ TEST(TrafficLight, Bulb_make_wrong)
   EXPECT_THROW(Bulb("red flashing wrong_shape"), std::runtime_error);
   EXPECT_THROW(Bulb("red wrong_status circle"), std::runtime_error);
   EXPECT_THROW(Bulb("wrong_color flashing circle"), std::runtime_error);
-
   EXPECT_THROW(Bulb("wrong_color wrong_status wrong_shape"), std::runtime_error);
 }
