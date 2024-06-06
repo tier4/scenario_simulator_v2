@@ -26,15 +26,21 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
+class RoutePlannerTest : public testing::Test
+{
+protected:
+  RoutePlannerTest() : hdmap_utils_ptr(makeHdMapUtilsSharedPointer()), planner(hdmap_utils_ptr) {}
+
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  traffic_simulator::RoutePlanner planner;
+};
+
 /**
  * @note Test functionality used by other units.
  * Test accessor getGoalPoses.
  */
-TEST(RoutePlanner, getGoalPoses)
+TEST_F(RoutePlannerTest, getGoalPoses)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
-
   const auto in_poses = std::vector<traffic_simulator::CanonicalizedLaneletPose>{
     makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659),
     makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120660),
@@ -57,11 +63,8 @@ TEST(RoutePlanner, getGoalPoses)
  * @note Test functionality used by other units.
  * Test performing transformations by getGoalPosesInWorldFrame accessor.
  */
-TEST(RoutePlanner, getGoalPosesInWorldFrame)
+TEST_F(RoutePlannerTest, getGoalPosesInWorldFrame)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
-
   const auto in_poses = std::vector<traffic_simulator::CanonicalizedLaneletPose>{
     makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659),
     makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120660),
@@ -81,11 +84,8 @@ TEST(RoutePlanner, getGoalPosesInWorldFrame)
  * @note Test functionality used by other units.
  * Test routing correctness with an entity pose and target pose spaced apart for more than horizon.
  */
-TEST(RoutePlanner, getRouteLanelets_horizon)
+TEST_F(RoutePlannerTest, getRouteLanelets_horizon)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
-
   const lanelet::Id id_target = 34579;
 
   planner.setWaypoints({makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_target)});
@@ -99,11 +99,8 @@ TEST(RoutePlanner, getRouteLanelets_horizon)
  * @note Test functionality used by other units.
  * Test routing correctness with an entity pose and target pose spaced apart for less than horizon.
  */
-TEST(RoutePlanner, getRouteLanelets_noHorizon)
+TEST_F(RoutePlannerTest, getRouteLanelets_noHorizon)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
-
   lanelet::Id id_target = 34579;
 
   planner.setWaypoints({makeCanonicalizedLaneletPose(hdmap_utils_ptr, id_target)});
@@ -118,11 +115,8 @@ TEST(RoutePlanner, getRouteLanelets_noHorizon)
  * Test routing correctness with an entity pose and empty waypoints vector
  * - the goal is to test function behavior when empty vector is passed.
  */
-TEST(RoutePlanner, getRouteLanelets_empty)
+TEST_F(RoutePlannerTest, getRouteLanelets_empty)
 {
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-  auto planner = traffic_simulator::RoutePlanner(hdmap_utils_ptr);
-
   const lanelet::Ids following_ids({120659, 120660, 34468, 34465, 34462});
 
   planner.setWaypoints({});

@@ -29,14 +29,19 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
+class MiscObjectEntityTest : public testing::Test
+{
+protected:
+  MiscObjectEntityTest() : hdmap_utils_ptr(makeHdMapUtilsSharedPointer()), entity_name("blob") {}
+
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
+  const std::string entity_name;
+};
 /**
  * @note Test basic functionality. Test current action obtaining when NPC logic is not started.
  */
-TEST(MiscObjectEntity, getCurrentAction_npcNotStarted)
+TEST_F(MiscObjectEntityTest, getCurrentAction_npcNotStarted)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-
   auto non_canonicalized_status = makeEntityStatus(
     hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(), 0.0,
     entity_name);
@@ -55,11 +60,8 @@ TEST(MiscObjectEntity, getCurrentAction_npcNotStarted)
 /**
  * @note Test basic functionality. Test current action obtaining when NPC logic is started.
  */
-TEST(MiscObjectEntity, getCurrentAction_npcStarted)
+TEST_F(MiscObjectEntityTest, getCurrentAction_npcStarted)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-
   auto non_canonicalized_status = makeEntityStatus(
     hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(), 0.0,
     entity_name);
@@ -79,10 +81,8 @@ TEST(MiscObjectEntity, getCurrentAction_npcStarted)
 /**
  * @note Test function behavior when absolute speed change is requested - the goal is to test throwing error.
  */
-TEST(MiscObjectEntity, requestSpeedChange_absolute)
+TEST_F(MiscObjectEntityTest, requestSpeedChange_absolute)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
@@ -97,10 +97,8 @@ TEST(MiscObjectEntity, requestSpeedChange_absolute)
 /**
  * @note Test function behavior when relative speed change is requested - the goal is to test throwing error.
  */
-TEST(MiscObjectEntity, requestSpeedChange_relative)
+TEST_F(MiscObjectEntityTest, requestSpeedChange_relative)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659);
   auto bbox = makeBoundingBox();
 
@@ -126,11 +124,8 @@ TEST(MiscObjectEntity, requestSpeedChange_relative)
  * @note Test function behavior when relative speed change with transition type is requested
  * - the goal is to test throwing error.
  */
-TEST(MiscObjectEntity, requestSpeedChange_absoluteTransition)
+TEST_F(MiscObjectEntityTest, requestSpeedChange_absoluteTransition)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
@@ -150,11 +145,8 @@ TEST(MiscObjectEntity, requestSpeedChange_absoluteTransition)
  * @note Test function behavior when route assigning is requested with lanelet pose
  * - the goal is to test throwing error.
  */
-TEST(MiscObjectEntity, requestAssignRoute_laneletPose)
+TEST_F(MiscObjectEntityTest, requestAssignRoute_laneletPose)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
@@ -171,11 +163,8 @@ TEST(MiscObjectEntity, requestAssignRoute_laneletPose)
  * @note Test function behavior when route assigning is requested with pose
  * - the goal is to test throwing error.
  */
-TEST(MiscObjectEntity, requestAssignRoute_pose)
+TEST_F(MiscObjectEntityTest, requestAssignRoute_pose)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
@@ -194,11 +183,8 @@ TEST(MiscObjectEntity, requestAssignRoute_pose)
  * @note Test function behavior when position acquiring is requested with lanelet pose
  * - the goal is to test throwing error.
  */
-TEST(MiscObjectEntity, requestAcquirePosition_laneletPose)
+TEST_F(MiscObjectEntityTest, requestAcquirePosition_laneletPose)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
@@ -214,11 +200,8 @@ TEST(MiscObjectEntity, requestAcquirePosition_laneletPose)
  * @note Test function behavior when position acquiring is requested with pose
  * - the goal is to test throwing error.
  */
-TEST(MiscObjectEntity, requestAcquirePosition_pose)
+TEST_F(MiscObjectEntityTest, requestAcquirePosition_pose)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
@@ -235,11 +218,8 @@ TEST(MiscObjectEntity, requestAcquirePosition_pose)
 /**
  * @note Test function behavior when called with any argument - the goal is to test error throwing.
  */
-TEST(MiscObjectEntity, getRouteLanelets)
+TEST_F(MiscObjectEntityTest, getRouteLanelets)
 {
-  const auto entity_name = std::string("blob");
-  auto hdmap_utils_ptr = makeHdMapUtilsSharedPointer();
-
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
