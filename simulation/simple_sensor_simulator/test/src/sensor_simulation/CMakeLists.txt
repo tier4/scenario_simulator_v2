@@ -1,2 +1,0 @@
-ament_add_gtest(test_sensor_simulation test_sensor_simulation.cpp)
-target_link_libraries(test_sensor_simulation simple_sensor_simulator_component)

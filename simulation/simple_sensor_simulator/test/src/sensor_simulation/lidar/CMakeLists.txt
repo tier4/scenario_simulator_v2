@@ -1,5 +1,0 @@
-ament_add_gtest(test_lidar_sensor test_lidar_sensor.cpp)
-target_link_libraries(test_lidar_sensor simple_sensor_simulator_component)
-
-ament_add_gtest(test_raycaster test_raycaster.cpp)
-target_link_libraries(test_raycaster simple_sensor_simulator_component)
