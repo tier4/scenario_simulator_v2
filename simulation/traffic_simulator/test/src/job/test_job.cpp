@@ -31,6 +31,7 @@ int main(int argc, char ** argv)
 TEST(Job, onUpdate)
 {
   bool was_cleanup_func_called = false;
+
   auto job = traffic_simulator::job::Job(
     [](const double) { return true; },
     [&was_cleanup_func_called]() { was_cleanup_func_called = true; },
