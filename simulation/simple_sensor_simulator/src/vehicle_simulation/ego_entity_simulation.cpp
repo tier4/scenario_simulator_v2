@@ -448,6 +448,8 @@ auto EgoEntitySimulation::getStatus() const -> const traffic_simulator_msgs::msg
 auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
   -> void
 {
+  /// @note The lanelet matching algorithm should be equivalent to the one used in
+  /// EgoEntity::setStatus
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
   const auto matching_distance =
