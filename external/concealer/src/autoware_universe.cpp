@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <random>
 #include <concealer/autoware_universe.hpp>
 
 namespace concealer
@@ -80,6 +81,26 @@ auto AutowareUniverse::getSteeringAngle() const -> double
 
 auto AutowareUniverse::updateLocalization() -> void
 {
+    // Add noise to the current_pose with std_dev that are statistics based on the AWSIM vlp16.
+    constexpr uint_fast32_t seed = 1;
+    static std::mt19937 rand_engine(seed);
+    double std_dev_x = 0.03;
+    double std_dev_y = 0.008;
+    double std_dev_yaw = 0.04;
+    std::normal_distribution<double> distribution_x(0.0, std_dev_x);
+    std::normal_distribution<double> distribution_y(0.0, std_dev_y);
+    std::normal_distribution<double> distribution_yaw(0.0, std_dev_yaw);
+
+    auto noised_pose = current_pose.load();
+    // Add noise to the position
+    noised_pose.position.x += distribution_x(rand_engine);
+    noised_pose.position.y += distribution_y(rand_engine);
+    // Add noise to the orientation
+    tf2::Quaternion current_orientation;
+    tf2::convert(noised_pose.orientation, current_orientation);
+    current_orientation *= tf2::Quaternion(tf2::Vector3(0, 0, 1), distribution_yaw(rand_engine));
+    tf2::convert(current_orientation, noised_pose.orientation);
+
   setAcceleration([this]() {
     geometry_msgs::msg::AccelWithCovarianceStamped message;
     message.header.stamp = get_clock()->now();
@@ -94,17 +115,17 @@ auto AutowareUniverse::updateLocalization() -> void
     return message;
   }());
 
-  setOdometry([this]() {
+  setOdometry([&]() {
     nav_msgs::msg::Odometry message;
     message.header.stamp = get_clock()->now();
     message.header.frame_id = "map";
-    message.pose.pose = current_pose.load();
+    message.pose.pose = noised_pose;
     message.pose.covariance = {};
     message.twist.twist = current_twist.load();
     return message;
   }());
 
-  setTransform(current_pose.load());
+  setTransform(noised_pose);
 }
 
 auto AutowareUniverse::updateVehicleState() -> void
