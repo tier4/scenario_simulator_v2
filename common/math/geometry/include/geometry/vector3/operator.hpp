@@ -16,6 +16,8 @@
 #define GEOMETRY__VECTOR3__OPERATOR_HPP_
 
 #include <geometry/vector3/is_like_vector3.hpp>
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 
 namespace math
@@ -28,11 +30,19 @@ template <
     nullptr>
 auto operator+(const T & a, const U & b)
 {
-  geometry_msgs::msg::Vector3 v;
-  v.x = a.x + b.x;
-  v.y = a.y + b.y;
-  v.z = a.z + b.z;
-  return v;
+  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value) {
+    geometry_msgs::msg::Vector3 v;
+    v.x = a.x + b.x;
+    v.y = a.y + b.y;
+    v.z = a.z + b.z;
+    return v;
+  } else {
+    geometry_msgs::msg::Point v;
+    v.x = a.x + b.x;
+    v.y = a.y + b.y;
+    v.z = a.z + b.z;
+    return v;
+  }
 }
 
 template <
@@ -41,11 +51,19 @@ template <
     nullptr>
 auto operator-(const T & a, const U & b)
 {
-  geometry_msgs::msg::Vector3 v;
-  v.x = a.x - b.x;
-  v.y = a.y - b.y;
-  v.z = a.z - b.z;
-  return v;
+  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value) {
+    geometry_msgs::msg::Vector3 v;
+    v.x = a.x - b.x;
+    v.y = a.y - b.y;
+    v.z = a.z - b.z;
+    return v;
+  } else {
+    geometry_msgs::msg::Point v;
+    v.x = a.x - b.x;
+    v.y = a.y - b.y;
+    v.z = a.z - b.z;
+    return v;
+  }
 }
 
 template <
@@ -54,11 +72,19 @@ template <
     nullptr>
 auto operator*(const T & a, const U & b)
 {
-  geometry_msgs::msg::Vector3 v;
-  v.x = a.x * b;
-  v.y = a.y * b;
-  v.z = a.z * b;
-  return v;
+  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value) {
+    geometry_msgs::msg::Vector3 v;
+    v.x = a.x * b;
+    v.y = a.y * b;
+    v.z = a.z * b;
+    return v;
+  } else {
+    geometry_msgs::msg::Point v;
+    v.x = a.x * b;
+    v.y = a.y * b;
+    v.z = a.z * b;
+    return v;
+  }
 }
 
 template <
@@ -67,11 +93,19 @@ template <
     nullptr>
 auto operator/(const T & a, const U & b)
 {
-  geometry_msgs::msg::Vector3 v;
-  v.x = a.x / b;
-  v.y = a.y / b;
-  v.z = a.z / b;
-  return v;
+  if constexpr (std::is_same<T, geometry_msgs::msg::Vector3>::value) {
+    geometry_msgs::msg::Vector3 v;
+    v.x = a.x / b;
+    v.y = a.y / b;
+    v.z = a.z / b;
+    return v;
+  } else {
+    geometry_msgs::msg::Point v;
+    v.x = a.x / b;
+    v.y = a.y / b;
+    v.z = a.z / b;
+    return v;
+  }
 }
 
 template <

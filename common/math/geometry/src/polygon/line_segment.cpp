@@ -252,7 +252,13 @@ auto LineSegment::getIntersection2D(const LineSegment & line) const
 
 auto LineSegment::getVector() const -> geometry_msgs::msg::Vector3
 {
-  return end_point - start_point;
+  using math::geometry::operator-;
+  const auto result_pt = end_point - start_point;
+  auto result = geometry_msgs::msg::Vector3();
+  result.x = result_pt.x;
+  result.y = result_pt.y;
+  result.z = result_pt.z;
+  return result;
 }
 
 /**

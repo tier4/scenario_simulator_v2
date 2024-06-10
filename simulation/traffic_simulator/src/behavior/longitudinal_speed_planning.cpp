@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #include <algorithm>
-#include <geometry/linear_algebra.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <iostream>
 #include <rclcpp/rclcpp.hpp>
 #include <scenario_simulator_exception/exception.hpp>
@@ -290,6 +290,9 @@ auto LongitudinalSpeedPlanner::forward(
   const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> geometry_msgs::msg::Twist
 {
+  using math::geometry::operator*;
+  using math::geometry::operator+;
+
   geometry_msgs::msg::Twist ret = twist;
   ret.linear = ret.linear + accel.linear * step_time;
   ret.linear.x = std::clamp(ret.linear.x, -1 * constraints.max_speed, constraints.max_speed);
@@ -301,6 +304,9 @@ auto LongitudinalSpeedPlanner::timeDerivative(
   const geometry_msgs::msg::Twist & before, const geometry_msgs::msg::Twist & after) const
   -> geometry_msgs::msg::Accel
 {
+  using math::geometry::operator-;
+  using math::geometry::operator/;
+
   geometry_msgs::msg::Accel ret;
   ret.linear = (after.linear - before.linear) / step_time;
   ret.angular = (after.angular - before.angular) / step_time;
