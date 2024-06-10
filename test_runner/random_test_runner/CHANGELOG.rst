@@ -13,6 +13,21 @@ Changelog for package random_test_runner
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.4 (2024-06-10)
+------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* Contributors: robomic
+
+2.0.3 (2024-06-10)
+------------------
+* Merge pull request `#1263 <https://github.com/tier4/scenario_simulator_v2/issues/1263>`_ from tier4/fix/remove_linear_algebra
+  Fix/remove linear algebra
+* Merge branch 'master' into fix/remove_linear_algebra
+* reformat
+* remove linear_algebra
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 2.0.2 (2024-06-03)
 ------------------
 
