@@ -16,6 +16,8 @@
 #define GEOMETRY__VECTOR3__NORMALIZE_HPP_
 
 #include <geometry/vector3/is_like_vector3.hpp>
+#include <geometry/vector3/norm.hpp>
+#include <scenario_simulator_exception/exception.hpp>
 
 namespace math
 {
@@ -24,7 +26,14 @@ namespace geometry
 template <typename T, std::enable_if_t<IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
 auto normalize(const T & v)
 {
-  return v / norm(v);
+  const auto n = norm(v);
+  if (std::fabs(n) <= std::numeric_limits<double>::epsilon()) {
+    THROW_SIMULATION_ERROR(
+      "size of norm (", v.x, ",", v.y, ",", v.z, ") is, ", n,
+      " size of the vector you want to normalize should be over ",
+      std::numeric_limits<double>::epsilon());
+  }
+  return v / n;
 }
 }  // namespace geometry
 }  // namespace math
