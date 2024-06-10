@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <do_nothing_plugin/plugin.hpp>
-#include <geometry/linear_algebra.hpp>
 #include <geometry/vector3/hypot.hpp>
+#include <geometry/vector3/operator.hpp>
 
 namespace entity_behavior
 {
@@ -67,6 +67,10 @@ auto interpolateEntityStatusFromPolylineTrajectory(
   const std::shared_ptr<traffic_simulator::CanonicalizedEntityStatus> & entity_status,
   double current_time, double step_time) -> std::optional<traffic_simulator::EntityStatus>
 {
+  using math::geometry::operator*;
+  using math::geometry::operator-;
+  using math::geometry::operator+;
+
   if (!trajectory) {
     return std::nullopt;
   }
