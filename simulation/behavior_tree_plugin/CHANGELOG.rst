@@ -13,6 +13,11 @@ Changelog for package behavior_tree_plugin
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.3 (2024-06-10)
+------------------
+* Merge branch 'master' into fix/remove_linear_algebra
+* Contributors: Taiga
+
 2.0.2 (2024-06-03)
 ------------------
 

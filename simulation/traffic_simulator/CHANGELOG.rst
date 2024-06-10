@@ -13,6 +13,21 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.3 (2024-06-10)
+------------------
+* Merge pull request `#1263 <https://github.com/tier4/scenario_simulator_v2/issues/1263>`_ from tier4/fix/remove_linear_algebra
+  Fix/remove linear algebra
+* Update simulation/traffic_simulator/src/entity/entity_manager.cpp
+* fix format
+* Merge branch 'master' into fix/remove_linear_algebra
+* reformat
+* update
+* update
+* Update entity_manager.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* remove linear_algebra
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 2.0.2 (2024-06-03)
 ------------------
 * Merge pull request `#1271 <https://github.com/tier4/scenario_simulator_v2/issues/1271>`_ from tier4/fix/rviz_config

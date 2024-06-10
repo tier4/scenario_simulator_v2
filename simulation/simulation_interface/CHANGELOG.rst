@@ -13,6 +13,14 @@ Changelog for package simulation_interface
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.3 (2024-06-10)
+------------------
+* fix format
+* fix format
+* Merge branch 'master' into fix/remove_linear_algebra
+* reformat
+* Contributors: Taiga, Taiga Takano
+
 2.0.2 (2024-06-03)
 ------------------
 

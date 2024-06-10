@@ -13,6 +13,26 @@ Changelog for package geometry
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.3 (2024-06-10)
+------------------
+* Merge pull request `#1263 <https://github.com/tier4/scenario_simulator_v2/issues/1263>`_ from tier4/fix/remove_linear_algebra
+  Fix/remove linear algebra
+* Update common/math/geometry/include/geometry/quaternion/make_quaternion.hpp
+* Update common/math/geometry/include/geometry/vector3/vector3.hpp
+* update test
+* Merge branch 'master' into fix/remove_linear_algebra
+* reformat
+* fix format
+* fix lint
+* update
+* Update internal_angle.hpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* Update inner_product.hpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* remove comment
+* remove linear_algebra
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 2.0.2 (2024-06-03)
 ------------------
 
