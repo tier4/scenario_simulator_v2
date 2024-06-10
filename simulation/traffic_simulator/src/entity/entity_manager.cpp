@@ -16,8 +16,8 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/intersection/collision.hpp>
-#include <geometry/linear_algebra.hpp>
 #include <geometry/transform.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -39,6 +39,9 @@ namespace entity
 {
 void EntityManager::broadcastEntityTransform()
 {
+  using math::geometry::operator/;
+  using math::geometry::operator*;
+  using math::geometry::operator+=;
   std::vector<std::string> names = getEntityNames();
   /**
    * @note This part of the process is intended to ensure that frames are issued in a position that makes 
@@ -69,9 +72,9 @@ void EntityManager::broadcastEntityTransform()
         .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
                 .position(std::accumulate(
                   names.begin(), names.end(), geometry_msgs::msg::Point(),
-                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
-                    return point +
-                           (getMapPose(name).position * (1.0 / static_cast<double>(names.size())));
+                  [this, names](geometry_msgs::msg::Point point, const std::string & name) {
+                    point += getMapPose(name).position * (1.0 / static_cast<double>(names.size()));
+                    return point;
                   }))
                 .orientation(geometry_msgs::msg::Quaternion())),
       true);
