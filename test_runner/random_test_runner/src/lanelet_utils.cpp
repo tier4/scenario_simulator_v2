@@ -22,7 +22,8 @@
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
 
 #include <geographic_msgs/msg/geo_point.hpp>
-#include <geometry/linear_algebra.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <optional>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
@@ -92,6 +93,9 @@ std::optional<traffic_simulator_msgs::msg::LaneletPose> LaneletUtils::getOpposit
 
   // TODO: Multiple same-direction lane support
   // TODO: Find lane width for current s value
+
+  using math::geometry::operator*;
+  using math::geometry::operator+;
 
   if (!lanelet_map_ptr_->laneletLayer.exists(pose.lanelet_id)) {
     return {};
