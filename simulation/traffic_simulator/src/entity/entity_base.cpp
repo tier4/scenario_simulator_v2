@@ -802,21 +802,18 @@ auto EntityBase::requestSynchronize(
         const auto border_distance = entity_velocity * target_entity_arrival_time -
                                      entity_velocity * entity_velocity / (accel_limit * 2);
         if (entity_velocity > accel_limit * target_entity_arrival_time) {
-          ///@brief Making entity slow down since the speed is too fast
+          ///@brief Making entity slow down since the speed is too fast. Dividing the loop_period by 1000 is to convert the unit from ms to s.
           return entity_velocity - accel_limit * loop_period / 1000;
         } else if (border_distance < entity_distance.value() - threshold) {
-          ///@brief Making entity speed up
+          ///@brief Making entity speed up. Dividing the loop_period by 1000 is to convert the unit from ms to s.
           return entity_velocity + accel_limit * loop_period / 1000;
         } else if (border_distance > entity_distance.value() - threshold) {
-          ///@brief Making entity slow down
+          ///@brief Making entity slow down. Dividing the loop_period by 1000 is to convert the unit from ms to s.
           return entity_velocity - accel_limit * loop_period / 1000;
         } else {
-          ///@brief Making entity keep the current speed
+          ///@brief Making entity keep the current speed. Dividing the loop_period by 1000 is to convert the unit from ms to s.
           return entity_velocity;
         }
-        /***
-         * @brief Dividing the loop_period by 1000 is to convert the unit from ms to s.
-        */
       };
 
       /**
