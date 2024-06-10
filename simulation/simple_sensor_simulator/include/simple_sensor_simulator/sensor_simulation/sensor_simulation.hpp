@@ -21,6 +21,11 @@
 #include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
 #include <autoware_auto_perception_msgs/msg/traffic_signal_array.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
+
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+#include <autoware_perception_msgs/msg/traffic_light_group_array.hpp>
+#endif
+
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
@@ -107,10 +112,17 @@ public:
       traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
         std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
           "/perception/traffic_light_recognition/internal/traffic_signals", &node, hdmap_utils)));
+#if __has_include(<autoware_perception_msgs/msg/traffic_light_group_array.hpp>)
+    } else if(configuration.architecture_type() == "awf/universe/20240605"){
+      using Message = autoware_perception_msgs::msg::TrafficLightGroupArray;
+      traffic_lights_detectors_.push_back(std::make_unique<traffic_lights::TrafficLightsDetector>(
+          std::make_shared<traffic_simulator::TrafficLightPublisher<Message>>(
+              "/perception/traffic_light_recognition/internal/traffic_signals", &node, hdmap_utils)));
+#endif
     } else {
       std::stringstream ss;
       ss << "Unexpected architecture_type " << std::quoted(configuration.architecture_type())
-         << " given.";
+         << " given for traffic light.";
       throw std::runtime_error(ss.str());
     }
   }
