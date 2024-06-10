@@ -13,6 +13,71 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.4 (2024-06-10)
+------------------
+* Merge pull request `#1270 <https://github.com/tier4/scenario_simulator_v2/issues/1270>`_ from tier4/feature/unit_tests/hdmap_utils
+  Feature/unit tests/hdmap utils
+* spellcheck
+* as requested, remove variables that are only used once
+* update coordinates for each map
+* use test_f
+* add comment on yaw angles
+* update older tests desciptions
+* remove ';' from comments
+* use builder
+* alter comment, alter distance
+* update comments - unit tests will not measure performance
+* remove unnecessary lines
+* alter getClosestLaneletId_onlyCrosswalkNearButExcluded testcase
+* fix spelling
+* add test descriptions
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* fix spelling
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* apply suggestions
+* remove problematic tests
+* remove comments
+* Merge branch 'feature/unit_tests/hdmap_utils' of github.com:RobotecAI/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* getDistanceToStopLine and getDistanceToTrafficLightStopLine tests
+* Add HdMapUtils::getCenterPoints tests
+* Improve stopline tests readability with additional information on failure
+* Use loop in tests with vectors
+* Add test expect macros with information stream
+* Fix style in HdMapUtils tests
+* Add comment about the issue
+* Change HdMapUtils::clipTrajectoryFromLaneletIds test reference values
+* Add clipTrajectoryFromLaneletIds tests
+* rename symbol
+* Merge branch 'feature/unit_tests/hdmap_utils' of github.com:RobotecAI/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* add map, stopLine tests
+* Add getLateralDistance tests
+* Add missing getAlongLaneletPose tests
+* Add missing getFollowingLanelets tests
+* Merge branch 'feature/unit_tests/hdmap_utils' of github.com:RobotecAI/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* getLongitudinalDistance, getTrafficLightIdsOnPath tests
+* Add getPreviousLanelets tests
+* Add toLaneletPose tests
+* Add test expect macros
+* getLaneletLength tests
+* isTrafficLight, isTrafficLightRegulatoryElement tests
+* getRoute tests
+* fix style; canChangeLane tests
+* getFollowingLanelets, getConflictingLaneIds, getConflictingCrosswalkIds test
+* added 2 maps, macros, and many tests
+* Add newline
+* Add more HdMapUtils tests
+* Style change for HdMapUtils tests
+* isInRoute tests
+* clarify comments regarding issues
+* remaining getNextLaneletIds and getPreviousLaneletIds tests
+* getNextLaneletIds tests
+* getClosestLaneletId tests
+* more tests
+* hdmap_utils test; bug
+* refactor
+* update file structure
+* Contributors: Masaya Kataoka, Mateusz Palczuk, robomic
+
 2.0.3 (2024-06-10)
 ------------------
 * Merge pull request `#1263 <https://github.com/tier4/scenario_simulator_v2/issues/1263>`_ from tier4/fix/remove_linear_algebra
