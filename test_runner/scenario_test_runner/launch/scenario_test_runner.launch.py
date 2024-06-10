@@ -33,7 +33,7 @@ from scenario_test_runner.shutdown_once import ShutdownOnce
 
 
 def architecture_types():
-    return ["awf/universe/20230906", "awf/universe/2023605"]
+    return ["awf/universe/20230906", "awf/universe/20240605"]
 
 
 def default_autoware_launch_package_of(architecture_type):
@@ -43,7 +43,7 @@ def default_autoware_launch_package_of(architecture_type):
         )
     return {
         "awf/universe/20230906": "autoware_launch",
-        "awf/universe/20230605": "autoware_launch",
+        "awf/universe/20240605": "autoware_launch",
     }[architecture_type]
 
 
@@ -54,7 +54,7 @@ def default_autoware_launch_file_of(architecture_type):
         )
     return {
         "awf/universe/20230906": "planning_simulator.launch.xml",
-        "awf/universe/202605": "planning_simulator.launch.xml",
+        "awf/universe/20240605": "planning_simulator.launch.xml",
     }[architecture_type]
 
 
