@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY__VECTOR3__IS_LIKE_VECTOR3_HPP_
-#define GEOMETRY__VECTOR3__IS_LIKE_VECTOR3_HPP_
+#ifndef GEOMETRY__QUATERNION__IS_LIKE_QUATERNION_HPP_
+#define GEOMETRY__QUATERNION__IS_LIKE_QUATERNION_HPP_
 
 #include <type_traits>
 #include <utility>
@@ -23,28 +23,19 @@ namespace math
 namespace geometry
 {
 template <typename T, typename = void>
-struct HasMemberW : std::false_type
+struct IsLikeQuaternion : std::false_type
 {
 };
 
 template <typename T>
-struct HasMemberW<T, std::void_t<decltype(std::declval<T>().w)>> : std::true_type
-{
-};
-
-template <typename T, typename = void>
-struct IsLikeVector3 : public std::false_type
-{
-};
-
-template <typename T>
-struct IsLikeVector3<
+struct IsLikeQuaternion<
   T, std::void_t<
        decltype(std::declval<T>().x), decltype(std::declval<T>().y), decltype(std::declval<T>().z),
-       std::enable_if_t<!HasMemberW<T>::value>>> : public std::true_type
+       decltype(std::declval<T>().w)>> : std::true_type
 {
 };
+
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY__VECTOR3__IS_LIKE_VECTOR3_HPP_
+#endif  // GEOMETRY__QUATERNION__IS_LIKE_QUATERNION_HPP_

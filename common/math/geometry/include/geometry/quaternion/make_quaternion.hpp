@@ -12,30 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef GEOMETRY__VECTOR3__NORMALIZE_HPP_
-#define GEOMETRY__VECTOR3__NORMALIZE_HPP_
+#ifndef GEOMETRY__QUATERNION__MAKE_QUATERNION_HPP_
+#define GEOMETRY__QUATERNION__MAKE_QUATERNION_HPP_
 
-#include <geometry/vector3/is_like_vector3.hpp>
-#include <geometry/vector3/norm.hpp>
-#include <scenario_simulator_exception/exception.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
 
 namespace math
 {
 namespace geometry
 {
-template <typename T, std::enable_if_t<IsLikeVector3<T>::value, std::nullptr_t> = nullptr>
-auto normalize(const T & v)
+template <
+  typename T, typename U, typename V, typename W,
+  std::enable_if_t<
+    std::conjunction_v<std::is_scalar<T>, std::is_scalar<U>, std::is_scalar<V>, std::is_scalar<W>>,
+    std::nullptr_t> = nullptr>
+auto makeQuaternion(const T & x, const U & y, const V & z, const W & w)
 {
-  const auto n = norm(v);
-  if (std::fabs(n) <= std::numeric_limits<double>::epsilon()) {
-    THROW_SIMULATION_ERROR(
-      "size of norm (", v.x, ",", v.y, ",", v.z, ") is, ", n,
-      " size of the vector you want to normalize should be over ",
-      std::numeric_limits<double>::epsilon());
-  }
-  return v / n;
+  return geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(x).y(y).z(z).w(w);
 }
 }  // namespace geometry
 }  // namespace math
 
-#endif  // GEOMETRY__VECTOR3__NORMALIZE_HPP_
+#endif  // GEOMETRY__QUATERNION__MAKE_QUATERNION_HPP_
