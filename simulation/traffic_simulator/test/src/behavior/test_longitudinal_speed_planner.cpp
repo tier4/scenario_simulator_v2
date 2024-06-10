@@ -40,11 +40,17 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
-auto makeLongitudinalSpeedPlanner()
-  -> traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner
+class LongitudinalSpeedPlannerTest : public testing::Test
 {
-  return traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner{0.001, "entity"};
-}
+protected:
+  LongitudinalSpeedPlannerTest()
+  : planner(
+      traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner{0.001, "entity"})
+  {
+  }
+
+  traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner planner;
+};
 
 auto makeTwistWithLinearX(double x) -> geometry_msgs::msg::Twist
 {
@@ -63,40 +69,32 @@ auto makeAccelWithLinearX(double x) -> geometry_msgs::msg::Accel
 /**
  * @note Test basic functionality. Test with an accelerating situation.
  */
-TEST(LongitudinalSpeedPlanner, isAccelerating_true)
+TEST_F(LongitudinalSpeedPlannerTest, isAccelerating_true)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
-
   EXPECT_TRUE(planner.isAccelerating(2.0, makeTwistWithLinearX(1.0)));
 }
 
 /**
  * @note Test basic functionality. Test with non accelerating situation.
  */
-TEST(LongitudinalSpeedPlanner, isAccelerating_false)
+TEST_F(LongitudinalSpeedPlannerTest, isAccelerating_false)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
-
   EXPECT_FALSE(planner.isAccelerating(2.0, makeTwistWithLinearX(3.0)));
 }
 
 /**
  * @note Test basic functionality. Test with a decelerating situation.
  */
-TEST(LongitudinalSpeedPlanner, isDecelerating_true)
+TEST_F(LongitudinalSpeedPlannerTest, isDecelerating_true)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
-
   EXPECT_TRUE(planner.isDecelerating(2.0, makeTwistWithLinearX(3.0)));
 }
 
 /**
  * @note Test basic functionality. Test with non decelerating situation.
  */
-TEST(LongitudinalSpeedPlanner, isDecelerating_false)
+TEST_F(LongitudinalSpeedPlannerTest, isDecelerating_false)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
-
   EXPECT_FALSE(planner.isDecelerating(2.0, makeTwistWithLinearX(1.0)));
 }
 
@@ -104,9 +102,8 @@ TEST(LongitudinalSpeedPlanner, isDecelerating_false)
  * @note Test calculations correctness of acceleration
  * duration with some positive acceleration and speed substantially below target_speed.
  */
-TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
+TEST_F(LongitudinalSpeedPlannerTest, getAccelerationDuration_acceleration)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
   const auto constraints =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
       .max_acceleration(2.0)
@@ -129,9 +126,8 @@ TEST(LongitudinalSpeedPlanner, getAccelerationDuration_acceleration)
  * @note Test functionality aggregation used in other classes.
  * Test function behavior when target_speed is bigger than max speed.
  */
-TEST(LongitudinalSpeedPlanner, getDynamicStates_targetSpeedOverLimit)
+TEST_F(LongitudinalSpeedPlannerTest, getDynamicStates_targetSpeedOverLimit)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
   const auto current_twist = makeTwistWithLinearX(10.0);
   const auto current_accel = makeAccelWithLinearX(1.0);
   const auto constraints =
@@ -142,13 +138,11 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_targetSpeedOverLimit)
       .max_deceleration_rate(1.0)
       .max_speed(20.0);
 
-  double target_speed = 100.0;
   const auto [result0_twist, result0_accel, result0_jerk] =
-    planner.getDynamicStates(target_speed, constraints, current_twist, current_accel);
+    planner.getDynamicStates(100.0, constraints, current_twist, current_accel);
 
-  target_speed = constraints.max_speed;
   const auto [result1_twist, result1_accel, result1_jerk] =
-    planner.getDynamicStates(target_speed, constraints, current_twist, current_accel);
+    planner.getDynamicStates(constraints.max_speed, constraints, current_twist, current_accel);
 
   EXPECT_ACCEL_EQ(result0_accel, result1_accel);
   EXPECT_TWIST_EQ(result0_twist, result1_twist);
@@ -160,9 +154,8 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_targetSpeedOverLimit)
  * Test calculations correctness with target_speed = max speed and current speed = 0
  * - goal is to test the situation when acceleration is so long that max jerk is reached.
  */
-TEST(LongitudinalSpeedPlanner, getDynamicStates_maxJerk)
+TEST_F(LongitudinalSpeedPlannerTest, getDynamicStates_maxJerk)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
   const auto current_twist = makeTwistWithLinearX(0.0);
   const auto current_accel = makeAccelWithLinearX(0.0);
   auto constraints =
@@ -190,9 +183,8 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_maxJerk)
  * Test calculations correctness with target_speed slightly smaller than current speed
  * - goal is to test the situation when the max jerk is not reached because the target_speed is reached first.
  */
-TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
+TEST_F(LongitudinalSpeedPlannerTest, getDynamicStates_shortAccel)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
   auto current_twist = makeTwistWithLinearX(0.0);
   const auto current_accel = makeAccelWithLinearX(0.0);
   const auto constraints =
@@ -203,7 +195,7 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
       .max_deceleration_rate(5.0)
       .max_speed(20.0);
 
-  const double speed_difference = 1e-8;
+  constexpr double speed_difference = 1e-8;
   double target_speed, result_jerk;
   {
     current_twist.linear.x = 10.0;
@@ -225,10 +217,8 @@ TEST(LongitudinalSpeedPlanner, getDynamicStates_shortAccel)
  * @note Test functionality used in other classes.
  * Test calculations correctness with target_speed differing from current speed by several units.
  */
-TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
+TEST_F(LongitudinalSpeedPlannerTest, isTargetSpeedReached_different)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
-
   EXPECT_FALSE(planner.isTargetSpeedReached(15.0, makeTwistWithLinearX(13.0), 0.1));
 }
 
@@ -237,10 +227,8 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_different)
  * Test calculations correctness with target_speed differing from current speed by very small amount
  * - goal is to simulate equal speed but with numerical noise.
  */
-TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
+TEST_F(LongitudinalSpeedPlannerTest, isTargetSpeedReached_same)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
-
   EXPECT_TRUE(planner.isTargetSpeedReached(10.09, makeTwistWithLinearX(10.0), 0.1));
 }
 
@@ -250,9 +238,8 @@ TEST(LongitudinalSpeedPlanner, isTargetSpeedReached_same)
  * - goal is to test the situation when the target speed is reached in little time,
  * so the loop executes only several times.
  */
-TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
+TEST_F(LongitudinalSpeedPlannerTest, getRunningDistance_shortTime)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
   const auto current_twist = makeTwistWithLinearX(10.0);
   const auto constraints =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
@@ -262,7 +249,7 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
       .max_deceleration_rate(6.0)
       .max_speed(70.0);
 
-  const double speed_difference = 0.1;
+  constexpr double speed_difference = 0.1;
   const double distance = planner.getRunningDistance(
     current_twist.linear.x + speed_difference, constraints, current_twist,
     makeAccelWithLinearX(0.0), 0.0);
@@ -279,9 +266,8 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_shortTime)
  * - goal is to test the situation when the target speed is reached takes longer to reach
  * so the loop has to run multiple times.
  */
-TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
+TEST_F(LongitudinalSpeedPlannerTest, getRunningDistance_longTime)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
   const auto current_twist = makeTwistWithLinearX(60.0);
   const auto constraints =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
@@ -291,7 +277,7 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
       .max_deceleration_rate(5.0)
       .max_speed(70.0);
 
-  const double target_speed = 0.0;
+  constexpr double target_speed = 0.0;
   const double distance = planner.getRunningDistance(
     target_speed, constraints, current_twist, makeAccelWithLinearX(0.0), 0.0);
 
@@ -305,9 +291,8 @@ TEST(LongitudinalSpeedPlanner, getRunningDistance_longTime)
  * @note Test functionality aggregation used in other classes.
  * Test calculations correctness with target_speed identical to current speed so that the time is 0.
  */
-TEST(LongitudinalSpeedPlanner, getRunningDistance_zero)
+TEST_F(LongitudinalSpeedPlannerTest, getRunningDistance_zero)
 {
-  const auto planner = makeLongitudinalSpeedPlanner();
   const auto current_twist = makeTwistWithLinearX(10.0);
   const auto constraints =
     traffic_simulator_msgs::build<traffic_simulator_msgs::msg::DynamicConstraints>()
