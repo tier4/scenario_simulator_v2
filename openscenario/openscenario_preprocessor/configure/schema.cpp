@@ -16,5 +16,5 @@
 
 namespace openscenario_preprocessor
 {
-    const char schema[] = R"###(${${PROJECT_NAME}_OPENSCENARIO_1_3_XSD})###";
+const char schema[] = R"###(${${PROJECT_NAME}_OPENSCENARIO_1_3_XSD})###";
 }  // namespace openscenario_preprocessor
