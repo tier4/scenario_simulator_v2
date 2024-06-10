@@ -277,26 +277,42 @@ struct DefaultNoiseApplicator
   }
 };
 
-struct CustomNoiseApplicator : public DefaultNoiseApplicator
+struct EllipseBasedNoiseApplicator : public DefaultNoiseApplicator
 {
   using DefaultNoiseApplicator::DefaultNoiseApplicator;
+  
+  double calculateEllipseDistance(double x, double y, double normalized_x_radius)
+  {
+    return std::sqrt(std::pow(x / normalized_x_radius, 2) + std::pow(y, 2));
+  }
 
-  /*
-     NOTE: for Autoware developers
+  auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_objects)
+    -> decltype(auto)
+  {
+    auto noise_config = detection_sensor_configuration.noise_config();
+    
 
-     If you need to apply experimental noise to the DetectedObjects that the
-     simulator publishes, comment out the following member functions and
-     implement them.
+    double x_, y_;
+    double dist_masking, dist_distance_mean, dist_distance_std, dist_yaw_mean, dist_yaw_std;
 
-     See class DefaultNoiseApplicator for the default noise implementation.
-     This class inherits from DefaultNoiseApplicator, so you can use its data
-     members, or you can explicitly call DefaultNoiseApplicator::operator().
-  */
-  // auto operator()(autoware_perception_msgs::msg::DetectedObjects detected_objects)
-  //   -> decltype(auto)
-  // {
-  //   return detected_objects;
-  // }
+    std::vector<bool> is_masked(detected_objects.objects.size(), false);
+
+    for (auto && detected_object : detected_objects.objects) {
+      // Calculate the normalized distance from the object to the ego vehicle.
+      x_ = detected_object.kinematics.pose_with_covariance.pose.position.x - ego_entity_status.pose().position().x();
+      y_ = detected_object.kinematics.pose_with_covariance.pose.position.y - ego_entity_status.pose().position().y();
+
+      dist_masking = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_masking());
+      dist_distance_mean = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_distance_mean());
+      dist_distance_std = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_distance_std());
+      dist_yaw_mean = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_yaw_mean());
+      dist_yaw_std = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_yaw_std());
+
+      // Apply noise. TODO
+      }
+    }
+    return detected_objects;
+  }
 };
 
 template <>
