@@ -125,13 +125,12 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
   const double pos_noise_stddev = 0, const int random_seed = 0,
   const double probability_of_lost = 0, const double object_recognition_delay = 0,
   const double object_recognition_ground_truth_delay = 0,
-  std::unique_ptr<simulation_api_schema::EllipseBasedNoiseConfiguration> ellipse_based_noise_config=
-    nullptr
+  std::unique_ptr<simulation_api_schema::EllipseBasedNoiseConfiguration> noise_config = nullptr
 );
 
 const simulation_api_schema::EllipseBasedNoiseConfiguration constructEllipseBasedNoiseConfiguration(
   const std::vector<double>& ellipse_y_radius_values = {10, 20, 40, 60, 80, 120, 150, 180, 1000},
-  const double ellipse_normalized_x_masking = 0.6,
+  const double ellipse_normalized_x_radius_masking = 0.6,
   const double ellipse_normalized_x_radius_distance_mean = 1.8,
   const double ellipse_normalized_x_radius_distance_std = 1.8,
   const double ellipse_normalized_x_radius_yaw_mean = 0.6,

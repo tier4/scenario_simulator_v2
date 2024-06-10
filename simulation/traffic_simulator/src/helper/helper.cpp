@@ -80,7 +80,7 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
   const double range, const bool detect_all_objects_in_range, const double pos_noise_stddev,
   const int random_seed, const double probability_of_lost, const double object_recognition_delay,
   const double object_recognition_ground_truth_delay,
-  std::unique_ptr<simulation_api_schema::EllipseBasedNoiseConfiguration> ellipse_based_noise_config)
+  std::unique_ptr<simulation_api_schema::EllipseBasedNoiseConfiguration> noise_config)
 {
   simulation_api_schema::DetectionSensorConfiguration configuration;
   configuration.set_entity(entity);
@@ -94,17 +94,17 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
   configuration.set_object_recognition_delay(object_recognition_delay);
   configuration.set_object_recognition_ground_truth_delay(object_recognition_ground_truth_delay);
 
-  if (!ellipse_based_noise_config) {
-      ellipse_based_noise_config = std::make_unique<simulation_api_schema::EllipseBasedNoiseConfiguration>(constructEllipseBasedNoiseConfiguration());
+  if (!noise_config) {
+      noise_config = std::make_unique<simulation_api_schema::EllipseBasedNoiseConfiguration>(constructEllipseBasedNoiseConfiguration());
   }
-  configuration.set_ellipse_based_noise(*ellipse_based_noise_config);
+  configuration.set_noise_config(*noise_config);
 
   return configuration;
 }
 
 const simulation_api_schema::EllipseBasedNoiseConfiguration constructEllipseBasedNoiseConfiguration(
   const std::vector<double>& ellipse_y_radius_values,
-  const double ellipse_normalized_x_masking,
+  const double ellipse_normalized_x_radius_masking,
   const double ellipse_normalized_x_radius_distance_mean,
   const double ellipse_normalized_x_radius_distance_std,
   const double ellipse_normalized_x_radius_yaw_mean,
@@ -119,7 +119,7 @@ const simulation_api_schema::EllipseBasedNoiseConfiguration constructEllipseBase
   for (const auto& value : ellipse_y_radius_values) {
     configuration.add_ellipse_y_radius_values(value);
   }
-  configuration.set_ellipse_normalized_x_masking(ellipse_normalized_x_masking);
+  configuration.set_ellipse_normalized_x_radius_masking(ellipse_normalized_x_masking);
   configuration.set_ellipse_normalized_x_radius_distance_mean(ellipse_normalized_x_radius_distance_mean);
   configuration.set_ellipse_normalized_x_radius_distance_std(ellipse_normalized_x_radius_distance_std);
   configuration.set_ellipse_normalized_x_radius_yaw_mean(ellipse_normalized_x_radius_yaw_mean);
