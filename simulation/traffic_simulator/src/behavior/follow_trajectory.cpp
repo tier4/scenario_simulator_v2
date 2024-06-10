@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <arithmetic/floating_point/comparison.hpp>
-#include <geometry/linear_algebra.hpp>
 #include <geometry/vector3/hypot.hpp>
+#include <geometry/vector3/inner_product.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
