@@ -741,7 +741,7 @@ auto EntityBase::requestSynchronize(
   }
 
   ///@brief Check if the entity has already arrived to the target lanelet.
-  if (reachPosition(other_status_.find(entity_target)->second.getMapPose(), tolerance)) {
+  if (reachPosition(entity_target, threshold)) {
     if (this->getStatus().getTwist().linear.x < accel_limit * loop_period / 1000) {
     } else {
       RCLCPP_WARN_ONCE(
