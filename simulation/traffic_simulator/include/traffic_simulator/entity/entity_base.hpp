@@ -120,6 +120,10 @@ public:
   /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
     -> geometry_msgs::msg::Pose;
 
+  virtual auto getMaxAcceleration() const -> double = 0;
+
+  virtual auto getMaxDeceleration() const -> double = 0;
+
   virtual auto getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double;
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
