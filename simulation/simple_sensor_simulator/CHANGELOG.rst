@@ -13,6 +13,17 @@ Changelog for package simple_sensor_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.1 (2024-06-11)
+------------------
+* Merge pull request `#1279 <https://github.com/tier4/scenario_simulator_v2/issues/1279>`_ from tier4/fix/reorder
+  fix -wreorder warning
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/reorder
+* fix -wreorder warning
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
 2.1.0 (2024-06-11)
 ------------------
 * Merge pull request `#1226 <https://github.com/tier4/scenario_simulator_v2/issues/1226>`_ from tier4/fix/RJD-955-fix-followtrajectoryaction-nan-time
