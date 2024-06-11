@@ -157,6 +157,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
         static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
         behavior_parameter_, hdmap_utils_ptr_, step_time,
+        getDefaultMatchingDistanceForLaneletPoseCalculation(),
         target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       // prefer the current lanelet
       const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
