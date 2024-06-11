@@ -12,7 +12,6 @@
 
   <depend>behaviortree_cpp_v3</depend>
   <depend>pluginlib</depend>
-  <depend>math::geometry</depend>
   <depend>rclcpp</depend>
   <depend>traffic_simulator</depend>
 
