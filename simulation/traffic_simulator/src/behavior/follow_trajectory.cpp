@@ -87,32 +87,6 @@ auto makeUpdatedStatus(
     return hypot(from, to);
   };
 
-  // auto fill_lanelet_data_and_adjust_orientation =
-  //   [&](traffic_simulator_msgs::msg::EntityStatus & status) {
-  //     if (const auto canonicalized_lanelet_pose =
-  //           pose::toCanonicalizedLaneletPose(status.pose, status.bounding_box, false, matching_distance);
-  //         canonicalized_lanelet_pose) {
-  //       status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-  //       const CatmullRomSpline spline(lanelet_map_core::lanelet_map::getCenterPoints(status.lanelet_pose.lanelet_id));
-  //       const auto lanelet_quaternion = spline.getPose(status.lanelet_pose.s, true).orientation;
-  //       const auto lanelet_rpy =
-  //         quaternion_operation::convertQuaternionToEulerAngle(lanelet_quaternion);
-  //       const auto entity_rpy =
-  //         quaternion_operation::convertQuaternionToEulerAngle(status.pose.orientation);
-  //       // adjust orientation in EntityStatus.pose (only pitch) and in EntityStatus.LaneletPose
-  //       status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
-  //         geometry_msgs::build<geometry_msgs::msg::Vector3>()
-  //           .x(entity_rpy.x)
-  //           .y(lanelet_rpy.y)
-  //           .z(entity_rpy.z));
-  //       status.lanelet_pose.rpy = quaternion_operation::convertQuaternionToEulerAngle(
-  //         quaternion_operation::getRotation(lanelet_quaternion, status.pose.orientation));
-  //       status.lanelet_pose_valid = true;
-  //     } else {
-  //       status.lanelet_pose_valid = false;
-  //     }
-  //   };
-
   auto discard_the_front_waypoint_and_recurse = [&]() {
     /*
        The OpenSCENARIO standard does not define the behavior when the value of
@@ -599,13 +573,6 @@ auto makeUpdatedStatus(
         return quaternion_operation::convertEulerAngleToQuaternion(direction);
       }
     }();
-
-    // /*
-    //   After the step, i.e. movement in the direction of designed_velocity, it is necessary to adjust
-    //   the pose of the entity to the lane - if possible, the pitch orientation may be
-    //   changed as a result because the slope of the lane may be different
-    // */
-    // fill_lanelet_data_and_adjust_orientation(updated_status);
 
     updated_status.action_status.twist.linear.x = norm(desired_velocity);
 
