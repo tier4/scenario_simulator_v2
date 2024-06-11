@@ -19,6 +19,8 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator_msgs/msg/entity_subtype.hpp>
+#include <traffic_simulator_msgs/msg/entity_type.hpp>
 
 #include "catalogs.hpp"
 #include "expect_eq_macros.hpp"
@@ -59,12 +61,12 @@ auto makePose(
 
 auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
 {
-  std::string path =
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
-  geographic_msgs::msg::GeoPoint origin;
-  origin.latitude = 35.9037067912303;
-  origin.longitude = 139.9337945139059;
-  return std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
+  return std::make_shared<hdmap_utils::HdMapUtils>(
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
+    geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+      .latitude(35.9037067912303)
+      .longitude(139.9337945139059)
+      .altitude(0.0));
 }
 
 auto makeCanonicalizedLaneletPose(
@@ -84,19 +86,17 @@ auto makeEntityStatus(
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::EntityStatus
 {
-  traffic_simulator::EntityStatus entity_status;
-  entity_status.type.type = type;
-  entity_status.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
-  entity_status.time = 0.0;
-  entity_status.name = name;
-  entity_status.bounding_box = bbox;
-  geometry_msgs::msg::Twist twist;
-  entity_status.action_status =
-    traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0);
-  entity_status.lanelet_pose_valid = true;
-  entity_status.lanelet_pose = static_cast<traffic_simulator::LaneletPose>(pose);
-  entity_status.pose = hdmap_utils->toMapPose(entity_status.lanelet_pose).pose;
-  return entity_status;
+  return traffic_simulator_msgs::build<traffic_simulator::EntityStatus>()
+    .type(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityType>().type(type))
+    .subtype(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntitySubtype>().value(
+      traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN))
+    .time(0.0)
+    .name(name)
+    .bounding_box(bbox)
+    .action_status(traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0))
+    .pose(hdmap_utils->toMapPose(static_cast<traffic_simulator::LaneletPose>(pose)).pose)
+    .lanelet_pose(static_cast<traffic_simulator::LaneletPose>(pose))
+    .lanelet_pose_valid(true);
 }
 
 auto makeEntityStatus(
@@ -106,18 +106,17 @@ auto makeEntityStatus(
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::EntityStatus
 {
-  traffic_simulator::EntityStatus entity_status;
-  entity_status.type.type = type;
-  entity_status.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
-  entity_status.time = 0.0;
-  entity_status.name = name;
-  entity_status.bounding_box = bbox;
-  geometry_msgs::msg::Twist twist;
-  entity_status.action_status =
-    traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0);
-  entity_status.lanelet_pose_valid = false;
-  entity_status.pose = pose;
-  return entity_status;
+  return traffic_simulator_msgs::build<traffic_simulator::EntityStatus>()
+    .type(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntityType>().type(type))
+    .subtype(traffic_simulator_msgs::build<traffic_simulator_msgs::msg::EntitySubtype>().value(
+      traffic_simulator_msgs::msg::EntitySubtype::UNKNOWN))
+    .time(0.0)
+    .name(name)
+    .bounding_box(bbox)
+    .action_status(traffic_simulator::helper::constructActionStatus(speed, 0.0, 0.0, 0.0))
+    .pose(pose)
+    .lanelet_pose(traffic_simulator_msgs::msg::LaneletPose{})
+    .lanelet_pose_valid(false);
 }
 
 auto makeCanonicalizedEntityStatus(
