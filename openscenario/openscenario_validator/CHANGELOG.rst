@@ -2,6 +2,19 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.0 (2024-06-11)
+------------------
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Contributors: DMoszynski, Tatsuya Yamasaki
+
 2.0.5 (2024-06-11)
 ------------------
 * merge / resolve confict
