@@ -399,6 +399,36 @@ auto getConflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids
   }
   return ids;
 }
+
+// private
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>
+{
+  std::vector<Point> ret;
+  for (const auto & p : line_string) {
+    Point point;
+    point.x = p.x();
+    point.y = p.y();
+    point.z = p.z();
+    ret.emplace_back(point);
+  }
+  return ret;
+}
+
+auto excludeSubtypeLanelets(
+  const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[])
+  -> std::vector<std::pair<double, lanelet::Lanelet>>
+{
+  std::vector<std::pair<double, lanelet::Lanelet>> exclude_subtype_lanelets;
+  for (const auto & ll : lls) {
+    if (ll.second.hasAttribute(lanelet::AttributeName::Subtype)) {
+      lanelet::Attribute attr = ll.second.attribute(lanelet::AttributeName::Subtype);
+      if (attr.value() != subtype) {
+        exclude_subtype_lanelets.push_back(ll);
+      }
+    }
+  }
+  return exclude_subtype_lanelets;
+}
 }  // namespace lanelet_map
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator

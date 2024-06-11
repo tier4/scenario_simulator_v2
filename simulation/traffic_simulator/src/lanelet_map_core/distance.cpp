@@ -319,6 +319,21 @@ auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id
   return route_spline.getCollisionPointIn2D(
     lanelet_map_core::lanelet_map::getLaneletPolygon(crosswalk_id), false);
 }
+
+// private
+auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d
+{
+  lanelet::ConstLineStrings3d ret;
+  for (const auto & traffic_sign :
+       traffic_lights::getTrafficSignRegulatoryElementsOnPath(lanelet_ids)) {
+    if (traffic_sign->type() == "stop_sign") {
+      for (const auto & stop_line : traffic_sign->refLines()) {
+        ret.emplace_back(stop_line);
+      }
+    }
+  }
+  return ret;
+}
 }  // namespace distance
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator
