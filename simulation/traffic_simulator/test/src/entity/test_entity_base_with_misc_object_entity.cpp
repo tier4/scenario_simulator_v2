@@ -18,6 +18,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <visualization_msgs/msg/marker.hpp>
 
 #include "../catalogs.hpp"
 #include "../expect_eq_macros.hpp"
@@ -65,13 +66,14 @@ TEST_F(EntityBaseWithMiscObjectTest, appendDebugMarker)
     EXPECT_EQ(markers.markers.size(), markers_copy.markers.size());
   }
 
-  visualization_msgs::msg::Marker marker{};
-  marker.action = visualization_msgs::msg::Marker::ADD;
-  marker.type = visualization_msgs::msg::Marker::ARROW;
-  marker.pose.position.x = 10.0;
-  marker.pose.position.y = 10.0;
-
-  markers.markers.push_back(marker);
+  markers.markers.push_back([] {
+    auto marker = visualization_msgs::msg::Marker{};
+    marker.action = visualization_msgs::msg::Marker::ADD;
+    marker.type = visualization_msgs::msg::Marker::ARROW;
+    marker.pose.position.x = 10.0;
+    marker.pose.position.y = 10.0;
+    return marker;
+  }());
 
   {
     auto markers_copy = markers;
@@ -95,13 +97,9 @@ TEST_F(EntityBaseWithMiscObjectTest, get2DPolygon)
 {
   const auto polygon = dummy.get2DPolygon();
 
-  std::vector<geometry_msgs::msg::Point> ref_poly{};
-
-  ref_poly.push_back(makePoint(-1.0, -1.0));
-  ref_poly.push_back(makePoint(-1.0, 1.0));
-  ref_poly.push_back(makePoint(3.0, 1.0));
-  ref_poly.push_back(makePoint(3.0, -1.0));
-  ref_poly.push_back(ref_poly.front());
+  std::vector<geometry_msgs::msg::Point> ref_poly{
+    makePoint(-1.0, -1.0), makePoint(-1.0, 1.0), makePoint(3.0, 1.0), makePoint(3.0, -1.0),
+    makePoint(-1.0, -1.0)};
 
   EXPECT_EQ(polygon.size(), ref_poly.size());
   EXPECT_POINT_EQ(polygon.at(0), ref_poly.at(0));
@@ -127,18 +125,12 @@ TEST_F(EntityBaseWithMiscObjectTest, startNpcLogic)
  */
 TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_speed)
 {
-  double min_velocity = 0.0;
-  double max_velocity = 0.0;
-  double min_acceleration = -100.0;
-  double max_acceleration = 100.0;
-  double min_jerk = -100.0;
-  double max_jerk = 100.0;
-  double velocity = 1.0;
+  constexpr double velocity = 1.0;
   dummy.setLinearVelocity(velocity);
-  dummy.activateOutOfRangeJob(
-    min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk);
-  double current_time = 0.0;
-  double step_time = 0.0;
+  dummy.activateOutOfRangeJob(0.0, 0.0, -100.0, 100.0, -100.0, 100.0);
+
+  constexpr double current_time = 0.0;
+  constexpr double step_time = 0.0;
   EXPECT_NO_THROW(dummy.EntityBase::onUpdate(current_time, step_time));
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
@@ -150,18 +142,12 @@ TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_speed)
  */
 TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_acceleration)
 {
-  double min_velocity = -100.0;
-  double max_velocity = 100.0;
-  double min_acceleration = 0.0;
-  double max_acceleration = 0.0;
-  double min_jerk = -100.0;
-  double max_jerk = 100.0;
-  double acceleration = 1.0;
+  constexpr double acceleration = 1.0;
   dummy.setLinearAcceleration(acceleration);
-  dummy.activateOutOfRangeJob(
-    min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk);
-  double current_time = 0.0;
-  double step_time = 0.0;
+  dummy.activateOutOfRangeJob(-100.0, 100.0, 0.0, 0.0, -100.0, 100.0);
+
+  constexpr double current_time = 0.0;
+  constexpr double step_time = 0.0;
   EXPECT_NO_THROW(dummy.EntityBase::onUpdate(current_time, step_time));
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
@@ -173,18 +159,12 @@ TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_acceleration)
  */
 TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_jerk)
 {
-  double min_velocity = -100.0;
-  double max_velocity = 100.0;
-  double min_acceleration = -100.0;
-  double max_acceleration = 100.0;
-  double min_jerk = 0.0;
-  double max_jerk = 0.0;
-  double jerk = 1.0;
+  constexpr double jerk = 1.0;
   dummy.setLinearJerk(jerk);
-  dummy.activateOutOfRangeJob(
-    min_velocity, max_velocity, min_acceleration, max_acceleration, min_jerk, max_jerk);
-  double current_time = 0.0;
-  double step_time = 0.0;
+  dummy.activateOutOfRangeJob(-100.0, 100.0, -100.0, 100.0, 0.0, 0.0);
+
+  constexpr double current_time = 0.0;
+  constexpr double step_time = 0.0;
   EXPECT_NO_THROW(dummy.EntityBase::onUpdate(current_time, step_time));
   EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
 }
@@ -195,28 +175,23 @@ TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_jerk)
 TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetLaneletPose)
 {
   const std::string target_name = "target_name";
-  geometry_msgs::msg::Pose target_pose;
-  target_pose.position = makePoint(3810.0, 73745.0);  // outside of road
 
-  auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
-
-  const double target_offset = 1.0;
-  traffic_simulator::lane_change::RelativeTarget target(
-    target_name, traffic_simulator::lane_change::Direction::STRAIGHT, 3, target_offset);
-
-  traffic_simulator::lane_change::TrajectoryShape trajectory_shape =
-    traffic_simulator::lane_change::TrajectoryShape::LINEAR;
-
-  traffic_simulator::lane_change::Constraint constraint(
-    traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
-    traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
-
-  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> other_status;
-  other_status.emplace(target_name, target_status);
+  auto other_status =
+    std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>{};
+  other_status.emplace(
+    target_name,
+    makeCanonicalizedEntityStatus(hdmap_utils, makePose(makePoint(3810.0, 73745.0)), bbox));
 
   dummy_base->setOtherStatus(other_status);
 
-  EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint);, common::Error);
+  EXPECT_THROW(dummy_base->requestLaneChange(
+    traffic_simulator::lane_change::RelativeTarget(
+      target_name, traffic_simulator::lane_change::Direction::STRAIGHT, 3, 1.0),
+    traffic_simulator::lane_change::TrajectoryShape::LINEAR,
+    traffic_simulator::lane_change::Constraint(
+      traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
+      traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT));
+               , common::Error);
 }
 
 /**
@@ -224,27 +199,24 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetLaneletPose
  */
 TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetName)
 {
-  const lanelet::Id target_id = 34468;
   const std::string target_name = "target_name";
-  auto target_pose = makeCanonicalizedLaneletPose(hdmap_utils, target_id, 5.0);
-  auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
 
-  const double target_offset = 1.0;
-  traffic_simulator::lane_change::RelativeTarget target(
-    target_name + "_wrong", traffic_simulator::lane_change::Direction::STRAIGHT, 3, target_offset);
-
-  traffic_simulator::lane_change::TrajectoryShape trajectory_shape =
-    traffic_simulator::lane_change::TrajectoryShape::LINEAR;
-
-  traffic_simulator::lane_change::Constraint constraint(
-    traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
-    traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
-
-  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> other_status;
-  other_status.emplace(target_name, target_status);
+  auto other_status =
+    std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>{};
+  other_status.emplace(
+    target_name, makeCanonicalizedEntityStatus(
+                   hdmap_utils, makeCanonicalizedLaneletPose(hdmap_utils, 34468, 5.0), bbox));
 
   dummy_base->setOtherStatus(other_status);
-  EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint);, common::Error);
+  EXPECT_THROW(
+    dummy_base->requestLaneChange(
+      traffic_simulator::lane_change::RelativeTarget(
+        target_name + "_wrong", traffic_simulator::lane_change::Direction::STRAIGHT, 3, 1.0),
+      traffic_simulator::lane_change::TrajectoryShape::LINEAR,
+      traffic_simulator::lane_change::Constraint(
+        traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
+        traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT)),
+    common::Error);
 }
 
 /**
@@ -253,28 +225,25 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetName)
  */
 TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetInvalid)
 {
-  const lanelet::Id target_id = 34468;
   const std::string target_name = "target_name";
-  auto target_pose = makeCanonicalizedLaneletPose(hdmap_utils, target_id, 5.0);
-  auto target_status = makeCanonicalizedEntityStatus(hdmap_utils, target_pose, bbox);
 
-  const double target_offset = 1.0;
-  traffic_simulator::lane_change::RelativeTarget target(
-    target_name, traffic_simulator::lane_change::Direction::RIGHT,
-    std::numeric_limits<std::uint8_t>::max(), target_offset);
-
-  traffic_simulator::lane_change::TrajectoryShape trajectory_shape =
-    traffic_simulator::lane_change::TrajectoryShape::LINEAR;
-
-  traffic_simulator::lane_change::Constraint constraint(
-    traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
-    traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT);
-
-  std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus> other_status;
-  other_status.emplace(target_name, target_status);
+  auto other_status =
+    std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>{};
+  other_status.emplace(
+    target_name, makeCanonicalizedEntityStatus(
+                   hdmap_utils, makeCanonicalizedLaneletPose(hdmap_utils, 34468, 5.0), bbox));
 
   dummy_base->setOtherStatus(other_status);
-  EXPECT_THROW(dummy_base->requestLaneChange(target, trajectory_shape, constraint), common::Error);
+  EXPECT_THROW(
+    dummy_base->requestLaneChange(
+      traffic_simulator::lane_change::RelativeTarget(
+        target_name, traffic_simulator::lane_change::Direction::RIGHT,
+        std::numeric_limits<std::uint8_t>::max(), 1.0),
+      traffic_simulator::lane_change::TrajectoryShape::LINEAR,
+      traffic_simulator::lane_change::Constraint(
+        traffic_simulator::lane_change::Constraint::Type::TIME, 30.0,
+        traffic_simulator::lane_change::Constraint::Policy::BEST_EFFORT)),
+    common::Error);
 }
 
 /**
@@ -282,8 +251,10 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetInvalid)
  */
 TEST_F(EntityBaseWithMiscObjectTest, requestFollowTrajectory)
 {
-  auto ptr = std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>();
-  EXPECT_THROW(dummy.requestFollowTrajectory(ptr), common::Error);
+  EXPECT_THROW(
+    dummy.requestFollowTrajectory(
+      std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>()),
+    common::Error);
 }
 
 /**
@@ -325,8 +296,8 @@ TEST_F(EntityBaseWithMiscObjectTest, updateStandStillDuration_notStarted)
  */
 TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_startedMoving)
 {
-  double velocity = 3.0;
-  double step_time = 0.1;
+  constexpr double velocity = 3.0;
+  constexpr double step_time = 0.1;
   dummy.startNpcLogic(0.0);
   dummy.setLinearVelocity(velocity);
 
@@ -341,9 +312,8 @@ TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_startedMoving)
  */
 TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_notStarted)
 {
-  double velocity = 3.0;
-  double step_time = 0.1;
-  dummy.setLinearVelocity(velocity);
+  constexpr double step_time = 0.1;
+  dummy.setLinearVelocity(3.0);
   EXPECT_EQ(0.0, dummy.updateTraveledDistance(step_time));
 
   dummy.setLinearVelocity(0.0);
@@ -356,39 +326,12 @@ TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_notStarted)
  */
 TEST_F(EntityBaseWithMiscObjectTest, stopAtCurrentPosition)
 {
-  double velocity = 3.0;
+  constexpr double velocity = 3.0;
   dummy.setLinearVelocity(velocity);
-  auto curr_twist = dummy.getCurrentTwist();
-  EXPECT_EQ(curr_twist.linear.x, velocity);
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, velocity);
 
   dummy.stopAtCurrentPosition();
-  curr_twist = dummy.getCurrentTwist();
-  EXPECT_EQ(curr_twist.linear.x, 0.0);
-}
-
-/**
- * @note Test functionality used by other units; test lanelet pose obtaining
- * with a matching distance smaller than a distance from an entity to the lanelet
- * (both crosswalk and road) and status_.type.type = PEDESTRIAN.
- */
-TEST(EntityBaseWithMiscObject, getLaneletPose_notOnRoadAndCrosswalkPedestrian)
-{
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto bbox = makeBoundingBox();
-
-  geometry_msgs::msg::Pose pose;
-  pose.position.x = 3810.0;
-  pose.position.y = 73745.0;
-
-  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
-  status_base.type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
-
-  auto dummy = traffic_simulator::entity::MiscObjectEntity(
-    "dummy_entity", status, hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{});
-
-  auto lanelet_pose = dummy.getLaneletPose(5.0);
-  EXPECT_FALSE(lanelet_pose);
+  EXPECT_EQ(dummy.getCurrentTwist().linear.x, 0.0);
 }
 
 /**
@@ -399,21 +342,17 @@ TEST(EntityBaseWithMiscObject, getLaneletPose_notOnRoadAndCrosswalkPedestrian)
 TEST(EntityBaseWithMiscObject, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
 {
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto bbox = makeBoundingBox();
 
-  geometry_msgs::msg::Pose pose;
-  pose.position.x = 3810.0;
-  pose.position.y = 73745.0;
-
-  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
-  status_base.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
-
-  auto dummy = traffic_simulator::entity::MiscObjectEntity(
-    "dummy_entity", status, hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{});
-
-  auto lanelet_pose = dummy.getLaneletPose(5.0);
-  EXPECT_FALSE(lanelet_pose);
+  EXPECT_FALSE(traffic_simulator::entity::MiscObjectEntity(
+                 "dummy_entity",
+                 traffic_simulator::CanonicalizedEntityStatus(
+                   makeEntityStatus(
+                     hdmap_utils, makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 0.0,
+                     "dummy_entity", traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+                   hdmap_utils),
+                 hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{})
+                 .getLaneletPose(5.0)
+                 .has_value());
 }
 
 /**
@@ -424,22 +363,20 @@ TEST(EntityBaseWithMiscObject, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian
 TEST(EntityBaseWithMiscObject, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
 {
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto bbox = makeBoundingBox();
 
-  geometry_msgs::msg::Pose pose;
-  pose.position.x = 3766.1;
-  pose.position.y = 73738.2;
-  pose.orientation = makeQuaternionFromYaw((120.0) * M_PI / 180.0);
-
-  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
-  status_base.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
-
-  auto dummy = traffic_simulator::entity::MiscObjectEntity(
-    "dummy_entity", status, hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{});
-
-  auto lanelet_pose = dummy.getLaneletPose(1.0);
-  EXPECT_TRUE(lanelet_pose);
+  EXPECT_TRUE(
+    traffic_simulator::entity::MiscObjectEntity(
+      "dummy_entity",
+      traffic_simulator::CanonicalizedEntityStatus(
+        makeEntityStatus(
+          hdmap_utils,
+          makePose(makePoint(3766.1, 73738.2), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
+          makeBoundingBox(), 0.0, "dummy_entity",
+          traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+        hdmap_utils),
+      hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      .getLaneletPose(1.0)
+      .has_value());
 }
 
 /**
@@ -450,22 +387,20 @@ TEST(EntityBaseWithMiscObject, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
 TEST(EntityBaseWithMiscObject, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
 {
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
-  auto bbox = makeBoundingBox();
 
-  geometry_msgs::msg::Pose pose;
-  pose.position.x = 3764.5;
-  pose.position.y = 73737.5;
-  pose.orientation = makeQuaternionFromYaw((120.0) * M_PI / 180.0);
-
-  auto status_base = makeEntityStatus(hdmap_utils, pose, bbox);
-  status_base.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-  traffic_simulator::CanonicalizedEntityStatus status(status_base, hdmap_utils);
-
-  auto dummy = traffic_simulator::entity::MiscObjectEntity(
-    "dummy_entity", status, hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{});
-
-  auto lanelet_pose = dummy.getLaneletPose(1.0);
-  EXPECT_FALSE(lanelet_pose);
+  EXPECT_FALSE(
+    traffic_simulator::entity::MiscObjectEntity(
+      "dummy_entity",
+      traffic_simulator::CanonicalizedEntityStatus(
+        makeEntityStatus(
+          hdmap_utils,
+          makePose(makePoint(3764.5, 73737.5), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
+          makeBoundingBox(), 0.0, "dummy_entity",
+          traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+        hdmap_utils),
+      hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{})
+      .getLaneletPose(1.0)
+      .has_value());
 }
 
 /**
@@ -474,14 +409,8 @@ TEST(EntityBaseWithMiscObject, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
  */
 TEST_F(EntityBaseWithMiscObjectTest, getMapPoseFromRelativePose_relative)
 {
-  const double s = 5.0;
-  constexpr double eps = 0.1;
-
-  geometry_msgs::msg::Pose relative_pose;
-  relative_pose.position.x = s;
-
-  auto result_pose = dummy.getMapPoseFromRelativePose(relative_pose);
-
-  auto ref_pose = makeCanonicalizedLaneletPose(hdmap_utils, id, s);
-  EXPECT_POSE_NEAR(result_pose, static_cast<geometry_msgs::msg::Pose>(ref_pose), eps);
+  constexpr double s = 5.0;
+  EXPECT_POSE_NEAR(
+    dummy.getMapPoseFromRelativePose(makePose(makePoint(s, 0.0))),
+    static_cast<geometry_msgs::msg::Pose>(makeCanonicalizedLaneletPose(hdmap_utils, id, s)), 0.1);
 }

@@ -23,6 +23,40 @@
 #include "catalogs.hpp"
 #include "expect_eq_macros.hpp"
 
+auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
+{
+  return geometry_msgs::build<geometry_msgs::msg::Point>().x(x).y(y).z(z);
+}
+
+auto makeBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
+{
+  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
+    .center(makePoint(1.0, center_y))
+    .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(4.0).y(2.0).z(1.5));
+}
+
+auto makeSmallBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
+{
+  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
+    .center(makePoint(0.0, center_y))
+    .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(1.0).y(1.0).z(1.0));
+}
+
+auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
+{
+  return quaternion_operation::convertEulerAngleToQuaternion(
+    geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(yaw));
+}
+
+auto makePose(
+  geometry_msgs::msg::Point position,
+  geometry_msgs::msg::Quaternion orientation = geometry_msgs::msg::Quaternion())
+  -> geometry_msgs::msg::Pose
+{
+  return geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
+    orientation);
+}
+
 auto makeHdMapUtilsSharedPointer() -> std::shared_ptr<hdmap_utils::HdMapUtils>
 {
   std::string path =
@@ -42,25 +76,16 @@ auto makeCanonicalizedLaneletPose(
     traffic_simulator::helper::constructLaneletPose(id, s, offset), hdmap_utils);
 }
 
-auto makeBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
-{
-  traffic_simulator_msgs::msg::BoundingBox bbox;
-  bbox.center.x = 1.0;
-  bbox.center.y = center_y;
-  bbox.dimensions.x = 4.0;
-  bbox.dimensions.y = 2.0;
-  bbox.dimensions.z = 1.5;
-  return bbox;
-}
-
 auto makeEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "dummy_entity") -> traffic_simulator::EntityStatus
+  const std::string name = "dummy_entity",
+  const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
+  -> traffic_simulator::EntityStatus
 {
   traffic_simulator::EntityStatus entity_status;
-  entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+  entity_status.type.type = type;
   entity_status.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
   entity_status.time = 0.0;
   entity_status.name = name;
@@ -77,10 +102,12 @@ auto makeEntityStatus(
 auto makeEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> /* hdmap_utils */, geometry_msgs::msg::Pose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "dummy_entity") -> traffic_simulator::EntityStatus
+  const std::string name = "dummy_entity",
+  const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
+  -> traffic_simulator::EntityStatus
 {
   traffic_simulator::EntityStatus entity_status;
-  entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+  entity_status.type.type = type;
   entity_status.subtype.value = traffic_simulator_msgs::msg::EntitySubtype::CAR;
   entity_status.time = 0.0;
   entity_status.name = name;
@@ -97,37 +124,23 @@ auto makeCanonicalizedEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "dummy_entity")
+  const std::string name = "dummy_entity",
+  const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::entity_status::CanonicalizedEntityStatus
 {
   return traffic_simulator::entity_status::CanonicalizedEntityStatus(
-    makeEntityStatus(hdmap_utils, pose, bbox, speed, name), hdmap_utils);
+    makeEntityStatus(hdmap_utils, pose, bbox, speed, name, type), hdmap_utils);
 }
 
 auto makeCanonicalizedEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils, geometry_msgs::msg::Pose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "dummy_entity")
+  const std::string name = "dummy_entity",
+  const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::entity_status::CanonicalizedEntityStatus
 {
   return traffic_simulator::entity_status::CanonicalizedEntityStatus(
-    makeEntityStatus(hdmap_utils, pose, bbox, speed, name), hdmap_utils);
-}
-
-auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
-{
-  geometry_msgs::msg::Point point;
-  point.x = x;
-  point.y = y;
-  point.z = z;
-  return point;
-}
-
-auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
-{
-  geometry_msgs::msg::Vector3 v;
-  v.z = yaw;
-  return quaternion_operation::convertEulerAngleToQuaternion(v);
+    makeEntityStatus(hdmap_utils, pose, bbox, speed, name, type), hdmap_utils);
 }
 
 #endif  // TRAFFIC_SIMULATOR__TEST__ENTITY_HELPER_FUNCTIONS_HPP_
