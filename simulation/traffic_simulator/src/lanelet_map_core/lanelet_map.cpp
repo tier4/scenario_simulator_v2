@@ -15,7 +15,6 @@
 #include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 
-#include <geometry/linear_algebra.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>

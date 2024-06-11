@@ -149,7 +149,6 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
-  std::cout << "EgoEntity::onUpdate" << std::endl;
   EntityBase::onUpdate(current_time, step_time);
 
   if (is_controlled_by_simulator_ && npc_logic_started_) {
@@ -160,10 +159,8 @@ void EgoEntity::onUpdate(double current_time, double step_time)
           behavior_parameter_, step_time, getDefaultMatchingDistanceForLaneletPoseCalculation(),
           target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       // prefer current lanelet on ss2 side
-      std::cout << "is_controlled_by_simulator_: " << is_controlled_by_simulator_ << std::endl;
       setStatus(non_canonicalized_updated_status.value(), status_.getLaneletIds());
     } else {
-      std::cout << "FTA END" << std::endl;
       is_controlled_by_simulator_ = false;
     }
   }
@@ -175,7 +172,6 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   field_operator_application->spinSome();
 
   EntityBase::onPostUpdate(current_time, step_time);
-  std::cout << "EgoEntity::~onUpdate" << std::endl;
 }
 
 void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)

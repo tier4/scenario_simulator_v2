@@ -58,6 +58,10 @@ auto toCanonicalizedLaneletPose(const Pose & map_pose, const bool include_crossw
   -> std::optional<CanonicalizedLaneletPose>;
 
 auto toCanonicalizedLaneletPose(
+  const Point & map_point, const BoundingBox & bounding_box, const bool include_crosswalk,
+  const double matching_distance) -> std::optional<CanonicalizedLaneletPose>;
+
+auto toCanonicalizedLaneletPose(
   const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>;
 

@@ -14,7 +14,10 @@
 
 #include <quaternion_operation/quaternion_operation.h>
 
-#include <geometry/linear_algebra.hpp>
+#include <geometry/quaternion/operator.hpp>
+#include <geometry/vector3/inner_product.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_map_core/pose.hpp>
@@ -28,6 +31,8 @@ namespace pose
 {
 auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseStamped
 {
+  using math::geometry::operator*;
+  using math::geometry::operator+=;
   if (
     const auto pose =
       std::get<std::optional<LaneletPose>>(pose::canonicalizeLaneletPose(lanelet_pose))) {
@@ -37,7 +42,7 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
     ret.pose = spline->getPose(pose->s);
     const auto normal_vec = spline->getNormalVector(pose->s);
     const auto diff = math::geometry::normalize(normal_vec) * pose->offset;
-    ret.pose.position = ret.pose.position + diff;
+    ret.pose.position += diff;
     const auto tangent_vec = spline->getTangentVector(pose->s);
     Vector3 rpy;
     rpy.x = 0.0;

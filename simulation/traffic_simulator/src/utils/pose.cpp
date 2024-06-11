@@ -179,6 +179,16 @@ auto toCanonicalizedLaneletPose(
 }
 
 auto toCanonicalizedLaneletPose(
+  const Point & map_point, const BoundingBox & bounding_box, const bool include_crosswalk,
+  const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
+{
+  return toCanonicalizedLaneletPose(
+    geometry_msgs::build<geometry_msgs::msg::Pose>().position(map_point).orientation(
+      geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)),
+    bounding_box, include_crosswalk, matching_distance);
+}
+
+auto toCanonicalizedLaneletPose(
   const Pose & map_pose, const BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
