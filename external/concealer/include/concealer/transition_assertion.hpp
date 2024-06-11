@@ -15,7 +15,7 @@
 #ifndef CONCEALER__TRANSITION_ASSERTION_HPP_
 #define CONCEALER__TRANSITION_ASSERTION_HPP_
 
-#include <autoware_auto_system_msgs/msg/autoware_state.hpp>
+#include <autoware_system_msgs/msg/autoware_state.hpp>
 #include <chrono>
 #include <rclcpp/node.hpp>
 #include <rclcpp/rate.hpp>
