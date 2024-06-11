@@ -268,8 +268,9 @@ bool API::updateTimeInSim()
 
 bool API::updateTrafficLightsInSim()
 {
-  if (entity_manager_ptr_->trafficLightsChanged()) {
-    auto req = entity_manager_ptr_->generateUpdateRequestForConventionalTrafficLights();
+  if (traffic_light_supervisor_ptr_->trafficLightsChanged()) {
+    auto req = traffic_light_supervisor_ptr_->getConventionalTrafficLightManager()
+                 ->generateUpdateTrafficLightsRequest();
     return zeromq_client_.call(req).result().success();
   }
   /// @todo handle response

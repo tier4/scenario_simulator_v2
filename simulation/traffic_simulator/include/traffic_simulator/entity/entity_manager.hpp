@@ -42,6 +42,7 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_supervisor.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -107,17 +108,23 @@ class EntityManager
 
   MarkerArray markers_raw_;
 
-  const std::shared_ptr<TrafficLightManager> conventional_traffic_light_manager_ptr_;
-  const std::shared_ptr<TrafficLightMarkerPublisher>
-    conventional_traffic_light_marker_publisher_ptr_;
-
-  const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
-  const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
-  const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_legacy_topic_publisher_ptr_;
-  const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_publisher_ptr_;
-  ConfigurableRateUpdater v2i_traffic_light_updater_, conventional_traffic_light_updater_;
+  std::shared_ptr<traffic_simulator::TrafficLightSupervisor> traffic_light_supervisor_ptr_;
 
 public:
+  /**
+   * This function is necessary, because TrafficLightSupervisor requires HdMapUtils.
+   * However, TrafficLightSupervisor is constructed in API and in that scope HdMapUtils is available
+   * only after EntityManager is constructed.
+   * This is why TrafficLightSupervisor has to be initialized in API after EntityManager and thus
+   * TrafficLightSupervisor needs to be passed to EntityManager after initialization.
+   */
+  auto setTrafficLightSupervisor(
+    const std::shared_ptr<traffic_simulator::TrafficLightSupervisor> & traffic_light_supervisor)
+    -> void
+  {
+    traffic_light_supervisor_ptr_ = traffic_light_supervisor;
+  }
+
   template <typename Node>
   auto getOrigin(Node & node) const
   {
@@ -136,22 +143,6 @@ public:
     return origin;
   }
 
-  template <typename... Ts>
-  auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
-  {
-    if (const auto architecture_type =
-          getParameter<std::string>("architecture_type", "awf/universe");
-        architecture_type.find("awf/universe") != std::string::npos) {
-      return std::make_shared<
-        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
-        std::forward<decltype(xs)>(xs)...);
-    } else {
-      throw common::SemanticError(
-        "Unexpected architecture_type ", std::quoted(architecture_type),
-        " given for V2I traffic lights simulation.");
-    }
-  }
-
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(NodeT && node, const Configuration & configuration)
   : configuration(configuration),
@@ -168,29 +159,7 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
       configuration.lanelet2_map_path(), getOrigin(*node))),
-    markers_raw_(hdmap_utils_ptr_->generateMarker()),
-    conventional_traffic_light_manager_ptr_(
-      std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
-    conventional_traffic_light_marker_publisher_ptr_(
-      std::make_shared<TrafficLightMarkerPublisher>(conventional_traffic_light_manager_ptr_, node)),
-    v2i_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
-    v2i_traffic_light_marker_publisher_ptr_(
-      std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
-    v2i_traffic_light_legacy_topic_publisher_ptr_(
-      makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_)),
-    v2i_traffic_light_publisher_ptr_(makeV2ITrafficLightPublisher(
-      "/perception/traffic_light_recognition/external/traffic_signals", node, hdmap_utils_ptr_)),
-    v2i_traffic_light_updater_(
-      node,
-      [this]() {
-        v2i_traffic_light_marker_publisher_ptr_->publish();
-        v2i_traffic_light_publisher_ptr_->publish(
-          clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
-        v2i_traffic_light_legacy_topic_publisher_ptr_->publish(
-          clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
-      }),
-    conventional_traffic_light_updater_(
-      node, [this]() { conventional_traffic_light_marker_publisher_ptr_->publish(); })
+    markers_raw_(hdmap_utils_ptr_->generateMarker())
   {
     updateHdmapMarker();
   }
@@ -198,47 +167,6 @@ public:
   ~EntityManager() = default;
 
 public:
-#define FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(NAME)                 \
-  template <typename... Ts>                                           \
-  decltype(auto) getConventional##NAME(Ts &&... xs) const             \
-  {                                                                   \
-    return conventional_traffic_light_manager_ptr_->get##NAME(xs...); \
-  }                                                                   \
-  static_assert(true, "");                                            \
-  template <typename... Ts>                                           \
-  decltype(auto) getV2I##NAME(Ts &&... xs) const                      \
-  {                                                                   \
-    return v2i_traffic_light_manager_ptr_->get##NAME(xs...);          \
-  }                                                                   \
-  static_assert(true, "")
-
-  FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLights);
-  FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLight);
-
-#undef FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
-
-  auto generateUpdateRequestForConventionalTrafficLights()
-  {
-    return conventional_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest();
-  }
-
-  auto resetConventionalTrafficLightPublishRate(double rate) -> void
-  {
-    conventional_traffic_light_updater_.resetUpdateRate(rate);
-  }
-
-  auto resetV2ITrafficLightPublishRate(double rate) -> void
-  {
-    v2i_traffic_light_updater_.resetUpdateRate(rate);
-  }
-
-  auto setConventionalTrafficLightConfidence(lanelet::Id id, double confidence) -> void
-  {
-    for (auto & traffic_light : conventional_traffic_light_manager_ptr_->getTrafficLights(id)) {
-      traffic_light.get().confidence = confidence;
-    }
-  }
-
   // clang-format off
 #define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
   /*!                                                                            \
@@ -298,8 +226,6 @@ public:
   auto getCurrentAction(const std::string & name) const -> std::string;
 
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
-
-  bool trafficLightsChanged();
 
   auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
     -> const CanonicalizedEntityStatus &;
@@ -471,7 +397,8 @@ public:
                   std::forward<decltype(xs)>(xs)...));
         success) {
       // FIXME: this ignores V2I traffic lights
-      iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
+      iter->second->setTrafficLightManager(
+        traffic_light_supervisor_ptr_->getConventionalTrafficLightManager());
       return success;
     } else {
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");

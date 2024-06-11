@@ -346,12 +346,6 @@ auto EntityManager::getCurrentAction(const std::string & name) const -> std::str
   }
 }
 
-bool EntityManager::trafficLightsChanged()
-{
-  return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
-         v2i_traffic_light_manager_ptr_->hasAnyLightChanged();
-}
-
 void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;
@@ -368,7 +362,7 @@ auto EntityManager::updateNpcLogic(
     std::cout << "update " << name << " behavior" << std::endl;
   }
   if (npc_logic_started_) {
-    entities_[name]->onUpdate(current_time_, step_time_);
+    entities_[name]->onUpdate(current_time, step_time);
   }
   return entities_[name]->getStatus();
 }
@@ -379,9 +373,9 @@ void EntityManager::update(const double current_time, const double step_time)
     "EntityManager::update", configuration.verbose);
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
-    conventional_traffic_light_updater_.createTimer(
+    traffic_light_supervisor_ptr_->createConventionalTimer(
       configuration.conventional_traffic_light_publish_rate);
-    v2i_traffic_light_updater_.createTimer(configuration.v2i_traffic_light_publish_rate);
+    traffic_light_supervisor_ptr_->createV2ITimer(configuration.v2i_traffic_light_publish_rate);
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {

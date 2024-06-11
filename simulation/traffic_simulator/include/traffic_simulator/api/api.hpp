@@ -41,6 +41,7 @@
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light_supervisor.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <utility>
 
@@ -66,6 +67,9 @@ public:
   explicit API(NodeT && node, const Configuration & configuration, Ts &&... xs)
   : configuration(configuration),
     entity_manager_ptr_(std::make_shared<entity::EntityManager>(node, configuration)),
+    traffic_light_supervisor_ptr_(std::make_shared<TrafficLightSupervisor>(
+      node, entity_manager_ptr_->getHdmapUtils(),
+      getParameter<std::string>("architecture_type", "awf/universe"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & entity_name) {
@@ -98,6 +102,7 @@ public:
     zeromq_client_(
       simulation_interface::protocol, configuration.simulator_host, getZMQSocketPort(*node))
   {
+    entity_manager_ptr_->setTrafficLightSupervisor(traffic_light_supervisor_ptr_);
     setVerbose(configuration.verbose);
 
     if (not configuration.standalone_mode) {
@@ -322,6 +327,41 @@ public:
     const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
     const bool random_orientation = false, std::optional<int> random_seed = std::nullopt) -> void;
 
+#define FORWARD_TO_TRAFFIC_LIGHT_SUPERVISOR(NAME)                                  \
+  template <typename... Ts>                                                        \
+  decltype(auto) NAME(Ts &&... xs)                                                 \
+  {                                                                                \
+    assert(traffic_light_supervisor_ptr_);                                         \
+    return traffic_light_supervisor_ptr_->NAME(std::forward<decltype(xs)>(xs)...); \
+  }                                                                                \
+  static_assert(true, "")
+
+  FORWARD_TO_TRAFFIC_LIGHT_SUPERVISOR(resetConventionalTrafficLightPublishRate);
+  FORWARD_TO_TRAFFIC_LIGHT_SUPERVISOR(resetV2ITrafficLightPublishRate);
+  FORWARD_TO_TRAFFIC_LIGHT_SUPERVISOR(setConventionalTrafficLightConfidence);
+
+#undef FORWARD_TO_TRAFFIC_LIGHT_SUPERVISOR
+
+#define FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(NAME)                                             \
+  template <typename... Ts>                                                                       \
+  decltype(auto) getConventional##NAME(Ts &&... xs) const                                         \
+  {                                                                                               \
+    assert(traffic_light_supervisor_ptr_);                                                        \
+    return traffic_light_supervisor_ptr_->getConventionalTrafficLightManager()->get##NAME(xs...); \
+  }                                                                                               \
+  template <typename... Ts>                                                                       \
+  decltype(auto) getV2I##NAME(Ts &&... xs) const                                                  \
+  {                                                                                               \
+    assert(traffic_light_supervisor_ptr_);                                                        \
+    return traffic_light_supervisor_ptr_->getV2ITrafficLightManager()->get##NAME(xs...);          \
+  }                                                                                               \
+  static_assert(true, "")
+
+  FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLight);
+  FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER(TrafficLights);
+
+#undef FORWARD_GETTER_TO_TRAFFIC_LIGHT_MANAGER
+
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \
   /*!                                                                      \
@@ -345,8 +385,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
-  FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
-  FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
@@ -359,8 +397,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
-  FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
-  FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLights);
   FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
@@ -372,13 +408,10 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
-  FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
-  FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(setAcceleration);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setAccelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setBehaviorParameter);
-  FORWARD_TO_ENTITY_MANAGER(setConventionalTrafficLightConfidence);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
   FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
@@ -402,6 +435,8 @@ private:
   const Configuration configuration;
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
+
+  const std::shared_ptr<TrafficLightSupervisor> traffic_light_supervisor_ptr_;
 
   const std::shared_ptr<traffic::TrafficController> traffic_controller_ptr_;
 
