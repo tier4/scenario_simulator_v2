@@ -13,6 +13,35 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.0.5 (2024-06-11)
+------------------
+* Merge pull request `#1269 <https://github.com/tier4/scenario_simulator_v2/issues/1269>`_ from tier4/feature/unit_tests/longitudinal_speed_planner
+  Feature/unit tests/longitudinal speed planner
+* cmakelists style fix
+* use test fixture, use constexpr
+* merge / resolve confict
+* add comment
+* remove ';' from comments
+* remove variables that are only used once
+* slightly alter getRunningDistance_shortTime test
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* spelling
+* add reason/test description
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* change variable name
+* review: use builder, rename variables; use const when possible
+* add copyright notice
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* remove implicit conversion
+* add newline at the end of a file
+* remove problematic tests
+* clarify comments, and break a test :)
+* Minor test fixes
+* fix epsilon
+* typo
+* longitudinal speed planner tests
+* Contributors: Masaya Kataoka, Mateusz Palczuk, robomic
+
 2.0.4 (2024-06-10)
 ------------------
 * Merge pull request `#1270 <https://github.com/tier4/scenario_simulator_v2/issues/1270>`_ from tier4/feature/unit_tests/hdmap_utils
