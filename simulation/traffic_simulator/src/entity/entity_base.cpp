@@ -606,7 +606,11 @@ void EntityBase::activateOutOfRangeJob(
     [this]() {}, job::Type::OUT_OF_RANGE, true, job::Event::POST_UPDATE);
 }
 
-void EntityBase::startNpcLogic() { npc_logic_started_ = true; }
+void EntityBase::startNpcLogic(const double current_time)
+{
+  updateEntityStatusTimestamp(current_time);
+  npc_logic_started_ = true;
+}
 
 void EntityBase::stopAtCurrentPosition()
 {

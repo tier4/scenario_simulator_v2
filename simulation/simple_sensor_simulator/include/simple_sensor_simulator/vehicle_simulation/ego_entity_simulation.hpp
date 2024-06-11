@@ -61,6 +61,8 @@ private:
 
   const bool consider_acceleration_by_road_slope_;
 
+  Eigen::Vector3d world_relative_position_;
+
 public:
   const traffic_simulator_msgs::msg::VehicleParameters vehicle_parameters;
 

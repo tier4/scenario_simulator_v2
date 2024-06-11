@@ -149,6 +149,7 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
 
 void EgoEntity::onUpdate(double current_time, double step_time)
 {
+  std::cout << "EgoEntity::onUpdate" << std::endl;
   EntityBase::onUpdate(current_time, step_time);
 
   if (is_controlled_by_simulator_ && npc_logic_started_) {
@@ -156,11 +157,13 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
           static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
-          behavior_parameter_, step_time,
+          behavior_parameter_, step_time, getDefaultMatchingDistanceForLaneletPoseCalculation(),
           target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       // prefer current lanelet on ss2 side
+      std::cout << "is_controlled_by_simulator_: " << is_controlled_by_simulator_ << std::endl;
       setStatus(non_canonicalized_updated_status.value(), status_.getLaneletIds());
     } else {
+      std::cout << "FTA END" << std::endl;
       is_controlled_by_simulator_ = false;
     }
   }
@@ -172,6 +175,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
   field_operator_application->spinSome();
 
   EntityBase::onPostUpdate(current_time, step_time);
+  std::cout << "EgoEntity::~onUpdate" << std::endl;
 }
 
 void EgoEntity::requestAcquirePosition(const CanonicalizedLaneletPose & lanelet_pose)
@@ -295,7 +299,11 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
   status_.setMapPose(map_pose);
   // prefer current lanelet on Autoware side
-  setStatus(static_cast<EntityStatus>(status_), unique_route_lanelets);
+  const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+    status_.getMapPose(), status_.getBoundingBox(), unique_route_lanelets, false,
+    getDefaultMatchingDistanceForLaneletPoseCalculation());
+  setCanonicalizedStatus(
+    CanonicalizedEntityStatus(static_cast<EntityStatus>(status_), canonicalized_lanelet_pose));
 }
 
 void EgoEntity::setStatus(const EntityStatus & status)
