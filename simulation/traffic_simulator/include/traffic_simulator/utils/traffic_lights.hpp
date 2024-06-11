@@ -35,8 +35,7 @@ inline auto bulbPosition(Ts &&... xs)
 template <typename... Ts>
 inline auto trafficLightIdsOnPath(Ts &&... xs)
 {
-  return lanelet_map_core::traffic_lights::trafficLightIdsOnPath(
-    std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::traffic_lights::trafficLightIdsOnPath(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>

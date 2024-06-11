@@ -287,8 +287,7 @@ auto distanceToYieldStop(
 
   std::set<double> distances;
   for (const auto & lanelet_id : following_lanelets) {
-    const auto right_of_way_ids =
-      lanelet_map_core::lanelet_map::rightOfWayLaneletIds(lanelet_id);
+    const auto right_of_way_ids = lanelet_map_core::lanelet_map::rightOfWayLaneletIds(lanelet_id);
     for (const auto right_of_way_id : right_of_way_ids) {
       const auto other_poses = getPosesOnLanelet(right_of_way_id);
       if (!other_poses.empty()) {

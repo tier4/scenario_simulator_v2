@@ -178,8 +178,7 @@ auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<La
   /// @note Define lambda functions for canonicalizing previous/next lanelet.
   const auto canonicalize_to_previous_lanelet =
     [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
-    if (const auto ids = lanelet_map::previousLaneletIds(lanelet_pose.lanelet_id);
-        !ids.empty()) {
+    if (const auto ids = lanelet_map::previousLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
       std::vector<LaneletPose> canonicalized_all;
       for (const auto id : ids) {
         const auto lanelet_pose_tmp = helper::constructLaneletPose(
@@ -305,8 +304,7 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
 {
   auto canonicalized = lanelet_pose;
   while (canonicalized.s < 0) {
-    if (const auto ids = lanelet_map::previousLaneletIds(canonicalized.lanelet_id);
-        ids.empty()) {
+    if (const auto ids = lanelet_map::previousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
       canonicalized.s += lanelet_map::laneletLength(ids[0]);
@@ -330,8 +328,7 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Id
   auto canonicalized = lanelet_pose;
   while (canonicalized.s < 0) {
     // When canonicalizing to backward lanelet_id, do not consider route
-    if (const auto ids = lanelet_map::previousLaneletIds(canonicalized.lanelet_id);
-        ids.empty()) {
+    if (const auto ids = lanelet_map::previousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
       return {std::nullopt, canonicalized.lanelet_id};
     } else {
       canonicalized.s += lanelet_map::laneletLength(ids[0]);

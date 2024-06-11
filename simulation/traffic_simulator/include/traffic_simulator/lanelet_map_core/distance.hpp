@@ -34,8 +34,7 @@ using Spline = math::geometry::CatmullRomSpline;
 using SplineInterface = math::geometry::CatmullRomSplineInterface;
 using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
-auto lateralDistance(
-  const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
+auto lateralDistance(const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
   -> std::optional<double>;
 
 auto longitudinalDistance(
@@ -50,8 +49,7 @@ auto distanceToStopLine(
 auto distanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & spline)
   -> std::optional<double>;
 
-auto distanceToStopLine(
-  const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
+auto distanceToStopLine(const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
   -> std::optional<double>;
 
 // TrafficLigthStopLine

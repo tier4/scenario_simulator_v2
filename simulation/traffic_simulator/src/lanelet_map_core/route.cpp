@@ -116,8 +116,8 @@ auto followingLanelets(
   // clang-format on
 }
 
-auto followingLanelets(
-  const lanelet::Id lanelet_id, const double distance, const bool include_self) -> lanelet::Ids
+auto followingLanelets(const lanelet::Id lanelet_id, const double distance, const bool include_self)
+  -> lanelet::Ids
 {
   lanelet::Ids ret;
   double total_distance = 0.0;

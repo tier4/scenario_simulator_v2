@@ -23,8 +23,7 @@ namespace lanelet_map_core
 {
 namespace distance
 {
-auto lateralDistance(
-  const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
+auto lateralDistance(const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
   -> std::optional<double>
 {
   const auto route = route::route(from.lanelet_id, to.lanelet_id, allow_lane_change);
@@ -182,8 +181,7 @@ auto distanceToStopLine(
   return *collision_points.begin();
 }
 
-auto distanceToStopLine(
-  const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
+auto distanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
   -> std::optional<double>
 {
   if (route_spline.getLength() <= 0) {
@@ -211,8 +209,7 @@ auto distanceToStopLine(
   return *collision_points.begin();
 }
 
-auto distanceToStopLine(
-  const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
+auto distanceToStopLine(const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
   -> std::optional<double>
 {
   if (route_waypoints.empty()) {
