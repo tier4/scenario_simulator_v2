@@ -27,7 +27,6 @@
   <depend>libomp-dev</depend>
   <depend>nlohmann-json-dev</depend>
   <depend>pugixml-dev</depend>
-  <depend>quaternion_operation</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>rosgraph_msgs</depend>

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <quaternion_operation/quaternion_operation.h>
 
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/transform.hpp>
 
 #include "expect_eq_macros.hpp"
@@ -27,7 +27,7 @@ geometry_msgs::msg::Pose getFilledPose()
   geometry_msgs::msg::Pose pose;
   pose.position = makePoint(1.0, 2.0, 3.0);
   pose.orientation =
-    quaternion_operation::convertEulerAngleToQuaternion(makeVector(90.0 * M_PI / 180.0, 0.0));
+    math::geometry::convertEulerAngleToQuaternion(makeVector(90.0 * M_PI / 180.0, 0.0));
   return pose;
 }
 
@@ -38,7 +38,7 @@ TEST(Transform, getRelativePoseDifferent)
 
   geometry_msgs::msg::Pose ans = makePose(
     2.0, -3.0, 2.0,
-    quaternion_operation::convertEulerAngleToQuaternion(makeVector(-90.0 * M_PI / 180.0, 0.0)));
+    math::geometry::convertEulerAngleToQuaternion(makeVector(-90.0 * M_PI / 180.0, 0.0)));
   EXPECT_POSE_NEAR(math::geometry::getRelativePose(pose0, pose1), ans, EPS);
 }
 

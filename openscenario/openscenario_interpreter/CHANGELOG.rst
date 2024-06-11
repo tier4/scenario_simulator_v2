@@ -2850,7 +2850,7 @@ Changelog for package openscenario_interpreter
 * Lipsticks
 * Add optional argument verbose (= True) to openscenario_utility
 * Rename 'step_time_ms' to 'frame-rate'
-* Fix external/quaternion_operation's commit hash
+* Fix external/math::geometry's commit hash
 * Add parameter 'real-time-factor' to openscenario_interpreter
 * enable pass colcon test
 * enable pass test case

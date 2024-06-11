@@ -43,7 +43,7 @@
   <depend>libpcl-all-dev</depend>
   <depend>nav_msgs</depend>
   <depend>pcl_conversions</depend>
-  <depend>quaternion_operation</depend>
+  <depend>math::geometry</depend>
   <depend>rclcpp_components</depend>
   <depend>simulation_interface</depend>
   <depend>traffic_simulator_msgs</depend>
