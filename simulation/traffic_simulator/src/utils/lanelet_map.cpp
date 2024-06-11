@@ -20,7 +20,7 @@ inline namespace lanelet_map
 {
 auto laneletLength(const lanelet::Id lanelet_id) -> double
 {
-  return lanelet_map_core::lanelet_map::getLaneletLength(lanelet_id);
+  return lanelet_map_core::lanelet_map::laneletLength(lanelet_id);
 }
 
 auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
@@ -33,15 +33,15 @@ auto nearbyLaneletIds(
   const Pose & pose, const double distance_thresh, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids
 {
-  return lanelet_map_core::lanelet_map::getNearbyLaneletIds(
+  return lanelet_map_core::lanelet_map::nearbyLaneletIds(
     pose.position, distance_thresh, include_crosswalk, search_count);
 }
 
 auto borderlinePoses() -> std::vector<Pose>
 {
   std::vector<Pose> borderline_poses;
-  for (const auto & lanelet_id : lanelet_map_core::lanelet_map::getLaneletIds()) {
-    if (lanelet_map_core::lanelet_map::getNextLaneletIds(lanelet_id).empty()) {
+  for (const auto & lanelet_id : lanelet_map_core::lanelet_map::laneletIds()) {
+    if (lanelet_map_core::lanelet_map::nextLaneletIds(lanelet_id).empty()) {
       LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lanelet_id;
       lanelet_pose.s = lanelet_map::laneletLength(lanelet_id);

@@ -69,7 +69,7 @@ auto isInLanelet(
     }
 
     const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
-      lanelet_id, lanelet_map_core::lanelet_map::getLaneletLength(lanelet_id), 0.0);
+      lanelet_id, lanelet_map_core::lanelet_map::laneletLength(lanelet_id), 0.0);
     if (const auto distance_to_end_lanelet_pose = distance::longitudinalDistance(
           canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
           include_opposite_direction, allow_lane_change);
@@ -89,8 +89,8 @@ auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool
 auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool
 {
   const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  return lanelet_map_core::route::getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-         lanelet_map_core::lanelet_map::getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
+  return lanelet_map_core::route::followingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
+         lanelet_map_core::lanelet_map::laneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
 }
 
 // Conversions
@@ -138,7 +138,7 @@ auto canonicalize(const LaneletPose & lanelet_pose, const lanelet::Ids & route_l
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>
 {
-  return lanelet_map_core::pose::getAlternativeLaneletPoses(lanelet_pose);
+  return lanelet_map_core::pose::alternativeLaneletPoses(lanelet_pose);
 }
 
 auto toCanonicalizedLaneletPose(const LaneletPose & lanelet_pose)
@@ -346,7 +346,7 @@ auto estimateCanonicalizedLaneletPose(
           return CanonicalizedLaneletPose(
             traffic_simulator_msgs::build<LaneletPose>()
               .lanelet_id(end_of_road_lanelet_id.value())
-              .s(lanelet_map_core::lanelet_map::getLaneletLength(end_of_road_lanelet_id.value()))
+              .s(lanelet_map_core::lanelet_map::laneletLength(end_of_road_lanelet_id.value()))
               .offset(lanelet_pose.value().offset)
               .rpy(lanelet_pose.value().rpy));
         }

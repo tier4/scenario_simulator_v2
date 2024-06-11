@@ -27,20 +27,20 @@ namespace route
 {
 auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
 
-auto getSpeedLimit(const lanelet::Ids & lanelet_ids) -> double;
+auto speedLimit(const lanelet::Ids & lanelet_ids) -> double;
 
-auto getRoute(
+auto route(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id,
   const bool allow_lane_change = false) -> lanelet::Ids;
 
-auto getFollowingLanelets(
+auto followingLanelets(
   const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids,
   const double distance = 100, const bool include_self = true) -> lanelet::Ids;
 
-auto getFollowingLanelets(
+auto followingLanelets(
   const lanelet::Id, const double distance = 100, const bool include_self = true) -> lanelet::Ids;
 
-auto getPreviousLanelets(const lanelet::Id, const double distance = 100) -> lanelet::Ids;
+auto previousLanelets(const lanelet::Id, const double distance = 100) -> lanelet::Ids;
 }  // namespace route
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator

@@ -32,7 +32,7 @@ auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanel
   return LaneletMapCore::trafficRulesVehicle()->canChangeLane(from_lanelet, to_lanelet);
 }
 
-auto getLaneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction & direction)
+auto laneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction & direction)
   -> std::optional<lanelet::Id>
 {
   const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
@@ -55,16 +55,16 @@ auto getLaneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction & 
   return target;
 }
 
-auto getLaneChangeableLaneletId(
+auto laneChangeableLaneletId(
   const lanelet::Id lanelet_id, const Direction & direction, const std::uint8_t shift)
   -> std::optional<lanelet::Id>
 {
   if (shift == 0) {
-    return getLaneChangeableLaneletId(lanelet_id, Direction::STRAIGHT);
+    return laneChangeableLaneletId(lanelet_id, Direction::STRAIGHT);
   } else {
     auto reference_id = lanelet_id;
     for (uint8_t i = 0; i < shift; i++) {
-      auto id = getLaneChangeableLaneletId(reference_id, direction);
+      auto id = laneChangeableLaneletId(reference_id, direction);
       if (!id) {
         return std::nullopt;
       } else {
@@ -79,7 +79,7 @@ auto getLaneChangeableLaneletId(
 }
 
 // Trajectory
-auto getLaneChangeTrajectory(const LaneletPose & from_pose, const Parameter & lane_change_parameter)
+auto laneChangeTrajectory(const LaneletPose & from_pose, const Parameter & lane_change_parameter)
   -> std::optional<std::pair<Curve, double>>
 {
   double longitudinal_distance = Parameter::default_lanechange_distance;
@@ -97,7 +97,7 @@ auto getLaneChangeTrajectory(const LaneletPose & from_pose, const Parameter & la
       longitudinal_distance = Parameter::default_lanechange_distance;
       break;
   }
-  const auto along_pose = pose::getAlongLaneletPose(from_pose, longitudinal_distance);
+  const auto along_pose = pose::alongLaneletPose(from_pose, longitudinal_distance);
   // clang-format off
   const auto left_point =
     pose::toMapPose(helper::constructLaneletPose(
@@ -107,7 +107,7 @@ auto getLaneChangeTrajectory(const LaneletPose & from_pose, const Parameter & la
       along_pose.lanelet_id, along_pose.s, along_pose.offset - 5.0)).pose.position;
   // clang-format on
   const auto collision_point =
-    lanelet_map::getCenterPointsSpline(lane_change_parameter.target.lanelet_id)
+    lanelet_map::centerPointsSpline(lane_change_parameter.target.lanelet_id)
       ->getCollisionPointIn2D(left_point, right_point);
   if (!collision_point) {
     return std::nullopt;
@@ -122,18 +122,18 @@ auto getLaneChangeTrajectory(const LaneletPose & from_pose, const Parameter & la
     std::pow(from_pose_in_map.position.y - goal_pose_in_map.position.y, 2) +
     std::pow(from_pose_in_map.position.z - goal_pose_in_map.position.z, 2));
 
-  auto traj = getLaneChangeTrajectory(
+  auto traj = laneChangeTrajectory(
     pose::toMapPose(from_pose).pose, to_pose, lane_change_parameter.trajectory_shape,
     start_to_goal_distance * 0.5);
   return std::make_pair(traj, collision_point.value());
 }
 
-auto getLaneChangeTrajectory(
+auto laneChangeTrajectory(
   const Pose & from_pose, const Parameter & lane_change_parameter,
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>
 {
-  double to_length = lanelet_map::getLaneletLength(lane_change_parameter.target.lanelet_id);
+  double to_length = lanelet_map::laneletLength(lane_change_parameter.target.lanelet_id);
   std::vector<double> evaluation, target_s;
   std::vector<Curve> curves;
 
@@ -152,7 +152,7 @@ auto getLaneChangeTrajectory(
     LaneletPose to_pose;
     to_pose.lanelet_id = lane_change_parameter.target.lanelet_id;
     to_pose.s = to_s;
-    auto traj = getLaneChangeTrajectory(
+    auto traj = laneChangeTrajectory(
       from_pose, to_pose, lane_change_parameter.trajectory_shape, start_to_goal_distance * 0.5);
     if (traj.getMaximum2DCurvature() < maximum_curvature_threshold) {
       double eval = std::fabs(target_trajectory_length - traj.getLength());
@@ -169,7 +169,7 @@ auto getLaneChangeTrajectory(
   return std::make_pair(curves[min_index], target_s[min_index]);
 }
 
-auto getLaneChangeTrajectory(
+auto laneChangeTrajectory(
   const Pose & from_pose, const LaneletPose & to_pose, const TrajectoryShape & trajectory_shape,
   const double tangent_vector_size) -> Curve
 {
@@ -183,7 +183,7 @@ auto getLaneChangeTrajectory(
   };
 
   auto tangentVector = [](const lanelet::Id lanelet_id, const double s) -> std::optional<Vector3> {
-    return lanelet_map::getCenterPointsSpline(lanelet_id)->getTangentVector(s);
+    return lanelet_map::centerPointsSpline(lanelet_id)->getTangentVector(s);
   };
 
   Vector3 start_vec;

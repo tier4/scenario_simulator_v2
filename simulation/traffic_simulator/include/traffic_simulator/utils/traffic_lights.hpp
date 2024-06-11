@@ -28,21 +28,21 @@ auto trafficLightsIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 template <typename... Ts>
 inline auto bulbPosition(Ts &&... xs)
 {
-  return lanelet_map_core::traffic_lights::getTrafficLightBulbPosition(
+  return lanelet_map_core::traffic_lights::trafficLightBulbPosition(
     std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 inline auto trafficLightIdsOnPath(Ts &&... xs)
 {
-  return lanelet_map_core::traffic_lights::getTrafficLightIdsOnPath(
+  return lanelet_map_core::traffic_lights::trafficLightIdsOnPath(
     std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 inline auto trafficLightRegulatoryElementIdsFromTrafficLightId(Ts &&... xs)
 {
-  return lanelet_map_core::traffic_lights::getTrafficLightRegulatoryElementIDsFromTrafficLight(
+  return lanelet_map_core::traffic_lights::trafficLightRegulatoryElementIDsFromTrafficLight(
     std::forward<decltype(xs)>(xs)...);
 }
 }  // namespace traffic_lights

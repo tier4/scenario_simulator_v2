@@ -35,65 +35,65 @@ auto isInLanelet(const double s, const lanelet::Id lanelet_id) -> bool;
 
 auto isInLanelet(const Point point, const lanelet::Id lanelet_id) -> bool;
 
-auto getLaneletLength(const lanelet::Id lanelet_id) -> double;
+auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
 auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
   -> std::tuple<double, Point, Point>;
 
-auto getLaneletIds() -> lanelet::Ids;
+auto laneletIds() -> lanelet::Ids;
 
-auto getNearbyLaneletIds(
+auto nearbyLaneletIds(
   const Point &, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids;
 
 // Center points
-auto getCenterPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>;
+auto centerPoints(const lanelet::Ids & lanelet_ids) -> std::vector<Point>;
 
-auto getCenterPoints(const lanelet::Id lanelet_id) -> std::vector<Point>;
+auto centerPoints(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
-auto getCenterPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>;
+auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>;
 
 // Next lanelet
-auto getNextLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+auto nextLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 
-auto getNextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
+auto nextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
   -> lanelet::Ids;
 
-auto getNextLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+auto nextLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 
-auto getNextLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
+auto nextLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
   -> lanelet::Ids;
 
 //Previous lanelet
-auto getPreviousLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+auto previousLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 
-auto getPreviousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
+auto previousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
   -> lanelet::Ids;
 
-auto getPreviousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+auto previousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 
-auto getPreviousLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
+auto previousLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
   -> lanelet::Ids;
 
 //Bounds
-auto getLeftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
+auto leftBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
-auto getRightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
+auto rightBound(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 // Polygons
-auto getLaneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
+auto laneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
-auto getStopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
+auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 // Relations
-auto getRightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
+auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
   -> std::unordered_map<lanelet::Id, lanelet::Ids>;
 
-auto getRightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 
-auto getConflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+auto conflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 
-auto getConflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 
 // private
 auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;

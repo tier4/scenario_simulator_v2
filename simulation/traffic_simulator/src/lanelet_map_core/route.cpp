@@ -36,7 +36,7 @@ auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool
          }) != route.end();
 }
 
-auto getSpeedLimit(const lanelet::Ids & lanelet_ids) -> double
+auto speedLimit(const lanelet::Ids & lanelet_ids) -> double
 {
   std::vector<double> limits;
   if (lanelet_ids.empty()) {
@@ -50,7 +50,7 @@ auto getSpeedLimit(const lanelet::Ids & lanelet_ids) -> double
   return *std::min_element(limits.begin(), limits.end());
 }
 
-auto getRoute(
+auto route(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, const bool allow_lane_change)
   -> lanelet::Ids
 {
@@ -78,7 +78,7 @@ auto getRoute(
   return ids;
 }
 
-auto getFollowingLanelets(
+auto followingLanelets(
   const lanelet::Id lanelet_id, const lanelet::Ids & candidate_lanelet_ids, const double distance,
   const bool include_self) -> lanelet::Ids
 {
@@ -91,7 +91,7 @@ auto getFollowingLanelets(
   for (const auto id : candidate_lanelet_ids) {
     if (found) {
       ids.emplace_back(id);
-      total_distance = total_distance + lanelet_map::getLaneletLength(id);
+      total_distance = total_distance + lanelet_map::laneletLength(id);
       if (total_distance > distance) {
         return ids;
       }
@@ -110,13 +110,13 @@ auto getFollowingLanelets(
     return ids;
   }
   // clang-format off
-  return ids + getFollowingLanelets(
+  return ids + followingLanelets(
     candidate_lanelet_ids[candidate_lanelet_ids.size() - 1],
     distance - total_distance, false);
   // clang-format on
 }
 
-auto getFollowingLanelets(
+auto followingLanelets(
   const lanelet::Id lanelet_id, const double distance, const bool include_self) -> lanelet::Ids
 {
   lanelet::Ids ret;
@@ -126,14 +126,14 @@ auto getFollowingLanelets(
   }
   lanelet::Id end_lanelet_id = lanelet_id;
   while (total_distance < distance) {
-    if (const auto straight_ids = lanelet_map::getNextLaneletIds(end_lanelet_id, "straight");
+    if (const auto straight_ids = lanelet_map::nextLaneletIds(end_lanelet_id, "straight");
         !straight_ids.empty()) {
-      total_distance = total_distance + lanelet_map::getLaneletLength(straight_ids[0]);
+      total_distance = total_distance + lanelet_map::laneletLength(straight_ids[0]);
       ret.push_back(straight_ids[0]);
       end_lanelet_id = straight_ids[0];
       continue;
-    } else if (const auto ids = lanelet_map::getNextLaneletIds(end_lanelet_id); ids.size() != 0) {
-      total_distance = total_distance + lanelet_map::getLaneletLength(ids[0]);
+    } else if (const auto ids = lanelet_map::nextLaneletIds(end_lanelet_id); ids.size() != 0) {
+      total_distance = total_distance + lanelet_map::laneletLength(ids[0]);
       ret.push_back(ids[0]);
       end_lanelet_id = ids[0];
       continue;
@@ -144,21 +144,21 @@ auto getFollowingLanelets(
   return ret;
 }
 
-auto getPreviousLanelets(const lanelet::Id lanelet_id, const double distance) -> lanelet::Ids
+auto previousLanelets(const lanelet::Id lanelet_id, const double distance) -> lanelet::Ids
 {
   lanelet::Ids ret;
   double total_distance = 0.0;
   ret.push_back(lanelet_id);
   while (total_distance < distance) {
-    auto ids = lanelet_map::getPreviousLaneletIds(lanelet_id, "straight");
+    auto ids = lanelet_map::previousLaneletIds(lanelet_id, "straight");
     if (ids.size() != 0) {
-      total_distance = total_distance + lanelet_map::getLaneletLength(ids[0]);
+      total_distance = total_distance + lanelet_map::laneletLength(ids[0]);
       ret.push_back(ids[0]);
       continue;
     } else {
-      auto else_ids = lanelet_map::getPreviousLaneletIds(lanelet_id);
+      auto else_ids = lanelet_map::previousLaneletIds(lanelet_id);
       if (else_ids.size() != 0) {
-        total_distance = total_distance + lanelet_map::getLaneletLength(else_ids[0]);
+        total_distance = total_distance + lanelet_map::laneletLength(else_ids[0]);
         ret.push_back(else_ids[0]);
         continue;
       } else {

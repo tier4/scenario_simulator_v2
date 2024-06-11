@@ -39,13 +39,13 @@ auto toSpline(const lanelet::Ids & route) -> Spline;
 template <typename... Ts>
 auto getRoute(Ts &&... xs)
 {
-  return lanelet_map_core::route::getRoute(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::route::route(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 auto speedLimit(Ts &&... xs)
 {
-  return lanelet_map_core::route::getSpeedLimit(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::route::speedLimit(std::forward<decltype(xs)>(xs)...);
 }
 
 auto isAnyConflictingEntity(
@@ -60,7 +60,7 @@ auto isNeedToRightOfWay(
 template <typename... Ts>
 auto followingLanelets(Ts &&... xs)
 {
-  return lanelet_map_core::route::getFollowingLanelets(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::route::followingLanelets(std::forward<decltype(xs)>(xs)...);
 }
 
 auto moveAlongLaneletPose(
@@ -71,7 +71,7 @@ auto moveAlongLaneletPose(
 template <typename... Ts>
 auto previousLanelets(Ts &&... xs)
 {
-  return lanelet_map_core::route::getPreviousLanelets(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::route::previousLanelets(std::forward<decltype(xs)>(xs)...);
 }
 
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
@@ -81,7 +81,7 @@ auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
 template <typename... Ts>
 auto laneChangeableLaneletId(Ts &&... xs)
 {
-  return lanelet_map_core::lane_change::getLaneChangeableLaneletId(
+  return lanelet_map_core::lane_change::laneChangeableLaneletId(
     std::forward<decltype(xs)>(xs)...);
 }
 

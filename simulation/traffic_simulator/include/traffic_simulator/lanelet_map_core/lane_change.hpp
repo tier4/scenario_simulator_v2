@@ -38,23 +38,23 @@ using TrajectoryShape = traffic_simulator::lane_change::TrajectoryShape;
 
 auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool;
 
-auto getLaneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction & direction)
+auto laneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction & direction)
   -> std::optional<lanelet::Id>;
 
-auto getLaneChangeableLaneletId(
+auto laneChangeableLaneletId(
   const lanelet::Id lanelet_id, const Direction & direction, const std::uint8_t shift)
   -> std::optional<lanelet::Id>;
 
 // Trajectory
-auto getLaneChangeTrajectory(const LaneletPose & from_pose, const Parameter & lane_change_parameter)
+auto laneChangeTrajectory(const LaneletPose & from_pose, const Parameter & lane_change_parameter)
   -> std::optional<std::pair<Curve, double>>;
 
-auto getLaneChangeTrajectory(
+auto laneChangeTrajectory(
   const Pose & from_pose, const Parameter & lane_change_parameter,
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>;
 
-auto getLaneChangeTrajectory(
+auto laneChangeTrajectory(
   const Pose & from_pose, const LaneletPose & to_pose, const TrajectoryShape & trajectory_shape,
   const double tangent_vector_size) -> Curve;
 }  // namespace lane_change

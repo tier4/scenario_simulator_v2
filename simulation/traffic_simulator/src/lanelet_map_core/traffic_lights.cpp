@@ -38,11 +38,11 @@ auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool
            LaneletMapCore::map()->regulatoryElementLayer.get(lanelet_id));
 }
 
-auto getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
+auto trafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
   -> std::vector<std::vector<Point>>
 {
   std::vector<std::vector<Point>> ret;
-  const auto traffic_lights = getTrafficLights(traffic_light_id);
+  const auto traffic_lights = trafficLights(traffic_light_id);
   for (const auto & traffic_light : traffic_lights) {
     ret.emplace_back(std::vector<Point>{});
     const auto stop_line = traffic_light->stopLine();
@@ -60,7 +60,7 @@ auto getTrafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
   return ret;
 }
 
-auto getTrafficLights(const lanelet::Id traffic_light_id)
+auto trafficLights(const lanelet::Id traffic_light_id)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>
 {
   std::vector<lanelet::AutowareTrafficLightConstPtr> ret;
@@ -82,7 +82,7 @@ auto getTrafficLights(const lanelet::Id traffic_light_id)
   return ret;
 }
 
-auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
+auto trafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
   -> std::optional<Point>
 {
   lanelet::ConstLanelets all_lanelets = lanelet::utils::query::laneletLayer(LaneletMapCore::map());
@@ -117,14 +117,14 @@ auto getTrafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::
   return std::nullopt;
 }
 
-auto getTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::TrafficLight::Ptr
+auto trafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::TrafficLight::Ptr
 {
   assert(isTrafficLightRegulatoryElement(lanelet_id));
   return std::dynamic_pointer_cast<lanelet::TrafficLight>(
     LaneletMapCore::map()->regulatoryElementLayer.get(lanelet_id));
 }
 
-auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traffic_light_way_id)
+auto trafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traffic_light_way_id)
   -> lanelet::Ids
 {
   assert(isTrafficLight(traffic_light_way_id));
@@ -143,10 +143,10 @@ auto getTrafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traff
 }
 
 // On path
-auto getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids
+auto trafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids
 {
   lanelet::Ids ids;
-  for (const auto & traffic_light : getTrafficLightRegulatoryElementsOnPath(route_lanelets)) {
+  for (const auto & traffic_light : trafficLightRegulatoryElementsOnPath(route_lanelets)) {
     for (auto light_string : traffic_light->lightBulbs()) {
       if (light_string.hasAttribute("traffic_light_id")) {
         if (auto id = light_string.attribute("traffic_light_id").asId(); id) {
@@ -158,7 +158,7 @@ auto getTrafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::I
   return ids;
 }
 
-auto getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
+auto trafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
@@ -173,7 +173,7 @@ auto getTrafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
 }
 
 // private
-auto getTrafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
+auto trafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>
 {
   std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>> ret;

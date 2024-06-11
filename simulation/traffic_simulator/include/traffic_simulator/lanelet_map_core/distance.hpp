@@ -34,39 +34,39 @@ using Spline = math::geometry::CatmullRomSpline;
 using SplineInterface = math::geometry::CatmullRomSplineInterface;
 using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 
-auto getLateralDistance(
+auto lateralDistance(
   const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
   -> std::optional<double>;
 
-auto getLongitudinalDistance(
+auto longitudinalDistance(
   const LaneletPose & from, const LaneletPose & to, const bool allow_lane_change)
   -> std::optional<double>;
 
 // StopLine
-auto getDistanceToStopLine(
+auto distanceToStopLine(
   const lanelet::Ids & route_lanelets, const std::vector<Point> & route_waypoints)
   -> std::optional<double>;
 
-auto getDistanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & spline)
+auto distanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & spline)
   -> std::optional<double>;
 
-auto getDistanceToStopLine(
+auto distanceToStopLine(
   const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
   -> std::optional<double>;
 
 // TrafficLigthStopLine
-auto getDistanceToTrafficLightStopLine(
+auto distanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
   -> std::optional<double>;
 
-auto getDistanceToTrafficLightStopLine(
+auto distanceToTrafficLightStopLine(
   const lanelet::Ids & route_lanelets, const SplineInterface & spline) -> std::optional<double>;
 
-auto getDistanceToTrafficLightStopLine(
+auto distanceToTrafficLightStopLine(
   const std::vector<Point> & route_waypoints, const lanelet::Id traffic_light_id)
   -> std::optional<double>;
 
-auto getDistanceToTrafficLightStopLine(
+auto distanceToTrafficLightStopLine(
   const SplineInterface & route_spline, const lanelet::Id traffic_light_id)
   -> std::optional<double>;
 
@@ -78,7 +78,7 @@ auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id
   -> std::optional<double>;
 
 // private
-auto getStopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
+auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
 }  // namespace distance
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator

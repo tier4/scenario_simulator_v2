@@ -95,7 +95,7 @@ public:
     return data_.find(lanelet_id) != data_.end();
   }
 
-  auto getCenterPoints(lanelet::Id lanelet_id) -> decltype(auto)
+  auto centerPoints(lanelet::Id lanelet_id) -> decltype(auto)
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");
@@ -104,7 +104,7 @@ public:
     return data_.at(lanelet_id);
   }
 
-  auto getCenterPointsSpline(lanelet::Id lanelet_id) -> decltype(auto)
+  auto centerPointsSpline(lanelet::Id lanelet_id) -> decltype(auto)
   {
     if (!exists(lanelet_id)) {
       THROW_SIMULATION_ERROR("center point of : ", lanelet_id, " does not exists on route cache.");

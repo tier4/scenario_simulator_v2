@@ -95,13 +95,13 @@ auto distanceToRightLaneBound(
 template <typename... Ts>
 auto distanceToStopLine(Ts &&... xs)
 {
-  return lanelet_map_core::distance::getDistanceToStopLine(std::forward<decltype(xs)>(xs)...);
+  return lanelet_map_core::distance::distanceToStopLine(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 auto distanceToTrafficLightStopLine(Ts &&... xs)
 {
-  return lanelet_map_core::distance::getDistanceToTrafficLightStopLine(
+  return lanelet_map_core::distance::distanceToTrafficLightStopLine(
     std::forward<decltype(xs)>(xs)...);
 }
 
