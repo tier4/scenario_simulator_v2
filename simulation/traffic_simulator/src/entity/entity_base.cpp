@@ -157,6 +157,7 @@ auto EntityBase::isTargetSpeedReached(const speed_change::RelativeTargetSpeed & 
 void EntityBase::onUpdate(double /*current_time*/, double step_time)
 {
   job_list_.update(step_time, job::Event::PRE_UPDATE);
+  step_time_ = step_time;
   status_before_update_ = status_;
   speed_planner_ =
     std::make_unique<traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner>(
@@ -751,12 +752,6 @@ auto EntityBase::requestSynchronize(
   const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
   const CanonicalizedLaneletPose & entity_target, const double threshold) -> bool
 {
-  /**
-   * @brief To get the step time of the simulation.
-   * @brief THIS FUNCTION SHOULD BE REMOVED IN THE FUTURE.
-   */
-  keepStepTime();
-
   if (traffic_simulator_msgs::msg::EntityType::EGO == getEntityType().type) {
     THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
   }
@@ -845,23 +840,6 @@ auto EntityBase::requestSynchronize(
     },
     [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
   return false;
-}
-
-/**
- * @brief Append a job to keep the step time of the simulation.
- */
-void EntityBase::keepStepTime()
-{
-  job_list_.append(
-    /**
-     * @brief This job is always ACTIVE
-     */
-    [this](double job_duration) {
-      step_time_ = prev_job_duration_ - job_duration;
-      prev_job_duration_ = job_duration;
-      return false;
-    },
-    [this]() {}, job::Type::UNKOWN, true, job::Event::POST_UPDATE);
 }
 
 }  // namespace entity
