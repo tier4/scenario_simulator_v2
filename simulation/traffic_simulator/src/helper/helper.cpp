@@ -97,19 +97,20 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
   if (!noise_config) {
       noise_config = std::make_unique<simulation_api_schema::EllipseBasedNoiseConfiguration>(constructEllipseBasedNoiseConfiguration());
   }
-  configuration.set_noise_config(*noise_config);
+  configuration.mutable_noise_config()->CopyFrom(*noise_config);
+
 
   return configuration;
 }
 
 const simulation_api_schema::EllipseBasedNoiseConfiguration constructEllipseBasedNoiseConfiguration(
   const std::vector<double>& ellipse_y_radius_values,
-  const double ellipse_normalized_x_radius_masking,
+  const double ellipse_normalized_x_radius_tp_rate,
   const double ellipse_normalized_x_radius_distance_mean,
   const double ellipse_normalized_x_radius_distance_std,
   const double ellipse_normalized_x_radius_yaw_mean,
   const double ellipse_normalized_x_radius_yaw_std,
-  const std::vector<double>& masking_probability_values,
+  const std::vector<double>& tp_rate_values,
   const std::vector<double>& distance_mean_values,
   const std::vector<double>& distance_std_values,
   const std::vector<double>& yaw_mean_values,
@@ -119,13 +120,13 @@ const simulation_api_schema::EllipseBasedNoiseConfiguration constructEllipseBase
   for (const auto& value : ellipse_y_radius_values) {
     configuration.add_ellipse_y_radius_values(value);
   }
-  configuration.set_ellipse_normalized_x_radius_masking(ellipse_normalized_x_masking);
+  configuration.set_ellipse_normalized_x_radius_tp_rate(ellipse_normalized_x_radius_tp_rate);
   configuration.set_ellipse_normalized_x_radius_distance_mean(ellipse_normalized_x_radius_distance_mean);
   configuration.set_ellipse_normalized_x_radius_distance_std(ellipse_normalized_x_radius_distance_std);
   configuration.set_ellipse_normalized_x_radius_yaw_mean(ellipse_normalized_x_radius_yaw_mean);
   configuration.set_ellipse_normalized_x_radius_yaw_std(ellipse_normalized_x_radius_yaw_std);
-  for (const auto& value : masking_probability_values) {
-    configuration.add_masking_probability_values(value);
+  for (const auto& value : tp_rate_values) {
+    configuration.add_tp_rate_values(value);
   }
   for (const auto& value : distance_mean_values) {
     configuration.add_distance_mean_values(value);

@@ -29,6 +29,7 @@
 #include <simulation_interface/conversions.hpp>
 #include <string>
 #include <vector>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
 namespace simple_sensor_simulator
 {
@@ -286,31 +287,80 @@ struct EllipseBasedNoiseApplicator : public DefaultNoiseApplicator
     return std::sqrt(std::pow(x / normalized_x_radius, 2) + std::pow(y, 2));
   }
 
+  double findValue(const google::protobuf::RepeatedField<double>& radius_values, const google::protobuf::RepeatedField<double>& target_values, double dist) {
+      for (int i = 0; i < radius_values.size(); i++) {
+          if (dist < radius_values[i]) {
+              return target_values[i];
+          }
+      }
+      return 0.0;
+  }
+
   auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_objects)
     -> decltype(auto)
   {
     auto noise_config = detection_sensor_configuration.noise_config();
+    auto ellipse_y_radius_values = noise_config.ellipse_y_radius_values();
+    auto tp_rate_values = noise_config.tp_rate_values();
+    auto distance_mean_values = noise_config.distance_mean_values();
+    auto distance_std_values = noise_config.distance_std_values();
+    auto yaw_mean_values = noise_config.yaw_mean_values();
+    auto yaw_std_values = noise_config.yaw_std_values();
     
 
-    double x_, y_;
-    double dist_masking, dist_distance_mean, dist_distance_std, dist_yaw_mean, dist_yaw_std;
+    double x, y, angle;
+    double dist_tp_rate, dist_distance_mean, dist_distance_std, dist_yaw_mean, dist_yaw_std;
 
     std::vector<bool> is_masked(detected_objects.objects.size(), false);
 
-    for (auto && detected_object : detected_objects.objects) {
+    for (std::size_t i = 0; i < detected_objects.objects.size(); ++i) {
+      auto & detected_object = detected_objects.objects[i];
+      auto & pose = detected_object.kinematics.pose_with_covariance.pose;
+
       // Calculate the normalized distance from the object to the ego vehicle.
-      x_ = detected_object.kinematics.pose_with_covariance.pose.position.x - ego_entity_status.pose().position().x();
-      y_ = detected_object.kinematics.pose_with_covariance.pose.position.y - ego_entity_status.pose().position().y();
+      x = pose.position.x - ego_entity_status.pose().position().x();
+      y = pose.position.y - ego_entity_status.pose().position().y();
+      angle = std::atan2(y, x);
 
-      dist_masking = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_masking());
-      dist_distance_mean = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_distance_mean());
-      dist_distance_std = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_distance_std());
-      dist_yaw_mean = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_yaw_mean());
-      dist_yaw_std = calculateEllipseDistance(x_, y_, noise_config.ellipse_normalized_x_radius_yaw_std());
+      dist_tp_rate = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_tp_rate());
+      dist_distance_mean = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_distance_mean());
+      dist_distance_std = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_distance_std());
+      dist_yaw_mean = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_yaw_mean());
+      dist_yaw_std = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_yaw_std());
 
-      // Apply noise. TODO
-      }
+      // find noise parameters
+      double tp_rate = findValue(ellipse_y_radius_values, tp_rate_values, dist_tp_rate);
+      double distance_mean = findValue(ellipse_y_radius_values, distance_mean_values, dist_distance_mean);
+      double distance_std = findValue(ellipse_y_radius_values, distance_std_values, dist_distance_std);
+      double yaw_mean = findValue(ellipse_y_radius_values, yaw_mean_values, dist_yaw_mean);
+      double yaw_std = findValue(ellipse_y_radius_values, yaw_std_values, dist_yaw_std);
+      
+      is_masked[i] = std::uniform_real_distribution<double>()(random_engine) > tp_rate;
+      if (is_masked[i])
+        continue;
+      
+      // Apply noise
+      double dis_offset = std::normal_distribution<double>(distance_mean, distance_std)(random_engine);
+      pose.position.x += dis_offset * std::cos(angle);
+      pose.position.y += dis_offset * std::sin(angle);
+
+      double yaw_offset = std::normal_distribution<double>(yaw_mean, yaw_std)(random_engine);
+      tf2::Quaternion obj_orientation;
+      tf2::convert(pose.orientation, obj_orientation);
+      obj_orientation *= tf2::Quaternion(tf2::Vector3(0, 0, 1), yaw_offset);
+      tf2::convert(obj_orientation, pose.orientation);
     }
+
+    // random mask
+    int idx = 0;
+    detected_objects.objects.erase(
+      std::remove_if(
+        detected_objects.objects.begin(), detected_objects.objects.end(),
+        [&](auto &&) {
+          return is_masked[idx++];
+        }),
+      detected_objects.objects.end());
+
     return detected_objects;
   }
 };
@@ -358,7 +408,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
     if (detected_objects_queue.emplace(detected_objects, current_simulation_time);
         current_simulation_time - detected_objects_queue.front().second >=
         configuration_.object_recognition_delay()) {
-      auto apply_noise = CustomNoiseApplicator(
+      auto apply_noise = EllipseBasedNoiseApplicator(
         current_simulation_time, current_ros_time, *ego_entity_status, random_engine_,
         configuration_);
       detected_objects_publisher->publish(apply_noise(detected_objects_queue.front().first));
