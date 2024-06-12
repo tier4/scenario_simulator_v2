@@ -64,6 +64,10 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
     }
   };
 
+  auto getMatchingDistance = [&]() -> double {
+    return entity_status->getBoundingBox().dimensions.y * 0.5 + 1.0;
+  };
+
   if (getBlackBoardValues();
       request != traffic_simulator::behavior::Request::FOLLOW_POLYLINE_TRAJECTORY or
       not getInput<decltype(polyline_trajectory)>("polyline_trajectory", polyline_trajectory) or
@@ -76,7 +80,7 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
   } else if (
     const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
       static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
-      behavior_parameter, hdmap_utils, step_time, getTargetSpeed())) {
+      behavior_parameter, hdmap_utils, step_time, getMatchingDistance(), getTargetSpeed())) {
     setOutput(
       "updated_status",
       std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
