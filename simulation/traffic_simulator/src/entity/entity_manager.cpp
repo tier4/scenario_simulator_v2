@@ -40,8 +40,11 @@ namespace entity
 void EntityManager::broadcastEntityTransform()
 {
   static bool isSend;
-  if(isSend){return;}
-  else{isSend = true;}
+  if (isSend) {
+    return;
+  } else {
+    isSend = true;
+  }
 
   using math::geometry::operator/;
   using math::geometry::operator*;
