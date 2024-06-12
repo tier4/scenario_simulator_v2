@@ -82,7 +82,7 @@ auto makeEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "dummy_entity",
+  const std::string name = "default_entity_name",
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::EntityStatus
 {
@@ -102,7 +102,7 @@ auto makeEntityStatus(
 auto makeEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> /* hdmap_utils */, geometry_msgs::msg::Pose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "dummy_entity",
+  const std::string name = "default_entity_name",
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::EntityStatus
 {
@@ -123,7 +123,7 @@ auto makeCanonicalizedEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "dummy_entity",
+  const std::string name = "default_entity_name",
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::entity_status::CanonicalizedEntityStatus
 {
@@ -134,7 +134,7 @@ auto makeCanonicalizedEntityStatus(
 auto makeCanonicalizedEntityStatus(
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils, geometry_msgs::msg::Pose pose,
   traffic_simulator_msgs::msg::BoundingBox bbox, const double speed = 0.0,
-  const std::string name = "dummy_entity",
+  const std::string name = "default_entity_name",
   const uint8_t type = traffic_simulator_msgs::msg::EntityType::VEHICLE)
   -> traffic_simulator::entity_status::CanonicalizedEntityStatus
 {

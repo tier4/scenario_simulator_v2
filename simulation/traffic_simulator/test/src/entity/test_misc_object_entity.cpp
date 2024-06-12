@@ -32,7 +32,10 @@ int main(int argc, char ** argv)
 class MiscObjectEntityTest : public testing::Test
 {
 protected:
-  MiscObjectEntityTest() : hdmap_utils_ptr(makeHdMapUtilsSharedPointer()), entity_name("blob") {}
+  MiscObjectEntityTest()
+  : hdmap_utils_ptr(makeHdMapUtilsSharedPointer()), entity_name("misc_object_entity")
+  {
+  }
 
   std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr;
   const std::string entity_name;
@@ -47,8 +50,10 @@ protected:
     pose(makeCanonicalizedLaneletPose(hdmap_utils, id)),
     bbox(makeBoundingBox()),
     status(makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox)),
-    dummy("dummy_entity", status, hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{}),
-    dummy_base(&dummy)
+    misc_object(
+      "default_entity_name", status, hdmap_utils,
+      traffic_simulator_msgs::msg::MiscObjectParameters{}),
+    entity_base(&misc_object)
   {
   }
 
@@ -57,8 +62,8 @@ protected:
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose;
   traffic_simulator_msgs::msg::BoundingBox bbox;
   traffic_simulator::entity_status::CanonicalizedEntityStatus status;
-  traffic_simulator::entity::MiscObjectEntity dummy;
-  traffic_simulator::entity::EntityBase * dummy_base;
+  traffic_simulator::entity::MiscObjectEntity misc_object;
+  traffic_simulator::entity::EntityBase * entity_base;
 };
 
 /**
@@ -115,15 +120,15 @@ TEST_F(MiscObjectEntityTest, requestSpeedChange_relative)
   std::unordered_map<std::string, traffic_simulator::entity_status::CanonicalizedEntityStatus>
     others;
   others.emplace(
-    "bob_entity", makeCanonicalizedEntityStatus(
-                    hdmap_utils_ptr, pose, bbox, 17.0, "bob",
-                    traffic_simulator_msgs::msg::EntityType::MISC_OBJECT));
+    "other_entity", makeCanonicalizedEntityStatus(
+                      hdmap_utils_ptr, pose, bbox, 17.0, "other_entity_name",
+                      traffic_simulator_msgs::msg::EntityType::MISC_OBJECT));
   blob.setOtherStatus(others);
 
   EXPECT_THROW(
     blob.requestSpeedChange(
       traffic_simulator::speed_change::RelativeTargetSpeed(
-        "bob_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 3.0),
+        "other_entity", traffic_simulator::speed_change::RelativeTargetSpeed::Type::DELTA, 3.0),
       true),
     common::SemanticError);
 }
@@ -244,7 +249,7 @@ TEST_F(EntityBaseWithMiscObjectTest, appendDebugMarker)
 
   {
     auto markers_copy = markers;
-    dummy.appendDebugMarker(markers);
+    misc_object.appendDebugMarker(markers);
     EXPECT_EQ(markers.markers.size(), markers_copy.markers.size());
   }
 
@@ -259,7 +264,7 @@ TEST_F(EntityBaseWithMiscObjectTest, appendDebugMarker)
 
   {
     auto markers_copy = markers;
-    dummy.appendDebugMarker(markers);
+    misc_object.appendDebugMarker(markers);
     EXPECT_EQ(markers.markers.size(), markers_copy.markers.size());
   }
 }
@@ -269,7 +274,7 @@ TEST_F(EntityBaseWithMiscObjectTest, appendDebugMarker)
  */
 TEST_F(EntityBaseWithMiscObjectTest, asFieldOperatorApplication)
 {
-  EXPECT_THROW(dummy.asFieldOperatorApplication(), common::Error);
+  EXPECT_THROW(misc_object.asFieldOperatorApplication(), common::Error);
 }
 
 /**
@@ -277,7 +282,7 @@ TEST_F(EntityBaseWithMiscObjectTest, asFieldOperatorApplication)
  */
 TEST_F(EntityBaseWithMiscObjectTest, get2DPolygon)
 {
-  const auto polygon = dummy.get2DPolygon();
+  const auto polygon = misc_object.get2DPolygon();
 
   std::vector<geometry_msgs::msg::Point> ref_poly{
     makePoint(-1.0, -1.0), makePoint(-1.0, 1.0), makePoint(3.0, 1.0), makePoint(3.0, -1.0),
@@ -296,9 +301,9 @@ TEST_F(EntityBaseWithMiscObjectTest, get2DPolygon)
  */
 TEST_F(EntityBaseWithMiscObjectTest, startNpcLogic)
 {
-  EXPECT_FALSE(dummy.isNpcLogicStarted());
-  dummy.startNpcLogic(0.0);
-  EXPECT_TRUE(dummy.isNpcLogicStarted());
+  EXPECT_FALSE(misc_object.isNpcLogicStarted());
+  misc_object.startNpcLogic(0.0);
+  EXPECT_TRUE(misc_object.isNpcLogicStarted());
 }
 
 /**
@@ -308,13 +313,13 @@ TEST_F(EntityBaseWithMiscObjectTest, startNpcLogic)
 TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_speed)
 {
   constexpr double velocity = 1.0;
-  dummy.setLinearVelocity(velocity);
-  dummy.activateOutOfRangeJob(0.0, 0.0, -100.0, 100.0, -100.0, 100.0);
+  misc_object.setLinearVelocity(velocity);
+  misc_object.activateOutOfRangeJob(0.0, 0.0, -100.0, 100.0, -100.0, 100.0);
 
   constexpr double current_time = 0.0;
   constexpr double step_time = 0.0;
-  EXPECT_NO_THROW(dummy.EntityBase::onUpdate(current_time, step_time));
-  EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
+  EXPECT_NO_THROW(misc_object.EntityBase::onUpdate(current_time, step_time));
+  EXPECT_THROW(misc_object.onPostUpdate(current_time, step_time), common::Error);
 }
 
 /**
@@ -325,13 +330,13 @@ TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_speed)
 TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_acceleration)
 {
   constexpr double acceleration = 1.0;
-  dummy.setLinearAcceleration(acceleration);
-  dummy.activateOutOfRangeJob(-100.0, 100.0, 0.0, 0.0, -100.0, 100.0);
+  misc_object.setLinearAcceleration(acceleration);
+  misc_object.activateOutOfRangeJob(-100.0, 100.0, 0.0, 0.0, -100.0, 100.0);
 
   constexpr double current_time = 0.0;
   constexpr double step_time = 0.0;
-  EXPECT_NO_THROW(dummy.EntityBase::onUpdate(current_time, step_time));
-  EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
+  EXPECT_NO_THROW(misc_object.EntityBase::onUpdate(current_time, step_time));
+  EXPECT_THROW(misc_object.onPostUpdate(current_time, step_time), common::Error);
 }
 
 /**
@@ -342,13 +347,13 @@ TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_acceleration)
 TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_jerk)
 {
   constexpr double jerk = 1.0;
-  dummy.setLinearJerk(jerk);
-  dummy.activateOutOfRangeJob(-100.0, 100.0, -100.0, 100.0, 0.0, 0.0);
+  misc_object.setLinearJerk(jerk);
+  misc_object.activateOutOfRangeJob(-100.0, 100.0, -100.0, 100.0, 0.0, 0.0);
 
   constexpr double current_time = 0.0;
   constexpr double step_time = 0.0;
-  EXPECT_NO_THROW(dummy.EntityBase::onUpdate(current_time, step_time));
-  EXPECT_THROW(dummy.onPostUpdate(current_time, step_time), common::Error);
+  EXPECT_NO_THROW(misc_object.EntityBase::onUpdate(current_time, step_time));
+  EXPECT_THROW(misc_object.onPostUpdate(current_time, step_time), common::Error);
 }
 
 /**
@@ -364,9 +369,9 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetLaneletPose
     target_name,
     makeCanonicalizedEntityStatus(hdmap_utils, makePose(makePoint(3810.0, 73745.0)), bbox));
 
-  dummy_base->setOtherStatus(other_status);
+  entity_base->setOtherStatus(other_status);
 
-  EXPECT_THROW(dummy_base->requestLaneChange(
+  EXPECT_THROW(entity_base->requestLaneChange(
     traffic_simulator::lane_change::RelativeTarget(
       target_name, traffic_simulator::lane_change::Direction::STRAIGHT, 3, 1.0),
     traffic_simulator::lane_change::TrajectoryShape::LINEAR,
@@ -389,9 +394,9 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetName)
     target_name, makeCanonicalizedEntityStatus(
                    hdmap_utils, makeCanonicalizedLaneletPose(hdmap_utils, 34468, 5.0), bbox));
 
-  dummy_base->setOtherStatus(other_status);
+  entity_base->setOtherStatus(other_status);
   EXPECT_THROW(
-    dummy_base->requestLaneChange(
+    entity_base->requestLaneChange(
       traffic_simulator::lane_change::RelativeTarget(
         target_name + "_wrong", traffic_simulator::lane_change::Direction::STRAIGHT, 3, 1.0),
       traffic_simulator::lane_change::TrajectoryShape::LINEAR,
@@ -415,9 +420,9 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetInvalid)
     target_name, makeCanonicalizedEntityStatus(
                    hdmap_utils, makeCanonicalizedLaneletPose(hdmap_utils, 34468, 5.0), bbox));
 
-  dummy_base->setOtherStatus(other_status);
+  entity_base->setOtherStatus(other_status);
   EXPECT_THROW(
-    dummy_base->requestLaneChange(
+    entity_base->requestLaneChange(
       traffic_simulator::lane_change::RelativeTarget(
         target_name, traffic_simulator::lane_change::Direction::RIGHT,
         std::numeric_limits<std::uint8_t>::max(), 1.0),
@@ -434,7 +439,7 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetInvalid)
 TEST_F(EntityBaseWithMiscObjectTest, requestFollowTrajectory)
 {
   EXPECT_THROW(
-    dummy.requestFollowTrajectory(
+    misc_object.requestFollowTrajectory(
       std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>()),
     common::Error);
 }
@@ -444,7 +449,7 @@ TEST_F(EntityBaseWithMiscObjectTest, requestFollowTrajectory)
  */
 TEST_F(EntityBaseWithMiscObjectTest, requestWalkStraight)
 {
-  EXPECT_THROW(dummy.requestWalkStraight(), common::Error);
+  EXPECT_THROW(misc_object.requestWalkStraight(), common::Error);
 }
 
 /**
@@ -453,10 +458,10 @@ TEST_F(EntityBaseWithMiscObjectTest, requestWalkStraight)
  */
 TEST_F(EntityBaseWithMiscObjectTest, updateStandStillDuration_startedMoving)
 {
-  dummy.startNpcLogic(0.0);
-  dummy.setLinearVelocity(3.0);
+  misc_object.startNpcLogic(0.0);
+  misc_object.setLinearVelocity(3.0);
 
-  EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
+  EXPECT_EQ(0.0, misc_object.updateStandStillDuration(0.1));
 }
 
 /**
@@ -465,11 +470,11 @@ TEST_F(EntityBaseWithMiscObjectTest, updateStandStillDuration_startedMoving)
  */
 TEST_F(EntityBaseWithMiscObjectTest, updateStandStillDuration_notStarted)
 {
-  dummy.setLinearVelocity(3.0);
-  EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
+  misc_object.setLinearVelocity(3.0);
+  EXPECT_EQ(0.0, misc_object.updateStandStillDuration(0.1));
 
-  dummy.setLinearVelocity(0.0);
-  EXPECT_EQ(0.0, dummy.updateStandStillDuration(0.1));
+  misc_object.setLinearVelocity(0.0);
+  EXPECT_EQ(0.0, misc_object.updateStandStillDuration(0.1));
 }
 
 /**
@@ -480,13 +485,13 @@ TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_startedMoving)
 {
   constexpr double velocity = 3.0;
   constexpr double step_time = 0.1;
-  dummy.startNpcLogic(0.0);
-  dummy.setLinearVelocity(velocity);
+  misc_object.startNpcLogic(0.0);
+  misc_object.setLinearVelocity(velocity);
 
-  EXPECT_EQ(1.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
-  EXPECT_EQ(2.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
-  EXPECT_EQ(3.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
-  EXPECT_EQ(4.0 * step_time * velocity, dummy.updateTraveledDistance(step_time));
+  EXPECT_EQ(1.0 * step_time * velocity, misc_object.updateTraveledDistance(step_time));
+  EXPECT_EQ(2.0 * step_time * velocity, misc_object.updateTraveledDistance(step_time));
+  EXPECT_EQ(3.0 * step_time * velocity, misc_object.updateTraveledDistance(step_time));
+  EXPECT_EQ(4.0 * step_time * velocity, misc_object.updateTraveledDistance(step_time));
 }
 
 /**
@@ -495,11 +500,11 @@ TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_startedMoving)
 TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_notStarted)
 {
   constexpr double step_time = 0.1;
-  dummy.setLinearVelocity(3.0);
-  EXPECT_EQ(0.0, dummy.updateTraveledDistance(step_time));
+  misc_object.setLinearVelocity(3.0);
+  EXPECT_EQ(0.0, misc_object.updateTraveledDistance(step_time));
 
-  dummy.setLinearVelocity(0.0);
-  EXPECT_EQ(0.0, dummy.updateTraveledDistance(step_time));
+  misc_object.setLinearVelocity(0.0);
+  EXPECT_EQ(0.0, misc_object.updateTraveledDistance(step_time));
 }
 
 /**
@@ -509,11 +514,11 @@ TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_notStarted)
 TEST_F(EntityBaseWithMiscObjectTest, stopAtCurrentPosition)
 {
   constexpr double velocity = 3.0;
-  dummy.setLinearVelocity(velocity);
-  EXPECT_EQ(dummy.getCurrentTwist().linear.x, velocity);
+  misc_object.setLinearVelocity(velocity);
+  EXPECT_EQ(misc_object.getCurrentTwist().linear.x, velocity);
 
-  dummy.stopAtCurrentPosition();
-  EXPECT_EQ(dummy.getCurrentTwist().linear.x, 0.0);
+  misc_object.stopAtCurrentPosition();
+  EXPECT_EQ(misc_object.getCurrentTwist().linear.x, 0.0);
 }
 
 /**
@@ -526,11 +531,11 @@ TEST(EntityBaseWithMiscObject, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian
   auto hdmap_utils = makeHdMapUtilsSharedPointer();
 
   EXPECT_FALSE(traffic_simulator::entity::MiscObjectEntity(
-                 "dummy_entity",
+                 "misc_object_entity",
                  traffic_simulator::CanonicalizedEntityStatus(
                    makeEntityStatus(
                      hdmap_utils, makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 0.0,
-                     "dummy_entity", traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+                     "misc_object_entity", traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
                    hdmap_utils),
                  hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{})
                  .getLaneletPose(5.0)
@@ -548,12 +553,12 @@ TEST(EntityBaseWithMiscObject, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
 
   EXPECT_TRUE(
     traffic_simulator::entity::MiscObjectEntity(
-      "dummy_entity",
+      "misc_object_entity",
       traffic_simulator::CanonicalizedEntityStatus(
         makeEntityStatus(
           hdmap_utils,
           makePose(makePoint(3766.1, 73738.2), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
-          makeBoundingBox(), 0.0, "dummy_entity",
+          makeBoundingBox(), 0.0, "misc_object_entity",
           traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
         hdmap_utils),
       hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{})
@@ -572,12 +577,12 @@ TEST(EntityBaseWithMiscObject, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
 
   EXPECT_FALSE(
     traffic_simulator::entity::MiscObjectEntity(
-      "dummy_entity",
+      "misc_object_entity",
       traffic_simulator::CanonicalizedEntityStatus(
         makeEntityStatus(
           hdmap_utils,
           makePose(makePoint(3764.5, 73737.5), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
-          makeBoundingBox(), 0.0, "dummy_entity",
+          makeBoundingBox(), 0.0, "misc_object_entity",
           traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
         hdmap_utils),
       hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{})
@@ -593,6 +598,6 @@ TEST_F(EntityBaseWithMiscObjectTest, getMapPoseFromRelativePose_relative)
 {
   constexpr double s = 5.0;
   EXPECT_POSE_NEAR(
-    dummy.getMapPoseFromRelativePose(makePose(makePoint(s, 0.0))),
+    misc_object.getMapPoseFromRelativePose(makePose(makePoint(s, 0.0))),
     static_cast<geometry_msgs::msg::Pose>(makeCanonicalizedLaneletPose(hdmap_utils, id, s)), 0.1);
 }
