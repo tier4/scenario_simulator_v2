@@ -237,8 +237,9 @@ public:
 
   /*   */ auto requestSynchronize(
     const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
-    const CanonicalizedLaneletPose & entity_target, const double threshold,
-    const double loop_period) -> bool;
+    const CanonicalizedLaneletPose & entity_target, const double threshold) -> bool;
+
+  /*   */ auto keepStepTime() -> bool;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
     -> void final;
@@ -258,6 +259,8 @@ protected:
   bool npc_logic_started_ = false;
   double stand_still_duration_ = 0.0;
   double traveled_distance_ = 0.0;
+  double prev_job_duration_ = 0.0;
+  double step_time_ = 0.0;
 
   std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
 

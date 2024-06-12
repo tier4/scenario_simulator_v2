@@ -749,16 +749,21 @@ bool EntityBase::reachPosition(
 
 auto EntityBase::requestSynchronize(
   const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
-  const CanonicalizedLaneletPose & entity_target, const double threshold, const double loop_period)
-  -> bool
+  const CanonicalizedLaneletPose & entity_target, const double threshold) -> bool
 {
+  /**
+   * @brief To get the step time of the simulation.
+   * @brief THIS FUNCTION SHOULD BE REMOVED IN THE FUTURE.
+   */
+  keepStepTime();
+
   if (traffic_simulator_msgs::msg::EntityType::EGO == getEntityType().type) {
     THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
   }
 
   ///@brief Check if the entity has already arrived to the target lanelet.
   if (reachPosition(entity_target, threshold)) {
-    if (this->getStatus().getTwist().linear.x < getMaxAcceleration() * loop_period / 1000) {
+    if (this->getStatus().getTwist().linear.x < getMaxAcceleration() * step_time_ / 1000) {
     } else {
       RCLCPP_WARN_ONCE(
         rclcpp::get_logger("traffic_simulator"),
@@ -770,7 +775,7 @@ auto EntityBase::requestSynchronize(
   }
 
   job_list_.append(
-    [this, target_name, target_sync_pose, entity_target, threshold, loop_period](double) {
+    [this, target_name, target_sync_pose, entity_target, threshold](double) {
       const auto entity_lanelet_pose = getLaneletPose();
       if (!entity_lanelet_pose.has_value()) {
         THROW_SEMANTIC_ERROR(
@@ -813,18 +818,18 @@ auto EntityBase::requestSynchronize(
           : 0;
 
       auto entity_velocity_to_synchronize = [this, entity_velocity, target_entity_arrival_time,
-                                             entity_distance, threshold, loop_period]() {
+                                             entity_distance, threshold]() {
         const auto border_distance = entity_velocity * target_entity_arrival_time -
                                      entity_velocity * entity_velocity / (getMaxDeceleration() * 2);
         if (entity_velocity > getMaxAcceleration() * target_entity_arrival_time) {
           ///@brief Making entity slow down since the speed is too fast. Dividing the loop_period by 1000 is to convert the unit from ms to s.
-          return entity_velocity - getMaxDeceleration() * loop_period / 1000;
+          return entity_velocity - getMaxDeceleration() * step_time_ / 1000;
         } else if (border_distance < entity_distance.value() - threshold) {
           ///@brief Making entity speed up. Dividing the loop_period by 1000 is to convert the unit from ms to s.
-          return entity_velocity + getMaxAcceleration() * loop_period / 1000;
+          return entity_velocity + getMaxAcceleration() * step_time_ / 1000;
         } else if (border_distance > entity_distance.value() - threshold) {
           ///@brief Making entity slow down. Dividing the loop_period by 1000 is to convert the unit from ms to s.
-          return entity_velocity - getMaxDeceleration() * loop_period / 1000;
+          return entity_velocity - getMaxDeceleration() * step_time_ / 1000;
         } else {
           ///@brief Making entity keep the current speed. Dividing the loop_period by 1000 is to convert the unit from ms to s.
           return entity_velocity;
@@ -840,6 +845,23 @@ auto EntityBase::requestSynchronize(
     },
     [this]() {}, job::Type::LINEAR_ACCELERATION, true, job::Event::POST_UPDATE);
   return false;
+}
+
+/**
+ * @brief Append a job to keep the step time of the simulation.
+ */
+bool EntityBase::keepStepTime()
+{
+  job_list_.append(
+    /**
+     * @brief This job is always ACTIVE
+     */
+    [this](double job_duration) {
+      step_time_ = prev_job_duration_ - job_duration;
+      prev_job_duration_ = job_duration;
+      return false;
+    },
+    [this]() {}, job::Type::UNKOWN, true, job::Event::POST_UPDATE);
 }
 
 }  // namespace entity
