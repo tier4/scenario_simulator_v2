@@ -83,7 +83,7 @@ auto isInLanelet(
 
 auto isInLanelet(const Point & point, const lanelet::Id lanelet_id) -> bool
 {
-  return lanelet_map_core::lanelet_map::isInLanelet(point, lanelet_id);
+  return lanelet_map_core::lanelet_map::isInLanelet(lanelet_id, point);
 }
 
 auto isAtEndOfLanelets(const CanonicalizedLaneletPose & canonicalized_lanelet_pose) -> bool

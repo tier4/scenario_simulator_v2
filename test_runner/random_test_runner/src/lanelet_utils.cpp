@@ -26,9 +26,9 @@
 #include <geometry/vector3/operator.hpp>
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <optional>
-#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
 #include <traffic_simulator/lanelet_map_core/pose.hpp>
 #include <traffic_simulator/lanelet_map_core/route.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
 {
@@ -44,6 +44,8 @@ LaneletUtils::LaneletUtils(const boost::filesystem::path & filename)
     lanelet::Locations::Germany, lanelet::Participants::Vehicle);
   vehicle_routing_graph_ptr_ =
     lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_vehicle_ptr, costPtrs);
+
+  traffic_simulator::lanelet_map::activate(filename.string());
 }
 
 std::vector<int64_t> LaneletUtils::getLaneletIds()
