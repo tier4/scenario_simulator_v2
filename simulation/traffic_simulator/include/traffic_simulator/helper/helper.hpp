@@ -130,12 +130,12 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
 
 const simulation_api_schema::EllipseBasedNoiseConfiguration constructEllipseBasedNoiseConfiguration(
   const std::vector<double>& ellipse_y_radius_values = {10, 20, 40, 60, 80, 120, 150, 180, 1000},
-  const double ellipse_normalized_x_radius_masking = 0.6,
+  const double ellipse_normalized_x_radius_tp_rate = 0.6,
   const double ellipse_normalized_x_radius_distance_mean = 1.8,
   const double ellipse_normalized_x_radius_distance_std = 1.8,
   const double ellipse_normalized_x_radius_yaw_mean = 0.6,
   const double ellipse_normalized_x_radius_yaw_std = 1.6,
-  const std::vector<double>& masking_probability_values = {0.92, 0.77, 0.74, 0.66, 0.57, 0.28, 0.09, 0.03, 0.00},
+  const std::vector<double>& tp_rate_values = {0.92, 0.77, 0.74, 0.66, 0.57, 0.28, 0.09, 0.03, 0.00},
   const std::vector<double>& distance_mean_values = {0.25, 0.27, 0.44, 0.67, 1.00, 3.00, 4.09, 3.40, 0.00},
   const std::vector<double>& distance_std_values = {0.35, 0.54, 0.83, 1.14, 1.60, 3.56, 4.31, 3.61, 0.00},
   const std::vector<double>& yaw_mean_values = {0.01, 0.01, 0.00, 0.03, 0.04, 0.00, 0.01, -1.93, 0.00},
