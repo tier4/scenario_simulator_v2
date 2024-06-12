@@ -22,6 +22,7 @@
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 
 namespace cpp_mock_scenarios
 {
