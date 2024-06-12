@@ -55,6 +55,10 @@ public:
   Job(
     const std::function<bool(double)> & func_on_update,
     const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive, Event event);
+  Job(
+    const std::function<bool(double, double)> & func_on_update,
+    const std::function<void()> & func_on_cleanup, job::Type type, bool exclusive, Event event);
+
   void onUpdate(const double step_time);
   void inactivate();
   Status getStatus() const;
