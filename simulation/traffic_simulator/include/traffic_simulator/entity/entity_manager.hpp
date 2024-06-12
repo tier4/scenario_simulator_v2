@@ -516,7 +516,7 @@ public:
 
   void updateHdmapMarker();
 
-  auto startNpcLogic() -> void;
+  auto startNpcLogic(const double current_time) -> void;
 
   auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 };
