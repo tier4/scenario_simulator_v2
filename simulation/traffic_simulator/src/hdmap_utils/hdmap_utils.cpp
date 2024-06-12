@@ -27,10 +27,13 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <deque>
-#include <geometry/linear_algebra.hpp>
+#include <geometry/quaternion/operator.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry/transform.hpp>
+#include <geometry/vector3/inner_product.hpp>
+#include <geometry/vector3/normalize.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <lanelet2_extension/io/autoware_osm_parser.hpp>
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <lanelet2_extension/utility/message_conversion.hpp>
@@ -597,6 +600,17 @@ auto HdMapUtils::toLaneletPose(
     }
   }
   return std::nullopt;
+}
+
+auto HdMapUtils::toLaneletPose(
+  const geometry_msgs::msg::Point & position, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const bool include_crosswalk, const double matching_distance) const
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  return toLaneletPose(
+    geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
+      geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)),
+    bbox, include_crosswalk, matching_distance);
 }
 
 auto HdMapUtils::toLaneletPose(
@@ -1398,6 +1412,8 @@ auto HdMapUtils::toMapPose(
   const traffic_simulator_msgs::msg::LaneletPose & lanelet_pose, const bool fill_pitch) const
   -> geometry_msgs::msg::PoseStamped
 {
+  using math::geometry::operator*;
+  using math::geometry::operator+=;
   if (
     const auto pose = std::get<std::optional<traffic_simulator_msgs::msg::LaneletPose>>(
       canonicalizeLaneletPose(lanelet_pose))) {
@@ -1406,8 +1422,8 @@ auto HdMapUtils::toMapPose(
     const auto spline = getCenterPointsSpline(pose->lanelet_id);
     ret.pose = spline->getPose(pose->s);
     const auto normal_vec = spline->getNormalVector(pose->s);
-    const auto diff = math::geometry::normalize(normal_vec) * pose->offset;
-    ret.pose.position = ret.pose.position + diff;
+    const auto diff = math::geometry::normalize(normal_vec) * pose->offset;  //this
+    ret.pose.position += diff;
     const auto tangent_vec = spline->getTangentVector(pose->s);
     geometry_msgs::msg::Vector3 rpy;
     rpy.x = 0.0;
