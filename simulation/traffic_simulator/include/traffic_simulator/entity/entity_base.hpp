@@ -236,9 +236,9 @@ public:
   /*   */ bool reachPosition(const std::string & target_name, const double tolerance) const;
 
   /*   */ auto requestSynchronize(
-    const std::string & target_name, const CanonicalizedLaneletPose & ego_target,
+    const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
     const CanonicalizedLaneletPose & entity_target, const double threshold,
-    const double accel_limit, const double loop_period) -> bool;
+    const double loop_period) -> bool;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
     -> void final;

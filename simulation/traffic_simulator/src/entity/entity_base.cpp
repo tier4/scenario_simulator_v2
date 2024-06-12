@@ -731,9 +731,18 @@ bool EntityBase::reachPosition(
   return reachPosition(static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
 }
 
+/***
+ * @brief Request synchronize the entity with the target entity.
+ * @param target_name The name of the target entity.
+ * @param target_sync_pose The target lanelet pose of the target entity.
+ * @param entity_target The target lanelet pose of the entity to control.
+ * @param threshold The threshold to determine if the entity has already arrived to the target lanelet.
+ * @param loop_period The period of the loop.
+*/
+
 auto EntityBase::requestSynchronize(
-  const std::string & target_name, const CanonicalizedLaneletPose & ego_target,
-  const CanonicalizedLaneletPose & entity_target, const double threshold, const double accel_limit,
+  const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
+  const CanonicalizedLaneletPose & entity_target, const double threshold,
   const double loop_period) -> bool
 {
   if (traffic_simulator_msgs::msg::EntityType::EGO == getEntityType().type) {
@@ -742,7 +751,7 @@ auto EntityBase::requestSynchronize(
 
   ///@brief Check if the entity has already arrived to the target lanelet.
   if (reachPosition(entity_target, threshold)) {
-    if (this->getStatus().getTwist().linear.x < accel_limit * loop_period / 1000) {
+    if (this->getStatus().getTwist().linear.x < getMaxAcceleration() * loop_period / 1000) {
     } else {
       RCLCPP_WARN_ONCE(
         rclcpp::get_logger("traffic_simulator"),
@@ -754,7 +763,7 @@ auto EntityBase::requestSynchronize(
   }
 
   job_list_.append(
-    [this, target_name, ego_target, entity_target, accel_limit, threshold, loop_period](double) {
+    [this, target_name, target_sync_pose, entity_target, threshold, loop_period](double) {
       const auto entity_lanelet_pose = getLaneletPose();
       if (!entity_lanelet_pose.has_value()) {
         THROW_SEMANTIC_ERROR(
@@ -777,8 +786,8 @@ auto EntityBase::requestSynchronize(
           : other_status_.find(target_name)->second.getLaneletPose();
 
       const auto target_entity_status = longitudinalDistance(
-        CanonicalizedLaneletPose(target_entity_lanelet_pose, hdmap_utils_ptr_), ego_target, true,
-        true, true, hdmap_utils_ptr_);
+        CanonicalizedLaneletPose(target_entity_lanelet_pose, hdmap_utils_ptr_), target_sync_pose,
+        true, true, true, hdmap_utils_ptr_);
       if (!target_entity_status.has_value()) {
         RCLCPP_WARN_ONCE(
           rclcpp::get_logger("traffic_simulator"),
@@ -797,19 +806,18 @@ auto EntityBase::requestSynchronize(
           : 0;
 
       auto entity_velocity_to_synchronize = [this, entity_velocity, target_entity_arrival_time,
-                                             entity_distance, accel_limit, threshold,
-                                             loop_period]() {
+                                             entity_distance, threshold, loop_period]() {
         const auto border_distance = entity_velocity * target_entity_arrival_time -
-                                     entity_velocity * entity_velocity / (accel_limit * 2);
-        if (entity_velocity > accel_limit * target_entity_arrival_time) {
+                                     entity_velocity * entity_velocity / (getMaxDeceleration() * 2);
+        if (entity_velocity > getMaxAcceleration() * target_entity_arrival_time) {
           ///@brief Making entity slow down since the speed is too fast. Dividing the loop_period by 1000 is to convert the unit from ms to s.
-          return entity_velocity - accel_limit * loop_period / 1000;
+          return entity_velocity - getMaxDeceleration() * loop_period / 1000;
         } else if (border_distance < entity_distance.value() - threshold) {
           ///@brief Making entity speed up. Dividing the loop_period by 1000 is to convert the unit from ms to s.
-          return entity_velocity + accel_limit * loop_period / 1000;
+          return entity_velocity + getMaxAcceleration() * loop_period / 1000;
         } else if (border_distance > entity_distance.value() - threshold) {
           ///@brief Making entity slow down. Dividing the loop_period by 1000 is to convert the unit from ms to s.
-          return entity_velocity - accel_limit * loop_period / 1000;
+          return entity_velocity - getMaxDeceleration() * loop_period / 1000;
         } else {
           ///@brief Making entity keep the current speed. Dividing the loop_period by 1000 is to convert the unit from ms to s.
           return entity_velocity;
