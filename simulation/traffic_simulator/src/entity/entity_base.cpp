@@ -749,8 +749,8 @@ bool EntityBase::reachPosition(
 
 auto EntityBase::requestSynchronize(
   const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
-  const CanonicalizedLaneletPose & entity_target, const double threshold,
-  const double loop_period) -> bool
+  const CanonicalizedLaneletPose & entity_target, const double threshold, const double loop_period)
+  -> bool
 {
   if (traffic_simulator_msgs::msg::EntityType::EGO == getEntityType().type) {
     THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
