@@ -25,13 +25,12 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
   elements([](const std::list<ProbabilityDistributionSetElement> & element_list) {
     return std::vector<ProbabilityDistributionSetElement>(element_list.begin(), element_list.end());
   }(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
-  distribute([this]() {
-    decltype(distribute)::param_type parameter;
-    parameter.probabilities().reserve(elements.size());
+  distribute([this]() -> std::discrete_distribution<std::size_t> {
+    std::vector<double> probabilities;
     for (const auto & element : elements) {
-      parameter.probabilities().push_back(element.weight);
+      probabilities.push_back(element.weight);
     }
-    return parameter;
+    return {std::begin(probabilities), std::end(probabilities)};
   }())
 {
 }

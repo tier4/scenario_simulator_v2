@@ -603,6 +603,17 @@ auto HdMapUtils::toLaneletPose(
 }
 
 auto HdMapUtils::toLaneletPose(
+  const geometry_msgs::msg::Point & position, const traffic_simulator_msgs::msg::BoundingBox & bbox,
+  const bool include_crosswalk, const double matching_distance) const
+  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
+{
+  return toLaneletPose(
+    geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
+      geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1)),
+    bbox, include_crosswalk, matching_distance);
+}
+
+auto HdMapUtils::toLaneletPose(
   const geometry_msgs::msg::Pose & pose, const traffic_simulator_msgs::msg::BoundingBox & bbox,
   const bool include_crosswalk, const double matching_distance) const
   -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
