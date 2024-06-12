@@ -426,10 +426,8 @@ void EntityManager::startNpcLogic(const double current_time)
 {
   npc_logic_started_ = true;
 
-  current_time_ = current_time;
-
   for ([[maybe_unused]] auto && [name, entity] : entities_) {
-    entity->startNpcLogic(current_time_);
+    entity->startNpcLogic(current_time);
   }
 }
 }  // namespace entity

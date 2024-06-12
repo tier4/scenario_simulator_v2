@@ -472,7 +472,7 @@ public:
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
       if (npc_logic_started_ && not is<EgoEntity>(name)) {
-        iter->second->startNpcLogic(getCurrentTime());
+        iter->second->startNpcLogic(current_time);
       }
       return success;
     } else {
