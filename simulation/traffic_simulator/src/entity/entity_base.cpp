@@ -850,7 +850,7 @@ auto EntityBase::requestSynchronize(
 /**
  * @brief Append a job to keep the step time of the simulation.
  */
-bool EntityBase::keepStepTime()
+void EntityBase::keepStepTime()
 {
   job_list_.append(
     /**

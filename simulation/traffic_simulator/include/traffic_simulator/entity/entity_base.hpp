@@ -239,7 +239,7 @@ public:
     const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
     const CanonicalizedLaneletPose & entity_target, const double threshold) -> bool;
 
-  /*   */ auto keepStepTime() -> bool;
+  /*   */ auto keepStepTime() -> void;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
     -> void final;
