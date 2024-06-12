@@ -15,6 +15,7 @@
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -22,7 +23,6 @@
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
-#include <geometry/quaternion/euler_to_quaternion.hpp>
 
 namespace cpp_mock_scenarios
 {
