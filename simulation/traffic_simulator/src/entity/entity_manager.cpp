@@ -488,7 +488,7 @@ auto EntityManager::startNpcLogic(const double current_time) -> void
   current_time_ = current_time;
 
   for ([[maybe_unused]] auto && [name, entity] : entities_) {
-    entity->updateEntityStatusTimeStamp(current_time_);
+    entity->updateEntityStatusTimestamp(current_time_);
   }
 }
 }  // namespace entity
