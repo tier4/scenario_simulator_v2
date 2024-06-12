@@ -25,7 +25,7 @@ ProbabilityDistributionSet::ProbabilityDistributionSet(
   elements([](const std::list<ProbabilityDistributionSetElement> & element_list) {
     return std::vector<ProbabilityDistributionSetElement>(element_list.begin(), element_list.end());
   }(readElements<ProbabilityDistributionSetElement, 1>("Element", node, scope))),
-  distribute([this]() -> DistributeType {
+  distribute([this]() -> std::discrete_distribution<std::size_t> {
     std::vector<double> probabilities;
     for (const auto & element : elements) {
       probabilities.push_back(element.weight);
