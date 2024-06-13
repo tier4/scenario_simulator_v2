@@ -59,24 +59,6 @@ message DetectionSensorConfiguration {
   double probability_of_lost = 8;                     // probability of lost recognition. (0.0 ~ 1.0)
   double object_recognition_delay = 9;                // object recognition delay. (unit : second) It delays only the position recognition.
   double object_recognition_ground_truth_delay = 10;  // object recognition ground truth delay. (unit : second) It delays only the position recognition.
-  EllipseBasedNoiseConfiguration noise_config = 11;   // Configuration of the ellipse based perception noise.
-}
-
-/**
- * Parameter configuration of the ellipse based perception noise
- **/
-message EllipseBasedNoiseConfiguration {
-  repeated double ellipse_y_radius_values = 1;
-  double ellipse_normalized_x_radius_tp_rate = 2;
-  double ellipse_normalized_x_radius_distance_mean = 3;
-  double ellipse_normalized_x_radius_distance_std = 4;
-  double ellipse_normalized_x_radius_yaw_mean = 5;
-  double ellipse_normalized_x_radius_yaw_std = 6;
-  repeated double tp_rate_values = 7;
-  repeated double distance_mean_values = 8;
-  repeated double distance_std_values = 9;
-  repeated double yaw_mean_values = 10;
-  repeated double yaw_std_values = 11;
 }
 
 /**

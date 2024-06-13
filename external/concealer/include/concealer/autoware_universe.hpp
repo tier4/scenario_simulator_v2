@@ -61,6 +61,12 @@ class AutowareUniverse : public Autoware
 
   std::atomic<bool> is_thrown = false;
 
+  std::atomic<double> noise_x = 0.0;
+
+  std::atomic<double> noise_y = 0.0;
+
+  std::atomic<double> noise_yaw = 0.0;
+
   std::exception_ptr thrown;
 
   auto stopAndJoin() -> void;

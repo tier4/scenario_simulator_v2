@@ -84,21 +84,35 @@ auto AutowareUniverse::updateLocalization() -> void
     // Add noise to the current_pose with std_dev that are statistics based on the AWSIM vlp16.
     constexpr uint_fast32_t seed = 1;
     static std::mt19937 rand_engine(seed);
-    double std_dev_x = 0.03;
-    double std_dev_y = 0.008;
-    double std_dev_yaw = 0.04;
-    std::normal_distribution<double> distribution_x(0.0, std_dev_x);
-    std::normal_distribution<double> distribution_y(0.0, std_dev_y);
-    std::normal_distribution<double> distribution_yaw(0.0, std_dev_yaw);
+    // localization noise should not be updated every time, so A changing probability is set to 0.01.
+    double noise_update_probability = 0.01;
+    // yaw noise affacts detected_objects' location, we may need to set yaw noise as 0.0.
+    double std_dev_x = 0.03, std_dev_y = 0.008, std_dev_yaw = 0.04;
+    
+    std::uniform_real_distribution<double> distribution_update(0.0, 1.0);
+
+    if (distribution_update(rand_engine) < noise_update_probability){
+      std::normal_distribution<double> distribution_x(0.0, std_dev_x);
+      noise_x.store(distribution_x(rand_engine));
+    }
+
+    if (distribution_update(rand_engine) < noise_update_probability){
+      std::normal_distribution<double> distribution_y(0.0, std_dev_y);
+      noise_y.store(distribution_y(rand_engine));
+    }
+    if (distribution_update(rand_engine) < noise_update_probability){
+      std::normal_distribution<double> distribution_yaw(0.0, std_dev_yaw);
+      noise_yaw.store(distribution_yaw(rand_engine));
+    }
 
     auto noised_pose = current_pose.load();
     // Add noise to the position
-    noised_pose.position.x += distribution_x(rand_engine);
-    noised_pose.position.y += distribution_y(rand_engine);
+    noised_pose.position.x += noise_x.load();
+    noised_pose.position.y += noise_y.load();
     // Add noise to the orientation
     tf2::Quaternion current_orientation;
     tf2::convert(noised_pose.orientation, current_orientation);
-    current_orientation *= tf2::Quaternion(tf2::Vector3(0, 0, 1), distribution_yaw(rand_engine));
+    current_orientation *= tf2::Quaternion(tf2::Vector3(0, 0, 1), noise_yaw.load());
     tf2::convert(current_orientation, noised_pose.orientation);
 
   setAcceleration([this]() {

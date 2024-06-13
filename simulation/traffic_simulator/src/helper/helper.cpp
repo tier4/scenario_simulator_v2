@@ -79,8 +79,7 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
   const std::string & entity, const std::string & architecture_type, const double update_duration,
   const double range, const bool detect_all_objects_in_range, const double pos_noise_stddev,
   const int random_seed, const double probability_of_lost, const double object_recognition_delay,
-  const double object_recognition_ground_truth_delay,
-  std::unique_ptr<simulation_api_schema::EllipseBasedNoiseConfiguration> noise_config)
+  const double object_recognition_ground_truth_delay)
 {
   simulation_api_schema::DetectionSensorConfiguration configuration;
   configuration.set_entity(entity);
@@ -93,55 +92,9 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
   configuration.set_probability_of_lost(probability_of_lost);
   configuration.set_object_recognition_delay(object_recognition_delay);
   configuration.set_object_recognition_ground_truth_delay(object_recognition_ground_truth_delay);
-
-  if (!noise_config) {
-      noise_config = std::make_unique<simulation_api_schema::EllipseBasedNoiseConfiguration>(constructEllipseBasedNoiseConfiguration());
-  }
-  configuration.mutable_noise_config()->CopyFrom(*noise_config);
-
-
   return configuration;
 }
 
-const simulation_api_schema::EllipseBasedNoiseConfiguration constructEllipseBasedNoiseConfiguration(
-  const std::vector<double>& ellipse_y_radius_values,
-  const double ellipse_normalized_x_radius_tp_rate,
-  const double ellipse_normalized_x_radius_distance_mean,
-  const double ellipse_normalized_x_radius_distance_std,
-  const double ellipse_normalized_x_radius_yaw_mean,
-  const double ellipse_normalized_x_radius_yaw_std,
-  const std::vector<double>& tp_rate_values,
-  const std::vector<double>& distance_mean_values,
-  const std::vector<double>& distance_std_values,
-  const std::vector<double>& yaw_mean_values,
-  const std::vector<double>& yaw_std_values)
-{
-  simulation_api_schema::EllipseBasedNoiseConfiguration configuration;
-  for (const auto& value : ellipse_y_radius_values) {
-    configuration.add_ellipse_y_radius_values(value);
-  }
-  configuration.set_ellipse_normalized_x_radius_tp_rate(ellipse_normalized_x_radius_tp_rate);
-  configuration.set_ellipse_normalized_x_radius_distance_mean(ellipse_normalized_x_radius_distance_mean);
-  configuration.set_ellipse_normalized_x_radius_distance_std(ellipse_normalized_x_radius_distance_std);
-  configuration.set_ellipse_normalized_x_radius_yaw_mean(ellipse_normalized_x_radius_yaw_mean);
-  configuration.set_ellipse_normalized_x_radius_yaw_std(ellipse_normalized_x_radius_yaw_std);
-  for (const auto& value : tp_rate_values) {
-    configuration.add_tp_rate_values(value);
-  }
-  for (const auto& value : distance_mean_values) {
-    configuration.add_distance_mean_values(value);
-  }
-  for (const auto& value : distance_std_values) {
-    configuration.add_distance_std_values(value);
-  }
-  for (const auto& value : yaw_mean_values) {
-    configuration.add_yaw_mean_values(value);
-  }
-  for (const auto& value : yaw_std_values) {
-    configuration.add_yaw_std_values(value);
-  }
-  return configuration;
-}
 
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   const LidarType type, const std::string & entity, const std::string & architecture_type,

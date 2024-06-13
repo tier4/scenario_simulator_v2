@@ -281,13 +281,24 @@ struct DefaultNoiseApplicator
 struct EllipseBasedNoiseApplicator : public DefaultNoiseApplicator
 {
   using DefaultNoiseApplicator::DefaultNoiseApplicator;
-  
+  const std::vector<double> ellipse_y_radius_values = {10, 20, 40, 60, 80, 120, 150, 180, 1000};
+  const double ellipse_normalized_x_radius_tp_rate = 0.6;
+  const double ellipse_normalized_x_radius_distance_mean = 1.8;
+  const double ellipse_normalized_x_radius_distance_std = 1.8;
+  const double ellipse_normalized_x_radius_yaw_mean = 0.6;
+  const double ellipse_normalized_x_radius_yaw_std = 1.6;
+  const std::vector<double> tp_rate_values = {0.92, 0.77, 0.74, 0.66, 0.57, 0.28, 0.09, 0.03, 0.00};
+  const std::vector<double> distance_mean_values = {0.25, 0.27, 0.44, 0.67, 1.00, 3.00, 4.09, 3.40, 0.00};
+  const std::vector<double> distance_std_values = {0.35, 0.54, 0.83, 1.14, 1.60, 3.56, 4.31, 3.61, 0.00};
+  const std::vector<double> yaw_mean_values = {0.01, 0.01, 0.00, 0.03, 0.04, 0.00, 0.01, -1.93, 0.00};
+  const std::vector<double> yaw_std_values = {0.45, 0.76, 0.79, 0.68, 0.76, 1.59, 1.71, 2.55, 0.00};
+
   double calculateEllipseDistance(double x, double y, double normalized_x_radius)
   {
-    return std::sqrt(std::pow(x / normalized_x_radius, 2) + std::pow(y, 2));
+    return std::hypot(x / normalized_x_radius, y);
   }
 
-  double findValue(const google::protobuf::RepeatedField<double>& radius_values, const google::protobuf::RepeatedField<double>& target_values, double dist) {
+  double findValue(const std::vector<double>& radius_values, const std::vector<double>& target_values, double dist) {
       for (int i = 0; i < radius_values.size(); i++) {
           if (dist < radius_values[i]) {
               return target_values[i];
@@ -296,18 +307,9 @@ struct EllipseBasedNoiseApplicator : public DefaultNoiseApplicator
       return 0.0;
   }
 
-  auto operator()(autoware_auto_perception_msgs::msg::DetectedObjects detected_objects)
+  auto operator()(autoware_perception_msgs::msg::DetectedObjects detected_objects)
     -> decltype(auto)
   {
-    auto noise_config = detection_sensor_configuration.noise_config();
-    auto ellipse_y_radius_values = noise_config.ellipse_y_radius_values();
-    auto tp_rate_values = noise_config.tp_rate_values();
-    auto distance_mean_values = noise_config.distance_mean_values();
-    auto distance_std_values = noise_config.distance_std_values();
-    auto yaw_mean_values = noise_config.yaw_mean_values();
-    auto yaw_std_values = noise_config.yaw_std_values();
-    
-
     double x, y, angle;
     double dist_tp_rate, dist_distance_mean, dist_distance_std, dist_yaw_mean, dist_yaw_std;
 
@@ -322,11 +324,11 @@ struct EllipseBasedNoiseApplicator : public DefaultNoiseApplicator
       y = pose.position.y - ego_entity_status.pose().position().y();
       angle = std::atan2(y, x);
 
-      dist_tp_rate = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_tp_rate());
-      dist_distance_mean = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_distance_mean());
-      dist_distance_std = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_distance_std());
-      dist_yaw_mean = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_yaw_mean());
-      dist_yaw_std = calculateEllipseDistance(x, y, noise_config.ellipse_normalized_x_radius_yaw_std());
+      dist_tp_rate = calculateEllipseDistance(x, y, ellipse_normalized_x_radius_tp_rate);
+      dist_distance_mean = calculateEllipseDistance(x, y, ellipse_normalized_x_radius_distance_mean);
+      dist_distance_std = calculateEllipseDistance(x, y, ellipse_normalized_x_radius_distance_std);
+      dist_yaw_mean = calculateEllipseDistance(x, y, ellipse_normalized_x_radius_yaw_mean);
+      dist_yaw_std = calculateEllipseDistance(x, y, ellipse_normalized_x_radius_yaw_std);
 
       // find noise parameters
       double tp_rate = findValue(ellipse_y_radius_values, tp_rate_values, dist_tp_rate);
@@ -334,12 +336,14 @@ struct EllipseBasedNoiseApplicator : public DefaultNoiseApplicator
       double distance_std = findValue(ellipse_y_radius_values, distance_std_values, dist_distance_std);
       double yaw_mean = findValue(ellipse_y_radius_values, yaw_mean_values, dist_yaw_mean);
       double yaw_std = findValue(ellipse_y_radius_values, yaw_std_values, dist_yaw_std);
-      
+
       is_masked[i] = std::uniform_real_distribution<double>()(random_engine) > tp_rate;
+
+
+      // Apply noise
       if (is_masked[i])
         continue;
-      
-      // Apply noise
+
       double dis_offset = std::normal_distribution<double>(distance_mean, distance_std)(random_engine);
       pose.position.x += dis_offset * std::cos(angle);
       pose.position.y += dis_offset * std::sin(angle);
