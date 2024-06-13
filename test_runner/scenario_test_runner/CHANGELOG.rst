@@ -23,6 +23,13 @@ Changelog for package scenario_test_runner
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
+2.1.1 (2024-06-11)
+------------------
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/reorder
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
 2.1.0 (2024-06-11)
 ------------------
 * Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time

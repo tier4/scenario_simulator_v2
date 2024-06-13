@@ -43,10 +43,10 @@ EgoEntitySimulation::EgoEntitySimulation(
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
-  hdmap_utils_ptr_(hdmap_utils),
-  vehicle_parameters(parameters),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
-  consider_pose_by_road_slope_(consider_pose_by_road_slope)
+  consider_pose_by_road_slope_(consider_pose_by_road_slope),
+  hdmap_utils_ptr_(hdmap_utils),
+  vehicle_parameters(parameters)
 {
   autoware->set_parameter(use_sim_time);
 }
