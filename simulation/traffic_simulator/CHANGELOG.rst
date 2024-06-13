@@ -13,6 +13,172 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.2 (2024-06-13)
+------------------
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+2.1.1 (2024-06-11)
+------------------
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/reorder
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
+2.1.0 (2024-06-11)
+------------------
+* Merge pull request `#1226 <https://github.com/tier4/scenario_simulator_v2/issues/1226>`_ from tier4/fix/RJD-955-fix-followtrajectoryaction-nan-time
+  fix(follow_trajectory_action): adapt to work with considering slopes
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* ref(traffic_simulator, behavior_tree): apply requested changes
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* fix(follow_trajectory): fix velocity vector and setting orientation - pitch consideration, add calc distance along lanes - if possible
+* fix(toLaneletPose): fix matching_distance in EgoEntity, EgoEntitySimulation and BehaviorTree
+* fix(entities_update): fix update time in EntityStatus
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Tatsuya Yamasaki
+
+2.0.5 (2024-06-11)
+------------------
+* Merge pull request `#1269 <https://github.com/tier4/scenario_simulator_v2/issues/1269>`_ from tier4/feature/unit_tests/longitudinal_speed_planner
+  Feature/unit tests/longitudinal speed planner
+* cmakelists style fix
+* use test fixture, use constexpr
+* merge / resolve confict
+* add comment
+* remove ';' from comments
+* remove variables that are only used once
+* slightly alter getRunningDistance_shortTime test
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* spelling
+* add reason/test description
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* change variable name
+* review: use builder, rename variables; use const when possible
+* add copyright notice
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* remove implicit conversion
+* add newline at the end of a file
+* remove problematic tests
+* clarify comments, and break a test :)
+* Minor test fixes
+* fix epsilon
+* typo
+* longitudinal speed planner tests
+* Contributors: Masaya Kataoka, Mateusz Palczuk, robomic
+
+2.0.4 (2024-06-10)
+------------------
+* Merge pull request `#1270 <https://github.com/tier4/scenario_simulator_v2/issues/1270>`_ from tier4/feature/unit_tests/hdmap_utils
+  Feature/unit tests/hdmap utils
+* spellcheck
+* as requested, remove variables that are only used once
+* update coordinates for each map
+* use test_f
+* add comment on yaw angles
+* update older tests desciptions
+* remove ';' from comments
+* use builder
+* alter comment, alter distance
+* update comments - unit tests will not measure performance
+* remove unnecessary lines
+* alter getClosestLaneletId_onlyCrosswalkNearButExcluded testcase
+* fix spelling
+* add test descriptions
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* fix spelling
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* apply suggestions
+* remove problematic tests
+* remove comments
+* Merge branch 'feature/unit_tests/hdmap_utils' of github.com:RobotecAI/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* getDistanceToStopLine and getDistanceToTrafficLightStopLine tests
+* Add HdMapUtils::getCenterPoints tests
+* Improve stopline tests readability with additional information on failure
+* Use loop in tests with vectors
+* Add test expect macros with information stream
+* Fix style in HdMapUtils tests
+* Add comment about the issue
+* Change HdMapUtils::clipTrajectoryFromLaneletIds test reference values
+* Add clipTrajectoryFromLaneletIds tests
+* rename symbol
+* Merge branch 'feature/unit_tests/hdmap_utils' of github.com:RobotecAI/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* add map, stopLine tests
+* Add getLateralDistance tests
+* Add missing getAlongLaneletPose tests
+* Add missing getFollowingLanelets tests
+* Merge branch 'feature/unit_tests/hdmap_utils' of github.com:RobotecAI/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* getLongitudinalDistance, getTrafficLightIdsOnPath tests
+* Add getPreviousLanelets tests
+* Add toLaneletPose tests
+* Add test expect macros
+* getLaneletLength tests
+* isTrafficLight, isTrafficLightRegulatoryElement tests
+* getRoute tests
+* fix style; canChangeLane tests
+* getFollowingLanelets, getConflictingLaneIds, getConflictingCrosswalkIds test
+* added 2 maps, macros, and many tests
+* Add newline
+* Add more HdMapUtils tests
+* Style change for HdMapUtils tests
+* isInRoute tests
+* clarify comments regarding issues
+* remaining getNextLaneletIds and getPreviousLaneletIds tests
+* getNextLaneletIds tests
+* getClosestLaneletId tests
+* more tests
+* hdmap_utils test; bug
+* refactor
+* update file structure
+* Contributors: Masaya Kataoka, Mateusz Palczuk, robomic
+
+2.0.3 (2024-06-10)
+------------------
+* Merge pull request `#1263 <https://github.com/tier4/scenario_simulator_v2/issues/1263>`_ from tier4/fix/remove_linear_algebra
+  Fix/remove linear algebra
+* Update simulation/traffic_simulator/src/entity/entity_manager.cpp
+* fix format
+* Merge branch 'master' into fix/remove_linear_algebra
+* reformat
+* update
+* update
+* Update entity_manager.cpp
+  Co-authored-by: Masaya Kataoka <ms.kataoka@gmail.com>
+* remove linear_algebra
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
 2.0.2 (2024-06-03)
 ------------------
 * Merge pull request `#1271 <https://github.com/tier4/scenario_simulator_v2/issues/1271>`_ from tier4/fix/rviz_config
