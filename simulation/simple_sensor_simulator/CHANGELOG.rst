@@ -13,6 +13,86 @@ Changelog for package simple_sensor_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.2 (2024-06-13)
+------------------
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
+2.1.1 (2024-06-11)
+------------------
+* Merge pull request `#1279 <https://github.com/tier4/scenario_simulator_v2/issues/1279>`_ from tier4/fix/reorder
+  fix -wreorder warning
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/reorder
+* fix -wreorder warning
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
+2.1.0 (2024-06-11)
+------------------
+* Merge pull request `#1226 <https://github.com/tier4/scenario_simulator_v2/issues/1226>`_ from tier4/fix/RJD-955-fix-followtrajectoryaction-nan-time
+  fix(follow_trajectory_action): adapt to work with considering slopes
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* fix(ego_entity_simulation): fix assignment of world_relative_position\_ when not npc_logic_started
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* fix(ego_entity_simulation): fix world_relative_position\_ for update()
+* Revert "feat(ego_entity_simulation): develop VehicleModelState"
+  This reverts commit 1f72837309a4055aa750b1ec2c5e31b50c6a65b6.
+* feat(ego_entity_simulation): develop VehicleModelState
+* ref(ego_entity_simulation): use world_relative_position\_ in getCurrentPose and calculateEgoPitch
+* ref(ego_entity_simulation): use world_relative_position, use only Oz
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* ref(ego_entity_simulation): apply clang reforamt
+* ref(ego_entity_simulation, sim_model_interface): use world_relative_position_z\_ to store Oz position
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* fix(ego_entity_simulation, sim_model_interface): add overwrite position in Oz axis
+* fix(toLaneletPose): fix matching_distance in EgoEntity, EgoEntitySimulation and BehaviorTree
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Tatsuya Yamasaki
+
+2.0.5 (2024-06-11)
+------------------
+* merge / resolve confict
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* Contributors: robomic
+
+2.0.4 (2024-06-10)
+------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* Contributors: robomic
+
+2.0.3 (2024-06-10)
+------------------
+* Merge branch 'master' into fix/remove_linear_algebra
+* Contributors: Taiga
+
 2.0.2 (2024-06-03)
 ------------------
 
