@@ -40,7 +40,9 @@ static auto getParameter(const std::string & name, T value = {})
 {
   rclcpp::Node node{"get_parameter", "simulation"};
 
-  node.declare_parameter<T>(name, value);
+  if (!node.has_parameter(name)) {
+    node.declare_parameter<T>(name, value);
+  }
   node.get_parameter<T>(name, value);
 
   return value;
@@ -67,7 +69,9 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
                                       : Configuration::Pathname(rviz_config).string()),
                  "scenario_simulation:=true", "use_foa:=false",
                  "perception/enable_traffic_light:=" +
-                   std::string((architecture_type >= "awf/universe/20230906") ? "true" : "false"))
+                   std::string((architecture_type >= "awf/universe/20230906") ? "true" : "false"),
+                 "use_sim_time:=" +
+                   std::string(getParameter<bool>("use_sim_time") ? "true" : "false"))
              : std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>();
   } else {
