@@ -31,11 +31,11 @@ template <
     nullptr>
 auto getRotation(T from, U to)
 {
+  // This code is inverting the sign of the coordinates (x, y, z) of the 'from' vector.
   from.x *= -1;
   from.y *= -1;
   from.z *= -1;
-  auto ans = from * to;
-  return ans;
+  return from * to;
 }
 }  // namespace geometry
 }  // namespace math

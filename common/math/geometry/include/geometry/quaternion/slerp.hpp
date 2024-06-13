@@ -29,16 +29,15 @@ template <
     std::nullptr_t> = nullptr>
 auto slerp(T quat1, U quat2, V t)
 {
-  geometry_msgs::msg::Quaternion q;
   double qr = quat1.w * quat2.w + quat1.x * quat2.x + quat1.y * quat2.y + quat1.z * quat2.z;
   double ss = 1.0 - qr * qr;
   constexpr double e = std::numeric_limits<double>::epsilon();
   if (std::fabs(ss) <= e) {
-    q.w = quat1.w;
-    q.x = quat1.x;
-    q.y = quat1.y;
-    q.z = quat1.z;
-    return q;
+    return geometry_msgs::build<geometry_msgs::msg::Quaternion>()
+      .x(quat1.x)
+      .y(quat1.y)
+      .z(quat1.z)
+      .w(quat1.w);
   } else {
     double sp = std::sqrt(ss);
     double ph = std::acos(qr);
@@ -46,11 +45,11 @@ auto slerp(T quat1, U quat2, V t)
     double t1 = std::sin(pt) / sp;
     double t0 = std::sin(ph - pt) / sp;
 
-    q.w = quat1.w * t0 + quat2.w * t1;
-    q.x = quat1.x * t0 + quat2.x * t1;
-    q.y = quat1.y * t0 + quat2.y * t1;
-    q.z = quat1.z * t0 + quat2.z * t1;
-    return q;
+    return geometry_msgs::build<geometry_msgs::msg::Quaternion>()
+      .x(quat1.x * t0 + quat2.x * t1)
+      .y(quat1.y * t0 + quat2.y * t1)
+      .z(quat1.z * t0 + quat2.z * t1)
+      .w(quat1.w * t0 + quat2.w * t1);
   }
 }
 }  // namespace geometry

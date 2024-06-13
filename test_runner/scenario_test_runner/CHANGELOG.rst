@@ -1735,7 +1735,7 @@ Changelog for package scenario_test_runner
 * Rename option 'timeout' to 'global-timeout'
 * Add optional argument verbose (= True) to openscenario_utility
 * Rename 'step_time_ms' to 'frame-rate'
-* Fix external/math::geometry's commit hash
+* Fix external/quaternion_operation's commit hash
 * Add parameter 'real-time-factor' to openscenario_interpreter
 * Rename option to '--global-real-time-factor' from 'real-time-factor'
 * Add launch argument '--real-time-factor'

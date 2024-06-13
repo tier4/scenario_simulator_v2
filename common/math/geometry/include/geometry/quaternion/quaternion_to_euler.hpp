@@ -29,15 +29,11 @@ template <
   typename T, std::enable_if_t<std::conjunction_v<IsLikeQuaternion<T>>, std::nullptr_t> = nullptr>
 auto convertQuaternionToEulerAngle(const T & q)
 {
-  geometry_msgs::msg::Vector3 ret;
   tf2::Quaternion tf_quat(q.x, q.y, q.z, q.w);
   tf2::Matrix3x3 mat(tf_quat);
   double roll, pitch, yaw;
   mat.getRPY(roll, pitch, yaw);
-  ret.x = roll;
-  ret.y = pitch;
-  ret.z = yaw;
-  return ret;
+  return geometry_msgs::build<geometry_msgs::msg::Vector3>().x(roll).y(pitch).z(yaw);
 }
 }  // namespace geometry
 }  // namespace math
