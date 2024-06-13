@@ -12,9 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_validator/schema.hpp>
+#ifndef GEOMETRY__VECTOR3__INNER_PRODUCT_HPP_
+#define GEOMETRY__VECTOR3__INNER_PRODUCT_HPP_
 
-namespace openscenario_validator
+#include <geometry/vector3/is_like_vector3.hpp>
+
+namespace math
 {
-const char schema[] = R"###(${${PROJECT_NAME}_OPENSCENARIO_1_3_XSD})###";
-}  // namespace openscenario_validator
+namespace geometry
+{
+template <
+  typename T, typename U,
+  std::enable_if_t<std::conjunction_v<IsLikeVector3<T>, IsLikeVector3<U>>, std::nullptr_t> =
+    nullptr>
+auto innerProduct(const T & v0, const U & v1)
+{
+  return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
+}
+}  // namespace geometry
+}  // namespace math
+
+#endif  // GEOMETRY__VECTOR3__INNER_PRODUCT_HPP_

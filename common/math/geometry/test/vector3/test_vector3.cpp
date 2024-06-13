@@ -15,8 +15,9 @@
 #include <gtest/gtest.h>
 
 #include <cmath>
-#include <geometry/linear_algebra.hpp>
 #include <geometry/vector3/hypot.hpp>
+#include <geometry/vector3/inner_product.hpp>
+#include <geometry/vector3/internal_angle.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
@@ -181,6 +182,70 @@ TEST(Vector3, additionAssignment_customVector)
   vec0 += vec1;
 
   EXPECT_VECTOR3_EQ(vec0, makeVector(0.0, 0.0, 2.0));
+}
+
+TEST(Vector3, vector3_getSizeZero)
+{
+  geometry_msgs::msg::Vector3 vec;
+  EXPECT_DOUBLE_EQ(math::geometry::norm(vec), 0.0);
+}
+
+TEST(Vector3, vector3_getSize)
+{
+  geometry_msgs::msg::Vector3 vec = makeVector(1.0, 0.0, 3.0);
+  EXPECT_DOUBLE_EQ(math::geometry::norm(vec), std::sqrt(10.0));
+}
+
+TEST(Vector3, vector3_normalizeZero)
+{
+  geometry_msgs::msg::Vector3 vec;
+  EXPECT_THROW(math::geometry::normalize(vec), common::SimulationError);
+}
+
+TEST(Vector3, vector3_normalize)
+{
+  geometry_msgs::msg::Vector3 vec = makeVector(1.0, 0.0, 3.0);
+  vec = math::geometry::normalize(vec);
+
+  geometry_msgs::msg::Vector3 ans = makeVector(0.31622776601683794, 0.0, 0.94868329805051377);
+  EXPECT_VECTOR3_EQ(vec, ans);
+  EXPECT_DOUBLE_EQ(math::geometry::norm(vec), 1.0);
+}
+
+TEST(Vector3, innerProduct_getInnerProduct)
+{
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 0.0, 3.0), vec1 = makeVector(-1.0, 0.0, -3.0);
+  EXPECT_DOUBLE_EQ(math::geometry::innerProduct(vec0, vec1), -10.0);
+}
+
+TEST(Vector3, innerProduct_identical)
+{
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 0.0, 3.0);
+  EXPECT_DOUBLE_EQ(math::geometry::innerProduct(vec0, vec0), 10.0);
+}
+
+TEST(Vector3, innerProduct_zero)
+{
+  geometry_msgs::msg::Vector3 vec0, vec1 = makeVector(1.0, 0.0, 3.0);
+  EXPECT_DOUBLE_EQ(math::geometry::innerProduct(vec0, vec1), 0.0);
+}
+
+TEST(Vector3, innerAngle_getInnerAngle)
+{
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 0.0, 3.0), vec1 = makeVector(-1.0, 0.0, -3.0);
+  EXPECT_NEAR(math::geometry::getInternalAngle(vec0, vec1), M_PI, EPS);
+}
+
+TEST(Vector3, innerAngle_angleIdentical)
+{
+  geometry_msgs::msg::Vector3 vec0 = makeVector(1.0, 0.0, 3.0);
+  EXPECT_NEAR(math::geometry::getInternalAngle(vec0, vec0), 0.0, EPS);
+}
+
+TEST(Vector3, innerAngle_angleZero)
+{
+  geometry_msgs::msg::Vector3 vec0, vec1 = makeVector(1.0, 0.0, 3.0);
+  EXPECT_THROW(math::geometry::getInternalAngle(vec0, vec1), common::SimulationError);
 }
 
 int main(int argc, char ** argv)

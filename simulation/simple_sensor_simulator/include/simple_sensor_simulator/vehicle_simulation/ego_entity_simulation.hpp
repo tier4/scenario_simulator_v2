@@ -62,6 +62,8 @@ private:
 
   const bool consider_pose_by_road_slope_;
 
+  Eigen::Vector3d world_relative_position_;
+
 public:
   const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
 

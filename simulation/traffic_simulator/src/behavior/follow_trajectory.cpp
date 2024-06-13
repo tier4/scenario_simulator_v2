@@ -15,8 +15,8 @@
 #include <quaternion_operation/quaternion_operation.h>
 
 #include <arithmetic/floating_point/comparison.hpp>
-#include <geometry/linear_algebra.hpp>
 #include <geometry/vector3/hypot.hpp>
+#include <geometry/vector3/inner_product.hpp>
 #include <geometry/vector3/norm.hpp>
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
@@ -47,7 +47,8 @@ auto makeUpdatedStatus(
   traffic_simulator_msgs::msg::PolylineTrajectory & polyline_trajectory,
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils, double step_time,
-  std::optional<double> target_speed) -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
+  double matching_distance, std::optional<double> target_speed)
+  -> std::optional<traffic_simulator_msgs::msg::EntityStatus>
 {
   using math::arithmetic::isApproximatelyEqualTo;
   using math::arithmetic::isDefinitelyLessThan;
@@ -58,11 +59,56 @@ auto makeUpdatedStatus(
   using math::geometry::operator/;
   using math::geometry::operator+=;
 
+  using math::geometry::CatmullRomSpline;
   using math::geometry::hypot;
   using math::geometry::innerProduct;
   using math::geometry::norm;
   using math::geometry::normalize;
   using math::geometry::truncate;
+
+  auto distance_along_lanelet =
+    [&](const geometry_msgs::msg::Point & from, const geometry_msgs::msg::Point & to) -> double {
+    if (const auto from_lanelet_pose =
+          hdmap_utils->toLaneletPose(from, entity_status.bounding_box, false, matching_distance);
+        from_lanelet_pose) {
+      if (const auto to_lanelet_pose =
+            hdmap_utils->toLaneletPose(to, entity_status.bounding_box, false, matching_distance);
+          to_lanelet_pose) {
+        if (const auto distance = hdmap_utils->getLongitudinalDistance(
+              from_lanelet_pose.value(), to_lanelet_pose.value());
+            distance) {
+          return distance.value();
+        }
+      }
+    }
+    return hypot(from, to);
+  };
+
+  auto fill_lanelet_data_and_adjust_orientation =
+    [&](traffic_simulator_msgs::msg::EntityStatus & status) {
+      if (const auto lanelet_pose =
+            hdmap_utils->toLaneletPose(status.pose, status.bounding_box, false, matching_distance);
+          lanelet_pose) {
+        status.lanelet_pose = lanelet_pose.value();
+        const CatmullRomSpline spline(hdmap_utils->getCenterPoints(status.lanelet_pose.lanelet_id));
+        const auto lanelet_quaternion = spline.getPose(status.lanelet_pose.s, true).orientation;
+        const auto lanelet_rpy =
+          quaternion_operation::convertQuaternionToEulerAngle(lanelet_quaternion);
+        const auto entity_rpy =
+          quaternion_operation::convertQuaternionToEulerAngle(status.pose.orientation);
+        // adjust orientation in EntityStatus.pose (only pitch) and in EntityStatus.LaneletPose
+        status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+          geometry_msgs::build<geometry_msgs::msg::Vector3>()
+            .x(entity_rpy.x)
+            .y(lanelet_rpy.y)
+            .z(entity_rpy.z));
+        status.lanelet_pose.rpy = quaternion_operation::convertQuaternionToEulerAngle(
+          quaternion_operation::getRotation(lanelet_quaternion, status.pose.orientation));
+        status.lanelet_pose_valid = true;
+      } else {
+        status.lanelet_pose_valid = false;
+      }
+    };
 
   auto discard_the_front_waypoint_and_recurse = [&]() {
     /*
@@ -97,7 +143,8 @@ auto makeUpdatedStatus(
     }
 
     return makeUpdatedStatus(
-      entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time, target_speed);
+      entity_status, polyline_trajectory, behavior_parameter, hdmap_utils, step_time,
+      matching_distance, target_speed);
   };
 
   auto is_infinity_or_nan = [](auto x) constexpr { return std::isinf(x) or std::isnan(x); };
@@ -148,7 +195,7 @@ auto makeUpdatedStatus(
        problems.
     */
     const auto [distance_to_front_waypoint, remaining_time_to_front_waypoint] = std::make_tuple(
-      hypot(position, target_position),
+      distance_along_lanelet(position, target_position),
       (not std::isnan(polyline_trajectory.base_time) ? polyline_trajectory.base_time : 0.0) +
         polyline_trajectory.shape.vertices.front().time - entity_status.time);
     /*
@@ -171,7 +218,8 @@ auto makeUpdatedStatus(
           auto total_distance = 0.0;
           for (auto iter = std::begin(polyline_trajectory.shape.vertices);
                0 < std::distance(iter, last); ++iter) {
-            total_distance += hypot(iter->position.position, std::next(iter)->position.position);
+            total_distance +=
+              distance_along_lanelet(iter->position.position, std::next(iter)->position.position);
           }
           return total_distance;
         };
@@ -333,7 +381,20 @@ auto makeUpdatedStatus(
                     variable is `followingMode == position`.
                  */
                  if (polyline_trajectory.dynamic_constraints_ignorable) {
-                   return normalize(target_position - position) * desired_speed;  // [m/s]
+                   const auto dx = target_position.x - position.x;
+                   const auto dy = target_position.y - position.y;
+                   // if entity is on lane use pitch from lanelet, otherwise use pitch on target
+                   const auto pitch =
+                     entity_status.lanelet_pose_valid
+                       ? -quaternion_operation::convertQuaternionToEulerAngle(
+                            entity_status.pose.orientation)
+                            .y
+                       : std::atan2(target_position.z - position.z, std::hypot(dy, dx));
+                   const auto yaw = std::atan2(dy, dx);  // Use yaw on target
+                   return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+                     .x(std::cos(pitch) * std::cos(yaw) * desired_speed)
+                     .y(std::cos(pitch) * std::sin(yaw) * desired_speed)
+                     .z(std::sin(pitch) * desired_speed);
                  } else {
                    /*
                       Note: The vector returned if
@@ -356,14 +417,16 @@ auto makeUpdatedStatus(
       desired_velocity.y, ", ", desired_velocity.z, "].");
   } else if (const auto current_velocity =
                [&]() {
+                 const auto pitch = -quaternion_operation::convertQuaternionToEulerAngle(
+                                       entity_status.pose.orientation)
+                                       .y;
                  const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(
                                     entity_status.pose.orientation)
                                     .z;
-                 geometry_msgs::msg::Vector3 direction;
-                 direction.x = std::cos(yaw) * speed;
-                 direction.y = std::sin(yaw) * speed;
-                 direction.z = 0.0;
-                 return direction;
+                 return geometry_msgs::build<geometry_msgs::msg::Vector3>()
+                   .x(std::cos(pitch) * std::cos(yaw) * speed)
+                   .y(std::cos(pitch) * std::sin(yaw) * speed)
+                   .z(std::sin(pitch) * speed);
                }();
              (speed * step_time) > distance_to_front_waypoint &&
              innerProduct(desired_velocity, current_velocity) < 0.0) {
@@ -515,28 +578,33 @@ auto makeUpdatedStatus(
        known by the name "collision avoidance" should be synthesized here into
        steering.
     */
-    const auto steering = desired_velocity - current_velocity;
-
-    const auto velocity = truncate(current_velocity + steering, desired_speed);
-
     auto updated_status = entity_status;
 
-    updated_status.pose.position += velocity * step_time;
+    updated_status.pose.position += desired_velocity * step_time;
 
     updated_status.pose.orientation = [&]() {
-      if (velocity.y == 0 && velocity.x == 0) {
-        // do not change orientation if there is no velocity vector
+      if (desired_velocity.y == 0 && desired_velocity.x == 0 && desired_velocity.z == 0) {
+        // do not change orientation if there is no designed_velocity vector
         return entity_status.pose.orientation;
       } else {
-        geometry_msgs::msg::Vector3 direction;
-        direction.x = 0;
-        direction.y = 0;
-        direction.z = std::atan2(velocity.y, velocity.x);
+        // if there is a designed_velocity vector, set the orientation in the direction of it
+        const geometry_msgs::msg::Vector3 direction =
+          geometry_msgs::build<geometry_msgs::msg::Vector3>()
+            .x(0.0)
+            .y(std::atan2(-desired_velocity.z, std::hypot(desired_velocity.x, desired_velocity.y)))
+            .z(std::atan2(desired_velocity.y, desired_velocity.x));
         return quaternion_operation::convertEulerAngleToQuaternion(direction);
       }
     }();
 
-    updated_status.action_status.twist.linear.x = norm(velocity);
+    /*
+      After the step, i.e. movement in the direction of designed_velocity, it is necessary to adjust
+      the pose of the entity to the lane - if possible, the pitch orientation may be
+      changed as a result because the slope of the lane may be different
+    */
+    fill_lanelet_data_and_adjust_orientation(updated_status);
+
+    updated_status.action_status.twist.linear.x = norm(desired_velocity);
 
     updated_status.action_status.twist.linear.y = 0;
 
@@ -556,16 +624,6 @@ auto makeUpdatedStatus(
       step_time;
 
     updated_status.time = entity_status.time + step_time;
-
-    // matching distance has been set to 3.0 due to matching problems during lane changes
-    if (const auto lanelet_pose =
-          hdmap_utils->toLaneletPose(updated_status.pose, entity_status.bounding_box, false, 3.0);
-        lanelet_pose) {
-      updated_status.lanelet_pose = lanelet_pose.value();
-      updated_status.lanelet_pose_valid = true;
-    } else {
-      updated_status.lanelet_pose_valid = false;
-    }
 
     return updated_status;
   }
