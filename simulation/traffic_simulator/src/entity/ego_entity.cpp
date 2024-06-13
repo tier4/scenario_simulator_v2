@@ -47,15 +47,16 @@ auto EgoEntity::makeFieldOperatorApplication(
     return node_parameter_handler->getParameterOrDeclare<bool>("launch_autoware", true)
              ? std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
-                 node_parameter_handler->getParameter<std::string>("autoware_launch_package"),
-                 node_parameter_handler->getParameter<std::string>("autoware_launch_file"),
+                 node_parameter_handler->getParameterOrDeclare<std::string>(
+                   "autoware_launch_package"),
+                 node_parameter_handler->getParameterOrDeclare<std::string>("autoware_launch_file"),
                  "map_path:=" + configuration.map_path.string(),
                  "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
                  "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
                  "sensor_model:=" +
-                   node_parameter_handler->getParameter<std::string>("sensor_model"),
+                   node_parameter_handler->getParameterOrDeclare<std::string>("sensor_model"),
                  "vehicle_model:=" +
-                   node_parameter_handler->getParameter<std::string>("vehicle_model"),
+                   node_parameter_handler->getParameterOrDeclare<std::string>("vehicle_model"),
                  "rviz_config:=" + ((rviz_config == "")
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
