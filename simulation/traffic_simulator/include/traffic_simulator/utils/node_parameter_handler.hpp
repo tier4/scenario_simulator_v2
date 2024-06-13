@@ -23,30 +23,27 @@ namespace traffic_simulator
 class NodeParameterHandler
 {
 public:
-  template <typename NodeType>
-  explicit NodeParameterHandler(NodeType && node)
+  template <typename NodeT>
+  explicit NodeParameterHandler(NodeT && node)
   : node_parameters_interface_(
-      rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeType>(node)))
+      rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node)))
   {
   }
 
-  template <typename ParameterType>
-  auto getParameterOrDeclare(
-    const std::string & name, const ParameterType & default_value = {}) const -> ParameterType
+  /**
+   * Get parameter or declare it if it has not been declared before. Declare it with a default value.
+   * @param name The name of the parameter
+   * @param default_value The default value of the parameter
+   * @return The value of the parameter
+   */
+  template <typename ParameterT>
+  auto getParameter(const std::string & name, const ParameterT & default_value = {}) const
+    -> ParameterT
   {
     if (not node_parameters_interface_->has_parameter(name)) {
       node_parameters_interface_->declare_parameter(name, rclcpp::ParameterValue(default_value));
     }
-    return node_parameters_interface_->get_parameter(name).get_value<ParameterType>();
-  }
-
-  template <typename ParameterType>
-  auto getParameter(const std::string & name) const -> ParameterType
-  {
-    if (not node_parameters_interface_->has_parameter(name)) {
-      THROW_SEMANTIC_ERROR("Parameter ", std::quoted(name), " does not exist");
-    }
-    return node_parameters_interface_->get_parameter(name).get_value<ParameterType>();
+    return node_parameters_interface_->get_parameter(name).get_value<ParameterT>();
   }
 
 private:

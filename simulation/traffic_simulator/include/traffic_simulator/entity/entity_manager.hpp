@@ -132,8 +132,8 @@ public:
   template <typename... Ts>
   auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
   {
-    if (const auto architecture_type = node_parameter_handler_->getParameterOrDeclare<std::string>(
-          "architecture_type", "awf/universe");
+    if (const auto architecture_type =
+          node_parameter_handler_->getParameter<std::string>("architecture_type", "awf/universe");
         architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_shared<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
@@ -499,8 +499,7 @@ public:
           entity_status.lanelet_pose = *lanelet_pose;
           entity_status.lanelet_pose_valid = true;
           /// @note fix z, roll and pitch to fitting to the lanelet
-          if (node_parameter_handler_->getParameterOrDeclare<bool>(
-                "consider_pose_by_road_slope", false)) {
+          if (node_parameter_handler_->getParameter<bool>("consider_pose_by_road_slope", false)) {
             entity_status.pose = hdmap_utils_ptr_->toMapPose(*lanelet_pose).pose;
           } else {
             entity_status.pose = pose;
