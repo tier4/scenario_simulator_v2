@@ -31,7 +31,7 @@ template <
     nullptr>
 auto getRotation(T from, U to)
 {
-  // This code is inverting the sign of the coordinates (x, y, z) of the 'from' vector.
+  // This function gets the conjugate of the quaternion.
   from.x *= -1;
   from.y *= -1;
   from.z *= -1;
