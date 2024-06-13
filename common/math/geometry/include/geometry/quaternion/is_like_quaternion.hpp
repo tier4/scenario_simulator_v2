@@ -12,7 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace openscenario_validator
+#ifndef GEOMETRY__QUATERNION__IS_LIKE_QUATERNION_HPP_
+#define GEOMETRY__QUATERNION__IS_LIKE_QUATERNION_HPP_
+
+#include <type_traits>
+#include <utility>
+
+namespace math
 {
-extern const char schema[];
-}  // namespace openscenario_validator
+namespace geometry
+{
+template <typename T, typename = void>
+struct IsLikeQuaternion : std::false_type
+{
+};
+
+template <typename T>
+struct IsLikeQuaternion<
+  T, std::void_t<
+       decltype(std::declval<T>().x), decltype(std::declval<T>().y), decltype(std::declval<T>().z),
+       decltype(std::declval<T>().w)>> : std::true_type
+{
+};
+
+}  // namespace geometry
+}  // namespace math
+
+#endif  // GEOMETRY__QUATERNION__IS_LIKE_QUATERNION_HPP_
