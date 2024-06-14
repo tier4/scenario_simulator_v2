@@ -14,6 +14,82 @@ Changelog for package openscenario_interpreter
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.2 (2024-06-13)
+------------------
+* Merge pull request `#1012 <https://github.com/tier4/scenario_simulator_v2/issues/1012>`_ from tier4/fix/interpreter/fault-injection-action
+  Fix/interpreter/fault injection action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge pull request `#1021 <https://github.com/tier4/scenario_simulator_v2/issues/1021>`_ from tier4/fix/interpreter/fault_injection_action/qos_depth
+  fix(action): fix fault injection action - qos
+* ref(action): apply clang_format
+* fix(action): fix fault injection - history_depth in qos
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Lipsticks
+* Update FaultInjection to prepare Node and Publisher in the parse phase
+* Contributors: Dawid Moszyński, Kotaro Yoshimoto, Tatsuya Yamasaki, yamacir-kit
+
+2.1.1 (2024-06-11)
+------------------
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' into fix/reorder
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into fix/reorder
+* Contributors: Kotaro Yoshimoto, hakuturu583
+
+2.1.0 (2024-06-11)
+------------------
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Merge branch 'master' into fix/RJD-955-fix-followtrajectoryaction-nan-time
+* Contributors: DMoszynski, Tatsuya Yamasaki
+
+2.0.5 (2024-06-11)
+------------------
+* merge / resolve confict
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/longitudinal_speed_planner
+* Contributors: robomic
+
+2.0.4 (2024-06-10)
+------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/hdmap_utils
+* Contributors: robomic
+
+2.0.3 (2024-06-10)
+------------------
+* Merge branch 'master' into fix/remove_linear_algebra
+* Contributors: Taiga
+
 2.0.2 (2024-06-03)
 ------------------
 
