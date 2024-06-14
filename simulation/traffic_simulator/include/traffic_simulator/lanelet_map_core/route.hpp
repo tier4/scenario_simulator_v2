@@ -25,7 +25,7 @@ namespace lanelet_map_core
 {
 namespace route
 {
-auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route) -> bool;
+auto isInRoute(const lanelet::Id lanelet_id, const lanelet::Ids & route_lanelets_ids) -> bool;
 
 auto speedLimit(const lanelet::Ids & lanelet_ids) -> double;
 
@@ -38,9 +38,10 @@ auto followingLanelets(
   const double distance = 100, const bool include_self = true) -> lanelet::Ids;
 
 auto followingLanelets(
-  const lanelet::Id, const double distance = 100, const bool include_self = true) -> lanelet::Ids;
+  const lanelet::Id lanelet_id, const double distance = 100, const bool include_self = true)
+  -> lanelet::Ids;
 
-auto previousLanelets(const lanelet::Id, const double distance = 100) -> lanelet::Ids;
+auto previousLanelets(const lanelet::Id lanelet_id, const double distance = 100) -> lanelet::Ids;
 }  // namespace route
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator
