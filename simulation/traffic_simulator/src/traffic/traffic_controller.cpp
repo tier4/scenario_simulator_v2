@@ -28,7 +28,7 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
-#include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <utility>
 #include <vector>
 
@@ -37,12 +37,10 @@ namespace traffic_simulator
 namespace traffic
 {
 TrafficController::TrafficController(
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils,
   const std::function<std::vector<std::string>(void)> & get_entity_names_function,
   const std::function<geometry_msgs::msg::Pose(const std::string &)> & get_entity_pose_function,
   const std::function<void(std::string)> & despawn_function, bool auto_sink)
-: hdmap_utils_(hdmap_utils),
-  get_entity_names_function(get_entity_names_function),
+: get_entity_names_function(get_entity_names_function),
   get_entity_pose_function(get_entity_pose_function),
   despawn_function(despawn_function),
   auto_sink(auto_sink)
@@ -54,15 +52,10 @@ TrafficController::TrafficController(
 
 void TrafficController::autoSink()
 {
-  for (const auto & lanelet_id : hdmap_utils_->getLaneletIds()) {
-    if (hdmap_utils_->getNextLaneletIds(lanelet_id).empty()) {
-      LaneletPose lanelet_pose;
-      lanelet_pose.lanelet_id = lanelet_id;
-      lanelet_pose.s = laneletLength(lanelet_id, hdmap_utils_);
-      const auto pose = toMapPose(lanelet_pose, hdmap_utils_);
-      addModule<traffic_simulator::traffic::TrafficSink>(
-        1, pose.position, get_entity_names_function, get_entity_pose_function, despawn_function);
-    }
+  const auto borderline_poses = lanelet_map::borderlinePoses();
+  for (const auto & pose : borderline_poses) {
+    addModule<traffic_simulator::traffic::TrafficSink>(
+      1, pose.position, get_entity_names_function, get_entity_pose_function, despawn_function);
   }
 }
 

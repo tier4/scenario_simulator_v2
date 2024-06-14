@@ -79,10 +79,9 @@ auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration
 
 EgoEntity::EgoEntity(
   const std::string & name, const CanonicalizedEntityStatus & entity_status,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration)
-: VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
+: VehicleEntity(name, entity_status, parameters),
   field_operator_application(makeFieldOperatorApplication(configuration))
 {
 }
@@ -157,8 +156,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       const auto non_canonicalized_updated_status =
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
           static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
-          behavior_parameter_, hdmap_utils_ptr_, step_time,
-          getDefaultMatchingDistanceForLaneletPoseCalculation(),
+          behavior_parameter_, step_time, getDefaultMatchingDistanceForLaneletPoseCalculation(),
           target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_.getLaneletIds());
@@ -299,7 +297,7 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
   // prefer current lanelet on Autoware side
   const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
     status_.getMapPose(), status_.getBoundingBox(), unique_route_lanelets, false,
-    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+    getDefaultMatchingDistanceForLaneletPoseCalculation());
   setCanonicalizedStatus(
     CanonicalizedEntityStatus(static_cast<EntityStatus>(status_), canonicalized_lanelet_pose));
 }
@@ -320,7 +318,7 @@ auto EgoEntity::setStatus(const EntityStatus & status, const lanelet::Ids & lane
   } else {
     const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       status.pose, status.bounding_box, lanelet_ids, false,
-      getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+      getDefaultMatchingDistanceForLaneletPoseCalculation());
     setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   }
 }

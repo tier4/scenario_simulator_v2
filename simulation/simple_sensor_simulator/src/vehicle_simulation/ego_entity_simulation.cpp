@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <quaternion_operation/quaternion_operation.h>
+
 #include <concealer/autoware_universe.hpp>
 #include <filesystem>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace vehicle_simulation
@@ -35,14 +38,13 @@ static auto getParameter(const std::string & name, T value = {})
 EgoEntitySimulation::EgoEntitySimulation(
   const traffic_simulator_msgs::msg::EntityStatus & initial_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
+
   const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
   status_(initial_status, std::nullopt),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
-  hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters)
 {
   setStatus(initial_status);
@@ -351,40 +353,12 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
   if (!status_.laneMatchingSucceed()) {
     return 0.0;
   }
-
-  /// @note Copied from motion_util::findNearestSegmentIndex
-  auto centerline_points = hdmap_utils_ptr_->getCenterPoints(status_.getLaneletId());
-  auto find_nearest_segment_index =
-    [](const std::vector<geometry_msgs::msg::Point> & points, const Eigen::Vector3d & point) {
-      assert(not points.empty());
-
-      double min_dist = std::numeric_limits<double>::max();
-      size_t min_idx = 0;
-
-      for (size_t i = 0; i < points.size(); ++i) {
-        const auto dist =
-          [](const geometry_msgs::msg::Point & point1, const Eigen::Vector3d & point2) {
-            const auto dx = point1.x - point2.x();
-            const auto dy = point1.y - point2.y();
-            return dx * dx + dy * dy;
-          }(points.at(i), point);
-
-        if (dist < min_dist) {
-          min_dist = dist;
-          min_idx = i;
-        }
-      }
-      return min_idx;
-    };
-
-  const size_t ego_seg_idx =
-    find_nearest_segment_index(centerline_points, world_relative_position_);
-
-  const auto & prev_point = centerline_points.at(ego_seg_idx);
-  const auto & next_point = centerline_points.at(ego_seg_idx + 1);
-
-  /// @note Calculate ego yaw angle on lanelet coordinates
-  const double lanelet_yaw = std::atan2(next_point.y - prev_point.y, next_point.x - prev_point.x);
+  geometry_msgs::msg::Point ego_point;
+  ego_point.x = world_relative_position_.x();
+  ego_point.y = world_relative_position_.y();
+  ego_point.z = world_relative_position_.z();
+  auto [lanelet_yaw, prev_point, next_point] =
+    traffic_simulator::lanelet_map::laneletYaw(ego_point, status_.getLaneletId());
   const double ego_yaw_against_lanelet = vehicle_model_ptr_->getYaw() - lanelet_yaw;
 
   /// @note calculate ego pitch angle considering ego yaw.
@@ -469,8 +443,7 @@ auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntitySta
                                    0.5 +
                                  1.0;
   const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
-    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
-    hdmap_utils_ptr_);
+    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance);
   status_.set(traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   setAutowareStatus();
 }

@@ -71,7 +71,7 @@ public:
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
-      return NativeLanePosition(non_canonicalized, core->getHdmapUtils());
+      return NativeLanePosition(non_canonicalized);
     }
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
@@ -79,8 +79,8 @@ public:
     {
       constexpr bool include_crosswalk{false};
       if (
-        const auto result = traffic_simulator::pose::toCanonicalizedLaneletPose(
-          pose, include_crosswalk, core->getHdmapUtils())) {
+        const auto result =
+          traffic_simulator::pose::toCanonicalizedLaneletPose(pose, include_crosswalk)) {
         return result.value();
       } else {
         throw Error(
@@ -177,7 +177,7 @@ public:
     {
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::relativeLaneletPose(
-        from_lanelet_pose, to_lanelet_pose, allow_lane_change, core->getHdmapUtils());
+        from_lanelet_pose, to_lanelet_pose, allow_lane_change);
     }
 
     static auto makeNativeBoundingBoxRelativeLanePosition(
@@ -222,8 +222,7 @@ public:
     {
       const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
       return traffic_simulator::pose::boundingBoxRelativeLaneletPose(
-        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box, allow_lane_change,
-        core->getHdmapUtils());
+        from_lanelet_pose, from_bounding_box, to_lanelet_pose, to_bounding_box, allow_lane_change);
     }
 
     static auto makeNativeBoundingBoxRelativeWorldPosition(

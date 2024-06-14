@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
 
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {

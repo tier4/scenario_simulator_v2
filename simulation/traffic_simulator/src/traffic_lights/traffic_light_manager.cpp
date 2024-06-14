@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <lanelet2_core/geometry/Lanelet.h>
+
 #include <iterator>
 #include <memory>
 #include <string>
 #include <traffic_simulator/traffic_lights/traffic_light_manager.hpp>
+#include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/traffic_lights.hpp>
 #include <type_traits>
 #include <utility>
 #include <vector>
 
 namespace traffic_simulator
 {
-TrafficLightManager::TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap)
-: hdmap_(hdmap)
-{
-}
+TrafficLightManager::TrafficLightManager() {}
 
 auto TrafficLightManager::hasAnyLightChanged() -> bool
 {
@@ -44,7 +45,7 @@ auto TrafficLightManager::getTrafficLight(const lanelet::Id traffic_light_id) ->
   } else {
     traffic_lights_.emplace(
       std::piecewise_construct, std::forward_as_tuple(traffic_light_id),
-      std::forward_as_tuple(traffic_light_id, *hdmap_));
+      std::forward_as_tuple(traffic_light_id));
     return traffic_lights_.at(traffic_light_id);
   }
 }
@@ -68,21 +69,41 @@ auto TrafficLightManager::getTrafficLights() -> TrafficLightMap & { return traff
 auto TrafficLightManager::getTrafficLights(const lanelet::Id lanelet_id)
   -> std::vector<std::reference_wrapper<TrafficLight>>
 {
+  const auto traffic_lights_ids = traffic_lights::trafficLightsIds(lanelet_id);
   std::vector<std::reference_wrapper<TrafficLight>> traffic_lights;
-
-  if (hdmap_->isTrafficLightRegulatoryElement(lanelet_id)) {
-    for (auto && traffic_light :
-         hdmap_->getTrafficLightRegulatoryElement(lanelet_id)->trafficLights()) {
-      traffic_lights.emplace_back(getTrafficLight(traffic_light.id()));
-    }
-  } else if (hdmap_->isTrafficLight(lanelet_id)) {
-    traffic_lights.emplace_back(getTrafficLight(lanelet_id));
-  } else {
-    throw common::scenario_simulator_exception::Error(
-      "Given lanelet ID ", lanelet_id, " is neither a traffic light ID not a traffic relation ID.");
+  for (auto && traffic_light_id : traffic_lights_ids) {
+    traffic_lights.emplace_back(getTrafficLight(traffic_light_id));
   }
-
   return traffic_lights;
+}
+
+auto TrafficLightManager::getDistanceToActiveTrafficLightStopLine(
+  const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+  -> std::optional<double>
+{
+  const auto traffic_light_ids = traffic_lights::trafficLightIdsOnPath(route_lanelets);
+  if (traffic_light_ids.empty()) {
+    return std::nullopt;
+  }
+  std::set<double> collision_points = {};
+  for (const auto id : traffic_light_ids) {
+    using Color = traffic_simulator::TrafficLight::Color;
+    using Status = traffic_simulator::TrafficLight::Status;
+    using Shape = traffic_simulator::TrafficLight::Shape;
+    if (auto && traffic_light = getTrafficLight(id);
+        traffic_light.contains(Color::red, Status::solid_on, Shape::circle) or
+        traffic_light.contains(Color::yellow, Status::solid_on, Shape::circle)) {
+      const auto collision_point =
+        traffic_simulator::distance::distanceToTrafficLightStopLine(spline, id);
+      if (collision_point) {
+        collision_points.insert(collision_point.value());
+      }
+    }
+  }
+  if (collision_points.empty()) {
+    return std::nullopt;
+  }
+  return *collision_points.begin();
 }
 
 auto TrafficLightManager::generateUpdateTrafficLightsRequest()

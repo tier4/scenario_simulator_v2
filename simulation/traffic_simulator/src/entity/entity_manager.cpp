@@ -27,9 +27,9 @@
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
 #include <traffic_simulator/utils/distance.hpp>
+#include <traffic_simulator/utils/route.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -181,11 +181,6 @@ auto EntityManager::getEntityStatus(const std::string & name) const
   }
 }
 
-auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
-{
-  return hdmap_utils_ptr_;
-}
-
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
@@ -263,8 +258,7 @@ bool EntityManager::isInLanelet(
 {
   if (const auto entity = getEntity(name)) {
     if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
-      return pose::isInLanelet(
-        canonicalized_lanelet_pose.value(), lanelet_id, tolerance, hdmap_utils_ptr_);
+      return pose::isInLanelet(canonicalized_lanelet_pose.value(), lanelet_id, tolerance);
     }
   }
   return false;
@@ -308,8 +302,8 @@ void EntityManager::requestLaneChange(
 {
   if (const auto entity = getEntity(name); entity && entity->laneMatchingSucceed()) {
     if (
-      const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-        entity->getStatus().getLaneletId(), direction)) {
+      const auto target =
+        route::laneChangeableLaneletId(entity->getStatus().getLaneletId(), direction)) {
       requestLaneChange(name, target.value());
     }
   }
@@ -459,7 +453,7 @@ void EntityManager::update(const double current_time, const double step_time)
   current_time_ += step_time;
 }
 
-void EntityManager::updateHdmapMarker()
+void EntityManager::updateLaneletMarker()
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();

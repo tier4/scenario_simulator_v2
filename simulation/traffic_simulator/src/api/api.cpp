@@ -132,7 +132,8 @@ std::optional<double> API::getTimeHeadway(
 {
   if (auto from_entity = getEntity(from_entity_name); from_entity) {
     if (auto to_entity = getEntity(to_entity_name); to_entity) {
-      if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+      if (auto relative_pose =
+            pose::relativePose(from_entity->getMapPose(), to_entity->getMapPose());
           relative_pose && relative_pose->position.x <= 0) {
         const double time_headway =
           (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;
@@ -147,8 +148,7 @@ auto API::setEntityStatus(
   const std::string & name, const LaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  setEntityStatus(
-    name, canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
+  setEntityStatus(name, pose::toCanonicalizedLaneletPose(lanelet_pose), action_status);
 }
 
 auto API::setEntityStatus(
@@ -172,7 +172,7 @@ auto API::setEntityStatus(
 {
   if (const auto reference_entity = getEntity(reference_entity_name)) {
     setEntityStatus(
-      name, transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
+      name, pose::transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
       action_status);
   } else {
     THROW_SIMULATION_ERROR(
@@ -346,7 +346,7 @@ void API::startNpcLogic()
   entity_manager_ptr_->startNpcLogic(getCurrentTime());
 }
 
-void API::requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id)
+void API::requestLaneChange(const std::string & name, const lanelet::Id lanelet_id)
 {
   entity_manager_ptr_->requestLaneChange(name, lanelet_id);
 }
@@ -392,7 +392,7 @@ auto API::addTrafficSource(
 
   traffic_controller_ptr_->addModule<traffic_simulator::traffic::TrafficSource>(
     radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
-    entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
+    [this, speed](const auto & name, auto &&... xs) {
       this->spawn(name, std::forward<decltype(xs)>(xs)...);
       setLinearVelocity(name, speed);
     });

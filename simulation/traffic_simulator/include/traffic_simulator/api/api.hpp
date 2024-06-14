@@ -36,7 +36,6 @@
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/entity_manager.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/simulation_clock/simulation_clock.hpp>
 #include <traffic_simulator/traffic/traffic_controller.hpp>
@@ -67,7 +66,7 @@ public:
   : configuration(configuration),
     entity_manager_ptr_(std::make_shared<entity::EntityManager>(node, configuration)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
+      [this]() { return API::getEntityNames(); },
       [this](const auto & entity_name) {
         if (const auto entity = getEntity(entity_name)) {
           return entity->getMapPose();
@@ -280,7 +279,7 @@ public:
 
   void startNpcLogic();
 
-  void requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id);
+  void requestLaneChange(const std::string & name, const lanelet::Id lanelet_id);
 
   void requestLaneChange(const std::string & name, const lane_change::Direction & direction);
 
@@ -354,7 +353,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
-  FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);

@@ -19,6 +19,7 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator/utils/lanelet_map.hpp>
 
 TEST(TrafficLight, Color)
 {
@@ -328,17 +329,11 @@ TEST(TrafficLight, TrafficLight)
   using Status = TrafficLight::Status;
   using Shape = TrafficLight::Shape;
 
-  hdmap_utils::HdMapUtils map_manager(
-    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm",
-    []() {
-      geographic_msgs::msg::GeoPoint geo_point;
-      geo_point.latitude = 35.61836750154;
-      geo_point.longitude = 139.78066608243;
-      return geo_point;
-    }());
+  traffic_simulator::lanelet_map::activate(
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm");
 
   {
-    auto traffic_light = TrafficLight(34802, map_manager);
+    auto traffic_light = TrafficLight(34802);
 
     traffic_light.emplace(Color::red, Status::flashing, Shape::circle);
     traffic_light.emplace(Color::green, Status::solid_on, Shape::right);
@@ -348,7 +343,7 @@ TEST(TrafficLight, TrafficLight)
   }
 
   {
-    auto traffic_light = TrafficLight(34802, map_manager);
+    auto traffic_light = TrafficLight(34802);
 
     traffic_light.emplace("red flashing circle");
     traffic_light.emplace("green solidOn right");
@@ -358,7 +353,7 @@ TEST(TrafficLight, TrafficLight)
   }
 
   {
-    auto traffic_light = TrafficLight(34802, map_manager);
+    auto traffic_light = TrafficLight(34802);
 
     traffic_light.set("red flashing circle, green solidOn right");
 

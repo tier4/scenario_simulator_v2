@@ -14,6 +14,7 @@
 
 #include <behavior_tree_plugin/vehicle/follow_lane_sequence/move_backward_action.hpp>
 #include <optional>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace entity_behavior
 {
@@ -35,29 +36,16 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> MoveBackwardAction::c
 
 const traffic_simulator_msgs::msg::WaypointsArray MoveBackwardAction::calculateWaypoints()
 {
-  if (!entity_status->laneMatchingSucceed()) {
-    THROW_SIMULATION_ERROR("failed to assign lane");
-  }
   if (entity_status->getTwist().linear.x >= 0) {
     return traffic_simulator_msgs::msg::WaypointsArray();
+  } else if (const auto canonicalized_lanelet_pose = entity_status->getCanonicalizedLaneletPose()) {
+    traffic_simulator_msgs::msg::WaypointsArray waypoints;
+    waypoints.waypoints =
+      traffic_simulator::route::moveBackPoints(canonicalized_lanelet_pose.value());
+    return waypoints;
+  } else {
+    THROW_SIMULATION_ERROR("failed to assign lane");
   }
-  const auto lanelet_pose = entity_status->getLaneletPose();
-  const auto ids = hdmap_utils->getPreviousLanelets(lanelet_pose.lanelet_id);
-  // DIFFERENT SPLINE - recalculation needed
-  math::geometry::CatmullRomSpline spline(hdmap_utils->getCenterPoints(ids));
-  double s_in_spline = 0;
-  for (const auto id : ids) {
-    if (id == lanelet_pose.lanelet_id) {
-      s_in_spline = s_in_spline + lanelet_pose.s;
-      break;
-    } else {
-      s_in_spline = hdmap_utils->getLaneletLength(id) + s_in_spline;
-    }
-  }
-  traffic_simulator_msgs::msg::WaypointsArray waypoints;
-  waypoints.waypoints =
-    spline.getTrajectory(s_in_spline, s_in_spline - 5, 1.0, lanelet_pose.offset);
-  return waypoints;
 }
 
 void MoveBackwardAction::getBlackBoardValues() { VehicleActionNode::getBlackBoardValues(); }
@@ -78,8 +66,8 @@ BT::NodeStatus MoveBackwardAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!target_speed) {
-    target_speed =
-      hdmap_utils->getSpeedLimit(hdmap_utils->getPreviousLanelets(entity_status->getLaneletId()));
+    target_speed = traffic_simulator::route::speedLimit(
+      traffic_simulator::route::previousLanelets(entity_status->getLaneletId()));
   }
   setOutput(
     "non_canonicalized_updated_status", std::make_shared<traffic_simulator::EntityStatus>(

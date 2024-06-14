@@ -19,7 +19,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <string>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 
 namespace traffic_simulator
 {
@@ -36,17 +35,12 @@ class TrafficLightPublisher : public TrafficLightPublisherBase
 {
   const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
 
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
-
 public:
   template <typename NodePointer>
-  explicit TrafficLightPublisher(
-    const std::string & topic_name, const NodePointer & node,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils = nullptr)
+  explicit TrafficLightPublisher(const std::string & topic_name, const NodePointer & node)
   : TrafficLightPublisherBase(),
     traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
-    hdmap_utils_(hdmap_utils)
+      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local()))
   {
   }
 

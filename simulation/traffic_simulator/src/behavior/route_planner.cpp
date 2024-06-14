@@ -13,13 +13,11 @@
 // limitations under the License.
 
 #include <traffic_simulator/behavior/route_planner.hpp>
+#include <traffic_simulator/utils/route.hpp>
 
 namespace traffic_simulator
 {
-RoutePlanner::RoutePlanner(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-: hdmap_utils_ptr_(hdmap_utils_ptr)
-{
-}
+RoutePlanner::RoutePlanner() {}
 
 auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & waypoints) -> void
 {
@@ -33,6 +31,7 @@ auto RoutePlanner::setWaypoints(const std::vector<CanonicalizedLaneletPose> & wa
 auto RoutePlanner::getRouteLanelets(
   const CanonicalizedLaneletPose & entity_lanelet_pose, double horizon) -> lanelet::Ids
 {
+  constexpr bool include_current_lanelet{true};
   const auto lanelet_pose = static_cast<LaneletPose>(entity_lanelet_pose);
   // If the queue is not empty, calculating route from the entity_lanelet_pose to waypoint_queue_.front()
   if (!waypoint_queue_.empty()) {
@@ -41,15 +40,14 @@ auto RoutePlanner::getRouteLanelets(
   // If the route from the entity_lanelet_pose to waypoint_queue_.front() was failed to calculate in updateRoute function,
   // use following lanelet as route.
   if (!route_) {
-    return hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
+    return route::followingLanelets(lanelet_pose.lanelet_id, horizon, include_current_lanelet);
   }
-  if (route_ && hdmap_utils_ptr_->isInRoute(lanelet_pose.lanelet_id, route_.value())) {
-    return hdmap_utils_ptr_->getFollowingLanelets(
-      lanelet_pose.lanelet_id, route_.value(), horizon, true);
+  if (route_ && route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
+    return route::followingLanelets(lanelet_pose.lanelet_id, route_.value(), horizon, true);
   }
   // If the entity_lanelet_pose is in the lanelet id of the waypoint queue, cancel the target waypoint.
   cancelWaypoint(entity_lanelet_pose);
-  return hdmap_utils_ptr_->getFollowingLanelets(lanelet_pose.lanelet_id, horizon, true);
+  return route::followingLanelets(lanelet_pose.lanelet_id, horizon, include_current_lanelet);
 }
 
 void RoutePlanner::cancelRoute()
@@ -103,14 +101,14 @@ auto RoutePlanner::updateRoute(const CanonicalizedLaneletPose & entity_lanelet_p
   }
   const auto lanelet_pose = static_cast<LaneletPose>(entity_lanelet_pose);
   if (!route_) {
-    route_ = hdmap_utils_ptr_->getRoute(
+    route_ = route::getRoute(
       lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id);
     return;
   }
-  if (hdmap_utils_ptr_->isInRoute(lanelet_pose.lanelet_id, route_.value())) {
+  if (route::isInRoute(lanelet_pose.lanelet_id, route_.value())) {
     return;
   } else {
-    route_ = hdmap_utils_ptr_->getRoute(
+    route_ = route::getRoute(
       lanelet_pose.lanelet_id, static_cast<LaneletPose>(waypoint_queue_.front()).lanelet_id);
     return;
   }

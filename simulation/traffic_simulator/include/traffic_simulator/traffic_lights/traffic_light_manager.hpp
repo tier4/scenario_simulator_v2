@@ -15,13 +15,13 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MANAGER_BASE_HPP_
 
+#include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <iomanip>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <simulation_interface/conversions.hpp>
 #include <stdexcept>  // std::out_of_range
 #include <string>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <tuple>
 #include <unordered_map>
@@ -37,10 +37,8 @@ protected:
 
   TrafficLightMap traffic_lights_;
 
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_;
-
 public:
-  explicit TrafficLightManager(const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap);
+  explicit TrafficLightManager();
 
   auto getTrafficLight(const lanelet::Id traffic_light_id) -> TrafficLight &;
 
@@ -54,6 +52,10 @@ public:
     -> std::vector<std::reference_wrapper<TrafficLight>>;
 
   auto hasAnyLightChanged() -> bool;
+
+  auto getDistanceToActiveTrafficLightStopLine(
+    const lanelet::Ids & route_lanelets, const math::geometry::CatmullRomSplineInterface & spline)
+    -> std::optional<double>;
 
   auto generateUpdateTrafficLightsRequest() -> simulation_api_schema::UpdateTrafficLightsRequest;
 };
