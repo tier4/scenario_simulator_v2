@@ -100,8 +100,7 @@ auto transformToCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
-  const double matching_distance)
-  -> std::optional<CanonicalizedLaneletPose>;
+  const double matching_distance) -> std::optional<CanonicalizedLaneletPose>;
 }  // namespace pedestrian
 }  // namespace pose
 }  // namespace traffic_simulator
