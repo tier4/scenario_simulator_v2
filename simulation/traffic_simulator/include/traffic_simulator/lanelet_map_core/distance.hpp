@@ -42,11 +42,11 @@ auto longitudinalDistance(
   -> std::optional<double>;
 
 // StopLine
-auto distanceToStopLine(
-  const lanelet::Ids & route_lanelets, const std::vector<Point> & route_waypoints)
+auto distanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
   -> std::optional<double>;
 
-auto distanceToStopLine(const lanelet::Ids & route_lanelets, const SplineInterface & spline)
+auto distanceToStopLine(
+  const lanelet::Ids & route_lanelets, const std::vector<Point> & route_waypoints)
   -> std::optional<double>;
 
 auto distanceToStopLine(const std::vector<Point> & route_waypoints, const lanelet::Id stop_line_id)
@@ -54,18 +54,19 @@ auto distanceToStopLine(const std::vector<Point> & route_waypoints, const lanele
 
 // TrafficLigthStopLine
 auto distanceToTrafficLightStopLine(
-  const lanelet::Ids & route_lanelets, const std::vector<Point> & waypoints)
+  const SplineInterface & route_spline, const lanelet::Id traffic_light_id)
   -> std::optional<double>;
-
-auto distanceToTrafficLightStopLine(
-  const lanelet::Ids & route_lanelets, const SplineInterface & spline) -> std::optional<double>;
 
 auto distanceToTrafficLightStopLine(
   const std::vector<Point> & route_waypoints, const lanelet::Id traffic_light_id)
   -> std::optional<double>;
 
 auto distanceToTrafficLightStopLine(
-  const SplineInterface & route_spline, const lanelet::Id traffic_light_id)
+  const lanelet::Ids & route_lanelets, const SplineInterface & route_spline)
+  -> std::optional<double>;
+
+auto distanceToTrafficLightStopLine(
+  const lanelet::Ids & route_lanelets, const std::vector<Point> & route_waypoints)
   -> std::optional<double>;
 
 // Crosswalk
@@ -74,9 +75,6 @@ auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanel
 
 auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id crosswalk_id)
   -> std::optional<double>;
-
-// private
-auto stopLinesOnPath(const lanelet::Ids & lanelet_ids) -> lanelet::ConstLineStrings3d;
 }  // namespace distance
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator
