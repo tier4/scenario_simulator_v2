@@ -83,12 +83,12 @@ auto longitudinalDistance(
         const auto next_lanelet_pose = helper::constructLaneletPose(route[i + 1], 0.0, 0.0);
         const auto current_lanelet_pose = helper::constructLaneletPose(route[i], 0.0, 0.0);
         if (
-          auto next_lanelet_origin_from_current_lanelet =
-            pose::toLaneletPose(pose::toMapPose(next_lanelet_pose).pose, route[i], 10.0)) {
+          auto next_lanelet_origin_from_current_lanelet = pose::toLaneletPose(
+            pose::toMapPose(next_lanelet_pose).pose, route[i], matching_distance)) {
           longitudinal_distance += next_lanelet_origin_from_current_lanelet->s;
         } else if (
-          auto current_lanelet_origin_from_next_lanelet =
-            pose::toLaneletPose(pose::toMapPose(current_lanelet_pose).pose, route[i + 1], 10.0)) {
+          auto current_lanelet_origin_from_next_lanelet = pose::toLaneletPose(
+            pose::toMapPose(current_lanelet_pose).pose, route[i + 1], matching_distance)) {
           longitudinal_distance -= current_lanelet_origin_from_next_lanelet->s;
         } else {
           /// @todo maybe an exception should be thrown here? since the route exists but is incorrect?
