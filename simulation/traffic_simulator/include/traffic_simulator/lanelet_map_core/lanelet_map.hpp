@@ -31,19 +31,19 @@ namespace lanelet_map
 using Point = geometry_msgs::msg::Point;
 using Spline = math::geometry::CatmullRomSpline;
 
-auto isInLanelet(const lanelet::Id lanelet_id, const double s) -> bool;
+auto isInLanelet(const lanelet::Id lanelet_id, const double lanelet_pose_s) -> bool;
 
 auto isInLanelet(const lanelet::Id lanelet_id, const Point point) -> bool;
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;
 
-auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
+auto laneletYaw(const lanelet::Id lanelet_id, const Point & point)
   -> std::tuple<double, Point, Point>;
 
 auto laneletIds() -> lanelet::Ids;
 
 auto nearbyLaneletIds(
-  const Point &, const double distance_threshold, const bool include_crosswalk,
+  const Point & point, const double distance_threshold, const bool include_crosswalk,
   const std::size_t search_count) -> lanelet::Ids;
 
 // Center points
@@ -54,25 +54,25 @@ auto centerPoints(const lanelet::Id lanelet_id) -> std::vector<Point>;
 auto centerPointsSpline(const lanelet::Id lanelet_id) -> std::shared_ptr<Spline>;
 
 // Next lanelet
-auto nextLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
-
-auto nextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
-  -> lanelet::Ids;
-
 auto nextLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
+
+auto nextLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 
 auto nextLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
   -> lanelet::Ids;
 
-//Previous lanelet
-auto previousLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
-
-auto previousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
+auto nextLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
   -> lanelet::Ids;
 
+//Previous lanelet
 auto previousLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 
+auto previousLaneletIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
+
 auto previousLaneletIds(const lanelet::Id lanelet_id, const std::string & turn_direction)
+  -> lanelet::Ids;
+
+auto previousLaneletIds(const lanelet::Ids & lanelet_ids, const std::string & turn_direction)
   -> lanelet::Ids;
 
 //Bounds
@@ -85,22 +85,17 @@ auto laneletPolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
 auto stopLinePolygon(const lanelet::Id lanelet_id) -> std::vector<Point>;
 
+auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
+
 // Relations
 auto rightOfWayLaneletIds(const lanelet::Ids & lanelet_ids)
   -> std::unordered_map<lanelet::Id, lanelet::Ids>;
 
 auto rightOfWayLaneletIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 
-auto conflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
-
 auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 
-// private
-auto toPolygon(const lanelet::ConstLineString3d & line_string) -> std::vector<Point>;
-
-auto excludeSubtypeLanelets(
-  const std::vector<std::pair<double, lanelet::Lanelet>> & lls, const char subtype[])
-  -> std::vector<std::pair<double, lanelet::Lanelet>>;
+auto conflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 }  // namespace lanelet_map
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator

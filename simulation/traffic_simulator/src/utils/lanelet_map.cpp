@@ -26,7 +26,7 @@ auto laneletLength(const lanelet::Id lanelet_id) -> double
 auto laneletYaw(const Point & point, const lanelet::Id lanelet_id)
   -> std::tuple<double, Point, Point>
 {
-  return lanelet_map_core::lanelet_map::laneletYaw(point, lanelet_id);
+  return lanelet_map_core::lanelet_map::laneletYaw(lanelet_id, point);
 }
 
 auto nearbyLaneletIds(
