@@ -86,8 +86,8 @@ auto AutowareUniverse::updateLocalization() -> void
     static std::mt19937 rand_engine(seed);
     // localization noise should not be updated every time, so A changing probability is set to 0.01.
     double noise_update_probability = 0.01;
-    // yaw noise affacts detected_objects' location, we may need to set yaw noise as 0.0.
-    double std_dev_x = 0.03, std_dev_y = 0.008, std_dev_yaw = 0.04;
+    // yaw noise affacts detected_objects' dummy point cloud, set yaw noise to 0.0 temporarily.
+    double std_dev_x = 0.03, std_dev_y = 0.008, std_dev_yaw = 0.0; //std_dev_yaw = 0.04
     
     std::uniform_real_distribution<double> distribution_update(0.0, 1.0);
 

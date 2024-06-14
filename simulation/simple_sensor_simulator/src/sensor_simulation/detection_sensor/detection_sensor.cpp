@@ -290,7 +290,7 @@ struct EllipseBasedNoiseApplicator : public DefaultNoiseApplicator
   const std::vector<double> tp_rate_values = {0.92, 0.77, 0.74, 0.66, 0.57, 0.28, 0.09, 0.03, 0.00};
   const std::vector<double> distance_mean_values = {0.25, 0.27, 0.44, 0.67, 1.00, 3.00, 4.09, 3.40, 0.00};
   const std::vector<double> distance_std_values = {0.35, 0.54, 0.83, 1.14, 1.60, 3.56, 4.31, 3.61, 0.00};
-  const std::vector<double> yaw_mean_values = {0.01, 0.01, 0.00, 0.03, 0.04, 0.00, 0.01, -1.93, 0.00};
+  const std::vector<double> yaw_mean_values = {0.01, 0.01, 0.00, 0.03, 0.04, 0.00, 0.01, 0.00, 0.00};
   const std::vector<double> yaw_std_values = {0.45, 0.76, 0.79, 0.68, 0.76, 1.59, 1.71, 2.55, 0.00};
 
   double calculateEllipseDistance(double x, double y, double normalized_x_radius)
