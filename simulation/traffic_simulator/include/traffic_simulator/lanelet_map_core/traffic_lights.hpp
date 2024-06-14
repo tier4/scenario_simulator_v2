@@ -34,7 +34,10 @@ auto isTrafficLight(const lanelet::Id lanelet_id) -> bool;
 
 auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool;
 
-auto trafficLights(const lanelet::Id traffic_light_id)
+auto toTrafficLightRegulatoryElement(const lanelet::Id traffic_light_regulatory_element_id)
+  -> lanelet::TrafficLight::Ptr;
+
+auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
   -> std::vector<lanelet::AutowareTrafficLightConstPtr>;
 
 auto trafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::string & color_name)
@@ -43,20 +46,17 @@ auto trafficLightBulbPosition(const lanelet::Id traffic_light_id, const std::str
 auto trafficLightStopLinesPoints(const lanelet::Id traffic_light_id)
   -> std::vector<std::vector<Point>>;
 
-auto trafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> lanelet::TrafficLight::Ptr;
-
 auto trafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traffic_light_way_id)
   -> lanelet::Ids;
 
 // On path
+auto autowareTrafficLightsOnPath(const lanelet::Ids & lanelet_ids)
+  -> std::vector<lanelet::AutowareTrafficLightConstPtr>;
+
 auto trafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids;
 
-auto trafficSignRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
+auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
-
-// private
-auto trafficLightRegulatoryElementsOnPath(const lanelet::Ids & lanelet_ids)
-  -> std::vector<std::shared_ptr<const lanelet::autoware::AutowareTrafficLight>>;
 }  // namespace traffic_lights
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator
