@@ -13,6 +13,15 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.3 (2024-06-14)
+------------------
+* Merge pull request `#1284 <https://github.com/tier4/scenario_simulator_v2/issues/1284>`_ from tier4/fix/issue1276
+  Optimize `EntityManager::broadcastEntityTransform` to Execute Only Once
+* Merge branch 'master' into fix/issue1276
+* fix format
+* Only publsih tf onece.
+* Contributors: Masaya Kataoka, Taiga Takano
+
 2.1.2 (2024-06-13)
 ------------------
 * Merge branch 'master' into fix/interpreter/fault-injection-action
