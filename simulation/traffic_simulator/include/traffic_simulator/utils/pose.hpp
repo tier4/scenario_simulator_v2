@@ -91,13 +91,6 @@ auto boundingBoxRelativeLaneletPose(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> LaneletPose;
 
 // Others
-auto estimateCanonicalizedLaneletPose(
-  const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
-  const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
-  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> std::optional<CanonicalizedLaneletPose>;
-
 auto isInLanelet(
   const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
   const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool;
@@ -110,6 +103,16 @@ auto isAtEndOfLanelets(
 auto laneletLength(
   const lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
   -> double;
+
+namespace pedestrian
+{
+auto transformToCanonicalizedLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
+  const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
+  const double matching_distance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> std::optional<CanonicalizedLaneletPose>;
+}  // namespace pedestrian
 }  // namespace pose
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__UTILS__POSE_HPP_
