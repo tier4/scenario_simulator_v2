@@ -95,7 +95,6 @@ const simulation_api_schema::DetectionSensorConfiguration constructDetectionSens
   return configuration;
 }
 
-
 const simulation_api_schema::LidarConfiguration constructLidarConfiguration(
   const LidarType type, const std::string & entity, const std::string & architecture_type,
   const double lidar_sensor_delay, const double horizontal_resolution)
