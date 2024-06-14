@@ -42,7 +42,8 @@ auto speedLimit(const lanelet::Ids & lanelet_ids) -> double
   if (lanelet_ids.empty()) {
     THROW_SEMANTIC_ERROR("size of the vector lanelet ids should be more than 1");
   } else {
-    std::vector<double> limits(lanelet_ids.size());
+    std::vector<double> limits;
+    limits.reserve(lanelet_ids.size());
     for (const auto & lanelet_id : lanelet_ids) {
       const auto & lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
       const auto & limit = LaneletMapCore::trafficRulesVehicle()->speedLimit(lanelet);

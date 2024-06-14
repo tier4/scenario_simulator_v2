@@ -425,7 +425,8 @@ auto leftLaneletIds(
   const bool include_opposite_direction) -> lanelet::Ids
 {
   const auto laneletIds = [](const auto & lanelets) -> lanelet::Ids {
-    lanelet::Ids lanelet_ids(lanelets.size());
+    lanelet::Ids lanelet_ids;
+    lanelet_ids.reserve(lanelets.size());
     std::transform(lanelets.begin(), lanelets.end(), lanelet_ids.begin(), [](const auto & lanelet) {
       return lanelet.id();
     });
@@ -463,7 +464,8 @@ auto rightLaneletIds(
   const bool include_opposite_direction) -> lanelet::Ids
 {
   const auto laneletIds = [](const auto & lanelets) -> lanelet::Ids {
-    lanelet::Ids lanelet_ids(lanelets.size());
+    lanelet::Ids lanelet_ids;
+    lanelet_ids.reserve(lanelets.size());
     std::transform(lanelets.begin(), lanelets.end(), lanelet_ids.begin(), [](const auto & lanelet) {
       return lanelet.id();
     });
