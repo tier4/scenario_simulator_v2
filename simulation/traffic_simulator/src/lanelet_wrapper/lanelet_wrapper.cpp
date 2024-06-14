@@ -17,13 +17,13 @@
 
 #include <lanelet2_extension/projection/mgrs_projector.hpp>
 #include <lanelet2_extension/utility/query.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
-auto LaneletMapCore::activate(const std::string & lanelet_map_path) -> void
+auto LaneletWrapper::activate(const std::string & lanelet_map_path) -> void
 {
   lanelet_map_path_ = lanelet_map_path;
   if (instance) {
@@ -32,12 +32,12 @@ auto LaneletMapCore::activate(const std::string & lanelet_map_path) -> void
   }
 }
 
-LaneletMapCore & LaneletMapCore::getInstance()
+LaneletWrapper & LaneletWrapper::getInstance()
 {
   std::lock_guard<std::mutex> lock(mutex_);
   if (!instance) {
     if (!lanelet_map_path_.empty()) {
-      instance.reset(new LaneletMapCore(lanelet_map_path_));
+      instance.reset(new LaneletWrapper(lanelet_map_path_));
     } else {
       THROW_SIMULATION_ERROR(
         "lanelet_map_path is empty! Please call lanelet_map::activate() first.");
@@ -46,45 +46,45 @@ LaneletMapCore & LaneletMapCore::getInstance()
   return *instance;
 }
 
-auto LaneletMapCore::routeCache() -> RouteCache & { return getInstance().route_cache_; }
+auto LaneletWrapper::routeCache() -> RouteCache & { return getInstance().route_cache_; }
 
-auto LaneletMapCore::centerPointsCache() -> CenterPointsCache &
+auto LaneletWrapper::centerPointsCache() -> CenterPointsCache &
 {
   return getInstance().center_points_cache_;
 }
 
-auto LaneletMapCore::laneletLengthCache() -> LaneletLengthCache &
+auto LaneletWrapper::laneletLengthCache() -> LaneletLengthCache &
 {
   return getInstance().lanelet_length_cache_;
 }
 
-auto LaneletMapCore::map() -> const lanelet::LaneletMapPtr &
+auto LaneletWrapper::map() -> const lanelet::LaneletMapPtr &
 {
   return getInstance().lanelet_map_ptr_;
 }
 
-auto LaneletMapCore::shoulderLanelets() -> const lanelet::ConstLanelets &
+auto LaneletWrapper::shoulderLanelets() -> const lanelet::ConstLanelets &
 {
   return getInstance().shoulder_lanelets_;
 }
-auto LaneletMapCore::vehicleRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
+auto LaneletWrapper::vehicleRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
 {
   return getInstance().vehicle_routing_graph_ptr_;
 }
-auto LaneletMapCore::pedestrianRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
+auto LaneletWrapper::pedestrianRoutingGraph() -> const lanelet::routing::RoutingGraphConstPtr &
 {
   return getInstance().pedestrian_routing_graph_ptr_;
 }
-auto LaneletMapCore::trafficRulesVehicle() -> const lanelet::traffic_rules::TrafficRulesPtr &
+auto LaneletWrapper::trafficRulesVehicle() -> const lanelet::traffic_rules::TrafficRulesPtr &
 {
   return getInstance().traffic_rules_vehicle_ptr_;
 }
-auto LaneletMapCore::trafficRulesPedestrian() -> const lanelet::traffic_rules::TrafficRulesPtr &
+auto LaneletWrapper::trafficRulesPedestrian() -> const lanelet::traffic_rules::TrafficRulesPtr &
 {
   return getInstance().traffic_rules_pedestrian_ptr_;
 }
 
-LaneletMapCore::LaneletMapCore(const std::filesystem::path & lanelet_map_path)
+LaneletWrapper::LaneletWrapper(const std::filesystem::path & lanelet_map_path)
 {
   lanelet::projection::MGRSProjector mgrs_projector;
   lanelet::ErrorMessages lanelet_errors;
@@ -117,7 +117,7 @@ LaneletMapCore::LaneletMapCore(const std::filesystem::path & lanelet_map_path)
     lanelet::routing::RoutingGraph::build(*lanelet_map_ptr_, *traffic_rules_pedestrian_ptr_);
 }
 
-auto LaneletMapCore::calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
+auto LaneletWrapper::calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
   -> std::vector<double>
 {
   auto calculateSegmentDistances =
@@ -139,7 +139,7 @@ auto LaneletMapCore::calculateAccumulatedLengths(const lanelet::ConstLineString3
   return accumulated_lengths;
 }
 
-auto LaneletMapCore::resamplePoints(
+auto LaneletWrapper::resamplePoints(
   const lanelet::ConstLineString3d & line_string, const std::int32_t num_segments)
   -> lanelet::BasicPoints3d
 {
@@ -190,7 +190,7 @@ auto LaneletMapCore::resamplePoints(
   return resampled_points;
 }
 
-auto LaneletMapCore::overwriteLaneletsCenterline() -> void
+auto LaneletWrapper::overwriteLaneletsCenterline() -> void
 {
   constexpr double resolution{2.0};
 
@@ -228,5 +228,5 @@ auto LaneletMapCore::overwriteLaneletsCenterline() -> void
     }
   }
 }
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

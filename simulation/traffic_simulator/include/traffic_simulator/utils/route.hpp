@@ -20,8 +20,8 @@
 #include <geometry/spline/hermite_curve.hpp>
 #include <traffic_simulator/data_type/lane_change.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/lanelet_map_core/lane_change.hpp>
-#include <traffic_simulator/lanelet_map_core/route.hpp>
+#include <traffic_simulator/lanelet_wrapper/lane_change.hpp>
+#include <traffic_simulator/lanelet_wrapper/route.hpp>
 
 namespace traffic_simulator
 {
@@ -39,13 +39,13 @@ auto toSpline(const lanelet::Ids & route) -> Spline;
 template <typename... Ts>
 auto getRoute(Ts &&... xs)
 {
-  return lanelet_map_core::route::route(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::route::route(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 auto speedLimit(Ts &&... xs)
 {
-  return lanelet_map_core::route::speedLimit(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::route::speedLimit(std::forward<decltype(xs)>(xs)...);
 }
 
 auto isAnyConflictingEntity(
@@ -60,7 +60,7 @@ auto isNeedToRightOfWay(
 template <typename... Ts>
 auto followingLanelets(Ts &&... xs)
 {
-  return lanelet_map_core::route::followingLanelets(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::route::followingLanelets(std::forward<decltype(xs)>(xs)...);
 }
 
 auto moveAlongLaneletPose(
@@ -71,7 +71,7 @@ auto moveAlongLaneletPose(
 template <typename... Ts>
 auto previousLanelets(Ts &&... xs)
 {
-  return lanelet_map_core::route::previousLanelets(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::route::previousLanelets(std::forward<decltype(xs)>(xs)...);
 }
 
 auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
@@ -81,7 +81,7 @@ auto moveBackPoints(const CanonicalizedLaneletPose & canonicalized_lanelet_pose)
 template <typename... Ts>
 auto laneChangeableLaneletId(Ts &&... xs)
 {
-  return lanelet_map_core::lane_change::laneChangeableLaneletId(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::lane_change::laneChangeableLaneletId(std::forward<decltype(xs)>(xs)...);
 }
 
 auto laneChangeAlongLaneletPose(

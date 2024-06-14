@@ -18,8 +18,8 @@
 #include <geometry_msgs/msg/point.hpp>
 #include <lanelet2_extension/visualization/visualization.hpp>
 #include <traffic_simulator/color_utils/color_utils.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
@@ -32,7 +32,7 @@ using Pose = geometry_msgs::msg::Pose;
 template <typename... Ts>
 inline auto activate(Ts &&... xs)
 {
-  return lanelet_map_core::LaneletMapCore::activate(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::LaneletWrapper::activate(std::forward<decltype(xs)>(xs)...);
 }
 
 auto laneletLength(const lanelet::Id lanelet_id) -> double;

@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_TRAFFIC_LIGHTS_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_TRAFFIC_LIGHTS_HPP_
+#ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_TRAFFIC_LIGHTS_HPP_
+#define TRAFFIC_SIMULATOR__LANELET_WRAPPER_TRAFFIC_LIGHTS_HPP_
 
 #include <geometry_msgs/msg/point.hpp>
 #include <lanelet2_extension/utility/query.hpp>
 #include <optional>
-#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace traffic_lights
 {
@@ -58,6 +58,6 @@ auto trafficLightIdsOnPath(const lanelet::Ids & route_lanelets) -> lanelet::Ids;
 auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
   -> std::vector<std::shared_ptr<const lanelet::TrafficSign>>;
 }  // namespace traffic_lights
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_TRAFFIC_LIGHTS_HPP_
+#endif  // TRAFFIC_SIMULATOR__LANELET_WRAPPER_TRAFFIC_LIGHTS_HPP_

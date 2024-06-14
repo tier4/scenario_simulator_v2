@@ -20,13 +20,13 @@
 
 #include <lanelet2_extension/utility/utilities.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
-#include <traffic_simulator/lanelet_map_core/route.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
+#include <traffic_simulator/lanelet_wrapper/route.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace route
 {
@@ -45,8 +45,8 @@ auto speedLimit(const lanelet::Ids & lanelet_ids) -> double
     std::vector<double> limits;
     limits.reserve(lanelet_ids.size());
     for (const auto & lanelet_id : lanelet_ids) {
-      const auto & lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
-      const auto & limit = LaneletMapCore::trafficRulesVehicle()->speedLimit(lanelet);
+      const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
+      const auto & limit = LaneletWrapper::trafficRulesVehicle()->speedLimit(lanelet);
       limits.push_back(lanelet::units::KmHQuantity(limit.speedLimit).value() / 3.6);
     }
     return *std::min_element(limits.begin(), limits.end());
@@ -57,9 +57,9 @@ auto route(
   const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id, const bool allow_lane_change)
   -> lanelet::Ids
 {
-  return LaneletMapCore::routeCache().getRoute(
-    from_lanelet_id, to_lanelet_id, allow_lane_change, LaneletMapCore::map(),
-    LaneletMapCore::vehicleRoutingGraph());
+  return LaneletWrapper::routeCache().getRoute(
+    from_lanelet_id, to_lanelet_id, allow_lane_change, LaneletWrapper::map(),
+    LaneletWrapper::vehicleRoutingGraph());
 }
 
 auto followingLanelets(
@@ -155,5 +155,5 @@ auto previousLanelets(const lanelet::Id lanelet_id, const double distance) -> la
   return previous_lanelets_ids;
 }
 }  // namespace route
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

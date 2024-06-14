@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_ROUTE_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_ROUTE_HPP_
+#ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_ROUTE_HPP_
+#define TRAFFIC_SIMULATOR__LANELET_WRAPPER_ROUTE_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
@@ -21,7 +21,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace route
 {
@@ -43,6 +43,6 @@ auto followingLanelets(
 
 auto previousLanelets(const lanelet::Id lanelet_id, const double distance = 100) -> lanelet::Ids;
 }  // namespace route
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_ROUTE_HPP_
+#endif  // TRAFFIC_SIMULATOR__LANELET_WRAPPER_ROUTE_HPP_

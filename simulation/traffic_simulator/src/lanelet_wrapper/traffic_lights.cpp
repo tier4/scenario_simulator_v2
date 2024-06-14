@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/lanelet_map_core/traffic_lights.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace traffic_lights
 {
 auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
 {
-  if (LaneletMapCore::map()->lineStringLayer.exists(lanelet_id)) {
-    if (const auto && linestring = LaneletMapCore::map()->lineStringLayer.get(lanelet_id);
+  if (LaneletWrapper::map()->lineStringLayer.exists(lanelet_id)) {
+    if (const auto && linestring = LaneletWrapper::map()->lineStringLayer.get(lanelet_id);
         linestring.hasAttribute(lanelet::AttributeName::Type)) {
       return linestring.attribute(lanelet::AttributeName::Type).value() == "traffic_light";
     }
@@ -33,9 +33,9 @@ auto isTrafficLight(const lanelet::Id lanelet_id) -> bool
 
 auto isTrafficLightRegulatoryElement(const lanelet::Id lanelet_id) -> bool
 {
-  return LaneletMapCore::map()->regulatoryElementLayer.exists(lanelet_id) &&
+  return LaneletWrapper::map()->regulatoryElementLayer.exists(lanelet_id) &&
          std::dynamic_pointer_cast<lanelet::TrafficLight>(
-           LaneletMapCore::map()->regulatoryElementLayer.get(lanelet_id));
+           LaneletWrapper::map()->regulatoryElementLayer.get(lanelet_id));
 }
 
 auto toTrafficLightRegulatoryElement(const lanelet::Id traffic_light_regulatory_element_id)
@@ -43,7 +43,7 @@ auto toTrafficLightRegulatoryElement(const lanelet::Id traffic_light_regulatory_
 {
   if (isTrafficLightRegulatoryElement(traffic_light_regulatory_element_id)) {
     return std::dynamic_pointer_cast<lanelet::TrafficLight>(
-      LaneletMapCore::map()->regulatoryElementLayer.get(traffic_light_regulatory_element_id));
+      LaneletWrapper::map()->regulatoryElementLayer.get(traffic_light_regulatory_element_id));
   } else {
     THROW_SEMANTIC_ERROR(
       traffic_light_regulatory_element_id, " is not traffic light regulatory element!");
@@ -60,7 +60,7 @@ auto toAutowareTrafficLights(const lanelet::Id traffic_light_id)
   };
 
   std::vector<lanelet::AutowareTrafficLightConstPtr> autoware_traffic_lights;
-  const auto & all_lanelets = lanelet::utils::query::laneletLayer(LaneletMapCore::map());
+  const auto & all_lanelets = lanelet::utils::query::laneletLayer(LaneletWrapper::map());
   for (const auto & autoware_traffic_light :
        lanelet::utils::query::autowareTrafficLights(all_lanelets)) {
     for (auto three_light_bulbs : autoware_traffic_light->lightBulbs()) {
@@ -121,7 +121,7 @@ auto trafficLightRegulatoryElementIDsFromTrafficLight(const lanelet::Id traffic_
 {
   if (isTrafficLight(traffic_light_id)) {
     lanelet::Ids traffic_light_regulatory_element_ids;
-    for (const auto & regulatory_element : LaneletMapCore::map()->regulatoryElementLayer) {
+    for (const auto & regulatory_element : LaneletWrapper::map()->regulatoryElementLayer) {
       if (
         regulatory_element->attribute(lanelet::AttributeName::Subtype).value() == "traffic_light") {
         for (const auto & reference_traffic_light :
@@ -144,7 +144,7 @@ auto autowareTrafficLightsOnPath(const lanelet::Ids & lanelet_ids)
 {
   std::vector<lanelet::AutowareTrafficLightConstPtr> autoware_traffic_lights;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto & lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+    const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
     for (const auto & traffic_light :
          lanelet.regulatoryElementsAs<const lanelet::autoware::AutowareTrafficLight>()) {
       autoware_traffic_lights.push_back(traffic_light);
@@ -174,7 +174,7 @@ auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
 {
   std::vector<std::shared_ptr<const lanelet::TrafficSign>> ret;
   for (const auto & lanelet_id : lanelet_ids) {
-    const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+    const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
     const auto traffic_signs = lanelet.regulatoryElementsAs<const lanelet::TrafficSign>();
     for (const auto & traffic_sign : traffic_signs) {
       ret.emplace_back(traffic_sign);
@@ -183,5 +183,5 @@ auto trafficSignsOnPath(const lanelet::Ids & lanelet_ids)
   return ret;
 }
 }  // namespace traffic_lights
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

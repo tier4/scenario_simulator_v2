@@ -16,10 +16,10 @@
 #include <geometry/distance.hpp>
 #include <geometry/transform.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/lanelet_map_core/distance.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
-#include <traffic_simulator/lanelet_map_core/pose.hpp>
-#include <traffic_simulator/lanelet_map_core/route.hpp>
+#include <traffic_simulator/lanelet_wrapper/distance.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/route.hpp>
 #include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
@@ -31,7 +31,7 @@ auto lateralDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   const bool allow_lane_change) -> std::optional<double>
 {
-  return lanelet_map_core::distance::lateralDistance(
+  return lanelet_wrapper::distance::lateralDistance(
     static_cast<LaneletPose>(from), static_cast<LaneletPose>(to), allow_lane_change);
 }
 
@@ -67,10 +67,10 @@ auto longitudinalDistance(
       }
     }
 
-    const auto forward_distance = lanelet_map_core::distance::longitudinalDistance(
+    const auto forward_distance = lanelet_wrapper::distance::longitudinalDistance(
       static_cast<LaneletPose>(from), to_canonicalized, allow_lane_change);
 
-    const auto backward_distance = lanelet_map_core::distance::longitudinalDistance(
+    const auto backward_distance = lanelet_wrapper::distance::longitudinalDistance(
       to_canonicalized, static_cast<LaneletPose>(from), allow_lane_change);
 
     if (forward_distance && backward_distance) {
@@ -91,7 +91,7 @@ auto longitudinalDistance(
      * A matching distance of about 1.5 lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
      */
-    auto from_poses = lanelet_map_core::pose::toLaneletPoses(
+    auto from_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<Pose>(from), static_cast<LaneletPose>(from).lanelet_id, matching_distance,
       include_opposite_direction);
     from_poses.emplace_back(from);
@@ -100,7 +100,7 @@ auto longitudinalDistance(
      * A matching distance of about 1.5 lane widths is given as the matching distance to match the
      * Entity present on the adjacent Lanelet.
      */
-    auto to_poses = lanelet_map_core::pose::toLaneletPoses(
+    auto to_poses = lanelet_wrapper::pose::toLaneletPoses(
       static_cast<Pose>(to), static_cast<LaneletPose>(to).lanelet_id, matching_distance,
       include_opposite_direction);
     to_poses.emplace_back(to);
@@ -202,7 +202,7 @@ auto splineDistanceToBoundingBox(
 auto distanceToLeftLaneBound(
   const Pose & map_pose, const BoundingBox & bounding_box, const lanelet::Id lanelet_id) -> double
 {
-  if (const auto bound = lanelet_map_core::lanelet_map::leftBound(lanelet_id); bound.empty()) {
+  if (const auto bound = lanelet_wrapper::lanelet_map::leftBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate left bounds of lanelet_id : ", lanelet_id, " please check lanelet map.");
   } else if (const auto polygon =
@@ -228,7 +228,7 @@ auto distanceToLeftLaneBound(
 auto distanceToRightLaneBound(
   const Pose & map_pose, const BoundingBox & bounding_box, const lanelet::Id lanelet_id) -> double
 {
-  if (const auto bound = lanelet_map_core::lanelet_map::rightBound(lanelet_id); bound.empty()) {
+  if (const auto bound = lanelet_wrapper::lanelet_map::rightBound(lanelet_id); bound.empty()) {
     THROW_SEMANTIC_ERROR(
       "Failed to calculate right bounds of lanelet_id : ", lanelet_id,
       " please check lanelet map.");
@@ -287,14 +287,14 @@ auto distanceToYieldStop(
 
   std::set<double> distances;
   for (const auto & lanelet_id : following_lanelets) {
-    const auto right_of_way_ids = lanelet_map_core::lanelet_map::rightOfWayLaneletIds(lanelet_id);
+    const auto right_of_way_ids = lanelet_wrapper::lanelet_map::rightOfWayLaneletIds(lanelet_id);
     for (const auto right_of_way_id : right_of_way_ids) {
       const auto other_poses = getPosesOnLanelet(right_of_way_id);
       if (!other_poses.empty()) {
-        const auto distance_forward = lanelet_map_core::distance::longitudinalDistance(
+        const auto distance_forward = lanelet_wrapper::distance::longitudinalDistance(
           static_cast<LaneletPose>(reference_pose),
           helper::constructLaneletPose(lanelet_id, 0.0, 0.0), allow_lane_change);
-        const auto distance_backward = lanelet_map_core::distance::longitudinalDistance(
+        const auto distance_backward = lanelet_wrapper::distance::longitudinalDistance(
           helper::constructLaneletPose(lanelet_id, 0.0, 0.0),
           static_cast<LaneletPose>(reference_pose), allow_lane_change);
         if (distance_forward) {
@@ -320,7 +320,7 @@ auto distanceToNearestConflictingPose(
       const lanelet::Ids & following_lanelets) -> std::vector<CanonicalizedEntityStatus> {
     std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
     const auto conflicting_crosswalks =
-      lanelet_map_core::lanelet_map::conflictingCrosswalkIds(following_lanelets);
+      lanelet_wrapper::lanelet_map::conflictingCrosswalkIds(following_lanelets);
     for (const auto & status : other_statuses) {
       if (
         status.laneMatchingSucceed() &&
@@ -338,7 +338,7 @@ auto distanceToNearestConflictingPose(
       const lanelet::Ids & following_lanelets) -> std::vector<CanonicalizedEntityStatus> {
     std::vector<CanonicalizedEntityStatus> conflicting_entity_status;
     const auto conflicting_lanes =
-      lanelet_map_core::lanelet_map::conflictingLaneIds(following_lanelets);
+      lanelet_wrapper::lanelet_map::conflictingLaneIds(following_lanelets);
     for (const auto & status : other_statuses) {
       if (
         status.laneMatchingSucceed() &&

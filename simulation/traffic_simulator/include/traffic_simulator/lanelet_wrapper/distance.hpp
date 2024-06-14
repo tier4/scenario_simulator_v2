@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_DISTANCE_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_DISTANCE_HPP_
+#ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_DISTANCE_HPP_
+#define TRAFFIC_SIMULATOR__LANELET_WRAPPER_DISTANCE_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
-#include <traffic_simulator/lanelet_map_core/traffic_lights.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace distance
 {
@@ -76,6 +76,6 @@ auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanel
 auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id crosswalk_id)
   -> std::optional<double>;
 }  // namespace distance
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_DISTANCE_HPP_
+#endif  // TRAFFIC_SIMULATOR__LANELET_WRAPPER_DISTANCE_HPP_

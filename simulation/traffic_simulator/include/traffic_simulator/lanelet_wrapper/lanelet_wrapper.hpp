@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef LaneletMapCoreTRAFFIC_SIMULATOR__UTILS__LANELET_MAP_CORE_MEMORY_HPP_
-#define LaneletMapCoreTRAFFIC_SIMULATOR__UTILS__LANELET_MAP_CORE_MEMORY_HPP_
+#ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_HPP_
+#define TRAFFIC_SIMULATOR__LANELET_WRAPPER_HPP_
 
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
@@ -47,7 +47,7 @@ public:
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 using Point = geometry_msgs::msg::Point;
 using Spline = math::geometry::CatmullRomSpline;
@@ -232,7 +232,7 @@ public:
   }
 };
 
-class LaneletMapCore
+class LaneletWrapper
 {
 public:
   static auto routeCache() -> RouteCache &;
@@ -248,8 +248,8 @@ public:
   static auto trafficRulesPedestrian() -> const lanelet::traffic_rules::TrafficRulesPtr &;
 
 private:
-  LaneletMapCore(const std::filesystem::path & lanelet2_map_path);
-  static LaneletMapCore & getInstance();
+  LaneletWrapper(const std::filesystem::path & lanelet2_map_path);
+  static LaneletWrapper & getInstance();
 
   auto calculateAccumulatedLengths(const lanelet::ConstLineString3d & line_string)
     -> std::vector<double>;
@@ -260,7 +260,7 @@ private:
 
   auto overwriteLaneletsCenterline() -> void;
 
-  inline static std::unique_ptr<LaneletMapCore> instance{nullptr};
+  inline static std::unique_ptr<LaneletWrapper> instance{nullptr};
   inline static std::string lanelet_map_path_{""};
   inline static std::mutex mutex_;
 
@@ -275,6 +275,6 @@ private:
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_vehicle_ptr_;
   lanelet::traffic_rules::TrafficRulesPtr traffic_rules_pedestrian_ptr_;
 };
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
-#endif  // LaneletMapCoreTRAFFIC_SIMULATOR__UTILS__LANELET_MAP_CORE_MEMORY_HPP_
+#endif  // TRAFFIC_SIMULATOR__LANELET_WRAPPER_HPP_

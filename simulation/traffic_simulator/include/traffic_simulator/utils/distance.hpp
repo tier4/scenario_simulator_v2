@@ -18,7 +18,7 @@
 #include <geometry/spline/catmull_rom_spline_interface.hpp>
 #include <traffic_simulator/data_type/entity_status.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
-#include <traffic_simulator/lanelet_map_core/distance.hpp>
+#include <traffic_simulator/lanelet_wrapper/distance.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 
@@ -95,20 +95,20 @@ auto distanceToRightLaneBound(
 template <typename... Ts>
 auto distanceToStopLine(Ts &&... xs)
 {
-  return lanelet_map_core::distance::distanceToStopLine(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::distance::distanceToStopLine(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 auto distanceToTrafficLightStopLine(Ts &&... xs)
 {
-  return lanelet_map_core::distance::distanceToTrafficLightStopLine(
+  return lanelet_wrapper::distance::distanceToTrafficLightStopLine(
     std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 auto distanceToCrosswalk(Ts &&... xs)
 {
-  return lanelet_map_core::distance::distanceToCrosswalk(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::distance::distanceToCrosswalk(std::forward<decltype(xs)>(xs)...);
 }
 
 auto distanceToYieldStop(

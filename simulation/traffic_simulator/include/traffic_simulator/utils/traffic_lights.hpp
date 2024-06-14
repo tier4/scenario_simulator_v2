@@ -15,7 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__UTILS__TRAFFIC_LIGHTS_HPP_
 #define TRAFFIC_SIMULATOR__UTILS__TRAFFIC_LIGHTS_HPP_
 
-#include <traffic_simulator/lanelet_map_core/traffic_lights.hpp>
+#include <traffic_simulator/lanelet_wrapper/traffic_lights.hpp>
 
 namespace traffic_simulator
 {
@@ -28,20 +28,20 @@ auto trafficLightsIds(const lanelet::Id lanelet_id) -> lanelet::Ids;
 template <typename... Ts>
 inline auto bulbPosition(Ts &&... xs)
 {
-  return lanelet_map_core::traffic_lights::trafficLightBulbPosition(
+  return lanelet_wrapper::traffic_lights::trafficLightBulbPosition(
     std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 inline auto trafficLightIdsOnPath(Ts &&... xs)
 {
-  return lanelet_map_core::traffic_lights::trafficLightIdsOnPath(std::forward<decltype(xs)>(xs)...);
+  return lanelet_wrapper::traffic_lights::trafficLightIdsOnPath(std::forward<decltype(xs)>(xs)...);
 }
 
 template <typename... Ts>
 inline auto trafficLightRegulatoryElementIdsFromTrafficLightId(Ts &&... xs)
 {
-  return lanelet_map_core::traffic_lights::trafficLightRegulatoryElementIDsFromTrafficLight(
+  return lanelet_wrapper::traffic_lights::trafficLightRegulatoryElementIDsFromTrafficLight(
     std::forward<decltype(xs)>(xs)...);
 }
 }  // namespace traffic_lights

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANE_CHANGE_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANE_CHANGE_HPP_
+#ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANE_CHANGE_HPP_
+#define TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANE_CHANGE_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
 
@@ -23,7 +23,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace lane_change
 {
@@ -59,6 +59,6 @@ auto laneChangeTrajectory(
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>;
 }  // namespace lane_change
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANE_CHANGE_HPP_
+#endif  // TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANE_CHANGE_HPP_

@@ -13,15 +13,15 @@
 // limitations under the License.
 
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/lanelet_map_core/distance.hpp>
-#include <traffic_simulator/lanelet_map_core/lane_change.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
-#include <traffic_simulator/lanelet_map_core/pose.hpp>
-#include <traffic_simulator/lanelet_map_core/route.hpp>
+#include <traffic_simulator/lanelet_wrapper/distance.hpp>
+#include <traffic_simulator/lanelet_wrapper/lane_change.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/route.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace distance
 {
@@ -176,7 +176,7 @@ auto distanceToStopLine(const std::vector<Point> & route_waypoints, const lanele
   } else {
     const Spline route_spline{route_waypoints};
     return route_spline.getCollisionPointIn2D(
-      lanelet_map_core::lanelet_map::stopLinePolygon(stop_line_id));
+      lanelet_wrapper::lanelet_map::stopLinePolygon(stop_line_id));
   }
 }
 
@@ -245,7 +245,7 @@ auto distanceToCrosswalk(const std::vector<Point> & route_waypoints, const lanel
   } else {
     const Spline route_spline(route_waypoints);
     return route_spline.getCollisionPointIn2D(
-      lanelet_map_core::lanelet_map::laneletPolygon(crosswalk_id));
+      lanelet_wrapper::lanelet_map::laneletPolygon(crosswalk_id));
   }
 }
 
@@ -253,8 +253,8 @@ auto distanceToCrosswalk(const SplineInterface & route_spline, const lanelet::Id
   -> std::optional<double>
 {
   return route_spline.getCollisionPointIn2D(
-    lanelet_map_core::lanelet_map::laneletPolygon(crosswalk_id), false);
+    lanelet_wrapper::lanelet_map::laneletPolygon(crosswalk_id), false);
 }
 }  // namespace distance
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

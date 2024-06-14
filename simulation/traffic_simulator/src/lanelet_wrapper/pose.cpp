@@ -19,13 +19,13 @@
 #include <geometry/vector3/normalize.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
-#include <traffic_simulator/lanelet_map_core/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace pose
 {
@@ -397,10 +397,10 @@ auto matchToLane(
   bounding_box_object.absoluteHull = absoluteHullPolygon(bounding_box, bounding_box_object.pose);
   // find matches and optionally filter
   auto matches = lanelet::matching::getDeterministicMatches(
-    *LaneletMapCore::map(), bounding_box_object, matching_distance);
+    *LaneletWrapper::map(), bounding_box_object, matching_distance);
   if (!include_crosswalk) {
     matches = lanelet::matching::removeNonRuleCompliantMatches(
-      matches, LaneletMapCore::trafficRulesVehicle());
+      matches, LaneletWrapper::trafficRulesVehicle());
   }
   // find best match (minimalize offset)
   if (matches.empty()) {
@@ -438,9 +438,9 @@ auto leftLaneletIds(
     switch (entity_type.type) {
       case EntityType::EGO:
       case EntityType::VEHICLE:
-        return LaneletMapCore::vehicleRoutingGraph();
+        return LaneletWrapper::vehicleRoutingGraph();
       case EntityType::PEDESTRIAN:
-        return LaneletMapCore::pedestrianRoutingGraph();
+        return LaneletWrapper::pedestrianRoutingGraph();
       case EntityType::MISC_OBJECT:
       default:
         return nullptr;
@@ -448,7 +448,7 @@ auto leftLaneletIds(
   };
 
   if (const auto routingGraph = getRoutingGraph(entity_type)) {
-    const auto & lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+    const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
     if (include_opposite_direction) {
       return laneletIds(routingGraph->lefts(lanelet));
     } else {
@@ -477,9 +477,9 @@ auto rightLaneletIds(
     switch (entity_type.type) {
       case EntityType::EGO:
       case EntityType::VEHICLE:
-        return LaneletMapCore::vehicleRoutingGraph();
+        return LaneletWrapper::vehicleRoutingGraph();
       case EntityType::PEDESTRIAN:
-        return LaneletMapCore::pedestrianRoutingGraph();
+        return LaneletWrapper::pedestrianRoutingGraph();
       case EntityType::MISC_OBJECT:
       default:
         return nullptr;
@@ -487,7 +487,7 @@ auto rightLaneletIds(
   };
 
   if (const auto routingGraph = getRoutingGraph(entity_type)) {
-    const auto & lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+    const auto & lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
     if (include_opposite_direction) {
       return laneletIds(routingGraph->rights(lanelet));
     } else {
@@ -498,5 +498,5 @@ auto rightLaneletIds(
   }
 }
 }  // namespace pose
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

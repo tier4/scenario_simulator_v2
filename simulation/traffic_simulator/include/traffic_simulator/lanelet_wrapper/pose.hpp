@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_POSE_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_POSE_HPP_
+#ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_POSE_HPP_
+#define TRAFFIC_SIMULATOR__LANELET_WRAPPER_POSE_HPP_
 
 #include <lanelet2_matching/LaneletMatching.h>
 
@@ -21,13 +21,13 @@
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace pose
 {
@@ -88,6 +88,6 @@ auto rightLaneletIds(
   const lanelet::Id lanelet_id, const EntityType & entity_type,
   const bool include_opposite_direction) -> lanelet::Ids;
 }  // namespace pose
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_POSE_HPP_
+#endif  // TRAFFIC_SIMULATOR__LANELET_WRAPPER_POSE_HPP_

@@ -15,35 +15,35 @@
 #include <geometry/transform.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
-#include <traffic_simulator/lanelet_map_core/lane_change.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map.hpp>
-#include <traffic_simulator/lanelet_map_core/lanelet_map_core.hpp>
-#include <traffic_simulator/lanelet_map_core/pose.hpp>
+#include <traffic_simulator/lanelet_wrapper/lane_change.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_map.hpp>
+#include <traffic_simulator/lanelet_wrapper/lanelet_wrapper.hpp>
+#include <traffic_simulator/lanelet_wrapper/pose.hpp>
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace lane_change
 {
 auto canChangeLane(const lanelet::Id from_lanelet_id, const lanelet::Id to_lanelet_id) -> bool
 {
-  const auto from_lanelet = LaneletMapCore::map()->laneletLayer.get(from_lanelet_id);
-  const auto to_lanelet = LaneletMapCore::map()->laneletLayer.get(to_lanelet_id);
-  return LaneletMapCore::trafficRulesVehicle()->canChangeLane(from_lanelet, to_lanelet);
+  const auto from_lanelet = LaneletWrapper::map()->laneletLayer.get(from_lanelet_id);
+  const auto to_lanelet = LaneletWrapper::map()->laneletLayer.get(to_lanelet_id);
+  return LaneletWrapper::trafficRulesVehicle()->canChangeLane(from_lanelet, to_lanelet);
 }
 
 auto laneChangeableLaneletId(const lanelet::Id lanelet_id, const Direction & direction)
   -> std::optional<lanelet::Id>
 {
-  const auto lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+  const auto lanelet = LaneletWrapper::map()->laneletLayer.get(lanelet_id);
   if (direction == Direction::STRAIGHT) {
     return lanelet.id();
-  } else if (direction == Direction::LEFT && LaneletMapCore::vehicleRoutingGraph()->left(lanelet)) {
-    return LaneletMapCore::vehicleRoutingGraph()->left(lanelet)->id();
+  } else if (direction == Direction::LEFT && LaneletWrapper::vehicleRoutingGraph()->left(lanelet)) {
+    return LaneletWrapper::vehicleRoutingGraph()->left(lanelet)->id();
   } else if (
-    direction == Direction::RIGHT && LaneletMapCore::vehicleRoutingGraph()->right(lanelet)) {
-    return LaneletMapCore::vehicleRoutingGraph()->right(lanelet)->id();
+    direction == Direction::RIGHT && LaneletWrapper::vehicleRoutingGraph()->right(lanelet)) {
+    return LaneletWrapper::vehicleRoutingGraph()->right(lanelet)->id();
   } else {
     return std::nullopt;
   }
@@ -202,5 +202,5 @@ auto laneChangeTrajectory(
   }
 }
 }  // namespace lane_change
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator

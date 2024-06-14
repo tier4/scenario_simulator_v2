@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANELET_MAP_HPP_
-#define TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANELET_MAP_HPP_
+#ifndef TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
+#define TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
 
 #include <lanelet2_core/geometry/Lanelet.h>
 #include <lanelet2_core/primitives/LaneletSequence.h>
@@ -24,7 +24,7 @@
 
 namespace traffic_simulator
 {
-namespace lanelet_map_core
+namespace lanelet_wrapper
 {
 namespace lanelet_map
 {
@@ -97,6 +97,6 @@ auto conflictingCrosswalkIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 
 auto conflictingLaneIds(const lanelet::Ids & lanelet_ids) -> lanelet::Ids;
 }  // namespace lanelet_map
-}  // namespace lanelet_map_core
+}  // namespace lanelet_wrapper
 }  // namespace traffic_simulator
-#endif  // TRAFFIC_SIMULATOR__UTILS__LANELET_CORE_LANELET_MAP_HPP_
+#endif  // TRAFFIC_SIMULATOR__LANELET_WRAPPER_LANELET_MAP_HPP_
