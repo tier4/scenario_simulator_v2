@@ -34,23 +34,31 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
   using math::geometry::operator*;
   using math::geometry::operator+=;
   if (
-    const auto pose =
+    const auto canonicalized_lanelet_pose =
       std::get<std::optional<LaneletPose>>(pose::canonicalizeLaneletPose(lanelet_pose))) {
-    PoseStamped ret;
-    ret.header.frame_id = "map";
-    const auto spline = lanelet_map::centerPointsSpline(pose->lanelet_id);
-    ret.pose = spline->getPose(pose->s);
-    const auto normal_vec = spline->getNormalVector(pose->s);
-    const auto diff = math::geometry::normalize(normal_vec) * pose->offset;
-    ret.pose.position += diff;
-    const auto tangent_vec = spline->getTangentVector(pose->s);
-    Vector3 rpy;
-    rpy.x = 0.0;
-    rpy.y = fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0;
-    rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
-    ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy) *
-                           quaternion_operation::convertEulerAngleToQuaternion(pose->rpy);
-    return ret;
+    PoseStamped pose_stamped;
+    pose_stamped.header.frame_id = "map";
+    const auto lanelet_spline =
+      lanelet_map::centerPointsSpline(canonicalized_lanelet_pose->lanelet_id);
+    // map position
+    const auto normal_vector = lanelet_spline->getNormalVector(canonicalized_lanelet_pose->s);
+    const auto offset_transition_vector =
+      math::geometry::normalize(normal_vector) * canonicalized_lanelet_pose->offset;
+    pose_stamped.pose = lanelet_spline->getPose(canonicalized_lanelet_pose->s);
+    pose_stamped.pose.position += offset_transition_vector;
+    // map orientation
+    const auto tangent_vector = lanelet_spline->getTangentVector(canonicalized_lanelet_pose->s);
+    const auto lanelet_rpy =
+      geometry_msgs::build<Vector3>()
+        .x(0.0)
+        .y(
+          fill_pitch ? std::atan2(-tangent_vector.z, std::hypot(tangent_vector.x, tangent_vector.y))
+                     : 0.0)
+        .z(std::atan2(tangent_vector.y, tangent_vector.x));
+    pose_stamped.pose.orientation =
+      quaternion_operation::convertEulerAngleToQuaternion(lanelet_rpy) *
+      quaternion_operation::convertEulerAngleToQuaternion(canonicalized_lanelet_pose->rpy);
+    return pose_stamped;
   } else {
     THROW_SEMANTIC_ERROR(
       "Lanelet pose (id=", lanelet_pose.lanelet_id, ",s=", lanelet_pose.s,
@@ -59,63 +67,47 @@ auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch) -> PoseS
   }
 }
 
-auto toLaneletPose(const Pose & pose, const lanelet::Id lanelet_id, const double matching_distance)
+auto toLaneletPose(
+  const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>
 {
-  const auto spline = lanelet_map::centerPointsSpline(lanelet_id);
-  const auto s = spline->getSValue(pose, matching_distance);
-  if (!s) {
+  constexpr double yaw_threshold = 0.25;
+  const auto lanelet_spline = lanelet_map::centerPointsSpline(lanelet_id);
+  if (const auto lanelet_pose_s = lanelet_spline->getSValue(map_pose, matching_distance);
+      !lanelet_pose_s) {
     return std::nullopt;
-  }
-  auto pose_on_centerline = spline->getPose(s.value());
-  auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
-    quaternion_operation::getRotation(pose_on_centerline.orientation, pose.orientation));
-  double offset = std::sqrt(spline->getSquaredDistanceIn2D(pose.position, s.value()));
-  /**
-   * @note Hard coded parameter
-   */
-  double yaw_threshold = 0.25;
-  if (M_PI * yaw_threshold < std::fabs(rpy.z) && std::fabs(rpy.z) < M_PI * (1 - yaw_threshold)) {
-    return std::nullopt;
-  }
-  double inner_prod = math::geometry::innerProduct(
-    spline->getNormalVector(s.value()), spline->getSquaredDistanceVector(pose.position, s.value()));
-  if (inner_prod < 0) {
-    offset = offset * -1;
-  }
-  LaneletPose lanelet_pose;
-  lanelet_pose.lanelet_id = lanelet_id;
-  lanelet_pose.s = s.value();
-  lanelet_pose.offset = offset;
-  lanelet_pose.rpy = rpy;
-  return lanelet_pose;
-}
-
-auto toLaneletPose(const Pose & pose, const bool include_crosswalk, const double matching_distance)
-  -> std::optional<LaneletPose>
-{
-  constexpr double distance_threshold{0.1};
-  constexpr std::size_t search_count{5};
-  const auto lanelet_ids = lanelet_map::nearbyLaneletIds(
-    pose.position, distance_threshold, include_crosswalk, search_count);
-  if (lanelet_ids.empty()) {
-    return std::nullopt;
-  }
-  for (const auto & id : lanelet_ids) {
-    const auto lanelet_pose = toLaneletPose(pose, id, matching_distance);
-    if (lanelet_pose) {
-      return lanelet_pose;
+  } else {
+    const auto lanelet_quaternion = lanelet_spline->getPose(lanelet_pose_s.value()).orientation;
+    if (const auto lanelet_pose_rpy = quaternion_operation::convertQuaternionToEulerAngle(
+          quaternion_operation::getRotation(lanelet_quaternion, map_pose.orientation));
+        std::fabs(lanelet_pose_rpy.z) > M_PI * yaw_threshold &&
+        std::fabs(lanelet_pose_rpy.z) < M_PI * (1 - yaw_threshold)) {
+      return std::nullopt;
+    } else {
+      double lanelet_pose_offset = std::sqrt(
+        lanelet_spline->getSquaredDistanceIn2D(map_pose.position, lanelet_pose_s.value()));
+      if (const double inner_product = math::geometry::innerProduct(
+            lanelet_spline->getNormalVector(lanelet_pose_s.value()),
+            lanelet_spline->getSquaredDistanceVector(map_pose.position, lanelet_pose_s.value()));
+          inner_product < 0) {
+        lanelet_pose_offset = lanelet_pose_offset * -1;
+      }
+      return traffic_simulator_msgs::build<LaneletPose>()
+        .lanelet_id(lanelet_id)
+        .s(lanelet_pose_s.value())
+        .offset(lanelet_pose_offset)
+        .rpy(lanelet_pose_rpy);
     }
   }
-  return std::nullopt;
 }
 
 auto toLaneletPose(
-  const Pose & pose, const lanelet::Ids & lanelet_ids, const double matching_distance)
+  const Pose & map_pose, const lanelet::Ids & lanelet_ids, const double matching_distance)
   -> std::optional<LaneletPose>
 {
-  for (const auto id : lanelet_ids) {
-    if (const auto lanelet_pose = toLaneletPose(pose, id, matching_distance); lanelet_pose) {
+  for (const auto & lanelet_id : lanelet_ids) {
+    if (const auto lanelet_pose = toLaneletPose(map_pose, lanelet_id, matching_distance);
+        lanelet_pose) {
       return lanelet_pose.value();
     }
   }
@@ -123,110 +115,127 @@ auto toLaneletPose(
 }
 
 auto toLaneletPose(
-  const Pose & pose, const BoundingBox & bbox, const bool include_crosswalk,
+  const Pose & map_pose, const bool include_crosswalk, const double matching_distance)
+  -> std::optional<LaneletPose>
+{
+  constexpr double distance_threshold{0.1};
+  constexpr std::size_t search_count{5};
+  const auto nearby_lanelet_ids = lanelet_map::nearbyLaneletIds(
+    map_pose.position, distance_threshold, include_crosswalk, search_count);
+  return toLaneletPose(map_pose, nearby_lanelet_ids, matching_distance);
+}
+
+auto toLaneletPose(
+  const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance) -> std::optional<LaneletPose>
 {
   constexpr double reduction_ratio{0.8};
-  const auto lanelet_id =
-    matchToLane(pose, bbox, include_crosswalk, matching_distance, reduction_ratio);
-  if (!lanelet_id) {
-    return toLaneletPose(pose, include_crosswalk, matching_distance);
-  }
-  const auto pose_in_target_lanelet = toLaneletPose(pose, lanelet_id.value(), matching_distance);
-  if (pose_in_target_lanelet) {
-    return pose_in_target_lanelet;
-  }
-  const auto previous = lanelet_map::previousLaneletIds(lanelet_id.value());
-  for (const auto id : previous) {
-    const auto pose_in_previous = toLaneletPose(pose, id, matching_distance);
-    if (pose_in_previous) {
-      return pose_in_previous;
+  if (
+    const auto lanelet_id_using_bounding_box =
+      matchToLane(map_pose, bounding_box, include_crosswalk, matching_distance, reduction_ratio)) {
+    if (
+      const auto lanelet_pose_using_bounding_box =
+        toLaneletPose(map_pose, lanelet_id_using_bounding_box.value(), matching_distance)) {
+      return lanelet_pose_using_bounding_box;
+    } else {
+      for (const auto & previous_lanelet_id :
+           lanelet_map::previousLaneletIds(lanelet_id_using_bounding_box.value())) {
+        if (
+          const auto lanelet_pose_in_previous_lanelet =
+            toLaneletPose(map_pose, previous_lanelet_id, matching_distance)) {
+          return lanelet_pose_in_previous_lanelet;
+        }
+      }
+      for (const auto & next_lanelet_id :
+           lanelet_map::nextLaneletIds(lanelet_id_using_bounding_box.value())) {
+        if (
+          const auto lanelet_pose_in_next_lanelet =
+            toLaneletPose(map_pose, next_lanelet_id, matching_distance)) {
+          return lanelet_pose_in_next_lanelet;
+        }
+      }
     }
   }
-  const auto next = lanelet_map::nextLaneletIds(lanelet_id.value());
-  for (const auto id : previous) {
-    const auto pose_in_next = toLaneletPose(pose, id, matching_distance);
-    if (pose_in_next) {
-      return pose_in_next;
-    }
-  }
-  return toLaneletPose(pose, include_crosswalk, matching_distance);
+  return toLaneletPose(map_pose, include_crosswalk, matching_distance);
 }
 
 auto toLaneletPoses(
-  const Pose & pose, const lanelet::Id lanelet_id, const double matching_distance,
+  const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance,
   const bool include_opposite_direction) -> std::vector<LaneletPose>
 {
-  std::vector<LaneletPose> ret;
-  EntityType type;
-  type.type = EntityType::VEHICLE;
-  std::vector lanelet_ids = {lanelet_id};
-  lanelet_ids += leftLaneletIds(lanelet_id, type, include_opposite_direction);
-  lanelet_ids += rightLaneletIds(lanelet_id, type, include_opposite_direction);
-  lanelet_ids += lanelet_map::previousLaneletIds(lanelet_ids);
-  lanelet_ids += lanelet_map::nextLaneletIds(lanelet_ids);
-  for (const auto & id : sortAndUnique(lanelet_ids)) {
-    if (const auto & lanelet_pose = toLaneletPose(pose, id, matching_distance)) {
-      ret.emplace_back(lanelet_pose.value());
+  std::vector<LaneletPose> lanelet_poses;
+  std::set<lanelet::Id> lanelet_ids_set{lanelet_id};
+  auto insertIds = [&](const auto & new_ids) {
+    lanelet_ids_set.insert(new_ids.begin(), new_ids.end());
+  };
+  /// @todo here entity_type is hardcoded as VEHICLE
+  const auto entity_type = traffic_simulator_msgs::build<EntityType>().type(EntityType::VEHICLE);
+  insertIds(leftLaneletIds(lanelet_id, entity_type, include_opposite_direction));
+  insertIds(rightLaneletIds(lanelet_id, entity_type, include_opposite_direction));
+  insertIds(lanelet_map::previousLaneletIds({lanelet_id}));
+  insertIds(lanelet_map::nextLaneletIds({lanelet_id}));
+  for (const auto & lanelet_id : lanelet_ids_set) {
+    if (const auto & lanelet_pose = toLaneletPose(map_pose, lanelet_id, matching_distance)) {
+      lanelet_poses.emplace_back(lanelet_pose.value());
     }
   }
-  return ret;
+  return lanelet_poses;
 }
 
 auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>
 {
-  /// @note Define lambda functions for canonicalizing previous/next lanelet.
-  const auto canonicalize_to_previous_lanelet =
+  const auto alternativesInPreviousLanelet =
     [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
-    if (const auto ids = lanelet_map::previousLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
-      std::vector<LaneletPose> canonicalized_all;
-      for (const auto id : ids) {
-        const auto lanelet_pose_tmp = helper::constructLaneletPose(
-          id, lanelet_pose.s + lanelet_map::laneletLength(id), lanelet_pose.offset);
-        if (const auto canonicalized_lanelet_poses = alternativeLaneletPoses(lanelet_pose_tmp);
-            canonicalized_lanelet_poses.empty()) {
-          canonicalized_all.emplace_back(lanelet_pose_tmp);
-        } else {
-          std::copy(
-            canonicalized_lanelet_poses.begin(), canonicalized_lanelet_poses.end(),
-            std::back_inserter(canonicalized_all));
-        }
-      }
-      return canonicalized_all;
-    } else {
-      return {};
-    }
-  };
-  const auto canonicalize_to_next_lanelet =
-    [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
-    if (const auto ids = lanelet_map::nextLaneletIds(lanelet_pose.lanelet_id); !ids.empty()) {
-      std::vector<LaneletPose> canonicalized_all;
-      for (const auto id : ids) {
-        const auto lanelet_pose_tmp = helper::constructLaneletPose(
-          id, lanelet_pose.s - lanelet_map::laneletLength(lanelet_pose.lanelet_id),
+    std::vector<LaneletPose> lanelet_poses_in_previous_lanelet;
+    if (const auto previous_lanelet_ids = lanelet_map::previousLaneletIds(lanelet_pose.lanelet_id);
+        !previous_lanelet_ids.empty()) {
+      for (const auto previous_lanelet_id : previous_lanelet_ids) {
+        const auto lanelet_pose_in_previous_lanelet = helper::constructLaneletPose(
+          previous_lanelet_id, lanelet_pose.s + lanelet_map::laneletLength(previous_lanelet_id),
           lanelet_pose.offset);
-        if (const auto canonicalized_lanelet_poses = alternativeLaneletPoses(lanelet_pose_tmp);
-            canonicalized_lanelet_poses.empty()) {
-          canonicalized_all.emplace_back(lanelet_pose_tmp);
+        if (const auto recurency_alternative_poses =
+              alternativeLaneletPoses(lanelet_pose_in_previous_lanelet);
+            recurency_alternative_poses.empty()) {
+          lanelet_poses_in_previous_lanelet.emplace_back(lanelet_pose_in_previous_lanelet);
         } else {
-          std::copy(
-            canonicalized_lanelet_poses.begin(), canonicalized_lanelet_poses.end(),
-            std::back_inserter(canonicalized_all));
+          lanelet_poses_in_previous_lanelet.insert(
+            lanelet_poses_in_previous_lanelet.end(), recurency_alternative_poses.begin(),
+            recurency_alternative_poses.end());
         }
       }
-      return canonicalized_all;
-    } else {
-      return {};
     }
+    return lanelet_poses_in_previous_lanelet;
+  };
+
+  const auto alternativesInNextLanelet = [](const auto & lanelet_pose) -> std::vector<LaneletPose> {
+    std::vector<LaneletPose> lanelet_poses_in_next_lanelet;
+    if (const auto next_lanelet_ids = lanelet_map::nextLaneletIds(lanelet_pose.lanelet_id);
+        !next_lanelet_ids.empty()) {
+      for (const auto next_lanelet_id : next_lanelet_ids) {
+        const auto lanelet_pose_in_next_lanelet = helper::constructLaneletPose(
+          next_lanelet_id, lanelet_pose.s - lanelet_map::laneletLength(lanelet_pose.lanelet_id),
+          lanelet_pose.offset);
+        if (const auto recurency_alternative_poses =
+              alternativeLaneletPoses(lanelet_pose_in_next_lanelet);
+            recurency_alternative_poses.empty()) {
+          lanelet_poses_in_next_lanelet.emplace_back(lanelet_pose_in_next_lanelet);
+        } else {
+          lanelet_poses_in_next_lanelet.insert(
+            lanelet_poses_in_next_lanelet.end(), recurency_alternative_poses.begin(),
+            recurency_alternative_poses.end());
+        }
+      }
+    }
+    return lanelet_poses_in_next_lanelet;
   };
 
   /// @note If s value under 0, it means this pose is on the previous lanelet.
   if (lanelet_pose.s < 0) {
-    return canonicalize_to_previous_lanelet(lanelet_pose);
+    return alternativesInPreviousLanelet(lanelet_pose);
   }
   /// @note If s value overs it's lanelet length, it means this pose is on the next lanelet.
   else if (lanelet_pose.s > (lanelet_map::laneletLength(lanelet_pose.lanelet_id))) {
-    return canonicalize_to_next_lanelet(lanelet_pose);
+    return alternativesInNextLanelet(lanelet_pose);
   }
   /// @note If s value is in range [0,length_of_the_lanelet], return lanelet_pose.
   else {
@@ -236,38 +245,41 @@ auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<La
 
 auto alongLaneletPose(const LaneletPose & from_pose, const double distance) -> LaneletPose
 {
-  LaneletPose along_pose = from_pose;
-  along_pose.s = along_pose.s + distance;
-  if (along_pose.s >= 0) {
-    while (along_pose.s >= lanelet_map::laneletLength(along_pose.lanelet_id)) {
-      auto next_ids = lanelet_map::nextLaneletIds(along_pose.lanelet_id, "straight");
-      if (next_ids.empty()) {
-        next_ids = lanelet_map::nextLaneletIds(along_pose.lanelet_id);
-        if (next_ids.empty()) {
-          THROW_SEMANTIC_ERROR(
-            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
-            from_pose.s + distance, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
-        }
+  auto lanelet_pose = from_pose;
+  lanelet_pose.s += distance;
+  if (lanelet_pose.s >= 0) {
+    while (lanelet_pose.s >= lanelet_map::laneletLength(lanelet_pose.lanelet_id)) {
+      auto next_lanelet_ids = lanelet_map::nextLaneletIds(lanelet_pose.lanelet_id, "straight");
+      if (next_lanelet_ids.empty()) {
+        /// @note if empty try to use other than "straight", but the first found
+        next_lanelet_ids = lanelet_map::nextLaneletIds(lanelet_pose.lanelet_id);
       }
-      along_pose.s = along_pose.s - lanelet_map::laneletLength(along_pose.lanelet_id);
-      along_pose.lanelet_id = next_ids[0];
+      if (next_lanelet_ids.empty()) {
+        THROW_SEMANTIC_ERROR(
+          "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+          from_pose.s + distance, "), next lanelet of id = ", lanelet_pose.lanelet_id, "is empty.");
+      }
+      lanelet_pose.s = lanelet_pose.s - lanelet_map::laneletLength(lanelet_pose.lanelet_id);
+      lanelet_pose.lanelet_id = next_lanelet_ids[0];
     }
   } else {
-    while (along_pose.s < 0) {
-      auto previous_ids = lanelet_map::previousLaneletIds(along_pose.lanelet_id, "straight");
-      if (previous_ids.empty()) {
-        previous_ids = lanelet_map::previousLaneletIds(along_pose.lanelet_id);
-        if (previous_ids.empty()) {
-          THROW_SEMANTIC_ERROR(
-            "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
-            from_pose.s + distance, "), next lanelet of id = ", along_pose.lanelet_id, "is empty.");
-        }
+    while (lanelet_pose.s < 0) {
+      auto previous_lanelet_ids =
+        lanelet_map::previousLaneletIds(lanelet_pose.lanelet_id, "straight");
+      if (previous_lanelet_ids.empty()) {
+        /// @note if empty try to use other than "straight", but the first found
+        previous_lanelet_ids = lanelet_map::previousLaneletIds(lanelet_pose.lanelet_id);
       }
-      along_pose.s = along_pose.s + lanelet_map::laneletLength(previous_ids[0]);
-      along_pose.lanelet_id = previous_ids[0];
+      if (previous_lanelet_ids.empty()) {
+        THROW_SEMANTIC_ERROR(
+          "failed to calculate along pose (id,s) = (", from_pose.lanelet_id, ",",
+          from_pose.s + distance, "), next lanelet of id = ", lanelet_pose.lanelet_id, "is empty.");
+      }
+      lanelet_pose.s = lanelet_pose.s + lanelet_map::laneletLength(previous_lanelet_ids[0]);
+      lanelet_pose.lanelet_id = previous_lanelet_ids[0];
     }
   }
-  return along_pose;
+  return lanelet_pose;
 }
 
 auto alongLaneletPose(
@@ -275,7 +287,7 @@ auto alongLaneletPose(
   -> LaneletPose
 {
   auto lanelet_pose = from_pose;
-  lanelet_pose.s = lanelet_pose.s + distance;
+  lanelet_pose.s += distance;
   const auto canonicalized = canonicalizeLaneletPose(lanelet_pose, route_lanelets);
   if (const auto canonicalized_lanelet_pose = std::get<std::optional<LaneletPose>>(canonicalized)) {
     // If canonicalize succeed, just return canonicalized pose
@@ -283,14 +295,11 @@ auto alongLaneletPose(
   } else {
     // If canonicalize failed, return lanelet pose as end of road
     if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
-      LaneletPose end_of_road_lanelet_pose;
-      end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
-      end_of_road_lanelet_pose.offset = lanelet_pose.offset;
-      end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
-      /// @note here was condition: .s < 0, now try to use .s <= 0
-      end_of_road_lanelet_pose.s =
-        lanelet_pose.s <= 0 ? 0 : lanelet_map::laneletLength(end_of_road_lanelet_id.value());
-      return end_of_road_lanelet_pose;
+      return traffic_simulator_msgs::build<LaneletPose>()
+        .lanelet_id(end_of_road_lanelet_id.value())
+        .s(lanelet_pose.s <= 0 ? 0 : lanelet_map::laneletLength(end_of_road_lanelet_id.value()))
+        .offset(lanelet_pose.offset)
+        .rpy(lanelet_pose.rpy);
     } else {
       THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
     }
@@ -302,154 +311,150 @@ auto alongLaneletPose(
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>
 {
-  auto canonicalized = lanelet_pose;
-  while (canonicalized.s < 0) {
-    if (const auto ids = lanelet_map::previousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
-      return {std::nullopt, canonicalized.lanelet_id};
+  auto canonicalized_lanelet_pose = lanelet_pose;
+  while (canonicalized_lanelet_pose.s < 0) {
+    if (const auto previous_lanelet_ids =
+          lanelet_map::previousLaneletIds(canonicalized_lanelet_pose.lanelet_id);
+        previous_lanelet_ids.empty()) {
+      return {std::nullopt, canonicalized_lanelet_pose.lanelet_id};
     } else {
-      canonicalized.s += lanelet_map::laneletLength(ids[0]);
-      canonicalized.lanelet_id = ids[0];
+      canonicalized_lanelet_pose.s += lanelet_map::laneletLength(previous_lanelet_ids[0]);
+      canonicalized_lanelet_pose.lanelet_id = previous_lanelet_ids[0];
     }
   }
-  while (canonicalized.s > lanelet_map::laneletLength(canonicalized.lanelet_id)) {
-    if (const auto ids = lanelet_map::nextLaneletIds(canonicalized.lanelet_id); ids.empty()) {
-      return {std::nullopt, canonicalized.lanelet_id};
+  while (canonicalized_lanelet_pose.s >
+         lanelet_map::laneletLength(canonicalized_lanelet_pose.lanelet_id)) {
+    if (const auto next_lanelet_ids =
+          lanelet_map::nextLaneletIds(canonicalized_lanelet_pose.lanelet_id);
+        next_lanelet_ids.empty()) {
+      return {std::nullopt, canonicalized_lanelet_pose.lanelet_id};
     } else {
-      canonicalized.s -= lanelet_map::laneletLength(canonicalized.lanelet_id);
-      canonicalized.lanelet_id = ids[0];
+      canonicalized_lanelet_pose.s -=
+        lanelet_map::laneletLength(canonicalized_lanelet_pose.lanelet_id);
+      canonicalized_lanelet_pose.lanelet_id = next_lanelet_ids[0];
     }
   }
-  return {canonicalized, std::nullopt};
+  return {canonicalized_lanelet_pose, std::nullopt};
 }
 
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Ids & route_lanelets)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>
 {
-  auto canonicalized = lanelet_pose;
-  while (canonicalized.s < 0) {
+  if (lanelet_pose.s < 0) {
     // When canonicalizing to backward lanelet_id, do not consider route
-    if (const auto ids = lanelet_map::previousLaneletIds(canonicalized.lanelet_id); ids.empty()) {
-      return {std::nullopt, canonicalized.lanelet_id};
-    } else {
-      canonicalized.s += lanelet_map::laneletLength(ids[0]);
-      canonicalized.lanelet_id = ids[0];
-    }
+    return canonicalizeLaneletPose(lanelet_pose);
   }
-  while (canonicalized.s > lanelet_map::laneletLength(canonicalized.lanelet_id)) {
-    bool next_lanelet_found = false;
+  auto canonicalized_lanelet_pose = lanelet_pose;
+  while (canonicalized_lanelet_pose.s >
+         lanelet_map::laneletLength(canonicalized_lanelet_pose.lanelet_id)) {
     // When canonicalizing to forward lanelet_id, consider route
-    for (const auto id : lanelet_map::nextLaneletIds(canonicalized.lanelet_id)) {
-      if (std::any_of(route_lanelets.begin(), route_lanelets.end(), [id](auto id_on_route) {
-            return id == id_on_route;
-          })) {
-        canonicalized.s -= lanelet_map::laneletLength(canonicalized.lanelet_id);
-        canonicalized.lanelet_id = id;
-        next_lanelet_found = true;
+    bool found_next_lanelet_in_route = false;
+    for (const auto next_lanelet_id :
+         lanelet_map::nextLaneletIds(canonicalized_lanelet_pose.lanelet_id)) {
+      if (
+        std::find(route_lanelets.begin(), route_lanelets.end(), next_lanelet_id) !=
+        route_lanelets.end()) {
+        found_next_lanelet_in_route = true;
+        canonicalized_lanelet_pose.s -=
+          lanelet_map::laneletLength(canonicalized_lanelet_pose.lanelet_id);
+        canonicalized_lanelet_pose.lanelet_id = next_lanelet_id;
       }
     }
-    if (!next_lanelet_found) {
-      return {std::nullopt, canonicalized.lanelet_id};
+    if (!found_next_lanelet_in_route) {
+      return {std::nullopt, canonicalized_lanelet_pose.lanelet_id};
     }
   }
-  return {canonicalized, std::nullopt};
+  return {canonicalized_lanelet_pose, std::nullopt};
 }
 
-// private
+// used only by this namespace
 auto matchToLane(
-  const Pose & pose, const BoundingBox & bbox, const bool include_crosswalk,
+  const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance, const double reduction_ratio) -> std::optional<lanelet::Id>
 {
-  auto absoluteHull = [](
-                        const lanelet::BasicPolygon2d & relative_hull,
-                        const lanelet::matching::Pose2d & pose) -> lanelet::BasicPolygon2d {
-    lanelet::BasicPolygon2d hull_points;
-    hull_points.reserve(relative_hull.size());
-    for (const auto & hull_ptr : relative_hull) {
-      hull_points.push_back(pose * hull_ptr);
+  const auto absoluteHullPolygon =
+    [&reduction_ratio](const auto & bounding_box, const auto & pose) -> lanelet::BasicPolygon2d {
+    auto relative_hull = lanelet::matching::Hull2d{
+      lanelet::BasicPoint2d{
+        bounding_box.center.x + bounding_box.dimensions.x * 0.5 * reduction_ratio,
+        bounding_box.center.y + bounding_box.dimensions.y * 0.5 * reduction_ratio},
+      lanelet::BasicPoint2d{
+        bounding_box.center.x - bounding_box.dimensions.x * 0.5 * reduction_ratio,
+        bounding_box.center.y - bounding_box.dimensions.y * 0.5 * reduction_ratio}};
+    lanelet::BasicPolygon2d absolute_hull_polygon;
+    absolute_hull_polygon.reserve(relative_hull.size());
+    for (const auto & relative_hull_point : relative_hull) {
+      absolute_hull_polygon.push_back(pose * relative_hull_point);
     }
-    return hull_points;
+    return absolute_hull_polygon;
   };
-
-  std::optional<lanelet::Id> id;
-  lanelet::matching::Object2d obj;
-  obj.pose.translation() = lanelet::BasicPoint2d(pose.position.x, pose.position.y);
-  obj.pose.linear() = Eigen::Rotation2D<double>(
-                        quaternion_operation::convertQuaternionToEulerAngle(pose.orientation).z)
-                        .matrix();
-  obj.absoluteHull = absoluteHull(
-    lanelet::matching::Hull2d{
-      lanelet::BasicPoint2d{
-        bbox.center.x + bbox.dimensions.x * 0.5 * reduction_ratio,
-        bbox.center.y + bbox.dimensions.y * 0.5 * reduction_ratio},
-      lanelet::BasicPoint2d{
-        bbox.center.x - bbox.dimensions.x * 0.5 * reduction_ratio,
-        bbox.center.y - bbox.dimensions.y * 0.5 * reduction_ratio}},
-    obj.pose);
-  auto matches =
-    lanelet::matching::getDeterministicMatches(*LaneletMapCore::map(), obj, matching_distance);
+  // prepere object for matching
+  const auto yaw = quaternion_operation::convertQuaternionToEulerAngle(map_pose.orientation).z;
+  lanelet::matching::Object2d bounding_box_object;
+  bounding_box_object.pose.translation() =
+    lanelet::BasicPoint2d(map_pose.position.x, map_pose.position.y);
+  bounding_box_object.pose.linear() = Eigen::Rotation2D<double>(yaw).matrix();
+  bounding_box_object.absoluteHull = absoluteHullPolygon(bounding_box, bounding_box_object.pose);
+  // find matches and optionally filter
+  auto matches = lanelet::matching::getDeterministicMatches(
+    *LaneletMapCore::map(), bounding_box_object, matching_distance);
   if (!include_crosswalk) {
     matches = lanelet::matching::removeNonRuleCompliantMatches(
       matches, LaneletMapCore::trafficRulesVehicle());
   }
+  // find best match (minimalize offset)
   if (matches.empty()) {
     return std::nullopt;
-  }
-  std::vector<std::pair<lanelet::Id, double>> id_and_distance;
-  for (const auto & match : matches) {
-    if (
-      const auto lanelet_pose = pose::toLaneletPose(pose, match.lanelet.id(), matching_distance)) {
-      id_and_distance.emplace_back(lanelet_pose->lanelet_id, lanelet_pose->offset);
+  } else {
+    std::optional<std::pair<lanelet::Id, double>> min_pair_id_offset;
+    for (const auto & match : matches) {
+      if (
+        const auto lanelet_pose =
+          pose::toLaneletPose(map_pose, match.lanelet.id(), matching_distance)) {
+        if (!min_pair_id_offset || lanelet_pose->offset < min_pair_id_offset->second) {
+          min_pair_id_offset = std::make_pair(lanelet_pose->lanelet_id, lanelet_pose->offset);
+        }
+      }
     }
+    return min_pair_id_offset ? std::optional(min_pair_id_offset->first) : std::nullopt;
   }
-  if (id_and_distance.empty()) {
-    return std::nullopt;
-  }
-  const auto min_id_and_distance = std::min_element(
-    id_and_distance.begin(), id_and_distance.end(),
-    [](auto const & lhs, auto const & rhs) { return lhs.second < rhs.second; });
-  return min_id_and_distance->first;
 }
 
 auto leftLaneletIds(
-  const lanelet::Id lanelet_id, const EntityType & type, const bool include_opposite_direction)
-  -> lanelet::Ids
+  const lanelet::Id lanelet_id, const EntityType & entity_type,
+  const bool include_opposite_direction) -> lanelet::Ids
 {
-  auto laneletIds = [](const auto & lanelets) -> lanelet::Ids {
-    lanelet::Ids ids;
-    std::transform(
-      lanelets.begin(), lanelets.end(), std::back_inserter(ids),
-      [](const auto & lanelet) { return lanelet.id(); });
-    return ids;
+  const auto laneletIds = [](const auto & lanelets) -> lanelet::Ids {
+    lanelet::Ids lanelet_ids(lanelets.size());
+    std::transform(lanelets.begin(), lanelets.end(), lanelet_ids.begin(), [](const auto & lanelet) {
+      return lanelet.id();
+    });
+    return lanelet_ids;
   };
 
-  switch (type.type) {
-    case EntityType::EGO:
-      if (include_opposite_direction) {
-        return laneletIds(LaneletMapCore::vehicleRoutingGraph()->lefts(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      } else {
-        return laneletIds(LaneletMapCore::vehicleRoutingGraph()->adjacentLefts(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      }
-    case EntityType::VEHICLE:
-      if (include_opposite_direction) {
-        return laneletIds(LaneletMapCore::vehicleRoutingGraph()->lefts(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      } else {
-        return laneletIds(LaneletMapCore::vehicleRoutingGraph()->adjacentLefts(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      }
-    case EntityType::PEDESTRIAN:
-      if (include_opposite_direction) {
-        return laneletIds(LaneletMapCore::pedestrianRoutingGraph()->lefts(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      } else {
-        return laneletIds(LaneletMapCore::pedestrianRoutingGraph()->adjacentLefts(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      }
-    default:
-    case EntityType::MISC_OBJECT:
-      return {};
+  const auto getRoutingGraph =
+    [](const EntityType & entity_type) -> std::shared_ptr<const lanelet::routing::RoutingGraph> {
+    switch (entity_type.type) {
+      case EntityType::EGO:
+      case EntityType::VEHICLE:
+        return LaneletMapCore::vehicleRoutingGraph();
+      case EntityType::PEDESTRIAN:
+        return LaneletMapCore::pedestrianRoutingGraph();
+      case EntityType::MISC_OBJECT:
+      default:
+        return nullptr;
+    }
+  };
+
+  if (const auto routingGraph = getRoutingGraph(entity_type)) {
+    const auto & lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+    if (include_opposite_direction) {
+      return laneletIds(routingGraph->lefts(lanelet));
+    } else {
+      return laneletIds(routingGraph->adjacentLefts(lanelet));
+    }
+  } else {
+    return {};
   }
 }
 
@@ -457,42 +462,37 @@ auto rightLaneletIds(
   const lanelet::Id lanelet_id, const EntityType & entity_type,
   const bool include_opposite_direction) -> lanelet::Ids
 {
-  auto laneletIds = [](const auto & lanelets) -> lanelet::Ids {
-    lanelet::Ids ids;
-    std::transform(
-      lanelets.begin(), lanelets.end(), std::back_inserter(ids),
-      [](const auto & lanelet) { return lanelet.id(); });
-    return ids;
+  const auto laneletIds = [](const auto & lanelets) -> lanelet::Ids {
+    lanelet::Ids lanelet_ids(lanelets.size());
+    std::transform(lanelets.begin(), lanelets.end(), lanelet_ids.begin(), [](const auto & lanelet) {
+      return lanelet.id();
+    });
+    return lanelet_ids;
   };
 
-  switch (entity_type.type) {
-    case EntityType::EGO:
-      if (include_opposite_direction) {
-        return laneletIds(LaneletMapCore::vehicleRoutingGraph()->rights(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      } else {
-        return laneletIds(LaneletMapCore::vehicleRoutingGraph()->adjacentRights(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      }
-    case EntityType::VEHICLE:
-      if (include_opposite_direction) {
-        return laneletIds(LaneletMapCore::vehicleRoutingGraph()->rights(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      } else {
-        return laneletIds(LaneletMapCore::vehicleRoutingGraph()->adjacentRights(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      }
-    case EntityType::PEDESTRIAN:
-      if (include_opposite_direction) {
-        return laneletIds(LaneletMapCore::pedestrianRoutingGraph()->rights(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      } else {
-        return laneletIds(LaneletMapCore::pedestrianRoutingGraph()->adjacentRights(
-          LaneletMapCore::map()->laneletLayer.get(lanelet_id)));
-      }
-    default:
-    case EntityType::MISC_OBJECT:
-      return {};
+  const auto getRoutingGraph =
+    [](const EntityType & entity_type) -> std::shared_ptr<const lanelet::routing::RoutingGraph> {
+    switch (entity_type.type) {
+      case EntityType::EGO:
+      case EntityType::VEHICLE:
+        return LaneletMapCore::vehicleRoutingGraph();
+      case EntityType::PEDESTRIAN:
+        return LaneletMapCore::pedestrianRoutingGraph();
+      case EntityType::MISC_OBJECT:
+      default:
+        return nullptr;
+    }
+  };
+
+  if (const auto routingGraph = getRoutingGraph(entity_type)) {
+    const auto & lanelet = LaneletMapCore::map()->laneletLayer.get(lanelet_id);
+    if (include_opposite_direction) {
+      return laneletIds(routingGraph->rights(lanelet));
+    } else {
+      return laneletIds(routingGraph->adjacentRights(lanelet));
+    }
+  } else {
+    return {};
   }
 }
 }  // namespace pose

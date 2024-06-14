@@ -39,24 +39,35 @@ using BoundingBox = traffic_simulator_msgs::msg::BoundingBox;
 using LaneletPose = traffic_simulator_msgs::msg::LaneletPose;
 using EntityType = traffic_simulator_msgs::msg::EntityType;
 
-auto toMapPose(const LaneletPose &, const bool fill_pitch = true) -> PoseStamped;
+auto toMapPose(const LaneletPose & lanelet_pose, const bool fill_pitch = true) -> PoseStamped;
 
-auto toLaneletPose(const Pose & pose, const bool include_crosswalk, const double matching_distance)
-  -> std::optional<LaneletPose>;
-
-auto toLaneletPose(const Pose & pose, const lanelet::Ids &, const double matching_distance)
+auto toLaneletPose(
+  const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance)
   -> std::optional<LaneletPose>;
 
 auto toLaneletPose(
-  const Pose & pose, const BoundingBox & bounding_box, const bool include_crosswalk,
-  const double matching_distance) -> std::optional<LaneletPose>;
-
-auto toLaneletPose(const Pose & pose, const lanelet::Id lanelet_id, const double matching_distance)
+  const Pose & map_pose, const lanelet::Ids & lanelet_ids, const double matching_distance)
   -> std::optional<LaneletPose>;
 
+auto toLaneletPose(
+  const Pose & map_pose, const bool include_crosswalk, const double matching_distance)
+  -> std::optional<LaneletPose>;
+
+auto toLaneletPose(
+  const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
+  const double matching_distance) -> std::optional<LaneletPose>;
+
 auto toLaneletPoses(
-  const Pose & pose, const lanelet::Id lanelet_id, const double matching_distance,
+  const Pose & map_pose, const lanelet::Id lanelet_id, const double matching_distance,
   const bool include_opposite_direction) -> std::vector<LaneletPose>;
+
+auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
+
+auto alongLaneletPose(
+  const LaneletPose & from_pose, const lanelet::Ids & route_lanelets, const double distance)
+  -> LaneletPose;
+
+auto alongLaneletPose(const LaneletPose & from_pose, const double distance) -> LaneletPose;
 
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>;
@@ -64,22 +75,14 @@ auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose)
 auto canonicalizeLaneletPose(const LaneletPose & lanelet_pose, const lanelet::Ids & route_lanelets)
   -> std::tuple<std::optional<LaneletPose>, std::optional<lanelet::Id>>;
 
-auto alternativeLaneletPoses(const LaneletPose & lanelet_pose) -> std::vector<LaneletPose>;
-
-auto alongLaneletPose(const LaneletPose & from_pose, const double distance) -> LaneletPose;
-
-auto alongLaneletPose(
-  const LaneletPose & from_pose, const lanelet::Ids & route_lanelets, const double distance)
-  -> LaneletPose;
-
-// private
+// used only by this namespace
 auto matchToLane(
-  const Pose & pose, const BoundingBox & bbox, const bool include_crosswalk,
+  const Pose & map_pose, const BoundingBox & bounding_box, const bool include_crosswalk,
   const double matching_distance, const double reduction_ratio) -> std::optional<lanelet::Id>;
 
 auto leftLaneletIds(
-  const lanelet::Id lanelet_id, const EntityType & type, const bool include_opposite_direction)
-  -> lanelet::Ids;
+  const lanelet::Id lanelet_id, const EntityType & entity_type,
+  const bool include_opposite_direction) -> lanelet::Ids;
 
 auto rightLaneletIds(
   const lanelet::Id lanelet_id, const EntityType & entity_type,
