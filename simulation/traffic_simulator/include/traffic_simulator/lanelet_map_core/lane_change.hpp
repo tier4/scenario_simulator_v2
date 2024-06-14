@@ -46,17 +46,18 @@ auto laneChangeableLaneletId(
   -> std::optional<lanelet::Id>;
 
 // Trajectory
-auto laneChangeTrajectory(const LaneletPose & from_pose, const Parameter & lane_change_parameter)
+auto laneChangeTrajectory(
+  const Pose & from_pose, const LaneletPose & to_lanelet_pose,
+  const TrajectoryShape & trajectory_shape, const double tangent_vector_size) -> Curve;
+
+auto laneChangeTrajectory(
+  const LaneletPose & from_lanelet_pose, const Parameter & lane_change_parameter)
   -> std::optional<std::pair<Curve, double>>;
 
 auto laneChangeTrajectory(
   const Pose & from_pose, const Parameter & lane_change_parameter,
   const double maximum_curvature_threshold, const double target_trajectory_length,
   const double forward_distance_threshold) -> std::optional<std::pair<Curve, double>>;
-
-auto laneChangeTrajectory(
-  const Pose & from_pose, const LaneletPose & to_pose, const TrajectoryShape & trajectory_shape,
-  const double tangent_vector_size) -> Curve;
 }  // namespace lane_change
 }  // namespace lanelet_map_core
 }  // namespace traffic_simulator
