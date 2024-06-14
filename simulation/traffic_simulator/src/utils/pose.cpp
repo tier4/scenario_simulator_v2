@@ -303,13 +303,16 @@ auto boundingBoxRelativeLaneletPose(
   return position;
 }
 
+namespace pedestrian
+{
 /*
   This function has been moved from pedestrian_action_node and modified,
   in case of inconsistency please compare in original:
   https://github.com/tier4/scenario_simulator_v2/blob/090a8d08bcb065d293a530cf641a953edf311f9f/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L67-L128
 */
-auto estimateCanonicalizedLaneletPose(
-  const Pose & map_pose, const BoundingBox & bounding_box,
+auto transformToCanonicalizedLaneletPose(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
   const double matching_distance) -> std::optional<CanonicalizedLaneletPose>
 {
@@ -358,5 +361,6 @@ auto estimateCanonicalizedLaneletPose(
     return std::nullopt;
   }
 }
+}  // namespace pedestrian
 }  // namespace pose
 }  // namespace traffic_simulator
