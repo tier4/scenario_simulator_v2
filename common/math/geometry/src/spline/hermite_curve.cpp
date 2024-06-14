@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cmath>
 #include <geometry/bounding_box.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <iostream>
 #include <limits>
@@ -292,7 +293,7 @@ const geometry_msgs::msg::Pose HermiteCurve::getPose(
   rpy.x = 0.0;
   rpy.y = fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0;
   rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
-  pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+  pose.orientation = math::geometry::convertEulerAngleToQuaternion(rpy);
   pose.position = getPoint(s);
   return pose;
 }
