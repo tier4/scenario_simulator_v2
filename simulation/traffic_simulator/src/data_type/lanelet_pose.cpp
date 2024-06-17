@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/data_type/lanelet_pose.hpp>
@@ -132,9 +133,9 @@ auto CanonicalizedLaneletPose::getAlternativeLaneletPoseBaseOnShortestRouteFrom(
 auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils) -> void
 {
-  using quaternion_operation::convertEulerAngleToQuaternion;
-  using quaternion_operation::convertQuaternionToEulerAngle;
-  using quaternion_operation::getRotation;
+  using math::geometry::convertEulerAngleToQuaternion;
+  using math::geometry::convertQuaternionToEulerAngle;
+  using math::geometry::getRotation;
   const math::geometry::CatmullRomSpline spline(
     hdmap_utils->getCenterPoints(lanelet_pose_.lanelet_id));
   // adjust Oz position
