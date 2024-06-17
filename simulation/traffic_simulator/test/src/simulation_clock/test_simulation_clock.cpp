@@ -59,7 +59,7 @@ TEST(SimulationClock, getCurrentRosTime)
 }
 
 /**
- * @note Test basic functionality used in API. Test scenario time calculation correctness with initialized obejct,
+ * @note Test basic functionality used in API. Test scenario time calculation correctness with initialized object,
  * npc logic started after several update() calls and additional update() calls after starting npc logic.
  */
 TEST(SimulationClock, getCurrentScenarioTime)
