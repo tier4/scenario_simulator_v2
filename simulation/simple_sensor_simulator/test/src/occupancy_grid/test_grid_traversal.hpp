@@ -24,7 +24,7 @@ using namespace simple_sensor_simulator;
 class GridTraversalTest : public ::testing::Test
 {
 protected:
-  void SetUp() override { traversal_ = std::make_unique<GridTraversal>(0.0, 0.0, 3.0, 3.0); }
+  GridTraversalTest() : traversal_(std::make_unique<GridTraversal>(0.0, 0.0, 3.0, 3.0)) {}
 
   std::unique_ptr<GridTraversal> traversal_;
 };

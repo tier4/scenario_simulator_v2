@@ -31,9 +31,8 @@ constexpr static double degToRad(double deg) { return deg * M_PI / 180.0; }
 class RaycasterTest : public ::testing::Test
 {
 protected:
-  void SetUp() override
+  RaycasterTest() : raycaster_(std::make_unique<Raycaster>())
   {
-    raycaster_ = std::make_unique<Raycaster>();
     configureLidar();
 
     origin_ =

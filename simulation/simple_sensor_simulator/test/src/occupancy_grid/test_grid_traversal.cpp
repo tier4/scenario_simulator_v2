@@ -21,7 +21,7 @@ TEST_F(GridTraversalTest, begin)
 {
   auto it = traversal_->begin();
 
-  EXPECT_TRUE(it != traversal_->end());
+  ASSERT_TRUE(it != traversal_->end());
   const auto [x, y] = *it;
 
   EXPECT_EQ(x, 0);
@@ -46,13 +46,13 @@ TEST_F(GridTraversalTest, end)
 TEST_F(GridTraversalTest, iterator_operator_dereference)
 {
   auto it = traversal_->begin();
-  EXPECT_TRUE(it != traversal_->end());
+  ASSERT_TRUE(it != traversal_->end());
   const auto [x, y] = *it;
   EXPECT_EQ(x, 0);
   EXPECT_EQ(y, 0);
 
   ++it;
-  EXPECT_TRUE(it != traversal_->end());
+  ASSERT_TRUE(it != traversal_->end());
   const auto [x1, y1] = *it;
   EXPECT_EQ(x1, 0);
   EXPECT_EQ(y1, 1);
@@ -64,22 +64,22 @@ TEST_F(GridTraversalTest, iterator_operator_dereference)
 TEST_F(GridTraversalTest, iterator_operator_increment)
 {
   auto it = traversal_->begin();
-  EXPECT_TRUE(it != traversal_->end());
+  ASSERT_TRUE(it != traversal_->end());
 
   ++it;
-  EXPECT_TRUE(it != traversal_->end());
+  ASSERT_TRUE(it != traversal_->end());
   const auto [x1, y1] = *it;
   EXPECT_EQ(x1, 0);
   EXPECT_EQ(y1, 1);
 
   ++it;
-  EXPECT_TRUE(it != traversal_->end());
+  ASSERT_TRUE(it != traversal_->end());
   const auto [x2, y2] = *it;
   EXPECT_EQ(x2, 1);
   EXPECT_EQ(y2, 1);
 
   ++it;
-  EXPECT_TRUE(it != traversal_->end());
+  ASSERT_TRUE(it != traversal_->end());
   const auto [x3, y3] = *it;
   EXPECT_EQ(x3, 1);
   EXPECT_EQ(y3, 2);
@@ -91,9 +91,9 @@ TEST_F(GridTraversalTest, iterator_operator_increment)
 TEST_F(GridTraversalTest, iterator_operator_notEqual)
 {
   auto it = traversal_->begin();
-  EXPECT_TRUE(it != traversal_->end());
+  ASSERT_TRUE(it != traversal_->end());
   ++it;
-  EXPECT_TRUE(it != traversal_->end());
+  ASSERT_TRUE(it != traversal_->end());
   while (it != traversal_->end()) {
     ++it;
   }

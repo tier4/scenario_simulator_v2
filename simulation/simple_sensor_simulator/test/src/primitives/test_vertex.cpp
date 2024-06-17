@@ -59,9 +59,7 @@ TEST(VertexTest, toVertex_manyPoints)
  */
 TEST(VertexTest, toVertex_empty)
 {
-  std::vector<geometry_msgs::msg::Point> points;
-
-  const std::vector<Vertex> vertices = toVertex(points);
+  const std::vector<Vertex> vertices = toVertex(std::vector<geometry_msgs::msg::Point>{});
 
   EXPECT_TRUE(vertices.empty());
 }
@@ -99,9 +97,7 @@ TEST(VertexTest, toPoints_manyVertices)
  */
 TEST(VertexTest, toPoints_empty)
 {
-  std::vector<Vertex> vertices;
-
-  const std::vector<geometry_msgs::msg::Point> points = toPoints(vertices);
+  const std::vector<geometry_msgs::msg::Point> points = toPoints(std::vector<Vertex>{});
 
   EXPECT_TRUE(points.empty());
 }

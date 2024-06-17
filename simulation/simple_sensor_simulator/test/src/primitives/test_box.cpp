@@ -46,7 +46,7 @@ TEST(BoxTest, Box)
       .orientation(
         geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(0.0).w(1.0));
 
-  Box box(1.0f, 1.0f, 1.0f, pose);
+  const Box box(1.0f, 1.0f, 1.0f, pose);
 
   const auto vertices = box.getVertex();
   const auto triangles = box.getTriangles();
