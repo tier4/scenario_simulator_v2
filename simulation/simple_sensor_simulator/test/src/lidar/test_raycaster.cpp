@@ -15,9 +15,7 @@
 #include "test_raycaster.hpp"
 
 /**
- * @note Test basic functionality
- *
- * Test adding a primitive to scene correctness with a Box.
+ * @note Test basic functionality. Test adding a primitive to scene correctness with a Box.
  */
 TEST_F(RaycasterTest, addPrimitive_box)
 {
@@ -40,41 +38,37 @@ TEST_F(RaycasterTest, addPrimitive_twoIdenticalNames)
 }
 
 /**
- * @note Test basic functionality
- *
- * Test raycasting correctness with an empty scene.
+ * @note Test basic functionality. Test raycasting correctness with an empty scene.
  */
 TEST_F(RaycasterTest, raycast_empty)
 {
-  auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
+  const auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
+  const auto total_num_of_points = cloud.width * cloud.height;
 
-  EXPECT_EQ(cloud.width, 0);
+  EXPECT_EQ(total_num_of_points, 0);
   EXPECT_EQ(cloud.header.frame_id, frame_id_);
   EXPECT_EQ(cloud.header.stamp, stamp_);
 }
 
 /**
- * @note Test basic functionality
- *
- * Test raycasting correctness with one box on the scene.
+ * @note Test basic functionality. Test raycasting correctness with one box on the scene.
  */
 TEST_F(RaycasterTest, raycast_box)
 {
   raycaster_->addPrimitive<primitives::Box>(
     box_name_, box_depth_, box_width_, box_height_, box_pose_);
 
-  auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
+  const auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
+  const auto total_num_of_points = cloud.width * cloud.height;
 
-  EXPECT_GT(cloud.width, 0);
+  EXPECT_GT(total_num_of_points, 0);
   EXPECT_EQ(cloud.header.frame_id, frame_id_);
   EXPECT_EQ(cloud.header.stamp, stamp_);
 }
 
 /**
- * @note Test basic functionality
- *
- * Test setting ray directions with a lidar configuration that has one ray which intersects with the
- * only box on the scene.
+ * @note Test basic functionality. Test setting ray directions with a lidar configuration that has
+ * one ray which intersects with the only box on the scene.
  */
 TEST_F(RaycasterTest, setDirection_oneBox)
 {
@@ -87,24 +81,24 @@ TEST_F(RaycasterTest, setDirection_oneBox)
 
   raycaster_->setDirection(config);
 
-  auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
+  const auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
+  const auto total_num_of_points = cloud.width * cloud.height;
 
-  EXPECT_GT(cloud.width, 0);
+  EXPECT_GT(total_num_of_points, 0);
   EXPECT_EQ(cloud.header.frame_id, frame_id_);
   EXPECT_EQ(cloud.header.stamp, stamp_);
 }
 
 /**
- * @note Test basic functionality
- *
- * Test setting ray directions with a lidar configuration that has a ring of horizontal rays which
- * intersect with boxes positioned on the ring so that they intersect with the rays.
+ * @note Test basic functionality. Test setting ray directions with a lidar configuration that has a
+ * ring of horizontal rays which intersect with boxes positioned on the ring so that they intersect
+ * with the rays.
  */
 TEST_F(RaycasterTest, setDirection_manyBoxes)
 {
   constexpr double radius = 5.0;
   constexpr int num_boxes = 10;
-  constexpr double angle_increment = 2 * M_PI / num_boxes;
+  constexpr double angle_increment = 2.0 * M_PI / num_boxes;
 
   for (int i = 0; i < num_boxes; ++i) {
     const double angle = i * angle_increment;
@@ -113,30 +107,31 @@ TEST_F(RaycasterTest, setDirection_manyBoxes)
         .position(geometry_msgs::build<geometry_msgs::msg::Point>()
                     .x(radius * cos(angle))
                     .y(radius * sin(angle))
-                    .z(0))
-        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
+                    .z(0.0))
+        .orientation(
+          geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(0.0).w(1.0));
 
-    std::string name = "box" + std::to_string(i);
+    const std::string name = "box" + std::to_string(i);
     raycaster_->addPrimitive<primitives::Box>(name, box_depth_, box_width_, box_height_, box_pose);
   }
 
   simulation_api_schema::LidarConfiguration config;
   config.add_vertical_angles(0.0);  // Only one vertical angle for a horizontal ring
-  config.set_horizontal_resolution(degToRad(5));
+  config.set_horizontal_resolution(degToRad(5.0));
 
   raycaster_->setDirection(config);
 
-  auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
+  const auto cloud = raycaster_->raycast(frame_id_, stamp_, origin_);
+  const auto total_num_of_points = cloud.width * cloud.height;
 
-  EXPECT_GT(cloud.width, 0);
+  EXPECT_GT(total_num_of_points, 0);
   EXPECT_EQ(cloud.header.frame_id, frame_id_);
   EXPECT_EQ(cloud.header.stamp, stamp_);
 }
 
 /**
- * @note Test basic functionality
- *
- * Test detected objects obtaining from the statuses list containing Ego.
+ * @note Test basic functionality. Test detected objects obtaining from the statuses list containing
+ * Ego.
  */
 TEST_F(RaycasterTest, getDetectedObjects)
 {
@@ -149,4 +144,10 @@ TEST_F(RaycasterTest, getDetectedObjects)
 
   ASSERT_FALSE(detected_objects.empty());
   EXPECT_EQ(detected_objects[0], box_name_);
+}
+
+int main(int argc, char ** argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

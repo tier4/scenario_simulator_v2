@@ -38,12 +38,14 @@ protected:
 
     origin_ =
       geometry_msgs::build<geometry_msgs::msg::Pose>()
-        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
-        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0.0).y(0.0).z(0.0))
+        .orientation(
+          geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(0.0).w(1.0));
     box_pose_ =
       geometry_msgs::build<geometry_msgs::msg::Pose>()
-        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(5.0).y(0).z(0))
-        .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
+        .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(5.0).y(0.0).z(0.0))
+        .orientation(
+          geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(0.0).w(1.0));
   }
 
   std::unique_ptr<Raycaster> raycaster_;

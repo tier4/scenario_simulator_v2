@@ -24,23 +24,20 @@
 using namespace simple_sensor_simulator;
 
 /**
- * @note Test basic functionality
- *
- * Test to vertex conversion correctness with a sample point.
+ * @note Test basic functionality. Test to vertex conversion correctness with a sample point.
  */
 TEST(VertexTest, toVertex_onePoint)
 {
   const auto point = geometry_msgs::build<geometry_msgs::msg::Point>().x(1.0).y(2.0).z(3.0);
 
-  Vertex vertex = toVertex(point);
+  const Vertex vertex = toVertex(point);
 
   EXPECT_VERTEX_AND_POINT_EQ(vertex, point);
 }
 
 /**
- * @note Test basic functionality
- *
- * Test to vertex conversion correctness with a vector containing multiple sample points.
+ * @note Test basic functionality. Test to vertex conversion correctness with a vector containing
+ * multiple sample points.
  */
 TEST(VertexTest, toVertex_manyPoints)
 {
@@ -49,7 +46,7 @@ TEST(VertexTest, toVertex_manyPoints)
     geometry_msgs::build<geometry_msgs::msg::Point>().x(4.0).y(5.0).z(6.0),
     geometry_msgs::build<geometry_msgs::msg::Point>().x(7.0).y(8.0).z(9.0)};
 
-  std::vector<Vertex> vertices = toVertex(points);
+  const std::vector<Vertex> vertices = toVertex(points);
 
   ASSERT_EQ(vertices.size(), points.size());
   for (size_t i = 0; i < vertices.size(); ++i) {
@@ -58,43 +55,38 @@ TEST(VertexTest, toVertex_manyPoints)
 }
 
 /**
- * @note Test function behavior when an empty vector is passed
- *
- * The goal is to get an empty vector.
+ * @note Test function behavior when an empty vector is passed. The goal is to get an empty vector.
  */
 TEST(VertexTest, toVertex_empty)
 {
   std::vector<geometry_msgs::msg::Point> points;
 
-  std::vector<Vertex> vertices = toVertex(points);
+  const std::vector<Vertex> vertices = toVertex(points);
 
   EXPECT_TRUE(vertices.empty());
 }
 
 /**
- * @note Test basic functionality
- *
- * Test to point conversion correctness with a sample vertex.
+ * @note Test basic functionality. Test to point conversion correctness with a sample vertex.
  */
 TEST(VertexTest, toPoint_oneVertex)
 {
-  const Vertex vertex{1.0, 2.0, 3.0};
+  const Vertex vertex{1.0f, 2.0f, 3.0f};
 
-  geometry_msgs::msg::Point point = toPoint(vertex);
+  const geometry_msgs::msg::Point point = toPoint(vertex);
 
   EXPECT_VERTEX_AND_POINT_EQ(point, vertex);
 }
 
 /**
- * @note Test basic functionality
- *
- *  Test to point conversion correctness with a vector containing multiple sample vertices.
+ * @note Test basic functionality. Test to point conversion correctness with a vector containing
+ * multiple sample vertices.
  */
 TEST(VertexTest, toPoints_manyVertices)
 {
-  const std::vector<Vertex> vertices = {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}, {7.0, 8.0, 9.0}};
+  const std::vector<Vertex> vertices = {{1.0f, 2.0f, 3.0f}, {4.0f, 5.0f, 6.0f}, {7.0f, 8.0f, 9.0f}};
 
-  std::vector<geometry_msgs::msg::Point> points = toPoints(vertices);
+  const std::vector<geometry_msgs::msg::Point> points = toPoints(vertices);
 
   ASSERT_EQ(points.size(), vertices.size());
   for (size_t i = 0; i < points.size(); ++i) {
@@ -103,15 +95,13 @@ TEST(VertexTest, toPoints_manyVertices)
 }
 
 /**
- * @note Test function behavior when an empty vector is passed
- *
- * The goal is to get an empty vector.
+ * @note Test function behavior when an empty vector is passed. The goal is to get an empty vector.
  */
 TEST(VertexTest, toPoints_empty)
 {
   std::vector<Vertex> vertices;
 
-  std::vector<geometry_msgs::msg::Point> points = toPoints(vertices);
+  const std::vector<geometry_msgs::msg::Point> points = toPoints(vertices);
 
   EXPECT_TRUE(points.empty());
 }

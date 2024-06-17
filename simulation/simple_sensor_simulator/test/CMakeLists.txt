@@ -1,14 +1,3 @@
-find_package(Protobuf REQUIRED)
-include_directories(${Protobuf_INCLUDE_DIRS})
-
-ament_add_gtest(test_box src/primitives/test_box.cpp)
-target_link_libraries(test_box simple_sensor_simulator_component)
-
-ament_add_gtest(test_vertex src/primitives/test_vertex.cpp)
-target_link_libraries(test_vertex simple_sensor_simulator_component)
-
-ament_add_gtest(test_raycaster src/lidar/test_raycaster.cpp)
-target_link_libraries(test_raycaster simple_sensor_simulator_component ${Protobuf_LIBRARIES})
-
-ament_add_gtest(test_grid_traversal src/occupancy_grid/test_grid_traversal.cpp)
-target_link_libraries(test_grid_traversal simple_sensor_simulator_component)
+add_subdirectory(src/lidar)
+add_subdirectory(src/primitives)
+add_subdirectory(src/occupancy_grid)

@@ -25,16 +25,15 @@ using namespace simple_sensor_simulator;
 using namespace simple_sensor_simulator::primitives;
 
 /**
- * @note Test initialization correctness
- *
- * The goal is to test whether the vertices and indices are initialized to create a box shape (can
- * use get2DConvexHull or other specially created const reference accessors).
+ * @note Test initialization correctness. The goal is to test whether the vertices and indices are
+ * initialized to create a box shape (can use get2DConvexHull or other specially created const
+ * reference accessors).
  */
 TEST(BoxTest, Box)
 {
   const std::vector<Vertex> expected_vertices = {
-    {-0.5, -0.5, -0.5}, {-0.5, -0.5, 0.5}, {-0.5, 0.5, -0.5}, {-0.5, 0.5, 0.5},
-    {0.5, -0.5, -0.5},  {0.5, -0.5, 0.5},  {0.5, 0.5, -0.5},  {0.5, 0.5, 0.5}};
+    {-0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f, 0.5f}, {-0.5f, 0.5f, -0.5f}, {-0.5f, 0.5f, 0.5f},
+    {0.5f, -0.5f, -0.5f},  {0.5f, -0.5f, 0.5f},  {0.5f, 0.5f, -0.5f},  {0.5f, 0.5f, 0.5f}};
 
   // Indices
   const std::vector<Triangle> expected_triangles = {{0, 1, 2}, {1, 3, 2}, {4, 6, 5}, {5, 6, 7},
@@ -43,13 +42,14 @@ TEST(BoxTest, Box)
 
   const auto pose =
     geometry_msgs::build<geometry_msgs::msg::Pose>()
-      .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0).y(0).z(0))
-      .orientation(geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0).y(0).z(0).w(1));
+      .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(0.0).y(0.0).z(0.0))
+      .orientation(
+        geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(0.0).w(1.0));
 
-  Box box(1.0, 1.0, 1.0, pose);
+  Box box(1.0f, 1.0f, 1.0f, pose);
 
-  auto vertices = box.getVertex();
-  auto triangles = box.getTriangles();
+  const auto vertices = box.getVertex();
+  const auto triangles = box.getTriangles();
 
   ASSERT_EQ(triangles.size(), expected_triangles.size());
   ASSERT_EQ(vertices.size(), expected_vertices.size());
