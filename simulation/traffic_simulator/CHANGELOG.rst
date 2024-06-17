@@ -13,6 +13,15 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.4 (2024-06-14)
+------------------
+* Merge pull request `#1281 <https://github.com/tier4/scenario_simulator_v2/issues/1281>`_ from tier4/fix/remove_quaternion_operation
+  Remove quaternion_operation
+* Merge branch 'master' into fix/remove_quaternion_operation
+* Merge branch 'master' into fix/remove_quaternion_operation
+* Remove quaternion_operation
+* Contributors: Masaya Kataoka, Taiga Takano
+
 2.1.3 (2024-06-14)
 ------------------
 * Merge pull request `#1284 <https://github.com/tier4/scenario_simulator_v2/issues/1284>`_ from tier4/fix/issue1276

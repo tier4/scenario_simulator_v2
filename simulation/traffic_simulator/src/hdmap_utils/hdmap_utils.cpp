@@ -16,7 +16,6 @@
 #include <lanelet2_io/Io.h>
 #include <lanelet2_io/io_handlers/Serialize.h>
 #include <lanelet2_projection/UTM.h>
-#include <quaternion_operation/quaternion_operation.h>
 
 #include <algorithm>
 #include <boost/archive/binary_iarchive.hpp>
@@ -27,7 +26,10 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 #include <deque>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
 #include <geometry/quaternion/operator.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <geometry/spline/hermite_curve.hpp>
 #include <geometry/transform.hpp>
@@ -505,9 +507,9 @@ auto HdMapUtils::matchToLane(
   std::optional<lanelet::Id> id;
   lanelet::matching::Object2d obj;
   obj.pose.translation() = toPoint2d(pose.position);
-  obj.pose.linear() = Eigen::Rotation2D<double>(
-                        quaternion_operation::convertQuaternionToEulerAngle(pose.orientation).z)
-                        .matrix();
+  obj.pose.linear() =
+    Eigen::Rotation2D<double>(math::geometry::convertQuaternionToEulerAngle(pose.orientation).z)
+      .matrix();
   obj.absoluteHull = absoluteHull(
     lanelet::matching::Hull2d{
       lanelet::BasicPoint2d{
@@ -567,8 +569,8 @@ auto HdMapUtils::toLaneletPose(
     return std::nullopt;
   }
   auto pose_on_centerline = spline->getPose(s.value());
-  auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
-    quaternion_operation::getRotation(pose_on_centerline.orientation, pose.orientation));
+  auto rpy = math::geometry::convertQuaternionToEulerAngle(
+    math::geometry::getRotation(pose_on_centerline.orientation, pose.orientation));
   double offset = std::sqrt(spline->getSquaredDistanceIn2D(pose.position, s.value()));
   /**
    * @note Hard coded parameter
@@ -1383,8 +1385,7 @@ auto HdMapUtils::getLaneChangeTrajectory(
 auto HdMapUtils::getVectorFromPose(const geometry_msgs::msg::Pose & pose, const double magnitude)
   const -> geometry_msgs::msg::Vector3
 {
-  geometry_msgs::msg::Vector3 dir =
-    quaternion_operation::convertQuaternionToEulerAngle(pose.orientation);
+  geometry_msgs::msg::Vector3 dir = math::geometry::convertQuaternionToEulerAngle(pose.orientation);
   geometry_msgs::msg::Vector3 vector;
   vector.x = magnitude * std::cos(dir.z);
   vector.y = magnitude * std::sin(dir.z);
@@ -1429,8 +1430,8 @@ auto HdMapUtils::toMapPose(
     rpy.x = 0.0;
     rpy.y = fill_pitch ? std::atan2(-tangent_vec.z, std::hypot(tangent_vec.x, tangent_vec.y)) : 0.0;
     rpy.z = std::atan2(tangent_vec.y, tangent_vec.x);
-    ret.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(rpy) *
-                           quaternion_operation::convertEulerAngleToQuaternion(pose->rpy);
+    ret.pose.orientation = math::geometry::convertEulerAngleToQuaternion(rpy) *
+                           math::geometry::convertEulerAngleToQuaternion(pose->rpy);
     return ret;
   } else {
     THROW_SEMANTIC_ERROR(
