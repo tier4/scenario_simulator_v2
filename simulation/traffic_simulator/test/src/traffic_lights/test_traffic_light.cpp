@@ -728,8 +728,7 @@ TEST(TrafficLight, Bulb_trafficLightMessageConversion)
  */
 TEST(TrafficLight, Color_make_wrong)
 {
-  using Color = traffic_simulator::TrafficLight::Color;
-  EXPECT_THROW([[maybe_unused]] Color color = Color::make("wrong_color"), common::SyntaxError);
+  EXPECT_THROW(traffic_simulator::TrafficLight::Color::make("wrong_color"), common::SyntaxError);
 }
 
 /**
@@ -737,8 +736,7 @@ TEST(TrafficLight, Color_make_wrong)
  */
 TEST(TrafficLight, Shape_make_wrong)
 {
-  using Shape = traffic_simulator::TrafficLight::Shape;
-  EXPECT_THROW([[maybe_unused]] Shape shape = Shape::make("wrong_shape"), common::SyntaxError);
+  EXPECT_THROW(traffic_simulator::TrafficLight::Shape::make("wrong_shape"), common::SyntaxError);
 }
 
 /**
@@ -746,8 +744,7 @@ TEST(TrafficLight, Shape_make_wrong)
  */
 TEST(TrafficLight, Status_make_wrong)
 {
-  using Status = traffic_simulator::TrafficLight::Status;
-  EXPECT_THROW([[maybe_unused]] Status status = Status::make("wrong_status"), common::SyntaxError);
+  EXPECT_THROW(traffic_simulator::TrafficLight::Status::make("wrong_status"), common::SyntaxError);
 }
 
 /**
