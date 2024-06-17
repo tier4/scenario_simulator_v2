@@ -50,9 +50,9 @@ LaneletPose constructLaneletPose(
   return lanelet_pose;
 }
 
-CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+auto constructCanonicalizedLaneletPose(
   lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
 {
   if (
     auto canonicalized_lanelet_pose = canonicalize(
@@ -67,9 +67,9 @@ CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
   }
 }
 
-CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+auto constructCanonicalizedLaneletPose(
   lanelet::Id lanelet_id, double s, double offset,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
 {
   return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0, hdmap_utils_ptr);
 }

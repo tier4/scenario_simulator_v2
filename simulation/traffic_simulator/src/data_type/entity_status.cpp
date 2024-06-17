@@ -179,7 +179,8 @@ auto CanonicalizedEntityStatus::setTime(double time) -> void { entity_status_.ti
 auto CanonicalizedEntityStatus::getTime() const noexcept -> double { return entity_status_.time; }
 }  // namespace entity_status
 
-bool isSameLaneletId(const CanonicalizedEntityStatus & s0, const CanonicalizedEntityStatus & s1)
+auto isSameLaneletId(const CanonicalizedEntityStatus & s0, const CanonicalizedEntityStatus & s1)
+  -> bool
 {
   if (const auto s0_canonicalized_lanelet_pose = s0.getCanonicalizedLaneletPose()) {
     if (const auto s1_canonicalized_lanelet_pose = s1.getCanonicalizedLaneletPose()) {
@@ -190,7 +191,7 @@ bool isSameLaneletId(const CanonicalizedEntityStatus & s0, const CanonicalizedEn
   THROW_SIMULATION_ERROR("There is no Lanelet pose");
 }
 
-bool isSameLaneletId(const CanonicalizedEntityStatus & s, const lanelet::Id lanelet_id)
+auto isSameLaneletId(const CanonicalizedEntityStatus & s, const lanelet::Id lanelet_id) -> bool
 {
   if (const auto s_canonicalized_lanelet_pose = s.getCanonicalizedLaneletPose()) {
     return isSameLaneletId(s_canonicalized_lanelet_pose.value(), lanelet_id);

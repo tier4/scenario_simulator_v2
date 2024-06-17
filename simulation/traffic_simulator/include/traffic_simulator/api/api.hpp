@@ -71,8 +71,9 @@ public:
       [this](const auto & entity_name) {
         if (const auto entity = getEntity(entity_name)) {
           return entity->getMapPose();
+        } else {
+          THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
         }
-        THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
       },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(

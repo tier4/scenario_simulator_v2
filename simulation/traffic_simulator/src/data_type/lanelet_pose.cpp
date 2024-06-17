@@ -60,8 +60,8 @@ CanonicalizedLaneletPose::CanonicalizedLaneletPose(CanonicalizedLaneletPose && o
 {
 }
 
-CanonicalizedLaneletPose & CanonicalizedLaneletPose::operator=(
-  const CanonicalizedLaneletPose & other)
+auto CanonicalizedLaneletPose::operator=(const CanonicalizedLaneletPose & other)
+  -> CanonicalizedLaneletPose &
 {
   this->lanelet_pose_ = other.lanelet_pose_;
   this->lanelet_poses_ = other.lanelet_poses_;
@@ -159,7 +159,8 @@ auto CanonicalizedLaneletPose::adjustOrientationAndOzPosition(
 
 }  // namespace lanelet_pose
 
-bool isSameLaneletId(const CanonicalizedLaneletPose & p0, const CanonicalizedLaneletPose & p1)
+auto isSameLaneletId(const CanonicalizedLaneletPose & p0, const CanonicalizedLaneletPose & p1)
+  -> bool
 {
   return static_cast<LaneletPose>(p0).lanelet_id == static_cast<LaneletPose>(p1).lanelet_id;
 }

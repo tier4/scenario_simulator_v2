@@ -70,9 +70,9 @@ LaneletPose constructLaneletPose(
  * @param hdmap_utils_ptr pointer to HdmapUtils
  * @return LaneletPose
  */
-CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+auto constructCanonicalizedLaneletPose(
   lanelet::Id lanelet_id, double s, double offset,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
 
 /**
  * @brief helper function for constructing canonicalized lanelet pose
@@ -86,9 +86,9 @@ CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
  * @param hdmap_utils_ptr pointer to HdmapUtils
  * @return LaneletPose
  */
-CanonicalizedLaneletPose constructCanonicalizedLaneletPose(
+auto constructCanonicalizedLaneletPose(
   lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr);
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
 
 /**
  * @brief helper function for constructing rpy
