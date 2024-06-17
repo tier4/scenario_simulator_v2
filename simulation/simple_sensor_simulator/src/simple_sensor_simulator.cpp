@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <limits>

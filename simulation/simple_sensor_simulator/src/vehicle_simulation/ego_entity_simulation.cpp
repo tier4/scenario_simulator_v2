@@ -14,6 +14,10 @@
 
 #include <concealer/autoware_universe.hpp>
 #include <filesystem>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/utils/pose.hpp>
@@ -218,8 +222,8 @@ void EgoEntitySimulation::overwrite(
   const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
   double step_time, bool npc_logic_started)
 {
-  using quaternion_operation::convertQuaternionToEulerAngle;
-  using quaternion_operation::getRotationMatrix;
+  using math::geometry::convertQuaternionToEulerAngle;
+  using math::geometry::getRotationMatrix;
 
   autoware->rethrow();
 
@@ -283,7 +287,7 @@ void EgoEntitySimulation::overwrite(
 void EgoEntitySimulation::update(
   double current_scenario_time, double step_time, bool npc_logic_started)
 {
-  using quaternion_operation::getRotationMatrix;
+  using math::geometry::getRotationMatrix;
 
   autoware->rethrow();
 
@@ -408,9 +412,10 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
 auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   -> geometry_msgs::msg::Pose
 {
+  using math::geometry::operator*;
   const auto relative_position =
-    quaternion_operation::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
-  const auto relative_orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    math::geometry::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
+  const auto relative_orientation = math::geometry::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
       .x(0)
       .y(pitch_angle)

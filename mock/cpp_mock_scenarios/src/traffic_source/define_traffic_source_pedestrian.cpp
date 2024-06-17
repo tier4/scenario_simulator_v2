@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <cpp_mock_scenarios/catalogs.hpp>
 #include <cpp_mock_scenarios/cpp_scenario_node.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
 #include <string>
@@ -77,7 +76,7 @@ private:
       1.0, 5.0, 3.0,
       geometry_msgs::build<geometry_msgs::msg::Pose>()
         .position(geometry_msgs::build<geometry_msgs::msg::Point>().x(3757.0).y(73750.3).z(0.0))
-        .orientation(quaternion_operation::convertEulerAngleToQuaternion(
+        .orientation(math::geometry::convertEulerAngleToQuaternion(
           geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(0.321802))),
 
       // clang-format off
