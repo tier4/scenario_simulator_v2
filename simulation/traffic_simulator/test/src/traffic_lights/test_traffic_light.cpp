@@ -668,11 +668,10 @@ TEST(TrafficLight, Bulb_make)
  */
 TEST(TrafficLight, Bulb_trafficLightMessageConversion)
 {
-  using TrafficLight = traffic_simulator::TrafficLight;
-  using Color = TrafficLight::Color;
-  using Status = TrafficLight::Status;
-  using Shape = TrafficLight::Shape;
-  using Bulb = TrafficLight::Bulb;
+  using Color = traffic_simulator::TrafficLight::Color;
+  using Status = traffic_simulator::TrafficLight::Status;
+  using Shape = traffic_simulator::TrafficLight::Shape;
+  using Bulb = traffic_simulator::TrafficLight::Bulb;
 
   {
     constexpr auto bulb = Bulb(Color::red, Status::flashing, Shape::circle);
@@ -730,8 +729,7 @@ TEST(TrafficLight, Bulb_trafficLightMessageConversion)
 TEST(TrafficLight, Color_make_wrong)
 {
   using Color = traffic_simulator::TrafficLight::Color;
-  Color color;
-  EXPECT_THROW(color = Color::make("wrong_color"), std::runtime_error);
+  EXPECT_THROW([[maybe_unused]] Color color = Color::make("wrong_color"), common::SyntaxError);
 }
 
 /**
@@ -740,8 +738,7 @@ TEST(TrafficLight, Color_make_wrong)
 TEST(TrafficLight, Shape_make_wrong)
 {
   using Shape = traffic_simulator::TrafficLight::Shape;
-  Shape shape;
-  EXPECT_THROW(shape = Shape::make("wrong_shape"), std::runtime_error);
+  EXPECT_THROW([[maybe_unused]] Shape shape = Shape::make("wrong_shape"), common::SyntaxError);
 }
 
 /**
@@ -750,8 +747,7 @@ TEST(TrafficLight, Shape_make_wrong)
 TEST(TrafficLight, Status_make_wrong)
 {
   using Status = traffic_simulator::TrafficLight::Status;
-  Status status;
-  EXPECT_THROW(status = Status::make("wrong_status"), std::runtime_error);
+  EXPECT_THROW([[maybe_unused]] Status status = Status::make("wrong_status"), common::SyntaxError);
 }
 
 /**
@@ -761,8 +757,8 @@ TEST(TrafficLight, Bulb_make_wrong)
 {
   using Bulb = traffic_simulator::TrafficLight::Bulb;
 
-  EXPECT_THROW(Bulb("red flashing wrong_shape"), std::runtime_error);
-  EXPECT_THROW(Bulb("red wrong_status circle"), std::runtime_error);
-  EXPECT_THROW(Bulb("wrong_color flashing circle"), std::runtime_error);
-  EXPECT_THROW(Bulb("wrong_color wrong_status wrong_shape"), std::runtime_error);
+  EXPECT_THROW(Bulb("red flashing wrong_shape"), common::SyntaxError);
+  EXPECT_THROW(Bulb("red wrong_status circle"), common::SyntaxError);
+  EXPECT_THROW(Bulb("wrong_color flashing circle"), common::SyntaxError);
+  EXPECT_THROW(Bulb("wrong_color wrong_status wrong_shape"), common::SyntaxError);
 }

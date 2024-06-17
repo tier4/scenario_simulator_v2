@@ -17,8 +17,8 @@
 #include <traffic_simulator/behavior/route_planner.hpp>
 
 #include "../catalogs.hpp"
-#include "../entity_helper_functions.hpp"
 #include "../expect_eq_macros.hpp"
+#include "../helper_functions.hpp"
 
 int main(int argc, char ** argv)
 {
