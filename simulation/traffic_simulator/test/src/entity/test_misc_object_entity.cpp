@@ -29,10 +29,10 @@ int main(int argc, char ** argv)
   return RUN_ALL_TESTS();
 }
 
-class MiscObjectEntityTest : public testing::Test
+class MiscObjectEntityTest_HdMapUtils : public testing::Test
 {
 protected:
-  MiscObjectEntityTest()
+  MiscObjectEntityTest_HdMapUtils()
   : hdmap_utils_ptr(makeHdMapUtilsSharedPointer()), entity_name("misc_object_entity")
   {
   }
@@ -41,24 +41,21 @@ protected:
   const std::string entity_name;
 };
 
-class EntityBaseWithMiscObjectTest : public testing::Test
+class MiscObjectEntityTest_FullObject : public MiscObjectEntityTest_HdMapUtils
 {
 protected:
-  EntityBaseWithMiscObjectTest()
+  MiscObjectEntityTest_FullObject()
   : id(120659),
-    hdmap_utils(makeHdMapUtilsSharedPointer()),
-    pose(makeCanonicalizedLaneletPose(hdmap_utils, id)),
+    pose(makeCanonicalizedLaneletPose(hdmap_utils_ptr, id)),
     bbox(makeBoundingBox()),
-    status(makeCanonicalizedEntityStatus(hdmap_utils, pose, bbox)),
+    status(makeCanonicalizedEntityStatus(hdmap_utils_ptr, pose, bbox, 0.0, entity_name)),
     misc_object(
-      "default_entity_name", status, hdmap_utils,
-      traffic_simulator_msgs::msg::MiscObjectParameters{}),
+      entity_name, status, hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{}),
     entity_base(&misc_object)
   {
   }
 
   const lanelet::Id id;
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils;
   traffic_simulator::lanelet_pose::CanonicalizedLaneletPose pose;
   traffic_simulator_msgs::msg::BoundingBox bbox;
   traffic_simulator::entity_status::CanonicalizedEntityStatus status;
@@ -69,7 +66,7 @@ protected:
 /**
  * @note Test basic functionality. Test current action obtaining when NPC logic is not started.
  */
-TEST_F(MiscObjectEntityTest, getCurrentAction_npcNotStarted)
+TEST_F(MiscObjectEntityTest_HdMapUtils, getCurrentAction_npcNotStarted)
 {
   auto non_canonicalized_status = makeEntityStatus(
     hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659), makeBoundingBox(), 0.0,
@@ -89,7 +86,7 @@ TEST_F(MiscObjectEntityTest, getCurrentAction_npcNotStarted)
 /**
  * @note Test function behavior when absolute speed change is requested - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest, requestSpeedChange_absolute)
+TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absolute)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -105,7 +102,7 @@ TEST_F(MiscObjectEntityTest, requestSpeedChange_absolute)
 /**
  * @note Test function behavior when relative speed change is requested - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest, requestSpeedChange_relative)
+TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_relative)
 {
   auto pose = makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659);
   auto bbox = makeBoundingBox();
@@ -137,7 +134,7 @@ TEST_F(MiscObjectEntityTest, requestSpeedChange_relative)
  * @note Test function behavior when relative speed change with transition type is requested
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest, requestSpeedChange_absoluteTransition)
+TEST_F(MiscObjectEntityTest_HdMapUtils, requestSpeedChange_absoluteTransition)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -158,7 +155,7 @@ TEST_F(MiscObjectEntityTest, requestSpeedChange_absoluteTransition)
  * @note Test function behavior when route assigning is requested with lanelet pose
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest, requestAssignRoute_laneletPose)
+TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_laneletPose)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -176,7 +173,7 @@ TEST_F(MiscObjectEntityTest, requestAssignRoute_laneletPose)
  * @note Test function behavior when route assigning is requested with pose
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest, requestAssignRoute_pose)
+TEST_F(MiscObjectEntityTest_HdMapUtils, requestAssignRoute_pose)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -194,7 +191,7 @@ TEST_F(MiscObjectEntityTest, requestAssignRoute_pose)
  * @note Test function behavior when position acquiring is requested with lanelet pose
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest, requestAcquirePosition_laneletPose)
+TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_laneletPose)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -211,7 +208,7 @@ TEST_F(MiscObjectEntityTest, requestAcquirePosition_laneletPose)
  * @note Test function behavior when position acquiring is requested with pose
  * - the goal is to test throwing error.
  */
-TEST_F(MiscObjectEntityTest, requestAcquirePosition_pose)
+TEST_F(MiscObjectEntityTest_HdMapUtils, requestAcquirePosition_pose)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -227,7 +224,7 @@ TEST_F(MiscObjectEntityTest, requestAcquirePosition_pose)
 /**
  * @note Test function behavior when called with any argument - the goal is to test error throwing.
  */
-TEST_F(MiscObjectEntityTest, getRouteLanelets)
+TEST_F(MiscObjectEntityTest_HdMapUtils, getRouteLanelets)
 {
   EXPECT_THROW(
     traffic_simulator::entity::MiscObjectEntity(
@@ -243,7 +240,7 @@ TEST_F(MiscObjectEntityTest, getRouteLanelets)
 /**
  * @note Test basic functionality; test whether the function does nothing.
  */
-TEST_F(EntityBaseWithMiscObjectTest, appendDebugMarker)
+TEST_F(MiscObjectEntityTest_FullObject, appendDebugMarker)
 {
   visualization_msgs::msg::MarkerArray markers{};
 
@@ -272,7 +269,7 @@ TEST_F(EntityBaseWithMiscObjectTest, appendDebugMarker)
 /**
  * @note Test basic functionality; test whether the function throws an error.
  */
-TEST_F(EntityBaseWithMiscObjectTest, asFieldOperatorApplication)
+TEST_F(MiscObjectEntityTest_FullObject, asFieldOperatorApplication)
 {
   EXPECT_THROW(misc_object.asFieldOperatorApplication(), common::Error);
 }
@@ -280,7 +277,7 @@ TEST_F(EntityBaseWithMiscObjectTest, asFieldOperatorApplication)
 /**
  * @note Test functionality used by other units; test correctness of 2d polygon calculations.
  */
-TEST_F(EntityBaseWithMiscObjectTest, get2DPolygon)
+TEST_F(MiscObjectEntityTest_FullObject, get2DPolygon)
 {
   const auto polygon = misc_object.get2DPolygon();
 
@@ -299,7 +296,7 @@ TEST_F(EntityBaseWithMiscObjectTest, get2DPolygon)
 /**
  * @note Test basic functionality; test whether the NPC logic is started correctly.
  */
-TEST_F(EntityBaseWithMiscObjectTest, startNpcLogic)
+TEST_F(MiscObjectEntityTest_FullObject, startNpcLogic)
 {
   EXPECT_FALSE(misc_object.isNpcLogicStarted());
   misc_object.startNpcLogic(0.0);
@@ -310,10 +307,9 @@ TEST_F(EntityBaseWithMiscObjectTest, startNpcLogic)
  * @note Test basic functionality; test activating an out of range job with
  * an entity that has a positive speed and a speed range specified in the job = [0, 0]
  */
-TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_speed)
+TEST_F(MiscObjectEntityTest_FullObject, activateOutOfRangeJob_speed)
 {
-  constexpr double velocity = 1.0;
-  misc_object.setLinearVelocity(velocity);
+  misc_object.setLinearVelocity(1.0);
   misc_object.activateOutOfRangeJob(0.0, 0.0, -100.0, 100.0, -100.0, 100.0);
 
   constexpr double current_time = 0.0;
@@ -327,10 +323,9 @@ TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_speed)
  * with an entity that has a positive acceleration
  * and an acceleration range specified in the job = [0, 0].
  */
-TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_acceleration)
+TEST_F(MiscObjectEntityTest_FullObject, activateOutOfRangeJob_acceleration)
 {
-  constexpr double acceleration = 1.0;
-  misc_object.setLinearAcceleration(acceleration);
+  misc_object.setLinearAcceleration(1.0);
   misc_object.activateOutOfRangeJob(-100.0, 100.0, 0.0, 0.0, -100.0, 100.0);
 
   constexpr double current_time = 0.0;
@@ -344,10 +339,9 @@ TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_acceleration)
  * with an entity that has a positive jerk
  * and a jerk range specified in the job = [0, 0].
  */
-TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_jerk)
+TEST_F(MiscObjectEntityTest_FullObject, activateOutOfRangeJob_jerk)
 {
-  constexpr double jerk = 1.0;
-  misc_object.setLinearJerk(jerk);
+  misc_object.setLinearJerk(1.0);
   misc_object.activateOutOfRangeJob(-100.0, 100.0, -100.0, 100.0, 0.0, 0.0);
 
   constexpr double current_time = 0.0;
@@ -359,7 +353,7 @@ TEST_F(EntityBaseWithMiscObjectTest, activateOutOfRangeJob_jerk)
 /**
  * @note Test basic functionality; test wrapper function with invalid relative target lanelet pose.
  */
-TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetLaneletPose)
+TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetLaneletPose)
 {
   const std::string target_name = "target_name";
 
@@ -367,7 +361,7 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetLaneletPose
     std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>{};
   other_status.emplace(
     target_name,
-    makeCanonicalizedEntityStatus(hdmap_utils, makePose(makePoint(3810.0, 73745.0)), bbox));
+    makeCanonicalizedEntityStatus(hdmap_utils_ptr, makePose(makePoint(3810.0, 73745.0)), bbox));
 
   entity_base->setOtherStatus(other_status);
 
@@ -384,15 +378,16 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetLaneletPose
 /**
  * @note Test basic functionality; test wrapper function with invalid relative target name.
  */
-TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetName)
+TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetName)
 {
   const std::string target_name = "target_name";
 
   auto other_status =
     std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>{};
   other_status.emplace(
-    target_name, makeCanonicalizedEntityStatus(
-                   hdmap_utils, makeCanonicalizedLaneletPose(hdmap_utils, 34468, 5.0), bbox));
+    target_name,
+    makeCanonicalizedEntityStatus(
+      hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 34468, 5.0), bbox));
 
   entity_base->setOtherStatus(other_status);
   EXPECT_THROW(
@@ -410,15 +405,16 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetName)
  * @note Test basic functionality; test wrapper function with invalid relative target lane change
  * - the goal is to request a lane change in the location where the lane change is impossible.
  */
-TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetInvalid)
+TEST_F(MiscObjectEntityTest_FullObject, requestLaneChange_relativeTargetInvalid)
 {
   const std::string target_name = "target_name";
 
   auto other_status =
     std::unordered_map<std::string, traffic_simulator::CanonicalizedEntityStatus>{};
   other_status.emplace(
-    target_name, makeCanonicalizedEntityStatus(
-                   hdmap_utils, makeCanonicalizedLaneletPose(hdmap_utils, 34468, 5.0), bbox));
+    target_name,
+    makeCanonicalizedEntityStatus(
+      hdmap_utils_ptr, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 34468, 5.0), bbox));
 
   entity_base->setOtherStatus(other_status);
   EXPECT_THROW(
@@ -436,7 +432,7 @@ TEST_F(EntityBaseWithMiscObjectTest, requestLaneChange_relativeTargetInvalid)
 /**
  * @note Test function behavior when called with any argument - the goal is to test error throwing.
  */
-TEST_F(EntityBaseWithMiscObjectTest, requestFollowTrajectory)
+TEST_F(MiscObjectEntityTest_FullObject, requestFollowTrajectory)
 {
   EXPECT_THROW(
     misc_object.requestFollowTrajectory(
@@ -447,7 +443,7 @@ TEST_F(EntityBaseWithMiscObjectTest, requestFollowTrajectory)
 /**
  * @note Test function behavior when called with any argument - the goal is to test error throwing.
  */
-TEST_F(EntityBaseWithMiscObjectTest, requestWalkStraight)
+TEST_F(MiscObjectEntityTest_FullObject, requestWalkStraight)
 {
   EXPECT_THROW(misc_object.requestWalkStraight(), common::Error);
 }
@@ -456,7 +452,7 @@ TEST_F(EntityBaseWithMiscObjectTest, requestWalkStraight)
  * @note test basic functionality; test updating stand still duration
  * when NPC logic is started and velocity is greater than 0.
  */
-TEST_F(EntityBaseWithMiscObjectTest, updateStandStillDuration_startedMoving)
+TEST_F(MiscObjectEntityTest_FullObject, updateStandStillDuration_startedMoving)
 {
   misc_object.startNpcLogic(0.0);
   misc_object.setLinearVelocity(3.0);
@@ -468,7 +464,7 @@ TEST_F(EntityBaseWithMiscObjectTest, updateStandStillDuration_startedMoving)
  * @note Test basic functionality; test updating stand still duration
  * when NPC logic is not started.
  */
-TEST_F(EntityBaseWithMiscObjectTest, updateStandStillDuration_notStarted)
+TEST_F(MiscObjectEntityTest_FullObject, updateStandStillDuration_notStarted)
 {
   misc_object.setLinearVelocity(3.0);
   EXPECT_EQ(0.0, misc_object.updateStandStillDuration(0.1));
@@ -481,7 +477,7 @@ TEST_F(EntityBaseWithMiscObjectTest, updateStandStillDuration_notStarted)
  * @note Test basic functionality; test updating traveled distance correctness
  * with NPC logic started and velocity greater than 0.
  */
-TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_startedMoving)
+TEST_F(MiscObjectEntityTest_FullObject, updateTraveledDistance_startedMoving)
 {
   constexpr double velocity = 3.0;
   constexpr double step_time = 0.1;
@@ -497,7 +493,7 @@ TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_startedMoving)
 /**
  * @note Test basic functionality; test updating traveled distance correctness with NPC not started.
  */
-TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_notStarted)
+TEST_F(MiscObjectEntityTest_FullObject, updateTraveledDistance_notStarted)
 {
   constexpr double step_time = 0.1;
   misc_object.setLinearVelocity(3.0);
@@ -511,7 +507,7 @@ TEST_F(EntityBaseWithMiscObjectTest, updateTraveledDistance_notStarted)
  * @note Test basic functionality; test stopping correctness - the goal
  * is to check whether the entity status is changed to stopped (no velocity etc.).
  */
-TEST_F(EntityBaseWithMiscObjectTest, stopAtCurrentPosition)
+TEST_F(MiscObjectEntityTest_FullObject, stopAtCurrentPosition)
 {
   constexpr double velocity = 3.0;
   misc_object.setLinearVelocity(velocity);
@@ -522,22 +518,33 @@ TEST_F(EntityBaseWithMiscObjectTest, stopAtCurrentPosition)
 }
 
 /**
+ * @note Test functionality used by other units; test relative pose calculations
+ * correctness with a transformation argument passed.
+ */
+TEST_F(MiscObjectEntityTest_FullObject, getMapPoseFromRelativePose_relative)
+{
+  constexpr double s = 5.0;
+  EXPECT_POSE_NEAR(
+    misc_object.getMapPoseFromRelativePose(makePose(makePoint(s, 0.0))),
+    static_cast<geometry_msgs::msg::Pose>(makeCanonicalizedLaneletPose(hdmap_utils_ptr, id, s)),
+    0.1);
+}
+
+/**
  * @note Test functionality used by other units; test lanelet pose obtaining
  * with a matching distance smaller than a distance from an entity to the lanelet
  * (both crosswalk and road) and status_.type.type != PEDESTRIAN.
  */
-TEST(EntityBaseWithMiscObject, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
+TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-
   EXPECT_FALSE(traffic_simulator::entity::MiscObjectEntity(
-                 "misc_object_entity",
+                 entity_name,
                  traffic_simulator::CanonicalizedEntityStatus(
                    makeEntityStatus(
-                     hdmap_utils, makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 0.0,
-                     "misc_object_entity", traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-                   hdmap_utils),
-                 hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{})
+                     hdmap_utils_ptr, makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 0.0,
+                     entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
+                   hdmap_utils_ptr),
+                 hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
                  .getLaneletPose(5.0)
                  .has_value());
 }
@@ -547,21 +554,19 @@ TEST(EntityBaseWithMiscObject, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian
  * with a matching distance greater than a distance from an entity to the lanelet
  * (both crosswalk and road) and status_.type.type != PEDESTRIAN.
  */
-TEST(EntityBaseWithMiscObject, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
+TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-
   EXPECT_TRUE(
     traffic_simulator::entity::MiscObjectEntity(
-      "misc_object_entity",
+      entity_name,
       traffic_simulator::CanonicalizedEntityStatus(
         makeEntityStatus(
-          hdmap_utils,
+          hdmap_utils_ptr,
           makePose(makePoint(3766.1, 73738.2), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
-          makeBoundingBox(), 0.0, "misc_object_entity",
+          makeBoundingBox(), 0.0, entity_name,
           traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-        hdmap_utils),
-      hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{})
+        hdmap_utils_ptr),
+      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .getLaneletPose(1.0)
       .has_value());
 }
@@ -571,33 +576,19 @@ TEST(EntityBaseWithMiscObject, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
  * with a matching distance greater than a distance from an entity to the crosswalk lanelet,
  * but smaller than to the road lanelet and status_.type.type != PEDESTRIAN.
  */
-TEST(EntityBaseWithMiscObject, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
+TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
 {
-  auto hdmap_utils = makeHdMapUtilsSharedPointer();
-
   EXPECT_FALSE(
     traffic_simulator::entity::MiscObjectEntity(
-      "misc_object_entity",
+      entity_name,
       traffic_simulator::CanonicalizedEntityStatus(
         makeEntityStatus(
-          hdmap_utils,
+          hdmap_utils_ptr,
           makePose(makePoint(3764.5, 73737.5), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
-          makeBoundingBox(), 0.0, "misc_object_entity",
+          makeBoundingBox(), 0.0, entity_name,
           traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-        hdmap_utils),
-      hdmap_utils, traffic_simulator_msgs::msg::MiscObjectParameters{})
+        hdmap_utils_ptr),
+      hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .getLaneletPose(1.0)
       .has_value());
-}
-
-/**
- * @note Test functionality used by other units; test relative pose calculations
- * correctness with a transformation argument passed.
- */
-TEST_F(EntityBaseWithMiscObjectTest, getMapPoseFromRelativePose_relative)
-{
-  constexpr double s = 5.0;
-  EXPECT_POSE_NEAR(
-    misc_object.getMapPoseFromRelativePose(makePose(makePoint(s, 0.0))),
-    static_cast<geometry_msgs::msg::Pose>(makeCanonicalizedLaneletPose(hdmap_utils, id, s)), 0.1);
 }
