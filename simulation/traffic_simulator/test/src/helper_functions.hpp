@@ -16,6 +16,7 @@
 #define TRAFFIC_SIMULATOR__TEST__HELPER_FUNCTIONS_HPP_
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/helper/helper.hpp>
@@ -46,7 +47,7 @@ auto makeSmallBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs
 
 auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
 {
-  return quaternion_operation::convertEulerAngleToQuaternion(
+  return math::geometry::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(yaw));
 }
 
