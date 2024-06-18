@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <limits>
@@ -88,14 +86,12 @@ auto ScenarioSimulator::initialize(const simulation_api_schema::InitializeReques
   simulation_interface::toMsg(req.initialize_ros_time(), t);
   current_ros_time_ = t;
   hdmap_utils_ = std::make_shared<hdmap_utils::HdMapUtils>(req.lanelet2_map_path(), getOrigin());
-  const auto consider_pose_by_road_slope = [&]() {
-    if (!has_parameter("consider_pose_by_road_slope")) {
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+    if (not has_parameter("consider_pose_by_road_slope")) {
       declare_parameter("consider_pose_by_road_slope", false);
     }
     return get_parameter("consider_pose_by_road_slope").as_bool();
-  }();
-  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
-    consider_pose_by_road_slope);
+  }());
   auto res = simulation_api_schema::InitializeResponse();
   res.mutable_result()->set_success(true);
   res.mutable_result()->set_description("succeed to initialize simulation");

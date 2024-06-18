@@ -31,14 +31,12 @@ CppScenarioNode::CppScenarioNode(
   declare_parameter<double>("timeout", 10.0);
   get_parameter<double>("timeout", timeout_);
 
-  const auto consider_pose_by_road_slope = [&]() {
-    if (!has_parameter("consider_pose_by_road_slope")) {
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+    if (not has_parameter("consider_pose_by_road_slope")) {
       declare_parameter("consider_pose_by_road_slope", false);
     }
     return get_parameter("consider_pose_by_road_slope").as_bool();
-  }();
-  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope(
-    consider_pose_by_road_slope);
+  }());
 }
 
 void CppScenarioNode::update()
