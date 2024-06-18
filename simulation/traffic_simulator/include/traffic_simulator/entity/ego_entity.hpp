@@ -25,7 +25,7 @@
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/utils/node_parameter_handler.hpp>
+#include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator_msgs/msg/entity_type.hpp>
 #include <vector>
 
@@ -38,7 +38,7 @@ class EgoEntity : public VehicleEntity
   const std::unique_ptr<concealer::FieldOperatorApplication> field_operator_application;
 
   static auto makeFieldOperatorApplication(
-    const Configuration &, const std::shared_ptr<NodeParameterHandler> &)
+    const Configuration &, const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &)
     -> std::unique_ptr<concealer::FieldOperatorApplication>;
 
   bool is_controlled_by_simulator_{false};
@@ -53,7 +53,7 @@ public:
     const std::string & name, const CanonicalizedEntityStatus &,
     const std::shared_ptr<hdmap_utils::HdMapUtils> &,
     const traffic_simulator_msgs::msg::VehicleParameters &, const Configuration &,
-    const std::shared_ptr<NodeParameterHandler> &);
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr &);
 
   explicit EgoEntity(EgoEntity &&) = delete;
 

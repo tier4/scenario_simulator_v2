@@ -34,25 +34,23 @@ namespace entity
 {
 auto EgoEntity::makeFieldOperatorApplication(
   const Configuration & configuration,
-  const std::shared_ptr<NodeParameterHandler> & node_parameter_handler)
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
   if (const auto architecture_type =
-        node_parameter_handler->getParameter<std::string>("architecture_type", "awf/universe");
+        getParameter<std::string>(node_parameters, "architecture_type", "awf/universe");
       architecture_type.find("awf/universe") != std::string::npos) {
-    std::string rviz_config = node_parameter_handler->getParameter<std::string>("rviz_config", "");
-    return node_parameter_handler->getParameter<bool>("launch_autoware", true)
+    std::string rviz_config = getParameter<std::string>(node_parameters, "rviz_config", "");
+    return getParameter<bool>(node_parameters, "launch_autoware", true)
              ? std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
-                 node_parameter_handler->getParameter<std::string>("autoware_launch_package"),
-                 node_parameter_handler->getParameter<std::string>("autoware_launch_file"),
+                 getParameter<std::string>(node_parameters, "autoware_launch_package"),
+                 getParameter<std::string>(node_parameters, "autoware_launch_file"),
                  "map_path:=" + configuration.map_path.string(),
                  "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
                  "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" +
-                   node_parameter_handler->getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" +
-                   node_parameter_handler->getParameter<std::string>("vehicle_model"),
+                 "sensor_model:=" + getParameter<std::string>(node_parameters, "sensor_model"),
+                 "vehicle_model:=" + getParameter<std::string>(node_parameters, "vehicle_model"),
                  "rviz_config:=" + ((rviz_config == "")
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
@@ -72,9 +70,9 @@ EgoEntity::EgoEntity(
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
   const Configuration & configuration,
-  const std::shared_ptr<NodeParameterHandler> & node_parameter_handler)
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
-  field_operator_application(makeFieldOperatorApplication(configuration, node_parameter_handler))
+  field_operator_application(makeFieldOperatorApplication(configuration, node_parameters))
 {
 }
 
