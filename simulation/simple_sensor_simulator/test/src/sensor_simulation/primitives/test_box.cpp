@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <quaternion_operation/quaternion_operation.h>
 
 #include <geometry_msgs/msg/pose.hpp>
+#include <geometry_msgs/msg/quaternion.hpp>
 #include <simple_sensor_simulator/sensor_simulation/primitives/box.hpp>
 #include <vector>
 
