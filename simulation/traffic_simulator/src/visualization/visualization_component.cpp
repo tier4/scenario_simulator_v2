@@ -42,8 +42,6 @@
   </table>
  */
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <cmath>
 #include <color_names/color_names.hpp>

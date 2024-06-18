@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -562,8 +563,7 @@ public:
           const auto relative_pose =
             traffic_simulator::pose::relativePose(from_map_pose, to_map_pose)) {
           return static_cast<Double>(std::abs(
-            quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
-              .z));
+            math::geometry::convertQuaternionToEulerAngle(relative_pose.value().orientation).z));
         }
       }
       return Double::nan();

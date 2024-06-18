@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <do_nothing_plugin/plugin.hpp>
+#include <geometry/quaternion/slerp.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
 
@@ -88,7 +89,7 @@ auto interpolateEntityStatusFromPolylineTrajectory(
         .position(
           v0.position.position * (1 - interpolation_ratio) +
           v1.position.position * interpolation_ratio)
-        .orientation(quaternion_operation::slerp(
+        .orientation(math::geometry::slerp(
           v0.position.orientation, v1.position.orientation, interpolation_ratio));
     const double linear_velocity =
       math::geometry::hypot(v1.position.position, v0.position.position) / (v1.time - v0.time);
