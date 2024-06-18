@@ -13,6 +13,12 @@ Changelog for package openscenario_interpreter_example
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.6 (2024-06-18)
+------------------
+
+2.1.5 (2024-06-18)
+------------------
+
 2.1.4 (2024-06-14)
 ------------------
 * Merge branch 'master' into fix/remove_quaternion_operation
