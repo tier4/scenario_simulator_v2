@@ -17,8 +17,9 @@
 
 #include <embree4/rtcore.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <quaternion_operation/quaternion_operation.h>
 
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 #include <memory>
@@ -83,7 +84,7 @@ private:
   {
     auto & rotation_matrices = ref_rotation_matrices.get();
     auto & thread_detected_ids = ref_thread_detected_ids.get();
-    const auto orientation_matrix = quaternion_operation::getRotationMatrix(origin.orientation);
+    const auto orientation_matrix = math::geometry::getRotationMatrix(origin.orientation);
     for (unsigned int i = thread_id; i < rotation_matrices.size(); i += thread_count) {
       RTCRayHit rayhit = {};
       rayhit.ray.org_x = origin.position.x;
