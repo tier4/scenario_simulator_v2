@@ -181,9 +181,21 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(static_cast<traffic_simulator::LaneletPose>(
-                      makeNativeRelativeLanePosition(triggering_entity, entity_ref))
-                      .offset);
+    /*
+       For historical reasons, signed distances are returned when
+       coordinateSystem == lane and relativeDistanceType ==
+       longitudinal/lateral. The sign has been mainly used to determine the
+       front/back and left/right positional relationship (a negative value is
+       returned if the target entity is behind or to the right).
+
+       This behavior violates the OpenSCENARIO standard. In the future, after
+       DistanceCondition and RelativeDistanceCondition of TIER IV's
+       OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
+       behavior will be enabled only when routingAlgorithm == undefined.
+    */
+    return static_cast<traffic_simulator::LaneletPose>(
+             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
+      .offset;
   } else {
     return Double::nan();
   }
@@ -197,9 +209,21 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(static_cast<traffic_simulator::LaneletPose>(
-                      makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
-                      .offset);
+    /*
+       For historical reasons, signed distances are returned when
+       coordinateSystem == lane and relativeDistanceType ==
+       longitudinal/lateral. The sign has been mainly used to determine the
+       front/back and left/right positional relationship (a negative value is
+       returned if the target entity is behind or to the right).
+
+       This behavior violates the OpenSCENARIO standard. In the future, after
+       DistanceCondition and RelativeDistanceCondition of TIER IV's
+       OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
+       behavior will be enabled only when routingAlgorithm == undefined.
+    */
+    return static_cast<traffic_simulator::LaneletPose>(
+             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
+      .offset;
   } else {
     return Double::nan();
   }
@@ -213,9 +237,21 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(static_cast<traffic_simulator::LaneletPose>(
-                      makeNativeRelativeLanePosition(triggering_entity, entity_ref))
-                      .s);
+    /*
+       For historical reasons, signed distances are returned when
+       coordinateSystem == lane and relativeDistanceType ==
+       longitudinal/lateral. The sign has been mainly used to determine the
+       front/back and left/right positional relationship (a negative value is
+       returned if the target entity is behind or to the right).
+
+       This behavior violates the OpenSCENARIO standard. In the future, after
+       DistanceCondition and RelativeDistanceCondition of TIER IV's
+       OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
+       behavior will be enabled only when routingAlgorithm == undefined.
+    */
+    return static_cast<traffic_simulator::LaneletPose>(
+             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
+      .s;
   } else {
     return Double::nan();
   }
@@ -229,9 +265,21 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(static_cast<traffic_simulator::LaneletPose>(
-                      makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
-                      .s);
+    /*
+       For historical reasons, signed distances are returned when
+       coordinateSystem == lane and relativeDistanceType ==
+       longitudinal/lateral. The sign has been mainly used to determine the
+       front/back and left/right positional relationship (a negative value is
+       returned if the target entity is behind or to the right).
+
+       This behavior violates the OpenSCENARIO standard. In the future, after
+       DistanceCondition and RelativeDistanceCondition of TIER IV's
+       OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
+       behavior will be enabled only when routingAlgorithm == undefined.
+    */
+    return static_cast<traffic_simulator::LaneletPose>(
+             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
+      .s;
   } else {
     return Double::nan();
   }
