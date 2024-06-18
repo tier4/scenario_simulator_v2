@@ -220,7 +220,7 @@ void EgoEntitySimulation::requestSpeedChange(double value)
 
 void EgoEntitySimulation::overwrite(
   const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
-  double step_time, bool npc_logic_started)
+  double step_time, bool is_npc_logic_started)
 {
   using math::geometry::convertQuaternionToEulerAngle;
   using math::geometry::getRotationMatrix;
@@ -238,7 +238,7 @@ void EgoEntitySimulation::overwrite(
                                status.pose.position.y - initial_pose_.position.y,
                                status.pose.position.z - initial_pose_.position.z);
 
-  if (npc_logic_started) {
+  if (is_npc_logic_started) {
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
         getRotationMatrix(initial_pose_.orientation).transpose() *
@@ -285,7 +285,7 @@ void EgoEntitySimulation::overwrite(
 }
 
 void EgoEntitySimulation::update(
-  double current_scenario_time, double step_time, bool npc_logic_started)
+  double current_scenario_time, double step_time, bool is_npc_logic_started)
 {
   using math::geometry::getRotationMatrix;
 
@@ -302,7 +302,7 @@ void EgoEntitySimulation::update(
                                status_.getMapPose().position.y - initial_pose_.position.y,
                                status_.getMapPose().position.z - initial_pose_.position.z);
 
-  if (npc_logic_started) {
+  if (is_npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
 
     auto acceleration_by_slope = [this]() {

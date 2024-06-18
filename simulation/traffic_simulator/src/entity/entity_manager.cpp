@@ -411,10 +411,17 @@ auto EntityManager::updateNpcLogic(const std::string & name) -> const Canonicali
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  if (npc_logic_started_) {
-    entities_[name]->onUpdate(current_time_, step_time_);
+  if (const auto entity = getEntity(name)) {
+    // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
+    if (npc_logic_started_) {
+      entity->onUpdate(current_time_, step_time_);
+    } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
+      ego_entity->updateFieldOperatorApplication();
+    }
+    return entity->getStatus();
+  } else {
+    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   }
-  return entities_[name]->getStatus();
 }
 
 void EntityManager::update(const double current_time, const double step_time)

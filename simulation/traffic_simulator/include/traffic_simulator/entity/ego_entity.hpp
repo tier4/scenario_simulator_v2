@@ -85,6 +85,8 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
+  auto updateFieldOperatorApplication() const -> void;
+
   void onUpdate(double current_time, double step_time) override;
 
   void requestAcquirePosition(const CanonicalizedLaneletPose &) override;
