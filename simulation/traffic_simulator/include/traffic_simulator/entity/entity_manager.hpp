@@ -309,6 +309,7 @@ public:
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
+  FORWARD_TO_ENTITY(requestClearRoute, );
   FORWARD_TO_ENTITY(setAcceleration, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
