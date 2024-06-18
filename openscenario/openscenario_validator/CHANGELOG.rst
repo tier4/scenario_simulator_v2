@@ -2,6 +2,9 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.5 (2024-06-18)
+------------------
+
 2.1.4 (2024-06-14)
 ------------------
 * Merge branch 'master' into fix/remove_quaternion_operation
