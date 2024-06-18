@@ -389,7 +389,7 @@ public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
   template <typename... Ts>
-  auto getParameter(const std::string & name, Ts &&... xs) const -> decltype(auto)
+  auto getROS2Parameter(const std::string & name, Ts &&... xs) const -> decltype(auto)
   {
     return node_parameter_handler_->getParameter(name, std::forward<Ts>(xs)...);
   }
