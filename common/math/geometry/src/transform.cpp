@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
 #include <tf2/LinearMath/Quaternion.h>
 
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/transform.hpp>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
@@ -64,7 +65,7 @@ const geometry_msgs::msg::Pose getRelativePose(
 const geometry_msgs::msg::Point transformPoint(
   const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Point & point)
 {
-  auto mat = quaternion_operation::getRotationMatrix(pose.orientation);
+  auto mat = math::geometry::getRotationMatrix(pose.orientation);
   Eigen::VectorXd v(3);
   v(0) = point.x;
   v(1) = point.y;
@@ -84,8 +85,8 @@ const geometry_msgs::msg::Point transformPoint(
   const geometry_msgs::msg::Pose & pose, const geometry_msgs::msg::Pose & sensor_pose,
   const geometry_msgs::msg::Point & point)
 {
-  auto mat = quaternion_operation::getRotationMatrix(
-    quaternion_operation::getRotation(sensor_pose.orientation, pose.orientation));
+  auto mat = math::geometry::getRotationMatrix(
+    math::geometry::getRotation(sensor_pose.orientation, pose.orientation));
   Eigen::VectorXd v(3);
   v(0) = point.x;
   v(1) = point.y;

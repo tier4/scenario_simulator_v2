@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <behavior_tree_plugin/action_node.hpp>
 #include <geometry/bounding_box.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <memory>
 #include <optional>
 #include <rclcpp/rclcpp.hpp>
@@ -238,14 +240,14 @@ auto ActionNode::getFrontEntityName(const math::geometry::CatmullRomSplineInterf
   std::vector<std::string> entities;
   for (const auto & each : other_entity_status) {
     const auto distance = getDistanceToTargetEntityPolygon(spline, each.first);
-    const auto quat = quaternion_operation::getRotation(
+    const auto quat = math::geometry::getRotation(
       entity_status->getMapPose().orientation,
       other_entity_status.at(each.first).getMapPose().orientation);
     /**
      * @note hard-coded parameter, if the Yaw value of RPY is in ~1.5708 -> 1.5708, entity is a candidate of front entity.
      */
     if (
-      std::fabs(quaternion_operation::convertQuaternionToEulerAngle(quat).z) <=
+      std::fabs(math::geometry::convertQuaternionToEulerAngle(quat).z) <=
       boost::math::constants::half_pi<double>()) {
       if (distance && distance.value() < 40) {
         entities.emplace_back(each.first);
@@ -477,6 +479,7 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   double target_speed, const traffic_simulator_msgs::msg::DynamicConstraints & constraints) const
   -> traffic_simulator::CanonicalizedEntityStatus
 {
+  using math::geometry::operator*;
   const auto speed_planner =
     traffic_simulator::longitudinal_speed_planning::LongitudinalSpeedPlanner(
       step_time, getEntityName());
@@ -489,14 +492,13 @@ auto ActionNode::calculateUpdatedEntityStatusInWorldFrame(
   geometry_msgs::msg::Vector3 angular_trans_vec;
   angular_trans_vec.z = twist_new.angular.z * step_time;
   geometry_msgs::msg::Quaternion angular_trans_quat =
-    quaternion_operation::convertEulerAngleToQuaternion(angular_trans_vec);
-  pose_new.orientation =
-    quaternion_operation::rotation(entity_status->getMapPose().orientation, angular_trans_quat);
+    math::geometry::convertEulerAngleToQuaternion(angular_trans_vec);
+  pose_new.orientation = entity_status->getMapPose().orientation * angular_trans_quat;
   Eigen::Vector3d trans_vec;
   trans_vec(0) = twist_new.linear.x * step_time;
   trans_vec(1) = twist_new.linear.y * step_time;
   trans_vec(2) = 0;
-  Eigen::Matrix3d rotation_mat = quaternion_operation::getRotationMatrix(pose_new.orientation);
+  Eigen::Matrix3d rotation_mat = math::geometry::getRotationMatrix(pose_new.orientation);
   trans_vec = rotation_mat * trans_vec;
   pose_new.position.x = trans_vec(0) + entity_status->getMapPose().position.x;
   pose_new.position.y = trans_vec(1) + entity_status->getMapPose().position.y;
