@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <memory>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <optional>
@@ -126,7 +125,7 @@ auto OccupancyGridSensor<nav_msgs::msg::OccupancyGrid>::getOccupancyGrid(
         simulation_interface::toMsg(s.pose(), pose);
         auto point = geometry_msgs::msg::Point();
         simulation_interface::toMsg(s.bounding_box().center(), point);
-        auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
+        auto rotation = math::geometry::getRotationMatrix(pose.orientation);
         auto center = (rotation * Eigen::Vector3d(point.x, point.y, point.z)).eval();
 
         pose.position.x += center.x();
