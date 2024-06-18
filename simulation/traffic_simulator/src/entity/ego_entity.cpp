@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <boost/lexical_cast.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
@@ -156,6 +154,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
       const auto updated_status = traffic_simulator::follow_trajectory::makeUpdatedStatus(
         static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
         behavior_parameter_, hdmap_utils_ptr_, step_time,
+        getDefaultMatchingDistanceForLaneletPoseCalculation(),
         target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       setStatus(CanonicalizedEntityStatus(*updated_status, hdmap_utils_ptr_));
     } else {

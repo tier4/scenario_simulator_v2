@@ -24,7 +24,7 @@ You can also see the detailed documentation of the API classes [here](https://ti
 
 ```c++
 #include <traffic_simulator/api/api.hpp>
-#include <quaternion_operation/quaternion_operation.h>
+
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <memory>

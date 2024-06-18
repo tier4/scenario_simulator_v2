@@ -16,7 +16,6 @@
 #define GEOMETRY__SPLINE__HERMITE_CURVE_HPP_
 
 #include <gtest/gtest.h>
-#include <quaternion_operation/quaternion_operation.h>
 
 #include <geometry/solver/polynomial_solver.hpp>
 #include <geometry_msgs/msg/point.hpp>

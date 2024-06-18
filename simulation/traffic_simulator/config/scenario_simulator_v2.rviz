@@ -7,7 +7,7 @@ Panels:
         - /Map1/Lanelet2VectorMap1
         - /Sensing1/LiDAR1/ConcatenatePointCloud1/Autocompute Value Bounds1
       Splitter Ratio: 0.557669460773468
-    Tree Height: 914
+    Tree Height: 1445
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -132,155 +132,6 @@ Visualization Manager:
                 Expand Link Details: false
                 Expand Tree: false
                 Link Tree Style: Links in Alphabetic Order
-                base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                camera0/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                camera0/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                camera1/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                camera1/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                camera2/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                camera2/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                camera3/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                camera3/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                camera4/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                camera4/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                camera5/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                camera5/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                camera6/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                camera6/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                camera7/camera_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                camera7/camera_optical_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                gnss_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                livox_front_left:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                livox_front_left_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                livox_front_right:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                livox_front_right_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                sensor_kit_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                tamagawa/imu_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_left:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_left_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_rear:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_rear_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_right:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_right_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_top:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
-                velodyne_top_base_link:
-                  Alpha: 1
-                  Show Axes: false
-                  Show Trail: false
-                  Value: true
               Mass Properties:
                 Inertia: false
                 Mass: false
@@ -371,31 +222,7 @@ Visualization Manager:
           Enabled: true
           Name: Lanelet2VectorMap
           Namespaces:
-            center_lane_line: false
-            center_line_arrows: false
-            crosswalk_lanelets: true
-            lane_start_bound: false
-            lanelet direction: true
-            lanelet_id: false
-            left_lane_bound: true
-            no_stopping_area: true
-            parking_lots: true
-            partitions: true
-            pedestrian_marking: true
-            right_lane_bound: true
-            road_lanelets: false
-            shoulder_center_lane_line: true
-            shoulder_center_line_arrows: true
-            shoulder_lane_start_bound: true
-            shoulder_lanelet direction: true
-            shoulder_left_lane_bound: true
-            shoulder_right_lane_bound: true
-            shoulder_road_lanelets: false
-            stop_lines: true
-            traffic_light: true
-            traffic_light_id: false
-            traffic_light_triangle: true
-            walkway_lanelets: true
+            {}
           Topic:
             Depth: 5
             Durability Policy: Transient Local
@@ -969,12 +796,7 @@ Visualization Manager:
               Enabled: true
               Name: RouteArea
               Namespaces:
-                end_lanelets: true
-                goal_lanelets: true
-                lane_start_bound: false
-                left_lane_bound: false
-                right_lane_bound: false
-                route_lanelets: true
+                {}
               Topic:
                 Depth: 5
                 Durability Policy: Transient Local
@@ -1039,6 +861,9 @@ Visualization Manager:
                 Offset: 0
                 Radius: 0.10000000149011612
                 Value: false
+              View Text Slope:
+                Scale: 0.30000001192092896
+                Value: false
               View Text Velocity:
                 Scale: 0.30000001192092896
                 Value: false
@@ -1090,6 +915,9 @@ Visualization Manager:
                         Offset: 0
                         Radius: 0.10000000149011612
                         Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -1136,6 +964,9 @@ Visualization Manager:
                         Color: 0; 60; 255
                         Offset: 0
                         Radius: 0.10000000149011612
+                        Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
                         Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
@@ -1184,6 +1015,9 @@ Visualization Manager:
                         Offset: 0
                         Radius: 0.10000000149011612
                         Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -1230,6 +1064,9 @@ Visualization Manager:
                         Color: 0; 60; 255
                         Offset: 0
                         Radius: 0.10000000149011612
+                        Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
                         Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
@@ -1278,6 +1115,9 @@ Visualization Manager:
                         Offset: 0
                         Radius: 0.10000000149011612
                         Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -1324,6 +1164,9 @@ Visualization Manager:
                         Color: 0; 60; 255
                         Offset: 0
                         Radius: 0.10000000149011612
+                        Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
                         Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
@@ -1372,6 +1215,9 @@ Visualization Manager:
                         Offset: 0
                         Radius: 0.10000000149011612
                         Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -1418,6 +1264,9 @@ Visualization Manager:
                         Color: 0; 60; 255
                         Offset: 0
                         Radius: 0.10000000149011612
+                        Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
                         Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
@@ -1466,6 +1315,9 @@ Visualization Manager:
                         Offset: 0
                         Radius: 0.10000000149011612
                         Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -1512,6 +1364,9 @@ Visualization Manager:
                         Color: 0; 60; 255
                         Offset: 0
                         Radius: 0.10000000149011612
+                        Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
                         Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
@@ -1560,6 +1415,9 @@ Visualization Manager:
                         Offset: 0
                         Radius: 0.10000000149011612
                         Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -1606,6 +1464,9 @@ Visualization Manager:
                         Color: 0; 60; 255
                         Offset: 0
                         Radius: 0.10000000149011612
+                        Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
                         Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
@@ -1654,6 +1515,9 @@ Visualization Manager:
                         Offset: 0
                         Radius: 0.10000000149011612
                         Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -1700,6 +1564,9 @@ Visualization Manager:
                         Color: 0; 60; 255
                         Offset: 0
                         Radius: 0.10000000149011612
+                        Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
                         Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
@@ -1748,6 +1615,9 @@ Visualization Manager:
                         Offset: 0
                         Radius: 0.10000000149011612
                         Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -1794,6 +1664,9 @@ Visualization Manager:
                         Color: 0; 60; 255
                         Offset: 0
                         Radius: 0.10000000149011612
+                        Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
                         Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
@@ -1942,8 +1815,7 @@ Visualization Manager:
                           Enabled: true
                           Name: VirtualWall (Walkway)
                           Namespaces:
-                            177703_stop_factor_text: true
-                            177703_stop_virtual_wall: true
+                            {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -1979,8 +1851,7 @@ Visualization Manager:
                           Enabled: true
                           Name: VirtualWall (MergeFromPrivateArea)
                           Namespaces:
-                            stop_factor_text: true
-                            stop_virtual_wall: true
+                            {}
                           Topic:
                             Depth: 5
                             Durability Policy: Volatile
@@ -2553,6 +2424,9 @@ Visualization Manager:
                         Offset: 0
                         Radius: 0.10000000149011612
                         Value: false
+                      View Text Slope:
+                        Scale: 0.30000001192092896
+                        Value: false
                       View Text Velocity:
                         Scale: 0.30000001192092896
                         Value: false
@@ -2879,6 +2753,9 @@ Visualization Manager:
             Offset: 0
             Radius: 0.10000000149011612
             Value: false
+          View Text Slope:
+            Scale: 0.30000001192092896
+            Value: false
           View Text Velocity:
             Scale: 0.30000001192092896
             Value: false
@@ -2944,7 +2821,7 @@ Visualization Manager:
           Enabled: true
           Name: Entity Marker
           Namespaces:
-            ego: true
+            {}
           Topic:
             Depth: 5
             Durability Policy: Volatile
@@ -2953,7 +2830,7 @@ Visualization Manager:
             Value: /simulation/entity/marker
           Value: true
         - Class: rviz_default_plugins/MarkerArray
-          Enabled: false
+          Enabled: true
           Name: Lanelet Marker
           Namespaces:
             {}
@@ -2963,7 +2840,7 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /simulation/lanelet/marker
-          Value: false
+          Value: true
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Traffic Light Marker
@@ -2977,9 +2854,16 @@ Visualization Manager:
             Value: /simulation/traffic_light/marker
           Value: true
         - Class: openscenario_visualization/VisualizationConditionGroups
+          Enabled: true
+          Left: 0
+          Length: 2000
           Name: Condition Group
+          Text Color: 255; 255; 255
+          Top: 450
           Topic: /simulation/context
           Value: true
+          Value Scale: 35
+          Width: 2000
         - Class: rviz_default_plugins/MarkerArray
           Enabled: true
           Name: Debug Marker
@@ -2991,7 +2875,7 @@ Visualization Manager:
             History Policy: Keep Last
             Reliability Policy: Reliable
             Value: /simulation/debug_marker
-          Value: false
+          Value: true
         - Class: rviz_common/Group
           Displays:
             - Alpha: 0.9990000128746033
@@ -3098,7 +2982,7 @@ Visualization Manager:
               Value: false
           Enabled: true
           Name: Simple Sensor Simulator
-      Enabled: false
+      Enabled: true
       Name: Simulation
   Enabled: true
   Global Options:
@@ -3207,8 +3091,8 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 19.597293853759766
-      Target Frame: ego
+      Scale: 10
+      Target Frame: entities
       Value: TopDownOrtho (rviz_default_plugins)
       X: 0
       Y: 0
@@ -3255,12 +3139,12 @@ Window Geometry:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 2083
+  Height: 2096
   Hide Left Dock: false
   Hide Right Dock: false
   InitialPoseButtonPanel:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd0000000400000000000002d5000007a8fc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000007901000003fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c0061007900730100000050000003e30000010101000003fc00000434000003c4000000f90100001dfa000000000100000002fb0000000a0056006900650077007301000000000000033c0000011b01000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff000000c401000003fb00000024004100750074006f00770061007200650053007400610074006500500061006e0065006c00000003e000000330000001c801000003fb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000009a01000003fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d006100670065000000066c0000008f0000002e01000003fb0000002a004100750074006f0077006100720065004400610074006500540069006d006500500061006e0065006c00000006e8000001100000005201000003000000010000015f000006fffc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d0065010000000000000450000000000000000000000be8000007a800000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000002d5000007d6fc020000000ffb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000005e2000000c900fffffffc00000625000001ee000000c10100001cfa000000010100000002fb0000000a0056006900650077007301000000000000033c0000010000fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000000ffffffff0000009d00fffffffb00000024004100750074006f00770061007200650053007400610074006500500061006e0065006c00000003e0000003300000017200fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d0065007200610100000682000000eb0000000000000000fb0000000a0049006d0061006700650100000505000002680000000000000000fb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000006e00fffffffb0000002c0049006e0069007400690061006c0050006f007300650042007500740074006f006e00500061006e0065006c000000068f000000de0000000000000000fb00000030005200650063006f0067006e006900740069006f006e0052006500730075006c0074004f006e0049006d006100670065000000066c0000008f0000002800fffffffb0000002a004100750074006f0077006100720065004400610074006500540069006d006500500061006e0065006c00000006e8000001100000004100ffffff000000010000015f000006fffc0200000002fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000e7a0000005afc0100000001fb0000000a00560069006500770073030000004e00000080000002e1000001970000000300000e7a0000005afc0100000002fb0000000800540069006d0065010000000000000e7a0000000000000000fb0000000800540069006d0065010000000000000450000000000000000000000bdf000007d600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RecognitionResultOnImage:
     collapsed: false
   Selection:
@@ -3269,6 +3153,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 3774
-  X: 2626
-  Y: 41
+  Width: 3770
+  X: 70
+  Y: 27

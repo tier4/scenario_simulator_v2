@@ -14,6 +14,7 @@
 
 #include <tf2/LinearMath/Quaternion.h>
 
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -112,7 +113,7 @@ auto API::setEntityStatus(
 {
   geometry_msgs::msg::Pose relative_pose;
   relative_pose.position = relative_position;
-  relative_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(relative_rpy);
+  relative_pose.orientation = math::geometry::convertEulerAngleToQuaternion(relative_rpy);
   setEntityStatus(name, reference_entity_name, relative_pose, action_status);
 }
 
@@ -338,8 +339,8 @@ void API::startNpcLogic()
   if (isNpcLogicStarted()) {
     THROW_SIMULATION_ERROR("NPC logics are already started.");
   }
-  entity_manager_ptr_->startNpcLogic();
   clock_.start();
+  entity_manager_ptr_->startNpcLogic(getCurrentTime());
 }
 
 void API::requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id)

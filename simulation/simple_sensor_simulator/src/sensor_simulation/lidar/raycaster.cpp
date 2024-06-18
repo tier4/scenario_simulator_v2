@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <iostream>
 #include <simple_sensor_simulator/sensor_simulation/lidar/lidar_sensor.hpp>
@@ -61,7 +59,7 @@ void Raycaster::setDirection(
     configuration.horizontal_resolution());
   rotation_matrices_.clear();
   for (const auto & q : quat_directions) {
-    rotation_matrices_.push_back(quaternion_operation::getRotationMatrix(q));
+    rotation_matrices_.push_back(math::geometry::getRotationMatrix(q));
   }
 }
 
@@ -83,7 +81,7 @@ std::vector<geometry_msgs::msg::Quaternion> Raycaster::getDirections(
         rpy.x = 0;
         rpy.y = vertical_angle;
         rpy.z = horizontal_angle;
-        auto quat = quaternion_operation::convertEulerAngleToQuaternion(rpy);
+        auto quat = math::geometry::convertEulerAngleToQuaternion(rpy);
         directions.emplace_back(quat);
       }
     }
