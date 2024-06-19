@@ -162,7 +162,7 @@ auto EntityManager::getEntity(const std::string & name) const
   }
 };
 
-auto EntityManager::getEntityOrThrow(const std::string & name)
+auto EntityManager::getEntityOrThrow(const std::string & name) const
   -> std::shared_ptr<traffic_simulator::entity::EntityBase>
 {
   if (const auto entity = getEntity(name)) {

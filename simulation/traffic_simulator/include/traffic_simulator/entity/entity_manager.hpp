@@ -320,7 +320,7 @@ public:
   auto getEntity(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
-  auto getEntityOrThrow(const std::string & name)
+  auto getEntityOrThrow(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
