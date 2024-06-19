@@ -375,7 +375,7 @@ auto EntityManager::updateNpcLogic(
   if (const auto entity = getEntity(name)) {
     // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
     if (npc_logic_started_) {
-      entity->onUpdate(current_time_, step_time_);
+      entity->onUpdate(current_time, step_time);
     } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
       ego_entity->updateFieldOperatorApplication();
     }
@@ -450,10 +450,8 @@ auto EntityManager::startNpcLogic(const double current_time) -> void
 {
   npc_logic_started_ = true;
 
-  current_time_ = current_time;
-
   for ([[maybe_unused]] auto && [name, entity] : entities_) {
-    entity->updateEntityStatusTimestamp(current_time_);
+    entity->updateEntityStatusTimestamp(current_time);
   }
 }
 }  // namespace entity
