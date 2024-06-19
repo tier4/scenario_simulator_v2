@@ -264,7 +264,6 @@ public:
   FORWARD_TO_ENTITY(getCurrentTwist, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
-  FORWARD_TO_ENTITY(getEntityType, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
