@@ -353,7 +353,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEntityOrThrow);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
-  FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);

@@ -261,7 +261,6 @@ public:
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
-  FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
   FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
