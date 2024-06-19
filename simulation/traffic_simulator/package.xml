@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>2.1.1</version>
+  <version>2.1.7</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -27,7 +27,6 @@
   <depend>libomp-dev</depend>
   <depend>nlohmann-json-dev</depend>
   <depend>pugixml-dev</depend>
-  <depend>quaternion_operation</depend>
   <depend>rclcpp</depend>
   <depend>rclcpp_components</depend>
   <depend>rosgraph_msgs</depend>

@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>geometry</name>
-  <version>2.1.1</version>
+  <version>2.1.7</version>
   <description>geometry math library for scenario_simulator_v2 application</description>
   <maintainer email="masaya.kataoka@tier4.jp">Masaya Kataoka</maintainer>
   <license>Apache License 2.0</license>
@@ -12,10 +12,10 @@
 
   <depend>boost</depend>
   <depend>geometry_msgs</depend>
-  <depend>quaternion_operation</depend>
   <depend>rclcpp</depend>
   <depend>scenario_simulator_exception</depend>
   <depend>tf2_geometry_msgs</depend>
+  <depend>tf2_ros</depend>
   <depend>traffic_simulator_msgs</depend>
 
   <test_depend>ament_cmake_clang_format</test_depend>

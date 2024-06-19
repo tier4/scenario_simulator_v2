@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>simple_sensor_simulator</name>
-  <version>2.1.1</version>
+  <version>2.1.7</version>
   <description>simple_sensor_simulator package</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -43,7 +43,6 @@
   <depend>libpcl-all-dev</depend>
   <depend>nav_msgs</depend>
   <depend>pcl_conversions</depend>
-  <depend>quaternion_operation</depend>
   <depend>rclcpp_components</depend>
   <depend>simulation_interface</depend>
   <depend>traffic_simulator_msgs</depend>
