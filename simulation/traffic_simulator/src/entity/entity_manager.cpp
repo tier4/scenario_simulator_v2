@@ -162,6 +162,16 @@ auto EntityManager::getEntity(const std::string & name) const
   }
 };
 
+auto EntityManager::getEntityOrThrow(const std::string & name)
+  -> std::shared_ptr<traffic_simulator::entity::EntityBase>
+{
+  if (const auto entity = getEntity(name)) {
+    return entity;
+  } else {
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+  }
+}
+
 auto EntityManager::getEntityStatus(const std::string & name) const
   -> const CanonicalizedEntityStatus &
 {
