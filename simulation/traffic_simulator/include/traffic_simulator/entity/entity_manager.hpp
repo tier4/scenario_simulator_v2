@@ -258,7 +258,6 @@ public:
 
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
   FORWARD_TO_ENTITY(get2DPolygon, const);
-  FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
