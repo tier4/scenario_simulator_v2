@@ -14,6 +14,10 @@
 
 #include <concealer/autoware_universe.hpp>
 #include <filesystem>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
@@ -39,10 +43,10 @@ EgoEntitySimulation::EgoEntitySimulation(
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
-  hdmap_utils_ptr_(hdmap_utils),
-  vehicle_parameters(parameters),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
-  consider_pose_by_road_slope_(consider_pose_by_road_slope)
+  consider_pose_by_road_slope_(consider_pose_by_road_slope),
+  hdmap_utils_ptr_(hdmap_utils),
+  vehicle_parameters(parameters)
 {
   autoware->set_parameter(use_sim_time);
 }
@@ -215,20 +219,23 @@ void EgoEntitySimulation::overwrite(
   const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
   double step_time, bool npc_logic_started)
 {
+  using math::geometry::convertQuaternionToEulerAngle;
+  using math::geometry::getRotationMatrix;
+
   autoware->rethrow();
 
+  /*
+     SimModelInterface only supports 2D, therefore the position in Oz is
+     considered unchangeable and stored in an additional variable
+     world_relative_position_ that is used in calculations.
+  */
+  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+                             Eigen::Vector3d(
+                               status.pose.position.x - initial_pose_.position.x,
+                               status.pose.position.y - initial_pose_.position.y,
+                               status.pose.position.z - initial_pose_.position.z);
+
   if (npc_logic_started) {
-    using quaternion_operation::convertQuaternionToEulerAngle;
-    using quaternion_operation::getRotationMatrix;
-
-    auto world_relative_position = [&]() -> Eigen::VectorXd {
-      auto v = Eigen::VectorXd(3);
-      v(0) = status.pose.position.x - initial_pose_.position.x;
-      v(1) = status.pose.position.y - initial_pose_.position.y;
-      v(2) = status.pose.position.z - initial_pose_.position.z;
-      return getRotationMatrix(initial_pose_.orientation).transpose() * v;
-    }();
-
     const auto yaw = [&]() {
       const auto q = Eigen::Quaterniond(
         getRotationMatrix(initial_pose_.orientation).transpose() *
@@ -259,8 +266,8 @@ void EgoEntitySimulation::overwrite(
         [[fallthrough]];
 
       case VehicleModelType::IDEAL_STEER_VEL:
-        state(0) = world_relative_position(0);
-        state(1) = world_relative_position(1);
+        state(0) = world_relative_position_.x();
+        state(1) = world_relative_position_.y();
         state(2) = yaw;
         vehicle_model_ptr_->setState(state);
         break;
@@ -277,7 +284,20 @@ void EgoEntitySimulation::overwrite(
 void EgoEntitySimulation::update(
   double current_scenario_time, double step_time, bool npc_logic_started)
 {
+  using math::geometry::getRotationMatrix;
+
   autoware->rethrow();
+
+  /*
+     SimModelInterface only supports 2D, therefore the position in Oz is
+     considered unchangeable and stored in an additional variable
+     world_relative_position_ that is used in calculations.
+  */
+  world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
+                             Eigen::Vector3d(
+                               status_.pose.position.x - initial_pose_.position.x,
+                               status_.pose.position.y - initial_pose_.position.y,
+                               status_.pose.position.z - initial_pose_.position.z);
 
   if (npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
@@ -319,6 +339,9 @@ void EgoEntitySimulation::update(
     vehicle_model_ptr_->setInput(input);
     vehicle_model_ptr_->update(step_time);
   }
+  // only the position in the Oz axis is left unchanged, the rest is taken from SimModelInterface
+  world_relative_position_.x() = vehicle_model_ptr_->getX();
+  world_relative_position_.y() = vehicle_model_ptr_->getY();
   updateStatus(current_scenario_time, step_time);
   updatePreviousValues();
 }
@@ -331,19 +354,23 @@ auto EgoEntitySimulation::getMatchedLaneletPoseFromEntityStatus(
   /// EgoEntity::setMapPose
   const auto unique_route_lanelets =
     traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
-  const auto matching_length = [entity_width] { return entity_width * 0.5 + 1.0; }();
+  const auto matching_distance = std::max(
+                                   vehicle_parameters.axles.front_axle.track_width,
+                                   vehicle_parameters.axles.rear_axle.track_width) *
+                                   0.5 +
+                                 1.0;
 
   std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
 
   if (unique_route_lanelets.empty()) {
     lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_length);
+      hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_distance);
   } else {
     lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, matching_length);
+      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, matching_distance);
     if (!lanelet_pose) {
       lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_length);
+        hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_distance);
     }
   }
   return lanelet_pose;
@@ -363,33 +390,31 @@ auto EgoEntitySimulation::calculateEgoPitch() const -> double
   auto centerline_points = hdmap_utils_ptr_->getCenterPoints(ego_lanelet.value().lanelet_id);
 
   /// @note Copied from motion_util::findNearestSegmentIndex
-  auto find_nearest_segment_index = [](
-                                      const std::vector<geometry_msgs::msg::Point> & points,
-                                      const geometry_msgs::msg::Point & point) {
-    assert(not points.empty());
+  auto find_nearest_segment_index =
+    [](const std::vector<geometry_msgs::msg::Point> & points, const Eigen::Vector3d & point) {
+      assert(not points.empty());
 
-    double min_dist = std::numeric_limits<double>::max();
-    size_t min_idx = 0;
+      double min_dist = std::numeric_limits<double>::max();
+      size_t min_idx = 0;
 
-    for (size_t i = 0; i < points.size(); ++i) {
-      const auto dist = [](const auto point1, const auto point2) {
-        const auto dx = point1.x - point2.x;
-        const auto dy = point1.y - point2.y;
-        return dx * dx + dy * dy;
-      }(points.at(i), point);
+      for (size_t i = 0; i < points.size(); ++i) {
+        const auto dist =
+          [](const geometry_msgs::msg::Point & point1, const Eigen::Vector3d & point2) {
+            const auto dx = point1.x - point2.x();
+            const auto dy = point1.y - point2.y();
+            return dx * dx + dy * dy;
+          }(points.at(i), point);
 
-      if (dist < min_dist) {
-        min_dist = dist;
-        min_idx = i;
+        if (dist < min_dist) {
+          min_dist = dist;
+          min_idx = i;
+        }
       }
-    }
-    return min_idx;
-  };
+      return min_idx;
+    };
 
-  geometry_msgs::msg::Point ego_point;
-  ego_point.x = vehicle_model_ptr_->getX();
-  ego_point.y = vehicle_model_ptr_->getY();
-  const size_t ego_seg_idx = find_nearest_segment_index(centerline_points, ego_point);
+  const size_t ego_seg_idx =
+    find_nearest_segment_index(centerline_points, world_relative_position_);
 
   const auto & prev_point = centerline_points.at(ego_seg_idx);
   const auto & next_point = centerline_points.at(ego_seg_idx + 1);
@@ -419,26 +444,21 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
 auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   -> geometry_msgs::msg::Pose
 {
-  Eigen::VectorXd relative_position(3);
-  relative_position(0) = vehicle_model_ptr_->getX();
-  relative_position(1) = vehicle_model_ptr_->getY();
-  relative_position(2) = 0.0;
-  relative_position =
-    quaternion_operation::getRotationMatrix(initial_pose_.orientation) * relative_position;
+  using math::geometry::operator*;
+  const auto relative_position =
+    math::geometry::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
+  const auto relative_orientation = math::geometry::convertEulerAngleToQuaternion(
+    geometry_msgs::build<geometry_msgs::msg::Vector3>()
+      .x(0)
+      .y(pitch_angle)
+      .z(vehicle_model_ptr_->getYaw()));
 
-  geometry_msgs::msg::Pose current_pose;
-  current_pose.position.x = initial_pose_.position.x + relative_position(0);
-  current_pose.position.y = initial_pose_.position.y + relative_position(1);
-  current_pose.position.z = initial_pose_.position.z + relative_position(2);
-  current_pose.orientation = [&]() {
-    geometry_msgs::msg::Vector3 rpy;
-    rpy.x = 0;
-    rpy.y = pitch_angle;
-    rpy.z = vehicle_model_ptr_->getYaw();
-    return initial_pose_.orientation * quaternion_operation::convertEulerAngleToQuaternion(rpy);
-  }();
-
-  return current_pose;
+  return geometry_msgs::build<geometry_msgs::msg::Pose>()
+    .position(geometry_msgs::build<geometry_msgs::msg::Point>()
+                .x(initial_pose_.position.x + relative_position(0))
+                .y(initial_pose_.position.y + relative_position(1))
+                .z(initial_pose_.position.z + relative_position(2)))
+    .orientation(initial_pose_.orientation * relative_orientation);
 }
 
 auto EgoEntitySimulation::getCurrentAccel(const double step_time) const -> geometry_msgs::msg::Accel
@@ -516,17 +536,17 @@ auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
     if (const auto s_value = spline.getSValue(status.pose)) {
       status.pose.position.z = spline.getPoint(s_value.value()).z;
       if (consider_pose_by_road_slope_) {
-        const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
+        const auto rpy = math::geometry::convertQuaternionToEulerAngle(
           spline.getPose(s_value.value(), true).orientation);
         const auto original_rpy =
-          quaternion_operation::convertQuaternionToEulerAngle(status.pose.orientation);
-        status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+          math::geometry::convertQuaternionToEulerAngle(status.pose.orientation);
+        status.pose.orientation = math::geometry::convertEulerAngleToQuaternion(
           geometry_msgs::build<geometry_msgs::msg::Vector3>()
             .x(original_rpy.x)
             .y(rpy.y)
             .z(original_rpy.z));
         lanelet_pose->rpy =
-          quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
+          math::geometry::convertQuaternionToEulerAngle(math::geometry::getRotation(
             spline.getPose(s_value.value(), true).orientation, status.pose.orientation));
       }
     }
