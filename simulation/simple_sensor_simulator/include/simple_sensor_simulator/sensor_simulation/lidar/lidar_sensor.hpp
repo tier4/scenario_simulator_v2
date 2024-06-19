@@ -17,6 +17,7 @@
 
 #include <simulation_api_schema.pb.h>
 
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <memory>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>

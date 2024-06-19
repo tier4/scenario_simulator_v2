@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -338,7 +339,7 @@ public:
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
           configuration.set_detect_all_objects_in_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_object_recognition_delay(controller.properties.template get<Double>("detectedObjectPublishingDelay"));
@@ -355,7 +356,7 @@ public:
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
@@ -370,7 +371,7 @@ public:
         core->attachPseudoTrafficLightDetector([&]() {
           simulation_api_schema::PseudoTrafficLightDetectorConfiguration configuration;
           configuration.set_architecture_type(
-            getParameter<std::string>("architecture_type", "awf/universe"));
+            core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
           return configuration;
         }());
 
@@ -562,8 +563,7 @@ public:
           const auto relative_pose =
             traffic_simulator::pose::relativePose(from_map_pose, to_map_pose)) {
           return static_cast<Double>(std::abs(
-            quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
-              .z));
+            math::geometry::convertQuaternionToEulerAngle(relative_pose.value().orientation).z));
         }
       }
       return Double::nan();
