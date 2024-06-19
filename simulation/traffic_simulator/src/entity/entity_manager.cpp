@@ -310,7 +310,7 @@ void EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name)
 {
   const auto & status = getEntityOrThrow(name)->getStatus();
-  const auto behavior_parameter = getBehaviorParameter(name);
+  const auto behavior_parameter = getEntityOrThrow(name)->getBehaviorParameter();
   if (is<EgoEntity>(name)) {
     THROW_SEMANTIC_ERROR(
       "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
