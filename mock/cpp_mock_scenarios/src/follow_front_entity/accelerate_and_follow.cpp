@@ -41,7 +41,7 @@ private:
   {
     double ego_accel = api_.getCurrentAccel("ego").linear.x;
     double ego_twist = api_.getCurrentTwist("ego").linear.x;
-    // double npc_accel = static_cast<EntityStatus>(api_.getEntityStatus("npc")).action_status.accel.linear.x;
+    // double npc_accel = static_cast<EntityStatus>(api_.getEntityOrThrow("npc")->getStatus()).action_status.accel.linear.x;
     double npc_twist = api_.getCurrentTwist("npc").linear.x;
     ;
     // LCOV_EXCL_START

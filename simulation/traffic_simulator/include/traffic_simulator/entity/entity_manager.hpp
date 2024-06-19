@@ -323,8 +323,6 @@ public:
   auto getEntityOrThrow(const std::string & name)
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
-  auto getEntityStatus(const std::string & name) const -> const CanonicalizedEntityStatus &;
-
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
   auto getNumberOfEgo() const -> std::size_t;
