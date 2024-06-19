@@ -16,7 +16,7 @@
 
 namespace traffic_simulator
 {
-auto ConfigurableRateUpdater::createTimer(double update_rate) -> void
+auto ConfigurableRateUpdater::startTimer(double update_rate) -> void
 {
   if (!timer_) {
     update_rate_ = update_rate;
@@ -27,7 +27,7 @@ auto ConfigurableRateUpdater::createTimer(double update_rate) -> void
   }
 }
 
-auto ConfigurableRateUpdater::resetUpdateRate(double update_rate) -> void
+auto ConfigurableRateUpdater::resetTimer(double update_rate) -> void
 {
   if (update_rate_ != update_rate) {
     update_rate_ = update_rate;

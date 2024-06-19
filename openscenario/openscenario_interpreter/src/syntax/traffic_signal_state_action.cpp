@@ -33,10 +33,7 @@ auto TrafficSignalStateAction::run() noexcept -> void {}
 
 auto TrafficSignalStateAction::start() const -> void
 {
-  for (traffic_simulator::TrafficLight & traffic_light : getConventionalTrafficLights(id())) {
-    traffic_light.clear();
-    traffic_light.set(state);
-  };
+  setConventionalTrafficLightsState(id(), state);
 }
 
 auto TrafficSignalStateAction::id() const -> std::int64_t

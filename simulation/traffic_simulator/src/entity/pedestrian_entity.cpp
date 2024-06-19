@@ -174,11 +174,11 @@ auto PedestrianEntity::getEntityTypename() const -> const std::string &
   return result;
 }
 
-void PedestrianEntity::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManager> & ptr)
+void PedestrianEntity::setTrafficLights(
+  const std::shared_ptr<traffic_simulator::TrafficLightsBase> & ptr)
 {
-  EntityBase::setTrafficLightManager(ptr);
-  behavior_plugin_ptr_->setTrafficLightManager(traffic_light_manager_);
+  EntityBase::setTrafficLights(ptr);
+  behavior_plugin_ptr_->setTrafficLights(traffic_lights_);
 }
 
 auto PedestrianEntity::getBehaviorParameter() const

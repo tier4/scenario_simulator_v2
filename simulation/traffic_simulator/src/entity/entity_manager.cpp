@@ -385,9 +385,9 @@ void EntityManager::update(const double current_time, const double step_time)
     "EntityManager::update", configuration.verbose);
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
-    traffic_light_supervisor_ptr_->createConventionalTimer(
-      configuration.conventional_traffic_light_publish_rate);
-    traffic_light_supervisor_ptr_->createV2ITimer(configuration.v2i_traffic_light_publish_rate);
+    traffic_lights_ptr_->startTrafficLightsUpdate(
+      configuration.conventional_traffic_light_publish_rate,
+      configuration.v2i_traffic_light_publish_rate);
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {

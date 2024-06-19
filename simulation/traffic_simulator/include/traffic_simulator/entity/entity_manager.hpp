@@ -42,7 +42,7 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_supervisor.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -108,21 +108,20 @@ class EntityManager
 
   MarkerArray markers_raw_;
 
-  std::shared_ptr<traffic_simulator::TrafficLightSupervisor> traffic_light_supervisor_ptr_;
+  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
 
 public:
   /**
-   * This function is necessary, because TrafficLightSupervisor requires HdMapUtils.
-   * However, TrafficLightSupervisor is constructed in API and in that scope HdMapUtils is available
+   * This function is necessary, because TrafficLights requires HdMapUtils.
+   * However, TrafficLights is constructed in API and in that scope HdMapUtils is available
    * only after EntityManager is constructed.
-   * This is why TrafficLightSupervisor has to be initialized in API after EntityManager and thus
-   * TrafficLightSupervisor needs to be passed to EntityManager after initialization.
+   * This is why TrafficLights has to be initialized in API after EntityManager and thus
+   * TrafficLights needs to be passed to EntityManager after initialization.
    */
-  auto setTrafficLightSupervisor(
-    const std::shared_ptr<traffic_simulator::TrafficLightSupervisor> & traffic_light_supervisor)
+  auto setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights)
     -> void
   {
-    traffic_light_supervisor_ptr_ = traffic_light_supervisor;
+    traffic_lights_ptr_ = traffic_lights;
   }
 
   template <typename Node>
@@ -397,8 +396,7 @@ public:
                   std::forward<decltype(xs)>(xs)...));
         success) {
       // FIXME: this ignores V2I traffic lights
-      iter->second->setTrafficLightManager(
-        traffic_light_supervisor_ptr_->getConventionalTrafficLightManager());
+      iter->second->setTrafficLights(traffic_lights_ptr_->getConventionalTrafficLights());
       return success;
     } else {
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");

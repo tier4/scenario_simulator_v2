@@ -39,9 +39,9 @@ public:
   {
   }
 
-  auto createTimer(double update_rate) -> void;
+  auto startTimer(double update_rate) -> void;
 
-  auto resetUpdateRate(double update_rate) -> void;
+  auto resetTimer(double update_rate) -> void;
 
   auto getUpdateRate() const -> double { return update_rate_; }
 };
