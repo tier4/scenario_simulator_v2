@@ -469,7 +469,6 @@ public:
       return core->checkCollision(std::forward<decltype(xs)>(xs)...);
     }
 
-    template <typename... Ts>
     static auto evaluateBoundingBoxEuclideanDistance(
       const std::string & from_entity_name,
       const std::string & to_entity_name)  // for RelativeDistanceCondition
