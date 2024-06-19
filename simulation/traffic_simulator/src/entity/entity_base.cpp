@@ -745,7 +745,6 @@ bool EntityBase::reachPosition(
  * @param target_sync_pose The target lanelet pose of the target entity.
  * @param entity_target The target lanelet pose of the entity to control.
  * @param threshold The threshold to determine if the entity has already arrived to the target lanelet.
- * @param loop_period The period of the loop.
 */
 
 auto EntityBase::requestSynchronize(
