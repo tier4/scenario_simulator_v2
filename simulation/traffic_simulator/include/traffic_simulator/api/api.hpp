@@ -349,7 +349,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
-  FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityOrThrow);

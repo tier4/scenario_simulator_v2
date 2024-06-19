@@ -137,8 +137,8 @@ std::optional<double> API::getTimeHeadway(
     if (auto to_entity = getEntity(to_entity_name); to_entity) {
       if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
           relative_pose && relative_pose->position.x <= 0) {
-        const double time_headway =
-          (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;
+        const double time_headway = (relative_pose->position.x * -1) /
+                                    getEntityOrThrow(to_entity_name)->getCurrentTwist().linear.x;
         return std::isnan(time_headway) ? std::numeric_limits<double>::infinity() : time_headway;
       }
     }

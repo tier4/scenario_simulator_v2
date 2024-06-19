@@ -40,13 +40,15 @@ public:
 private:
   void onUpdate() override
   {
-    if (api_.getCurrentTime() <= 3.9 && api_.getCurrentTwist("ego").linear.x >= 3.0) {
+    if (
+      api_.getCurrentTime() <= 3.9 &&
+      api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x >= 3.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.getCurrentTime() >= 3.9999) {
       if (
-        api_.getCurrentTwist("ego").linear.x <= 3.1 &&
-        api_.getCurrentTwist("ego").linear.x >= 2.9) {
+        api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x <= 3.1 &&
+        api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x >= 2.9) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);

@@ -50,17 +50,17 @@ private:
      * @sa https://wandbox.org/permlink/dSNRX7K2bQiqSI7P
      */
     if (t == 1.0) {
-      if (t != api_.getCurrentTwist("bob").linear.x) {
+      if (t != api_.getEntityOrThrow("bob")->getCurrentTwist().linear.x) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
     if (t >= 6.6) {
       if (7.5 >= t) {
-        if (std::fabs(0.1) <= api_.getCurrentTwist("ego").linear.x) {
+        if (std::fabs(0.1) <= api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }
       } else {
-        if (0.1 >= api_.getCurrentTwist("ego").linear.x) {
+        if (0.1 >= api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x) {
           stop(cpp_mock_scenarios::Result::FAILURE);
         }
       }

@@ -50,13 +50,13 @@ private:
      * @sa https://wandbox.org/permlink/dSNRX7K2bQiqSI7P
      */
     if (t == 1.0) {
-      const auto vel = api_.getCurrentTwist("bob").linear.x;
+      const auto vel = api_.getEntityOrThrow("bob")->getCurrentTwist().linear.x;
       if (t != vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
     if (t >= 6.65 && 7.25 >= t) {
-      const auto vel = api_.getCurrentTwist("ego").linear.x;
+      const auto vel = api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x;
       if (std::fabs(0.01) <= vel) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }

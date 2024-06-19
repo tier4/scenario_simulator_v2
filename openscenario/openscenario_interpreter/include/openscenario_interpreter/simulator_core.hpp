@@ -458,10 +458,9 @@ public:
   class ConditionEvaluation : protected CoordinateSystemConversion
   {
   protected:
-    template <typename... Ts>
-    static auto evaluateAcceleration(Ts &&... xs)
+    static auto evaluateAcceleration(const std::string & name)
     {
-      return core->getCurrentAccel(std::forward<decltype(xs)>(xs)...).linear.x;
+      return core->getEntityOrThrow(name)->getCurrentAccel().linear.x;
     }
 
     template <typename... Ts>
@@ -501,7 +500,7 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear.x;
+      return core->getEntityOrThrow(std::forward<decltype(xs)>(xs)...)->getCurrentTwist().linear.x;
     }
 
     template <typename... Ts>

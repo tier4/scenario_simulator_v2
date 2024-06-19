@@ -263,7 +263,8 @@ bool EntityManager::isInLanelet(
 
 bool EntityManager::isStopping(const std::string & name) const
 {
-  return std::fabs(getCurrentTwist(name).linear.x) < std::numeric_limits<double>::epsilon();
+  return std::fabs(getEntityOrThrow(name)->getCurrentTwist().linear.x) <
+         std::numeric_limits<double>::epsilon();
 }
 
 bool EntityManager::reachPosition(

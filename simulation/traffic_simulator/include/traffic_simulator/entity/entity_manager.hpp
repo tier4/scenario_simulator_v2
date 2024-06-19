@@ -260,7 +260,6 @@ public:
   FORWARD_TO_ENTITY(get2DPolygon, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAccel, const);
-  FORWARD_TO_ENTITY(getCurrentTwist, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
