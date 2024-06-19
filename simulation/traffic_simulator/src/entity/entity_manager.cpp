@@ -16,8 +16,8 @@
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
 #include <geometry/intersection/collision.hpp>
-#include <geometry/linear_algebra.hpp>
 #include <geometry/transform.hpp>
+#include <geometry/vector3/operator.hpp>
 #include <limits>
 #include <memory>
 #include <optional>
@@ -39,10 +39,14 @@ namespace entity
 {
 void EntityManager::broadcastEntityTransform()
 {
+  using math::geometry::operator/;
+  using math::geometry::operator*;
+  using math::geometry::operator+=;
+  std::vector<std::string> names = getEntityNames();
   /**
-   * @note This part of the process is intended to ensure that frames are issued in a position that makes 
+   * @note This part of the process is intended to ensure that frames are issued in a position that makes
    * it as easy as possible to see the entities that will appear in the scenario.
-   * In the past, we used to publish the frames of all entities, but that would be too heavy processing, 
+   * In the past, we used to publish the frames of all entities, but that would be too heavy processing,
    * so we publish the average of the coordinates of all entities.
    */
   if (isEgoSpawned()) {
@@ -50,8 +54,8 @@ void EntityManager::broadcastEntityTransform()
       broadcastTransform(
         geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
           /**
-           * @note This is the intended implementation. 
-           * It is easier to create rviz config if the name “ego” is fixed, 
+           * @note This is the intended implementation.
+           * It is easier to create rviz config if the name "ego" is fixed,
            * so the frame_id “ego” is issued regardless of the name of the ego entity.
            */
           .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
@@ -68,8 +72,9 @@ void EntityManager::broadcastEntityTransform()
                 .position(std::accumulate(
                   names.begin(), names.end(), geometry_msgs::msg::Point(),
                   [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
-                    return point + (getEntity(name)->getMapPose().position *
-                                    (1.0 / static_cast<double>(names.size())));
+                    return point +=
+                           (getEntity(name)->getMapPose().position *
+                            (1.0 / static_cast<double>(names.size())));
                   }))
                 .orientation(geometry_msgs::msg::Quaternion())),
       true);
@@ -367,10 +372,17 @@ auto EntityManager::updateNpcLogic(
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  if (npc_logic_started_) {
-    entities_[name]->onUpdate(current_time_, step_time_);
+  if (const auto entity = getEntity(name)) {
+    // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
+    if (npc_logic_started_) {
+      entity->onUpdate(current_time_, step_time_);
+    } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
+      ego_entity->updateFieldOperatorApplication();
+    }
+    return entity->getStatus();
+  } else {
+    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   }
-  return entities_[name]->getStatus();
 }
 
 void EntityManager::update(const double current_time, const double step_time)
@@ -434,7 +446,15 @@ void EntityManager::updateHdmapMarker()
   lanelet_marker_pub_ptr_->publish(markers);
 }
 
-auto EntityManager::startNpcLogic() -> void { npc_logic_started_ = true; }
+auto EntityManager::startNpcLogic(const double current_time) -> void
+{
+  npc_logic_started_ = true;
 
+  current_time_ = current_time;
+
+  for ([[maybe_unused]] auto && [name, entity] : entities_) {
+    entity->updateEntityStatusTimestamp(current_time_);
+  }
+}
 }  // namespace entity
 }  // namespace traffic_simulator

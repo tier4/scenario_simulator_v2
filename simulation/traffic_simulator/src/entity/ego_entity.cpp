@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <boost/lexical_cast.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
@@ -148,7 +146,13 @@ auto EgoEntity::getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsAr
   return field_operator_application->getWaypoints();
 }
 
-auto EgoEntity::onUpdate(const double current_time, const double step_time) -> void
+void EgoEntity::updateFieldOperatorApplication() const
+{
+  field_operator_application->rethrow();
+  field_operator_application->spinSome();
+}
+
+void EgoEntity::onUpdate(double current_time, double step_time)
 {
   EntityBase::onUpdate(current_time, step_time);
 
@@ -158,6 +162,7 @@ auto EgoEntity::onUpdate(const double current_time, const double step_time) -> v
         traffic_simulator::follow_trajectory::makeUpdatedStatus(
           static_cast<traffic_simulator::EntityStatus>(status_), *polyline_trajectory_,
           behavior_parameter_, hdmap_utils_ptr_, step_time,
+          getDefaultMatchingDistanceForLaneletPoseCalculation(),
           target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       // prefer current lanelet on ss2 side
       setStatus(non_canonicalized_updated_status.value(), status_.getLaneletIds());
@@ -168,9 +173,7 @@ auto EgoEntity::onUpdate(const double current_time, const double step_time) -> v
 
   updateStandStillDuration(step_time);
   updateTraveledDistance(step_time);
-
-  field_operator_application->rethrow();
-  field_operator_application->spinSome();
+  updateFieldOperatorApplication();
 
   EntityBase::onPostUpdate(current_time, step_time);
 }
@@ -303,7 +306,11 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
   const auto unique_route_lanelets = traffic_simulator::helper::getUniqueValues(getRouteLanelets());
   status_.setMapPose(map_pose);
   // prefer current lanelet on Autoware side
-  setStatus(static_cast<EntityStatus>(status_), unique_route_lanelets);
+  const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+    status_.getMapPose(), status_.getBoundingBox(), unique_route_lanelets, false,
+    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  setCanonicalizedStatus(
+    CanonicalizedEntityStatus(static_cast<EntityStatus>(status_), canonicalized_lanelet_pose));
 }
 
 void EgoEntity::setStatus(const EntityStatus & status)
@@ -320,7 +327,7 @@ auto EgoEntity::setStatus(const EntityStatus & status, const lanelet::Ids & lane
       "You cannot set entity status to the ego vehicle named ", std::quoted(status.name),
       " after starting scenario.");
   } else {
-    const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       status.pose, status.bounding_box, lanelet_ids, false,
       getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
     setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));

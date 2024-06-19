@@ -225,12 +225,64 @@ auto boundingBoxRelativeLaneletPose(
   return position;
 }
 
+auto isInLanelet(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
+  const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
+{
+  constexpr bool include_adjacent_lanelet{false};
+  constexpr bool include_opposite_direction{false};
+  constexpr bool allow_lane_change{false};
+
+  if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
+    return true;
+  } else {
+    const auto start_lanelet_pose =
+      helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0, hdmap_utils_ptr);
+    if (const auto distance_to_start_lanelet_pose = longitudinalDistance(
+          start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, allow_lane_change, hdmap_utils_ptr);
+        distance_to_start_lanelet_pose and
+        std::abs(distance_to_start_lanelet_pose.value()) < tolerance) {
+      return true;
+    }
+
+    const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
+      lanelet_id, hdmap_utils_ptr->getLaneletLength(lanelet_id), 0.0, hdmap_utils_ptr);
+    if (const auto distance_to_end_lanelet_pose = longitudinalDistance(
+          canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
+          include_opposite_direction, allow_lane_change, hdmap_utils_ptr);
+        distance_to_end_lanelet_pose and
+        std::abs(distance_to_end_lanelet_pose.value()) < tolerance) {
+      return true;
+    }
+  }
+  return false;
+}
+
+auto isAtEndOfLanelets(
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
+{
+  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  return hdmap_utils_ptr->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
+         hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
+}
+
+auto laneletLength(
+  const lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
+  -> double
+{
+  return hdmap_utils_ptr->getLaneletLength(lanelet_id);
+}
+
+namespace pedestrian
+{
 /*
   This function has been moved from pedestrian_action_node and modified,
   in case of inconsistency please compare in original:
   https://github.com/tier4/scenario_simulator_v2/blob/090a8d08bcb065d293a530cf641a953edf311f9f/simulation/behavior_tree_plugin/src/pedestrian/pedestrian_action_node.cpp#L67-L128
 */
-auto estimateCanonicalizedLaneletPose(
+auto transformToCanonicalizedLaneletPose(
   const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::BoundingBox & bounding_box,
   const lanelet::Ids & unique_route_lanelets, const bool include_crosswalk,
@@ -283,55 +335,6 @@ auto estimateCanonicalizedLaneletPose(
     return std::nullopt;
   }
 }
-
-auto isInLanelet(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose, const lanelet::Id lanelet_id,
-  const double tolerance, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
-{
-  constexpr bool include_adjacent_lanelet{false};
-  constexpr bool include_opposite_direction{false};
-  constexpr bool allow_lane_change{false};
-
-  if (isSameLaneletId(canonicalized_lanelet_pose, lanelet_id)) {
-    return true;
-  } else {
-    const auto start_lanelet_pose =
-      helper::constructCanonicalizedLaneletPose(lanelet_id, 0.0, 0.0, hdmap_utils_ptr);
-    if (const auto distance_to_start_lanelet_pose = longitudinalDistance(
-          start_lanelet_pose, canonicalized_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, allow_lane_change, hdmap_utils_ptr);
-        distance_to_start_lanelet_pose and
-        std::abs(distance_to_start_lanelet_pose.value()) < tolerance) {
-      return true;
-    }
-
-    const auto end_lanelet_pose = helper::constructCanonicalizedLaneletPose(
-      lanelet_id, hdmap_utils_ptr->getLaneletLength(lanelet_id), 0.0, hdmap_utils_ptr);
-    if (const auto distance_to_end_lanelet_pose = longitudinalDistance(
-          canonicalized_lanelet_pose, end_lanelet_pose, include_adjacent_lanelet,
-          include_opposite_direction, allow_lane_change, hdmap_utils_ptr);
-        distance_to_end_lanelet_pose and
-        std::abs(distance_to_end_lanelet_pose.value()) < tolerance) {
-      return true;
-    }
-  }
-  return false;
-}
-
-auto isAtEndOfLanelets(
-  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
-  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> bool
-{
-  const auto lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
-  return hdmap_utils_ptr->getFollowingLanelets(lanelet_pose.lanelet_id).size() == 1 &&
-         hdmap_utils_ptr->getLaneletLength(lanelet_pose.lanelet_id) <= lanelet_pose.s;
-}
-
-auto laneletLength(
-  const lanelet::Id lanelet_id, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr)
-  -> double
-{
-  return hdmap_utils_ptr->getLaneletLength(lanelet_id);
-}
+}  // namespace pedestrian
 }  // namespace pose
 }  // namespace traffic_simulator
