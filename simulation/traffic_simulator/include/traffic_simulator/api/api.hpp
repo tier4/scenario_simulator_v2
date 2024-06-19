@@ -353,6 +353,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getCurrentTwist);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntity);
+  FORWARD_TO_ENTITY_MANAGER(getEntityOrThrow);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
