@@ -14,6 +14,7 @@
 
 #include <gtest/gtest.h>
 
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/spline/catmull_rom_spline.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
@@ -470,7 +471,7 @@ TEST(CatmullRomSpline, getPoseLine)
   EXPECT_POINT_NEAR(pose.position, makePoint(1.5, 4.5), EPS);
   EXPECT_QUATERNION_NEAR(
     pose.orientation,
-    quaternion_operation::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, std::atan(3.0))), EPS);
+    math::geometry::convertEulerAngleToQuaternion(makeVector(0.0, 0.0, std::atan(3.0))), EPS);
 }
 
 TEST(CatmullRomSpline, getPoseLineWithPitch)
@@ -480,7 +481,7 @@ TEST(CatmullRomSpline, getPoseLineWithPitch)
   EXPECT_POINT_NEAR(pose.position, makePoint(1.5, 4.5, 1.5), EPS);
   EXPECT_QUATERNION_NEAR(
     pose.orientation,
-    quaternion_operation::convertEulerAngleToQuaternion(
+    math::geometry::convertEulerAngleToQuaternion(
       makeVector(0.0, std::atan2(-1.0, std::sqrt(1.0 + 3.0 * 3.0)), std::atan(3.0))),
     EPS);
 }
