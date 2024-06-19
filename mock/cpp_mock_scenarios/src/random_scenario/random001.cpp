@@ -175,7 +175,9 @@ private:
         api_.requestSpeedChange(entity_name, speed, true);
         api_.setLinearVelocity(entity_name, speed);
       }
-      if (api_.entityExists(entity_name) && api_.getStandStillDuration(entity_name) >= 0.5) {
+      if (
+        api_.entityExists(entity_name) &&
+        api_.getEntityOrThrow(entity_name)->getStandStillDuration() >= 0.5) {
         api_.despawn(entity_name);
       }
     };

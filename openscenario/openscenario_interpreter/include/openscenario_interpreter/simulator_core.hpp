@@ -501,10 +501,9 @@ public:
       return core->getEntityOrThrow(name)->getCurrentTwist().linear.x;
     }
 
-    template <typename... Ts>
-    static auto evaluateStandStill(Ts &&... xs)
+    static auto evaluateStandStill(const std::string & name)
     {
-      return core->getStandStillDuration(std::forward<decltype(xs)>(xs)...);
+      return core->getEntityOrThrow(name)->getStandStillDuration();
     }
 
     template <typename... Ts>

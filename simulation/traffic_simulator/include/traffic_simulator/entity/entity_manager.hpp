@@ -260,7 +260,6 @@ public:
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
-  FORWARD_TO_ENTITY(getStandStillDuration, const);
   FORWARD_TO_ENTITY(getTraveledDistance, const);
   FORWARD_TO_ENTITY(laneMatchingSucceed, const);
   FORWARD_TO_ENTITY(activateOutOfRangeJob, );
