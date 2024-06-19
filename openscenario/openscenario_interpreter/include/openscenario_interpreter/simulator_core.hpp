@@ -496,10 +496,9 @@ public:
       }
     }
 
-    template <typename... Ts>
-    static auto evaluateSpeed(Ts &&... xs)
+    static auto evaluateSpeed(const std::string & name)
     {
-      return core->getEntityOrThrow(std::forward<decltype(xs)>(xs)...)->getCurrentTwist().linear.x;
+      return core->getEntityOrThrow(name)->getCurrentTwist().linear.x;
     }
 
     template <typename... Ts>

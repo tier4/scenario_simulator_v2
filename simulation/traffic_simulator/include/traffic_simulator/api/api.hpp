@@ -347,7 +347,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getBoundingBox);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLights);
-  FORWARD_TO_ENTITY_MANAGER(getCurrentAccel);
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntity);

@@ -39,7 +39,7 @@ public:
 private:
   void onUpdate() override
   {
-    double ego_accel = api_.getCurrentAccel("ego").linear.x;
+    double ego_accel = api_.getEntityOrThrow("ego")->getCurrentAccel().linear.x;
     double ego_twist = api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x;
     // double npc_accel = static_cast<EntityStatus>(api_.getEntityOrThrow("npc")->getStatus()).action_status.accel.linear.x;
     double npc_twist = api_.getEntityOrThrow("npc")->getCurrentTwist().linear.x;
