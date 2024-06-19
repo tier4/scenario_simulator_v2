@@ -43,9 +43,9 @@ public:
 private:
   bool requested = false;
   const traffic_simulator::CanonicalizedLaneletPose ego_target =
-    api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34585, 0, 0, 0, 0, 0));
+    api_.canonicalize(traffic_simulator::helper::constructLaneletPose(147, 0, 0, 0, 0, 0));
   const traffic_simulator::CanonicalizedLaneletPose npc_target =
-    api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34570, 0, 0, 0, 0, 0));
+    api_.canonicalize(traffic_simulator::helper::constructLaneletPose(133, 0, 0, 0, 0, 0));
 
   void onUpdate() override
   {
@@ -68,23 +68,23 @@ private:
   {
     api_.spawn(
       "ego",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34976, 20, 0, 0, 0, 0)),
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(7, 40, 0, 0, 0, 0)),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 3);
     api_.requestSpeedChange("ego", 3, true);
 
     std::vector<geometry_msgs::msg::Pose> goal_poses;
     goal_poses.emplace_back(
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34579, 40, 0, 0, 0, 0)));
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(154, 20, 0, 0, 0, 0)));
     api_.requestAssignRoute("ego", goal_poses);
 
     api_.spawn(
       "npc",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34576, 9, 0, 0, 0, 0)),
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(14, 10, 0, 0, 0, 0)),
       getVehicleParameters());
     std::vector<geometry_msgs::msg::Pose> npc_goal_poses;
     npc_goal_poses.emplace_back(
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34564, 23, 0, 0, 0, 0)));
+      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(140, 20, 0, 0, 0, 0)));
     api_.requestAssignRoute("npc", npc_goal_poses);
     api_.setLinearVelocity("npc", 3);
   }
