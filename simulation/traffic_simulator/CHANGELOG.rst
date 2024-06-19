@@ -13,6 +13,57 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.6 (2024-06-18)
+------------------
+* Merge pull request `#1289 <https://github.com/tier4/scenario_simulator_v2/issues/1289>`_ from tier4/revert-1284-fix/issue1276
+  Revert "Optimize `EntityManager::broadcastEntityTransform` to Execute Only Once"
+* Revert "Optimize `EntityManager::broadcastEntityTransform` to Execute Only Once"
+* Contributors: Masaya Kataoka
+
+2.1.5 (2024-06-18)
+------------------
+
+2.1.4 (2024-06-14)
+------------------
+* Merge pull request `#1281 <https://github.com/tier4/scenario_simulator_v2/issues/1281>`_ from tier4/fix/remove_quaternion_operation
+  Remove quaternion_operation
+* Merge branch 'master' into fix/remove_quaternion_operation
+* Merge branch 'master' into fix/remove_quaternion_operation
+* Remove quaternion_operation
+* Contributors: Masaya Kataoka, Taiga Takano
+
+2.1.3 (2024-06-14)
+------------------
+* Merge pull request `#1284 <https://github.com/tier4/scenario_simulator_v2/issues/1284>`_ from tier4/fix/issue1276
+  Optimize `EntityManager::broadcastEntityTransform` to Execute Only Once
+* Merge branch 'master' into fix/issue1276
+* fix format
+* Only publsih tf onece.
+* Contributors: Masaya Kataoka, Taiga Takano
+
+2.1.2 (2024-06-13)
+------------------
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge branch 'master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Merge remote-tracking branch 'origin/master' into fix/interpreter/fault-injection-action
+* Contributors: Tatsuya Yamasaki, yamacir-kit
+
 2.1.1 (2024-06-11)
 ------------------
 * Merge branch 'master' into fix/reorder

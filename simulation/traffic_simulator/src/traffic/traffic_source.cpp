@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <geometry/intersection/collision.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/traffic/traffic_source.hpp>
@@ -83,7 +84,7 @@ auto TrafficSource::makeRandomPose(const bool random_orientation) -> geometry_ms
   random_pose.position.y += radius * std::sin(angle);
 
   if (random_orientation) {
-    random_pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    random_pose.orientation = math::geometry::convertEulerAngleToQuaternion(
       traffic_simulator::helper::constructRPY(0.0, 0.0, angle_distribution_(engine_)));
   }
 
