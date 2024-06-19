@@ -20,6 +20,7 @@
 #endif
 
 #include <autoware_adapi_v1_msgs/msg/mrm_state.hpp>
+#include <autoware_adapi_v1_msgs/srv/change_operation_mode.hpp>
 #include <autoware_adapi_v1_msgs/srv/clear_route.hpp>
 #include <autoware_adapi_v1_msgs/srv/initialize_localization.hpp>
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
@@ -73,7 +74,8 @@ class FieldOperatorApplicationFor<AutowareUniverse>
   ServiceWithValidation<autoware_adapi_v1_msgs::srv::SetRoutePoints>              requestSetRoutePoints;
   ServiceWithValidation<tier4_rtc_msgs::srv::AutoModeWithModule>                  requestSetRtcAutoMode;
   ServiceWithValidation<tier4_external_api_msgs::srv::SetVelocityLimit>           requestSetVelocityLimit;
-  ServiceWithValidation<tier4_system_msgs::srv::ChangeAutowareControl>            requestChangeAutowareControl;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestEnableAutowareControl;
+  ServiceWithValidation<autoware_adapi_v1_msgs::srv::ChangeOperationMode>         requestDisableAutowareControl;
   // clang-format on
 
   tier4_rtc_msgs::msg::CooperateStatusArray latest_cooperate_status_array;
@@ -135,7 +137,8 @@ public:
     requestSetRoutePoints("/api/routing/set_route_points", *this, std::chrono::seconds(10)),
     requestSetRtcAutoMode("/api/external/set/rtc_auto_mode", *this),
     requestSetVelocityLimit("/api/autoware/set/velocity_limit", *this),
-    requestChangeAutowareControl("/system/operation_mode/change_autoware_control", *this)
+    requestEnableAutowareControl("/api/operation_mode/enable_autoware_control", *this),
+    requestDisableAutowareControl("/api/operation_mode/disable_autoware_control", *this)
   // clang-format on
   {
   }
@@ -175,7 +178,9 @@ public:
 
   auto setVelocityLimit(double) -> void override;
 
-  auto requestAutowareControl(const bool autoware_control) -> void override;
+  auto enableAutowareControl() -> void override;
+
+  auto disableAutowareControl() -> void override;
 };
 }  // namespace concealer
 

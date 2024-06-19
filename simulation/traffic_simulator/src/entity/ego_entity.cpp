@@ -150,7 +150,7 @@ void EgoEntity::onUpdate(double current_time, double step_time)
         target_speed_ ? target_speed_.value() : status_.getTwist().linear.x)) {
       setStatus(CanonicalizedEntityStatus(*updated_status, hdmap_utils_ptr_));
     } else {
-      field_operator_application->requestAutowareControl(true);
+      field_operator_application->enableAutowareControl();
       is_controlled_by_simulator_ = false;
     }
   }
@@ -216,7 +216,7 @@ auto EgoEntity::requestFollowTrajectory(
 {
   polyline_trajectory_ = parameter;
   VehicleEntity::requestFollowTrajectory(parameter);
-  field_operator_application->requestAutowareControl(false);
+  field_operator_application->disableAutowareControl();
   is_controlled_by_simulator_ = true;
 }
 
