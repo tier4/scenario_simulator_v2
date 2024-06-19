@@ -13,6 +13,29 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.7 (2024-06-19)
+------------------
+* Merge pull request `#1275 <https://github.com/tier4/scenario_simulator_v2/issues/1275>`_ from tier4/feature/improve-ros-parameter-handling
+  Feature: improve ROS parameter handling
+* Convert parameterHandler class to free function getParameter used with parameters interface
+* getParameter -> getROS2Parameter
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Revert changes adding parameter checking
+  After thic change the code is functionally the same as in the beginning
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Declare parameters before getting values
+* ref(ParameterManager): rename to NodeParameterHandler, improve
+* Make ParameterManager explicit
+* Remove getParameter from EntityManager
+* Remove getParameter from EgoEntity
+* Use ParameterManager in EgoEntity
+* Use const for getParameter
+* Add getParameter forwarding in API
+* Add ParameterManager to API
+* Move ParameterManager
+* Prototype ParameterManager
+* Contributors: Dawid Moszynski, Masaya Kataoka, Mateusz Palczuk
+
 2.1.6 (2024-06-18)
 ------------------
 * Merge pull request `#1289 <https://github.com/tier4/scenario_simulator_v2/issues/1289>`_ from tier4/revert-1284-fix/issue1276
