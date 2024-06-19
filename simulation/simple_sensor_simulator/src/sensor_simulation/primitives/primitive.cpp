@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <boost/geometry.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>

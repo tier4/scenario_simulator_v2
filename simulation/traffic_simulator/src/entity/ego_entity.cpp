@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <boost/lexical_cast.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application_for_autoware_universe.hpp>
@@ -34,34 +32,25 @@ namespace traffic_simulator
 {
 namespace entity
 {
-/// @todo find some shared space for this function
-template <typename T>
-static auto getParameter(const std::string & name, T value = {})
-{
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  node.declare_parameter<T>(name, value);
-  node.get_parameter<T>(name, value);
-
-  return value;
-}
-
-auto EgoEntity::makeFieldOperatorApplication(const Configuration & configuration)
+auto EgoEntity::makeFieldOperatorApplication(
+  const Configuration & configuration,
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   -> std::unique_ptr<concealer::FieldOperatorApplication>
 {
-  if (const auto architecture_type = getParameter<std::string>("architecture_type", "awf/universe");
+  if (const auto architecture_type =
+        getParameter<std::string>(node_parameters, "architecture_type", "awf/universe");
       architecture_type.find("awf/universe") != std::string::npos) {
-    std::string rviz_config = getParameter<std::string>("rviz_config", "");
-    return getParameter<bool>("launch_autoware", true)
+    std::string rviz_config = getParameter<std::string>(node_parameters, "rviz_config", "");
+    return getParameter<bool>(node_parameters, "launch_autoware", true)
              ? std::make_unique<
                  concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse>>(
-                 getParameter<std::string>("autoware_launch_package"),
-                 getParameter<std::string>("autoware_launch_file"),
+                 getParameter<std::string>(node_parameters, "autoware_launch_package"),
+                 getParameter<std::string>(node_parameters, "autoware_launch_file"),
                  "map_path:=" + configuration.map_path.string(),
                  "lanelet2_map_file:=" + configuration.getLanelet2MapFile(),
                  "pointcloud_map_file:=" + configuration.getPointCloudMapFile(),
-                 "sensor_model:=" + getParameter<std::string>("sensor_model"),
-                 "vehicle_model:=" + getParameter<std::string>("vehicle_model"),
+                 "sensor_model:=" + getParameter<std::string>(node_parameters, "sensor_model"),
+                 "vehicle_model:=" + getParameter<std::string>(node_parameters, "vehicle_model"),
                  "rviz_config:=" + ((rviz_config == "")
                                       ? configuration.rviz_config_path.string()
                                       : Configuration::Pathname(rviz_config).string()),
@@ -80,9 +69,10 @@ EgoEntity::EgoEntity(
   const std::string & name, const CanonicalizedEntityStatus & entity_status,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters,
-  const Configuration & configuration)
+  const Configuration & configuration,
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
 : VehicleEntity(name, entity_status, hdmap_utils_ptr, parameters),
-  field_operator_application(makeFieldOperatorApplication(configuration))
+  field_operator_application(makeFieldOperatorApplication(configuration, node_parameters))
 {
 }
 

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <memory>
 #include <optional>
 #include <simple_sensor_simulator/exception.hpp>
@@ -39,7 +37,7 @@ auto LidarSensor<sensor_msgs::msg::PointCloud2>::raycast(
     } else {
       geometry_msgs::msg::Pose pose;
       simulation_interface::toMsg(entity.pose(), pose);
-      auto rotation = quaternion_operation::getRotationMatrix(pose.orientation);
+      auto rotation = math::geometry::getRotationMatrix(pose.orientation);
       geometry_msgs::msg::Point center_point;
       simulation_interface::toMsg(entity.bounding_box().center(), center_point);
       Eigen::Vector3d center(center_point.x, center_point.y, center_point.z);

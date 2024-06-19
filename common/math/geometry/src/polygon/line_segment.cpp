@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <cmath>
 #include <geometry/polygon/line_segment.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/transform.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <geometry/vector3/operator.hpp>
@@ -104,7 +103,7 @@ auto LineSegment::getPose(const double s, const bool denormalize_s, const bool f
     .position(getPoint(s, denormalize_s))
     .orientation([this, fill_pitch]() -> geometry_msgs::msg::Quaternion {
       const auto tangent_vec = getVector();
-      return quaternion_operation::convertEulerAngleToQuaternion(
+      return math::geometry::convertEulerAngleToQuaternion(
         geometry_msgs::build<geometry_msgs::msg::Vector3>()
           .x(0.0)
           .y(
