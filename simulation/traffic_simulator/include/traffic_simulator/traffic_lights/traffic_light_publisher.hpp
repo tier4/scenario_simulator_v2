@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2024 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,20 +28,16 @@ class TrafficLightPublisherBase
 public:
   virtual auto publish(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void = 0;
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
 };
 
 template <typename Message>
 class TrafficLightPublisher : public TrafficLightPublisherBase
 {
-  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
-
 public:
-  template <typename NodePointer>
+  template <typename NodeTypePointer>
   explicit TrafficLightPublisher(
-    const std::string & topic_name, const NodePointer & node,
+    const std::string & topic_name, const NodeTypePointer & node,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils = nullptr)
   : TrafficLightPublisherBase(),
     traffic_light_state_array_publisher_(
@@ -52,7 +48,11 @@ public:
 
   auto publish(
     const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void override;
+    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override;
+
+private:
+  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_

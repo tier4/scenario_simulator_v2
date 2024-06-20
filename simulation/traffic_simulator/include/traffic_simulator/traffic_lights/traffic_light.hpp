@@ -320,6 +320,8 @@ struct TrafficLight
     }
   };
 
+  explicit TrafficLight(const lanelet::Id, const hdmap_utils::HdMapUtils &);
+
   const lanelet::Id way_id;
 
   double confidence = 1.0;
@@ -327,8 +329,6 @@ struct TrafficLight
   std::set<Bulb> bulbs;
 
   const std::map<Bulb::Hash, std::optional<geometry_msgs::msg::Point>> positions;
-
-  explicit TrafficLight(const lanelet::Id, hdmap_utils::HdMapUtils &);
 
   auto clear() { bulbs.clear(); }
 

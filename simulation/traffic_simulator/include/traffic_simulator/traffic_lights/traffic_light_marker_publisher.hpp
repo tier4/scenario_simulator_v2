@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2024 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_MARKER_PUBLISHER_HPP
 
+#include <rclcpp/rclcpp.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 
 namespace traffic_simulator
@@ -32,24 +33,10 @@ public:
   {
   }
 
-  auto deleteMarkers() const -> void
-  {
-    visualization_msgs::msg::MarkerArray marker_array;
-    visualization_msgs::msg::Marker marker;
-    marker.action = visualization_msgs::msg::Marker::DELETEALL;
-    marker_array.markers.push_back(marker);
-    publisher_->publish(marker_array);
-  }
+  auto deleteMarkers() const -> void;
 
   auto drawMarkers(const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const
-    -> void
-  {
-    visualization_msgs::msg::MarkerArray marker_array;
-    for (const auto & [id, traffic_light] : traffic_lights_map) {
-      traffic_light.draw(marker_array.markers, clock_ptr_->now(), frame_);
-    }
-    publisher_->publish(marker_array);
-  }
+    -> void;
 
 private:
   const std::string frame_;

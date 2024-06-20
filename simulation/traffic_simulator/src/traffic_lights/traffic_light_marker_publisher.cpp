@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2024 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,4 +17,22 @@
 
 namespace traffic_simulator
 {
+auto TrafficLightMarkerPublisher::deleteMarkers() const -> void
+{
+  visualization_msgs::msg::MarkerArray marker_array;
+  visualization_msgs::msg::Marker marker;
+  marker.action = visualization_msgs::msg::Marker::DELETEALL;
+  marker_array.markers.push_back(marker);
+  publisher_->publish(marker_array);
+}
+
+auto TrafficLightMarkerPublisher::drawMarkers(
+  const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const -> void
+{
+  visualization_msgs::msg::MarkerArray marker_array;
+  for (const auto & [id, traffic_light] : traffic_lights_map) {
+    traffic_light.draw(marker_array.markers, clock_ptr_->now(), frame_);
+  }
+  publisher_->publish(marker_array);
+}
 }  // namespace traffic_simulator

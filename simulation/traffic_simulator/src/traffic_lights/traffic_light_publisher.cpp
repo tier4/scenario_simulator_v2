@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2024 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,57 +21,55 @@ namespace traffic_simulator
 template <>
 auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::publish(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
+  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
 {
-  autoware_auto_perception_msgs::msg::TrafficSignalArray message;
   using TrafficLightType = autoware_auto_perception_msgs::msg::TrafficSignal;
-  message.header.frame_id = "camera_link";  // DIRTY HACK!!!
-  message.header.stamp = current_ros_time;
+  using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
+
+  autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_lights_message;
+  traffic_lights_message.header.frame_id = "camera_link";  // DIRTY HACK!!!
+  traffic_lights_message.header.stamp = current_ros_time;
   for (const auto & traffic_light : request.states()) {
-    TrafficLightType traffic_light_message;
-    traffic_light_message.map_primitive_id = traffic_light.id();
-    for (auto bulb_status : traffic_light.traffic_light_status()) {
-      using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
+    // NOT skip if the traffic light has no bulbs
+    TrafficLightType single_traffic_light_message;
+    single_traffic_light_message.map_primitive_id = traffic_light.id();
+    for (const auto & bulb_status : traffic_light.traffic_light_status()) {
       TrafficLightBulbType light_bulb_message;
       simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
-      traffic_light_message.lights.push_back(light_bulb_message);
+      single_traffic_light_message.lights.push_back(light_bulb_message);
     }
-    message.signals.push_back(traffic_light_message);
+    traffic_lights_message.signals.push_back(single_traffic_light_message);
   }
-  traffic_light_state_array_publisher_->publish(message);
+  traffic_light_state_array_publisher_->publish(traffic_lights_message);
 }
 
 template <>
 auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::publish(
   const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
+  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
 {
-  assert(hdmap_utils_ != nullptr);
+  using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
+  using TrafficLightBulbType = TrafficLightType::_elements_type::value_type;
 
-  autoware_perception_msgs::msg::TrafficSignalArray message;
-  message.stamp = current_ros_time;
+  autoware_perception_msgs::msg::TrafficSignalArray traffic_lights_message;
+  traffic_lights_message.stamp = current_ros_time;
   for (const auto & traffic_light : request.states()) {
-    auto relation_ids =
+    const auto relation_ids =
       hdmap_utils_->getTrafficLightRegulatoryElementIDsFromTrafficLight(traffic_light.id());
-
-    for (auto relation_id : relation_ids) {
+    for (const auto & relation_id : relation_ids) {
       // skip if the traffic light has no bulbs
       if (not traffic_light.traffic_light_status().empty()) {
-        using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
-        TrafficLightType traffic_light_message;
-        traffic_light_message.traffic_signal_id = relation_id;
-
-        for (auto bulb_status : traffic_light.traffic_light_status()) {
-          using TrafficLightBulbType =
-            autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
+        TrafficLightType single_traffic_light_message;
+        single_traffic_light_message.traffic_signal_id = relation_id;
+        for (const auto & bulb_status : traffic_light.traffic_light_status()) {
           TrafficLightBulbType light_bulb_message;
           simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
-          traffic_light_message.elements.push_back(light_bulb_message);
+          single_traffic_light_message.elements.push_back(light_bulb_message);
         }
-        message.signals.push_back(traffic_light_message);
+        traffic_lights_message.signals.push_back(single_traffic_light_message);
       }
     }
   }
-  traffic_light_state_array_publisher_->publish(message);
+  traffic_light_state_array_publisher_->publish(traffic_lights_message);
 }
 }  // namespace traffic_simulator

@@ -44,23 +44,25 @@ public:
     publisher_ptr_(makePublisher(
       architecture_type, "/perception/traffic_light_recognition/external/traffic_signals", node_ptr,
       hdmap_utils)),
-    legacy_publisher_ptr_(
+    legacy_topic_publisher_ptr_(
       makePublisher(architecture_type, "/v2x/traffic_signals", node_ptr, hdmap_utils))
   {
   }
 
 private:
-  auto update() -> void
+  auto update() const -> void override
   {
     TrafficLightsBase::update();
     publisher_ptr_->publish(clock_ptr_->now(), generateUpdateTrafficLightsRequest());
-    legacy_publisher_ptr_->publish(clock_ptr_->now(), generateUpdateTrafficLightsRequest());
+    legacy_topic_publisher_ptr_->publish(clock_ptr_->now(), generateUpdateTrafficLightsRequest());
   }
 
   template <typename... Ts>
   auto makePublisher(const std::string & architecture_type, Ts &&... xs)
     -> std::unique_ptr<TrafficLightPublisherBase>
   {
+    /// here autoware_perception_msgs is used for all awf/universe/**.
+    /// @note perhaps autoware_auto_perception_msgs should be used for >= "awf/universe/20230906"?
     if (architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_unique<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
@@ -73,7 +75,7 @@ private:
   }
 
   const std::unique_ptr<TrafficLightPublisherBase> publisher_ptr_;
-  const std::unique_ptr<TrafficLightPublisherBase> legacy_publisher_ptr_;
+  const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
 };
 
 class TrafficLights
@@ -90,29 +92,15 @@ public:
   {
   }
 
-  auto isAnyTrafficLightChanged() -> bool
-  {
-    return conventional_traffic_lights_->isAnyTrafficLightChanged() or
-           v2i_traffic_lights_->isAnyTrafficLightChanged();
-  }
+  auto isAnyTrafficLightChanged() -> bool;
 
   auto startTrafficLightsUpdate(
     const double conventional_traffic_light_update_rate,
-    const double v2i_traffic_lights_update_rate)
-  {
-    conventional_traffic_lights_->startUpdate(conventional_traffic_light_update_rate);
-    v2i_traffic_lights_->startUpdate(v2i_traffic_lights_update_rate);
-  }
+    const double v2i_traffic_lights_update_rate) -> void;
 
-  auto getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>
-  {
-    return conventional_traffic_lights_;
-  }
+  auto getConventionalTrafficLights() const -> std::shared_ptr<ConventionalTrafficLights>;
 
-  auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>
-  {
-    return v2i_traffic_lights_;
-  }
+  auto getV2ITrafficLights() const -> std::shared_ptr<V2ITrafficLights>;
 
 private:
   const std::shared_ptr<ConventionalTrafficLights> conventional_traffic_lights_;
