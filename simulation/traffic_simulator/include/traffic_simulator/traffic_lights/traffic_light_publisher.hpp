@@ -23,6 +23,7 @@
 
 namespace traffic_simulator
 {
+
 class TrafficLightPublisherBase
 {
 public:
@@ -30,19 +31,15 @@ public:
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
 };
-
-template <typename Message>
+template <typename MessageType>
 class TrafficLightPublisher : public TrafficLightPublisherBase
 {
 public:
   template <typename NodeTypePointer>
-  explicit TrafficLightPublisher(
-    const std::string & topic_name, const NodeTypePointer & node,
-    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils = nullptr)
+  explicit TrafficLightPublisher(const NodeTypePointer & node, const std::string & topic_name)
   : TrafficLightPublisherBase(),
     traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<Message>(node, topic_name, rclcpp::QoS(10).transient_local())),
-    hdmap_utils_(hdmap_utils)
+      rclcpp::create_publisher<MessageType>(node, topic_name, rclcpp::QoS(10).transient_local()))
   {
   }
 
@@ -51,8 +48,7 @@ public:
     const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override;
 
 private:
-  const typename rclcpp::Publisher<Message>::SharedPtr traffic_light_state_array_publisher_;
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_;
+  const typename rclcpp::Publisher<MessageType>::SharedPtr traffic_light_state_array_publisher_;
 };
 }  // namespace traffic_simulator
 #endif  // TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_PUBLISHER_HPP_

@@ -324,6 +324,8 @@ struct TrafficLight
 
   const lanelet::Id way_id;
 
+  const lanelet::Ids regulatory_elements_ids;
+
   double confidence = 1.0;
 
   std::set<Bulb> bulbs;
@@ -390,6 +392,9 @@ struct TrafficLight
     simulation_api_schema::TrafficSignal traffic_signal_proto;
 
     traffic_signal_proto.set_id(way_id);
+    for (const auto relation_id : regulatory_elements_ids) {
+      traffic_signal_proto.add_relation_ids(relation_id);
+    }
     for (const auto & bulb : bulbs) {
       auto traffic_light_bulb_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
       traffic_light_bulb_proto.set_confidence(confidence);

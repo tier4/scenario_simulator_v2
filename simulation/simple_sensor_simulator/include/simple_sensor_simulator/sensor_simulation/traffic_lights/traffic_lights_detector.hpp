@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2024 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,12 +32,10 @@ namespace traffic_lights
  */
 class TrafficLightsDetector
 {
-  const std::shared_ptr<traffic_simulator::TrafficLightPublisherBase> publisher_;
-
 public:
-  explicit TrafficLightsDetector(
-    const std::shared_ptr<traffic_simulator::TrafficLightPublisherBase> & publisher)
-  : publisher_(publisher)
+  template <typename NodeType>
+  explicit TrafficLightsDetector(NodeType & node, const std::string & architecture_type)
+  : publisher_ptr_(makePublisher(node, architecture_type))
   {
   }
 
@@ -45,8 +43,33 @@ public:
     const rclcpp::Time & current_ros_time,
     const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
   {
-    publisher_->publish(current_ros_time, request);
+    publisher_ptr_->publish(current_ros_time, request);
   }
+
+private:
+  template <typename NodeType>
+  auto makePublisher(NodeType & node, const std::string & architecture_type)
+    -> std::unique_ptr<traffic_simulator::TrafficLightPublisherBase>
+  {
+    /*
+       V2ITrafficLights in TrafficSimulator publishes using topics "/v2x/traffic_signals" and
+       "/perception/traffic_light_recognition/external/traffic_signals" for all "awf/universe/..."
+    */
+    if (architecture_type == "awf/universe") {
+      using Message = autoware_auto_perception_msgs::msg::TrafficSignalArray;
+      return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
+        &node, "/perception/traffic_light_recognition/traffic_signals");
+    } else if (architecture_type >= "awf/universe/20230906") {
+      using Message = autoware_perception_msgs::msg::TrafficSignalArray;
+      return std::make_unique<traffic_simulator::TrafficLightPublisher<Message>>(
+        &node, "/perception/traffic_light_recognition/internal/traffic_signals");
+    } else {
+      throw common::SemanticError(
+        "Unexpected architecture_type ", std::quoted(architecture_type), " given.");
+    }
+  };
+
+  const std::unique_ptr<traffic_simulator::TrafficLightPublisherBase> publisher_ptr_;
 };
 }  // namespace traffic_lights
 }  // namespace simple_sensor_simulator

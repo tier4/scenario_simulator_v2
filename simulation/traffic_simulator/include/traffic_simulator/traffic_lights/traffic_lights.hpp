@@ -42,10 +42,9 @@ public:
     const std::string & architecture_type)
   : TrafficLightsBase(node_ptr, hdmap_utils),
     publisher_ptr_(makePublisher(
-      architecture_type, "/perception/traffic_light_recognition/external/traffic_signals", node_ptr,
-      hdmap_utils)),
-    legacy_topic_publisher_ptr_(
-      makePublisher(architecture_type, "/v2x/traffic_signals", node_ptr, hdmap_utils))
+      node_ptr, architecture_type,
+      "/perception/traffic_light_recognition/external/traffic_signals")),
+    legacy_topic_publisher_ptr_(makePublisher(node_ptr, architecture_type, "/v2x/traffic_signals"))
   {
   }
 
@@ -57,16 +56,23 @@ private:
     legacy_topic_publisher_ptr_->publish(clock_ptr_->now(), generateUpdateTrafficLightsRequest());
   }
 
-  template <typename... Ts>
-  auto makePublisher(const std::string & architecture_type, Ts &&... xs)
-    -> std::unique_ptr<TrafficLightPublisherBase>
+  template <typename NodeTypePointer>
+  auto makePublisher(
+    const NodeTypePointer & node_ptr, const std::string & architecture_type,
+    const std::string & topic_name) -> std::unique_ptr<TrafficLightPublisherBase>
   {
-    /// here autoware_perception_msgs is used for all awf/universe/**.
-    /// @note perhaps autoware_auto_perception_msgs should be used for >= "awf/universe/20230906"?
+    /*
+       Here autoware_perception_msgs is used for all awf/universe/....
+       Perhaps autoware_auto_perception_msgs should be used for >= "awf/universe/20230906"?
+       
+       PseudoTrafficLightsDetector in SimpleSensorSimulator publishes using topic
+       "/perception/traffic_light_recognition/traffic_signals" for >= "awf/universe/20230906"
+       otherwise uses "/perception/traffic_light_recognition/internal/traffic_signals".
+    */
     if (architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_unique<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
-        std::forward<decltype(xs)>(xs)...);
+        node_ptr, topic_name);
     } else {
       throw common::SemanticError(
         "Unexpected architecture_type ", std::quoted(architecture_type),

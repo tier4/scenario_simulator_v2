@@ -179,6 +179,7 @@ TrafficLight::TrafficLight(
       }
     }
   }()),
+  regulatory_elements_ids(hdmap_utils.getTrafficLightRegulatoryElementIDsFromTrafficLight(way_id)),
   positions{
     std::make_pair(
       Bulb(Color::green, Status::solid_on, Shape::circle).hash(),
