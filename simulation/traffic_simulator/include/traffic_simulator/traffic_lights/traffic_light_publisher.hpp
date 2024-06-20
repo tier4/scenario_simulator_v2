@@ -42,8 +42,8 @@ public:
   : TrafficLightsPublisherBase(),
     frame_(frame),
     clock_ptr_(node_ptr->get_clock()),
-    traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<MessageType>(node_ptr, topic_name, rclcpp::QoS(10).transient_local()))
+    traffic_light_state_array_publisher_(rclcpp::create_publisher<MessageType>(
+      node_ptr, topic_name, rclcpp::QoS(10).transient_local()))
   {
   }
 

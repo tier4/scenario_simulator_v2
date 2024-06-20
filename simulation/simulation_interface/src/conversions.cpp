@@ -603,6 +603,100 @@ auto toProto(
   toProto(std::get<1>(message), *proto.mutable_gear_command());
 }
 
+auto toProto(
+  const autoware_auto_perception_msgs::msg::TrafficLight & message,
+  simulation_api_schema::TrafficLight & proto) -> void
+{
+  auto color = [&]() {
+    switch (message.color) {
+      case autoware_auto_perception_msgs::msg::TrafficLight::GREEN:
+        return simulation_api_schema::TrafficLight_Color_GREEN;
+      case autoware_auto_perception_msgs::msg::TrafficLight::AMBER:
+        return simulation_api_schema::TrafficLight_Color_AMBER;
+      case autoware_auto_perception_msgs::msg::TrafficLight::RED:
+        return simulation_api_schema::TrafficLight_Color_RED;
+      case autoware_auto_perception_msgs::msg::TrafficLight::WHITE:
+        return simulation_api_schema::TrafficLight_Color_WHITE;
+      default:
+        return simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
+        //
+        //   throw THROW_SIMULATION_ERROR(message.color, " is not supported as a status.");
+    }
+  };
+
+  auto status = [&]() {
+    switch (message.status) {
+      case autoware_auto_perception_msgs::msg::TrafficLight::SOLID_ON:
+        return simulation_api_schema::TrafficLight_Status_SOLID_ON;
+      case autoware_auto_perception_msgs::msg::TrafficLight::SOLID_OFF:
+        return simulation_api_schema::TrafficLight_Status_SOLID_OFF;
+      case autoware_auto_perception_msgs::msg::TrafficLight::FLASHING:
+        return simulation_api_schema::TrafficLight_Status_FLASHING;
+      default:
+        return simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
+        // default:
+        //   throw THROW_SIMULATION_ERROR(message.status, " is not supported as a status.");
+    }
+  };
+
+  auto shape = [&]() {
+    switch (message.shape) {
+      case autoware_auto_perception_msgs::msg::TrafficLight::CIRCLE:
+        return simulation_api_schema::TrafficLight_Shape_CIRCLE;
+      case autoware_auto_perception_msgs::msg::TrafficLight::CROSS:
+        return simulation_api_schema::TrafficLight_Shape_CROSS;
+      case autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW:
+        return simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
+      case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW:
+        return simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
+      case autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW:
+        return simulation_api_schema::TrafficLight_Shape_UP_ARROW;
+      case autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW:
+        return simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
+      case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_LEFT_ARROW:
+        return simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
+      case autoware_auto_perception_msgs::msg::TrafficLight::DOWN_RIGHT_ARROW:
+        return simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
+      case autoware_auto_perception_msgs::msg::TrafficLight::UP_LEFT_ARROW:
+        return simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
+      case autoware_auto_perception_msgs::msg::TrafficLight::UP_RIGHT_ARROW:
+        return simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
+      default:
+        return simulation_api_schema::TrafficLight_Shape_UNKNOWN_SHAPE;
+    }
+  };
+
+  proto.set_status(status());
+  proto.set_shape(shape());
+  proto.set_color(color());
+  proto.set_confidence(message.confidence);
+}
+
+auto toProto(
+  const autoware_auto_perception_msgs::msg::TrafficSignal & message,
+  simulation_api_schema::TrafficSignal & proto) -> void
+{
+  // here is a lack of information in autoware_auto_perception_msgs::msg
+  // to complete relation_ids it in simulation_api_schema::TrafficSignal
+  proto.set_id(message.map_primitive_id);
+  for (const auto & traffic_light : message.lights) {
+    simulation_api_schema::TrafficLight traffic_light_proto;
+    toProto(traffic_light, traffic_light_proto);
+    *proto.add_traffic_light_status() = traffic_light_proto;
+  }
+}
+
+auto toProto(
+  const autoware_auto_perception_msgs::msg::TrafficSignalArray & message,
+  simulation_api_schema::UpdateTrafficLightsRequest & proto) -> void
+{
+  for (const auto & traffic_signal : message.signals) {
+    simulation_api_schema::TrafficSignal traffic_signal_proto;
+    toProto(traffic_signal, traffic_signal_proto);
+    *proto.add_states() = traffic_signal_proto;
+  }
+}
+
 auto toProtobufMessage(const traffic_simulator_msgs::msg::Vertex & message)
   -> traffic_simulator_msgs::Vertex
 {

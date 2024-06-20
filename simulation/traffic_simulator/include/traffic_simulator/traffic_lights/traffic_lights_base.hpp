@@ -67,6 +67,9 @@ public:
 
   auto getTrafficLightsComposedState(const lanelet::Id lanelet_id) -> std::string;
 
+  // simulation_api_schema should not occur here, but it is necessary to transfer
+  // "relation_ids" in proto - which is not needed when autoware_auto_perception_msgs::msg::TrafficSignal is used
+  // it will be removed when autoware_perception_msgs::msg::TrafficSignal is no longer supported
   auto generateUpdateTrafficLightsRequest() const
     -> simulation_api_schema::UpdateTrafficLightsRequest;
 

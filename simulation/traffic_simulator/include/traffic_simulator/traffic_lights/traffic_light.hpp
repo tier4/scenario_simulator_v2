@@ -253,6 +253,7 @@ struct TrafficLight
 
     friend auto operator<<(std::ostream & os, const Bulb & bulb) -> std::ostream &;
 
+    // it will be removed when autoware_perception_msgs::msg::TrafficSignal is no longer supported
     explicit operator simulation_api_schema::TrafficLight() const
     {
       auto color = [this]() {
@@ -388,6 +389,7 @@ struct TrafficLight
       return msg;
     }
 
+    // it will be removed when autoware_perception_msgs::msg::TrafficSignal is no longer supported
     explicit operator autoware_perception_msgs::msg::TrafficSignalElement() const
     {
       auto color = [this]() {
@@ -522,6 +524,9 @@ struct TrafficLight
 
   friend auto operator<<(std::ostream & os, const TrafficLight & traffic_light) -> std::ostream &;
 
+  // simulation_api_schema should not occur here, but it is necessary to transfer
+  // "relation_ids" in proto - which is not needed when autoware_auto_perception_msgs::msg::TrafficSignal is used
+  // it will be removed when autoware_perception_msgs::msg::TrafficSignal is no longer supported
   explicit operator simulation_api_schema::TrafficSignal() const
   {
     simulation_api_schema::TrafficSignal traffic_signal_proto;
@@ -550,6 +555,7 @@ struct TrafficLight
     return traffic_signal;
   }
 
+  // it will be removed when autoware_perception_msgs::msg::TrafficSignal is no longer supported
   explicit operator std::vector<autoware_perception_msgs::msg::TrafficSignal>() const
   {
     // skip if the traffic light has no bulbs

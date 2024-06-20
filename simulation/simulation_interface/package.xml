@@ -12,6 +12,7 @@
 
   <depend>autoware_auto_control_msgs</depend>
   <depend>autoware_auto_vehicle_msgs</depend>
+  <depend>autoware_auto_perception_msgs</depend>
   <depend>boost</depend>
   <depend>builtin_interfaces</depend>
   <depend>geometry_msgs</depend>
