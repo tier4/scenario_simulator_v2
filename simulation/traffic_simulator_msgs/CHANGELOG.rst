@@ -13,6 +13,18 @@ Changelog for package openscenario_msgs
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.7 (2024-06-19)
+------------------
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Contributors: Masaya Kataoka, Mateusz Palczuk
+
+2.1.6 (2024-06-18)
+------------------
+
+2.1.5 (2024-06-18)
+------------------
+
 2.1.4 (2024-06-14)
 ------------------
 * Merge branch 'master' into fix/remove_quaternion_operation

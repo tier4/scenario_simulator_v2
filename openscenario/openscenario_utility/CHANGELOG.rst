@@ -16,6 +16,18 @@ Changelog for package openscenario_utility
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
+2.1.7 (2024-06-19)
+------------------
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Contributors: Masaya Kataoka, Mateusz Palczuk
+
+2.1.6 (2024-06-18)
+------------------
+
+2.1.5 (2024-06-18)
+------------------
+
 2.1.4 (2024-06-14)
 ------------------
 * Merge branch 'master' into fix/remove_quaternion_operation
