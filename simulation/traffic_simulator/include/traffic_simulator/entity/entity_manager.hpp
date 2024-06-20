@@ -40,9 +40,9 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic/traffic_sink.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights_marker_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights_publisher.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>

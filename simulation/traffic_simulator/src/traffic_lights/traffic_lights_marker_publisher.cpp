@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights_marker_publisher.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {
-auto TrafficLightMarkerPublisher::deleteMarkers() const -> void
+auto TrafficLightsMarkerPublisher::deleteMarkers() const -> void
 {
   visualization_msgs::msg::MarkerArray marker_array;
   visualization_msgs::msg::Marker marker;
@@ -26,7 +26,7 @@ auto TrafficLightMarkerPublisher::deleteMarkers() const -> void
   publisher_->publish(marker_array);
 }
 
-auto TrafficLightMarkerPublisher::drawMarkers(
+auto TrafficLightsMarkerPublisher::drawMarkers(
   const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const -> void
 {
   visualization_msgs::msg::MarkerArray marker_array;

@@ -21,7 +21,7 @@
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
-#include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights_marker_publisher.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -42,7 +42,7 @@ public:
   : hdmap_utils_(hdmap_utils),
     clock_ptr_(node_ptr->get_clock()),
     rate_updater_(node_ptr, [this]() { update(); }),
-    marker_publisher_ptr_(std::make_unique<TrafficLightMarkerPublisher>(node_ptr))
+    marker_publisher_ptr_(std::make_unique<TrafficLightsMarkerPublisher>(node_ptr))
   {
   }
 
@@ -89,7 +89,7 @@ protected:
   const rclcpp::Clock::SharedPtr clock_ptr_;
 
   std::unordered_map<lanelet::Id, TrafficLight> traffic_lights_map_;
-  const std::unique_ptr<TrafficLightMarkerPublisher> marker_publisher_ptr_;
+  const std::unique_ptr<TrafficLightsMarkerPublisher> marker_publisher_ptr_;
   ConfigurableRateUpdater rate_updater_;
 };
 }  // namespace traffic_simulator
