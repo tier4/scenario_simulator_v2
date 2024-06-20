@@ -15,6 +15,9 @@
 #ifndef TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 #define TRAFFIC_SIMULATOR__TRAFFIC_LIGHTS__TRAFFIC_LIGHT_HPP_
 
+#include <autoware_auto_perception_msgs/msg/traffic_light.hpp>
+#include <autoware_auto_perception_msgs/msg/traffic_signal.hpp>
+#include <autoware_perception_msgs/msg/traffic_signal.hpp>
 #include <color_names/color_names.hpp>
 #include <cstdint>
 #include <geometry_msgs/msg/point.hpp>
@@ -318,6 +321,138 @@ struct TrafficLight
 
       return traffic_light_bulb_proto;
     }
+
+    explicit operator autoware_auto_perception_msgs::msg::TrafficLight() const
+    {
+      auto color = [this]() {
+        switch (std::get<Color>(value).value) {
+          case Color::green:
+            return autoware_auto_perception_msgs::msg::TrafficLight::GREEN;
+          case Color::yellow:
+            return autoware_auto_perception_msgs::msg::TrafficLight::AMBER;
+          case Color::red:
+            return autoware_auto_perception_msgs::msg::TrafficLight::RED;
+          case Color::white:
+            return autoware_auto_perception_msgs::msg::TrafficLight::WHITE;
+          default:
+            return autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN;
+        }
+      };
+
+      auto status = [this]() {
+        switch (std::get<Status>(value).value) {
+          case Status::solid_on:
+            return autoware_auto_perception_msgs::msg::TrafficLight::SOLID_ON;
+          case Status::solid_off:
+            return autoware_auto_perception_msgs::msg::TrafficLight::SOLID_OFF;
+          case Status::flashing:
+            return autoware_auto_perception_msgs::msg::TrafficLight::FLASHING;
+          default:
+            return autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN;
+        }
+      };
+
+      auto shape = [this]() {
+        switch (std::get<Shape>(value).value) {
+          case Shape::circle:
+            return autoware_auto_perception_msgs::msg::TrafficLight::CIRCLE;
+          case Shape::cross:
+            return autoware_auto_perception_msgs::msg::TrafficLight::CROSS;
+          case Shape::left:
+            return autoware_auto_perception_msgs::msg::TrafficLight::LEFT_ARROW;
+          case Shape::down:
+            return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_ARROW;
+          case Shape::up:
+            return autoware_auto_perception_msgs::msg::TrafficLight::UP_ARROW;
+          case Shape::right:
+            return autoware_auto_perception_msgs::msg::TrafficLight::RIGHT_ARROW;
+          case Shape::lower_left:
+            return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_LEFT_ARROW;
+          case Shape::lower_right:
+            return autoware_auto_perception_msgs::msg::TrafficLight::DOWN_RIGHT_ARROW;
+          case Shape::upper_left:
+            return autoware_auto_perception_msgs::msg::TrafficLight::UP_LEFT_ARROW;
+          case Shape::upper_right:
+            return autoware_auto_perception_msgs::msg::TrafficLight::UP_RIGHT_ARROW;
+          default:
+            return autoware_auto_perception_msgs::msg::TrafficLight::UNKNOWN;
+        };
+      };
+
+      autoware_auto_perception_msgs::msg::TrafficLight msg;
+      msg.color = color();
+      msg.status = status();
+      msg.shape = shape();
+      // NOTE: confidence will be overwritten
+      msg.confidence = 1.0;
+      return msg;
+    }
+
+    explicit operator autoware_perception_msgs::msg::TrafficSignalElement() const
+    {
+      auto color = [this]() {
+        switch (std::get<Color>(value).value) {
+          case Color::green:
+            return autoware_perception_msgs::msg::TrafficSignalElement::GREEN;
+          case Color::yellow:
+            return autoware_perception_msgs::msg::TrafficSignalElement::AMBER;
+          case Color::red:
+            return autoware_perception_msgs::msg::TrafficSignalElement::RED;
+          case Color::white:
+            return autoware_perception_msgs::msg::TrafficSignalElement::WHITE;
+          default:
+            throw common::SyntaxError(std::get<Color>(value), " is not supported color.");
+        }
+      };
+
+      auto status = [this]() {
+        switch (std::get<Status>(value).value) {
+          case Status::solid_on:
+            return autoware_perception_msgs::msg::TrafficSignalElement::SOLID_ON;
+          case Status::solid_off:
+            return autoware_perception_msgs::msg::TrafficSignalElement::SOLID_OFF;
+          case Status::flashing:
+            return autoware_perception_msgs::msg::TrafficSignalElement::FLASHING;
+          default:
+            throw common::SyntaxError(std::get<Status>(value), " is not supported color.");
+        }
+      };
+
+      auto shape = [this]() {
+        switch (std::get<Shape>(value).value) {
+          case Shape::circle:
+            return autoware_perception_msgs::msg::TrafficSignalElement::CIRCLE;
+          case Shape::cross:
+            return autoware_perception_msgs::msg::TrafficSignalElement::CROSS;
+          case Shape::left:
+            return autoware_perception_msgs::msg::TrafficSignalElement::LEFT_ARROW;
+          case Shape::down:
+            return autoware_perception_msgs::msg::TrafficSignalElement::DOWN_ARROW;
+          case Shape::up:
+            return autoware_perception_msgs::msg::TrafficSignalElement::UP_ARROW;
+          case Shape::right:
+            return autoware_perception_msgs::msg::TrafficSignalElement::RIGHT_ARROW;
+          case Shape::lower_left:
+            return autoware_perception_msgs::msg::TrafficSignalElement::DOWN_LEFT_ARROW;
+          case Shape::lower_right:
+            return autoware_perception_msgs::msg::TrafficSignalElement::DOWN_RIGHT_ARROW;
+          case Shape::upper_left:
+            return autoware_perception_msgs::msg::TrafficSignalElement::UP_LEFT_ARROW;
+          case Shape::upper_right:
+            return autoware_perception_msgs::msg::TrafficSignalElement::UP_RIGHT_ARROW;
+          default:
+            throw common::SyntaxError(std::get<Shape>(value), " is not supported color.");
+        };
+      };
+
+      autoware_perception_msgs::msg::TrafficSignalElement msg;
+      msg.color = color();
+      msg.status = status();
+      msg.shape = shape();
+      // NOTE: confidence will be overwritten
+      msg.confidence = 1.0;
+      return msg;
+    }
   };
 
   explicit TrafficLight(const lanelet::Id, const hdmap_utils::HdMapUtils &);
@@ -401,6 +536,38 @@ struct TrafficLight
       *traffic_signal_proto.add_traffic_light_status() = traffic_light_bulb_proto;
     }
     return traffic_signal_proto;
+  }
+
+  explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const
+  {
+    autoware_auto_perception_msgs::msg::TrafficSignal traffic_signal;
+    traffic_signal.map_primitive_id = way_id;
+    for (const auto & bulb : bulbs) {
+      auto traffic_light_bulb = static_cast<autoware_auto_perception_msgs::msg::TrafficLight>(bulb);
+      traffic_light_bulb.confidence = confidence;
+      traffic_signal.lights.push_back(traffic_light_bulb);
+    }
+    return traffic_signal;
+  }
+
+  explicit operator std::vector<autoware_perception_msgs::msg::TrafficSignal>() const
+  {
+    // skip if the traffic light has no bulbs
+    if (bulbs.empty()) {
+      return {};
+    } else {
+      std::vector<autoware_perception_msgs::msg::TrafficSignal> traffic_signals;
+      for (const auto & regulatory_element : regulatory_elements_ids) {
+        autoware_perception_msgs::msg::TrafficSignal traffic_signal;
+        traffic_signal.traffic_signal_id = regulatory_element;
+        for (const auto & bulb : bulbs) {
+          traffic_signal.elements.push_back(
+            static_cast<autoware_perception_msgs::msg::TrafficSignalElement>(bulb));
+          traffic_signals.push_back(traffic_signal);
+        }
+      }
+      return traffic_signals;
+    }
   }
 };
 }  // namespace traffic_simulator
