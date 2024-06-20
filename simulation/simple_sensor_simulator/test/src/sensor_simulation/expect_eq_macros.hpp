@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 
 #include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose.hpp>
 #include <geometry_msgs/msg/vector3.hpp>
 
 #define EXPECT_POINT_EQ(DATA0, DATA1) \
@@ -64,5 +65,10 @@
   EXPECT_FLOAT_EQ(VERTEX.x, POINT.x);             \
   EXPECT_FLOAT_EQ(VERTEX.y, POINT.y);             \
   EXPECT_FLOAT_EQ(VERTEX.z, POINT.z);
+
+#define EXPECT_POSITION_NEAR(POSITION0, POSITION1, TOLERANCE) \
+  EXPECT_NEAR(POSITION0.x, POSITION1.x, TOLERANCE);           \
+  EXPECT_NEAR(POSITION0.y, POSITION1.y, TOLERANCE);           \
+  EXPECT_NEAR(POSITION0.z, POSITION1.z, TOLERANCE);
 
 #endif  // SIMPLE_SENSOR_SIMULATOR__TEST__UTILS__EXPECT_EQ_MACROS_HPP_

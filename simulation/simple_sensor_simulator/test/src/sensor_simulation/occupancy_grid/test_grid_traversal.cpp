@@ -41,7 +41,7 @@ TEST_F(GridTraversalTest, end)
 }
 
 /**
- * @note Test basic functionality. Test iterator dereferencing correcntess with a sample iterator.
+ * @note Test basic functionality. Test iterator dereferencing correctness with a sample iterator.
  */
 TEST_F(GridTraversalTest, iterator_operator_dereference)
 {

@@ -1,0 +1,2 @@
+ament_add_gtest(test_detection_sensor_base test_detection_sensor_base.cpp)
+target_link_libraries(test_detection_sensor_base simple_sensor_simulator_component ${Protobuf_LIBRARIES})
