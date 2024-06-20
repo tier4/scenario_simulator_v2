@@ -31,6 +31,15 @@ public:
   : TrafficLightsBase(node_ptr, hdmap_utils)
   {
   }
+
+private:
+  auto update() const -> void
+  {
+    if (isAnyTrafficLightChanged()) {
+      marker_publisher_ptr_->deleteMarkers();
+    }
+    marker_publisher_ptr_->drawMarkers(traffic_lights_map_);
+  }
 };
 
 class V2ITrafficLights : public TrafficLightsBase
@@ -51,15 +60,18 @@ public:
 private:
   auto update() const -> void override
   {
-    TrafficLightsBase::update();
-    publisher_ptr_->publish(clock_ptr_->now(), generateUpdateTrafficLightsRequest());
-    legacy_topic_publisher_ptr_->publish(clock_ptr_->now(), generateUpdateTrafficLightsRequest());
+    publisher_ptr_->publish(traffic_lights_map_);
+    legacy_topic_publisher_ptr_->publish(traffic_lights_map_);
+    if (isAnyTrafficLightChanged()) {
+      marker_publisher_ptr_->deleteMarkers();
+    }
+    marker_publisher_ptr_->drawMarkers(traffic_lights_map_);
   }
 
   template <typename NodeTypePointer>
   auto makePublisher(
     const NodeTypePointer & node_ptr, const std::string & architecture_type,
-    const std::string & topic_name) -> std::unique_ptr<TrafficLightPublisherBase>
+    const std::string & topic_name) -> std::unique_ptr<TrafficLightsPublisherBase>
   {
     /*
        Here autoware_perception_msgs is used for all awf/universe/....
@@ -71,7 +83,7 @@ private:
     */
     if (architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_unique<
-        TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
+        TrafficLightsPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
         node_ptr, topic_name);
     } else {
       throw common::SemanticError(
@@ -80,8 +92,8 @@ private:
     }
   }
 
-  const std::unique_ptr<TrafficLightPublisherBase> publisher_ptr_;
-  const std::unique_ptr<TrafficLightPublisherBase> legacy_topic_publisher_ptr_;
+  const std::unique_ptr<TrafficLightsPublisherBase> publisher_ptr_;
+  const std::unique_ptr<TrafficLightsPublisherBase> legacy_topic_publisher_ptr_;
 };
 
 class TrafficLights

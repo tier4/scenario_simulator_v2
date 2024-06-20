@@ -20,34 +20,39 @@
 #include <simulation_interface/conversions.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
+#include <traffic_simulator/traffic_lights/traffic_light.hpp>
 
 namespace traffic_simulator
 {
-
-class TrafficLightPublisherBase
+class TrafficLightsPublisherBase
 {
 public:
   virtual auto publish(
-    const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void = 0;
+    const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const -> void = 0;
 };
+
 template <typename MessageType>
-class TrafficLightPublisher : public TrafficLightPublisherBase
+class TrafficLightsPublisher : public TrafficLightsPublisherBase
 {
 public:
   template <typename NodeTypePointer>
-  explicit TrafficLightPublisher(const NodeTypePointer & node, const std::string & topic_name)
-  : TrafficLightPublisherBase(),
+  explicit TrafficLightsPublisher(
+    const NodeTypePointer & node_ptr, const std::string & topic_name,
+    const std::string & frame = "camera_link")
+  : TrafficLightsPublisherBase(),
+    frame_(frame),
+    clock_ptr_(node_ptr->get_clock()),
     traffic_light_state_array_publisher_(
-      rclcpp::create_publisher<MessageType>(node, topic_name, rclcpp::QoS(10).transient_local()))
+      rclcpp::create_publisher<MessageType>(node_ptr, topic_name, rclcpp::QoS(10).transient_local()))
   {
   }
 
-  auto publish(
-    const rclcpp::Time & current_ros_time,
-    const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void override;
+  auto publish(const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const
+    -> void override;
 
 private:
+  const std::string frame_;
+  const rclcpp::Clock::SharedPtr clock_ptr_;
   const typename rclcpp::Publisher<MessageType>::SharedPtr traffic_light_state_array_publisher_;
 };
 }  // namespace traffic_simulator

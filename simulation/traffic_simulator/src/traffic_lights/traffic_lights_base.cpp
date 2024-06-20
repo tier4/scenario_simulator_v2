@@ -105,14 +105,6 @@ auto TrafficLightsBase::generateUpdateTrafficLightsRequest() const
 }
 
 // private
-auto TrafficLightsBase::update() const -> void
-{
-  if (isAnyTrafficLightChanged()) {
-    marker_publisher_ptr_->deleteMarkers();
-  }
-  marker_publisher_ptr_->drawMarkers(traffic_lights_map_);
-}
-
 auto TrafficLightsBase::isTrafficLightAdded(const lanelet::Id traffic_light_id) const -> bool
 {
   return traffic_lights_map_.find(traffic_light_id) != traffic_lights_map_.end();

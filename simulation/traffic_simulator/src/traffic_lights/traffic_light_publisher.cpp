@@ -19,54 +19,37 @@
 namespace traffic_simulator
 {
 template <>
-auto TrafficLightPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::publish(
-  const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
+auto TrafficLightsPublisher<autoware_auto_perception_msgs::msg::TrafficSignalArray>::publish(
+  const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const -> void
 {
-  using TrafficLightType = autoware_auto_perception_msgs::msg::TrafficSignal;
-  using TrafficLightBulbType = TrafficLightType::_lights_type::value_type;
-
   autoware_auto_perception_msgs::msg::TrafficSignalArray traffic_lights_message;
-  traffic_lights_message.header.frame_id = "camera_link";  // DIRTY HACK!!!
-  traffic_lights_message.header.stamp = current_ros_time;
-  for (const auto & traffic_light : request.states()) {
-    // NOT skip if the traffic light has no bulbs
-    TrafficLightType single_traffic_light_message;
-    single_traffic_light_message.map_primitive_id = traffic_light.id();
-    for (const auto & bulb_status : traffic_light.traffic_light_status()) {
-      TrafficLightBulbType light_bulb_message;
-      simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
-      single_traffic_light_message.lights.push_back(light_bulb_message);
-    }
-    traffic_lights_message.signals.push_back(single_traffic_light_message);
+  traffic_lights_message.header.frame_id = frame_;
+  traffic_lights_message.header.stamp = clock_ptr_->now();
+  for (const auto & [id, traffic_light] : traffic_lights_map) {
+    traffic_lights_message.signals.push_back(
+      static_cast<autoware_auto_perception_msgs::msg::TrafficSignal>(traffic_light));
   }
   traffic_light_state_array_publisher_->publish(traffic_lights_message);
 }
 
 template <>
-auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::publish(
-  const rclcpp::Time & current_ros_time,
-  const simulation_api_schema::UpdateTrafficLightsRequest & request) const -> void
+auto TrafficLightsPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::publish(
+  const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const -> void
 {
-  using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
-  using TrafficLightBulbType = TrafficLightType::_elements_type::value_type;
-
   autoware_perception_msgs::msg::TrafficSignalArray traffic_lights_message;
-  traffic_lights_message.stamp = current_ros_time;
-  for (const auto & traffic_light : request.states()) {
-    for (const auto & relation_id : traffic_light.relation_ids()) {
-      // skip if the traffic light has no bulbs
-      if (not traffic_light.traffic_light_status().empty()) {
-        TrafficLightType single_traffic_light_message;
-        single_traffic_light_message.traffic_signal_id = relation_id;
-        for (const auto & bulb_status : traffic_light.traffic_light_status()) {
-          TrafficLightBulbType light_bulb_message;
-          simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
-          single_traffic_light_message.elements.push_back(light_bulb_message);
-        }
-        traffic_lights_message.signals.push_back(single_traffic_light_message);
-      }
-    }
+  traffic_lights_message.stamp = clock_ptr_->now();
+
+  size_t total_number_of_signals{0};
+  for (const auto & [id, traffic_light] : traffic_lights_map) {
+    total_number_of_signals += traffic_light.regulatory_elements_ids.size();
+  }
+  traffic_lights_message.signals.reserve(total_number_of_signals);
+
+  for (const auto & [id, traffic_light] : traffic_lights_map) {
+    const auto traffic_signals =
+      static_cast<std::vector<autoware_perception_msgs::msg::TrafficSignal>>(traffic_light);
+    traffic_lights_message.signals.insert(
+      traffic_lights_message.signals.end(), traffic_signals.begin(), traffic_signals.end());
   }
   traffic_light_state_array_publisher_->publish(traffic_lights_message);
 }

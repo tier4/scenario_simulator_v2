@@ -71,7 +71,7 @@ public:
     -> simulation_api_schema::UpdateTrafficLightsRequest;
 
 protected:
-  virtual auto update() const -> void;
+  virtual auto update() const -> void = 0;
 
   auto isTrafficLightAdded(const lanelet::Id traffic_light_id) const -> bool;
 
