@@ -195,9 +195,6 @@ auto ActionNode::getDistanceToTrafficLightStopLine(
       !traffic_light_ids.empty()) {
     std::set<double> collision_points = {};
     for (const auto traffic_light_id : traffic_light_ids) {
-      using Color = traffic_simulator::TrafficLight::Color;
-      using Status = traffic_simulator::TrafficLight::Status;
-      using Shape = traffic_simulator::TrafficLight::Shape;
       if (traffic_lights->isRequiredStopTrafficLightState(traffic_light_id)) {
         if (
           const auto collision_point =
