@@ -619,8 +619,6 @@ auto toProto(
         return simulation_api_schema::TrafficLight_Color_WHITE;
       default:
         return simulation_api_schema::TrafficLight_Color_UNKNOWN_COLOR;
-        //
-        //   throw THROW_SIMULATION_ERROR(message.color, " is not supported as a status.");
     }
   };
 
@@ -634,8 +632,6 @@ auto toProto(
         return simulation_api_schema::TrafficLight_Status_FLASHING;
       default:
         return simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
-        // default:
-        //   throw THROW_SIMULATION_ERROR(message.status, " is not supported as a status.");
     }
   };
 
