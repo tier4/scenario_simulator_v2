@@ -677,7 +677,7 @@ auto toProto(
   simulation_api_schema::TrafficSignal & proto) -> void
 {
   // here is a lack of information in autoware_auto_perception_msgs::msg
-  // to complete relation_ids it in simulation_api_schema::TrafficSignal
+  // to complete relation_ids in simulation_api_schema::TrafficSignal
   proto.set_id(message.map_primitive_id);
   for (const auto & traffic_light : message.lights) {
     simulation_api_schema::TrafficLight traffic_light_proto;

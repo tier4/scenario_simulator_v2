@@ -60,8 +60,8 @@ public:
 private:
   auto update() const -> void override
   {
-    publisher_ptr_->publish(traffic_lights_map_);
-    legacy_topic_publisher_ptr_->publish(traffic_lights_map_);
+    publisher_ptr_->publish(*this);
+    legacy_topic_publisher_ptr_->publish(*this);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }

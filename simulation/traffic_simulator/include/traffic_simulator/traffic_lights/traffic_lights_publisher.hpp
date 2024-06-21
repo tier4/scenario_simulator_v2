@@ -17,18 +17,17 @@
 
 #include <memory>
 #include <rclcpp/rclcpp.hpp>
-#include <simulation_interface/conversions.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
+#include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
 namespace traffic_simulator
 {
 class TrafficLightsPublisherBase
 {
 public:
-  virtual auto publish(
-    const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const -> void = 0;
+  virtual auto publish(const TrafficLightsBase & traffic_lights) const -> void = 0;
 };
 
 template <typename MessageType>
@@ -47,8 +46,7 @@ public:
   {
   }
 
-  auto publish(const std::unordered_map<lanelet::Id, TrafficLight> & traffic_lights_map) const
-    -> void override;
+  auto publish(const TrafficLightsBase & traffic_lights) const -> void override;
 
 private:
   const std::string frame_;

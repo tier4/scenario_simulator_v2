@@ -24,6 +24,7 @@
 #include <queue>
 #include <scenario_simulator_exception/exception.hpp>
 #include <sstream>
+#include <std_msgs/msg/header.hpp>
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>

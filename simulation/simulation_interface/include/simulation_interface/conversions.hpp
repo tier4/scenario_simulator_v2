@@ -188,17 +188,14 @@ auto toProto(
     autoware_auto_vehicle_msgs::msg::GearCommand> &,
   traffic_simulator_msgs::VehicleCommand &) -> void;
 
-// now unused since autoware_perception_msgs::msg::TrafficSignal is still supported
 auto toProto(
   const autoware_auto_perception_msgs::msg::TrafficLight & message,
   simulation_api_schema::TrafficLight & proto) -> void;
 
-// now unused since autoware_perception_msgs::msg::TrafficSignal is still supported
 auto toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignal & message,
   simulation_api_schema::TrafficSignal & proto) -> void;
 
-// now unused since autoware_perception_msgs::msg::TrafficSignal is still supported
 auto toProto(
   const autoware_auto_perception_msgs::msg::TrafficSignalArray & message,
   simulation_api_schema::UpdateTrafficLightsRequest & proto) -> void;

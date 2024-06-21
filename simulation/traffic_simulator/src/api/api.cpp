@@ -270,9 +270,21 @@ bool API::updateTimeInSim()
 bool API::updateTrafficLightsInSim()
 {
   if (traffic_lights_ptr_->isAnyTrafficLightChanged()) {
-    auto req =
-      traffic_lights_ptr_->getConventionalTrafficLights()->generateUpdateTrafficLightsRequest();
-    return zeromq_client_.call(req).result().success();
+    simulation_api_schema::UpdateTrafficLightsRequest request;
+    const auto traffic_lights_msg =
+      traffic_lights_ptr_->getConventionalTrafficLights()->generateAutowareAutoPerceptionMsg();
+    simulation_interface::toProto(traffic_lights_msg, request);
+    // here is a lack of information in autoware_auto_perception_msgs::msg
+    // to complete the relation_ids, so complete it manually here
+    for (auto & traffic_signal : *request.mutable_states()) {
+      const auto relation_ids =
+        entity_manager_ptr_->getHdmapUtils()->getTrafficLightRegulatoryElementIDsFromTrafficLight(
+          traffic_signal.id());
+      for (const auto & relation_id : relation_ids) {
+        traffic_signal.add_relation_ids(relation_id);
+      }
+    }
+    return zeromq_client_.call(request).result().success();
   }
   /// @todo handle response
   return simulation_api_schema::UpdateTrafficLightsResponse().result().success();

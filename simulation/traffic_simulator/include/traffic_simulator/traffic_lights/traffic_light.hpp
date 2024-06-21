@@ -28,7 +28,6 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <set>
-#include <simulation_interface/conversions.hpp>
 #include <stdexcept>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <tuple>
@@ -253,76 +252,6 @@ struct TrafficLight
 
     friend auto operator<<(std::ostream & os, const Bulb & bulb) -> std::ostream &;
 
-    // it will be removed when autoware_perception_msgs::msg::TrafficSignal is no longer supported
-    explicit operator simulation_api_schema::TrafficLight() const
-    {
-      auto color = [this]() {
-        switch (std::get<Color>(value).value) {
-          case Color::green:
-            return simulation_api_schema::TrafficLight_Color_GREEN;
-          case Color::yellow:
-            return simulation_api_schema::TrafficLight_Color_AMBER;
-          case Color::red:
-            return simulation_api_schema::TrafficLight_Color_RED;
-          case Color::white:
-            return simulation_api_schema::TrafficLight_Color_WHITE;
-          default:
-            throw common::SyntaxError(std::get<Color>(value), " is not supported color.");
-        }
-      };
-
-      auto status = [this]() {
-        switch (std::get<Status>(value).value) {
-          case Status::solid_on:
-            return simulation_api_schema::TrafficLight_Status_SOLID_ON;
-          case Status::solid_off:
-            return simulation_api_schema::TrafficLight_Status_SOLID_OFF;
-          case Status::flashing:
-            return simulation_api_schema::TrafficLight_Status_FLASHING;
-          case Status::unknown:
-            return simulation_api_schema::TrafficLight_Status_UNKNOWN_STATUS;
-          default:
-            throw common::SyntaxError(std::get<Status>(value), " is not supported as a status.");
-        }
-      };
-
-      auto shape = [this]() {
-        switch (std::get<Shape>(value).value) {
-          case Shape::circle:
-            return simulation_api_schema::TrafficLight_Shape_CIRCLE;
-          case Shape::cross:
-            return simulation_api_schema::TrafficLight_Shape_CROSS;
-          case Shape::left:
-            return simulation_api_schema::TrafficLight_Shape_LEFT_ARROW;
-          case Shape::down:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_ARROW;
-          case Shape::up:
-            return simulation_api_schema::TrafficLight_Shape_UP_ARROW;
-          case Shape::right:
-            return simulation_api_schema::TrafficLight_Shape_RIGHT_ARROW;
-          case Shape::lower_left:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_LEFT_ARROW;
-          case Shape::lower_right:
-            return simulation_api_schema::TrafficLight_Shape_DOWN_RIGHT_ARROW;
-          case Shape::upper_left:
-            return simulation_api_schema::TrafficLight_Shape_UP_LEFT_ARROW;
-          case Shape::upper_right:
-            return simulation_api_schema::TrafficLight_Shape_UP_RIGHT_ARROW;
-          default:
-            throw common::SyntaxError(std::get<Shape>(value), " is not supported as a shape.");
-        }
-      };
-
-      simulation_api_schema::TrafficLight traffic_light_bulb_proto;
-      traffic_light_bulb_proto.set_status(status());
-      traffic_light_bulb_proto.set_shape(shape());
-      traffic_light_bulb_proto.set_color(color());
-      // NOTE: confidence will be overwritten in TrafficLight::operator simulation_api_schema::TrafficSignal()
-      traffic_light_bulb_proto.set_confidence(1.0);
-
-      return traffic_light_bulb_proto;
-    }
-
     explicit operator autoware_auto_perception_msgs::msg::TrafficLight() const
     {
       auto color = [this]() {
@@ -523,25 +452,6 @@ struct TrafficLight
   auto set(const std::string & states) -> void;
 
   friend auto operator<<(std::ostream & os, const TrafficLight & traffic_light) -> std::ostream &;
-
-  // simulation_api_schema should not occur here, but it is necessary to transfer
-  // "relation_ids" in proto - which is not needed when autoware_auto_perception_msgs::msg::TrafficSignal is used
-  // it will be removed when autoware_perception_msgs::msg::TrafficSignal is no longer supported
-  explicit operator simulation_api_schema::TrafficSignal() const
-  {
-    simulation_api_schema::TrafficSignal traffic_signal_proto;
-
-    traffic_signal_proto.set_id(way_id);
-    for (const auto relation_id : regulatory_elements_ids) {
-      traffic_signal_proto.add_relation_ids(relation_id);
-    }
-    for (const auto & bulb : bulbs) {
-      auto traffic_light_bulb_proto = static_cast<simulation_api_schema::TrafficLight>(bulb);
-      traffic_light_bulb_proto.set_confidence(confidence);
-      *traffic_signal_proto.add_traffic_light_status() = traffic_light_bulb_proto;
-    }
-    return traffic_signal_proto;
-  }
 
   explicit operator autoware_auto_perception_msgs::msg::TrafficSignal() const
   {
