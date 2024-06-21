@@ -481,13 +481,19 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutoModeForCooperatio
   }
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::requestAutowareControl(
-  const bool autoware_control) -> void
+auto FieldOperatorApplicationFor<AutowareUniverse>::enableAutowareControl() -> void
 {
   task_queue.delay([this, autoware_control]() {
     auto request = std::make_shared<tier4_system_msgs::srv::ChangeAutowareControl::Request>();
-    request->autoware_control = autoware_control;
-    requestChangeAutowareControl(request);
+    requestEnableAutowareControl(request);
+  });
+}
+
+auto FieldOperatorApplicationFor<AutowareUniverse>::disableAutowareControl() -> void
+{
+  task_queue.delay([this, autoware_control]() {
+    auto request = std::make_shared<tier4_system_msgs::srv::ChangeAutowareControl::Request>();
+    requestDisableAutowareControl(request);
   });
 }
 
