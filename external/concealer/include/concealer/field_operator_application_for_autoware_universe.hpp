@@ -43,7 +43,6 @@
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>
 #include <tier4_rtc_msgs/srv/cooperate_commands.hpp>
 #include <tier4_system_msgs/msg/autoware_state.hpp>
-#include <tier4_system_msgs/srv/change_autoware_control.hpp>
 
 namespace concealer
 {
