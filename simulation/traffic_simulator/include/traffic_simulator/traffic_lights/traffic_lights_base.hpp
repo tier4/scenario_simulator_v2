@@ -43,8 +43,8 @@ public:
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
   : hdmap_utils_(hdmap_utils),
     clock_ptr_(node_ptr->get_clock()),
-    rate_updater_(node_ptr, [this]() { update(); }),
-    marker_publisher_ptr_(std::make_unique<TrafficLightsMarkerPublisher>(node_ptr))
+    marker_publisher_ptr_(std::make_unique<TrafficLightsMarkerPublisher>(node_ptr)),
+    rate_updater_(node_ptr, [this]() { update(); })
   {
   }
 
