@@ -328,26 +328,12 @@ public:
     const bool allow_spawn_outside_lane = false, const bool require_footprint_fitting = false,
     const bool random_orientation = false, std::optional<int> random_seed = std::nullopt) -> void;
 
-  // clang-format off
-#define FORWARD_TO_TRAFFIC_LIGHTS(NAME)                                    \
-  /*!                                                                      \
-   @brief Forward to arguments to the TrafficLights::NAME function.        \
-   @return return value of the TrafficLights::NAME function.               \
-   @note This function was defined by FORWARD_TO_TRAFFIC_LIGHTS macro.     \
-   */                                                                      \
-  template <typename... Ts>                                                \
-  decltype(auto) NAME(Ts &&... xs)                                         \
-  {                                                                        \
-    assert(traffic_lights_ptr_);                                           \
-    return (*traffic_lights_ptr_).NAME(std::forward<decltype(xs)>(xs)...); \
-  }                                                                        \
-  static_assert(true, "")
-  // clang-format on
+  auto getV2ITrafficLights() { return traffic_lights_ptr_->getV2ITrafficLights(); }
 
-  FORWARD_TO_TRAFFIC_LIGHTS(getV2ITrafficLights);
-  FORWARD_TO_TRAFFIC_LIGHTS(getConventionalTrafficLights);
-
-#undef FORWARD_TO_TRAFFIC_LIGHTS
+  auto getConventionalTrafficLights()
+  {
+    return traffic_lights_ptr_->getConventionalTrafficLights();
+  }
 
   // clang-format off
 #define FORWARD_TO_ENTITY_MANAGER(NAME)                                    \

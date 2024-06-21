@@ -112,16 +112,14 @@ class EntityManager
 
 public:
   /**
-   * This function is necessary, because TrafficLights requires HdMapUtils.
-   * However, TrafficLights is constructed in API and in that scope HdMapUtils is available
-   * only after EntityManager is constructed.
-   * This is why TrafficLights has to be initialized in API after EntityManager and thus
-   * TrafficLights needs to be passed to EntityManager after initialization.
+     This function is necessary because the TrafficLights object is created after the EntityManager, 
+     so it can be assigned during the call of the EntityManager constructor. 
+     TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
    */
-  auto setTrafficLights(const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights)
-    -> void
+  auto setTrafficLights(
+    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
   {
-    traffic_lights_ptr_ = traffic_lights;
+    traffic_lights_ptr_ = traffic_lights_ptr;
   }
 
   template <typename Node>

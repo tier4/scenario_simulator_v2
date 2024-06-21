@@ -477,10 +477,12 @@ struct TrafficLight
         autoware_perception_msgs::msg::TrafficSignal traffic_signal;
         traffic_signal.traffic_signal_id = regulatory_element;
         for (const auto & bulb : bulbs) {
-          traffic_signal.elements.push_back(
-            static_cast<autoware_perception_msgs::msg::TrafficSignalElement>(bulb));
-          traffic_signals.push_back(traffic_signal);
+          auto traffic_light_bulb =
+            static_cast<autoware_perception_msgs::msg::TrafficSignalElement>(bulb);
+          traffic_light_bulb.confidence = confidence;
+          traffic_signal.elements.push_back(traffic_light_bulb);
         }
+        traffic_signals.push_back(traffic_signal);
       }
       return traffic_signals;
     }
