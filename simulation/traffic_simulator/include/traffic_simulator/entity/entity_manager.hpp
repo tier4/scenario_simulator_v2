@@ -46,16 +46,13 @@
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
-
-#if __has_include(<tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>)
-#include <tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>
-#endif
 
 namespace traffic_simulator
 {
@@ -107,12 +104,8 @@ class EntityManager
   const std::shared_ptr<TrafficLightManager> conventional_traffic_light_manager_ptr_;
   const std::shared_ptr<TrafficLightMarkerPublisher>
     conventional_traffic_light_marker_publisher_ptr_;
-
-#if __has_include(<tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>)
   const std::shared_ptr<TrafficLightPublisherBase>
     conventional_backward_compatible_traffic_light_publisher_ptr_;
-#endif
-
   const std::shared_ptr<TrafficLightManager> v2i_traffic_light_manager_ptr_;
   const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
   const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_legacy_topic_publisher_ptr_;
@@ -179,11 +172,9 @@ public:
       std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
     conventional_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(conventional_traffic_light_manager_ptr_, node)),
-#if __has_include(<tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>)
     conventional_backward_compatible_traffic_light_publisher_ptr_(
-      std::make_shared<TrafficLightPublisher<tier4_simulation_msgs::msg::TrafficLightArrayV1>>(
+      std::make_shared<TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>>(
         "/simulation/traffic_lights", node, hdmap_utils_ptr_)),
-#endif
     v2i_traffic_light_manager_ptr_(std::make_shared<TrafficLightManager>(hdmap_utils_ptr_)),
     v2i_traffic_light_marker_publisher_ptr_(
       std::make_shared<TrafficLightMarkerPublisher>(v2i_traffic_light_manager_ptr_, node)),
@@ -202,11 +193,9 @@ public:
       }),
     conventional_traffic_light_updater_(node, [this]() {
       conventional_traffic_light_marker_publisher_ptr_->publish();
-#if __has_include(<tier4_simulation_msgs/msg/traffic_light_array_v1.hpp>)
       conventional_backward_compatible_traffic_light_publisher_ptr_->publish(
         clock_ptr_->now(),
         conventional_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
-#endif
     })
   {
     updateHdmapMarker();
