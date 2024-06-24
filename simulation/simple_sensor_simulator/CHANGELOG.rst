@@ -13,6 +13,41 @@ Changelog for package simple_sensor_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.9 (2024-06-24)
+------------------
+
+2.1.8 (2024-06-20)
+------------------
+* Merge pull request `#1291 <https://github.com/tier4/scenario_simulator_v2/issues/1291>`_ from tier4/feature/simple_sensor_simulator_unit_test
+  Feature/simple sensor simulator unit test
+* Moved ament_cmake_gtest to package.xml
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Fixed an issue with missed header file
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Fixed an issue with missing package
+* test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Corrected directory structure
+  - Fixed an issue with a mistake
+* test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Replaced constructors with SetUp: RaycasterTest and GridTraversalTest
+  - Refactored Box, GridTraversal and Vertex unit tests
+* test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Fixed an issue with Raycaster tests - pointcloud size checking
+  - Updated test descriptions
+  - Added 'const' to specific variables
+  - Ensured a new line is added at the end of each file
+* test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Added CMakeLists.txt
+* test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Added unit tests to GridTraversal
+* test: [RJD-937] to Implement Unit tests on simple_sensor_simulator
+  - Added unit tests to Box and Vertex classes
+  - Added unit tests to Raycaster class
+  - Added set of macros used in unit tests
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
 2.1.7 (2024-06-19)
 ------------------
 * Merge branch 'master' into feature/improve-ros-parameter-handling
