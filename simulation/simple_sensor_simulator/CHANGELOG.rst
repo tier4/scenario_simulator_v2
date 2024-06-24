@@ -13,6 +13,17 @@ Changelog for package simple_sensor_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.11 (2024-06-24)
+-------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* resolve merge confilct
+* resolve merge
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* remove simple sensor simulator tets
+* vertex, toPoints
+* simple_sensr_simulation unit tests
+* Contributors: robomic
+
 2.1.10 (2024-06-24)
 -------------------
 * Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/misc_object_entity
