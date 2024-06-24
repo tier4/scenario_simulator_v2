@@ -271,6 +271,13 @@ void EntityBase::requestSpeedChangeWithConstantAcceleration(
   }
 }
 
+void EntityBase::requestClearRoute()
+{
+  THROW_SEMANTIC_ERROR(
+    "requestClearRoute is only supported for EgoEntity. The specified Entity is not an EgoEntity. "
+    "Please check the scenario carefully.");
+}
+
 void EntityBase::requestSpeedChangeWithTimeConstraint(
   const double target_speed, const speed_change::Transition transition, double acceleration_time)
 {
