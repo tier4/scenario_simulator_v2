@@ -425,7 +425,7 @@ public:
   auto spawnEntity(
     const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
   {
-    auto makeEntityStatus = [&]() {
+    auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
@@ -470,16 +470,13 @@ public:
         }
       }(parameters);
 
-      if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
+      if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
+        THROW_SYNTAX_ERROR(
+          "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
+          "msg::Pose are supported as pose argument of EntityManager::spawnEntity().");
+      } else if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
         entity_status.pose = toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
-      } else if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
-        entity_status.pose = toMapPose(pose, hdmap_utils_ptr_);
-        // here bounding_box and matching_distance are not used to adjust LaneletPose
-        // it is just rewritten, assuming that in the scenario is right, alternatively:
-        // toCanonicalizedLaneletPose(entity_status.pose, parameters.bounding_box,
-        // {pose.lanelet_id}, include_crosswalk, matching_distance, hdmap_utils_ptr_);
-        return CanonicalizedEntityStatus(entity_status, canonicalize(pose, hdmap_utils_ptr_));
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
         const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
