@@ -2,6 +2,9 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.9 (2024-06-24)
+------------------
+
 2.1.8 (2024-06-20)
 ------------------
 * Merge branch 'master' into feature/simple_sensor_simulator_unit_test
