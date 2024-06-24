@@ -166,6 +166,8 @@ public:
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
 
+  virtual void requestClearRoute();
+
   virtual auto isControlledBySimulator() const -> bool;
 
   virtual auto setControlledBySimulator(bool) -> void;
