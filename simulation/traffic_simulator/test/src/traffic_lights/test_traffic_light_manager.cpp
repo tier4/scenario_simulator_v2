@@ -27,6 +27,12 @@ auto stateFromColor(const std::string & color)   -> std::string { return color +
 auto stateFromStatus(const std::string & status) -> std::string { return "green " + status + " circle"; }
 auto stateFromShape(const std::string & shape)   -> std::string { return "green solidOn " + shape; }
 // clang-format on
+auto getTime(const std_msgs::msg::Header & header) -> unsigned int
+{
+  static constexpr unsigned int nanosecond_multiplier = static_cast<unsigned int>(1e+9);
+  return static_cast<unsigned int>(header.stamp.sec) * nanosecond_multiplier +
+         static_cast<unsigned int>(header.stamp.nanosec);
+}
 
 class ConventionalTrafficLightsTest : public testing::Test
 {
@@ -243,6 +249,8 @@ TEST_F(ConventionalTrafficLightsTest, startUpdate)
       marker.color, std_msgs::build<std_msgs::msg::ColorRGBA>().r(1.0).g(0.0).b(0.0).a(1.0), info);
   };
 
+  std::vector<std_msgs::msg::Header> headers;
+
   // verify
   EXPECT_EQ(markers.size(), static_cast<std::size_t>(40));
   for (std::size_t i = 0; i < markers.size(); i += 2) {
@@ -255,8 +263,18 @@ TEST_F(ConventionalTrafficLightsTest, startUpdate)
       const auto & one_marker = markers[i + 1].markers;
       EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
       verify_add_marker(one_marker[0], "marker " + std::to_string(i + 1));
+
+      headers.push_back(one_marker[0].header);
     }
   }
+
+  // verify message timing
+  const double expected_time = 1.0 / 20.0;
+  const double actual_time =
+    (static_cast<double>(getTime(headers.back()) - getTime(headers.front())) /
+     static_cast<double>(headers.size() - 1)) *
+    1e-9;
+  EXPECT_NEAR(actual_time, expected_time, 1e-4);
 }
 
 TEST_F(ConventionalTrafficLightsTest, resetUpdate)
@@ -313,6 +331,8 @@ TEST_F(ConventionalTrafficLightsTest, resetUpdate)
       info);
   };
 
+  std::vector<std_msgs::msg::Header> headers;
+
   // verify
   EXPECT_EQ(markers.size(), static_cast<std::size_t>(24));
   for (std::size_t i = 0; i < markers.size(); i += 2) {
@@ -325,7 +345,27 @@ TEST_F(ConventionalTrafficLightsTest, resetUpdate)
       const auto & one_marker = markers[i + 1].markers;
       EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
       verify_add_marker(one_marker[0], "marker " + std::to_string(i + 1));
+
+      headers.push_back(one_marker[0].header);
     }
+  }
+
+  // verify message timing
+  {
+    const double expected_time = 1.0 / 20.0;
+    const double actual_time =
+      (static_cast<double>(getTime(headers.at(9)) - getTime(headers.front())) /
+       static_cast<double>(10 - 1)) *
+      1e-9;
+    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  }
+  {
+    const double expected_time = 1.0 / 4.0;
+    const double actual_time =
+      (static_cast<double>(getTime(headers.back()) - getTime(*(headers.rbegin() + 1))) /
+       static_cast<double>(headers.size() - 10 - 1)) *
+      1e-9;
+    EXPECT_NEAR(actual_time, expected_time, 1e-4);
   }
 }
 
