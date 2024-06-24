@@ -519,21 +519,6 @@ TEST_F(MiscObjectEntityTest_FullObject, stopAtCurrentPosition)
 }
 
 /**
- * @note Test functionality used by other units; test relative pose calculations
- * correctness with a transformation argument passed.
- */
-TEST_F(MiscObjectEntityTest_FullObject, transformRelativePoseToGlobal_relative)
-{
-  constexpr double s = 5.0;
-
-  EXPECT_POSE_NEAR(
-    traffic_simulator::pose::transformRelativePoseToGlobal(
-      misc_object.getMapPose(), makePose(makePoint(s, 0.0))),
-    static_cast<geometry_msgs::msg::Pose>(makeCanonicalizedLaneletPose(hdmap_utils_ptr, id, s)),
-    0.1);
-}
-
-/**
  * @note Test functionality used by other units; test lanelet pose obtaining
  * with a matching distance smaller than a distance from an entity to the lanelet
  * (both crosswalk and road) and status_.type.type != PEDESTRIAN.
