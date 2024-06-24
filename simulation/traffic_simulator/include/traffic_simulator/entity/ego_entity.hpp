@@ -113,6 +113,8 @@ public:
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,
     const speed_change::Constraint, const bool continuous) -> void override;
 
+  void requestClearRoute() override;
+
   auto isControlledBySimulator() const -> bool override;
 
   auto setControlledBySimulator(bool state) -> void override

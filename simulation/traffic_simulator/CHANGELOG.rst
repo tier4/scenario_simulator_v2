@@ -13,6 +13,87 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.2.0 (2024-06-24)
+------------------
+* Merge pull request `#1292 <https://github.com/tier4/scenario_simulator_v2/issues/1292>`_ from tier4/feature/clear_route_api
+  add API::clearRoute()
+* Merge branch 'master' into feature/clear_route_api
+* Merge remote-tracking branch 'origin/master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* add API::clearRoute()
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+2.1.11 (2024-06-24)
+-------------------
+* Merge pull request `#1287 <https://github.com/tier4/scenario_simulator_v2/issues/1287>`_ from tier4/feature/unit_tests/miscellaneous
+  Feature/unit tests/miscellaneous
+* resolve conflict
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* fix typo
+* remove unecessary assignment
+* add newlines
+* add copy of helper_functions, apply review requests
+* remove misc tests
+* resolve merge confilct
+* resolve merge
+* remove test list file
+* use test fixtures
+* rename literal
+* use test fixture
+* remove variables that are used only once
+* remove unnecesary checks
+* newlines
+* add tes descriptions
+* prepare notes for descriptions
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* remove conversions tests
+* remove tests that exist in other branches and refactor wht is left
+* style
+* getDistanceToLeftLaneBound
+* getRouteLanelets_empty
+* simulation clock tests
+* entity_base tests
+* entity_base tests; code cleanup
+* EntityBase onUpdate. onPostUpdate tests
+* entity_base dummy class with a couple of tests
+* job accessor tests
+* make linter happy
+* job and job_list unit tests
+* behavior getRequestString
+* vertex, toPoints
+* traffic light bulb tests
+* traffic_light status shape color tests
+* traffic_simulator unit tests
+* Contributors: Masaya Kataoka, robomic
+
+2.1.10 (2024-06-24)
+-------------------
+* Merge pull request `#1286 <https://github.com/tier4/scenario_simulator_v2/issues/1286>`_ from tier4/feature/unit_tests/misc_object_entity
+  Feature/unit tests/misc object entity
+* resolve conflict
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/misc_object_entity
+* internal review corrections
+* use better naming
+* merge tests into a singular file
+* clean up
+* add newline
+* rename file definition
+* use builder
+* remove variables used only once
+* make it work; some tests have been deleted
+* collect tests, will not compile
+* Contributors: Masaya Kataoka, robomic
+
+2.1.9 (2024-06-24)
+------------------
+
+2.1.8 (2024-06-20)
+------------------
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
 2.1.7 (2024-06-19)
 ------------------
 * Merge pull request `#1275 <https://github.com/tier4/scenario_simulator_v2/issues/1275>`_ from tier4/feature/improve-ros-parameter-handling
