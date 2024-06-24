@@ -13,6 +13,9 @@ Changelog for package simple_sensor_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.1.9 (2024-06-24)
+------------------
+
 2.1.8 (2024-06-20)
 ------------------
 * Merge pull request `#1291 <https://github.com/tier4/scenario_simulator_v2/issues/1291>`_ from tier4/feature/simple_sensor_simulator_unit_test
