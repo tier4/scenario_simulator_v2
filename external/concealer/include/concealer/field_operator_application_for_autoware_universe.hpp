@@ -26,7 +26,6 @@
 #include <autoware_adapi_v1_msgs/srv/set_route_points.hpp>
 #include <autoware_control_msgs/msg/control.hpp>
 #include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
-#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_vehicle_msgs/msg/gear_command.hpp>
 #include <concealer/autoware_universe.hpp>
 #include <concealer/field_operator_application.hpp>
@@ -38,6 +37,7 @@
 #include <tier4_external_api_msgs/msg/emergency.hpp>
 #include <tier4_external_api_msgs/srv/engage.hpp>
 #include <tier4_external_api_msgs/srv/set_velocity_limit.hpp>
+#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #include <tier4_planning_msgs/msg/trajectory.hpp>
 #include <tier4_rtc_msgs/msg/cooperate_status_array.hpp>
 #include <tier4_rtc_msgs/srv/auto_mode_with_module.hpp>

@@ -16,7 +16,6 @@
 #define CONCEALER__AUTOWARE_UNIVERSE_HPP_
 
 #include <autoware_control_msgs/msg/control.hpp>
-#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 #include <autoware_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_vehicle_msgs/msg/gear_report.hpp>
 #include <autoware_vehicle_msgs/msg/steering_report.hpp>
@@ -27,6 +26,7 @@
 #include <concealer/subscriber_wrapper.hpp>
 #include <geometry_msgs/msg/accel_with_covariance_stamped.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <tier4_planning_msgs/msg/path_with_lane_id.hpp>
 
 namespace concealer
 {
@@ -90,8 +90,7 @@ public:
   auto getGearSign() const -> double override;
 
   auto getVehicleCommand() const -> std::tuple<
-    autoware_control_msgs::msg::Control,
-    autoware_vehicle_msgs::msg::GearCommand> override;
+    autoware_control_msgs::msg::Control, autoware_vehicle_msgs::msg::GearCommand> override;
 
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 

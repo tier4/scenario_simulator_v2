@@ -68,10 +68,7 @@ auto AutowareUniverse::getAcceleration() const -> double
   return getCommand().longitudinal.acceleration;
 }
 
-auto AutowareUniverse::getVelocity() const -> double
-{
-  return getCommand().longitudinal.velocity;
-}
+auto AutowareUniverse::getVelocity() const -> double { return getCommand().longitudinal.velocity; }
 
 auto AutowareUniverse::getSteeringAngle() const -> double
 {
@@ -164,9 +161,8 @@ auto AutowareUniverse::getGearSign() const -> double
            : 1.0;
 }
 
-auto AutowareUniverse::getVehicleCommand() const -> std::tuple<
-  autoware_control_msgs::msg::Control,
-  autoware_vehicle_msgs::msg::GearCommand>
+auto AutowareUniverse::getVehicleCommand() const
+  -> std::tuple<autoware_control_msgs::msg::Control, autoware_vehicle_msgs::msg::GearCommand>
 {
   return std::make_tuple(getCommand(), getGearCommand());
 }

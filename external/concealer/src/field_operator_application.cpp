@@ -151,8 +151,7 @@ auto FieldOperatorApplication::getTurnIndicatorsCommand() const
 {
   static auto turn_indicators_command = []() {
     autoware_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
-    turn_indicators_command.command =
-      autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
+    turn_indicators_command.command = autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
     return turn_indicators_command;
   }();
   turn_indicators_command.stamp = now();
@@ -168,9 +167,9 @@ auto operator<<(
   std::ostream & out, const autoware_vehicle_msgs::msg::TurnIndicatorsCommand & message)
   -> std::ostream &
 {
-#define CASE(IDENTIFIER)                                                   \
+#define CASE(IDENTIFIER)                                              \
   case autoware_vehicle_msgs::msg::TurnIndicatorsCommand::IDENTIFIER: \
-    out << #IDENTIFIER;                                                    \
+    out << #IDENTIFIER;                                               \
     break
 
   switch (message.command) {

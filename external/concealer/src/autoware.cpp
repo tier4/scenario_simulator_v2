@@ -44,13 +44,11 @@ auto Autoware::set(const geometry_msgs::msg::Twist & twist) -> void { current_tw
 
 auto Autoware::set(const geometry_msgs::msg::Pose & pose) -> void { current_pose.store(pose); }
 
-auto Autoware::getTurnIndicatorsCommand() const
-  -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand
+auto Autoware::getTurnIndicatorsCommand() const -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand
 {
   static auto turn_indicators_command = []() {
     autoware_vehicle_msgs::msg::TurnIndicatorsCommand turn_indicators_command;
-    turn_indicators_command.command =
-      autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
+    turn_indicators_command.command = autoware_vehicle_msgs::msg::TurnIndicatorsCommand::NO_COMMAND;
     return turn_indicators_command;
   }();
   turn_indicators_command.stamp = now();

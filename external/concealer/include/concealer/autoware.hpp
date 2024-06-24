@@ -60,9 +60,8 @@ public:
   virtual auto getTurnIndicatorsCommand() const
     -> autoware_vehicle_msgs::msg::TurnIndicatorsCommand;
 
-  virtual auto getVehicleCommand() const -> std::tuple<
-    autoware_control_msgs::msg::Control,
-    autoware_vehicle_msgs::msg::GearCommand> = 0;
+  virtual auto getVehicleCommand() const
+    -> std::tuple<autoware_control_msgs::msg::Control, autoware_vehicle_msgs::msg::GearCommand> = 0;
 
   virtual auto getRouteLanelets() const -> std::vector<std::int64_t> = 0;
 
