@@ -13,6 +13,42 @@ Changelog for package junit_exporter
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.2.0 (2024-06-24)
+------------------
+* Merge branch 'master' into feature/clear_route_api
+* Merge remote-tracking branch 'origin/master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* Contributors: Masaya Kataoka, Taiga
+
+2.1.11 (2024-06-24)
+-------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* resolve merge confilct
+* resolve merge
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* Contributors: robomic
+
+2.1.10 (2024-06-24)
+-------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/misc_object_entity
+* Contributors: robomic
+
+2.1.9 (2024-06-24)
+------------------
+
+2.1.8 (2024-06-20)
+------------------
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
+2.1.7 (2024-06-19)
+------------------
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Contributors: Masaya Kataoka, Mateusz Palczuk
+
 2.1.6 (2024-06-18)
 ------------------
 
