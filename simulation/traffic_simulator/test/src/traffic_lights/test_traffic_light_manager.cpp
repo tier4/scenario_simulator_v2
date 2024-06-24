@@ -27,17 +27,22 @@ auto stateFromColor(const std::string & color)   -> std::string { return color +
 auto stateFromStatus(const std::string & status) -> std::string { return "green " + status + " circle"; }
 auto stateFromShape(const std::string & shape)   -> std::string { return "green solidOn " + shape; }
 // clang-format on
-auto getTime(const std_msgs::msg::Header & header) -> unsigned int
+
+/// Returns time in nanoseconds
+auto getTime(const std_msgs::msg::Header & header) -> int
 {
-  static constexpr unsigned int nanosecond_multiplier = static_cast<unsigned int>(1e+9);
-  return static_cast<unsigned int>(header.stamp.sec) * nanosecond_multiplier +
-         static_cast<unsigned int>(header.stamp.nanosec);
+  static constexpr int nanosecond_multiplier = static_cast<int>(1e+9);
+  return static_cast<int>(header.stamp.sec) * nanosecond_multiplier +
+         static_cast<int>(header.stamp.nanosec);
 }
+/// Returns time in nanoseconds
+auto getTime(const rclcpp::Time & time) -> int { return static_cast<int>(time.nanoseconds()); }
 
 class ConventionalTrafficLightsTest : public testing::Test
 {
 protected:
   const lanelet::Id id = 34836;
+  const lanelet::Id signal_id = 34806;
 
   const rclcpp::Node::SharedPtr node_ptr =
     std::make_shared<rclcpp::Node>("ConventionalTrafficLightsTest");
@@ -367,6 +372,65 @@ TEST_F(ConventionalTrafficLightsTest, resetUpdate)
       1e-9;
     EXPECT_NEAR(actual_time, expected_time, 1e-4);
   }
+}
+
+TEST_F(ConventionalTrafficLightsTest, generateAutowarePerceptionMsg)
+{
+  lights.setTrafficLightsState(id, "red solidOn circle, yellow flashing circle");
+  lights.setTrafficLightsConfidence(id, 0.7);
+
+  const auto msg = lights.generateAutowarePerceptionMsg();
+
+  const double expected_time = static_cast<double>(getTime(node_ptr->get_clock()->now())) * 1e-9;
+  const double actual_time = static_cast<double>(getTime(msg.stamp)) * 1e-9;
+  EXPECT_NEAR(actual_time, expected_time, 1e-4);
+
+  EXPECT_EQ(msg.signals.size(), static_cast<std::size_t>(1));
+  EXPECT_EQ(msg.signals.front().elements.size(), static_cast<std::size_t>(2));
+
+  EXPECT_EQ(msg.signals[0].traffic_signal_id, signal_id);
+
+  using TrafficSignalElement = autoware_perception_msgs::msg::TrafficSignalElement;
+  // signals are parsed in reverse order
+  EXPECT_EQ(msg.signals[0].elements[0].color, TrafficSignalElement::AMBER);
+  EXPECT_EQ(msg.signals[0].elements[0].status, TrafficSignalElement::FLASHING);
+  EXPECT_EQ(msg.signals[0].elements[0].shape, TrafficSignalElement::CIRCLE);
+  EXPECT_NEAR(msg.signals[0].elements[0].confidence, 0.7, 1e-6);
+
+  EXPECT_EQ(msg.signals[0].elements[1].color, TrafficSignalElement::RED);
+  EXPECT_EQ(msg.signals[0].elements[1].status, TrafficSignalElement::SOLID_ON);
+  EXPECT_EQ(msg.signals[0].elements[1].shape, TrafficSignalElement::CIRCLE);
+  EXPECT_NEAR(msg.signals[0].elements[1].confidence, 0.7, 1e-6);
+}
+
+TEST_F(ConventionalTrafficLightsTest, generateAutowareAutoPerceptionMsg)
+{
+  lights.setTrafficLightsState(id, "red solidOn circle, yellow flashing circle");
+  lights.setTrafficLightsConfidence(id, 0.7);
+
+  const auto msg = lights.generateAutowareAutoPerceptionMsg();
+
+  const double expected_time = static_cast<double>(getTime(node_ptr->get_clock()->now())) * 1e-9;
+  const double actual_time = static_cast<double>(getTime(msg.header)) * 1e-9;
+  EXPECT_NEAR(actual_time, expected_time, 1e-4);
+
+  EXPECT_EQ(msg.signals.size(), static_cast<std::size_t>(1));
+  EXPECT_EQ(msg.signals.front().lights.size(), static_cast<std::size_t>(2));
+
+  EXPECT_EQ(msg.header.frame_id, "camera_link");
+  EXPECT_EQ(msg.signals[0].map_primitive_id, id);
+
+  using TrafficLight = autoware_auto_perception_msgs::msg::TrafficLight;
+  // signals are parsed in reverse order
+  EXPECT_EQ(msg.signals[0].lights[0].color, TrafficLight::AMBER);
+  EXPECT_EQ(msg.signals[0].lights[0].status, TrafficLight::FLASHING);
+  EXPECT_EQ(msg.signals[0].lights[0].shape, TrafficLight::CIRCLE);
+  EXPECT_NEAR(msg.signals[0].lights[0].confidence, 0.7, 1e-6);
+
+  EXPECT_EQ(msg.signals[0].lights[1].color, TrafficLight::RED);
+  EXPECT_EQ(msg.signals[0].lights[1].status, TrafficLight::SOLID_ON);
+  EXPECT_EQ(msg.signals[0].lights[1].shape, TrafficLight::CIRCLE);
+  EXPECT_NEAR(msg.signals[0].lights[1].confidence, 0.7, 1e-6);
 }
 
 int main(int argc, char ** argv)
