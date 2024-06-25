@@ -16,6 +16,7 @@
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 #include <scenario_simulator_exception/exception.hpp>
+#include <std_msgs/msg/header.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
@@ -29,12 +30,15 @@ auto stateFromShape(const std::string & shape)   -> std::string { return "green 
 // clang-format on
 
 /// Returns time in nanoseconds
-auto getTime(const std_msgs::msg::Header & header) -> int
+auto getTime(const builtin_interfaces::msg::Time & time) -> int
 {
   static constexpr int nanosecond_multiplier = static_cast<int>(1e+9);
-  return static_cast<int>(header.stamp.sec) * nanosecond_multiplier +
-         static_cast<int>(header.stamp.nanosec);
+  return static_cast<int>(time.sec) * nanosecond_multiplier + static_cast<int>(time.nanosec);
 }
+
+/// Returns time in nanoseconds
+auto getTime(const std_msgs::msg::Header & header) -> int { return getTime(header.stamp); }
+
 /// Returns time in nanoseconds
 auto getTime(const rclcpp::Time & time) -> int { return static_cast<int>(time.nanoseconds()); }
 
@@ -59,6 +63,28 @@ protected:
 
   traffic_simulator::ConventionalTrafficLights lights =
     traffic_simulator::ConventionalTrafficLights(node_ptr, hdmap_utils_ptr);
+};
+
+class V2ITrafficLightsTest : public testing::Test
+{
+protected:
+  const lanelet::Id id = 34836;
+  const lanelet::Id signal_id = 34806;
+
+  const rclcpp::Node::SharedPtr node_ptr = std::make_shared<rclcpp::Node>("V2ITrafficLightsTest");
+
+  const std::string path =
+    ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
+
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr =
+    std::make_shared<hdmap_utils::HdMapUtils>(
+      path, geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+              .latitude(35.61836750154)
+              .longitude(139.78066608243)
+              .altitude(0.0));
+
+  traffic_simulator::V2ITrafficLights lights =
+    traffic_simulator::V2ITrafficLights(node_ptr, hdmap_utils_ptr, "awf/universe");
 };
 
 TEST_F(ConventionalTrafficLightsTest, setTrafficLightsColor)
@@ -431,6 +457,264 @@ TEST_F(ConventionalTrafficLightsTest, generateAutowareAutoPerceptionMsg)
   EXPECT_EQ(msg.signals[0].lights[1].status, TrafficLight::SOLID_ON);
   EXPECT_EQ(msg.signals[0].lights[1].shape, TrafficLight::CIRCLE);
   EXPECT_NEAR(msg.signals[0].lights[1].confidence, 0.7, 1e-6);
+}
+
+TEST_F(V2ITrafficLightsTest, startUpdate)
+{
+  using namespace autoware_perception_msgs::msg;
+
+  lights.setTrafficLightsState(id, "red solidOn circle, yellow flashing circle");
+  lights.setTrafficLightsConfidence(id, 0.7);
+
+  std::vector<TrafficSignalArray> signals;
+
+  lights.startUpdate(20.0);
+
+  rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
+    node_ptr->create_subscription<TrafficSignalArray>(
+      "/perception/traffic_light_recognition/external/traffic_signals", 10,
+      [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+
+  // spin for 1 second
+  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1001);
+  while (std::chrono::system_clock::now() < end) {
+    rclcpp::spin_some(node_ptr);
+  }
+
+  EXPECT_EQ(signals.size(), static_cast<std::size_t>(20));
+
+  std::vector<builtin_interfaces::msg::Time> stamps;
+
+  for (std::size_t i = 0; i < signals.size(); ++i) {
+    stamps.push_back(signals[i].stamp);
+
+    const auto & one_message = signals[i].signals;
+    std::string info = "signals message number " + std::to_string(i);
+
+    EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
+    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+
+    EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
+
+    EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
+    EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+
+    EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
+    EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+  }
+
+  // verify message timing
+  const double expected_time = 1.0 / 20.0;
+  const double actual_time =
+    (static_cast<double>(getTime(stamps.back()) - getTime(stamps.front())) /
+     static_cast<double>(stamps.size() - 1)) *
+    1e-9;
+  EXPECT_NEAR(actual_time, expected_time, 1e-4);
+}
+
+TEST_F(V2ITrafficLightsTest, startUpdate_legacy)
+{
+  using namespace autoware_perception_msgs::msg;
+
+  lights.setTrafficLightsState(id, "red solidOn circle, yellow flashing circle");
+  lights.setTrafficLightsConfidence(id, 0.7);
+
+  std::vector<TrafficSignalArray> signals;
+
+  lights.startUpdate(20.0);
+
+  rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
+    node_ptr->create_subscription<TrafficSignalArray>(
+      "/v2x/traffic_signals", 10,
+      [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+
+  // spin for 1 second
+  const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1001);
+  while (std::chrono::system_clock::now() < end) {
+    rclcpp::spin_some(node_ptr);
+  }
+
+  EXPECT_EQ(signals.size(), static_cast<std::size_t>(20));
+
+  std::vector<builtin_interfaces::msg::Time> stamps;
+
+  for (std::size_t i = 0; i < signals.size(); ++i) {
+    stamps.push_back(signals[i].stamp);
+
+    const auto & one_message = signals[i].signals;
+    std::string info = "signals message number " + std::to_string(i);
+
+    EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
+    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+
+    EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
+
+    EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
+    EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+
+    EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
+    EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+  }
+
+  // verify message timing
+  const double expected_time = 1.0 / 20.0;
+  const double actual_time =
+    (static_cast<double>(getTime(stamps.back()) - getTime(stamps.front())) /
+     static_cast<double>(stamps.size() - 1)) *
+    1e-9;
+  EXPECT_NEAR(actual_time, expected_time, 1e-4);
+}
+
+TEST_F(V2ITrafficLightsTest, resetUpdate)
+{
+  using namespace autoware_perception_msgs::msg;
+
+  lights.setTrafficLightsState(id, "red solidOn circle, yellow flashing circle");
+  lights.setTrafficLightsConfidence(id, 0.7);
+
+  std::vector<TrafficSignalArray> signals;
+
+  lights.startUpdate(20.0);
+
+  rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
+    node_ptr->create_subscription<TrafficSignalArray>(
+      "/perception/traffic_light_recognition/external/traffic_signals", 10,
+      [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+
+  // spin for 1 second
+  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
+  while (std::chrono::system_clock::now() < end) {
+    rclcpp::spin_some(node_ptr);
+  }
+  lights.resetUpdate(4.0);
+  end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
+  while (std::chrono::system_clock::now() < end) {
+    rclcpp::spin_some(node_ptr);
+  }
+
+  EXPECT_EQ(signals.size(), static_cast<std::size_t>(12));
+
+  std::vector<builtin_interfaces::msg::Time> stamps;
+
+  for (std::size_t i = 0; i < signals.size(); ++i) {
+    stamps.push_back(signals[i].stamp);
+
+    const auto & one_message = signals[i].signals;
+    std::string info = "signals message number " + std::to_string(i);
+
+    EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
+    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+
+    EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
+
+    EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
+    EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+
+    EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
+    EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+  }
+
+  // verify message timing
+  {
+    const double expected_time = 1.0 / 20.0;
+    const double actual_time =
+      (static_cast<double>(getTime(stamps.at(9)) - getTime(stamps.front())) /
+       static_cast<double>(10 - 1)) *
+      1e-9;
+    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  }
+  {
+    const double expected_time = 1.0 / 4.0;
+    const double actual_time =
+      (static_cast<double>(getTime(stamps.back()) - getTime(*(stamps.rbegin() + 1))) /
+       static_cast<double>(stamps.size() - 10 - 1)) *
+      1e-9;
+    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  }
+}
+
+TEST_F(V2ITrafficLightsTest, resetUpdate_legacy)
+{
+  using namespace autoware_perception_msgs::msg;
+
+  lights.setTrafficLightsState(id, "red solidOn circle, yellow flashing circle");
+  lights.setTrafficLightsConfidence(id, 0.7);
+
+  std::vector<TrafficSignalArray> signals;
+
+  lights.startUpdate(20.0);
+
+  rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
+    node_ptr->create_subscription<TrafficSignalArray>(
+      "/v2x/traffic_signals", 10,
+      [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
+
+  // spin for 1 second
+  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
+  while (std::chrono::system_clock::now() < end) {
+    rclcpp::spin_some(node_ptr);
+  }
+  lights.resetUpdate(4.0);
+  end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
+  while (std::chrono::system_clock::now() < end) {
+    rclcpp::spin_some(node_ptr);
+  }
+
+  EXPECT_EQ(signals.size(), static_cast<std::size_t>(12));
+
+  std::vector<builtin_interfaces::msg::Time> stamps;
+
+  for (std::size_t i = 0; i < signals.size(); ++i) {
+    stamps.push_back(signals[i].stamp);
+
+    const auto & one_message = signals[i].signals;
+    std::string info = "signals message number " + std::to_string(i);
+
+    EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
+    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+
+    EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
+
+    EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
+    EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+
+    EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
+    EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+  }
+
+  // verify message timing
+  {
+    const double expected_time = 1.0 / 20.0;
+    const double actual_time =
+      (static_cast<double>(getTime(stamps.at(9)) - getTime(stamps.front())) /
+       static_cast<double>(10 - 1)) *
+      1e-9;
+    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  }
+  {
+    const double expected_time = 1.0 / 4.0;
+    const double actual_time =
+      (static_cast<double>(getTime(stamps.back()) - getTime(*(stamps.rbegin() + 1))) /
+       static_cast<double>(stamps.size() - 10 - 1)) *
+      1e-9;
+    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  }
 }
 
 int main(int argc, char ** argv)
