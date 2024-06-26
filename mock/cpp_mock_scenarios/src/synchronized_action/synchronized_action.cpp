@@ -51,7 +51,7 @@ private:
     if (
       api_.requestSynchronize("npc", "ego", ego_target, npc_target, 0, 0.5) &&
       api_.reachPosition("ego", ego_target, 1.0) && api_.reachPosition("npc", npc_target, 1.0) &&
-      api_.getCurrentTwist("npc").linear.x < 0.5){
+      api_.getCurrentTwist("npc").linear.x < 0.5) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
 

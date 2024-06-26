@@ -766,7 +766,7 @@ auto EntityBase::requestSynchronize(
 
   ///@brief Check if the entity has already arrived to the target lanelet.
   if (reachPosition(entity_target, tolerance)) {
-    if (this->getStatus().getTwist().linear.x < getMaxAcceleration() * step_time_) {
+    if (this->getStatus().getTwist().linear.x < target_speed + getMaxAcceleration() * step_time_) {
     } else {
       RCLCPP_WARN_ONCE(
         rclcpp::get_logger("traffic_simulator"),
