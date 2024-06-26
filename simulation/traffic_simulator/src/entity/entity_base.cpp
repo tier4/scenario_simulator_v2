@@ -764,6 +764,12 @@ auto EntityBase::requestSynchronize(
     THROW_SYNTAX_ERROR("Request synchronize is only for non-ego entities.");
   }
 
+  if (tolerance == 0) {
+    RCLCPP_WARN_ONCE(
+      rclcpp::get_logger("traffic_simulator"),
+      "The tolerance is set to 0.0. This may cause the entity to never reach the target lanelet.");
+  }
+
   ///@brief Check if the entity has already arrived to the target lanelet.
   if (reachPosition(entity_target, tolerance)) {
     if (this->getStatus().getTwist().linear.x < target_speed + getMaxAcceleration() * step_time_) {
