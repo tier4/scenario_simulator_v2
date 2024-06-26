@@ -42,14 +42,14 @@ auto getTime(const std_msgs::msg::Header & header) -> int { return getTime(heade
 /// Returns time in nanoseconds
 auto getTime(const rclcpp::Time & time) -> int { return static_cast<int>(time.nanoseconds()); }
 
-// Separate base class to enable different constructor argument number
-class TrafficLightsTestBase : public testing::Test
+template <typename TrafficLightsT>
+class TrafficLightsTest : public testing::Test
 {
 public:
   const lanelet::Id id = 34836;
   const lanelet::Id signal_id = 34806;
 
-  const rclcpp::Node::SharedPtr node_ptr = std::make_shared<rclcpp::Node>("TrafficLightsTest");
+  const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsTest");
 
   const std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
@@ -60,25 +60,20 @@ public:
               .latitude(35.61836750154)
               .longitude(139.78066608243)
               .altitude(0.0));
-};
 
-template <typename TrafficLightsT>
-class TrafficLightsTest : public TrafficLightsTestBase
-{
-public:
-  TrafficLightsT lights;
+  std::unique_ptr<TrafficLightsT> lights;
 
-  TrafficLightsTest() : lights(node_ptr, hdmap_utils_ptr) {}
-};
-
-// Add specialization to enable different constructor argument number
-template <>
-class TrafficLightsTest<traffic_simulator::V2ITrafficLights> : public TrafficLightsTestBase
-{
-public:
-  traffic_simulator::V2ITrafficLights lights;
-
-  TrafficLightsTest() : lights(node_ptr, hdmap_utils_ptr, "awf/universe"){};
+  TrafficLightsTest()
+  : lights([this] {
+      if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>)
+        return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr);
+      else if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::V2ITrafficLights>)
+        return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr, "awf/universe");
+      else
+        throw std::runtime_error("Given TrafficLights type is not supported");
+    }())
+  {
+  }
 };
 
 // Alias for declaring types in typed tests
@@ -99,6 +94,7 @@ public:
   }
 };
 
+// Declare typed test suite
 TYPED_TEST_SUITE(TrafficLightsTest, TrafficLightsTypes, TrafficLightsNameGenerator);
 
 // Define V2I type for use in tests with V2I traffic lights only
@@ -108,158 +104,158 @@ TYPED_TEST(TrafficLightsTest, setTrafficLightsColor)
 {
   using Color = traffic_simulator::TrafficLight::Color;
 
-  this->lights.setTrafficLightsColor(this->id, Color::green);
+  this->lights->setTrafficLightsColor(this->id, Color::green);
   EXPECT_FALSE(
-    this->lights.getTrafficLightsComposedState(this->id).find("green") == std::string::npos);
+    this->lights->getTrafficLightsComposedState(this->id).find("green") == std::string::npos);
 
-  this->lights.setTrafficLightsColor(this->id, Color::yellow);
+  this->lights->setTrafficLightsColor(this->id, Color::yellow);
   EXPECT_FALSE(
-    this->lights.getTrafficLightsComposedState(this->id).find("yellow") == std::string::npos);
+    this->lights->getTrafficLightsComposedState(this->id).find("yellow") == std::string::npos);
 
-  this->lights.setTrafficLightsColor(this->id, Color::red);
+  this->lights->setTrafficLightsColor(this->id, Color::red);
   EXPECT_FALSE(
-    this->lights.getTrafficLightsComposedState(this->id).find("red") == std::string::npos);
+    this->lights->getTrafficLightsComposedState(this->id).find("red") == std::string::npos);
 
-  this->lights.setTrafficLightsColor(this->id, Color::white);
+  this->lights->setTrafficLightsColor(this->id, Color::white);
   EXPECT_FALSE(
-    this->lights.getTrafficLightsComposedState(this->id).find("white") == std::string::npos);
+    this->lights->getTrafficLightsComposedState(this->id).find("white") == std::string::npos);
 }
 
 TYPED_TEST(TrafficLightsTest, setTrafficLightsState_color)
 {
   // green
-  this->lights.setTrafficLightsState(this->id, stateFromColor("green"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromColor("green"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("green"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromColor("Green"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromColor("green"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("Green"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("green"));
 
   // red
-  this->lights.setTrafficLightsState(this->id, stateFromColor("red"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromColor("red"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("red"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("red"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromColor("Red"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromColor("red"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("Red"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("red"));
 
   // yellow
-  this->lights.setTrafficLightsState(this->id, stateFromColor("yellow"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromColor("yellow"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("yellow"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("yellow"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromColor("Yellow"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromColor("yellow"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("Yellow"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("yellow"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromColor("amber"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromColor("yellow"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("amber"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("yellow"));
 
   // white
-  this->lights.setTrafficLightsState(this->id, stateFromColor("white"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromColor("white"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("white"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("white"));
 }
 
 TYPED_TEST(TrafficLightsTest, setTrafficLightsState_status)
 {
   // solid on
-  this->lights.setTrafficLightsState(this->id, stateFromStatus("solidOn"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromStatus("solidOn"));
+  this->lights->setTrafficLightsState(this->id, stateFromStatus("solidOn"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("solidOn"));
 
   // solid off
-  this->lights.setTrafficLightsState(this->id, stateFromStatus("solidOff"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromStatus("solidOff"));
+  this->lights->setTrafficLightsState(this->id, stateFromStatus("solidOff"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("solidOff"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromStatus("Blank"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromStatus("solidOff"));
+  this->lights->setTrafficLightsState(this->id, stateFromStatus("Blank"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("solidOff"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromStatus("none"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromStatus("solidOff"));
+  this->lights->setTrafficLightsState(this->id, stateFromStatus("none"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("solidOff"));
 
   // flashing
-  this->lights.setTrafficLightsState(this->id, stateFromStatus("flashing"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromStatus("flashing"));
+  this->lights->setTrafficLightsState(this->id, stateFromStatus("flashing"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("flashing"));
 
   // unknown
-  this->lights.setTrafficLightsState(this->id, stateFromStatus("unknown"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromStatus("unknown"));
+  this->lights->setTrafficLightsState(this->id, stateFromStatus("unknown"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("unknown"));
 }
 
 TYPED_TEST(TrafficLightsTest, setTrafficLightsState_shape)
 {
-  this->lights.setTrafficLightsState(this->id, stateFromShape("circle"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("circle"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("circle"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("circle"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("cross"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("cross"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("cross"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("cross"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("left"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("left"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("left"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("left"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("down"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("down"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("down"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("down"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("up"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("up"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("up"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("up"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("right"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("right"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("right"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("right"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("lowerLeft"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("lowerLeft"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("lowerLeft"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("lowerLeft"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("upperLeft"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("upperLeft"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("upperLeft"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("upperLeft"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("lowerRight"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("lowerRight"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("lowerRight"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("lowerRight"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("upperRight"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("upperRight"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("upperRight"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("upperRight"));
 
-  this->lights.setTrafficLightsState(this->id, stateFromShape("straight"));
-  EXPECT_EQ(this->lights.getTrafficLightsComposedState(this->id), stateFromShape("up"));
+  this->lights->setTrafficLightsState(this->id, stateFromShape("straight"));
+  EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("up"));
 }
 
 TYPED_TEST(TrafficLightsTest, isAnyTrafficLightChanged)
 {
-  EXPECT_TRUE(this->lights.isAnyTrafficLightChanged());
+  EXPECT_TRUE(this->lights->isAnyTrafficLightChanged());
 }
 
 TYPED_TEST(TrafficLightsTest, isRequiredStopTrafficLightState)
 {
-  this->lights.setTrafficLightsState(this->id, stateFromColor("green"));
-  EXPECT_FALSE(this->lights.isRequiredStopTrafficLightState(this->id));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
+  EXPECT_FALSE(this->lights->isRequiredStopTrafficLightState(this->id));
 
-  this->lights.setTrafficLightsState(this->id, stateFromColor("yellow"));
-  EXPECT_TRUE(this->lights.isRequiredStopTrafficLightState(this->id));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("yellow"));
+  EXPECT_TRUE(this->lights->isRequiredStopTrafficLightState(this->id));
 
-  this->lights.setTrafficLightsState(this->id, "yellow flashing circle");
-  EXPECT_FALSE(this->lights.isRequiredStopTrafficLightState(this->id));
+  this->lights->setTrafficLightsState(this->id, "yellow flashing circle");
+  EXPECT_FALSE(this->lights->isRequiredStopTrafficLightState(this->id));
 
-  this->lights.setTrafficLightsState(this->id, stateFromColor("red"));
-  EXPECT_TRUE(this->lights.isRequiredStopTrafficLightState(this->id));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("red"));
+  EXPECT_TRUE(this->lights->isRequiredStopTrafficLightState(this->id));
 }
 
 TYPED_TEST(TrafficLightsTest, compareTrafficLightsState)
 {
-  this->lights.setTrafficLightsState(this->id, stateFromColor("green"));
-  EXPECT_TRUE(this->lights.compareTrafficLightsState(this->id, stateFromColor("green")));
-  EXPECT_TRUE(this->lights.compareTrafficLightsState(this->id, stateFromColor("Green")));
-  EXPECT_FALSE(this->lights.compareTrafficLightsState(this->id, stateFromColor("yellow")));
-  EXPECT_FALSE(this->lights.compareTrafficLightsState(this->id, stateFromColor("red")));
-  EXPECT_FALSE(this->lights.compareTrafficLightsState(this->id, stateFromColor("amber")));
-  EXPECT_FALSE(this->lights.compareTrafficLightsState(this->id, stateFromColor("white")));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
+  EXPECT_TRUE(this->lights->compareTrafficLightsState(this->id, stateFromColor("green")));
+  EXPECT_TRUE(this->lights->compareTrafficLightsState(this->id, stateFromColor("Green")));
+  EXPECT_FALSE(this->lights->compareTrafficLightsState(this->id, stateFromColor("yellow")));
+  EXPECT_FALSE(this->lights->compareTrafficLightsState(this->id, stateFromColor("red")));
+  EXPECT_FALSE(this->lights->compareTrafficLightsState(this->id, stateFromColor("amber")));
+  EXPECT_FALSE(this->lights->compareTrafficLightsState(this->id, stateFromColor("white")));
 
-  this->lights.setTrafficLightsState(this->id, stateFromStatus("Blank"));
-  EXPECT_TRUE(this->lights.compareTrafficLightsState(this->id, stateFromStatus("solidOff")));
-  EXPECT_TRUE(this->lights.compareTrafficLightsState(this->id, stateFromStatus("Blank")));
-  EXPECT_TRUE(this->lights.compareTrafficLightsState(this->id, stateFromStatus("none")));
+  this->lights->setTrafficLightsState(this->id, stateFromStatus("Blank"));
+  EXPECT_TRUE(this->lights->compareTrafficLightsState(this->id, stateFromStatus("solidOff")));
+  EXPECT_TRUE(this->lights->compareTrafficLightsState(this->id, stateFromStatus("Blank")));
+  EXPECT_TRUE(this->lights->compareTrafficLightsState(this->id, stateFromStatus("none")));
 }
 
 TYPED_TEST(TrafficLightsTest, startUpdate_publishMarkers)
 {
-  this->lights.setTrafficLightsState(this->id, stateFromColor("red"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("red"));
 
   std::vector<visualization_msgs::msg::MarkerArray> markers;
 
-  this->lights.startUpdate(20.0);
+  this->lights->startUpdate(20.0);
 
   auto node_ptr = this->node_ptr;
 
@@ -333,11 +329,11 @@ TYPED_TEST(TrafficLightsTest, startUpdate_publishMarkers)
 
 TYPED_TEST(TrafficLightsTest, resetUpdate_publishMarkers)
 {
-  this->lights.setTrafficLightsState(this->id, stateFromColor("green"));
+  this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
 
   std::vector<visualization_msgs::msg::MarkerArray> markers;
 
-  this->lights.startUpdate(20.0);
+  this->lights->startUpdate(20.0);
 
   rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr subscriber =
     this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
@@ -351,7 +347,7 @@ TYPED_TEST(TrafficLightsTest, resetUpdate_publishMarkers)
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-  this->lights.resetUpdate(4.0);
+  this->lights->resetUpdate(4.0);
   end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
@@ -425,10 +421,10 @@ TYPED_TEST(TrafficLightsTest, resetUpdate_publishMarkers)
 
 TYPED_TEST(TrafficLightsTest, generateAutowarePerceptionMsg)
 {
-  this->lights.setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights.setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
+  this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  const auto msg = this->lights.generateAutowarePerceptionMsg();
+  const auto msg = this->lights->generateAutowarePerceptionMsg();
 
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
@@ -455,10 +451,10 @@ TYPED_TEST(TrafficLightsTest, generateAutowarePerceptionMsg)
 
 TYPED_TEST(TrafficLightsTest, generateAutowareAutoPerceptionMsg)
 {
-  this->lights.setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights.setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
+  this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  const auto msg = this->lights.generateAutowareAutoPerceptionMsg();
+  const auto msg = this->lights->generateAutowareAutoPerceptionMsg();
 
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
@@ -488,12 +484,12 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
 {
   using namespace autoware_perception_msgs::msg;
 
-  this->lights.setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights.setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
+  this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
   std::vector<TrafficSignalArray> signals;
 
-  this->lights.startUpdate(20.0);
+  this->lights->startUpdate(20.0);
 
   rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
     this->node_ptr->create_subscription<TrafficSignalArray>(
@@ -545,12 +541,12 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
 {
   using namespace autoware_perception_msgs::msg;
 
-  this->lights.setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights.setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
+  this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
   std::vector<TrafficSignalArray> signals;
 
-  this->lights.startUpdate(20.0);
+  this->lights->startUpdate(20.0);
 
   rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
     this->node_ptr->create_subscription<TrafficSignalArray>(
@@ -602,12 +598,12 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
 {
   using namespace autoware_perception_msgs::msg;
 
-  this->lights.setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights.setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
+  this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
   std::vector<TrafficSignalArray> signals;
 
-  this->lights.startUpdate(20.0);
+  this->lights->startUpdate(20.0);
 
   rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
     this->node_ptr->create_subscription<TrafficSignalArray>(
@@ -619,7 +615,7 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-  this->lights.resetUpdate(4.0);
+  this->lights->resetUpdate(4.0);
   end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
@@ -674,12 +670,12 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
 {
   using namespace autoware_perception_msgs::msg;
 
-  this->lights.setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
-  this->lights.setTrafficLightsConfidence(this->id, 0.7);
+  this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
+  this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
   std::vector<TrafficSignalArray> signals;
 
-  this->lights.startUpdate(20.0);
+  this->lights->startUpdate(20.0);
 
   rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
     this->node_ptr->create_subscription<TrafficSignalArray>(
@@ -691,7 +687,7 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-  this->lights.resetUpdate(4.0);
+  this->lights->resetUpdate(4.0);
   end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
