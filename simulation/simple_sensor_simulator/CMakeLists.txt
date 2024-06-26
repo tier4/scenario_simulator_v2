@@ -85,6 +85,7 @@ EXPORT export_simple_sensor_simulator_component
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   ament_lint_auto_find_test_dependencies()
-endif()
 
+  add_subdirectory(test)
+endif()
 ament_auto_package()

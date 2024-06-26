@@ -65,7 +65,10 @@ public:
   template <typename NodeT, typename AllocatorT = std::allocator<void>, typename... Ts>
   explicit API(NodeT && node, const Configuration & configuration, Ts &&... xs)
   : configuration(configuration),
-    entity_manager_ptr_(std::make_shared<entity::EntityManager>(node, configuration)),
+    node_parameters_(
+      rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node))),
+    entity_manager_ptr_(
+      std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & entity_name) { return getEntity(entity_name)->getMapPose(); },
@@ -109,6 +112,12 @@ public:
     }
   }
 
+  template <typename ParameterT, typename... Ts>
+  auto getROS2Parameter(Ts &&... xs) const -> decltype(auto)
+  {
+    return getParameter<ParameterT>(node_parameters_, std::forward<Ts>(xs)...);
+  }
+
   template <typename Node>
   int getZMQSocketPort(Node & node)
   {
@@ -131,7 +140,7 @@ public:
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, getCurrentTime(), configuration);
+                 name, pose, parameters, getCurrentTime(), configuration, node_parameters_);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, getCurrentTime(), behavior);
@@ -359,6 +368,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(requestClearRoute);
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
@@ -388,6 +398,8 @@ private:
   bool updateTrafficLightsInSim();
 
   const Configuration configuration;
+
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
 
