@@ -42,6 +42,7 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator/utils/pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -52,18 +53,6 @@
 #include <utility>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
-
-/// @todo find some shared space for this function
-template <typename T>
-static auto getParameter(const std::string & name, T value = {})
-{
-  rclcpp::Node node{"get_parameter", "simulation"};
-
-  node.declare_parameter<T>(name, value);
-  node.get_parameter<T>(name, value);
-
-  return value;
-}
 
 namespace traffic_simulator
 {
@@ -86,6 +75,7 @@ class EntityManager
   Configuration configuration;
 
   std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
   tf2_ros::StaticTransformBroadcaster broadcaster_;
   tf2_ros::TransformBroadcaster base_link_broadcaster_;
@@ -140,7 +130,7 @@ public:
   auto makeV2ITrafficLightPublisher(Ts &&... xs) -> std::shared_ptr<TrafficLightPublisherBase>
   {
     if (const auto architecture_type =
-          getParameter<std::string>("architecture_type", "awf/universe");
+          getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe");
         architecture_type.find("awf/universe") != std::string::npos) {
       return std::make_shared<
         TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>>(
@@ -153,9 +143,12 @@ public:
   }
 
   template <class NodeT, class AllocatorT = std::allocator<void>>
-  explicit EntityManager(NodeT && node, const Configuration & configuration)
+  explicit EntityManager(
+    NodeT && node, const Configuration & configuration,
+    const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   : configuration(configuration),
     node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
+    node_parameters_(node_parameters),
     broadcaster_(node),
     base_link_broadcaster_(node),
     clock_ptr_(node->get_clock()),
@@ -280,6 +273,7 @@ public:
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
+  FORWARD_TO_ENTITY(requestClearRoute, );
   FORWARD_TO_ENTITY(setAcceleration, );
   FORWARD_TO_ENTITY(setAccelerationLimit, );
   FORWARD_TO_ENTITY(setAccelerationRateLimit, );
@@ -402,7 +396,7 @@ public:
     const std::string & name, const Pose & pose, const Parameters & parameters,
     const double current_time, Ts &&... xs)
   {
-    auto makeEntityStatus = [&]() {
+    auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
@@ -447,16 +441,13 @@ public:
         }
       }(parameters);
 
-      if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
+      if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
+        THROW_SYNTAX_ERROR(
+          "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
+          "msg::Pose are supported as pose argument of EntityManager::spawnEntity().");
+      } else if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
         entity_status.pose = toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
-      } else if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
-        entity_status.pose = toMapPose(pose, hdmap_utils_ptr_);
-        // here bounding_box and matching_distance are not used to adjust LaneletPose
-        // it is just rewritten, assuming that in the scenario is right, alternatively:
-        // toCanonicalizedLaneletPose(entity_status.pose, parameters.bounding_box,
-        // {pose.lanelet_id}, include_crosswalk, matching_distance, hdmap_utils_ptr_);
-        return CanonicalizedEntityStatus(entity_status, canonicalize(pose, hdmap_utils_ptr_));
       } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
         const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);

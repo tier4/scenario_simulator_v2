@@ -20,6 +20,12 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 
+int main(int argc, char ** argv)
+{
+  testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
+}
+
 TEST(TrafficLight, Color)
 {
   using Color = traffic_simulator::TrafficLight::Color;
@@ -367,8 +373,389 @@ TEST(TrafficLight, TrafficLight)
   }
 }
 
-int main(int argc, char ** argv)
+/**
+ * @note Test basic functionality. Test whether the function
+ * creates Color object appropriate to the argument.
+ */
+TEST(TrafficLight, Color_make)
 {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+  using Color = traffic_simulator::TrafficLight::Color;
+  {
+    const auto color = Color::make("green");
+
+    EXPECT_TRUE(color == Color::green);
+    EXPECT_TRUE(color.is(Color::green));
+    EXPECT_TRUE(boost::lexical_cast<Color>("green") == Color::green);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "green");
+  }
+
+  {
+    const auto color = Color::make("yellow");
+
+    EXPECT_TRUE(color == Color::yellow);
+    EXPECT_TRUE(color.is(Color::yellow));
+    EXPECT_TRUE(boost::lexical_cast<Color>("yellow") == Color::yellow);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
+  }
+
+  {
+    const auto color = Color::make("red");
+
+    EXPECT_TRUE(color == Color::red);
+    EXPECT_TRUE(color.is(Color::red));
+    EXPECT_TRUE(boost::lexical_cast<Color>("red") == Color::red);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "red");
+  }
+
+  {
+    const auto color = Color::make("white");
+
+    EXPECT_TRUE(color == Color::white);
+    EXPECT_TRUE(color.is(Color::white));
+    EXPECT_TRUE(boost::lexical_cast<Color>("white") == Color::white);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "white");
+  }
+
+  {
+    const auto color = Color::make("amber");
+
+    EXPECT_TRUE(color == Color::yellow);
+    EXPECT_TRUE(color.is(Color::yellow));
+    EXPECT_TRUE(boost::lexical_cast<Color>("amber") == Color::yellow);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(color) == "yellow");
+  }
+}
+
+/**
+ * @note Test basic functionality. Test whether the function creates Color object appropriate to the argument.
+ */
+TEST(TrafficLight, Shape_make)
+{
+  using Shape = traffic_simulator::TrafficLight::Shape;
+
+  {
+    const auto shape = Shape::make("circle");
+
+    EXPECT_TRUE(shape == Shape::circle);
+    EXPECT_TRUE(shape.is(Shape::circle));
+    EXPECT_TRUE(shape.is(Shape::Category::circle));
+    EXPECT_TRUE(shape.category() == Shape::Category::circle);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("circle") == Shape::circle);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "circle");
+  }
+
+  {
+    const auto shape = Shape::make("cross");
+
+    EXPECT_TRUE(shape == Shape::cross);
+    EXPECT_TRUE(shape.is(Shape::cross));
+    EXPECT_TRUE(shape.is(Shape::Category::cross));
+    EXPECT_TRUE(shape.category() == Shape::Category::cross);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("cross") == Shape::cross);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "cross");
+  }
+
+  {
+    const auto shape = Shape::make("left");
+
+    EXPECT_TRUE(shape == Shape::left);
+    EXPECT_TRUE(shape.is(Shape::left));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("left") == Shape::left);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "left");
+  }
+
+  {
+    const auto shape = Shape::make("down");
+
+    EXPECT_TRUE(shape == Shape::down);
+    EXPECT_TRUE(shape.is(Shape::down));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("down") == Shape::down);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "down");
+  }
+
+  {
+    const auto shape = Shape::make("up");
+
+    EXPECT_TRUE(shape == Shape::up);
+    EXPECT_TRUE(shape.is(Shape::up));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("up") == Shape::up);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "up");
+  }
+
+  {
+    const auto shape = Shape::make("right");
+
+    EXPECT_TRUE(shape == Shape::right);
+    EXPECT_TRUE(shape.is(Shape::right));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("right") == Shape::right);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "right");
+  }
+
+  {
+    const auto shape = Shape::make("lowerLeft");
+
+    EXPECT_TRUE(shape == Shape::lower_left);
+    EXPECT_TRUE(shape.is(Shape::lower_left));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("lowerLeft") == Shape::lower_left);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "lowerLeft");
+  }
+
+  {
+    const auto shape = Shape::make("upperLeft");
+
+    EXPECT_TRUE(shape == Shape::upper_left);
+    EXPECT_TRUE(shape.is(Shape::upper_left));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("upperLeft") == Shape::upper_left);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "upperLeft");
+  }
+
+  {
+    const auto shape = Shape::make("lowerRight");
+
+    EXPECT_TRUE(shape == Shape::lower_right);
+    EXPECT_TRUE(shape.is(Shape::lower_right));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("lowerRight") == Shape::lower_right);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "lowerRight");
+  }
+
+  {
+    const auto shape = Shape::make("upperRight");
+
+    EXPECT_TRUE(shape == Shape::upper_right);
+    EXPECT_TRUE(shape.is(Shape::upper_right));
+    EXPECT_TRUE(shape.is(Shape::Category::arrow));
+    EXPECT_TRUE(shape.category() == Shape::Category::arrow);
+    EXPECT_TRUE(boost::lexical_cast<Shape>("upperRight") == Shape::upper_right);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(shape) == "upperRight");
+  }
+}
+
+/**
+ * @note Test basic functionality. Test whether the function creates Status object appropriate to the argument.
+ */
+TEST(TrafficLight, Status_make)
+{
+  using Status = traffic_simulator::TrafficLight::Status;
+
+  {
+    const auto status = Status::make("solidOn");
+
+    EXPECT_TRUE(status == Status::solid_on);
+    EXPECT_TRUE(status.is(Status::solid_on));
+    EXPECT_TRUE(boost::lexical_cast<Status>("solidOn") == Status::solid_on);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "solidOn");
+  }
+
+  {
+    const auto status = Status::make("solidOff");
+
+    EXPECT_TRUE(status == Status::solid_off);
+    EXPECT_TRUE(status.is(Status::solid_off));
+    EXPECT_TRUE(boost::lexical_cast<Status>("solidOff") == Status::solid_off);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "solidOff");
+  }
+
+  {
+    const auto status = Status::make("flashing");
+
+    EXPECT_TRUE(status == Status::flashing);
+    EXPECT_TRUE(status.is(Status::flashing));
+    EXPECT_TRUE(boost::lexical_cast<Status>("flashing") == Status::flashing);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "flashing");
+  }
+
+  {
+    const auto status = Status::make("unknown");
+
+    EXPECT_TRUE(status == Status::unknown);
+    EXPECT_TRUE(status.is(Status::unknown));
+    EXPECT_TRUE(boost::lexical_cast<Status>("unknown") == Status::unknown);
+    EXPECT_TRUE(boost::lexical_cast<std::string>(status) == "unknown");
+  }
+}
+
+/**
+ * @note Test basic functionality. Test whether the function creates Color object appropriate to the argument.
+ */
+TEST(TrafficLight, Bulb_make)
+{
+  using TrafficLight = traffic_simulator::TrafficLight;
+  using Color = TrafficLight::Color;
+  using Status = TrafficLight::Status;
+  using Shape = TrafficLight::Shape;
+  using Bulb = TrafficLight::Bulb;
+  {
+    constexpr auto bulb = Bulb(Color::red, Status::flashing, Shape::circle);
+
+    EXPECT_TRUE(bulb.is(Color::red));
+    EXPECT_TRUE(bulb.is(Status::flashing));
+    EXPECT_TRUE(bulb.is(Shape::circle));
+    EXPECT_TRUE(bulb.is(Shape::Category::circle));
+  }
+
+  {
+    constexpr auto bulb = Bulb(Color::green, Status::solid_on, Shape::right);
+
+    EXPECT_TRUE(bulb.is(Color::green));
+    EXPECT_TRUE(bulb.is(Status::solid_on));
+    EXPECT_TRUE(bulb.is(Shape::right));
+    EXPECT_TRUE(bulb.is(Shape::Category::arrow));
+  }
+
+  {
+    const auto bulb = Bulb("red flashing circle");
+
+    EXPECT_TRUE(bulb.is(Color::red));
+    EXPECT_TRUE(bulb.is(Status::flashing));
+    EXPECT_TRUE(bulb.is(Shape::circle));
+    EXPECT_TRUE(bulb.is(Shape::Category::circle));
+  }
+
+  {
+    const auto bulb = Bulb("red flashing");
+
+    EXPECT_TRUE(bulb.is(Color::red));
+    EXPECT_TRUE(bulb.is(Status::flashing));
+    EXPECT_TRUE(bulb.is(Shape::circle));
+    EXPECT_TRUE(bulb.is(Shape::Category::circle));
+  }
+
+  {
+    const auto bulb = Bulb("red");
+
+    EXPECT_TRUE(bulb.is(Color::red));
+    EXPECT_TRUE(bulb.is(Status::solid_on));
+    EXPECT_TRUE(bulb.is(Shape::circle));
+    EXPECT_TRUE(bulb.is(Shape::Category::circle));
+  }
+
+  {
+    const auto bulb = Bulb("green solidOn right");
+
+    EXPECT_TRUE(bulb.is(Color::green));
+    EXPECT_TRUE(bulb.is(Status::solid_on));
+    EXPECT_TRUE(bulb.is(Shape::right));
+    EXPECT_TRUE(bulb.is(Shape::Category::arrow));
+  }
+
+  {
+    const auto bulb = Bulb("green right");
+
+    EXPECT_TRUE(bulb.is(Color::green));
+    EXPECT_TRUE(bulb.is(Status::solid_on));
+    EXPECT_TRUE(bulb.is(Shape::right));
+    EXPECT_TRUE(bulb.is(Shape::Category::arrow));
+  }
+}
+
+/**
+ * @note Test basic functionality. Test whether the TrafficLight message
+ * is constructed configured according to the Bulb object.
+ */
+TEST(TrafficLight, Bulb_trafficLightMessageConversion)
+{
+  using Color = traffic_simulator::TrafficLight::Color;
+  using Status = traffic_simulator::TrafficLight::Status;
+  using Shape = traffic_simulator::TrafficLight::Shape;
+  using Bulb = traffic_simulator::TrafficLight::Bulb;
+
+  {
+    constexpr auto bulb = Bulb(Color::red, Status::flashing, Shape::circle);
+    std::ostringstream oss;
+    oss << bulb;
+    EXPECT_TRUE(oss.str() == "red flashing circle");
+  }
+
+  {
+    constexpr auto bulb = Bulb(Color::green, Status::solid_on, Shape::right);
+    std::ostringstream oss;
+    oss << bulb;
+    EXPECT_TRUE(oss.str() == "green solidOn right");
+  }
+
+  {
+    const auto bulb = Bulb("red flashing circle");
+    std::ostringstream oss;
+    oss << bulb;
+    EXPECT_TRUE(oss.str() == "red flashing circle");
+  }
+
+  {
+    const auto bulb = Bulb("red flashing");
+    std::ostringstream oss;
+    oss << bulb;
+    EXPECT_TRUE(oss.str() == "red flashing circle");
+  }
+
+  {
+    const auto bulb = Bulb("red");
+    std::ostringstream oss;
+    oss << bulb;
+    EXPECT_TRUE(oss.str() == "red solidOn circle");
+  }
+
+  {
+    const auto bulb = Bulb("green solidOn right");
+    std::ostringstream oss;
+    oss << bulb;
+    EXPECT_TRUE(oss.str() == "green solidOn right");
+  }
+
+  {
+    const auto bulb = Bulb("green right");
+    std::ostringstream oss;
+    oss << bulb;
+    EXPECT_TRUE(oss.str() == "green solidOn right");
+  }
+}
+
+/**
+ * @note Test basic functionality. Test function behavior when called with invalid name.
+ */
+TEST(TrafficLight, Color_make_wrong)
+{
+  EXPECT_THROW(traffic_simulator::TrafficLight::Color::make("wrong_color"), common::SyntaxError);
+}
+
+/**
+ * @note Test basic functionality. Test function behavior when called with invalid name. 
+ */
+TEST(TrafficLight, Shape_make_wrong)
+{
+  EXPECT_THROW(traffic_simulator::TrafficLight::Shape::make("wrong_shape"), common::SyntaxError);
+}
+
+/**
+ * @note Test basic functionality. Test function behavior when called with invalid name.
+ */
+TEST(TrafficLight, Status_make_wrong)
+{
+  EXPECT_THROW(traffic_simulator::TrafficLight::Status::make("wrong_status"), common::SyntaxError);
+}
+
+/**
+ * @note Test basic functionality. Test function behavior when called with invalid name.
+ */
+TEST(TrafficLight, Bulb_make_wrong)
+{
+  using Bulb = traffic_simulator::TrafficLight::Bulb;
+
+  EXPECT_THROW(Bulb("red flashing wrong_shape"), common::SyntaxError);
+  EXPECT_THROW(Bulb("red wrong_status circle"), common::SyntaxError);
+  EXPECT_THROW(Bulb("wrong_color flashing circle"), common::SyntaxError);
+  EXPECT_THROW(Bulb("wrong_color wrong_status wrong_shape"), common::SyntaxError);
 }

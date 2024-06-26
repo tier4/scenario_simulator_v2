@@ -93,7 +93,7 @@ void CppScenarioNode::stop(Result result, const std::string & description)
 }
 
 void CppScenarioNode::spawnEgoEntity(
-  const traffic_simulator::LaneletPose & spawn_lanelet_pose,
+  const traffic_simulator::CanonicalizedLaneletPose & spawn_lanelet_pose,
   const std::vector<traffic_simulator::CanonicalizedLaneletPose> & goal_lanelet_poses,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters)
 {
@@ -108,7 +108,7 @@ void CppScenarioNode::spawnEgoEntity(
   api_.attachOccupancyGridSensor([this] {
     simulation_api_schema::OccupancyGridSensorConfiguration configuration;
     // clang-format off
-      configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
+      configuration.set_architecture_type(api_.getROS2Parameter<std::string>("architecture_type", "awf/universe"));
       configuration.set_entity("ego");
       configuration.set_filter_by_range(true);
       configuration.set_height(200);
