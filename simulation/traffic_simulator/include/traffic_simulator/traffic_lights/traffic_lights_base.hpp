@@ -48,6 +48,8 @@ public:
   {
   }
 
+  virtual ~TrafficLightsBase() = default;
+
   // update
   auto startUpdate(const double update_rate) -> void;
 

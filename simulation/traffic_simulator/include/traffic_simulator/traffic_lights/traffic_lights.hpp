@@ -32,6 +32,8 @@ public:
   {
   }
 
+  ~ConventionalTrafficLights() override = default;
+
 private:
   auto update() const -> void
   {
@@ -56,6 +58,8 @@ public:
     legacy_topic_publisher_ptr_(makePublisher(node_ptr, architecture_type, "/v2x/traffic_signals"))
   {
   }
+
+  ~V2ITrafficLights() override = default;
 
 private:
   auto update() const -> void override
