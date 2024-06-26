@@ -22,6 +22,7 @@
 #include <autoware_auto_vehicle_msgs/msg/steering_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/velocity_report.hpp>
+#include <autoware_planning_msgs/msg/lanelet_route.hpp>
 #include <concealer/autoware.hpp>
 #include <concealer/publisher_wrapper.hpp>
 #include <concealer/subscriber_wrapper.hpp>
@@ -41,6 +42,8 @@ class AutowareUniverse : public Autoware
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
   SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
+  SubscriberWrapper<autoware_planning_msgs::msg::LaneletRoute,                ThreadSafety::safe> getAWMissionRoute;
+
 
   PublisherWrapper<geometry_msgs::msg::AccelWithCovarianceStamped>        setAcceleration;
   PublisherWrapper<nav_msgs::msg::Odometry>                               setOdometry;

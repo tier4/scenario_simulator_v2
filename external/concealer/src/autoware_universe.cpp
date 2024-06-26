@@ -22,6 +22,7 @@ AutowareUniverse::AutowareUniverse()
   getTurnIndicatorsCommand("/control/command/turn_indicators_cmd", *this),
   getPathWithLaneId(
     "/planning/scenario_planning/lane_driving/behavior_planning/path_with_lane_id", *this),
+  getAWMissionRoute("/planning/mission_planning/route", *this),
   setAcceleration("/localization/acceleration", *this),
   setOdometry("/localization/kinematic_state", *this),
   setSteeringReport("/vehicle/status/steering_status", *this),
