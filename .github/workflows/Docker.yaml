@@ -26,7 +26,11 @@ jobs:
     strategy:
       matrix:
         rosdistro: [humble]
-        arch: [amd64, arm64]
+        arch: [amd64]
+        # Build test for arm64 CPU is broken.
+        # This is a temporary solution and will be repaired in the future.
+        # See also https://github.com/tier4/scenario_simulator_v2/pull/1295
+        # arch: [amd64, arm64]
     steps:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
