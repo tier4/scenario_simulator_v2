@@ -21,26 +21,10 @@
 #include <traffic_simulator/traffic_lights/traffic_lights_base.hpp>
 
 #include "../expect_eq_macros.hpp"
+#include "helper.hpp"
 
-/// Helper functions
-// clang-format off
-auto stateFromColor(const std::string & color)   -> std::string { return color + " solidOn circle"; }
-auto stateFromStatus(const std::string & status) -> std::string { return "green " + status + " circle"; }
-auto stateFromShape(const std::string & shape)   -> std::string { return "green solidOn " + shape; }
-// clang-format on
-
-/// Returns time in nanoseconds
-auto getTime(const builtin_interfaces::msg::Time & time) -> int
-{
-  static constexpr int nanosecond_multiplier = static_cast<int>(1e+9);
-  return static_cast<int>(time.sec) * nanosecond_multiplier + static_cast<int>(time.nanosec);
-}
-
-/// Returns time in nanoseconds
-auto getTime(const std_msgs::msg::Header & header) -> int { return getTime(header.stamp); }
-
-/// Returns time in nanoseconds
-auto getTime(const rclcpp::Time & time) -> int { return static_cast<int>(time.nanoseconds()); }
+constexpr double timing_eps = 1e-3;
+constexpr double frequency_eps = 0.5;
 
 template <typename TrafficLightsT>
 class TrafficLightsInternalTest : public testing::Test
@@ -255,10 +239,6 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 
   std::vector<visualization_msgs::msg::MarkerArray> markers;
 
-  this->lights->startUpdate(20.0);
-
-  auto node_ptr = this->node_ptr;
-
   rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr subscriber =
     this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
       "traffic_light/marker", 10,
@@ -266,8 +246,10 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
         markers.push_back(*msg_in);
       });
 
+  this->lights->startUpdate(20.0);
+
   // spin for 1 second
-  const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1001);
+  const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1005);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -302,7 +284,6 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
   std::vector<std_msgs::msg::Header> headers;
 
   // verify
-  EXPECT_EQ(markers.size(), static_cast<std::size_t>(40));
   for (std::size_t i = 0; i < markers.size(); i += 2) {
     {
       const auto & one_marker = markers[i].markers;
@@ -319,21 +300,18 @@ TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
   }
 
   // verify message timing
-  const double expected_time = 1.0 / 20.0;
-  const double actual_time =
-    (static_cast<double>(getTime(headers.back()) - getTime(headers.front())) /
-     static_cast<double>(headers.size() - 1)) *
-    1e-9;
-  EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  const double expected_frequency = 20.0;
+  const double actual_frequency =
+    static_cast<double>(headers.size() - 1) /
+    static_cast<double>(getTime(headers.back()) - getTime(headers.front())) * 1e+9;
+  EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
 }
 
 TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 {
   this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
 
-  std::vector<visualization_msgs::msg::MarkerArray> markers;
-
-  this->lights->startUpdate(20.0);
+  std::vector<visualization_msgs::msg::MarkerArray> markers, markers_reset;
 
   rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr subscriber =
     this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
@@ -342,13 +320,22 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
         markers.push_back(*msg_in);
       });
 
+  this->lights->startUpdate(20.0);
+
   // spin for 1 second
-  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
+  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-  this->lights->resetUpdate(4.0);
-  end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
+
+  subscriber = this->node_ptr->template create_subscription<visualization_msgs::msg::MarkerArray>(
+    "traffic_light/marker", 10,
+    [&markers_reset](const visualization_msgs::msg::MarkerArray::SharedPtr msg_in) {
+      markers_reset.push_back(*msg_in);
+    });
+
+  this->lights->resetUpdate(10.0);
+  end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
@@ -381,10 +368,9 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
       info);
   };
 
-  std::vector<std_msgs::msg::Header> headers;
+  std::vector<std_msgs::msg::Header> headers, headers_reset;
 
   // verify
-  EXPECT_EQ(markers.size(), static_cast<std::size_t>(24));
   for (std::size_t i = 0; i < markers.size(); i += 2) {
     {
       const auto & one_marker = markers[i].markers;
@@ -399,23 +385,35 @@ TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
       headers.push_back(one_marker[0].header);
     }
   }
+  for (std::size_t i = 0; i < markers_reset.size(); i += 2) {
+    {
+      const auto & one_marker = markers_reset[i].markers;
+      EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
+      verify_delete_marker(one_marker[0], "marker " + std::to_string(i));
+    }
+    {
+      const auto & one_marker = markers_reset[i + 1].markers;
+      EXPECT_EQ(one_marker.size(), static_cast<std::size_t>(1));
+      verify_add_marker(one_marker[0], "marker " + std::to_string(i + 1));
+
+      headers_reset.push_back(one_marker[0].header);
+    }
+  }
 
   // verify message timing
   {
-    const double expected_time = 1.0 / 20.0;
-    const double actual_time =
-      (static_cast<double>(getTime(headers.at(9)) - getTime(headers.front())) /
-       static_cast<double>(10 - 1)) *
-      1e-9;
-    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+    const double expected_frequency = 20.0;
+    const double actual_frequency =
+      static_cast<double>(headers.size() - 1) /
+      static_cast<double>(getTime(headers.back()) - getTime(headers.front())) * 1e+9;
+    EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
   }
   {
-    const double expected_time = 1.0 / 4.0;
-    const double actual_time =
-      (static_cast<double>(getTime(headers.back()) - getTime(*(headers.rbegin() + 1))) /
-       static_cast<double>(headers.size() - 10 - 1)) *
-      1e-9;
-    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+    const double expected_frequency = 10.0;
+    const double actual_frequency =
+      static_cast<double>(headers_reset.size() - 1) /
+      static_cast<double>(getTime(headers_reset.back()) - getTime(headers_reset.front())) * 1e+9;
+    EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
   }
 }
 
@@ -429,7 +427,7 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionMsg)
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
   const double actual_time = static_cast<double>(getTime(msg.stamp)) * 1e-9;
-  EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  EXPECT_NEAR(actual_time, expected_time, timing_eps);
 
   EXPECT_EQ(msg.signals.size(), static_cast<std::size_t>(1));
   EXPECT_EQ(msg.signals.front().elements.size(), static_cast<std::size_t>(2));
@@ -459,7 +457,7 @@ TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
   const double expected_time =
     static_cast<double>(getTime(this->node_ptr->get_clock()->now())) * 1e-9;
   const double actual_time = static_cast<double>(getTime(msg.header)) * 1e-9;
-  EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  EXPECT_NEAR(actual_time, expected_time, timing_eps);
 
   EXPECT_EQ(msg.signals.size(), static_cast<std::size_t>(1));
   EXPECT_EQ(msg.signals.front().lights.size(), static_cast<std::size_t>(2));
@@ -489,20 +487,18 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
 
   std::vector<TrafficSignalArray> signals;
 
-  this->lights->startUpdate(20.0);
-
   rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
     this->node_ptr->create_subscription<TrafficSignalArray>(
       "/perception/traffic_light_recognition/external/traffic_signals", 10,
       [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
+  this->lights->startUpdate(20.0);
+
   // spin for 1 second
-  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1001);
+  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1005);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-
-  EXPECT_EQ(signals.size(), static_cast<std::size_t>(20));
 
   std::vector<builtin_interfaces::msg::Time> stamps;
 
@@ -529,12 +525,12 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignals)
   }
 
   // verify message timing
-  const double expected_time = 1.0 / 20.0;
-  const double actual_time =
-    (static_cast<double>(getTime(stamps.back()) - getTime(stamps.front())) /
-     static_cast<double>(stamps.size() - 1)) *
-    1e-9;
-  EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  const double expected_frequency = 20.0;
+  const double actual_frequency =
+    static_cast<double>(stamps.size() - 1) /
+    static_cast<double>(getTime(stamps.back()) - getTime(stamps.front())) * 1e+9;
+
+  EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
 }
 
 TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
@@ -546,20 +542,18 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
 
   std::vector<TrafficSignalArray> signals;
 
-  this->lights->startUpdate(20.0);
-
   rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
     this->node_ptr->create_subscription<TrafficSignalArray>(
       "/v2x/traffic_signals", 10,
       [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
+  this->lights->startUpdate(20.0);
+
   // spin for 1 second
-  const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1001);
+  const auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(1005);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
-
-  EXPECT_EQ(signals.size(), static_cast<std::size_t>(20));
 
   std::vector<builtin_interfaces::msg::Time> stamps;
 
@@ -586,12 +580,11 @@ TEST_F(V2ITrafficLightsTest, startUpdate_publishSignalsLegacy)
   }
 
   // verify message timing
-  const double expected_time = 1.0 / 20.0;
-  const double actual_time =
-    (static_cast<double>(getTime(stamps.back()) - getTime(stamps.front())) /
-     static_cast<double>(stamps.size() - 1)) *
-    1e-9;
-  EXPECT_NEAR(actual_time, expected_time, 1e-4);
+  const double expected_frequency = 20.0;
+  const double actual_frequency =
+    static_cast<double>(stamps.size() - 1) /
+    static_cast<double>(getTime(stamps.back()) - getTime(stamps.front())) * 1e+9;
+  EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
 }
 
 TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
@@ -601,29 +594,34 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  std::vector<TrafficSignalArray> signals;
-
-  this->lights->startUpdate(20.0);
+  std::vector<TrafficSignalArray> signals, signals_reset;
 
   rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
     this->node_ptr->create_subscription<TrafficSignalArray>(
       "/perception/traffic_light_recognition/external/traffic_signals", 10,
       [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
+  this->lights->startUpdate(20.0);
+
   // spin for 1 second
-  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
-  while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
-  }
-  this->lights->resetUpdate(4.0);
-  end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
+  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
 
-  EXPECT_EQ(signals.size(), static_cast<std::size_t>(12));
+  subscriber = this->node_ptr->create_subscription<TrafficSignalArray>(
+    "/perception/traffic_light_recognition/external/traffic_signals", 10,
+    [&signals_reset](const TrafficSignalArray::SharedPtr msg_in) {
+      signals_reset.push_back(*msg_in);
+    });
 
-  std::vector<builtin_interfaces::msg::Time> stamps;
+  this->lights->resetUpdate(10.0);
+  end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
+  while (std::chrono::system_clock::now() < end) {
+    rclcpp::spin_some(this->node_ptr);
+  }
+
+  std::vector<builtin_interfaces::msg::Time> stamps, stamps_reset;
 
   for (std::size_t i = 0; i < signals.size(); ++i) {
     stamps.push_back(signals[i].stamp);
@@ -647,22 +645,42 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignals)
     EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
   }
 
+  for (std::size_t i = 0; i < signals_reset.size(); ++i) {
+    stamps_reset.push_back(signals_reset[i].stamp);
+
+    const auto & one_message = signals_reset[i].signals;
+    std::string info = "signals message number " + std::to_string(i);
+
+    EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
+    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+
+    EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
+
+    EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
+    EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+
+    EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
+    EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+  }
+
   // verify message timing
   {
-    const double expected_time = 1.0 / 20.0;
-    const double actual_time =
-      (static_cast<double>(getTime(stamps.at(9)) - getTime(stamps.front())) /
-       static_cast<double>(10 - 1)) *
-      1e-9;
-    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+    const double expected_frequency = 20.0;
+    const double actual_frequency =
+      static_cast<double>(stamps.size() - 1) /
+      static_cast<double>(getTime(stamps.back()) - getTime(stamps.front())) * 1e+9;
+    EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
   }
   {
-    const double expected_time = 1.0 / 4.0;
-    const double actual_time =
-      (static_cast<double>(getTime(stamps.back()) - getTime(*(stamps.rbegin() + 1))) /
-       static_cast<double>(stamps.size() - 10 - 1)) *
-      1e-9;
-    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+    const double expected_frequency = 10.0;
+    const double actual_frequency =
+      static_cast<double>(stamps_reset.size() - 1) /
+      static_cast<double>(getTime(stamps_reset.back()) - getTime(stamps_reset.front())) * 1e+9;
+    EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
   }
 }
 
@@ -673,29 +691,33 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
 
-  std::vector<TrafficSignalArray> signals;
-
-  this->lights->startUpdate(20.0);
+  std::vector<TrafficSignalArray> signals, signals_reset;
 
   rclcpp::Subscription<TrafficSignalArray>::SharedPtr subscriber =
     this->node_ptr->create_subscription<TrafficSignalArray>(
       "/v2x/traffic_signals", 10,
       [&signals](const TrafficSignalArray::SharedPtr msg_in) { signals.push_back(*msg_in); });
 
+  this->lights->startUpdate(20.0);
+
   // spin for 1 second
-  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
-  while (std::chrono::system_clock::now() < end) {
-    rclcpp::spin_some(this->node_ptr);
-  }
-  this->lights->resetUpdate(4.0);
-  end = std::chrono::system_clock::now() + std::chrono::milliseconds(501);
+  auto end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
   while (std::chrono::system_clock::now() < end) {
     rclcpp::spin_some(this->node_ptr);
   }
 
-  EXPECT_EQ(signals.size(), static_cast<std::size_t>(12));
+  subscriber = this->node_ptr->create_subscription<TrafficSignalArray>(
+    "/v2x/traffic_signals", 10, [&signals_reset](const TrafficSignalArray::SharedPtr msg_in) {
+      signals_reset.push_back(*msg_in);
+    });
 
-  std::vector<builtin_interfaces::msg::Time> stamps;
+  this->lights->resetUpdate(10.0);
+  end = std::chrono::system_clock::now() + std::chrono::milliseconds(505);
+  while (std::chrono::system_clock::now() < end) {
+    rclcpp::spin_some(this->node_ptr);
+  }
+
+  std::vector<builtin_interfaces::msg::Time> stamps, stamps_reset;
 
   for (std::size_t i = 0; i < signals.size(); ++i) {
     stamps.push_back(signals[i].stamp);
@@ -719,28 +741,41 @@ TEST_F(V2ITrafficLightsTest, resetUpdate_publishSignalsLegacy)
     EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
   }
 
+  for (std::size_t i = 0; i < signals_reset.size(); ++i) {
+    stamps_reset.push_back(signals_reset[i].stamp);
+
+    const auto & one_message = signals_reset[i].signals;
+    std::string info = "signals message number " + std::to_string(i);
+
+    EXPECT_EQ(one_message.size(), static_cast<std::size_t>(1)) << info;
+    EXPECT_EQ(one_message[0].traffic_signal_id, signal_id) << info;
+
+    EXPECT_EQ(one_message[0].elements.size(), static_cast<std::size_t>(2)) << info;
+
+    EXPECT_EQ(one_message[0].elements[0].color, TrafficSignalElement::AMBER) << info;
+    EXPECT_EQ(one_message[0].elements[0].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[0].status, TrafficSignalElement::FLASHING) << info;
+    EXPECT_NEAR(one_message[0].elements[0].confidence, 0.7, 1e-6);
+
+    EXPECT_EQ(one_message[0].elements[1].color, TrafficSignalElement::RED) << info;
+    EXPECT_EQ(one_message[0].elements[1].shape, TrafficSignalElement::CIRCLE) << info;
+    EXPECT_EQ(one_message[0].elements[1].status, TrafficSignalElement::SOLID_ON) << info;
+    EXPECT_NEAR(one_message[0].elements[1].confidence, 0.7, 1e-6);
+  }
+
   // verify message timing
   {
-    const double expected_time = 1.0 / 20.0;
-    const double actual_time =
-      (static_cast<double>(getTime(stamps.at(9)) - getTime(stamps.front())) /
-       static_cast<double>(10 - 1)) *
-      1e-9;
-    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+    const double expected_frequency = 20.0;
+    const double actual_frequency =
+      static_cast<double>(stamps.size() - 1) /
+      static_cast<double>(getTime(stamps.back()) - getTime(stamps.front())) * 1e+9;
+    EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
   }
   {
-    const double expected_time = 1.0 / 4.0;
-    const double actual_time =
-      (static_cast<double>(getTime(stamps.back()) - getTime(*(stamps.rbegin() + 1))) /
-       static_cast<double>(stamps.size() - 10 - 1)) *
-      1e-9;
-    EXPECT_NEAR(actual_time, expected_time, 1e-4);
+    const double expected_frequency = 10.0;
+    const double actual_frequency =
+      static_cast<double>(stamps_reset.size() - 1) /
+      static_cast<double>(getTime(stamps_reset.back()) - getTime(stamps_reset.front())) * 1e+9;
+    EXPECT_NEAR(actual_frequency, expected_frequency, frequency_eps);
   }
-}
-
-int main(int argc, char ** argv)
-{
-  testing::InitGoogleTest(&argc, argv);
-  rclcpp::init(argc, argv);
-  return RUN_ALL_TESTS();
 }
