@@ -257,7 +257,7 @@ bool EntityManager::isStopping(const std::string & name) const
 void EntityManager::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
-  if (const auto entity = getEntity(name); entity->laneMatchingSucceed()) {
+  if (const auto entity = getEntity(name); entity->isInLanelet()) {
     if (
       const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
         entity->getStatus().getLaneletId(), direction)) {

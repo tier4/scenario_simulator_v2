@@ -54,7 +54,7 @@ StopAtCrossingEntityAction::calculateObstacle(const traffic_simulator_msgs::msg:
 
 const traffic_simulator_msgs::msg::WaypointsArray StopAtCrossingEntityAction::calculateWaypoints()
 {
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!entity_status->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (entity_status->getTwist().linear.x >= 0) {
@@ -92,7 +92,7 @@ BT::NodeStatus StopAtCrossingEntityAction::tick()
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!entity_status->isInLanelet()) {
     in_stop_sequence_ = false;
     return BT::NodeStatus::FAILURE;
   }

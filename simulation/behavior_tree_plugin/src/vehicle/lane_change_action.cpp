@@ -102,7 +102,7 @@ BT::NodeStatus LaneChangeAction::tick()
   }
   if (!curve_) {
     if (request == traffic_simulator::behavior::Request::LANE_CHANGE) {
-      if (!entity_status->laneMatchingSucceed()) {
+      if (!entity_status->isInLanelet()) {
         return BT::NodeStatus::FAILURE;
       }
       const auto lanelet_pose = entity_status->getLaneletPose();

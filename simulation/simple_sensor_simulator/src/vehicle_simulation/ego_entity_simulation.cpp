@@ -352,7 +352,7 @@ void EgoEntitySimulation::update(
 auto EgoEntitySimulation::calculateEgoPitch() const -> double
 {
   // calculate prev/next point of lanelet centerline nearest to ego pose.
-  if (!status_.laneMatchingSucceed()) {
+  if (!status_.isInLanelet()) {
     return 0.0;
   }
 

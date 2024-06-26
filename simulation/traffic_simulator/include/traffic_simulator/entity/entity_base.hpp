@@ -84,17 +84,6 @@ public:
   // clang-format on
 #undef DEFINE_GETTER
 
-  // clang-format off
-#define DEFINE_CHECK_FUNCTION(FUNCTION_NAME, BOOL_VARIABLE)            \
-  /**                                                                  \
-   @note This function was defined by DEFINE_CHECK_FUNCTION function.  \
-   */                                                                  \
-  /*   */ auto FUNCTION_NAME() const->bool { return BOOL_VARIABLE; }
-
-  DEFINE_CHECK_FUNCTION(laneMatchingSucceed, status_.laneMatchingSucceed())
-  // clang-format on
-#undef DEFINE_CHECK_FUNCTION
-
   /*   */ auto get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>;
 
   virtual auto getCurrentAction() const -> std::string = 0;
@@ -115,6 +104,8 @@ public:
 
   /*   */ auto isInPosition(
     const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const -> bool;
+
+  /*   */ auto isInLanelet() const -> bool { return status_.isInLanelet(); };
 
   /*   */ auto isInLanelet(
     const lanelet::Id lanelet_id, std::optional<double> tolerance = std::nullopt) const -> bool;

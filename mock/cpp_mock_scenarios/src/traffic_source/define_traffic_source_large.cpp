@@ -56,7 +56,7 @@ private:
         const bool is_vehicle =
           entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
 
-        if (!entity->laneMatchingSucceed() || !is_vehicle) {
+        if (!entity->isInLanelet() || !is_vehicle) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         }
       }

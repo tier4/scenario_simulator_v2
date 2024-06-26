@@ -56,7 +56,7 @@ private:
         const bool is_pedestrian =
           entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
 
-        if (entity->laneMatchingSucceed() || !is_pedestrian) {
+        if (entity->isInLanelet() || !is_pedestrian) {
           stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         }
         stop(cpp_mock_scenarios::Result::SUCCESS);

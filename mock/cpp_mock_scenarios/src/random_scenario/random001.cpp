@@ -138,7 +138,7 @@ private:
         lane_change_requested = false;
       }
       /// Checking the ego entity overs the lane change position.
-      if (ego_entity->laneMatchingSucceed()) {
+      if (ego_entity->isInLanelet()) {
         if (
           ego_entity->getStatus().getLaneletId() == 34684 &&
           std::abs(ego_entity->getStatus().getLaneletPose().s) >= lane_change_position) {

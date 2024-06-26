@@ -156,7 +156,7 @@ void EntityBase::requestLaneChange(
 {
   lanelet::Id reference_lanelet_id = 0;
   if (target.entity_name == name) {
-    if (not laneMatchingSucceed()) {
+    if (not isInLanelet()) {
       THROW_SEMANTIC_ERROR(
         "Source entity does not assigned to lanelet. Please check source entity name : ", name,
         " exists on lane.");
@@ -167,7 +167,7 @@ void EntityBase::requestLaneChange(
       THROW_SEMANTIC_ERROR(
         "Target entity : ", target.entity_name, " does not exist. Please check ",
         target.entity_name, " exists.");
-    } else if (!other_status_.at(target.entity_name).laneMatchingSucceed()) {
+    } else if (!other_status_.at(target.entity_name).isInLanelet()) {
       THROW_SEMANTIC_ERROR(
         "Target entity does not assigned to lanelet. Please check Target entity name : ",
         target.entity_name, " exists on lane.");

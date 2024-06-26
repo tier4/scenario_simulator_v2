@@ -60,7 +60,7 @@ public:
   auto getLinearJerk() const noexcept -> double;
   auto setLinearJerk(double) -> void;
 
-  auto laneMatchingSucceed() const noexcept -> bool;
+  auto isInLanelet() const noexcept -> bool;
   auto getLaneletId() const noexcept -> lanelet::Id;
   auto getLaneletIds() const noexcept -> lanelet::Ids;
   auto getLaneletPose() const noexcept -> LaneletPose;

@@ -83,7 +83,7 @@ auto CanonicalizedEntityStatus::set(
   set(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
 }
 
-auto CanonicalizedEntityStatus::laneMatchingSucceed() const noexcept -> bool
+auto CanonicalizedEntityStatus::isInLanelet() const noexcept -> bool
 {
   return canonicalized_lanelet_pose_.has_value();
 }
@@ -120,7 +120,7 @@ auto CanonicalizedEntityStatus::getLaneletId() const noexcept -> lanelet::Id
 
 auto CanonicalizedEntityStatus::getLaneletIds() const noexcept -> lanelet::Ids
 {
-  return laneMatchingSucceed() ? lanelet::Ids{getLaneletId()} : lanelet::Ids{};
+  return isInLanelet() ? lanelet::Ids{getLaneletId()} : lanelet::Ids{};
 }
 
 auto CanonicalizedEntityStatus::getCanonicalizedLaneletPose() const noexcept

@@ -53,7 +53,7 @@ const std::optional<traffic_simulator_msgs::msg::Obstacle> StopAtStopLineAction:
 
 const traffic_simulator_msgs::msg::WaypointsArray StopAtStopLineAction::calculateWaypoints()
 {
-  if (!entity_status->laneMatchingSucceed()) {
+  if (!entity_status->isInLanelet()) {
     THROW_SIMULATION_ERROR("failed to assign lane");
   }
   if (entity_status->getTwist().linear.x >= 0) {

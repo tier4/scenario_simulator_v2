@@ -46,7 +46,7 @@ private:
   {
     const auto from_entity = api_.getEntity(from_entity_name);
     const auto to_entity = api_.getEntity(to_entity_name);
-    if (from_entity->laneMatchingSucceed() && to_entity->laneMatchingSucceed()) {
+    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
       return traffic_simulator::distance::lateralDistance(
         from_entity->getCanonicalizedLaneletPose().value(),
         to_entity->getCanonicalizedLaneletPose().value(), false, api_.getHdmapUtils());
@@ -76,7 +76,7 @@ private:
   {
     const auto from_entity = api_.getEntity(from_entity_name);
     const auto to_entity = api_.getEntity(to_entity_name);
-    if (from_entity->laneMatchingSucceed() && to_entity->laneMatchingSucceed()) {
+    if (from_entity->isInLanelet() && to_entity->isInLanelet()) {
       return traffic_simulator::distance::longitudinalDistance(
         from_entity->getCanonicalizedLaneletPose().value(),
         to_entity->getCanonicalizedLaneletPose().value(), false, true, false, api_.getHdmapUtils());
