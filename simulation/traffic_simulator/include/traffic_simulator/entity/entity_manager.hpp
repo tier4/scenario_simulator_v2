@@ -356,8 +356,6 @@ public:
 
   const std::string getEgoName() const;
 
-  bool isInLanelet(const std::string & name, const lanelet::Id lanelet_id, const double tolerance);
-
   bool isStopping(const std::string & name) const;
 
   bool reachPosition(

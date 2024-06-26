@@ -40,7 +40,7 @@ private:
   bool lanechange_finished = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34513, 0.1)) {
+    if (api_.getEntity("ego")->isInLanelet(34513, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }

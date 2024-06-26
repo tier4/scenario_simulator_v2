@@ -39,7 +39,7 @@ private:
   bool requested = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34510, 0.1)) {
+    if (api_.getEntity("ego")->isInLanelet(34510, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
     // LCOV_EXCL_START

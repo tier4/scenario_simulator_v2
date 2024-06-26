@@ -82,6 +82,18 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
     matching_distance, hdmap_utils_ptr_);
 }
 
+auto EntityBase::isInLanelet(const lanelet::Id lanelet_id, std::optional<double> tolerance) const
+  -> bool
+{
+  if (const auto lanelet_pose = getCanonicalizedLaneletPose()) {
+    const auto tolerance_ =
+      tolerance ? tolerance.value() : getDefaultMatchingDistanceForLaneletPoseCalculation();
+    return traffic_simulator::pose::isInLanelet(
+      lanelet_pose.value(), lanelet_id, tolerance_, hdmap_utils_ptr_);
+  }
+  return false;
+}
+
 auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double
 {
   return getBoundingBox().dimensions.y * 0.5 + 1.0;

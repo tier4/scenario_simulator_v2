@@ -248,19 +248,6 @@ bool EntityManager::isEgoSpawned() const
   return false;
 }
 
-/// @todo it should be removed (use pose::isINLanelet instead)
-bool EntityManager::isInLanelet(
-  const std::string & name, const lanelet::Id lanelet_id, const double tolerance)
-{
-  const auto entity = getEntity(name);
-  if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
-    return pose::isInLanelet(
-      canonicalized_lanelet_pose.value(), lanelet_id, tolerance, hdmap_utils_ptr_);
-  } else {
-    return false;
-  }
-}
-
 bool EntityManager::isStopping(const std::string & name) const
 {
   return std::fabs(getEntity(name)->getCurrentTwist().linear.x) <

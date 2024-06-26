@@ -147,7 +147,7 @@ private:
       }
     };
 
-    if (api_.isInLanelet("ego", 34684, 0.1)) {
+    if (api_.getEntity("ego")->isInLanelet(34684, 0.1)) {
       spawn_and_change_lane("lane_following_0", 0.0);
     }
 
