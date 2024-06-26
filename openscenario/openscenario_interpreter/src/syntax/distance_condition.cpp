@@ -120,9 +120,10 @@ auto DistanceCondition::description() const -> std::string
 #define SWITCH_FREESPACE(FUNCTION, ...) \
   return freespace ? FUNCTION(__VA_ARGS__, true) : FUNCTION(__VA_ARGS__, false)
 
-#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity)
+#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, position)
 
-auto DistanceCondition::distance(const EntityRef & triggering_entity) -> double
+auto DistanceCondition::distance(const EntityRef & triggering_entity, const Position & position)
+  -> double
 {
   SWITCH_COORDINATE_SYSTEM(
     SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
@@ -144,7 +145,7 @@ static auto hypot(const double x, const double y, const double z)
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  false>(const EntityRef & triggering_entity) -> double
+  false>(const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -178,7 +179,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  true>(const EntityRef & triggering_entity) -> double
+  true>(const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -212,7 +213,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -242,7 +243,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -272,7 +273,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -302,7 +303,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -332,7 +333,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -381,7 +382,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -430,7 +431,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -479,7 +480,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -528,7 +529,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -581,7 +582,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -634,7 +635,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -687,7 +688,7 @@ auto DistanceCondition::distance<
 template <>
 auto DistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity) -> double
+  const EntityRef & triggering_entity, const Position & position) -> double
 {
   return apply<double>(
     overload(
@@ -742,7 +743,7 @@ auto DistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(distance(triggering_entity));
+    results.push_back(distance(triggering_entity, position));
     return rule(static_cast<double>(results.back()), value);
   }));
 }
