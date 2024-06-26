@@ -28,6 +28,7 @@ class TrafficLightsPublisherBase
 {
 public:
   virtual auto publish(const TrafficLightsBase & traffic_lights) const -> void = 0;
+  virtual ~TrafficLightsPublisherBase() = default;
 };
 
 template <typename MessageType>
@@ -45,6 +46,8 @@ public:
       node_ptr, topic_name, rclcpp::QoS(10).transient_local()))
   {
   }
+
+  ~TrafficLightsPublisher() override = default;
 
   auto publish(const TrafficLightsBase & traffic_lights) const -> void override;
 
