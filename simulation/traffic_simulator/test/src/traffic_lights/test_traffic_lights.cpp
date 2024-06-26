@@ -43,13 +43,13 @@ auto getTime(const std_msgs::msg::Header & header) -> int { return getTime(heade
 auto getTime(const rclcpp::Time & time) -> int { return static_cast<int>(time.nanoseconds()); }
 
 template <typename TrafficLightsT>
-class TrafficLightsTest : public testing::Test
+class TrafficLightsInternalTest : public testing::Test
 {
 public:
   const lanelet::Id id = 34836;
   const lanelet::Id signal_id = 34806;
 
-  const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsTest");
+  const rclcpp::Node::SharedPtr node_ptr = rclcpp::Node::make_shared("TrafficLightsInternalTest");
 
   const std::string path =
     ament_index_cpp::get_package_share_directory("traffic_simulator") + "/map/lanelet2_map.osm";
@@ -63,7 +63,7 @@ public:
 
   std::unique_ptr<TrafficLightsT> lights;
 
-  TrafficLightsTest()
+  TrafficLightsInternalTest()
   : lights([this] {
       if constexpr (std::is_same_v<TrafficLightsT, traffic_simulator::ConventionalTrafficLights>)
         return std::make_unique<TrafficLightsT>(node_ptr, hdmap_utils_ptr);
@@ -95,12 +95,12 @@ public:
 };
 
 // Declare typed test suite
-TYPED_TEST_SUITE(TrafficLightsTest, TrafficLightsTypes, TrafficLightsNameGenerator);
+TYPED_TEST_SUITE(TrafficLightsInternalTest, TrafficLightsTypes, TrafficLightsNameGenerator);
 
 // Define V2I type for use in tests with V2I traffic lights only
-using V2ITrafficLightsTest = TrafficLightsTest<traffic_simulator::V2ITrafficLights>;
+using V2ITrafficLightsTest = TrafficLightsInternalTest<traffic_simulator::V2ITrafficLights>;
 
-TYPED_TEST(TrafficLightsTest, setTrafficLightsColor)
+TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsColor)
 {
   using Color = traffic_simulator::TrafficLight::Color;
 
@@ -121,7 +121,7 @@ TYPED_TEST(TrafficLightsTest, setTrafficLightsColor)
     this->lights->getTrafficLightsComposedState(this->id).find("white") == std::string::npos);
 }
 
-TYPED_TEST(TrafficLightsTest, setTrafficLightsState_color)
+TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_color)
 {
   // green
   this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
@@ -152,7 +152,7 @@ TYPED_TEST(TrafficLightsTest, setTrafficLightsState_color)
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromColor("white"));
 }
 
-TYPED_TEST(TrafficLightsTest, setTrafficLightsState_status)
+TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_status)
 {
   // solid on
   this->lights->setTrafficLightsState(this->id, stateFromStatus("solidOn"));
@@ -177,7 +177,7 @@ TYPED_TEST(TrafficLightsTest, setTrafficLightsState_status)
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromStatus("unknown"));
 }
 
-TYPED_TEST(TrafficLightsTest, setTrafficLightsState_shape)
+TYPED_TEST(TrafficLightsInternalTest, setTrafficLightsState_shape)
 {
   this->lights->setTrafficLightsState(this->id, stateFromShape("circle"));
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("circle"));
@@ -213,12 +213,12 @@ TYPED_TEST(TrafficLightsTest, setTrafficLightsState_shape)
   EXPECT_EQ(this->lights->getTrafficLightsComposedState(this->id), stateFromShape("up"));
 }
 
-TYPED_TEST(TrafficLightsTest, isAnyTrafficLightChanged)
+TYPED_TEST(TrafficLightsInternalTest, isAnyTrafficLightChanged)
 {
   EXPECT_TRUE(this->lights->isAnyTrafficLightChanged());
 }
 
-TYPED_TEST(TrafficLightsTest, isRequiredStopTrafficLightState)
+TYPED_TEST(TrafficLightsInternalTest, isRequiredStopTrafficLightState)
 {
   this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
   EXPECT_FALSE(this->lights->isRequiredStopTrafficLightState(this->id));
@@ -233,7 +233,7 @@ TYPED_TEST(TrafficLightsTest, isRequiredStopTrafficLightState)
   EXPECT_TRUE(this->lights->isRequiredStopTrafficLightState(this->id));
 }
 
-TYPED_TEST(TrafficLightsTest, compareTrafficLightsState)
+TYPED_TEST(TrafficLightsInternalTest, compareTrafficLightsState)
 {
   this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
   EXPECT_TRUE(this->lights->compareTrafficLightsState(this->id, stateFromColor("green")));
@@ -249,7 +249,7 @@ TYPED_TEST(TrafficLightsTest, compareTrafficLightsState)
   EXPECT_TRUE(this->lights->compareTrafficLightsState(this->id, stateFromStatus("none")));
 }
 
-TYPED_TEST(TrafficLightsTest, startUpdate_publishMarkers)
+TYPED_TEST(TrafficLightsInternalTest, startUpdate_publishMarkers)
 {
   this->lights->setTrafficLightsState(this->id, stateFromColor("red"));
 
@@ -327,7 +327,7 @@ TYPED_TEST(TrafficLightsTest, startUpdate_publishMarkers)
   EXPECT_NEAR(actual_time, expected_time, 1e-4);
 }
 
-TYPED_TEST(TrafficLightsTest, resetUpdate_publishMarkers)
+TYPED_TEST(TrafficLightsInternalTest, resetUpdate_publishMarkers)
 {
   this->lights->setTrafficLightsState(this->id, stateFromColor("green"));
 
@@ -419,7 +419,7 @@ TYPED_TEST(TrafficLightsTest, resetUpdate_publishMarkers)
   }
 }
 
-TYPED_TEST(TrafficLightsTest, generateAutowarePerceptionMsg)
+TYPED_TEST(TrafficLightsInternalTest, generateAutowarePerceptionMsg)
 {
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
@@ -449,7 +449,7 @@ TYPED_TEST(TrafficLightsTest, generateAutowarePerceptionMsg)
   EXPECT_NEAR(msg.signals[0].elements[1].confidence, 0.7, 1e-6);
 }
 
-TYPED_TEST(TrafficLightsTest, generateAutowareAutoPerceptionMsg)
+TYPED_TEST(TrafficLightsInternalTest, generateAutowareAutoPerceptionMsg)
 {
   this->lights->setTrafficLightsState(this->id, "red solidOn circle, yellow flashing circle");
   this->lights->setTrafficLightsConfidence(this->id, 0.7);
