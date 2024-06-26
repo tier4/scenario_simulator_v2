@@ -49,8 +49,9 @@ private:
   {
     // SUCCESS
     if (
-      api_.requestSynchronize("npc", "ego", ego_target, npc_target, 1.0) &&
-      api_.reachPosition("ego", ego_target, 1.0) && api_.reachPosition("npc", npc_target, 1.0)) {
+      api_.requestSynchronize("npc", "ego", ego_target, npc_target, 0, 0.5) &&
+      api_.reachPosition("ego", ego_target, 1.0) && api_.reachPosition("npc", npc_target, 1.0) &&
+      api_.getCurrentTwist("npc").linear.x < 0.5){
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
 
@@ -76,13 +77,13 @@ private:
     api_.requestAssignRoute("ego", goal_poses);
 
     api_.spawn(
-      "npc", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(14, 10, 0, 0, 0, 0)),
+      "npc", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(14, 15, 0, 0, 0, 0)),
       getVehicleParameters());
     std::vector<geometry_msgs::msg::Pose> npc_goal_poses;
     npc_goal_poses.emplace_back(
       api_.canonicalize(traffic_simulator::helper::constructLaneletPose(140, 20, 0, 0, 0, 0)));
     api_.requestAssignRoute("npc", npc_goal_poses);
-    api_.setLinearVelocity("npc", 3);
+    api_.setLinearVelocity("npc", 6);
   }
 
   auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)

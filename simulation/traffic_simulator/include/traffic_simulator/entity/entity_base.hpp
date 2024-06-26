@@ -239,7 +239,8 @@ public:
 
   /*   */ auto requestSynchronize(
     const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
-    const CanonicalizedLaneletPose & entity_target, const double threshold) -> bool;
+    const CanonicalizedLaneletPose & entity_target,
+    const double target_speed, const double threshold) -> bool;
 
   virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
     -> void final;
