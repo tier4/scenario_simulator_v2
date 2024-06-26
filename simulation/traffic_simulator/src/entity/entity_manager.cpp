@@ -50,18 +50,16 @@ void EntityManager::broadcastEntityTransform()
    * so we publish the average of the coordinates of all entities.
    */
   if (isEgoSpawned()) {
-    if (const auto ego = getEntity(getEgoName())) {
-      broadcastTransform(
-        geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
-          /**
+    broadcastTransform(
+      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+        /**
            * @note This is the intended implementation.
            * It is easier to create rviz config if the name "ego" is fixed,
            * so the frame_id “ego” is issued regardless of the name of the ego entity.
            */
-          .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-          .pose(ego->getMapPose()),
-        true);
-    }
+        .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
+        .pose(getEntity(getEgoName())->getMapPose()),
+      true);
   }
   if (const auto names = getEntityNames(); !names.empty()) {
     broadcastTransform(
@@ -102,12 +100,13 @@ void EntityManager::broadcastTransform(
   }
 }
 
+/// @todo it probably should be moved to SimulatorCore
 bool EntityManager::checkCollision(
   const std::string & first_entity_name, const std::string & second_entity_name)
 {
   if (first_entity_name != second_entity_name) {
-    if (const auto first_entity = getEntity(first_entity_name)) {
-      if (const auto second_entity = getEntity(second_entity_name)) {
+    if (const auto first_entity = getEntityOrNullptr(first_entity_name)) {
+      if (const auto second_entity = getEntityOrNullptr(second_entity_name)) {
         return math::geometry::checkCollision2D(
           first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
           second_entity->getBoundingBox());
@@ -145,7 +144,7 @@ auto EntityManager::getEntityNames() const -> const std::vector<std::string>
   return names;
 }
 
-auto EntityManager::getEntity(const std::string & name) const
+auto EntityManager::getEntityOrNullptr(const std::string & name) const
   -> std::shared_ptr<traffic_simulator::entity::EntityBase>
 {
   if (auto it = entities_.find(name); it != entities_.end()) {
@@ -155,17 +154,17 @@ auto EntityManager::getEntity(const std::string & name) const
       This method returns nullptr, due to the fact that the interpretation of the scenario operates in
       such a way that checking a condition, e.g. DistanceCondition, is called also for Entities that
       have not yet been spawned. For example, if for DistanceCondition any getEntity() returns
-      nullptr, the condition returns a distance equal to NaN. For this reason, throwing an exception
-      through getEntity() is not recommended.
+      nullptr, the condition returns a distance equal to NaN. For this reason, using getEntity() with
+      throwing an exception is not recommended.
     */
     return nullptr;
   }
 };
 
-auto EntityManager::getEntityOrThrow(const std::string & name) const
+auto EntityManager::getEntity(const std::string & name) const
   -> std::shared_ptr<traffic_simulator::entity::EntityBase>
 {
-  if (const auto entity = getEntity(name)) {
+  if (const auto entity = getEntityOrNullptr(name)) {
     return entity;
   } else {
     THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
@@ -249,45 +248,49 @@ bool EntityManager::isEgoSpawned() const
   return false;
 }
 
+/// @todo it should be removed (use pose::isINLanelet instead)
 bool EntityManager::isInLanelet(
   const std::string & name, const lanelet::Id lanelet_id, const double tolerance)
 {
-  if (const auto entity = getEntity(name)) {
-    if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
-      return pose::isInLanelet(
-        canonicalized_lanelet_pose.value(), lanelet_id, tolerance, hdmap_utils_ptr_);
-    }
+  const auto entity = getEntity(name);
+  if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+    return pose::isInLanelet(
+      canonicalized_lanelet_pose.value(), lanelet_id, tolerance, hdmap_utils_ptr_);
+  } else {
+    return false;
   }
-  return false;
 }
 
 bool EntityManager::isStopping(const std::string & name) const
 {
-  return std::fabs(getEntityOrThrow(name)->getCurrentTwist().linear.x) <
+  return std::fabs(getEntity(name)->getCurrentTwist().linear.x) <
          std::numeric_limits<double>::epsilon();
 }
 
+/// @todo it probably should be moved to SimulatorCore
 bool EntityManager::reachPosition(
   const std::string & name, const std::string & target_entity_name, const double tolerance) const
 {
-  if (const auto target_entity = getEntity(target_entity_name)) {
+  if (const auto target_entity = getEntityOrNullptr(target_entity_name)) {
     return reachPosition(name, target_entity->getMapPose(), tolerance);
   } else {
     return false;
   }
 }
 
+/// @todo it probably should be moved to SimulatorCore
 bool EntityManager::reachPosition(
   const std::string & name, const geometry_msgs::msg::Pose & target_pose,
   const double tolerance) const
 {
-  if (const auto entity = getEntity(name)) {
+  if (const auto entity = getEntityOrNullptr(name)) {
     return math::geometry::getDistance(entity->getMapPose(), target_pose) < tolerance;
   } else {
     return false;
   }
 }
 
+/// @todo it probably should be moved to SimulatorCore
 bool EntityManager::reachPosition(
   const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
   const double tolerance) const
@@ -298,7 +301,7 @@ bool EntityManager::reachPosition(
 void EntityManager::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
-  if (const auto entity = getEntity(name); entity && entity->laneMatchingSucceed()) {
+  if (const auto entity = getEntity(name); entity->laneMatchingSucceed()) {
     if (
       const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
         entity->getStatus().getLaneletId(), direction)) {
@@ -310,8 +313,8 @@ void EntityManager::requestLaneChange(
 void EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name)
 {
-  const auto & status = getEntityOrThrow(name)->getStatus();
-  const auto behavior_parameter = getEntityOrThrow(name)->getBehaviorParameter();
+  const auto & status = getEntity(name)->getStatus();
+  const auto behavior_parameter = getEntity(name)->getBehaviorParameter();
   if (is<EgoEntity>(name)) {
     THROW_SEMANTIC_ERROR(
       "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
@@ -341,14 +344,10 @@ void EntityManager::resetBehaviorPlugin(
 
 auto EntityManager::getCurrentAction(const std::string & name) const -> std::string
 {
-  if (const auto entity = getEntity(name)) {
-    if (not npc_logic_started_ and not is<EgoEntity>(name)) {
-      return "waiting";
-    } else {
-      return entity->getCurrentAction();
-    }
+  if (not npc_logic_started_ and not is<EgoEntity>(name)) {
+    return "waiting";
   } else {
-    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+    return getEntity(name)->getCurrentAction();
   }
 }
 
@@ -373,17 +372,14 @@ auto EntityManager::updateNpcLogic(
   if (configuration.verbose) {
     std::cout << "update " << name << " behavior" << std::endl;
   }
-  if (const auto entity = getEntity(name)) {
-    // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
-    if (npc_logic_started_) {
-      entity->onUpdate(current_time, step_time);
-    } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
-      ego_entity->updateFieldOperatorApplication();
-    }
-    return entity->getStatus();
-  } else {
-    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
+  const auto entity = getEntity(name);
+  // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
+  if (npc_logic_started_) {
+    entity->onUpdate(current_time, step_time);
+  } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
+    ego_entity->updateFieldOperatorApplication();
   }
+  return entity->getStatus();
 }
 
 void EntityManager::update(const double current_time, const double step_time)

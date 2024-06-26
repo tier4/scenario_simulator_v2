@@ -67,7 +67,7 @@ auto API::respawn(
     // read status from EntityManager, then send it to SimpleSensorSimulator
     simulation_api_schema::UpdateEntityStatusRequest req;
     simulation_interface::toProto(
-      static_cast<EntityStatus>(entity_manager_ptr_->getEntityOrThrow(name)->getStatus()),
+      static_cast<EntityStatus>(entity_manager_ptr_->getEntity(name)->getStatus()),
       *req.add_status());
     req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
     req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(name));
@@ -87,7 +87,7 @@ auto API::respawn(
     } else {
       // if valid, set response in EntityManager, then plan path and engage
       auto entity_status =
-        static_cast<EntityStatus>(entity_manager_ptr_->getEntityOrThrow(name)->getStatus());
+        static_cast<EntityStatus>(entity_manager_ptr_->getEntity(name)->getStatus());
       simulation_interface::toMsg(res_status->pose(), entity_status.pose);
       simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
       setMapPose(name, entity_status.pose);
@@ -106,39 +106,32 @@ auto API::setEntityStatus(
   const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  if (const auto entity = getEntity(name)) {
-    auto status = static_cast<EntityStatus>(entity->getStatus());
-    status.action_status = action_status;
-    if (canonicalized_lanelet_pose) {
-      status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
-      status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-      status.lanelet_pose_valid = true;
-    }
-    entity->setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
-  } else {
-    THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
+  const auto entity = getEntity(name);
+  auto status = static_cast<EntityStatus>(entity->getStatus());
+  status.action_status = action_status;
+  if (canonicalized_lanelet_pose) {
+    status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
+    status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
+    status.lanelet_pose_valid = true;
   }
+  entity->setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
 }
 
 auto API::setEntityStatus(const std::string & name, const EntityStatus & status) -> void
 {
-  if (const auto entity = getEntity(name)) {
-    entity->setStatus(status);
-  } else {
-    THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
-  }
+  getEntity(name)->setStatus(status);
 }
 
 /// @todo it probably should be moved to SimulatorCore
 std::optional<double> API::getTimeHeadway(
   const std::string & from_entity_name, const std::string & to_entity_name)
 {
-  if (auto from_entity = getEntity(from_entity_name); from_entity) {
-    if (auto to_entity = getEntity(to_entity_name); to_entity) {
+  if (auto from_entity = getEntityOrNullptr(from_entity_name); from_entity) {
+    if (auto to_entity = getEntityOrNullptr(to_entity_name); to_entity) {
       if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
           relative_pose && relative_pose->position.x <= 0) {
-        const double time_headway = (relative_pose->position.x * -1) /
-                                    getEntityOrThrow(to_entity_name)->getCurrentTwist().linear.x;
+        const double time_headway =
+          (relative_pose->position.x * -1) / getEntity(to_entity_name)->getCurrentTwist().linear.x;
         return std::isnan(time_headway) ? std::numeric_limits<double>::infinity() : time_headway;
       }
     }
@@ -158,14 +151,11 @@ auto API::setEntityStatus(
   const std::string & name, const geometry_msgs::msg::Pose & map_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  if (const auto entity = getEntity(name)) {
-    EntityStatus status = static_cast<EntityStatus>(entity->getStatus());
-    status.pose = map_pose;
-    status.action_status = action_status;
-    setEntityStatus(name, status);
-  } else {
-    THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
-  }
+  const auto entity = getEntity(name);
+  EntityStatus status = static_cast<EntityStatus>(entity->getStatus());
+  status.pose = map_pose;
+  status.action_status = action_status;
+  setEntityStatus(name, status);
 }
 
 auto API::setEntityStatus(
@@ -173,14 +163,10 @@ auto API::setEntityStatus(
   const geometry_msgs::msg::Pose & relative_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  if (const auto reference_entity = getEntity(reference_entity_name)) {
-    setEntityStatus(
-      name, transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
-      action_status);
-  } else {
-    THROW_SIMULATION_ERROR(
-      "Cannot get entity \"", reference_entity_name, "\" - such entity does not exist.");
-  }
+  const auto reference_entity = getEntity(reference_entity_name);
+  setEntityStatus(
+    name, transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
+    action_status);
 }
 
 auto API::setEntityStatus(
@@ -285,7 +271,7 @@ bool API::updateEntitiesStatusInSim()
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
     const auto entity_status =
-      static_cast<EntityStatus>(entity_manager_ptr_->getEntityOrThrow(entity_name)->getStatus());
+      static_cast<EntityStatus>(entity_manager_ptr_->getEntity(entity_name)->getStatus());
     simulation_interface::toProto(entity_status, *req.add_status());
     if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
       req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(entity_name));
@@ -297,7 +283,7 @@ bool API::updateEntitiesStatusInSim()
     for (const auto & res_status : res.status()) {
       auto entity_name = res_status.name();
       auto entity_status =
-        static_cast<EntityStatus>(entity_manager_ptr_->getEntityOrThrow(entity_name)->getStatus());
+        static_cast<EntityStatus>(entity_manager_ptr_->getEntity(entity_name)->getStatus());
       simulation_interface::toMsg(res_status.pose(), entity_status.pose);
       simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
 

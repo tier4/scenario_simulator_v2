@@ -40,13 +40,12 @@ private:
   bool requested = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34507, 0.1)) {
+    const auto entity = api_.getEntity("ego");
+    if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    } else if (traffic_simulator::pose::isInLanelet(
+                 lanelet_pose.value(), 34507, 0.1, api_.getHdmapUtils())) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
-    }
-    if (const auto entity = api_.getEntity("ego"); not entity) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
-    } else if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
-      stop(cpp_mock_scenarios::Result::FAILURE);
     } else if (
       std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).offset) <= 2.8) {
       stop(cpp_mock_scenarios::Result::FAILURE);

@@ -52,13 +52,12 @@ private:
         stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
       }
       for (const auto & name : names) {
-        if (const auto entity = api_.getEntity(name)) {
-          const bool is_pedestrian =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
+        const auto entity = api_.getEntity(name);
+        const bool is_pedestrian =
+          entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
 
-          if (entity->laneMatchingSucceed() || !is_pedestrian) {
-            stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
-          }
+        if (entity->laneMatchingSucceed() || !is_pedestrian) {
+          stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
         }
         stop(cpp_mock_scenarios::Result::SUCCESS);
       }

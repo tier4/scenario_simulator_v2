@@ -45,19 +45,17 @@ private:
      */
     if (api_.getCurrentTime() <= 0.95) {
       if (!equals(
-            api_.getCurrentTime() * 10.0, api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x,
+            api_.getCurrentTime() * 10.0, api_.getEntity("ego")->getCurrentTwist().linear.x,
             0.01)) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     }
-    if (
-      api_.getCurrentTime() >= 1.0 &&
-      api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x <= 10.0) {
+    if (api_.getCurrentTime() >= 1.0 && api_.getEntity("ego")->getCurrentTwist().linear.x <= 10.0) {
       speed_reached = true;
     }
     if (
       speed_reached && api_.getCurrentTime() >= 1.5 &&
-      api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x >= 13.88) {
+      api_.getEntity("ego")->getCurrentTwist().linear.x >= 13.88) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }

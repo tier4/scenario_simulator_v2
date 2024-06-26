@@ -68,13 +68,7 @@ public:
     entity_manager_ptr_(std::make_shared<entity::EntityManager>(node, configuration)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
-      [this](const auto & entity_name) {
-        if (const auto entity = getEntity(entity_name)) {
-          return entity->getMapPose();
-        } else {
-          THROW_SEMANTIC_ERROR("Entity ", std::quoted(entity_name), " does not exists.");
-        }
-      },
+      [this](const auto & entity_name) { return getEntity(entity_name)->getMapPose(); },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
       node, "/clock", rclcpp::QoS(rclcpp::KeepLast(1)).best_effort(),
@@ -147,7 +141,7 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
-      } else if (const auto entity = entity_manager_ptr_->getEntity(name); not entity) {
+      } else if (const auto entity = entity_manager_ptr_->getEntityOrNullptr(name); not entity) {
         throw common::SemanticError(
           "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
@@ -181,7 +175,7 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
-      } else if (const auto entity = entity_manager_ptr_->getEntity(name); not entity) {
+      } else if (const auto entity = entity_manager_ptr_->getEntityOrNullptr(name); not entity) {
         throw common::SemanticError(
           "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
@@ -211,7 +205,7 @@ public:
     auto register_to_environment_simulator = [&]() {
       if (configuration.standalone_mode) {
         return true;
-      } else if (const auto entity = entity_manager_ptr_->getEntity(name); not entity) {
+      } else if (const auto entity = entity_manager_ptr_->getEntityOrNullptr(name); not entity) {
         throw common::SemanticError(
           "Entity ", name, " can not be registered in simulator - it has not been spawned yet.");
       } else {
@@ -349,7 +343,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntity);
-  FORWARD_TO_ENTITY_MANAGER(getEntityOrThrow);
+  FORWARD_TO_ENTITY_MANAGER(getEntityOrNullptr);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);

@@ -106,8 +106,8 @@ public:
     static auto makeNativeRelativeWorldPosition(
       const std::string & from_entity_name, const std::string & to_entity_name)
     {
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto to_entity = core->getEntity(to_entity_name)) {
+      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
+        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
           if (
             const auto relative_pose = traffic_simulator::pose::relativePose(
               from_entity->getMapPose(), to_entity->getMapPose()))
@@ -120,7 +120,7 @@ public:
     static auto makeNativeRelativeWorldPosition(
       const std::string & from_entity_name, const NativeWorldPosition & to_map_pose)
     {
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
+      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
         if (
           const auto relative_pose =
             traffic_simulator::pose::relativePose(from_entity->getMapPose(), to_map_pose)) {
@@ -133,7 +133,7 @@ public:
     static auto makeNativeRelativeWorldPosition(
       const NativeWorldPosition & from_map_pose, const std::string & to_entity_name)
     {
-      if (const auto to_entity = core->getEntity(to_entity_name)) {
+      if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
         if (
           const auto relative_pose =
             traffic_simulator::pose::relativePose(from_map_pose, to_entity->getMapPose())) {
@@ -148,7 +148,7 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      if (const auto to_entity = core->getEntity(to_entity_name)) {
+      if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
         if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_entity_name, to_lanelet_pose.value(), routing_algorithm);
@@ -162,7 +162,7 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
       -> traffic_simulator::LaneletPose
     {
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
+      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
         if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_lanelet_pose.value(), to_lanelet_pose, routing_algorithm);
@@ -185,8 +185,8 @@ public:
       const std::string & from_entity_name, const std::string & to_entity_name,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto to_entity = core->getEntity(to_entity_name)) {
+      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
+        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
           if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
             if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
               return makeNativeBoundingBoxRelativeLanePosition(
@@ -203,7 +203,7 @@ public:
       const std::string & from_entity_name, const NativeLanePosition & to_lanelet_pose,
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
+      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
         if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeBoundingBoxRelativeLanePosition(
             from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose,
@@ -230,8 +230,8 @@ public:
     static auto makeNativeBoundingBoxRelativeWorldPosition(
       const std::string & from_entity_name, const std::string & to_entity_name)
     {
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto to_entity = core->getEntity(to_entity_name)) {
+      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
+        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
           if (
             const auto relative_pose = traffic_simulator::pose::boundingBoxRelativePose(
               from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
@@ -246,7 +246,7 @@ public:
     static auto makeNativeBoundingBoxRelativeWorldPosition(
       const std::string & from_entity_name, const NativeWorldPosition & to_map_pose)
     {
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
+      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
         if (
           const auto relative_pose = traffic_simulator::pose::boundingBoxRelativePose(
             from_entity->getMapPose(), from_entity->getBoundingBox(), to_map_pose,
@@ -278,7 +278,7 @@ public:
       const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints) -> void
     {
       return core->setBehaviorParameter(entity_ref, [&]() {
-        auto behavior_parameter = core->getEntityOrThrow(entity_ref)->getBehaviorParameter();
+        auto behavior_parameter = core->getEntity(entity_ref)->getBehaviorParameter();
 
         if (not std::isinf(dynamic_constraints.max_speed)) {
           behavior_parameter.dynamic_constraints.max_speed = dynamic_constraints.max_speed;
@@ -317,7 +317,7 @@ public:
                       "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
       core->setBehaviorParameter(entity_ref, [&]() {
-        auto message = core->getEntityOrThrow(entity_ref)->getBehaviorParameter();
+        auto message = core->getEntity(entity_ref)->getBehaviorParameter();
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
         /// The default values written in https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
         message.dynamic_constraints.max_acceleration =
@@ -460,7 +460,7 @@ public:
   protected:
     static auto evaluateAcceleration(const std::string & name)
     {
-      return core->getEntityOrThrow(name)->getCurrentAccel().linear.x;
+      return core->getEntity(name)->getCurrentAccel().linear.x;
     }
 
     template <typename... Ts>
@@ -473,8 +473,8 @@ public:
       const std::string & from_entity_name,
       const std::string & to_entity_name)  // for RelativeDistanceCondition
     {
-      if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto to_entity = core->getEntity(to_entity_name)) {
+      if (const auto from_entity = core->getEntityOrNullptr(from_entity_name)) {
+        if (const auto to_entity = core->getEntityOrNullptr(to_entity_name)) {
           if (
             const auto distance = traffic_simulator::distance::boundingBoxDistance(
               from_entity->getMapPose(), from_entity->getBoundingBox(), to_entity->getMapPose(),
@@ -498,12 +498,12 @@ public:
 
     static auto evaluateSpeed(const std::string & name)
     {
-      return core->getEntityOrThrow(name)->getCurrentTwist().linear.x;
+      return core->getEntity(name)->getCurrentTwist().linear.x;
     }
 
     static auto evaluateStandStill(const std::string & name)
     {
-      return core->getEntityOrThrow(name)->getStandStillDuration();
+      return core->getEntity(name)->getStandStillDuration();
     }
 
     template <typename... Ts>
@@ -553,7 +553,7 @@ public:
     static auto evaluateRelativeHeading(
       const EntityRef & entity_ref, const OSCLanePosition & osc_lane_position)
     {
-      if (const auto entity = core->getEntity(entity_ref)) {
+      if (const auto entity = core->getEntityOrNullptr(entity_ref)) {
         const auto from_map_pose = entity->getMapPose();
         const auto to_map_pose = static_cast<NativeWorldPosition>(osc_lane_position);
         if (
@@ -569,7 +569,7 @@ public:
     template <typename EntityRef>
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
-      if (const auto entity = core->getEntity(entity_ref)) {
+      if (const auto entity = core->getEntityOrNullptr(entity_ref)) {
         if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
           return static_cast<Double>(std::abs(
             static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()).rpy.z));

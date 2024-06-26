@@ -75,7 +75,7 @@ public:
   MOCK_METHOD(bool, despawn, (const std::string), ());
   MOCK_METHOD(std::string, getEgoName, (), ());
   MOCK_METHOD(double, getCurrentTime, (), ());
-  MOCK_METHOD(void, getEntityOrThrowMock, (const std::string &), ());
+  MOCK_METHOD(void, getEntityMock, (const std::string &), ());
   MOCK_METHOD(bool, entityExists, (const std::string &), ());
   MOCK_METHOD(bool, checkCollision, (const std::string &, const std::string &), ());
 
@@ -86,9 +86,9 @@ public:
     return *field_operator_application_mock;
   }
 
-  std::shared_ptr<traffic_simulator::entity::EntityBase> getEntityOrThrow(const std::string & name)
+  std::shared_ptr<traffic_simulator::entity::EntityBase> getEntity(const std::string & name)
   {
-    getEntityOrThrowMock(name);
+    getEntityMock(name);
     /// @note set invalid LaneletPose so pass std::nullopt
     return std::make_shared<traffic_simulator::entity::VehicleEntity>(
       "", traffic_simulator::CanonicalizedEntityStatus(entity_status_, std::nullopt), nullptr,
@@ -165,7 +165,7 @@ TEST(TestExecutor, UpdateNoNPCs)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(1.0));
-  EXPECT_CALL(*MockAPI, getEntityOrThrowMock).Times(2).InSequence(sequence);
+  EXPECT_CALL(*MockAPI, getEntityMock).Times(2).InSequence(sequence);
   EXPECT_CALL(*MockAPI, updateFrame).Times(1).InSequence(sequence);
 
   test_executor.update();

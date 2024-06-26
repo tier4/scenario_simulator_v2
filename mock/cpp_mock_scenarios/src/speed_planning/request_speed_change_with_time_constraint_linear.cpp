@@ -42,8 +42,7 @@ private:
   {
     if (api_.getCurrentTime() <= 3.999) {
       if (!equals(
-            api_.getCurrentTime() * 2.5, api_.getEntityOrThrow("ego")->getCurrentTwist().linear.x,
-            0.01)) {
+            api_.getCurrentTime() * 2.5, api_.getEntity("ego")->getCurrentTwist().linear.x, 0.01)) {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
     } else if (api_.getCurrentTime() >= 4.0) {
