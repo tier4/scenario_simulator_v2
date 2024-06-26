@@ -236,7 +236,7 @@ protected:
 
   CanonicalizedEntityStatus status_before_update_;
 
-  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;//use this
+  std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
   std::shared_ptr<traffic_simulator::TrafficLightManager> traffic_light_manager_;
 
   bool npc_logic_started_ = false;

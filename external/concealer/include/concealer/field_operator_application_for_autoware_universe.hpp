@@ -108,7 +108,7 @@ protected:
 
 public:
   SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId> getPathWithLaneId;
-  SubscriberWrapper<autoware_planning_msgs::msg::LaneletRoute>        getAWMissionRoute;
+  SubscriberWrapper<autoware_planning_msgs::msg::LaneletRoute> getAWMissionRoute;
 
 public:
   template <typename... Ts>

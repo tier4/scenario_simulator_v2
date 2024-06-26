@@ -22,8 +22,8 @@
 #include <system_error>
 #include <thread>
 #include <traffic_simulator/entity/ego_entity.hpp>
-#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <traffic_simulator/utils/pose.hpp>
+#include <traffic_simulator_msgs/msg/waypoints_array.hpp>
 #include <tuple>
 #include <unordered_map>
 #include <utility>
@@ -105,15 +105,17 @@ auto EgoEntity::getEntityTypename() const -> const std::string &
 
 auto EgoEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
 {
-  std::vector<CanonicalizedLaneletPose> lenlet_pose;
+  std::vector<CanonicalizedLaneletPose> lanelet_pose;
 
   if (const auto universe =
         dynamic_cast<concealer::FieldOperatorApplicationFor<concealer::AutowareUniverse> *>(
           field_operator_application.get());
       universe) {
-    lenlet_pose.push_back(traffic_simulator::pose::toLaneletPose(universe->getAWMissionRoute().goal_pose, false, hdmap_utils_ptr_).value());
+    lanelet_pose.push_back(traffic_simulator::pose::toLaneletPose(
+                            universe->getAWMissionRoute().goal_pose, false, hdmap_utils_ptr_)
+                            .value());
   }
-  return lenlet_pose;
+  return lanelet_pose;
 }
 
 auto EgoEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
