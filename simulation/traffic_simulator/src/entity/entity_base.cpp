@@ -822,7 +822,8 @@ auto EntityBase::requestSynchronize(
 
       auto entity_velocity_to_synchronize = [this, entity_velocity, target_entity_arrival_time,
                                              entity_distance, target_speed]() {
-        const auto border_distance = (entity_velocity - target_speed) * target_entity_arrival_time / 2;
+        const auto border_distance =
+          (entity_velocity + target_speed) * target_entity_arrival_time / 2;
         if (border_distance < entity_distance.value()) {
           ///@brief Making entity speed up.
           return entity_velocity + getMaxAcceleration() * step_time_;
