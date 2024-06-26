@@ -254,37 +254,6 @@ bool EntityManager::isStopping(const std::string & name) const
          std::numeric_limits<double>::epsilon();
 }
 
-/// @todo it probably should be moved to SimulatorCore
-bool EntityManager::reachPosition(
-  const std::string & name, const std::string & target_entity_name, const double tolerance) const
-{
-  if (const auto target_entity = getEntityOrNullptr(target_entity_name)) {
-    return reachPosition(name, target_entity->getMapPose(), tolerance);
-  } else {
-    return false;
-  }
-}
-
-/// @todo it probably should be moved to SimulatorCore
-bool EntityManager::reachPosition(
-  const std::string & name, const geometry_msgs::msg::Pose & target_pose,
-  const double tolerance) const
-{
-  if (const auto entity = getEntityOrNullptr(name)) {
-    return math::geometry::getDistance(entity->getMapPose(), target_pose) < tolerance;
-  } else {
-    return false;
-  }
-}
-
-/// @todo it probably should be moved to SimulatorCore
-bool EntityManager::reachPosition(
-  const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
-  const double tolerance) const
-{
-  return reachPosition(name, static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
-}
-
 void EntityManager::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {

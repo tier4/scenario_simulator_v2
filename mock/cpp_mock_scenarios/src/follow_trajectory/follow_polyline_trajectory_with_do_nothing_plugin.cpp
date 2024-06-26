@@ -63,31 +63,32 @@ private:
 
   void onUpdate() override
   {
+    const auto entity = api_.getEntity("ego");
     // LCOV_EXCL_START
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
-    if (equals(api_.getCurrentTime(), 0.0, 0.01) && !api_.reachPosition("ego", spawn_pose, 0.1)) {
+    if (equals(api_.getCurrentTime(), 0.0, 0.01) && entity->isInPosition(spawn_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 1.0, 0.01) &&
-      !api_.reachPosition("ego", trajectory_start_pose, 0.1)) {
+      !entity->isInPosition(trajectory_start_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 1.5, 0.01) &&
-      !api_.reachPosition("ego", trajectory_waypoint_pose, 0.1)) {
+      !entity->isInPosition(trajectory_waypoint_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 2.0, 0.01) &&
-      !api_.reachPosition("ego", trajectory_goal_pose, 0.1)) {
+      !entity->isInPosition(trajectory_goal_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (equals(api_.getCurrentTime(), 2.5, 0.01)) {
-      if (api_.reachPosition("ego", trajectory_goal_pose, 0.1)) {
+      if (entity->isInPosition(trajectory_goal_pose, 0.1)) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);

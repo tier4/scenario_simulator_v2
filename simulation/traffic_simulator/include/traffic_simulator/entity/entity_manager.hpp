@@ -358,15 +358,6 @@ public:
 
   bool isStopping(const std::string & name) const;
 
-  bool reachPosition(
-    const std::string & name, const geometry_msgs::msg::Pose & target_pose,
-    const double tolerance) const;
-  bool reachPosition(
-    const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
-    const double tolerance) const;
-  bool reachPosition(
-    const std::string & name, const std::string & target_entity_name, const double tolerance) const;
-
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 

@@ -39,8 +39,8 @@ private:
   bool canceled = false;
   void onUpdate() override
   {
-    if (api_.reachPosition(
-          "ego",
+    const auto entity = api_.getEntity("ego");
+    if (entity->isInPosition(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34513, 30, 0, api_.getHdmapUtils()),
           3.0)) {

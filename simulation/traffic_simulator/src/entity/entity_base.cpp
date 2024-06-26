@@ -82,6 +82,18 @@ auto EntityBase::getCanonicalizedLaneletPose(double matching_distance) const
     matching_distance, hdmap_utils_ptr_);
 }
 
+auto EntityBase::isInPosition(
+  const geometry_msgs::msg::Pose & target_pose, const double tolerance) const -> bool
+{
+  return math::geometry::getDistance(getMapPose(), target_pose) < tolerance;
+}
+
+auto EntityBase::isInPosition(
+  const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const -> bool
+{
+  return isInPosition(static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
+}
+
 auto EntityBase::isInLanelet(const lanelet::Id lanelet_id, std::optional<double> tolerance) const
   -> bool
 {

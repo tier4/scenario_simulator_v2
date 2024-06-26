@@ -110,6 +110,12 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
 
+  /*   */ auto isInPosition(
+    const geometry_msgs::msg::Pose & target_pose, const double tolerance) const -> bool;
+
+  /*   */ auto isInPosition(
+    const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const -> bool;
+
   /*   */ auto isInLanelet(
     const lanelet::Id lanelet_id, std::optional<double> tolerance = std::nullopt) const -> bool;
 

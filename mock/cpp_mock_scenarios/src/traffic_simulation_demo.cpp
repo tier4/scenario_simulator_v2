@@ -55,8 +55,9 @@ private:
     if (api_.getCurrentTime() >= 6 && api_.entityExists("obstacle")) {
       api_.despawn("obstacle");
     }
-    if (api_.reachPosition(
-          "ego",
+    const auto ego_entity = api_.getEntity("ego");
+    const auto npc_entity = api_.getEntity("npc2");
+    if (ego_entity->isInPosition(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34615, 10.0, 0.0, api_.getHdmapUtils()),
           5)) {
@@ -67,8 +68,7 @@ private:
         api_.requestSpeedChange("npc2", 13, true);
       }
     }
-    if (api_.reachPosition(
-          "ego",
+    if (ego_entity->isInPosition(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34579, 0.0, 0.0, api_.getHdmapUtils()),
           5)) {
@@ -79,8 +79,7 @@ private:
         api_.requestSpeedChange("npc2", 3, true);
       }
     }
-    if (api_.reachPosition(
-          "npc2",
+    if (npc_entity->isInPosition(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34513, 0.0, 0.0, api_.getHdmapUtils()),
           5)) {
