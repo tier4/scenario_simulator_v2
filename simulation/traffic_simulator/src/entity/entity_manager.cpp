@@ -39,6 +39,9 @@ namespace entity
 {
 void EntityManager::broadcastEntityTransform()
 {
+  static bool is_send = false;
+  static geometry_msgs::msg::Pose pose;
+
   using math::geometry::operator/;
   using math::geometry::operator*;
   using math::geometry::operator+=;
@@ -52,31 +55,39 @@ void EntityManager::broadcastEntityTransform()
   if (isEgoSpawned()) {
     const auto ego_name = getEgoName();
     if (entityExists(ego_name)) {
+      if (!is_send) {
+        pose = getMapPose(ego_name);
+        is_send = true;
+      }
       broadcastTransform(
         geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
           /**
            * @note This is the intended implementation.
            * It is easier to create rviz config if the name "ego" is fixed,
-           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           * so the frame_id "ego" is issued regardless of the name of the ego entity.
            */
           .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-          .pose(getMapPose(ego_name)),
+          .pose(pose),
         true);
     }
   }
   if (!names.empty()) {
+    if (!is_send) {
+      pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
+               .position(std::accumulate(
+                 names.begin(), names.end(), geometry_msgs::msg::Point(),
+                 [this, names](geometry_msgs::msg::Point point, const std::string & name) {
+                   point += getMapPose(name).position * (1.0 / static_cast<double>(names.size()));
+                   return point;
+                 }))
+               .orientation(geometry_msgs::msg::Quaternion());
+      is_send = true;
+    }
     broadcastTransform(
       geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
         .header(
           std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
-        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
-                .position(std::accumulate(
-                  names.begin(), names.end(), geometry_msgs::msg::Point(),
-                  [this, names](geometry_msgs::msg::Point point, const std::string & name) {
-                    point += getMapPose(name).position * (1.0 / static_cast<double>(names.size()));
-                    return point;
-                  }))
-                .orientation(geometry_msgs::msg::Quaternion())),
+        .pose(pose),
       true);
   }
 }
