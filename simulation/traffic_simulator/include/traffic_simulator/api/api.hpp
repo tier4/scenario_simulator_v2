@@ -367,6 +367,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(requestClearRoute);
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
