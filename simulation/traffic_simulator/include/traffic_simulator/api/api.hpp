@@ -368,9 +368,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
-  FORWARD_TO_ENTITY_MANAGER(setBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(setConventionalTrafficLightConfidence);
-  FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
 
 public:
 #undef FORWARD_TO_ENTITY_MANAGER

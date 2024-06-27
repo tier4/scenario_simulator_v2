@@ -56,18 +56,20 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("ego")->setLinearVelocity(0.0);
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(0.0);
     api_.requestSpeedChange("ego", 15, true);
     traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
     behavior_parameter.see_around = false;
-    api_.setBehaviorParameter("ego", behavior_parameter);
+    ego_entity->setBehaviorParameter(behavior_parameter);
 
     api_.spawn(
       "npc",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("npc")->setLinearVelocity(0.0);
+    auto npc_entity = api_.getEntity("npc");
+    npc_entity->setLinearVelocity(0.0);
     api_.requestSpeedChange("npc", 5, true);
   }
 };

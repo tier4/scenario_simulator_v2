@@ -277,8 +277,9 @@ public:
     static auto applyProfileAction(
       const EntityRef & entity_ref, const DynamicConstraints & dynamic_constraints) -> void
     {
-      return core->setBehaviorParameter(entity_ref, [&]() {
-        auto behavior_parameter = core->getEntity(entity_ref)->getBehaviorParameter();
+      auto entity = core->getEntity(entity_ref);
+      return entity->setBehaviorParameter([&]() {
+        auto behavior_parameter = entity->getBehaviorParameter();
 
         if (not std::isinf(dynamic_constraints.max_speed)) {
           behavior_parameter.dynamic_constraints.max_speed = dynamic_constraints.max_speed;
@@ -312,12 +313,12 @@ public:
     static auto applyAssignControllerAction(
       const std::string & entity_ref, Controller && controller) -> void
     {
-      core->setVelocityLimit(
-        entity_ref, controller.properties.template get<Double>(
-                      "maxSpeed", std::numeric_limits<Double::value_type>::max()));
+      auto entity = core->getEntity(entity_ref);
+      entity->setVelocityLimit(controller.properties.template get<Double>(
+        "maxSpeed", std::numeric_limits<Double::value_type>::max()));
 
-      core->setBehaviorParameter(entity_ref, [&]() {
-        auto message = core->getEntity(entity_ref)->getBehaviorParameter();
+      entity->setBehaviorParameter([&]() {
+        auto message = entity->getBehaviorParameter();
         message.see_around = not controller.properties.template get<Boolean>("isBlind");
         /// The default values written in https://github.com/tier4/scenario_simulator_v2/blob/master/simulation/traffic_simulator_msgs/msg/DynamicConstraints.msg
         message.dynamic_constraints.max_acceleration =
