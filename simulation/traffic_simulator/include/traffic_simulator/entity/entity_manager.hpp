@@ -265,12 +265,9 @@ public:
   void broadcastTransform(
     const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true);
 
-  bool checkCollision(
-    const std::string & first_entity_name, const std::string & second_entity_name);
-
   bool despawnEntity(const std::string & name);
 
-  bool entityExists(const std::string & name);
+  bool isEntitySpawned(const std::string & name);
 
   auto getEntityNames() const -> const std::vector<std::string>;
 

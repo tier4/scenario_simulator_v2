@@ -40,7 +40,7 @@ private:
   {
     const auto t = api_.getCurrentTime();
     // LCOV_EXCL_START
-    if (api_.entityExists("bob") && api_.checkCollision("ego", "bob")) {
+    if (api_.isEntitySpawned("bob") && api_.checkCollision("ego", "bob")) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     /**

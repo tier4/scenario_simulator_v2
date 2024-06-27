@@ -98,7 +98,7 @@ private:
   {
     for (int i = 0; i < params_.random_parameters.crossing_pedestrian.number_of_pedestrian; i++) {
       std::string entity_name = "pedestrian" + std::to_string(i);
-      if (api_.entityExists(entity_name)) {
+      if (api_.isEntitySpawned(entity_name)) {
         api_.despawn(entity_name);
       }
     }
@@ -120,7 +120,7 @@ private:
     };
 
     const auto spawn_and_change_lane = [&](const auto & entity_name, const auto spawn_s_value) {
-      if (!api_.entityExists(entity_name)) {
+      if (!api_.isEntitySpawned(entity_name)) {
         api_.spawn(
           entity_name,
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
@@ -159,7 +159,7 @@ private:
       std::string entity_name = "pedestrian" + std::to_string(entity_index);
       constexpr lanelet::Id lanelet_id = 34392;
       if (
-        !api_.entityExists(entity_name) &&
+        !api_.isEntitySpawned(entity_name) &&
         !ego_entity->isInPosition(
           traffic_simulator::helper::constructCanonicalizedLaneletPose(
             34576, 25.0, 0.0, api_.getHdmapUtils()),
@@ -180,7 +180,7 @@ private:
         entity->setLinearVelocity(speed);
       }
       if (
-        api_.entityExists(entity_name) &&
+        api_.isEntitySpawned(entity_name) &&
         api_.getEntity(entity_name)->getStandStillDuration() >= 0.5) {
         api_.despawn(entity_name);
       }
@@ -194,7 +194,7 @@ private:
         34621, 10, 0.0, api_.getHdmapUtils());
       const auto entity_name = "spawn_nearby_ego";
       const auto ego = api_.getEntity("ego");
-      if (ego_entity->isInPosition(trigger_position, 20.0) && !api_.entityExists(entity_name)) {
+      if (ego_entity->isInPosition(trigger_position, 20.0) && !api_.isEntitySpawned(entity_name)) {
         api_.spawn(
           entity_name,
           traffic_simulator::pose::transformRelativePoseToGlobal(
@@ -207,7 +207,7 @@ private:
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
       }
-      if (!ego_entity->isInPosition(trigger_position, 20.0) && api_.entityExists(entity_name)) {
+      if (!ego_entity->isInPosition(trigger_position, 20.0) && api_.isEntitySpawned(entity_name)) {
         api_.despawn(entity_name);
       }
     }

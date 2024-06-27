@@ -76,7 +76,7 @@ public:
   MOCK_METHOD(std::string, getEgoName, (), ());
   MOCK_METHOD(double, getCurrentTime, (), ());
   MOCK_METHOD(void, getEntityMock, (const std::string &), ());
-  MOCK_METHOD(bool, entityExists, (const std::string &), ());
+  MOCK_METHOD(bool, isEntitySpawned, (const std::string &), ());
   MOCK_METHOD(bool, checkCollision, (const std::string &, const std::string &), ());
 
   ::testing::StrictMock<MockFieldOperatorApplication> & asFieldOperatorApplication(

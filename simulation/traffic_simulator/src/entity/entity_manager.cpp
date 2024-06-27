@@ -15,7 +15,6 @@
 #include <cstdint>
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
-#include <geometry/intersection/collision.hpp>
 #include <geometry/transform.hpp>
 #include <geometry/vector3/operator.hpp>
 #include <limits>
@@ -100,22 +99,6 @@ void EntityManager::broadcastTransform(
   }
 }
 
-/// @todo it probably should be moved to SimulatorCore
-bool EntityManager::checkCollision(
-  const std::string & first_entity_name, const std::string & second_entity_name)
-{
-  if (first_entity_name != second_entity_name) {
-    if (const auto first_entity = getEntityOrNullptr(first_entity_name)) {
-      if (const auto second_entity = getEntityOrNullptr(second_entity_name)) {
-        return math::geometry::checkCollision2D(
-          first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
-          second_entity->getBoundingBox());
-      }
-    }
-  }
-  return false;
-}
-
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 {
   visualization_msgs::msg::MarkerArray marker;
@@ -127,10 +110,10 @@ visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
 
 bool EntityManager::despawnEntity(const std::string & name)
 {
-  return entityExists(name) && entities_.erase(name);
+  return isEntitySpawned(name) && entities_.erase(name);
 }
 
-bool EntityManager::entityExists(const std::string & name)
+bool EntityManager::isEntitySpawned(const std::string & name)
 {
   return entities_.find(name) != std::end(entities_);
 }

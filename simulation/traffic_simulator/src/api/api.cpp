@@ -14,6 +14,7 @@
 
 #include <tf2/LinearMath/Quaternion.h>
 
+#include <geometry/intersection/collision.hpp>
 #include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <limits>
 #include <memory>
@@ -46,7 +47,7 @@ bool API::despawn(const std::string & name)
 
 bool API::despawnEntities()
 {
-  auto entities = getEntityNames();
+  auto entities = entity_manager_ptr_->getEntityNames();
   return std::all_of(
     entities.begin(), entities.end(), [&](const auto & entity) { return despawn(entity); });
 }
@@ -98,6 +99,21 @@ auto API::respawn(
       entity_manager_ptr_->asFieldOperatorApplication(name).engage();
     }
   }
+}
+
+bool API::checkCollision(
+  const std::string & first_entity_name, const std::string & second_entity_name)
+{
+  if (first_entity_name != second_entity_name) {
+    if (const auto first_entity = getEntityOrNullptr(first_entity_name)) {
+      if (const auto second_entity = getEntityOrNullptr(second_entity_name)) {
+        return math::geometry::checkCollision2D(
+          first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
+          second_entity->getBoundingBox());
+      }
+    }
+  }
+  return false;
 }
 
 auto API::setEntityStatus(

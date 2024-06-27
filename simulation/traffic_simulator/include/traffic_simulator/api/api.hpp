@@ -70,7 +70,8 @@ public:
     entity_manager_ptr_(
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
-      entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
+      entity_manager_ptr_->getHdmapUtils(),
+      [this]() { return entity_manager_ptr_->getEntityNames(); },
       [this](const auto & entity_name) { return getEntity(entity_name)->getMapPose(); },
       [this](const auto & name) { return API::despawn(name); }, configuration.auto_sink)),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
@@ -138,7 +139,7 @@ public:
   {
     auto register_to_entity_manager = [&]() {
       if (behavior == VehicleBehavior::autoware()) {
-        return entity_manager_ptr_->entityExists(name) or
+        return entity_manager_ptr_->isEntitySpawned(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
                  name, pose, parameters, getCurrentTime(), configuration, node_parameters_);
       } else {
@@ -232,6 +233,9 @@ public:
 
   bool despawn(const std::string & name);
   bool despawnEntities();
+
+  bool checkCollision(
+    const std::string & first_entity_name, const std::string & second_entity_name);
 
   auto setEntityStatus(const std::string & name, const EntityStatus & status) -> void;
   auto respawn(
@@ -327,8 +331,7 @@ public:
   // clang-format on
 
   FORWARD_TO_ENTITY_MANAGER(asFieldOperatorApplication);
-  FORWARD_TO_ENTITY_MANAGER(checkCollision);
-  FORWARD_TO_ENTITY_MANAGER(entityExists);
+  FORWARD_TO_ENTITY_MANAGER(isEntitySpawned);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLights);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
