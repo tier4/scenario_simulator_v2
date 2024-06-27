@@ -139,11 +139,11 @@ public:
   auto update() -> void
   {
     executeWithErrorHandling([this]() {
-      if (not api_->isEgoSpawned() and not api_->isNpcLogicStarted()) {
+      if (not api_->isAnyEgoSpawned() and not api_->isNpcLogicStarted()) {
         api_->startNpcLogic();
       }
       if (
-        api_->isEgoSpawned() and not api_->isNpcLogicStarted() and
+        api_->isAnyEgoSpawned() and not api_->isNpcLogicStarted() and
         api_->asFieldOperatorApplication(api_->getEgoName()).engageable()) {
         api_->startNpcLogic();
       }

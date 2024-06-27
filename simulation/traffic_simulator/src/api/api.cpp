@@ -55,12 +55,11 @@ auto API::respawn(
   const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
   const geometry_msgs::msg::PoseStamped & goal_pose) -> void
 {
-  if (not entity_manager_ptr_->is<entity::EgoEntity>(name)) {
+  if (auto entity = entity_manager_ptr_->getEntity(name); not entity->is<entity::EgoEntity>()) {
     throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
   } else if (new_pose.header.frame_id != "map") {
     throw std::runtime_error("Respawn request with frame id other than map not supported.");
   } else {
-    auto entity = entity_manager_ptr_->getEntity(name);
     // set new pose and default action status in EntityManager
     entity->setControlledBySimulator(true);
     setEntityStatus(name, new_pose.pose.pose, helper::constructActionStatus());
@@ -273,7 +272,7 @@ bool API::updateEntitiesStatusInSim()
     const auto entity = entity_manager_ptr_->getEntity(entity_name);
     const auto entity_status = static_cast<EntityStatus>(entity->getStatus());
     simulation_interface::toProto(entity_status, *req.add_status());
-    if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
+    if (entity->is<entity::EgoEntity>()) {
       req.set_overwrite_ego_status(entity->isControlledBySimulator());
     }
   }
@@ -281,18 +280,17 @@ bool API::updateEntitiesStatusInSim()
   simulation_api_schema::UpdateEntityStatusResponse res;
   if (auto res = zeromq_client_.call(req); res.result().success()) {
     for (const auto & res_status : res.status()) {
-      auto entity_name = res_status.name();
-      auto entity = entity_manager_ptr_->getEntity(entity_name);
+      auto entity = entity_manager_ptr_->getEntity(res_status.name());
       auto entity_status = static_cast<EntityStatus>(entity->getStatus());
       simulation_interface::toMsg(res_status.pose(), entity_status.pose);
       simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
 
-      if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
+      if (entity->is<entity::EgoEntity>()) {
         entity->setMapPose(entity_status.pose);
         entity->setTwist(entity_status.action_status.twist);
         entity->setAcceleration(entity_status.action_status.accel);
       } else {
-        setEntityStatus(entity_name, entity_status);
+        setEntityStatus(entity->getName(), entity_status);
       }
     }
     return true;
@@ -302,7 +300,7 @@ bool API::updateEntitiesStatusInSim()
 
 bool API::updateFrame()
 {
-  if (configuration.standalone_mode && entity_manager_ptr_->isEgoSpawned()) {
+  if (configuration.standalone_mode && entity_manager_ptr_->isAnyEgoSpawned()) {
     THROW_SEMANTIC_ERROR("Ego simulation is no longer supported in standalone mode");
   }
 

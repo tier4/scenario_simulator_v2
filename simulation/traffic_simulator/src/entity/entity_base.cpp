@@ -111,6 +111,11 @@ auto EntityBase::getDefaultMatchingDistanceForLaneletPoseCalculation() const -> 
   return getBoundingBox().dimensions.y * 0.5 + 1.0;
 }
 
+auto EntityBase::isStopping() const -> bool
+{
+  return std::fabs(getCurrentTwist().linear.x) < std::numeric_limits<double>::epsilon();
+}
+
 auto EntityBase::isTargetSpeedReached(double target_speed) const -> bool
 {
   return speed_planner_->isTargetSpeedReached(target_speed, getCurrentTwist());

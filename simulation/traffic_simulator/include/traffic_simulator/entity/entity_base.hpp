@@ -55,6 +55,12 @@ public:
 
   virtual ~EntityBase() = default;
 
+  template <typename EntityType>
+  /*   */ auto is() const -> bool
+  {
+    return dynamic_cast<EntityType const *>(this) != nullptr;
+  }
+
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray &);
 
   virtual auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &;
@@ -81,6 +87,8 @@ public:
   DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
   DEFINE_GETTER(Status,                   const CanonicalizedEntityStatus &,               status_)
   DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
+  DEFINE_GETTER(Name,                     const std::string &,                             getStatus().getName())
+
   // clang-format on
 #undef DEFINE_GETTER
 
@@ -98,6 +106,8 @@ public:
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
+
+  /*   */ auto isStopping() const -> bool;
 
   /*   */ auto isInPosition(
     const geometry_msgs::msg::Pose & target_pose, const double tolerance) const -> bool;

@@ -330,17 +330,9 @@ public:
     }
   }
 
-  template <typename EntityType>
-  bool is(const std::string & name) const
-  {
-    return dynamic_cast<EntityType const *>(entities_.at(name).get()) != nullptr;
-  }
+  auto isAnyEgoSpawned() const -> bool;
 
-  bool isEgoSpawned() const;
-
-  const std::string getEgoName() const;
-
-  bool isStopping(const std::string & name) const;
+  auto getEgoName() const -> const std::string &;
 
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
@@ -366,10 +358,7 @@ public:
       EntityStatus entity_status;
 
       if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
-        if (auto iter = std::find_if(
-              std::begin(entities_), std::end(entities_),
-              [this](auto && each) { return is<EgoEntity>(each.first); });
-            iter != std::end(entities_)) {
+        if (isAnyEgoSpawned()) {
           THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
         } else {
           entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;

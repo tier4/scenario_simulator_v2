@@ -49,7 +49,7 @@ void EntityManager::broadcastEntityTransform()
    * In the past, we used to publish the frames of all entities, but that would be too heavy processing,
    * so we publish the average of the coordinates of all entities.
    */
-  if (isEgoSpawned()) {
+  if (isAnyEgoSpawned()) {
     broadcastTransform(
       geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
         /**
@@ -179,16 +179,15 @@ auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapU
 auto EntityManager::getNumberOfEgo() const -> std::size_t
 {
   return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
-    return is<EgoEntity>(each.first);
+    return each.second->template is<EgoEntity>();
   });
 }
 
-const std::string EntityManager::getEgoName() const
+auto EntityManager::getEgoName() const -> const std::string &
 {
-  const auto names = getEntityNames();
-  for (const auto & name : names) {
-    if (is<EgoEntity>(name)) {
-      return name;
+  for (const auto & each : entities_) {
+    if (each.second->template is<EgoEntity>()) {
+      return each.second->getName();
     }
   }
   THROW_SEMANTIC_ERROR(
@@ -238,20 +237,11 @@ auto EntityManager::getWaypoints(const std::string & name)
   }
 }
 
-bool EntityManager::isEgoSpawned() const
+auto EntityManager::isAnyEgoSpawned() const -> bool
 {
-  for (const auto & name : getEntityNames()) {
-    if (is<EgoEntity>(name)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-bool EntityManager::isStopping(const std::string & name) const
-{
-  return std::fabs(getEntity(name)->getCurrentTwist().linear.x) <
-         std::numeric_limits<double>::epsilon();
+  return std::any_of(std::begin(entities_), std::end(entities_), [this](const auto & each) {
+    return each.second->template is<EgoEntity>();
+  });
 }
 
 void EntityManager::requestLaneChange(
@@ -269,21 +259,22 @@ void EntityManager::requestLaneChange(
 void EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name)
 {
-  const auto & status = getEntity(name)->getStatus();
-  const auto behavior_parameter = getEntity(name)->getBehaviorParameter();
-  if (is<EgoEntity>(name)) {
+  const auto reference_entity = getEntity(name);
+  const CanonicalizedEntityStatus status = reference_entity->getStatus();
+  const auto behavior_parameter = reference_entity->getBehaviorParameter();
+  if (reference_entity->is<EgoEntity>()) {
     THROW_SEMANTIC_ERROR(
       "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
-  } else if (is<MiscObjectEntity>(name)) {
+  } else if (reference_entity->is<MiscObjectEntity>()) {
     THROW_SEMANTIC_ERROR(
       "Entity :", name, "is MiscObjectEntity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
-  } else if (is<VehicleEntity>(name)) {
+  } else if (reference_entity->is<VehicleEntity>()) {
     const auto parameters = getVehicleParameters(name);
     despawnEntity(name);
     spawnEntity<VehicleEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
-  } else if (is<PedestrianEntity>(name)) {
+  } else if (reference_entity->is<PedestrianEntity>()) {
     const auto parameters = getPedestrianParameters(name);
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(
@@ -292,19 +283,20 @@ void EntityManager::resetBehaviorPlugin(
     THROW_SIMULATION_ERROR(
       "Entity :", name, "is unkown entity type.", "Please contact to developer.");
   }
-  auto entity = getEntity(name);
-  entity->setLinearJerk(status.getLinearJerk());
-  entity->setAcceleration(status.getAccel());
-  entity->setTwist(status.getTwist());
-  entity->setBehaviorParameter(behavior_parameter);
+  auto spawned_entity = getEntity(name);
+  spawned_entity->setLinearJerk(status.getLinearJerk());
+  spawned_entity->setAcceleration(status.getAccel());
+  spawned_entity->setTwist(status.getTwist());
+  spawned_entity->setBehaviorParameter(behavior_parameter);
 }
 
 auto EntityManager::getCurrentAction(const std::string & name) const -> std::string
 {
-  if (not npc_logic_started_ and not is<EgoEntity>(name)) {
+  const auto entity = getEntity(name);
+  if (not npc_logic_started_ and not entity->is<EgoEntity>()) {
     return "waiting";
   } else {
-    return getEntity(name)->getCurrentAction();
+    return entity->getCurrentAction();
   }
 }
 

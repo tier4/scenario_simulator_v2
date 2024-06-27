@@ -69,7 +69,7 @@ public:
      const traffic_simulator_msgs::msg::VehicleParameters &),
     ());
   MOCK_METHOD(void, requestSpeedChange, (const std::string &, double, bool), ());
-  MOCK_METHOD(bool, isEgoSpawned, (), ());
+  MOCK_METHOD(bool, isAnyEgoSpawned, (), ());
   MOCK_METHOD(bool, isNpcLogicStarted, (), ());
   MOCK_METHOD(void, startNpcLogic, (), ());
   MOCK_METHOD(bool, despawn, (const std::string), ());
@@ -148,7 +148,7 @@ TEST(TestExecutor, UpdateNoNPCs)
     MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
     ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
 
-  EXPECT_CALL(*MockAPI, isEgoSpawned)
+  EXPECT_CALL(*MockAPI, isAnyEgoSpawned)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(false));
@@ -157,7 +157,7 @@ TEST(TestExecutor, UpdateNoNPCs)
     .InSequence(sequence)
     .WillOnce(::testing::Return(false));
   EXPECT_CALL(*MockAPI, startNpcLogic).Times(1).InSequence(sequence);
-  EXPECT_CALL(*MockAPI, isEgoSpawned)
+  EXPECT_CALL(*MockAPI, isAnyEgoSpawned)
     .Times(1)
     .InSequence(sequence)
     .WillOnce(::testing::Return(false));
