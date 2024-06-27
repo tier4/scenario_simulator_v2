@@ -24,9 +24,6 @@ auto ConfigurableRateUpdater::startTimer(const double update_rate) -> void
     const auto period = std::chrono::duration<double>(1.0 / update_rate_);
     timer_ = rclcpp::create_timer(
       node_base_interface_, node_timers_interface_, clock_ptr_, period, [this]() { thunk_(); });
-  } else {
-    throw std::logic_error(
-      "ConfigurableRateUpdater was started earlier, cannot be started again - reset instead.");
   }
 }
 
