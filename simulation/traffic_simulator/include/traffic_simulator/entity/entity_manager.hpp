@@ -249,7 +249,6 @@ public:
   static_assert(true, "")
   // clang-format on
 
-  FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
 
 #undef FORWARD_TO_ENTITY

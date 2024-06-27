@@ -326,7 +326,6 @@ public:
   static_assert(true, "")
   // clang-format on
 
-  FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
   FORWARD_TO_ENTITY_MANAGER(asFieldOperatorApplication);
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);

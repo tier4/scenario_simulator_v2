@@ -533,10 +533,12 @@ public:
       const std::string & entity_ref, const Performance & performance,
       const Properties & properties)
     {
-      core->activateOutOfRangeJob(
-        entity_ref, -performance.max_speed, +performance.max_speed, -performance.max_deceleration,
-        +performance.max_acceleration, properties.template get<Double>("minJerk", Double::lowest()),
-        properties.template get<Double>("maxJerk", Double::max()));
+      core->getEntity(entity_ref)
+        ->activateOutOfRangeJob(
+          -performance.max_speed, +performance.max_speed, -performance.max_deceleration,
+          +performance.max_acceleration,
+          properties.template get<Double>("minJerk", Double::lowest()),
+          properties.template get<Double>("maxJerk", Double::max()));
     }
 
     template <typename... Ts>
