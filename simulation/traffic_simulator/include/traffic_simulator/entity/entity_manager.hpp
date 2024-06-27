@@ -252,11 +252,6 @@ public:
   FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
   FORWARD_TO_ENTITY(cancelRequest, );
-  FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
-  FORWARD_TO_ENTITY(getEntityTypename, const);
-  FORWARD_TO_ENTITY(getRouteLanelets, const);
-  FORWARD_TO_ENTITY(getTraveledDistance, const);
-  FORWARD_TO_ENTITY(isControlledBySimulator, );
   FORWARD_TO_ENTITY(requestAcquirePosition, );
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestClearRoute, );
@@ -264,17 +259,7 @@ public:
   FORWARD_TO_ENTITY(requestLaneChange, );
   FORWARD_TO_ENTITY(requestSpeedChange, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
-  FORWARD_TO_ENTITY(setAcceleration, );
-  FORWARD_TO_ENTITY(setAccelerationLimit, );
-  FORWARD_TO_ENTITY(setAccelerationRateLimit, );
   FORWARD_TO_ENTITY(setBehaviorParameter, );
-  FORWARD_TO_ENTITY(setControlledBySimulator, );
-  FORWARD_TO_ENTITY(setDecelerationLimit, );
-  FORWARD_TO_ENTITY(setDecelerationRateLimit, );
-  FORWARD_TO_ENTITY(setLinearJerk, );
-  FORWARD_TO_ENTITY(setLinearVelocity, );
-  FORWARD_TO_ENTITY(setMapPose, );
-  FORWARD_TO_ENTITY(setTwist, );
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_ENTITY

@@ -63,14 +63,14 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 3);
+    api_.getEntity("ego")->setLinearVelocity(3);
 
     api_.spawn(
       "npc",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("npc", 10);
+    api_.getEntity("npc")->setLinearVelocity(10);
     api_.requestSpeedChange("npc", 10, true);
   }
 };

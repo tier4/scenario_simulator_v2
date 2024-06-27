@@ -60,8 +60,9 @@ auto API::respawn(
   } else if (new_pose.header.frame_id != "map") {
     throw std::runtime_error("Respawn request with frame id other than map not supported.");
   } else {
+    auto entity = entity_manager_ptr_->getEntity(name);
     // set new pose and default action status in EntityManager
-    entity_manager_ptr_->setControlledBySimulator(name, true);
+    entity->setControlledBySimulator(true);
     setEntityStatus(name, new_pose.pose.pose, helper::constructActionStatus());
 
     // read status from EntityManager, then send it to SimpleSensorSimulator
@@ -70,8 +71,8 @@ auto API::respawn(
       static_cast<EntityStatus>(entity_manager_ptr_->getEntity(name)->getStatus()),
       *req.add_status());
     req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-    req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(name));
-    entity_manager_ptr_->setControlledBySimulator(name, false);
+    req.set_overwrite_ego_status(entity->isControlledBySimulator());
+    entity->setControlledBySimulator(false);
 
     // check response
     if (const auto res = zeromq_client_.call(req); not res.result().success()) {
@@ -86,13 +87,12 @@ auto API::respawn(
         res_name + "\".");
     } else {
       // if valid, set response in EntityManager, then plan path and engage
-      auto entity_status =
-        static_cast<EntityStatus>(entity_manager_ptr_->getEntity(name)->getStatus());
+      auto entity_status = static_cast<EntityStatus>(entity->getStatus());
       simulation_interface::toMsg(res_status->pose(), entity_status.pose);
       simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
-      setMapPose(name, entity_status.pose);
-      setTwist(name, entity_status.action_status.twist);
-      setAcceleration(name, entity_status.action_status.accel);
+      entity->setMapPose(entity_status.pose);
+      entity->setTwist(entity_status.action_status.twist);
+      entity->setAcceleration(entity_status.action_status.accel);
 
       entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
       entity_manager_ptr_->asFieldOperatorApplication(name).plan({goal_pose});
@@ -270,11 +270,11 @@ bool API::updateEntitiesStatusInSim()
   simulation_api_schema::UpdateEntityStatusRequest req;
   req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
   for (const auto & entity_name : entity_manager_ptr_->getEntityNames()) {
-    const auto entity_status =
-      static_cast<EntityStatus>(entity_manager_ptr_->getEntity(entity_name)->getStatus());
+    const auto entity = entity_manager_ptr_->getEntity(entity_name);
+    const auto entity_status = static_cast<EntityStatus>(entity->getStatus());
     simulation_interface::toProto(entity_status, *req.add_status());
     if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
-      req.set_overwrite_ego_status(entity_manager_ptr_->isControlledBySimulator(entity_name));
+      req.set_overwrite_ego_status(entity->isControlledBySimulator());
     }
   }
 
@@ -282,15 +282,15 @@ bool API::updateEntitiesStatusInSim()
   if (auto res = zeromq_client_.call(req); res.result().success()) {
     for (const auto & res_status : res.status()) {
       auto entity_name = res_status.name();
-      auto entity_status =
-        static_cast<EntityStatus>(entity_manager_ptr_->getEntity(entity_name)->getStatus());
+      auto entity = entity_manager_ptr_->getEntity(entity_name);
+      auto entity_status = static_cast<EntityStatus>(entity->getStatus());
       simulation_interface::toMsg(res_status.pose(), entity_status.pose);
       simulation_interface::toMsg(res_status.action_status(), entity_status.action_status);
 
       if (entity_manager_ptr_->is<entity::EgoEntity>(entity_name)) {
-        setMapPose(entity_name, entity_status.pose);
-        setTwist(entity_name, entity_status.action_status.twist);
-        setAcceleration(entity_name, entity_status.action_status.accel);
+        entity->setMapPose(entity_status.pose);
+        entity->setTwist(entity_status.action_status.twist);
+        entity->setAcceleration(entity_status.action_status.accel);
       } else {
         setEntityStatus(entity_name, entity_status);
       }
@@ -384,7 +384,7 @@ auto API::addTrafficSource(
     radius, rate, pose, distribution, seed, getCurrentTime(), configuration,
     entity_manager_ptr_->getHdmapUtils(), [this, speed](const auto & name, auto &&... xs) {
       this->spawn(name, std::forward<decltype(xs)>(xs)...);
-      setLinearVelocity(name, speed);
+      getEntity(name)->setLinearVelocity(speed);
     });
 }
 }  // namespace traffic_simulator

@@ -74,7 +74,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         120545, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 10);
+    api_.getEntity("ego")->setLinearVelocity(10);
     api_.requestSpeedChange("ego", 8, true);
     api_.requestAssignRoute(
       "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
@@ -87,7 +87,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34378, 0.0, 0.0, api_.getHdmapUtils()),
       getPedestrianParameters());
-    api_.setLinearVelocity("bob", 0);
+    api_.getEntity("bob")->setLinearVelocity(0);
     api_.requestWalkStraight("bob");
     api_.requestSpeedChange(
       "bob", 1.0, traffic_simulator::speed_change::Transition::LINEAR,

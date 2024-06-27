@@ -131,7 +131,7 @@ private:
           params_.random_parameters.lane_following_vehicle.max_speed);
         const auto speed = speed_distribution(engine_);
         api_.requestSpeedChange(entity_name, speed, true);
-        api_.setLinearVelocity(entity_name, speed);
+        api_.getEntity(entity_name)->setLinearVelocity(speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
           0.0, traffic_simulator::pose::laneletLength(34684, api_.getHdmapUtils()));
         lane_change_position = lane_change_position_distribution(engine_);
@@ -174,7 +174,7 @@ private:
           getPedestrianParameters());
         const auto speed = speed_distribution(engine_);
         api_.requestSpeedChange(entity_name, speed, true);
-        api_.setLinearVelocity(entity_name, speed);
+        api_.getEntity(entity_name)->setLinearVelocity(speed);
       }
       if (
         api_.entityExists(entity_name) &&

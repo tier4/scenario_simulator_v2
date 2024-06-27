@@ -58,7 +58,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 7);
+    api_.getEntity("ego")->setLinearVelocity(7);
     api_.requestSpeedChange("ego", 7, true);
     const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
       traffic_simulator::helper::constructLaneletPose(34408, 0.0, 0.0), api_.getHdmapUtils());

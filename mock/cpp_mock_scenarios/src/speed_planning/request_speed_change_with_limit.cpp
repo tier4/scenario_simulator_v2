@@ -56,7 +56,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0);
+    api_.getEntity("ego")->setLinearVelocity(0);
     api_.setVelocityLimit("ego", 5.0);
     api_.requestSpeedChange(
       "ego", 10.0, traffic_simulator::speed_change::Transition::LINEAR,

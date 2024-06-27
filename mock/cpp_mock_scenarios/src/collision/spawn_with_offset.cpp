@@ -54,7 +54,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.2, 1.3, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 0);
+    api_.getEntity("ego")->setLinearVelocity(0);
     api_.requestSpeedChange("ego", 0, true);
 
     api_.spawn(
@@ -62,7 +62,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, -0.874, api_.getHdmapUtils()),
       getPedestrianParameters());
-    api_.setLinearVelocity("bob", 0);
+    api_.getEntity("bob")->setLinearVelocity(0);
     api_.requestSpeedChange("bob", 0, true);
   }
 };

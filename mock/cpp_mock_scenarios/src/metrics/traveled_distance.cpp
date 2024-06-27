@@ -47,20 +47,15 @@ private:
     const auto entity = api_.getEntity("ego");
     if (!entity) {
       stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    const auto lanelet_pose = entity->getCanonicalizedLaneletPose();
-    const auto traveled_distance = api_.getTraveledDistance("ego");
-    if (!lanelet_pose) {
+    } else if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
       stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    const auto difference = std::abs(
-      static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).s - traveled_distance);
-    if (difference > std::numeric_limits<double>::epsilon()) {
+    } else if (const auto difference = std::abs(
+                 static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).s -
+                 entity->getTraveledDistance());
+               difference > std::numeric_limits<double>::epsilon()) {
       stop(cpp_mock_scenarios::Result::FAILURE);
-    }
-    // LCOV_EXCL_STOP
-
-    if (api_.getCurrentTime() >= 12) {
+    }  // LCOV_EXCL_STOP
+    else if (api_.getCurrentTime() >= 12) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
   }
@@ -72,7 +67,7 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 3);
+    api_.getEntity("ego")->setLinearVelocity(3);
     api_.requestSpeedChange("ego", 3, true);
   }
 };

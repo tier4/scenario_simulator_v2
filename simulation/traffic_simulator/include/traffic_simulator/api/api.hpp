@@ -352,37 +352,25 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getCurrentAction);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntity);
-  FORWARD_TO_ENTITY_MANAGER(getEntityOrNullptr);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
+  FORWARD_TO_ENTITY_MANAGER(getEntityOrNullptr);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
-  FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLights);
   FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
+  FORWARD_TO_ENTITY_MANAGER(requestClearRoute);
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
-  FORWARD_TO_ENTITY_MANAGER(requestClearRoute);
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
-  FORWARD_TO_ENTITY_MANAGER(setAcceleration);
-  FORWARD_TO_ENTITY_MANAGER(setAccelerationLimit);
-  FORWARD_TO_ENTITY_MANAGER(setAccelerationRateLimit);
   FORWARD_TO_ENTITY_MANAGER(setBehaviorParameter);
   FORWARD_TO_ENTITY_MANAGER(setConventionalTrafficLightConfidence);
-  FORWARD_TO_ENTITY_MANAGER(setDecelerationLimit);
-  FORWARD_TO_ENTITY_MANAGER(setDecelerationRateLimit);
-  FORWARD_TO_ENTITY_MANAGER(setLinearVelocity);
-  FORWARD_TO_ENTITY_MANAGER(setMapPose);
-  FORWARD_TO_ENTITY_MANAGER(setTwist);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
-
-private:
-  FORWARD_TO_ENTITY_MANAGER(getDefaultMatchingDistanceForLaneletPoseCalculation);
 
 public:
 #undef FORWARD_TO_ENTITY_MANAGER

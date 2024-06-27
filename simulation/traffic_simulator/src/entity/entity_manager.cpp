@@ -213,7 +213,7 @@ auto EntityManager::getPedestrianParameters(const std::string & name) const
     return entity->pedestrian_parameters;
   }
   THROW_SIMULATION_ERROR(
-    "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
+    "EntityType: ", getEntity(name)->getEntityTypename(), ", does not have pedestrian parameter.",
     "Please check description of the scenario and entity type of the Entity: " + name);
 }
 
@@ -224,7 +224,7 @@ auto EntityManager::getVehicleParameters(const std::string & name) const
     return vehicle->vehicle_parameters;
   }
   THROW_SIMULATION_ERROR(
-    "EntityType: ", getEntityTypename(name), ", does not have pedestrian parameter.",
+    "EntityType: ", getEntity(name)->getEntityTypename(), ", does not have pedestrian parameter.",
     "Please check description of the scenario and entity type of the Entity: " + name);
 }
 
@@ -292,10 +292,11 @@ void EntityManager::resetBehaviorPlugin(
     THROW_SIMULATION_ERROR(
       "Entity :", name, "is unkown entity type.", "Please contact to developer.");
   }
-  setLinearJerk(name, status.getLinearJerk());
-  setAcceleration(name, status.getAccel());
-  setTwist(name, status.getTwist());
-  setBehaviorParameter(name, behavior_parameter);
+  auto entity = getEntity(name);
+  entity->setLinearJerk(status.getLinearJerk());
+  entity->setAcceleration(status.getAccel());
+  entity->setTwist(status.getTwist());
+  entity->setBehaviorParameter(behavior_parameter);
 }
 
 auto EntityManager::getCurrentAction(const std::string & name) const -> std::string

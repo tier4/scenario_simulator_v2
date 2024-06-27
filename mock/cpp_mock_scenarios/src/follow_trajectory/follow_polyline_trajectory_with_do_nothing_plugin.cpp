@@ -100,7 +100,7 @@ private:
     api_.spawn(
       "ego", spawn_pose, getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
-    api_.setLinearVelocity("ego", 10);
+    api_.getEntity("ego")->setLinearVelocity(10);
     api_.requestSpeedChange("ego", 10, true);
     api_.requestFollowTrajectory(
       "ego",
