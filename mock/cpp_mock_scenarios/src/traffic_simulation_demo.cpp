@@ -47,7 +47,9 @@ private:
     }
     if (api_.getCurrentTime() >= 4 && api_.entityExists("obstacle")) {
       api_.setEntityStatus(
-        "obstacle", traffic_simulator::helper::constructLaneletPose(120545, 0),
+        "obstacle",
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(
+          120545, 0.0, 0.0, api_.getHdmapUtils()),
         traffic_simulator::helper::constructActionStatus(10));
     }
     if (api_.getCurrentTime() >= 6 && api_.entityExists("obstacle")) {
@@ -97,7 +99,10 @@ private:
     lanechange_executed_ = false;
 
     api_.spawn(
-      "ego", traffic_simulator::helper::constructLaneletPose(120545, 0), getVehicleParameters());
+      "ego",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        120545, 0.0, 0.0, api_.getHdmapUtils()),
+      getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 8, true);
     api_.requestAssignRoute(
@@ -117,13 +122,18 @@ private:
     api_.requestSpeedChange("tom", 3, true);
 
     api_.spawn(
-      "bob", traffic_simulator::helper::constructLaneletPose(34378, 0.0),
+      "bob",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34378, 0.0, 0.0, api_.getHdmapUtils()),
       getPedestrianParameters());
     api_.setLinearVelocity("bob", 1.0);
     api_.requestSpeedChange("bob", 1, true);
 
     api_.spawn(
-      "npc1", traffic_simulator::helper::constructLaneletPose(34579, 20.0), getVehicleParameters());
+      "npc1",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34579, 20.0, 0.0, api_.getHdmapUtils()),
+      getVehicleParameters());
     api_.setLinearVelocity("npc1", 5.0);
     api_.requestSpeedChange("npc1", 5, true);
     api_.requestAcquirePosition(
@@ -131,12 +141,18 @@ private:
                 34675, 0.0, 0.0, api_.getHdmapUtils()));
 
     api_.spawn(
-      "npc2", traffic_simulator::helper::constructLaneletPose(34606, 20.0), getVehicleParameters());
+      "npc2",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34606, 20.0, 0.0, api_.getHdmapUtils()),
+      getVehicleParameters());
     api_.setLinearVelocity("npc2", 5);
     api_.requestSpeedChange("npc2", 0, true);
 
     api_.spawn(
-      "npc3", traffic_simulator::helper::constructLaneletPose(34468, 0), getVehicleParameters());
+      "npc3",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34468, 0.0, 0.0, api_.getHdmapUtils()),
+      getVehicleParameters());
     api_.setLinearVelocity("npc3", 10);
 
     api_.spawn(
