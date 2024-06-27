@@ -111,9 +111,6 @@ struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvalua
 
   auto description() const -> std::string;
 
-  // TODO STATIC
-  auto distance(const EntityRef &, const Position &) -> double;
-
   template <
     CoordinateSystem::value_type, RelativeDistanceType::value_type, RoutingAlgorithm::value_type,
     Boolean::value_type>
@@ -121,6 +118,10 @@ struct DistanceCondition : private Scope, private SimulatorCore::ConditionEvalua
   {
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
+
+  static auto evaluate(
+    const EntityRef &, const Position &, const Entities *, CoordinateSystem, RelativeDistanceType,
+    RoutingAlgorithm, bool) -> double;
 
   auto evaluate() -> Object;
 };

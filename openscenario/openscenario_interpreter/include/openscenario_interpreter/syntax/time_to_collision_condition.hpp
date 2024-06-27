@@ -17,8 +17,10 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
+#include <openscenario_interpreter/syntax/distance_condition.hpp>
 #include <openscenario_interpreter/syntax/relative_distance_condition.hpp>
 #include <openscenario_interpreter/syntax/relative_speed_condition.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/syntax/time_to_collision_condition_target.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 
@@ -126,15 +128,23 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
           const TimeToCollisionConditionTarget & time_to_collision_condition_target) {
           if (time_to_collision_condition_target.is<EntityRef>()) {
             std::cerr << "RELATIVE DISTANCE = "
-                      << RelativeDistanceCondition::distance(
+                      << RelativeDistanceCondition::evaluate(
                            triggering_entity, time_to_collision_condition_target.as<EntityRef>(),
                            global().entities, coordinate_system, relative_distance_type,
                            routing_algorithm, freespace)
-                      << ", "
-                      << "RELATIVE SPEED = "
+                      << ", RELATIVE SPEED = "
                       << RelativeSpeedCondition::evaluate(
                            triggering_entity, time_to_collision_condition_target.as<EntityRef>(),
                            global().entities, std::nullopt)
+                      << std::endl;
+          } else {
+            std::cerr << "DISTANCE = "
+                      << DistanceCondition::evaluate(
+                           triggering_entity, time_to_collision_condition_target.as<Position>(),
+                           global().entities, coordinate_system, relative_distance_type,
+                           routing_algorithm, freespace)
+                      << ", RELATIVE SPEED = "
+                      << SpeedCondition::evaluate(triggering_entity, global().entities)
                       << std::endl;
           }
           return Double();
