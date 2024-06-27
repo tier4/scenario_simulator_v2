@@ -551,9 +551,9 @@ public:
     }
 
     template <typename... Ts>
-    static auto evaluateCurrentState(Ts &&... xs) -> decltype(auto)
+    static auto evaluateCurrentState(const std::string & entity_ref, Ts &&... xs) -> decltype(auto)
     {
-      return core->getCurrentAction(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(entity_ref)->getCurrentAction(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename EntityRef, typename OSCLanePosition>

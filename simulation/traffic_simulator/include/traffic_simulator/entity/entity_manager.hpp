@@ -254,8 +254,6 @@ public:
 
 #undef FORWARD_TO_ENTITY
 
-  auto getCurrentAction(const std::string & name) const -> std::string;
-
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 
   bool trafficLightsChanged();

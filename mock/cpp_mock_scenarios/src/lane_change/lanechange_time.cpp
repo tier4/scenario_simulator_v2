@@ -39,10 +39,11 @@ private:
   int lanechange_frames = 0;
   void onUpdate() override
   {
-    if (api_.getCurrentAction("ego") == "lane_change") {
+    const auto ego_entity = api_.getEntity("ego");
+    if (ego_entity->getCurrentAction() == "lane_change") {
       lanechange_frames++;
     }
-    if (api_.getCurrentAction("ego") != "lane_change" && api_.getCurrentTime() >= 10.0) {
+    if (ego_entity->getCurrentAction() != "lane_change" && api_.getCurrentTime() >= 10.0) {
       if (const double step_time = 50e-3, expected_time = 20.0,
           real_time = static_cast<double>(lanechange_frames) * step_time;
           expected_time - step_time <= real_time && real_time <= expected_time + step_time) {

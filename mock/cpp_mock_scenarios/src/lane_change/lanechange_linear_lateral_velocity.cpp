@@ -39,10 +39,11 @@ private:
   int lanechange_frames = 0;
   void onUpdate() override
   {
-    if (api_.getCurrentAction("ego") == "lane_change") {
+    const auto ego_entity = api_.getEntity("ego");
+    if (ego_entity->getCurrentAction() == "lane_change") {
       lanechange_frames++;
     }
-    if (api_.getCurrentAction("ego") != "lane_change" && api_.getCurrentTime() >= 2.0) {
+    if (ego_entity->getCurrentAction() != "lane_change" && api_.getCurrentTime() >= 2.0) {
       double duration = static_cast<double>(lanechange_frames) * 0.05;
       if (duration >= 3.05 && 3.1 >= duration) {
         stop(cpp_mock_scenarios::Result::SUCCESS);

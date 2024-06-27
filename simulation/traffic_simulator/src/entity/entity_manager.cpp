@@ -278,16 +278,6 @@ void EntityManager::resetBehaviorPlugin(
   spawned_entity->setBehaviorParameter(behavior_parameter);
 }
 
-auto EntityManager::getCurrentAction(const std::string & name) const -> std::string
-{
-  const auto entity = getEntity(name);
-  if (not npc_logic_started_ and not entity->is<EgoEntity>()) {
-    return "waiting";
-  } else {
-    return entity->getCurrentAction();
-  }
-}
-
 bool EntityManager::trafficLightsChanged()
 {
   return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
