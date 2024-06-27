@@ -75,7 +75,7 @@ private:
             offset, api_.getHdmapUtils()),
           getVehicleParameters(
             get_entity_subtype(params_.random_parameters.road_parking_vehicle.entity_type)));
-        api_.requestSpeedChange(entity_name, 0, true);
+        api_.getEntity(entity_name)->requestSpeedChange(0, true);
       };
     std::uniform_real_distribution<> dist(
       params_.random_parameters.road_parking_vehicle.min_offset,
@@ -130,8 +130,9 @@ private:
           params_.random_parameters.lane_following_vehicle.min_speed,
           params_.random_parameters.lane_following_vehicle.max_speed);
         const auto speed = speed_distribution(engine_);
-        api_.requestSpeedChange(entity_name, speed, true);
-        api_.getEntity(entity_name)->setLinearVelocity(speed);
+        auto entity = api_.getEntity(entity_name);
+        entity->requestSpeedChange(speed, true);
+        entity->setLinearVelocity(speed);
         std::uniform_real_distribution<> lane_change_position_distribution(
           0.0, traffic_simulator::pose::laneletLength(34684, api_.getHdmapUtils()));
         lane_change_position = lane_change_position_distribution(engine_);
@@ -142,7 +143,8 @@ private:
         if (
           ego_entity->getStatus().getLaneletId() == 34684 &&
           std::abs(ego_entity->getStatus().getLaneletPose().s) >= lane_change_position) {
-          api_.requestLaneChange(entity_name, traffic_simulator::lane_change::Direction::RIGHT);
+          api_.getEntity(entity_name)
+            ->requestLaneChange(traffic_simulator::lane_change::Direction::RIGHT);
           lane_change_requested = true;
         }
       }
@@ -173,8 +175,9 @@ private:
             lanelet_id, 0.0, offset_distribution(engine_), api_.getHdmapUtils()),
           getPedestrianParameters());
         const auto speed = speed_distribution(engine_);
-        api_.requestSpeedChange(entity_name, speed, true);
-        api_.getEntity(entity_name)->setLinearVelocity(speed);
+        auto entity = api_.getEntity(entity_name);
+        entity->requestSpeedChange(speed, true);
+        entity->setLinearVelocity(speed);
       }
       if (
         api_.entityExists(entity_name) &&

@@ -70,8 +70,9 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 15.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("npc")->setLinearVelocity(10);
-    api_.requestSpeedChange("npc", 10, true);
+    auto npc_entity = api_.getEntity("npc");
+    npc_entity->setLinearVelocity(10);
+    npc_entity->requestSpeedChange(10, true);
   }
 };
 }  // namespace cpp_mock_scenarios

@@ -117,8 +117,8 @@ public:
       // XXX dirty hack: wait for autoware system to launch
       // ugly but helps for now
       std::this_thread::sleep_for(std::chrono::milliseconds{5000});
-
-      api_->requestAssignRoute(ego_name_, std::vector({test_description_.ego_goal_pose}));
+      api_->getEntity(ego_name_)->requestAssignRoute(
+        std::vector({test_description_.ego_goal_pose}));
       api_->asFieldOperatorApplication(ego_name_).engage();
 
       goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
@@ -128,10 +128,11 @@ public:
         api_->spawn(
           npc_descr.name, npc_descr.start_position, getVehicleParameters(),
           traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
+        auto entity = api_->getEntity(npc_descr.name);
         api_->setEntityStatus(
           npc_descr.name, npc_descr.start_position,
           traffic_simulator::helper::constructActionStatus(npc_descr.speed));
-        api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
+        entity->requestSpeedChange(npc_descr.speed, true);
       }
     });
   }

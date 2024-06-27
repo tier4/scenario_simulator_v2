@@ -58,7 +58,7 @@ private:
       getVehicleParameters());
     auto ego_entity = api_.getEntity("ego");
     ego_entity->setLinearVelocity(0.0);
-    api_.requestSpeedChange("ego", 15, true);
+    ego_entity->requestSpeedChange(15, true);
     traffic_simulator_msgs::msg::BehaviorParameter behavior_parameter;
     behavior_parameter.see_around = false;
     ego_entity->setBehaviorParameter(behavior_parameter);
@@ -70,7 +70,7 @@ private:
       getVehicleParameters());
     auto npc_entity = api_.getEntity("npc");
     npc_entity->setLinearVelocity(0.0);
-    api_.requestSpeedChange("npc", 5, true);
+    npc_entity->requestSpeedChange(5, true);
   }
 };
 }  // namespace cpp_mock_scenarios

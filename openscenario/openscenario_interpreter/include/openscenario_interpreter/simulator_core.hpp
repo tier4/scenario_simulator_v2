@@ -262,9 +262,10 @@ public:
   {
   protected:
     template <typename... Ts>
-    static auto applyAcquirePositionAction(Ts &&... xs)
+    static auto applyAcquirePositionAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
+      auto entity = core->getEntity(entity_ref);
+      return entity->requestAcquirePosition(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -413,9 +414,10 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyAssignRouteAction(Ts &&... xs)
+    static auto applyAssignRouteAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
+      auto entity = core->getEntity(entity_ref);
+      return entity->requestAssignRoute(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -425,21 +427,24 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyFollowTrajectoryAction(Ts &&... xs)
+    static auto applyFollowTrajectoryAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
+      auto entity = core->getEntity(entity_ref);
+      return entity->requestFollowTrajectory(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
-    static auto applyLaneChangeAction(Ts &&... xs)
+    static auto applyLaneChangeAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestLaneChange(std::forward<decltype(xs)>(xs)...);
+      auto entity = core->getEntity(entity_ref);
+      return entity->requestLaneChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
-    static auto applySpeedAction(Ts &&... xs)
+    static auto applySpeedAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
+      auto entity = core->getEntity(entity_ref);
+      return entity->requestSpeedChange(std::forward<decltype(xs)>(xs)...);
     }
 
     template <typename... Ts>
@@ -449,9 +454,10 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyWalkStraightAction(Ts &&... xs)
+    static auto applyWalkStraightAction(const std::string & entity_ref, Ts &&... xs)
     {
-      return core->requestWalkStraight(std::forward<decltype(xs)>(xs)...);
+      auto entity = core->getEntity(entity_ref);
+      return entity->requestWalkStraight(std::forward<decltype(xs)>(xs)...);
     }
   };
 

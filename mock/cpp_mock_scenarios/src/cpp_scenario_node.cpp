@@ -119,7 +119,8 @@ void CppScenarioNode::spawnEgoEntity(
     // clang-format on
     return configuration;
   }());
-  api_.requestAssignRoute("ego", goal_lanelet_poses);
+  auto ego_entity = api_.getEntity("ego");
+  ego_entity->requestAssignRoute(goal_lanelet_poses);
 
   using namespace std::chrono_literals;
   while (!api_.asFieldOperatorApplication("ego").engaged()) {

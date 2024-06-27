@@ -285,22 +285,6 @@ public:
 
   void startNpcLogic();
 
-  void requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id);
-
-  void requestLaneChange(const std::string & name, const lane_change::Direction & direction);
-
-  void requestLaneChange(const std::string & name, const lane_change::Parameter &);
-
-  void requestLaneChange(
-    const std::string & name, const lane_change::RelativeTarget & target,
-    const lane_change::TrajectoryShape trajectory_shape,
-    const lane_change::Constraint & constraint);
-
-  void requestLaneChange(
-    const std::string & name, const lane_change::AbsoluteTarget & target,
-    const lane_change::TrajectoryShape trajectory_shape,
-    const lane_change::Constraint & constraint);
-
   /**
    * @brief Add a traffic source to the simulation
    * @param radius The radius defining the area on which entities will be spawned
@@ -344,7 +328,6 @@ public:
 
   FORWARD_TO_ENTITY_MANAGER(activateOutOfRangeJob);
   FORWARD_TO_ENTITY_MANAGER(asFieldOperatorApplication);
-  FORWARD_TO_ENTITY_MANAGER(cancelRequest);
   FORWARD_TO_ENTITY_MANAGER(checkCollision);
   FORWARD_TO_ENTITY_MANAGER(entityExists);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
@@ -359,12 +342,6 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLights);
   FORWARD_TO_ENTITY_MANAGER(isAnyEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
-  FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
-  FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
-  FORWARD_TO_ENTITY_MANAGER(requestClearRoute);
-  FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
-  FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
-  FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);

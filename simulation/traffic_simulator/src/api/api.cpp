@@ -334,39 +334,6 @@ void API::startNpcLogic()
   }
 }
 
-void API::requestLaneChange(const std::string & name, const lanelet::Id & lanelet_id)
-{
-  entity_manager_ptr_->requestLaneChange(name, lanelet_id);
-}
-
-void API::requestLaneChange(
-  const std::string & name, const traffic_simulator::lane_change::Direction & direction)
-{
-  entity_manager_ptr_->requestLaneChange(name, direction);
-}
-
-void API::requestLaneChange(
-  const std::string & name, const traffic_simulator::lane_change::Parameter & parameter)
-{
-  entity_manager_ptr_->requestLaneChange(name, parameter);
-}
-
-void API::requestLaneChange(
-  const std::string & name, const traffic_simulator::lane_change::RelativeTarget & target,
-  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const lane_change::Constraint & constraint)
-{
-  entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
-}
-
-void API::requestLaneChange(
-  const std::string & name, const traffic_simulator::lane_change::AbsoluteTarget & target,
-  const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,
-  const lane_change::Constraint & constraint)
-{
-  entity_manager_ptr_->requestLaneChange(name, target, trajectory_shape, constraint);
-}
-
 auto API::addTrafficSource(
   const double radius, const double rate, const double speed, const geometry_msgs::msg::Pose & pose,
   const traffic::TrafficSource::Distribution & distribution, const bool allow_spawn_outside_lane,

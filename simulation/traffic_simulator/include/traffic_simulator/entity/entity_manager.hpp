@@ -251,14 +251,6 @@ public:
 
   FORWARD_TO_ENTITY(activateOutOfRangeJob, );
   FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-  FORWARD_TO_ENTITY(cancelRequest, );
-  FORWARD_TO_ENTITY(requestAcquirePosition, );
-  FORWARD_TO_ENTITY(requestAssignRoute, );
-  FORWARD_TO_ENTITY(requestClearRoute, );
-  FORWARD_TO_ENTITY(requestFollowTrajectory, );
-  FORWARD_TO_ENTITY(requestLaneChange, );
-  FORWARD_TO_ENTITY(requestSpeedChange, );
-  FORWARD_TO_ENTITY(requestWalkStraight, );
 
 #undef FORWARD_TO_ENTITY
 
@@ -331,9 +323,6 @@ public:
   auto isAnyEgoSpawned() const -> bool;
 
   auto getEgoName() const -> const std::string &;
-
-  void requestLaneChange(
-    const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
   /**
    * @brief Reset behavior plugin of the target entity.

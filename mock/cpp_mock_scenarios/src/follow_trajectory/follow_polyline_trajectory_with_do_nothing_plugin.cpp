@@ -100,10 +100,10 @@ private:
     api_.spawn(
       "ego", spawn_pose, getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
-    api_.getEntity("ego")->setLinearVelocity(10);
-    api_.requestSpeedChange("ego", 10, true);
-    api_.requestFollowTrajectory(
-      "ego",
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(10);
+    ego_entity->requestSpeedChange(10, true);
+    ego_entity->requestFollowTrajectory(
       std::make_shared<traffic_simulator_msgs::msg::PolylineTrajectory>(
         traffic_simulator_msgs::build<traffic_simulator_msgs::msg::PolylineTrajectory>()
           .initial_distance_offset(0.0)

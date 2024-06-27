@@ -74,23 +74,24 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         120545, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("ego")->setLinearVelocity(10);
-    api_.requestSpeedChange("ego", 8, true);
-    api_.requestAssignRoute(
-      "ego", std::vector<traffic_simulator::CanonicalizedLaneletPose>{
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34675, 0.0, 0.0, api_.getHdmapUtils()),
-               traffic_simulator::helper::constructCanonicalizedLaneletPose(
-                 34690, 0.0, 0.0, api_.getHdmapUtils())});
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(10);
+    ego_entity->requestSpeedChange(8, true);
+    ego_entity->requestAssignRoute(std::vector<traffic_simulator::CanonicalizedLaneletPose>{
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34675, 0.0, 0.0, api_.getHdmapUtils()),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34690, 0.0, 0.0, api_.getHdmapUtils())});
     api_.spawn(
       "bob",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34378, 0.0, 0.0, api_.getHdmapUtils()),
       getPedestrianParameters());
-    api_.getEntity("bob")->setLinearVelocity(0);
-    api_.requestWalkStraight("bob");
-    api_.requestSpeedChange(
-      "bob", 1.0, traffic_simulator::speed_change::Transition::LINEAR,
+    auto bob_entity = api_.getEntity("bob");
+    bob_entity->setLinearVelocity(0);
+    bob_entity->requestWalkStraight();
+    bob_entity->requestSpeedChange(
+      1.0, traffic_simulator::speed_change::Transition::LINEAR,
       traffic_simulator::speed_change::Constraint(
         traffic_simulator::speed_change::Constraint::Type::LONGITUDINAL_ACCELERATION, 1.0),
       true);

@@ -149,18 +149,21 @@ public:
 
   virtual void requestLaneChange(const lanelet::Id){};
 
-  virtual void requestLaneChange(const traffic_simulator::lane_change::Parameter &){};
+  virtual void requestLaneChange(const lane_change::Parameter &){};
 
-  /*   */ void requestLaneChange(
-    const lane_change::AbsoluteTarget &, const lane_change::TrajectoryShape,
-    const lane_change::Constraint &);
+  /*   */ auto requestLaneChange(const lane_change::Direction & direction) -> void;
 
-  /*   */ void requestLaneChange(
-    const lane_change::RelativeTarget &, const lane_change::TrajectoryShape,
-    const lane_change::Constraint &);
+  /*   */ auto requestLaneChange(
+    const lane_change::AbsoluteTarget & target, const lane_change::TrajectoryShape trajectory_shape,
+    const lane_change::Constraint & constraint) -> void;
 
-  virtual void requestSpeedChange(
-    const double, const speed_change::Transition, const speed_change::Constraint, const bool);
+  /*   */ auto requestLaneChange(
+    const lane_change::RelativeTarget & target, const lane_change::TrajectoryShape trajectory_shape,
+    const lane_change::Constraint & constraint) -> void;
+
+  virtual auto requestSpeedChange(
+    const double, const speed_change::Transition, const speed_change::Constraint, const bool)
+    -> void;
 
   virtual void requestSpeedChange(
     const speed_change::RelativeTargetSpeed &, const speed_change::Transition,

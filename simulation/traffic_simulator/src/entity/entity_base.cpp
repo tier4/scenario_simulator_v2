@@ -146,6 +146,17 @@ void EntityBase::resetDynamicConstraints()
   setDynamicConstraints(getDefaultDynamicConstraints());
 }
 
+auto EntityBase::requestLaneChange(const lane_change::Direction & direction) -> void
+{
+  if (isInLanelet()) {
+    if (
+      const auto target =
+        hdmap_utils_ptr_->getLaneChangeableLaneletId(getStatus().getLaneletId(), direction)) {
+      requestLaneChange(target.value());
+    }
+  }
+}
+
 void EntityBase::requestLaneChange(
   const traffic_simulator::lane_change::AbsoluteTarget & target,
   const traffic_simulator::lane_change::TrajectoryShape trajectory_shape,

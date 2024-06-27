@@ -51,10 +51,10 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34462, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("ego")->setLinearVelocity(1);
-    api_.requestSpeedChange("ego", 1, true);
-    api_.requestLaneChange(
-      "ego",
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(1);
+    ego_entity->requestSpeedChange(1, true);
+    ego_entity->requestLaneChange(
       traffic_simulator::lane_change::RelativeTarget(
         "ego", traffic_simulator::lane_change::Direction::LEFT, 1, 0),
       traffic_simulator::lane_change::TrajectoryShape::CUBIC,

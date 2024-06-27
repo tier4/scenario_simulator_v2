@@ -140,24 +140,27 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 5.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("ego")->setLinearVelocity(10);
-    api_.requestSpeedChange("ego", 3, true);
+    auto ego_entity = api_.getEntity("ego");
+    ego_entity->setLinearVelocity(10);
+    ego_entity->requestSpeedChange(3, true);
 
     api_.spawn(
       "front",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 10.0, 1.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("front")->setLinearVelocity(10);
-    api_.requestSpeedChange("front", 3, true);
+    auto front_entity = api_.getEntity("front");
+    front_entity->setLinearVelocity(10);
+    front_entity->requestSpeedChange(3, true);
 
     api_.spawn(
       "behind",
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 0.0, -1.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.getEntity("behind")->setLinearVelocity(10);
-    api_.requestSpeedChange("behind", 3, true);
+    auto behind_entity = api_.getEntity("behind");
+    behind_entity->setLinearVelocity(10);
+    behind_entity->requestSpeedChange(3, true);
   }
 };
 }  // namespace cpp_mock_scenarios
