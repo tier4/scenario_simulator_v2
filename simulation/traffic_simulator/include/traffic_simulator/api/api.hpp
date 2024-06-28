@@ -330,10 +330,10 @@ public:
   static_assert(true, "")
   // clang-format on
 
-  FORWARD_TO_ENTITY_MANAGER(asFieldOperatorApplication);
   FORWARD_TO_ENTITY_MANAGER(isEntitySpawned);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getConventionalTrafficLights);
+  FORWARD_TO_ENTITY_MANAGER(getEgoEntity);
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntity);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);

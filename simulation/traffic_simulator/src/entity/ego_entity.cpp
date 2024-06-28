@@ -77,10 +77,45 @@ EgoEntity::EgoEntity(
 {
 }
 
-auto EgoEntity::asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &
+auto EgoEntity::engage() -> void { field_operator_application->engage(); }
+
+auto EgoEntity::isEngaged() const -> bool { return field_operator_application->engaged(); }
+
+auto EgoEntity::isEngageable() const -> bool { return field_operator_application->engageable(); }
+
+auto EgoEntity::replanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void
 {
-  assert(field_operator_application);
-  return *field_operator_application;
+  field_operator_application->clearRoute();
+  field_operator_application->plan(route);
+  field_operator_application->engage();
+}
+
+auto EgoEntity::sendCooperateCommand(const std::string & module_name, const std::string & command)
+  -> void
+{
+  field_operator_application->sendCooperateCommand(module_name, command);
+}
+
+auto EgoEntity::requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void
+{
+  field_operator_application->requestAutoModeForCooperation(module_name, enable);
+}
+
+auto EgoEntity::getMinimumRiskManeuverBehaviorName() const -> const std::string &
+{
+  return field_operator_application->getMinimumRiskManeuverBehaviorName();
+}
+auto EgoEntity::getMinimumRiskManeuverStateName() const -> const std::string &
+{
+  return field_operator_application->getMinimumRiskManeuverStateName();
+}
+auto EgoEntity::getEmergencyStateName() const -> const std::string &
+{
+  return field_operator_application->getEmergencyStateName();
+}
+auto EgoEntity::getTurnIndicatorsCommandName() const -> const std::string
+{
+  return boost::lexical_cast<std::string>(field_operator_application->getTurnIndicatorsCommand());
 }
 
 auto EgoEntity::getCurrentAction() const -> std::string

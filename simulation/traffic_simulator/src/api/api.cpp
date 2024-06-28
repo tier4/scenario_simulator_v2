@@ -56,13 +56,12 @@ auto API::respawn(
   const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
   const geometry_msgs::msg::PoseStamped & goal_pose) -> void
 {
-  if (auto entity = entity_manager_ptr_->getEntity(name); not entity->is<entity::EgoEntity>()) {
-    throw std::runtime_error("Respawn of any entities other than EGO is not supported.");
-  } else if (new_pose.header.frame_id != "map") {
+  if (new_pose.header.frame_id != "map") {
     throw std::runtime_error("Respawn request with frame id other than map not supported.");
   } else {
+    auto ego_entity = entity_manager_ptr_->getEgoEntity(name);
     // set new pose and default action status in EntityManager
-    entity->setControlledBySimulator(true);
+    ego_entity->setControlledBySimulator(true);
     setEntityStatus(name, new_pose.pose.pose, helper::constructActionStatus());
 
     // read status from EntityManager, then send it to SimpleSensorSimulator
@@ -71,8 +70,8 @@ auto API::respawn(
       static_cast<EntityStatus>(entity_manager_ptr_->getEntity(name)->getStatus()),
       *req.add_status());
     req.set_npc_logic_started(entity_manager_ptr_->isNpcLogicStarted());
-    req.set_overwrite_ego_status(entity->isControlledBySimulator());
-    entity->setControlledBySimulator(false);
+    req.set_overwrite_ego_status(ego_entity->isControlledBySimulator());
+    ego_entity->setControlledBySimulator(false);
 
     // check response
     if (const auto res = zeromq_client_.call(req); not res.result().success()) {
@@ -87,16 +86,13 @@ auto API::respawn(
         res_name + "\".");
     } else {
       // if valid, set response in EntityManager, then plan path and engage
-      auto entity_status = static_cast<EntityStatus>(entity->getStatus());
+      auto entity_status = static_cast<EntityStatus>(ego_entity->getStatus());
       simulation_interface::toMsg(res_status->pose(), entity_status.pose);
       simulation_interface::toMsg(res_status->action_status(), entity_status.action_status);
-      entity->setMapPose(entity_status.pose);
-      entity->setTwist(entity_status.action_status.twist);
-      entity->setAcceleration(entity_status.action_status.accel);
-
-      entity_manager_ptr_->asFieldOperatorApplication(name).clearRoute();
-      entity_manager_ptr_->asFieldOperatorApplication(name).plan({goal_pose});
-      entity_manager_ptr_->asFieldOperatorApplication(name).engage();
+      ego_entity->setMapPose(entity_status.pose);
+      ego_entity->setTwist(entity_status.action_status.twist);
+      ego_entity->setAcceleration(entity_status.action_status.accel);
+      ego_entity->replanRoute({goal_pose});
     }
   }
 }

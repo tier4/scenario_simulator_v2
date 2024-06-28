@@ -48,14 +48,6 @@ EntityBase::EntityBase(
 
 void EntityBase::appendDebugMarker(visualization_msgs::msg::MarkerArray &) {}
 
-auto EntityBase::asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &
-{
-  throw common::Error(
-    "An operation was requested for Entity ", std::quoted(name),
-    " that is valid only for the entity controlled by Autoware, but ", std::quoted(name),
-    " is not the entity controlled by Autoware.");
-}
-
 void EntityBase::cancelRequest() {}
 
 auto EntityBase::get2DPolygon() const -> std::vector<geometry_msgs::msg::Point>

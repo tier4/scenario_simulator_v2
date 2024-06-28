@@ -63,8 +63,6 @@ public:
 
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray &);
 
-  virtual auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication &;
-
   virtual void cancelRequest();
 
   // clang-format off

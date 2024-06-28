@@ -232,27 +232,6 @@ public:
     }
   }
 
-  // clang-format off
-#define FORWARD_TO_ENTITY(IDENTIFIER, ...)                                       \
-  /*!                                                                            \
-   @brief Forward to arguments to the EntityBase::IDENTIFIER function.           \
-   @return return value of the EntityBase::IDENTIFIER function.                  \
-   @note This function was defined by FORWARD_TO_ENTITY macro.    　  　　　　　   \
-   */                                                                            \
-  template <typename... Ts>                                                      \
-  decltype(auto) IDENTIFIER(const std::string & name, Ts &&... xs) __VA_ARGS__   \
-  try {                                                                          \
-    return entities_.at(name)->IDENTIFIER(std::forward<decltype(xs)>(xs)...);    \
-  } catch (const std::out_of_range &) {                                          \
-    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");                   \
-  }                                                                              \
-  static_assert(true, "")
-  // clang-format on
-
-  FORWARD_TO_ENTITY(asFieldOperatorApplication, const);
-
-#undef FORWARD_TO_ENTITY
-
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 
   bool trafficLightsChanged();
@@ -276,6 +255,29 @@ public:
 
   auto getEntity(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
+
+  auto getEgoEntity() const -> std::shared_ptr<traffic_simulator::entity::EgoEntity>
+  {
+    for (const auto & each : entities_) {
+      if (each.second->template is<EgoEntity>()) {
+        return std::dynamic_pointer_cast<EgoEntity>(each.second);
+      }
+    }
+    THROW_SEMANTIC_ERROR("getEgoEntity function was called, but ego vehicle does not exist");
+  }
+
+  auto getEgoEntity(const std::string & name) const
+    -> std::shared_ptr<traffic_simulator::entity::EgoEntity>
+  {
+    if (auto it = entities_.find(name); it == entities_.end()) {
+      THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+    } else {
+      if (auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(it->second); !ego_entity) {
+        THROW_SEMANTIC_ERROR("entity : ", name, " exists, but it is not ego");
+      } else
+        return ego_entity;
+    }
+  }
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 

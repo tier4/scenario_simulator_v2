@@ -87,6 +87,8 @@ public:
         ego_name_, test_description_.ego_start_position,
         traffic_simulator::helper::constructActionStatus());
 
+      auto ego_entity = api_->getEgoEntity(ego_name_);
+
       if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
         api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
           traffic_simulator::helper::LidarType::VLP16, ego_name_,
@@ -110,16 +112,14 @@ public:
           return configuration;
         }());
 
-        api_->asFieldOperatorApplication(ego_name_).template declare_parameter<bool>(
-          "allow_goal_modification", true);
+        ego_entity->template setParameter<bool>("allow_goal_modification", true);
       }
 
       // XXX dirty hack: wait for autoware system to launch
       // ugly but helps for now
       std::this_thread::sleep_for(std::chrono::milliseconds{5000});
-      api_->getEntity(ego_name_)->requestAssignRoute(
-        std::vector({test_description_.ego_goal_pose}));
-      api_->asFieldOperatorApplication(ego_name_).engage();
+      ego_entity->requestAssignRoute(std::vector({test_description_.ego_goal_pose}));
+      ego_entity->engage();
 
       goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
 
@@ -140,13 +140,15 @@ public:
   auto update() -> void
   {
     executeWithErrorHandling([this]() {
-      if (not api_->isAnyEgoSpawned() and not api_->isNpcLogicStarted()) {
-        api_->startNpcLogic();
-      }
-      if (
-        api_->isAnyEgoSpawned() and not api_->isNpcLogicStarted() and
-        api_->asFieldOperatorApplication(api_->getEgoName()).engageable()) {
-        api_->startNpcLogic();
+      if (not api_->isNpcLogicStarted()) {
+        if (api_->isAnyEgoSpawned()) {
+          auto ego_entity = api_->getEgoEntity(api_->getEgoName());
+          if (ego_entity->isEngageable()) {
+            api_->startNpcLogic();
+          }
+        } else {
+          api_->startNpcLogic();
+        }
       }
 
       auto current_time = api_->getCurrentTime();

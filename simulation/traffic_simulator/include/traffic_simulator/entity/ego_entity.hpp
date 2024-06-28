@@ -65,8 +65,6 @@ public:
 
   auto operator=(const EgoEntity &) -> EgoEntity & = delete;
 
-  auto asFieldOperatorApplication() const -> concealer::FieldOperatorApplication & override;
-
   auto getCurrentAction() const -> std::string override;
 
   auto getCurrentPose() const -> geometry_msgs::msg::Pose;
@@ -139,6 +137,25 @@ public:
   auto setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void;
 
   auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
+
+  template <typename ParameterType>
+  auto setParameter(const std::string & name, const ParameterType & default_value = {}) const
+    -> ParameterType
+  {
+    return field_operator_application->template declare_parameter<ParameterType>(
+      name, default_value);
+  }
+
+  auto engage() -> void;
+  auto isEngaged() const -> bool;
+  auto isEngageable() const -> bool;
+  auto replanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void;
+  auto sendCooperateCommand(const std::string & module_name, const std::string & command) -> void;
+  auto requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void;
+  auto getMinimumRiskManeuverBehaviorName() const -> const std::string &;
+  auto getMinimumRiskManeuverStateName() const -> const std::string &;
+  auto getEmergencyStateName() const -> const std::string &;
+  auto getTurnIndicatorsCommandName() const -> const std::string;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

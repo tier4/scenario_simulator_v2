@@ -336,6 +336,7 @@ public:
       }());
 
       if (controller.isAutoware()) {
+        auto ego_entity = core->getEgoEntity(entity_ref);
         core->attachLidarSensor(
           entity_ref, controller.properties.template get<Double>("pointcloudPublishingDelay"));
 
@@ -378,10 +379,9 @@ public:
           return configuration;
         }());
 
-        core->asFieldOperatorApplication(entity_ref)
-          .declare_parameter<bool>(
-            "allow_goal_modification",
-            controller.properties.template get<Boolean>("allowGoalModification"));
+        ego_entity->setParameter<bool>(
+          "allow_goal_modification",
+          controller.properties.template get<Boolean>("allowGoalModification"));
 
         for (const auto & module :
              [](std::string manual_modules_string) {
@@ -401,8 +401,7 @@ public:
              }(controller.properties.template get<String>(
                "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions"))) {
           try {
-            core->asFieldOperatorApplication(entity_ref)
-              .requestAutoModeForCooperation(module, false);
+            ego_entity->requestAutoModeForCooperation(module, false);
           } catch (const Error & error) {
             throw Error(
               "featureIdentifiersRequiringExternalPermissionForAutonomousDecisions is not "
@@ -541,12 +540,6 @@ public:
           properties.template get<Double>("maxJerk", Double::max()));
     }
 
-    template <typename... Ts>
-    static auto asFieldOperatorApplication(Ts &&... xs) -> decltype(auto)
-    {
-      return core->asFieldOperatorApplication(std::forward<decltype(xs)>(xs)...);
-    }
-
     static auto activateNonUserDefinedControllers() -> decltype(auto)
     {
       return core->startNpcLogic();
@@ -611,11 +604,46 @@ public:
       return core->resetV2ITrafficLightPublishRate(std::forward<decltype(xs)>(xs)...);
     }
 
+    static auto engage(const std::string & ego_ref) -> decltype(auto)
+    {
+      return core->getEgoEntity(ego_ref)->engage();
+    }
+
+    static auto isEngageable(const std::string & ego_ref) -> decltype(auto)
+    {
+      return core->getEgoEntity(ego_ref)->isEngageable();
+    }
+
+    static auto isEngaged(const std::string & ego_ref) -> decltype(auto)
+    {
+      return core->getEgoEntity(ego_ref)->isEngaged();
+    }
+
     template <typename... Ts>
     static auto sendCooperateCommand(Ts &&... xs) -> decltype(auto)
     {
-      return asFieldOperatorApplication(core->getEgoName())
-        .sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
+      /// @note here ego name is not passed from OpenScenarioInterpreter, it uses first found
+      return core->getEgoEntity()->sendCooperateCommand(std::forward<decltype(xs)>(xs)...);
+    }
+
+    static auto getMinimumRiskManeuverBehaviorName(const std::string & ego_ref) -> decltype(auto)
+    {
+      return core->getEgoEntity(ego_ref)->getMinimumRiskManeuverBehaviorName();
+    }
+
+    static auto getMinimumRiskManeuverStateName(const std::string & ego_ref) -> decltype(auto)
+    {
+      return core->getEgoEntity(ego_ref)->getMinimumRiskManeuverStateName();
+    }
+
+    static auto getEmergencyStateName(const std::string & ego_ref) -> decltype(auto)
+    {
+      return core->getEgoEntity(ego_ref)->getEmergencyStateName();
+    }
+
+    static auto getTurnIndicatorsCommandName(const std::string & ego_ref) -> decltype(auto)
+    {
+      return core->getEgoEntity(ego_ref)->getTurnIndicatorsCommandName();
     }
 
     template <typename... Ts>

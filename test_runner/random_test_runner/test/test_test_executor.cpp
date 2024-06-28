@@ -17,6 +17,7 @@
 #include <gmock/gmock.h>
 
 #include <random_test_runner/test_executor.hpp>
+#include <traffic_simulator/api/configuration.hpp>
 
 class MockFieldOperatorApplication
 {
@@ -60,7 +61,6 @@ public:
     void, attachDetectionSensor, (const simulation_api_schema::DetectionSensorConfiguration &), ());
   MOCK_METHOD(
     bool, attachOccupancyGridSensor, (simulation_api_schema::OccupancyGridSensorConfiguration), ());
-  MOCK_METHOD(void, asFieldOperatorApplicationMock, (const std::string &), ());
   MOCK_METHOD(
     void, requestAssignRoute, (const std::string &, std::vector<geometry_msgs::msg::Pose>), ());
   MOCK_METHOD(
@@ -76,15 +76,9 @@ public:
   MOCK_METHOD(std::string, getEgoName, (), ());
   MOCK_METHOD(double, getCurrentTime, (), ());
   MOCK_METHOD(void, getEntityMock, (const std::string &), ());
+  MOCK_METHOD(void, getEgoEntityMock, (const std::string &), ());
   MOCK_METHOD(bool, isEntitySpawned, (const std::string &), ());
   MOCK_METHOD(bool, checkCollision, (const std::string &, const std::string &), ());
-
-  ::testing::StrictMock<MockFieldOperatorApplication> & asFieldOperatorApplication(
-    const std::string & name)
-  {
-    asFieldOperatorApplicationMock(name);
-    return *field_operator_application_mock;
-  }
 
   std::shared_ptr<traffic_simulator::entity::EntityBase> getEntity(const std::string & name)
   {
@@ -93,6 +87,18 @@ public:
     return std::make_shared<traffic_simulator::entity::VehicleEntity>(
       "", traffic_simulator::CanonicalizedEntityStatus(entity_status_, std::nullopt), nullptr,
       getVehicleParameters());
+  }
+
+  std::shared_ptr<traffic_simulator::entity::EgoEntity> getEgoEntity(const std::string & name)
+  {
+    getEgoEntityMock(name);
+    /// @note set invalid LaneletPose so pass std::nullopt
+    return std::make_shared<traffic_simulator::entity::EgoEntity>(
+      "", traffic_simulator::CanonicalizedEntityStatus(entity_status_, std::nullopt), nullptr,
+      getVehicleParameters(),
+      traffic_simulator::Configuration(
+        ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map"),
+      nullptr);
   }
 
   void setEntityStatusNecessaryValues(
@@ -127,12 +133,10 @@ TEST(TestExecutor, InitializeWithNoNPCs)
   EXPECT_CALL(*MockAPI, attachLidarSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachDetectionSensor).Times(1).InSequence(sequence);
   EXPECT_CALL(*MockAPI, attachOccupancyGridSensor).Times(1).InSequence(sequence);
-  EXPECT_CALL(*MockAPI, asFieldOperatorApplicationMock).Times(1).InSequence(sequence);
   EXPECT_CALL(*(MockAPI->field_operator_application_mock), declare_parameter_mock)
     .Times(1)
     .InSequence(sequence);
   EXPECT_CALL(*MockAPI, requestAssignRoute).Times(1).InSequence(sequence);
-  EXPECT_CALL(*MockAPI, asFieldOperatorApplicationMock).Times(1).InSequence(sequence);
   EXPECT_CALL(*(MockAPI->field_operator_application_mock), engage).Times(1).InSequence(sequence);
 
   test_executor.initialize();

@@ -407,7 +407,8 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::restrictTargetSpeed(double v
   return value;
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const
+  -> const std::string &
 {
 #define IF(IDENTIFIER, RETURN)                                                         \
   if (getAutowareState().state == tier4_system_msgs::msg::AutowareState::IDENTIFIER) { \
@@ -427,19 +428,20 @@ auto FieldOperatorApplicationFor<AutowareUniverse>::getAutowareStateName() const
 #undef IF
 }
 
-auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const -> std::string
+auto FieldOperatorApplicationFor<AutowareUniverse>::getEmergencyStateName() const
+  -> const std::string &
 {
   return minimum_risk_maneuver_state;
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverBehaviorName() const
-  -> std::string
+  -> const std::string &
 {
   return minimum_risk_maneuver_behavior;
 }
 
 auto FieldOperatorApplicationFor<AutowareUniverse>::getMinimumRiskManeuverStateName() const
-  -> std::string
+  -> const std::string &
 {
   return minimum_risk_maneuver_state;
 }
