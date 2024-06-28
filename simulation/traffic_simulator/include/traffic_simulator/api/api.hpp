@@ -383,6 +383,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(setMapPose);
   FORWARD_TO_ENTITY_MANAGER(setTwist);
   FORWARD_TO_ENTITY_MANAGER(setVelocityLimit);
+  FORWARD_TO_ENTITY_MANAGER(setV2ITrafficLightExtraInfo);
   FORWARD_TO_ENTITY_MANAGER(toMapPose);
 
 private:

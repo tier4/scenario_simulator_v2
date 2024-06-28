@@ -99,18 +99,65 @@ auto TrafficSignalController::cycleTime() const -> double
 
 auto TrafficSignalController::evaluate() -> Object
 {
-  if (shouldChangePhaseToBegin()) {
-    return changePhaseTo(std::begin(phases));
-  } else if (currentPhaseExceeded()) {
-    return changePhaseTo(std::next(current_phase));
-  } else {
-    return unspecified;
+  auto updated = [&]() {
+    if (shouldChangePhaseToBegin()) {
+      return changePhaseTo(std::begin(phases));
+    } else if (currentPhaseExceeded()) {
+      return changePhaseTo(std::next(current_phase));
+    } else {
+      return unspecified;
+    }
+  }();
+
+  double current_phase_rest_time =
+    (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
+
+  for (const auto traffic_signal_state : (*current_phase).traffic_signal_states) {
+    setV2ITrafficLightExtraInfo(
+      boost::lexical_cast<std::int64_t>(traffic_signal_state.traffic_signal_id),
+      current_phase_rest_time, restTimeToRed(traffic_signal_state.id()));
   }
+  return updated;
 }
 
 auto TrafficSignalController::notifyBegin() -> void
 {
   change_to_begin_time = evaluateSimulationTime() + delay;
+}
+
+auto TrafficSignalController::restTimeToRed(const lanelet::Id traffic_signal_id) const -> double
+{
+  auto is_red = [](const TrafficSignalState & state) {
+    return state.state.find("red") != std::string::npos;
+  };
+
+  auto find_state = [traffic_signal_id](const auto & phase) {
+    return std::find_if(
+      (*phase).traffic_signal_states.begin(), (*phase).traffic_signal_states.end(),
+      [&](const auto & state) { return state.id() == traffic_signal_id; });
+  };
+
+  (*current_phase).traffic_signal_states.front().state;
+  if (current_phase == std::end(phases)) {
+    return 0;
+  } else if (is_red(*find_state(current_phase))) {
+    return 0;
+  } else {
+    double rest_time_to_red =
+      (*current_phase).duration - (evaluateSimulationTime() - current_phase_started_at);
+    auto iterator = current_phase;
+    iterator++;
+    while (not is_red(*find_state(iterator))) {
+      // if there is INF phase to red phase, "rest_time_to_red == cycleTime()" is true (INF == INF) and return 0
+      if (rest_time_to_red >= cycleTime()) {
+        // no red phase or some INF phases to red phase
+        return 0;
+      }
+      rest_time_to_red += (*iterator).duration;
+      iterator++;
+    }
+    return rest_time_to_red;
+  }
 }
 
 auto TrafficSignalController::shouldChangePhaseToBegin() -> bool

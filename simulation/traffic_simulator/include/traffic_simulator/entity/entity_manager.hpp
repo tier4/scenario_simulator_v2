@@ -42,6 +42,7 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_marker_publisher.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator/traffic_lights/v2i_traffic_light_info_publisher.hpp>
 #include <traffic_simulator/utils/node_parameters.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
@@ -108,6 +109,7 @@ class EntityManager
   const std::shared_ptr<TrafficLightMarkerPublisher> v2i_traffic_light_marker_publisher_ptr_;
   const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_legacy_topic_publisher_ptr_;
   const std::shared_ptr<TrafficLightPublisherBase> v2i_traffic_light_publisher_ptr_;
+  const std::shared_ptr<V2ITrafficLightInfoPublisher> v2i_traffic_light_info_publisher_ptr_;
   ConfigurableRateUpdater v2i_traffic_light_updater_, conventional_traffic_light_updater_;
 
 public:
@@ -177,6 +179,9 @@ public:
       makeV2ITrafficLightPublisher("/v2x/traffic_signals", node, hdmap_utils_ptr_)),
     v2i_traffic_light_publisher_ptr_(makeV2ITrafficLightPublisher(
       "/perception/traffic_light_recognition/external/traffic_signals", node, hdmap_utils_ptr_)),
+    v2i_traffic_light_info_publisher_ptr_(std::make_shared<V2ITrafficLightInfoPublisher>(
+      "/v2i/external/v2i_traffic_light_info", node, conventional_traffic_light_manager_ptr_,
+      hdmap_utils_ptr_)),
     v2i_traffic_light_updater_(
       node,
       [this]() {
@@ -186,8 +191,10 @@ public:
         v2i_traffic_light_legacy_topic_publisher_ptr_->publish(
           clock_ptr_->now(), v2i_traffic_light_manager_ptr_->generateUpdateTrafficLightsRequest());
       }),
-    conventional_traffic_light_updater_(
-      node, [this]() { conventional_traffic_light_marker_publisher_ptr_->publish(); })
+    conventional_traffic_light_updater_(node, [this]() {
+      conventional_traffic_light_marker_publisher_ptr_->publish();
+      v2i_traffic_light_info_publisher_ptr_->publish();
+    })
   {
     updateHdmapMarker();
   }
@@ -234,6 +241,13 @@ public:
     for (auto & traffic_light : conventional_traffic_light_manager_ptr_->getTrafficLights(id)) {
       traffic_light.get().confidence = confidence;
     }
+  }
+
+  auto setV2ITrafficLightExtraInfo(
+    lanelet::Id id, double current_phase_rest_time, double rest_time_to_red) -> void
+  {
+    v2i_traffic_light_info_publisher_ptr_->setTrafficLightExtraInfo(
+      id, current_phase_rest_time, rest_time_to_red);
   }
 
   // clang-format off
