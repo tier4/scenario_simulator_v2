@@ -106,6 +106,7 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
       GET_PARAMETER(record);
+      GET_PARAMETER(publish_empty_context);
 
       script = std::make_shared<OpenScenario>(osc_path);
 
