@@ -275,7 +275,11 @@ auto Interpreter::publishCurrentContext() const -> void
   {
     nlohmann::json json;
     context.stamp = now();
-    context.data = (json << *script).dump();
+    if (publish_empty_context) {
+      context.data = "{}";
+    } else {
+      context.data = (json << *script).dump();
+    }
     context.time = evaluateSimulationTime();
   }
 
