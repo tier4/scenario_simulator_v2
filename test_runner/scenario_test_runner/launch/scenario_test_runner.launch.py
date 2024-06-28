@@ -75,6 +75,7 @@ def launch_setup(context, *args, **kwargs):
     launch_simple_sensor_simulator      = LaunchConfiguration("launch_simple_sensor_simulator",         default=True)
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
     port                                = LaunchConfiguration("port",                                   default=5555)
+    publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
     rviz_config                         = LaunchConfiguration("rviz_config",                            default="")
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
