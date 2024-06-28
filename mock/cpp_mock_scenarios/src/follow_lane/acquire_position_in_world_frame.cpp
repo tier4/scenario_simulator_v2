@@ -51,12 +51,11 @@ private:
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
-    api_.setEntityStatus(
-      "ego",
+    auto entity = api_.getEntity("ego");
+    entity->setStatus(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(
         34513, 0.0, 0.0, api_.getHdmapUtils()),
       traffic_simulator::helper::constructActionStatus(10));
-    auto entity = api_.getEntity("ego");
     entity->requestSpeedChange(10, true);
     const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
       traffic_simulator::helper::constructCanonicalizedLaneletPose(

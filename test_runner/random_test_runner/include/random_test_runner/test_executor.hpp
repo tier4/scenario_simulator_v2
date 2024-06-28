@@ -83,11 +83,10 @@ public:
       api_->spawn(
         ego_name_, test_description_.ego_start_position, getVehicleParameters(),
         traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
-      api_->setEntityStatus(
-        ego_name_, test_description_.ego_start_position,
-        traffic_simulator::helper::constructActionStatus());
 
       auto ego_entity = api_->getEgoEntity(ego_name_);
+      ego_entity->setStatus(
+        test_description_.ego_start_position, traffic_simulator::helper::constructActionStatus());
 
       if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
         api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
@@ -129,8 +128,8 @@ public:
           npc_descr.name, npc_descr.start_position, getVehicleParameters(),
           traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
         auto entity = api_->getEntity(npc_descr.name);
-        api_->setEntityStatus(
-          npc_descr.name, npc_descr.start_position,
+        entity->setStatus(
+          npc_descr.start_position,
           traffic_simulator::helper::constructActionStatus(npc_descr.speed));
         entity->requestSpeedChange(npc_descr.speed, true);
       }

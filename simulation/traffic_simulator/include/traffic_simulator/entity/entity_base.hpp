@@ -196,9 +196,38 @@ public:
 
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
-  virtual void setStatus(const EntityStatus & status);
+  /*   */ auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
 
-  virtual auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
+  virtual auto setStatus(const EntityStatus & status) -> void;
+
+  virtual auto setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void;
+
+  virtual auto setStatus(
+    const geometry_msgs::msg::Pose & map_pose,
+    const traffic_simulator_msgs::msg::ActionStatus & action_status =
+      helper::constructActionStatus()) -> void;
+
+  virtual auto setStatus(
+    const geometry_msgs::msg::Pose & reference_pose, const geometry_msgs::msg::Pose & relative_pose,
+    const traffic_simulator_msgs::msg::ActionStatus & action_status =
+      helper::constructActionStatus()) -> void;
+
+  virtual auto setStatus(
+    const geometry_msgs::msg::Pose & reference_pose,
+    const geometry_msgs::msg::Point & relative_position,
+    const geometry_msgs::msg::Vector3 & relative_rpy,
+    const traffic_simulator_msgs::msg::ActionStatus & action_status =
+      helper::constructActionStatus()) -> void;
+
+  virtual auto setStatus(
+    const LaneletPose & lanelet_pose,
+    const traffic_simulator_msgs::msg::ActionStatus & action_status =
+      helper::constructActionStatus()) -> void;
+
+  virtual auto setStatus(
+    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
+    const traffic_simulator_msgs::msg::ActionStatus & action_status =
+      helper::constructActionStatus()) -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 

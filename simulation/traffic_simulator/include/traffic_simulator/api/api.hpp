@@ -242,33 +242,9 @@ public:
   bool checkCollision(
     const std::string & first_entity_name, const std::string & second_entity_name);
 
-  auto setEntityStatus(const std::string & name, const EntityStatus & status) -> void;
   auto respawn(
     const std::string & name, const geometry_msgs::msg::PoseWithCovarianceStamped & new_pose,
     const geometry_msgs::msg::PoseStamped & goal_pose) -> void;
-  auto setEntityStatus(
-    const std::string & name, const geometry_msgs::msg::Pose & map_pose,
-    const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      helper::constructActionStatus()) -> void;
-  auto setEntityStatus(
-    const std::string & name, const LaneletPose & lanelet_pose,
-    const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void;
-  auto setEntityStatus(
-    const std::string & name,
-    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
-    const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      helper::constructActionStatus()) -> void;
-  auto setEntityStatus(
-    const std::string & name, const std::string & reference_entity_name,
-    const geometry_msgs::msg::Pose & relative_pose,
-    const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      helper::constructActionStatus()) -> void;
-  auto setEntityStatus(
-    const std::string & name, const std::string & reference_entity_name,
-    const geometry_msgs::msg::Point & relative_position,
-    const geometry_msgs::msg::Vector3 & relative_rpy,
-    const traffic_simulator_msgs::msg::ActionStatus & action_status =
-      helper::constructActionStatus()) -> void;
 
   bool attachPseudoTrafficLightDetector(
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &);

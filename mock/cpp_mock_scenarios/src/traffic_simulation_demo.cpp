@@ -46,11 +46,11 @@ private:
       api_.despawn("tom");
     }
     if (api_.getCurrentTime() >= 4 && api_.isEntitySpawned("obstacle")) {
-      api_.setEntityStatus(
-        "obstacle",
-        traffic_simulator::helper::constructCanonicalizedLaneletPose(
-          120545, 0.0, 0.0, api_.getHdmapUtils()),
-        traffic_simulator::helper::constructActionStatus(10));
+      api_.getEntity("obstacle")
+        ->setStatus(
+          traffic_simulator::helper::constructCanonicalizedLaneletPose(
+            120545, 0.0, 0.0, api_.getHdmapUtils()),
+          traffic_simulator::helper::constructActionStatus(10));
     }
     if (api_.getCurrentTime() >= 6 && api_.isEntitySpawned("obstacle")) {
       api_.despawn("obstacle");
@@ -114,8 +114,8 @@ private:
     api_.spawn(
       "tom", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       getPedestrianParameters());
-    api_.setEntityStatus(
-      "tom", "ego", traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
+    api_.getEntity("tom")->setStatus(
+      ego_entity->getMapPose(), traffic_simulator::helper::constructPose(10, 3, 0, 0, 0, -1.57),
       traffic_simulator::helper::constructActionStatus());
     auto tom_entity = api_.getEntity("tom");
     tom_entity->requestWalkStraight();
@@ -162,9 +162,10 @@ private:
     api_.spawn(
       "obstacle", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
       getMiscObjectParameters());
-    api_.setEntityStatus(
-      "obstacle", "ego", traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
-      traffic_simulator::helper::constructActionStatus());
+    api_.getEntity("obstacle")
+      ->setStatus(
+        ego_entity->getMapPose(), traffic_simulator::helper::constructPose(10, 5, 0, 0, 0, -1.57),
+        traffic_simulator::helper::constructActionStatus());
 
     api_.getConventionalTrafficLights()->setTrafficLightsColor(
       34802, traffic_simulator::TrafficLight::Color::green);

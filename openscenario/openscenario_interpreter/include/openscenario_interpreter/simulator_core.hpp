@@ -447,9 +447,21 @@ public:
     }
 
     template <typename... Ts>
-    static auto applyTeleportAction(Ts &&... xs)
+    static auto applyTeleportAction(const std::string & name, Ts &&... xs)
     {
-      return core->setEntityStatus(std::forward<decltype(xs)>(xs)...);
+      return core->getEntity(name)->setStatus(std::forward<decltype(xs)>(xs)...);
+    }
+
+    template <typename... Ts>
+    static auto applyTeleportAction(
+      const std::string & name, const std::string & reference_entity_name, Ts &&... xs)
+    {
+      if (const auto reference_entity = core->getEntityOrNullptr(reference_entity_name)) {
+        return core->getEntity(name)->setStatus(
+          reference_entity->getMapPose(), std::forward<decltype(xs)>(xs)...);
+      } else {
+        throw Error("Reference entity \"", reference_entity_name, "\" does not exist");
+      }
     }
 
     template <typename... Ts>

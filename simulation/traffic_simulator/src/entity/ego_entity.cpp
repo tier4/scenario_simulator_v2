@@ -341,26 +341,5 @@ auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
   setCanonicalizedStatus(
     CanonicalizedEntityStatus(static_cast<EntityStatus>(status_), canonicalized_lanelet_pose));
 }
-
-void EgoEntity::setStatus(const EntityStatus & status)
-{
-  THROW_SEMANTIC_ERROR(
-    "You cannot set entity status to the ego vehicle named ", std::quoted(status.name),
-    " without specifing lanelets.");
-}
-
-auto EgoEntity::setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void
-{
-  if (status_.getTime() > 0 && not isControlledBySimulator()) {
-    THROW_SEMANTIC_ERROR(
-      "You cannot set entity status to the ego vehicle named ", std::quoted(status.name),
-      " after starting scenario.");
-  } else {
-    const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-      status.pose, status.bounding_box, lanelet_ids, false,
-      getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-    setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
-  }
-}
 }  // namespace entity
 }  // namespace traffic_simulator

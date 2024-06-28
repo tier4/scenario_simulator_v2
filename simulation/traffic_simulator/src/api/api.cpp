@@ -62,7 +62,7 @@ auto API::respawn(
     auto ego_entity = entity_manager_ptr_->getEgoEntity(name);
     // set new pose and default action status in EntityManager
     ego_entity->setControlledBySimulator(true);
-    setEntityStatus(name, new_pose.pose.pose, helper::constructActionStatus());
+    ego_entity->setStatus(new_pose.pose.pose, helper::constructActionStatus());
 
     // read status from EntityManager, then send it to SimpleSensorSimulator
     simulation_api_schema::UpdateEntityStatusRequest req;
@@ -110,70 +110,6 @@ bool API::checkCollision(
     }
   }
   return false;
-}
-
-auto API::setEntityStatus(
-  const std::string & name,
-  const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
-{
-  const auto entity = getEntity(name);
-  auto status = static_cast<EntityStatus>(entity->getStatus());
-  status.action_status = action_status;
-  if (canonicalized_lanelet_pose) {
-    status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
-    status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-    status.lanelet_pose_valid = true;
-  }
-  entity->setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
-}
-
-auto API::setEntityStatus(const std::string & name, const EntityStatus & status) -> void
-{
-  getEntity(name)->setStatus(status);
-}
-
-auto API::setEntityStatus(
-  const std::string & name, const LaneletPose & lanelet_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
-{
-  setEntityStatus(
-    name, canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
-}
-
-auto API::setEntityStatus(
-  const std::string & name, const geometry_msgs::msg::Pose & map_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
-{
-  const auto entity = getEntity(name);
-  EntityStatus status = static_cast<EntityStatus>(entity->getStatus());
-  status.pose = map_pose;
-  status.action_status = action_status;
-  setEntityStatus(name, status);
-}
-
-auto API::setEntityStatus(
-  const std::string & name, const std::string & reference_entity_name,
-  const geometry_msgs::msg::Pose & relative_pose,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
-{
-  const auto reference_entity = getEntity(reference_entity_name);
-  setEntityStatus(
-    name, transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
-    action_status);
-}
-
-auto API::setEntityStatus(
-  const std::string & name, const std::string & reference_entity_name,
-  const geometry_msgs::msg::Point & relative_position,
-  const geometry_msgs::msg::Vector3 & relative_rpy,
-  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
-{
-  const auto relative_pose =
-    geometry_msgs::build<geometry_msgs::msg::Pose>()
-      .position(relative_position)
-      .orientation(math::geometry::convertEulerAngleToQuaternion(relative_rpy));
-  setEntityStatus(name, reference_entity_name, relative_pose, action_status);
 }
 
 bool API::attachPseudoTrafficLightDetector(
@@ -298,7 +234,7 @@ bool API::updateEntitiesStatusInSim()
         entity->setTwist(entity_status.action_status.twist);
         entity->setAcceleration(entity_status.action_status.accel);
       } else {
-        setEntityStatus(entity->getName(), entity_status);
+        entity->setStatus(entity_status);
       }
     }
     return true;

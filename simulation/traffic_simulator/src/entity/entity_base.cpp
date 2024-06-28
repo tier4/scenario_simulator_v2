@@ -14,6 +14,7 @@
 
 #include <geometry/bounding_box.hpp>
 #include <geometry/distance.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <geometry/transform.hpp>
 #include <limits>
 #include <rclcpp/rclcpp.hpp>
@@ -555,14 +556,73 @@ void EntityBase::setOtherStatus(
   other_status_.erase(name);
 }
 
+auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void
+{
+  status_.set(status);
+}
+
 void EntityBase::setStatus(const EntityStatus & status)
 {
   status_.set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
 
-auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status) -> void
+auto EntityBase::setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void
 {
-  status_.set(status);
+  const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+    status.pose, status.bounding_box, lanelet_ids, false,
+    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+  setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
+}
+
+auto EntityBase::setStatus(
+  const geometry_msgs::msg::Pose & map_pose,
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
+{
+  EntityStatus status = static_cast<EntityStatus>(getStatus());
+  status.pose = map_pose;
+  status.action_status = action_status;
+  setStatus(status);
+}
+
+auto EntityBase::setStatus(
+  const geometry_msgs::msg::Pose & reference_pose, const geometry_msgs::msg::Pose & relative_pose,
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
+{
+  setStatus(pose::transformRelativePoseToGlobal(reference_pose, relative_pose), action_status);
+}
+
+auto EntityBase::setStatus(
+  const geometry_msgs::msg::Pose & reference_pose,
+  const geometry_msgs::msg::Point & relative_position,
+  const geometry_msgs::msg::Vector3 & relative_rpy,
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
+{
+  const auto relative_pose =
+    geometry_msgs::build<geometry_msgs::msg::Pose>()
+      .position(relative_position)
+      .orientation(math::geometry::convertEulerAngleToQuaternion(relative_rpy));
+  setStatus(reference_pose, relative_pose, action_status);
+}
+
+auto EntityBase::setStatus(
+  const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::ActionStatus & action_status)
+  -> void
+{
+  setStatus(pose::canonicalize(lanelet_pose, hdmap_utils_ptr_), action_status);
+}
+
+auto EntityBase::setStatus(
+  const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
+  const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
+{
+  auto status = static_cast<EntityStatus>(getStatus());
+  status.action_status = action_status;
+  if (canonicalized_lanelet_pose) {
+    status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
+    status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
+    status.lanelet_pose_valid = true;
+  }
+  setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
