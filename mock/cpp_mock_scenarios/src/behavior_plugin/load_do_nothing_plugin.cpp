@@ -40,21 +40,15 @@ private:
   void onUpdate() override
   {
     /// @note When using the do_nothing plugin, the return value of the `getCurrentAction` function is always do_nothing.
-    auto const ego_entity = api_.getEntity("ego");
-    auto const pedestrian_entity = api_.getEntity("pedestrian");
-    auto const vehicle_spawn_with_behavior_tree_entity =
-      api_.getEntity("vehicle_spawn_with_behavior_tree");
-    auto const pedestrian_spawn_with_behavior_tree_entity =
-      api_.getEntity("pedestrian_spawn_with_behavior_tree");
 
     if (
-      ego_entity->getCurrentAction() != "do_nothing" ||
-      pedestrian_entity->getCurrentAction() != "do_nothing") {
+      api_.getEntity("ego")->getCurrentAction() != "do_nothing" ||
+      api_.getEntity("pedestrian")->getCurrentAction() != "do_nothing") {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
-      vehicle_spawn_with_behavior_tree_entity->getCurrentAction() == "do_nothing" ||
-      pedestrian_spawn_with_behavior_tree_entity->getCurrentAction() == "do_nothing") {
+      api_.getEntity("vehicle_spawn_with_behavior_tree")->getCurrentAction() == "do_nothing" ||
+      api_.getEntity("pedestrian_spawn_with_behavior_tree")->getCurrentAction() == "do_nothing") {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     api_.resetBehaviorPlugin(
@@ -64,8 +58,8 @@ private:
       "pedestrian_spawn_with_behavior_tree",
       traffic_simulator::entity::PedestrianEntity::BuiltinBehavior::doNothing());
     if (
-      vehicle_spawn_with_behavior_tree_entity->getCurrentAction() != "do_nothing" ||
-      pedestrian_spawn_with_behavior_tree_entity->getCurrentAction() != "do_nothing") {
+      api_.getEntity("vehicle_spawn_with_behavior_tree")->getCurrentAction() != "do_nothing" ||
+      api_.getEntity("pedestrian_spawn_with_behavior_tree")->getCurrentAction() != "do_nothing") {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
 
