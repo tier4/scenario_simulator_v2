@@ -69,7 +69,7 @@ private:
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
-    if (equals(api_.getCurrentTime(), 0.0, 0.01) && entity->isInPosition(spawn_pose, 0.1)) {
+    if (equals(api_.getCurrentTime(), 0.0, 0.01) && !entity->isInPosition(spawn_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
