@@ -575,10 +575,10 @@ auto EntityBase::setLinearAcceleration(const double linear_acceleration) -> void
   status_.setLinearAcceleration(linear_acceleration);
 }
 
-void EntityBase::setTrafficLightManager(
-  const std::shared_ptr<traffic_simulator::TrafficLightManager> & traffic_light_manager)
+void EntityBase::setTrafficLights(
+  const std::shared_ptr<traffic_simulator::TrafficLightsBase> & traffic_lights)
 {
-  traffic_light_manager_ = traffic_light_manager;
+  traffic_lights_ = traffic_lights;
 }
 
 auto EntityBase::setTwist(const geometry_msgs::msg::Twist & twist) -> void

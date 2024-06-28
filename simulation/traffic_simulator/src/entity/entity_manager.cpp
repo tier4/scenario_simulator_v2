@@ -23,6 +23,7 @@
 #include <queue>
 #include <scenario_simulator_exception/exception.hpp>
 #include <sstream>
+#include <std_msgs/msg/header.hpp>
 #include <stdexcept>
 #include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
@@ -261,12 +262,6 @@ void EntityManager::resetBehaviorPlugin(
   spawned_entity->setBehaviorParameter(behavior_parameter);
 }
 
-bool EntityManager::trafficLightsChanged()
-{
-  return conventional_traffic_light_manager_ptr_->hasAnyLightChanged() or
-         v2i_traffic_light_manager_ptr_->hasAnyLightChanged();
-}
-
 void EntityManager::setVerbose(const bool verbose)
 {
   configuration.verbose = verbose;
@@ -298,9 +293,9 @@ void EntityManager::update(const double current_time, const double step_time)
     "EntityManager::update", configuration.verbose);
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
-    conventional_traffic_light_updater_.createTimer(
-      configuration.conventional_traffic_light_publish_rate);
-    v2i_traffic_light_updater_.createTimer(configuration.v2i_traffic_light_publish_rate);
+    traffic_lights_ptr_->startTrafficLightsUpdate(
+      configuration.conventional_traffic_light_publish_rate,
+      configuration.v2i_traffic_light_publish_rate);
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {
