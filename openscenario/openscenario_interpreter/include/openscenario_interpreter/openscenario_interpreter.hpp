@@ -62,6 +62,8 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   bool record;
 
+  bool publish_empty_context;
+
   std::shared_ptr<OpenScenario> script;
 
   std::list<std::shared_ptr<ScenarioDefinition>> scenarios;
