@@ -2,6 +2,9 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.2.2 (2024-06-28)
+------------------
+
 2.2.1 (2024-06-27)
 ------------------
 * Merge remote-tracking branch 'origin/master' into fix/issue1276-re
