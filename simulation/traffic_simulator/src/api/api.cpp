@@ -133,23 +133,6 @@ auto API::setEntityStatus(const std::string & name, const EntityStatus & status)
   getEntity(name)->setStatus(status);
 }
 
-/// @todo it probably should be moved to SimulatorCore
-std::optional<double> API::getTimeHeadway(
-  const std::string & from_entity_name, const std::string & to_entity_name)
-{
-  if (auto from_entity = getEntityOrNullptr(from_entity_name); from_entity) {
-    if (auto to_entity = getEntityOrNullptr(to_entity_name); to_entity) {
-      if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
-          relative_pose && relative_pose->position.x <= 0) {
-        const double time_headway =
-          (relative_pose->position.x * -1) / getEntity(to_entity_name)->getCurrentTwist().linear.x;
-        return std::isnan(time_headway) ? std::numeric_limits<double>::infinity() : time_headway;
-      }
-    }
-  }
-  return std::nullopt;
-}
-
 auto API::setEntityStatus(
   const std::string & name, const LaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void

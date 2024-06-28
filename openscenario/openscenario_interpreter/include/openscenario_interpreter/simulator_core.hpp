@@ -512,15 +512,22 @@ public:
       return core->getEntity(name)->getStandStillDuration();
     }
 
-    template <typename... Ts>
-    static auto evaluateTimeHeadway(Ts &&... xs)
+    static auto evaluateTimeHeadway(
+      const std::string & from_entity_name, const std::string & to_entity_name)
     {
-      if (const auto result = core->getTimeHeadway(std::forward<decltype(xs)>(xs)...); result) {
-        return result.value();
-      } else {
-        using value_type = typename std::decay<decltype(result)>::type::value_type;
-        return std::numeric_limits<value_type>::quiet_NaN();
+      if (auto from_entity = core->getEntityOrNullptr(from_entity_name); from_entity) {
+        if (auto to_entity = core->getEntityOrNullptr(to_entity_name); to_entity) {
+          if (auto relative_pose = traffic_simulator::pose::relativePose(
+                from_entity->getMapPose(), to_entity->getMapPose());
+              relative_pose && relative_pose->position.x <= 0) {
+            const double time_headway =
+              (relative_pose->position.x * -1) / to_entity->getCurrentTwist().linear.x;
+            return std::isnan(time_headway) ? std::numeric_limits<double>::infinity()
+                                            : time_headway;
+          }
+        }
       }
+      return std::numeric_limits<double>::quiet_NaN();
     }
   };
 

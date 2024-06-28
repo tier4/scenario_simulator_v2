@@ -270,8 +270,6 @@ public:
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
 
-  std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
-
   bool attachPseudoTrafficLightDetector(
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &);
 
