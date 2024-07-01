@@ -22,6 +22,7 @@
 #include <openscenario_interpreter/reader/evaluate.hpp>
 #include <openscenario_interpreter/syntax/parameter_type.hpp>
 #include <openscenario_interpreter/utility/highlighter.hpp>
+#include <optional>
 #include <pugixml.hpp>
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
@@ -162,6 +163,16 @@ auto readAttribute(const std::string & name, const Node & node, const Scope & sc
     return readAttribute<T>(name, node, scope);
   } else {
     return value;
+  }
+}
+
+template <typename T, typename Node, typename Scope>
+auto readAttribute(const std::string & name, const Node & node, const Scope & scope, std::nullopt_t)
+{
+  if (node.attribute(name.c_str())) {
+    return std::make_optional(readAttribute<T>(name, node, scope));
+  } else {
+    return std::optional<T>();
   }
 }
 }  // namespace reader
