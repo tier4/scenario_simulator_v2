@@ -36,6 +36,33 @@ public:
   }
 };
 
+/// Simplest possible valid lanelet pose that can be converted to CanonicalizedLaneletPose
+auto getTestDescription() -> TestDescription
+{
+  TestDescription td;
+  td.ego_goal_position = traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
+                           .lanelet_id(34513)
+                           .s(10.0)
+                           .offset(0.0)
+                           .rpy(geometry_msgs::msg::Vector3());
+
+  td.ego_goal_pose =
+    geometry_msgs::build<geometry_msgs::msg::Pose>()
+      .position(
+        geometry_msgs::build<geometry_msgs::msg::Point>().x(3704.31).y(73766.2).z(-0.875988))
+      .orientation(
+        geometry_msgs::build<geometry_msgs::msg::Quaternion>().x(0.0).y(0.0).z(0.23587).w(
+          0.971785));
+
+  td.ego_start_position = traffic_simulator_msgs::build<traffic_simulator_msgs::msg::LaneletPose>()
+                            .lanelet_id(34513)
+                            .s(0.0)
+                            .offset(0.0)
+                            .rpy(geometry_msgs::msg::Vector3());
+
+  return td;
+}
+
 class MockTrafficSimulatorAPI
 {
 public:
@@ -75,7 +102,6 @@ public:
   MOCK_METHOD(bool, despawn, (const std::string), ());
   MOCK_METHOD(std::string, getEgoName, (), ());
   MOCK_METHOD(double, getCurrentTime, (), ());
-  MOCK_METHOD(void, getHdmapUtilsMock, (), ());
   MOCK_METHOD(void, getEntityStatusMock, (const std::string &), ());
   MOCK_METHOD(bool, entityExists, (const std::string &), ());
   MOCK_METHOD(bool, checkCollision, (const std::string &, const std::string &), ());
@@ -87,6 +113,7 @@ public:
     return *field_operator_application_mock;
   }
 
+  /// Real member function required for the canonicalization of the lanelet pose in TestExecutor.InitializeWithNoNPCs test
   const std::shared_ptr<hdmap_utils::HdMapUtils> & getHdmapUtils()
   {
     static const std::string path =
@@ -123,7 +150,7 @@ TEST(TestExecutor, InitializeWithNoNPCs)
 
   auto test_case = common::junit::SimpleTestCase("test_case");
   auto test_executor = TestExecutor<MockTrafficSimulatorAPI>(
-    MockAPI, TestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
+    MockAPI, getTestDescription(), JunitXmlReporterTestCase(test_case), 20.0,
     ArchitectureType::AWF_UNIVERSE, rclcpp::get_logger("test_executor_test"));
 
   EXPECT_CALL(*MockAPI, updateFrame).Times(1).InSequence(sequence);
