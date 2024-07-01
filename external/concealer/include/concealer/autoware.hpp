@@ -17,6 +17,7 @@
 
 #include <atomic>
 #include <autoware_auto_control_msgs/msg/ackermann_control_command.hpp>
+#include <autoware_auto_vehicle_msgs/msg/control_mode_report.hpp>
 #include <autoware_auto_vehicle_msgs/msg/gear_command.hpp>
 #include <autoware_auto_vehicle_msgs/msg/turn_indicators_command.hpp>
 #include <concealer/continuous_transform_broadcaster.hpp>
@@ -66,6 +67,9 @@ public:
 
   virtual auto getRouteLanelets() const -> std::vector<std::int64_t> = 0;
 
+  virtual auto getControlModeReport() const
+    -> autoware_auto_vehicle_msgs::msg::ControlModeReport = 0;
+
   auto set(const geometry_msgs::msg::Accel &) -> void;
 
   auto set(const geometry_msgs::msg::Twist &) -> void;
@@ -73,10 +77,6 @@ public:
   auto set(const geometry_msgs::msg::Pose &) -> void;
 
   virtual auto rethrow() -> void;
-
-  virtual auto setManualMode() -> void = 0;
-
-  virtual auto setAutonomousMode() -> void = 0;
 };
 }  // namespace concealer
 

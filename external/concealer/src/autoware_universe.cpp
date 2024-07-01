@@ -16,6 +16,7 @@
 
 namespace concealer
 {
+using autoware_auto_vehicle_msgs::srv::ControlModeCommand;
 AutowareUniverse::AutowareUniverse()
 : getAckermannControlCommand("/control/command/control_cmd", *this),
   getGearCommandImpl("/control/command/gear_cmd", *this),
@@ -29,6 +30,22 @@ AutowareUniverse::AutowareUniverse()
   setControlModeReport("/vehicle/status/control_mode", *this),
   setVelocityReport("/vehicle/status/velocity_status", *this),
   setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
+  controlModeRequestService(create_service<ControlModeCommand>(
+    "/control/control_mode_request",
+    [this](
+      const ControlModeCommand::Request::SharedPtr request,
+      ControlModeCommand::Response::SharedPtr response) {
+      using autoware_auto_vehicle_msgs::msg::ControlModeReport;
+      if (request->mode == ControlModeCommand::Request::AUTONOMOUS) {
+        current_control_mode.store(ControlModeReport::AUTONOMOUS);
+        response->success = true;
+      } else if (request->mode == ControlModeCommand::Request::MANUAL) {
+        current_control_mode.store(ControlModeReport::MANUAL);
+        response->success = true;
+      } else {
+        response->success = false;
+      }
+    })),
   // Autoware.Universe requires localization topics to send data at 50Hz
   localization_update_timer(rclcpp::create_timer(
     this, get_clock(), std::chrono::milliseconds(20), [this]() { updateLocalization(); })),
@@ -109,11 +126,7 @@ auto AutowareUniverse::updateLocalization() -> void
 
 auto AutowareUniverse::updateVehicleState() -> void
 {
-  setControlModeReport([this]() {
-    autoware_auto_vehicle_msgs::msg::ControlModeReport message;
-    message.mode = current_control_mode.load();
-    return message;
-  }());
+  setControlModeReport(getControlModeReport());
 
   setGearReport([this]() {
     autoware_auto_vehicle_msgs::msg::GearReport message;
@@ -180,13 +193,11 @@ auto AutowareUniverse::getRouteLanelets() const -> std::vector<std::int64_t>
   return ids;
 }
 
-auto AutowareUniverse::setManualMode() -> void
+auto AutowareUniverse::getControlModeReport() const
+  -> autoware_auto_vehicle_msgs::msg::ControlModeReport
 {
-  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::MANUAL);
-}
-
-auto AutowareUniverse::setAutonomousMode() -> void
-{
-  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS);
+  autoware_auto_vehicle_msgs::msg::ControlModeReport message;
+  message.mode = current_control_mode.load();
+  return message;
 }
 }  // namespace concealer
