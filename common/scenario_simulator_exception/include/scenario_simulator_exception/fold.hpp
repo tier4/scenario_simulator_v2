@@ -52,4 +52,4 @@ constexpr decltype(auto) fold_right(F && f, T && x, Ts &&... xs)
 }  // namespace scenario_simulator_exception
 }  // namespace common
 
-#endif  // OPENSCENARIO_INTERPRETER__FOLD_HPP_
+#endif  // SCENARIO_SIMULATOR_EXCEPTION__FOLD_HPP_

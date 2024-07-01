@@ -22,24 +22,27 @@ namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- UserDefinedDistribution 1.2 --------------------------------------------
- *
- *  <xsd:complexType name="UserDefinedDistribution">
- *    <xsd:simpleContent>
- *      <xsd:extension base="xsd:string">
- *        <xsd:attribute name="type" type="String" use="required"/>
- *      </xsd:extension>
- *    </xsd:simpleContent>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
+/*
+   UserDefinedDistribution (OpenSCENARIO XML 1.3)
+
+   Indicates a user defined distribution which can be deterministic or stochastic.
+   This distribution contains a property with the name type and some user defined content.
+
+   <xsd:complexType name="UserDefinedDistribution">
+     <xsd:simpleContent>
+       <xsd:extension base="xsd:string">
+         <xsd:attribute name="type" type="String" use="required"/>
+       </xsd:extension>
+     </xsd:simpleContent>
+   </xsd:complexType>
+*/
 struct UserDefinedDistribution : private Scope, public ComplexType
 {
   const String type;
 
   explicit UserDefinedDistribution(const pugi::xml_node &, const Scope &);
 
-  // TODO: implement evaluate()?`
+  auto evaluate() -> Object;
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
