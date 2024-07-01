@@ -2,6 +2,9 @@
 Changelog for package simple_cross_map
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.4.0 (2024-07-01)
+------------------
+
 2.3.0 (2024-06-28)
 ------------------
 * Merge pull request `#1234 <https://github.com/tier4/scenario_simulator_v2/issues/1234>`_ from tier4/feature/synchronized_action
