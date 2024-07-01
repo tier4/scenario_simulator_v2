@@ -220,12 +220,12 @@ public:
       helper::constructActionStatus()) -> void;
 
   virtual auto setStatus(
-    const LaneletPose & lanelet_pose,
+    const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
 
   virtual auto setStatus(
-    const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
+    const LaneletPose & lanelet_pose,
     const traffic_simulator_msgs::msg::ActionStatus & action_status =
       helper::constructActionStatus()) -> void;
 

@@ -561,17 +561,15 @@ auto EntityBase::setCanonicalizedStatus(const CanonicalizedEntityStatus & status
   status_.set(status);
 }
 
+auto EntityBase::setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void
+{
+  status_.set(
+    status, lanelet_ids, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
+}
+
 void EntityBase::setStatus(const EntityStatus & status)
 {
   status_.set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-}
-
-auto EntityBase::setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void
-{
-  const auto canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
-    status.pose, status.bounding_box, lanelet_ids, false,
-    getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
-  setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
 }
 
 auto EntityBase::setStatus(
@@ -605,24 +603,28 @@ auto EntityBase::setStatus(
 }
 
 auto EntityBase::setStatus(
-  const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::ActionStatus & action_status)
-  -> void
-{
-  setStatus(pose::canonicalize(lanelet_pose, hdmap_utils_ptr_), action_status);
-}
-
-auto EntityBase::setStatus(
-  const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
+  const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   auto status = static_cast<EntityStatus>(getStatus());
   status.action_status = action_status;
-  if (canonicalized_lanelet_pose) {
-    status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
-    status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-    status.lanelet_pose_valid = true;
-  }
+  status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
+  status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+  status.lanelet_pose_valid = true;
   setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
+}
+
+auto EntityBase::setStatus(
+  const LaneletPose & lanelet_pose, const traffic_simulator_msgs::msg::ActionStatus & action_status)
+  -> void
+{
+  if (const auto canonicalized_lanelet_pose = pose::canonicalize(lanelet_pose, hdmap_utils_ptr_)) {
+    setStatus(canonicalized_lanelet_pose.value(), action_status);
+  } else {
+    std::stringstream ss;
+    ss << "Status can not be set. lanelet pose: " << lanelet_pose << " is not canonicalizable for ";
+    THROW_SEMANTIC_ERROR(ss.str(), " entity named: ", std::quoted(name), ".");
+  }
 }
 
 auto EntityBase::setLinearVelocity(const double linear_velocity) -> void
