@@ -47,12 +47,12 @@ public:
   MOCK_METHOD(bool, updateFrame, (), ());
   MOCK_METHOD(
     bool, spawn,
-    (const std::string &, const traffic_simulator::LaneletPose &,
+    (const std::string &, const traffic_simulator::CanonicalizedLaneletPose &,
      const traffic_simulator_msgs::msg::VehicleParameters &, const std::string &, std::string),
     ());
   MOCK_METHOD(
     void, setEntityStatus,
-    (const std::string &, const traffic_simulator::LaneletPose &,
+    (const std::string &, const traffic_simulator::CanonicalizedLaneletPose &,
      const traffic_simulator_msgs::msg::ActionStatus),
     ());
   MOCK_METHOD(void, attachLidarSensor, (const simulation_api_schema::LidarConfiguration &), ());
@@ -65,7 +65,7 @@ public:
     void, requestAssignRoute, (const std::string &, std::vector<geometry_msgs::msg::Pose>), ());
   MOCK_METHOD(
     void, spawn,
-    (const std::string &, const traffic_simulator::LaneletPose &,
+    (const std::string &, const traffic_simulator::CanonicalizedLaneletPose &,
      const traffic_simulator_msgs::msg::VehicleParameters &),
     ());
   MOCK_METHOD(void, requestSpeedChange, (const std::string &, double, bool), ());
@@ -75,6 +75,7 @@ public:
   MOCK_METHOD(bool, despawn, (const std::string), ());
   MOCK_METHOD(std::string, getEgoName, (), ());
   MOCK_METHOD(double, getCurrentTime, (), ());
+  MOCK_METHOD(void, getHdmapUtilsMock, (), ());
   MOCK_METHOD(void, getEntityStatusMock, (const std::string &), ());
   MOCK_METHOD(bool, entityExists, (const std::string &), ());
   MOCK_METHOD(bool, checkCollision, (const std::string &, const std::string &), ());
@@ -84,6 +85,18 @@ public:
   {
     asFieldOperatorApplicationMock(name);
     return *field_operator_application_mock;
+  }
+
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & getHdmapUtils()
+  {
+    static const std::string path =
+      ament_index_cpp::get_package_share_directory("random_test_runner") + "/map/lanelet2_map.osm";
+    static const auto origin = geographic_msgs::build<geographic_msgs::msg::GeoPoint>()
+                                 .latitude(35.61836750154)
+                                 .longitude(139.78066608243)
+                                 .altitude(0.0);
+    static const auto hdmap_utils_ptr = std::make_shared<hdmap_utils::HdMapUtils>(path, origin);
+    return hdmap_utils_ptr;
   }
 
   traffic_simulator::CanonicalizedEntityStatus getEntityStatus(const std::string & name)
@@ -115,11 +128,11 @@ TEST(TestExecutor, InitializeWithNoNPCs)
 
   EXPECT_CALL(*MockAPI, updateFrame).Times(1).InSequence(sequence);
   EXPECT_CALL(
-    *MockAPI,
-    spawn(
-      ::testing::A<const std::string &>(), ::testing::A<const traffic_simulator::LaneletPose &>(),
-      ::testing::A<const traffic_simulator_msgs::msg::VehicleParameters &>(),
-      ::testing::A<const std::string &>(), ::testing::A<std::string>()))
+    *MockAPI, spawn(
+                ::testing::A<const std::string &>(),
+                ::testing::A<const traffic_simulator::CanonicalizedLaneletPose &>(),
+                ::testing::A<const traffic_simulator_msgs::msg::VehicleParameters &>(),
+                ::testing::A<const std::string &>(), ::testing::A<std::string>()))
     .Times(1)
     .InSequence(sequence);
   EXPECT_CALL(*MockAPI, setEntityStatus).Times(1).InSequence(sequence);
