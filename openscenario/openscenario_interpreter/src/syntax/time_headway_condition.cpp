@@ -22,13 +22,13 @@ inline namespace syntax
 {
 TimeHeadwayCondition::TimeHeadwayCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
-: entity_ref(readAttribute<String>("entityRef", node, scope)),
+: entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   value(readAttribute<Double>("value", node, scope)),
   freespace(readAttribute<Boolean>("freespace", node, scope)),
   along_route(readAttribute<Boolean>("alongRoute", node, scope)),
   compare(readAttribute<Rule>("rule", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), {Double::nan()})
 {
 }
 
@@ -51,8 +51,9 @@ auto TimeHeadwayCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(evaluateTimeHeadway(triggering_entity, entity_ref));
-    return compare(results.back(), value);
+    results.push_back(triggering_entity.apply(
+      [&](const auto & object) { return evaluateTimeHeadway(entity_ref, object); }));
+    return not results.back().size() or compare(results.back(), value).min();
   }));
 }
 }  // namespace syntax

@@ -1,0 +1,229 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: '2023-07-18T03:23:52.943Z'
+    description: ''
+    author: 'Shota Minami'
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+  RoadNetwork:
+    LogicFile: { filepath: "$(find-pkg-share kashiwanoha_map)/map/lanelet2_map.osm" }
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+    ScenarioObject:
+      - name: npc0
+        Vehicle: &default-vehicle
+          name: default-vehicle
+          vehicleCategory: car
+          BoundingBox:
+            Center: { x: 0, y: 0, z: 0 }
+            Dimensions: { width: 1.8, length: 4, height: 2.5 }
+          Performance: { maxSpeed: 30, maxAcceleration: INF, maxDeceleration: INF }
+          Axles:
+            FrontAxle: { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX:  1, positionZ: 0.3 }
+            RearAxle:  { maxSteering: 3.1415, wheelDiameter: 0.6, trackWidth: 4, positionX: -1, positionZ: 0.3 }
+          Properties:
+            Property: []
+      - name: npc1
+        Vehicle:
+          <<: *default-vehicle
+      - name: npc2
+        Vehicle:
+          <<: *default-vehicle
+    EntitySelection:
+      - name: npcs
+        Members:
+          EntityRef: [ entityRef: npc1, entityRef: npc2 ]
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: npc0
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition: &collision-position
+                      roadId: ''
+                      laneId: '34513'
+                      s: 20
+                      offset: 0
+                      Orientation: { type: relative, h: 0, p: 0, r: 0 }
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+          - entityRef: npcs
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      <<: *collision-position
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 0
+    Story:
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: 'collision_test'
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'test(CollisionCondition1 Satisfied)'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: npcs ]
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef: { entityRef: npc0 }
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: collision_test_1
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'test(CollisionCondition1 Satisfied)'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: any
+                                      EntityRef: [ entityRef: npc1 ]
+                                    EntityCondition:
+                                      CollisionCondition:
+                                        EntityRef: { entityRef: npc2 }
+                  - name: 'stand_still_test'
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: 'test(StandStillCondition Satisfied)'
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByEntityCondition:
+                                    TriggeringEntities:
+                                      triggeringEntitiesRule: all
+                                      EntityRef: [ entityRef: npcs, entityRef: npc0 ]
+                                    EntityCondition:
+                                      StandStillCondition:
+                                        duration: 5
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - name: ''
+                maximumExecutionCount: 1
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: collision_test
+                                      storyboardElementType: action
+                                      state: completeState
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: stand_still_test
+                                      storyboardElementType: action
+                                      state: completeState
+                      - name: ''
+                        priority: parallel
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 5
+                                      rule: greaterThan
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

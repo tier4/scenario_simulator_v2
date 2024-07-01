@@ -17,6 +17,7 @@
 
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/bounding_box.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/parameter_declarations.hpp>
 #include <openscenario_interpreter/syntax/pedestrian_category.hpp>
 #include <openscenario_interpreter/syntax/properties.hpp>
@@ -45,6 +46,8 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Pedestrian : public Scope
 {
+  static constexpr ObjectType object_type{ObjectType::pedestrian};
+
   const Double mass;
 
   const String model;

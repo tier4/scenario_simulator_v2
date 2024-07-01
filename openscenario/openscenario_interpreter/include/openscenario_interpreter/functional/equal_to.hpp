@@ -19,6 +19,7 @@
 #include <functional>
 #include <limits>
 #include <type_traits>
+#include <valarray>
 
 namespace openscenario_interpreter
 {
@@ -33,6 +34,26 @@ template <typename T>
 struct equal_to<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
 {
   constexpr auto operator()(const T & lhs, const T & rhs) const noexcept
+  {
+    return std::abs(lhs - rhs) < std::numeric_limits<typename std::decay<T>::type>::epsilon();
+  }
+};
+
+template <typename T>
+struct equal_to<std::valarray<T>, typename std::enable_if<std::is_floating_point<T>::value>::type>
+{
+  constexpr auto operator()(
+    const std::valarray<T> & lhs, const std::valarray<T> & rhs) const noexcept
+  {
+    return std::abs(lhs - rhs) < std::numeric_limits<typename std::decay<T>::type>::epsilon();
+  }
+
+  constexpr auto operator()(const std::valarray<T> & lhs, const T & rhs) const noexcept
+  {
+    return std::abs(lhs - rhs) < std::numeric_limits<typename std::decay<T>::type>::epsilon();
+  }
+
+  constexpr auto operator()(const T & lhs, const std::valarray<T> & rhs) const noexcept
   {
     return std::abs(lhs - rhs) < std::numeric_limits<typename std::decay<T>::type>::epsilon();
   }

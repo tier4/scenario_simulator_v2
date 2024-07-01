@@ -43,7 +43,7 @@ auto AcquirePositionAction::start() -> void
     });
 
   for (const auto & actor : actors) {
-    apply<void>(acquire_position, position, actor);
+    actor.apply([&](const auto & object) { apply<void>(acquire_position, position, object); });
   }
 }
 }  // namespace syntax

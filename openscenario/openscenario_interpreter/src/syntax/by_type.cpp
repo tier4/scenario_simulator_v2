@@ -12,28 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/relative_target_lane.hpp>
+#include <openscenario_interpreter/syntax/by_type.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-RelativeTargetLane::RelativeTargetLane(const pugi::xml_node & node, Scope & scope)
-: entity_ref(readAttribute<String>("entityRef", node, scope), scope),
-  value(readAttribute<Integer>("value", node, scope))
+ByType::ByType(const pugi::xml_node & tree, Scope & scope)
+: ObjectType(readAttribute<ObjectType>("objectType", tree, scope))
 {
-}
-
-RelativeTargetLane::operator traffic_simulator::lane_change::Direction() const
-{
-  if (value < 0) {
-    return traffic_simulator::lane_change::Direction::RIGHT;
-  } else if (value == 0) {
-    return traffic_simulator::lane_change::Direction::STRAIGHT;
-  } else {
-    return traffic_simulator::lane_change::Direction::LEFT;
-  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

@@ -18,7 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/dynamic_constraints.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/following_mode.hpp>
 #include <openscenario_interpreter/syntax/speed_profile_entry.hpp>
 #include <pugixml.hpp>
@@ -47,7 +47,7 @@ struct SpeedProfileAction : private Scope,  // NOTE: Required for access to acto
      Reference entity. If set, the speed values will be interpreted as relative
      delta to the speed of the referenced entity.
   */
-  const EntityRef entity_ref;
+  const Entity entity_ref;
 
   /*
      Defines whether to apply strictly linear interpolation between speed
@@ -68,13 +68,13 @@ struct SpeedProfileAction : private Scope,  // NOTE: Required for access to acto
 
   const std::list<SpeedProfileEntry> speed_profile_entry;  // Defines a series of speed targets.
 
-  std::unordered_map<String, std::list<SpeedProfileEntry>::const_iterator> accomplishments;
+  std::unordered_map<Entity, std::list<SpeedProfileEntry>::const_iterator> accomplishments;
 
   explicit SpeedProfileAction(const pugi::xml_node &, Scope &);
 
   auto accomplished() -> bool;
 
-  auto apply(const EntityRef &, const SpeedProfileEntry &) -> void;
+  auto apply(const Entity &, const SpeedProfileEntry &) -> void;
 
   auto endsImmediately() const -> bool;
 

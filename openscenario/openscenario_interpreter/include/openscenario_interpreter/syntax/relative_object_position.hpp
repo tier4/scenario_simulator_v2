@@ -18,7 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
-#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/orientation.hpp>
 #include <pugixml.hpp>
 #include <traffic_simulator_msgs/msg/lanelet_pose.hpp>
@@ -44,7 +44,7 @@ struct RelativeObjectPosition : private SimulatorCore::CoordinateSystemConversio
 {
   const Orientation orientation;
 
-  const String entity_ref;
+  const Entity entity_ref;
 
   const Double dx, dy, dz;
 

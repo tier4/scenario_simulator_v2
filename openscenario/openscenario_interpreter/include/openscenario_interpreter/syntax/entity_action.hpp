@@ -18,6 +18,7 @@
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/delete_entity_action.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
 
@@ -38,7 +39,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct EntityAction : public ComplexType
 {
-  const String entity_ref;
+  const Entity entity_ref;
 
   explicit EntityAction(const pugi::xml_node &, Scope &);
 

@@ -1,0 +1,215 @@
+OpenSCENARIO:
+  FileHeader:
+    revMajor: 1
+    revMinor: 0
+    date: '2021-09-06T09:09:41.856Z'
+    description: ''
+    author: ''
+  ParameterDeclarations:
+    ParameterDeclaration: []
+  CatalogLocations:
+    CatalogLocation: []
+  RoadNetwork:
+    LogicFile:
+      filepath: $(find-pkg-share kashiwanoha_map)/map
+    TrafficSignals:
+      TrafficSignalController: []
+  Entities:
+    ScenarioObject:
+      - name: ego
+        Vehicle: &vehicle
+          name: ''
+          vehicleCategory: car
+          BoundingBox:
+            Center: { x: 0, y: 0, z: 0 }
+            Dimensions: { width: 2.25, length: 4.77, height: 2.5 }
+          Performance:
+            maxSpeed: INF
+            maxAcceleration: INF
+            maxDeceleration: INF
+          Axles:
+            FrontAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: 1
+              positionZ: 0.3
+            RearAxle:
+              maxSteering: 3.1415
+              wheelDiameter: 0.6
+              trackWidth: 4
+              positionX: -1
+              positionZ: 0.3
+          Properties:
+            Property: []
+      - name: npc
+        Vehicle:
+          <<: *vehicle
+    EntitySelection:
+      - name: vehicles
+        Members:
+          ByType: [ objectType: vehicle ]
+  Storyboard:
+    Init:
+      Actions:
+        Private:
+          - entityRef: ego
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 10
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 5
+          - entityRef: npc
+            PrivateAction:
+              - TeleportAction:
+                  Position:
+                    LanePosition:
+                      roadId: ''
+                      laneId: '34513'
+                      s: 0
+                      offset: 0
+                      Orientation:
+                        type: relative
+                        h: 0
+                        p: 0
+                        r: 0
+              - LongitudinalAction:
+                  SpeedAction:
+                    SpeedActionDynamics:
+                      dynamicsDimension: time
+                      value: 0
+                      dynamicsShape: step
+                    SpeedActionTarget:
+                      AbsoluteTargetSpeed:
+                        value: 5
+    Story:
+      - name: ''
+        Act:
+          - name: ''
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: [ entityRef: vehicles ]
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 1
+                                      rule: greaterThan
+                        Action:
+                          - name: lane_change
+                            PrivateAction:
+                              LateralAction:
+                                LaneChangeAction:
+                                  LaneChangeActionDynamics:
+                                    dynamicsDimension: time
+                                    dynamicsShape: cubic
+                                    value: 3
+                                  LaneChangeTarget:
+                                    RelativeTargetLane:
+                                      entityRef: npc
+                                      value: -1
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+      - name: ''
+        Act:
+          - name: _EndCondition
+            ManeuverGroup:
+              - maximumExecutionCount: 1
+                name: ''
+                Actors:
+                  selectTriggeringEntities: false
+                  EntityRef: []
+                Maneuver:
+                  - name: ''
+                    Event:
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 20
+                                      rule: greaterThan
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    StoryboardElementStateCondition:
+                                      storyboardElementRef: lane_change
+                                      storyboardElementType: action
+                                      state: completeState
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitSuccess
+                      - name: ''
+                        priority: parallel
+                        StartTrigger:
+                          ConditionGroup:
+                            - Condition:
+                                - name: ''
+                                  delay: 0
+                                  conditionEdge: none
+                                  ByValueCondition:
+                                    SimulationTimeCondition:
+                                      value: 180
+                                      rule: greaterThan
+                        Action:
+                          - name: ''
+                            UserDefinedAction:
+                              CustomCommandAction:
+                                type: exitFailure
+            StartTrigger:
+              ConditionGroup:
+                - Condition:
+                    - name: ''
+                      delay: 0
+                      conditionEdge: none
+                      ByValueCondition:
+                        SimulationTimeCondition:
+                          value: 0
+                          rule: greaterThan
+    StopTrigger:
+      ConditionGroup: []

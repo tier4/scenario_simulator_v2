@@ -46,7 +46,7 @@ DistanceCondition::DistanceCondition(
   value(readAttribute<Double>("value", node, scope)),
   position(readElement<Position>("Position", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan()),
+  results(triggering_entities.entity_refs.size(), {Double::nan()}),
   consider_z([]() {
     rclcpp::Node node{"get_parameter", "simulation"};
     node.declare_parameter("consider_pose_by_road_slope", false);
@@ -749,8 +749,9 @@ auto DistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(distance(triggering_entity));
-    return rule(static_cast<double>(results.back()), value);
+    results.push_back(
+      triggering_entity.apply([&](const auto & object) { return distance(object); }));
+    return not results.back().size() or rule(results.back(), value).min();
   }));
 }
 }  // namespace syntax

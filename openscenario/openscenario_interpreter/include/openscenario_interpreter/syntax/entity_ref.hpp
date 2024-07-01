@@ -33,10 +33,7 @@ inline namespace syntax
 */
 struct EntityRef : public String
 {
-  template <typename... Ts>
-  EntityRef(Ts &&... xs) : String(std::forward<decltype(xs)>(xs)...)
-  {
-  }
+  EntityRef(const String & string) : String(string) {}
 
   template <typename Node, typename Scope>
   explicit EntityRef(const Node & node, Scope & scope)
