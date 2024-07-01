@@ -287,26 +287,6 @@ bool EntityManager::isStopping(const std::string & name) const
   return std::fabs(getCurrentTwist(name).linear.x) < std::numeric_limits<double>::epsilon();
 }
 
-bool EntityManager::reachPosition(
-  const std::string & name, const std::string & target_name, const double tolerance) const
-{
-  return reachPosition(name, getMapPose(target_name), tolerance);
-}
-
-bool EntityManager::reachPosition(
-  const std::string & name, const geometry_msgs::msg::Pose & target_pose,
-  const double tolerance) const
-{
-  return math::geometry::getDistance(getMapPose(name), target_pose) < tolerance;
-}
-
-bool EntityManager::reachPosition(
-  const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
-  const double tolerance) const
-{
-  return reachPosition(name, static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
-}
-
 void EntityManager::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
