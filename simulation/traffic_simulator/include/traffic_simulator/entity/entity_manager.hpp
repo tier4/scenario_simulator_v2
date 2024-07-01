@@ -412,6 +412,12 @@ public:
   auto spawnEntity(
     const std::string & name, const Pose & pose, const Parameters & parameters, Ts &&... xs)
   {
+    static_assert(
+      std::disjunction<
+        std::is_same<Pose, CanonicalizedLaneletPose>,
+        std::is_same<Pose, geometry_msgs::msg::Pose>>::value,
+      "Pose must be of type CanonicalizedLaneletPose or geometry_msgs::msg::Pose");
+
     auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
