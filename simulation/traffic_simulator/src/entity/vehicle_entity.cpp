@@ -266,6 +266,20 @@ void VehicleEntity::requestLaneChange(const traffic_simulator::lane_change::Para
   behavior_plugin_ptr_->setLaneChangeParameters(parameter);
 }
 
+auto VehicleEntity::getMaxAcceleration() const -> double
+{
+  return std::clamp(
+    getBehaviorParameter().dynamic_constraints.max_acceleration, 0.0,
+    vehicle_parameters.performance.max_acceleration);
+}
+
+auto VehicleEntity::getMaxDeceleration() const -> double
+{
+  return std::clamp(
+    getBehaviorParameter().dynamic_constraints.max_deceleration, 0.0,
+    vehicle_parameters.performance.max_deceleration);
+}
+
 void VehicleEntity::setVelocityLimit(double linear_velocity)
 {
   if (linear_velocity < 0.0) {
