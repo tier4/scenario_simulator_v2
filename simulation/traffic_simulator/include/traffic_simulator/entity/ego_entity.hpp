@@ -160,9 +160,9 @@ public:
   auto replanRoute(const std::vector<geometry_msgs::msg::PoseStamped> & route) -> void;
   auto sendCooperateCommand(const std::string & module_name, const std::string & command) -> void;
   auto requestAutoModeForCooperation(const std::string & module_name, bool enable) -> void;
-  auto getMinimumRiskManeuverBehaviorName() const -> const std::string &;
-  auto getMinimumRiskManeuverStateName() const -> const std::string &;
-  auto getEmergencyStateName() const -> const std::string &;
+  auto getMinimumRiskManeuverBehaviorName() const -> std::string;
+  auto getMinimumRiskManeuverStateName() const -> std::string;
+  auto getEmergencyStateName() const -> std::string;
   auto getTurnIndicatorsCommandName() const -> const std::string;
 };
 }  // namespace entity

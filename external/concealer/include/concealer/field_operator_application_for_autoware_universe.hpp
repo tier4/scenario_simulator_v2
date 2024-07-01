@@ -145,18 +145,18 @@ public:
 
   auto engaged() const -> bool override;
 
-  auto getAutowareStateName() const -> const std::string & override;
+  auto getAutowareStateName() const -> std::string override;
 
   auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray override;
 
   auto getTurnIndicatorsCommand() const
     -> autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand override;
 
-  auto getEmergencyStateName() const -> const std::string & override;
+  auto getEmergencyStateName() const -> std::string override;
 
-  auto getMinimumRiskManeuverBehaviorName() const -> const std::string & override;
+  auto getMinimumRiskManeuverBehaviorName() const -> std::string override;
 
-  auto getMinimumRiskManeuverStateName() const -> const std::string & override;
+  auto getMinimumRiskManeuverStateName() const -> std::string override;
 
   auto initialize(const geometry_msgs::msg::Pose &) -> void override;
 

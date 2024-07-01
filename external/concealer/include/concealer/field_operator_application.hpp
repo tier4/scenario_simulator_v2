@@ -129,13 +129,13 @@ public:
 
   virtual auto clearRoute() -> void = 0;
 
-  virtual auto getAutowareStateName() const -> const std::string & = 0;
+  virtual auto getAutowareStateName() const -> std::string = 0;
 
-  virtual auto getMinimumRiskManeuverBehaviorName() const -> const std::string & = 0;
+  virtual auto getMinimumRiskManeuverBehaviorName() const -> std::string = 0;
 
-  virtual auto getMinimumRiskManeuverStateName() const -> const std::string & = 0;
+  virtual auto getMinimumRiskManeuverStateName() const -> std::string = 0;
 
-  virtual auto getEmergencyStateName() const -> const std::string & = 0;
+  virtual auto getEmergencyStateName() const -> std::string = 0;
 
   virtual auto getWaypoints() const -> traffic_simulator_msgs::msg::WaypointsArray = 0;
 

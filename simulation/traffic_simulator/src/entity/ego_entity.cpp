@@ -101,15 +101,15 @@ auto EgoEntity::requestAutoModeForCooperation(const std::string & module_name, b
   field_operator_application->requestAutoModeForCooperation(module_name, enable);
 }
 
-auto EgoEntity::getMinimumRiskManeuverBehaviorName() const -> const std::string &
+auto EgoEntity::getMinimumRiskManeuverBehaviorName() const -> std::string
 {
   return field_operator_application->getMinimumRiskManeuverBehaviorName();
 }
-auto EgoEntity::getMinimumRiskManeuverStateName() const -> const std::string &
+auto EgoEntity::getMinimumRiskManeuverStateName() const -> std::string
 {
   return field_operator_application->getMinimumRiskManeuverStateName();
 }
-auto EgoEntity::getEmergencyStateName() const -> const std::string &
+auto EgoEntity::getEmergencyStateName() const -> std::string
 {
   return field_operator_application->getEmergencyStateName();
 }
