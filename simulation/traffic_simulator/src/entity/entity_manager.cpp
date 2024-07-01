@@ -39,6 +39,9 @@ namespace entity
 {
 void EntityManager::broadcastEntityTransform()
 {
+  static bool is_send = false;
+  static geometry_msgs::msg::Pose pose;
+
   using math::geometry::operator/;
   using math::geometry::operator*;
   using math::geometry::operator+=;
@@ -51,32 +54,40 @@ void EntityManager::broadcastEntityTransform()
    */
   if (isEgoSpawned()) {
     if (const auto ego = getEntity(getEgoName())) {
+      if (!is_send) {
+        pose = ego->getMapPose();
+        is_send = true;
+      }
       broadcastTransform(
         geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
           /**
            * @note This is the intended implementation.
            * It is easier to create rviz config if the name "ego" is fixed,
-           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           * so the frame_id "ego" is issued regardless of the name of the ego entity.
            */
           .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-          .pose(ego->getMapPose()),
+          .pose(pose),
         true);
     }
   }
-  if (const auto names = getEntityNames(); !names.empty()) {
+  if (!names.empty()) {
+    if (!is_send) {
+      pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
+               .position(std::accumulate(
+                 names.begin(), names.end(), geometry_msgs::msg::Point(),
+                 [this, names](geometry_msgs::msg::Point point, const std::string & name) {
+                   point += getEntity(name)->getMapPose().position *
+                            (1.0 / static_cast<double>(names.size()));
+                   return point;
+                 }))
+               .orientation(geometry_msgs::msg::Quaternion());
+      is_send = true;
+    }
     broadcastTransform(
       geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
         .header(
           std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
-        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
-                .position(std::accumulate(
-                  names.begin(), names.end(), geometry_msgs::msg::Point(),
-                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
-                    return point +=
-                           (getEntity(name)->getMapPose().position *
-                            (1.0 / static_cast<double>(names.size())));
-                  }))
-                .orientation(geometry_msgs::msg::Quaternion())),
+        .pose(pose),
       true);
   }
 }
@@ -262,34 +273,6 @@ bool EntityManager::isInLanelet(
 bool EntityManager::isStopping(const std::string & name) const
 {
   return std::fabs(getCurrentTwist(name).linear.x) < std::numeric_limits<double>::epsilon();
-}
-
-bool EntityManager::reachPosition(
-  const std::string & name, const std::string & target_entity_name, const double tolerance) const
-{
-  if (const auto target_entity = getEntity(target_entity_name)) {
-    return reachPosition(name, target_entity->getMapPose(), tolerance);
-  } else {
-    return false;
-  }
-}
-
-bool EntityManager::reachPosition(
-  const std::string & name, const geometry_msgs::msg::Pose & target_pose,
-  const double tolerance) const
-{
-  if (const auto entity = getEntity(name)) {
-    return math::geometry::getDistance(entity->getMapPose(), target_pose) < tolerance;
-  } else {
-    return false;
-  }
-}
-
-bool EntityManager::reachPosition(
-  const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
-  const double tolerance) const
-{
-  return reachPosition(name, static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
 }
 
 void EntityManager::requestLaneChange(
