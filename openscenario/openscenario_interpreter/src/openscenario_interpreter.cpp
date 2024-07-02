@@ -39,8 +39,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   local_real_time_factor(1.0),
   osc_path(""),
   output_directory("/tmp"),
-  record(false),
-  publish_empty_context(false)
+  publish_empty_context(false),
+  record(false)
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
