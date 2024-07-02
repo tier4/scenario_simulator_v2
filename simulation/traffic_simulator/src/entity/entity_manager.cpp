@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2024 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,95 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cstdint>
-#include <geometry/bounding_box.hpp>
-#include <geometry/distance.hpp>
-#include <geometry/transform.hpp>
 #include <geometry/vector3/operator.hpp>
-#include <limits>
-#include <memory>
-#include <optional>
-#include <queue>
-#include <scenario_simulator_exception/exception.hpp>
-#include <sstream>
 #include <std_msgs/msg/header.hpp>
-#include <stdexcept>
-#include <string>
 #include <traffic_simulator/entity/entity_manager.hpp>
-#include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/helper/stop_watch.hpp>
-#include <traffic_simulator/utils/distance.hpp>
-#include <unordered_map>
-#include <vector>
 
 namespace traffic_simulator
 {
 namespace entity
 {
-void EntityManager::broadcastEntityTransform()
+// global
+auto EntityManager::setTrafficLights(const std::shared_ptr<TrafficLights> & traffic_lights_ptr)
+  -> void
 {
-  using math::geometry::operator/;
-  using math::geometry::operator*;
-  using math::geometry::operator+=;
-  std::vector<std::string> names = getEntityNames();
-  /**
-   * @note This part of the process is intended to ensure that frames are issued in a position that makes
-   * it as easy as possible to see the entities that will appear in the scenario.
-   * In the past, we used to publish the frames of all entities, but that would be too heavy processing,
-   * so we publish the average of the coordinates of all entities.
-   */
-  if (isAnyEgoSpawned()) {
-    broadcastTransform(
-      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
-        /**
-           * @note This is the intended implementation.
-           * It is easier to create rviz config if the name "ego" is fixed,
-           * so the frame_id “ego” is issued regardless of the name of the ego entity.
-           */
-        .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-        .pose(getEntity(getEgoName())->getMapPose()),
-      true);
-  }
-  if (const auto names = getEntityNames(); !names.empty()) {
-    broadcastTransform(
-      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
-        .header(
-          std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
-        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
-                .position(std::accumulate(
-                  names.begin(), names.end(), geometry_msgs::msg::Point(),
-                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
-                    return point +=
-                           (getEntity(name)->getMapPose().position *
-                            (1.0 / static_cast<double>(names.size())));
-                  }))
-                .orientation(geometry_msgs::msg::Quaternion())),
-      true);
+  traffic_lights_ptr_ = traffic_lights_ptr;
+}
+
+auto EntityManager::setVerbose(const bool verbose) -> void
+{
+  configuration.verbose = verbose;
+  for (auto & entity : entities_) {
+    entity.second->verbose = verbose;
   }
 }
 
-void EntityManager::broadcastTransform(
-  const geometry_msgs::msg::PoseStamped & pose, const bool static_transform)
+auto EntityManager::startNpcLogic(const double current_time) -> void
 {
-  geometry_msgs::msg::TransformStamped transform_stamped;
-  {
-    transform_stamped.header.stamp = pose.header.stamp;
-    transform_stamped.header.frame_id = "map";
-    transform_stamped.child_frame_id = pose.header.frame_id;
-    transform_stamped.transform.translation.x = pose.pose.position.x;
-    transform_stamped.transform.translation.y = pose.pose.position.y;
-    transform_stamped.transform.translation.z = pose.pose.position.z;
-    transform_stamped.transform.rotation = pose.pose.orientation;
-  }
+  npc_logic_started_ = true;
 
-  if (static_transform) {
-    broadcaster_.sendTransform(transform_stamped);
-  } else {
-    base_link_broadcaster_.sendTransform(transform_stamped);
+  for ([[maybe_unused]] auto && [name, entity] : entities_) {
+    entity->updateEntityStatusTimestamp(current_time);
   }
 }
 
-visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
+auto EntityManager::isNpcLogicStarted() const -> bool { return npc_logic_started_; }
+
+auto EntityManager::makeDebugMarker() const -> visualization_msgs::msg::MarkerArray
 {
   visualization_msgs::msg::MarkerArray marker;
   for (const auto & entity : entities_) {
@@ -109,145 +56,10 @@ visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
   return marker;
 }
 
-bool EntityManager::despawnEntity(const std::string & name)
+// update
+auto EntityManager::update(const double current_time, const double step_time) -> void
 {
-  return isEntitySpawned(name) && entities_.erase(name);
-}
-
-bool EntityManager::isEntitySpawned(const std::string & name)
-{
-  return entities_.find(name) != std::end(entities_);
-}
-
-auto EntityManager::getEntityNames() const -> const std::vector<std::string>
-{
-  std::vector<std::string> names{};
-  for (const auto & each : entities_) {
-    names.push_back(each.first);
-  }
-  return names;
-}
-
-auto EntityManager::getEntityOrNullptr(const std::string & name) const
-  -> std::shared_ptr<traffic_simulator::entity::EntityBase>
-{
-  if (auto it = entities_.find(name); it != entities_.end()) {
-    return it->second;
-  } else {
-    /*
-      This method returns nullptr, due to the fact that the interpretation of the scenario operates in
-      such a way that checking a condition, e.g. DistanceCondition, is called also for Entities that
-      have not yet been spawned. For example, if for DistanceCondition any getEntity() returns
-      nullptr, the condition returns a distance equal to NaN. For this reason, using getEntity() with
-      throwing an exception is not recommended.
-    */
-    return nullptr;
-  }
-};
-
-auto EntityManager::getEntity(const std::string & name) const
-  -> std::shared_ptr<traffic_simulator::entity::EntityBase>
-{
-  if (const auto entity = getEntityOrNullptr(name)) {
-    return entity;
-  } else {
-    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
-  }
-}
-
-auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
-{
-  return hdmap_utils_ptr_;
-}
-
-auto EntityManager::getNumberOfEgo() const -> std::size_t
-{
-  return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
-    return each.second->template is<EgoEntity>();
-  });
-}
-
-auto EntityManager::getEgoName() const -> const std::string &
-{
-  for (const auto & each : entities_) {
-    if (each.second->template is<EgoEntity>()) {
-      return each.second->getName();
-    }
-  }
-  THROW_SEMANTIC_ERROR(
-    "const std::string EntityManager::getEgoName(const std::string & name) function was called, "
-    "but ego vehicle does not exist");
-}
-
-auto EntityManager::isAnyEgoSpawned() const -> bool
-{
-  return std::any_of(std::begin(entities_), std::end(entities_), [this](const auto & each) {
-    return each.second->template is<EgoEntity>();
-  });
-}
-
-void EntityManager::resetBehaviorPlugin(
-  const std::string & name, const std::string & behavior_plugin_name)
-{
-  const auto reference_entity = getEntity(name);
-  const CanonicalizedEntityStatus status = reference_entity->getStatus();
-  const auto behavior_parameter = reference_entity->getBehaviorParameter();
-  if (reference_entity->is<EgoEntity>()) {
-    THROW_SEMANTIC_ERROR(
-      "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
-  } else if (reference_entity->is<MiscObjectEntity>()) {
-    THROW_SEMANTIC_ERROR(
-      "Entity :", name, "is MiscObjectEntity.",
-      "You cannot reset behavior plugin of MiscObjectEntity.");
-  } else if (reference_entity->is<VehicleEntity>()) {
-    const auto parameters = reference_entity->as<VehicleEntity>()->getParameters();
-    despawnEntity(name);
-    spawnEntity<VehicleEntity>(
-      name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
-  } else if (reference_entity->is<PedestrianEntity>()) {
-    const auto parameters = reference_entity->as<PedestrianEntity>()->getParameters();
-    despawnEntity(name);
-    spawnEntity<PedestrianEntity>(
-      name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
-  } else {
-    THROW_SIMULATION_ERROR(
-      "Entity :", name, "is unkown entity type.", "Please contact to developer.");
-  }
-  auto spawned_entity = getEntity(name);
-  spawned_entity->setLinearJerk(status.getLinearJerk());
-  spawned_entity->setAcceleration(status.getAccel());
-  spawned_entity->setTwist(status.getTwist());
-  spawned_entity->setBehaviorParameter(behavior_parameter);
-}
-
-void EntityManager::setVerbose(const bool verbose)
-{
-  configuration.verbose = verbose;
-  for (auto & entity : entities_) {
-    entity.second->verbose = verbose;
-  }
-}
-
-auto EntityManager::updateNpcLogic(
-  const std::string & name, const double current_time, const double step_time)
-  -> const CanonicalizedEntityStatus &
-{
-  if (configuration.verbose) {
-    std::cout << "update " << name << " behavior" << std::endl;
-  }
-  const auto entity = getEntity(name);
-  // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
-  if (npc_logic_started_) {
-    entity->onUpdate(current_time, step_time);
-  } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
-    ego_entity->updateFieldOperatorApplication();
-  }
-  return entity->getStatus();
-}
-
-void EntityManager::update(const double current_time, const double step_time)
-{
-  traffic_simulator::helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
+  helper::StopWatch<std::chrono::milliseconds> stop_watch_update(
     "EntityManager::update", configuration.verbose);
   setVerbose(configuration.verbose);
   if (npc_logic_started_) {
@@ -295,7 +107,24 @@ void EntityManager::update(const double current_time, const double step_time)
   }
 }
 
-void EntityManager::updateHdmapMarker()
+auto EntityManager::updateNpcLogic(
+  const std::string & name, const double current_time, const double step_time)
+  -> const CanonicalizedEntityStatus &
+{
+  if (configuration.verbose) {
+    std::cout << "update " << name << " behavior" << std::endl;
+  }
+  const auto entity = getEntity(name);
+  // Update npc completely if logic has started, otherwise update Autoware only - if it is Ego
+  if (npc_logic_started_) {
+    entity->onUpdate(current_time, step_time);
+  } else if (const auto ego_entity = std::dynamic_pointer_cast<const EgoEntity>(entity)) {
+    ego_entity->updateFieldOperatorApplication();
+  }
+  return entity->getStatus();
+}
+
+auto EntityManager::updateHdmapMarker() -> void
 {
   MarkerArray markers;
   const auto stamp = clock_ptr_->now();
@@ -307,13 +136,205 @@ void EntityManager::updateHdmapMarker()
   lanelet_marker_pub_ptr_->publish(markers);
 }
 
-auto EntityManager::startNpcLogic(const double current_time) -> void
+auto EntityManager::broadcastEntityTransform() -> void
 {
-  npc_logic_started_ = true;
-
-  for ([[maybe_unused]] auto && [name, entity] : entities_) {
-    entity->updateEntityStatusTimestamp(current_time);
+  using math::geometry::operator/;
+  using math::geometry::operator*;
+  using math::geometry::operator+=;
+  std::vector<std::string> names = getEntityNames();
+  /**
+   * @note This part of the process is intended to ensure that frames are issued in a position that makes
+   * it as easy as possible to see the entities that will appear in the scenario.
+   * In the past, we used to publish the frames of all entities, but that would be too heavy processing,
+   * so we publish the average of the coordinates of all entities.
+   */
+  if (isAnyEgoSpawned()) {
+    broadcastTransform(
+      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+        /**
+           * @note This is the intended implementation.
+           * It is easier to create rviz config if the name "ego" is fixed,
+           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           */
+        .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
+        .pose(getEntity(getEgoName())->getMapPose()),
+      true);
   }
+  if (const auto names = getEntityNames(); !names.empty()) {
+    broadcastTransform(
+      geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
+        .header(
+          std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
+        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
+                .position(std::accumulate(
+                  names.begin(), names.end(), geometry_msgs::msg::Point(),
+                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
+                    return point +=
+                           (getEntity(name)->getMapPose().position *
+                            (1.0 / static_cast<double>(names.size())));
+                  }))
+                .orientation(geometry_msgs::msg::Quaternion())),
+      true);
+  }
+}
+
+auto EntityManager::broadcastTransform(
+  const geometry_msgs::msg::PoseStamped & pose, const bool static_transform) -> void
+{
+  geometry_msgs::msg::TransformStamped transform_stamped;
+  {
+    transform_stamped.header.stamp = pose.header.stamp;
+    transform_stamped.header.frame_id = "map";
+    transform_stamped.child_frame_id = pose.header.frame_id;
+    transform_stamped.transform.translation.x = pose.pose.position.x;
+    transform_stamped.transform.translation.y = pose.pose.position.y;
+    transform_stamped.transform.translation.z = pose.pose.position.z;
+    transform_stamped.transform.rotation = pose.pose.orientation;
+  }
+
+  if (static_transform) {
+    broadcaster_.sendTransform(transform_stamped);
+  } else {
+    base_link_broadcaster_.sendTransform(transform_stamped);
+  }
+}
+
+// ego - checks, getters
+auto EntityManager::getNumberOfEgo() const -> std::size_t
+{
+  return std::count_if(std::begin(entities_), std::end(entities_), [this](const auto & each) {
+    return each.second->template is<EgoEntity>();
+  });
+}
+
+auto EntityManager::isAnyEgoSpawned() const -> bool
+{
+  return std::any_of(std::begin(entities_), std::end(entities_), [this](const auto & each) {
+    return each.second->template is<EgoEntity>();
+  });
+}
+
+auto EntityManager::getEgoName() const -> const std::string &
+{
+  for (const auto & each : entities_) {
+    if (each.second->template is<EgoEntity>()) {
+      return each.second->getName();
+    }
+  }
+  THROW_SEMANTIC_ERROR(
+    "const std::string EntityManager::getEgoName(const std::string & name) function was called, "
+    "but ego vehicle does not exist");
+}
+
+auto EntityManager::getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>
+{
+  for (const auto & each : entities_) {
+    if (each.second->template is<EgoEntity>()) {
+      return std::dynamic_pointer_cast<EgoEntity>(each.second);
+    }
+  }
+  THROW_SEMANTIC_ERROR(
+    "EntityManager::getEgoEntity function was called, but ego vehicle does not exist.");
+}
+
+auto EntityManager::getEgoEntity(const std::string & name) const
+  -> std::shared_ptr<entity::EgoEntity>
+{
+  if (auto it = entities_.find(name); it == entities_.end()) {
+    THROW_SEMANTIC_ERROR("Entity : ", name, "does not exist.");
+  } else {
+    if (auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(it->second); !ego_entity) {
+      THROW_SEMANTIC_ERROR("Entity : ", name, " exists, but it is not ego.");
+    } else
+      return ego_entity;
+  }
+}
+
+// entities - checks, getters
+bool EntityManager::isEntitySpawned(const std::string & name)
+{
+  return entities_.find(name) != std::end(entities_);
+}
+
+auto EntityManager::getEntityNames() const -> const std::vector<std::string>
+{
+  std::vector<std::string> names{};
+  for (const auto & each : entities_) {
+    names.push_back(each.first);
+  }
+  return names;
+}
+
+auto EntityManager::getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>
+{
+  if (const auto entity = getEntityOrNullptr(name)) {
+    return entity;
+  } else {
+    THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+  }
+}
+
+auto EntityManager::getEntityOrNullptr(const std::string & name) const
+  -> std::shared_ptr<entity::EntityBase>
+{
+  if (auto it = entities_.find(name); it != entities_.end()) {
+    return it->second;
+  } else {
+    /*
+      This method returns nullptr, due to the fact that the interpretation of the scenario operates in
+      such a way that checking a condition, e.g. DistanceCondition, is called also for Entities that
+      have not yet been spawned. For example, if for DistanceCondition any getEntity() returns
+      nullptr, the condition returns a distance equal to NaN. For this reason, using getEntity() with
+      throwing an exception is not recommended.
+    */
+    return nullptr;
+  }
+};
+
+// entities - respawn, despawn, reset
+auto EntityManager::resetBehaviorPlugin(
+  const std::string & name, const std::string & behavior_plugin_name) -> void
+{
+  const auto reference_entity = getEntity(name);
+  const CanonicalizedEntityStatus status = reference_entity->getStatus();
+  const auto behavior_parameter = reference_entity->getBehaviorParameter();
+  if (reference_entity->is<EgoEntity>()) {
+    THROW_SEMANTIC_ERROR(
+      "Entity :", name, "is EgoEntity.", "You cannot reset behavior plugin of EgoEntity.");
+  } else if (reference_entity->is<MiscObjectEntity>()) {
+    THROW_SEMANTIC_ERROR(
+      "Entity :", name, "is MiscObjectEntity.",
+      "You cannot reset behavior plugin of MiscObjectEntity.");
+  } else if (reference_entity->is<VehicleEntity>()) {
+    const auto parameters = reference_entity->as<VehicleEntity>()->getParameters();
+    despawnEntity(name);
+    spawnEntity<VehicleEntity>(
+      name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
+  } else if (reference_entity->is<PedestrianEntity>()) {
+    const auto parameters = reference_entity->as<PedestrianEntity>()->getParameters();
+    despawnEntity(name);
+    spawnEntity<PedestrianEntity>(
+      name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
+  } else {
+    THROW_SIMULATION_ERROR(
+      "Entity :", name, "is unkown entity type.", "Please contact to developer.");
+  }
+  auto spawned_entity = getEntity(name);
+  spawned_entity->setLinearJerk(status.getLinearJerk());
+  spawned_entity->setAcceleration(status.getAccel());
+  spawned_entity->setTwist(status.getTwist());
+  spawned_entity->setBehaviorParameter(behavior_parameter);
+}
+
+auto EntityManager::despawnEntity(const std::string & name) -> bool
+{
+  return isEntitySpawned(name) && entities_.erase(name);
+}
+
+// traffics, lanelet
+auto EntityManager::getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &
+{
+  return hdmap_utils_ptr_;
 }
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -1,4 +1,4 @@
-// Copyright 2015 TIER IV, Inc. All rights reserved.
+// Copyright 2024 TIER IV, Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,45 +15,16 @@
 #ifndef TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
 #define TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
 
-#include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/static_transform_broadcaster.h>
 #include <tf2_ros/transform_broadcaster.h>
 
-#include <autoware_perception_msgs/msg/traffic_signal_array.hpp>
-#include <memory>
-#include <optional>
-#include <rclcpp/node_interfaces/get_node_topics_interface.hpp>
-#include <rclcpp/node_interfaces/node_topics_interface.hpp>
-#include <rclcpp/rclcpp.hpp>
-#include <scenario_simulator_exception/exception.hpp>
-#include <stdexcept>
-#include <string>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 #include <traffic_simulator/api/configuration.hpp>
-#include <traffic_simulator/data_type/lane_change.hpp>
-#include <traffic_simulator/data_type/speed_change.hpp>
 #include <traffic_simulator/entity/ego_entity.hpp>
 #include <traffic_simulator/entity/entity_base.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/entity/pedestrian_entity.hpp>
 #include <traffic_simulator/entity/vehicle_entity.hpp>
-#include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
-#include <traffic_simulator/traffic/traffic_sink.hpp>
-#include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
-#include <traffic_simulator/traffic_lights/traffic_lights.hpp>
-#include <traffic_simulator/traffic_lights/traffic_lights_marker_publisher.hpp>
-#include <traffic_simulator/traffic_lights/traffic_lights_publisher.hpp>
-#include <traffic_simulator/utils/node_parameters.hpp>
-#include <traffic_simulator/utils/pose.hpp>
-#include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
-#include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
-#include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
-#include <type_traits>
-#include <unordered_map>
-#include <utility>
-#include <vector>
-#include <visualization_msgs/msg/marker_array.hpp>
 
 namespace traffic_simulator
 {
@@ -73,82 +44,31 @@ public:
 
 class EntityManager
 {
-  Configuration configuration;
-
-  std::shared_ptr<rclcpp::node_interfaces::NodeTopicsInterface> node_topics_interface;
-  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
-
-  tf2_ros::StaticTransformBroadcaster broadcaster_;
-  tf2_ros::TransformBroadcaster base_link_broadcaster_;
-
-  const rclcpp::Clock::SharedPtr clock_ptr_;
-
-  std::unordered_map<std::string, std::shared_ptr<traffic_simulator::entity::EntityBase>> entities_;
-
-  bool npc_logic_started_;
-
   using EntityStatusWithTrajectoryArray =
     traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray;
-  const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
-
   using MarkerArray = visualization_msgs::msg::MarkerArray;
-  const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
-
-  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
-
-  MarkerArray markers_raw_;
-
-  std::shared_ptr<traffic_simulator::TrafficLights> traffic_lights_ptr_;
 
 public:
-  /**
-     This function is necessary because the TrafficLights object is created after the EntityManager, 
-     so it can be assigned during the call of the EntityManager constructor. 
-     TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
-   */
-  auto setTrafficLights(
-    const std::shared_ptr<traffic_simulator::TrafficLights> & traffic_lights_ptr) -> void
-  {
-    traffic_lights_ptr_ = traffic_lights_ptr;
-  }
-
-  template <typename Node>
-  auto getOrigin(Node & node) const
-  {
-    geographic_msgs::msg::GeoPoint origin;
-    {
-      if (!node.has_parameter("origin_latitude")) {
-        node.declare_parameter("origin_latitude", 0.0);
-      }
-      if (!node.has_parameter("origin_longitude")) {
-        node.declare_parameter("origin_longitude", 0.0);
-      }
-      node.get_parameter("origin_latitude", origin.latitude);
-      node.get_parameter("origin_longitude", origin.longitude);
-    }
-
-    return origin;
-  }
-
   template <class NodeT, class AllocatorT = std::allocator<void>>
   explicit EntityManager(
     NodeT && node, const Configuration & configuration,
     const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr & node_parameters)
   : configuration(configuration),
+    clock_ptr_(node->get_clock()),
     node_topics_interface(rclcpp::node_interfaces::get_node_topics_interface(node)),
     node_parameters_(node_parameters),
     broadcaster_(node),
     base_link_broadcaster_(node),
-    clock_ptr_(node->get_clock()),
-    npc_logic_started_(false),
     entity_status_array_pub_ptr_(rclcpp::create_publisher<EntityStatusWithTrajectoryArray>(
       node, "entity/status", EntityMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     lanelet_marker_pub_ptr_(rclcpp::create_publisher<MarkerArray>(
       node, "lanelet/marker", LaneletMarkerQoS(),
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
+    npc_logic_started_(false),
+    traffic_lights_ptr_(nullptr),
     hdmap_utils_ptr_(std::make_shared<hdmap_utils::HdMapUtils>(
-      configuration.lanelet2_map_path(), getOrigin(*node))),
+      configuration.lanelet2_map_path(), getOrigin(node_parameters))),
     markers_raw_(hdmap_utils_ptr_->generateMarker())
   {
     updateHdmapMarker();
@@ -156,72 +76,36 @@ public:
 
   ~EntityManager() = default;
 
-public:
-  visualization_msgs::msg::MarkerArray makeDebugMarker() const;
+  // global
+  /**
+     This function is necessary because the TrafficLights object is created after the EntityManager, 
+     so it can be assigned during the call of the EntityManager constructor. 
+     TrafficLights cannot be created before the EntityManager due to the dependency on HdMapUtils.
+   */
+  auto setTrafficLights(const std::shared_ptr<TrafficLights> & traffic_lights_ptr) -> void;
+
+  auto setVerbose(const bool verbose) -> void;
+
+  auto startNpcLogic(const double current_time) -> void;
+
+  auto isNpcLogicStarted() const -> bool;
+
+  auto makeDebugMarker() const -> visualization_msgs::msg::MarkerArray;
+
+  // update
+  auto update(const double current_time, const double step_time) -> void;
 
   auto updateNpcLogic(const std::string & name, const double current_time, const double step_time)
     -> const CanonicalizedEntityStatus &;
 
-  void broadcastEntityTransform();
+  auto updateHdmapMarker() -> void;
 
-  void broadcastTransform(
-    const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true);
+  auto broadcastEntityTransform() -> void;
 
-  bool despawnEntity(const std::string & name);
+  auto broadcastTransform(
+    const geometry_msgs::msg::PoseStamped & pose, const bool static_transform = true) -> void;
 
-  bool isEntitySpawned(const std::string & name);
-
-  auto getEntityNames() const -> const std::vector<std::string>;
-
-  auto getEntityOrNullptr(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
-
-  auto getEntity(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
-
-  auto getEgoEntity() const -> std::shared_ptr<traffic_simulator::entity::EgoEntity>
-  {
-    for (const auto & each : entities_) {
-      if (each.second->template is<EgoEntity>()) {
-        return std::dynamic_pointer_cast<EgoEntity>(each.second);
-      }
-    }
-    THROW_SEMANTIC_ERROR("getEgoEntity function was called, but ego vehicle does not exist");
-  }
-
-  auto getEgoEntity(const std::string & name) const
-    -> std::shared_ptr<traffic_simulator::entity::EgoEntity>
-  {
-    if (auto it = entities_.find(name); it == entities_.end()) {
-      THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
-    } else {
-      if (auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(it->second); !ego_entity) {
-        THROW_SEMANTIC_ERROR("entity : ", name, " exists, but it is not ego");
-      } else
-        return ego_entity;
-    }
-  }
-
-  auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
-
-  auto getNumberOfEgo() const -> std::size_t;
-
-  auto isAnyEgoSpawned() const -> bool;
-
-  auto getEgoName() const -> const std::string &;
-
-  /**
-   * @brief Reset behavior plugin of the target entity.
-   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
-   * @param name The name of the target entity.
-   * @param behavior_plugin_name The name of the behavior plugin you want to set.
-   * @sa traffic_simulator::entity::PedestrianEntity::BuiltinBehavior
-   * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
-   */
-  void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
-
-  void setVerbose(const bool verbose);
-
+  // entities, ego - spawn
   template <typename EntityType, typename PoseType, typename ParametersType, typename... Ts>
   auto spawnEntity(
     const std::string & name, const PoseType & pose, const ParametersType & parameters,
@@ -232,7 +116,7 @@ public:
 
       if constexpr (std::is_same_v<std::decay_t<EntityType>, EgoEntity>) {
         if (isAnyEgoSpawned()) {
-          THROW_SEMANTIC_ERROR("Multiple egos in the simulation are unsupported yet");
+          THROW_SEMANTIC_ERROR("Multiple egos in the simulation are unsupported yet.");
         } else {
           entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
         }
@@ -297,28 +181,70 @@ public:
     }
   }
 
-  template <typename MessageT, typename... Args>
-  auto createPublisher(Args &&... args)
-  {
-    return rclcpp::create_publisher<MessageT>(node_topics_interface, std::forward<Args>(args)...);
-  }
+  // ego - checks, getters
+  auto getNumberOfEgo() const -> std::size_t;
 
-  template <typename MessageT, typename... Args>
-  auto createSubscription(Args &&... args)
-  {
-    return rclcpp::create_subscription<MessageT>(
-      node_topics_interface, std::forward<Args>(args)...);
-  }
+  auto isAnyEgoSpawned() const -> bool;
 
-  void update(const double current_time, const double step_time);
+  auto getEgoName() const -> const std::string &;
 
-  void updateHdmapMarker();
+  auto getEgoEntity() const -> std::shared_ptr<entity::EgoEntity>;
 
-  auto startNpcLogic(const double current_time) -> void;
+  auto getEgoEntity(const std::string & name) const -> std::shared_ptr<entity::EgoEntity>;
 
-  auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
+  // entities - checks, getters
+  auto isEntitySpawned(const std::string & name) -> bool;
+
+  auto getEntityNames() const -> const std::vector<std::string>;
+
+  auto getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
+
+  auto getEntityOrNullptr(const std::string & name) const -> std::shared_ptr<entity::EntityBase>;
+
+  // entities - respawn, despawn, reset
+  /**
+   * @brief Reset behavior plugin of the target entity.
+   * The internal behavior is to take over the various parameters and save them, then respawn the Entity and set the parameters.
+   * @param name The name of the target entity.
+   * @param behavior_plugin_name The name of the behavior plugin you want to set.
+   * @sa entity::PedestrianEntity::BuiltinBehavior
+   * @sa entity::VehicleEntity::BuiltinBehavior
+   */
+  auto resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name)
+    -> void;
+
+  auto despawnEntity(const std::string & name) -> bool;
+
+  // traffics, lanelet
+  auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
+
+private:
+  /* */ Configuration configuration;
+
+  const rclcpp::Clock::SharedPtr clock_ptr_;
+
+  const rclcpp::node_interfaces::NodeTopicsInterface::SharedPtr node_topics_interface;
+
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
+
+  /* */ tf2_ros::StaticTransformBroadcaster broadcaster_;
+
+  /* */ tf2_ros::TransformBroadcaster base_link_broadcaster_;
+
+  const rclcpp::Publisher<EntityStatusWithTrajectoryArray>::SharedPtr entity_status_array_pub_ptr_;
+
+  const rclcpp::Publisher<MarkerArray>::SharedPtr lanelet_marker_pub_ptr_;
+
+  /* */ std::unordered_map<std::string, std::shared_ptr<entity::EntityBase>> entities_;
+
+  /* */ bool npc_logic_started_;
+
+  /* */ std::shared_ptr<TrafficLights> traffic_lights_ptr_;
+
+  const std::shared_ptr<hdmap_utils::HdMapUtils> hdmap_utils_ptr_;
+
+  /* */ MarkerArray markers_raw_;
 };
 }  // namespace entity
 }  // namespace traffic_simulator
-
 #endif  // TRAFFIC_SIMULATOR__ENTITY__ENTITY_MANAGER_HPP_
