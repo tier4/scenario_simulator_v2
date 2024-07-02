@@ -19,7 +19,6 @@
 #include <traffic_simulator/api/api.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 
-// headers in STL
 #include <memory>
 #include <string>
 #include <vector>
