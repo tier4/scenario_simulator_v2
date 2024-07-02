@@ -13,6 +13,23 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.4.0 (2024-07-01)
+------------------
+* Merge pull request `#1262 <https://github.com/tier4/scenario_simulator_v2/issues/1262>`_ from tier4/feature/traffic_light_for_evaluator
+  Add traffic light publisher for external services
+* refactor: delete unused dependencies for tarffic_simulator
+* feat: use traffic_simulator_msgs for traffic light
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* refactor: use const ref
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* chore: use conditional compilation implementation in the absence of TrafficLightArrayV1
+* feat: integrate TrafficLightPublisher for evaluator to EntityManager
+* feat: implement TrafficLightPublisher specialization for tier4_simulation_msgs
+* Contributors: Kotaro Yoshimoto
+
 2.3.0 (2024-06-28)
 ------------------
 * Merge pull request `#1234 <https://github.com/tier4/scenario_simulator_v2/issues/1234>`_ from tier4/feature/synchronized_action
