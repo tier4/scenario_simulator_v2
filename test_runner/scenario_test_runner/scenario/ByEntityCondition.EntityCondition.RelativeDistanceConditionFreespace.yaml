@@ -97,7 +97,7 @@ OpenSCENARIO:
                                         freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
                                         relativeDistanceType: euclidianDistance
                                         rule: equalTo
-                                        value: 5.230991883723311808296330127632
+                                        value: 5.230991883730583325018415052909
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none
@@ -113,7 +113,7 @@ OpenSCENARIO:
                                         freespace: true # True: distance is measured between closest bounding box points. False: reference point distance is used.
                                         relativeDistanceType: longitudinal
                                         rule: equalTo
-                                        value: 5.228228771542489994317293167114
+                                        value: 5.228228771549765951931476593018
                                 - name: ""
                                   delay: 0
                                   conditionEdge: none

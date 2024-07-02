@@ -33,8 +33,8 @@ void MiscObjectEntity::onUpdate(double, double step_time)
   status.action_status.accel = geometry_msgs::msg::Accel();
   status.action_status.linear_jerk = 0;
   status.action_status.current_action = "static";
-  status_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
-  status_before_update_ = CanonicalizedEntityStatus(status, hdmap_utils_ptr_);
+  status_ = CanonicalizedEntityStatus(status, status_.getCanonicalizedLaneletPose());
+  status_before_update_ = CanonicalizedEntityStatus(status, status_.getCanonicalizedLaneletPose());
   if (npc_logic_started_) {
     updateStandStillDuration(step_time);
   }
@@ -90,11 +90,6 @@ void MiscObjectEntity::requestSpeedChange(
   const double, const speed_change::Transition, const speed_change::Constraint, const bool)
 {
   THROW_SEMANTIC_ERROR("requestSpeedChange function cannot not use in MiscObjectEntity");
-}
-
-auto MiscObjectEntity::fillLaneletPose(CanonicalizedEntityStatus & status) -> void
-{
-  EntityBase::fillLaneletPose(status, false);
 }
 
 }  // namespace entity

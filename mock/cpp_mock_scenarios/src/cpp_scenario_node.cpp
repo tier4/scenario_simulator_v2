@@ -30,6 +30,13 @@ CppScenarioNode::CppScenarioNode(
   get_parameter<std::string>("junit_path", junit_path_);
   declare_parameter<double>("timeout", 10.0);
   get_parameter<double>("timeout", timeout_);
+
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+    if (not has_parameter("consider_pose_by_road_slope")) {
+      declare_parameter("consider_pose_by_road_slope", false);
+    }
+    return get_parameter("consider_pose_by_road_slope").as_bool();
+  }());
 }
 
 void CppScenarioNode::update()

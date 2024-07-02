@@ -133,8 +133,6 @@ public:
   auto setVelocityLimit(double) -> void override;
 
   auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
-
-  auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void override;
 };
 }  // namespace entity
 }  // namespace traffic_simulator

@@ -47,15 +47,19 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 10, 0)),
+      "ego",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34741, 10.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setEntityStatus(
       "ego",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0)),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 0.0, 0.0, api_.getHdmapUtils()),
       traffic_simulator::helper::constructActionStatus(10));
     api_.requestSpeedChange("ego", 10, true);
-    const geometry_msgs::msg::Pose goal_pose = api_.toMapPose(
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34408, 1.0, 0, 0, 0, 0)));
+    const geometry_msgs::msg::Pose goal_pose = traffic_simulator::pose::toMapPose(
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34408, 1.0, 0.0, api_.getHdmapUtils()));
     api_.requestAcquirePosition("ego", goal_pose);
   }
 };

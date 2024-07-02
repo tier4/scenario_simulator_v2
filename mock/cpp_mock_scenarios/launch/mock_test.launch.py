@@ -79,6 +79,7 @@ def generate_launch_description():
     launch_rviz = LaunchConfiguration("launch_rviz", default=False)
     vehicle_model = LaunchConfiguration("vehicle_model", default="sample_vehicle")
     sensor_model = LaunchConfiguration("sensor_model", default="sample_sensor_kit")
+    consider_pose_by_road_slope = LaunchConfiguration("consider_pose_by_road_slope", default=True)
     scenario_node = Node(
         package=scenario_package,
         executable=scenario,
@@ -95,7 +96,8 @@ def generate_launch_description():
                 "launch_autoware": True,
                 "vehicle_model": vehicle_model,
                 "sensor_model": sensor_model,
-                "initialize_duration": 900
+                "initialize_duration": 900,
+                "consider_pose_by_road_slope": consider_pose_by_road_slope
             }
         ],
     )
@@ -139,6 +141,11 @@ def generate_launch_description():
                 "sensor_model",
                 default_value=sensor_model,
                 description="Sensor model of the Autoware",
+            ),
+            DeclareLaunchArgument(
+                "consider_pose_by_road_slope",
+                default_value=consider_pose_by_road_slope   ,
+                description="Consideration of lanelet slope in matching position",   
             ),
             scenario_node,
             RegisterEventHandler(event_handler=io_handler),

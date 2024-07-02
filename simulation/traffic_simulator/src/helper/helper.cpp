@@ -16,6 +16,7 @@
 #include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <string>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace traffic_simulator
 {
@@ -47,6 +48,30 @@ LaneletPose constructLaneletPose(
   lanelet_pose.rpy.y = pitch;
   lanelet_pose.rpy.z = yaw;
   return lanelet_pose;
+}
+
+auto constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
+{
+  if (
+    auto canonicalized_lanelet_pose = canonicalize(
+      traffic_simulator::helper::constructLaneletPose(lanelet_id, s, offset, roll, pitch, yaw),
+      hdmap_utils_ptr)) {
+    return canonicalized_lanelet_pose.value();
+  } else {
+    THROW_SEMANTIC_ERROR(
+      "Lanelet pose (id=", lanelet_id, ",s=", s, ",offset=", offset, ",rpy.x=", roll,
+      ",rpy.y=", pitch, ",rpy.z=", yaw,
+      ") is invalid, please check lanelet length and connection.");
+  }
+}
+
+auto constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose
+{
+  return constructCanonicalizedLaneletPose(lanelet_id, s, offset, 0, 0, 0, hdmap_utils_ptr);
 }
 
 geometry_msgs::msg::Vector3 constructRPY(double roll, double pitch, double yaw)

@@ -30,14 +30,14 @@ public:
   : cpp_mock_scenarios::CppScenarioNode(
       "respawn_ego", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option),
-    goal_pose{
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34606, 0, 0, 0, 0, 0))},
+    goal_pose{traffic_simulator::helper::constructCanonicalizedLaneletPose(
+      34606, 0, 0, api_.getHdmapUtils())},
     new_position_subscriber{create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>(
       "/initialpose", rclcpp::QoS(rclcpp::KeepLast(1)).reliable(),
       [this](const geometry_msgs::msg::PoseWithCovarianceStamped & message) {
         geometry_msgs::msg::PoseStamped goal_msg;
         goal_msg.header.frame_id = "map";
-        goal_msg.pose = api_.toMapPose(goal_pose);
+        goal_msg.pose = static_cast<geometry_msgs::msg::Pose>(goal_pose);
         api_.respawn("ego", message, goal_msg);
       })}
   {
@@ -55,7 +55,8 @@ private:
   void onInitialize() override
   {
     spawnEgoEntity(
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34621, 10, 0, 0, 0, 0)),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34621, 10.0, 0.0, api_.getHdmapUtils()),
       {goal_pose}, getVehicleParameters());
   }
 

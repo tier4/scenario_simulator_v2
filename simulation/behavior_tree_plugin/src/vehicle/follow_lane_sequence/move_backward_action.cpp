@@ -78,8 +78,8 @@ BT::NodeStatus MoveBackwardAction::tick()
     return BT::NodeStatus::FAILURE;
   }
   if (!target_speed) {
-    target_speed = hdmap_utils->getSpeedLimit(
-      hdmap_utils->getPreviousLanelets(entity_status->getLaneletPose().lanelet_id));
+    target_speed =
+      hdmap_utils->getSpeedLimit(hdmap_utils->getPreviousLanelets(entity_status->getLaneletId()));
   }
   setOutput(
     "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(

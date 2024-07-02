@@ -55,7 +55,8 @@ private:
   {
     api_.spawn(
       "ego",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34462, 15, 0, 0, 0, 0)),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34462, 15.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 5);
     api_.requestSpeedChange("ego", 5, true);
@@ -63,7 +64,8 @@ private:
 
     api_.spawn(
       "npc",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0, 0, 0, 0, 0)),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("npc", 10);
   }

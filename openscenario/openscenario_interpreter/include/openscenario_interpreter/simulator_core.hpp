@@ -72,15 +72,16 @@ public:
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
-      return traffic_simulator::pose::canonicalize(non_canonicalized, core->getHdmapUtils());
+      return NativeLanePosition(non_canonicalized, core->getHdmapUtils());
     }
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const NativeWorldPosition & pose) -> NativeLanePosition
     {
+      constexpr bool include_crosswalk{false};
       if (
-        const auto result =
-          traffic_simulator::pose::toLaneletPose(pose, false, core->getHdmapUtils())) {
+        const auto result = traffic_simulator::pose::toCanonicalizedLaneletPose(
+          pose, include_crosswalk, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(
@@ -148,7 +149,7 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto to_entity = core->getEntity(to_entity_name)) {
-        if (const auto to_lanelet_pose = to_entity->getLaneletPose()) {
+        if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_entity_name, to_lanelet_pose.value(), routing_algorithm);
         }
@@ -162,7 +163,7 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose = from_entity->getLaneletPose()) {
+        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_lanelet_pose.value(), to_lanelet_pose, routing_algorithm);
         }
@@ -186,8 +187,8 @@ public:
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
-          if (const auto from_lanelet_pose = from_entity->getLaneletPose()) {
-            if (const auto to_lanelet_pose = to_entity->getLaneletPose()) {
+          if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
+            if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
               return makeNativeBoundingBoxRelativeLanePosition(
                 from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose.value(),
                 to_entity->getBoundingBox(), routing_algorithm);
@@ -203,7 +204,7 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose = from_entity->getLaneletPose()) {
+        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeBoundingBoxRelativeLanePosition(
             from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose,
             traffic_simulator_msgs::msg::BoundingBox(), routing_algorithm);
@@ -572,12 +573,13 @@ public:
     template <typename EntityRef>
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
-      if (auto lanelet_pose = core->getLaneletPose(entity_ref)) {
-        return static_cast<Double>(
-          std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).rpy.z));
-      } else {
-        return Double::nan();
+      if (const auto entity = core->getEntity(entity_ref)) {
+        if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+          return static_cast<Double>(std::abs(
+            static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()).rpy.z));
+        }
       }
+      return Double::nan();
     }
 
     template <typename... Ts>

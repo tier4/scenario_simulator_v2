@@ -18,6 +18,7 @@
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/entity/misc_object_entity.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 #include "../catalogs.hpp"
 #include "../expect_eq_macros.hpp"
@@ -518,24 +519,12 @@ TEST_F(MiscObjectEntityTest_FullObject, stopAtCurrentPosition)
 }
 
 /**
- * @note Test functionality used by other units; test relative pose calculations
- * correctness with a transformation argument passed.
- */
-TEST_F(MiscObjectEntityTest_FullObject, getMapPoseFromRelativePose_relative)
-{
-  constexpr double s = 5.0;
-  EXPECT_POSE_NEAR(
-    misc_object.getMapPoseFromRelativePose(makePose(makePoint(s, 0.0))),
-    static_cast<geometry_msgs::msg::Pose>(makeCanonicalizedLaneletPose(hdmap_utils_ptr, id, s)),
-    0.1);
-}
-
-/**
  * @note Test functionality used by other units; test lanelet pose obtaining
  * with a matching distance smaller than a distance from an entity to the lanelet
  * (both crosswalk and road) and status_.type.type != PEDESTRIAN.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
+TEST_F(
+  MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_notOnRoadAndCrosswalkNotPedestrian)
 {
   EXPECT_FALSE(traffic_simulator::entity::MiscObjectEntity(
                  entity_name,
@@ -545,7 +534,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_notOnRoadAndCrosswalkNotP
                      entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
                    hdmap_utils_ptr),
                  hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-                 .getLaneletPose(5.0)
+                 .getCanonicalizedLaneletPose(5.0)
                  .has_value());
 }
 
@@ -554,7 +543,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_notOnRoadAndCrosswalkNotP
  * with a matching distance greater than a distance from an entity to the lanelet
  * (both crosswalk and road) and status_.type.type != PEDESTRIAN.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_onRoadAndCrosswalkNotPedestrian)
+TEST_F(MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_onRoadAndCrosswalkNotPedestrian)
 {
   EXPECT_TRUE(
     traffic_simulator::entity::MiscObjectEntity(
@@ -567,7 +556,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_onRoadAndCrosswalkNotPede
           traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
         hdmap_utils_ptr),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .getLaneletPose(1.0)
+      .getCanonicalizedLaneletPose(1.0)
       .has_value());
 }
 
@@ -576,7 +565,8 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_onRoadAndCrosswalkNotPede
  * with a matching distance greater than a distance from an entity to the crosswalk lanelet,
  * but smaller than to the road lanelet and status_.type.type != PEDESTRIAN.
  */
-TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
+TEST_F(
+  MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_onCrosswalkNotOnRoadNotPedestrian)
 {
   EXPECT_FALSE(
     traffic_simulator::entity::MiscObjectEntity(
@@ -589,6 +579,6 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getLaneletPose_onCrosswalkNotOnRoadNotPe
           traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
         hdmap_utils_ptr),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
-      .getLaneletPose(1.0)
+      .getCanonicalizedLaneletPose(1.0)
       .has_value());
 }

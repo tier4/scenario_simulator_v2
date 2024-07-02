@@ -26,12 +26,19 @@
 #include <rclcpp/logger.hpp>
 #include <string>
 #include <traffic_simulator/api/configuration.hpp>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <vector>
 
 RandomTestRunner::RandomTestRunner(const rclcpp::NodeOptions & option)
 : Node("random_test_runner", option), error_reporter_(get_logger())
 {
+  traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+    if (not has_parameter("consider_pose_by_road_slope")) {
+      declare_parameter("consider_pose_by_road_slope", false);
+    }
+    return get_parameter("consider_pose_by_road_slope").as_bool();
+  }());
   TestControlParameters test_control_parameters = collectAndValidateTestControlParameters();
   std::string message = fmt::format("test control parameters: {}", test_control_parameters);
   RCLCPP_INFO_STREAM(get_logger(), message);
