@@ -2,6 +2,15 @@
 Changelog for package openscenario_validator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.4.0 (2024-07-01)
+------------------
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Contributors: Kotaro Yoshimoto
+
 2.3.0 (2024-06-28)
 ------------------
 * Merge branch 'master' into feature/synchronized_action
