@@ -46,8 +46,8 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
-  DECLARE_PARAMETER(record);
   DECLARE_PARAMETER(publish_empty_context);
+  DECLARE_PARAMETER(record);
 }
 
 Interpreter::~Interpreter() {}
