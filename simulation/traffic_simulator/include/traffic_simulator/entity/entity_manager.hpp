@@ -258,6 +258,7 @@ public:
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
   FORWARD_TO_ENTITY(getEntityType, const);
+  FORWARD_TO_ENTITY(reachPosition, const);
   FORWARD_TO_ENTITY(getEntityTypename, const);
   FORWARD_TO_ENTITY(getLinearJerk, const);
   FORWARD_TO_ENTITY(getRouteLanelets, const);
@@ -271,6 +272,7 @@ public:
   FORWARD_TO_ENTITY(requestAssignRoute, );
   FORWARD_TO_ENTITY(requestFollowTrajectory, );
   FORWARD_TO_ENTITY(requestLaneChange, );
+  FORWARD_TO_ENTITY(requestSynchronize, );
   FORWARD_TO_ENTITY(requestWalkStraight, );
   FORWARD_TO_ENTITY(requestClearRoute, );
   FORWARD_TO_ENTITY(setAcceleration, );
@@ -368,15 +370,6 @@ public:
 
   bool isStopping(const std::string & name) const;
 
-  bool reachPosition(
-    const std::string & name, const geometry_msgs::msg::Pose & target_pose,
-    const double tolerance) const;
-  bool reachPosition(
-    const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
-    const double tolerance) const;
-  bool reachPosition(
-    const std::string & name, const std::string & target_entity_name, const double tolerance) const;
-
   void requestLaneChange(
     const std::string & name, const traffic_simulator::lane_change::Direction & direction);
 
@@ -397,6 +390,12 @@ public:
     const std::string & name, const Pose & pose, const Parameters & parameters,
     const double current_time, Ts &&... xs)
   {
+    static_assert(
+      std::disjunction<
+        std::is_same<Pose, CanonicalizedLaneletPose>,
+        std::is_same<Pose, geometry_msgs::msg::Pose>>::value,
+      "Pose must be of type CanonicalizedLaneletPose or geometry_msgs::msg::Pose");
+
     auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
