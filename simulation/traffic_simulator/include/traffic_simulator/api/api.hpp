@@ -48,7 +48,6 @@ public:
   template <typename NodeT, typename AllocatorT = std::allocator<void>, typename... Ts>
   explicit API(NodeT && node, const Configuration & configuration, Ts &&... xs)
   : configuration_(configuration),
-    clock_(getROS2Parameter<bool>("use_sim_time", true), std::forward<decltype(xs)>(xs)...),
     node_parameters_(
       rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node))),
     clock_pub_(rclcpp::create_publisher<rosgraph_msgs::msg::Clock>(
@@ -56,16 +55,17 @@ public:
       rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
     debug_marker_pub_(rclcpp::create_publisher<visualization_msgs::msg::MarkerArray>(
       node, "debug_marker", rclcpp::QoS(100), rclcpp::PublisherOptionsWithAllocator<AllocatorT>())),
+    clock_(getROS2Parameter<bool>("use_sim_time", true), std::forward<decltype(xs)>(xs)...),
     zeromq_client_(
-      simulation_interface::protocol, configuration_.simulator_host,
+      simulation_interface::protocol, configuration.simulator_host,
       getROS2Parameter<int>("port", 5555)),
     entity_manager_ptr_(
-      std::make_shared<entity::EntityManager>(node, configuration_, node_parameters_)),
+      std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(),
       [this]() { return entity_manager_ptr_->getEntityNames(); },
       [this](const auto & entity_name) { return getEntity(entity_name)->getMapPose(); },
-      [this](const auto & name) { return despawn(name); }, configuration_.auto_sink)),
+      [this](const auto & name) { return despawn(name); }, configuration.auto_sink)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
       getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe"))),
@@ -272,15 +272,15 @@ private:
 
   const Configuration configuration_;
 
-  /* */ SimulationClock clock_;
-
   const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
   const rclcpp::Publisher<rosgraph_msgs::msg::Clock>::SharedPtr clock_pub_;
 
   const rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr debug_marker_pub_;
 
-  /* */ zeromq::MultiClient zeromq_client_;
+  SimulationClock clock_;
+
+  zeromq::MultiClient zeromq_client_;
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
 
