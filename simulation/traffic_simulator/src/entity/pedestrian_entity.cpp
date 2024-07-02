@@ -192,6 +192,16 @@ void PedestrianEntity::setBehaviorParameter(
   behavior_plugin_ptr_->setBehaviorParameter(behavior_parameter);
 }
 
+auto PedestrianEntity::getMaxAcceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_acceleration;
+}
+
+auto PedestrianEntity::getMaxDeceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_deceleration;
+}
+
 void PedestrianEntity::setVelocityLimit(double linear_velocity)
 {
   if (linear_velocity < 0.0) {

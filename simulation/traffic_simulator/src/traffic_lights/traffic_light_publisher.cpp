@@ -22,6 +22,7 @@
 #endif
 
 #include <traffic_simulator/traffic_lights/traffic_light_publisher.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 
 namespace traffic_simulator
 {
@@ -39,14 +40,14 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::p
     auto relation_ids =
       hdmap_utils_->getTrafficLightRegulatoryElementIDsFromTrafficLight(traffic_light.id());
 
-    for (auto relation_id : relation_ids) {
+    for (const auto & relation_id : relation_ids) {
       // skip if the traffic light has no bulbs
       if (not traffic_light.traffic_light_status().empty()) {
         using TrafficLightType = autoware_perception_msgs::msg::TrafficSignal;
         TrafficLightType traffic_light_message;
         traffic_light_message.traffic_signal_id = relation_id;
 
-        for (auto bulb_status : traffic_light.traffic_light_status()) {
+        for (const auto & bulb_status : traffic_light.traffic_light_status()) {
           using TrafficLightBulbType =
             autoware_perception_msgs::msg::TrafficSignal::_elements_type::value_type;
           TrafficLightBulbType light_bulb_message;
@@ -95,4 +96,25 @@ auto TrafficLightPublisher<autoware_perception_msgs::msg::TrafficLightGroupArray
   traffic_light_state_array_publisher_->publish(message);
 }
 #endif
+
+template <>
+auto TrafficLightPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::publish(
+  [[maybe_unused]] const rclcpp::Time & current_ros_time,
+  const simulation_api_schema::UpdateTrafficLightsRequest & request) -> void
+{
+  traffic_simulator_msgs::msg::TrafficLightArrayV1 message;
+  using TrafficLightType = traffic_simulator_msgs::msg::TrafficLightV1;
+  for (const auto & traffic_light : request.states()) {
+    TrafficLightType traffic_light_message;
+    traffic_light_message.lanelet_way_id = traffic_light.id();
+    for (const auto & bulb_status : traffic_light.traffic_light_status()) {
+      using TrafficLightBulbType = traffic_simulator_msgs::msg::TrafficLightBulbV1;
+      TrafficLightBulbType light_bulb_message;
+      simulation_interface::toMsg<TrafficLightBulbType>(bulb_status, light_bulb_message);
+      traffic_light_message.traffic_light_bulbs.push_back(light_bulb_message);
+    }
+    message.traffic_lights.push_back(traffic_light_message);
+  }
+  traffic_light_state_array_publisher_->publish(message);
+}
 }  // namespace traffic_simulator
