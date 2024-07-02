@@ -46,7 +46,7 @@ namespace traffic_simulator
 {
 namespace entity
 {
-class EntityBase
+class EntityBase : public std::enable_shared_from_this<EntityBase>
 {
 public:
   explicit EntityBase(
@@ -59,6 +59,28 @@ public:
   /*   */ auto is() const -> bool
   {
     return dynamic_cast<EntityType const *>(this) != nullptr;
+  }
+
+  template <typename EntityType>
+  /*   */ auto as() -> std::shared_ptr<EntityType>
+  {
+    if (auto derived = std::dynamic_pointer_cast<EntityType>(shared_from_this()); !derived) {
+      THROW_SEMANTIC_ERROR(
+        "Entity ", std::quoted(name), " is not ", std::quoted(typeid(EntityType).name()), "type");
+    } else {
+      return derived;
+    }
+  }
+
+  template <typename T>
+  /*   */ auto as() const -> std::shared_ptr<const EntityType>
+  {
+    if (auto derived = std::dynamic_pointer_cast<const EntityType>(shared_from_this()); !derived) {
+      THROW_SEMANTIC_ERROR(
+        "Entity ", std::quoted(name), " is not ", std::quoted(typeid(EntityType).name()), "type");
+    } else {
+      return derived;
+    }
   }
 
   virtual void appendDebugMarker(visualization_msgs::msg::MarkerArray &);
@@ -103,7 +125,7 @@ public:
 
   virtual auto getEntityTypename() const -> const std::string & = 0;
 
-  virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
+  virtual auto getGoalPoses() -> std::vector<geometry_msgs::msg::Pose> = 0;
 
   /*   */ auto isStopping() const -> bool;
 

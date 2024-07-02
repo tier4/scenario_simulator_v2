@@ -179,48 +179,6 @@ auto EntityManager::getEgoName() const -> const std::string &
     "but ego vehicle does not exist");
 }
 
-auto EntityManager::getObstacle(const std::string & name)
-  -> std::optional<traffic_simulator_msgs::msg::Obstacle>
-{
-  if (not npc_logic_started_) {
-    return std::nullopt;
-  } else {
-    return entities_.at(name)->getObstacle();
-  }
-}
-
-auto EntityManager::getPedestrianParameters(const std::string & name) const
-  -> const traffic_simulator_msgs::msg::PedestrianParameters &
-{
-  if (const auto entity = dynamic_cast<PedestrianEntity const *>(entities_.at(name).get())) {
-    return entity->pedestrian_parameters;
-  }
-  THROW_SIMULATION_ERROR(
-    "EntityType: ", getEntity(name)->getEntityTypename(), ", does not have pedestrian parameter.",
-    "Please check description of the scenario and entity type of the Entity: " + name);
-}
-
-auto EntityManager::getVehicleParameters(const std::string & name) const
-  -> const traffic_simulator_msgs::msg::VehicleParameters &
-{
-  if (const auto vehicle = dynamic_cast<VehicleEntity const *>(entities_.at(name).get())) {
-    return vehicle->vehicle_parameters;
-  }
-  THROW_SIMULATION_ERROR(
-    "EntityType: ", getEntity(name)->getEntityTypename(), ", does not have pedestrian parameter.",
-    "Please check description of the scenario and entity type of the Entity: " + name);
-}
-
-auto EntityManager::getWaypoints(const std::string & name)
-  -> traffic_simulator_msgs::msg::WaypointsArray
-{
-  if (not npc_logic_started_) {
-    return traffic_simulator_msgs::msg::WaypointsArray();
-  } else {
-    return entities_.at(name)->getWaypoints();
-  }
-}
-
 auto EntityManager::isAnyEgoSpawned() const -> bool
 {
   return std::any_of(std::begin(entities_), std::end(entities_), [this](const auto & each) {
@@ -242,12 +200,12 @@ void EntityManager::resetBehaviorPlugin(
       "Entity :", name, "is MiscObjectEntity.",
       "You cannot reset behavior plugin of MiscObjectEntity.");
   } else if (reference_entity->is<VehicleEntity>()) {
-    const auto parameters = getVehicleParameters(name);
+    const auto parameters = reference_entity->as<VehicleEntity>()->getParameters();
     despawnEntity(name);
     spawnEntity<VehicleEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
   } else if (reference_entity->is<PedestrianEntity>()) {
-    const auto parameters = getPedestrianParameters(name);
+    const auto parameters = reference_entity->as<PedestrianEntity>()->getParameters();
     despawnEntity(name);
     spawnEntity<PedestrianEntity>(
       name, status.getMapPose(), parameters, status.getTime(), behavior_plugin_name);
@@ -313,12 +271,13 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   traffic_simulator_msgs::msg::EntityStatusWithTrajectoryArray status_array_msg;
   for (auto && [name, status] : all_status) {
+    const auto entity = getEntity(name);
     traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_trajectory;
-    status_with_trajectory.waypoint = getWaypoints(name);
-    for (const auto & goal : getGoalPoses<geometry_msgs::msg::Pose>(name)) {
+    status_with_trajectory.waypoint = entity->getWaypoints();
+    for (const auto & goal : entity->getGoalPoses()) {
       status_with_trajectory.goal_pose.push_back(goal);
     }
-    if (const auto obstacle = getObstacle(name); obstacle) {
+    if (const auto obstacle = entity->getObstacle(); obstacle) {
       status_with_trajectory.obstacle = obstacle.value();
       status_with_trajectory.obstacle_find = true;
     } else {
