@@ -268,7 +268,6 @@ public:
   FORWARD_TO_ENTITY(getBehaviorParameter, const);
   FORWARD_TO_ENTITY(getBoundingBox, const);
   FORWARD_TO_ENTITY(getCurrentAccel, const);
-  FORWARD_TO_ENTITY(getCurrentAction, const);
   FORWARD_TO_ENTITY(getCurrentTwist, const);
   FORWARD_TO_ENTITY(getDefaultMatchingDistanceForLaneletPoseCalculation, const);
   FORWARD_TO_ENTITY(getEntityStatusBeforeUpdate, const);
@@ -304,6 +303,8 @@ public:
   FORWARD_TO_ENTITY(setVelocityLimit, );
 
 #undef FORWARD_TO_ENTITY
+
+  auto getCurrentAction(const std::string & name) const -> std::string;
 
   visualization_msgs::msg::MarkerArray makeDebugMarker() const;
 
@@ -491,9 +492,6 @@ public:
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLightManager(conventional_traffic_light_manager_ptr_);
-      if (npc_logic_started_ && not is<EgoEntity>(name)) {
-        iter->second->startNpcLogic(getCurrentTime());
-      }
       return success;
     } else {
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");
@@ -517,9 +515,9 @@ public:
 
   void updateHdmapMarker();
 
-  void startNpcLogic(const double current_time);
+  auto startNpcLogic(const double current_time) -> void;
 
-  auto isNpcLogicStarted() const { return npc_logic_started_; }
+  auto isNpcLogicStarted() const -> bool { return npc_logic_started_; }
 };
 }  // namespace entity
 }  // namespace traffic_simulator

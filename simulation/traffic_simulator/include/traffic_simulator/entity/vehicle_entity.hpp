@@ -96,7 +96,7 @@ public:
 
   auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray override;
 
-  void onUpdate(double current_time, double step_time) override;
+  auto onUpdate(double current_time, double step_time) -> void override;
 
   void requestAcquirePosition(const CanonicalizedLaneletPose &);
 
