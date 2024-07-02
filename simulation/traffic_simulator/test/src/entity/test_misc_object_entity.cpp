@@ -77,7 +77,7 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getCurrentAction_npcNotStarted)
   const auto blob = traffic_simulator::entity::MiscObjectEntity(
     entity_name,
     traffic_simulator::entity_status::CanonicalizedEntityStatus(
-      non_canonicalized_status, hdmap_utils_ptr),
+      non_canonicalized_status, makeCanonicalizedLaneletPose(hdmap_utils_ptr, 120659)),
     hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{});
 
   EXPECT_FALSE(blob.isNpcLogicStarted());
@@ -528,11 +528,9 @@ TEST_F(
 {
   EXPECT_FALSE(traffic_simulator::entity::MiscObjectEntity(
                  entity_name,
-                 traffic_simulator::CanonicalizedEntityStatus(
-                   makeEntityStatus(
-                     hdmap_utils_ptr, makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 0.0,
-                     entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-                   hdmap_utils_ptr),
+                 makeCanonicalizedEntityStatus(
+                   hdmap_utils_ptr, makePose(makePoint(3810.0, 73745.0)), makeBoundingBox(), 1.0,
+                   0.0, entity_name, traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
                  hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
                  .getCanonicalizedLaneletPose(5.0)
                  .has_value());
@@ -548,13 +546,11 @@ TEST_F(MiscObjectEntityTest_HdMapUtils, getCanonicalizedLaneletPose_onRoadAndCro
   EXPECT_TRUE(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
-      traffic_simulator::CanonicalizedEntityStatus(
-        makeEntityStatus(
-          hdmap_utils_ptr,
-          makePose(makePoint(3766.1, 73738.2), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
-          makeBoundingBox(), 0.0, entity_name,
-          traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-        hdmap_utils_ptr),
+      makeCanonicalizedEntityStatus(
+        hdmap_utils_ptr,
+        makePose(makePoint(3766.1, 73738.2), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
+        makeBoundingBox(), 1.0, 0.0, entity_name,
+        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .getCanonicalizedLaneletPose(1.0)
       .has_value());
@@ -571,13 +567,11 @@ TEST_F(
   EXPECT_FALSE(
     traffic_simulator::entity::MiscObjectEntity(
       entity_name,
-      traffic_simulator::CanonicalizedEntityStatus(
-        makeEntityStatus(
-          hdmap_utils_ptr,
-          makePose(makePoint(3764.5, 73737.5), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
-          makeBoundingBox(), 0.0, entity_name,
-          traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
-        hdmap_utils_ptr),
+      makeCanonicalizedEntityStatus(
+        hdmap_utils_ptr,
+        makePose(makePoint(3764.5, 73737.5), makeQuaternionFromYaw((120.0) * M_PI / 180.0)),
+        makeBoundingBox(), 1.0, 0.0, entity_name,
+        traffic_simulator_msgs::msg::EntityType::MISC_OBJECT),
       hdmap_utils_ptr, traffic_simulator_msgs::msg::MiscObjectParameters{})
       .getCanonicalizedLaneletPose(1.0)
       .has_value());

@@ -48,8 +48,9 @@ BT::NodeStatus WalkStraightAction::tick()
     target_speed = 1.111;
   }
   setOutput(
-    "updated_status", std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-                        calculateUpdatedEntityStatusInWorldFrame(target_speed.value())));
+    "non_canonicalized_updated_status",
+    std::make_shared<traffic_simulator::EntityStatus>(
+      calculateUpdatedEntityStatusInWorldFrame(target_speed.value())));
   return BT::NodeStatus::RUNNING;
 }
 }  // namespace pedestrian

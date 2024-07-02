@@ -115,7 +115,7 @@ BT::NodeStatus LaneChangeAction::tick()
       switch (lane_change_parameters_->constraint.type) {
         case traffic_simulator::lane_change::Constraint::Type::NONE:
           /**
-          @note Hard coded parameter, 
+          @note Hard coded parameter,
           10.0 is a maximum_curvature_threshold (If the curvature of the trajectory is over 10.0, the trajectory was not selected.)
           20.0 is a target_trajectory_length (The one with the closest length to 20 m is selected from the candidate trajectories.)
           1.0 is a forward_distance_threshold (If the goal x position in the cartesian coordinate was under 1.0, the goal was rejected.)
@@ -219,19 +219,13 @@ BT::NodeStatus LaneChangeAction::tick()
     }
     if (current_s_ < curve_->getLength()) {
       geometry_msgs::msg::Pose pose = curve_->getPose(current_s_, true);
-      traffic_simulator::EntityStatus entity_status_updated;
+      auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
       entity_status_updated.pose = pose;
-      auto lanelet_pose = hdmap_utils->toLaneletPose(pose, entity_status->getBoundingBox(), false);
-      if (lanelet_pose) {
-        entity_status_updated.lanelet_pose = lanelet_pose.value();
-      } else {
-        entity_status_updated.lanelet_pose_valid = false;
-      }
+      entity_status_updated.lanelet_pose_valid = false;
       entity_status_updated.action_status = getActionStatus();
       setOutput(
-        "updated_status",
-        std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-          traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils)));
+        "non_canonicalized_updated_status",
+        std::make_shared<traffic_simulator::EntityStatus>(entity_status_updated));
       const auto waypoints = calculateWaypoints();
       if (waypoints.waypoints.empty()) {
         return BT::NodeStatus::FAILURE;
@@ -252,18 +246,18 @@ BT::NodeStatus LaneChangeAction::tick()
       curve_ = std::nullopt;
       current_s_ = 0;
       lane_change_velocity_ = 0;
-      traffic_simulator::EntityStatus entity_status_updated;
+      auto entity_status_updated = static_cast<traffic_simulator::EntityStatus>(*entity_status);
       traffic_simulator::LaneletPose lanelet_pose;
       lanelet_pose.lanelet_id = lane_change_parameters_->target.lanelet_id;
       lanelet_pose.s = s;
       lanelet_pose.offset = 0;
-      entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose).pose;
       entity_status_updated.lanelet_pose = lanelet_pose;
+      entity_status_updated.lanelet_pose_valid = true;
+      entity_status_updated.pose = hdmap_utils->toMapPose(lanelet_pose).pose;
       entity_status_updated.action_status = getActionStatus();
       setOutput(
-        "updated_status",
-        std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-          traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils)));
+        "non_canonicalized_updated_status",
+        std::make_shared<traffic_simulator::EntityStatus>(entity_status_updated));
       return BT::NodeStatus::SUCCESS;
     }
   }

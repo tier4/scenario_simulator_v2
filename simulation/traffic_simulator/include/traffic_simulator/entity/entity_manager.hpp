@@ -345,7 +345,7 @@ public:
   auto getEntity(const std::string & name) const
     -> std::shared_ptr<traffic_simulator::entity::EntityBase>;
 
-  auto getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus;
+  auto getEntityStatus(const std::string & name) const -> const CanonicalizedEntityStatus &;
 
   auto getHdmapUtils() -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
@@ -412,8 +412,6 @@ public:
    * @sa traffic_simulator::entity::VehicleEntity::BuiltinBehavior
    */
   void resetBehaviorPlugin(const std::string & name, const std::string & behavior_plugin_name);
-
-  auto setEntityStatus(const std::string & name, const CanonicalizedEntityStatus & status) -> void;
 
   void setVerbose(const bool verbose);
 

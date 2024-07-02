@@ -175,17 +175,13 @@ auto EntityManager::getEntity(const std::string & name) const
   }
 };
 
-auto EntityManager::getEntityStatus(const std::string & name) const -> CanonicalizedEntityStatus
+auto EntityManager::getEntityStatus(const std::string & name) const
+  -> const CanonicalizedEntityStatus &
 {
-  if (const auto iter = entities_.find(name); iter == entities_.end()) {
-    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
+  if (const auto entity = getEntity(name)) {
+    return entity->getStatus();
   } else {
-    auto entity_status = static_cast<EntityStatus>(iter->second->getStatus());
-    assert(entity_status.name == name && "The entity name in status is different from key!");
-    entity_status.action_status.current_action = getCurrentAction(name);
-    entity_status.time = current_time_;
-    return CanonicalizedEntityStatus(
-      entity_status, iter->second->getStatus().getCanonicalizedLaneletPose());
+    THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   }
 }
 
@@ -298,7 +294,7 @@ void EntityManager::requestLaneChange(
 void EntityManager::resetBehaviorPlugin(
   const std::string & name, const std::string & behavior_plugin_name)
 {
-  const auto status = getEntityStatus(name);
+  const auto & status = getEntityStatus(name);
   const auto behavior_parameter = getBehaviorParameter(name);
   if (is<EgoEntity>(name)) {
     THROW_SEMANTIC_ERROR(
@@ -368,18 +364,6 @@ void EntityManager::requestSpeedChange(
     THROW_SEMANTIC_ERROR("You cannot set target speed to the ego vehicle after starting scenario.");
   }
   return entities_.at(name)->requestSpeedChange(target_speed, transition, constraint, continuous);
-}
-
-auto EntityManager::setEntityStatus(
-  const std::string & name, const CanonicalizedEntityStatus & status) -> void
-{
-  if (is<EgoEntity>(name) && getCurrentTime() > 0 && not isControlledBySimulator(name)) {
-    THROW_SEMANTIC_ERROR(
-      "You cannot set entity status to the ego vehicle name ", std::quoted(name),
-      " after starting scenario.");
-  } else {
-    entities_.at(name)->setStatus(status);
-  }
 }
 
 void EntityManager::setVerbose(const bool verbose)

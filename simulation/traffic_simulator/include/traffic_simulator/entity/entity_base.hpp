@@ -194,7 +194,9 @@ public:
 
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
-  virtual auto setStatus(const CanonicalizedEntityStatus &) -> void;
+  virtual void setStatus(const EntityStatus & status);
+
+  virtual auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 
@@ -214,6 +216,8 @@ public:
   /*   */ auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
 
   /*   */ auto setAcceleration(const geometry_msgs::msg::Accel & accel) -> void;
+
+  /*   */ auto setAction(const std::string & action) -> void;
 
   /*   */ auto setLinearJerk(const double liner_jerk) -> void;
 

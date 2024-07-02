@@ -266,8 +266,9 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
     behavior_plugin_ptr_->setTargetSpeed(target_speed_);
     behavior_plugin_ptr_->setRouteLanelets(getRouteLanelets());
     behavior_plugin_ptr_->update(current_time, step_time);
-    auto status_updated = behavior_plugin_ptr_->getUpdatedStatus();
-    if (const auto canonicalized_lanelet_pose = status_updated->getCanonicalizedLaneletPose()) {
+    setStatus(*behavior_plugin_ptr_->getUpdatedStatus());
+    /// @note setStatus() is not skipped even if isAtEndOfLanelets return true
+    if (const auto canonicalized_lanelet_pose = status_.getCanonicalizedLaneletPose()) {
       if (isAtEndOfLanelets(canonicalized_lanelet_pose.value(), hdmap_utils_ptr_)) {
         stopAtCurrentPosition();
         updateStandStillDuration(step_time);
@@ -275,7 +276,6 @@ void PedestrianEntity::onUpdate(double current_time, double step_time)
         return;
       }
     }
-    setStatus(*status_updated);
     updateStandStillDuration(step_time);
     updateTraveledDistance(step_time);
   } else {

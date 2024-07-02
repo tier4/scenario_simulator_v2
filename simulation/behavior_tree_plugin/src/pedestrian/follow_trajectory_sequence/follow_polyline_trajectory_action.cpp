@@ -82,9 +82,8 @@ auto FollowPolylineTrajectoryAction::tick() -> BT::NodeStatus
       static_cast<traffic_simulator::EntityStatus>(*entity_status), *polyline_trajectory,
       behavior_parameter, hdmap_utils, step_time, getMatchingDistance(), getTargetSpeed())) {
     setOutput(
-      "updated_status",
-      std::make_shared<traffic_simulator::CanonicalizedEntityStatus>(
-        traffic_simulator::CanonicalizedEntityStatus(*updated_status, hdmap_utils)));
+      "non_canonicalized_updated_status",
+      std::make_shared<traffic_simulator::EntityStatus>(updated_status.value()));
     setOutput("waypoints", calculateWaypoints());
     setOutput("obstacle", calculateObstacle(calculateWaypoints()));
     return BT::NodeStatus::RUNNING;

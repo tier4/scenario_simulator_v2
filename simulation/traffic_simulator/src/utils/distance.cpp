@@ -45,6 +45,10 @@ auto lateralDistance(
   }
 }
 
+/*
+   See doc: 
+   https://github.com/tier4/scenario_simulator_v2/blob/729e4e6372cdba60e377ae097d032905b80763a9/docs/developer_guide/lane_pose_calculation/GetLongitudinalDistance.md
+*/
 auto longitudinalDistance(
   const CanonicalizedLaneletPose & from, const CanonicalizedLaneletPose & to,
   bool include_adjacent_lanelet, bool include_opposite_direction, bool allow_lane_change,
