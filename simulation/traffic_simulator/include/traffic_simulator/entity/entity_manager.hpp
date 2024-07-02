@@ -255,23 +255,23 @@ public:
 
   void setVerbose(const bool verbose);
 
-  template <typename Entity, typename Pose, typename Parameters, typename... Ts>
+  template <typename EntityType, typename PoseType, typename ParametersType, typename... Ts>
   auto spawnEntity(
-    const std::string & name, const Pose & pose, const Parameters & parameters,
-    const double current_time, Ts &&... xs)
+    const std::string & name, const PoseType & pose, const ParametersType & parameters,
+    const double current_time, Ts &&... xs) -> std::shared_ptr<entity::EntityBase>
   {
     auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
-      if constexpr (std::is_same_v<std::decay_t<Entity>, EgoEntity>) {
+      if constexpr (std::is_same_v<std::decay_t<EntityType>, EgoEntity>) {
         if (isAnyEgoSpawned()) {
-          THROW_SEMANTIC_ERROR("multi ego simulation does not support yet");
+          THROW_SEMANTIC_ERROR("Multiple egos in the simulation are unsupported yet");
         } else {
           entity_status.type.type = traffic_simulator_msgs::msg::EntityType::EGO;
         }
-      } else if constexpr (std::is_same_v<std::decay_t<Entity>, VehicleEntity>) {
+      } else if constexpr (std::is_same_v<std::decay_t<EntityType>, VehicleEntity>) {
         entity_status.type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
-      } else if constexpr (std::is_same_v<std::decay_t<Entity>, PedestrianEntity>) {
+      } else if constexpr (std::is_same_v<std::decay_t<EntityType>, PedestrianEntity>) {
         entity_status.type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
       } else {
         entity_status.type.type = traffic_simulator_msgs::msg::EntityType::MISC_OBJECT;
@@ -291,7 +291,8 @@ public:
 
       const auto matching_distance = [](const auto & parameters) {
         if constexpr (std::is_same_v<
-                        std::decay_t<Parameters>, traffic_simulator_msgs::msg::VehicleParameters>) {
+                        std::decay_t<ParametersType>,
+                        traffic_simulator_msgs::msg::VehicleParameters>) {
           return std::max(
                    parameters.axles.front_axle.track_width,
                    parameters.axles.rear_axle.track_width) *
@@ -302,14 +303,14 @@ public:
         }
       }(parameters);
 
-      if constexpr (std::is_same_v<std::decay_t<Pose>, LaneletPose>) {
+      if constexpr (std::is_same_v<std::decay_t<PoseType>, LaneletPose>) {
         THROW_SYNTAX_ERROR(
           "LaneletPose is not supported type as pose argument. Only CanonicalizedLaneletPose and "
           "msg::Pose are supported as pose argument of EntityManager::spawnEntity().");
-      } else if constexpr (std::is_same_v<std::decay_t<Pose>, CanonicalizedLaneletPose>) {
+      } else if constexpr (std::is_same_v<std::decay_t<PoseType>, CanonicalizedLaneletPose>) {
         entity_status.pose = toMapPose(pose);
         return CanonicalizedEntityStatus(entity_status, pose);
-      } else if constexpr (std::is_same_v<std::decay_t<Pose>, geometry_msgs::msg::Pose>) {
+      } else if constexpr (std::is_same_v<std::decay_t<PoseType>, geometry_msgs::msg::Pose>) {
         const auto canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
           pose, parameters.bounding_box, include_crosswalk, matching_distance, hdmap_utils_ptr_);
         return CanonicalizedEntityStatus(entity_status, canonicalized_lanelet_pose);
@@ -317,13 +318,13 @@ public:
     };
 
     if (const auto [iter, success] = entities_.emplace(
-          name, std::make_unique<Entity>(
+          name, std::make_unique<EntityType>(
                   name, makeEntityStatus(), hdmap_utils_ptr_, parameters,
                   std::forward<decltype(xs)>(xs)...));
         success) {
       // FIXME: this ignores V2I traffic lights
       iter->second->setTrafficLights(traffic_lights_ptr_->getConventionalTrafficLights());
-      return success;
+      return iter->second;
     } else {
       THROW_SEMANTIC_ERROR("Entity ", std::quoted(name), " is already exists.");
     }
