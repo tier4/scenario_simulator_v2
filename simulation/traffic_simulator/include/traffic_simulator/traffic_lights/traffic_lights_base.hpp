@@ -24,6 +24,7 @@
 #include <traffic_simulator/traffic_lights/configurable_rate_updater.hpp>
 #include <traffic_simulator/traffic_lights/traffic_light.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights_marker_publisher.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <unordered_map>
 #include <vector>
 
@@ -75,6 +76,8 @@ public:
 
   auto generateAutowareAutoPerceptionMsg() const
     -> autoware_auto_perception_msgs::msg::TrafficSignalArray;
+
+  auto generateTrafficSimulatorV1Msg() const -> traffic_simulator_msgs::msg::TrafficLightArrayV1;
 
 protected:
   virtual auto update() const -> void = 0;

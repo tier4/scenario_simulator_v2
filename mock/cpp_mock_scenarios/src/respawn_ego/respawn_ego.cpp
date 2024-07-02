@@ -55,8 +55,9 @@ private:
   void onInitialize() override
   {
     spawnEgoEntity(
-      traffic_simulator::helper::constructLaneletPose(34621, 10, 0), {goal_pose},
-      getVehicleParameters());
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34621, 10.0, 0.0, api_.getHdmapUtils()),
+      {goal_pose}, getVehicleParameters());
   }
 
 private:

@@ -31,6 +31,7 @@
 #include <traffic_simulator/helper/helper.hpp>
 #include <traffic_simulator/job/job_list.hpp>
 #include <traffic_simulator/traffic_lights/traffic_lights.hpp>
+#include <traffic_simulator/utils/distance.hpp>
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status.hpp>
@@ -115,6 +116,13 @@ public:
   /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
     -> std::optional<CanonicalizedLaneletPose>;
 
+  /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
+    -> geometry_msgs::msg::Pose;
+
+  virtual auto getMaxAcceleration() const -> double = 0;
+
+  virtual auto getMaxDeceleration() const -> double = 0;
+
   virtual auto getDefaultMatchingDistanceForLaneletPoseCalculation() const -> double;
 
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
@@ -159,6 +167,8 @@ public:
   virtual void requestSpeedChange(double, bool);
 
   virtual void requestSpeedChange(const speed_change::RelativeTargetSpeed &, bool);
+
+  virtual void requestClearRoute();
 
   virtual auto isControlledBySimulator() const -> bool;
 
@@ -217,6 +227,19 @@ public:
 
   /*   */ auto updateTraveledDistance(const double step_time) -> double;
 
+  /*   */ bool reachPosition(
+    const geometry_msgs::msg::Pose & target_pose, const double tolerance) const;
+
+  /*   */ bool reachPosition(
+    const CanonicalizedLaneletPose & lanelet_pose, const double tolerance) const;
+
+  /*   */ bool reachPosition(const std::string & target_name, const double tolerance) const;
+
+  /*   */ auto requestSynchronize(
+    const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
+    const CanonicalizedLaneletPose & entity_target, const double target_speed,
+    const double tolerance) -> bool;
+
   const std::string name;
 
   bool verbose;
@@ -231,6 +254,8 @@ protected:
 
   double stand_still_duration_ = 0.0;
   double traveled_distance_ = 0.0;
+  double prev_job_duration_ = 0.0;
+  double step_time_ = 0.0;
 
   std::unordered_map<std::string, CanonicalizedEntityStatus> other_status_;
 

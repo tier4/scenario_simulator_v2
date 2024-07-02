@@ -1,0 +1,2 @@
+ament_add_gtest(test_simulation_clock test_simulation_clock.cpp)
+target_link_libraries(test_simulation_clock traffic_simulator)
