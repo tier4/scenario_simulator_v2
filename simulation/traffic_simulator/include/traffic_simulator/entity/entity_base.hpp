@@ -105,6 +105,7 @@ public:
   DEFINE_GETTER(LinearJerk,               double,                                          static_cast<EntityStatus>(getStatus()).action_status.linear_jerk)
   DEFINE_GETTER(MapPose,                  geometry_msgs::msg::Pose,                        static_cast<EntityStatus>(getStatus()).pose)
   DEFINE_GETTER(StandStillDuration,       double,                                          stand_still_duration_)
+  DEFINE_GETTER(LaneletRelativeYaw,       std::optional<double>,                           getStatus().getLaneletRelativeYaw()) 
   DEFINE_GETTER(Status,                   const CanonicalizedEntityStatus &,               status_)
   DEFINE_GETTER(TraveledDistance,         double,                                          traveled_distance_)
   DEFINE_GETTER(Name,                     const std::string &,                             getStatus().getName())

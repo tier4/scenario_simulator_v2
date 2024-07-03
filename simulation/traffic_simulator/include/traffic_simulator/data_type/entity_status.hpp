@@ -53,6 +53,11 @@ public:
   auto getMapPose() const noexcept -> geometry_msgs::msg::Pose;
   auto setMapPose(const geometry_msgs::msg::Pose & pose) -> void;
 
+  auto getLaneletRelativeYaw() const -> std::optional<double>
+  {
+    return isInLanelet() ? std::make_optional<double>(getLaneletPose().rpy.z) : (std::nullopt);
+  }
+
   auto getTwist() const noexcept -> geometry_msgs::msg::Twist;
   auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
   auto setLinearVelocity(double linear_velocity) -> void;
@@ -68,6 +73,7 @@ public:
   auto getLaneletId() const noexcept -> lanelet::Id;
   auto getLaneletIds() const noexcept -> lanelet::Ids;
   auto getLaneletPose() const noexcept -> LaneletPose;
+
   auto getCanonicalizedLaneletPose() const noexcept -> std::optional<CanonicalizedLaneletPose>;
   auto getName() const noexcept -> const std::string & { return entity_status_.name; }
   auto getType() const noexcept -> const EntityType & { return entity_status_.type; }

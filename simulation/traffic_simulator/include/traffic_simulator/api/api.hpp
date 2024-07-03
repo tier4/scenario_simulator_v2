@@ -231,6 +231,55 @@ public:
   auto checkCollision(
     const std::string & first_entity_name, const std::string & second_entity_name) const -> bool;
 
+  auto laneletRelativeYaw(
+    const std::string & entity_name, const CanonicalizedLaneletPose & lanelet_pose) const
+    -> std::optional<double>;
+
+  auto timeHeadway(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<double>;
+
+  auto boundingBoxDistance(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<double>;
+
+  auto relativePose(const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto relativePose(
+    const std::string & from_entity_name, const geometry_msgs::msg::Pose & to_map_pose)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto relativePose(
+    const geometry_msgs::msg::Pose & from_map_pose, const std::string & to_entity_name)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto boundingBoxRelativePose(
+    const std::string & from_entity_name, const geometry_msgs::msg::Pose & to_map_pose)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto boundingBoxRelativePose(
+    const std::string & from_entity_name, const std::string & to_entity_name)
+    -> std::optional<geometry_msgs::msg::Pose>;
+
+  auto relativeLaneletPose(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const bool allow_lane_change) -> std::optional<LaneletPose>;
+
+  auto relativeLaneletPose(
+    const std::string & from_entity_name, const CanonicalizedLaneletPose & to_lanelet_pose,
+    const bool allow_lane_change) -> std::optional<LaneletPose>;
+
+  auto relativeLaneletPose(
+    const CanonicalizedLaneletPose & from_lanelet_pose, const std::string & to_entity_name,
+    const bool allow_lane_change) -> std::optional<LaneletPose>;
+
+  auto boundingBoxRelativeLaneletPose(
+    const std::string & from_entity_name, const std::string & to_entity_name,
+    const bool allow_lane_change) -> std::optional<LaneletPose>;
+
+  auto boundingBoxRelativeLaneletPose(
+    const std::string & from_entity_name, const CanonicalizedLaneletPose & to_lanelet_pose,
+    const bool allow_lane_change) -> std::optional<LaneletPose>;
+
   // traffics, lanelet
   auto getHdmapUtils() const -> const std::shared_ptr<hdmap_utils::HdMapUtils> &;
 
