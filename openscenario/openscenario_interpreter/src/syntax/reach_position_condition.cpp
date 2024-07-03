@@ -64,24 +64,20 @@ auto ReachPositionCondition::evaluate() -> Object
   // TODO USE DistanceCondition::distance
   const auto distance = overload(
     [&](const WorldPosition & position, auto && triggering_entity) {
-      const auto pose = makeNativeRelativeWorldPosition(
-        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-      return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
+      return euclideanDistance(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), consider_z);
     },
     [&](const RelativeWorldPosition & position, auto && triggering_entity) {
-      const auto pose = makeNativeRelativeWorldPosition(
-        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-      return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
+      return euclideanDistance(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), consider_z);
     },
     [&](const RelativeObjectPosition & position, auto && triggering_entity) {
-      const auto pose = makeNativeRelativeWorldPosition(
-        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-      return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
+      return euclideanDistance(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), consider_z);
     },
     [&](const LanePosition & position, auto && triggering_entity) {
-      const auto pose = makeNativeRelativeWorldPosition(
-        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position));
-      return hypot(pose.position.x, pose.position.y, pose.position.z, consider_z);
+      return euclideanDistance(
+        triggering_entity, static_cast<geometry_msgs::msg::Pose>(position), consider_z);
     });
 
   results.clear();

@@ -76,7 +76,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
+    return std::abs(longitudinalEntityDistance(triggering_entity, entity_ref));
   } else {
     return Double::nan();
   }
@@ -93,8 +93,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x);
+    return std::abs(longitudinalEntityBoundingBoxDistance(triggering_entity, entity_ref));
   } else {
     return Double::nan();
   }
@@ -108,7 +107,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+    return std::abs(lateralEntityDistance(triggering_entity, entity_ref));
   } else {
     return Double::nan();
   }
@@ -125,8 +124,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return std::abs(
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
+    return std::abs(lateralEntityBoundingBoxDistance(triggering_entity, entity_ref));
   } else {
     return Double::nan();
   }
@@ -146,11 +144,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return hypot(
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y,
-      makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.z,
-      consider_z);
+    return euclideanBoundingBoxDistance(triggering_entity, entity_ref, consider_z);
   } else {
     return Double::nan();
   }
@@ -164,10 +158,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
     global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
-    return hypot(
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y,
-      makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.z, consider_z);
+    return euclideanDistance(triggering_entity, entity_ref, consider_z);
   } else {
     return Double::nan();
   }
@@ -193,9 +184,7 @@ auto RelativeDistanceCondition::distance<
        OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
        behavior will be enabled only when routingAlgorithm == undefined.
     */
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
-      .offset;
+    return lateralLaneDistance(triggering_entity, entity_ref);
   } else {
     return Double::nan();
   }
@@ -221,9 +210,7 @@ auto RelativeDistanceCondition::distance<
        OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
        behavior will be enabled only when routingAlgorithm == undefined.
     */
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
-      .offset;
+    return lateralLaneBoundingBoxDistance(triggering_entity, entity_ref);
   } else {
     return Double::nan();
   }
@@ -249,9 +236,7 @@ auto RelativeDistanceCondition::distance<
        OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
        behavior will be enabled only when routingAlgorithm == undefined.
     */
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeRelativeLanePosition(triggering_entity, entity_ref))
-      .s;
+    return longitudinalLaneDistance(triggering_entity, entity_ref);
   } else {
     return Double::nan();
   }
@@ -277,9 +262,7 @@ auto RelativeDistanceCondition::distance<
        OpenSCENARIO Interpreter support OpenSCENARIO 1.2 RoutingAlgorithm, this
        behavior will be enabled only when routingAlgorithm == undefined.
     */
-    return static_cast<traffic_simulator::LaneletPose>(
-             makeNativeBoundingBoxRelativeLanePosition(triggering_entity, entity_ref))
-      .s;
+    return longitudinalLaneBoundingBoxDistance(triggering_entity, entity_ref);
   } else {
     return Double::nan();
   }
@@ -293,10 +276,8 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(static_cast<traffic_simulator::LaneletPose>(
-                      makeNativeBoundingBoxRelativeLanePosition(
-                        triggering_entity, entity_ref, RoutingAlgorithm::shortest))
-                      .offset);
+    return std::abs(
+      lateralLaneBoundingBoxDistance(triggering_entity, entity_ref, RoutingAlgorithm::shortest));
   } else {
     return Double::nan();
   }
@@ -310,10 +291,7 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(
-      static_cast<traffic_simulator::LaneletPose>(
-        makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
-        .offset);
+    return std::abs(lateralLaneDistance(triggering_entity, entity_ref, RoutingAlgorithm::shortest));
   } else {
     return Double::nan();
   }
@@ -327,10 +305,8 @@ auto RelativeDistanceCondition::distance<
   if (
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
-    return std::abs(static_cast<traffic_simulator::LaneletPose>(
-                      makeNativeBoundingBoxRelativeLanePosition(
-                        triggering_entity, entity_ref, RoutingAlgorithm::shortest))
-                      .s);
+    return std::abs(longitudinalLaneBoundingBoxDistance(
+      triggering_entity, entity_ref, RoutingAlgorithm::shortest));
   } else {
     return Double::nan();
   }
@@ -345,9 +321,7 @@ auto RelativeDistanceCondition::distance<
     global().entities->at(entity_ref).as<ScenarioObject>().is_added and
     global().entities->at(triggering_entity).as<ScenarioObject>().is_added) {
     return std::abs(
-      static_cast<traffic_simulator::LaneletPose>(
-        makeNativeRelativeLanePosition(triggering_entity, entity_ref, RoutingAlgorithm::shortest))
-        .s);
+      longitudinalLaneDistance(triggering_entity, entity_ref, RoutingAlgorithm::shortest));
   } else {
     return Double::nan();
   }

@@ -102,120 +102,191 @@ public:
       return traffic_simulator::pose::toMapPose(native_lane_position);
     }
 
-    static auto makeNativeRelativeWorldPosition(
-      const std::string & from_entity_name, const std::string & to_entity_name)
+    template <typename FirstType, typename SecondType>
+    static auto prerequisite(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name) -> bool
     {
-      if (core->isEntitySpawned(from_entity_name) && core->isEntitySpawned(to_entity_name)) {
-        if (const auto relative_pose = core->relativePose(from_entity_name, to_entity_name)) {
-          return relative_pose.value();
+      if constexpr (std::is_same_v<FirstType, std::string>) {
+        if (!core->isEntitySpawned(from_pose_or_entity_name)) {
+          return false;
         }
       }
-      return traffic_simulator::pose::quietNaNPose();
-    }
-
-    static auto makeNativeRelativeWorldPosition(
-      const std::string & from_entity_name, const NativeWorldPosition & to_map_pose)
-    {
-      if (core->isEntitySpawned(from_entity_name)) {
-        if (const auto relative_pose = core->relativePose(from_entity_name, to_map_pose)) {
-          return relative_pose.value();
+      if constexpr (std::is_same_v<SecondType, std::string>) {
+        if (!core->isEntitySpawned(to_pose_or_entity_name)) {
+          return false;
         }
       }
-      return traffic_simulator::pose::quietNaNPose();
+      return true;
     }
 
+    // Euclidean distance
+    template <typename FirstType, typename SecondType>
+    static auto euclideanDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
+      const bool consider_z) -> double
+    {
+      const auto hypot = [&](const double x, const double y, const double z) {
+        return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
+      };
+
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose = core->relativePose(from_pose_or_entity_name, to_pose_or_entity_name)) {
+          return hypot(pose.value().position.x, pose.value().position.y, pose.value().position.z);
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    template <typename FirstType, typename SecondType>
+    static auto euclideanBoundingBoxDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
+      const bool consider_z) -> double
+    {
+      const auto hypot = [&](const double x, const double y, const double z) {
+        return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
+      };
+
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose =
+            core->boundingBoxRelativePose(from_pose_or_entity_name, to_pose_or_entity_name)) {
+          return hypot(pose.value().position.x, pose.value().position.y, pose.value().position.z);
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    // Entity coordinate system distance
+    template <typename FirstType, typename SecondType>
+    static auto lateralEntityDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name)
+      -> double
+    {
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose = core->relativePose(from_pose_or_entity_name, to_pose_or_entity_name)) {
+          return pose.value().position.y;
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    template <typename FirstType, typename SecondType>
+    static auto longitudinalEntityDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name)
+      -> double
+    {
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose = core->relativePose(from_pose_or_entity_name, to_pose_or_entity_name)) {
+          return pose.value().position.x;
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    template <typename FirstType, typename SecondType>
+    static auto lateralEntityBoundingBoxDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name)
+      -> double
+    {
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose =
+            core->boundingBoxRelativePose(from_pose_or_entity_name, to_pose_or_entity_name)) {
+          return pose.value().position.y;
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    template <typename FirstType, typename SecondType>
+    static auto longitudinalEntityBoundingBoxDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name)
+      -> double
+    {
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose =
+            core->boundingBoxRelativePose(from_pose_or_entity_name, to_pose_or_entity_name)) {
+          return pose.value().position.x;
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    // Lane coordinate system distance
+    template <typename FirstType, typename SecondType>
+    static auto lateralLaneDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> double
+    {
+      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose = core->relativeLaneletPose(
+            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
+          return pose.value().offset;
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    template <typename FirstType, typename SecondType>
+    static auto longitudinalLaneDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> double
+    {
+      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose = core->relativeLaneletPose(
+            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
+          return pose.value().s;
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    template <typename FirstType, typename SecondType>
+    static auto lateralLaneBoundingBoxDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> double
+    {
+      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose = core->boundingBoxRelativeLaneletPose(
+            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
+          return pose.value().offset;
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    template <typename FirstType, typename SecondType>
+    static auto longitudinalLaneBoundingBoxDistance(
+      const FirstType & from_pose_or_entity_name, const SecondType & to_pose_or_entity_name,
+      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined) -> double
+    {
+      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
+      if (prerequisite(from_pose_or_entity_name, to_pose_or_entity_name)) {
+        if (
+          const auto pose = core->boundingBoxRelativeLaneletPose(
+            from_pose_or_entity_name, to_pose_or_entity_name, allow_lane_change)) {
+          return pose.value().s;
+        }
+      }
+      return std::numeric_limits<double>::quiet_NaN();
+    }
+
+    // other necessary now
     static auto makeNativeRelativeWorldPosition(
       const NativeWorldPosition & from_map_pose, const std::string & to_entity_name)
     {
       if (core->isEntitySpawned(to_entity_name)) {
         if (const auto relative_pose = core->relativePose(from_map_pose, to_entity_name)) {
-          return relative_pose.value();
-        }
-      }
-      return traffic_simulator::pose::quietNaNPose();
-    }
-
-    static auto makeNativeRelativeLanePosition(
-      const std::string & from_entity_name, const std::string & to_entity_name,
-      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
-      -> traffic_simulator::LaneletPose
-    {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      if (core->isEntitySpawned(from_entity_name) && core->isEntitySpawned(to_entity_name)) {
-        if (
-          const auto relative_lanelet_pose =
-            core->relativeLaneletPose(from_entity_name, to_entity_name, allow_lane_change)) {
-          return relative_lanelet_pose.value();
-        }
-      }
-      return traffic_simulator::pose::quietNaNLaneletPose();
-    }
-
-    static auto makeNativeRelativeLanePosition(
-      const std::string & from_entity_name, const NativeLanePosition & to_lanelet_pose,
-      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
-      -> traffic_simulator::LaneletPose
-    {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      if (core->isEntitySpawned(from_entity_name)) {
-        if (
-          const auto relative_lanelet_pose =
-            core->relativeLaneletPose(from_entity_name, to_lanelet_pose, allow_lane_change)) {
-          return relative_lanelet_pose.value();
-        }
-      }
-      return traffic_simulator::pose::quietNaNLaneletPose();
-    }
-
-    static auto makeNativeBoundingBoxRelativeLanePosition(
-      const std::string & from_entity_name, const std::string & to_entity_name,
-      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
-    {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      if (core->isEntitySpawned(from_entity_name) && core->isEntitySpawned(to_entity_name)) {
-        if (
-          const auto relative_pose = core->boundingBoxRelativeLaneletPose(
-            from_entity_name, to_entity_name, allow_lane_change)) {
-          return relative_pose.value();
-        }
-      }
-      return traffic_simulator::pose::quietNaNLaneletPose();
-    }
-
-    static auto makeNativeBoundingBoxRelativeLanePosition(
-      const std::string & from_entity_name, const NativeLanePosition & to_lanelet_pose,
-      const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
-    {
-      const bool allow_lane_change = (routing_algorithm == RoutingAlgorithm::value_type::shortest);
-      if (core->isEntitySpawned(from_entity_name)) {
-        if (
-          const auto relative_pose = core->boundingBoxRelativeLaneletPose(
-            from_entity_name, to_lanelet_pose, allow_lane_change)) {
-          return relative_pose.value();
-        }
-      }
-      return traffic_simulator::pose::quietNaNLaneletPose();
-    }
-
-    static auto makeNativeBoundingBoxRelativeWorldPosition(
-      const std::string & from_entity_name, const std::string & to_entity_name)
-    {
-      if (core->isEntitySpawned(from_entity_name) && core->isEntitySpawned(to_entity_name)) {
-        if (
-          const auto relative_pose =
-            core->boundingBoxRelativePose(from_entity_name, to_entity_name)) {
-          return relative_pose.value();
-        }
-      }
-      return traffic_simulator::pose::quietNaNPose();
-    }
-
-    static auto makeNativeBoundingBoxRelativeWorldPosition(
-      const std::string & from_entity_name, const NativeWorldPosition & to_map_pose)
-    {
-      if (core->isEntitySpawned(from_entity_name)) {
-        if (
-          const auto relative_pose = core->boundingBoxRelativePose(from_entity_name, to_map_pose)) {
           return relative_pose.value();
         }
       }
