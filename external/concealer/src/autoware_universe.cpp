@@ -40,8 +40,12 @@ AutowareUniverse::AutowareUniverse()
         current_control_mode.store(ControlModeReport::AUTONOMOUS);
         response->success = true;
       } else if (request->mode == ControlModeCommand::Request::MANUAL) {
-        current_control_mode.store(ControlModeReport::MANUAL);
-        response->success = true;
+        /*
+          NOTE:
+            This will be used when a remote override is triggered.
+            But scenario_simulator_v2 don't support a remote override for now.
+        */
+        response->success = false;
       } else {
         response->success = false;
       }
