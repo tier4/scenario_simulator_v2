@@ -333,6 +333,16 @@ public:
       }());
 
       if (controller.isAutoware()) {
+        core->attachImuSensor(entity_ref, [&]() {
+          simulation_api_schema::ImuSensorConfiguration configuration;
+          configuration.set_entity(entity_ref);
+          configuration.set_add_noise(false);
+          configuration.set_use_seed(true);
+          configuration.set_seed(0);
+          configuration.set_noise_standard_deviation(0.01);
+          return configuration;
+        }());
+
         core->attachLidarSensor(
           entity_ref, controller.properties.template get<Double>("pointcloudPublishingDelay"));
 

@@ -251,6 +251,10 @@ public:
 
   std::optional<double> getTimeHeadway(const std::string & from, const std::string & to);
 
+  auto attachImuSensor(
+    const std::string &, const simulation_api_schema::ImuSensorConfiguration & configuration)
+    -> bool;
+
   bool attachPseudoTrafficLightDetector(
     const simulation_api_schema::PseudoTrafficLightDetectorConfiguration &);
 
