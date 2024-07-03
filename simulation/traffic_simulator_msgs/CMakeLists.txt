@@ -26,6 +26,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   msg/Performance.msg
   msg/Polyline.msg
   msg/PolylineTrajectory.msg
+  msg/TrafficLightArrayV1.msg
+  msg/TrafficLightBulbV1.msg
+  msg/TrafficLightV1.msg
   msg/VehicleParameters.msg
   msg/Vertex.msg
   msg/WaypointsArray.msg
