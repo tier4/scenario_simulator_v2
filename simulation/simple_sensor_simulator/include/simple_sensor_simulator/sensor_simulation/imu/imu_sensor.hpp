@@ -31,9 +31,9 @@ class ImuSensorBase
 {
 public:
   explicit ImuSensorBase(const simulation_api_schema::ImuSensorConfiguration & configuration)
-  : entity_name_(configuration.entity()),
+  : add_gravity_(configuration.add_gravity()),
     add_noise_(configuration.add_noise()),
-    noise_standard_deviation_(configuration.noise_standard_deviation()),
+    noise_standard_deviation_(add_noise_ ? configuration.noise_standard_deviation() : 0.0),
     random_generator_(configuration.use_seed() ? configuration.seed() : std::random_device{}()),
     noise_distribution_(0.0, noise_standard_deviation_)
   {
@@ -46,7 +46,7 @@ public:
     const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> bool = 0;
 
 protected:
-  const std::string entity_name_;
+  const bool add_gravity_;
   const bool add_noise_;
   const double noise_standard_deviation_;
   mutable std::mt19937 random_generator_;
@@ -60,13 +60,13 @@ public:
   explicit ImuSensor(
     const simulation_api_schema::ImuSensorConfiguration & configuration,
     const typename rclcpp::Publisher<MessageType>::SharedPtr & publisher)
-  : ImuSensorBase(configuration), publisher_(publisher)
+  : ImuSensorBase(configuration), entity_name_(configuration.entity()), publisher_(publisher)
   {
   }
 
   auto update(
     const rclcpp::Time & current_ros_time,
-    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> bool
+    const std::vector<traffic_simulator_msgs::EntityStatus> & statuses) const -> bool override
   {
     for (const auto & status : statuses) {
       if (status.name() == entity_name_) {
@@ -82,9 +82,10 @@ public:
 private:
   auto generateMessage(
     const rclcpp::Time & current_ros_time,
-    const traffic_simulator_msgs::msg::EntityStatus & status) const -> const sensor_msgs::msg::Imu;
+    const traffic_simulator_msgs::msg::EntityStatus & status) const -> const MessageType;
 
-  const rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr publisher_;
+  const std::string entity_name_;
+  const typename rclcpp::Publisher<MessageType>::SharedPtr publisher_;
 };
 }  // namespace simple_sensor_simulator
 #endif  // SIMPLE_SENSOR_SIMULATOR__SENSOR_SIMULATION__IMU_SENSOR_HPP_

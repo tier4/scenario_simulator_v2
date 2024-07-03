@@ -38,10 +38,11 @@ message PseudoTrafficLightDetectorConfiguration {
  **/
  message ImuSensorConfiguration {
   string entity = 1;                   // Name of the entity which you want to attach imu.
-  bool add_noise = 2;
-  bool use_seed = 3;
-  int32 seed = 4;
-  double noise_standard_deviation = 5;
+  bool add_gravity = 2;                // If true, gravity will be added to the acceleration vector
+  bool add_noise = 3;                  // If true, noise will be added to every vector published
+  bool use_seed = 4;                   // If true, as seed will be used the passed value, if not it will be random
+  int32 seed = 5;                      // Seed for random number generator
+  double noise_standard_deviation = 6; // Standard deviation for noise (normal distribution, mean equal to 0.0)
 }
 
 /**
