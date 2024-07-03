@@ -200,4 +200,14 @@ auto AutowareUniverse::getControlModeReport() const
   message.mode = current_control_mode.load();
   return message;
 }
+
+auto AutowareUniverse::setAutonomousMode() -> void
+{
+  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::AUTONOMOUS);
+}
+
+auto AutowareUniverse::setManualMode() -> void
+{
+  current_control_mode.store(autoware_auto_vehicle_msgs::msg::ControlModeReport::MANUAL);
+}
 }  // namespace concealer

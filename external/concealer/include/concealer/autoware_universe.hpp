@@ -100,6 +100,10 @@ public:
   auto getRouteLanelets() const -> std::vector<std::int64_t>;
 
   auto getControlModeReport() const -> autoware_auto_vehicle_msgs::msg::ControlModeReport override;
+
+  auto setAutonomousMode() -> void override;
+
+  auto setManualMode() -> void override;
 };
 
 }  // namespace concealer
