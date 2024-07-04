@@ -16,6 +16,42 @@ Changelog for package embree_vendor
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.4.0 (2024-07-01)
+------------------
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Contributors: Kotaro Yoshimoto
+
+2.3.0 (2024-06-28)
+------------------
+* Merge branch 'master' into feature/synchronized_action
+* Merge commit 'c50d79fce98242d76671360029b97c166412e76f' into feature/synchronized_action
+* Merge remote-tracking branch 'origin/master' into feature/synchronized_action
+* Merge commit 'bf6a962e14e3e85627fca226574120cdba30080e' into feature/synchronized_action
+* Merge commit 'bd366bce147e65d5991b62db333cf35153dd96fb' into feature/synchronized_action
+* Merge commit 'b03fd92759845935be79f7ac32366848c78a2a66' into feature/synchronized_action
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/synchronized_action
+* Merge commit '45d42a79d92c370387749ad16c10665deb42e02c' into feature/synchronized_action
+* Merge branch 'master' into feature/synchronized_action
+* Merge commit '1ceb05c7206e163eb8214ceb68f5e35e7880d7a4' into feature/synchronized_action
+* Merge commit 'f74901b45bbec4b3feb288c4ad86491de642f5ca' into feature/synchronized_action
+* Merge commit '8a9b141aaf6cf5a58f537781a47f66e4c305cea3' into feature/synchronized_action
+* Merge branch 'master' into feature/synchronized_action
+* Merge commit '27266909414686613cea4f9aa17162d33ecf4668' into feature/synchronized_action
+* Merge commit 'ada77d59ffd6545105e40e88e4ad50050062a3d6' into feature/synchronized_action
+* Contributors: Masaya Kataoka, hakuturu583, koki suzuki
+
+2.2.2 (2024-06-28)
+------------------
+
+2.2.1 (2024-06-27)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/issue1276-re
+* Contributors: Masaya Kataoka
+
 2.2.0 (2024-06-24)
 ------------------
 * Merge branch 'master' into feature/clear_route_api
