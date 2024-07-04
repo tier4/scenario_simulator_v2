@@ -53,7 +53,7 @@ class AutowareUniverse : public Autoware
   // clang-format on
 
   rclcpp::Service<autoware_auto_vehicle_msgs::srv::ControlModeCommand>::SharedPtr
-    controlModeRequestService;
+    control_mode_request_server;
 
   const rclcpp::TimerBase::SharedPtr localization_update_timer;
 

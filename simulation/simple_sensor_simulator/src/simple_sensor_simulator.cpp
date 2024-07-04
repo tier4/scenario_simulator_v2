@@ -167,11 +167,6 @@ auto ScenarioSimulator::updateEntityStatus(
             ego_status_msg, current_scenario_time_ + step_time_, step_time_,
             req.npc_logic_started());
         } else {
-          /*
-            NOTE:
-              Do not set autonomous mode here,
-              because the recovery from the override is made via an API call from Autoware.
-           */
           ego_entity_simulation_->update(
             current_scenario_time_ + step_time_, step_time_, req.npc_logic_started());
         }

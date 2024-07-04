@@ -30,7 +30,7 @@ AutowareUniverse::AutowareUniverse()
   setControlModeReport("/vehicle/status/control_mode", *this),
   setVelocityReport("/vehicle/status/velocity_status", *this),
   setTurnIndicatorsReport("/vehicle/status/turn_indicators_status", *this),
-  controlModeRequestService(create_service<ControlModeCommand>(
+  control_mode_request_server(create_service<ControlModeCommand>(
     "/control/control_mode_request",
     [this](
       const ControlModeCommand::Request::SharedPtr request,
@@ -42,7 +42,7 @@ AutowareUniverse::AutowareUniverse()
       } else if (request->mode == ControlModeCommand::Request::MANUAL) {
         /*
           NOTE:
-            This will be used when a remote override is triggered.
+            MANUAL request will come when a remote override is triggered.
             But scenario_simulator_v2 don't support a remote override for now.
         */
         response->success = false;
