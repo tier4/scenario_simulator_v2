@@ -490,8 +490,7 @@ void toMsg(const std_msgs::Header & proto, std_msgs::msg::Header & header)
 }
 
 void toProto(
-  const autoware_control_msgs::msg::Lateral & message,
-  autoware_control_msgs::Lateral & proto)
+  const autoware_control_msgs::msg::Lateral & message, autoware_control_msgs::Lateral & proto)
 {
   toProto(message.stamp, *proto.mutable_stamp());
   proto.set_steering_tire_angle(message.steering_tire_angle);
@@ -499,8 +498,7 @@ void toProto(
 }
 
 void toMsg(
-  const autoware_control_msgs::Lateral & proto,
-  autoware_control_msgs::msg::Lateral & message)
+  const autoware_control_msgs::Lateral & proto, autoware_control_msgs::msg::Lateral & message)
 {
   toMsg(proto.stamp(), message.stamp);
   message.steering_tire_angle = proto.steering_tire_angle();
@@ -528,8 +526,7 @@ void toMsg(
 }
 
 void toProto(
-  const autoware_control_msgs::msg::Control & message,
-  autoware_control_msgs::Control & proto)
+  const autoware_control_msgs::msg::Control & message, autoware_control_msgs::Control & proto)
 {
   toProto(message.stamp, *proto.mutable_stamp());
   toProto(message.lateral, *proto.mutable_lateral());
@@ -537,8 +534,7 @@ void toProto(
 }
 
 void toMsg(
-  const autoware_control_msgs::Control & proto,
-  autoware_control_msgs::msg::Control & message)
+  const autoware_control_msgs::Control & proto, autoware_control_msgs::msg::Control & message)
 {
   toMsg(proto.stamp(), message.stamp);
   toMsg(proto.lateral(), message.lateral);
@@ -551,7 +547,7 @@ auto toProto(
 {
   toProto(message.stamp, *proto.mutable_stamp());
 
-#define CASE(NAME)                                                              \
+#define CASE(NAME)                                                         \
   case autoware_vehicle_msgs::msg::GearCommand::NAME:                      \
     proto.set_command(autoware_vehicle_msgs::GearCommand_Constants::NAME); \
     break
@@ -594,9 +590,8 @@ auto toMsg(
 }
 
 auto toProto(
-  const std::tuple<
-    autoware_control_msgs::msg::Control,
-    autoware_vehicle_msgs::msg::GearCommand> & message,
+  const std::tuple<autoware_control_msgs::msg::Control, autoware_vehicle_msgs::msg::GearCommand> &
+    message,
   traffic_simulator_msgs::VehicleCommand & proto) -> void
 {
   toProto(std::get<0>(message), *proto.mutable_control());

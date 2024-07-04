@@ -250,8 +250,7 @@ struct DefaultNoiseApplicator
 
   auto operator=(DefaultNoiseApplicator &&) = delete;
 
-  auto operator()(autoware_perception_msgs::msg::DetectedObjects detected_objects)
-    -> decltype(auto)
+  auto operator()(autoware_perception_msgs::msg::DetectedObjects detected_objects) -> decltype(auto)
   {
     auto position_noise_distribution =
       std::normal_distribution<>(0.0, detection_sensor_configuration.pos_noise_stddev());
@@ -330,8 +329,7 @@ auto DetectionSensor<autoware_perception_msgs::msg::DetectedObjects>::update(
 
     for (const auto & status : statuses) {
       if (is_in_range(status)) {
-        const auto detected_object =
-          make<autoware_perception_msgs::msg::DetectedObject>(status);
+        const auto detected_object = make<autoware_perception_msgs::msg::DetectedObject>(status);
         detected_objects.objects.push_back(detected_object);
         ground_truth_objects.objects.push_back(
           make<autoware_perception_msgs::msg::TrackedObject>(status, detected_object));
