@@ -112,7 +112,7 @@ auto EgoEntity::getGoalPoses() -> std::vector<CanonicalizedLaneletPose>
           field_operator_application.get());
       universe) {
     lanelet_pose.push_back(traffic_simulator::pose::toLaneletPose(
-                             universe->getAWMissionRoute().goal_pose, false, hdmap_utils_ptr_)
+                             universe->getAutowareMissionRoute().goal_pose, false, hdmap_utils_ptr_)
                              .value());
   }
   return lanelet_pose;

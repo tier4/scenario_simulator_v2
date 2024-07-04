@@ -42,7 +42,7 @@ class AutowareUniverse : public Autoware
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::GearCommand,             ThreadSafety::safe> getGearCommandImpl;
   SubscriberWrapper<autoware_auto_vehicle_msgs::msg::TurnIndicatorsCommand,   ThreadSafety::safe> getTurnIndicatorsCommand;
   SubscriberWrapper<autoware_auto_planning_msgs::msg::PathWithLaneId,         ThreadSafety::safe> getPathWithLaneId;
-  SubscriberWrapper<autoware_planning_msgs::msg::LaneletRoute,                ThreadSafety::safe> getAWMissionRoute;
+  SubscriberWrapper<autoware_planning_msgs::msg::LaneletRoute,                ThreadSafety::safe> getAutowareMissionRoute;
 
 
   PublisherWrapper<geometry_msgs::msg::AccelWithCovarianceStamped>        setAcceleration;
