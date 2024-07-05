@@ -57,9 +57,7 @@ auto RelativeSpeedCondition::evaluate(
   const EntityRef & triggering_entity, const EntityRef & entity_ref, const Entities * entities,
   const std::optional<DirectionalDimension> & direction) -> double
 {
-  if (
-    entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    entities->at(entity_ref).as<ScenarioObject>().is_added) {
+  if (entities->isAdded(triggering_entity) and entities->isAdded(entity_ref)) {
     if (const auto v = evaluateRelativeSpeed(triggering_entity, entity_ref); direction) {
       switch (*direction) {
         case DirectionalDimension::longitudinal:

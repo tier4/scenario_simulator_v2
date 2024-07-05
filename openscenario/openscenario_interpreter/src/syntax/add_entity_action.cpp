@@ -47,7 +47,7 @@ auto AddEntityAction::endsImmediately() noexcept -> bool  //
 
 auto AddEntityAction::operator()(const EntityRef & entity_ref) const -> void
 try {
-  const auto entity = global().entities->at(entity_ref);
+  const auto entity = global().entities->ref(entity_ref);
 
   const auto add_entity = overload(
     [&](const Vehicle & vehicle) {

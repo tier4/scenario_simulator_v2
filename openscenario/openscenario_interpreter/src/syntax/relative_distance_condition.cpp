@@ -321,9 +321,7 @@ auto RelativeDistanceCondition::evaluate(
   CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
   RoutingAlgorithm routing_algorithm, bool freespace) -> double
 {
-  if (
-    entities->at(triggering_entity).as<ScenarioObject>().is_added and
-    entities->at(entity_ref).as<ScenarioObject>().is_added) {
+  if (entities->isAdded(triggering_entity) and entities->isAdded(entity_ref)) {
     SWITCH_COORDINATE_SYSTEM(
       SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
   } else {
