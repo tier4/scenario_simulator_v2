@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/speed_action.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 
 namespace openscenario_interpreter
 {
@@ -45,19 +46,22 @@ auto SpeedAction::accomplished() -> bool
   auto check = [this](auto && actor) {
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       return equal_to<double>()(
-        speed_action_target.as<AbsoluteTargetSpeed>().value, evaluateSpeed(actor));
+        speed_action_target.as<AbsoluteTargetSpeed>().value,
+        SpeedCondition::evaluate(actor, global().entities));
     } else {
       switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
         case SpeedTargetValueType::delta:
           return equal_to<double>()(
-            evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
+            SpeedCondition::evaluate(
+              speed_action_target.as<RelativeTargetSpeed>().entity_ref, global().entities) +
               speed_action_target.as<RelativeTargetSpeed>().value,
-            evaluateSpeed(actor));
+            SpeedCondition::evaluate(actor, global().entities));
         case SpeedTargetValueType::factor:
           return equal_to<double>()(
-            evaluateSpeed(speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
+            SpeedCondition::evaluate(
+              speed_action_target.as<RelativeTargetSpeed>().entity_ref, global().entities) *
               speed_action_target.as<RelativeTargetSpeed>().value,
-            evaluateSpeed(actor));
+            SpeedCondition::evaluate(actor, global().entities));
         default:
           return false;
       }

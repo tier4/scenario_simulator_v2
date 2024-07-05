@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <geometry/vector3/norm.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/simulator_core.hpp>
@@ -27,10 +28,11 @@ inline namespace syntax
 SpeedCondition::SpeedCondition(
   const pugi::xml_node & node, Scope & scope, const TriggeringEntities & triggering_entities)
 : Scope(scope),
+  rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
-  compare(readAttribute<Rule>("rule", node, scope)),
+  direction(readAttribute<DirectionalDimension>("direction", node, scope, std::nullopt)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  evaluations(triggering_entities.entity_refs.size(), Double::nan())
 {
 }
 
@@ -40,18 +42,32 @@ auto SpeedCondition::description() const -> String
 
   description << triggering_entities.description() << "'s speed = ";
 
-  print_to(description, results);
+  print_to(description, evaluations);
 
-  description << " " << compare << " " << value << "?";
+  description << " " << rule << " " << value << "?";
 
   return description.str();
 }
 
-auto SpeedCondition::evaluate(const EntityRef & triggering_entity, const Entities * entities)
-  -> double
+auto SpeedCondition::evaluate(
+  const EntityRef & triggering_entity, const Entities * entities,
+  const std::optional<DirectionalDimension> & direction) -> double
 {
-  if (entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
-    return evaluateSpeed(triggering_entity);
+  if (entities->isAdded(triggering_entity)) {
+    if (const auto v = evaluateSpeed(triggering_entity); direction) {
+      switch (*direction) {
+        case DirectionalDimension::longitudinal:
+          return v.x;
+        case DirectionalDimension::lateral:
+          return v.y;
+        case DirectionalDimension::vertical:
+          return v.z;
+        default:
+          return math::geometry::norm(v);
+      }
+    } else {
+      return math::geometry::norm(v);
+    }
   } else {
     return Double::nan();
   }
@@ -59,11 +75,11 @@ auto SpeedCondition::evaluate(const EntityRef & triggering_entity, const Entitie
 
 auto SpeedCondition::evaluate() -> Object
 {
-  results.clear();
+  evaluations.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    results.push_back(evaluate(triggering_entity, global().entities));
-    return compare(results.back(), value);
+    evaluations.push_back(evaluate(triggering_entity, global().entities));
+    return std::invoke(rule, evaluations.back(), value);
   }));
 }
 }  // namespace syntax

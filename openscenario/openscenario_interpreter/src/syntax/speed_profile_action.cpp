@@ -15,6 +15,7 @@
 #include <openscenario_interpreter/functional/equal_to.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/speed_condition.hpp>
 #include <openscenario_interpreter/syntax/speed_profile_action.hpp>
 
 namespace openscenario_interpreter
@@ -100,10 +101,12 @@ auto SpeedProfileAction::run() -> void
   for (auto && [actor, iter] : accomplishments) {
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
       if (entity_ref.empty()) {
-        return equal_to<double>()(evaluateSpeed(actor), speed_profile_entry.speed);
+        return equal_to<double>()(
+          SpeedCondition::evaluate(actor, global().entities), speed_profile_entry.speed);
       } else {
         return equal_to<double>()(
-          evaluateSpeed(actor), speed_profile_entry.speed + evaluateSpeed(entity_ref));
+          SpeedCondition::evaluate(actor, global().entities),
+          speed_profile_entry.speed + SpeedCondition::evaluate(entity_ref, global().entities));
       }
     };
 

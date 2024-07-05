@@ -507,7 +507,7 @@ public:
     template <typename... Ts>
     static auto evaluateSpeed(Ts &&... xs)
     {
-      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear.x;
+      return core->getCurrentTwist(std::forward<decltype(xs)>(xs)...).linear;
     }
 
     template <typename... Ts>
