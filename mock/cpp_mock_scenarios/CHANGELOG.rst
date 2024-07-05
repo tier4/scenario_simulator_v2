@@ -13,6 +13,14 @@ Changelog for package cpp_mock_scenarios
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.4.1 (2024-07-05)
+------------------
+* Merge pull request `#1307 <https://github.com/tier4/scenario_simulator_v2/issues/1307>`_ from tier4/hakuturu583/fix/remove/stl_comment
+  Remove incorrect comment `// headers in STL`
+* apply reformat
+* Remove incorrect comment `// headers in STL`
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
 2.4.0 (2024-07-01)
 ------------------
 * Merge branch 'master' into feature/traffic_light_for_evaluator
