@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <openscenario_interpreter/cmath/hypot.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
@@ -103,18 +104,6 @@ auto RelativeDistanceCondition::distance<
   */
   return std::abs(
     makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y);
-}
-
-// @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x, y, z)
-auto hypot(double x, double y, double z)
-{
-  static auto consider_z = []() {
-    auto node = rclcpp::Node("get_parameter", "simulation");
-    node.declare_parameter("consider_pose_by_road_slope", false);
-    return node.get_parameter("consider_pose_by_road_slope").as_bool();
-  }();
-
-  return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
 }
 
 template <>

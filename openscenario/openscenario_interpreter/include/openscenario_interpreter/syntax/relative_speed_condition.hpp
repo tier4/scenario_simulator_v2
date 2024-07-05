@@ -74,7 +74,7 @@ struct RelativeSpeedCondition : private Scope, private SimulatorCore::ConditionE
 
   static auto evaluate(
     const EntityRef &, const EntityRef &, const Entities *,
-    const std::optional<DirectionalDimension> &) -> double;
+    const std::optional<DirectionalDimension> & = std::nullopt) -> double;
 
   auto evaluate() -> Object;
 };

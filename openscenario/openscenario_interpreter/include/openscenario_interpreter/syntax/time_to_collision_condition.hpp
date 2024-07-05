@@ -135,7 +135,7 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
                       << ", RELATIVE SPEED = "
                       << RelativeSpeedCondition::evaluate(
                            triggering_entity, time_to_collision_condition_target.as<EntityRef>(),
-                           global().entities, std::nullopt)
+                           global().entities)
                       << std::endl;
           } else {
             std::cerr << "DISTANCE = "

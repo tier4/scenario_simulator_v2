@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <cmath>
+#include <openscenario_interpreter/cmath/hypot.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
@@ -130,21 +130,10 @@ auto DistanceCondition::evaluate(
   if (entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
     SWITCH_COORDINATE_SYSTEM(
       SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
+    return Double::nan();
   } else {
     return Double::nan();
   }
-}
-
-// @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x,y,z)
-static auto hypot(const double x, const double y, const double z)
-{
-  static auto consider_z = []() {
-    auto node = rclcpp::Node("get_parameter", "simulation");
-    node.declare_parameter("consider_pose_by_road_slope", false);
-    return node.get_parameter("consider_pose_by_road_slope").as_bool();
-  }();
-
-  return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
 }
 
 template <>
