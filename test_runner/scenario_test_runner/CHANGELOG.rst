@@ -23,6 +23,9 @@ Changelog for package scenario_test_runner
 * refactor: delete workflow.Workflow and rename workflow.py to scenario.py
 * Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki
 
+2.4.1 (2024-07-05)
+------------------
+
 2.4.0 (2024-07-01)
 ------------------
 * Merge branch 'master' into feature/traffic_light_for_evaluator
