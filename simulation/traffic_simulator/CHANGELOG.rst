@@ -13,6 +13,9 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.4.1 (2024-07-05)
+------------------
+
 2.4.0 (2024-07-01)
 ------------------
 * Merge pull request `#1262 <https://github.com/tier4/scenario_simulator_v2/issues/1262>`_ from tier4/feature/traffic_light_for_evaluator

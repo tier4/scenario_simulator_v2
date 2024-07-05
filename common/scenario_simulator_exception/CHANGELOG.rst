@@ -13,6 +13,9 @@ Changelog for package scenario_simulator_exception
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.4.1 (2024-07-05)
+------------------
+
 2.4.0 (2024-07-01)
 ------------------
 * Merge branch 'master' into feature/traffic_light_for_evaluator
