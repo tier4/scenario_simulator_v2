@@ -130,8 +130,13 @@ jobs:
           name: ${{ steps.new_version.outputs.new_version }}
           body: ${{ steps.get_release_description.outputs.stdout }}
 
-      - name: Delete branch
+      - name: Delete branch if merged
         if: github.event.pull_request.merged == true
-        uses: SvanBoxel/delete-merged-branch@main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.deleteRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `heads/${context.payload.pull_request.head.ref}`,
+            })
