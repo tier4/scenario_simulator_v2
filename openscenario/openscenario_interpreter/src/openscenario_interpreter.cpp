@@ -277,7 +277,7 @@ auto Interpreter::publishCurrentContext() const -> void
     nlohmann::json json;
     context.stamp = now();
     if (publish_empty_context) {
-      context.data = "{}";
+      context.data = "";
     } else {
       context.data = (json << *script).dump();
     }
