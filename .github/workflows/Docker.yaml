@@ -52,7 +52,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push (${{ matrix.arch }})
+      - name: Build (${{ matrix.arch }})
         uses: docker/bake-action@v3
         with:
           files: |
@@ -61,6 +61,6 @@ jobs:
           set: |
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
-          push: ${{ github.event_name != 'pull_request' && matrix.arch == 'amd64' }}
+          push: false
           targets: |
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
