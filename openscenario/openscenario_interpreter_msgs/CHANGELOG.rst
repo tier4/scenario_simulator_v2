@@ -13,6 +13,9 @@ Changelog for package openscenario_interpreter_msgs
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.4.2 (2024-07-08)
+------------------
+
 2.4.1 (2024-07-05)
 ------------------
 
