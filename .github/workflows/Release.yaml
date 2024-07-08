@@ -184,6 +184,7 @@ jobs:
           set: |
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble_${{ steps.new_version.outputs.new_version }}
           push: true
           targets: |
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
