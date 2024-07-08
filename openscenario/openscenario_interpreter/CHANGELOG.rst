@@ -32,6 +32,25 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+2.6.0 (2024-07-08)
+------------------
+* Bump version of scenario_simulator_v2 from version 2.4.2 to version 2.5.0
+* Merge pull request `#1305 <https://github.com/tier4/scenario_simulator_v2/issues/1305>`_ from tier4/feature/publish_empty_context
+  Feature/publish empty context
+* Merge remote-tracking branch 'origin/feature/publish_empty_context' into feature/publish_empty_context
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* change context from emtpy json to empty string
+* sort GET_PARAMETER
+* sort member values
+* sort DECLARE_PARAMETER in lexicographical order
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* add GET_PARAMETER line
+* Enable publish empty json "{}"
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* add publish_empty_context parameter
+* Contributors: Masaya Kataoka, Release Bot
+
 2.4.2 (2024-07-08)
 ------------------
 
