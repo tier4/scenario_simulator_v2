@@ -13,6 +13,119 @@ Changelog for package status_monitor
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.5.0 (2024-07-08)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Contributors: Masaya Kataoka
+
+2.6.0 (2024-07-08)
+------------------
+* Bump version of scenario_simulator_v2 from version 2.4.2 to version 2.5.0
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Contributors: Masaya Kataoka, Release Bot
+
+2.4.2 (2024-07-08)
+------------------
+
+2.4.1 (2024-07-05)
+------------------
+
+2.4.0 (2024-07-01)
+------------------
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Contributors: Kotaro Yoshimoto
+
+2.3.0 (2024-06-28)
+------------------
+* Merge branch 'master' into feature/synchronized_action
+* Merge commit 'c50d79fce98242d76671360029b97c166412e76f' into feature/synchronized_action
+* Merge remote-tracking branch 'origin/master' into feature/synchronized_action
+* Merge commit 'bf6a962e14e3e85627fca226574120cdba30080e' into feature/synchronized_action
+* Merge commit 'bd366bce147e65d5991b62db333cf35153dd96fb' into feature/synchronized_action
+* Merge commit 'b03fd92759845935be79f7ac32366848c78a2a66' into feature/synchronized_action
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/synchronized_action
+* Merge commit '45d42a79d92c370387749ad16c10665deb42e02c' into feature/synchronized_action
+* Merge branch 'master' into feature/synchronized_action
+* Merge commit '1ceb05c7206e163eb8214ceb68f5e35e7880d7a4' into feature/synchronized_action
+* Merge commit 'f74901b45bbec4b3feb288c4ad86491de642f5ca' into feature/synchronized_action
+* Merge commit '8a9b141aaf6cf5a58f537781a47f66e4c305cea3' into feature/synchronized_action
+* Merge branch 'master' into feature/synchronized_action
+* Merge commit '27266909414686613cea4f9aa17162d33ecf4668' into feature/synchronized_action
+* Merge commit 'ada77d59ffd6545105e40e88e4ad50050062a3d6' into feature/synchronized_action
+* Merge commit '253fa785573217ad3a6bde882724a9e35a0c99ed' into feature/synchronized_action
+* Contributors: Masaya Kataoka, hakuturu583, koki suzuki
+
+2.2.2 (2024-06-28)
+------------------
+
+2.2.1 (2024-06-27)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/issue1276-re
+* Contributors: Masaya Kataoka
+
+2.2.0 (2024-06-24)
+------------------
+* Merge branch 'master' into feature/clear_route_api
+* Merge remote-tracking branch 'origin/master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* Contributors: Masaya Kataoka, Taiga
+
+2.1.11 (2024-06-24)
+-------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* resolve merge confilct
+* resolve merge
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* Contributors: robomic
+
+2.1.10 (2024-06-24)
+-------------------
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/misc_object_entity
+* Contributors: robomic
+
+2.1.9 (2024-06-24)
+------------------
+
+2.1.8 (2024-06-20)
+------------------
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
+2.1.7 (2024-06-19)
+------------------
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Contributors: Masaya Kataoka, Mateusz Palczuk
+
+2.1.6 (2024-06-18)
+------------------
+
+2.1.5 (2024-06-18)
+------------------
+
+2.1.4 (2024-06-14)
+------------------
+* Merge branch 'master' into fix/remove_quaternion_operation
+* Merge branch 'master' into fix/remove_quaternion_operation
+* Contributors: Masaya Kataoka
+
+2.1.3 (2024-06-14)
+------------------
+* Merge branch 'master' into fix/issue1276
+* Contributors: Masaya Kataoka
+
 2.1.2 (2024-06-13)
 ------------------
 * Merge branch 'master' into fix/interpreter/fault-injection-action

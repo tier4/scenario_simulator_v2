@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <memory>
 #include <string>
@@ -192,6 +190,16 @@ void PedestrianEntity::setBehaviorParameter(
   const traffic_simulator_msgs::msg::BehaviorParameter & behavior_parameter)
 {
   behavior_plugin_ptr_->setBehaviorParameter(behavior_parameter);
+}
+
+auto PedestrianEntity::getMaxAcceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_acceleration;
+}
+
+auto PedestrianEntity::getMaxDeceleration() const -> double
+{
+  return getBehaviorParameter().dynamic_constraints.max_deceleration;
 }
 
 void PedestrianEntity::setVelocityLimit(double linear_velocity)

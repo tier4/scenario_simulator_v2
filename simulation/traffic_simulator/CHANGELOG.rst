@@ -13,6 +13,261 @@ Changelog for package traffic_simulator
 * Merge branch 'master' into refactor/drop_workflow
 * Contributors: Kotaro Yoshimoto
 
+2.5.0 (2024-07-08)
+------------------
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Contributors: Masaya Kataoka
+
+2.6.0 (2024-07-08)
+------------------
+* Bump version of scenario_simulator_v2 from version 2.4.2 to version 2.5.0
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge branch 'master' into feature/publish_empty_context
+* Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
+* Contributors: Masaya Kataoka, Release Bot
+
+2.4.2 (2024-07-08)
+------------------
+
+2.4.1 (2024-07-05)
+------------------
+
+2.4.0 (2024-07-01)
+------------------
+* Merge pull request `#1262 <https://github.com/tier4/scenario_simulator_v2/issues/1262>`_ from tier4/feature/traffic_light_for_evaluator
+  Add traffic light publisher for external services
+* refactor: delete unused dependencies for tarffic_simulator
+* feat: use traffic_simulator_msgs for traffic light
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* refactor: use const ref
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* Merge branch 'master' into feature/traffic_light_for_evaluator
+* chore: use conditional compilation implementation in the absence of TrafficLightArrayV1
+* feat: integrate TrafficLightPublisher for evaluator to EntityManager
+* feat: implement TrafficLightPublisher specialization for tier4_simulation_msgs
+* Contributors: Kotaro Yoshimoto
+
+2.3.0 (2024-06-28)
+------------------
+* Merge pull request `#1234 <https://github.com/tier4/scenario_simulator_v2/issues/1234>`_ from tier4/feature/synchronized_action
+  Feature/synchronized action
+* Merge branch 'master' into feature/synchronized_action
+* chore: format miss
+* chore: Update requestSynchronize function parameter name for clarity
+* Update requestSynchronize function and added new test scenario.
+* chore: Update requestSynchronize function to fix border distance calculation
+* chore: Update requestSynchronize function to fix border distance calculation
+* chore: Update requestSynchronize function signature to include target_speed parameter
+* Merge commit 'c50d79fce98242d76671360029b97c166412e76f' into feature/synchronized_action
+* Merge remote-tracking branch 'origin/master' into feature/synchronized_action
+* Merge commit 'bf6a962e14e3e85627fca226574120cdba30080e' into feature/synchronized_action
+* removed comment
+* Merge commit 'bd366bce147e65d5991b62db333cf35153dd96fb' into feature/synchronized_action
+* Remove unused function and update step time in EntityBase
+* Add synchronized_action subdirectory and change return type of keepStepTime function
+* Refactor requestSynchronize function and add keepStepTime function
+* Refactor requestSynchronize function signature
+* Merge commit 'b03fd92759845935be79f7ac32366848c78a2a66' into feature/synchronized_action
+* Fix synchronization bug in entity_base.cpp
+* add getMaxAcceleration/getMaxDeceleration function
+* fix reachPosition function
+* add EntityBase::reachPosition function
+* remvoe ReachPosition function
+* fix comment and bump version package
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into feature/synchronized_action
+* Fix typo in comment
+* Refactor entity_base.hpp and .cpp
+* Merge commit '45d42a79d92c370387749ad16c10665deb42e02c' into feature/synchronized_action
+* Merge branch 'master' into feature/synchronized_action
+* Update entity_base.hpp
+* refuctured code of synchronized action
+* Merge commit '1ceb05c7206e163eb8214ceb68f5e35e7880d7a4' into feature/synchronized_action
+* Fix requestLaneChange function signatures
+* Fix requestLaneChange function formatting
+* Merge commit 'f74901b45bbec4b3feb288c4ad86491de642f5ca' into feature/synchronized_action
+* Remove unused function reachPosition
+* Merge commit '8a9b141aaf6cf5a58f537781a47f66e4c305cea3' into feature/synchronized_action
+* Update package version and refactor reachPosition method
+* Refactor synchronization logic in EntityBase::requestSynchronize()
+* Update package version and fix const correctness in entity manager and entity base
+* Refactor entity_base.cpp to improve code readability
+* Remove unnecessary code and include statements
+* Merge branch 'master' into feature/synchronized_action
+* Fix distance margin typo and update comments in entity_base.cpp
+* added new line at the end of the code
+* Remove debug logging statements and update function names
+* Merge commit '27266909414686613cea4f9aa17162d33ecf4668' into feature/synchronized_action
+* Fix lanelet target pose in synchronized action
+* Merge commit 'ada77d59ffd6545105e40e88e4ad50050062a3d6' into feature/synchronized_action
+* Merge commit '253fa785573217ad3a6bde882724a9e35a0c99ed' into feature/synchronized_action
+* Update entity_base.hpp and synchronized_action.cpp
+* Update synchronized action behavior
+* Update entity synchronization logic to consider acceleration limit
+* Update target lanelet poses and velocities
+* 途中経過
+* Refactor synchronization logic and add new API method
+* Disable building of C++ mock scenarios and update requestSynchronize function
+* Add requestSynchronize method to API and EntityManager and few bug fix
+* tried to format
+* implemented atleast functions with no error
+* Fix synchronization issue in EntityBase class
+* Fix distance calculation in EntityBase::getDistanceToTargetLaneletPose()
+* error is not fixed but pushing today's implements
+* fixed revert and errors
+* Implemented a draft of getDistanceToTargetLaneletPose and requestSynchronize methods
+* changed the function and made it simple
+* Add draft functions for synchronized action
+* Contributors: Koki Suzuki, Masaya Kataoka, hakuturu583, koki suzuki
+
+2.2.2 (2024-06-28)
+------------------
+
+2.2.1 (2024-06-27)
+------------------
+* Merge pull request `#1293 <https://github.com/tier4/scenario_simulator_v2/issues/1293>`_ from tier4/fix/issue1276-re
+  Optimize entity frame computation.
+* Merge remote-tracking branch 'origin/master' into fix/issue1276-re
+* Optimize entity frame computation.
+* Contributors: Masaya Kataoka, Taiga Takano
+
+2.2.0 (2024-06-24)
+------------------
+* Merge pull request `#1292 <https://github.com/tier4/scenario_simulator_v2/issues/1292>`_ from tier4/feature/clear_route_api
+  add API::clearRoute()
+* Merge branch 'master' into feature/clear_route_api
+* Merge remote-tracking branch 'origin/master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* Merge branch 'master' into feature/clear_route_api
+* add API::clearRoute()
+* Contributors: Masaya Kataoka, Taiga, Taiga Takano
+
+2.1.11 (2024-06-24)
+-------------------
+* Merge pull request `#1287 <https://github.com/tier4/scenario_simulator_v2/issues/1287>`_ from tier4/feature/unit_tests/miscellaneous
+  Feature/unit tests/miscellaneous
+* resolve conflict
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* fix typo
+* remove unecessary assignment
+* add newlines
+* add copy of helper_functions, apply review requests
+* remove misc tests
+* resolve merge confilct
+* resolve merge
+* remove test list file
+* use test fixtures
+* rename literal
+* use test fixture
+* remove variables that are used only once
+* remove unnecesary checks
+* newlines
+* add tes descriptions
+* prepare notes for descriptions
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/miscellaneous
+* remove conversions tests
+* remove tests that exist in other branches and refactor wht is left
+* style
+* getDistanceToLeftLaneBound
+* getRouteLanelets_empty
+* simulation clock tests
+* entity_base tests
+* entity_base tests; code cleanup
+* EntityBase onUpdate. onPostUpdate tests
+* entity_base dummy class with a couple of tests
+* job accessor tests
+* make linter happy
+* job and job_list unit tests
+* behavior getRequestString
+* vertex, toPoints
+* traffic light bulb tests
+* traffic_light status shape color tests
+* traffic_simulator unit tests
+* Contributors: Masaya Kataoka, robomic
+
+2.1.10 (2024-06-24)
+-------------------
+* Merge pull request `#1286 <https://github.com/tier4/scenario_simulator_v2/issues/1286>`_ from tier4/feature/unit_tests/misc_object_entity
+  Feature/unit tests/misc object entity
+* resolve conflict
+* Merge branch 'master' of github.com:tier4/scenario_simulator_v2 into feature/unit_tests/misc_object_entity
+* internal review corrections
+* use better naming
+* merge tests into a singular file
+* clean up
+* add newline
+* rename file definition
+* use builder
+* remove variables used only once
+* make it work; some tests have been deleted
+* collect tests, will not compile
+* Contributors: Masaya Kataoka, robomic
+
+2.1.9 (2024-06-24)
+------------------
+
+2.1.8 (2024-06-20)
+------------------
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Merge branch 'master' into feature/simple_sensor_simulator_unit_test
+* Contributors: Kotaro Yoshimoto, SzymonParapura
+
+2.1.7 (2024-06-19)
+------------------
+* Merge pull request `#1275 <https://github.com/tier4/scenario_simulator_v2/issues/1275>`_ from tier4/feature/improve-ros-parameter-handling
+  Feature: improve ROS parameter handling
+* Convert parameterHandler class to free function getParameter used with parameters interface
+* getParameter -> getROS2Parameter
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Revert changes adding parameter checking
+  After thic change the code is functionally the same as in the beginning
+* Merge branch 'master' into feature/improve-ros-parameter-handling
+* Declare parameters before getting values
+* ref(ParameterManager): rename to NodeParameterHandler, improve
+* Make ParameterManager explicit
+* Remove getParameter from EntityManager
+* Remove getParameter from EgoEntity
+* Use ParameterManager in EgoEntity
+* Use const for getParameter
+* Add getParameter forwarding in API
+* Add ParameterManager to API
+* Move ParameterManager
+* Prototype ParameterManager
+* Contributors: Dawid Moszynski, Masaya Kataoka, Mateusz Palczuk
+
+2.1.6 (2024-06-18)
+------------------
+* Merge pull request `#1289 <https://github.com/tier4/scenario_simulator_v2/issues/1289>`_ from tier4/revert-1284-fix/issue1276
+  Revert "Optimize `EntityManager::broadcastEntityTransform` to Execute Only Once"
+* Revert "Optimize `EntityManager::broadcastEntityTransform` to Execute Only Once"
+* Contributors: Masaya Kataoka
+
+2.1.5 (2024-06-18)
+------------------
+
+2.1.4 (2024-06-14)
+------------------
+* Merge pull request `#1281 <https://github.com/tier4/scenario_simulator_v2/issues/1281>`_ from tier4/fix/remove_quaternion_operation
+  Remove quaternion_operation
+* Merge branch 'master' into fix/remove_quaternion_operation
+* Merge branch 'master' into fix/remove_quaternion_operation
+* Remove quaternion_operation
+* Contributors: Masaya Kataoka, Taiga Takano
+
+2.1.3 (2024-06-14)
+------------------
+* Merge pull request `#1284 <https://github.com/tier4/scenario_simulator_v2/issues/1284>`_ from tier4/fix/issue1276
+  Optimize `EntityManager::broadcastEntityTransform` to Execute Only Once
+* Merge branch 'master' into fix/issue1276
+* fix format
+* Only publsih tf onece.
+* Contributors: Masaya Kataoka, Taiga Takano
+
 2.1.2 (2024-06-13)
 ------------------
 * Merge branch 'master' into fix/interpreter/fault-injection-action

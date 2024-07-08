@@ -65,7 +65,10 @@ public:
   template <typename NodeT, typename AllocatorT = std::allocator<void>, typename... Ts>
   explicit API(NodeT && node, const Configuration & configuration, Ts &&... xs)
   : configuration(configuration),
-    entity_manager_ptr_(std::make_shared<entity::EntityManager>(node, configuration)),
+    node_parameters_(
+      rclcpp::node_interfaces::get_node_parameters_interface(std::forward<NodeT>(node))),
+    entity_manager_ptr_(
+      std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(), [this]() { return API::getEntityNames(); },
       [this](const auto & name) { return API::getMapPose(name); },
@@ -131,7 +134,7 @@ public:
       if (behavior == VehicleBehavior::autoware()) {
         return entity_manager_ptr_->entityExists(name) or
                entity_manager_ptr_->spawnEntity<entity::EgoEntity>(
-                 name, pose, parameters, configuration);
+                 name, pose, parameters, configuration, node_parameters_);
       } else {
         return entity_manager_ptr_->spawnEntity<entity::VehicleEntity>(
           name, pose, parameters, behavior);
@@ -354,16 +357,18 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getTraveledDistance);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLight);
   FORWARD_TO_ENTITY_MANAGER(getV2ITrafficLights);
+  FORWARD_TO_ENTITY_MANAGER(reachPosition);
   FORWARD_TO_ENTITY_MANAGER(isEgoSpawned);
   FORWARD_TO_ENTITY_MANAGER(isInLanelet);
   FORWARD_TO_ENTITY_MANAGER(isNpcLogicStarted);
   FORWARD_TO_ENTITY_MANAGER(laneMatchingSucceed);
-  FORWARD_TO_ENTITY_MANAGER(reachPosition);
   FORWARD_TO_ENTITY_MANAGER(requestAcquirePosition);
   FORWARD_TO_ENTITY_MANAGER(requestAssignRoute);
   FORWARD_TO_ENTITY_MANAGER(requestFollowTrajectory);
   FORWARD_TO_ENTITY_MANAGER(requestSpeedChange);
+  FORWARD_TO_ENTITY_MANAGER(requestSynchronize);
   FORWARD_TO_ENTITY_MANAGER(requestWalkStraight);
+  FORWARD_TO_ENTITY_MANAGER(requestClearRoute);
   FORWARD_TO_ENTITY_MANAGER(resetBehaviorPlugin);
   FORWARD_TO_ENTITY_MANAGER(resetConventionalTrafficLightPublishRate);
   FORWARD_TO_ENTITY_MANAGER(resetV2ITrafficLightPublishRate);
@@ -386,6 +391,12 @@ private:
 public:
 #undef FORWARD_TO_ENTITY_MANAGER
 
+  template <typename ParameterT, typename... Ts>
+  auto getROS2Parameter(Ts &&... xs) const -> decltype(auto)
+  {
+    return getParameter<ParameterT>(node_parameters_, std::forward<Ts>(xs)...);
+  }
+
   auto canonicalize(const LaneletPose & maybe_non_canonicalized_lanelet_pose) const
     -> CanonicalizedLaneletPose;
   auto canonicalize(const EntityStatus & may_non_canonicalized_entity_status) const
@@ -402,6 +413,8 @@ private:
   bool updateTrafficLightsInSim();
 
   const Configuration configuration;
+
+  const rclcpp::node_interfaces::NodeParametersInterface::SharedPtr node_parameters_;
 
   const std::shared_ptr<entity::EntityManager> entity_manager_ptr_;
 
