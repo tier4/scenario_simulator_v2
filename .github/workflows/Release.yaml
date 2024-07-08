@@ -175,6 +175,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push (${{ matrix.arch }})
+        if: github.event.pull_request.merged == true
         uses: docker/bake-action@v3
         with:
           files: |
@@ -183,6 +184,6 @@ jobs:
           set: |
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
-          push: ${{ github.event_name != 'pull_request' && matrix.arch == 'amd64' }}
+          push: true
           targets: |
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
