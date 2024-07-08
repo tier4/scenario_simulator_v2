@@ -50,7 +50,7 @@ auto SpeedCondition::description() const -> String
 }
 
 auto SpeedCondition::evaluate(
-  const EntityRef & triggering_entity, const Entities * entities,
+  const Entities * entities, const EntityRef & triggering_entity,
   const std::optional<DirectionalDimension> & direction) -> double
 {
   if (entities->isAdded(triggering_entity)) {
@@ -78,7 +78,7 @@ auto SpeedCondition::evaluate() -> Object
   evaluations.clear();
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-    evaluations.push_back(evaluate(triggering_entity, global().entities));
+    evaluations.push_back(evaluate(global().entities, triggering_entity));
     return std::invoke(rule, evaluations.back(), value);
   }));
 }

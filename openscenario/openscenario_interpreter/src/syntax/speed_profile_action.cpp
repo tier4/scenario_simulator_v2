@@ -102,11 +102,11 @@ auto SpeedProfileAction::run() -> void
     auto accomplished = [this](const auto & actor, const auto & speed_profile_entry) {
       if (entity_ref.empty()) {
         return equal_to<double>()(
-          SpeedCondition::evaluate(actor, global().entities), speed_profile_entry.speed);
+          SpeedCondition::evaluate(global().entities, actor), speed_profile_entry.speed);
       } else {
         return equal_to<double>()(
-          SpeedCondition::evaluate(actor, global().entities),
-          speed_profile_entry.speed + SpeedCondition::evaluate(entity_ref, global().entities));
+          SpeedCondition::evaluate(global().entities, actor),
+          speed_profile_entry.speed + SpeedCondition::evaluate(global().entities, entity_ref));
       }
     };
 

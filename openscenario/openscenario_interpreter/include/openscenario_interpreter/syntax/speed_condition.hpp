@@ -68,7 +68,7 @@ struct SpeedCondition : private Scope, private SimulatorCore::ConditionEvaluatio
   auto description() const -> String;
 
   static auto evaluate(
-    const EntityRef &, const Entities *, const std::optional<DirectionalDimension> & = std::nullopt)
+    const Entities *, const EntityRef &, const std::optional<DirectionalDimension> & = std::nullopt)
     -> double;
 
   auto evaluate() -> Object;

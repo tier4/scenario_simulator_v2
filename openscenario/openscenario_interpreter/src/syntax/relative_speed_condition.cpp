@@ -54,7 +54,7 @@ auto RelativeSpeedCondition::description() const -> String
 }
 
 auto RelativeSpeedCondition::evaluate(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref, const Entities * entities,
+  const Entities * entities, const EntityRef & triggering_entity, const EntityRef & entity_ref,
   const std::optional<DirectionalDimension> & direction) -> double
 {
   if (entities->isAdded(triggering_entity) and entities->isAdded(entity_ref)) {
@@ -82,7 +82,7 @@ auto RelativeSpeedCondition::evaluate() -> Object
   evaluations.clear();
 
   return asBoolean(triggering_entities.apply([this](auto && triggering_entity) {
-    evaluations.push_back(evaluate(triggering_entity, entity_ref, global().entities, direction));
+    evaluations.push_back(evaluate(global().entities, triggering_entity, entity_ref, direction));
     return std::invoke(rule, evaluations.back(), value);
   }));
 }

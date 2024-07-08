@@ -117,40 +117,57 @@ struct TimeToCollisionCondition : private Scope, private SimulatorCore::Conditio
     return description.str();
   }
 
+  static auto evaluate(
+    const Entities * entities, const EntityRef & triggering_entity,
+    const TimeToCollisionConditionTarget & time_to_collision_condition_target,
+    CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
+    RoutingAlgorithm routing_algorithm, Boolean freespace)
+  {
+    if (time_to_collision_condition_target.is<EntityRef>()) {
+      const auto relative_distance = RelativeDistanceCondition::evaluate(
+        entities,                                            //
+        triggering_entity,                                   //
+        time_to_collision_condition_target.as<EntityRef>(),  //
+        coordinate_system,                                   //
+        relative_distance_type,                              //
+        routing_algorithm,                                   //
+        freespace);
+
+      const auto relative_speed = RelativeSpeedCondition::evaluate(
+        entities,           //
+        triggering_entity,  //
+        time_to_collision_condition_target.as<EntityRef>());
+
+      std::cerr << "RELATIVE DISTANCE = " << relative_distance
+                << ", RELATIVE SPEED = " << relative_speed << std::endl;
+
+      return relative_distance / relative_speed;
+    } else {
+      const auto distance = DistanceCondition::evaluate(
+        entities,                                           //
+        triggering_entity,                                  //
+        time_to_collision_condition_target.as<Position>(),  //
+        coordinate_system,                                  //
+        relative_distance_type,                             //
+        routing_algorithm,                                  //
+        freespace);
+
+      const auto speed = SpeedCondition::evaluate(entities, triggering_entity);
+
+      std::cerr << "DISTANCE = " << distance << ", RELATIVE SPEED = " << speed << std::endl;
+
+      return distance / speed;
+    }
+  }
+
   auto evaluate()
   {
     evaluations.clear();
 
     return asBoolean(triggering_entities.apply([this](auto && triggering_entity) {
-      [[deprecated]] auto evaluateTimeToCollision =
-        [this](
-          const EntityRef & triggering_entity,
-          const TimeToCollisionConditionTarget & time_to_collision_condition_target) {
-          if (time_to_collision_condition_target.is<EntityRef>()) {
-            std::cerr << "RELATIVE DISTANCE = "
-                      << RelativeDistanceCondition::evaluate(
-                           triggering_entity, time_to_collision_condition_target.as<EntityRef>(),
-                           global().entities, coordinate_system, relative_distance_type,
-                           routing_algorithm, freespace)
-                      << ", RELATIVE SPEED = "
-                      << RelativeSpeedCondition::evaluate(
-                           triggering_entity, time_to_collision_condition_target.as<EntityRef>(),
-                           global().entities)
-                      << std::endl;
-          } else {
-            std::cerr << "DISTANCE = "
-                      << DistanceCondition::evaluate(
-                           triggering_entity, time_to_collision_condition_target.as<Position>(),
-                           global().entities, coordinate_system, relative_distance_type,
-                           routing_algorithm, freespace)
-                      << ", RELATIVE SPEED = "
-                      << SpeedCondition::evaluate(triggering_entity, global().entities)
-                      << std::endl;
-          }
-          return Double();
-        };
-      evaluations.push_back(
-        evaluateTimeToCollision(triggering_entity, time_to_collision_condition_target));
+      evaluations.push_back(evaluate(
+        global().entities, triggering_entity, time_to_collision_condition_target, coordinate_system,
+        relative_distance_type, routing_algorithm, freespace));
       return std::invoke(rule, evaluations.back(), value);
     }));
   }

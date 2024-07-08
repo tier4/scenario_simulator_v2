@@ -123,9 +123,9 @@ auto DistanceCondition::description() const -> std::string
 #define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, position)
 
 auto DistanceCondition::evaluate(
-  const EntityRef & triggering_entity, const Position & position, const Entities * entities,
+  const Entities * entities, const EntityRef & triggering_entity, const Position & position,
   CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
-  RoutingAlgorithm routing_algorithm, bool freespace) -> double
+  RoutingAlgorithm routing_algorithm, Boolean freespace) -> double
 {
   if (entities->ref(triggering_entity).as<ScenarioObject>().is_added) {
     SWITCH_COORDINATE_SYSTEM(
@@ -610,7 +610,7 @@ auto DistanceCondition::evaluate() -> Object
 
   return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
     results.push_back(evaluate(
-      triggering_entity, position, global().entities, coordinate_system, relative_distance_type,
+      global().entities, triggering_entity, position, coordinate_system, relative_distance_type,
       routing_algorithm, freespace));
     return rule(static_cast<double>(results.back()), value);
   }));

@@ -47,21 +47,21 @@ auto SpeedAction::accomplished() -> bool
     if (speed_action_target.is<AbsoluteTargetSpeed>()) {
       return equal_to<double>()(
         speed_action_target.as<AbsoluteTargetSpeed>().value,
-        SpeedCondition::evaluate(actor, global().entities));
+        SpeedCondition::evaluate(global().entities, actor));
     } else {
       switch (speed_action_target.as<RelativeTargetSpeed>().speed_target_value_type) {
         case SpeedTargetValueType::delta:
           return equal_to<double>()(
             SpeedCondition::evaluate(
-              speed_action_target.as<RelativeTargetSpeed>().entity_ref, global().entities) +
+              global().entities, speed_action_target.as<RelativeTargetSpeed>().entity_ref) +
               speed_action_target.as<RelativeTargetSpeed>().value,
-            SpeedCondition::evaluate(actor, global().entities));
+            SpeedCondition::evaluate(global().entities, actor));
         case SpeedTargetValueType::factor:
           return equal_to<double>()(
             SpeedCondition::evaluate(
-              speed_action_target.as<RelativeTargetSpeed>().entity_ref, global().entities) *
+              global().entities, speed_action_target.as<RelativeTargetSpeed>().entity_ref) *
               speed_action_target.as<RelativeTargetSpeed>().value,
-            SpeedCondition::evaluate(actor, global().entities));
+            SpeedCondition::evaluate(global().entities, actor));
         default:
           return false;
       }
