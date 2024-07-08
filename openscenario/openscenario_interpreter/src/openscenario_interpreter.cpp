@@ -39,14 +39,12 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   local_real_time_factor(1.0),
   osc_path(""),
   output_directory("/tmp"),
-  publish_empty_context(false),
   record(false)
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
-  DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
 }
 
@@ -105,7 +103,6 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(local_real_time_factor);
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
-      GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
 
       script = std::make_shared<OpenScenario>(osc_path);
@@ -276,11 +273,7 @@ auto Interpreter::publishCurrentContext() const -> void
   {
     nlohmann::json json;
     context.stamp = now();
-    if (publish_empty_context) {
-      context.data = "";
-    } else {
-      context.data = (json << *script).dump();
-    }
+    context.data = (json << *script).dump();
     context.time = evaluateSimulationTime();
   }
 

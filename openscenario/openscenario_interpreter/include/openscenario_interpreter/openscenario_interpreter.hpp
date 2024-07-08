@@ -60,8 +60,6 @@ class Interpreter : public rclcpp_lifecycle::LifecycleNode,
 
   String output_directory;
 
-  bool publish_empty_context;
-
   bool record;
 
   std::shared_ptr<OpenScenario> script;
