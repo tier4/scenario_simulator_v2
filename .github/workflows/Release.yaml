@@ -143,7 +143,6 @@ jobs:
               ref: `heads/${context.payload.pull_request.head.ref}`,
             })
   push_docker:
-    if: github.event.pull_request.merged == true
     needs: release
     name: Push Docker Image
     runs-on: ubuntu-22.04
