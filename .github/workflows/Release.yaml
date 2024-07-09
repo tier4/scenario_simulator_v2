@@ -29,6 +29,8 @@ jobs:
       statuses: write
     timeout-minutes: 10
     container: ros:humble
+    outputs:
+      new_version: ${{ steps.new_version.outputs.new_version }}
     steps:
       - name: Restore branch
         uses: levonet/action-restore-branch@master
@@ -172,7 +174,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}\]
 
       - name: Build and push (${{ matrix.arch }})
         if: github.event.pull_request.merged == true
@@ -184,7 +186,7 @@ jobs:
           set: |
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
-            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble_${{ steps.new_version.outputs.new_version }}
+            *.tags=ghcr.io/tier4/scenario_simulator_v2:humble_${{ needs.release.outputs.new_version }}"
           push: true
           targets: |
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
