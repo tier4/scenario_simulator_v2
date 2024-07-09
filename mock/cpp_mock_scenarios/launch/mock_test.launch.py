@@ -89,7 +89,7 @@ def generate_launch_description():
             {
                 "junit_path": junit_path,
                 "timeout": timeout,
-                "architecture_type": "awf/universe",
+                "architecture_type": "awf/universe/20240605",
                 "autoware_launch_file": "planning_simulator.launch.xml",
                 "autoware_launch_package": "autoware_launch",
                 "launch_autoware": True,
