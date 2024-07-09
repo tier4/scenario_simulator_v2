@@ -143,6 +143,7 @@ jobs:
               ref: `heads/${context.payload.pull_request.head.ref}`,
             })
   push_docker:
+    if: github.event.pull_request.merged == true
     needs: release
     name: Push Docker Image
     runs-on: ubuntu-22.04
@@ -177,7 +178,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push (${{ matrix.arch }})
-        if: github.event.pull_request.merged == true
         uses: docker/bake-action@v3
         with:
           files: |
