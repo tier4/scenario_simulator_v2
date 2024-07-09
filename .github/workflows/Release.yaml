@@ -187,6 +187,6 @@ jobs:
             *.cache-to=type=gha,mode=max
             *.cache-from=type=gha
             *.tags=ghcr.io/tier4/scenario_simulator_v2:humble_${{ needs.release.outputs.new_version }}"
-          push: true
+          push: ${{ github.event_name != 'pull_request' }}
           targets: |
             ${{ matrix.rosdistro }}_base_${{ matrix.arch }}
