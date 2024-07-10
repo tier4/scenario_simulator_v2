@@ -21,6 +21,64 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.0.0 (2024-07-10)
+------------------
+* Merge pull request `#1266 <https://github.com/tier4/scenario_simulator_v2/issues/1266>`_ from tier4/ref/RJD-1053-implement-pose-utils
+  ref(traffic_simulator): extend utils/pose - use it globally, improve canonization process
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* fix(cpp_mock_scenarios): adapt synchronized_action
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-implement-pose-utils
+* feat(cpp_mock_scenarios): change constructLaneletPose to constructCanonicalizedLaneletPose
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* feat(pose utils): apply requested changes
+* Merge remote-tracking branch 'origin' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1053-implement-pose-utils' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* fix(cpp_mock_scenarios): adapt traffic_source scenarios to new canonicalization approach
+* Merge master->ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* Revert "tmp"
+  This reverts commit 6149b4cd77fa9e18ced8152c9ca0242228b5966f.
+* Merge remote-tracking branch 'origin/ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* tmp
+* fix(cpp_mock_scenarios): fix use consider_pose_by_road_slope
+* ref(traffic_simulator): global improvements, comments, revert unnecessary changes
+* ref(traffic_simulator): use only toMapPose and laneletLength from ::pose
+* fix(cpp_mock_scenarios): fix respawn_ego
+* feat(traffic_simulator): use consider_pose_by_road_slope as static variable in CanonicaliedLaneletPose
+* Merge remote-tracking branch 'origin/ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* fix(cpp_mock_scenarios): fix accuracy in traveled_distance
+* fix(cpp_mock_scenario): fix load do nothing plugin
+* ref(simulator_core, ego_entity_simulation): improve strings
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(traffic_simulator, cpp_mock_scenarios): separate getLaneletLength and adapt entire code
+* ref(cpp_mock_scenarios): simplify radndom001 lane change check
+* fix(cpp_mock_scenarios): fix after ::pose refactor
+* ref(traffic_simulator): separate getMapPoseFromRelativePose
+* ref(cpp_mock_scenarios): fix canonicalize
+* ref(traffic_simulator): tidy up constructCanonicalizedLaneletPose
+* ref(traffic_simulator): improve setEntityManager - use ::pose, improve CanonicalizedEntityStatus
+* ref(cpp_mock_scenario): remove canonicalize for spawn and setEntityStatus
+* ref(cpp_mock_scenarios): adapt to separated pose::canonicalize() and getCanonicalizeLaneletPose
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(traffic_simulator): use toLaneletPose() from separated pose collection
+* feat(traffic_simulator): transform PoseUtils to pose collection
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(pose): use separated toMapPose
+* feat(pose): separate pose utils methods
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Tatsuya Yamasaki
+
 2.6.0 (2024-07-08)
 ------------------
 * Bump version of scenario_simulator_v2 from version 2.4.2 to version 2.5.0

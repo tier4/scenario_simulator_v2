@@ -112,9 +112,9 @@ public:
 
   virtual auto getGoalPoses() -> std::vector<CanonicalizedLaneletPose> = 0;
 
-  /*   */ auto getLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
+  /*   */ auto getCanonicalizedLaneletPose() const -> std::optional<CanonicalizedLaneletPose>;
 
-  /*   */ auto getLaneletPose(double matching_distance) const
+  /*   */ auto getCanonicalizedLaneletPose(double matching_distance) const
     -> std::optional<CanonicalizedLaneletPose>;
 
   /*   */ auto getMapPoseFromRelativePose(const geometry_msgs::msg::Pose &) const
@@ -129,8 +129,6 @@ public:
   virtual auto getObstacle() -> std::optional<traffic_simulator_msgs::msg::Obstacle> = 0;
 
   virtual auto getRouteLanelets(double horizon = 100) -> lanelet::Ids = 0;
-
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status) -> void = 0;
 
   virtual auto getWaypoints() -> const traffic_simulator_msgs::msg::WaypointsArray = 0;
 
@@ -241,9 +239,6 @@ public:
     const std::string & target_name, const CanonicalizedLaneletPose & target_sync_pose,
     const CanonicalizedLaneletPose & entity_target, const double target_speed,
     const double tolerance) -> bool;
-
-  virtual auto fillLaneletPose(CanonicalizedEntityStatus & status, bool include_crosswalk)
-    -> void final;
 
   const std::string name;
 
