@@ -44,7 +44,11 @@ private:
   void onUpdate() override
   {
     // LCOV_EXCL_START
-    const auto lanelet_pose = api_.getLaneletPose("ego");
+    const auto entity = api_.getEntity("ego");
+    if (!entity) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    }
+    const auto lanelet_pose = entity->getCanonicalizedLaneletPose();
     const auto traveled_distance = api_.getTraveledDistance("ego");
     if (!lanelet_pose) {
       stop(cpp_mock_scenarios::Result::FAILURE);
@@ -64,7 +68,9 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34741, 0, 0)),
+      "ego",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34741, 0.0, 0.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 3);
     api_.requestSpeedChange("ego", 3, true);

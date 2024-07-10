@@ -43,9 +43,11 @@ private:
     if (api_.isInLanelet("ego", 34507, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
     }
-    const auto lanelet_pose = api_.getLaneletPose("ego");
-    if (
-      !lanelet_pose ||
+    if (const auto entity = api_.getEntity("ego"); not entity) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    } else if (const auto lanelet_pose = entity->getCanonicalizedLaneletPose(); not lanelet_pose) {
+      stop(cpp_mock_scenarios::Result::FAILURE);
+    } else if (
       std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).offset) <= 2.8) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
@@ -54,7 +56,8 @@ private:
   {
     api_.spawn(
       "ego",
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(34513, 0, 3, 0, 0, 0)),
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34513, 0.0, 3.0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 10);
     api_.requestSpeedChange("ego", 10, true);
