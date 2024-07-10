@@ -171,8 +171,7 @@ auto ActionNode::getRightOfWayEntities() const
     return {};
   }
   std::vector<traffic_simulator::CanonicalizedEntityStatus> ret;
-  const auto lanelet_ids =
-    hdmap_utils->getRightOfWayLaneletIds(entity_status->getLaneletPose().lanelet_id);
+  const auto lanelet_ids = hdmap_utils->getRightOfWayLaneletIds(entity_status->getLaneletId());
   if (lanelet_ids.empty()) {
     return ret;
   }
@@ -272,7 +271,7 @@ auto ActionNode::getDistanceToTargetEntityOnCrosswalk(
 {
   if (status.laneMatchingSucceed()) {
     return spline.getCollisionPointIn2D(
-      hdmap_utils->getLaneletPolygon(status.getLaneletPose().lanelet_id), false);
+      hdmap_utils->getLaneletPolygon(status.getLaneletId()), false);
   }
   return std::nullopt;
 }
@@ -351,7 +350,7 @@ auto ActionNode::getConflictingEntityStatusOnCrossWalk(const lanelet::Ids & rout
       status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.getLaneletPose().lanelet_id) >= 1) {
+        status.second.getLaneletId()) >= 1) {
       conflicting_entity_status.emplace_back(status.second);
     }
   }
@@ -365,9 +364,9 @@ auto ActionNode::getConflictingEntityStatusOnLane(const lanelet::Ids & route_lan
   auto conflicting_lanes = hdmap_utils->getConflictingLaneIds(route_lanelets);
   for (const auto & status : other_entity_status) {
     if (
-      status.second.laneMatchingSucceed() && std::count(
-                                               conflicting_lanes.begin(), conflicting_lanes.end(),
-                                               status.second.getLaneletPose().lanelet_id) >= 1) {
+      status.second.laneMatchingSucceed() &&
+      std::count(
+        conflicting_lanes.begin(), conflicting_lanes.end(), status.second.getLaneletId()) >= 1) {
       conflicting_entity_status.emplace_back(status.second);
     }
   }
@@ -383,13 +382,13 @@ auto ActionNode::foundConflictingEntity(const lanelet::Ids & following_lanelets)
       status.second.laneMatchingSucceed() &&
       std::count(
         conflicting_crosswalks.begin(), conflicting_crosswalks.end(),
-        status.second.getLaneletPose().lanelet_id) >= 1) {
+        status.second.getLaneletId()) >= 1) {
       return true;
     }
     if (
-      status.second.laneMatchingSucceed() && std::count(
-                                               conflicting_lanes.begin(), conflicting_lanes.end(),
-                                               status.second.getLaneletPose().lanelet_id) >= 1) {
+      status.second.laneMatchingSucceed() &&
+      std::count(
+        conflicting_lanes.begin(), conflicting_lanes.end(), status.second.getLaneletId()) >= 1) {
       return true;
     }
   }
@@ -406,71 +405,76 @@ auto ActionNode::calculateUpdatedEntityStatus(
   const auto dynamics = speed_planner.getDynamicStates(
     target_speed, constraints, entity_status->getTwist(), entity_status->getAccel());
 
-  double linear_jerk_new = std::get<2>(dynamics);
-  geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
-  geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
+  const double linear_jerk_new = std::get<2>(dynamics);
+  const geometry_msgs::msg::Accel accel_new = std::get<1>(dynamics);
+  const geometry_msgs::msg::Twist twist_new = std::get<0>(dynamics);
 
-  auto lanelet_pose = entity_status->getLaneletPose();
-  lanelet_pose.s =
-    lanelet_pose.s + (twist_new.linear.x + entity_status->getTwist().linear.x) / 2.0 * step_time;
-  const auto canonicalized = hdmap_utils->canonicalizeLaneletPose(lanelet_pose, route_lanelets);
-  if (
-    const auto canonicalized_lanelet_pose =
-      std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
-    // If canonicalize succeed, set canonicalized pose and set other values.
-    traffic_simulator::EntityStatus entity_status_updated;
-    {
-      entity_status_updated.time = current_time + step_time;
-      entity_status_updated.lanelet_pose = canonicalized_lanelet_pose.value();
-      entity_status_updated.action_status.twist = twist_new;
-      entity_status_updated.action_status.accel = accel_new;
-      entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-      entity_status_updated.pose = hdmap_utils->toMapPose(canonicalized_lanelet_pose.value()).pose;
-    }
-    return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
+  if (!entity_status->laneMatchingSucceed()) {
+    THROW_SIMULATION_ERROR("Entity ", entity_status->getName(), " is not matched to the lanelet.");
   } else {
-    // If canonicalize failed, set end of road lanelet pose.
-    if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
-      if (lanelet_pose.s < 0) {
-        traffic_simulator::LaneletPose end_of_road_lanelet_pose;
-        {
-          end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
-          end_of_road_lanelet_pose.s = 0;
-          end_of_road_lanelet_pose.offset = lanelet_pose.offset;
-          end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
-        }
-        traffic_simulator::EntityStatus entity_status_updated;
-        {
-          entity_status_updated.time = current_time + step_time;
-          entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
-          entity_status_updated.action_status.twist = twist_new;
-          entity_status_updated.action_status.accel = accel_new;
-          entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-          entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
-        }
-        return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
-      } else {
-        traffic_simulator::LaneletPose end_of_road_lanelet_pose;
-        {
-          end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
-          end_of_road_lanelet_pose.s =
-            hdmap_utils->getLaneletLength(end_of_road_lanelet_id.value());
-          end_of_road_lanelet_pose.offset = lanelet_pose.offset;
-          end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
-        }
-        traffic_simulator::EntityStatus entity_status_updated;
-        {
-          entity_status_updated.time = current_time + step_time;
-          entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
-          entity_status_updated.action_status.twist = twist_new;
-          entity_status_updated.action_status.accel = accel_new;
-          entity_status_updated.action_status.linear_jerk = linear_jerk_new;
-          entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
-        }
-        return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
+    auto lanelet_pose = entity_status->getLaneletPose();
+    lanelet_pose.s =
+      lanelet_pose.s + (twist_new.linear.x + entity_status->getTwist().linear.x) / 2.0 * step_time;
+    const auto canonicalized = hdmap_utils->canonicalizeLaneletPose(lanelet_pose, route_lanelets);
+    if (
+      const auto canonicalized_lanelet_pose =
+        std::get<std::optional<traffic_simulator::LaneletPose>>(canonicalized)) {
+      // If canonicalize succeed, set canonicalized pose and set other values.
+      traffic_simulator::EntityStatus entity_status_updated;
+      {
+        entity_status_updated.time = current_time + step_time;
+        entity_status_updated.lanelet_pose = canonicalized_lanelet_pose.value();
+        entity_status_updated.action_status.twist = twist_new;
+        entity_status_updated.action_status.accel = accel_new;
+        entity_status_updated.action_status.linear_jerk = linear_jerk_new;
+        entity_status_updated.pose =
+          hdmap_utils->toMapPose(canonicalized_lanelet_pose.value()).pose;
       }
+      return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
     } else {
-      THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
+      // If canonicalize failed, set end of road lanelet pose.
+      if (const auto end_of_road_lanelet_id = std::get<std::optional<lanelet::Id>>(canonicalized)) {
+        if (lanelet_pose.s < 0) {
+          traffic_simulator::LaneletPose end_of_road_lanelet_pose;
+          {
+            end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
+            end_of_road_lanelet_pose.s = 0;
+            end_of_road_lanelet_pose.offset = lanelet_pose.offset;
+            end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
+          }
+          traffic_simulator::EntityStatus entity_status_updated;
+          {
+            entity_status_updated.time = current_time + step_time;
+            entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
+            entity_status_updated.action_status.twist = twist_new;
+            entity_status_updated.action_status.accel = accel_new;
+            entity_status_updated.action_status.linear_jerk = linear_jerk_new;
+            entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
+          }
+          return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
+        } else {
+          traffic_simulator::LaneletPose end_of_road_lanelet_pose;
+          {
+            end_of_road_lanelet_pose.lanelet_id = end_of_road_lanelet_id.value();
+            end_of_road_lanelet_pose.s =
+              hdmap_utils->getLaneletLength(end_of_road_lanelet_id.value());
+            end_of_road_lanelet_pose.offset = lanelet_pose.offset;
+            end_of_road_lanelet_pose.rpy = lanelet_pose.rpy;
+          }
+          traffic_simulator::EntityStatus entity_status_updated;
+          {
+            entity_status_updated.time = current_time + step_time;
+            entity_status_updated.lanelet_pose = end_of_road_lanelet_pose;
+            entity_status_updated.action_status.twist = twist_new;
+            entity_status_updated.action_status.accel = accel_new;
+            entity_status_updated.action_status.linear_jerk = linear_jerk_new;
+            entity_status_updated.pose = hdmap_utils->toMapPose(end_of_road_lanelet_pose).pose;
+          }
+          return traffic_simulator::CanonicalizedEntityStatus(entity_status_updated, hdmap_utils);
+        }
+      } else {
+        THROW_SIMULATION_ERROR("Failed to find trailing lanelet_id.");
+      }
     }
   }
 }
