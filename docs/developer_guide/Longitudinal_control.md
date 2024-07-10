@@ -130,7 +130,3 @@ By using `API::setVelocityLimit`, you can set the velocity limit of the npc.
 | --------------- | ------ | -------------------------- |
 | name            | string | Name of the npc.           |
 | lenear_velocity | double | Velocity limit of the npc. |
-
-
-
-
