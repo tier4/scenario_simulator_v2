@@ -21,6 +21,11 @@ Changelog for package openscenario_interpreter_msgs
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.0.1 (2024-07-10)
+------------------
+* Merge branch 'master' into feature/docker_tag
+* Contributors: Tatsuya Yamasaki
+
 3.0.0 (2024-07-10)
 ------------------
 * Merge branch 'master' into ref/RJD-1053-implement-pose-utils
