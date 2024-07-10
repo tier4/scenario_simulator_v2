@@ -190,7 +190,8 @@ auto toMsg(
 {
   using namespace simulation_api_schema;
 
-  auto convert_color = [](auto color) constexpr {
+  auto convert_color = [](auto color) constexpr
+  {
     switch (color) {
       case TrafficLight_Color_RED:
         return TrafficLightBulbMessageType::RED;
@@ -205,7 +206,8 @@ auto toMsg(
     }
   };
 
-  auto convert_shape = [](auto shape) constexpr {
+  auto convert_shape = [](auto shape) constexpr
+  {
     switch (shape) {
       case TrafficLight_Shape_CIRCLE:
         return TrafficLightBulbMessageType::CIRCLE;
@@ -233,7 +235,8 @@ auto toMsg(
     }
   };
 
-  auto convert_status = [](auto status) constexpr {
+  auto convert_status = [](auto status) constexpr
+  {
     switch (status) {
       case TrafficLight_Status_SOLID_OFF:
         return TrafficLightBulbMessageType::SOLID_OFF;
