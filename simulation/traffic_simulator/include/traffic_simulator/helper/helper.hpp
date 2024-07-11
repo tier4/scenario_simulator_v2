@@ -62,6 +62,35 @@ LaneletPose constructLaneletPose(
   double yaw = 0);
 
 /**
+ * @brief helper function for constructing canonicalized lanelet pose
+ *
+ * @param lanelet_id lanelet id
+ * @param s s value in lane coordinate
+ * @param offset offset value in lane coordinate
+ * @param hdmap_utils_ptr pointer to HdmapUtils
+ * @return LaneletPose
+ */
+auto constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
+
+/**
+ * @brief helper function for constructing canonicalized lanelet pose
+ *
+ * @param lanelet_id lanelet id
+ * @param s s value in lane coordinate
+ * @param offset offset value in lane coordinate
+ * @param roll roll value in the lane coordinate
+ * @param pitch pitch value in the lane coordinate
+ * @param yaw yaw value in the lane coordinate
+ * @param hdmap_utils_ptr pointer to HdmapUtils
+ * @return LaneletPose
+ */
+auto constructCanonicalizedLaneletPose(
+  lanelet::Id lanelet_id, double s, double offset, double roll, double pitch, double yaw,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> CanonicalizedLaneletPose;
+
+/**
  * @brief helper function for constructing rpy
  *
  * @param roll roll value of the orientation

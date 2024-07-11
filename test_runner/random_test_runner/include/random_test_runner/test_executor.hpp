@@ -78,61 +78,80 @@ public:
       RCLCPP_INFO_STREAM(logger_, message);
       scenario_completed_ = false;
 
-      api_->updateFrame();
+      if (const auto ego_start_canonicalized_lanelet_pose = traffic_simulator::pose::canonicalize(
+            test_description_.ego_start_position, api_->getHdmapUtils());
+          !ego_start_canonicalized_lanelet_pose) {
+        throw std::runtime_error(
+          "Can not canonicalize ego start lanelet pose: id: " +
+          std::to_string(test_description_.ego_start_position.lanelet_id) +
+          " s: " + std::to_string(test_description_.ego_start_position.s) +
+          " offset: " + std::to_string(test_description_.ego_start_position.offset));
+      } else {
+        api_->updateFrame();
+        api_->spawn(
+          ego_name_, ego_start_canonicalized_lanelet_pose.value(), getVehicleParameters(),
+          traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
+        api_->setEntityStatus(
+          ego_name_, ego_start_canonicalized_lanelet_pose.value(),
+          traffic_simulator::helper::constructActionStatus());
 
-      api_->spawn(
-        ego_name_, api_->canonicalize(test_description_.ego_start_position), getVehicleParameters(),
-        traffic_simulator::VehicleBehavior::autoware(), "lexus_rx450h");
-      api_->setEntityStatus(
-        ego_name_, api_->canonicalize(test_description_.ego_start_position),
-        traffic_simulator::helper::constructActionStatus());
+        if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
+          api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
+            traffic_simulator::helper::LidarType::VLP16, ego_name_,
+            stringFromArchitectureType(architecture_type_)));
 
-      if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
-        api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
-          traffic_simulator::helper::LidarType::VLP16, ego_name_,
-          stringFromArchitectureType(architecture_type_)));
+          double constexpr detection_update_duration = 0.1;
+          api_->attachDetectionSensor(
+            traffic_simulator::helper::constructDetectionSensorConfiguration(
+              ego_name_, stringFromArchitectureType(architecture_type_),
+              detection_update_duration));
 
-        double constexpr detection_update_duration = 0.1;
-        api_->attachDetectionSensor(
-          traffic_simulator::helper::constructDetectionSensorConfiguration(
-            ego_name_, stringFromArchitectureType(architecture_type_), detection_update_duration));
+          api_->attachOccupancyGridSensor([&]() {
+            simulation_api_schema::OccupancyGridSensorConfiguration configuration;
+            configuration.set_architecture_type(stringFromArchitectureType(architecture_type_));
+            configuration.set_entity(ego_name_);
+            configuration.set_filter_by_range(true);
+            configuration.set_height(200);
+            configuration.set_range(300);
+            configuration.set_resolution(0.5);
+            configuration.set_update_duration(0.1);
+            configuration.set_width(200);
+            return configuration;
+          }());
 
-        api_->attachOccupancyGridSensor([&]() {
-          simulation_api_schema::OccupancyGridSensorConfiguration configuration;
-          configuration.set_architecture_type(stringFromArchitectureType(architecture_type_));
-          configuration.set_entity(ego_name_);
-          configuration.set_filter_by_range(true);
-          configuration.set_height(200);
-          configuration.set_range(300);
-          configuration.set_resolution(0.5);
-          configuration.set_update_duration(0.1);
-          configuration.set_width(200);
-          return configuration;
-        }());
-
-        api_->asFieldOperatorApplication(ego_name_).template declare_parameter<bool>(
-          "allow_goal_modification", true);
+          api_->asFieldOperatorApplication(ego_name_).template declare_parameter<bool>(
+            "allow_goal_modification", true);
+        }
       }
 
       // XXX dirty hack: wait for autoware system to launch
       // ugly but helps for now
       std::this_thread::sleep_for(std::chrono::milliseconds{5000});
 
-      api_->requestAssignRoute(
-        ego_name_, std::vector({api_->canonicalize(test_description_.ego_goal_position)}));
+      api_->requestAssignRoute(ego_name_, std::vector({test_description_.ego_goal_pose}));
       api_->asFieldOperatorApplication(ego_name_).engage();
 
       goal_reached_metric_.setGoal(test_description_.ego_goal_pose);
 
       for (size_t i = 0; i < test_description_.npcs_descriptions.size(); i++) {
         const auto & npc_descr = test_description_.npcs_descriptions[i];
-        api_->spawn(
-          npc_descr.name, api_->canonicalize(npc_descr.start_position), getVehicleParameters(),
-          traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
-        api_->setEntityStatus(
-          npc_descr.name, api_->canonicalize(npc_descr.start_position),
-          traffic_simulator::helper::constructActionStatus(npc_descr.speed));
-        api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
+        if (const auto npc_start_canonicalized_lanelet_pose = traffic_simulator::pose::canonicalize(
+              npc_descr.start_position, api_->getHdmapUtils());
+            !npc_start_canonicalized_lanelet_pose) {
+          throw std::runtime_error(
+            "Can not canonicalize npc start lanelet pose: id: " +
+            std::to_string(npc_descr.start_position.lanelet_id) +
+            " s: " + std::to_string(npc_descr.start_position.s) +
+            " offset: " + std::to_string(npc_descr.start_position.offset));
+        } else {
+          api_->spawn(
+            npc_descr.name, npc_start_canonicalized_lanelet_pose.value(), getVehicleParameters(),
+            traffic_simulator::VehicleBehavior::defaultBehavior(), "taxi");
+          api_->setEntityStatus(
+            npc_descr.name, npc_start_canonicalized_lanelet_pose.value(),
+            traffic_simulator::helper::constructActionStatus(npc_descr.speed));
+          api_->requestSpeedChange(npc_descr.name, npc_descr.speed, true);
+        }
       }
     });
   }
