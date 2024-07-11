@@ -21,6 +21,9 @@ Changelog for package do_nothing_plugin
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.0.2 (2024-07-11)
+------------------
+
 3.0.1 (2024-07-10)
 ------------------
 * Merge branch 'master' into feature/docker_tag
