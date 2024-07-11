@@ -32,6 +32,51 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+3.0.1 (2024-07-10)
+------------------
+* Merge branch 'master' into feature/docker_tag
+* Contributors: Tatsuya Yamasaki
+
+3.0.0 (2024-07-10)
+------------------
+* Merge pull request `#1266 <https://github.com/tier4/scenario_simulator_v2/issues/1266>`_ from tier4/ref/RJD-1053-implement-pose-utils
+  ref(traffic_simulator): extend utils/pose - use it globally, improve canonization process
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* feat(pose utils): apply requested changes
+* Merge remote-tracking branch 'origin' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1053-implement-pose-utils' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* fix(traffic_simulator): fix spell
+* Merge master->ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(traffic_simulator): global improvements, comments, revert unnecessary changes
+* feat(traffic_simulator): use consider_pose_by_road_slope as static variable in CanonicaliedLaneletPose
+* fix(api, simulator_core): fix canonicalize in setEntityStatus, apply optional to canonicalize
+* Merge remote-tracking branch 'origin/ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(simulator_core, ego_entity_simulation): improve strings
+* ref(simulator_core,sss,pose): revert unintended changes
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(openscenario_interpreter): adapt SimulatorCore to getCanonicalizedLaneletPose
+* ref(traffic_simulator): use toCanonicalizedLaneletPose
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* feat(pose): separate pose utils methods
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Tatsuya Yamasaki
+
 2.6.0 (2024-07-08)
 ------------------
 * Bump version of scenario_simulator_v2 from version 2.4.2 to version 2.5.0
