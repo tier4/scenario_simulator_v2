@@ -39,6 +39,9 @@ namespace entity
 {
 void EntityManager::broadcastEntityTransform()
 {
+  static bool is_send = false;
+  static geometry_msgs::msg::Pose pose;
+
   using math::geometry::operator/;
   using math::geometry::operator*;
   using math::geometry::operator+=;
@@ -50,33 +53,41 @@ void EntityManager::broadcastEntityTransform()
    * so we publish the average of the coordinates of all entities.
    */
   if (isEgoSpawned()) {
-    const auto ego_name = getEgoName();
-    if (entityExists(ego_name)) {
+    if (const auto ego = getEntity(getEgoName())) {
+      if (!is_send) {
+        pose = ego->getMapPose();
+        is_send = true;
+      }
       broadcastTransform(
         geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
           /**
            * @note This is the intended implementation.
            * It is easier to create rviz config if the name "ego" is fixed,
-           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           * so the frame_id "ego" is issued regardless of the name of the ego entity.
            */
           .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
-          .pose(getMapPose(ego_name)),
+          .pose(pose),
         true);
     }
   }
   if (!names.empty()) {
+    if (!is_send) {
+      pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
+               .position(std::accumulate(
+                 names.begin(), names.end(), geometry_msgs::msg::Point(),
+                 [this, names](geometry_msgs::msg::Point point, const std::string & name) {
+                   point += getEntity(name)->getMapPose().position *
+                            (1.0 / static_cast<double>(names.size()));
+                   return point;
+                 }))
+               .orientation(geometry_msgs::msg::Quaternion());
+      is_send = true;
+    }
     broadcastTransform(
       geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
         .header(
           std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
-        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
-                .position(std::accumulate(
-                  names.begin(), names.end(), geometry_msgs::msg::Point(),
-                  [this, names](geometry_msgs::msg::Point point, const std::string & name) {
-                    point += getMapPose(name).position * (1.0 / static_cast<double>(names.size()));
-                    return point;
-                  }))
-                .orientation(geometry_msgs::msg::Quaternion())),
+        .pose(pose),
       true);
   }
 }
@@ -102,11 +113,19 @@ void EntityManager::broadcastTransform(
   }
 }
 
-bool EntityManager::checkCollision(const std::string & name0, const std::string & name1)
+bool EntityManager::checkCollision(
+  const std::string & first_entity_name, const std::string & second_entity_name)
 {
-  return name0 != name1 and
-         math::geometry::checkCollision2D(
-           getMapPose(name0), getBoundingBox(name0), getMapPose(name1), getBoundingBox(name1));
+  if (first_entity_name != second_entity_name) {
+    if (const auto first_entity = getEntity(first_entity_name)) {
+      if (const auto second_entity = getEntity(second_entity_name)) {
+        return math::geometry::checkCollision2D(
+          first_entity->getMapPose(), first_entity->getBoundingBox(), second_entity->getMapPose(),
+          second_entity->getBoundingBox());
+      }
+    }
+  }
+  return false;
 }
 
 visualization_msgs::msg::MarkerArray EntityManager::makeDebugMarker() const
@@ -165,7 +184,8 @@ auto EntityManager::getEntityStatus(const std::string & name) const -> Canonical
     assert(entity_status.name == name && "The entity name in status is different from key!");
     entity_status.action_status.current_action = getCurrentAction(name);
     entity_status.time = current_time_;
-    return CanonicalizedEntityStatus(entity_status, hdmap_utils_ptr_);
+    return CanonicalizedEntityStatus(
+      entity_status, iter->second->getStatus().getCanonicalizedLaneletPose());
   }
 }
 
@@ -249,23 +269,10 @@ bool EntityManager::isEgoSpawned() const
 bool EntityManager::isInLanelet(
   const std::string & name, const lanelet::Id lanelet_id, const double tolerance)
 {
-  const auto status = getEntityStatus(name);
-  if (not status.laneMatchingSucceed()) {
-    return false;
-  }
-  if (isSameLaneletId(status, lanelet_id)) {
-    return true;
-  } else {
-    auto dist0 = hdmap_utils_ptr_->getLongitudinalDistance(
-      helper::constructLaneletPose(lanelet_id, hdmap_utils_ptr_->getLaneletLength(lanelet_id)),
-      status.getLaneletPose());
-    auto dist1 = hdmap_utils_ptr_->getLongitudinalDistance(
-      status.getLaneletPose(), helper::constructLaneletPose(lanelet_id, 0));
-    if (dist0 and dist0.value() < tolerance) {
-      return true;
-    }
-    if (dist1 and dist1.value() < tolerance) {
-      return true;
+  if (const auto entity = getEntity(name)) {
+    if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+      return pose::isInLanelet(
+        canonicalized_lanelet_pose.value(), lanelet_id, tolerance, hdmap_utils_ptr_);
     }
   }
   return false;
@@ -276,33 +283,13 @@ bool EntityManager::isStopping(const std::string & name) const
   return std::fabs(getCurrentTwist(name).linear.x) < std::numeric_limits<double>::epsilon();
 }
 
-bool EntityManager::reachPosition(
-  const std::string & name, const std::string & target_name, const double tolerance) const
-{
-  return reachPosition(name, getMapPose(target_name), tolerance);
-}
-
-bool EntityManager::reachPosition(
-  const std::string & name, const geometry_msgs::msg::Pose & target_pose,
-  const double tolerance) const
-{
-  return math::geometry::getDistance(getMapPose(name), target_pose) < tolerance;
-}
-
-bool EntityManager::reachPosition(
-  const std::string & name, const CanonicalizedLaneletPose & lanelet_pose,
-  const double tolerance) const
-{
-  return reachPosition(name, static_cast<geometry_msgs::msg::Pose>(lanelet_pose), tolerance);
-}
-
 void EntityManager::requestLaneChange(
   const std::string & name, const traffic_simulator::lane_change::Direction & direction)
 {
-  if (const auto lanelet_pose = getLaneletPose(name)) {
+  if (const auto entity = getEntity(name); entity && entity->laneMatchingSucceed()) {
     if (
       const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-        static_cast<LaneletPose>(lanelet_pose.value()).lanelet_id, direction)) {
+        entity->getStatus().getLaneletId(), direction)) {
       requestLaneChange(name, target.value());
     }
   }
@@ -401,12 +388,6 @@ void EntityManager::setVerbose(const bool verbose)
   for (auto & entity : entities_) {
     entity.second->verbose = verbose;
   }
-}
-
-auto EntityManager::toMapPose(const CanonicalizedLaneletPose & lanelet_pose) const
-  -> const geometry_msgs::msg::Pose
-{
-  return static_cast<geometry_msgs::msg::Pose>(lanelet_pose);
 }
 
 auto EntityManager::updateNpcLogic(const std::string & name) -> const CanonicalizedEntityStatus &

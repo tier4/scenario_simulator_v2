@@ -24,6 +24,7 @@
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
 #include <status_monitor/status_monitor.hpp>
+#include <traffic_simulator/data_type/lanelet_pose.hpp>
 
 #define DECLARE_PARAMETER(IDENTIFIER) \
   declare_parameter<decltype(IDENTIFIER)>(#IDENTIFIER, IDENTIFIER)
@@ -39,12 +40,14 @@ Interpreter::Interpreter(const rclcpp::NodeOptions & options)
   local_real_time_factor(1.0),
   osc_path(""),
   output_directory("/tmp"),
+  publish_empty_context(false),
   record(false)
 {
   DECLARE_PARAMETER(local_frame_rate);
   DECLARE_PARAMETER(local_real_time_factor);
   DECLARE_PARAMETER(osc_path);
   DECLARE_PARAMETER(output_directory);
+  DECLARE_PARAMETER(publish_empty_context);
   DECLARE_PARAMETER(record);
 }
 
@@ -103,9 +106,19 @@ auto Interpreter::on_configure(const rclcpp_lifecycle::State &) -> Result
       GET_PARAMETER(local_real_time_factor);
       GET_PARAMETER(osc_path);
       GET_PARAMETER(output_directory);
+      GET_PARAMETER(publish_empty_context);
       GET_PARAMETER(record);
 
       script = std::make_shared<OpenScenario>(osc_path);
+
+      // CanonicalizedLaneletPose is also used on the OpenScenarioInterpreter side as NativeLanePose.
+      // so canonicalization takes place here - it uses the value of the consider_pose_by_road_slope parameter
+      traffic_simulator::lanelet_pose::CanonicalizedLaneletPose::setConsiderPoseByRoadSlope([&]() {
+        if (not has_parameter("consider_pose_by_road_slope")) {
+          declare_parameter("consider_pose_by_road_slope", false);
+        }
+        return get_parameter("consider_pose_by_road_slope").as_bool();
+      }());
 
       if (script->category.is<ScenarioDefinition>()) {
         scenarios = {std::dynamic_pointer_cast<ScenarioDefinition>(script->category)};
@@ -276,7 +289,11 @@ auto Interpreter::publishCurrentContext() const -> void
   {
     nlohmann::json json;
     context.stamp = now();
-    context.data = (json << *script).dump();
+    if (publish_empty_context) {
+      context.data = "";
+    } else {
+      context.data = (json << *script).dump();
+    }
     context.time = evaluateSimulationTime();
   }
 

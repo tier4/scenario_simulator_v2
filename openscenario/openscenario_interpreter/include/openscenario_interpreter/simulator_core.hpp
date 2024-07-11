@@ -15,6 +15,7 @@
 #ifndef OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 #define OPENSCENARIO_INTERPRETER__SIMULATOR_CORE_HPP_
 
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <openscenario_interpreter/error.hpp>
 #include <openscenario_interpreter/syntax/boolean.hpp>
 #include <openscenario_interpreter/syntax/double.hpp>
@@ -71,15 +72,16 @@ public:
     static auto canonicalize(const traffic_simulator::LaneletPose & non_canonicalized)
       -> NativeLanePosition
     {
-      return traffic_simulator::pose::canonicalize(non_canonicalized, core->getHdmapUtils());
+      return NativeLanePosition(non_canonicalized, core->getHdmapUtils());
     }
 
     template <typename T, typename std::enable_if_t<std::is_same_v<T, NativeLanePosition>, int> = 0>
     static auto convert(const NativeWorldPosition & pose) -> NativeLanePosition
     {
+      constexpr bool include_crosswalk{false};
       if (
-        const auto result =
-          traffic_simulator::pose::toLaneletPose(pose, false, core->getHdmapUtils())) {
+        const auto result = traffic_simulator::pose::toCanonicalizedLaneletPose(
+          pose, include_crosswalk, core->getHdmapUtils())) {
         return result.value();
       } else {
         throw Error(
@@ -147,7 +149,7 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto to_entity = core->getEntity(to_entity_name)) {
-        if (const auto to_lanelet_pose = to_entity->getLaneletPose()) {
+        if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_entity_name, to_lanelet_pose.value(), routing_algorithm);
         }
@@ -161,7 +163,7 @@ public:
       -> traffic_simulator::LaneletPose
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose = from_entity->getLaneletPose()) {
+        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeRelativeLanePosition(
             from_lanelet_pose.value(), to_lanelet_pose, routing_algorithm);
         }
@@ -185,8 +187,8 @@ public:
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
         if (const auto to_entity = core->getEntity(to_entity_name)) {
-          if (const auto from_lanelet_pose = from_entity->getLaneletPose()) {
-            if (const auto to_lanelet_pose = to_entity->getLaneletPose()) {
+          if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
+            if (const auto to_lanelet_pose = to_entity->getCanonicalizedLaneletPose()) {
               return makeNativeBoundingBoxRelativeLanePosition(
                 from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose.value(),
                 to_entity->getBoundingBox(), routing_algorithm);
@@ -202,7 +204,7 @@ public:
       const RoutingAlgorithm::value_type routing_algorithm = RoutingAlgorithm::undefined)
     {
       if (const auto from_entity = core->getEntity(from_entity_name)) {
-        if (const auto from_lanelet_pose = from_entity->getLaneletPose()) {
+        if (const auto from_lanelet_pose = from_entity->getCanonicalizedLaneletPose()) {
           return makeNativeBoundingBoxRelativeLanePosition(
             from_lanelet_pose.value(), from_entity->getBoundingBox(), to_lanelet_pose,
             traffic_simulator_msgs::msg::BoundingBox(), routing_algorithm);
@@ -338,7 +340,7 @@ public:
         core->attachDetectionSensor([&]() {
           simulation_api_schema::DetectionSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
           configuration.set_detect_all_objects_in_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_object_recognition_delay(controller.properties.template get<Double>("detectedObjectPublishingDelay"));
@@ -355,7 +357,7 @@ public:
         core->attachOccupancyGridSensor([&]() {
           simulation_api_schema::OccupancyGridSensorConfiguration configuration;
           // clang-format off
-          configuration.set_architecture_type(getParameter<std::string>("architecture_type", "awf/universe"));
+          configuration.set_architecture_type(core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
           configuration.set_entity(entity_ref);
           configuration.set_filter_by_range(controller.properties.template get<Boolean>("isClairvoyant"));
           configuration.set_height(200);
@@ -370,7 +372,7 @@ public:
         core->attachPseudoTrafficLightDetector([&]() {
           simulation_api_schema::PseudoTrafficLightDetectorConfiguration configuration;
           configuration.set_architecture_type(
-            getParameter<std::string>("architecture_type", "awf/universe"));
+            core->getROS2Parameter<std::string>("architecture_type", "awf/universe"));
           return configuration;
         }());
 
@@ -562,8 +564,7 @@ public:
           const auto relative_pose =
             traffic_simulator::pose::relativePose(from_map_pose, to_map_pose)) {
           return static_cast<Double>(std::abs(
-            quaternion_operation::convertQuaternionToEulerAngle(relative_pose.value().orientation)
-              .z));
+            math::geometry::convertQuaternionToEulerAngle(relative_pose.value().orientation).z));
         }
       }
       return Double::nan();
@@ -572,12 +573,13 @@ public:
     template <typename EntityRef>
     static auto evaluateRelativeHeading(const EntityRef & entity_ref)
     {
-      if (auto lanelet_pose = core->getLaneletPose(entity_ref)) {
-        return static_cast<Double>(
-          std::abs(static_cast<traffic_simulator::LaneletPose>(lanelet_pose.value()).rpy.z));
-      } else {
-        return Double::nan();
+      if (const auto entity = core->getEntity(entity_ref)) {
+        if (const auto canonicalized_lanelet_pose = entity->getCanonicalizedLaneletPose()) {
+          return static_cast<Double>(std::abs(
+            static_cast<traffic_simulator::LaneletPose>(canonicalized_lanelet_pose.value()).rpy.z));
+        }
       }
+      return Double::nan();
     }
 
     template <typename... Ts>

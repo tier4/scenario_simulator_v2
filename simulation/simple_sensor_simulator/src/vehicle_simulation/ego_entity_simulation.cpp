@@ -14,8 +14,13 @@
 
 #include <concealer/autoware_universe.hpp>
 #include <filesystem>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
+#include <geometry/quaternion/get_rotation.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
+#include <geometry/quaternion/quaternion_to_euler.hpp>
 #include <simple_sensor_simulator/vehicle_simulation/ego_entity_simulation.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/utils/pose.hpp>
 
 namespace vehicle_simulation
 {
@@ -32,18 +37,20 @@ static auto getParameter(const std::string & name, T value = {})
 }
 
 EgoEntitySimulation::EgoEntitySimulation(
+  const traffic_simulator_msgs::msg::EntityStatus & initial_status,
   const traffic_simulator_msgs::msg::VehicleParameters & parameters, double step_time,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils,
-  const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope,
-  const bool consider_pose_by_road_slope)
+  const rclcpp::Parameter & use_sim_time, const bool consider_acceleration_by_road_slope)
 : autoware(std::make_unique<concealer::AutowareUniverse>()),
   vehicle_model_type_(getVehicleModelType()),
   vehicle_model_ptr_(makeSimulationModel(vehicle_model_type_, step_time, parameters)),
+  status_(initial_status, std::nullopt),
   consider_acceleration_by_road_slope_(consider_acceleration_by_road_slope),
-  consider_pose_by_road_slope_(consider_pose_by_road_slope),
   hdmap_utils_ptr_(hdmap_utils),
   vehicle_parameters(parameters)
 {
+  setStatus(initial_status);
+  initial_pose_ = status_.getMapPose();
   autoware->set_parameter(use_sim_time);
 }
 
@@ -174,7 +181,7 @@ auto EgoEntitySimulation::setAutowareStatus() -> void
     return message;
   }());
 
-  autoware->set(status_.pose);
+  autoware->set(status_.getMapPose());
 
   autoware->set(getCurrentTwist());
 }
@@ -215,8 +222,8 @@ void EgoEntitySimulation::overwrite(
   const traffic_simulator_msgs::msg::EntityStatus & status, double current_scenario_time,
   double step_time, bool npc_logic_started)
 {
-  using quaternion_operation::convertQuaternionToEulerAngle;
-  using quaternion_operation::getRotationMatrix;
+  using math::geometry::convertQuaternionToEulerAngle;
+  using math::geometry::getRotationMatrix;
 
   autoware->rethrow();
 
@@ -280,7 +287,7 @@ void EgoEntitySimulation::overwrite(
 void EgoEntitySimulation::update(
   double current_scenario_time, double step_time, bool npc_logic_started)
 {
-  using quaternion_operation::getRotationMatrix;
+  using math::geometry::getRotationMatrix;
 
   autoware->rethrow();
 
@@ -291,9 +298,9 @@ void EgoEntitySimulation::update(
   */
   world_relative_position_ = getRotationMatrix(initial_pose_.orientation).transpose() *
                              Eigen::Vector3d(
-                               status_.pose.position.x - initial_pose_.position.x,
-                               status_.pose.position.y - initial_pose_.position.y,
-                               status_.pose.position.z - initial_pose_.position.z);
+                               status_.getMapPose().position.x - initial_pose_.position.x,
+                               status_.getMapPose().position.y - initial_pose_.position.y,
+                               status_.getMapPose().position.z - initial_pose_.position.z);
 
   if (npc_logic_started) {
     auto input = Eigen::VectorXd(vehicle_model_ptr_->getDimU());
@@ -342,50 +349,15 @@ void EgoEntitySimulation::update(
   updatePreviousValues();
 }
 
-auto EgoEntitySimulation::getMatchedLaneletPoseFromEntityStatus(
-  const traffic_simulator_msgs::msg::EntityStatus & status, const double entity_width) const
-  -> std::optional<traffic_simulator_msgs::msg::LaneletPose>
-{
-  /// @note The lanelet matching algorithm should be equivalent to the one used in
-  /// EgoEntity::setMapPose
-  const auto unique_route_lanelets =
-    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
-  const auto matching_distance = std::max(
-                                   vehicle_parameters.axles.front_axle.track_width,
-                                   vehicle_parameters.axles.rear_axle.track_width) *
-                                   0.5 +
-                                 1.0;
-
-  std::optional<traffic_simulator_msgs::msg::LaneletPose> lanelet_pose;
-
-  if (unique_route_lanelets.empty()) {
-    lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_distance);
-  } else {
-    lanelet_pose =
-      hdmap_utils_ptr_->toLaneletPose(status.pose, unique_route_lanelets, matching_distance);
-    if (!lanelet_pose) {
-      lanelet_pose =
-        hdmap_utils_ptr_->toLaneletPose(status.pose, status.bounding_box, false, matching_distance);
-    }
-  }
-  return lanelet_pose;
-}
-
 auto EgoEntitySimulation::calculateEgoPitch() const -> double
 {
   // calculate prev/next point of lanelet centerline nearest to ego pose.
-  auto ego_lanelet = getMatchedLaneletPoseFromEntityStatus(
-    status_, std::max(
-               vehicle_parameters.axles.front_axle.track_width,
-               vehicle_parameters.axles.rear_axle.track_width));
-  if (not ego_lanelet) {
+  if (!status_.laneMatchingSucceed()) {
     return 0.0;
   }
 
-  auto centerline_points = hdmap_utils_ptr_->getCenterPoints(ego_lanelet.value().lanelet_id);
-
   /// @note Copied from motion_util::findNearestSegmentIndex
+  auto centerline_points = hdmap_utils_ptr_->getCenterPoints(status_.getLaneletId());
   auto find_nearest_segment_index =
     [](const std::vector<geometry_msgs::msg::Point> & points, const Eigen::Vector3d & point) {
       assert(not points.empty());
@@ -440,9 +412,10 @@ auto EgoEntitySimulation::getCurrentTwist() const -> geometry_msgs::msg::Twist
 auto EgoEntitySimulation::getCurrentPose(const double pitch_angle = 0.) const
   -> geometry_msgs::msg::Pose
 {
+  using math::geometry::operator*;
   const auto relative_position =
-    quaternion_operation::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
-  const auto relative_orientation = quaternion_operation::convertEulerAngleToQuaternion(
+    math::geometry::getRotationMatrix(initial_pose_.orientation) * world_relative_position_;
+  const auto relative_orientation = math::geometry::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>()
       .x(0)
       .y(pitch_angle)
@@ -483,72 +456,36 @@ auto EgoEntitySimulation::updatePreviousValues() -> void
   previous_angular_velocity_ = vehicle_model_ptr_->getWz();
 }
 
-auto EgoEntitySimulation::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus &
+auto EgoEntitySimulation::getStatus() const -> const traffic_simulator_msgs::msg::EntityStatus
 {
-  return status_;
+  return static_cast<traffic_simulator_msgs::msg::EntityStatus>(status_);
 }
 
 auto EgoEntitySimulation::setStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
   -> void
 {
-  status_ = status;
+  const auto unique_route_lanelets =
+    traffic_simulator::helper::getUniqueValues(autoware->getRouteLanelets());
+  const auto matching_distance = std::max(
+                                   vehicle_parameters.axles.front_axle.track_width,
+                                   vehicle_parameters.axles.rear_axle.track_width) *
+                                   0.5 +
+                                 1.0;
+  const auto canonicalized_lanelet_pose = traffic_simulator::pose::toCanonicalizedLaneletPose(
+    status.pose, status.bounding_box, unique_route_lanelets, false, matching_distance,
+    hdmap_utils_ptr_);
+  status_ = traffic_simulator::CanonicalizedEntityStatus(status, canonicalized_lanelet_pose);
   setAutowareStatus();
-}
-
-auto EgoEntitySimulation::setInitialStatus(const traffic_simulator_msgs::msg::EntityStatus & status)
-  -> void
-{
-  setStatus(status);
-  initial_pose_ = status_.pose;
 }
 
 auto EgoEntitySimulation::updateStatus(double current_scenario_time, double step_time) -> void
 {
-  traffic_simulator_msgs::msg::EntityStatus status;
-  status.name = status_.name;
+  auto status = static_cast<traffic_simulator_msgs::msg::EntityStatus>(status_);
   status.time = std::isnan(current_scenario_time) ? 0 : current_scenario_time;
-  status.type = status_.type;
-  status.bounding_box = status_.bounding_box;
   status.pose = getCurrentPose();
   status.action_status.twist = getCurrentTwist();
   status.action_status.accel = getCurrentAccel(step_time);
   status.action_status.linear_jerk = getLinearJerk(step_time);
-
-  fillLaneletDataAndSnapZToLanelet(status);
   setStatus(status);
-}
-
-auto EgoEntitySimulation::fillLaneletDataAndSnapZToLanelet(
-  traffic_simulator_msgs::msg::EntityStatus & status) -> void
-{
-  if (
-    auto lanelet_pose = getMatchedLaneletPoseFromEntityStatus(
-      status, std::max(
-                vehicle_parameters.axles.front_axle.track_width,
-                vehicle_parameters.axles.rear_axle.track_width))) {
-    math::geometry::CatmullRomSpline spline(
-      hdmap_utils_ptr_->getCenterPoints(lanelet_pose->lanelet_id));
-    if (const auto s_value = spline.getSValue(status.pose)) {
-      status.pose.position.z = spline.getPoint(s_value.value()).z;
-      if (consider_pose_by_road_slope_) {
-        const auto rpy = quaternion_operation::convertQuaternionToEulerAngle(
-          spline.getPose(s_value.value(), true).orientation);
-        const auto original_rpy =
-          quaternion_operation::convertQuaternionToEulerAngle(status.pose.orientation);
-        status.pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
-          geometry_msgs::build<geometry_msgs::msg::Vector3>()
-            .x(original_rpy.x)
-            .y(rpy.y)
-            .z(original_rpy.z));
-        lanelet_pose->rpy =
-          quaternion_operation::convertQuaternionToEulerAngle(quaternion_operation::getRotation(
-            spline.getPose(s_value.value(), true).orientation, status.pose.orientation));
-      }
-    }
-    status.lanelet_pose_valid = true;
-    status.lanelet_pose = lanelet_pose.value();
-  } else {
-    status.lanelet_pose_valid = false;
-  }
 }
 }  // namespace vehicle_simulation

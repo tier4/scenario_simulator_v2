@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <quaternion_operation/quaternion_operation.h>
-
 #include <algorithm>
 #include <autoware_auto_perception_msgs/msg/detected_objects.hpp>
 #include <autoware_auto_perception_msgs/msg/tracked_objects.hpp>
@@ -21,6 +19,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <geometry/quaternion/get_rotation_matrix.hpp>
 #include <geometry/vector3/hypot.hpp>
 #include <memory>
 #include <random>
@@ -117,7 +116,7 @@ auto make(const traffic_simulator_msgs::EntityStatus & status) -> geometry_msgs:
   auto center_point = geometry_msgs::msg::Point();
   simulation_interface::toMsg(status.bounding_box().center(), center_point);
 
-  Eigen::Vector3d center = quaternion_operation::getRotationMatrix(pose.orientation) *
+  Eigen::Vector3d center = math::geometry::getRotationMatrix(pose.orientation) *
                            Eigen::Vector3d(center_point.x, center_point.y, center_point.z);
 
   pose.position.x = pose.position.x + center.x();

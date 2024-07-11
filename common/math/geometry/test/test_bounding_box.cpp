@@ -13,9 +13,9 @@
 // limitations under the License.
 
 #include <gtest/gtest.h>
-#include <quaternion_operation/quaternion_operation.h>
 
 #include <geometry/bounding_box.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <scenario_simulator_exception/exception.hpp>
 
 #include "expect_eq_macros.hpp"
@@ -79,7 +79,7 @@ TEST(BoundingBox, get2DPolygonOnlyTranslation)
 TEST(BoundingBox, get2DPolygonFullPose)
 {
   geometry_msgs::msg::Pose pose = makePose(1.0, 2.0);
-  pose.orientation = quaternion_operation::convertEulerAngleToQuaternion(
+  pose.orientation = math::geometry::convertEulerAngleToQuaternion(
     geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(30.0 * M_PI / 180.0));
   traffic_simulator_msgs::msg::BoundingBox bounding_box = makeBbox(2.0, 2.0, 2.0);
   boost::geometry::model::polygon<boost::geometry::model::d2::point_xy<double>> poly =

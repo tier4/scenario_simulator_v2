@@ -16,45 +16,13 @@
 #include <gtest/gtest.h>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
+#include <geometry/quaternion/euler_to_quaternion.hpp>
 #include <string>
 #include <traffic_simulator/hdmap_utils/hdmap_utils.hpp>
 #include <traffic_simulator/helper/helper.hpp>
 
 #include "../expect_eq_macros.hpp"
-
-auto makePoint(const double x, const double y, const double z = 0.0) -> geometry_msgs::msg::Point
-{
-  return geometry_msgs::build<geometry_msgs::msg::Point>().x(x).y(y).z(z);
-}
-
-auto makeBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
-{
-  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
-    .center(makePoint(1.0, center_y))
-    .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(4.0).y(2.0).z(1.5));
-}
-
-auto makePose(
-  geometry_msgs::msg::Point position,
-  geometry_msgs::msg::Quaternion orientation = geometry_msgs::msg::Quaternion())
-  -> geometry_msgs::msg::Pose
-{
-  return geometry_msgs::build<geometry_msgs::msg::Pose>().position(position).orientation(
-    orientation);
-}
-
-auto makeSmallBoundingBox(const double center_y = 0.0) -> traffic_simulator_msgs::msg::BoundingBox
-{
-  return traffic_simulator_msgs::build<traffic_simulator_msgs::msg::BoundingBox>()
-    .center(makePoint(0.0, center_y))
-    .dimensions(geometry_msgs::build<geometry_msgs::msg::Vector3>().x(1.0).y(1.0).z(1.0));
-}
-
-auto makeQuaternionFromYaw(const double yaw) -> geometry_msgs::msg::Quaternion
-{
-  return quaternion_operation::convertEulerAngleToQuaternion(
-    geometry_msgs::build<geometry_msgs::msg::Vector3>().x(0.0).y(0.0).z(yaw));
-}
+#include "../helper_functions.hpp"
 
 int main(int argc, char ** argv)
 {
