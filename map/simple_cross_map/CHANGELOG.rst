@@ -9,6 +9,14 @@ Changelog for package simple_cross_map
 * Merge branch 'master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.0.2 (2024-07-11)
+------------------
+
+3.0.1 (2024-07-10)
+------------------
+* Merge branch 'master' into feature/docker_tag
+* Contributors: Tatsuya Yamasaki
+
 3.0.0 (2024-07-10)
 ------------------
 * Merge branch 'master' into ref/RJD-1053-implement-pose-utils
