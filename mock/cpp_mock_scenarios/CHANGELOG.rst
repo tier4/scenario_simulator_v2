@@ -21,6 +21,14 @@ Changelog for package cpp_mock_scenarios
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.0.3 (2024-07-12)
+------------------
+* Merge pull request `#1319 <https://github.com/tier4/scenario_simulator_v2/issues/1319>`_ from tier4/test/synchronized-action-kashiwanoha-map
+  fix: Change map of synchronized action's test
+* Merge branch 'master' into test/synchronized-action-kashiwanoha-map
+* Changed map from simple_cross_map to kashiwanoha_map since bug has  been removed.
+* Contributors: Masaya Kataoka, koki suzuki
+
 3.0.2 (2024-07-11)
 ------------------
 
