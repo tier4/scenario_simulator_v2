@@ -194,7 +194,7 @@ public:
 
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
-  virtual void setStatus(const EntityStatus & status);
+  virtual auto setStatus(const EntityStatus & status) -> void;
 
   virtual auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
 

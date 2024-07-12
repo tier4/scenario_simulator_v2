@@ -300,7 +300,7 @@ void EgoEntity::setStatus(const EntityStatus & status)
 {
   THROW_SEMANTIC_ERROR(
     "You cannot set entity status to the ego vehicle named ", std::quoted(status.name),
-    " without specifing lanelets.");
+    " without specifying lanelets.");
 }
 
 auto EgoEntity::setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void

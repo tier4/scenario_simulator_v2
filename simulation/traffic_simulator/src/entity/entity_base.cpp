@@ -526,7 +526,7 @@ void EntityBase::setOtherStatus(
   other_status_.erase(name);
 }
 
-void EntityBase::setStatus(const EntityStatus & status)
+auto EntityBase::setStatus(const EntityStatus & status) -> void
 {
   status_.set(status, getDefaultMatchingDistanceForLaneletPoseCalculation(), hdmap_utils_ptr_);
 }
