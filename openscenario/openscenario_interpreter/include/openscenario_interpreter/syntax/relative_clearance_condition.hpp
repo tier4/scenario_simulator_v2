@@ -55,7 +55,7 @@ struct RelativeClearanceCondition : private Scope, private SimulatorCore::Condit
   /*
      	If false, then entityRefs are only considered to be on the lane if their reference point is within the checked area; otherwise the whole bounding box is considered.
   */
-  const Boolean freespace;
+  const Boolean free_space;
 
   /*
      If true, then also lanes in the opposite direction are considered; otherwise only lanes in the same direction are considered.

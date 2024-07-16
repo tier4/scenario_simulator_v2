@@ -27,7 +27,7 @@ RelativeClearanceCondition::RelativeClearanceCondition(
 : Scope(scope),
   distance_backward(readAttribute<Double>("distanceBackward", node, scope, 0.0)),
   distance_forward(readAttribute<Double>("distanceForward", node, scope, 0.0)),
-  freespace(readAttribute<Boolean>("freespace", node, scope)),
+  free_space(readAttribute<Boolean>("freeSpace", node, scope)),
   opposite_lanes(readAttribute<Boolean>("oppositeLanes", node, scope)),
   relative_lane_range(readElements<RelativeLaneRange, 0>("RelativeLaneRange", node, scope)),
   entity_refs(readElements<EntityRef, 0>("EntityRef", node, scope)),
