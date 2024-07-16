@@ -21,6 +21,14 @@ Changelog for package openscenario_interpreter_example
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.0.3 (2024-07-12)
+------------------
+* Merge branch 'master' into test/synchronized-action-kashiwanoha-map
+* Contributors: Masaya Kataoka
+
+3.0.2 (2024-07-11)
+------------------
+
 3.0.1 (2024-07-10)
 ------------------
 * Merge branch 'master' into feature/docker_tag
