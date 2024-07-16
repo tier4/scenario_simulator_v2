@@ -30,18 +30,17 @@ public:
   explicit SynchronizedAction(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
       "synchronized_action",
-      ament_index_cpp::get_package_share_directory("simple_cross_map") + "/map", "lanelet2_map.osm",
+      ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map", "lanelet2_map.osm",
       __FILE__, false, option)
   {
     start();
   }
 
 private:
-  bool requested = false;
   const traffic_simulator::CanonicalizedLaneletPose ego_target =
-    api_.canonicalize(traffic_simulator::helper::constructLaneletPose(147, 0, 0, 0, 0, 0));
+    traffic_simulator::helper::constructCanonicalizedLaneletPose(34585, 0, 0, api_.getHdmapUtils());
   const traffic_simulator::CanonicalizedLaneletPose npc_target =
-    api_.canonicalize(traffic_simulator::helper::constructLaneletPose(133, 0, 0, 0, 0, 0));
+    traffic_simulator::helper::constructCanonicalizedLaneletPose(34570, 0, 0, api_.getHdmapUtils());
 
   void onUpdate() override
   {
@@ -54,7 +53,7 @@ private:
     }
 
     // FAILURES
-    if (api_.getCurrentTime() >= 9.0) {
+    if (api_.getCurrentTime() >= 30.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (api_.checkCollision("ego", "npc")) {
@@ -64,30 +63,34 @@ private:
   void onInitialize() override
   {
     api_.spawn(
-      "ego", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(7, 40, 0, 0, 0, 0)),
+      "ego",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34976, 20, 0, api_.getHdmapUtils()),
       getVehicleParameters());
     api_.setLinearVelocity("ego", 3);
     api_.requestSpeedChange("ego", 3, true);
 
     std::vector<geometry_msgs::msg::Pose> goal_poses;
-    goal_poses.emplace_back(
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(154, 20, 0, 0, 0, 0)));
+    goal_poses.emplace_back(traffic_simulator::helper::constructCanonicalizedLaneletPose(
+      34579, 20, 0, api_.getHdmapUtils()));
     api_.requestAssignRoute("ego", goal_poses);
 
     api_.spawn(
-      "npc", api_.canonicalize(traffic_simulator::helper::constructLaneletPose(14, 15, 0, 0, 0, 0)),
+      "npc",
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        34576, 0, 0, api_.getHdmapUtils()),
       getVehicleParameters());
     std::vector<geometry_msgs::msg::Pose> npc_goal_poses;
-    npc_goal_poses.emplace_back(
-      api_.canonicalize(traffic_simulator::helper::constructLaneletPose(140, 20, 0, 0, 0, 0)));
+    npc_goal_poses.emplace_back(traffic_simulator::helper::constructCanonicalizedLaneletPose(
+      34564, 20, 0, api_.getHdmapUtils()));
     api_.requestAssignRoute("npc", npc_goal_poses);
     api_.setLinearVelocity("npc", 6);
   }
 
   auto getSampleLaneletPose(const traffic_simulator::LaneletPose & lanelet_pose)
-    -> traffic_simulator::CanonicalizedLaneletPose
+    -> std::optional<traffic_simulator::CanonicalizedLaneletPose>
   {
-    return api_.canonicalize(lanelet_pose);
+    return traffic_simulator::pose::canonicalize(lanelet_pose, api_.getHdmapUtils());
   }
 };
 }  // namespace cpp_mock_scenarios
