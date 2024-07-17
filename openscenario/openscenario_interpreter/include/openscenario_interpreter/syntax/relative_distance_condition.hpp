@@ -102,9 +102,9 @@ struct RelativeDistanceCondition : private Scope, private SimulatorCore::Conditi
     throw SyntaxError(__FILE__, ":", __LINE__);
   }
 
-  static auto distance(
-    const EntityRef &, const EntityRef &, const Entities &, CoordinateSystem, RelativeDistanceType,
-    RoutingAlgorithm, bool) -> double;
+  static auto evaluate(
+    const Entities *, const EntityRef &, const EntityRef &, CoordinateSystem, RelativeDistanceType,
+    RoutingAlgorithm, Boolean) -> double;
 
   auto evaluate() -> Object;
 };
