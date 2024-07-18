@@ -10,8 +10,7 @@ Major Changes :race_car: :red_car: :blue_car:
 
 | Feature                 | Brief summary                                                        | Category            | Pull request                                                      | Contributor                                   |
 | ----------------------- | -------------------------------------------------------------------- | ------------------- | ----------------------------------------------------------------- | --------------------------------------------- |
-| Extend matching length.            | Enable consider tread when calculating matching length of EgoEntity.          | `traffic_simulator`        | [#1181](https://github.com/tier4/scenario_simulator_v2/pull/1181) | [hakuturu583](https://github.com/hakuturu583) |
-| OpenSCENARIO 1.2 `EntitySelection` | Added `EntitySelection` and modified some classes to be able to handle it.    | `openscenario_interpreter` | [#1059](https://github.com/tier4/scenario_simulator_v2/pull/1059) | [shouth](https://github.com/shouth)           |
+| Extend matching length. | Enable consider tread when calculating matching length of EgoEntity. | `traffic_simulator` | [#1181](https://github.com/tier4/scenario_simulator_v2/pull/1181) | [hakuturu583](https://github.com/hakuturu583) |
 
 Bug Fixes:bug:
 
