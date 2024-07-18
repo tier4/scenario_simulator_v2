@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>traffic_simulator</name>
-  <version>3.0.2</version>
+  <version>3.1.0</version>
   <description>control traffic flow</description>
 
   <maintainer email="masaya.kataoka@tier4.jp">masaya kataoka</maintainer>
@@ -13,12 +13,12 @@
 
   <depend>ament_index_cpp</depend>
   <depend>arithmetic</depend>
+  <depend>autoware_lanelet2_extension</depend>
   <depend>concealer</depend>
   <depend>color_names</depend>
   <depend>geographic_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>lanelet2_core</depend>
-  <depend>lanelet2_extension</depend>
   <depend>lanelet2_io</depend>
   <depend>lanelet2_matching</depend>
   <depend>lanelet2_projection</depend>
