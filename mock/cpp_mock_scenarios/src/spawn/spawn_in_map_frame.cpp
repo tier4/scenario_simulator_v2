@@ -24,41 +24,38 @@
 
 namespace cpp_mock_scenarios
 {
-class LaneChangeRightScenario : public cpp_mock_scenarios::CppScenarioNode
+class SpawnInMapFrameScenario : public cpp_mock_scenarios::CppScenarioNode
 {
 public:
-  explicit LaneChangeRightScenario(const rclcpp::NodeOptions & option)
+  explicit SpawnInMapFrameScenario(const rclcpp::NodeOptions & option)
   : cpp_mock_scenarios::CppScenarioNode(
-      "lanechange_left", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
+      "stop_at_crosswalk", ament_index_cpp::get_package_share_directory("kashiwanoha_map") + "/map",
       "lanelet2_map.osm", __FILE__, false, option)
   {
     start();
   }
 
 private:
-  bool requested = false;
   void onUpdate() override
   {
-    if (api_.isInLanelet("ego", 34462, 0.1)) {
+    const auto map_pose = traffic_simulator::pose::toMapPose(
+      traffic_simulator::helper::constructCanonicalizedLaneletPose(
+        120545, 0.0, 0.0, api_.getHdmapUtils()));
+    if (api_.reachPosition("ego", map_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::SUCCESS);
-    }
-    // LCOV_EXCL_START
-    if (api_.getCurrentTime() >= 10.0) {
+    } else {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
-    // LCOV_EXCL_STOP
   }
+
   void onInitialize() override
   {
     api_.spawn(
       "ego",
-      traffic_simulator::helper::constructCanonicalizedLaneletPose(
-        34513, 10.0, 0.0, api_.getHdmapUtils()),
+      traffic_simulator::pose::toMapPose(
+        traffic_simulator::helper::constructCanonicalizedLaneletPose(
+          120545, 0.0, 0.0, api_.getHdmapUtils())),
       getVehicleParameters());
-    api_.setLinearVelocity("ego", 10);
-    api_.requestSpeedChange("ego", 10, true);
-    api_.requestLaneChange("ego", traffic_simulator::lane_change::Direction::RIGHT);
-    // api_.requestLaneChange("ego", 34462);
   }
 };
 }  // namespace cpp_mock_scenarios
@@ -67,7 +64,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   rclcpp::NodeOptions options;
-  auto component = std::make_shared<cpp_mock_scenarios::LaneChangeRightScenario>(options);
+  auto component = std::make_shared<cpp_mock_scenarios::SpawnInMapFrameScenario>(options);
   rclcpp::spin(component);
   rclcpp::shutdown();
   return 0;

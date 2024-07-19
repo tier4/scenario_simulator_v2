@@ -21,6 +21,125 @@ Changelog for package traffic_simulator
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.2.0 (2024-07-18)
+------------------
+* Merge pull request `#1323 <https://github.com/tier4/scenario_simulator_v2/issues/1323>`_ from tier4/fix/spawn_position_of_map_pose
+  Fill x/y value when spawning entity in map frame.
+* Merge remote-tracking branch 'origin/master' into fix/spawn_position_of_map_pose
+* comment in entity_status.pose = pose;
+* add test scenario for validation
+* Contributors: Masaya Kataoka, Tatsuya Yamasaki
+
+3.1.0 (2024-07-16)
+------------------
+* Merge pull request `#1309 <https://github.com/tier4/scenario_simulator_v2/issues/1309>`_ from tier4/autoware_lanelet2_extension
+  feat: use autoware_lanelet2_extension instead of lanelet2_extension
+* Merge branch 'master' into autoware_lanelet2_extension
+* Merge branch 'master' into autoware_lanelet2_extension
+* chore: apply linter
+* add autoware\_ prefix
+* Contributors: Kotaro Yoshimoto, Tatsuya Yamasaki, Yutaka Kondo
+
+3.0.3 (2024-07-12)
+------------------
+* Merge branch 'master' into test/synchronized-action-kashiwanoha-map
+* Contributors: Masaya Kataoka
+
+3.0.2 (2024-07-11)
+------------------
+
+3.0.1 (2024-07-10)
+------------------
+* Merge branch 'master' into feature/docker_tag
+* Contributors: Tatsuya Yamasaki
+
+3.0.0 (2024-07-10)
+------------------
+* Merge pull request `#1266 <https://github.com/tier4/scenario_simulator_v2/issues/1266>`_ from tier4/ref/RJD-1053-implement-pose-utils
+  ref(traffic_simulator): extend utils/pose - use it globally, improve canonization process
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* feat(entity_manager): add Pose type assertion to ::spawnEntity
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* feat(traffic_simulator): remove deprecated test
+* fix(tests): fix traffic_simulator test after merge
+* Merge branch 'master' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-implement-pose-utils
+* feat(entity_manager): remove LaneletPose support from spawnEntity()
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* feat(pose utils): apply requested changes
+* fix(lanelet_pose): fix after merge - remove quaternion::
+* Merge remote-tracking branch 'origin' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1053-implement-pose-utils' of https://github.com/tier4/scenario_simulator_v2 into ref/RJD-1053-implement-pose-utils
+* ref(pose utils, pedestrian_action_node): rename estimateCanonicalizedLaneletPose to pedestrian::transformToCanonicalizedLaneletPose
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* Merge remote-tracking branch 'origin/master' into ref/RJD-1053-implement-pose-utils
+* ref(behavior_tree_plugin, traffic_simulator): apply requested changes
+* ref(traffic_simulator, pose utils): add the missing brackets
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'master' into ref/RJD-1053-implement-pose-utils
+* fix(traffic_simulator): fix spell
+* Merge master->ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(rviz): fix last line ss2 config
+* ref(rviz): add new line at the end - ss2 config
+* ref(rviz): revert changes ss2 config
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* fix(entity_manager): fix reachPosition - unused target
+* fix(entity_status): add operator= for CanonicalizedEntityStatus
+* Revert "tmp"
+  This reverts commit 6149b4cd77fa9e18ced8152c9ca0242228b5966f.
+* Merge remote-tracking branch 'origin/ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* tmp
+* ref(traffic_simulator): tidy up pose::estimateCanonicalizedLaneletPose
+* ref(traffic_simulator): tidy up namespace usage, rename bbox to bounding_box
+* ref(traffic_simulator): tidy up namespace usage, use inline namespace
+* fix(traffic_simulator): revert rviz config changes
+* ref(traffic_simulator): global improvements, comments, revert unnecessary changes
+* ref(traffic_simulator): use only toMapPose and laneletLength from ::pose
+* feat(traffic_simulator): use getCanonicalizedLaneletPose instead of HdMapUtils
+* fix(traffic_simulator): fix map_pose after canonicalize
+* feat(traffic_simulator): use consider_pose_by_road_slope as static variable in CanonicaliedLaneletPose
+* ref(traffic_simulator): remove remains getMapPose
+* fix(toCanonicalizeLaneletPose):  fix using unique_lanelets (current)
+* fix(api, simulator_core): fix canonicalize in setEntityStatus, apply optional to canonicalize
+* fix(entity_base): fix requestLaneChange
+* Merge remote-tracking branch 'origin/ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* fix(toCanonicalizeLaneletPose): add use current lanelet id to provide better match
+* feat(api): add throwing exception if getEntity issue durning register
+* ref(simulator_core,sss,pose): revert unintended changes
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(traffic_simulator, cpp_mock_scenarios): separate getLaneletLength and adapt entire code
+* ref(traffic_simulator): remove commented out for refactor
+* fix(traffic_simulator): fix CanonicalizedEntityStatus with HdmapUtils constructor
+* ref(traffic_simulator): remove fillLaneletPose
+* ref(traffic_simulator): tidyup requestLaneChange
+* ref(traffic_simulator): separate getMapPoseFromRelativePose
+* ref(traffic_simulator): tidyup names and unused
+* feat(traffic_simulator): add adjust Oz and pitch to CanonicalizedLaneletPose contructor
+* ref(traffic_simulator, behavior_tree): separate isInLanelet, isAtEndOfLanelet, estimateLaneletPose
+* ref(behavior_tree): add getLaneletId to CanonicalizedEntityStatus
+* ref(traffic_simulator): tidy up constructCanonicalizedLaneletPose
+* ref(traffic_simulator): improve setEntityManager - use ::pose, improve CanonicalizedEntityStatus
+* ref(traffic_simulator): simply setEntityStatus - move canonicalize to EntityManager
+* feat(traffic_simulator): add extend ::pose collection
+* ref(traffic_simulator): adapt EntityManager to getCanonicalizedLaneletPose()
+* ref(traffic_simulator): adapt pedestrian and vehicle entities to getCanonicalizedLaneletPose
+* feat(traffic_simulator): add canonicalized_lanelet_pose, getCanonicalizedLaneletPose to: EntityStatus and EntityBase
+* ref(traffic_simulator): use toCanonicalizedLaneletPose
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* ref(traffic_simulator): use toLaneletPose() from separated pose collection
+* feat(traffic_simulator): transform PoseUtils to pose collection
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* Merge branch 'ref/RJD-1054-implement-distance-utils' into ref/RJD-1053-implement-pose-utils
+* feat(helper): add constructCanonicalizedLaneletPose
+* ref(pose): use separated toMapPose
+* feat(pose): separate pose utils methods
+* Contributors: DMoszynski, Dawid Moszynski, Dawid Moszyński, Masaya Kataoka, Tatsuya Yamasaki
+
 2.6.0 (2024-07-08)
 ------------------
 * Bump version of scenario_simulator_v2 from version 2.4.2 to version 2.5.0
