@@ -99,6 +99,11 @@ auto API::respawn(
   }
 }
 
+auto API::getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>
+{
+  return entity_manager_ptr_->getEntity(name);
+}
+
 auto API::setEntityStatus(
   const std::string & name,
   const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,

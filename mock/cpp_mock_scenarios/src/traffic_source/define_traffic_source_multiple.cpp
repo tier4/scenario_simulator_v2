@@ -54,11 +54,6 @@ private:
       unsigned int vehicle_count = 0u, pedestrian_count = 0u;
       for (const auto & name : names) {
         if (const auto entity = api_.getEntity(name)) {
-          const bool is_vehicle =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
-          const bool is_pedestrian =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-
           const bool valid_vehicle_lanelet =
             api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
             api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
@@ -66,17 +61,17 @@ private:
           const bool valid_pedestrian_lanelet =
             api_.isInLanelet(name, static_cast<lanelet::Id>(34385), 10.0);
 
-          if (is_vehicle) {
+          if (isVehicle(name)) {
             ++vehicle_count;
-          } else if (is_pedestrian) {
+          } else if (isPedestrian(name)) {
             ++pedestrian_count;
           }
 
           if (
             // clang-format off
           !entity->laneMatchingSucceed() ||
-          (is_vehicle && !valid_vehicle_lanelet) ||
-          (is_pedestrian && !valid_pedestrian_lanelet))
+          (isVehicle(name) && !valid_vehicle_lanelet) ||
+          (isPedestrian(name) && !valid_pedestrian_lanelet))
           // clang-format on
           {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
