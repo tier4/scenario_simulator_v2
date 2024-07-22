@@ -110,7 +110,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   if (const auto entity = getEntity(name)) {
-    auto status = static_cast<EntityStatus>(entity->getStatus());
+    auto status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.action_status = action_status;
     if (canonicalized_lanelet_pose) {
       status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
@@ -163,7 +163,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   if (const auto entity = getEntity(name)) {
-    EntityStatus status = static_cast<EntityStatus>(entity->getStatus());
+    EntityStatus status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.pose = map_pose;
     status.action_status = action_status;
     setEntityStatus(name, status);

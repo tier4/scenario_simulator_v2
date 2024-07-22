@@ -364,7 +364,7 @@ public:
   FORWARD_TO_ENTITY_MANAGER(getEgoName);
   FORWARD_TO_ENTITY_MANAGER(getEntityNames);
   FORWARD_TO_ENTITY_MANAGER(getEntityStatus);
-  FORWARD_TO_ENTITY_MANAGER(getEntityStatusBeforeUpdate);
+  FORWARD_TO_ENTITY_MANAGER(getCanonicalizedStatusBeforeUpdate);
   FORWARD_TO_ENTITY_MANAGER(getHdmapUtils);
   FORWARD_TO_ENTITY_MANAGER(getLinearJerk);
   FORWARD_TO_ENTITY_MANAGER(getStandStillDuration);
