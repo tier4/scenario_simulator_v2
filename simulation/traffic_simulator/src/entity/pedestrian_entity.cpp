@@ -164,13 +164,6 @@ void PedestrianEntity::cancelRequest()
   route_planner_.cancelRoute();
 }
 
-auto PedestrianEntity::getEntityType() const -> const traffic_simulator_msgs::msg::EntityType &
-{
-  static traffic_simulator_msgs::msg::EntityType type;
-  type.type = traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-  return type;
-}
-
 auto PedestrianEntity::getEntityTypename() const -> const std::string &
 {
   static const std::string result = "PedestrianEntity";
