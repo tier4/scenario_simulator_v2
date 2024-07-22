@@ -21,6 +21,11 @@ Changelog for package random_test_runner
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.2.0 (2024-07-18)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/spawn_position_of_map_pose
+* Contributors: Masaya Kataoka
+
 3.1.0 (2024-07-16)
 ------------------
 * Merge pull request `#1309 <https://github.com/tier4/scenario_simulator_v2/issues/1309>`_ from tier4/autoware_lanelet2_extension
