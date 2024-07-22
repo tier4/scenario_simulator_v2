@@ -78,6 +78,8 @@ public:
     const lanelet::Id, const double s, const lanelet::Ids &,
     const double forward_distance = 20) const -> std::vector<geometry_msgs::msg::Point>;
 
+  auto countLaneChangesAlongRoute(const lanelet::Ids &) const -> std::pair<int, int>;
+
   auto filterLaneletIds(const lanelet::Ids &, const char subtype[]) const -> lanelet::Ids;
 
   auto generateMarker() const -> visualization_msgs::msg::MarkerArray;

@@ -214,6 +214,31 @@ auto HdMapUtils::canonicalizeLaneletPose(
   return {canonicalized, std::nullopt};
 }
 
+auto HdMapUtils::countLaneChangesAlongRoute(const lanelet::Ids & route_lanelets) const -> std::pair<int, int>
+{
+  std::pair<int, int> lane_changes{0, 0};
+  for (size_t i = 1; i < route_lanelets.size(); ++i) {
+      const auto& previous = route_lanelets[i-1];
+      const auto& current = route_lanelets[i];
+
+      if (auto followings = getNextLaneletIds(previous);
+      std::find_if(followings.begin(),
+                   followings.end(),
+                   [&current](const auto& lanelet) { return lanelet == current; }) == followings.end()) {
+        traffic_simulator_msgs::msg::EntityType type;
+        type.type = traffic_simulator_msgs::msg::EntityType::VEHICLE;
+        if (auto lefts = getLeftLaneletIds(previous, type);
+            std::find_if(lefts.begin(), lefts.end(), [&current](const auto& lanelet) { return lanelet == current; }) != lefts.end()) {
+          lane_changes.first++;
+        } else if (auto rights = getRightLaneletIds(previous, type);
+                   std::find_if(rights.begin(), rights.end(), [&current](const auto& lanelet) { return lanelet == current; }) != rights.end()) {
+          lane_changes.second++;
+        }
+      }
+    }
+    return lane_changes;
+}
+
 auto HdMapUtils::getLaneletIds() const -> lanelet::Ids
 {
   lanelet::Ids ids;
