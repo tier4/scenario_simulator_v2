@@ -28,7 +28,7 @@ public:
   bool isAlmostStandingStill(const traffic_simulator::CanonicalizedEntityStatus & status)
   {
     if (!last_status_) {
-      last_status_->set(status);
+      last_status_.emplace(status);
       return false;
     }
 

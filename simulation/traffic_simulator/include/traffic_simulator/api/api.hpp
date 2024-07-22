@@ -72,7 +72,7 @@ public:
       std::make_shared<entity::EntityManager>(node, configuration, node_parameters_)),
     traffic_lights_ptr_(std::make_shared<TrafficLights>(
       node, entity_manager_ptr_->getHdmapUtils(),
-      getParameter<std::string>(node_parameters_, "architecture_type", "awf/universe"))),
+      getROS2Parameter<std::string>("architecture_type", "awf/universe"))),
     traffic_controller_ptr_(std::make_shared<traffic::TrafficController>(
       entity_manager_ptr_->getHdmapUtils(),
       [this]() { return entity_manager_ptr_->getEntityNames(); },

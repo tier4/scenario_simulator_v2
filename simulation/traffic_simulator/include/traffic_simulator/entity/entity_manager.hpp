@@ -48,6 +48,7 @@
 #include <traffic_simulator_msgs/msg/behavior_parameter.hpp>
 #include <traffic_simulator_msgs/msg/bounding_box.hpp>
 #include <traffic_simulator_msgs/msg/entity_status_with_trajectory_array.hpp>
+#include <traffic_simulator_msgs/msg/traffic_light_array_v1.hpp>
 #include <traffic_simulator_msgs/msg/vehicle_parameters.hpp>
 #include <type_traits>
 #include <unordered_map>
@@ -181,9 +182,9 @@ public:
 
   auto getEgoEntity() const -> std::shared_ptr<traffic_simulator::entity::EgoEntity>
   {
-    for (const auto & each : entities_) {
-      if (each.second->template is<EgoEntity>()) {
-        return std::dynamic_pointer_cast<EgoEntity>(each.second);
+    for (const auto & [name, entity] : entities_) {
+      if (entity->template is<EgoEntity>()) {
+        return std::dynamic_pointer_cast<EgoEntity>(entity);
       }
     }
     THROW_SEMANTIC_ERROR("getEgoEntity function was called, but ego vehicle does not exist");
@@ -193,10 +194,10 @@ public:
     -> std::shared_ptr<traffic_simulator::entity::EgoEntity>
   {
     if (auto it = entities_.find(name); it == entities_.end()) {
-      THROW_SEMANTIC_ERROR("entity : ", name, "does not exist");
+      THROW_SEMANTIC_ERROR("entity : ", std::quoted(name), " does not exist");
     } else {
       if (auto ego_entity = std::dynamic_pointer_cast<EgoEntity>(it->second); !ego_entity) {
-        THROW_SEMANTIC_ERROR("entity : ", name, " exists, but it is not ego");
+        THROW_SEMANTIC_ERROR("entity : ", std::quoted(name), " exists, but it is not ego");
       } else
         return ego_entity;
     }
@@ -260,6 +261,12 @@ public:
     const std::string & name, const Pose & pose, const Parameters & parameters,
     const double current_time, Ts &&... xs)
   {
+    static_assert(
+      std::disjunction<
+        std::is_same<Pose, CanonicalizedLaneletPose>,
+        std::is_same<Pose, geometry_msgs::msg::Pose>>::value,
+      "Pose must be of type CanonicalizedLaneletPose or geometry_msgs::msg::Pose");
+
     auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 
