@@ -64,7 +64,8 @@ public:
   auto getLaneletId() const noexcept -> lanelet::Id;
   auto getLaneletIds() const noexcept -> lanelet::Ids;
   auto getLaneletPose() const noexcept -> const LaneletPose &;
-  auto getCanonicalizedLaneletPose() const noexcept -> const std::optional<CanonicalizedLaneletPose> &;
+  auto getCanonicalizedLaneletPose() const noexcept
+    -> const std::optional<CanonicalizedLaneletPose> &;
   auto getName() const noexcept -> const std::string & { return entity_status_.name; }
   auto getType() const noexcept -> const EntityType & { return entity_status_.type; }
   auto getSubtype() const noexcept -> const EntitySubtype & { return entity_status_.subtype; }
