@@ -21,6 +21,17 @@ Changelog for package openscenario_interpreter_msgs
 * Merge remote-tracking branch 'origin/master' into feature/publish_empty_context
 * Contributors: Masaya Kataoka
 
+3.2.0 (2024-07-18)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/spawn_position_of_map_pose
+* Contributors: Masaya Kataoka
+
+3.1.0 (2024-07-16)
+------------------
+* Merge branch 'master' into autoware_lanelet2_extension
+* Merge branch 'master' into autoware_lanelet2_extension
+* Contributors: Tatsuya Yamasaki
+
 3.0.3 (2024-07-12)
 ------------------
 * Merge branch 'master' into test/synchronized-action-kashiwanoha-map
