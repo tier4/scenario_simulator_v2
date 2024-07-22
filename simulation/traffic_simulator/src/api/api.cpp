@@ -133,7 +133,8 @@ std::optional<double> API::getTimeHeadway(
 {
   if (auto from_entity = getEntity(from_entity_name); from_entity) {
     if (auto to_entity = getEntity(to_entity_name); to_entity) {
-      if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+      if (auto relative_pose =
+            pose::relativePose(from_entity->getMapPose(), to_entity->getMapPose());
           relative_pose && relative_pose->position.x <= 0) {
         const double time_headway =
           (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;
@@ -149,7 +150,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   setEntityStatus(
-    name, canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
+    name, pose::canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
 }
 
 auto API::setEntityStatus(
@@ -173,7 +174,7 @@ auto API::setEntityStatus(
 {
   if (const auto reference_entity = getEntity(reference_entity_name)) {
     setEntityStatus(
-      name, transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
+      name, pose::transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
       action_status);
   } else {
     THROW_SIMULATION_ERROR(

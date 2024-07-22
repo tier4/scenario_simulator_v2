@@ -34,7 +34,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
       The position in Oz axis and orientation based on LaneletPose are rewritten to
       the used msg::Pose (map_pose) since such adjustment relative to the lanelet is necessary,
       The position in Ox and Oy axis is not rewritten because the map_pose retrieved via
-      lanelet_pose = toCanonicalizedLaneletPose(map_pose), then map_pose = toMapPose(lanelet_pose)
+      lanelet_pose = pose::toCanonicalizedLaneletPose(map_pose), then map_pose pose::toMapPose(lanelet_pose)
       can be slightly different from the original one (especially if the entity changes lane).
     */
     const auto map_pose_based_on_lanelet_pose =
@@ -76,7 +76,7 @@ auto CanonicalizedEntityStatus::set(
     canonicalized_lanelet_pose = pose::canonicalize(status.lanelet_pose, hdmap_utils_ptr);
   } else {
     // prefer the current lanelet
-    canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
+    canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
       status.pose, getBoundingBox(), getLaneletIds(), include_crosswalk, matching_distance,
       hdmap_utils_ptr);
   }
