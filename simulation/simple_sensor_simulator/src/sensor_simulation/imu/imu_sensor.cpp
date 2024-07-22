@@ -35,7 +35,7 @@ auto ImuSensor<sensor_msgs::msg::Imu>::generateMessage(
 
   auto imu_msg = sensor_msgs::msg::Imu();
   imu_msg.header.stamp = current_ros_time;
-  imu_msg.header.frame_id = "imu_link";
+  imu_msg.header.frame_id = "imu_link"; //tamagawa/
 
   auto orientation_rpy = math::geometry::convertQuaternionToEulerAngle(status.pose.orientation);
   auto twist = status.action_status.twist;
