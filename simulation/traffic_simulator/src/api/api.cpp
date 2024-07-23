@@ -157,7 +157,8 @@ auto API::setEntityStatus(
     setEntityStatus(name, canonicalized_lanelet_pose.value(), action_status);
   } else {
     std::stringstream ss;
-    ss << "Status can not be set. lanelet pose: " << lanelet_pose << " is not canonicalizable for ";
+    ss << "Status can not be set. lanelet pose: " << lanelet_pose
+       << " cannot be canonicalized for ";
     THROW_SEMANTIC_ERROR(ss.str(), " entity named: ", std::quoted(name), ".");
   }
 }

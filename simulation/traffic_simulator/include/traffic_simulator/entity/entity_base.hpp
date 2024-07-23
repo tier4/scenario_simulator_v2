@@ -197,7 +197,7 @@ public:
 
   virtual auto setStatus(const EntityStatus & status) -> void;
 
-  virtual auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
+  /*   */ auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;
 
   virtual auto setLinearAcceleration(const double linear_acceleration) -> void;
 
