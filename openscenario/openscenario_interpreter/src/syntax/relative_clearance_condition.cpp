@@ -54,5 +54,18 @@ auto RelativeClearanceCondition::evaluate() -> Object
   // TODO(HansRobo): implement
   return unspecified;
 }
+
+auto RelativeClearanceCondition::getRelativeLanePosition(
+  const EntityRef & triggering_entity, const EntityRef & entity, bool use_bounding_box) const
+  -> traffic_simulator::LaneletPose
+{
+  if (use_bounding_box) {
+    return static_cast<traffic_simulator::LaneletPose>(makeNativeBoundingBoxRelativeLanePosition(
+      triggering_entity, entity, RoutingAlgorithm::shortest));
+  } else {
+    return static_cast<traffic_simulator::LaneletPose>(
+      makeNativeRelativeLanePosition(triggering_entity, entity, RoutingAlgorithm::shortest));
+  }
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
