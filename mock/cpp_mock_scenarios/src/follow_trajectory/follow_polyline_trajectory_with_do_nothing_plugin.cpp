@@ -63,32 +63,32 @@ private:
 
   void onUpdate() override
   {
-    const auto entity = api_.getEntity("ego");
+    const auto ego_entity = api_.getEntity("ego");
     // LCOV_EXCL_START
     if (api_.getCurrentTime() >= 10.0) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     // LCOV_EXCL_STOP
-    if (equals(api_.getCurrentTime(), 0.0, 0.01) && !entity->isInPosition(spawn_pose, 0.1)) {
+    if (equals(api_.getCurrentTime(), 0.0, 0.01) && !ego_entity->isInPosition(spawn_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 1.0, 0.01) &&
-      !entity->isInPosition(trajectory_start_pose, 0.1)) {
+      !ego_entity->isInPosition(trajectory_start_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 1.5, 0.01) &&
-      !entity->isInPosition(trajectory_waypoint_pose, 0.1)) {
+      !ego_entity->isInPosition(trajectory_waypoint_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (
       equals(api_.getCurrentTime(), 2.0, 0.01) &&
-      !entity->isInPosition(trajectory_goal_pose, 0.1)) {
+      !ego_entity->isInPosition(trajectory_goal_pose, 0.1)) {
       stop(cpp_mock_scenarios::Result::FAILURE);
     }
     if (equals(api_.getCurrentTime(), 2.5, 0.01)) {
-      if (entity->isInPosition(trajectory_goal_pose, 0.1)) {
+      if (ego_entity->isInPosition(trajectory_goal_pose, 0.1)) {
         stop(cpp_mock_scenarios::Result::SUCCESS);
       } else {
         stop(cpp_mock_scenarios::Result::FAILURE);
@@ -97,10 +97,9 @@ private:
   }
   void onInitialize() override
   {
-    api_.spawn(
+    auto ego_entity = api_.spawn(
       "ego", spawn_pose, getVehicleParameters(),
       traffic_simulator::entity::VehicleEntity::BuiltinBehavior::doNothing());
-    auto ego_entity = api_.getEntity("ego");
     ego_entity->setLinearVelocity(10);
     ego_entity->requestSpeedChange(10, true);
     ego_entity->requestFollowTrajectory(

@@ -17,6 +17,7 @@
 #include <regex>
 #include <scenario_simulator_exception/exception.hpp>
 #include <traffic_simulator/helper/helper.hpp>
+#include <traffic_simulator/helper/ostream_helpers.hpp>
 
 #include "../expect_eq_macros.hpp"
 
@@ -49,6 +50,7 @@ TEST(HELPER, POSE)
 
 TEST(HELPER, LANELET_POSE)
 {
+  using traffic_simulator::operator<<;
   const auto lanelet_pose = traffic_simulator::helper::constructLaneletPose(5, 10, 2, 0, 0, 0);
   traffic_simulator::LaneletPose expected_pose;
   expected_pose.lanelet_id = 5;
@@ -60,7 +62,9 @@ TEST(HELPER, LANELET_POSE)
   EXPECT_LANELET_POSE_EQ(lanelet_pose, expected_pose);
   std::stringstream ss;
   ss << lanelet_pose;
-  EXPECT_STREQ(ss.str().c_str(), "lanelet id : 5\ns : 10");
+  EXPECT_STREQ(
+    ss.str().c_str(),
+    "LaneletPose(lanelet_id: 5, s: 10, offset: 2, rpy: Vector3(x: 0, y: 0, z: 0))");
 }
 
 TEST(HELPER, ACTION_STATUS)

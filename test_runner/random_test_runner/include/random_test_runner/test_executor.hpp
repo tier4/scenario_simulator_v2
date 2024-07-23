@@ -95,7 +95,8 @@ public:
         auto ego_entity = api_->getEgoEntity(ego_name_);
 
         ego_entity->setStatus(
-          ego_start_canonicalized_lanelet_pose, traffic_simulator::helper::constructActionStatus());
+          ego_start_canonicalized_lanelet_pose.value(),
+          traffic_simulator::helper::constructActionStatus());
 
         if (architecture_type_ == ArchitectureType::AWF_UNIVERSE) {
           api_->attachLidarSensor(traffic_simulator::helper::constructLidarConfiguration(
@@ -151,7 +152,7 @@ public:
             auto entity = api_->getEntity(npc_descr.name);
 
             entity->setStatus(
-              npc_start_canonicalized_lanelet_pose,
+              npc_start_canonicalized_lanelet_pose.value(),
               traffic_simulator::helper::constructActionStatus(npc_descr.speed));
 
             entity->requestSpeedChange(npc_descr.speed, true);
