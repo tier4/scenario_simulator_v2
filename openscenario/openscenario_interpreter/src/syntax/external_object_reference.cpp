@@ -13,27 +13,15 @@
 // limitations under the License.
 
 #include <openscenario_interpreter/reader/attribute.hpp>
-#include <openscenario_interpreter/syntax/relative_target_lane.hpp>
+#include <openscenario_interpreter/syntax/external_object_reference.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-RelativeTargetLane::RelativeTargetLane(const pugi::xml_node & node, Scope & scope)
-: entity_ref(readAttribute<String>("entityRef", node, scope), scope),
-  value(readAttribute<Integer>("value", node, scope))
+ExternalObjectReference::ExternalObjectReference(const pugi::xml_node & node, Scope & scope)
+: name(readAttribute<String>("name", node, scope))
 {
-}
-
-RelativeTargetLane::operator traffic_simulator::lane_change::Direction() const
-{
-  if (value < 0) {
-    return traffic_simulator::lane_change::Direction::RIGHT;
-  } else if (value == 0) {
-    return traffic_simulator::lane_change::Direction::STRAIGHT;
-  } else {
-    return traffic_simulator::lane_change::Direction::LEFT;
-  }
 }
 }  // namespace syntax
 }  // namespace openscenario_interpreter

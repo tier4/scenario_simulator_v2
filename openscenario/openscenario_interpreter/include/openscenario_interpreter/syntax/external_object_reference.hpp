@@ -12,37 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
+#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
+#define OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_
 
 #include <openscenario_interpreter/scope.hpp>
-#include <openscenario_interpreter/syntax/entity.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
+#include <openscenario_interpreter/syntax/string.hpp>
 #include <pugixml.hpp>
-#include <traffic_simulator/data_type/lane_change.hpp>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- RelativeTargetLane -----------------------------------------------------
+/* ---- ExternalObjectReference ------------------------------------------------
  *
- *  <xsd:complexType name="RelativeTargetLane">
- *    <xsd:attribute name="entityRef" type="String" use="required"/>
- *    <xsd:attribute name="value" type="Int" use="required"/>
- *  </xsd:complexType>*
+ *  <xsd:complexType name="ExternalObjectReference">
+ *    <xsd:attribute name="name" type="String" use="required"/>
+ *  </xsd:complexType>
  *
  * -------------------------------------------------------------------------- */
-struct RelativeTargetLane
+struct ExternalObjectReference
 {
-  const Entity entity_ref;
+  static constexpr ObjectType object_type{ObjectType::external};
 
-  const Integer value;
+  const String name;
 
-  explicit RelativeTargetLane(const pugi::xml_node &, Scope &);
-
-  explicit operator traffic_simulator::lane_change::Direction() const;
+  explicit ExternalObjectReference(const pugi::xml_node &, Scope &);
 };
 }  // namespace syntax
 }  // namespace openscenario_interpreter
 
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__RELATIVE_TARGET_LANE_HPP_
+#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__EVENT_HPP_

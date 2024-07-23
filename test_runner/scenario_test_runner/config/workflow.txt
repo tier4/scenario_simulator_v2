@@ -16,3 +16,8 @@ $(find-pkg-share scenario_test_runner)/scenario/all-in-one.yaml
 $(find-pkg-share scenario_test_runner)/scenario/minimal.yaml
 $(find-pkg-share scenario_test_runner)/scenario/prefixed-name-reference.yaml
 $(find-pkg-share scenario_test_runner)/scenario/stand-still.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/DistanceCondition_RelativeDistanceCondition_ReachPositionCondition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/LaneChangeAction.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/SpeedAction_SpeedCondition_AccelerationCondition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/TeleportAction_CollisionCondition_StandStillCondition.yaml
+$(find-pkg-share scenario_test_runner)/scenario/EntitySelection/TimeHeadwayCondition.yaml

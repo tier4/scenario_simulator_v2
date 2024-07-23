@@ -12,37 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef OPENSCENARIO_INTERPRETER__SYNTAX__SELECTED_ENTITIES_HPP_
-#define OPENSCENARIO_INTERPRETER__SYNTAX__SELECTED_ENTITIES_HPP_
-
 #include <openscenario_interpreter/object.hpp>
+#include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/scope.hpp>
 #include <openscenario_interpreter/syntax/by_type.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/entity.hpp>
+#include <openscenario_interpreter/syntax/entity_ref.hpp>
+#include <openscenario_interpreter/syntax/entity_selection.hpp>
+#include <openscenario_interpreter/syntax/scenario_object.hpp>
+#include <openscenario_interpreter/syntax/selected_entities.hpp>
+#include <utility>
 
 namespace openscenario_interpreter
 {
 inline namespace syntax
 {
-/* ---- SelectedEntities -------------------------------------------------------
- *
- *  <xsd:complexType name="SelectedEntities">
- *    <xsd:choice>
- *      <xsd:element name="EntityRef" minOccurs="0" maxOccurs="unbounded" type="EntityRef"/>
- *      <xsd:element name="ByType" minOccurs="0" maxOccurs="unbounded" type="ByType"/>
- *    </xsd:choice>
- *  </xsd:complexType>
- *
- * -------------------------------------------------------------------------- */
-struct SelectedEntities : public ComplexType
+SelectedEntities::SelectedEntities(const pugi::xml_node & tree, Scope & scope)
+: entityRef(readElements<Entity, 0>("EntityRef", tree, scope)),
+  byType(readElements<ByType, 0>("ByType", tree, scope))
 {
-  const std::list<Entity> entityRef;
-
-  const std::list<ByType> byType;
-
-  explicit SelectedEntities(const pugi::xml_node &, Scope &);
-};
+  // clang-format off
+  // This function call is added to check the correctness of the syntax.
+  // DO NOT REMOVE unless syntax check is conducted in another way.
+  choice(tree,
+    std::pair{"EntityRef", [](const auto &) { return unspecified; }},
+    std::pair{"ByType",    [](const auto &) { return unspecified; }});
+  // clang-format on
+}
 }  // namespace syntax
 }  // namespace openscenario_interpreter
-
-#endif  // OPENSCENARIO_INTERPRETER__SYNTAX__SELECTED_ENTITIES_HPP_

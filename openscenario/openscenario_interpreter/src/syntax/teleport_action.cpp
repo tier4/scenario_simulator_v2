@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/add_entity_action.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>  // TEMPORARY (TODO REMOVE THIS LINE)
+#include <openscenario_interpreter/syntax/object_type.hpp>
 #include <openscenario_interpreter/syntax/scenario_object.hpp>
 #include <openscenario_interpreter/syntax/teleport_action.hpp>
 #include <openscenario_interpreter/utility/overload.hpp>
@@ -27,6 +28,13 @@ inline namespace syntax
 TeleportAction::TeleportAction(const pugi::xml_node & node, Scope & scope)
 : Scope(scope), position(readElement<Position>("Position", node, local()))
 {
+  // OpenSCENARIO 1.2 Table 11
+  for (const auto & actor : actors) {
+    if (auto object_types = actor.objectTypes(); object_types.count(ObjectType::external)) {
+      THROW_SEMANTIC_ERROR(
+        "Actors cannot be ExternalObjectReference; See OpenSCENARIO 1.2 Table 11 for more details");
+    }
+  }
 }
 
 auto TeleportAction::accomplished() noexcept -> bool { return true; }
@@ -44,10 +52,10 @@ auto TeleportAction::run() noexcept -> void {}
 auto TeleportAction::start() const -> void
 {
   for (const auto & actor : actors) {
-    if (not global().entities->at(actor).as<ScenarioObject>().is_added) {
-      AddEntityAction(local(), position)(actor);  // NOTE: TIER IV extension
+    if (not global().entities->isAdded(actor)) {
+      actor.apply(AddEntityAction(local(), position));  // NOTE: TIER IV extension
     } else {
-      return teleport(actor, position);
+      actor.apply([&](const auto & object) { teleport(object, position); });
     }
   }
 }

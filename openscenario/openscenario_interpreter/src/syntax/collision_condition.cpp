@@ -16,6 +16,7 @@
 #include <openscenario_interpreter/simulator_core.hpp>
 #include <openscenario_interpreter/syntax/collision_condition.hpp>
 #include <openscenario_interpreter/syntax/entities.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/entity_ref.hpp>
 
 namespace openscenario_interpreter
@@ -28,7 +29,7 @@ CollisionCondition::CollisionCondition(
 : Scope(scope),
   another_given_entity(
     choice(node,
-      std::make_pair("EntityRef", [&](auto && node) { return make<EntityRef>(node, scope); }),
+      std::make_pair("EntityRef", [&](auto && node) { return make<Entity>(node, scope); }),
       std::make_pair("ByType",    [&](auto && node) { throw UNSUPPORTED_ELEMENT_SPECIFIED(node.name()); return unspecified; }))),
   triggering_entities(triggering_entities)
 // clang-format on
@@ -51,10 +52,13 @@ auto CollisionCondition::description() const -> std::string
 auto CollisionCondition::evaluate() const -> Object
 {
   if (
-    another_given_entity.is<EntityRef>() and
-    global().entities->isAdded(another_given_entity.as<EntityRef>())) {
+    another_given_entity.is<Entity>() and
+    global().entities->isAdded(another_given_entity.as<Entity>())) {
     return asBoolean(triggering_entities.apply([&](auto && triggering_entity) {
-      return evaluateCollisionCondition(triggering_entity, another_given_entity.as<EntityRef>());
+      auto evaluation = triggering_entity.apply([&](const auto & object) {
+        return evaluateCollisionCondition(object, another_given_entity.as<Entity>());
+      });
+      return not evaluation.size() or evaluation.min();
     }));
   } else {
     // TODO ByType
