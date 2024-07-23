@@ -39,7 +39,12 @@ RelativeDistanceCondition::RelativeDistanceCondition(
   rule(readAttribute<Rule>("rule", node, scope)),
   value(readAttribute<Double>("value", node, scope)),
   triggering_entities(triggering_entities),
-  results(triggering_entities.entity_refs.size(), Double::nan())
+  results(triggering_entities.entity_refs.size(), Double::nan()),
+  consider_z([]() {
+    rclcpp::Node node{"get_parameter", "simulation"};
+    node.declare_parameter("consider_pose_by_road_slope", false);
+    return node.get_parameter("consider_pose_by_road_slope").as_bool();
+  }())
 {
   std::set<RoutingAlgorithm::value_type> supported = {
     RoutingAlgorithm::value_type::shortest, RoutingAlgorithm::value_type::undefined};
@@ -66,7 +71,7 @@ auto RelativeDistanceCondition::description() const -> String
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x);
 }
@@ -74,7 +79,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   /**
      @note This implementation differs from the OpenSCENARIO standard. See the
@@ -87,7 +92,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   return std::abs(makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y);
 }
@@ -95,7 +100,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   /**
      @note This implementation differs from the OpenSCENARIO standard. See the
@@ -106,40 +111,38 @@ auto RelativeDistanceCondition::distance<
 }
 
 // @todo: after checking all the scenario work well with consider_z = true, remove this function and use std::hypot(x, y, z)
-auto hypot(double x, double y, double z)
+auto hypot(double x, double y, double z, bool consider_z)
 {
-  static auto consider_z = []() {
-    auto node = rclcpp::Node("get_parameter", "simulation");
-    node.declare_parameter("consider_pose_by_road_slope", false);
-    return node.get_parameter("consider_pose_by_road_slope").as_bool();
-  }();
-
   return consider_z ? std::hypot(x, y, z) : std::hypot(x, y);
 }
 
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  true>(const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  true>(const EntityRef & triggering_entity) -> double
 {
-  const auto relative_world =
-    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref);
-  return hypot(relative_world.position.x, relative_world.position.y, relative_world.position.z);
+  return hypot(
+    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.x,
+    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.y,
+    makeNativeBoundingBoxRelativeWorldPosition(triggering_entity, entity_ref).position.z,
+    consider_z);
 }
 
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::entity, RelativeDistanceType::euclidianDistance, RoutingAlgorithm::undefined,
-  false>(const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  false>(const EntityRef & triggering_entity) -> double
 {
-  const auto relative_world = makeNativeRelativeWorldPosition(triggering_entity, entity_ref);
-  return hypot(relative_world.position.x, relative_world.position.y, relative_world.position.z);
+  return hypot(
+    makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.x,
+    makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.y,
+    makeNativeRelativeWorldPosition(triggering_entity, entity_ref).position.z, consider_z);
 }
 
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   /*
      For historical reasons, signed distances are returned when
@@ -161,7 +164,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   /*
      For historical reasons, signed distances are returned when
@@ -183,7 +186,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, false>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   /*
      For historical reasons, signed distances are returned when
@@ -205,7 +208,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::undefined, true>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   /*
      For historical reasons, signed distances are returned when
@@ -227,7 +230,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   return std::abs(static_cast<traffic_simulator::LaneletPose>(
                     makeNativeBoundingBoxRelativeLanePosition(
@@ -238,7 +241,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::lateral, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   return std::abs(
     static_cast<traffic_simulator::LaneletPose>(
@@ -249,7 +252,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, true>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   return std::abs(static_cast<traffic_simulator::LaneletPose>(
                     makeNativeBoundingBoxRelativeLanePosition(
@@ -260,7 +263,7 @@ auto RelativeDistanceCondition::distance<
 template <>
 auto RelativeDistanceCondition::distance<
   CoordinateSystem::lane, RelativeDistanceType::longitudinal, RoutingAlgorithm::shortest, false>(
-  const EntityRef & triggering_entity, const EntityRef & entity_ref) -> double
+  const EntityRef & triggering_entity) -> double
 {
   return std::abs(
     static_cast<traffic_simulator::LaneletPose>(
@@ -325,14 +328,13 @@ auto RelativeDistanceCondition::distance<
 #define SWITCH_FREESPACE(FUNCTION, ...) \
   return freespace ? FUNCTION(__VA_ARGS__, true) : FUNCTION(__VA_ARGS__, false)
 
-#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity, entity_ref)
+#define DISTANCE(...) distance<__VA_ARGS__>(triggering_entity)
 
-auto RelativeDistanceCondition::evaluate(
-  const Entities * entities, const EntityRef & triggering_entity, const EntityRef & entity_ref,
-  CoordinateSystem coordinate_system, RelativeDistanceType relative_distance_type,
-  RoutingAlgorithm routing_algorithm, Boolean freespace) -> double
+auto RelativeDistanceCondition::distance(const EntityRef & triggering_entity) -> double
 {
-  if (entities->isAdded(triggering_entity) and entities->isAdded(entity_ref)) {
+  if (
+    global().entities->at(triggering_entity).as<ScenarioObject>().is_added and
+    global().entities->at(entity_ref).as<ScenarioObject>().is_added) {
     SWITCH_COORDINATE_SYSTEM(
       SWITCH_RELATIVE_DISTANCE_TYPE, SWITCH_ROUTING_ALGORITHM, SWITCH_FREESPACE, DISTANCE);
   } else {
@@ -345,9 +347,7 @@ auto RelativeDistanceCondition::evaluate() -> Object
   results.clear();
 
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    results.push_back(evaluate(
-      global().entities, triggering_entity, entity_ref, coordinate_system, relative_distance_type,
-      routing_algorithm, freespace));
+    results.push_back(distance(triggering_entity));
     return rule(static_cast<double>(results.back()), value);
   }));
 }
