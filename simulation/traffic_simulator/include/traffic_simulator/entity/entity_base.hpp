@@ -193,6 +193,8 @@ public:
 
   /*   */ void setOtherStatus(const std::unordered_map<std::string, CanonicalizedEntityStatus> &);
 
+  virtual auto setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void;
+
   virtual auto setStatus(const EntityStatus & status) -> void;
 
   virtual auto setCanonicalizedStatus(const CanonicalizedEntityStatus &) -> void;

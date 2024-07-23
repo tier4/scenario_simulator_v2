@@ -105,18 +105,15 @@ auto API::getEntity(const std::string & name) const -> std::shared_ptr<entity::E
 }
 
 auto API::setEntityStatus(
-  const std::string & name,
-  const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
+  const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   if (const auto entity = getEntity(name)) {
     auto status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.action_status = action_status;
-    if (canonicalized_lanelet_pose) {
-      status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
-      status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-      status.lanelet_pose_valid = true;
-    }
+    status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
+    status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+    status.lanelet_pose_valid = true;
     entity->setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
@@ -154,8 +151,15 @@ auto API::setEntityStatus(
   const std::string & name, const LaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  setEntityStatus(
-    name, pose::canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
+  if (
+    const auto canonicalized_lanelet_pose =
+      pose::canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils())) {
+    setEntityStatus(name, canonicalized_lanelet_pose.value(), action_status);
+  } else {
+    std::stringstream ss;
+    ss << "Status can not be set. lanelet pose: " << lanelet_pose << " is not canonicalizable for ";
+    THROW_SEMANTIC_ERROR(ss.str(), " entity named: ", std::quoted(name), ".");
+  }
 }
 
 auto API::setEntityStatus(

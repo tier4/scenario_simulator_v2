@@ -130,11 +130,19 @@ public:
 
   auto setVelocityLimit(double) -> void override;
 
-  void setStatus(const EntityStatus & status) override;
-
-  auto setStatus(const EntityStatus & status, const lanelet::Ids & lanelet_ids) -> void;
-
   auto setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void override;
+
+  template <typename... Ts>
+  auto setStatus(Ts &&... xs)
+  {
+    if (status_.getTime() > 0 && not isControlledBySimulator()) {
+      THROW_SEMANTIC_ERROR(
+        "You cannot set entity status to the ego vehicle named ", std::quoted(status_.getName()),
+        " after starting scenario.");
+    } else {
+      EntityBase::setStatus(std::forward<decltype(xs)>(xs)...);
+    }
+  }
 };
 }  // namespace entity
 }  // namespace traffic_simulator
