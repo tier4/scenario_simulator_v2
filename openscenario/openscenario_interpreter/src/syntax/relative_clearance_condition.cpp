@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/attribute.hpp>
 #include <openscenario_interpreter/reader/element.hpp>
+#include <openscenario_interpreter/syntax/entities.hpp>
 #include <openscenario_interpreter/syntax/relative_clearance_condition.hpp>
 #include <openscenario_interpreter/utility/print.hpp>
 #include <unordered_map>
@@ -30,7 +31,15 @@ RelativeClearanceCondition::RelativeClearanceCondition(
   free_space(readAttribute<Boolean>("freeSpace", node, scope)),
   opposite_lanes(readAttribute<Boolean>("oppositeLanes", node, scope)),
   relative_lane_range(readElements<RelativeLaneRange, 0>("RelativeLaneRange", node, scope)),
-  entity_refs(readElements<EntityRef, 0>("EntityRef", node, scope)),
+  entity_refs([&]() {
+    auto entities = readElements<EntityRef, 0>("EntityRef", node, scope);
+    if (entities.empty()) {
+      for (const auto & [name, entity] : *global().entities) {
+        entities.emplace_back(name);
+      }
+    }
+    return entities;
+  }()),
   triggering_entities(triggering_entities)
 {
 }
