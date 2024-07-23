@@ -448,18 +448,43 @@ TEST_F(HdMapUtilsTest_StandardMap, CanonicalizeAll)
 }
 
 /**
- * @note Testcase for countLaneChangesAlongRoute() function
+ * @note Testcase for countLaneChanges() function
  */
 TEST_F(HdMapUtilsTest_FourTrackHighwayMap, CountLaneChangesAlongRoute)
 {
-  EXPECT_EQ(hdmap_utils.countLaneChangesAlongRoute(hdmap_utils.getRoute(3002176, 3002175, true)), std::make_pair(1,0));
-  EXPECT_EQ(hdmap_utils.countLaneChangesAlongRoute(hdmap_utils.getRoute(3002176, 3002182, true)), std::make_pair(1,0));
-  EXPECT_EQ(hdmap_utils.countLaneChangesAlongRoute(hdmap_utils.getRoute(3002176, 199, true)), std::make_pair(1,0));
-  EXPECT_EQ(hdmap_utils.countLaneChangesAlongRoute(hdmap_utils.getRoute(3002176, 3002176, true)), std::make_pair(0,0));
-  EXPECT_EQ(hdmap_utils.countLaneChangesAlongRoute(hdmap_utils.getRoute(3002176, 200, true)), std::make_pair(0,0));
-  EXPECT_EQ(hdmap_utils.countLaneChangesAlongRoute(hdmap_utils.getRoute(3002176, 201, true)), std::make_pair(0,1));
-  EXPECT_EQ(hdmap_utils.countLaneChangesAlongRoute(hdmap_utils.getRoute(3002176, 202, true)), std::make_pair(0,2));
-  EXPECT_EQ(hdmap_utils.countLaneChangesAlongRoute(hdmap_utils.getRoute(3002176, 206, true)), std::make_pair(0,2));
+  using traffic_simulator::helper::constructLaneletPose;
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(3002175, 0), true),
+    std::make_pair(1, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(3002182, 0), true),
+    std::make_pair(1, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(199, 0), true),
+    std::make_pair(1, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(3002176, 0), true),
+    std::make_pair(0, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(200, 0), true),
+    std::make_pair(0, 0));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(201, 0), true),
+    std::make_pair(0, 1));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(202, 0), true),
+    std::make_pair(0, 2));
+  EXPECT_EQ(
+    hdmap_utils.countLaneChanges(
+      constructLaneletPose(3002176, 0), constructLaneletPose(206, 0), true),
+    std::make_pair(0, 2));
 }
 
 /**
