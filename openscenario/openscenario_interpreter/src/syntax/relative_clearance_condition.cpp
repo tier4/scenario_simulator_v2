@@ -51,8 +51,34 @@ auto RelativeClearanceCondition::description() const -> String
 
 auto RelativeClearanceCondition::evaluate() -> Object
 {
-  // TODO(HansRobo): implement
-  return unspecified;
+  return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
+    for (const auto & entity : entity_refs) {
+      auto is_in_lateral_range = [&]() {
+        if (relative_lane_range.empty()) {
+          return true;
+        } else {
+          auto relative_lateral_lane =
+            evaluateLateralRelativeLanes(triggering_entity, entity, RoutingAlgorithm::shortest);
+          return std::any_of(
+            relative_lane_range.begin(), relative_lane_range.end(), [&](const auto & range) {
+              return range.from <= relative_lateral_lane && range.to >= relative_lateral_lane;
+            });
+        }
+      };
+
+      auto is_in_longitudinal_range = [&]() {
+        auto relative_lane_position =
+          getRelativeLanePosition(triggering_entity, entity, free_space);
+        if (relative_lane_position.s < 0) {
+          return std::abs(relative_lane_position.s) <= distance_backward;
+        } else {
+          return relative_lane_position.s <= distance_forward;
+        }
+      };
+
+      return is_in_lateral_range() && is_in_longitudinal_range();
+    }
+  }));
 }
 
 auto RelativeClearanceCondition::getRelativeLanePosition(
