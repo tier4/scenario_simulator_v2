@@ -17,6 +17,7 @@
 
 #include <nlohmann/json.hpp>
 #include <openscenario_interpreter/scope.hpp>
+#include <openscenario_interpreter/syntax/entity.hpp>
 #include <openscenario_interpreter/syntax/private_action.hpp>
 #include <pugixml.hpp>
 
@@ -36,7 +37,7 @@ inline namespace syntax
  * -------------------------------------------------------------------------- */
 struct Private : public Scope
 {
-  const String entity_ref;
+  const Entity entity_ref;
 
   std::list<PrivateAction> private_actions;
 

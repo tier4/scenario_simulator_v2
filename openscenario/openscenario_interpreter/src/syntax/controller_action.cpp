@@ -14,6 +14,7 @@
 
 #include <openscenario_interpreter/reader/element.hpp>
 #include <openscenario_interpreter/syntax/controller_action.hpp>
+#include <openscenario_interpreter/syntax/object_type.hpp>
 
 namespace openscenario_interpreter
 {
@@ -26,6 +27,16 @@ ControllerAction::ControllerAction(const pugi::xml_node & node, Scope & scope)
   override_controller_value_action(readElement<OverrideControllerValueAction>(
     "OverrideControllerValueAction", node, scope))  // NOTE: DUMMY IMPLEMENTATION
 {
+  // OpenSCENARIO 1.2 Table 11
+  for (const auto & actor : actors) {
+    for (const auto & object_type : actor.objectTypes()) {
+      if (object_type != ObjectType::vehicle and object_type != ObjectType::pedestrian) {
+        THROW_SEMANTIC_ERROR(
+          "Actors may be either of vehicle type or a pedestrian type;"
+          "See OpenSCENARIO 1.2 Table 11 for more details");
+      }
+    }
+  }
 }
 
 auto ControllerAction::accomplished() noexcept -> bool  //
@@ -43,7 +54,7 @@ auto ControllerAction::run() noexcept -> void {}
 auto ControllerAction::start() const -> void
 {
   for (const auto & actor : actors) {
-    assign_controller_action(actor);
+    actor.apply(assign_controller_action);
   }
 }
 }  // namespace syntax
