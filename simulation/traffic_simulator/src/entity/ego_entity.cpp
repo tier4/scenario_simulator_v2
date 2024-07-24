@@ -279,9 +279,11 @@ auto EgoEntity::setVelocityLimit(double value) -> void  //
 
 auto EgoEntity::setMapPose(const geometry_msgs::msg::Pose & map_pose) -> void
 {
-  status_.setMapPose(map_pose);
+  auto entity_status = static_cast<EntityStatus>(status_);
+  entity_status.pose = map_pose;
+  entity_status.lanelet_pose_valid = false;
   // prefer current lanelet on Autoware side
-  setStatus(static_cast<EntityStatus>(status_), helper::getUniqueValues(getRouteLanelets()));
+  setStatus(entity_status, helper::getUniqueValues(getRouteLanelets()));
 }
 }  // namespace entity
 }  // namespace traffic_simulator
