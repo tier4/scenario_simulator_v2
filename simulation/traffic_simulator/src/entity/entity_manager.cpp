@@ -177,7 +177,7 @@ auto EntityManager::getEntityStatus(const std::string & name) const
   -> const CanonicalizedEntityStatus &
 {
   if (const auto entity = getEntity(name)) {
-    return entity->getStatus();
+    return entity->getCanonicalizedStatus();
   } else {
     THROW_SEMANTIC_ERROR("entity ", std::quoted(name), " does not exist.");
   }
@@ -281,7 +281,7 @@ void EntityManager::requestLaneChange(
   if (const auto entity = getEntity(name); entity && entity->laneMatchingSucceed()) {
     if (
       const auto target = hdmap_utils_ptr_->getLaneChangeableLaneletId(
-        entity->getStatus().getLaneletId(), direction)) {
+        entity->getCanonicalizedStatus().getLaneletId(), direction)) {
       requestLaneChange(name, target.value());
     }
   }
@@ -341,7 +341,7 @@ auto EntityManager::updateNpcLogic(
     std::cout << "update " << name << " behavior" << std::endl;
   }
   entities_[name]->onUpdate(current_time, step_time);
-  return entities_[name]->getStatus();
+  return entities_[name]->getCanonicalizedStatus();
 }
 
 void EntityManager::update(const double current_time, const double step_time)
@@ -356,7 +356,7 @@ void EntityManager::update(const double current_time, const double step_time)
   }
   std::unordered_map<std::string, CanonicalizedEntityStatus> all_status;
   for (auto && [name, entity] : entities_) {
-    all_status.emplace(name, entity->getStatus());
+    all_status.emplace(name, entity->getCanonicalizedStatus());
   }
   for (auto && [name, entity] : entities_) {
     entity->setOtherStatus(all_status);

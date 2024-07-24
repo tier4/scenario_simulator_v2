@@ -54,18 +54,13 @@ private:
       unsigned int vehicle_count = 0u, pedestrian_count = 0u;
       for (const auto & name : names) {
         if (const auto entity = api_.getEntity(name)) {
-          const bool is_vehicle =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
-          const bool is_pedestrian =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::PEDESTRIAN;
-
           const bool valid_vehicle_lanelet =
             api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
             api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
 
-          if (is_vehicle) {
+          if (isVehicle(name)) {
             ++vehicle_count;
-          } else if (is_pedestrian) {
+          } else if (isPedestrian(name)) {
             ++pedestrian_count;
           }
 

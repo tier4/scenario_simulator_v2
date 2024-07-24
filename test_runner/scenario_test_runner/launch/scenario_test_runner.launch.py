@@ -75,6 +75,7 @@ def launch_setup(context, *args, **kwargs):
     launch_simple_sensor_simulator      = LaunchConfiguration("launch_simple_sensor_simulator",         default=True)
     output_directory                    = LaunchConfiguration("output_directory",                       default=Path("/tmp"))
     port                                = LaunchConfiguration("port",                                   default=5555)
+    publish_empty_context               = LaunchConfiguration("publish_empty_context",                  default=False)
     record                              = LaunchConfiguration("record",                                 default=True)
     rviz_config                         = LaunchConfiguration("rviz_config",                            default="")
     scenario                            = LaunchConfiguration("scenario",                               default=Path("/dev/null"))
@@ -98,6 +99,7 @@ def launch_setup(context, *args, **kwargs):
     print(f"launch_rviz                         := {launch_rviz.perform(context)}")
     print(f"output_directory                    := {output_directory.perform(context)}")
     print(f"port                                := {port.perform(context)}")
+    print(f"publish_empty_context               := {publish_empty_context.perform(context)}")
     print(f"record                              := {record.perform(context)}")
     print(f"rviz_config                         := {rviz_config.perform(context)}")
     print(f"scenario                            := {scenario.perform(context)}")
@@ -122,6 +124,7 @@ def launch_setup(context, *args, **kwargs):
             {"initialize_duration": initialize_duration},
             {"launch_autoware": launch_autoware},
             {"port": port},
+            {"publish_empty_context" : publish_empty_context},
             {"record": record},
             {"rviz_config": rviz_config},
             {"sensor_model": sensor_model},
@@ -157,6 +160,7 @@ def launch_setup(context, *args, **kwargs):
         DeclareLaunchArgument("global_timeout",                      default_value=global_timeout                     ),
         DeclareLaunchArgument("launch_autoware",                     default_value=launch_autoware                    ),
         DeclareLaunchArgument("launch_rviz",                         default_value=launch_rviz                        ),
+        DeclareLaunchArgument("publish_empty_context",               default_value=publish_empty_context              ),
         DeclareLaunchArgument("output_directory",                    default_value=output_directory                   ),
         DeclareLaunchArgument("rviz_config",                         default_value=rviz_config                        ),
         DeclareLaunchArgument("scenario",                            default_value=scenario                           ),
