@@ -47,7 +47,7 @@ struct SpeedAction : private Scope,  // NOTE: Required for access to actors
 
   explicit SpeedAction(const pugi::xml_node &, Scope &);
 
-  std::unordered_map<String, Boolean> accomplishments;
+  std::unordered_map<Entity, Boolean> accomplishments;
 
   auto accomplished() -> bool;
 

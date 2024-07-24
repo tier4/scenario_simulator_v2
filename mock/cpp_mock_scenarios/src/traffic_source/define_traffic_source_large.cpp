@@ -53,10 +53,7 @@ private:
       }
       for (const auto & name : names) {
         if (const auto entity = api_.getEntity(name)) {
-          const bool is_vehicle =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
-
-          if (!entity->laneMatchingSucceed() || !is_vehicle) {
+          if (!entity->laneMatchingSucceed() || !isVehicle(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }

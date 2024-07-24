@@ -37,23 +37,26 @@ public:
   explicit CanonicalizedEntityStatus(const CanonicalizedEntityStatus & obj);
   explicit operator EntityStatus() const noexcept { return entity_status_; }
 
+  auto set(const CanonicalizedEntityStatus & status) -> void;
+  auto set(
+    const EntityStatus & status, const lanelet::Ids & lanelet_ids, const double matching_distance,
+    const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void;
   auto set(
     const EntityStatus & status, const double matching_distance,
     const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void;
-  auto set(const CanonicalizedEntityStatus & status) -> void;
   auto setAction(const std::string & action) -> void;
 
   auto getTime() const noexcept -> double;
   auto setTime(double) -> void;
 
-  auto getMapPose() const noexcept -> geometry_msgs::msg::Pose;
+  auto getMapPose() const noexcept -> const geometry_msgs::msg::Pose &;
   auto setMapPose(const geometry_msgs::msg::Pose & pose) -> void;
 
-  auto getTwist() const noexcept -> geometry_msgs::msg::Twist;
+  auto getTwist() const noexcept -> const geometry_msgs::msg::Twist &;
   auto setTwist(const geometry_msgs::msg::Twist & twist) -> void;
   auto setLinearVelocity(double linear_velocity) -> void;
 
-  auto getAccel() const noexcept -> geometry_msgs::msg::Accel;
+  auto getAccel() const noexcept -> const geometry_msgs::msg::Accel &;
   auto setAccel(const geometry_msgs::msg::Accel & accel) -> void;
   auto setLinearAcceleration(double linear_acceleration) -> void;
 
@@ -63,12 +66,13 @@ public:
   auto laneMatchingSucceed() const noexcept -> bool;
   auto getLaneletId() const noexcept -> lanelet::Id;
   auto getLaneletIds() const noexcept -> lanelet::Ids;
-  auto getLaneletPose() const noexcept -> LaneletPose;
-  auto getCanonicalizedLaneletPose() const noexcept -> std::optional<CanonicalizedLaneletPose>;
+  auto getLaneletPose() const noexcept -> const LaneletPose &;
+  auto getCanonicalizedLaneletPose() const noexcept
+    -> const std::optional<CanonicalizedLaneletPose> &;
   auto getName() const noexcept -> const std::string & { return entity_status_.name; }
   auto getType() const noexcept -> const EntityType & { return entity_status_.type; }
   auto getSubtype() const noexcept -> const EntitySubtype & { return entity_status_.subtype; }
-  auto getBoundingBox() const noexcept -> traffic_simulator_msgs::msg::BoundingBox;
+  auto getBoundingBox() const noexcept -> const traffic_simulator_msgs::msg::BoundingBox &;
 
 private:
   std::optional<CanonicalizedLaneletPose> canonicalized_lanelet_pose_;

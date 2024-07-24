@@ -99,19 +99,21 @@ auto API::respawn(
   }
 }
 
+auto API::getEntity(const std::string & name) const -> std::shared_ptr<entity::EntityBase>
+{
+  return entity_manager_ptr_->getEntity(name);
+}
+
 auto API::setEntityStatus(
-  const std::string & name,
-  const std::optional<CanonicalizedLaneletPose> & canonicalized_lanelet_pose,
+  const std::string & name, const CanonicalizedLaneletPose & canonicalized_lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   if (const auto entity = getEntity(name)) {
-    auto status = static_cast<EntityStatus>(entity->getStatus());
+    auto status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.action_status = action_status;
-    if (canonicalized_lanelet_pose) {
-      status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose.value());
-      status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose.value());
-      status.lanelet_pose_valid = true;
-    }
+    status.pose = static_cast<geometry_msgs::msg::Pose>(canonicalized_lanelet_pose);
+    status.lanelet_pose = static_cast<LaneletPose>(canonicalized_lanelet_pose);
+    status.lanelet_pose_valid = true;
     entity->setCanonicalizedStatus(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
   } else {
     THROW_SIMULATION_ERROR("Cannot set entity \"", name, "\" status - such entity does not exist.");
@@ -133,7 +135,8 @@ std::optional<double> API::getTimeHeadway(
 {
   if (auto from_entity = getEntity(from_entity_name); from_entity) {
     if (auto to_entity = getEntity(to_entity_name); to_entity) {
-      if (auto relative_pose = relativePose(from_entity->getMapPose(), to_entity->getMapPose());
+      if (auto relative_pose =
+            pose::relativePose(from_entity->getMapPose(), to_entity->getMapPose());
           relative_pose && relative_pose->position.x <= 0) {
         const double time_headway =
           (relative_pose->position.x * -1) / getCurrentTwist(to_entity_name).linear.x;
@@ -148,8 +151,16 @@ auto API::setEntityStatus(
   const std::string & name, const LaneletPose & lanelet_pose,
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
-  setEntityStatus(
-    name, canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils()), action_status);
+  if (
+    const auto canonicalized_lanelet_pose =
+      pose::canonicalize(lanelet_pose, entity_manager_ptr_->getHdmapUtils())) {
+    setEntityStatus(name, canonicalized_lanelet_pose.value(), action_status);
+  } else {
+    std::stringstream ss;
+    ss << "Status can not be set. lanelet pose: " << lanelet_pose
+       << " cannot be canonicalized for ";
+    THROW_SEMANTIC_ERROR(ss.str(), " entity named: ", std::quoted(name), ".");
+  }
 }
 
 auto API::setEntityStatus(
@@ -157,7 +168,7 @@ auto API::setEntityStatus(
   const traffic_simulator_msgs::msg::ActionStatus & action_status) -> void
 {
   if (const auto entity = getEntity(name)) {
-    EntityStatus status = static_cast<EntityStatus>(entity->getStatus());
+    EntityStatus status = static_cast<EntityStatus>(entity->getCanonicalizedStatus());
     status.pose = map_pose;
     status.action_status = action_status;
     setEntityStatus(name, status);
@@ -173,7 +184,7 @@ auto API::setEntityStatus(
 {
   if (const auto reference_entity = getEntity(reference_entity_name)) {
     setEntityStatus(
-      name, transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
+      name, pose::transformRelativePoseToGlobal(reference_entity->getMapPose(), relative_pose),
       action_status);
   } else {
     THROW_SIMULATION_ERROR(
