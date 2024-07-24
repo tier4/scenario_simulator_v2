@@ -76,14 +76,11 @@ private:
       }
       for (const auto & name : names) {
         if (const auto entity = api_.getEntity(name)) {
-          const bool is_vehicle =
-            entity->getEntityType().type == traffic_simulator_msgs::msg::EntityType::VEHICLE;
-
           const bool valid_vehicle_lanelet =
             api_.isInLanelet(name, static_cast<lanelet::Id>(34705), 50.0) ||
             api_.isInLanelet(name, static_cast<lanelet::Id>(34696), 50.0);
 
-          if (!entity->laneMatchingSucceed() || !valid_vehicle_lanelet || !is_vehicle) {
+          if (!entity->laneMatchingSucceed() || !valid_vehicle_lanelet || !isVehicle(name)) {
             stop(cpp_mock_scenarios::Result::FAILURE);  // LCOV_EXCL_LINE
           }
         }
