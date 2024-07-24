@@ -20,7 +20,7 @@ namespace openscenario_interpreter
 inline namespace syntax
 {
 RelativeTargetLane::RelativeTargetLane(const pugi::xml_node & node, Scope & scope)
-: entity_ref(readAttribute<String>("entityRef", node, scope)),
+: entity_ref(readAttribute<String>("entityRef", node, scope), scope),
   value(readAttribute<Integer>("value", node, scope))
 {
 }

@@ -32,6 +32,192 @@ Changelog for package openscenario_interpreter
 * add publish_empty_context parameter
 * Contributors: Masaya Kataoka
 
+3.3.0 (2024-07-23)
+------------------
+* Merge pull request `#1059 <https://github.com/tier4/scenario_simulator_v2/issues/1059>`_ from tier4/feature/interpreter/entity_selection
+  Add `EntitySelection`
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge branch 'master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Add operator overloading for ostream
+* Merge branch 'feature/interpreter/entity_selection' into feature/interpreter/refactoring_entity
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Rename
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/refactoring_entity
+* Remove implementation-defined types
+* Unite `GroupedEntity` and `SingleEntity` into `Entity`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Fix wrong branch
+* Update entity lookup to consider empty name
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Format
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Fix constraint check
+* Update assign `this` after parsing ScenarioObject
+* Remove extra this
+* Update constructor to pass args by reference
+* Remove unneccessary type argument
+* Remove unneccessary argument name
+* Remove unneccessary argument name
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Add missing `return`
+* Simplify entity inspection
+* Simplify entity inspection
+* Simplify entity inspection
+* Simplify entity inspection
+* Simplify entity inspection
+* Update entity lookup
+* Use universal reference
+* Remove std::any_of
+* Simplify for loop
+* Rename
+* Simplify `AccelerationCondition::evaluate`
+* Format
+* Update comparators to handle `std::valarray`
+* Add `evaluate` to `GroupedEntity`
+* Rename variable
+* Use variadic function
+* Rename argument
+* Add this to lambda capture
+* Remove extra header
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Revert changes on Entities
+* Revert changes on Entities
+* Revert changes on Entities
+* Revert changes on Entities
+* Fix wrong cast
+* Format
+* Fix headers and declarations
+* Update entity implementation to distinguish plurality
+* Format
+* [WIP] Replace Entities::objects with Entity::objects
+* Remove extra
+* Make entity hashable
+* Remove extra include and declaration
+* Update entity exploration
+* Add static field of object type
+* Remove extra header
+* Rename
+* Implement `Entity`
+* Add const version of `apply`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Remove
+* Remove unnecessary empty check
+* Format
+* Reorder header
+* Update parameter name
+* Rename HasIterator to Iterable
+* Update to use EntityRef instead of String
+* Use forward declration
+* Format
+* Remove extra header include
+* Replace String entity_ref to original EntityRef
+* Format
+* Update to use type trait
+* Add type trait for iterator detection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Remove unneccesary static_cast
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Fix wrong include guard
+* Fix typo
+* Remove wrong `return`
+* Refactor
+* Fix wrong argument order
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Use `Entities::isAdded`
+* Assign `this` first to avoid null dereference
+* Format
+* Add missing condition
+* Update to fill `results` with NaN by default
+* Update not to use temporal
+* Use `set` instead of `list` to deduplicate entity
+* Change to use inline variable instead of struct
+* Simplify
+* Fix wrong printing process
+* Refactor
+* Fix wrong condition
+* Update to check ExternalObjectReference
+* Refactor
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Update conditions to handle EntitySelection properly
+* Update `print_to` to print nested sequences
+* Remove redundant iteration
+* Simplify
+* Format
+* Update `Entities::isAdded` to handle `EntitySelection`
+* Mark constructor explicit
+* Implement constraints on entities of actions
+* Implement `objectTypes`
+* Update `ByType` to be like `EntityRef`
+* Reorder
+* Add simple impl of `ExternalObjectReference`
+* Remove redundant explicit
+* Make construcotors explicit
+* Make `entities` public
+* Rename header
+* Rename
+* Fix wrong message
+* Add constraints check for actions
+* Format
+* Use `is_also` instead of `is`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Use switch for byType
+* Update `TeleportAction` to handle `EntitySelection`
+* Update `SpeedProfileAction` to handle `EntitySelection`
+* Update `SpeedAction` to handle `EntitySelection`
+* Use new enumeration in `SelectedEntities`
+* Update `LaneChangeAction` to handle `EntitySelection`
+* Update `EntityAction` to use new enumeration
+* Update `CustomCommandAction` to handle `EntitySelection`
+* Update `ControllerAction` to handle `EntitySelection`
+* Update `AssignRouteAction` to handle `EntitySelection`
+* Update `AcquirePositionAction` to handle `EntitySelection`
+* Update `Triggering_entities` to use new enumration
+* Update object enumeration
+* Add `EntitySelection` support for `TriggeringEntities`
+* Add support for `EntitySelection` in `EntityAction`
+* Improve entity enumeration
+* Add entity enumeration
+* Make `EntityRef` more specific to parsing
+* Add `readNameRef`
+* Remove unused functions
+* [WIP] implement tree flattening
+* Use class member instead of inheritance
+* Make reference to `EntitySelection` error by default
+* Ignore `EntitySelection` on engagement
+* Fix wrong parsing of `SelectedEntities`
+* Format include
+* `EntitySelection`の不完全な読み取り処理の追加
+* エンティティの列挙処理の追加
+* Make `EntityRef` more specific to parsing
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Add `readNameRef`
+* Merge remote-tracking branch 'origin/master' into feature/interpreter/entity_selection
+* Remove unused functions
+* [WIP] implement tree flattening
+* Use class member instead of inheritance
+* Make reference to `EntitySelection` error by default
+* Ignore `EntitySelection` on engagement
+* Fix wrong parsing of `SelectedEntities`
+* Format include
+* `EntitySelection`の不完全な読み取り処理の追加
+* Contributors: Shota Minami, Tatsuya Yamasaki
+
+3.2.0 (2024-07-18)
+------------------
+* Merge remote-tracking branch 'origin/master' into fix/spawn_position_of_map_pose
+* Contributors: Masaya Kataoka
+
+3.1.0 (2024-07-16)
+------------------
+* Merge branch 'master' into autoware_lanelet2_extension
+* Merge branch 'master' into autoware_lanelet2_extension
+* Contributors: Tatsuya Yamasaki
+
 3.0.3 (2024-07-12)
 ------------------
 * Merge branch 'master' into test/synchronized-action-kashiwanoha-map

@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>behavior_tree_plugin</name>
-  <version>3.0.3</version>
+  <version>3.3.0</version>
   <description>Behavior tree plugin for traffic_simulator</description>
   <maintainer email="masaya.kataoka@tier4.jp">masaya</maintainer>
   <license>Apache 2.0</license>
