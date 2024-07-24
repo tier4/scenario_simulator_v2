@@ -28,10 +28,11 @@ MiscObjectEntity can not be controlled by this API.
 | target_speed | double | Target speed of the npc.                                    |
 | continuous   | bool   | If true the npc will keep the speed until the next command. |
 #### EgoEntity
-`target_speed` will be set to the target speed of the EgoEntity only before the scenario starts.
+`target_speed` will be set as initial target speed of the EgoEntity only before the scenario starts.
 
 #### Other entity
-The function will append the job to change the target_speed of the npc to the job queue. If `continuous` is set to `false`, the job will be deleted after the velocity has reached the target speed. If set to `true`, the npc will keep the speed until the next longitudinal control command. It will accelerate on maximum acceleration rate set previously.
+The function will change the target speed of entity to `target_speed` immediately.
+If `continuous` is set to `false`, job to accelerate to target speed will be deleted after the velocity has reached the target speed. If set to `true`, the npc will keep the speed until the next longitudinal control command ordered. It will accelerate on maximum acceleration rate set previously.
 
 | Value        | Type                     | Description                                                 |
 | ------------ | ------------------------ | ----------------------------------------------------------- |
@@ -41,15 +42,21 @@ The function will append the job to change the target_speed of the npc to the jo
 | constraint   | speed_change::Constraint | Constraint type.                                            |
 | continuous   | bool                     | If true the npc will keep the speed until the next command. |
 #### EgoEntity
-`target_speed` will be set to the target speed of the EgoEntity only before the scenario starts.
+`target_speed` will be set as initial target speed of the EgoEntity only before the scenario starts.
 
 #### Other entity
-The function will append the job to change the target_speed of the npc to the job queue. If `continuous` is set to `false`, the job will be deleted after the velocity has reached the target speed. If set to `true`, the npc will keep the speed until the next longitudinal control command.
+If `continuous` is set to `false`, job to accelerate to target speed will be deleted after the velocity has reached the target speed. If set to `true`, the npc will keep the speed until the next longitudinal control command ordered.
+
 When `constraint` is set to `LONGITUDINAL_ACCELERATION`, the entity will accelerate to the target speed with acceleration rate you set.
-If `transition` is set to `LINEAR`, the entity will accelerate to the target speed linearly.
-If `transition` is set to `AUTO`, it will change the maximum acceleration speed of the entity and append the job to change the target speed of the npc to the job queue. After the npc reaches the target speed, it will change the maximum acceleration speed back to the original value.
+- If `transition` is set to `LINEAR`, the entity will accelerate to the target speed linearly.
+- If `transition` is set to `AUTO`, it will change the maximum acceleration speed of the entity and append the job to change the target speed of the npc to the job queue. After the npc reaches the target speed, it will change the maximum acceleration speed back to the original value.
+- If `transition` is set to `STEP`, it
+
+
 When `constraint` is set to `TIME`, the entity will accelerate to the target speed by the time you set.
 When `constraint` is set to `NONE`, is will append the job to change the target_speed of the npc to the job queue.
+
+![requestSpeedChange](../images/Longitudinal_control/requestSpeedChange.png)
 
 
 | Value        | Type                              | Description                                                 |
