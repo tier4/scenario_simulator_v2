@@ -337,7 +337,7 @@ public:
         core->attachLidarSensor([&]() {
           simulation_api_schema::LidarConfiguration configuration;
 
-          auto degree_to_radian = [](auto degree) constexpr {
+          auto degree_to_radian = [](auto degree) {
             return degree / 180.0 * boost::math::constants::pi<double>();
           };
 
