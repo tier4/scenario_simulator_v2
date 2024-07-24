@@ -17,21 +17,32 @@
 
 #include <iomanip>
 #include <iostream>
+#include <openscenario_interpreter/type_traits/has_stream_output_operator.hpp>
+#include <openscenario_interpreter/type_traits/iterable.hpp>
+#include <type_traits>
 
 namespace openscenario_interpreter
 {
 inline namespace utility
 {
-template <typename SequenceContainer>
-auto & print_to(std::ostream & os, const SequenceContainer & sequence_container)
+template <typename T>
+auto print_to(std::ostream & os, const T & value)
+  -> std::enable_if_t<concepts::HasStreamOutputOperator<T>::value, std::ostream &>
 {
-  const auto * separator = "[";
+  return os << value;
+}
 
-  for (const auto & each : sequence_container) {
-    os << separator << each;
-    separator = ", ";
+template <typename T>
+auto print_to(std::ostream & os, const T & iterable) -> std::enable_if_t<
+  not concepts::HasStreamOutputOperator<T>::value and type_traits::Iterable<T>::value,
+  std::ostream &>
+{
+  os << "[";
+  const auto * separator = "";
+  for (const auto & value : iterable) {
+    os << std::exchange(separator, ", ");
+    print_to(os, value);
   }
-
   return os << "]";
 }
 

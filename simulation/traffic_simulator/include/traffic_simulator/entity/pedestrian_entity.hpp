@@ -66,8 +66,6 @@ public:
 
   void appendDebugMarker(visualization_msgs::msg::MarkerArray & marker_array) override;
 
-  auto getEntityType() const -> const traffic_simulator_msgs::msg::EntityType & override;
-
   auto getEntityTypename() const -> const std::string & override;
 
   auto onUpdate(double current_time, double step_time) -> void override;

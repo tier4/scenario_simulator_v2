@@ -34,7 +34,7 @@ CanonicalizedEntityStatus::CanonicalizedEntityStatus(
       The position in Oz axis and orientation based on LaneletPose are rewritten to
       the used msg::Pose (map_pose) since such adjustment relative to the lanelet is necessary,
       The position in Ox and Oy axis is not rewritten because the map_pose retrieved via
-      lanelet_pose = toCanonicalizedLaneletPose(map_pose), then map_pose = toMapPose(lanelet_pose)
+      lanelet_pose = pose::toCanonicalizedLaneletPose(map_pose), then map_pose pose::toMapPose(lanelet_pose)
       can be slightly different from the original one (especially if the entity changes lane).
     */
     const auto map_pose_based_on_lanelet_pose =
@@ -64,7 +64,7 @@ auto CanonicalizedEntityStatus::set(const CanonicalizedEntityStatus & status) ->
 }
 
 auto CanonicalizedEntityStatus::set(
-  const EntityStatus & status, const double matching_distance,
+  const EntityStatus & status, const lanelet::Ids & lanelet_ids, const double matching_distance,
   const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void
 {
   const auto include_crosswalk =
@@ -76,11 +76,18 @@ auto CanonicalizedEntityStatus::set(
     canonicalized_lanelet_pose = pose::canonicalize(status.lanelet_pose, hdmap_utils_ptr);
   } else {
     // prefer the current lanelet
-    canonicalized_lanelet_pose = toCanonicalizedLaneletPose(
-      status.pose, getBoundingBox(), getLaneletIds(), include_crosswalk, matching_distance,
+    canonicalized_lanelet_pose = pose::toCanonicalizedLaneletPose(
+      status.pose, getBoundingBox(), lanelet_ids, include_crosswalk, matching_distance,
       hdmap_utils_ptr);
   }
   set(CanonicalizedEntityStatus(status, canonicalized_lanelet_pose));
+}
+
+auto CanonicalizedEntityStatus::set(
+  const EntityStatus & status, const double matching_distance,
+  const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils_ptr) -> void
+{
+  set(status, getLaneletIds(), matching_distance, hdmap_utils_ptr);
 }
 
 auto CanonicalizedEntityStatus::laneMatchingSucceed() const noexcept -> bool
@@ -89,7 +96,7 @@ auto CanonicalizedEntityStatus::laneMatchingSucceed() const noexcept -> bool
 }
 
 auto CanonicalizedEntityStatus::getBoundingBox() const noexcept
-  -> traffic_simulator_msgs::msg::BoundingBox
+  -> const traffic_simulator_msgs::msg::BoundingBox &
 {
   return entity_status_.bounding_box;
 }
@@ -99,15 +106,15 @@ auto CanonicalizedEntityStatus::setMapPose(const geometry_msgs::msg::Pose & pose
   entity_status_.pose = pose;
 }
 
-auto CanonicalizedEntityStatus::getMapPose() const noexcept -> geometry_msgs::msg::Pose
+auto CanonicalizedEntityStatus::getMapPose() const noexcept -> const geometry_msgs::msg::Pose &
 {
   return entity_status_.pose;
 }
 
-auto CanonicalizedEntityStatus::getLaneletPose() const noexcept -> LaneletPose
+auto CanonicalizedEntityStatus::getLaneletPose() const noexcept -> const LaneletPose &
 {
   if (canonicalized_lanelet_pose_) {
-    return static_cast<LaneletPose>(canonicalized_lanelet_pose_.value());
+    return canonicalized_lanelet_pose_->getLaneletPose();
   } else {
     THROW_SEMANTIC_ERROR("Target entity status did not matched to lanelet pose.");
   }
@@ -124,7 +131,7 @@ auto CanonicalizedEntityStatus::getLaneletIds() const noexcept -> lanelet::Ids
 }
 
 auto CanonicalizedEntityStatus::getCanonicalizedLaneletPose() const noexcept
-  -> std::optional<CanonicalizedLaneletPose>
+  -> const std::optional<CanonicalizedLaneletPose> &
 {
   return canonicalized_lanelet_pose_;
 }
@@ -134,7 +141,7 @@ auto CanonicalizedEntityStatus::setTwist(const geometry_msgs::msg::Twist & twist
   entity_status_.action_status.twist = twist;
 }
 
-auto CanonicalizedEntityStatus::getTwist() const noexcept -> geometry_msgs::msg::Twist
+auto CanonicalizedEntityStatus::getTwist() const noexcept -> const geometry_msgs::msg::Twist &
 {
   return entity_status_.action_status.twist;
 }
@@ -154,7 +161,7 @@ auto CanonicalizedEntityStatus::setLinearAcceleration(double linear_acceleration
   entity_status_.action_status.accel.linear.x = linear_acceleration;
 }
 
-auto CanonicalizedEntityStatus::getAccel() const noexcept -> geometry_msgs::msg::Accel
+auto CanonicalizedEntityStatus::getAccel() const noexcept -> const geometry_msgs::msg::Accel &
 {
   return entity_status_.action_status.accel;
 }
