@@ -20,12 +20,18 @@ traffic_simulator has various ways to control the longitudinal behavior of the n
 ## Details
 ### requestSpeedChange
 By using `API::requestSpeedChange`, you can change the speed of the npc.
+MiscObjectEntity can not be controlled by this API.
 
 | Value        | Type   | Description                                                 |
 | ------------ | ------ | ----------------------------------------------------------- |
 | name         | string | Name of the npc.                                            |
 | target_speed | double | Target speed of the npc.                                    |
 | continuous   | bool   | If true the npc will keep the speed until the next command. |
+#### EgoEntity
+`target_speed` will be set to the target speed of the EgoEntity only before the scenario starts.
+
+#### Other entity
+The function will append the job to change the target_speed of the npc to the job queue. If `continuous` is set to `false`, the job will be deleted after the velocity has reached the target speed. If set to `true`, the npc will keep the speed until the next longitudinal control command.
 
 | Value        | Type                     | Description                                                 |
 | ------------ | ------------------------ | ----------------------------------------------------------- |
@@ -34,6 +40,10 @@ By using `API::requestSpeedChange`, you can change the speed of the npc.
 | transition   | speed_change::Transition | Transition type.                                            |
 | constraint   | speed_change::Constraint | Constraint type.                                            |
 | continuous   | bool                     | If true the npc will keep the speed until the next command. |
+#### EgoEntity
+`target_speed` will be set to the target speed of the EgoEntity only before the scenario starts.
+
+#### Other entity
 
 | Value        | Type                              | Description                                                 |
 | ------------ | --------------------------------- | ----------------------------------------------------------- |
