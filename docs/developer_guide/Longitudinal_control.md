@@ -31,7 +31,7 @@ MiscObjectEntity can not be controlled by this API.
 `target_speed` will be set to the target speed of the EgoEntity only before the scenario starts.
 
 #### Other entity
-The function will append the job to change the target_speed of the npc to the job queue. If `continuous` is set to `false`, the job will be deleted after the velocity has reached the target speed. If set to `true`, the npc will keep the speed until the next longitudinal control command.
+The function will append the job to change the target_speed of the npc to the job queue. If `continuous` is set to `false`, the job will be deleted after the velocity has reached the target speed. If set to `true`, the npc will keep the speed until the next longitudinal control command. It will accelerate on maximum acceleration rate set previously.
 
 | Value        | Type                     | Description                                                 |
 | ------------ | ------------------------ | ----------------------------------------------------------- |
@@ -44,6 +44,13 @@ The function will append the job to change the target_speed of the npc to the jo
 `target_speed` will be set to the target speed of the EgoEntity only before the scenario starts.
 
 #### Other entity
+The function will append the job to change the target_speed of the npc to the job queue. If `continuous` is set to `false`, the job will be deleted after the velocity has reached the target speed. If set to `true`, the npc will keep the speed until the next longitudinal control command.
+When `constraint` is set to `LONGITUDINAL_ACCELERATION`, the entity will accelerate to the target speed with acceleration rate you set.
+If `transition` is set to `LINEAR`, the entity will accelerate to the target speed linearly.
+If `transition` is set to `AUTO`, it will change the maximum acceleration speed of the entity and append the job to change the target speed of the npc to the job queue. After the npc reaches the target speed, it will change the maximum acceleration speed back to the original value.
+When `constraint` is set to `TIME`, the entity will accelerate to the target speed by the time you set.
+When `constraint` is set to `NONE`, is will append the job to change the target_speed of the npc to the job queue.
+
 
 | Value        | Type                              | Description                                                 |
 | ------------ | --------------------------------- | ----------------------------------------------------------- |
