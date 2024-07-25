@@ -175,7 +175,7 @@ Calculates the relative angle between the orientation of `<ENTITY-REF>` and the 
 
 Calculates the relative angle between the orientation of `<ENTITY-REF>` and the direction at the position specified by `<S>` on `<LANE-ID>`.
 
-#### ROS2 Topic Condition
+#### ROS 2 Topic Condition
 
 `scenario_simulator_v2` can read values from another ROS 2 node to a scenario through ROS 2 topics. `name` field should be filled with the name of the ROS 2 topic like below.
 
