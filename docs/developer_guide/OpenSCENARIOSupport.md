@@ -727,7 +727,7 @@ Currently, the only way to know the result of the simulation is by viewing the s
 
 #### PedestrianCategory
 
-- Enumeration literals `wheelchar` and `animal` are **not** supported.
+- Enumeration literals `wheelchair` and `animal` are **not** supported.
 
 #### Phase
 
