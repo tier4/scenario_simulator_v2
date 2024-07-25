@@ -34,8 +34,15 @@ RelativeClearanceCondition::RelativeClearanceCondition(
   entity_refs([&]() {
     auto entities = readElements<EntityRef, 0>("EntityRef", node, scope);
     if (entities.empty()) {
-      for (const auto & [name, entity] : *global().entities) {
-        entities.emplace_back(name);
+      for (const auto & entity : *global().entities) {
+        if (
+          std::find_if(
+            triggering_entities.entity_refs.begin(), triggering_entities.entity_refs.end(),
+            [&](const auto & triggering_entity) {
+              return triggering_entity.name() == entity.first;
+            }) == triggering_entities.entity_refs.end()) {
+          entities.emplace_back(name);
+        }
       }
     }
     return entities;
@@ -61,8 +68,9 @@ auto RelativeClearanceCondition::description() const -> String
 auto RelativeClearanceCondition::evaluate() -> Object
 {
   return asBoolean(triggering_entities.apply([&](const auto & triggering_entity) {
-    for (const auto & entity : entity_refs) {
+    return std::all_of(entity_refs.begin(), entity_refs.end(), [&](const auto & entity) {
       auto is_in_lateral_range = [&]() {
+        // The lanes to be checked to left and right of the triggering entity (positive to the y-axis). If omitted: all lanes are checked.
         if (relative_lane_range.empty()) {
           return true;
         } else {
@@ -85,8 +93,10 @@ auto RelativeClearanceCondition::evaluate() -> Object
         }
       };
 
-      return is_in_lateral_range() && is_in_longitudinal_range();
-    }
+      auto lat_ok = is_in_lateral_range();
+      auto lon_ok = is_in_longitudinal_range();
+      return not(lat_ok && lon_ok);
+    });
   }));
 }
 
