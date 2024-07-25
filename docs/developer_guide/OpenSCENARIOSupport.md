@@ -220,7 +220,8 @@ Within the scenario, you can end the scenario simulation with a status of either
 > `exitSuccess` and `exitFailure` terminate the simulation immediately without any state transitions in the lifecycle of a `StoryboardElement`. This means there is no way to detect simulations terminated by `exitSuccess` or `exitFailure` from within the scenario using conditions like `StoryboardElementStateCondition`.
 
 Currently, the only way to know the result of the simulation is by viewing the status string printed to standard output. However, this method may change in the future.
-## Conformance
+
+## Standards Supported by `scenario_simulator_v2`
 
 | Name                                         | Supported Version | Detail                                     |
 |:---------------------------------------------|:-----------------:|:------------------------------------------:|
