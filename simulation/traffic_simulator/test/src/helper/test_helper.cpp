@@ -62,7 +62,9 @@ TEST(HELPER, LANELET_POSE)
   EXPECT_LANELET_POSE_EQ(lanelet_pose, expected_pose);
   std::stringstream ss;
   ss << lanelet_pose;
-  EXPECT_STREQ(ss.str().c_str(), "lanelet id : 5\ns : 10");
+  EXPECT_STREQ(
+    ss.str().c_str(),
+    "LaneletPose(lanelet_id: 5, s: 10, offset: 2, rpy: Vector3(x: 0, y: 0, z: 0))");
 }
 
 TEST(HELPER, ACTION_STATUS)

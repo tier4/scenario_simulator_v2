@@ -28,7 +28,10 @@ public:
   template <typename NodeTypePointer>
   ConventionalTrafficLights(
     const NodeTypePointer & node_ptr, const std::shared_ptr<hdmap_utils::HdMapUtils> & hdmap_utils)
-  : TrafficLightsBase(node_ptr, hdmap_utils)
+  : TrafficLightsBase(node_ptr, hdmap_utils),
+    backward_compatible_publisher_ptr_(
+      std::make_unique<TrafficLightsPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>>(
+        node_ptr, "/simulation/traffic_lights"))
   {
   }
 
@@ -37,11 +40,14 @@ public:
 private:
   auto update() const -> void
   {
+    backward_compatible_publisher_ptr_->publish(*this);
     if (isAnyTrafficLightChanged()) {
       marker_publisher_ptr_->deleteMarkers();
     }
     marker_publisher_ptr_->drawMarkers(traffic_lights_map_);
   }
+
+  const std::unique_ptr<TrafficLightsPublisherBase> backward_compatible_publisher_ptr_;
 };
 
 class V2ITrafficLights : public TrafficLightsBase

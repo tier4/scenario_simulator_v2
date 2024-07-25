@@ -111,6 +111,12 @@ public:
     const std::string & name, const PoseType & pose, const ParametersType & parameters,
     const double current_time, Ts &&... xs) -> std::shared_ptr<entity::EntityBase>
   {
+    static_assert(
+      std::disjunction<
+        std::is_same<PoseType, CanonicalizedLaneletPose>,
+        std::is_same<PoseType, geometry_msgs::msg::Pose>>::value,
+      "Pose must be of type CanonicalizedLaneletPose or geometry_msgs::msg::Pose");
+
     auto makeEntityStatus = [&]() -> CanonicalizedEntityStatus {
       EntityStatus entity_status;
 

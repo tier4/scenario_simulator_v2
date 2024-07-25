@@ -84,6 +84,10 @@ public:
 
   auto getBehaviorParameter() const -> traffic_simulator_msgs::msg::BehaviorParameter;
 
+  auto getMaxAcceleration() const -> double override;
+
+  auto getMaxDeceleration() const -> double override;
+
   void setBehaviorParameter(const traffic_simulator_msgs::msg::BehaviorParameter &);
 
   void setVelocityLimit(double linear_velocity) override;

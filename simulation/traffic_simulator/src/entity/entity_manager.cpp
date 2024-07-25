@@ -85,11 +85,14 @@ auto EntityManager::update(const double current_time, const double step_time) ->
   for (auto && [name, status] : all_status) {
     const auto entity = getEntity(name);
     traffic_simulator_msgs::msg::EntityStatusWithTrajectory status_with_trajectory;
-    status_with_trajectory.waypoint = entity->getWaypoints();
+    status_with_trajectory.waypoint =
+      npc_logic_started_ ? entity->getWaypoints() : traffic_simulator_msgs::msg::WaypointsArray();
     for (const auto & goal : entity->getGoalPoses()) {
       status_with_trajectory.goal_pose.push_back(goal);
     }
-    if (const auto obstacle = entity->getObstacle(); obstacle) {
+    if (
+      const std::optional<traffic_simulator_msgs::msg::Obstacle> obstacle =
+        npc_logic_started_ ? entity->getObstacle() : std::nullopt) {
       status_with_trajectory.obstacle = obstacle.value();
       status_with_trajectory.obstacle_find = true;
     } else {
@@ -138,6 +141,9 @@ auto EntityManager::updateHdmapMarker() -> void
 
 auto EntityManager::broadcastEntityTransform() -> void
 {
+  static bool is_send = false;
+  static geometry_msgs::msg::Pose pose;
+
   using math::geometry::operator/;
   using math::geometry::operator*;
   using math::geometry::operator+=;
@@ -154,26 +160,30 @@ auto EntityManager::broadcastEntityTransform() -> void
         /**
            * @note This is the intended implementation.
            * It is easier to create rviz config if the name "ego" is fixed,
-           * so the frame_id “ego” is issued regardless of the name of the ego entity.
+           * so the frame_id "ego" is issued regardless of the name of the ego entity.
            */
         .header(std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("ego"))
         .pose(getEntity(getEgoName())->getMapPose()),
       true);
   }
-  if (const auto names = getEntityNames(); !names.empty()) {
+  if (!names.empty()) {
+    if (!is_send) {
+      pose = geometry_msgs::build<geometry_msgs::msg::Pose>()
+               .position(std::accumulate(
+                 names.begin(), names.end(), geometry_msgs::msg::Point(),
+                 [this, names](geometry_msgs::msg::Point point, const std::string & name) {
+                   point += getEntity(name)->getMapPose().position *
+                            (1.0 / static_cast<double>(names.size()));
+                   return point;
+                 }))
+               .orientation(geometry_msgs::msg::Quaternion());
+      is_send = true;
+    }
     broadcastTransform(
       geometry_msgs::build<geometry_msgs::msg::PoseStamped>()
         .header(
           std_msgs::build<std_msgs::msg::Header>().stamp(clock_ptr_->now()).frame_id("entities"))
-        .pose(geometry_msgs::build<geometry_msgs::msg::Pose>()
-                .position(std::accumulate(
-                  names.begin(), names.end(), geometry_msgs::msg::Point(),
-                  [this, names](geometry_msgs::msg::Point & point, const std::string & name) {
-                    return point +=
-                           (getEntity(name)->getMapPose().position *
-                            (1.0 / static_cast<double>(names.size())));
-                  }))
-                .orientation(geometry_msgs::msg::Quaternion())),
+        .pose(pose),
       true);
   }
 }

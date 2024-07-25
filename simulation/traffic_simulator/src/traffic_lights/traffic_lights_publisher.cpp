@@ -31,4 +31,11 @@ auto TrafficLightsPublisher<autoware_perception_msgs::msg::TrafficSignalArray>::
 {
   traffic_light_state_array_publisher_->publish(traffic_lights.generateAutowarePerceptionMsg());
 }
+
+template <>
+auto TrafficLightsPublisher<traffic_simulator_msgs::msg::TrafficLightArrayV1>::publish(
+  const TrafficLightsBase & traffic_lights) const -> void
+{
+  traffic_light_state_array_publisher_->publish(traffic_lights.generateTrafficSimulatorV1Msg());
+}
 }  // namespace traffic_simulator
